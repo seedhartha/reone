@@ -1,0 +1,80 @@
+#include "soundinstance.h"
+
+#include "AL/al.h"
+
+namespace reone {
+
+namespace audio {
+
+SoundInstance::SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop) : _stream(stream), _loop(loop) {
+    _multiframe = _stream->frameCount() > 1;
+}
+
+void SoundInstance::init() {
+    int bufferCount = _multiframe ? 2 : 1;
+    _buffers.resize(bufferCount);
+    alGenBuffers(bufferCount, &_buffers[0]);
+    alGenSources(1, &_source);
+
+    if (_multiframe) {
+        _stream->fill(_nextFrame++, _buffers[0]);
+        _stream->fill(_nextFrame++, _buffers[1]);
+        alSourceQueueBuffers(_source, 2, &_buffers[0]);
+    } else {
+        _stream->fill(0, _buffers[0]);
+        alSourcei(_source, AL_BUFFER, _buffers[0]);
+        alSourcei(_source, AL_LOOPING, _loop);
+    }
+
+    alSourcePlay(_source);
+    _state = State::Playing;
+}
+
+SoundInstance::~SoundInstance() {
+    deinit();
+}
+
+void SoundInstance::deinit() {
+    if (_source) {
+        alSourceStop(_source);
+        alDeleteSources(1, &_source);
+        _source = 0;
+    }
+    if (!_buffers.empty()) {
+        alDeleteBuffers(_buffers.size(), &_buffers[0]);
+        _buffers.clear();
+    }
+}
+
+void SoundInstance::update() {
+    if (_state == State::NotInited) {
+        init();
+    }
+    if (!_multiframe) return;
+
+    ALint processed = 0;
+    alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
+
+    while (processed--) {
+        alSourceUnqueueBuffers(_source, 1, &_buffers[_nextBuffer]);
+        if (_nextFrame >= _stream->frameCount()) {
+            if (_loop) {
+                _nextFrame = 0;
+            } else {
+                _state = State::Stopped;
+                break;
+            }
+        }
+        _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
+        alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
+        _nextBuffer = (++_nextBuffer) % 2;
+    }
+}
+
+bool SoundInstance::stopped() const {
+    return _state == State::Stopped;
+}
+
+} // namespace audio
+
+} // namespace reone
