@@ -19,9 +19,9 @@
 
 #include <boost/format.hpp>
 
-#include "../core/log.h"
-#include "../resources/rimfile.h"
-#include "../resources/util.h"
+#include "src/core/log.h"
+#include "src/resources/rimfile.h"
+#include "src/resources/util.h"
 
 using namespace reone::resources;
 
