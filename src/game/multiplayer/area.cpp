@@ -24,8 +24,10 @@ namespace reone {
 
 namespace game {
 
-MultiplayerArea::MultiplayerArea(resources::GameVersion version, const std::string &name, IMultiplayerCallbacks *callbacks) :
+MultiplayerArea::MultiplayerArea(MultiplayerMode mode, resources::GameVersion version, const std::string &name, IMultiplayerCallbacks *callbacks) :
     Area(version, name), _callbacks(callbacks) {
+
+    _scriptsEnabled = mode == MultiplayerMode::Server;
 }
 
 std::shared_ptr<Creature> MultiplayerArea::makeCreature() {

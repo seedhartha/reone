@@ -57,6 +57,8 @@ private:
     static void threadStart(AudioPlayer *);
 };
 
+#define TheAudioPlayer audio::AudioPlayer::instance()
+
 } // namespace audio
 
 } // namespace reone

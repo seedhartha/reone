@@ -116,6 +116,7 @@ set(HEADERS
     src/resources/manager.h
     src/resources/mdlfile.h
     src/resources/mp3file.h
+    src/resources/ncsfile.h
     src/resources/rimfile.h
     src/resources/tgafile.h
     src/resources/tlkfile.h
@@ -124,7 +125,13 @@ set(HEADERS
     src/resources/txifile.h
     src/resources/util.h
     src/resources/visfile.h
-    src/resources/wavfile.h)
+    src/resources/wavfile.h
+    src/script/execution.h
+    src/script/manager.h
+    src/script/program.h
+    src/script/routines.h
+    src/script/types.h
+    src/script/variable.h)
 
 set(SOURCES
     src/audio/player.cpp
@@ -198,6 +205,7 @@ set(SOURCES
     src/resources/manager.cpp
     src/resources/mdlfile.cpp
     src/resources/mp3file.cpp
+    src/resources/ncsfile.cpp
     src/resources/rimfile.cpp
     src/resources/tgafile.cpp
     src/resources/tlkfile.cpp
@@ -205,7 +213,14 @@ set(SOURCES
     src/resources/txifile.cpp
     src/resources/util.cpp
     src/resources/visfile.cpp
-    src/resources/wavfile.cpp)
+    src/resources/wavfile.cpp
+    src/script/execution.cpp
+    src/script/manager.cpp
+    src/script/program.cpp
+    src/script/routines.cpp
+    src/script/routines_kotor.cpp
+    src/script/routines_tsl.cpp
+    src/script/variable.cpp)
 
 add_executable(reone ${HEADERS} ${SOURCES})
 

@@ -27,7 +27,7 @@ namespace game {
 
 class MultiplayerArea : public Area {
 public:
-    MultiplayerArea(resources::GameVersion version, const std::string &name, IMultiplayerCallbacks *callbacks);
+    MultiplayerArea(MultiplayerMode mode, resources::GameVersion version, const std::string &name, IMultiplayerCallbacks *callbacks);
 
     void execute(const Command &cmd);
 

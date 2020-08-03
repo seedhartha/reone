@@ -17,14 +17,18 @@
 
 #pragma once
 
+#include <list>
+
 #include "../gui/types.h"
 #include "../net/types.h"
 #include "../render/camera/camera.h"
 #include "../render/types.h"
 #include "../resources/types.h"
+#include "../script/manager.h"
+#include "../script/variable.h"
 
-#include "navmesh.h"
 #include "multiplayer/command.h"
+#include "navmesh.h"
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/placeable.h"
@@ -88,6 +92,7 @@ public:
 protected:
     uint32_t _idCounter { 0 };
     std::map<ObjectType, ObjectList> _objects;
+    bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
 
     // Party
@@ -111,6 +116,19 @@ private:
         Transparent
     };
 
+    struct Scripts {
+        std::shared_ptr<script::ScriptProgram> onEnter;
+        std::shared_ptr<script::ScriptProgram> onExit;
+        std::shared_ptr<script::ScriptProgram> onHeartbeat;
+        std::shared_ptr<script::ScriptProgram> onUserDefined;
+    };
+
+    struct DelayedAction {
+        uint32_t timestamp { 0 };
+        script::ExecutionContext context;
+        bool executed { false };
+    };
+
     resources::GameVersion _version { resources::GameVersion::KotOR };
     std::string _name;
     std::vector<std::shared_ptr<Room>> _rooms;
@@ -120,10 +138,13 @@ private:
     std::map<RenderListName, render::RenderList> _renderLists;
     std::unique_ptr<NavMesh> _navMesh;
     gui::DebugMode _debugMode { gui::DebugMode::None };
+    Scripts _scripts;
+    std::list<DelayedAction> _delayed;
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
 
+    void updateDelayedActions();
     void navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
@@ -137,6 +158,7 @@ private:
     void loadLayout();
     void loadVisibility();
     void loadCameraStyle(const resources::GffStruct &are);
+    void loadScripts(const resources::GffStruct &are);
 };
 
 } // namespace game
