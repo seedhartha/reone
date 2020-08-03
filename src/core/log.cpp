@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace reone {
 
 enum class LogLevel {
@@ -27,6 +29,12 @@ enum class LogLevel {
     Info,
     Debug
 };
+
+static bool g_debugEnabled = false;
+
+void setDebugLogEnabled(bool enabled) {
+    g_debugEnabled = enabled;
+}
 
 inline static const char *describeLogLevel(LogLevel level) {
     switch (level) {
@@ -39,45 +47,49 @@ inline static const char *describeLogLevel(LogLevel level) {
         case LogLevel::Debug:
             return "DEBUG";
         default:
-            throw std::logic_error("Invalid log level: " + std::to_string(static_cast<int>(level)));
+            throw logic_error("Invalid log level: " + to_string(static_cast<int>(level)));
     }
 }
 
-static void log(std::ostream &out, LogLevel level, const std::string &s) {
+static void log(ostream &out, LogLevel level, const string &s) {
     boost::format msg(boost::format("%s %s") % describeLogLevel(level) % s);
-    out << msg << std::endl;
+    out << msg << endl;
 }
 
-void error(const std::string &s) {
-    log(std::cerr, LogLevel::Error, s);
+void error(const string &s) {
+    log(cerr, LogLevel::Error, s);
 }
 
 void error(const boost::format &s) {
-    log(std::cerr, LogLevel::Error, str(s));
+    log(cerr, LogLevel::Error, str(s));
 }
 
-void warn(const std::string &s) {
-    log(std::cout, LogLevel::Warn, s);
+void warn(const string &s) {
+    log(cout, LogLevel::Warn, s);
 }
 
 void warn(const boost::format &s) {
-    log(std::cout, LogLevel::Warn, str(s));
+    log(cout, LogLevel::Warn, str(s));
 }
 
-void info(const std::string &s) {
-    log(std::cout, LogLevel::Info, s);
+void info(const string &s) {
+    log(cout, LogLevel::Info, s);
 }
 
 void info(const boost::format &s) {
-    log(std::cout, LogLevel::Info, str(s));
+    log(cout, LogLevel::Info, str(s));
 }
 
-void debug(const std::string &s) {
-    log(std::cout, LogLevel::Debug, s);
+void debug(const string &s) {
+    if (g_debugEnabled) {
+        log(cout, LogLevel::Debug, s);
+    }
 }
 
 void debug(const boost::format &s) {
-    log(std::cout, LogLevel::Debug, str(s));
+    if (g_debugEnabled) {
+        log(cout, LogLevel::Debug, str(s));
+    }
 }
 
 } // namespace reone
