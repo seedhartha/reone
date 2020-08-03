@@ -17,9 +17,13 @@
 
 #pragma once
 
+#include <string>
+
 #include <boost/format.hpp>
 
 namespace reone {
+
+void setDebugLogEnabled(bool enabled);
 
 void error(const std::string &s);
 void error(const boost::format &s);

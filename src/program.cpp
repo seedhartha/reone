@@ -21,6 +21,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "core/log.h"
 #include "game/multiplayer/game.h"
 
 using namespace std;
@@ -105,6 +106,9 @@ void Program::loadOptions() {
     _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<std::string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
 
+    bool debug = _vars["debug"].as<bool>();
+    setDebugLogEnabled(debug);
+
     initGameVersion();
     initMultiplayerMode();
     initCommand();
@@ -121,7 +125,8 @@ void Program::initOptions() {
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
         ("volume", po::value<int>()->default_value(100), "audio volume in percents")
-        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number");
+        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
+        ("debug", po::value<bool>()->default_value(false), "enable debug logging");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
