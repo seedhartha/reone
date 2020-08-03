@@ -32,6 +32,7 @@
 #include "../resources/lytfile.h"
 #include "../resources/manager.h"
 #include "../resources/visfile.h"
+#include "../script/execution.h"
 
 #include "object/door.h"
 #include "object/placeable.h"
@@ -42,6 +43,7 @@ using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resources;
+using namespace reone::script;
 
 namespace reone {
 
@@ -80,6 +82,7 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
     loadVisibility();
     loadLayout();
     loadCameraStyle(are);
+    loadScripts(are);
 
     for (auto &gffs : git.getList("Creature List")) {
         std::shared_ptr<Creature> creature(makeCreature());
@@ -111,7 +114,7 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
         _objects[ObjectType::Trigger].push_back(std::move(trigger));
     }
 
-    JobExecutor::instance().enqueue([&](const std::atomic_bool &cancel) {
+    JobExecutor::instance().enqueue([this](const std::atomic_bool &cancel) {
         info("Computing navigation mesh");
         _navMesh->compute(cancel);
         info("Finished computing NavMesh");
@@ -189,6 +192,13 @@ void Area::loadCameraStyle(const GffStruct &are) {
     _cameraStyle.height = styleTable->getFloat(styleIdx, "height", 0.0f);
 }
 
+void Area::loadScripts(const GffStruct &are) {
+    _scripts.onEnter = ScriptMan.find(are.getString("OnEnter"));
+    _scripts.onExit = ScriptMan.find(are.getString("OnExit"));
+    _scripts.onHeartbeat = ScriptMan.find(are.getString("OnHeartbeat"));
+    _scripts.onUserDefined = ScriptMan.find(are.getString("OnUserDefined"));
+}
+
 void Area::landObject(Object &object) {
     glm::vec3 position(object.position());
     if (findElevationAt(position, position.z)) {
@@ -234,6 +244,18 @@ void Area::loadParty(const glm::vec3 &position, float heading) {
     //    if (crit->tag().empty()) continue;
     //    static_cast<Creature &>(*crit).enqueue(Creature::Action(Creature::ActionType::Follow, _player, kCompanionFollowDistance));
     //}
+
+    if (_scriptsEnabled && _scripts.onEnter) {
+        ExecutionContext ctx;
+        if (_player) {
+            ctx.playerId = _player->id();
+            ctx.enteringObjectId = ctx.playerId;
+            ctx.delayCommand = [this](uint32_t timestamp, const ExecutionContext &ctx) {
+                _delayed.push_back(DelayedAction { timestamp, ctx });
+            };
+        }
+        ScriptExecution(_scripts.onEnter, ctx).run();
+    }
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -241,6 +263,8 @@ bool Area::handle(const SDL_Event &event) {
 }
 
 void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
+    updateDelayedActions();
+
     for (auto &creature : _objects[ObjectType::Creature]) {
         updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
     }
@@ -311,6 +335,28 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         default:
             break;
     }
+}
+
+void Area::updateDelayedActions() {
+    uint32_t now = SDL_GetTicks();
+
+    for (auto &action : _delayed) {
+        if (now >= action.timestamp) {
+            std::shared_ptr<ScriptProgram> program(action.context.savedState->program);
+
+            debug("Executing delayed action from " + program->name());
+            ScriptExecution(program, action.context).run();
+
+            action.executed = true;
+        }
+    }
+
+    auto it = std::remove_if(
+        _delayed.begin(),
+        _delayed.end(),
+        [](const DelayedAction &action) { return action.executed; });
+
+    _delayed.erase(it, _delayed.end());
 }
 
 void Area::updateCreature(Creature &creature, float dt) {

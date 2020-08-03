@@ -105,7 +105,7 @@ void MultiplayerGame::loadNextModule() {
 }
 
 const std::shared_ptr<Module> MultiplayerGame::makeModule(const std::string &name) {
-    return std::shared_ptr<Module>(new MultiplayerModule(name, _version, _opts.graphics, this));
+    return std::shared_ptr<Module>(new MultiplayerModule(name, _mode, _version, _opts.graphics, this));
 }
 
 void MultiplayerGame::configureModule() {

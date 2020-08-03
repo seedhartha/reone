@@ -17,25 +17,34 @@
 
 #pragma once
 
-#include "../module.h"
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-class IMultiplayerCallbacks;
+class ScriptProgram;
+struct Variable;
 
-class MultiplayerModule : public Module {
-public:
-    MultiplayerModule(const std::string &name, MultiplayerMode mode, resources::GameVersion version, const render::GraphicsOptions &opts, IMultiplayerCallbacks *callbacks);
-
-private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
-
-    const std::shared_ptr<Area> makeArea() const override;
+struct ExecutionState {
+    std::shared_ptr<ScriptProgram> program;
+    std::vector<Variable> globals;
+    std::vector<Variable> locals;
+    uint32_t insOffset { 0 };
 };
 
-} // namespace game
+struct ExecutionContext {
+    std::shared_ptr<ExecutionState> savedState;
+    uint32_t callerId { 0xffffffff };
+    uint32_t playerId { 0xffffffff };
+    uint32_t enteringObjectId { 0xffffffff };
+    std::function<void(uint32_t, const ExecutionContext &)> delayCommand;
+};
+
+} // namespace script
 
 } // namespace reone

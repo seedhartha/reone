@@ -24,6 +24,7 @@
 #include "../core/log.h"
 #include "../core/streamutil.h"
 #include "../resources/manager.h"
+#include "../script/routines.h"
 
 using namespace std::placeholders;
 
@@ -31,6 +32,7 @@ using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
+using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -56,20 +58,18 @@ int Game::run() {
     _renderWindow.setRenderWorldFunc(std::bind(&Game::renderWorld, this));
     _renderWindow.setRenderGUIFunc(std::bind(&Game::renderGUI, this));
 
-    ResourceManager &resources = ResourceManager::instance();
-    resources.init(_version, _path);
-
-    AudioPlayer &audio = AudioPlayer::instance();
-    audio.init(_opts.audio);
+    ResMan.init(_version, _path);
+    TheAudioPlayer.init(_opts.audio);
+    RoutineMan.init(_version);
 
     configure();
 
     _renderWindow.show();
     runMainLoop();
 
-    JobExecutor::instance().deinit();
-    resources.deinit();
-    audio.deinit();
+    TheJobExecutor.deinit();
+    ResMan.deinit();
+    TheAudioPlayer.deinit();
     _renderWindow.deinit();
 
     return 0;

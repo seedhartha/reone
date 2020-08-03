@@ -17,25 +17,29 @@
 
 #pragma once
 
-#include "../module.h"
+#include <string>
+#include <memory>
+
+#include "program.h"
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-class IMultiplayerCallbacks;
-
-class MultiplayerModule : public Module {
+class ScriptManager {
 public:
-    MultiplayerModule(const std::string &name, MultiplayerMode mode, resources::GameVersion version, const render::GraphicsOptions &opts, IMultiplayerCallbacks *callbacks);
+    static ScriptManager &instance();
+
+    std::shared_ptr<ScriptProgram> find(const std::string &name);
 
 private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
-
-    const std::shared_ptr<Area> makeArea() const override;
+    ScriptManager() = default;
+    ScriptManager(const ScriptManager &) = delete;
+    ScriptManager &operator=(const ScriptManager &) = delete;
 };
 
-} // namespace game
+#define ScriptMan script::ScriptManager::instance()
+
+} // namespace script
 
 } // namespace reone

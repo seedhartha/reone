@@ -112,10 +112,22 @@ int16_t BinaryFile::readInt16() {
     return val;
 }
 
+int16_t BinaryFile::readInt16BE() {
+    int16_t val;
+    _in->read(reinterpret_cast<char *>(&val), 2);
+    return ((val << 8) & 0xff00) | ((val >> 8) & 0x00ff);
+}
+
 uint16_t BinaryFile::readUint16() {
     uint16_t val;
     _in->read(reinterpret_cast<char *>(&val), 2);
     return val;
+}
+
+uint16_t BinaryFile::readUint16BE() {
+    uint16_t val;
+    _in->read(reinterpret_cast<char *>(&val), 2);
+    return ((val << 8) & 0xff00) | ((val >> 8) & 0x00ff);
 }
 
 int32_t BinaryFile::readInt32() {
@@ -124,10 +136,32 @@ int32_t BinaryFile::readInt32() {
     return val;
 }
 
+int32_t BinaryFile::readInt32BE() {
+    int32_t val;
+    _in->read(reinterpret_cast<char *>(&val), 4);
+
+    return
+        ((val << 24) & 0xff000000) |
+        ((val << 8) & 0x00ff0000) |
+        ((val >> 8) & 0x0000ff00) |
+        ((val >> 24) & 0x000000ff);
+}
+
 uint32_t BinaryFile::readUint32() {
     uint32_t val;
     _in->read(reinterpret_cast<char *>(&val), 4);
     return val;
+}
+
+uint32_t BinaryFile::readUint32BE() {
+    uint32_t val;
+    _in->read(reinterpret_cast<char *>(&val), 4);
+
+    return
+        ((val << 24) & 0xff000000) |
+        ((val << 8) & 0x00ff0000) |
+        ((val >> 8) & 0x0000ff00) |
+        ((val >> 24) & 0x000000ff);
 }
 
 int64_t BinaryFile::readInt64() {
@@ -146,6 +180,18 @@ float BinaryFile::readFloat() {
     float val;
     _in->read(reinterpret_cast<char *>(&val), 4);
     return val;
+}
+
+float BinaryFile::readFloatBE() {
+    uint32_t val;
+    _in->read(reinterpret_cast<char *>(&val), 4);
+    val =
+        ((val << 24) & 0xff000000) |
+        ((val << 8) & 0x00ff0000) |
+        ((val >> 8) & 0x0000ff00) |
+        ((val >> 24) & 0x000000ff);
+
+    return *reinterpret_cast<float *>(&val);
 }
 
 double BinaryFile::readDouble() {

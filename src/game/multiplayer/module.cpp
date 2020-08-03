@@ -26,12 +26,18 @@ namespace reone {
 
 namespace game {
 
-MultiplayerModule::MultiplayerModule(const std::string &name, GameVersion version, const GraphicsOptions &opts, IMultiplayerCallbacks *callbacks) :
+MultiplayerModule::MultiplayerModule(
+    const std::string &name,
+    MultiplayerMode mode,
+    GameVersion version,
+    const GraphicsOptions &opts,
+    IMultiplayerCallbacks *callbacks
+) :
     Module(name, version, opts), _callbacks(callbacks) {
 }
 
 const std::shared_ptr<Area> MultiplayerModule::makeArea() const {
-    return std::shared_ptr<Area>(new MultiplayerArea(_version, _info.entryArea, _callbacks));
+    return std::shared_ptr<Area>(new MultiplayerArea(_mode, _version, _info.entryArea, _callbacks));
 }
 
 } // namespace game

@@ -84,6 +84,8 @@ private:
     std::shared_ptr<ByteArray> find(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
 };
 
+#define ResMan resources::ResourceManager::instance()
+
 } // namespace resources
 
 } // namespace reone

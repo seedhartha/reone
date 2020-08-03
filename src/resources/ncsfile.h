@@ -17,25 +17,37 @@
 
 #pragma once
 
-#include "../module.h"
+#include <memory>
+#include <string>
+
+#include "binfile.h"
+
+#include "../script/program.h"
 
 namespace reone {
 
-namespace game {
+namespace resources {
 
-class IMultiplayerCallbacks;
-
-class MultiplayerModule : public Module {
+/**
+ * Parses compiled script program.
+ *
+ * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
+ */
+class NcsFile : public BinaryFile {
 public:
-    MultiplayerModule(const std::string &name, MultiplayerMode mode, resources::GameVersion version, const render::GraphicsOptions &opts, IMultiplayerCallbacks *callbacks);
+    NcsFile(const std::string &resRef);
+
+    void doLoad() override;
+
+    std::shared_ptr<script::ScriptProgram> program() const;
 
 private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
+    std::string _resRef;
+    std::shared_ptr<script::ScriptProgram> _program;
 
-    const std::shared_ptr<Area> makeArea() const override;
+    void readInstruction(uint32_t &offset);
 };
 
-} // namespace game
+} // namespace resources
 
 } // namespace reone
