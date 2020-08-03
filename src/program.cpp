@@ -120,7 +120,8 @@ void Program::initOptions() {
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
-        ("volume", po::value<int>()->default_value(100), "audio volume in percents");
+        ("volume", po::value<int>()->default_value(100), "audio volume in percents")
+        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
@@ -129,8 +130,7 @@ void Program::initOptions() {
         ("convert", "convert 2DA or GFF file to JSON")
         ("input-file", po::value<std::string>(), "path to input file")
         ("serve", "start multiplayer game")
-        ("join", po::value<std::string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address")
-        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number");
+        ("join", po::value<std::string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
 }
 
 void Program::initGameVersion() {
