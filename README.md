@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.com/seedhartha/reone.svg?branch=master)](https://travis-ci.com/seedhartha/reone)
 
-reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. The project aim is to create an engine that is modern, cross-platform, extensible and very mod friendly.
+reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. The project goal is to create an engine that is modern, portable and very extensible.
 
 Currently, reone has functional resource management, rendering, audio, GUI and networking subsystems – actual gameplay implementation is very limited. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
-The project author is strongly against software piracy. You must legally own a game to run it using reone.
+You must legally own a game to run it using reone – we do not endorse piracy.
 
 ## Installation
 
