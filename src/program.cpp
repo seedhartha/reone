@@ -22,6 +22,7 @@
 #include <boost/program_options.hpp>
 
 #include "core/log.h"
+#include "core/pathutil.h"
 #include "game/multiplayer/game.h"
 
 using namespace std;
@@ -96,9 +97,8 @@ void Program::loadOptions() {
 }
 
 void Program::initGameVersion() {
-    fs::path path(_gamePath);
-    path.append("swkotor2.exe");
-    _version = fs::exists(path) ? GameVersion::TheSithLords : GameVersion::KotOR;
+    fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
+    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
 }
 
 void Program::initMultiplayerMode() {

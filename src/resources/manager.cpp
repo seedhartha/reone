@@ -68,6 +68,9 @@ ResourceManager &ResourceManager::instance() {
 
 void ResourceManager::init(GameVersion version, const boost::filesystem::path &gamePath) {
     fs::path keyPath(getPathIgnoreCase(gamePath, kKeyFileName));
+    if (keyPath.empty()) {
+        throw std::runtime_error(str(boost::format("Key file not found: %s %s") % gamePath % kKeyFileName));
+    }
     _keyFile.load(keyPath);
 
     if (version == GameVersion::KotOR) {
