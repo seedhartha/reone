@@ -43,8 +43,6 @@ void Tool::throwNotImplemented() const {
     throw logic_error("Not implemented");
 }
 
-#ifdef REONE_WITH_TOOLS
-
 unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
     string ext(path.extension().string());
     if (ext == ".key") {
@@ -61,14 +59,6 @@ unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
         return make_unique<GffTool>();
     }
 }
-
-#else
-
-unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
-    throw runtime_error("Tools disabled");
-}
-
-#endif // REONE_WITH_TOOLS
 
 } // namespace tools
 

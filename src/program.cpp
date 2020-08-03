@@ -29,7 +29,6 @@ using namespace std;
 using namespace reone::game;
 using namespace reone::net;
 using namespace reone::resources;
-using namespace reone::tools;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -45,40 +44,32 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 int Program::run() {
     loadOptions();
 
-    if (_command == Command::Help) {
+    if (_help) {
         cout << _cmdLineOpts << endl;
         return 0;
     }
 
-    int code = 0;
-
-    switch (_command) {
-        case Command::List:
-            _tool->list(_inputFilePath, _keyPath);
-            break;
-        case Command::Extract:
-            _tool->extract(_inputFilePath, _keyPath, _destPath);
-            break;
-        case Command::Convert:
-            _tool->convert(_inputFilePath, _destPath);
-            break;
-        default:
-            code = runGame();
-            break;
-    }
-
-    return code;
+    return runGame();
 }
 
 void Program::loadOptions() {
-    initOptions();
+    _commonOpts.add_options()
+        ("game", po::value<std::string>(), "path to game directory")
+        ("module", po::value<std::string>(), "starting module name")
+        ("width", po::value<int>()->default_value(800), "window width")
+        ("height", po::value<int>()->default_value(600), "window height")
+        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
+        ("volume", po::value<int>()->default_value(100), "audio volume in percents")
+        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
+        ("debug", po::value<bool>()->default_value(false), "enable debug logging");
 
-    po::positional_options_description positional;
-    positional.add("input-file", 1);
+    _cmdLineOpts.add(_commonOpts).add_options()
+        ("help", "print this message")
+        ("serve", "start multiplayer game")
+        ("join", po::value<std::string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_cmdLineOpts)
-        .positional(positional)
         .run();
 
     po::store(parsedCmdLineOpts, _vars);
@@ -87,18 +78,9 @@ void Program::loadOptions() {
     }
     po::notify(_vars);
 
+    _help = _vars.count("help") > 0;
     _gamePath = _vars.count("game") ? _vars["game"].as<std::string>() : fs::current_path();
-
-    if (_vars.count("key")) {
-        _keyPath = _vars["key"].as<std::string>();
-    } else {
-        _keyPath = _gamePath;
-        _keyPath.append("chitin.key");
-    }
-
-    _destPath = _vars.count("dest") ? _vars["dest"].as<std::string>() : fs::current_path();
     _module = _vars.count("module") ? _vars["module"].as<std::string>() : "";
-    _inputFilePath = _vars.count("input-file") ? _vars["input-file"].as<std::string>() : "";
     _gameOpts.graphics.width = _vars["width"].as<int>();
     _gameOpts.graphics.height = _vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
@@ -111,31 +93,6 @@ void Program::loadOptions() {
 
     initGameVersion();
     initMultiplayerMode();
-    initCommand();
-    initTool();
-}
-
-void Program::initOptions() {
-    _commonOpts.add_options()
-        ("game", po::value<std::string>(), "path to game directory")
-        ("key", po::value<std::string>(), "path to Key file")
-        ("dest", po::value<std::string>(), "path to destination directory")
-        ("module", po::value<std::string>(), "starting module name")
-        ("width", po::value<int>()->default_value(800), "window width")
-        ("height", po::value<int>()->default_value(600), "window height")
-        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
-        ("volume", po::value<int>()->default_value(100), "audio volume in percents")
-        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
-        ("debug", po::value<bool>()->default_value(false), "enable debug logging");
-
-    _cmdLineOpts.add(_commonOpts).add_options()
-        ("help", "print this message")
-        ("list", "list file contents")
-        ("extract", "extract file contents")
-        ("convert", "convert 2DA or GFF file to JSON")
-        ("input-file", po::value<std::string>(), "path to input file")
-        ("serve", "start multiplayer game")
-        ("join", po::value<std::string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
 }
 
 void Program::initGameVersion() {
@@ -149,33 +106,6 @@ void Program::initMultiplayerMode() {
         _multiplayer = MultiplayerMode::Server;
     } else if (_vars.count("join")) {
         _multiplayer = MultiplayerMode::Client;
-    }
-}
-
-void Program::initCommand() {
-    if (_vars.count("help")) {
-        _command = Command::Help;
-    } else if (_vars.count("list")) {
-        _command = Command::List;
-    } else if (_vars.count("extract")) {
-        _command = Command::Extract;
-    } else if (_vars.count("convert")) {
-        _command = Command::Convert;
-    }
-}
-
-void Program::initTool() {
-    switch (_command) {
-        case Command::List:
-        case Command::Extract:
-        case Command::Convert:
-            if (!fs::exists(_inputFilePath)) {
-                throw std::runtime_error("Input file does not exist: " + _inputFilePath.string());
-            }
-            _tool = getToolByPath(_version, _inputFilePath);
-            break;
-        default:
-            break;
     }
 }
 

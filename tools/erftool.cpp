@@ -19,9 +19,9 @@
 
 #include <boost/format.hpp>
 
-#include "../core/log.h"
-#include "../resources/erffile.h"
-#include "../resources/util.h"
+#include "src/core/log.h"
+#include "src/resources/erffile.h"
+#include "src/resources/util.h"
 
 using namespace reone::resources;
 

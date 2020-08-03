@@ -17,22 +17,16 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include "game/types.h"
-#include "net/types.h"
-#include "resources/types.h"
+#include "tools.h"
 
 namespace reone {
 
-/**
- * Encapsulates program-level logic (i.e., option management).
- */
+namespace tools {
+
 class Program {
 public:
     Program(int argc, char **argv);
@@ -40,25 +34,36 @@ public:
     int run();
 
 private:
+    enum class Command {
+        None,
+        Help,
+        List,
+        Extract,
+        Convert
+    };
+
     int _argc { 0 };
     char **_argv { nullptr };
-    boost::program_options::options_description _commonOpts;
     boost::program_options::options_description _cmdLineOpts { "Usage" };
     boost::program_options::variables_map _vars;
-    bool _help { false };
     boost::filesystem::path _gamePath;
-    std::string _module;
-    game::Options _gameOpts;
+    boost::filesystem::path _destPath;
+    boost::filesystem::path _inputFilePath;
+    boost::filesystem::path _keyPath;
     resources::GameVersion _version { resources::GameVersion::KotOR };
-    game::MultiplayerMode _multiplayer { game::MultiplayerMode::None };
+    Command _command { Command::None };
+    std::unique_ptr<Tool> _tool;
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
     void loadOptions();
+    void initKeyPath();
     void initGameVersion();
-    void initMultiplayerMode();
-    int runGame();
+    void initCommand();
+    void initTool();
 };
+
+} // namespace tools
 
 } // namespace reone

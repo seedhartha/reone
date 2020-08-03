@@ -19,7 +19,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../resources/2dafile.h"
+#include "src/resources/2dafile.h"
 
 using namespace reone::resources;
 

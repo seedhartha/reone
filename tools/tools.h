@@ -22,30 +22,17 @@
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
-
-#ifdef REONE_WITH_TOOLS
-
 #include <boost/property_tree/ptree.hpp>
 
-#include "../resources/keyfile.h"
-
-#else
-
-#include "../resources/types.h"
-
-#endif // REONE_WITH_TOOLS
+#include "src/resources/keyfile.h"
 
 namespace reone {
-
-#ifdef REONE_WITH_TOOLS
 
 namespace resources {
 
 class GffStruct;
 
 }
-
-#endif // REONE_WITH_TOOLS
 
 namespace tools {
 
@@ -68,8 +55,6 @@ private:
 };
 
 std::unique_ptr<Tool> getToolByPath(resources::GameVersion version, const boost::filesystem::path &path);
-
-#ifdef REONE_WITH_TOOLS
 
 class KeyTool : public Tool {
 public:
@@ -109,8 +94,6 @@ public:
 private:
     boost::property_tree::ptree getPropertyTree(const resources::GffStruct &gffs) const;
 };
-
-#endif // REONE_WITH_TOOLS
 
 } // namespace tools
 

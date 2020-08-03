@@ -22,7 +22,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../resources/gfffile.h"
+#include "src/resources/gfffile.h"
 
 using namespace reone::resources;
 
