@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "../game.h"
 
 #include "../../net/client.h"
