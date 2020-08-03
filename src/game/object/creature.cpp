@@ -244,6 +244,8 @@ void Creature::equip(const std::string &resRef) {
         case ItemType::RightWeapon:
             _equipment[kInventorySlotRightWeapon] = std::move(item);
             break;
+        default:
+            break;
     }
 }
 

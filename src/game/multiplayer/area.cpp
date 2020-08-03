@@ -62,6 +62,8 @@ void MultiplayerArea::execute(const Command &cmd) {
         case CommandType::SetDoorOpen:
             executeSetDoorOpen(cmd);
             break;
+        default:
+            break;
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
@@ -85,6 +87,8 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
         case CreatureRole::PartyMember2:
             _partyMember2 = creature;
             break;
+        default:
+            break;
     }
 
     landObject(*creature);
@@ -102,6 +106,8 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
             break;
         case CreatureRole::PartyMember2:
             _player = _partyMember2;
+            break;
+        default:
             break;
     }
     if (_onPlayerChanged) {

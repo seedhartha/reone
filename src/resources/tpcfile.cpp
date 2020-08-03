@@ -61,6 +61,8 @@ int TpcFile::getMipMapSize(int idx) {
                 return glm::max(8, ((width + 3) / 4) * ((height + 3) / 4) *  8);
             case EncodingType::RGBA:
                 return glm::max(16, ((width + 3) / 4) * ((height + 3) / 4) * 16);
+            default:
+                break;
         }
     } else {
         switch (_encoding) {
