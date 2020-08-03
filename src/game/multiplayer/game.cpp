@@ -58,6 +58,9 @@ void MultiplayerGame::configure() {
             _client->setOnCommandReceived(std::bind(&MultiplayerGame::onCommandReceived, this, _1));
             _client->start(_opts.network.host, _opts.network.port);
             break;
+
+        default:
+            break;
     }
 
     Game::configure();
@@ -177,6 +180,9 @@ bool MultiplayerGame::shouldSendObjectUpdates(const std::string &tag) const {
 
         case MultiplayerMode::Client:
             return player && tag == player->tag();
+
+        default:
+            break;
     }
 
     return false;

@@ -225,6 +225,9 @@ bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
         case SDL_SCANCODE_S:
             _moveBackward = true;
             return true;
+
+        default:
+            break;
     }
 
     return false;
@@ -255,6 +258,9 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
         case SDL_SCANCODE_X:
             static_cast<Creature &>(*_area->player()).playGreetingAnimation();
             return true;
+
+        default:
+            break;
     }
 
     return false;

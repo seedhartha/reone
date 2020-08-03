@@ -307,6 +307,9 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
                 }
             }
             break;
+
+        default:
+            break;
     }
 }
 
@@ -314,11 +317,16 @@ void Area::updateCreature(Creature &creature, float dt) {
     const Creature::Action &action = creature.currentAction();
     if (action.type == Creature::ActionType::QueueEmpty) return;
 
+    glm::vec3 dest;
+
     switch (action.type) {
         case Creature::ActionType::MoveToPoint:
         case Creature::ActionType::Follow:
-            glm::vec3 dest(action.type == Creature::ActionType::Follow ? action.object->position() : action.point);
+            dest = action.type == Creature::ActionType::Follow ? action.object->position() : action.point;
             navigateCreature(creature, dest, action.distance, dt);
+            break;
+
+        default:
             break;
     }
 }
@@ -408,8 +416,8 @@ void Area::updateTriggers(const Creature &creature) {
 
         const std::vector<glm::vec3> &geometry = trigger.geometry();
         bool triggered =
-            geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, geometry[0], geometry[1], geometry[2], intersection, distance) ||
-            geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance);
+            (geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, geometry[0], geometry[1], geometry[2], intersection, distance)) ||
+            (geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance));
 
         if (triggered) {
             if (!trigger.linkedToModule().empty() && _onModuleTransition) {
@@ -591,7 +599,7 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
 
         for (auto &object : list.second) {
             if (!object->walkmesh() ||
-                object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
+                (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen())) continue;
 
             float distToFrom = object->distanceTo(from);
             if (distToFrom > kMaxDistanceToTestCollision) continue;
@@ -650,8 +658,8 @@ bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int ma
 
         for (auto &object : list.second) {
             if (!object->model() ||
-                object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen() ||
-                except && object.get() == except) continue;
+                (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen()) ||
+                (except && object.get() == except)) continue;
 
             float distToFrom = object->distanceTo(from);
             if (distToFrom > kMaxDistanceToTestCollision) continue;

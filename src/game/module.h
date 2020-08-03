@@ -47,11 +47,11 @@ public:
     Module(const std::string &name, resources::GameVersion version, const render::GraphicsOptions &opts);
 
     void load(const resources::GffStruct &ifo, const std::string &entry = "");
-    bool handle(const SDL_Event &event);
     void update(float dt, gui::GuiContext &guiCtx);
 
     virtual const std::shared_ptr<Area> makeArea() const;
 
+    bool handle(const SDL_Event &event) override;
     void initGL() override;
     void render() const override;
 

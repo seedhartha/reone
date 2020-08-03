@@ -47,8 +47,8 @@ void TgaFile::doLoad() {
 
     uint8_t bpp = readByte();
 
-    if (_imageType == ImageType::RGBA && bpp != 32 ||
-        _imageType == ImageType::Grayscale && bpp != 8) {
+    if ((_imageType == ImageType::RGBA && bpp != 32) ||
+        (_imageType == ImageType::Grayscale && bpp != 8)) {
 
         throw std::runtime_error("TGA: unsupported bits per pixel: " + std::to_string(bpp));
     }

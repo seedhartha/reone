@@ -237,6 +237,8 @@ bool Game::handle(const SDL_Event &event) {
             if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
+        default:
+            break;
     }
 
     return false;
@@ -259,6 +261,8 @@ void Game::renderGUI() {
             break;
         case Screen::ModuleSelection:
             _modulesGui->render();
+            break;
+        default:
             break;
     }
 }
