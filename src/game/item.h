@@ -41,7 +41,7 @@ public:
 
 private:
     std::string _resRef;
-    ItemType _type { ItemType::Armor };
+    ItemType _type { ItemType::None };
     std::string _baseBodyVariation;
     int _bodyVariation { 0 };
     int _textureVariation { 0 };
