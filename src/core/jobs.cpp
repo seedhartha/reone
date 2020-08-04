@@ -33,6 +33,7 @@ JobExecutor::~JobExecutor() {
 }
 
 void JobExecutor::deinit() {
+    _cancel = true;
     _pool.join();
 }
 
