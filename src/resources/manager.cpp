@@ -364,15 +364,18 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
         return it->second;
     }
     debug("Loading texture " + resRef);
-
+    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
     shared_ptr<Texture> texture;
-    shared_ptr<ByteArray> tpcData(find(resRef, ResourceType::Texture));
 
-    if (tpcData) {
-        TpcFile tpc(resRef, type);
-        tpc.load(wrap(tpcData));
-        texture = tpc.texture();
-    } else {
+    if (tryTpc) {
+        shared_ptr<ByteArray> tpcData(find(resRef, ResourceType::Texture));
+        if (tpcData) {
+            TpcFile tpc(resRef, type);
+            tpc.load(wrap(tpcData));
+            texture = tpc.texture();
+        }
+    }
+    if (!texture) {
         shared_ptr<ByteArray> tgaData(find(resRef, ResourceType::Tga));
         if (tgaData) {
             TgaFile tga(resRef, type);
