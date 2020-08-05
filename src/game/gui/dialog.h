@@ -17,25 +17,29 @@
 
 #pragma once
 
-#include "gui.h"
-
-#include "../resources/types.h"
+#include "../../gui/gui.h"
+#include "../../resources/types.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class HUD : public GUI {
+class DialogGui : public gui::GUI {
 public:
-    HUD(const render::GraphicsOptions &opts);
+    DialogGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void update(const HudContext &ctx);
 
 private:
-    std::string getResRef(resources::GameVersion version) const;
+    resources::GameVersion _version { resources::GameVersion::KotOR };
+
+    void addTopFrame();
+    void addBottomFrame();
+    void addFrame(int top, int height);
+    void configureMessage();
+    void configureReplies();
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

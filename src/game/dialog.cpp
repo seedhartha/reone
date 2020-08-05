@@ -15,26 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "dialog.h"
+
+using namespace std;
+
+using namespace reone::resources;
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    Button = 6,
-    ScrollBar = 9,
-    ListBox = 11,
-};
+void Dialog::load(const string &resRef, const GffStruct &dlg) {
+}
 
-enum class BackgroundType {
-    None,
-    Menu
-};
-
-} // namespace gui
+} // namespace game
 
 } // namespace reone

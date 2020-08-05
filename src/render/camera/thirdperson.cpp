@@ -114,6 +114,11 @@ void ThirdPersonCamera::updateView() {
     _view = glm::inverse(_view);
 }
 
+void ThirdPersonCamera::resetInput() {
+    _rotateCCW = false;
+    _rotateCW = false;
+}
+
 void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {
     _targetPosition = position;
     updateView();

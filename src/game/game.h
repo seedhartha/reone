@@ -18,13 +18,15 @@
 #pragma once
 
 #include "../audio/types.h"
-#include "../gui/debug.h"
 #include "../gui/gui.h"
-#include "../gui/hud.h"
-#include "../gui/mainmenu.h"
-#include "../gui/modules.h"
 #include "../render/window.h"
 #include "../resources/types.h"
+
+#include "gui/debug.h"
+#include "gui/dialog.h"
+#include "gui/hud.h"
+#include "gui/mainmenu.h"
+#include "gui/modules.h"
 
 #include "module.h"
 
@@ -70,21 +72,25 @@ private:
         None,
         MainMenu,
         ModuleSelection,
-        InGame
+        InGame,
+        Dialog
     };
 
     boost::filesystem::path _path;
     std::string _startModule;
-    std::shared_ptr<gui::MainMenu> _mainMenu;
-    std::shared_ptr<gui::ModulesGui> _modulesGui;
-    std::shared_ptr<gui::HUD> _hud;
-    std::shared_ptr<gui::DebugGui> _debug;
     render::RenderWindow _renderWindow;
     uint32_t _ticks { 0 };
     bool _quit { false };
     Screen _screen { Screen::None };
     std::string _nextEntry;
     GameState _state;
+
+    // GUI
+    std::shared_ptr<MainMenu> _mainMenu;
+    std::shared_ptr<ModulesGui> _modulesGui;
+    std::shared_ptr<HUD> _hud;
+    std::shared_ptr<DialogGui> _dialog;
+    std::shared_ptr<DebugGui> _debug;
 
     void startModuleSelection();
     void runMainLoop();

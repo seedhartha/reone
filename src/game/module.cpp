@@ -26,6 +26,7 @@
 
 #include "object/door.h"
 
+using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::gui;
@@ -39,14 +40,14 @@ namespace game {
 
 static const float kDefaultFieldOfView = 75.0f;
 
-Module::Module(const std::string &name, GameVersion version, const GraphicsOptions &opts) :
+Module::Module(const string &name, GameVersion version, const GraphicsOptions &opts) :
     _name(name),
     _version(version),
     _opts(opts),
     _cameraAspect(opts.width / static_cast<float>(opts.height)) {
 }
 
-void Module::load(const GffStruct &ifo, const std::string &entry) {
+void Module::load(const GffStruct &ifo, const string &entry) {
     loadInfo(ifo);
     loadArea(ifo);
     loadCameras(entry);
@@ -71,11 +72,11 @@ void Module::loadArea(const GffStruct &ifo) {
     reone::info("Loading area " + _info.entryArea);
 
     ResourceManager &resources = ResourceManager::instance();
-    std::shared_ptr<GffStruct> are(resources.findGFF(_info.entryArea, ResourceType::Area));
-    std::shared_ptr<GffStruct> git(resources.findGFF(_info.entryArea, ResourceType::GameInstance));
+    shared_ptr<GffStruct> are(resources.findGFF(_info.entryArea, ResourceType::Area));
+    shared_ptr<GffStruct> git(resources.findGFF(_info.entryArea, ResourceType::GameInstance));
 
-    std::shared_ptr<Area> area(makeArea());
-    area->setOnModuleTransition([this](const std::string &module, const std::string &entry) {
+    shared_ptr<Area> area(makeArea());
+    area->setOnModuleTransition([this](const string &module, const string &entry) {
         if (_transitionEnabled && _onModuleTransition) {
             _onModuleTransition(module, entry);
         }
@@ -90,41 +91,41 @@ void Module::loadArea(const GffStruct &ifo) {
         }
     });
     area->load(*are, *git);
-    _area = std::move(area);
+    _area = move(area);
 }
 
-const std::shared_ptr<Area> Module::makeArea() const {
-    return std::make_shared<Area>(_version, _info.entryArea);
+const shared_ptr<Area> Module::makeArea() const {
+    return make_shared<Area>(_version, _info.entryArea);
 }
 
-void Module::loadCameras(const std::string &entry) {
+void Module::loadCameras(const string &entry) {
     glm::vec3 position(0.0f);
     float heading = 0.0f;
     getEntryPoint(entry, position, heading);
     position += glm::vec3(0.0f, 0.0f, 1.7f);
 
-    std::unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_cameraAspect, glm::radians(kDefaultFieldOfView)));
+    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_cameraAspect, glm::radians(kDefaultFieldOfView)));
     firstPersonCamera->setPosition(position);
     firstPersonCamera->setHeading(heading);
-    _firstPersonCamera = std::move(firstPersonCamera);
+    _firstPersonCamera = move(firstPersonCamera);
 
-    std::unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_cameraAspect, _area->cameraStyle()));
-    thirdPersonCamera->setFindObstacleFunc(std::bind(&Module::findObstacle, this, _1, _2, _3));
+    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_cameraAspect, _area->cameraStyle()));
+    thirdPersonCamera->setFindObstacleFunc(bind(&Module::findObstacle, this, _1, _2, _3));
     thirdPersonCamera->setTargetPosition(position);
     thirdPersonCamera->setHeading(heading);
-    _thirdPersonCamera = std::move(thirdPersonCamera);
+    _thirdPersonCamera = move(thirdPersonCamera);
 
     if (_onCameraChanged) {
         _onCameraChanged(_cameraType);
     }
 }
 
-void Module::getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) {
+void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &heading) {
     position = _info.entryPosition;
     heading = _info.entryHeading;
 
     if (!waypoint.empty()) {
-        std::shared_ptr<Object> object(_area->find(waypoint, ObjectType::Waypoint));
+        shared_ptr<Object> object(_area->find(waypoint, ObjectType::Waypoint));
         if (object) {
             position = object->position();
             heading = object->heading();
@@ -141,7 +142,7 @@ bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 
     return false;
 }
 
-void Module::loadParty(const std::string &entry) {
+void Module::loadParty(const string &entry) {
     if (!_loadParty) return;
 
     glm::vec3 position(0.0f);
@@ -186,12 +187,12 @@ bool Module::handle(const SDL_Event &event) {
 }
 
 bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    std::shared_ptr<Camera> camera(getCamera());
+    shared_ptr<Camera> camera(getCamera());
     glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
     glm::vec3 fromWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 0.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 1.0f), camera->view(), camera->projection(), viewport));
 
-    std::shared_ptr<Object> player(_area->player());
+    shared_ptr<Object> player(_area->player());
     Object *except = player ? player.get() : nullptr;
     Object *obstacle = nullptr;
 
@@ -210,10 +211,30 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
             }
         }
 
+        Creature *creature = dynamic_cast<Creature *>(obstacle);
+        if (creature) {
+            if (!creature->conversation().empty() && _startConversation) {
+                resetInput();
+                getCamera()->resetInput();
+
+                shared_ptr<Object> player(_area->player());
+                player->face(*creature);
+                creature->face(*player);
+                _thirdPersonCamera->setHeading(player->heading());
+
+                _startConversation(creature->conversation());
+            }
+        }
+
         return true;
     }
 
     return false;
+}
+
+void Module::resetInput() {
+    _moveForward = false;
+    _moveBackward = false;
 }
 
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
@@ -309,7 +330,7 @@ void Module::cycleDebugMode(bool forward) {
 void Module::update(float dt, GuiContext &guiCtx) {
     if (!_loaded) return;
 
-    std::shared_ptr<Camera> camera(getCamera());
+    shared_ptr<Camera> camera(getCamera());
     camera->update(dt);
 
     updatePlayer(dt);
@@ -370,15 +391,19 @@ void Module::setTransitionEnabled(bool enabled) {
     _transitionEnabled = enabled;
 }
 
-void Module::setOnCameraChanged(const std::function<void(CameraType)> &fn) {
+void Module::setOnCameraChanged(const function<void(CameraType)> &fn) {
     _onCameraChanged = fn;
 }
 
-void Module::setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn) {
+void Module::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {
     _onModuleTransition = fn;
 }
 
-const std::string &Module::name() const {
+void Module::setStartConversation(const function<void(const string &)> &fn) {
+    _startConversation = fn;
+}
+
+const string &Module::name() const {
     return _name;
 }
 
@@ -386,8 +411,8 @@ bool Module::loaded() const {
     return _loaded;
 }
 
-std::shared_ptr<Camera> Module::getCamera() const {
-    return _cameraType == CameraType::FirstPerson ? std::shared_ptr<Camera>(_firstPersonCamera) : _thirdPersonCamera;
+shared_ptr<Camera> Module::getCamera() const {
+    return _cameraType == CameraType::FirstPerson ? shared_ptr<Camera>(_firstPersonCamera) : _thirdPersonCamera;
 }
 
 const ModuleInfo &Module::info() const {

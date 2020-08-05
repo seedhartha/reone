@@ -36,6 +36,12 @@ namespace gui {
  */
 class Control {
 public:
+    enum class TextAlign {
+        LeftCenter = 9,
+        CenterBottom = 10,
+        CenterCenter = 18
+    };
+
     struct Extent {
         int left { 0 };
         int top { 0 };
@@ -60,18 +66,24 @@ public:
         std::string text;
         std::shared_ptr<render::Font> font;
         glm::vec3 color { 1.0f };
+        TextAlign align { TextAlign::CenterCenter };
     };
 
+    static std::unique_ptr<Control> makeControl(const resources::GffStruct &gffs);
+
     virtual void load(const resources::GffStruct &gffs);
+    virtual bool handleMouseMotion(int x, int y);
     virtual bool handleMouseWheel(int x, int y);
     virtual bool handleClick(int x, int y);
     virtual void initGL();
-    virtual void render(const glm::mat4 &transform) const;
+    virtual void render(const glm::mat4 &transform, const std::string &textOverride = "") const;
+    virtual void resize(float scaleX, float scaleY);
 
     void setVisible(bool visible);
-    void setFocus(bool focus);
-    void setExtent(const Extent &extent);
+    virtual void setFocus(bool focus);
+    virtual void setExtent(const Extent &extent);
     void setBorder(const Border &border);
+    void setHilight(const Border &hilight);
     void setText(const Text &text);
 
     const std::string &tag() const;

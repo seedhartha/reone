@@ -99,6 +99,8 @@ private:
     void setUniform(unsigned int ordinal, const std::string &name, const std::vector<glm::mat4> &arr);
 };
 
+#define ShaderMan render::ShaderManager::instance()
+
 } // namespace render
 
 } // namespace reone

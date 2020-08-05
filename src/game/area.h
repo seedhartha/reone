@@ -56,7 +56,7 @@ public:
     void load(const resources::GffStruct &are, const resources::GffStruct &git);
     void loadParty(const glm::vec3 &position, float heading);
     bool handle(const SDL_Event &event);
-    void update(const UpdateContext &updateCtx, gui::GuiContext &guiCtx);
+    void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
     void initGL();
@@ -73,7 +73,7 @@ public:
     bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const Object *except, Object **obstacle) const;
 
     // Setters
-    void setDebugMode(gui::DebugMode mode);
+    void setDebugMode(DebugMode mode);
 
     // General getters
     const render::CameraStyle &cameraStyle() const;
@@ -137,7 +137,7 @@ private:
     std::string _music;
     std::map<RenderListName, render::RenderList> _renderLists;
     std::unique_ptr<NavMesh> _navMesh;
-    gui::DebugMode _debugMode { gui::DebugMode::None };
+    DebugMode _debugMode { DebugMode::None };
     Scripts _scripts;
     std::list<DelayedAction> _delayed;
 
@@ -149,8 +149,8 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    void addToDebugContext(const render::RenderListItem &item, const UpdateContext &updateCtx, gui::DebugContext &debugCtx) const;
-    void addToDebugContext(const Object &object, const UpdateContext &updateCtx, gui::DebugContext &debugCtx) const;
+    void addToDebugContext(const render::RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
+    void addToDebugContext(const Object &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
     bool findElevationAt(const glm::vec3 &position, float &z) const;
 
     // Loading

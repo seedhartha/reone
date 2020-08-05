@@ -23,9 +23,18 @@
 
 #include "SDL2/SDL_opengl.h"
 
+#include "../../core/log.h"
 #include "../../render/mesh/guiquad.h"
 #include "../../render/shadermanager.h"
 #include "../../resources/manager.h"
+
+#include "button.h"
+#include "label.h"
+#include "listbox.h"
+#include "panel.h"
+#include "scrollbar.h"
+
+using namespace std;
 
 using namespace reone::render;
 using namespace reone::resources;
@@ -33,6 +42,36 @@ using namespace reone::resources;
 namespace reone {
 
 namespace gui {
+
+unique_ptr<Control> Control::makeControl(const GffStruct &gffs) {
+    ControlType controlType = static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
+    unique_ptr<Control> control;
+
+    switch (controlType) {
+        case ControlType::Panel:
+            control = make_unique<Panel>();
+            break;
+        case ControlType::Label:
+            control = make_unique<Label>();
+            break;
+        case ControlType::Button:
+            control = make_unique<Button>();
+            break;
+        case ControlType::ListBox:
+            control = make_unique<ListBox>();
+            break;
+        case ControlType::ScrollBar:
+            control = make_unique<ScrollBar>();
+            break;
+        default:
+            warn("Unsupported control type: " + to_string(static_cast<int>(controlType)));
+            return nullptr;
+    }
+
+    control->load(gffs);
+
+    return move(control);
+}
 
 Control::Extent::Extent(int left, int top, int width, int height) : left(left), top(top), width(width), height(height) {
 }
@@ -44,7 +83,7 @@ bool Control::Extent::contains(int x, int y) const {
 Control::Control(ControlType type) : _type(type) {
 }
 
-Control::Control(ControlType type, const std::string &tag) : _type(type), _tag(tag) {
+Control::Control(ControlType type, const string &tag) : _type(type), _tag(tag) {
 }
 
 void Control::load(const GffStruct &gffs) {
@@ -75,12 +114,12 @@ void Control::loadExtent(const GffStruct &gffs) {
 }
 
 void Control::loadBorder(const GffStruct &gffs) {
-    std::string corner(gffs.getString("CORNER"));
-    std::string edge(gffs.getString("EDGE"));
-    std::string fill(gffs.getString("FILL"));
+    string corner(gffs.getString("CORNER"));
+    string edge(gffs.getString("EDGE"));
+    string fill(gffs.getString("FILL"));
 
     ResourceManager &resources = ResourceManager::instance();
-    _border = std::make_shared<Border>();
+    _border = make_shared<Border>();
 
     if (!corner.empty()) {
         _border->corner = resources.findTexture(corner, TextureType::Diffuse);
@@ -104,15 +143,16 @@ void Control::loadText(const GffStruct &gffs) {
     _text.text = strRef == -1 ? "" : resources.getString(strRef).text;
 
     _text.color = gffs.getVector("COLOR");
+    _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
 }
 
 void Control::loadHilight(const GffStruct &gffs) {
-    std::string corner(gffs.getString("CORNER"));
-    std::string edge(gffs.getString("EDGE"));
-    std::string fill(gffs.getString("FILL"));
+    string corner(gffs.getString("CORNER"));
+    string edge(gffs.getString("EDGE"));
+    string fill(gffs.getString("FILL"));
 
     ResourceManager &resources = ResourceManager::instance();
-    _hilight = std::make_shared<Border>();
+    _hilight = make_shared<Border>();
 
     if (!corner.empty()) {
         _hilight->corner = resources.findTexture(corner, TextureType::Diffuse);
@@ -131,6 +171,10 @@ void Control::loadHilight(const GffStruct &gffs) {
 void Control::updateTransform() {
     _transform = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left, _extent.top, 0.0f));
     _transform = glm::scale(_transform, glm::vec3(_extent.width, _extent.height, 1.0f));
+}
+
+bool Control::handleMouseMotion(int x, int y) {
+    return false;
 }
 
 bool Control::handleMouseWheel(int x, int y) {
@@ -160,7 +204,7 @@ void Control::initGL() {
     if (_text.font) _text.font->initGL();
 }
 
-void Control::render(const glm::mat4 &transform) const {
+void Control::render(const glm::mat4 &transform, const std::string &textOverride) const {
     if (!_visible) return;
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -176,13 +220,38 @@ void Control::render(const glm::mat4 &transform) const {
 
     shaders.deactivate();
 
-    if (!_text.text.empty()) {
+    if (!textOverride.empty() || !_text.text.empty()) {
+        TextGravity gravity;
         float scaleX = transform[0][0];
         float scaleY = transform[1][1];
-        float offsetX = scaleX * (_extent.left + 0.5f * _extent.width);
-        float offsetY = scaleY * (_extent.top + 0.5f * _extent.height);
+        float offsetX;
+        float offsetY;
+
+        switch (_text.align) {
+            case TextAlign::LeftCenter:
+                gravity = TextGravity::Right;
+                offsetX = scaleX * _extent.left;
+                offsetY = scaleY * (_extent.top + 0.5f * _extent.height);
+                break;
+            case TextAlign::CenterBottom:
+                gravity = TextGravity::Center;
+                offsetX = scaleX * (_extent.left + 0.5f * _extent.width);
+                offsetY = scaleY * (_extent.top + _extent.height - 0.5f * _text.font->height());
+                break;
+            default:
+                gravity = TextGravity::Center;
+                offsetX = scaleX * (_extent.left + 0.5f * _extent.width);
+                offsetY = scaleY * (_extent.top + 0.5f * _extent.height);
+                break;
+        }
+
         glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offsetX, offsetY, 0.0f)));
-        _text.font->render(_text.text, textTransform, (_focus && _hilight) ? _hilight->color : _text.color);
+
+        _text.font->render(
+            !textOverride.empty() ? textOverride : _text.text,
+            textTransform,
+            (_focus && _hilight) ? _hilight->color : _text.color,
+            gravity);
     }
 }
 
@@ -215,39 +284,89 @@ void Control::drawBorder(const Border &border, const glm::mat4 &transform) const
         border.fill->unbind();
     }
     if (border.edge) {
+        float verticalHeight = _extent.height - 2.0f * border.dimension;
+        float horizonalWidth = _extent.width - 2.0f * border.dimension;
+        glm::mat4 edgeTransform(1.0f);
         shaders.setUniform("color", border.color);
         border.edge->bind();
-        glm::mat4 edgeTransform(1.0f);
 
-        // Left edge
-        edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]));
-        edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, _extent.height, 1.0f));
-        edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-        shaders.setUniform("model", transform * edgeTransform);
-        quad.render(GL_TRIANGLES);
+        if (verticalHeight > 0.0f) {
+            // Left edge
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(0.0f, border.dimension, 0.0f));
+            edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, verticalHeight, 1.0f));
+            edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+            edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+            shaders.setUniform("model", transform * edgeTransform);
+            quad.render(GL_TRIANGLES);
 
-        // Top edge
-        edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]));
-        edgeTransform = glm::scale(edgeTransform, glm::vec3(_extent.width, border.dimension, 1.0f));
-        shaders.setUniform("model", transform * edgeTransform);
-        quad.render(GL_TRIANGLES);
+            // Right edge
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, border.dimension, 0.0f));
+            edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, verticalHeight, 1.0f));
+            edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+            shaders.setUniform("model", transform * edgeTransform);
+            quad.render(GL_TRIANGLES);
+        }
 
-        // Bottom edge
-        edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(0.0f, _extent.height, 0.0f));
-        edgeTransform = glm::scale(edgeTransform, glm::vec3(_extent.width, border.dimension, 1.0f));
-        edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-        shaders.setUniform("model", transform * edgeTransform);
-        quad.render(GL_TRIANGLES);
+        if (horizonalWidth > 0.0f) {
+            // Top edge
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(border.dimension, 0.0f, 0.0f));
+            edgeTransform = glm::scale(edgeTransform, glm::vec3(horizonalWidth, border.dimension, 1.0f));
+            shaders.setUniform("model", transform * edgeTransform);
+            quad.render(GL_TRIANGLES);
 
-        // Right edge
-        edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, 0.0f, 0.0f));
-        edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, _extent.height, 1.0f));
-        edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-        shaders.setUniform("model", transform * edgeTransform);
-        quad.render(GL_TRIANGLES);
+            // Bottom edge
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(border.dimension, _extent.height, 0.0f));
+            edgeTransform = glm::scale(edgeTransform, glm::vec3(horizonalWidth, border.dimension, 1.0f));
+            edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+            shaders.setUniform("model", transform * edgeTransform);
+            quad.render(GL_TRIANGLES);
+        }
 
         border.edge->unbind();
     }
+    if (border.corner) {
+        border.corner->bind();
+        glm::mat4 cornerTransform(1.0f);
+
+        // Top left corner
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]));
+        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
+        shaders.setUniform("model", transform * cornerTransform);
+        quad.render(GL_TRIANGLES);
+
+        // Bottom left corner
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(0.0f, _extent.height, 0.0f));
+        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
+        cornerTransform = glm::rotate(cornerTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+        shaders.setUniform("model", transform * cornerTransform);
+        quad.render(GL_TRIANGLES);
+
+        // Top right corner
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, 0.0f, 0.0f));
+        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
+        cornerTransform = glm::rotate(cornerTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+        shaders.setUniform("model", transform * cornerTransform);
+        quad.render(GL_TRIANGLES);
+
+        // Bottom right corner
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, _extent.height, 0.0f));
+        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
+        cornerTransform = glm::rotate(cornerTransform, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+        shaders.setUniform("model", transform * cornerTransform);
+        quad.render(GL_TRIANGLES);
+
+        border.corner->unbind();
+    }
+}
+
+void Control::resize(float scaleX, float scaleY) {
+    Control::Extent extent(_extent);
+    extent.left *= scaleX;
+    extent.top *= scaleY;
+    extent.width *= scaleX;
+    extent.height *= scaleY;
+
+    setExtent(move(extent));
 }
 
 void Control::setVisible(bool visible) {
@@ -264,14 +383,18 @@ void Control::setExtent(const Extent &extent) {
 }
 
 void Control::setBorder(const Border &border) {
-    _border = std::make_shared<Border>(border);
+    _border = make_shared<Border>(border);
+}
+
+void Control::setHilight(const Border &hilight) {
+    _hilight = make_shared<Border>(hilight);
 }
 
 void Control::setText(const Text &text) {
     _text = text;
 }
 
-const std::string &Control::tag() const {
+const string &Control::tag() const {
     return _tag;
 }
 
@@ -295,11 +418,11 @@ bool Control::visible() const {
     return _visible;
 }
 
-void Control::setOnClick(const std::function<void(const std::string &)> &fn) {
+void Control::setOnClick(const function<void(const string &)> &fn) {
     _onClick = fn;
 }
 
-void Control::setOnItemClicked(const std::function<void(const std::string &, const std::string &)> &fn) {
+void Control::setOnItemClicked(const function<void(const string &, const string &)> &fn) {
     _onItemClicked = fn;
 }
 

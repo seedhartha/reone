@@ -17,19 +17,21 @@
 
 #include "modules.h"
 
-#include "../resources/manager.h"
+#include "../../resources/manager.h"
 
-#include "control/label.h"
-#include "control/listbox.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
 
 using namespace std::placeholders;
 
+using namespace reone::gui;
 using namespace reone::resources;
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
+static const char kFontResRef[] = "fnt_d16x16b";
 static const int kMargin = 10;
 static const int kWidth = 400;
 
@@ -37,13 +39,18 @@ ModulesGui::ModulesGui(const render::GraphicsOptions &opts) : GUI(opts) {
 }
 
 void ModulesGui::load() {
-    loadFont();
+    _font = ResMan.findFont(kFontResRef);
     assert(_font);
 
     loadLabel();
     loadListBox();
 
     _focus = _controls.front();
+}
+
+void ModulesGui::initGL() {
+    GUI::initGL();
+    _font->initGL();
 }
 
 void ModulesGui::loadLabel() {
@@ -95,6 +102,6 @@ void ModulesGui::setOnModuleSelected(const std::function<void(const std::string 
     _onModuleSelected = fn;
 }
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

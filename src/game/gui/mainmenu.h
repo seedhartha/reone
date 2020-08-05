@@ -17,15 +17,14 @@
 
 #pragma once
 
-#include "gui.h"
-
-#include "../resources/types.h"
+#include "../../gui/gui.h"
+#include "../../resources/types.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class MainMenu : public GUI {
+class MainMenu : public gui::GUI {
 public:
     MainMenu(const render::GraphicsOptions &opts);
 
@@ -42,6 +41,6 @@ private:
     std::string getResRef(resources::GameVersion version) const;
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

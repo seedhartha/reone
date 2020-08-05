@@ -26,11 +26,7 @@
 #include "../render/mesh/guiquad.h"
 #include "../render/shadermanager.h"
 
-#include "control/button.h"
-#include "control/label.h"
-#include "control/listbox.h"
-#include "control/panel.h"
-
+using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::render;
@@ -40,56 +36,55 @@ namespace reone {
 
 namespace gui {
 
-static const char kFontResRef[] = "fnt_d16x16b";
-
 GUI::GUI(const GraphicsOptions &opts) : _opts(opts) {
     _screenCenter = glm::vec3(0.5f * _opts.width, 0.5f * _opts.height, 0.0f);
 }
 
-void GUI::load(const std::string &resRef, BackgroundType background) {
-    ResourceManager &resources = ResourceManager::instance();
-    std::shared_ptr<GffStruct> gui(resources.findGFF(resRef, ResourceType::Gui));
+void GUI::load(const string &resRef, BackgroundType background) {
+    shared_ptr<GffStruct> gui(ResMan.findGFF(resRef, ResourceType::Gui));
     assert(gui);
 
-    loadFont();
     loadBackground(background);
 
-    _rootControl = makeControl(*gui);
-
-    const Control::Extent &rootExtent = _rootControl->extent();
-    float x = 0.0f;
-    float y = 0.0f;
+    float aspectX = _opts.width / static_cast<float>(_resolutionX);
+    float aspectY = _opts.height / static_cast<float>(_resolutionY);
 
     switch (_scaling) {
-        case ScalingMode::Center:
-            x = _screenCenter.x - 0.5f * rootExtent.width;
-            y = _screenCenter.y - 0.5f * rootExtent.height;
+        case ScalingMode::Center: {
+            float x = _screenCenter.x - 0.5f * _resolutionX;
+            float y = _screenCenter.y - 0.5f * _resolutionY;
             _controlTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
             break;
-        case ScalingMode::Scale:
-            x = _opts.width / static_cast<float>(rootExtent.width);
-            y = _opts.height / static_cast<float>(rootExtent.height);
-            _controlTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, 1.0f));
+        }
+        case ScalingMode::Stretch:
+            _controlTransform = glm::scale(glm::mat4(1.0f), glm::vec3(aspectX, aspectY, 1.0f));
             break;
     }
 
+    _rootControl = Control::makeControl(*gui);
+
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
-        std::unique_ptr<Control> control(makeControl(ctrlGffs));
+        unique_ptr<Control> control(Control::makeControl(ctrlGffs));
         if (!control) continue;
 
-        control->setOnClick(std::bind(&GUI::onClick, this, _1));
-        _controls.push_back(std::move(control));
+        control->setOnClick(bind(&GUI::onClick, this, _1));
+        _controls.push_back(move(control));
     }
-}
 
-void GUI::loadFont() {
-    ResourceManager &resources = ResourceManager::instance();
-    _font = resources.findFont(kFontResRef);
-    assert(_font);
+    if (_scaling == ScalingMode::Resize) {
+        _rootControl->resize(aspectX, aspectY);
+
+        for (auto &ctrl : _controls) {
+            ctrl->resize(aspectX, aspectY);
+        }
+    }
+
+    const Control::Extent &rootExtent = _rootControl->extent();
+    _controlTransform = glm::translate(_controlTransform, glm::vec3(rootExtent.left, rootExtent.top, 0.0f));
 }
 
 void GUI::loadBackground(BackgroundType type) {
-    std::string resRef;
+    string resRef;
 
     if ((_opts.width == 1600 && _opts.height == 1200) ||
         (_opts.width == 1280 && _opts.height == 960) ||
@@ -113,33 +108,6 @@ void GUI::loadBackground(BackgroundType type) {
     assert(_background);
 }
 
-std::unique_ptr<Control> GUI::makeControl(const GffStruct &gffs) const {
-    ControlType controlType = static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
-    std::unique_ptr<Control> control;
-
-    switch (controlType) {
-        case ControlType::Panel:
-            control = std::make_unique<Panel>();
-            break;
-        case ControlType::Label:
-            control = std::make_unique<Label>();
-            break;
-        case ControlType::Button:
-            control = std::make_unique<Button>();
-            break;
-        case ControlType::ListBox:
-            control = std::make_unique<ListBox>();
-            break;
-        default:
-            warn("Unsupported control type: " + std::to_string(static_cast<int>(controlType)));
-            return nullptr;
-    }
-
-    control->load(gffs);
-
-    return std::move(control);
-}
-
 bool GUI::handle(const SDL_Event &event) {
     glm::vec2 ctrlCoords(0.0f);
 
@@ -147,6 +115,9 @@ bool GUI::handle(const SDL_Event &event) {
         case SDL_MOUSEMOTION:
             ctrlCoords = screenToControlCoords(event.motion.x, event.motion.y);
             updateFocus(ctrlCoords.x, ctrlCoords.y);
+            if (_focus) {
+                _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
+            }
             break;
 
         case SDL_MOUSEBUTTONUP:
@@ -175,7 +146,7 @@ void GUI::updateFocus(int x, int y) {
         _focus = nullptr;
     }
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
-        std::shared_ptr<Control> control(*it);
+        shared_ptr<Control> control(*it);
         if (!control->visible()) continue;
 
         const Control::Extent &extent = control->extent();
@@ -188,10 +159,7 @@ void GUI::updateFocus(int x, int y) {
 }
 
 void GUI::initGL() {
-    _font->initGL();
-
     if (_background) _background->initGL();
-    if (_rootControl) _rootControl->initGL();
 
     for (auto &control : _controls) {
         control->initGL();
@@ -200,7 +168,6 @@ void GUI::initGL() {
 
 void GUI::render() const {
     if (_background) renderBackground();
-    if (_rootControl) _rootControl->render(_controlTransform);
 
     for (auto &control : _controls) {
         control->render(_controlTransform);
@@ -225,7 +192,7 @@ void GUI::renderBackground() const {
     shaders.deactivate();
 }
 
-void GUI::showControl(const std::string &tag) {
+void GUI::showControl(const string &tag) {
     for (auto &control : _controls) {
         if (control->tag() == tag) {
             control->setVisible(true);
@@ -234,7 +201,7 @@ void GUI::showControl(const std::string &tag) {
     }
 }
 
-void GUI::hideControl(const std::string &tag) {
+void GUI::hideControl(const string &tag) {
     for (auto &control : _controls) {
         if (control->tag() == tag) {
             control->setVisible(false);
@@ -243,19 +210,19 @@ void GUI::hideControl(const std::string &tag) {
     }
 }
 
-Control &GUI::getControl(const std::string &tag) const {
-    auto it = std::find_if(
+Control &GUI::getControl(const string &tag) const {
+    auto it = find_if(
         _controls.begin(),
         _controls.end(),
-        [&tag](const std::shared_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
+        [&tag](const shared_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
 
     return **it;
 }
 
-void GUI::onClick(const std::string &control) {
+void GUI::onClick(const string &control) {
 }
 
-void GUI::onItemClicked(const std::string &control, const std::string &item) {
+void GUI::onItemClicked(const string &control, const string &item) {
 }
 
 } // namespace gui

@@ -76,8 +76,9 @@ public:
     // Getters
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
-    const Action &currentAction() const;
+    const std::string &conversation() const;
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    const Action &currentAction() const;
     std::shared_ptr<Path> &path();
     bool isPathUpdating() const;
     float walkSpeed() const;
@@ -96,8 +97,9 @@ private:
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
-    std::vector<Action> _actions;
     std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
+    std::string _conversation;
+    std::vector<Action> _actions;
     std::shared_ptr<Path> _path;
     std::atomic_bool _pathUpdating { false };
     float _walkSpeed { 0.0f };

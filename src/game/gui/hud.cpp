@@ -17,17 +17,20 @@
 
 #include "hud.h"
 
-#include "control/label.h"
+#include "../../gui/control/label.h"
 
+using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
 HUD::HUD(const render::GraphicsOptions &opts) : GUI(opts) {
-    _scaling = ScalingMode::Scale;
+    _resolutionX = 800;
+    _resolutionY = 600;
+    _scaling = ScalingMode::Resize;
 }
 
 void HUD::load(GameVersion version) {
@@ -171,6 +174,6 @@ void HUD::update(const HudContext &ctx) {
     }
 }
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

@@ -40,16 +40,30 @@ public:
     void loadCustom();
     void add(const Item &item);
 
+    void load(const resources::GffStruct &gffs) override;
+    bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
     void initGL() override;
-    void render(const glm::mat4 &transform) const override;
+    void render(const glm::mat4 &transform, const std::string &textOverride) const override;
+    void resize(float scaleX, float scaleY) override;
+
+    void setFocus(bool focus) override;
+    void setExtent(const Extent &extent) override;
+
+    Control &protoItem() const;
+    Control &scrollBar() const;
 
 private:
     std::shared_ptr<Control> _protoItem;
+    std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;
     int _slotCount { 0 };
     int _itemOffset { 0 };
+    int _hilightedIndex { -1 };
+
+    void updateItems();
+    int getItemIndex(int y) const;
 };
 
 } // namespace gui

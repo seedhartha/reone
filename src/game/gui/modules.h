@@ -17,20 +17,30 @@
 
 #pragma once
 
-#include "gui.h"
+#include "../../gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class DebugGui : public GUI {
+class ModulesGui : public gui::GUI {
 public:
-    DebugGui(const render::GraphicsOptions &opts);
+    ModulesGui(const render::GraphicsOptions &opts);
 
     void load();
-    void update(const DebugContext &ctx);
+    void initGL() override;
+    void onItemClicked(const std::string &control, const std::string &item) override;
+
+    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
+
+private:
+    std::shared_ptr<render::Font> _font;
+    std::function<void(const std::string &name)> _onModuleSelected;
+
+    void loadLabel();
+    void loadListBox();
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

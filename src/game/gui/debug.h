@@ -17,24 +17,26 @@
 
 #pragma once
 
+#include "../../gui/gui.h"
+
+#include "../types.h"
+
 namespace reone {
 
-namespace gui {
+namespace game {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    Button = 6,
-    ScrollBar = 9,
-    ListBox = 11,
+class DebugGui : public gui::GUI {
+public:
+    DebugGui(const render::GraphicsOptions &opts);
+
+    void load();
+    void initGL() override;
+    void update(const DebugContext &ctx);
+
+private:
+    std::shared_ptr<render::Font> _font;
 };
 
-enum class BackgroundType {
-    None,
-    Menu
-};
-
-} // namespace gui
+} // namespace game
 
 } // namespace reone
