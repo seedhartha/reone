@@ -69,6 +69,12 @@ void Object::saveTo(AreaState &state) const {
 void Object::loadState(const AreaState &state) {
 }
 
+void Object::face(const Object &other) {
+    glm::vec2 dir(glm::normalize(other._position - _position));
+    _heading = -glm::atan(dir.x, dir.y);
+    updateTransform();
+}
+
 float Object::distanceTo(const glm::vec3 &point) const {
     return glm::distance2(_position, point);
 }

@@ -17,14 +17,19 @@
 
 #include "mainmenu.h"
 
+using namespace std;
+
+using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
 MainMenu::MainMenu(const GraphicsOptions &opts) : GUI(opts) {
+    _resolutionX = 800;
+    _resolutionY = 600;
 }
 
 void MainMenu::load(GameVersion version) {
@@ -34,10 +39,11 @@ void MainMenu::load(GameVersion version) {
     hideControl("LBL_NEWCONTENT");
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
+    hideControl("LB_MODULES");
 }
 
-std::string MainMenu::getResRef(GameVersion version) const {
-    std::string resRef("mainmenu");
+string MainMenu::getResRef(GameVersion version) const {
+    string resRef("mainmenu");
     switch (version) {
         case GameVersion::KotOR:
             resRef += "16x12";
@@ -50,7 +56,7 @@ std::string MainMenu::getResRef(GameVersion version) const {
     return resRef;
 }
 
-void MainMenu::onClick(const std::string &control) {
+void MainMenu::onClick(const string &control) {
     if (control == "BTN_NEWGAME") {
         if (_onNewGame) _onNewGame();
     } else if (control == "BTN_EXIT") {
@@ -58,14 +64,14 @@ void MainMenu::onClick(const std::string &control) {
     }
 }
 
-void MainMenu::setOnNewGame(const std::function<void()> &fn) {
+void MainMenu::setOnNewGame(const function<void()> &fn) {
     _onNewGame = fn;
 }
 
-void MainMenu::setOnExit(const std::function<void()> &fn) {
+void MainMenu::setOnExit(const function<void()> &fn) {
     _onExit = fn;
 }
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

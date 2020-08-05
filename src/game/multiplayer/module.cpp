@@ -19,6 +19,8 @@
 
 #include "area.h"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -27,7 +29,7 @@ namespace reone {
 namespace game {
 
 MultiplayerModule::MultiplayerModule(
-    const std::string &name,
+    const string &name,
     MultiplayerMode mode,
     GameVersion version,
     const GraphicsOptions &opts,
@@ -36,8 +38,8 @@ MultiplayerModule::MultiplayerModule(
     Module(name, version, opts), _callbacks(callbacks) {
 }
 
-const std::shared_ptr<Area> MultiplayerModule::makeArea() const {
-    return std::shared_ptr<Area>(new MultiplayerArea(_mode, _version, _info.entryArea, _callbacks));
+const shared_ptr<Area> MultiplayerModule::makeArea() const {
+    return shared_ptr<Area>(new MultiplayerArea(_mode, _version, _info.entryArea, _callbacks));
 }
 
 } // namespace game

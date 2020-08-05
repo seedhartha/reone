@@ -26,6 +26,7 @@
 #include "../resources/manager.h"
 #include "../script/routines.h"
 
+using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
@@ -43,7 +44,7 @@ namespace game {
 Game::Game(
     GameVersion version,
     const fs::path &path,
-    const std::string &startModule,
+    const string &startModule,
     const Options &opts
 ) :
     _version(version),
@@ -55,8 +56,8 @@ Game::Game(
 
 int Game::run() {
     _renderWindow.init();
-    _renderWindow.setRenderWorldFunc(std::bind(&Game::renderWorld, this));
-    _renderWindow.setRenderGUIFunc(std::bind(&Game::renderGUI, this));
+    _renderWindow.setRenderWorldFunc(bind(&Game::renderWorld, this));
+    _renderWindow.setRenderGUIFunc(bind(&Game::renderGUI, this));
 
     ResMan.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
@@ -76,15 +77,15 @@ int Game::run() {
 }
 
 void Game::configure() {
-    const std::vector<std::string> &moduleNames = ResourceManager::instance().moduleNames();
-    if (_startModule.empty() || std::find(moduleNames.begin(), moduleNames.end(), _startModule) == moduleNames.end()) {
-        std::unique_ptr<MainMenu> mainMenu(new MainMenu(_opts.graphics));
+    const vector<string> &moduleNames = ResourceManager::instance().moduleNames();
+    if (_startModule.empty() || find(moduleNames.begin(), moduleNames.end(), _startModule) == moduleNames.end()) {
+        unique_ptr<MainMenu> mainMenu(new MainMenu(_opts.graphics));
         mainMenu->load(_version);
         mainMenu->initGL();
-        mainMenu->setOnNewGame(std::bind(&Game::startModuleSelection, this));
+        mainMenu->setOnNewGame(bind(&Game::startModuleSelection, this));
         mainMenu->setOnExit([this]() { _quit = true; });
 
-        _mainMenu = std::move(mainMenu);
+        _mainMenu = move(mainMenu);
         _screen = Screen::MainMenu;
 
     } else {
@@ -93,22 +94,22 @@ void Game::configure() {
 }
 
 void Game::startModuleSelection() {
-    std::unique_ptr<ModulesGui> modules(new ModulesGui(_opts.graphics));
+    unique_ptr<ModulesGui> modules(new ModulesGui(_opts.graphics));
     modules->load();
     modules->initGL();
-    modules->setOnModuleSelected([this](const std::string &name) { loadModule(name); });
+    modules->setOnModuleSelected([this](const string &name) { loadModule(name); });
 
-    _modulesGui = std::move(modules);
+    _modulesGui = move(modules);
     _screen = Screen::ModuleSelection;
 }
 
-void Game::loadModule(const std::string &name, std::string entry) {
+void Game::loadModule(const string &name, string entry) {
     info("Loading module " + name);
 
     ResourceManager &resources = ResourceManager::instance();
     resources.loadModule(name);
 
-    std::shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
+    shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
 
     _module = makeModule(name);
     configureModule();
@@ -120,42 +121,49 @@ void Game::loadModule(const std::string &name, std::string entry) {
     AudioPlayer &audio = AudioPlayer::instance();
     audio.reset();
 
-    std::string musicName(_module->area().music());
+    string musicName(_module->area().music());
     if (!musicName.empty()) {
-        std::shared_ptr<AudioStream> music(resources.findAudio(musicName));
+        shared_ptr<AudioStream> music(resources.findAudio(musicName));
         audio.play(music, true);
     }
 
     if (!_hud) {
-        std::unique_ptr<HUD> hud(new HUD(_opts.graphics));
+        unique_ptr<HUD> hud(new HUD(_opts.graphics));
         hud->load(_version);
         hud->initGL();
-
-        _hud = std::move(hud);
+        _hud = move(hud);
     }
     if (!_debug) {
-        std::unique_ptr<DebugGui> debug(new DebugGui(_opts.graphics));
+        unique_ptr<DebugGui> debug(new DebugGui(_opts.graphics));
         debug->load();
         debug->initGL();
-
-        _debug = std::move(debug);
+        _debug = move(debug);
+    }
+    if (!_dialog) {
+        unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
+        dialog->load(_version);
+        dialog->initGL();
+        _dialog = move(dialog);
     }
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
 }
 
-const std::shared_ptr<Module> Game::makeModule(const std::string &name) {
-    return std::make_shared<Module>(name, _version, _opts.graphics);
+const shared_ptr<Module> Game::makeModule(const string &name) {
+    return make_shared<Module>(name, _version, _opts.graphics);
 }
 
 void Game::configureModule() {
     _module->setOnCameraChanged([this](CameraType type) {
         _renderWindow.setRelativeMouseMode(type == CameraType::FirstPerson);
     });
-    _module->setOnModuleTransition([this](const std::string &name, const std::string &entry) {
+    _module->setOnModuleTransition([this](const string &name, const string &entry) {
         _nextModule = name;
         _nextEntry = entry;
+    });
+    _module->setStartConversation([this](const string &name) {
+        _screen = Screen::Dialog;
     });
 }
 
@@ -166,7 +174,7 @@ void Game::runMainLoop() {
         _renderWindow.processEvents(_quit);
         update();
 
-        std::shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
+        shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
         _renderWindow.render(camera);
     }
 }
@@ -176,9 +184,10 @@ void Game::update() {
         loadNextModule();
     }
     float dt = getDeltaTime();
+    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
 
-    if (_screen == Screen::InGame && _module) {
-        gui::GuiContext guiCtx;
+    if (updModule && _module) {
+        GuiContext guiCtx;
         _module->update(dt, guiCtx);
 
         if (_module->cameraType() == CameraType::ThirdPerson) {
@@ -212,7 +221,7 @@ float Game::getDeltaTime() {
     return dt;
 }
 
-std::shared_ptr<GUI> Game::currentGUI() const {
+shared_ptr<GUI> Game::currentGUI() const {
     switch (_screen) {
         case Screen::MainMenu:
             return _mainMenu;
@@ -220,6 +229,8 @@ std::shared_ptr<GUI> Game::currentGUI() const {
             return _modulesGui;
         case Screen::InGame:
             return _hud;
+        case Screen::Dialog:
+            return _dialog;
         default:
             return nullptr;
     }
@@ -237,6 +248,9 @@ bool Game::handle(const SDL_Event &event) {
             if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
+        case Screen::Dialog:
+            if (_dialog->handle(event)) return true;
+            break;
         default:
             break;
     }
@@ -245,8 +259,13 @@ bool Game::handle(const SDL_Event &event) {
 }
 
 void Game::renderWorld() {
-    if (_screen == Screen::InGame && _module) {
-        _module->render();
+    switch (_screen) {
+        case Screen::InGame:
+        case Screen::Dialog:
+            if (_module) _module->render();
+            break;
+        default:
+            break;
     }
 }
 
@@ -255,12 +274,15 @@ void Game::renderGUI() {
         case Screen::MainMenu:
             _mainMenu->render();
             break;
+        case Screen::ModuleSelection:
+            _modulesGui->render();
+            break;
         case Screen::InGame:
             _debug->render();
             if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
             break;
-        case Screen::ModuleSelection:
-            _modulesGui->render();
+        case Screen::Dialog:
+            _dialog->render();
             break;
         default:
             break;

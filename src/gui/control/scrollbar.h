@@ -17,26 +17,34 @@
 
 #pragma once
 
-#include "gui.h"
+#include "control.h"
 
 namespace reone {
 
 namespace gui {
 
-class ModulesGui : public GUI {
+class ScrollBar : public Control {
 public:
-    ModulesGui(const render::GraphicsOptions &opts);
+    ScrollBar();
 
-    void load();
-    void onItemClicked(const std::string &control, const std::string &item) override;
+    void load(const resources::GffStruct &gffs) override;
+    void initGL() override;
+    void render(const glm::mat4 &transform, const std::string &textOverride) const override;
 
-    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
+    void setCanScrollUp(bool scroll);
+    void setCanScrollDown(bool scroll);
 
 private:
-    std::function<void(const std::string &name)> _onModuleSelected;
+    struct Direction {
+        std::shared_ptr<render::Texture> image;
+    };
 
-    void loadLabel();
-    void loadListBox();
+    Direction _dir;
+    bool _canScrollUp { false };
+    bool _canScrollDown { false };
+
+    void drawUpArrow(const glm::mat4 &transform) const;
+    void drawDownArrow(const glm::mat4 &transform) const;
 };
 
 } // namespace gui

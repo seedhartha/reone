@@ -47,7 +47,7 @@ public:
     Module(const std::string &name, resources::GameVersion version, const render::GraphicsOptions &opts);
 
     void load(const resources::GffStruct &ifo, const std::string &entry = "");
-    void update(float dt, gui::GuiContext &guiCtx);
+    void update(float dt, GuiContext &guiCtx);
 
     virtual const std::shared_ptr<Area> makeArea() const;
 
@@ -70,6 +70,7 @@ public:
     // Callbacks
     void setOnCameraChanged(const std::function<void(render::CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
+    void setStartConversation(const std::function<void(const std::string &)> &fn);
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -86,13 +87,14 @@ private:
     std::shared_ptr<render::ThirdPersonCamera> _thirdPersonCamera;
     bool _moveForward { false };
     bool _moveBackward { false };
-    gui::DebugMode _debugMode { gui::DebugMode::None };
+    DebugMode _debugMode { DebugMode::None };
     bool _loadParty { true };
     bool _transitionEnabled { true };
 
     // Callbacks
     std::function<void(render::CameraType)> _onCameraChanged;
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
+    std::function<void(const std::string &)> _startConversation;
 
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
@@ -107,6 +109,7 @@ private:
     void updatePlayer(float dt);
     bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
     void syncThirdPersonCamera();
+    void resetInput();
 };
 
 } // namespace game

@@ -107,7 +107,7 @@ void Font::initGL() {
     if (_texture) _texture->initGL();
 }
 
-void Font::render(const std::string &text, const glm::mat4 &transform, const glm::vec3 &color, TextAlign align) const {
+void Font::render(const std::string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -124,14 +124,14 @@ void Font::render(const std::string &text, const glm::mat4 &transform, const glm
     float textWidth = measure(text);
     glm::vec3 textOffset;
 
-    switch (align) {
-        case TextAlign::Left:
+    switch (gravity) {
+        case TextGravity::Left:
             textOffset = glm::vec3(-textWidth, -0.5f * _height, 0.0f);
             break;
-        case TextAlign::Center:
+        case TextGravity::Center:
             textOffset = glm::vec3(-0.5f * textWidth, -0.5f * _height, 0.0f);
             break;
-        case TextAlign::Right:
+        case TextGravity::Right:
             textOffset = glm::vec3(0.0f, -0.5f * _height, 0.0f);
             break;
     }

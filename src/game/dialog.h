@@ -17,24 +17,25 @@
 
 #pragma once
 
+#include <string>
+
+#include "../resources/gfffile.h"
+
 namespace reone {
 
-namespace gui {
+namespace game {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    Button = 6,
-    ScrollBar = 9,
-    ListBox = 11,
+class Dialog {
+public:
+    Dialog() = default;
+
+    void load(const std::string &resRef, const resources::GffStruct &dlg);
+
+private:
+    Dialog(const Dialog &) = delete;
+    Dialog &operator=(const Dialog &) = delete;
 };
 
-enum class BackgroundType {
-    None,
-    Menu
-};
-
-} // namespace gui
+} // namespace game
 
 } // namespace reone

@@ -34,6 +34,7 @@ public:
     virtual void initGL();
     virtual void saveTo(AreaState &state) const;
     virtual void loadState(const AreaState &state);
+    void face(const Object &other);
 
     float distanceTo(const glm::vec3 &point) const;
     bool contains(const glm::vec3 &point) const;

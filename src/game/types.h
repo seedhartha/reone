@@ -18,12 +18,16 @@
 #pragma once
 
 #include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 
 #include "../audio/types.h"
 #include "../net/types.h"
+#include "../render/texture.h"
 #include "../render/types.h"
 
 namespace reone {
@@ -89,6 +93,12 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
+enum class DebugMode {
+    None,
+    GameObjects,
+    ModelNodes
+};
+
 struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
@@ -118,6 +128,25 @@ struct AreaState {
 
 struct GameState {
     std::map<std::string, AreaState> areas;
+};
+
+struct HudContext {
+    std::vector<std::shared_ptr<render::Texture>> partyPortraits;
+};
+
+struct DebugObject {
+    std::string tag;
+    std::string text;
+    glm::vec3 screenCoords { 0.0f };
+};
+
+struct DebugContext {
+    std::vector<DebugObject> objects;
+};
+
+struct GuiContext {
+    HudContext hud;
+    DebugContext debug;
 };
 
 } // namespace game

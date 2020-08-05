@@ -146,6 +146,13 @@ void FirstPersonCamera::update(float dt) {
     if (positionChanged) updateView();
 }
 
+void FirstPersonCamera::resetInput() {
+    _moveForward = false;
+    _moveLeft = false;
+    _moveBackward = false;
+    _moveRight = false;
+}
+
 void FirstPersonCamera::setPosition(const glm::vec3 &pos) {
     _position = pos;
     updateView();

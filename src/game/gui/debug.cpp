@@ -17,19 +17,33 @@
 
 #include "debug.h"
 
-#include "control/label.h"
+#include "../../gui/control/label.h"
+#include "../../resources/manager.h"
 
+#include "../types.h"
+
+using namespace std;
+
+using namespace reone::gui;
 using namespace reone::render;
 
 namespace reone {
 
-namespace gui {
+namespace game {
+
+static const char kFontResRef[] = "fnt_d16x16b";
 
 DebugGui::DebugGui(const GraphicsOptions &opts) : GUI(opts) {
 }
 
 void DebugGui::load() {
-    loadFont();
+    _font = ResMan.findFont(kFontResRef);
+    assert(_font);
+}
+
+void DebugGui::initGL() {
+    GUI::initGL();
+    _font->initGL();
 }
 
 void DebugGui::update(const DebugContext &ctx) {
@@ -50,14 +64,14 @@ void DebugGui::update(const DebugContext &ctx) {
         text.font = _font;
         text.color = glm::vec3(1.0f, 0.0f, 0.0f);
 
-        std::unique_ptr<Label> label(new Label(object.tag));
+        unique_ptr<Label> label(new Label(object.tag));
         label->setExtent(extent);
         label->setText(text);
 
-        _controls.push_back(std::move(label));
+        _controls.push_back(move(label));
     }
 }
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

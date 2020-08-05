@@ -27,6 +27,9 @@
 #include "../../resources/manager.h"
 
 #include "button.h"
+#include "scrollbar.h"
+
+using namespace std;
 
 using namespace reone::render;
 using namespace reone::resources;
@@ -40,26 +43,65 @@ static const int kItemPadding = 3;
 ListBox::ListBox() : Control(ControlType::ListBox) {
 }
 
-ListBox::ListBox(const std::string &tag) : Control(ControlType::ListBox, tag) {
+ListBox::ListBox(const string &tag) : Control(ControlType::ListBox, tag) {
 }
 
 void ListBox::loadCustom() {
-    ResourceManager &resources = ResourceManager::instance();
-
     Control::Border border;
-    border.fill = resources.findTexture("brightblue", TextureType::Diffuse);
+    border.fill = ResMan.findTexture("brightblue", TextureType::Diffuse);
 
-    std::unique_ptr<Control> protoItem(new Button());
+    Control::Text text;
+    text.font = ResMan.findFont("fnt_d16x16b");
+
+    unique_ptr<Control> protoItem(new Button());
     protoItem->setExtent(Control::Extent(0, 0, _extent.width, _text.font->height() + 2 * kItemPadding));
     protoItem->setBorder(border);
-    _protoItem = std::move(protoItem);
+    protoItem->setText(text);
+    _protoItem = move(protoItem);
 
     _padding = 3;
+    updateItems();
+}
+
+void ListBox::updateItems() {
+    if (!_protoItem) return;
+
     _slotCount = _extent.height / (_protoItem->extent().height + _padding);
+
+    if (_scrollBar) {
+        _scrollBar->setVisible(_items.size() > _slotCount);
+    }
 }
 
 void ListBox::add(const Item &item) {
     _items.push_back(item);
+    updateItems();
+}
+
+void ListBox::load(const GffStruct &gffs) {
+    Control::load(gffs);
+
+    const GffField *protoItem = gffs.find("PROTOITEM");
+    if (protoItem) {
+        _protoItem = makeControl(protoItem->asStruct());
+        updateItems();
+    }
+
+    const GffField *scrollBar = gffs.find("SCROLLBAR");
+    if (scrollBar) {
+        _scrollBar = makeControl(scrollBar->asStruct());
+    }
+}
+
+bool ListBox::handleMouseMotion(int x, int y) {
+    _hilightedIndex = getItemIndex(y);
+    return false;
+}
+
+int ListBox::getItemIndex(int y) const {
+    const Control::Extent &protoExtent = _protoItem->extent();
+    int idx = (y - _extent.top - protoExtent.top) / (protoExtent.height + _padding) + _itemOffset;
+    return idx >= 0 && idx < _items.size() ? idx : -1;
 }
 
 bool ListBox::handleMouseWheel(int x, int y) {
@@ -75,8 +117,8 @@ bool ListBox::handleMouseWheel(int x, int y) {
 }
 
 bool ListBox::handleClick(int x, int y) {
-    int itemIdx = (y - _extent.top) / (_protoItem->extent().height + _padding) + _itemOffset;
-    if (itemIdx >= _items.size()) return false;
+    int itemIdx = getItemIndex(y);
+    if (itemIdx == -1) return false;
 
     if (_onItemClicked) {
         _onItemClicked(_tag, _items[itemIdx].tag);
@@ -90,52 +132,63 @@ void ListBox::initGL() {
     Control::initGL();
 
     if (_protoItem) _protoItem->initGL();
+    if (_scrollBar) _scrollBar->initGL();
 }
 
-void ListBox::render(const glm::mat4 &transform) const {
+void ListBox::render(const glm::mat4 &transform, const std::string &textOverride) const {
+    if (!_visible) return;
+
+    Control::render(transform);
+
     if (!_protoItem) return;
 
-    ShaderManager &shaders = ShaderManager::instance();
-    shaders.activate(ShaderProgram::BasicDiffuse);
-    shaders.setUniform("alpha", 1.0f);
-    shaders.setUniform("color", glm::vec3(1.0f));
-
-    std::shared_ptr<Texture> itemFill(_protoItem->border().fill);
-    assert(itemFill);
-
-    glActiveTexture(0);
-    itemFill->bind();
-
-    int x = _extent.left;
-    int y = _extent.top;
-
-    glm::mat4 transform2(1.0f);
-    GUIQuad &quad = GUIQuad::instance();
-
-    for (int i = 0; i < _items.size() && i < _slotCount; ++i) {
-        transform2 = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-        transform2 = glm::scale(transform2, glm::vec3(_extent.width, _protoItem->extent().height, 1.0f));
-
-        shaders.setUniform("model", transform2);
-        quad.render(GL_TRIANGLES);
-
-        y += _protoItem->extent().height + _padding;
-    }
-
-    itemFill->unbind();
-    shaders.deactivate();
-
-    x = _extent.left + 0.5f * _extent.width;
-    y = _extent.top + 0.5f * _protoItem->extent().height;
+    const Control::Extent &protoExtent = _protoItem->extent();
+    glm::mat4 itemTransform(glm::translate(transform, glm::vec3(_extent.left, _extent.top - protoExtent.top, 0.0f)));
 
     for (int i = 0; i < _items.size() && i < _slotCount; ++i) {
         int itemIdx = i + _itemOffset;
-        transform2 = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-
-        _text.font->render(_items[itemIdx].text, transform2);
-
-        y += _protoItem->extent().height + _padding;
+        _protoItem->setFocus(_hilightedIndex == itemIdx);
+        _protoItem->render(itemTransform, _items[itemIdx].text);
+        itemTransform = glm::translate(itemTransform, glm::vec3(0.0f, protoExtent.height + _padding, 0.0f));
     }
+
+    if (_scrollBar) {
+        ScrollBar &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
+        scrollBar.setCanScrollUp(_itemOffset > 0);
+        scrollBar.setCanScrollDown(_itemOffset + _slotCount < _items.size());
+        scrollBar.render(transform, "");
+    }
+}
+
+void ListBox::resize(float scaleX, float scaleY) {
+    assert(_protoItem);
+    _protoItem->resize(scaleX, 1.0f);
+
+    if (_scrollBar) {
+        _scrollBar->resize(1.0f, scaleY);
+    }
+
+    Control::resize(scaleX, scaleY);
+}
+
+void ListBox::setFocus(bool focus) {
+    Control::setFocus(focus);
+    if (!focus) {
+        _hilightedIndex = -1;
+    }
+}
+
+void ListBox::setExtent(const Extent &extent) {
+    Control::setExtent(extent);
+    updateItems();
+}
+
+Control &ListBox::protoItem() const {
+    return *_protoItem;
+}
+
+Control &ListBox::scrollBar() const {
+    return *_scrollBar;
 }
 
 } // namespace gui

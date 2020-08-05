@@ -25,7 +25,7 @@ namespace reone {
 
 namespace render {
 
-enum class TextAlign {
+enum class TextGravity {
     Left,
     Center,
     Right
@@ -42,7 +42,7 @@ public:
         const std::string &text,
         const glm::mat4 &transform,
         const glm::vec3 &color = glm::vec3(1.0f, 1.0f, 1.0f),
-        TextAlign align = TextAlign::Center) const;
+        TextGravity align = TextGravity::Center) const;
 
     float measure(const std::string &text) const;
     float height() const;

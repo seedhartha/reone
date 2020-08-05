@@ -30,6 +30,7 @@ class Camera {
 public:
     virtual bool handle(const SDL_Event &event) = 0;
     virtual void update(float dt) = 0;
+    virtual void resetInput() = 0;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;

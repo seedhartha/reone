@@ -50,7 +50,13 @@ set(HEADERS
     src/core/streamutil.h
     src/core/types.h
     src/game/area.h
+    src/game/dialog.h
     src/game/game.h
+    src/game/gui/debug.h
+    src/game/gui/dialog.h
+    src/game/gui/hud.h
+    src/game/gui/mainmenu.h
+    src/game/gui/modules.h
     src/game/item.h
     src/game/navmesh.h
     src/game/module.h
@@ -75,11 +81,8 @@ set(HEADERS
     src/gui/control/label.h
     src/gui/control/listbox.h
     src/gui/control/panel.h
-    src/gui/debug.h
+    src/gui/control/scrollbar.h
     src/gui/gui.h
-    src/gui/hud.h
-    src/gui/mainmenu.h
-    src/gui/modules.h
     src/gui/types.h
     src/net/client.h
     src/net/connection.h
@@ -143,7 +146,13 @@ set(SOURCES
     src/core/random.cpp
     src/core/streamutil.cpp
     src/game/area.cpp
+    src/game/dialog.cpp
     src/game/game.cpp
+    src/game/gui/debug.cpp
+    src/game/gui/dialog.cpp
+    src/game/gui/hud.cpp
+    src/game/gui/mainmenu.cpp
+    src/game/gui/modules.cpp
     src/game/item.cpp
     src/game/module.cpp
     src/game/multiplayer/area.cpp
@@ -166,11 +175,8 @@ set(SOURCES
     src/gui/control/label.cpp
     src/gui/control/listbox.cpp
     src/gui/control/panel.cpp
-    src/gui/debug.cpp
+    src/gui/control/scrollbar.cpp
     src/gui/gui.cpp
-    src/gui/hud.cpp
-    src/gui/mainmenu.cpp
-    src/gui/modules.cpp
     src/main.cpp
     src/net/client.cpp
     src/net/connection.cpp

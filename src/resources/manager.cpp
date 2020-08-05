@@ -56,15 +56,19 @@ static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
 static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
 static const char kMusicDirectoryName[] = "streammusic";
 
-static map<string, shared_ptr<ByteArray>> g_resCache = map<string, shared_ptr<ByteArray>>();
-static map<string, shared_ptr<TwoDaTable>> g_2daCache = map<string, shared_ptr<TwoDaTable>>();
-static map<string, shared_ptr<GffStruct>> g_gffCache = map<string, shared_ptr<GffStruct>>();
-static map<string, shared_ptr<TalkTable>> g_talkTableCache = map<string, shared_ptr<TalkTable>>();
-static map<string, shared_ptr<AudioStream>> g_audioCache = map<string, shared_ptr<AudioStream>>();
-static map<string, shared_ptr<Model>> g_modelCache = map<string, shared_ptr<Model>>();
-static map<string, shared_ptr<Walkmesh>> g_walkmeshCache = map<string, shared_ptr<Walkmesh>>();
-static map<string, shared_ptr<Texture>> g_texCache = map<string, shared_ptr<Texture>>();
-static map<string, shared_ptr<Font>> g_fontCache = map<string, shared_ptr<Font>>();
+static map<string, shared_ptr<ByteArray>> g_resCache;
+static map<string, shared_ptr<TwoDaTable>> g_2daCache;
+static map<string, shared_ptr<GffStruct>> g_gffCache;
+static map<string, shared_ptr<TalkTable>> g_talkTableCache;
+static map<string, shared_ptr<AudioStream>> g_audioCache;
+static map<string, shared_ptr<Model>> g_modelCache;
+static map<string, shared_ptr<Walkmesh>> g_walkmeshCache;
+static map<string, shared_ptr<Texture>> g_texCache;
+static map<string, shared_ptr<Font>> g_fontCache;
+
+static map<string, string> g_fontOverride = {
+    { "fnt_d16x16", "fnt_d16x16b" }
+};
 
 ResourceManager &ResourceManager::instance() {
     static ResourceManager instance;
@@ -393,24 +397,27 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
 }
 
 shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
-    auto it = g_fontCache.find(resRef);
+    auto fontOverride = g_fontOverride.find(resRef);
+    const string &resRef2 = fontOverride != g_fontOverride.end() ? fontOverride->second : resRef;
+
+    auto it = g_fontCache.find(resRef2);
     if (it != g_fontCache.end()) {
         return it->second;
     }
-    debug("Loading font " + resRef);
+    debug("Loading font " + resRef2);
 
     shared_ptr<Font> font;
-    shared_ptr<Texture> texture(findTexture(resRef, TextureType::Font));
+    shared_ptr<Texture> texture(findTexture(resRef2, TextureType::Font));
 
     if (texture) {
         font = make_shared<Font>();
         font->load(texture);
     }
     if (!font) {
-        warn("Font not found: " + resRef);
+        warn("Font not found: " + resRef2);
     }
 
-    auto pair = g_fontCache.insert(make_pair(resRef, font));
+    auto pair = g_fontCache.insert(make_pair(resRef2, font));
 
     return pair.first->second;
 }
