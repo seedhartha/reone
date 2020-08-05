@@ -17,6 +17,13 @@
 
 #pragma once
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <boost/filesystem/path.hpp>
+
 #include "../audio/stream.h"
 #include "../render/font.h"
 #include "../render/model.h"
