@@ -26,3 +26,7 @@ Controls:
 ## Configuration
 
 reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).
+
+## Contribution
+
+reone is in the early stages of development at the moment, meaning that the codebase is not entirely stable. Nevertheless, the project is open to potential contributors. Take a look at the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) and [development](https://github.com/seedhartha/reone/wiki/Development) pages in the Wiki if you want to contribute.
