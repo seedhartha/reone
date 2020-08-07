@@ -17,6 +17,8 @@
 
 #include "control.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "glm/ext.hpp"
 
 #include "GL/glew.h"
@@ -221,37 +223,7 @@ void Control::render(const glm::mat4 &transform, const std::string &textOverride
     shaders.deactivate();
 
     if (!textOverride.empty() || !_text.text.empty()) {
-        TextGravity gravity;
-        float scaleX = transform[0][0];
-        float scaleY = transform[1][1];
-        float offsetX;
-        float offsetY;
-
-        switch (_text.align) {
-            case TextAlign::LeftCenter:
-                gravity = TextGravity::Right;
-                offsetX = scaleX * _extent.left;
-                offsetY = scaleY * (_extent.top + 0.5f * _extent.height);
-                break;
-            case TextAlign::CenterBottom:
-                gravity = TextGravity::Center;
-                offsetX = scaleX * (_extent.left + 0.5f * _extent.width);
-                offsetY = scaleY * (_extent.top + _extent.height - 0.5f * _text.font->height());
-                break;
-            default:
-                gravity = TextGravity::Center;
-                offsetX = scaleX * (_extent.left + 0.5f * _extent.width);
-                offsetY = scaleY * (_extent.top + 0.5f * _extent.height);
-                break;
-        }
-
-        glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offsetX, offsetY, 0.0f)));
-
-        _text.font->render(
-            !textOverride.empty() ? textOverride : _text.text,
-            textTransform,
-            (_focus && _hilight) ? _hilight->color : _text.color,
-            gravity);
+        drawText(transform, textOverride);
     }
 }
 
@@ -356,6 +328,95 @@ void Control::drawBorder(const Border &border, const glm::mat4 &transform) const
         quad.render(GL_TRIANGLES);
 
         border.corner->unbind();
+    }
+}
+
+void Control::drawText(const glm::mat4 &transform, const string &textOverride) const {
+    glm::vec2 scale(transform[0][0], transform[1][1]);
+    string text(!textOverride.empty() ? textOverride : _text.text);
+    float textWidth = _text.font->measure(text);
+    int lineCount = glm::ceil(textWidth / (scale.x * static_cast<float>(_extent.width)));
+
+    TextGravity gravity;
+    switch (_text.align) {
+        case TextAlign::LeftCenter:
+            gravity = TextGravity::Right;
+            break;
+        default:
+            gravity = TextGravity::Center;
+            break;
+    }
+
+    glm::vec2 offset;
+
+    if (lineCount == 1) {
+        getTextOffset(scale, offset, 1);
+        glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offset, 0.0f)));
+
+        _text.font->render(
+            !textOverride.empty() ? textOverride : _text.text,
+            textTransform,
+            (_focus && _hilight) ? _hilight->color : _text.color,
+            gravity);
+
+    } else {
+        vector<string> lines(breakText(text, scale.x * _extent.width));
+        getTextOffset(scale, offset, lines.size());
+
+        for (auto &line : lines) {
+            glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offset, 0.0f)));
+            offset.y += _text.font->height();
+
+            _text.font->render(
+                line,
+                textTransform,
+                (_focus && _hilight) ? _hilight->color : _text.color,
+                gravity);
+        }
+    }
+}
+
+vector<string> Control::breakText(const string &text, int maxWidth) const {
+    vector<string> tokens;
+    boost::split(tokens, text, boost::is_space(), boost::token_compress_on);
+
+    vector<string> lines;
+    string line;
+
+    for (auto &token : tokens) {
+        string candidate(line + token);
+        if (_text.font->measure(candidate) > maxWidth) {
+            lines.push_back(move(candidate));
+            line.clear();
+            continue;
+        }
+        line = move(candidate);
+        line += " ";
+    }
+    if (!line.empty()) {
+        boost::trim_right(line);
+        lines.push_back(move(line));
+    }
+
+    return move(lines);
+}
+
+void Control::getTextOffset(const glm::vec2 &scale, glm::vec2 &offset, int lineCount) const {
+    switch (_text.align) {
+        case TextAlign::CenterBottom:
+            offset.y = scale.y * (_extent.top + _extent.height - (lineCount - 0.5f) * _text.font->height());
+            break;
+        default:
+            offset.y = scale.y * (_extent.top + 0.5f * _extent.height);
+            break;
+    }
+    switch (_text.align) {
+        case TextAlign::LeftCenter:
+            offset.x = scale.x * _extent.left;
+            break;
+        default:
+            offset.x = scale.x * (_extent.left + 0.5f * _extent.width);
+            break;
     }
 }
 

@@ -125,6 +125,9 @@ private:
     void loadText(const resources::GffStruct &gffs);
     void loadHilight(const resources::GffStruct &gffs);
     void drawBorder(const Border &border, const glm::mat4 &transform) const;
+    void drawText(const glm::mat4 &transform, const std::string &textOverride) const;
+    std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
+    void getTextOffset(const glm::vec2 &scale, glm::vec2 &offset, int lineCount) const;
 };
 
 } // namespace gui
