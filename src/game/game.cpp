@@ -124,7 +124,7 @@ void Game::loadModule(const string &name, string entry) {
     string musicName(_module->area().music());
     if (!musicName.empty()) {
         shared_ptr<AudioStream> music(resources.findAudio(musicName));
-        audio.play(music, true);
+        audio.play(music, AudioType::Music);
     }
 
     if (!_hud) {

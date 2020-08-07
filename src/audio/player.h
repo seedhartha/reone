@@ -30,6 +30,11 @@ namespace reone {
 
 namespace audio {
 
+enum class AudioType {
+    Music,
+    Sound
+};
+
 class AudioPlayer {
 public:
     static AudioPlayer &instance();
@@ -38,7 +43,7 @@ public:
     void deinit();
 
     void reset();
-    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, bool loop = false);
+    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, AudioType type);
 
 private:
     AudioOptions _opts;

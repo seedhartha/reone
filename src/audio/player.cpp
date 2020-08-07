@@ -38,8 +38,8 @@ AudioPlayer &AudioPlayer::instance() {
 
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
-    if (_opts.volume == 0) {
-        info("Volume set to 0, disabling audio");
+    if (_opts.musicVolume == 0 && _opts.soundVolume == 0) {
+        info("Music and sound volume set to 0, disabling audio");
         return;
     }
 
@@ -53,7 +53,6 @@ void AudioPlayer::init(const AudioOptions &opts) {
         throw runtime_error("Failed to create audio context");
     }
     alcMakeContextCurrent(_context);
-    alListenerf(AL_GAIN, _opts.volume / 100.0f);
 
     _thread = thread(bind(&AudioPlayer::threadStart, this));
 }
@@ -102,11 +101,14 @@ void AudioPlayer::reset() {
     _sounds.clear();
 }
 
-shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, bool loop) {
+shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type) {
     if (!stream) {
         throw invalid_argument("Audio stream is empty");
     }
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop));
+    bool loop = type == AudioType::Music;
+    float gain = (type == AudioType::Music ? _opts.musicVolume : _opts.soundVolume) / 100.0f;
+
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, gain));
 
     lock_guard<recursive_mutex> lock(_soundsMutex);
     _sounds.push_back(sound);

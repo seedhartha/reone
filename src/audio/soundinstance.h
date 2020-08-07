@@ -27,7 +27,7 @@ namespace audio {
 
 class SoundInstance {
 public:
-    SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop);
+    SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain);
     SoundInstance(SoundInstance &&) = default;
     ~SoundInstance();
 
@@ -47,6 +47,7 @@ private:
 
     std::shared_ptr<AudioStream> _stream;
     bool _loop { false };
+    float _gain { 0.0f };
     bool _multiframe { false };
     State _state { State::NotInited };
     int _nextFrame { 0 };

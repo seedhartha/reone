@@ -194,7 +194,7 @@ void DialogGui::loadCurrentEntry() {
     if (!_currentEntry->voResRef.empty()) {
         shared_ptr<AudioStream> voice(ResMan.findAudio(_currentEntry->voResRef));
         if (voice) {
-            _currentVoice = TheAudioPlayer.play(voice);
+            _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);
         }
     }
 
