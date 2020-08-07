@@ -32,8 +32,9 @@ public:
     DialogGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void startDialog(const std::string &resRef);
+    void startDialog(const std::string &resRef, const std::string &owner);
 
+    void setOnSpeakerChanged(const std::function<void(const std::string &, const std::string &)> &fn);
     void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
@@ -41,6 +42,8 @@ private:
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
+    std::string _currentSpeaker;
+    std::function<void(const std::string &, const std::string &)> _onSpeakerChanged;
     std::function<void()> _onDialogFinished;
 
     void addTopFrame();

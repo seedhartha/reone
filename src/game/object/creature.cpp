@@ -221,10 +221,18 @@ void Creature::initGL() {
     if (_portrait) _portrait->initGL();
 }
 
+void Creature::playDefaultAnimation() {
+    if (_model) _model->playDefaultAnimation();
+}
+
 void Creature::playGreetingAnimation() {
     if (_movementType != MovementType::None) return;
 
     animate("greeting");
+}
+
+void Creature::playTalkAnimation() {
+    animate("tlknorm", kAnimationLoop);
 }
 
 void Creature::clearActions() {

@@ -82,13 +82,8 @@ void Module::loadArea(const GffStruct &ifo) {
         }
     });
     area->setOnPlayerChanged([this]() {
-        syncThirdPersonCamera();
-        if (_cameraType != CameraType::ThirdPerson) {
-            _cameraType = CameraType::ThirdPerson;
-            if (_onCameraChanged) {
-                _onCameraChanged(CameraType::ThirdPerson);
-            }
-        }
+        update3rdPersonCameraTarget();
+        switchTo3rdPersonCamera();
     });
     area->load(*are, *git);
     _area = move(area);
@@ -151,18 +146,29 @@ void Module::loadParty(const string &entry) {
 
     _area->loadParty(position, heading);
 
-    syncThirdPersonCamera();
-    _thirdPersonCamera->setHeading(heading);
+    update3rdPersonCameraTarget();
+    update3rdPersonCameraHeading();
+    switchTo3rdPersonCamera();
+}
+
+void Module::update3rdPersonCameraTarget() {
+    Object &player = *_area->player();
+    _thirdPersonCamera->setTargetPosition(player.position() + player.model()->getNodeAbsolutePosition("camerahook"));
+}
+
+void Module::update3rdPersonCameraHeading() {
+    Object &player = *_area->player();
+    _thirdPersonCamera->setHeading(player.heading());
+}
+
+void Module::switchTo3rdPersonCamera() {
+    if (_cameraType == CameraType::ThirdPerson) return;
+
     _cameraType = CameraType::ThirdPerson;
 
     if (_onCameraChanged) {
         _onCameraChanged(_cameraType);
     }
-}
-
-void Module::syncThirdPersonCamera() {
-    Creature &player = static_cast<Creature &>(*_area->player());
-    _thirdPersonCamera->setTargetPosition(player.position() + player.model()->getNodeAbsolutePosition("camerahook"));
 }
 
 bool Module::handle(const SDL_Event &event) {
@@ -213,16 +219,10 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 
         Creature *creature = dynamic_cast<Creature *>(obstacle);
         if (creature) {
-            if (!creature->conversation().empty() && _startConversation) {
+            if (!creature->conversation().empty() && _startDialog) {
                 resetInput();
                 getCamera()->resetInput();
-
-                shared_ptr<Object> player(_area->player());
-                player->face(*creature);
-                creature->face(*player);
-                _thirdPersonCamera->setHeading(player->heading());
-
-                _startConversation(creature->conversation());
+                _startDialog(creature->conversation(), creature->tag());
             }
         }
 
@@ -368,7 +368,7 @@ void Module::updatePlayer(float dt) {
 
         if (_area->moveCreatureTowards(player, target, dt)) {
             player.setMovementType(MovementType::Run);
-            syncThirdPersonCamera();
+            update3rdPersonCameraTarget();
         }
     } else {
         player.setMovementType(MovementType::None);
@@ -399,8 +399,8 @@ void Module::setOnModuleTransition(const function<void(const string &, const str
     _onModuleTransition = fn;
 }
 
-void Module::setStartConversation(const function<void(const string &)> &fn) {
-    _startConversation = fn;
+void Module::setStartDialog(const function<void(const string &, const string &)> &fn) {
+    _startDialog = fn;
 }
 
 const string &Module::name() const {

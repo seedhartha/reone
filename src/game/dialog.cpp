@@ -17,6 +17,8 @@
 
 #include "dialog.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../resources/manager.h"
 
 using namespace std;
@@ -64,6 +66,9 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     entry.sound = gffs.getString("Sound");
     entry.listener = gffs.getString("Listener");
     entry.cameraAngle = gffs.getInt("CameraAngle");
+
+    boost::to_lower(entry.speaker);
+    boost::to_lower(entry.listener);
 
     const GffField *repliesList = gffs.find("RepliesList");
     if (repliesList) {
