@@ -394,6 +394,10 @@ void Control::setText(const Text &text) {
     _text = text;
 }
 
+void Control::setTextMessage(const string &text) {
+    _text.text = text;
+}
+
 const string &Control::tag() const {
     return _tag;
 }

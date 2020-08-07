@@ -17,6 +17,8 @@
 
 #include "dialog.h"
 
+#include "../resources/manager.h"
+
 using namespace std;
 
 using namespace reone::resources;
@@ -25,7 +27,72 @@ namespace reone {
 
 namespace game {
 
+void Dialog::reset() {
+    _entries.clear();
+    _replies.clear();
+    _startEntries.clear();
+}
+
 void Dialog::load(const string &resRef, const GffStruct &dlg) {
+    for (auto &entry : dlg.getList("EntryList")) {
+        _entries.push_back(getEntryReply(entry));
+    }
+    for (auto &reply : dlg.getList("ReplyList")) {
+        _replies.push_back(getEntryReply(reply));
+    }
+    for (auto &entry : dlg.getList("StartingList")) {
+        _startEntries.push_back(getEntryReplyLink(entry));
+    }
+}
+
+Dialog::EntryReplyLink Dialog::getEntryReplyLink(const GffStruct &gffs) const {
+    EntryReplyLink link;
+    link.index = gffs.getInt("Index");
+    link.active = gffs.getString("Active");
+
+    return move(link);
+}
+
+Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
+    int strRef = gffs.getInt("Text");
+
+    EntryReply entry;
+    entry.speaker = gffs.getString("Speaker");
+    entry.text = strRef == -1 ? "" : ResMan.getString(strRef).text;
+    entry.voResRef = gffs.getString("VO_ResRef");
+    entry.script = gffs.getString("Script");
+    entry.sound = gffs.getString("Sound");
+    entry.listener = gffs.getString("Listener");
+    entry.cameraAngle = gffs.getInt("CameraAngle");
+
+    const GffField *repliesList = gffs.find("RepliesList");
+    if (repliesList) {
+        for (auto &link : repliesList->children()) {
+            entry.replies.push_back(getEntryReplyLink(link));
+        }
+    }
+    const GffField *entriesList = gffs.find("EntriesList");
+    if (entriesList) {
+        for (auto &link : entriesList->children()) {
+            entry.entries.push_back(getEntryReplyLink(link));
+        }
+    }
+
+    return move(entry);
+}
+
+const vector<Dialog::EntryReplyLink> &Dialog::startEntries() const {
+    return _startEntries;
+}
+
+const Dialog::EntryReply &Dialog::getEntry(int index) const {
+    assert(index >= 0 && index < _entries.size());
+    return _entries[index];
+}
+
+const Dialog::EntryReply &Dialog::getReply(int index) const {
+    assert(index >= 0 && index < _replies.size());
+    return _replies[index];
 }
 
 } // namespace game

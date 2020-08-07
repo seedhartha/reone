@@ -55,6 +55,9 @@ static const char kTexturePackDirectoryName[] = "texturepacks";
 static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
 static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
 static const char kMusicDirectoryName[] = "streammusic";
+static const char kSoundsDirectoryName[] = "streamsounds";
+static const char kWavesDirectoryName[] = "streamwaves";
+static const char kVoiceDirectoryName[] = "streamvoice";
 
 static map<string, shared_ptr<ByteArray>> g_resCache;
 static map<string, shared_ptr<TwoDaTable>> g_2daCache;
@@ -94,10 +97,25 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
     fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
     fs::path guiTexPackPath(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
     fs::path musicPath(getPathIgnoreCase(gamePath, kMusicDirectoryName));
+    fs::path soundsPath(getPathIgnoreCase(gamePath, kSoundsDirectoryName));
 
     addErfProvider(texPackPath);
     addErfProvider(guiTexPackPath);
     addFolderProvider(musicPath);
+    addFolderProvider(soundsPath);
+
+    switch (version) {
+        case GameVersion::KotOR: {
+            fs::path wavesPath(getPathIgnoreCase(gamePath, kWavesDirectoryName));
+            addFolderProvider(wavesPath);
+            break;
+        }
+        case GameVersion::TheSithLords: {
+            fs::path voicePath(getPathIgnoreCase(gamePath, kVoiceDirectoryName));
+            addFolderProvider(voicePath);
+            break;
+        }
+    }
 
     _version = version;
     _gamePath = gamePath;
@@ -143,12 +161,23 @@ void ResourceManager::loadModule(const string &name) {
 
     addTransientRimProvider(rimPath);
     addTransientRimProvider(rimsPath);
+
+    if (_version == GameVersion::TheSithLords) {
+        fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
+        addTransientErfProvider(dlgPath);
+    }
 }
 
 void ResourceManager::addTransientRimProvider(const fs::path &path) {
     unique_ptr<RimFile> rim(new RimFile());
     rim->load(path);
     _transientProviders.push_back(move(rim));
+}
+
+void ResourceManager::addTransientErfProvider(const fs::path &path) {
+    unique_ptr<ErfFile> erf(new ErfFile());
+    erf->load(path);
+    _transientProviders.push_back(move(erf));
 }
 
 void ResourceManager::addFolderProvider(const fs::path &path) {

@@ -73,6 +73,12 @@ void ListBox::updateItems() {
     }
 }
 
+void ListBox::clearItems() {
+    _items.clear();
+    _itemOffset = 0;
+    updateItems();
+}
+
 void ListBox::add(const Item &item) {
     _items.push_back(item);
     updateItems();
@@ -106,7 +112,7 @@ int ListBox::getItemIndex(int y) const {
 
 bool ListBox::handleMouseWheel(int x, int y) {
     if (y < 0) {
-        if (_itemOffset < _items.size() - _slotCount) _itemOffset++;
+        if (_items.size() - _itemOffset > _slotCount) _itemOffset++;
         return true;
     } else if (y > 0) {
         if (_itemOffset > 0) _itemOffset--;
@@ -145,8 +151,10 @@ void ListBox::render(const glm::mat4 &transform, const std::string &textOverride
     const Control::Extent &protoExtent = _protoItem->extent();
     glm::mat4 itemTransform(glm::translate(transform, glm::vec3(_extent.left, _extent.top - protoExtent.top, 0.0f)));
 
-    for (int i = 0; i < _items.size() && i < _slotCount; ++i) {
+    for (int i = 0; i < _slotCount; ++i) {
         int itemIdx = i + _itemOffset;
+        if (itemIdx >= _items.size()) break;
+
         _protoItem->setFocus(_hilightedIndex == itemIdx);
         _protoItem->render(itemTransform, _items[itemIdx].text);
         itemTransform = glm::translate(itemTransform, glm::vec3(0.0f, protoExtent.height + _padding, 0.0f));
@@ -155,7 +163,7 @@ void ListBox::render(const glm::mat4 &transform, const std::string &textOverride
     if (_scrollBar) {
         ScrollBar &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setCanScrollUp(_itemOffset > 0);
-        scrollBar.setCanScrollDown(_itemOffset + _slotCount < _items.size());
+        scrollBar.setCanScrollDown(_items.size() - _itemOffset > _slotCount);
         scrollBar.render(transform, "");
     }
 }

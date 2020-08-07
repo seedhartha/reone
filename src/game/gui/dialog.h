@@ -17,8 +17,11 @@
 
 #pragma once
 
+#include "../../audio/soundinstance.h"
 #include "../../gui/gui.h"
 #include "../../resources/types.h"
+
+#include "../dialog.h"
 
 namespace reone {
 
@@ -29,15 +32,26 @@ public:
     DialogGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
+    void startDialog(const std::string &resRef);
+
+    void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
     resources::GameVersion _version { resources::GameVersion::KotOR };
+    std::shared_ptr<Dialog> _dialog;
+    std::shared_ptr<Dialog::EntryReply> _currentEntry;
+    std::shared_ptr<audio::SoundInstance> _currentVoice;
+    std::function<void()> _onDialogFinished;
 
     void addTopFrame();
     void addBottomFrame();
     void addFrame(int top, int height);
     void configureMessage();
     void configureReplies();
+    void onReplyClicked(int index);
+    void loadStartEntry();
+    bool checkCondition(const std::string &script);
+    void loadCurrentEntry();
 };
 
 } // namespace game

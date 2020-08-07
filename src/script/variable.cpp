@@ -43,8 +43,11 @@ Variable Variable::operator+(const Variable &other) const {
     if (type == VariableType::Float && other.type == VariableType::Float) {
         return floatValue + other.floatValue;
     }
+    if (type == VariableType::String && other.type == VariableType::String) {
+        return strValue + other.strValue;
+    }
 
-throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
+    throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
 }
 
 Variable Variable::operator-(const Variable &other) const {

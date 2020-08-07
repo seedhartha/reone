@@ -143,6 +143,9 @@ void Game::loadModule(const string &name, string entry) {
         unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
         dialog->load(_version);
         dialog->initGL();
+        dialog->setOnDialogFinished([this]() {
+            _screen = Screen::InGame;
+        });
         _dialog = move(dialog);
     }
 
@@ -164,6 +167,7 @@ void Game::configureModule() {
     });
     _module->setStartConversation([this](const string &name) {
         _screen = Screen::Dialog;
+        _dialog->startDialog(name);
     });
 }
 
