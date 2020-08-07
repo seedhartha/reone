@@ -56,7 +56,6 @@ set(HEADERS
     src/game/gui/dialog.h
     src/game/gui/hud.h
     src/game/gui/mainmenu.h
-    src/game/gui/modules.h
     src/game/item.h
     src/game/navmesh.h
     src/game/module.h
@@ -152,7 +151,6 @@ set(SOURCES
     src/game/gui/dialog.cpp
     src/game/gui/hud.cpp
     src/game/gui/mainmenu.cpp
-    src/game/gui/modules.cpp
     src/game/item.cpp
     src/game/module.cpp
     src/game/multiplayer/area.cpp

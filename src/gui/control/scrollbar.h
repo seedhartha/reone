@@ -29,7 +29,7 @@ public:
 
     void load(const resources::GffStruct &gffs) override;
     void initGL() override;
-    void render(const glm::mat4 &transform, const std::string &textOverride) const override;
+    void render(const glm::vec2 &offset, const std::string &textOverride) const override;
 
     void setCanScrollUp(bool scroll);
     void setCanScrollDown(bool scroll);
@@ -43,8 +43,8 @@ private:
     bool _canScrollUp { false };
     bool _canScrollDown { false };
 
-    void drawUpArrow(const glm::mat4 &transform) const;
-    void drawDownArrow(const glm::mat4 &transform) const;
+    void drawUpArrow(const glm::vec2 &offset) const;
+    void drawDownArrow(const glm::vec2 &offset) const;
 };
 
 } // namespace gui

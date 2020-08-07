@@ -44,7 +44,7 @@ static glm::vec3 g_tslBaseColor { 0.192157f, 0.768627f, 0.647059f };
 static glm::vec3 g_tslHilightColor { 0.768627f, 0.768627f, 0.686275f };
 
 DialogGui::DialogGui(const render::GraphicsOptions &opts) : GUI(opts) {
-    _scaling = ScalingMode::Resize;
+    _scaling = ScalingMode::Stretch;
 }
 
 static string getResRef(GameVersion version) {

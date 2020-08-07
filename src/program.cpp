@@ -57,20 +57,19 @@ int Program::run() {
 
 void Program::loadOptions() {
     _commonOpts.add_options()
-        ("game", po::value<std::string>(), "path to game directory")
-        ("module", po::value<std::string>(), "starting module name")
+        ("game", po::value<string>(), "path to game directory")
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
-        ("debug", po::value<bool>()->default_value(false), "enable debug logging");
+        ("debug", po::value<bool>()->default_value(false), "enable debug mode");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
         ("serve", "start multiplayer game")
-        ("join", po::value<std::string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
+        ("join", po::value<string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_cmdLineOpts)
@@ -83,14 +82,14 @@ void Program::loadOptions() {
     po::notify(_vars);
 
     _help = _vars.count("help") > 0;
-    _gamePath = _vars.count("game") ? _vars["game"].as<std::string>() : fs::current_path();
-    _module = _vars.count("module") ? _vars["module"].as<std::string>() : "";
+    _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
+    _debug = _vars["debug"].as<bool>();
     _gameOpts.graphics.width = _vars["width"].as<int>();
     _gameOpts.graphics.height = _vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
     _gameOpts.audio.musicVolume = _vars["musicvol"].as<int>();
     _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
-    _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<std::string>() : "";
+    _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
 
     bool debug = _vars["debug"].as<bool>();
@@ -114,16 +113,16 @@ void Program::initMultiplayerMode() {
 }
 
 int Program::runGame() {
-    std::unique_ptr<Game> game;
+    unique_ptr<Game> game;
 
     switch (_multiplayer) {
         case MultiplayerMode::Client:
         case MultiplayerMode::Server:
-            game.reset(new MultiplayerGame(_multiplayer, _version, _gamePath, _module, _gameOpts));
+            game.reset(new MultiplayerGame(_multiplayer, _version, _gamePath, _gameOpts));
             break;
 
         default:
-            game.reset(new Game(_version, _gamePath, _module, _gameOpts));
+            game.reset(new Game(_version, _gamePath, _gameOpts));
             break;
     }
 

@@ -37,7 +37,6 @@ public:
     ListBox();
     ListBox(const std::string &tag);
 
-    void loadCustom();
     void clearItems();
     void add(const Item &item);
 
@@ -46,8 +45,8 @@ public:
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
     void initGL() override;
-    void render(const glm::mat4 &transform, const std::string &textOverride) const override;
-    void resize(float scaleX, float scaleY) override;
+    void render(const glm::vec2 &offset, const std::string &textOverride) const override;
+    void stretch(float x, float y) override;
 
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;

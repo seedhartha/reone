@@ -37,7 +37,8 @@ namespace reone {
 namespace gui {
 
 GUI::GUI(const GraphicsOptions &opts) : _opts(opts) {
-    _screenCenter = glm::vec3(0.5f * _opts.width, 0.5f * _opts.height, 0.0f);
+    _screenCenter.x = 0.5f * _opts.width;
+    _screenCenter.y = 0.5f * _opts.height;
 }
 
 void GUI::load(const string &resRef, BackgroundType background) {
@@ -46,41 +47,58 @@ void GUI::load(const string &resRef, BackgroundType background) {
 
     loadBackground(background);
 
-    float aspectX = _opts.width / static_cast<float>(_resolutionX);
-    float aspectY = _opts.height / static_cast<float>(_resolutionY);
+    _rootControl = Control::makeControl(*gui);
 
     switch (_scaling) {
-        case ScalingMode::Center: {
-            float x = _screenCenter.x - 0.5f * _resolutionX;
-            float y = _screenCenter.y - 0.5f * _resolutionY;
-            _controlTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+        case ScalingMode::Center:
+            _controlOffset.x = _screenCenter.x - 0.5f * _resolutionX;
+            _controlOffset.y = _screenCenter.y - 0.5f * _resolutionY;
             break;
-        }
         case ScalingMode::Stretch:
-            _controlTransform = glm::scale(glm::mat4(1.0f), glm::vec3(aspectX, aspectY, 1.0f));
+            stretchControl(*_rootControl);
+            break;
+        default:
             break;
     }
 
-    _rootControl = Control::makeControl(*gui);
+    const Control::Extent &rootExtent = _rootControl->extent();
+    _controlOffset.x += rootExtent.left;
+    _controlOffset.y += rootExtent.top;
 
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
         unique_ptr<Control> control(Control::makeControl(ctrlGffs));
         if (!control) continue;
 
+        switch (_scaling) {
+            case ScalingMode::PositionRelativeToCenter:
+                positionRelativeToCenter(*control);
+                break;
+            case ScalingMode::Stretch:
+                stretchControl(*control);
+                break;
+            default:
+                break;
+        }
         control->setOnClick(bind(&GUI::onClick, this, _1));
         _controls.push_back(move(control));
     }
+}
 
-    if (_scaling == ScalingMode::Resize) {
-        _rootControl->resize(aspectX, aspectY);
-
-        for (auto &ctrl : _controls) {
-            ctrl->resize(aspectX, aspectY);
-        }
+void GUI::positionRelativeToCenter(Control &control) {
+    Control::Extent extent(control.extent());
+    if (extent.left >= 0.5f * _resolutionX) {
+        extent.left = extent.left - _resolutionX + _opts.width;
     }
+    if (extent.top >= 0.5f * _resolutionY) {
+        extent.top = extent.top - _resolutionY + _opts.height;
+    }
+    control.setExtent(move(extent));
+}
 
-    const Control::Extent &rootExtent = _rootControl->extent();
-    _controlTransform = glm::translate(_controlTransform, glm::vec3(rootExtent.left, rootExtent.top, 0.0f));
+void GUI::stretchControl(Control &control) {
+    float aspectX = _opts.width / static_cast<float>(_resolutionX);
+    float aspectY = _opts.height / static_cast<float>(_resolutionY);
+    control.stretch(aspectX, aspectY);
 }
 
 void GUI::loadBackground(BackgroundType type) {
@@ -109,21 +127,19 @@ void GUI::loadBackground(BackgroundType type) {
 }
 
 bool GUI::handle(const SDL_Event &event) {
-    glm::vec2 ctrlCoords(0.0f);
-
     switch (event.type) {
-        case SDL_MOUSEMOTION:
-            ctrlCoords = screenToControlCoords(event.motion.x, event.motion.y);
+        case SDL_MOUSEMOTION: {
+            glm::vec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
             updateFocus(ctrlCoords.x, ctrlCoords.y);
             if (_focus) {
                 _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
             }
             break;
-
+        }
         case SDL_MOUSEBUTTONUP:
-            if (event.button.button == SDL_BUTTON_LEFT && event.button.clicks == 1 && _focus) {
+            if (_focus && event.button.button == SDL_BUTTON_LEFT && event.button.clicks == 1) {
                 debug("GUI: control clicked on: " + _focus->tag());
-                ctrlCoords = screenToControlCoords(event.button.x, event.button.y);
+                glm::vec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 return _focus->handleClick(ctrlCoords.x, ctrlCoords.y);
             }
             break;
@@ -134,10 +150,6 @@ bool GUI::handle(const SDL_Event &event) {
     }
 
     return false;
-}
-
-glm::vec2 GUI::screenToControlCoords(int x, int y) const {
-    return glm::inverse(_controlTransform) * glm::vec4(x, y, 0.0f, 1.0f);
 }
 
 void GUI::updateFocus(int x, int y) {
@@ -170,7 +182,7 @@ void GUI::render() const {
     if (_background) renderBackground();
 
     for (auto &control : _controls) {
-        control->render(_controlTransform);
+        control->render(_controlOffset);
     }
 }
 

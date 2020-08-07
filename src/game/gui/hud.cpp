@@ -19,6 +19,8 @@
 
 #include "../../gui/control/label.h"
 
+using namespace std;
+
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
@@ -30,7 +32,7 @@ namespace game {
 HUD::HUD(const render::GraphicsOptions &opts) : GUI(opts) {
     _resolutionX = 800;
     _resolutionY = 600;
-    _scaling = ScalingMode::Resize;
+    _scaling = ScalingMode::PositionRelativeToCenter;
 }
 
 void HUD::load(GameVersion version) {
@@ -128,8 +130,8 @@ void HUD::load(GameVersion version) {
     hideControl("BTN_ACTIONDOWN5");
 }
 
-std::string HUD::getResRef(GameVersion version) const {
-    std::string resRef("mipc28x6");
+string HUD::getResRef(GameVersion version) const {
+    string resRef("mipc28x6");
     if (version == GameVersion::TheSithLords) {
         resRef += "_p";
     }
