@@ -37,7 +37,7 @@ namespace script {
 #define Action VariableType::Action
 
 void RoutineManager::addKotorRoutines() {
-    _routines.emplace_back("Random", Int, vector<VariableType>());
+    _routines.emplace_back("Random", Int, vector<VariableType> { Int });
     _routines.emplace_back("PrintString", Void, vector<VariableType> { String });
     _routines.emplace_back("PrintFloat", Void, vector<VariableType> { Float, Int, Int });
     _routines.emplace_back("FloatToString", String, vector<VariableType> { Float, Int, Int });

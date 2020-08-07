@@ -34,6 +34,8 @@ public:
     SoundInstance &operator=(SoundInstance &&) = default;
 
     void update();
+    void stop();
+
     bool stopped() const;
 
 private:
@@ -49,8 +51,8 @@ private:
     State _state { State::NotInited };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
-    unsigned int _source { 0 };
-    std::vector<unsigned int> _buffers;
+    uint32_t _source { 0 };
+    std::vector<uint32_t> _buffers;
 
     SoundInstance(SoundInstance &) = delete;
     SoundInstance &operator=(SoundInstance &) = delete;

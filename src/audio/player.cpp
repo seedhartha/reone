@@ -25,6 +25,8 @@
 
 #include "../core/log.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace audio {
@@ -43,29 +45,31 @@ void AudioPlayer::init(const AudioOptions &opts) {
 
     _device = alcOpenDevice(nullptr);
     if (!_device) {
-        throw std::runtime_error("Failed to open audio device");
+        throw runtime_error("Failed to open audio device");
     }
 
     _context = alcCreateContext(_device, nullptr);
     if (!_context) {
-        throw std::runtime_error("Failed to create audio context");
+        throw runtime_error("Failed to create audio context");
     }
     alcMakeContextCurrent(_context);
     alListenerf(AL_GAIN, _opts.volume / 100.0f);
 
-    _thread = std::thread(std::bind(threadStart, this));
+    _thread = thread(bind(&AudioPlayer::threadStart, this));
 }
 
-void AudioPlayer::threadStart(AudioPlayer *player) {
-    while (player->_run) {
-        std::lock_guard<std::recursive_mutex> lock(player->_soundsMutex);
-        std::remove_if(
-            player->_sounds.begin(),
-            player->_sounds.end(),
-            [](const SoundInstance &sound) { return sound.stopped(); });
+void AudioPlayer::threadStart() {
+    while (_run) {
+        lock_guard<recursive_mutex> lock(_soundsMutex);
+        auto it = remove_if(
+            _sounds.begin(),
+            _sounds.end(),
+            [](const shared_ptr<SoundInstance> &sound) { return sound->stopped(); });
 
-        for (auto &sound : player->_sounds) {
-            sound.update();
+        _sounds.erase(it, _sounds.end());
+
+        for (auto &sound : _sounds) {
+            sound->update();
         }
     }
 }
@@ -93,18 +97,21 @@ void AudioPlayer::deinit() {
     }
 }
 
-void AudioPlayer::play(const std::shared_ptr<AudioStream> &stream, bool loop) {
-    if (!stream) {
-        throw std::invalid_argument("Audio stream is empty");
-    }
-    SoundInstance sound(stream, loop);
-    std::lock_guard<std::recursive_mutex> lock(_soundsMutex);
-    _sounds.push_back(std::move(sound));
+void AudioPlayer::reset() {
+    lock_guard<recursive_mutex> lock(_soundsMutex);
+    _sounds.clear();
 }
 
-void AudioPlayer::reset() {
-    std::lock_guard<std::recursive_mutex> lock(_soundsMutex);
-    _sounds.clear();
+shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, bool loop) {
+    if (!stream) {
+        throw invalid_argument("Audio stream is empty");
+    }
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop));
+
+    lock_guard<recursive_mutex> lock(_soundsMutex);
+    _sounds.push_back(sound);
+
+    return move(sound);
 }
 
 } // namespace audio

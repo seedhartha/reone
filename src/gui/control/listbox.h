@@ -38,6 +38,7 @@ public:
     ListBox(const std::string &tag);
 
     void loadCustom();
+    void clearItems();
     void add(const Item &item);
 
     void load(const resources::GffStruct &gffs) override;

@@ -67,7 +67,14 @@ void SoundInstance::update() {
     if (_state == State::NotInited) {
         init();
     }
-    if (!_multiframe) return;
+    if (!_multiframe) {
+        ALint state = 0;
+        alGetSourcei(_source, AL_SOURCE_STATE, &state);
+        if (state == AL_STOPPED) {
+            _state = State::Stopped;
+        }
+        return;
+    }
 
     ALint processed = 0;
     alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
@@ -86,6 +93,10 @@ void SoundInstance::update() {
         alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
         _nextBuffer = (++_nextBuffer) % 2;
     }
+}
+
+void SoundInstance::stop() {
+    alSourceStop(_source);
 }
 
 bool SoundInstance::stopped() const {

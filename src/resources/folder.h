@@ -48,6 +48,8 @@ private:
 
     Folder(const Folder &) = delete;
     Folder &operator=(const Folder &) = delete;
+
+    void loadDirectory(const boost::filesystem::path &path);
 };
 
 } // namespace resources

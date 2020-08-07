@@ -36,8 +36,9 @@ public:
 
     void init(const AudioOptions &opts);
     void deinit();
-    void play(const std::shared_ptr<AudioStream> &stream, bool loop = false);
+
     void reset();
+    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, bool loop = false);
 
 private:
     AudioOptions _opts;
@@ -45,7 +46,7 @@ private:
     ALCcontext *_context { nullptr };
     std::thread _thread;
     std::atomic_bool _run { true };
-    std::list<SoundInstance> _sounds;
+    std::list<std::shared_ptr<SoundInstance>> _sounds;
     std::recursive_mutex _soundsMutex;
 
     AudioPlayer() = default;
@@ -54,7 +55,7 @@ private:
 
     AudioPlayer &operator=(const AudioPlayer &) = delete;
 
-    static void threadStart(AudioPlayer *);
+    void threadStart();
 };
 
 #define TheAudioPlayer audio::AudioPlayer::instance()

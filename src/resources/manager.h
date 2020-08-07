@@ -78,6 +78,7 @@ private:
 
     void addErfProvider(const boost::filesystem::path &path);
     void addTransientRimProvider(const boost::filesystem::path &path);
+    void addTransientErfProvider(const boost::filesystem::path &path);
     void addFolderProvider(const boost::filesystem::path &path);
     void initModuleNames();
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;

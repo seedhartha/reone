@@ -85,6 +85,7 @@ public:
     void setBorder(const Border &border);
     void setHilight(const Border &hilight);
     void setText(const Text &text);
+    void setTextMessage(const std::string &text);
 
     const std::string &tag() const;
     const Extent &extent() const;

@@ -85,11 +85,12 @@ ScriptExecution::ScriptExecution(const std::shared_ptr<ScriptProgram> &program, 
 
 int ScriptExecution::run() {
     uint32_t insOff = kStartInstructionOffset;
+    _stack.push_back(Variable(0));
 
     if (_context.savedState) {
         vector<Variable> globals(_context.savedState->globals);
         copy(globals.begin(), globals.end(), back_inserter(_stack));
-        _globalCount = globals.size();
+        _globalCount = _stack.size();
 
         vector<Variable> locals(_context.savedState->locals);
         copy(locals.begin(), locals.end(), back_inserter(_stack));
@@ -112,7 +113,9 @@ int ScriptExecution::run() {
         insOff = _nextInstruction;
     }
 
-    return 0;
+    assert(_stack.front().type == VariableType::Int);
+
+    return _stack.front().intValue;
 }
 
 void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
