@@ -55,6 +55,8 @@ public:
     void initGL() override;
     void render() const override;
 
+    void update3rdPersonCameraHeading();
+
     // Setters
     void setLoadParty(bool load);
     void setTransitionEnabled(bool enabled);
@@ -70,7 +72,7 @@ public:
     // Callbacks
     void setOnCameraChanged(const std::function<void(render::CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
-    void setStartConversation(const std::function<void(const std::string &)> &fn);
+    void setStartDialog(const std::function<void(const std::string &, const std::string &)> &fn);
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -94,7 +96,7 @@ private:
     // Callbacks
     std::function<void(render::CameraType)> _onCameraChanged;
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
-    std::function<void(const std::string &)> _startConversation;
+    std::function<void(const std::string &, const std::string &)> _startDialog;
 
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
@@ -108,7 +110,8 @@ private:
     void cycleDebugMode(bool forward);
     void updatePlayer(float dt);
     bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
-    void syncThirdPersonCamera();
+    void update3rdPersonCameraTarget();
+    void switchTo3rdPersonCamera();
     void resetInput();
 };
 

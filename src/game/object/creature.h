@@ -59,7 +59,9 @@ public:
     void load(const resources::GffStruct &gffs);
     void load(int appearance, const glm::vec3 &position, float heading);
     void initGL() override;
+    void playDefaultAnimation();
     void playGreetingAnimation();
+    void playTalkAnimation();
     void clearActions();
     void enqueue(const Action &action);
     void equip(const std::string &resRef);

@@ -129,7 +129,12 @@ void DialogGui::configureReplies() {
 void DialogGui::onReplyClicked(int index) {
     const Dialog::EntryReply &reply = _dialog->getReply(index);
     if (reply.entries.empty()) {
-        if (_onDialogFinished) _onDialogFinished();
+        if (_onDialogFinished) {
+            if (_onSpeakerChanged) {
+                _onSpeakerChanged(_currentSpeaker, "");
+            }
+            _onDialogFinished();
+        }
         return;
     }
     int entryIdx = -1;
@@ -151,15 +156,19 @@ void DialogGui::onReplyClicked(int index) {
     }
 }
 
-void DialogGui::startDialog(const string &resRef) {
+void DialogGui::startDialog(const string &resRef, const string &owner) {
     shared_ptr<GffStruct> dlg(ResMan.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         if (_onDialogFinished) _onDialogFinished();
         return;
     }
-
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
+
+    _currentSpeaker = owner;
+    if (_onSpeakerChanged) {
+        _onSpeakerChanged("", _currentSpeaker);
+    }
 
     loadStartEntry();
 }
@@ -191,6 +200,14 @@ void DialogGui::loadCurrentEntry() {
     if (_currentVoice) _currentVoice->stop();
 
     assert(_currentEntry);
+
+    if (!_currentEntry->speaker.empty() && _currentSpeaker != _currentEntry->speaker) {
+        string prevSpeaker(_currentSpeaker);
+        _currentSpeaker = _currentEntry->speaker;
+        if (_onSpeakerChanged) {
+            _onSpeakerChanged(prevSpeaker, _currentSpeaker);
+        }
+    }
     if (!_currentEntry->voResRef.empty()) {
         shared_ptr<AudioStream> voice(ResMan.findAudio(_currentEntry->voResRef));
         if (voice) {
@@ -218,11 +235,18 @@ void DialogGui::loadCurrentEntry() {
         ScriptExecution(ScriptMan.find(_currentEntry->script), ExecutionContext()).run();
     }
     if (replyCount == 0 && _onDialogFinished) {
+        if (_onSpeakerChanged) {
+            _onSpeakerChanged(_currentSpeaker, "");
+        }
         _onDialogFinished();
     }
 }
 
-void DialogGui::setOnDialogFinished(const std::function<void()> &fn) {
+void DialogGui::setOnSpeakerChanged(const std::function<void(const string&, const string &)> &fn) {
+    _onSpeakerChanged = fn;
+}
+
+void DialogGui::setOnDialogFinished(const function<void()> &fn) {
     _onDialogFinished = fn;
 }
 

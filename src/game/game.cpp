@@ -143,6 +143,21 @@ void Game::loadModule(const string &name, string entry) {
         unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
         dialog->load(_version);
         dialog->initGL();
+        dialog->setOnSpeakerChanged([this](const string &from, const string &to) {
+            Object *player = _module->area().player().get();
+            Creature *prevSpeaker = !from.empty() ? static_cast<Creature *>(_module->area().find(from).get()) : nullptr;
+            Creature *speaker = !to.empty() ? static_cast<Creature *>(_module->area().find(to).get()) : nullptr;
+
+            if (prevSpeaker) {
+                prevSpeaker->playDefaultAnimation();
+            }
+            if (player && speaker) {
+                player->face(*speaker);
+                speaker->face(*player);
+                speaker->playTalkAnimation();
+                _module->update3rdPersonCameraHeading();
+            }
+        });
         dialog->setOnDialogFinished([this]() {
             _screen = Screen::InGame;
         });
@@ -165,9 +180,9 @@ void Game::configureModule() {
         _nextModule = name;
         _nextEntry = entry;
     });
-    _module->setStartConversation([this](const string &name) {
+    _module->setStartDialog([this](const string &resRef, const string &owner) {
         _screen = Screen::Dialog;
-        _dialog->startDialog(name);
+        _dialog->startDialog(resRef, owner);
     });
 }
 
