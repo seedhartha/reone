@@ -26,7 +26,6 @@
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
-#include "gui/modules.h"
 
 #include "module.h"
 
@@ -46,7 +45,6 @@ public:
     Game(
         resources::GameVersion version,
         const boost::filesystem::path &path,
-        const std::string &startModule,
         const Options &opts);
 
     int run();
@@ -71,13 +69,11 @@ private:
     enum class Screen {
         None,
         MainMenu,
-        ModuleSelection,
         InGame,
         Dialog
     };
 
     boost::filesystem::path _path;
-    std::string _startModule;
     render::RenderWindow _renderWindow;
     uint32_t _ticks { 0 };
     bool _quit { false };
@@ -87,12 +83,14 @@ private:
 
     // GUI
     std::shared_ptr<MainMenu> _mainMenu;
-    std::shared_ptr<ModulesGui> _modulesGui;
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DialogGui> _dialog;
     std::shared_ptr<DebugGui> _debug;
 
-    void startModuleSelection();
+    void loadMainMenu();
+    void loadHUD();
+    void loadDebugGui();
+    void loadDialogGui();
     void runMainLoop();
     std::shared_ptr<gui::GUI> currentGUI() const;
     float getDeltaTime();

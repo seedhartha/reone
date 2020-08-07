@@ -206,7 +206,7 @@ void Control::initGL() {
     if (_text.font) _text.font->initGL();
 }
 
-void Control::render(const glm::mat4 &transform, const std::string &textOverride) const {
+void Control::render(const glm::vec2 &offset, const std::string &textOverride) const {
     if (!_visible) return;
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -215,26 +215,34 @@ void Control::render(const glm::mat4 &transform, const std::string &textOverride
     shaders.setUniform("alpha", 1.0f);
 
     if (_focus && _hilight) {
-        drawBorder(*_hilight, transform);
+        drawBorder(*_hilight, offset);
     } else if (_border) {
-        drawBorder(*_border, transform);
+        drawBorder(*_border, offset);
     }
 
     shaders.deactivate();
 
     if (!textOverride.empty() || !_text.text.empty()) {
-        drawText(transform, textOverride);
+        string text(!textOverride.empty() ? textOverride : _text.text);
+        drawText(text, offset);
     }
 }
 
-void Control::drawBorder(const Border &border, const glm::mat4 &transform) const {
+void Control::drawBorder(const Border &border, const glm::vec2 &offset) const {
     ShaderManager &shaders = ShaderManager::instance();
     GUIQuad &quad = GUIQuad::instance();
 
     glActiveTexture(0);
 
     if (border.fill) {
-        shaders.setUniform("model", transform * _transform);
+        int x = _extent.left + border.dimension + offset.x;
+        int y = _extent.top + border.dimension + offset.y;
+        int w = _extent.width - 2 * border.dimension;
+        int h = _extent.height - 2 * border.dimension;
+        glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
+        transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+        shaders.setUniform("model", transform);
         border.fill->bind();
 
         GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
@@ -256,86 +264,92 @@ void Control::drawBorder(const Border &border, const glm::mat4 &transform) const
         border.fill->unbind();
     }
     if (border.edge) {
-        float verticalHeight = _extent.height - 2.0f * border.dimension;
-        float horizonalWidth = _extent.width - 2.0f * border.dimension;
+        int verticalHeight = _extent.height - 2 * border.dimension;
+        int horizonalWidth = _extent.width - 2 * border.dimension;
         glm::mat4 edgeTransform(1.0f);
         shaders.setUniform("color", border.color);
         border.edge->bind();
 
         if (verticalHeight > 0.0f) {
+            int x = _extent.left + offset.x;
+            int y = _extent.top + border.dimension + offset.y;
+
             // Left edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(0.0f, border.dimension, 0.0f));
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
             edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, verticalHeight, 1.0f));
             edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
             edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-            shaders.setUniform("model", transform * edgeTransform);
+            shaders.setUniform("model", edgeTransform);
             quad.render(GL_TRIANGLES);
 
             // Right edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, border.dimension, 0.0f));
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + _extent.width, y, 0.0f));
             edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, verticalHeight, 1.0f));
             edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-            shaders.setUniform("model", transform * edgeTransform);
+            shaders.setUniform("model", edgeTransform);
             quad.render(GL_TRIANGLES);
         }
 
         if (horizonalWidth > 0.0f) {
+            int x = _extent.left + border.dimension + offset.x;
+            int y = _extent.top + offset.y;
+
             // Top edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(border.dimension, 0.0f, 0.0f));
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
             edgeTransform = glm::scale(edgeTransform, glm::vec3(horizonalWidth, border.dimension, 1.0f));
-            shaders.setUniform("model", transform * edgeTransform);
+            shaders.setUniform("model", edgeTransform);
             quad.render(GL_TRIANGLES);
 
             // Bottom edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(border.dimension, _extent.height, 0.0f));
+            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + _extent.height, 0.0f));
             edgeTransform = glm::scale(edgeTransform, glm::vec3(horizonalWidth, border.dimension, 1.0f));
             edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-            shaders.setUniform("model", transform * edgeTransform);
+            shaders.setUniform("model", edgeTransform);
             quad.render(GL_TRIANGLES);
         }
 
         border.edge->unbind();
     }
     if (border.corner) {
-        border.corner->bind();
+        int x = _extent.left + offset.x;
+        int y = _extent.top + offset.y;
         glm::mat4 cornerTransform(1.0f);
+        border.corner->bind();
 
         // Top left corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]));
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
-        shaders.setUniform("model", transform * cornerTransform);
+        shaders.setUniform("model", cornerTransform);
         quad.render(GL_TRIANGLES);
 
         // Bottom left corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(0.0f, _extent.height, 0.0f));
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + _extent.height, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         cornerTransform = glm::rotate(cornerTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-        shaders.setUniform("model", transform * cornerTransform);
+        shaders.setUniform("model", cornerTransform);
         quad.render(GL_TRIANGLES);
 
         // Top right corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, 0.0f, 0.0f));
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + _extent.width, y, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         cornerTransform = glm::rotate(cornerTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-        shaders.setUniform("model", transform * cornerTransform);
+        shaders.setUniform("model", cornerTransform);
         quad.render(GL_TRIANGLES);
 
         // Bottom right corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::make_vec3(_transform[3]) + glm::vec3(_extent.width, _extent.height, 0.0f));
+        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + _extent.width, y + _extent.height, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         cornerTransform = glm::rotate(cornerTransform, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-        shaders.setUniform("model", transform * cornerTransform);
+        shaders.setUniform("model", cornerTransform);
         quad.render(GL_TRIANGLES);
 
         border.corner->unbind();
     }
 }
 
-void Control::drawText(const glm::mat4 &transform, const string &textOverride) const {
-    glm::vec2 scale(transform[0][0], transform[1][1]);
-    string text(!textOverride.empty() ? textOverride : _text.text);
+void Control::drawText(const string &text, const glm::vec2 &offset) const {
     float textWidth = _text.font->measure(text);
-    int lineCount = glm::ceil(textWidth / (scale.x * static_cast<float>(_extent.width)));
+    int lineCount = glm::ceil(textWidth / static_cast<float>(_extent.width));
 
     TextGravity gravity;
     switch (_text.align) {
@@ -347,31 +361,22 @@ void Control::drawText(const glm::mat4 &transform, const string &textOverride) c
             break;
     }
 
-    glm::vec2 offset;
+    glm::vec2 position;
+    glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
     if (lineCount == 1) {
-        getTextOffset(scale, offset, 1);
-        glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offset, 0.0f)));
-
-        _text.font->render(
-            !textOverride.empty() ? textOverride : _text.text,
-            textTransform,
-            (_focus && _hilight) ? _hilight->color : _text.color,
-            gravity);
+        getTextPosition(position, 1);
+        glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
+        _text.font->render(text, transform, color, gravity);
 
     } else {
-        vector<string> lines(breakText(text, scale.x * _extent.width));
-        getTextOffset(scale, offset, lines.size());
+        vector<string> lines(breakText(text, _extent.width));
+        getTextPosition(position, lines.size());
 
         for (auto &line : lines) {
-            glm::mat4 textTransform(glm::translate(glm::mat4(1.0f), glm::make_vec3(transform[3]) + glm::vec3(offset, 0.0f)));
-            offset.y += _text.font->height();
-
-            _text.font->render(
-                line,
-                textTransform,
-                (_focus && _hilight) ? _hilight->color : _text.color,
-                gravity);
+            glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
+            position.y += _text.font->height();
+            _text.font->render(line, transform, color, gravity);
         }
     }
 }
@@ -401,33 +406,31 @@ vector<string> Control::breakText(const string &text, int maxWidth) const {
     return move(lines);
 }
 
-void Control::getTextOffset(const glm::vec2 &scale, glm::vec2 &offset, int lineCount) const {
+void Control::getTextPosition(glm::vec2 &position, int lineCount) const {
     switch (_text.align) {
         case TextAlign::CenterBottom:
-            offset.y = scale.y * (_extent.top + _extent.height - (lineCount - 0.5f) * _text.font->height());
+            position.y = _extent.top + _extent.height - (lineCount - 0.5f) * _text.font->height();
             break;
         default:
-            offset.y = scale.y * (_extent.top + 0.5f * _extent.height);
+            position.y = _extent.top + 0.5f * _extent.height;
             break;
     }
     switch (_text.align) {
         case TextAlign::LeftCenter:
-            offset.x = scale.x * _extent.left;
+            position.x = _extent.left;
             break;
         default:
-            offset.x = scale.x * (_extent.left + 0.5f * _extent.width);
+            position.x = _extent.left + 0.5f * _extent.width;
             break;
     }
 }
 
-void Control::resize(float scaleX, float scaleY) {
-    Control::Extent extent(_extent);
-    extent.left *= scaleX;
-    extent.top *= scaleY;
-    extent.width *= scaleX;
-    extent.height *= scaleY;
-
-    setExtent(move(extent));
+void Control::stretch(float x, float y) {
+    _extent.left *= x;
+    _extent.top *= y;
+    _extent.width *= x;
+    _extent.height *= y;
+    updateTransform();
 }
 
 void Control::setVisible(bool visible) {

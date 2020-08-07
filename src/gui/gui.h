@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
 
 #include "../resources/gfffile.h"
 
@@ -46,16 +46,16 @@ public:
 protected:
     enum class ScalingMode {
         Center,
-        Stretch,
-        Resize
+        PositionRelativeToCenter,
+        Stretch
     };
 
     render::GraphicsOptions _opts;
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };
-    glm::vec3 _screenCenter { 0.0f };
-    glm::mat4 _controlTransform { 1.0f };
+    glm::vec2 _screenCenter { 0.0f };
+    glm::vec2 _controlOffset { 0.0f };
     std::shared_ptr<render::Texture> _background;
     std::shared_ptr<Control> _rootControl;
     std::vector<std::shared_ptr<Control>> _controls;
@@ -74,7 +74,8 @@ private:
     GUI(const GUI &) = delete;
     GUI &operator=(const GUI &) = delete;
 
-    glm::vec2 screenToControlCoords(int x, int y) const;
+    void positionRelativeToCenter(Control &control);
+    void stretchControl(Control &control);
     void updateFocus(int x, int y);
     void renderBackground() const;
 };

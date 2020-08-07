@@ -36,7 +36,6 @@ public:
         MultiplayerMode mode,
         resources::GameVersion version,
         const boost::filesystem::path &path,
-        const std::string &startModule,
         const Options &opts);
 
 private:

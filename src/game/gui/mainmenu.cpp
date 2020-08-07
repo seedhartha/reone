@@ -17,6 +17,9 @@
 
 #include "mainmenu.h"
 
+#include "../../gui/control/listbox.h"
+#include "../../resources/manager.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -35,11 +38,10 @@ MainMenu::MainMenu(const GraphicsOptions &opts) : GUI(opts) {
 void MainMenu::load(GameVersion version) {
     GUI::load(getResRef(version), version == GameVersion::KotOR ? BackgroundType::Menu : BackgroundType::None);
 
-    hideControl("BTN_WARP");
+    hideControl("LB_MODULES");
     hideControl("LBL_NEWCONTENT");
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
-    hideControl("LB_MODULES");
 }
 
 string MainMenu::getResRef(GameVersion version) const {
@@ -61,6 +63,32 @@ void MainMenu::onClick(const string &control) {
         if (_onNewGame) _onNewGame();
     } else if (control == "BTN_EXIT") {
         if (_onExit) _onExit();
+    } else if (control == "BTN_WARP") {
+        startModuleSelection();
+    }
+}
+
+void MainMenu::startModuleSelection() {
+    hideControl("BTN_EXIT");
+    hideControl("BTN_LOADGAME");
+    hideControl("BTN_MOVIES");
+    hideControl("BTN_MUSIC");
+    hideControl("BTN_NEWGAME");
+    hideControl("BTN_OPTIONS");
+    hideControl("BTN_WARP");
+    showControl("LB_MODULES");
+    hideControl("LBL_3DVIEW");
+    hideControl("LBL_GAMELOGO");
+    hideControl("LBL_MENUBG");
+
+    ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
+    modules.setOnItemClicked([this](const string &ctrl, const string &item) {
+        if (_onModuleSelected) {
+            _onModuleSelected(item);
+        }
+    });
+    for (auto &module : ResMan.moduleNames()) {
+        modules.add({ module, module });
     }
 }
 
@@ -70,6 +98,10 @@ void MainMenu::setOnNewGame(const function<void()> &fn) {
 
 void MainMenu::setOnExit(const function<void()> &fn) {
     _onExit = fn;
+}
+
+void MainMenu::setOnModuleSelected(const function<void(const string &)> &fn) {
+    _onModuleSelected = fn;
 }
 
 } // namespace game

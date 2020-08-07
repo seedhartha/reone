@@ -33,12 +33,15 @@ public:
 
     void setOnNewGame(const std::function<void()> &fn);
     void setOnExit(const std::function<void()> &fn);
+    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
 
 private:
     std::function<void()> _onNewGame;
     std::function<void()> _onExit;
+    std::function<void(const std::string &)> _onModuleSelected;
 
     std::string getResRef(resources::GameVersion version) const;
+    void startModuleSelection();
 };
 
 } // namespace game

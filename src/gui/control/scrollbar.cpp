@@ -25,6 +25,8 @@
 #include "../../render/shadermanager.h"
 #include "../../resources/manager.h"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -40,7 +42,8 @@ void ScrollBar::load(const GffStruct &gffs) {
 
     const GffField *dir = gffs.find("DIR");
     if (dir) {
-        _dir.image = ResMan.findTexture(dir->asStruct().getString("IMAGE"), TextureType::Diffuse);
+        string image(dir->asStruct().getString("IMAGE"));
+        _dir.image = ResMan.findTexture(image, TextureType::Diffuse);
     }
 }
 
@@ -48,7 +51,7 @@ void ScrollBar::initGL() {
     if (_dir.image) _dir.image->initGL();
 }
 
-void ScrollBar::render(const glm::mat4 &transform, const std::string &textOverride) const {
+void ScrollBar::render(const glm::vec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
     ShaderMan.activate(ShaderProgram::BasicDiffuse);
@@ -58,28 +61,28 @@ void ScrollBar::render(const glm::mat4 &transform, const std::string &textOverri
     glActiveTexture(0);
     _dir.image->bind();
 
-    if (_canScrollUp) drawUpArrow(transform);
-    if (_canScrollDown) drawDownArrow(transform);
+    if (_canScrollUp) drawUpArrow(offset);
+    if (_canScrollDown) drawDownArrow(offset);
 
     _dir.image->unbind();
     ShaderMan.deactivate();
 }
 
-void ScrollBar::drawUpArrow(const glm::mat4 &transform) const {
-    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
+void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
+    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f)));
     arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    ShaderMan.setUniform("model", transform * arrowTransform);
+    ShaderMan.setUniform("model", arrowTransform);
 
     GUIQuad::instance().render(GL_TRIANGLES);
 }
 
-void ScrollBar::drawDownArrow(const glm::mat4 &transform) const {
-    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, _extent.height, 0.0f)));
+void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
+    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f)));
     arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
     arrowTransform = glm::rotate(arrowTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    ShaderMan.setUniform("model", transform * arrowTransform);
+    ShaderMan.setUniform("model", arrowTransform);
 
     GUIQuad::instance().render(GL_TRIANGLES);
 }

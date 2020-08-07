@@ -46,23 +46,6 @@ ListBox::ListBox() : Control(ControlType::ListBox) {
 ListBox::ListBox(const string &tag) : Control(ControlType::ListBox, tag) {
 }
 
-void ListBox::loadCustom() {
-    Control::Border border;
-    border.fill = ResMan.findTexture("brightblue", TextureType::Diffuse);
-
-    Control::Text text;
-    text.font = ResMan.findFont("fnt_d16x16b");
-
-    unique_ptr<Control> protoItem(new Button());
-    protoItem->setExtent(Control::Extent(0, 0, _extent.width, _text.font->height() + 2 * kItemPadding));
-    protoItem->setBorder(border);
-    protoItem->setText(text);
-    _protoItem = move(protoItem);
-
-    _padding = 3;
-    updateItems();
-}
-
 void ListBox::updateItems() {
     if (!_protoItem) return;
 
@@ -106,7 +89,7 @@ bool ListBox::handleMouseMotion(int x, int y) {
 
 int ListBox::getItemIndex(int y) const {
     const Control::Extent &protoExtent = _protoItem->extent();
-    int idx = (y - _extent.top - protoExtent.top) / (protoExtent.height + _padding) + _itemOffset;
+    int idx = (y - protoExtent.top) / (protoExtent.height + _padding) + _itemOffset;
     return idx >= 0 && idx < _items.size() ? idx : -1;
 }
 
@@ -141,42 +124,39 @@ void ListBox::initGL() {
     if (_scrollBar) _scrollBar->initGL();
 }
 
-void ListBox::render(const glm::mat4 &transform, const std::string &textOverride) const {
+void ListBox::render(const glm::vec2 &offset, const std::string &textOverride) const {
     if (!_visible) return;
 
-    Control::render(transform);
+    Control::render(offset, textOverride);
 
     if (!_protoItem) return;
 
+    glm::vec2 itemOffset(offset);
     const Control::Extent &protoExtent = _protoItem->extent();
-    glm::mat4 itemTransform(glm::translate(transform, glm::vec3(_extent.left, _extent.top - protoExtent.top, 0.0f)));
 
     for (int i = 0; i < _slotCount; ++i) {
         int itemIdx = i + _itemOffset;
         if (itemIdx >= _items.size()) break;
 
         _protoItem->setFocus(_hilightedIndex == itemIdx);
-        _protoItem->render(itemTransform, _items[itemIdx].text);
-        itemTransform = glm::translate(itemTransform, glm::vec3(0.0f, protoExtent.height + _padding, 0.0f));
+        _protoItem->render(itemOffset, _items[itemIdx].text);
+
+        itemOffset.y += protoExtent.height + _padding;
     }
 
     if (_scrollBar) {
         ScrollBar &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setCanScrollUp(_itemOffset > 0);
         scrollBar.setCanScrollDown(_items.size() - _itemOffset > _slotCount);
-        scrollBar.render(transform, "");
+        scrollBar.render(offset, textOverride);
     }
 }
 
-void ListBox::resize(float scaleX, float scaleY) {
-    assert(_protoItem);
-    _protoItem->resize(scaleX, 1.0f);
+void ListBox::stretch(float x, float y) {
+    Control::stretch(x, y);
 
-    if (_scrollBar) {
-        _scrollBar->resize(1.0f, scaleY);
-    }
-
-    Control::resize(scaleX, scaleY);
+    if (_protoItem) _protoItem->stretch(x, 1.0f);
+    if (_scrollBar) _scrollBar->stretch(1.0f, y);
 }
 
 void ListBox::setFocus(bool focus) {

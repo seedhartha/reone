@@ -37,10 +37,9 @@ MultiplayerGame::MultiplayerGame(
     MultiplayerMode mode,
     GameVersion version,
     const fs::path &path,
-    const std::string &startModule,
     const Options &opts
 ) :
-    Game(version, path, startModule, opts), _mode(mode) {
+    Game(version, path, opts), _mode(mode) {
 }
 
 void MultiplayerGame::configure() {
