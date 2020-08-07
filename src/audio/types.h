@@ -29,7 +29,8 @@ enum class AudioFormat {
 };
 
 struct AudioOptions {
-    int volume { 0 };
+    int soundVolume { 85 };
+    int musicVolume { 85 };
 };
 
 } // namespace audio

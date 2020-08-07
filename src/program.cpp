@@ -37,6 +37,8 @@ namespace po = boost::program_options;
 namespace reone {
 
 static const char *kConfigFilename = "reone.cfg";
+static const int kDefaultMusicVolume = 85;
+static const int kDefaultSoundVolume = 85;
 static const int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -60,7 +62,8 @@ void Program::loadOptions() {
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
-        ("volume", po::value<int>()->default_value(100), "audio volume in percents")
+        ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
+        ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
         ("debug", po::value<bool>()->default_value(false), "enable debug logging");
 
@@ -85,7 +88,8 @@ void Program::loadOptions() {
     _gameOpts.graphics.width = _vars["width"].as<int>();
     _gameOpts.graphics.height = _vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
-    _gameOpts.audio.volume = _vars["volume"].as<int>();
+    _gameOpts.audio.musicVolume = _vars["musicvol"].as<int>();
+    _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
     _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<std::string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
 

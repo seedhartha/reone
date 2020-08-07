@@ -23,7 +23,9 @@ namespace reone {
 
 namespace audio {
 
-SoundInstance::SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop) : _stream(stream), _loop(loop) {
+SoundInstance::SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain) :
+    _stream(stream), _loop(loop), _gain(gain) {
+
     _multiframe = _stream->frameCount() > 1;
 }
 
@@ -32,6 +34,7 @@ void SoundInstance::init() {
     _buffers.resize(bufferCount);
     alGenBuffers(bufferCount, &_buffers[0]);
     alGenSources(1, &_source);
+    alSourcef(_source, AL_GAIN, _gain);
 
     if (_multiframe) {
         _stream->fill(_nextFrame++, _buffers[0]);
