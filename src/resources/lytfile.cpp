@@ -19,15 +19,17 @@
 
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
 
 namespace resources {
 
-void LytFile::load(const std::shared_ptr<std::istream> &in) {
+void LytFile::load(const shared_ptr<istream> &in) {
     if (!in) {
-        throw std::invalid_argument("LYT: invalid input stream");
+        throw invalid_argument("LYT: invalid input stream");
     }
     _in = in;
 
@@ -36,7 +38,7 @@ void LytFile::load(const std::shared_ptr<std::istream> &in) {
 
 void LytFile::load(const fs::path &path) {
     if (!fs::exists(path)) {
-        throw std::runtime_error("LYT: file not found: " + path.string());
+        throw runtime_error("LYT: file not found: " + path.string());
     }
     _in.reset(new fs::ifstream(path));
     _path = path;
@@ -48,18 +50,18 @@ void LytFile::load() {
     char buf[256];
     do {
         _in->getline(buf, sizeof(buf));
-        processLine(std::string(buf));
+        processLine(string(buf));
     } while (!_in->eof());
 }
 
-void LytFile::processLine(const std::string &line) {
-    std::string trimmed(line);
+void LytFile::processLine(const string &line) {
+    string trimmed(line);
     boost::trim(trimmed);
 
-    std::vector<std::string> tokens;
+    vector<string> tokens;
     boost::split(tokens, trimmed, boost::is_space(), boost::token_compress_on);
 
-    const std::string &first = tokens[0];
+    const string &first = tokens[0];
     switch (_state) {
         case State::None:
             if (first == "beginlayout") {
@@ -70,13 +72,13 @@ void LytFile::processLine(const std::string &line) {
             if (first == "donelayout") {
                 _state = State::None;
             } else if (first == "roomcount") {
-                _roomCount = std::stoi(tokens[1]);
+                _roomCount = stoi(tokens[1]);
                 if (_roomCount > 0) {
                     _rooms.reserve(_roomCount);
                     _state = State::Rooms;
                 }
             } else if (first == "doorhookcount") {
-                _doorHookCount = std::stoi(tokens[1]);
+                _doorHookCount = stoi(tokens[1]);
                 if (_doorHookCount > 0) {
                     _doorHooks.reserve(_doorHookCount);
                     _state = State::DoorHooks;
@@ -98,34 +100,34 @@ void LytFile::processLine(const std::string &line) {
     }
 }
 
-LytFile::Room LytFile::getRoom(const std::vector<std::string> &tokens) const {
+LytFile::Room LytFile::getRoom(const vector<string> &tokens) const {
     Room room;
     room.name = boost::to_lower_copy(tokens[0]);
     room.position = glm::vec3(
-        std::stof(tokens[1]),
-        std::stof(tokens[2]),
-        std::stof(tokens[3]));
+        stof(tokens[1]),
+        stof(tokens[2]),
+        stof(tokens[3]));
 
-    return std::move(room);
+    return move(room);
 }
 
-LytFile::DoorHook LytFile::getDoorHook(const std::vector<std::string> &tokens) const {
+LytFile::DoorHook LytFile::getDoorHook(const vector<string> &tokens) const {
     DoorHook door;
     door.room = boost::to_lower_copy(tokens[0]);
     door.name = boost::to_lower_copy(tokens[1]);
     door.position = glm::vec3(
-        std::stof(tokens[2]),
-        std::stof(tokens[3]),
-        std::stof(tokens[4]));
+        stof(tokens[2]),
+        stof(tokens[3]),
+        stof(tokens[4]));
 
-    return std::move(door);
+    return move(door);
 }
 
-const std::vector<LytFile::Room> &LytFile::rooms() const {
+const vector<LytFile::Room> &LytFile::rooms() const {
     return _rooms;
 }
 
-const std::vector<LytFile::DoorHook> &LytFile::doorHooks() const {
+const vector<LytFile::DoorHook> &LytFile::doorHooks() const {
     return _doorHooks;
 }
 

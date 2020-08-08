@@ -242,7 +242,7 @@ void DialogGui::loadCurrentEntry() {
     }
 }
 
-void DialogGui::setOnSpeakerChanged(const std::function<void(const string&, const string &)> &fn) {
+void DialogGui::setOnSpeakerChanged(const function<void(const string&, const string &)> &fn) {
     _onSpeakerChanged = fn;
 }
 

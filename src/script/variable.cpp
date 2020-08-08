@@ -24,8 +24,6 @@
 
 using namespace std;
 
-using namespace glm;
-
 namespace reone {
 
 namespace script {
@@ -113,7 +111,7 @@ Variable::Variable(float value) : type(VariableType::Float), floatValue(value) {
 Variable::Variable(const string &value) : type(VariableType::String), strValue(value) {
 }
 
-Variable::Variable(const vec3 &value) : type(VariableType::Vector), vecValue(value) {
+Variable::Variable(const glm::vec3 &value) : type(VariableType::Vector), vecValue(value) {
 }
 
 Variable::Variable(const ExecutionContext &ctx) : type(VariableType::Action), context(ctx) {

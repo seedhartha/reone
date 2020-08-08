@@ -19,6 +19,7 @@
 
 #include "../core/log.h"
 
+using namespace std;
 using namespace std::placeholders;
 
 using namespace boost::system;
@@ -32,41 +33,41 @@ namespace reone {
 namespace net {
 
 void Server::start(int port) {
-    info("Starting TCP server on port: " + std::to_string(port));
+    info("Starting TCP server on port: " + to_string(port));
 
-    std::shared_ptr<tcp::socket> socket(new tcp::socket(_service));
+    shared_ptr<tcp::socket> socket(new tcp::socket(_service));
 
-    _acceptor = std::make_unique<tcp::acceptor>(_service, tcp::endpoint(ip::address_v4::any(), port));
-    _acceptor->async_accept(*socket, std::bind(&Server::handleAccept, this, socket, _1));
+    _acceptor = make_unique<tcp::acceptor>(_service, tcp::endpoint(ip::address_v4::any(), port));
+    _acceptor->async_accept(*socket, bind(&Server::handleAccept, this, socket, _1));
 
-    _thread = std::thread([this]() { _service.run(); });
+    _thread = thread([this]() { _service.run(); });
 }
 
-void Server::handleAccept(std::shared_ptr<tcp::socket> &socket, const error_code &ec) {
+void Server::handleAccept(shared_ptr<tcp::socket> &socket, const boost::system::error_code &ec) {
     if (ec) {
         error("TCP: accept failed: " + ec.message());
         return;
     }
 
-    std::string tag(str(boost::format("%s") % socket->remote_endpoint()));
+    string tag(str(boost::format("%s") % socket->remote_endpoint()));
     info("TCP: client connected: " + tag);
 
-    std::unique_ptr<Connection> client(new Connection(socket));
+    unique_ptr<Connection> client(new Connection(socket));
     client->setTag(tag);
-    client->setOnAbort([this, &client](const std::string &tag) { stopClient(tag); });
+    client->setOnAbort([this, &client](const string &tag) { stopClient(tag); });
     client->setOnCommandReceived(_onCommandReceived);
     client->open();
-    _clients.insert(std::make_pair(tag, std::move(client)));
+    _clients.insert(make_pair(tag, move(client)));
 
     if (_onClientConnected) {
         _onClientConnected(tag);
     }
 
-    std::shared_ptr<tcp::socket> nextSocket(new tcp::socket(_service));
-    _acceptor->async_accept(*nextSocket, std::bind(&Server::handleAccept, this, nextSocket, _1));
+    shared_ptr<tcp::socket> nextSocket(new tcp::socket(_service));
+    _acceptor->async_accept(*nextSocket, bind(&Server::handleAccept, this, nextSocket, _1));
 }
 
-void Server::stopClient(const std::string &tag) {
+void Server::stopClient(const string &tag) {
     info(boost::format("TCP: client disconnected: %s") % tag);
 
     Connection &client = *_clients.find(tag)->second;
@@ -100,7 +101,7 @@ void Server::stop() {
     _clients.clear();
 }
 
-void Server::send(const std::string &tag, const ByteArray &data) {
+void Server::send(const string &tag, const ByteArray &data) {
     auto it = _clients.find(tag);
     if (it == _clients.end()) {
         warn("TCP: invalid client: " + tag);
@@ -119,15 +120,15 @@ const ServerClients &Server::clients() const {
     return _clients;
 }
 
-void Server::setOnClientConnected(const std::function<void(const std::string &)> &fn) {
+void Server::setOnClientConnected(const function<void(const string &)> &fn) {
     _onClientConnected = fn;
 }
 
-void Server::setOnClientDisconnected(const std::function<void(const std::string &)> &fn) {
+void Server::setOnClientDisconnected(const function<void(const string &)> &fn) {
     _onClientDisconnected = fn;
 }
 
-void Server::setOnCommandReceived(const std::function<void(const ByteArray &)> &fn) {
+void Server::setOnCommandReceived(const function<void(const ByteArray &)> &fn) {
     _onCommandReceived = fn;
 }
 

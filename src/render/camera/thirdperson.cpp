@@ -19,6 +19,8 @@
 
 #include "glm/ext.hpp"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -129,7 +131,7 @@ void ThirdPersonCamera::setHeading(float heading) {
     updateView();
 }
 
-void ThirdPersonCamera::setFindObstacleFunc(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
+void ThirdPersonCamera::setFindObstacleFunc(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
     _findObstacleFunc = fn;
 }
 

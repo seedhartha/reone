@@ -34,7 +34,7 @@ shared_ptr<ScriptProgram> ScriptManager::find(const string &name) {
         ncs.load(wrap(ncsData));
         program = ncs.program();
     }
-    auto pair = g_programs.insert(std::make_pair(name, program));
+    auto pair = g_programs.insert(make_pair(name, program));
 
     return pair.first->second;
 }

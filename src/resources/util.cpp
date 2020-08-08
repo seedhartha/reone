@@ -21,11 +21,13 @@
 
 #include "types.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace resources {
 
-static std::map<ResourceType, std::string> g_extByType = {
+static map<ResourceType, string> g_extByType = {
     { ResourceType::Bmp, "bmp" },
     { ResourceType::Tga, "tga" },
     { ResourceType::Wav, "wav" },
@@ -75,26 +77,26 @@ static std::map<ResourceType, std::string> g_extByType = {
     { ResourceType::Texture, "tpc" },
     { ResourceType::Mdx, "mdx" } };
 
-static std::map<std::string, ResourceType> g_typeByExt;
+static map<string, ResourceType> g_typeByExt;
 
-const std::string &getExtByResType(ResourceType type) {
+const string &getExtByResType(ResourceType type) {
     auto it = g_extByType.find(type);
     if (it != g_extByType.end()) return it->second;
 
-    g_extByType.insert(std::make_pair(type, std::to_string(static_cast<int>(type))));
+    g_extByType.insert(make_pair(type, to_string(static_cast<int>(type))));
 
     return g_extByType[type];
 }
 
-ResourceType getResTypeByExt(const std::string &ext) {
+ResourceType getResTypeByExt(const string &ext) {
     if (g_typeByExt.empty()) {
         for (auto &entry : g_extByType) {
-            g_typeByExt.insert(std::make_pair(entry.second, entry.first));
+            g_typeByExt.insert(make_pair(entry.second, entry.first));
         }
     }
     auto it = g_typeByExt.find(ext);
     if (it == g_typeByExt.end()) {
-        throw std::runtime_error("Resource type not found by extension: " + ext);
+        throw runtime_error("Resource type not found by extension: " + ext);
     }
 
     return it->second;

@@ -17,18 +17,20 @@
 
 #include "guiquad.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
 
-static std::vector<float> g_vertices = {
+static vector<float> g_vertices = {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f, 0.0f
 };
 
-static std::vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };
+static vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };
 
 static Mesh::VertexOffsets g_offsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, 5 * sizeof(float) };
 

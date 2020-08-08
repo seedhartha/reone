@@ -124,7 +124,7 @@ void ListBox::initGL() {
     if (_scrollBar) _scrollBar->initGL();
 }
 
-void ListBox::render(const glm::vec2 &offset, const std::string &textOverride) const {
+void ListBox::render(const glm::vec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
     Control::render(offset, textOverride);

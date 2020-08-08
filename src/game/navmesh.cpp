@@ -21,6 +21,8 @@
 
 #include "../core/log.h"
 
+using namespace std;
+
 using namespace reone::render;
 
 namespace reone {
@@ -30,19 +32,19 @@ namespace game {
 static const float kCellSize = 2.0f;
 static const float kTestDistance = 16.0f;
 
-NavMesh::WalkmeshWrapper::WalkmeshWrapper(const std::shared_ptr<Walkmesh> &walkmesh, const glm::mat4 &transform) :
+NavMesh::WalkmeshWrapper::WalkmeshWrapper(const shared_ptr<Walkmesh> &walkmesh, const glm::mat4 &transform) :
     walkmesh(walkmesh), transform(transform) {
 }
 
 NavMesh::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void NavMesh::add(const std::shared_ptr<Walkmesh> &walkmesh, const glm::mat4 &transform) {
+void NavMesh::add(const shared_ptr<Walkmesh> &walkmesh, const glm::mat4 &transform) {
     _walkmeshes.push_back(WalkmeshWrapper(walkmesh, transform));
 }
 
-void NavMesh::compute(const std::atomic_bool &cancel) {
-    std::vector<glm::vec3> candidates;
+void NavMesh::compute(const atomic_bool &cancel) {
+    vector<glm::vec3> candidates;
     glm::vec3 size;
 
     for (auto &walkmesh : _walkmeshes) {
@@ -107,18 +109,18 @@ void NavMesh::compute(const std::atomic_bool &cancel) {
     _computed = true;
 }
 
-const std::vector<glm::vec3> NavMesh::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
+const vector<glm::vec3> NavMesh::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
     if (!_computed) {
-        return std::vector<glm::vec3> { from, to };
+        return vector<glm::vec3> { from, to };
     }
     uint16_t fromIdx = getNearestVertex(from);
     uint16_t toIdx = getNearestVertex(to);
     if (fromIdx == 0xffff || toIdx == 0xffff) {
-        return std::vector<glm::vec3> { from, to };
+        return vector<glm::vec3> { from, to };
     }
 
     FindPathContext ctx;
-    ctx.distToOrigin = { { fromIdx, std::make_pair(fromIdx, 0.0f) } };
+    ctx.distToOrigin = { { fromIdx, make_pair(fromIdx, 0.0f) } };
     ctx.queue.push(fromIdx);
 
     while (!ctx.queue.empty()) {
@@ -127,11 +129,11 @@ const std::vector<glm::vec3> NavMesh::findPath(const glm::vec3 &from, const glm:
         visit(idx, ctx);
     }
     if (ctx.distToOrigin.find(toIdx) == ctx.distToOrigin.end()) {
-        return std::vector<glm::vec3> { from, to };
+        return vector<glm::vec3> { from, to };
     }
 
     uint16_t idx = toIdx;
-    std::vector<glm::vec3> path;
+    vector<glm::vec3> path;
 
     while (true) {
         path.insert(path.begin(), _vertices[idx]);
@@ -141,7 +143,7 @@ const std::vector<glm::vec3> NavMesh::findPath(const glm::vec3 &from, const glm:
         idx = pair.first;
     }
 
-    return std::move(path);
+    return move(path);
 }
 
 uint16_t NavMesh::getNearestVertex(const glm::vec3 &point) const {
@@ -171,7 +173,7 @@ void NavMesh::visit(uint16_t index, FindPathContext &ctx) const {
         for (auto &edge : edges->second) {
             auto it = ctx.distToOrigin.find(edge.toIndex);
             if (it == ctx.distToOrigin.end() || it->second.second > dist + edge.length) {
-                ctx.distToOrigin[edge.toIndex] = std::make_pair(index, dist + edge.length);
+                ctx.distToOrigin[edge.toIndex] = make_pair(index, dist + edge.length);
             }
             if (ctx.visited.find(edge.toIndex) == ctx.visited.end()) {
                 ctx.queue.push(edge.toIndex);

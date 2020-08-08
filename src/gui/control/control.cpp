@@ -206,7 +206,7 @@ void Control::initGL() {
     if (_text.font) _text.font->initGL();
 }
 
-void Control::render(const glm::vec2 &offset, const std::string &textOverride) const {
+void Control::render(const glm::vec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
     ShaderManager &shaders = ShaderManager::instance();

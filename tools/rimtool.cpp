@@ -23,6 +23,8 @@
 #include "src/resources/rimfile.h"
 #include "src/resources/util.h"
 
+using namespace std;
+
 using namespace reone::resources;
 
 namespace fs = boost::filesystem;
@@ -53,7 +55,7 @@ void RimTool::extract(const fs::path &path, const fs::path &keyPath, const fs::p
         resPath.append(resource.resRef + "." + getExtByResType(resource.type));
 
         ByteArray data(rim.getResourceData(i));
-        fs::ofstream res(resPath, std::ios::binary);
+        fs::ofstream res(resPath, ios::binary);
         res.write(data.data(), data.size());
     }
 }

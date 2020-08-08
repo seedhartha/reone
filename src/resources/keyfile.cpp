@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -60,7 +62,7 @@ KeyFile::FileEntry KeyFile::readFileEntry() {
     entry.fileSize = fileSize;
     entry.filename = readString(filenameOffset, filenameSize);
 
-    return std::move(entry);
+    return move(entry);
 }
 
 void KeyFile::loadKeys() {
@@ -73,7 +75,7 @@ void KeyFile::loadKeys() {
 }
 
 KeyFile::KeyEntry KeyFile::readKeyEntry() {
-    std::string resRef(readFixedString(16));
+    string resRef(readFixedString(16));
     uint16_t resType = readUint16();
     uint32_t resId = readUint32();
 
@@ -86,17 +88,17 @@ KeyFile::KeyEntry KeyFile::readKeyEntry() {
     return entry;
 }
 
-const std::string &KeyFile::getFilename(int idx) const {
+const string &KeyFile::getFilename(int idx) const {
     if (idx >= _files.size()) {
-        throw std::out_of_range("KEY: file index out of range: " + std::to_string(idx));
+        throw out_of_range("KEY: file index out of range: " + to_string(idx));
     }
     return _files[idx].filename;
 }
 
-bool KeyFile::find(const std::string &resRef, ResourceType type, KeyEntry &key) const {
-    std::string lcResRef(boost::to_lower_copy(resRef));
+bool KeyFile::find(const string &resRef, ResourceType type, KeyEntry &key) const {
+    string lcResRef(boost::to_lower_copy(resRef));
 
-    auto it = std::find_if(
+    auto it = find_if(
         _keys.begin(),
         _keys.end(),
         [&](const KeyEntry &e) { return e.resRef == lcResRef && e.resType == type; });
@@ -108,11 +110,11 @@ bool KeyFile::find(const std::string &resRef, ResourceType type, KeyEntry &key) 
     return true;
 }
 
-const std::vector<KeyFile::FileEntry> &KeyFile::files() const {
+const vector<KeyFile::FileEntry> &KeyFile::files() const {
     return _files;
 }
 
-const std::vector<KeyFile::KeyEntry> &KeyFile::keys() const {
+const vector<KeyFile::KeyEntry> &KeyFile::keys() const {
     return _keys;
 }
 

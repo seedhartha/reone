@@ -24,6 +24,8 @@
 
 #include "src/resources/gfffile.h"
 
+using namespace std;
+
 using namespace reone::resources;
 
 namespace fs = boost::filesystem;
@@ -37,7 +39,7 @@ void GffTool::convert(const fs::path &path, const fs::path &destPath) const {
     GffFile gff;
     gff.load(path);
 
-    std::shared_ptr<GffStruct> gffs(gff.top());
+    shared_ptr<GffStruct> gffs(gff.top());
     pt::ptree tree(getPropertyTree(*gffs));
 
     fs::path jsonPath(destPath);
@@ -51,7 +53,7 @@ pt::ptree GffTool::getPropertyTree(const GffStruct &gffs) const {
     pt::ptree tree;
     pt::ptree child;
     pt::ptree children;
-    std::vector<float> values;
+    vector<float> values;
 
     for (auto &field : gffs.fields()) {
         auto &fieldChildren = field.children();
@@ -66,7 +68,7 @@ pt::ptree GffTool::getPropertyTree(const GffStruct &gffs) const {
                 children.clear();
                 for (auto &childGffs : fieldChildren) {
                     child = getPropertyTree(childGffs);
-                    children.push_back(std::make_pair("", child));
+                    children.push_back(make_pair("", child));
                 }
                 tree.add_child(field.label(), children);
                 break;

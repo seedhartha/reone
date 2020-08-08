@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 namespace reone {
 
 namespace resources {
@@ -46,13 +48,13 @@ void TlkFile::doLoad() {
 }
 
 void TlkFile::loadStrings() {
-    _table = std::make_shared<TalkTable>();
+    _table = make_shared<TalkTable>();
     _table->_strings.reserve(_stringCount);
 
     for (int i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
 
-        std::string soundResRef(readFixedString(16));
+        string soundResRef(readFixedString(16));
         boost::to_lower(soundResRef);
 
         ignore(8);
@@ -73,7 +75,7 @@ void TlkFile::loadStrings() {
     }
 }
 
-std::shared_ptr<TalkTable> TlkFile::table() const {
+shared_ptr<TalkTable> TlkFile::table() const {
     return _table;
 }
 

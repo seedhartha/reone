@@ -17,6 +17,8 @@
 
 #include "mp3file.h"
 
+using namespace std;
+
 using namespace reone::audio;
 
 namespace reone {
@@ -40,7 +42,7 @@ static inline int scale(mad_fixed_t sample) {
 
 void Mp3File::load(ByteArray &&data) {
     _input = data;
-    _stream = std::make_shared<AudioStream>();
+    _stream = make_shared<AudioStream>();
 
     mad_decoder decoder;
     mad_decoder_init(
@@ -94,12 +96,12 @@ mad_flow Mp3File::outputFunc(void *playbuf, mad_header const *header, mad_pcm *p
         }
     }
 
-    mp3->_stream->add(std::move(frame));
+    mp3->_stream->add(move(frame));
 
     return MAD_FLOW_CONTINUE;
 }
 
-std::shared_ptr<AudioStream> Mp3File::stream() const {
+shared_ptr<AudioStream> Mp3File::stream() const {
     return _stream;
 }
 

@@ -23,6 +23,8 @@
 
 #include "mp3file.h"
 
+using namespace std;
+
 using namespace reone::audio;
 
 namespace reone {
@@ -33,17 +35,17 @@ WavFile::WavFile() : BinaryFile(0) {
 }
 
 void WavFile::doLoad() {
-    std::string sign(readFixedString(4));
+    string sign(readFixedString(4));
     if (sign == "\xff\xf3\x60\xc4") {
         seek(0x1da);
     } else if (sign != "RIFF") {
-        throw std::runtime_error("WAV: invalid file signature: " + sign);
+        throw runtime_error("WAV: invalid file signature: " + sign);
     }
 
     uint32_t chunkSize = readUint32();
-    std::string format(readFixedString(4));
+    string format(readFixedString(4));
     if (format != "WAVE") {
-        throw std::runtime_error("WAV: invalid chunk format: " + format);
+        throw runtime_error("WAV: invalid chunk format: " + format);
     }
     ChunkHeader chunk;
     while (readChunkHeader(chunk)) {
@@ -61,10 +63,10 @@ void WavFile::doLoad() {
 bool WavFile::readChunkHeader(ChunkHeader &chunk) {
     if (_in->eof()) return false;
 
-    std::string id(readFixedString(4));
+    string id(readFixedString(4));
     uint32_t size = readUint32();
 
-    chunk.id = std::move(id);
+    chunk.id = move(id);
     chunk.size = size;
 
     return true;
@@ -73,11 +75,11 @@ bool WavFile::readChunkHeader(ChunkHeader &chunk) {
 void WavFile::loadFormat(ChunkHeader chunk) {
     _audioFormat = static_cast<WavAudioFormat>(readUint16());
     if (_audioFormat != WavAudioFormat::PCM && _audioFormat != WavAudioFormat::IMAADPCM) {
-        throw std::runtime_error("WAV: unsupported audio format: " + std::to_string(static_cast<int>(_audioFormat)));
+        throw runtime_error("WAV: unsupported audio format: " + to_string(static_cast<int>(_audioFormat)));
     }
     _channelCount = readUint16();
     if (_channelCount != 1 && _channelCount != 2) {
-        throw std::runtime_error("WAV: invalid number of channels: " + std::to_string(_channelCount));
+        throw runtime_error("WAV: invalid number of channels: " + to_string(_channelCount));
     }
     _sampleRate = readUint32();
 
@@ -87,7 +89,7 @@ void WavFile::loadFormat(ChunkHeader chunk) {
     _bitsPerSample = readUint16();
 
     if (_bitsPerSample != 4 && _bitsPerSample != 8 && _bitsPerSample != 16) {
-        throw std::runtime_error("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
+        throw runtime_error("WAV: invalid bits per sample: " + to_string(_bitsPerSample));
     }
 
     ignore(chunk.size - 16);
@@ -100,7 +102,7 @@ void WavFile::loadData(ChunkHeader chunk) {
         _in->read(&data[0], data.size());
 
         Mp3File mp3;
-        mp3.load(std::move(data));
+        mp3.load(move(data));
         _stream = mp3.stream();
 
         return;
@@ -123,8 +125,8 @@ void WavFile::loadPCM(uint32_t chunkSize) {
     frame.samples.resize(chunkSize);
     _in->read(&frame.samples[0], chunkSize);
 
-    _stream = std::make_shared<AudioStream>();
-    _stream->add(std::move(frame));
+    _stream = make_shared<AudioStream>();
+    _stream->add(move(frame));
 }
 
 static const int kIMAIndexTable[] = { -1, -1, -1, -1, 2, 4, 6, 8 };
@@ -181,8 +183,8 @@ void WavFile::loadIMAADPCM(uint32_t chunkSize) {
         }
     }
 
-    _stream = std::make_shared<AudioStream>();
-    _stream->add(std::move(frame));
+    _stream = make_shared<AudioStream>();
+    _stream->add(move(frame));
 }
 
 audio::AudioFormat WavFile::getAudioFormat() const {
@@ -194,11 +196,11 @@ audio::AudioFormat WavFile::getAudioFormat() const {
                 case 8:
                     return _channelCount == 2 ? AudioFormat::Stereo8 : AudioFormat::Mono8;
                 default:
-                    throw std::logic_error("WAV: PCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
+                    throw logic_error("WAV: PCM: invalid bits per sample: " + to_string(_bitsPerSample));
             }
         case WavAudioFormat::IMAADPCM:
             if (_bitsPerSample != 4) {
-                throw std::logic_error("WAV: IMA ADPCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
+                throw logic_error("WAV: IMA ADPCM: invalid bits per sample: " + to_string(_bitsPerSample));
             }
             return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
     }
@@ -223,7 +225,7 @@ int16_t WavFile::getIMASample(int channel, uint8_t nibble) {
     return sample;
 }
 
-std::shared_ptr<audio::AudioStream> WavFile::stream() const {
+shared_ptr<audio::AudioStream> WavFile::stream() const {
     return _stream;
 }
 

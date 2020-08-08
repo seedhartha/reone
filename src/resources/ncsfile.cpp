@@ -244,7 +244,7 @@ void NcsFile::readInstruction(uint32_t &offset) {
     uint32_t pos = tell();
     ins.nextOffset = pos;
 
-    _program->_instructions.insert(std::make_pair(offset, std::move(ins)));
+    _program->_instructions.insert(make_pair(offset, move(ins)));
 
     offset = pos;
 }

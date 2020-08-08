@@ -19,11 +19,13 @@
 
 #include "AL/al.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace audio {
 
-SoundInstance::SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain) :
+SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain) :
     _stream(stream), _loop(loop), _gain(gain) {
 
     _multiframe = _stream->frameCount() > 1;

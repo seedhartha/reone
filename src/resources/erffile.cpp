@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -55,7 +57,7 @@ void ErfFile::loadKeys() {
 }
 
 ErfFile::Key ErfFile::readKey() {
-    std::string resRef(readFixedString(16));
+    string resRef(readFixedString(16));
     uint32_t resId = readUint32();
     uint16_t resType = readUint16();
     ignore(2);
@@ -65,7 +67,7 @@ ErfFile::Key ErfFile::readKey() {
     key.resId = resId;
     key.resType = static_cast<ResourceType>(resType);
 
-    return std::move(key);
+    return move(key);
 }
 
 void ErfFile::loadResources() {
@@ -85,15 +87,15 @@ ErfFile::Resource ErfFile::readResource() {
     res.offset = offset;
     res.size = size;
 
-    return std::move(res);
+    return move(res);
 }
 
 bool ErfFile::supports(ResourceType type) const {
     return true;
 }
 
-std::shared_ptr<ByteArray> ErfFile::find(const std::string &resRef, ResourceType type) {
-    std::string lcResRef(boost::to_lower_copy(resRef));
+shared_ptr<ByteArray> ErfFile::find(const string &resRef, ResourceType type) {
+    string lcResRef(boost::to_lower_copy(resRef));
     int idx = -1;
 
     for (int i = 0; i < _entryCount; ++i) {
@@ -105,7 +107,7 @@ std::shared_ptr<ByteArray> ErfFile::find(const std::string &resRef, ResourceType
     if (idx == -1) return nullptr;
     const Resource &res = _resources[idx];
 
-    return std::make_shared<ByteArray>(getResourceData(res));
+    return make_shared<ByteArray>(getResourceData(res));
 }
 
 ByteArray ErfFile::getResourceData(const Resource &res) {
@@ -114,7 +116,7 @@ ByteArray ErfFile::getResourceData(const Resource &res) {
 
 ByteArray ErfFile::getResourceData(int idx) {
     if (idx >= _entryCount) {
-        throw std::out_of_range("ERF: resource index out of range: " + std::to_string(idx));
+        throw out_of_range("ERF: resource index out of range: " + to_string(idx));
     }
     return getResourceData(_resources[idx]);
 }
@@ -123,7 +125,7 @@ int ErfFile::entryCount() const {
     return _entryCount;
 }
 
-const std::vector<ErfFile::Key> &ErfFile::keys() const {
+const vector<ErfFile::Key> &ErfFile::keys() const {
     return _keys;
 }
 

@@ -21,6 +21,8 @@
 
 #include <boost/asio/post.hpp>
 
+using namespace std;
+
 namespace reone {
 
 JobExecutor &JobExecutor::instance() {
@@ -37,7 +39,7 @@ void JobExecutor::deinit() {
     _pool.join();
 }
 
-void JobExecutor::enqueue(const std::function<void(const std::atomic_bool &)> &job) {
+void JobExecutor::enqueue(const function<void(const atomic_bool &)> &job) {
     _cancel = false;
 
     boost::asio::post(_pool, [&, job]() {
@@ -53,7 +55,7 @@ void JobExecutor::cancel() {
 
 void JobExecutor::await() {
     while (_jobsActive) {
-        std::this_thread::yield();
+        this_thread::yield();
     }
 }
 

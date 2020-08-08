@@ -19,13 +19,15 @@
 
 #include <boost/iostreams/stream.hpp>
 
+using namespace std;
+
 namespace io = boost::iostreams;
 
 namespace reone {
 
-std::unique_ptr<std::istream> wrap(const ByteArray &arr) {
+unique_ptr<istream> wrap(const ByteArray &arr) {
     io::array_source source(arr.data(), arr.size());
-    return std::make_unique<io::stream<io::array_source>>(source);
+    return make_unique<io::stream<io::array_source>>(source);
 }
 
 } // namespace reone

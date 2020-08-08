@@ -20,22 +20,24 @@
 #include "creature.h"
 #include "door.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-MultiplayerArea::MultiplayerArea(MultiplayerMode mode, resources::GameVersion version, const std::string &name, IMultiplayerCallbacks *callbacks) :
+MultiplayerArea::MultiplayerArea(MultiplayerMode mode, resources::GameVersion version, const string &name, IMultiplayerCallbacks *callbacks) :
     Area(version, name), _callbacks(callbacks) {
 
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }
 
-std::shared_ptr<Creature> MultiplayerArea::makeCreature() {
-    return std::make_unique<MultiplayerCreature>(_idCounter++, _callbacks);
+shared_ptr<Creature> MultiplayerArea::makeCreature() {
+    return make_unique<MultiplayerCreature>(_idCounter++, _callbacks);
 }
 
-std::shared_ptr<Door> MultiplayerArea::makeDoor() {
-    return std::make_unique<MultiplayerDoor>(_idCounter++, _callbacks);
+shared_ptr<Door> MultiplayerArea::makeDoor() {
+    return make_unique<MultiplayerDoor>(_idCounter++, _callbacks);
 }
 
 void MultiplayerArea::updateCreature(Creature &creature, float dt) {
@@ -69,7 +71,7 @@ void MultiplayerArea::execute(const Command &cmd) {
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
-    std::shared_ptr<Creature> creature(makeCreature());
+    shared_ptr<Creature> creature(makeCreature());
     creature->setTag(cmd.tag());
 
     for (auto &item : cmd.equipment()) {
@@ -95,7 +97,7 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
 
     landObject(*creature);
 
-    _objects[ObjectType::Creature].push_back(std::move(creature));
+    _objects[ObjectType::Creature].push_back(move(creature));
 }
 
 void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
@@ -118,7 +120,7 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
-    std::shared_ptr<Object> object(find(cmd.tag()));
+    shared_ptr<Object> object(find(cmd.tag()));
     if (object) {
         object->setSynchronize(false);
         object->setPosition(cmd.position());
@@ -128,7 +130,7 @@ void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
-    std::shared_ptr<Object> object(find(cmd.tag()));
+    shared_ptr<Object> object(find(cmd.tag()));
     if (object) {
         object->setSynchronize(false);
         object->animate(cmd.animation(), cmd.animationFlags());
@@ -137,7 +139,7 @@ void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
-    std::shared_ptr<Object> creature(find(cmd.tag(), ObjectType::Creature));
+    shared_ptr<Object> creature(find(cmd.tag(), ObjectType::Creature));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
@@ -146,8 +148,8 @@ void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
-    std::shared_ptr<Object> door(find(cmd.objectId(), ObjectType::Door));
-    std::shared_ptr<Object> trigerrer(find(cmd.trigerrer()));
+    shared_ptr<Object> door(find(cmd.objectId(), ObjectType::Door));
+    shared_ptr<Object> trigerrer(find(cmd.trigerrer()));
     if (door) {
         door->setSynchronize(false);
         static_cast<Door &>(*door).open(trigerrer);
@@ -155,12 +157,12 @@ void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
     }
 }
 
-const std::shared_ptr<Object> MultiplayerArea::findCreatureByClientTag(const std::string &clientTag) const {
+const shared_ptr<Object> MultiplayerArea::findCreatureByClientTag(const string &clientTag) const {
     auto creatures = _objects.find(ObjectType::Creature)->second;
-    auto it = std::find_if(
+    auto it = find_if(
         creatures.begin(),
         creatures.end(),
-        [this, &clientTag](const std::shared_ptr<Object> &o) { return static_cast<MultiplayerCreature &>(*o).clientTag() == clientTag; });
+        [this, &clientTag](const shared_ptr<Object> &o) { return static_cast<MultiplayerCreature &>(*o).clientTag() == clientTag; });
 
     return it == creatures.end() ? nullptr : *it;
 }

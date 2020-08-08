@@ -21,6 +21,8 @@
 
 #include <boost/format.hpp>
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -29,18 +31,18 @@ namespace resources {
 
 static const int kSignatureSize = 8;
 
-GffField::GffField(GffFieldType type, const std::string &label) : _type(type), _label(label) {
+GffField::GffField(GffFieldType type, const string &label) : _type(type), _label(label) {
 }
 
 GffFieldType GffField::type() const {
     return _type;
 }
 
-const std::string &GffField::label() const {
+const string &GffField::label() const {
     return _label;
 }
 
-const std::vector<GffStruct> &GffField::children() const {
+const vector<GffStruct> &GffField::children() const {
     return _children;
 }
 
@@ -60,39 +62,39 @@ double GffField::asDouble() const {
     return _doubleValue;
 }
 
-std::string GffField::asString() const {
+string GffField::asString() const {
     switch (_type) {
         case GffFieldType::CExoString:
         case GffFieldType::ResRef:
             return _strValue;
 
         case GffFieldType::Char:
-            return std::string(1, _strValue[0]);
+            return string(1, _strValue[0]);
 
         case GffFieldType::Short:
         case GffFieldType::Int:
         case GffFieldType::Int64:
         case GffFieldType::CExoLocString:
         case GffFieldType::StrRef:
-            return std::to_string(_intValue);
+            return to_string(_intValue);
 
         case GffFieldType::Byte:
         case GffFieldType::Word:
         case GffFieldType::Dword:
         case GffFieldType::Dword64:
-            return std::to_string(_uintValue);
+            return to_string(_uintValue);
 
         case GffFieldType::Float:
-            return std::to_string(_floatValue);
+            return to_string(_floatValue);
 
         case GffFieldType::Double:
-            return std::to_string(_doubleValue);
+            return to_string(_doubleValue);
 
         case GffFieldType::Void:
             return boost::str(boost::format("[array of %d bytes]") % _data.size());
 
         default:
-            throw std::logic_error("GFF: field type cannot be converted to string: " + std::to_string(static_cast<int>(_type)));
+            throw logic_error("GFF: field type cannot be converted to string: " + to_string(static_cast<int>(_type)));
     }
 }
 
@@ -100,10 +102,10 @@ const ByteArray &GffField::asByteArray() const {
     return _data;
 }
 
-std::vector<float> GffField::asFloatArray() const {
-    std::vector<float> values(_data.size() / sizeof(float));
-    std::memcpy(&values[0], &_data[0], values.size() * sizeof(float));
-    return std::move(values);
+vector<float> GffField::asFloatArray() const {
+    vector<float> values(_data.size() / sizeof(float));
+    memcpy(&values[0], &_data[0], values.size() * sizeof(float));
+    return move(values);
 }
 
 const GffStruct &GffField::asStruct() const {
@@ -120,19 +122,19 @@ GffStruct::GffStruct(GffFieldType type) : _type(type) {
 }
 
 void GffStruct::add(GffField &&field) {
-    _fields.push_back(std::move(field));
+    _fields.push_back(move(field));
 }
 
 void GffStruct::setType(GffFieldType type) {
     _type = type;
 }
 
-const std::vector<GffField> &GffStruct::fields() const {
+const vector<GffField> &GffStruct::fields() const {
     return _fields;
 }
 
-const GffField *GffStruct::find(const std::string &name) const {
-    auto it = std::find_if(
+const GffField *GffStruct::find(const string &name) const {
+    auto it = find_if(
         _fields.begin(),
         _fields.end(),
         [&](const GffField &f) { return f.label() == name; });
@@ -140,45 +142,45 @@ const GffField *GffStruct::find(const std::string &name) const {
     return it != _fields.end() ? &*it : nullptr;
 }
 
-int GffStruct::getInt(const std::string &name) const {
+int GffStruct::getInt(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
     return field->asInt();
 }
 
-int GffStruct::getInt(const std::string &name, int defaultValue) const {
+int GffStruct::getInt(const string &name, int defaultValue) const {
     const GffField *field = find(name);
     return field ? field->asInt() : defaultValue;
 }
 
-float GffStruct::getFloat(const std::string &name) const {
+float GffStruct::getFloat(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
     return field->asFloat();
 }
 
-std::string GffStruct::getString(const std::string &name) const {
+string GffStruct::getString(const string &name) const {
     const GffField *field = find(name);
     return field ? field->asString() : "";
 }
 
-const GffStruct &GffStruct::getStruct(const std::string &name) const {
+const GffStruct &GffStruct::getStruct(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
     return field->children()[0];
 }
 
-const std::vector<GffStruct> &GffStruct::getList(const std::string &name) const {
+const vector<GffStruct> &GffStruct::getList(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
     return field->children();
 }
 
-glm::vec3 GffStruct::getVector(const std::string &name) const {
+glm::vec3 GffStruct::getVector(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
@@ -205,7 +207,7 @@ void GffFile::doLoad() {
     _top.reset(new GffStruct(readStruct(0)));
 }
 
-std::shared_ptr<GffStruct> GffFile::top() const {
+shared_ptr<GffStruct> GffFile::top() const {
     return _top;
 }
 
@@ -221,13 +223,13 @@ GffStruct GffFile::readStruct(int idx) {
     if (fieldCount == 1) {
         gffs.add(readField(dataOrDataOffset));
     } else {
-        std::vector<uint32_t> indices(readFieldIndices(dataOrDataOffset, fieldCount));
+        vector<uint32_t> indices(readFieldIndices(dataOrDataOffset, fieldCount));
         for (auto &idx : indices) {
             gffs.add(readField(idx));
         }
     }
 
-    return std::move(gffs);
+    return move(gffs);
 }
 
 GffField GffFile::readField(int idx) {
@@ -237,10 +239,10 @@ GffField GffFile::readField(int idx) {
     uint32_t labelIndex = readUint32();
     uint32_t dataOrDataOffset = readUint32();
 
-    std::string label(readLabel(labelIndex));
+    string label(readLabel(labelIndex));
     GffField field(static_cast<GffFieldType>(type), label);
     LocString locString;
-    std::vector<uint32_t> list;
+    vector<uint32_t> list;
 
     switch (field._type) {
         case GffFieldType::Byte:
@@ -301,18 +303,18 @@ GffField GffFile::readField(int idx) {
             break;
 
         default:
-            throw std::runtime_error("GFF: unsupported field type: " + std::to_string(type));
+            throw runtime_error("GFF: unsupported field type: " + to_string(type));
     }
 
-    return std::move(field);
+    return move(field);
 }
 
-std::string GffFile::readLabel(int idx) {
+string GffFile::readLabel(int idx) {
     uint32_t off = _labelOffset + 16 * idx;
     return readFixedString(off, 16);
 }
 
-std::vector<uint32_t> GffFile::readFieldIndices(uint32_t off, int count) {
+vector<uint32_t> GffFile::readFieldIndices(uint32_t off, int count) {
     return readArray<uint32_t>(_fieldIndicesOffset + off, count);
 }
 
@@ -325,26 +327,26 @@ uint64_t GffFile::readQWordFieldData(uint32_t off) {
     return val;
 }
 
-std::string GffFile::readStringFieldData(uint32_t off) {
+string GffFile::readStringFieldData(uint32_t off) {
     uint32_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
-    std::string s(readFixedString(size));
+    string s(readFixedString(size));
     seek(pos);
 
-    return std::move(s);
+    return move(s);
 }
 
-std::string GffFile::readResRefFieldData(uint32_t off) {
+string GffFile::readResRefFieldData(uint32_t off) {
     uint32_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint8_t size = readByte();
-    std::string s(readFixedString(size));
+    string s(readFixedString(size));
     seek(pos);
 
-    return std::move(s);
+    return move(s);
 }
 
 GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
@@ -367,7 +369,7 @@ GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
 
     seek(pos);
 
-    return std::move(loc);
+    return move(loc);
 }
 
 int32_t GffFile::readStrRefFieldData(uint32_t off) {
@@ -390,22 +392,22 @@ ByteArray GffFile::readByteArrayFieldData(uint32_t off) {
     ByteArray arr(readArray<char>(size));
     seek(pos);
 
-    return std::move(arr);
+    return move(arr);
 }
 
 ByteArray GffFile::readByteArrayFieldData(uint32_t off, int size) {
     return readArray<char>(_fieldDataOffset + off, size);
 }
 
-std::vector<uint32_t> GffFile::readList(uint32_t off) {
-    std::streampos pos = _in->tellg();
+vector<uint32_t> GffFile::readList(uint32_t off) {
+    streampos pos = _in->tellg();
     seek(_listIndicesOffset + off);
 
     uint32_t count = readUint32();
-    std::vector<uint32_t> arr(readArray<uint32_t>(count));
+    vector<uint32_t> arr(readArray<uint32_t>(count));
     seek(pos);
 
-    return std::move(arr);
+    return move(arr);
 }
 
 } // namespace resources

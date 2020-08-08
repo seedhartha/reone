@@ -21,6 +21,8 @@
 
 #include "../../resources/manager.h"
 
+using namespace std;
+
 using namespace reone::resources;
 
 namespace reone {
@@ -62,15 +64,15 @@ void Trigger::load(const GffStruct &gffs) {
     }
 }
 
-const std::string &Trigger::linkedToModule() const {
+const string &Trigger::linkedToModule() const {
     return _linkedToModule;
 }
 
-const std::string &Trigger::linkedTo() const {
+const string &Trigger::linkedTo() const {
     return _linkedTo;
 }
 
-const std::vector<glm::vec3> &Trigger::geometry() const {
+const vector<glm::vec3> &Trigger::geometry() const {
     return _geometry;
 }
 

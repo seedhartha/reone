@@ -19,13 +19,15 @@
 
 #include "glm/ext.hpp"
 
+using namespace std;
+
 using namespace reone::render;
 
 namespace reone {
 
 namespace resources {
 
-static std::vector<uint32_t> g_walkableTypes = { 1, 3, 4, 5, 9, 10 };
+static vector<uint32_t> g_walkableTypes = { 1, 3, 4, 5, 9, 10 };
 
 BwmFile::BwmFile() : BinaryFile(8, "BWM V1.0") {
 }
@@ -80,7 +82,7 @@ void BwmFile::loadFaceTypes() {
 }
 
 void BwmFile::makeWalkmesh() {
-    _walkmesh = std::make_shared<Walkmesh>();
+    _walkmesh = make_shared<Walkmesh>();
     _walkmesh->_vertices.reserve(_vertexCount);
     _walkmesh->_walkableFaces.reserve(_faceCount);
 
@@ -90,7 +92,7 @@ void BwmFile::makeWalkmesh() {
 
     for (int i = 0; i < _faceCount; ++i) {
         uint32_t type = _faceTypes[i];
-        bool walkable = std::find(g_walkableTypes.begin(), g_walkableTypes.end(), type) != g_walkableTypes.end();
+        bool walkable = find(g_walkableTypes.begin(), g_walkableTypes.end(), type) != g_walkableTypes.end();
 
         int off = 3 * i;
         Walkmesh::Face face;
@@ -100,16 +102,16 @@ void BwmFile::makeWalkmesh() {
         face.indices.push_back(_indices[off + 2]);
 
         if (walkable) {
-            _walkmesh->_walkableFaces.push_back(std::move(face));
+            _walkmesh->_walkableFaces.push_back(move(face));
         } else {
-            _walkmesh->_nonWalkableFaces.push_back(std::move(face));
+            _walkmesh->_nonWalkableFaces.push_back(move(face));
         }
     }
 
     _walkmesh->computeAABB();
 }
 
-std::shared_ptr<render::Walkmesh> BwmFile::walkmesh() const {
+shared_ptr<render::Walkmesh> BwmFile::walkmesh() const {
     return _walkmesh;
 }
 

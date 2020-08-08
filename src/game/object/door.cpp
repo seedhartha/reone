@@ -23,6 +23,8 @@
 #include "../../render/modelinstance.h"
 #include "../../resources/manager.h"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -56,8 +58,8 @@ void Door::load(const GffStruct &gffs) {
 
     updateTransform();
 
-    std::string templResRef(gffs.getString("TemplateResRef"));
-    std::shared_ptr<GffStruct> utd(resources.findGFF(templResRef, ResourceType::DoorBlueprint));
+    string templResRef(gffs.getString("TemplateResRef"));
+    shared_ptr<GffStruct> utd(resources.findGFF(templResRef, ResourceType::DoorBlueprint));
     loadBlueprint(*utd);
 }
 
@@ -68,17 +70,17 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     _static = gffs.getInt("Static", 0) != 0;
 
     ResourceManager &resources = ResourceManager::instance();
-    std::shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
+    shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
 
     int type = gffs.getInt("GenericType");
-    std::string model(table->getString(type, "modelname"));
+    string model(table->getString(type, "modelname"));
     boost::to_lower(model);
 
-    _model = std::make_unique<ModelInstance>(resources.findModel(model));
+    _model = make_unique<ModelInstance>(resources.findModel(model));
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 
-void Door::open(const std::shared_ptr<Object> &trigerrer) {
+void Door::open(const shared_ptr<Object> &trigerrer) {
     animate("opened1");
     _open = true;
 }
@@ -89,7 +91,7 @@ void Door::saveTo(AreaState &state) const {
     DoorState doorState;
     doorState.open = _open;
 
-    state.doors[_tag] = std::move(doorState);
+    state.doors[_tag] = move(doorState);
 }
 
 void Door::loadState(const AreaState &state) {
@@ -110,15 +112,15 @@ bool Door::isStatic() const {
     return _static;
 }
 
-const std::string &Door::linkedToModule() const {
+const string &Door::linkedToModule() const {
     return _linkedToModule;
 }
 
-const std::string &Door::linkedTo() const {
+const string &Door::linkedTo() const {
     return _linkedTo;
 }
 
-const std::string &Door::transitionDestin() const {
+const string &Door::transitionDestin() const {
     return _transitionDestin;
 }
 

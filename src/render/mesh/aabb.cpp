@@ -23,11 +23,13 @@
 
 #include "../shadermanager.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
 
-static std::vector<float> g_vertices = {
+static vector<float> g_vertices = {
     -0.5f, -0.5f, -0.5f,
     -0.5f, -0.5f,  0.5f,
     -0.5f,  0.5f,  0.5f,
@@ -38,7 +40,7 @@ static std::vector<float> g_vertices = {
      0.5f, -0.5f,  0.5f
 };
 
-static std::vector<uint16_t> g_indices = {
+static vector<uint16_t> g_indices = {
     0, 1, 1, 2, 2, 3, 3, 0,
     2, 4, 4, 5, 5, 3, 3, 2,
     1, 7, 7, 4, 4, 2, 2, 1,

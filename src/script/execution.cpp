@@ -28,8 +28,6 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace glm;
-
 using namespace reone::resources;
 
 namespace reone {
@@ -38,7 +36,7 @@ namespace script {
 
 static const int kStartInstructionOffset = 13;
 
-ScriptExecution::ScriptExecution(const std::shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
+ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
     _handlers.insert(make_pair(ByteCode::CopyDownSP, bind(&ScriptExecution::executeCopyDownSP, this, _1)));
     _handlers.insert(make_pair(ByteCode::Reserve, bind(&ScriptExecution::executeReserve, this, _1)));
     _handlers.insert(make_pair(ByteCode::CopyTopSP, bind(&ScriptExecution::executeCopyTopSP, this, _1)));
@@ -186,7 +184,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
         case InstructionType::Object: {
             Variable var(VariableType::Object);
             var.objectId = ins.objectId;
-            _stack.push_back(std::move(var));
+            _stack.push_back(move(var));
             break;
         }
         case InstructionType::String:
@@ -243,7 +241,7 @@ Variable ScriptExecution::getVectorFromStack() {
     float y = getFloatFromStack().floatValue;
     float z = getFloatFromStack().floatValue;
 
-    return vec3(x, y, z);
+    return glm::vec3(x, y, z);
 }
 
 Variable ScriptExecution::getFloatFromStack() {
@@ -251,7 +249,7 @@ Variable ScriptExecution::getFloatFromStack() {
     assert(var.type == VariableType::Float);
     _stack.pop_back();
 
-    return std::move(var);
+    return move(var);
 }
 
 void ScriptExecution::executeLogicalAnd(const Instruction &ins) {
