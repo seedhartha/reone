@@ -436,7 +436,7 @@ shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
     debug("Loading font " + resRef2);
 
     shared_ptr<Font> font;
-    shared_ptr<Texture> texture(findTexture(resRef2, TextureType::Font));
+    shared_ptr<Texture> texture(findTexture(resRef2, TextureType::GUI));
 
     if (texture) {
         font = make_shared<Font>();
