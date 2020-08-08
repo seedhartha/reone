@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-MainMenu::MainMenu(const GraphicsOptions &opts) : GUI(opts) {
+MainMenu::MainMenu(const Options &opts) : GUI(opts.graphics), _opts(opts) {
     _resolutionX = 800;
     _resolutionY = 600;
 }
@@ -42,6 +42,10 @@ void MainMenu::load(GameVersion version) {
     hideControl("LBL_NEWCONTENT");
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
+
+    if (!_opts.debug) {
+        hideControl("BTN_WARP");
+    }
 }
 
 string MainMenu::getResRef(GameVersion version) const {

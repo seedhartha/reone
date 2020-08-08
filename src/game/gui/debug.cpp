@@ -54,8 +54,8 @@ void DebugGui::update(const DebugContext &ctx) {
 
         float textWidth = _font->measure(object.text);
         Control::Extent extent(
-            _opts.width * object.screenCoords.x - 0.5f * textWidth,
-            _opts.height * (1.0f - object.screenCoords.y),
+            _gfxOpts.width * object.screenCoords.x - 0.5f * textWidth,
+            _gfxOpts.height * (1.0f - object.screenCoords.y),
             textWidth,
             _font->height());
 

@@ -36,9 +36,9 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(const GraphicsOptions &opts) : _opts(opts) {
-    _screenCenter.x = 0.5f * _opts.width;
-    _screenCenter.y = 0.5f * _opts.height;
+GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
+    _screenCenter.x = 0.5f * _gfxOpts.width;
+    _screenCenter.y = 0.5f * _gfxOpts.height;
 }
 
 void GUI::load(const string &resRef, BackgroundType background) {
@@ -87,29 +87,29 @@ void GUI::load(const string &resRef, BackgroundType background) {
 void GUI::positionRelativeToCenter(Control &control) {
     Control::Extent extent(control.extent());
     if (extent.left >= 0.5f * _resolutionX) {
-        extent.left = extent.left - _resolutionX + _opts.width;
+        extent.left = extent.left - _resolutionX + _gfxOpts.width;
     }
     if (extent.top >= 0.5f * _resolutionY) {
-        extent.top = extent.top - _resolutionY + _opts.height;
+        extent.top = extent.top - _resolutionY + _gfxOpts.height;
     }
     control.setExtent(move(extent));
 }
 
 void GUI::stretchControl(Control &control) {
-    float aspectX = _opts.width / static_cast<float>(_resolutionX);
-    float aspectY = _opts.height / static_cast<float>(_resolutionY);
+    float aspectX = _gfxOpts.width / static_cast<float>(_resolutionX);
+    float aspectY = _gfxOpts.height / static_cast<float>(_resolutionY);
     control.stretch(aspectX, aspectY);
 }
 
 void GUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if ((_opts.width == 1600 && _opts.height == 1200) ||
-        (_opts.width == 1280 && _opts.height == 960) ||
-        (_opts.width == 1024 && _opts.height == 768) ||
-        (_opts.width == 800 && _opts.height == 600)) {
+    if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
+        (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
+        (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
+        (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
 
-        resRef = str(boost::format("%dx%d") % _opts.width % _opts.height);
+        resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
     } else {
         resRef = "1600x1200";
     }
@@ -187,7 +187,7 @@ void GUI::render() const {
 }
 
 void GUI::renderBackground() const {
-    glm::mat4 transform(glm::scale(glm::mat4(1.0f), glm::vec3(_opts.width, _opts.height, 1.0f)));
+    glm::mat4 transform(glm::scale(glm::mat4(1.0f), glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f)));
 
     ShaderManager &shaders = ShaderManager::instance();
     shaders.activate(ShaderProgram::BasicDiffuse);

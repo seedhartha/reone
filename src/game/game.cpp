@@ -75,7 +75,7 @@ void Game::configure() {
 }
 
 void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(_opts.graphics));
+    unique_ptr<MainMenu> mainMenu(new MainMenu(_opts));
     mainMenu->load(_version);
     mainMenu->initGL();
     mainMenu->setOnExit([this]() { _quit = true; });
