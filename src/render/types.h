@@ -34,7 +34,7 @@ enum class TextureType {
     Lightmap,
     EnvironmentMap,
     BumpMap,
-    Font
+    GUI
 };
 
 enum class TextureBlending {

@@ -124,13 +124,13 @@ void Control::loadBorder(const GffStruct &gffs) {
     _border = make_shared<Border>();
 
     if (!corner.empty()) {
-        _border->corner = resources.findTexture(corner, TextureType::Diffuse);
+        _border->corner = resources.findTexture(corner, TextureType::GUI);
     }
     if (!edge.empty()) {
-        _border->edge = resources.findTexture(edge, TextureType::Diffuse);
+        _border->edge = resources.findTexture(edge, TextureType::GUI);
     }
     if (!fill.empty()) {
-        _border->fill = resources.findTexture(fill, TextureType::Diffuse);
+        _border->fill = resources.findTexture(fill, TextureType::GUI);
     }
 
     _border->dimension = gffs.getInt("DIMENSION", 0);
@@ -157,13 +157,13 @@ void Control::loadHilight(const GffStruct &gffs) {
     _hilight = make_shared<Border>();
 
     if (!corner.empty()) {
-        _hilight->corner = resources.findTexture(corner, TextureType::Diffuse);
+        _hilight->corner = resources.findTexture(corner, TextureType::GUI);
     }
     if (!edge.empty()) {
-        _hilight->edge = resources.findTexture(edge, TextureType::Diffuse);
+        _hilight->edge = resources.findTexture(edge, TextureType::GUI);
     }
     if (!fill.empty()) {
-        _hilight->fill = resources.findTexture(fill, TextureType::Diffuse);
+        _hilight->fill = resources.findTexture(fill, TextureType::GUI);
     }
 
     _hilight->dimension = gffs.getInt("DIMENSION", 0);
