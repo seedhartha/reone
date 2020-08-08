@@ -61,24 +61,34 @@ public:
     const TextureFeatures &features() const;
 
 private:
+    struct MipMap {
+        int width { 0 };
+        int height { 0 };
+        ByteArray data;
+    };
+
+    struct Layer {
+        std::vector<MipMap> mipMaps;
+    };
+
     bool _glInited { false };
     std::string _name;
     TextureType _type { TextureType::Diffuse };
+    PixelFormat _pixelFormat { PixelFormat::BGR };
     int _width { 0 };
     int _height { 0 };
-    PixelFormat _pixelFormat { PixelFormat::BGR };
-    std::vector<ByteArray> _images;
-    bool _cubeMap { false };
+    std::vector<Layer> _layers;
     TextureFeatures _features;
-    unsigned int _textureId { 0 };
+    uint32_t _textureId { 0 };
 
     Texture(const Texture &) = delete;
 
     Texture &operator=(const Texture &) = delete;
 
-    void fillTextureTarget(unsigned int target, const ByteArray &data);
+    inline bool isCubeMap() const;
+    void fillTextureTarget(uint32_t target, int level, int width, int height, const ByteArray &data);
     int glInternalPixelFormat() const;
-    unsigned int glPixelFormat() const;
+    uint32_t glPixelFormat() const;
 
     friend class resources::TgaFile;
     friend class resources::TpcFile;

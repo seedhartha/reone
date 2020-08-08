@@ -37,8 +37,8 @@ private:
     };
 
     std::string _resRef;
-    render::TextureType _texType;
-    ImageType _imageType;
+    render::TextureType _texType { render::TextureType::Diffuse };
+    ImageType _imageType { ImageType::RGBA };
     int _width { 0 };
     int _height { 0 };
     std::shared_ptr<render::Texture> _texture;

@@ -49,7 +49,8 @@ private:
     std::shared_ptr<render::Texture> _texture;
 
     void doLoad() override;
-    int getMipMapSize(int idx);
+    void getMipMapSize(int index, int &width, int &height) const;
+    int getMipMapDataSize(int width, int height) const;
     void loadTexture();
     render::PixelFormat pixelFormat() const;
 };
