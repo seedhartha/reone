@@ -20,6 +20,8 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/norm.hpp"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -30,7 +32,7 @@ namespace game {
 Object::Object(uint32_t id) : _id(id) {
 }
 
-void Object::animate(const std::string &anim, int flags) {
+void Object::animate(const string &anim, int flags) {
     if (_model) {
         _model->animate(anim, flags);
     }
@@ -109,7 +111,7 @@ ObjectType Object::type() const {
     return _type;
 }
 
-const std::string &Object::tag() const {
+const string &Object::tag() const {
     return _tag;
 }
 
@@ -125,11 +127,11 @@ const glm::mat4 &Object::transform() const {
     return _transform;
 }
 
-std::shared_ptr<ModelInstance> Object::model() const {
+shared_ptr<ModelInstance> Object::model() const {
     return _model;
 }
 
-std::shared_ptr<Walkmesh> Object::walkmesh() const {
+shared_ptr<Walkmesh> Object::walkmesh() const {
     return _walkmesh;
 }
 

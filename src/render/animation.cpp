@@ -19,35 +19,37 @@
 
 #include <queue>
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
 
-Animation::Animation(const std::string &name, float length, float transitionTime, const std::shared_ptr<ModelNode> &rootNode) :
+Animation::Animation(const string &name, float length, float transitionTime, const shared_ptr<ModelNode> &rootNode) :
     _name(name), _length(length), _transitionTime(transitionTime), _rootNode(rootNode) {
 
-    std::queue<std::shared_ptr<ModelNode>> nodes;
+    queue<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
     while (!nodes.empty()) {
-        std::shared_ptr<ModelNode> node(nodes.front());
+        shared_ptr<ModelNode> node(nodes.front());
         nodes.pop();
 
-        _nodeByName.insert(std::make_pair(node->name(), node));
+        _nodeByName.insert(make_pair(node->name(), node));
 
-        const std::vector<std::shared_ptr<ModelNode>> &children = node->children();
+        const vector<shared_ptr<ModelNode>> &children = node->children();
         for (auto &child : children) {
             nodes.push(child);
         }
     }
 }
 
-std::shared_ptr<ModelNode> Animation::findNode(const std::string &name) const {
+shared_ptr<ModelNode> Animation::findNode(const string &name) const {
     auto it = _nodeByName.find(name);
     return it != _nodeByName.end() ? it->second : nullptr;
 }
 
-const std::string &Animation::name() const {
+const string &Animation::name() const {
     return _name;
 }
 
@@ -59,7 +61,7 @@ float Animation::transitionTime() const {
     return _transitionTime;
 }
 
-std::shared_ptr<ModelNode> Animation::rootNode() const {
+shared_ptr<ModelNode> Animation::rootNode() const {
     return _rootNode;
 }
 

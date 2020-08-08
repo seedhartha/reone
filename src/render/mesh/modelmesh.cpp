@@ -21,6 +21,8 @@
 
 #include "SDL2/SDL_opengl.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -39,8 +41,8 @@ void ModelMesh::initGL() {
     if (_bumpyShiny) _bumpyShiny->initGL();
 }
 
-void ModelMesh::render(const std::shared_ptr<Texture> &diffuseOverride) const {
-    const std::shared_ptr<Texture> &diffuse = diffuseOverride ? diffuseOverride : _diffuse;
+void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
+    const shared_ptr<Texture> &diffuse = diffuseOverride ? diffuseOverride : _diffuse;
     bool additive = false;
 
     if (diffuse) {
@@ -123,7 +125,7 @@ bool ModelMesh::hasBumpyShinyTexture() const {
     return static_cast<bool>(_bumpyShiny);
 }
 
-const std::shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
+const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
     return _diffuse;
 }
 

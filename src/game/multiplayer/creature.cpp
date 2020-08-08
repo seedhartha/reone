@@ -19,6 +19,8 @@
 
 #include "callbacks.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
@@ -26,7 +28,7 @@ namespace game {
 MultiplayerCreature::MultiplayerCreature(uint32_t id, IMultiplayerCallbacks *callbacks) : Creature(id), _callbacks(callbacks) {
 }
 
-void MultiplayerCreature::setClientTag(const std::string &clientTag) {
+void MultiplayerCreature::setClientTag(const string &clientTag) {
     _clientTag = clientTag;
 }
 
@@ -34,11 +36,11 @@ bool MultiplayerCreature::isControlled() const {
     return !_clientTag.empty();
 }
 
-const std::string &MultiplayerCreature::clientTag() const {
+const string &MultiplayerCreature::clientTag() const {
     return _clientTag;
 }
 
-void MultiplayerCreature::animate(const std::string &anim, int flags) {
+void MultiplayerCreature::animate(const string &anim, int flags) {
     Object::animate(anim, flags);
     if (_synchronize) {
         _callbacks->onObjectAnimationChanged(*this, anim, flags);

@@ -22,6 +22,8 @@
 
 #include "AL/al.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace audio {
@@ -32,7 +34,7 @@ void AudioStream::add(Frame &&frame) {
 
 void AudioStream::fill(int frameIdx, uint32_t buffer) {
     if (frameIdx >= _frames.size()) {
-        throw std::out_of_range("Frame index out of range: " + std::to_string(frameIdx));
+        throw out_of_range("Frame index out of range: " + to_string(frameIdx));
     }
     Frame &frame = _frames[frameIdx];
     alBufferData(buffer, getALAudioFormat(frame.format), &frame.samples[0], frame.samples.size(), frame.sampleRate);
@@ -49,7 +51,7 @@ int AudioStream::getALAudioFormat(AudioFormat format) const {
         case AudioFormat::Stereo16:
             return AL_FORMAT_STEREO16;
         default:
-            throw std::logic_error("Unknown audio format: " + std::to_string(static_cast<int>(format)));
+            throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
     }
 }
 

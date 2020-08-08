@@ -40,7 +40,7 @@ RoutineDecl::RoutineDecl(
     const string &name,
     VariableType retType,
     const vector<VariableType> &argTypes,
-    const function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn
+    const function<Variable(const vector<Variable> &, ExecutionContext &ctx)> &fn
 ) :
     _name(name), _returnType(retType), _argumentTypes(argTypes), _func(fn) {
 }
@@ -91,7 +91,7 @@ const RoutineDecl &RoutineManager::get(int index) {
     return _routines[index];
 }
 
-Variable RoutineManager::delayCommand(const std::vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(
         args.size() == 2 &&
         args[0].type == VariableType::Float &&
@@ -105,13 +105,13 @@ Variable RoutineManager::delayCommand(const std::vector<Variable> &args, Executi
     return Variable();
 }
 
-Variable RoutineManager::getEnteringObject(const std::vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getEnteringObject(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Object);
     result.objectId = ctx.enteringObjectId;
-    return std::move(result);
+    return move(result);
 }
 
-Variable RoutineManager::getIsPC(const std::vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
     return Variable(args[0].objectId == ctx.playerId);
 }

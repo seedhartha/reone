@@ -23,6 +23,8 @@
 #include "../../render/modelinstance.h"
 #include "../../resources/manager.h"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -45,9 +47,9 @@ void Placeable::load(const GffStruct &gffs) {
 
     updateTransform();
 
-    std::string templResRef(gffs.getString("TemplateResRef"));
+    string templResRef(gffs.getString("TemplateResRef"));
     ResourceManager &resources = ResourceManager::instance();
-    std::shared_ptr<GffStruct> utp(resources.findGFF(templResRef, ResourceType::PlaceableBlueprint));
+    shared_ptr<GffStruct> utp(resources.findGFF(templResRef, ResourceType::PlaceableBlueprint));
     loadBlueprint(*utp);
 }
 
@@ -56,13 +58,13 @@ void Placeable::loadBlueprint(const resources::GffStruct &gffs) {
     boost::to_lower(_tag);
 
     ResourceManager &resources = ResourceManager::instance();
-    std::shared_ptr<TwoDaTable> table = resources.find2DA("placeables");
+    shared_ptr<TwoDaTable> table = resources.find2DA("placeables");
 
     int appearance = gffs.getInt("Appearance");
-    std::string model(table->getString(appearance, "modelname"));
+    string model(table->getString(appearance, "modelname"));
     boost::to_lower(model);
 
-    _model = std::make_unique<ModelInstance>(resources.findModel(model));
+    _model = make_unique<ModelInstance>(resources.findModel(model));
     _walkmesh = resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 }
 

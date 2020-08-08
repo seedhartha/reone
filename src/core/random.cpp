@@ -20,12 +20,14 @@
 #include <ctime>
 #include <random>
 
+using namespace std;
+
 namespace reone {
 
-static std::default_random_engine g_generator(time(nullptr));
+static default_random_engine g_generator(time(nullptr));
 
 float random(float min, float max) {
-    std::uniform_real_distribution<float> distr(min, max);
+    uniform_real_distribution<float> distr(min, max);
     return distr(g_generator);
 }
 

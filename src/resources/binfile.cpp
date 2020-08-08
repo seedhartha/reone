@@ -17,42 +17,44 @@
 
 #include "binfile.h"
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
 
 namespace resources {
 
-std::vector<char> BinaryFile::readArray(std::istream &in, int n) {
+vector<char> BinaryFile::readArray(istream &in, int n) {
     if (n == 0) {
         return ByteArray();
     }
     ByteArray arr(n);
     in.read(&arr[0], n);
 
-    return std::move(arr);
+    return move(arr);
 }
 
-std::vector<char> BinaryFile::readArray(std::istream &in, uint32_t off, int n) {
-    std::streampos pos = in.tellg();
+vector<char> BinaryFile::readArray(istream &in, uint32_t off, int n) {
+    streampos pos = in.tellg();
     in.seekg(off);
 
     ByteArray arr(readArray<char>(in, n));
     in.seekg(pos);
 
-    return std::move(arr);
+    return move(arr);
 }
 
 BinaryFile::BinaryFile(int signSize, const char *sign) : _signSize(signSize) {
     if (!sign) return;
 
     _sign.resize(_signSize);
-    std::memcpy(&_sign[0], sign, _signSize);
+    memcpy(&_sign[0], sign, _signSize);
 }
 
-void BinaryFile::load(const std::shared_ptr<std::istream> &in) {
+void BinaryFile::load(const shared_ptr<istream> &in) {
     if (!in) {
-        throw std::invalid_argument("Invalid input stream");
+        throw invalid_argument("Invalid input stream");
     }
     _in = in;
 
@@ -66,27 +68,27 @@ void BinaryFile::load() {
 }
 
 void BinaryFile::querySize() {
-    _in->seekg(0, std::ios::end);
+    _in->seekg(0, ios::end);
     _size = _in->tellg();
     _in->seekg(0);
 }
 
 void BinaryFile::checkSignature() {
     if (_size < _signSize) {
-        throw std::runtime_error("Invalid binary file size");
+        throw runtime_error("Invalid binary file size");
     }
     char buf[16];
     _in->read(buf, _signSize);
-    if (!std::equal(_sign.begin(), _sign.end(), buf)) {
-        throw std::runtime_error("Invalid binary file signature");
+    if (!equal(_sign.begin(), _sign.end(), buf)) {
+        throw runtime_error("Invalid binary file signature");
     }
 }
 
 void BinaryFile::load(const fs::path &path) {
     if (!fs::exists(path)) {
-        throw std::runtime_error("File not found: " + path.string());
+        throw runtime_error("File not found: " + path.string());
     }
-    _in.reset(new fs::ifstream(path, std::ios::binary));
+    _in.reset(new fs::ifstream(path, ios::binary));
     _path = path;
 
     load();
@@ -200,47 +202,47 @@ double BinaryFile::readDouble() {
     return val;
 }
 
-std::string BinaryFile::readFixedString(int size) {
-    std::string s;
+string BinaryFile::readFixedString(int size) {
+    string s;
     s.resize(size);
     _in->read(&s[0], size);
 
     return s.c_str();
 }
 
-std::string BinaryFile::readFixedString(uint32_t off, int size) {
-    std::streampos pos = _in->tellg();
+string BinaryFile::readFixedString(uint32_t off, int size) {
+    streampos pos = _in->tellg();
     _in->seekg(off);
 
-    std::string s(readFixedString(size));
+    string s(readFixedString(size));
     _in->seekg(pos);
 
-    return std::move(s);
+    return move(s);
 }
 
-std::string BinaryFile::readString(uint32_t off) {
-    std::streampos pos = _in->tellg();
+string BinaryFile::readString(uint32_t off) {
+    streampos pos = _in->tellg();
     _in->seekg(off);
 
     char buf[256];
-    std::streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
+    streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
 
     _in->seekg(pos);
 
-    return std::string(buf, strnlen(buf, chRead));
+    return string(buf, strnlen(buf, chRead));
 }
 
-std::string BinaryFile::readString(uint32_t off, int size) {
-    std::streampos pos = _in->tellg();
+string BinaryFile::readString(uint32_t off, int size) {
+    streampos pos = _in->tellg();
     _in->seekg(off);
 
-    std::string s;
+    string s;
     s.resize(size);
 
     _in->read(&s[0], size);
     _in->seekg(pos);
 
-    return std::move(s);
+    return move(s);
 }
 
 } // namespace resources

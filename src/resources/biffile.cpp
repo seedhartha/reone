@@ -17,6 +17,8 @@
 
 #include "biffile.h"
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -37,7 +39,7 @@ void BifFile::doLoad() {
 
 ByteArray BifFile::getResourceData(int idx) {
     if (idx >= _resourceCount) {
-        throw std::out_of_range("BIF: resource index out of range: " + std::to_string(idx));
+        throw out_of_range("BIF: resource index out of range: " + to_string(idx));
     }
     ResourceEntry entry(readResourceEntry(idx));
 
@@ -55,7 +57,7 @@ BifFile::ResourceEntry BifFile::readResourceEntry(int idx) {
     entry.offset = offset;
     entry.fileSize = fileSize;
 
-    return std::move(entry);
+    return move(entry);
 }
 
 } // namespace bioware

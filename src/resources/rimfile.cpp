@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -50,7 +52,7 @@ void RimFile::loadResources() {
 }
 
 RimFile::Resource RimFile::readResource() {
-    std::string resRef(readFixedString(16));
+    string resRef(readFixedString(16));
     uint16_t type = readUint16();
     ignore(4 + 2);
     uint32_t offset = readUint32();
@@ -62,24 +64,24 @@ RimFile::Resource RimFile::readResource() {
     res.offset = offset;
     res.size = size;
 
-    return std::move(res);
+    return move(res);
 }
 
 bool RimFile::supports(ResourceType type) const {
     return true;
 }
 
-std::shared_ptr<ByteArray> RimFile::find(const std::string &resRef, ResourceType type) {
-    std::string lcResRef(boost::to_lower_copy(resRef));
+shared_ptr<ByteArray> RimFile::find(const string &resRef, ResourceType type) {
+    string lcResRef(boost::to_lower_copy(resRef));
 
-    auto it = std::find_if(
+    auto it = find_if(
         _resources.begin(),
         _resources.end(),
         [&](const Resource &res) { return res.resRef == lcResRef && res.type == type; });
 
     if (it == _resources.end()) return nullptr;
 
-    return std::make_shared<ByteArray>(getResourceData(*it));
+    return make_shared<ByteArray>(getResourceData(*it));
 }
 
 ByteArray RimFile::getResourceData(const Resource &res) {
@@ -88,12 +90,12 @@ ByteArray RimFile::getResourceData(const Resource &res) {
 
 ByteArray RimFile::getResourceData(int idx) {
     if (idx >= _resourceCount) {
-        throw std::logic_error("RIM: resource index out of range: " + std::to_string(idx));
+        throw logic_error("RIM: resource index out of range: " + to_string(idx));
     }
     return getResourceData(_resources[idx]);
 }
 
-const std::vector<RimFile::Resource> &RimFile::resources() const {
+const vector<RimFile::Resource> &RimFile::resources() const {
     return _resources;
 }
 

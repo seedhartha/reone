@@ -17,6 +17,8 @@
 
 #include "modelnode.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -45,7 +47,7 @@ uint16_t ModelNode::nodeNumber() const {
     return _nodeNumber;
 }
 
-const std::string &ModelNode::name() const {
+const string &ModelNode::name() const {
     return _name;
 }
 
@@ -121,15 +123,15 @@ float ModelNode::alpha() const {
     return _alpha;
 }
 
-std::shared_ptr<ModelMesh> ModelNode::mesh() const {
+shared_ptr<ModelMesh> ModelNode::mesh() const {
     return _mesh;
 }
 
-std::shared_ptr<ModelNode::Skin> ModelNode::skin() const {
+shared_ptr<ModelNode::Skin> ModelNode::skin() const {
     return _skin;
 }
 
-const std::vector<std::shared_ptr<ModelNode>> &ModelNode::children() const {
+const vector<shared_ptr<ModelNode>> &ModelNode::children() const {
     return _children;
 }
 

@@ -31,6 +31,8 @@
 
 #include "shadermanager.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -55,13 +57,13 @@ void RenderWindow::init() {
         flags);
 
     if (!_window) {
-        throw std::runtime_error("Failed to create a window: " + std::string(SDL_GetError()));
+        throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
     }
 
     _context = SDL_GL_CreateContext(_window);
 
     if (!_context) {
-        throw std::runtime_error("Failed to create a GL context: " + std::string(SDL_GetError()));
+        throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
 
     SDL_GL_SetSwapInterval(0);
@@ -126,7 +128,7 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
     }
 }
 
-void RenderWindow::render(const std::shared_ptr<Camera> &camera) const {
+void RenderWindow::render(const shared_ptr<Camera> &camera) const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     renderWorld(camera);
@@ -135,7 +137,7 @@ void RenderWindow::render(const std::shared_ptr<Camera> &camera) const {
     SDL_GL_SwapWindow(_window);
 }
 
-void RenderWindow::renderWorld(const std::shared_ptr<Camera> &camera) const {
+void RenderWindow::renderWorld(const shared_ptr<Camera> &camera) const {
     if (!camera) return;
 
     glEnable(GL_DEPTH_TEST);
@@ -166,11 +168,11 @@ void RenderWindow::setRelativeMouseMode(bool enabled) {
     SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
 }
 
-void RenderWindow::setRenderWorldFunc(const std::function<void()> &fn) {
+void RenderWindow::setRenderWorldFunc(const function<void()> &fn) {
     _onRenderWorld = fn;
 }
 
-void RenderWindow::setRenderGUIFunc(const std::function<void()> &fn) {
+void RenderWindow::setRenderGUIFunc(const function<void()> &fn) {
     _onRenderGUI = fn;
 }
 

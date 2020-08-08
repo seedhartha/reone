@@ -66,9 +66,9 @@ void Program::loadOptions() {
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("convert", "convert 2DA or GFF file to JSON")
-        ("game", po::value<std::string>(), "path to game directory")
-        ("dest", po::value<std::string>(), "path to destination directory")
-        ("input-file", po::value<std::string>(), "path to input file");
+        ("game", po::value<string>(), "path to game directory")
+        ("dest", po::value<string>(), "path to destination directory")
+        ("input-file", po::value<string>(), "path to input file");
 
     po::positional_options_description positional;
     positional.add("input-file", 1);
@@ -81,9 +81,9 @@ void Program::loadOptions() {
     po::store(parsedCmdLineOpts, _vars);
     po::notify(_vars);
 
-    _gamePath = _vars.count("game") ? _vars["game"].as<std::string>() : fs::current_path();
-    _destPath = _vars.count("dest") ? _vars["dest"].as<std::string>() : fs::current_path();
-    _inputFilePath = _vars.count("input-file") ? _vars["input-file"].as<std::string>() : "";
+    _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
+    _destPath = _vars.count("dest") ? _vars["dest"].as<string>() : fs::current_path();
+    _inputFilePath = _vars.count("input-file") ? _vars["input-file"].as<string>() : "";
 
     initKeyPath();
     initGameVersion();

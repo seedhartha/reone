@@ -28,6 +28,8 @@
 
 #include "modelinstance.h"
 
+using namespace std;
+
 using namespace reone::resources;
 
 namespace reone {
@@ -38,10 +40,10 @@ RenderListItem::RenderListItem(const ModelInstance *model, const ModelNode *node
     model(model), node(node), transform(transform) {
 }
 
-ModelInstance::ModelInstance(const std::shared_ptr<Model> &model) : _model(model) {
+ModelInstance::ModelInstance(const shared_ptr<Model> &model) : _model(model) {
 }
 
-void ModelInstance::animate(const std::string &name, int flags) {
+void ModelInstance::animate(const string &name, int flags) {
     if (!_model || _animState.name == name) return;
 
     _animState.nextAnimation = name;
@@ -52,26 +54,26 @@ void ModelInstance::animate(const std::string &name, int flags) {
     }
 }
 
-void ModelInstance::attach(const std::string &parentNode, const std::shared_ptr<Model> &model) {
-    std::shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
+void ModelInstance::attach(const string &parentNode, const shared_ptr<Model> &model) {
+    shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
     if (!parent) {
         warn("Parent node not found: " + parentNode);
         return;
     }
-    _attachedModels.insert(std::make_pair(parent->nodeNumber(), std::make_unique<ModelInstance>(model)));
+    _attachedModels.insert(make_pair(parent->nodeNumber(), make_unique<ModelInstance>(model)));
 }
 
-void ModelInstance::changeTexture(const std::string &resRef) {
+void ModelInstance::changeTexture(const string &resRef) {
     ResourceManager &resources = ResourceManager::instance();
     _textureOverride = resources.findTexture(resRef, TextureType::Diffuse);
     if (_textureOverride) _textureOverride->initGL();
 }
 
 void ModelInstance::update(float dt) {
-    doUpdate(dt, std::set<std::string>());
+    doUpdate(dt, set<string>());
 }
 
-void ModelInstance::doUpdate(float dt, const std::set<std::string> &skipNodes) {
+void ModelInstance::doUpdate(float dt, const set<string> &skipNodes) {
     if (!_model || !_visible) return;
 
     if (!_animState.nextAnimation.empty()) {
@@ -86,8 +88,8 @@ void ModelInstance::doUpdate(float dt, const std::set<std::string> &skipNodes) {
     updateNodeTansforms(_model->rootNode(), glm::mat4(1.0f));
 
     for (auto &pair : _attachedModels) {
-        std::set<std::string> skipNodes;
-        std::shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
+        set<string> skipNodes;
+        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
 
         const ModelNode *pn = &*parent;
         while (pn) {
@@ -101,10 +103,10 @@ void ModelInstance::doUpdate(float dt, const std::set<std::string> &skipNodes) {
 
 void ModelInstance::startNextAnimation() {
     const Model *model = nullptr;
-    std::shared_ptr<Animation> anim(_model->findAnimation(_animState.nextAnimation, &model));
+    shared_ptr<Animation> anim(_model->findAnimation(_animState.nextAnimation, &model));
     if (!anim) return;
 
-    _animState.animation = std::move(anim);
+    _animState.animation = move(anim);
     _animState.model = model;
     _animState.name = _animState.nextAnimation;
     _animState.flags = _animState.nextFlags;
@@ -115,7 +117,7 @@ void ModelInstance::startNextAnimation() {
     _animState.nextFlags = 0;
 }
 
-void ModelInstance::advanceAnimation(float dt, const std::set<std::string> &skipNodes) {
+void ModelInstance::advanceAnimation(float dt, const set<string> &skipNodes) {
     float length = _animState.animation->length();
     float time = _animState.time + dt;
 
@@ -132,29 +134,29 @@ void ModelInstance::advanceAnimation(float dt, const std::set<std::string> &skip
     updateAnimTransforms(*_animState.animation->rootNode(), glm::mat4(1.0f), _animState.time, skipNodes);
 }
 
-void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const std::set<std::string> &skipNodes) {
-    std::string name(animNode.name());
+void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const set<string> &skipNodes) {
+    string name(animNode.name());
     glm::mat4 absTransform(transform);
 
     if (skipNodes.count(name) == 0) {
-        std::shared_ptr<ModelNode> refNode(_model->findNodeByName(name));
+        shared_ptr<ModelNode> refNode(_model->findNodeByName(name));
         if (refNode) {
             glm::mat4 localTransform(glm::translate(glm::mat4(1.0f), refNode->position()));
 
             glm::vec3 position;
             if (animNode.getPosition(time, position)) {
-                localTransform = glm::translate(localTransform, std::move(position));
+                localTransform = glm::translate(localTransform, move(position));
             }
 
             glm::quat orientation;
             if (animNode.getOrientation(time, orientation)) {
-                localTransform *= glm::mat4_cast(std::move(orientation));
+                localTransform *= glm::mat4_cast(move(orientation));
             } else {
                 localTransform *= glm::mat4_cast(refNode->orientation());
             }
 
             absTransform *= localTransform;
-            _animState.localTransforms.insert(std::make_pair(name, localTransform));
+            _animState.localTransforms.insert(make_pair(name, localTransform));
         }
     }
 
@@ -179,8 +181,8 @@ void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &
         transform2 *= glm::mat4_cast(node.orientation());
     }
 
-    _nodeTransforms.insert(std::make_pair(node.nodeNumber(), transform2));
-    _boneTransforms.insert(std::make_pair(node.index(), transform2 * node.absoluteTransformInverse()));
+    _nodeTransforms.insert(make_pair(node.nodeNumber(), transform2));
+    _boneTransforms.insert(make_pair(node.index(), transform2 * node.absoluteTransformInverse()));
 
     for (auto &child : node.children()) {
         updateNodeTansforms(*child, transform2);
@@ -193,7 +195,7 @@ void ModelInstance::fillRenderLists(const glm::mat4 &transform, RenderList &opaq
     fillRenderLists(_model->rootNode(), transform, opaque, transparent);
 
     for (auto &pair : _attachedModels) {
-        std::shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
+        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
         if (!parent) continue;
 
         glm::mat4 transform2(transform * getNodeTransform(*parent));
@@ -203,15 +205,15 @@ void ModelInstance::fillRenderLists(const glm::mat4 &transform, RenderList &opaq
 
 void ModelInstance::fillRenderLists(const ModelNode &node, const glm::mat4 &transform, RenderList &opaque, RenderList &transparent) {
     glm::mat4 transform2(transform * getNodeTransform(node));
-    std::shared_ptr<ModelMesh> mesh(node.mesh());
+    shared_ptr<ModelMesh> mesh(node.mesh());
     RenderListItem item(this, &node, transform2);
 
     if (mesh && mesh->shouldRender() && (mesh->hasDiffuseTexture() || _textureOverride)) {
         item.center = transform2 * glm::vec4(mesh->aabb().center(), 1.0f);
         if (mesh->isTransparent() || node.alpha() < 1.0f) {
-            transparent.push_back(std::move(item));
+            transparent.push_back(move(item));
         } else {
-            opaque.push_back(std::move(item));
+            opaque.push_back(move(item));
         }
     }
 
@@ -239,7 +241,7 @@ void ModelInstance::initGL() {
 }
 
 void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bool debug) const {
-    std::shared_ptr<ModelMesh> mesh(node.mesh());
+    shared_ptr<ModelMesh> mesh(node.mesh());
     renderMesh(node, transform);
 
     if (debug) {
@@ -248,8 +250,8 @@ void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bo
 }
 
 void ModelInstance::renderMesh(const ModelNode &node, const glm::mat4 &transform) const {
-    std::shared_ptr<ModelMesh> mesh(node.mesh());
-    std::shared_ptr<ModelNode::Skin> skin(node.skin());
+    shared_ptr<ModelMesh> mesh(node.mesh());
+    shared_ptr<ModelNode::Skin> skin(node.skin());
     bool skeletal = skin && !_animState.name.empty();
     ShaderProgram program = getShaderProgram(*mesh, skeletal);
 
@@ -273,8 +275,8 @@ void ModelInstance::renderMesh(const ModelNode &node, const glm::mat4 &transform
         shaders.setUniform("absTransform", node.absoluteTransform());
         shaders.setUniform("absTransformInv", node.absoluteTransformInverse());
 
-        const std::map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
-        std::vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
+        const map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
+        vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
 
         for (auto &pair : nodeIdxByBoneIdx) {
             uint16_t boneIdx = pair.first;
@@ -325,7 +327,7 @@ ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skelet
     }
 
     if (program == ShaderProgram::None) {
-        throw std::logic_error("Shader program not selected");
+        throw logic_error("Shader program not selected");
     }
 
     return program;
@@ -359,16 +361,16 @@ void ModelInstance::setAlpha(float alpha) {
     }
 }
 
-void ModelInstance::setDefaultAnimation(const std::string &name) {
+void ModelInstance::setDefaultAnimation(const string &name) {
     _defaultAnimation = name;
 }
 
-glm::vec3 ModelInstance::getNodeAbsolutePosition(const std::string &name) const {
+glm::vec3 ModelInstance::getNodeAbsolutePosition(const string &name) const {
     glm::vec3 position(0.0f);
 
-    std::shared_ptr<ModelNode> node(_model->findNodeByName(name));
+    shared_ptr<ModelNode> node(_model->findNodeByName(name));
     if (!node) {
-        std::shared_ptr<Model> superModel(_model->superModel());
+        shared_ptr<Model> superModel(_model->superModel());
         if (superModel) {
             node = superModel->findNodeByName(name);
         }
@@ -381,11 +383,11 @@ glm::vec3 ModelInstance::getNodeAbsolutePosition(const std::string &name) const 
     return node->absoluteTransform()[3];
 }
 
-const std::string &ModelInstance::name() const {
+const string &ModelInstance::name() const {
     return _model->name();
 }
 
-std::shared_ptr<Model> ModelInstance::model() const {
+shared_ptr<Model> ModelInstance::model() const {
     return _model;
 }
 

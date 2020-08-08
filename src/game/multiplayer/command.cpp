@@ -193,7 +193,7 @@ ByteArray Command::bytes() const {
             throw runtime_error("Unsupported command type: " + to_string(static_cast<int>(_type)));
     }
 
-    return std::move(data);
+    return move(data);
 }
 
 CommandType Command::type() const {
@@ -248,7 +248,7 @@ bool Command::open() const {
     return _open;
 }
 
-const std::string &Command::trigerrer() const {
+const string &Command::trigerrer() const {
     return _trigerrer;
 }
 

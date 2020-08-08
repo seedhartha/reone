@@ -22,6 +22,7 @@
 #include "area.h"
 #include "module.h"
 
+using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::net;
@@ -45,16 +46,16 @@ MultiplayerGame::MultiplayerGame(
 void MultiplayerGame::configure() {
     switch (_mode) {
         case MultiplayerMode::Server:
-            _server = std::make_unique<Server>();
-            _server->setOnClientConnected(std::bind(&MultiplayerGame::onClientConnected, this, _1));
-            _server->setOnClientDisconnected(std::bind(&MultiplayerGame::onClientDisconnected, this, _1));
-            _server->setOnCommandReceived(std::bind(&MultiplayerGame::onCommandReceived, this, _1));
+            _server = make_unique<Server>();
+            _server->setOnClientConnected(bind(&MultiplayerGame::onClientConnected, this, _1));
+            _server->setOnClientDisconnected(bind(&MultiplayerGame::onClientDisconnected, this, _1));
+            _server->setOnCommandReceived(bind(&MultiplayerGame::onCommandReceived, this, _1));
             _server->start(_opts.network.port);
             break;
 
         case MultiplayerMode::Client:
             _client.reset(new Client());
-            _client->setOnCommandReceived(std::bind(&MultiplayerGame::onCommandReceived, this, _1));
+            _client->setOnCommandReceived(bind(&MultiplayerGame::onCommandReceived, this, _1));
             _client->start(_opts.network.host, _opts.network.port);
             break;
 
@@ -66,7 +67,7 @@ void MultiplayerGame::configure() {
 }
 
 void MultiplayerGame::update() {
-    std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
+    lock_guard<recursive_mutex> lock(_commandsMutex);
     bool skip = false;
 
     while (!_commands.empty() && !skip) {
@@ -103,8 +104,8 @@ void MultiplayerGame::loadNextModule() {
     }
 }
 
-const std::shared_ptr<Module> MultiplayerGame::makeModule(const std::string &name) {
-    return std::shared_ptr<Module>(new MultiplayerModule(name, _mode, _version, _opts.graphics, this));
+const shared_ptr<Module> MultiplayerGame::makeModule(const string &name) {
+    return shared_ptr<Module>(new MultiplayerModule(name, _mode, _version, _opts.graphics, this));
 }
 
 void MultiplayerGame::configureModule() {
@@ -122,7 +123,7 @@ void MultiplayerGame::onObjectTransformChanged(const Object &object, const glm::
     }
 }
 
-void MultiplayerGame::onObjectAnimationChanged(const Object &object, const std::string &anim, int flags) {
+void MultiplayerGame::onObjectAnimationChanged(const Object &object, const string &anim, int flags) {
     if (shouldSendObjectUpdates(object.tag())) {
         sendSetObjectAnimationCommand(object.tag(), anim, flags);
     }
@@ -134,24 +135,24 @@ void MultiplayerGame::onCreatureMovementTypeChanged(const MultiplayerCreature &c
     }
 }
 
-void MultiplayerGame::onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<Object> &trigerrer) {
-    std::string trigerrerTag(trigerrer ? trigerrer->tag() : "");
+void MultiplayerGame::onDoorOpen(const MultiplayerDoor &door, const shared_ptr<Object> &trigerrer) {
+    string trigerrerTag(trigerrer ? trigerrer->tag() : "");
     if (shouldSendObjectUpdates(trigerrerTag)) {
         sendSetDoorOpenCommand(door.id(), trigerrerTag);
     }
 }
 
-void MultiplayerGame::onClientConnected(const std::string tag) {
+void MultiplayerGame::onClientConnected(const string tag) {
     if (!_module) return;
 
     synchronizeClient(tag);
 }
 
-void MultiplayerGame::onClientDisconnected(const std::string tag) {
+void MultiplayerGame::onClientDisconnected(const string tag) {
     if (!_module) return;
 
     const MultiplayerArea &area = static_cast<MultiplayerArea &>(_module->area());
-    std::shared_ptr<Object> object(area.findCreatureByClientTag(tag));
+    shared_ptr<Object> object(area.findCreatureByClientTag(tag));
 
     if (object) {
         static_cast<MultiplayerCreature &>(*object).setClientTag("");
@@ -162,16 +163,16 @@ void MultiplayerGame::onCommandReceived(const ByteArray &data) {
     Command cmd;
     cmd.load(data);
 
-    debug("Command received: " + std::to_string(static_cast<int>(cmd.type())));
+    debug("Command received: " + to_string(static_cast<int>(cmd.type())));
 
-    std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
+    lock_guard<recursive_mutex> lock(_commandsMutex);
     _commands.push(cmd);
 }
 
-bool MultiplayerGame::shouldSendObjectUpdates(const std::string &tag) const {
+bool MultiplayerGame::shouldSendObjectUpdates(const string &tag) const {
     if (!_module || !_module->loaded()) return false;
 
-    std::shared_ptr<Object> player(_module->area().player());
+    shared_ptr<Object> player(_module->area().player());
 
     switch (_mode) {
         case MultiplayerMode::Server:
@@ -187,21 +188,21 @@ bool MultiplayerGame::shouldSendObjectUpdates(const std::string &tag) const {
     return false;
 }
 
-void MultiplayerGame::synchronizeClient(const std::string &tag) {
-    std::lock_guard<std::recursive_mutex> lock(_syncMutex);
+void MultiplayerGame::synchronizeClient(const string &tag) {
+    lock_guard<recursive_mutex> lock(_syncMutex);
 
     sendLoadModuleCommand(tag, _module->name());
 
     Creature &partyLeader = static_cast<Creature &>(*_module->area().partyLeader());
     sendLoadCreatureCommand(tag, CreatureRole::PartyLeader, partyLeader);
 
-    std::shared_ptr<Object> partyMember1(_module->area().partyMember1());
+    shared_ptr<Object> partyMember1(_module->area().partyMember1());
     if (partyMember1) {
         Creature &creature = static_cast<Creature &>(*partyMember1);
         sendLoadCreatureCommand(tag, CreatureRole::PartyMember1, creature);
     }
 
-    std::shared_ptr<Object> partyMember2(_module->area().partyMember2());
+    shared_ptr<Object> partyMember2(_module->area().partyMember2());
     if (partyMember2) {
         Creature &creature = static_cast<Creature &>(*partyMember2);
         sendLoadCreatureCommand(tag, CreatureRole::PartyMember2, creature);
@@ -225,14 +226,14 @@ void MultiplayerGame::synchronizeClient(const std::string &tag) {
     }
 }
 
-void MultiplayerGame::sendLoadModuleCommand(const std::string &client, const std::string &module) {
+void MultiplayerGame::sendLoadModuleCommand(const string &client, const string &module) {
     Command cmd(CommandType::LoadModule);
     cmd._module = module;
 
     _server->send(client, cmd.bytes());
 }
 
-void MultiplayerGame::sendLoadCreatureCommand(const std::string &client, CreatureRole role, const Creature &creature) {
+void MultiplayerGame::sendLoadCreatureCommand(const string &client, CreatureRole role, const Creature &creature) {
     Command cmd(CommandType::LoadCreature);
     cmd._role = role;
     cmd._tag = creature.tag();
@@ -248,14 +249,14 @@ void MultiplayerGame::sendLoadCreatureCommand(const std::string &client, Creatur
     _server->send(client, cmd.bytes());
 }
 
-void MultiplayerGame::sendSetPlayerRoleCommand(const std::string &client, CreatureRole role) {
+void MultiplayerGame::sendSetPlayerRoleCommand(const string &client, CreatureRole role) {
     Command cmd(CommandType::SetPlayerRole);
     cmd._role = role;
 
     _server->send(client, cmd.bytes());
 }
 
-void MultiplayerGame::sendSetObjectTransformCommand(const std::string &tag, const glm::vec3 &position, float heading) {
+void MultiplayerGame::sendSetObjectTransformCommand(const string &tag, const glm::vec3 &position, float heading) {
     Command cmd(CommandType::SetObjectTransform);
     cmd._tag = tag;
     cmd._position = position;
@@ -268,7 +269,7 @@ void MultiplayerGame::sendSetObjectTransformCommand(const std::string &tag, cons
     }
 }
 
-void MultiplayerGame::sendSetObjectAnimationCommand(const std::string &tag, const std::string &animation, int flags) {
+void MultiplayerGame::sendSetObjectAnimationCommand(const string &tag, const string &animation, int flags) {
     Command cmd(CommandType::SetObjectAnimation);
     cmd._tag = tag;
     cmd._animation = animation;
@@ -281,7 +282,7 @@ void MultiplayerGame::sendSetObjectAnimationCommand(const std::string &tag, cons
     }
 }
 
-void MultiplayerGame::sendSetCreatureMovementTypeCommand(const std::string &tag, MovementType type) {
+void MultiplayerGame::sendSetCreatureMovementTypeCommand(const string &tag, MovementType type) {
     Command cmd(CommandType::SetCreatureMovementType);
     cmd._tag = tag;
     cmd._movementType = type;
@@ -293,7 +294,7 @@ void MultiplayerGame::sendSetCreatureMovementTypeCommand(const std::string &tag,
     }
 }
 
-void MultiplayerGame::sendSetDoorOpenCommand(uint32_t id, const std::string &trigerrer) {
+void MultiplayerGame::sendSetDoorOpenCommand(uint32_t id, const string &trigerrer) {
     Command cmd(CommandType::SetDoorOpen);
     cmd._objectId = id;
     cmd._trigerrer = trigerrer;

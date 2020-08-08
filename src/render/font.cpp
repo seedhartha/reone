@@ -27,6 +27,8 @@
 
 #include "shadermanager.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -34,9 +36,9 @@ namespace render {
 static const int kVertexValuesPerGlyph = 20;
 static const int kIndicesPerGlyph = 6;
 
-void Font::load(const std::shared_ptr<Texture> &texture) {
+void Font::load(const shared_ptr<Texture> &texture) {
     if (!texture) {
-        throw std::invalid_argument("Invalid font texture");
+        throw invalid_argument("Invalid font texture");
     }
     _texture = texture;
 
@@ -107,7 +109,7 @@ void Font::initGL() {
     if (_texture) _texture->initGL();
 }
 
-void Font::render(const std::string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
+void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -156,7 +158,7 @@ void Font::render(const std::string &text, const glm::mat4 &transform, const glm
     shaders.deactivate();
 }
 
-float Font::measure(const std::string &text) const {
+float Font::measure(const string &text) const {
     float w = 0.0f;
     for (auto &glyph : text) {
         w += _glyphWidths[glyph];

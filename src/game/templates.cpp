@@ -55,7 +55,7 @@ shared_ptr<Item> TemplateManager::findItem(const string &resRef) {
         warn("Item blueprint not found: " + resRef);
     }
 
-    auto pair = g_itemCache.insert(std::make_pair(resRef, item));
+    auto pair = g_itemCache.insert(make_pair(resRef, item));
 
     return pair.first->second;
 }

@@ -25,6 +25,8 @@
 
 #include "manager.h"
 
+using namespace std;
+
 using namespace reone::render;
 
 namespace fs = boost::filesystem;
@@ -59,7 +61,7 @@ enum class ControllerType {
 MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
 }
 
-void MdlFile::load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx) {
+void MdlFile::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
     assert(mdx);
     _mdx = mdx;
 
@@ -88,32 +90,32 @@ void MdlFile::doLoad() {
 
     uint32_t animOffOffset, animCount;
     readArrayDefinition(animOffOffset, animCount);
-    std::vector<uint32_t> animOffsets(readArray<uint32_t>(kMdlDataOffset + animOffOffset, animCount));
+    vector<uint32_t> animOffsets(readArray<uint32_t>(kMdlDataOffset + animOffOffset, animCount));
 
     ignore(28);
 
     float radius = readFloat();
     float scale = readFloat();
 
-    std::string superModelName(readFixedString(32));
+    string superModelName(readFixedString(32));
     boost::to_lower(superModelName);
 
     ignore(16);
 
     uint32_t nameOffOffset, nameCount;
     readArrayDefinition(nameOffOffset, nameCount);
-    std::vector<uint32_t> nameOffsets(readArray<uint32_t>(kMdlDataOffset + nameOffOffset, nameCount));
+    vector<uint32_t> nameOffsets(readArray<uint32_t>(kMdlDataOffset + nameOffOffset, nameCount));
     readNodeNames(nameOffsets);
 
-    std::unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
-    std::vector<std::shared_ptr<Animation>> anims(readAnimations(animOffsets));
-    std::shared_ptr<Model> superModel;
+    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
+    vector<shared_ptr<Animation>> anims(readAnimations(animOffsets));
+    shared_ptr<Model> superModel;
 
     if (!superModelName.empty() && superModelName != "null") {
         superModel = ResourceManager::instance().findModel(superModelName);
     }
 
-    _model = std::make_unique<Model>(_name, std::move(rootNode), anims, superModel);
+    _model = make_unique<Model>(_name, move(rootNode), anims, superModel);
 }
 
 void MdlFile::openMDX() {
@@ -123,9 +125,9 @@ void MdlFile::openMDX() {
     mdxPath.replace_extension(".mdx");
 
     if (!fs::exists(mdxPath)) {
-        throw std::runtime_error("MDL: MDX file not found: " + mdxPath.string());
+        throw runtime_error("MDL: MDX file not found: " + mdxPath.string());
     }
-    _mdx.reset(new fs::ifstream(mdxPath, std::ios::binary));
+    _mdx.reset(new fs::ifstream(mdxPath, ios::binary));
 
 }
 
@@ -135,11 +137,11 @@ void MdlFile::readArrayDefinition(uint32_t &offset, uint32_t &count) {
     ignore(4);
 }
 
-void MdlFile::readNodeNames(const std::vector<uint32_t> &offsets) {
-    std::map<std::string, int> nameHits;
+void MdlFile::readNodeNames(const vector<uint32_t> &offsets) {
+    map<string, int> nameHits;
 
     for (uint32_t offset : offsets) {
-        std::string name(readString(kMdlDataOffset + offset));
+        string name(readString(kMdlDataOffset + offset));
         boost::to_lower(name);
 
         int hitCount = nameHits[name]++;
@@ -147,30 +149,30 @@ void MdlFile::readNodeNames(const std::vector<uint32_t> &offsets) {
             warn(boost::format("MDL: duplicate node name: %s, model %s") % name % _name);
             name = str(boost::format("%s_dup%d") % name % hitCount);
         }
-        _nodeNames.push_back(std::move(name));
+        _nodeNames.push_back(move(name));
     }
 }
 
-std::unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
+unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     uint32_t pos = tell();
     seek(offset);
 
     uint16_t flags = readUint16();
     if (flags & 0xf408) {
-        throw std::runtime_error("MDL: unsupported node flags: " + std::to_string(flags));
+        throw runtime_error("MDL: unsupported node flags: " + to_string(flags));
     }
 
     ignore(2);
 
     uint16_t nodeNumber = readUint16();
-    std::string name(_nodeNames[nodeNumber]);
+    string name(_nodeNames[nodeNumber]);
 
     ignore(10);
 
-    std::vector<float> positionValues(readArray<float>(3));
+    vector<float> positionValues(readArray<float>(3));
     glm::vec3 position(glm::make_vec3(&positionValues[0]));
 
-    std::vector<float> orientationValues(readArray<float>(4));
+    vector<float> orientationValues(readArray<float>(4));
     glm::quat orientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
     glm::mat4 absTransform(parent ? parent->_absTransform : glm::mat4(1.0f));
@@ -179,16 +181,16 @@ std::unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent)
 
     uint32_t childOffOffset, childCount;
     readArrayDefinition(childOffOffset, childCount);
-    std::vector<uint32_t> childOffsets(readArray<uint32_t>(kMdlDataOffset + childOffOffset, childCount));
+    vector<uint32_t> childOffsets(readArray<uint32_t>(kMdlDataOffset + childOffOffset, childCount));
 
     uint32_t controllerKeyOffset, controllerKeyCount;
     readArrayDefinition(controllerKeyOffset, controllerKeyCount);
 
     uint32_t controllerDataOffset, controllerDataCount;
     readArrayDefinition(controllerDataOffset, controllerDataCount);
-    std::vector<float> controllerData(readArray<float>(kMdlDataOffset + controllerDataOffset, controllerDataCount));
+    vector<float> controllerData(readArray<float>(kMdlDataOffset + controllerDataOffset, controllerDataCount));
 
-    std::unique_ptr<ModelNode> node(new ModelNode(_nodeIndex++, parent));
+    unique_ptr<ModelNode> node(new ModelNode(_nodeIndex++, parent));
     node->_nodeNumber = nodeNumber;
     node->_name = name;
     node->_position = position;
@@ -216,16 +218,16 @@ std::unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent)
     }
 
     for (auto offset : childOffsets) {
-        std::unique_ptr<ModelNode> child(readNode(kMdlDataOffset + offset, node.get()));
-        node->_children.push_back(std::move(child));
+        unique_ptr<ModelNode> child(readNode(kMdlDataOffset + offset, node.get()));
+        node->_children.push_back(move(child));
     }
 
     seek(pos);
 
-    return std::move(node);
+    return move(node);
 }
 
-void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const std::vector<float> &data, ModelNode &node) {
+void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vector<float> &data, ModelNode &node) {
     uint32_t pos = tell();
     seek(kMdlDataOffset + keyOffset);
 
@@ -259,7 +261,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const std::
     seek(pos);
 }
 
-void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, ModelNode &node) {
+void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     bool bezier = columnCount & 16;
     node._positionFrames.reserve(rowCount);
 
@@ -274,7 +276,7 @@ void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uin
                 frame.time = data[rowTimeIdx];
                 frame.position = glm::make_vec3(&data[rowDataIdx]);
 
-                node._positionFrames.push_back(std::move(frame));
+                node._positionFrames.push_back(move(frame));
             }
             break;
         default:
@@ -282,7 +284,7 @@ void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uin
     }
 }
 
-void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, ModelNode &node) {
+void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._orientationFrames.reserve(rowCount);
 
     switch (columnCount) {
@@ -312,7 +314,7 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
                 frame.time = data[rowTimeIdx];
                 frame.orientation = glm::quat(w, x, y, z);
 
-                node._orientationFrames.push_back(std::move(frame));
+                node._orientationFrames.push_back(move(frame));
             }
             break;
 
@@ -328,7 +330,7 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
                 frame.orientation.z = data[rowDataIdx + 2];
                 frame.orientation.w = data[rowDataIdx + 3];
 
-                node._orientationFrames.push_back(std::move(frame));
+                node._orientationFrames.push_back(move(frame));
             }
             break;
         default:
@@ -336,11 +338,11 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
     }
 }
 
-void MdlFile::readAlphaController(uint16_t dataIndex, const std::vector<float> &data, ModelNode &node) {
+void MdlFile::readAlphaController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._alpha = data[dataIndex];
 }
 
-std::unique_ptr<ModelMesh> MdlFile::readMesh() {
+unique_ptr<ModelMesh> MdlFile::readMesh() {
     ignore(8);
 
     uint32_t faceOffset, faceCount;
@@ -350,10 +352,10 @@ std::unique_ptr<ModelMesh> MdlFile::readMesh() {
 
     uint32_t transparency = readUint32();
 
-    std::string diffuse(readFixedString(32));
+    string diffuse(readFixedString(32));
     boost::to_lower(diffuse);
 
-    std::string lightmap(readFixedString(32));
+    string lightmap(readFixedString(32));
     boost::to_lower(lightmap);
 
     ignore(36);
@@ -395,25 +397,25 @@ std::unique_ptr<ModelMesh> MdlFile::readMesh() {
     uint32_t endPos = tell();
 
     if (faceCount == 0) {
-        warn(boost::format("MDL: invalid face count: %d, model %s") % std::to_string(faceCount) % _name);
+        warn(boost::format("MDL: invalid face count: %d, model %s") % to_string(faceCount) % _name);
         return nullptr;
     }
     if (mdxVertexSize == 0) {
-        warn(boost::format("MDL: invalid MDX vertex size: %d, model %s") % std::to_string(mdxVertexSize) % _name);
+        warn(boost::format("MDL: invalid MDX vertex size: %d, model %s") % to_string(mdxVertexSize) % _name);
         return nullptr;
     }
 
     seek(kMdlDataOffset + indexOffOffset);
     uint32_t indexOffset = readUint32();
     seek(kMdlDataOffset + indexOffset);
-    std::vector<uint16_t> indices(readArray<uint16_t>(3 * faceCount));
+    vector<uint16_t> indices(readArray<uint16_t>(3 * faceCount));
 
     seek(endPos);
 
     int valPerVert = mdxVertexSize / sizeof(float);
     int vertValCount = valPerVert * vertexCount;
     seek(*_mdx, mdxDataOffset);
-    std::vector<float> vertices(readArray<float>(*_mdx, vertValCount));
+    vector<float> vertices(readArray<float>(*_mdx, vertValCount));
 
     Mesh::VertexOffsets offsets;
     offsets.vertexCoords = mdxVerticesOffset;
@@ -422,10 +424,10 @@ std::unique_ptr<ModelMesh> MdlFile::readMesh() {
     offsets.texCoords2 = mdxLightmapOffset != 0xffff ? mdxLightmapOffset : -1;
     offsets.stride = mdxVertexSize;
 
-    std::unique_ptr<ModelMesh> mesh(new ModelMesh(render));
-    mesh->_vertices = std::move(vertices);
-    mesh->_indices = std::move(indices);
-    mesh->_offsets = std::move(offsets);
+    unique_ptr<ModelMesh> mesh(new ModelMesh(render));
+    mesh->_vertices = move(vertices);
+    mesh->_indices = move(indices);
+    mesh->_offsets = move(offsets);
     mesh->computeAABB();
 
     ResourceManager &resources = ResourceManager::instance();
@@ -445,7 +447,7 @@ std::unique_ptr<ModelMesh> MdlFile::readMesh() {
         mesh->_lightmap = resources.findTexture(lightmap, TextureType::Lightmap);
     }
 
-    return std::move(mesh);
+    return move(mesh);
 }
 
 void MdlFile::readSkin(ModelNode &node) {
@@ -459,7 +461,7 @@ void MdlFile::readSkin(ModelNode &node) {
     node._mesh->_offsets.boneWeights = boneWeightsOffset;
     node._mesh->_offsets.boneIndices = boneIndicesOffset;
 
-    std::map<uint16_t, uint16_t> nodeIdxByBoneIdx;
+    map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + bonesOffset);
 
     for (int i = 0; i < boneCount; ++i) {
@@ -467,30 +469,30 @@ void MdlFile::readSkin(ModelNode &node) {
         if (boneIdx == 0xffff) continue;
 
         uint16_t nodeIdx = i;
-        nodeIdxByBoneIdx.insert(std::make_pair(boneIdx, nodeIdx));
+        nodeIdxByBoneIdx.insert(make_pair(boneIdx, nodeIdx));
     }
 
-    node._skin = std::make_unique<ModelNode::Skin>();
-    node._skin->nodeIdxByBoneIdx = std::move(nodeIdxByBoneIdx);
+    node._skin = make_unique<ModelNode::Skin>();
+    node._skin->nodeIdxByBoneIdx = move(nodeIdxByBoneIdx);
 }
 
-std::vector<std::shared_ptr<Animation>> MdlFile::readAnimations(const std::vector<uint32_t> &offsets) {
-    std::vector<std::shared_ptr<Animation>> anims;
+vector<shared_ptr<Animation>> MdlFile::readAnimations(const vector<uint32_t> &offsets) {
+    vector<shared_ptr<Animation>> anims;
     anims.reserve(offsets.size());
 
     for (uint32_t offset : offsets) {
-        std::unique_ptr<Animation> anim(readAnimation(offset));
-        anims.push_back(std::move(anim));
+        unique_ptr<Animation> anim(readAnimation(offset));
+        anims.push_back(move(anim));
     }
 
-    return std::move(anims);
+    return move(anims);
 }
 
-std::unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
+unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
     seek(kMdlDataOffset + offset);
     ignore(8);
 
-    std::string name(readFixedString(32));
+    string name(readFixedString(32));
     boost::to_lower(name);
 
     uint32_t rootNodeOffset = readUint32();
@@ -503,12 +505,12 @@ std::unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
     ignore(48);
 
     _nodeIndex = 0;
-    std::unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
+    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
 
-    return std::make_unique<Animation>(name, length, transitionTime, std::move(rootNode));
+    return make_unique<Animation>(name, length, transitionTime, move(rootNode));
 }
 
-std::shared_ptr<Model> MdlFile::model() const {
+shared_ptr<Model> MdlFile::model() const {
     return _model;
 }
 

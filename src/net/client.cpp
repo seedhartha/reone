@@ -19,6 +19,7 @@
 
 #include "../core/log.h"
 
+using namespace std;
 using namespace std::placeholders;
 
 using namespace boost::system;
@@ -31,21 +32,21 @@ namespace reone {
 
 namespace net {
 
-void Client::start(const std::string &address, int port) {
+void Client::start(const string &address, int port) {
     tcp::endpoint endpoint(ip::make_address(address), port);
 
-    _socket = std::make_shared<tcp::socket>(_service);
-    _socket->async_connect(endpoint, std::bind(&Client::handleConnect, this, _1));
+    _socket = make_shared<tcp::socket>(_service);
+    _socket->async_connect(endpoint, bind(&Client::handleConnect, this, _1));
 
-    _thread = std::thread([this]() { _service.run(); });
+    _thread = thread([this]() { _service.run(); });
 }
 
-void Client::handleConnect(const error_code &ec) {
+void Client::handleConnect(const boost::system::error_code &ec) {
     if (ec) {
         error("TCP: connection failed: " + ec.message());
         return;
     }
-    _connection = std::make_shared<Connection>(_socket);
+    _connection = make_shared<Connection>(_socket);
     _connection->setOnCommandReceived(_onCommandReceived);
     _connection->open();
 }
@@ -75,7 +76,7 @@ void Client::send(const ByteArray &data) {
     _connection->send(data);
 }
 
-void Client::setOnCommandReceived(const std::function<void(const ByteArray &)> &fn) {
+void Client::setOnCommandReceived(const function<void(const ByteArray &)> &fn) {
     _onCommandReceived = fn;
 }
 

@@ -23,6 +23,8 @@
 
 #include "../core/log.h"
 
+using namespace std;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
@@ -32,43 +34,43 @@ namespace resources {
 static const int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
-const std::string &TwoDaTable::getString(int row, const std::string &column) const {
+const string &TwoDaTable::getString(int row, const string &column) const {
     if (row >= _rows.size()) {
-        throw std::out_of_range("2DA: row index out of range: " + std::to_string(row));
+        throw out_of_range("2DA: row index out of range: " + to_string(row));
     }
-    auto it = std::find(_headers.begin(), _headers.end(), column);
+    auto it = find(_headers.begin(), _headers.end(), column);
     if (it == _headers.end()) {
-        throw std::logic_error("2DA: column not found: " + column);
+        throw logic_error("2DA: column not found: " + column);
     }
-    int idx = std::distance(_headers.begin(), it);
+    int idx = distance(_headers.begin(), it);
 
     return _rows[row].values[idx];
 }
 
-int TwoDaTable::getInt(int row, const std::string &column, int defValue) const {
-    const std::string &value = getString(row, column);
+int TwoDaTable::getInt(int row, const string &column, int defValue) const {
+    const string &value = getString(row, column);
     if (value.empty()) return defValue;
 
-    return std::stoi(value);
+    return stoi(value);
 }
 
-uint32_t TwoDaTable::getUint(int row, const std::string &column, uint32_t defValue) const {
-    const std::string &value = getString(row, column);
+uint32_t TwoDaTable::getUint(int row, const string &column, uint32_t defValue) const {
+    const string &value = getString(row, column);
     if (value.empty()) return defValue;
 
-    return std::stoi(value, nullptr, 16);
+    return stoi(value, nullptr, 16);
 }
 
-float TwoDaTable::getFloat(int row, const std::string &column, float defValue) const {
-    const std::string &value = getString(row, column);
+float TwoDaTable::getFloat(int row, const string &column, float defValue) const {
+    const string &value = getString(row, column);
     if (value.empty()) return defValue;
 
-    return std::stof(value);
+    return stof(value);
 }
 
-const std::string &TwoDaTable::getStringFromRowByColumnValue(const std::string &column, const std::string &rowByColumn, const std::string &columnValue, const std::string &defValue) const {
-    int columnIdx = std::distance(_headers.begin(), std::find(_headers.begin(), _headers.end(), column));
-    int rowByColumnIdx = std::distance(_headers.begin(), std::find(_headers.begin(), _headers.end(), rowByColumn));
+const string &TwoDaTable::getStringFromRowByColumnValue(const string &column, const string &rowByColumn, const string &columnValue, const string &defValue) const {
+    int columnIdx = distance(_headers.begin(), find(_headers.begin(), _headers.end(), column));
+    int rowByColumnIdx = distance(_headers.begin(), find(_headers.begin(), _headers.end(), rowByColumn));
 
     for (auto &row : _rows) {
         if (row.values[rowByColumnIdx] == columnValue) {
@@ -81,11 +83,11 @@ const std::string &TwoDaTable::getStringFromRowByColumnValue(const std::string &
     return defValue;
 }
 
-const std::vector<std::string> &TwoDaTable::headers() const {
+const vector<string> &TwoDaTable::headers() const {
     return _headers;
 }
 
-const std::vector<TwoDaRow> &TwoDaTable::rows() const {
+const vector<TwoDaRow> &TwoDaTable::rows() const {
     return _rows;
 }
 
@@ -103,17 +105,17 @@ void TwoDaFile::doLoad() {
 }
 
 void TwoDaFile::loadHeaders() {
-    std::string token;
+    string token;
     while (readToken(token)) {
         _table->_headers.push_back(token);
     }
 }
 
-bool TwoDaFile::readToken(std::string &token) {
+bool TwoDaFile::readToken(string &token) {
     uint32_t pos = tell();
 
     char buf[256];
-    std::streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
+    streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
     const char *pch = buf;
 
     for (; pch - buf < chRead; ++pch) {
@@ -122,18 +124,18 @@ bool TwoDaFile::readToken(std::string &token) {
             return false;
         }
         if (*pch == '\t') {
-            std::string s(buf, pch - buf);
+            string s(buf, pch - buf);
             seek(pos + pch - buf + 1);
-            token = std::move(s);
+            token = move(s);
             return true;
         }
     }
 
-    throw std::runtime_error("2DA: token not terminated");
+    throw runtime_error("2DA: token not terminated");
 }
 
 void TwoDaFile::loadLabels() {
-    std::string token;
+    string token;
     for (int i = 0; i < _rowCount; ++i) {
         readToken(token);
     }
@@ -144,7 +146,7 @@ void TwoDaFile::loadRows() {
 
     int columnCount = _table->_headers.size();
     int cellCount = _rowCount * columnCount;
-    std::vector<uint16_t> offsets(cellCount);
+    vector<uint16_t> offsets(cellCount);
 
     for (int i = 0; i < cellCount; ++i) {
         offsets[i] = readUint16();
@@ -167,7 +169,7 @@ void TwoDaFile::loadRows() {
     }
 }
 
-const std::shared_ptr<TwoDaTable> &TwoDaFile::table() const {
+const shared_ptr<TwoDaTable> &TwoDaFile::table() const {
     return _table;
 }
 

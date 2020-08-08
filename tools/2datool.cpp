@@ -21,6 +21,8 @@
 
 #include "src/resources/2dafile.h"
 
+using namespace std;
+
 using namespace reone::resources;
 
 namespace fs = boost::filesystem;
@@ -36,7 +38,7 @@ void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
 
     pt::ptree tree;
     pt::ptree children;
-    std::shared_ptr<TwoDaTable> table(twoDa.table());
+    shared_ptr<TwoDaTable> table(twoDa.table());
     auto &headers = table->headers();
     auto &rows = table->rows();
 
@@ -44,10 +46,10 @@ void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
         auto &values = row.values;
         pt::ptree child;
         for (int i = 0; i < headers.size(); ++i) {
-            const std::string &val = values[i];
+            const string &val = values[i];
             child.put(headers[i], val);
         }
-        children.push_back(std::make_pair("", child));
+        children.push_back(make_pair("", child));
     }
     tree.add_child("rows", children);
 

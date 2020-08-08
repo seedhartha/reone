@@ -25,6 +25,8 @@
 
 #include "glm/ext.hpp"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -330,10 +332,10 @@ void ShaderManager::initShader(ShaderName name, unsigned int type, const char *s
 
     if (!success) {
         glGetShaderInfoLog(shader, sizeof(log), &logSize, log);
-        throw std::runtime_error("Shader compilation failed: " + std::string(log, logSize));
+        throw runtime_error("Shader compilation failed: " + string(log, logSize));
     }
 
-    _shaders.insert(std::make_pair(name, shader));
+    _shaders.insert(make_pair(name, shader));
 }
 
 void ShaderManager::initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader) {
@@ -352,10 +354,10 @@ void ShaderManager::initProgram(ShaderProgram program, ShaderName vertexShader, 
 
     if (!success) {
         glGetProgramInfoLog(ordinal, sizeof(log), &logSize, log);
-        throw std::runtime_error("Program linking failed: " + std::string(log, logSize));
+        throw runtime_error("Program linking failed: " + string(log, logSize));
     }
 
-    _programs.insert(std::make_pair(program, ordinal));
+    _programs.insert(make_pair(program, ordinal));
 }
 
 ShaderManager::~ShaderManager() {
@@ -386,7 +388,7 @@ void ShaderManager::activate(ShaderProgram program) {
 unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
     auto it = _programs.find(program);
     if (it == _programs.end()) {
-        throw std::invalid_argument("Shader program not found: " + std::to_string(static_cast<int>(program)));
+        throw invalid_argument("Shader program not found: " + to_string(static_cast<int>(program)));
     }
     return it->second;
 }
@@ -409,55 +411,55 @@ void ShaderManager::setGlobalUniforms(const ShaderUniforms &uniforms) {
     }
 }
 
-void ShaderManager::setUniform(unsigned int ordinal, const std::string &name, const glm::mat4 &m) {
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::mat4 &m) {
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
 }
 
-void ShaderManager::setUniform(const std::string &name, int value) {
+void ShaderManager::setUniform(const string &name, int value) {
     setUniform(_activeOrdinal, name, value);
 }
 
-void ShaderManager::setUniform(unsigned int ordinal, const std::string &name, int value) {
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, int value) {
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
     glUniform1i(loc, value);
 }
 
-void ShaderManager::setUniform(const std::string &name, float value) {
+void ShaderManager::setUniform(const string &name, float value) {
     setUniform(_activeOrdinal, name, value);
 }
 
-void ShaderManager::setUniform(unsigned int ordinal, const std::string &name, float value) {
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, float value) {
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
     glUniform1f(loc, value);
 }
 
-void ShaderManager::setUniform(const std::string &name, const glm::vec3 &v) {
+void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
     setUniform(_activeOrdinal, name, v);
 }
 
-void ShaderManager::setUniform(unsigned int ordinal, const std::string &name, const glm::vec3 &v) {
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::vec3 &v) {
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
     glUniform3f(loc, v.x, v.y, v.z);
 }
 
-void ShaderManager::setUniform(const std::string &name, const glm::mat4 &m) {
+void ShaderManager::setUniform(const string &name, const glm::mat4 &m) {
     setUniform(_activeOrdinal, name, m);
 }
 
-void ShaderManager::setUniform(const std::string &name, const std::vector<glm::mat4> &arr) {
+void ShaderManager::setUniform(const string &name, const vector<glm::mat4> &arr) {
     setUniform(_activeOrdinal, name, arr);
 }
 
-void ShaderManager::setUniform(unsigned int ordinal, const std::string &name, const std::vector<glm::mat4> &arr) {
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, const vector<glm::mat4> &arr) {
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
