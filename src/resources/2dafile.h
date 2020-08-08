@@ -31,6 +31,7 @@ class TwoDaTable {
 public:
     TwoDaTable() = default;
 
+    int getColumnIndex(const std::string &name) const;
     const std::string &getString(int row, const std::string &column) const;
     int getInt(int row, const std::string &column, int defValue) const;
     uint32_t getUint(int row, const std::string &column, uint32_t defValue) const;

@@ -78,9 +78,45 @@ void Game::loadMainMenu() {
     unique_ptr<MainMenu> mainMenu(new MainMenu(_opts));
     mainMenu->load(_version);
     mainMenu->initGL();
+    mainMenu->setOnNewGame([this]() {
+        _mainMenu->resetFocus();
+        if (!_classSelection) loadClassSelectionGui();
+        _screen = Screen::ClassSelection;
+    });
     mainMenu->setOnExit([this]() { _quit = true; });
     mainMenu->setOnModuleSelected([this](const string &name) { loadModule(name); });
     _mainMenu = move(mainMenu);
+}
+
+void Game::loadClassSelectionGui() {
+    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_opts.graphics));
+    gui->load(_version);
+    gui->initGL();
+    gui->setOnClassSelected([this](Gender gender, ClassType clazz) {
+        _classSelection->resetFocus();
+        if (!_portraits) loadPortraitsGui();
+        _portraits->loadPortraits(gender);
+        _screen = Screen::Portraits;
+    });
+    gui->setOnCancel([this]() {
+        _classSelection->resetFocus();
+        _screen = Screen::MainMenu;
+    });
+    _classSelection = move(gui);
+}
+
+void Game::loadPortraitsGui() {
+    unique_ptr<PortraitsGui> gui(new PortraitsGui(_opts.graphics));
+    gui->load(_version);
+    gui->initGL();
+    gui->setOnPortraitSelected([this](const string &portrait) {
+        _portraits->resetFocus();
+        loadModule(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+    });
+    gui->setOnCancel([this]() {
+        _screen = Screen::ClassSelection;
+    });
+    _portraits = move(gui);
 }
 
 void Game::loadModule(const string &name, string entry) {
@@ -226,6 +262,10 @@ shared_ptr<GUI> Game::currentGUI() const {
     switch (_screen) {
         case Screen::MainMenu:
             return _mainMenu;
+        case Screen::ClassSelection:
+            return _classSelection;
+        case Screen::Portraits:
+            return _portraits;
         case Screen::InGame:
             return _hud;
         case Screen::Dialog:
@@ -237,17 +277,12 @@ shared_ptr<GUI> Game::currentGUI() const {
 
 bool Game::handle(const SDL_Event &event) {
     switch (_screen) {
-        case Screen::MainMenu:
-            if (_mainMenu->handle(event)) return true;
-            break;
         case Screen::InGame:
             if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
-        case Screen::Dialog:
-            if (_dialog->handle(event)) return true;
-            break;
         default:
+            if (currentGUI()->handle(event)) return true;
             break;
     }
 
@@ -267,17 +302,12 @@ void Game::renderWorld() {
 
 void Game::renderGUI() {
     switch (_screen) {
-        case Screen::MainMenu:
-            _mainMenu->render();
-            break;
         case Screen::InGame:
             _debug->render();
             if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
             break;
-        case Screen::Dialog:
-            _dialog->render();
-            break;
         default:
+            currentGUI()->render();
             break;
     }
 }

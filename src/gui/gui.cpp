@@ -153,10 +153,8 @@ bool GUI::handle(const SDL_Event &event) {
 }
 
 void GUI::updateFocus(int x, int y) {
-    if (_focus) {
-        _focus->setFocus(false);
-        _focus = nullptr;
-    }
+    resetFocus();
+
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
         shared_ptr<Control> control(*it);
         if (!control->visible()) continue;
@@ -165,13 +163,18 @@ void GUI::updateFocus(int x, int y) {
         if (extent.contains(x, y)) {
             _focus = control;
             _focus->setFocus(true);
+            onFocusChanged(_focus->tag(), true);
             return;
         }
     }
 }
 
+void GUI::onFocusChanged(const string &control, bool focus) {
+}
+
 void GUI::initGL() {
     if (_background) _background->initGL();
+    if (_rootControl) _rootControl->initGL();
 
     for (auto &control : _controls) {
         control->initGL();
@@ -180,6 +183,7 @@ void GUI::initGL() {
 
 void GUI::render() const {
     if (_background) renderBackground();
+    if (_rootControl) _rootControl->render(_controlOffset);
 
     for (auto &control : _controls) {
         control->render(_controlOffset);
@@ -202,6 +206,14 @@ void GUI::renderBackground() const {
 
     _background->unbind();
     shaders.deactivate();
+}
+
+void GUI::resetFocus() {
+    if (_focus) {
+        _focus->setFocus(false);
+        onFocusChanged(_focus->tag(), false);
+        _focus = nullptr;
+    }
 }
 
 void GUI::showControl(const string &tag) {

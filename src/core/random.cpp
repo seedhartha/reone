@@ -26,6 +26,11 @@ namespace reone {
 
 static default_random_engine g_generator(time(nullptr));
 
+int random(int min, int max) {
+    uniform_int_distribution<int> dist(min, max);
+    return dist(g_generator);
+}
+
 float random(float min, float max) {
     uniform_real_distribution<float> distr(min, max);
     return distr(g_generator);

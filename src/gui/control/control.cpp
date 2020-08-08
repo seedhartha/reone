@@ -82,6 +82,11 @@ bool Control::Extent::contains(int x, int y) const {
     return x >= left && x <= left + width && y >= top && y <= top + height;
 }
 
+void Control::Extent::getCenter(int &x, int &y) const {
+    x = left + width / 2;
+    y = top + height / 2;
+}
+
 Control::Control(ControlType type) : _type(type) {
 }
 

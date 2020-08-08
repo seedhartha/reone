@@ -36,8 +36,21 @@ MainMenu::MainMenu(const Options &opts) : GUI(opts.graphics), _opts(opts) {
 }
 
 void MainMenu::load(GameVersion version) {
-    GUI::load(getResRef(version), version == GameVersion::KotOR ? BackgroundType::Menu : BackgroundType::None);
+    string resRef;
+    BackgroundType background;
 
+    switch (version) {
+        case GameVersion::TheSithLords:
+            resRef = "mainmenu8x6_p";
+            background = BackgroundType::None;
+            break;
+        default:
+            resRef = "mainmenu16x12";
+            background = BackgroundType::Menu;
+            break;
+    }
+
+    GUI::load(resRef, background);
     hideControl("LB_MODULES");
     hideControl("LBL_NEWCONTENT");
     hideControl("LBL_BW");
@@ -46,20 +59,32 @@ void MainMenu::load(GameVersion version) {
     if (!_opts.debug) {
         hideControl("BTN_WARP");
     }
+    _version = version;
+    configureButtons();
 }
 
-string MainMenu::getResRef(GameVersion version) const {
-    string resRef("mainmenu");
-    switch (version) {
-        case GameVersion::KotOR:
-            resRef += "16x12";
-            break;
-        case GameVersion::TheSithLords:
-            resRef += "8x6_p";
-            break;
-    }
+void MainMenu::configureButtons() {
+    setButtonColors("BTN_EXIT");
+    setButtonColors("BTN_LOADGAME");
+    setButtonColors("BTN_MOVIES");
+    setButtonColors("BTN_NEWGAME");
+    setButtonColors("BTN_OPTIONS");
 
-    return resRef;
+    if (_version == GameVersion::TheSithLords) {
+        setButtonColors("BTN_MUSIC");
+    }
+}
+
+void MainMenu::setButtonColors(const string &tag) {
+    Control &control = getControl(tag);
+
+    Control::Text text(control.text());
+    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
+    control.setText(move(text));
+
+    Control::Border hilight(control.hilight());
+    hilight.color = _version == GameVersion::KotOR ? getKotorHilightColor() : getTslHilightColor();
+    control.setHilight(move(hilight));
 }
 
 void MainMenu::onClick(const string &control) {

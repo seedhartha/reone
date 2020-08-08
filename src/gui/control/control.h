@@ -53,6 +53,7 @@ public:
         Extent(int left, int top, int width, int height);
 
         bool contains(int x, int y) const;
+        void getCenter(int &x, int &y) const;
     };
 
     struct Border {
