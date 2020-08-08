@@ -21,6 +21,8 @@
 
 #include "txifile.h"
 
+using namespace std;
+
 using namespace reone::render;
 
 namespace fs = boost::filesystem;
@@ -29,7 +31,7 @@ namespace reone {
 
 namespace resources {
 
-TpcFile::TpcFile(const std::string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _type(type) {
+TpcFile::TpcFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _type(type) {
 }
 
 void TpcFile::doLoad() {
@@ -46,15 +48,23 @@ void TpcFile::doLoad() {
     _cubeMap = _height / _width == 6;
     if (_cubeMap) _height = _width;
 
-    _dataSize = _compressed ? dataSize : getMipMapSize(0);
+    if (_compressed) {
+        _dataSize = dataSize;
+    } else {
+        int w, h;
+        getMipMapSize(0, w, h);
+        _dataSize = getMipMapDataSize(w, h);
+    }
 
     loadTexture();
 }
 
-int TpcFile::getMipMapSize(int idx) {
-    int width = _width >> idx;
-    int height = _height >> idx;
+void TpcFile::getMipMapSize(int index, int &width, int &height) const {
+    width = _width >> index;
+    height = _height >> index;
+}
 
+int TpcFile::getMipMapDataSize(int width, int height) const {
     if (_compressed) {
         switch (_encoding) {
             case EncodingType::RGB:
@@ -75,27 +85,36 @@ int TpcFile::getMipMapSize(int idx) {
         }
     }
 
-    throw std::logic_error("TPC: unable to compute mip map size");
+    throw logic_error("TPC: unable to compute mip map size");
 }
 
 void TpcFile::loadTexture() {
-    seek(128);
-
-    _texture = std::make_shared<Texture>(_resRef, _type);
+    _texture = make_shared<Texture>(_resRef, _type);
     _texture->_width = _width;
     _texture->_height = _height;
-    _texture->_cubeMap = _cubeMap;
     _texture->_pixelFormat = pixelFormat();
-    _texture->_images.resize(_cubeMap ? 6 : 1);
+    _texture->_layers.resize(_cubeMap ? 6 : 1);
 
-    for (auto &image : _texture->_images) {
-        image.resize(_dataSize);
+    seek(128);
 
-        _in->read(&image[0], _dataSize);
+    for (auto &layer : _texture->_layers) {
+        layer.mipMaps.resize(_mipMapCount);
 
-        for (int i = 1; i < _mipMapCount; ++i) {
-            int mipMapDataSize = getMipMapSize(i);
-            ignore(mipMapDataSize);
+        for (int j = 0; j < _mipMapCount; ++j) {
+            Texture::MipMap &mipMap = layer.mipMaps[j];
+            int dataSize;
+            if (j == 0) {
+                mipMap.width = _width;
+                mipMap.height = _height;
+                dataSize = _dataSize;
+            } else {
+                getMipMapSize(j, mipMap.width, mipMap.height);
+                dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
+            }
+            ByteArray &data = mipMap.data;
+            data.resize(dataSize);
+
+            _in->read(&data[0], dataSize);
         }
     }
 
@@ -122,7 +141,7 @@ PixelFormat TpcFile::pixelFormat() const {
             case EncodingType::RGBA:
                 return PixelFormat::RGBA;
             default:
-                throw std::logic_error("TCP: unsupported texture encoding: " + std::to_string(static_cast<int>(_encoding)));
+                throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
         }
     } else switch (_encoding) {
         case EncodingType::RGB:
@@ -130,11 +149,11 @@ PixelFormat TpcFile::pixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::DXT5;
         default:
-            throw std::logic_error("TCP: unsupported compressed texture encoding: " + std::to_string(static_cast<int>(_encoding)));
+            throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
     }
 }
 
-std::shared_ptr<Texture> TpcFile::texture() const {
+shared_ptr<Texture> TpcFile::texture() const {
     return _texture;
 }
 

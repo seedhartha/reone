@@ -17,13 +17,15 @@
 
 #include "tgafile.h"
 
+using namespace std;
+
 using namespace reone::render;
 
 namespace reone {
 
 namespace resources {
 
-TgaFile::TgaFile(const std::string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _texType(type) {
+TgaFile::TgaFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _texType(type) {
 }
 
 void TgaFile::doLoad() {
@@ -37,7 +39,7 @@ void TgaFile::doLoad() {
         case ImageType::RGBA:
             break;
         default:
-            throw std::runtime_error("TGA: unsupported image type: " + std::to_string(static_cast<int>(_imageType)));
+            throw runtime_error("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
     }
 
     ignore(9);
@@ -50,7 +52,7 @@ void TgaFile::doLoad() {
     if ((_imageType == ImageType::RGBA && bpp != 32) ||
         (_imageType == ImageType::Grayscale && bpp != 8)) {
 
-        throw std::runtime_error("TGA: unsupported bits per pixel: " + std::to_string(bpp));
+        throw runtime_error("TGA: unsupported bits per pixel: " + to_string(bpp));
     }
 
     ignore(1);
@@ -60,23 +62,28 @@ void TgaFile::doLoad() {
 }
 
 void TgaFile::loadTexture() {
-    int resultSize = 4 * _width * _height;
+    int finalSize = 4 * _width * _height;
 
-    _texture = std::make_shared<Texture>(_resRef, _texType);
+    _texture = make_shared<Texture>(_resRef, _texType);
     _texture->_width = _width;
     _texture->_height = _height;
     _texture->_pixelFormat = PixelFormat::BGRA;
-    _texture->_images.resize(1);
+    _texture->_layers.resize(1);
 
-    ByteArray &image = _texture->_images.front();
-    image.resize(resultSize);
+    Texture::Layer &layer = _texture->_layers.front();
+    layer.mipMaps.resize(1);
+
+    Texture::MipMap &mipMap = layer.mipMaps.front();
+    mipMap.width = _width;
+    mipMap.height = _height;
+    mipMap.data.resize(finalSize);
 
     if (_imageType == ImageType::Grayscale) {
         int size = _width * _height;
         ByteArray buf(size);
         _in->read(&buf[0], size);
 
-        char *pi = &image[0];
+        char *pi = &mipMap.data[0];
 
         for (int i = 0; i < size; ++i) {
             pi[0] = buf[i];
@@ -87,12 +94,12 @@ void TgaFile::loadTexture() {
         }
 
     } else {
-        _in->read(&image[0], resultSize);
+        _in->read(&mipMap.data[0], finalSize);
     }
 
 }
 
-std::shared_ptr<Texture> TgaFile::texture() const {
+shared_ptr<Texture> TgaFile::texture() const {
     return _texture;
 }
 

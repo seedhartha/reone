@@ -23,11 +23,13 @@
 
 #include "SDL2/SDL_opengl.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
 
-Texture::Texture(const std::string &name, TextureType type) : _name(name), _type(type) {
+Texture::Texture(const string &name, TextureType type) : _name(name), _type(type) {
 }
 
 void Texture::initGL() {
@@ -35,7 +37,7 @@ void Texture::initGL() {
 
     glGenTextures(1, &_textureId);
 
-    if (_cubeMap) {
+    if (isCubeMap()) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -43,28 +45,37 @@ void Texture::initGL() {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        for (int i = 0; i < 6; ++i) {
-            fillTextureTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, _images[i]);
+        int i = 0;
+        for (auto &layer : _layers) {
+            const MipMap &mipMap = layer.mipMaps.front();
+            fillTextureTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i++, 0, mipMap.width, mipMap.height, mipMap.data);
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     } else {
         glBindTexture(GL_TEXTURE_2D, _textureId);
+        const Layer &layer = _layers.front();
+        int mipMapCount = layer.mipMaps.size();
+        assert(mipMapCount > 0);
+
+        if (mipMapCount > 1) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         if (_type == TextureType::Font) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        } else {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
 
-        fillTextureTarget(GL_TEXTURE_2D, _images.front());
-
-        if (_type != TextureType::Font) {
+        int i = 0;
+        for (auto &mipMap : layer.mipMaps) {
+            fillTextureTarget(GL_TEXTURE_2D, i++, mipMap.width, mipMap.height, mipMap.data);
+        }
+        if (mipMapCount == 1) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
@@ -74,19 +85,23 @@ void Texture::initGL() {
     _glInited = true;
 }
 
-void Texture::fillTextureTarget(unsigned int target, const ByteArray &data) {
+bool Texture::isCubeMap() const {
+    return _layers.size() == 6;
+}
+
+void Texture::fillTextureTarget(uint32_t target, int level, int width, int height, const ByteArray &data) {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
         case PixelFormat::RGB:
         case PixelFormat::RGBA:
         case PixelFormat::BGR:
         case PixelFormat::BGRA:
-            glTexImage2D(target, 0, glInternalPixelFormat(), _width, _height, 0, glPixelFormat(), GL_UNSIGNED_BYTE, &data[0]);
+            glTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, glPixelFormat(), GL_UNSIGNED_BYTE, &data[0]);
             break;
 
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, 0, glInternalPixelFormat(), _width, _height, 0, data.size(), &data[0]);
+            glCompressedTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, data.size(), &data[0]);
             break;
     }
 }
@@ -106,11 +121,11 @@ int Texture::glInternalPixelFormat() const {
         case PixelFormat::DXT5:
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         default:
-            throw std::runtime_error("Unsupported pixel format: " + std::to_string(static_cast<int>(_pixelFormat)));
+            throw runtime_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
-unsigned int Texture::glPixelFormat() const {
+uint32_t Texture::glPixelFormat() const {
     switch (_pixelFormat) {
         case PixelFormat::RGB:
             return GL_RGB;
@@ -125,7 +140,7 @@ unsigned int Texture::glPixelFormat() const {
             return GL_BGRA;
 
         default:
-            throw std::runtime_error("Unsupported pixel format: " + std::to_string(static_cast<int>(_pixelFormat)));
+            throw runtime_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
@@ -143,19 +158,19 @@ void Texture::deinitGL() {
 
 void Texture::bind() {
     assert(_glInited);
-    glBindTexture(_cubeMap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
 void Texture::unbind() {
     assert(_glInited);
-    glBindTexture(_cubeMap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
 }
 
 bool Texture::isAdditive() const {
     return _features.blending == TextureBlending::Additive;
 }
 
-const std::string &Texture::name() const {
+const string &Texture::name() const {
     return _name;
 }
 
