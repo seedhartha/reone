@@ -40,8 +40,7 @@ public:
     void initGL() override;
     void render() const override;
 
-    virtual void onClick(const std::string &control);
-    virtual void onItemClicked(const std::string &control, const std::string &item);
+    void resetFocus();
 
 protected:
     enum class ScalingMode {
@@ -69,6 +68,10 @@ protected:
     void hideControl(const std::string &tag);
 
     Control &getControl(const std::string &tag) const;
+
+    virtual void onFocusChanged(const std::string &control, bool focus);
+    virtual void onClick(const std::string &control);
+    virtual void onItemClicked(const std::string &control, const std::string &item);
 
 private:
     GUI(const GUI &) = delete;

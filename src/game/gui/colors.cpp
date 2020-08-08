@@ -17,9 +17,32 @@
 
 #pragma once
 
+#include "glm/vec3.hpp"
+
 namespace reone {
 
-int random(int min, int max);
-float random(float min, float max);
+namespace game {
+
+glm::vec3 getKotorBaseColor() {
+    static glm::vec3 color(0.0f, 0.639216f, 0.952941f);
+    return color;
+}
+
+glm::vec3 getKotorHilightColor() {
+    static glm::vec3 color(0.980392f, 1.0f, 0.0f);
+    return color;
+}
+
+glm::vec3 getTslBaseColor() {
+    static glm::vec3 color(0.192157f, 0.768627f, 0.647059f);
+    return color;
+}
+
+glm::vec3 getTslHilightColor() {
+    static glm::vec3 color(0.768627f, 0.768627f, 0.686275f);
+    return color;
+}
+
+} // namespace game
 
 } // namespace reone

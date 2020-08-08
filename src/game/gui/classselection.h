@@ -26,27 +26,36 @@ namespace reone {
 
 namespace game {
 
-class MainMenu : public gui::GUI {
+class ClassSelectionGui : public gui::GUI {
 public:
-    MainMenu(const Options &opts);
+    ClassSelectionGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void onClick(const std::string &control) override;
 
-    void setOnNewGame(const std::function<void()> &fn);
-    void setOnExit(const std::function<void()> &fn);
-    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
+    void setOnClassSelected(const std::function<void(Gender, ClassType)> &fn);
+    void setOnCancel(const std::function<void()> &fn);
 
 private:
-    Options _opts;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
-    std::function<void()> _onNewGame;
-    std::function<void()> _onExit;
-    std::function<void(const std::string &)> _onModuleSelected;
+    struct ClassButton {
+        gui::Control *control { nullptr };
+        glm::vec2 center { 0.0f };
+        Gender gender { Gender::Male };
+        ClassType clazz { ClassType::Soldier };
+    };
 
-    void configureButtons();
-    void setButtonColors(const std::string &tag);
-    void startModuleSelection();
+    resources::GameVersion _version { resources::GameVersion::KotOR };
+    glm::vec2 _defaultButtonSize { 0.0f };
+    glm::vec2 _enlargedButtonSize { 0.0f };
+    std::vector<ClassButton> _classButtons;
+    std::function<void(Gender, ClassType)> _onClassSelected;
+    std::function<void()> _onCancel;
+
+    void configureClassButtons();
+    void setButtonColors(gui::Control &control);
+    void setClassButtonEnlarged(int index, bool enlarged);
+    void onFocusChanged(const std::string &control, bool focus) override;
+    int getClassButtonIndexByTag(const std::string &tag) const;
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

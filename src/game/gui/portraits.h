@@ -26,27 +26,31 @@ namespace reone {
 
 namespace game {
 
-class MainMenu : public gui::GUI {
+class PortraitsGui : public gui::GUI {
 public:
-    MainMenu(const Options &opts);
+    PortraitsGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void onClick(const std::string &control) override;
+    void loadPortraits(Gender gender);
 
-    void setOnNewGame(const std::function<void()> &fn);
-    void setOnExit(const std::function<void()> &fn);
-    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
+    void setOnPortraitSelected(const std::function<void(const std::string &)> &fn);
+    void setOnCancel(const std::function<void()> &fn);
 
 private:
-    Options _opts;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
-    std::function<void()> _onNewGame;
-    std::function<void()> _onExit;
-    std::function<void(const std::string &)> _onModuleSelected;
+    struct Portrait {
+        std::string resRef;
+        std::shared_ptr<render::Texture> image;
+    };
 
-    void configureButtons();
+    resources::GameVersion _version { resources::GameVersion::KotOR };
+    std::vector<Portrait> _portraits;
+    int _currentPortrait { 0 };
+    std::function<void(const std::string &)> _onPortraitSelected;
+    std::function<void()> _onCancel;
+
     void setButtonColors(const std::string &tag);
-    void startModuleSelection();
+    void loadCurrentPortrait();
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

@@ -22,10 +22,12 @@
 #include "../render/window.h"
 #include "../resources/types.h"
 
+#include "gui/classselection.h"
 #include "gui/debug.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
+#include "gui/portraits.h"
 
 #include "module.h"
 
@@ -69,6 +71,8 @@ private:
     enum class Screen {
         None,
         MainMenu,
+        ClassSelection,
+        Portraits,
         InGame,
         Dialog
     };
@@ -83,11 +87,15 @@ private:
 
     // GUI
     std::shared_ptr<MainMenu> _mainMenu;
+    std::shared_ptr<ClassSelectionGui> _classSelection;
+    std::shared_ptr<PortraitsGui> _portraits;
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DialogGui> _dialog;
     std::shared_ptr<DebugGui> _debug;
 
     void loadMainMenu();
+    void loadClassSelectionGui();
+    void loadPortraitsGui();
     void loadHUD();
     void loadDebugGui();
     void loadDialogGui();

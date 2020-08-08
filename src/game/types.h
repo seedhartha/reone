@@ -34,6 +34,26 @@ namespace reone {
 
 namespace game {
 
+enum class Gender {
+    Male = 0,
+    Female = 1,
+    Both = 2,
+    Other = 3,
+    None = 4
+};
+
+enum class ClassType {
+    Soldier = 0,
+    Scout = 1,
+    Scoundrel = 2,
+    JediGuardian = 3,
+    JediConsular = 4,
+    JediSentinel = 5,
+    CombatDroid = 6,
+    ExpertDroid = 7,
+    Minion = 8
+};
+
 enum class ObjectType {
     None,
     Creature,
@@ -149,6 +169,11 @@ struct GuiContext {
     HudContext hud;
     DebugContext debug;
 };
+
+glm::vec3 getKotorBaseColor();
+glm::vec3 getKotorHilightColor();
+glm::vec3 getTslBaseColor();
+glm::vec3 getTslHilightColor();
 
 } // namespace game
 

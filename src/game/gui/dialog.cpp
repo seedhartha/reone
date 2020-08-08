@@ -26,6 +26,8 @@
 #include "../../script/execution.h"
 #include "../../script/manager.h"
 
+#include "../types.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -37,11 +39,6 @@ using namespace reone::script;
 namespace reone {
 
 namespace game {
-
-static glm::vec3 g_kotorBaseColor { 0.0f, 0.639216f, 0.952941f };
-static glm::vec3 g_kotorHilightColor { 0.980392f, 1.0f, 0.0f };
-static glm::vec3 g_tslBaseColor { 0.192157f, 0.768627f, 0.647059f };
-static glm::vec3 g_tslHilightColor { 0.768627f, 0.768627f, 0.686275f };
 
 DialogGui::DialogGui(const render::GraphicsOptions &opts) : GUI(opts) {
     _scaling = ScalingMode::Stretch;
@@ -101,7 +98,7 @@ void DialogGui::configureMessage() {
     extent.top = -_rootControl->extent().top;
 
     Control::Text text(message.text());
-    text.color = _version == GameVersion::KotOR ? g_kotorBaseColor : g_tslBaseColor;
+    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
 
     message.setExtent(move(extent));
     message.setText(move(text));
@@ -112,10 +109,10 @@ void DialogGui::configureReplies() {
     Control &protoItem = replies.protoItem();
 
     Control::Border hilight;
-    hilight.color = _version == GameVersion::KotOR ? g_kotorHilightColor : g_tslHilightColor;
+    hilight.color = _version == GameVersion::KotOR ? getKotorHilightColor() : getTslHilightColor();
 
     Control::Text text(protoItem.text());
-    text.color = _version == GameVersion::KotOR ? g_kotorBaseColor : g_tslBaseColor;
+    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
 
     protoItem.setHilight(move(hilight));
     protoItem.setText(move(text));

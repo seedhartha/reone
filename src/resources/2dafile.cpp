@@ -34,6 +34,15 @@ namespace resources {
 static const int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
+int TwoDaTable::getColumnIndex(const std::string &name) const {
+    for (int i = 0; i < _headers.size(); ++i) {
+        if (_headers[i] == name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 const string &TwoDaTable::getString(int row, const string &column) const {
     if (row >= _rows.size()) {
         throw out_of_range("2DA: row index out of range: " + to_string(row));
