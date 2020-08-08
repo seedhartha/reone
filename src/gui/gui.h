@@ -50,7 +50,7 @@ protected:
         Stretch
     };
 
-    render::GraphicsOptions _opts;
+    render::GraphicsOptions _gfxOpts;
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };

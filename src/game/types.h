@@ -103,6 +103,7 @@ struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
     net::NetworkOptions network;
+    bool debug { false };
 };
 
 struct UpdateContext {

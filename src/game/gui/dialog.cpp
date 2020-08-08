@@ -71,9 +71,9 @@ void DialogGui::addTopFrame() {
 
 void DialogGui::addBottomFrame() {
     int rootTop = _rootControl->extent().top;
-    int height = _opts.height - rootTop;
+    int height = _gfxOpts.height - rootTop;
 
-    addFrame(_opts.height - rootTop - height, height);
+    addFrame(_gfxOpts.height - rootTop - height, height);
 }
 
 void DialogGui::addFrame(int top, int height) {
@@ -82,7 +82,7 @@ void DialogGui::addFrame(int top, int height) {
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
     extent.top = top;
-    extent.width = _opts.width;
+    extent.width = _gfxOpts.width;
     extent.height = height;
 
     Control::Border border;

@@ -20,13 +20,15 @@
 #include "../../gui/gui.h"
 #include "../../resources/types.h"
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
 
 class MainMenu : public gui::GUI {
 public:
-    MainMenu(const render::GraphicsOptions &opts);
+    MainMenu(const Options &opts);
 
     void load(resources::GameVersion version);
     void onClick(const std::string &control) override;
@@ -36,6 +38,7 @@ public:
     void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
 
 private:
+    Options _opts;
     std::function<void()> _onNewGame;
     std::function<void()> _onExit;
     std::function<void(const std::string &)> _onModuleSelected;

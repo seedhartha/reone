@@ -83,7 +83,6 @@ void Program::loadOptions() {
 
     _help = _vars.count("help") > 0;
     _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
-    _debug = _vars["debug"].as<bool>();
     _gameOpts.graphics.width = _vars["width"].as<int>();
     _gameOpts.graphics.height = _vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
@@ -91,9 +90,9 @@ void Program::loadOptions() {
     _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
     _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
+    _gameOpts.debug = _vars["debug"].as<bool>();
 
-    bool debug = _vars["debug"].as<bool>();
-    setDebugLogEnabled(debug);
+    setDebugLogEnabled(_gameOpts.debug);
 
     initGameVersion();
     initMultiplayerMode();
