@@ -103,9 +103,9 @@ void Game::loadModule(const string &name, string entry) {
         TheAudioPlayer.play(music, AudioType::Music);
     }
 
-    loadHUD();
-    loadDebugGui();
-    loadDialogGui();
+    if (!_hud) loadHUD();
+    if (!_debug) loadDebugGui();
+    if (!_dialog) loadDialogGui();
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
