@@ -137,7 +137,7 @@ bool GUI::handle(const SDL_Event &event) {
             break;
         }
         case SDL_MOUSEBUTTONUP:
-            if (_focus && event.button.button == SDL_BUTTON_LEFT && event.button.clicks == 1) {
+            if (_focus && event.button.button == SDL_BUTTON_LEFT) {
                 debug("GUI: control clicked on: " + _focus->tag());
                 glm::vec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 return _focus->handleClick(ctrlCoords.x, ctrlCoords.y);
