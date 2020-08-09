@@ -61,9 +61,9 @@ void Module::loadInfo(const GffStruct &ifo) {
     _info.entryPosition.y = ifo.getFloat("Mod_Entry_Y");
     _info.entryPosition.z = ifo.getFloat("Mod_Entry_Z");
 
-    float headingSin = ifo.getFloat("Mod_Entry_Dir_X");
-    float headingCos = ifo.getFloat("Mod_Entry_Dir_Y");
-    _info.entryHeading = -glm::atan(headingSin, headingCos);
+    float dirX = ifo.getFloat("Mod_Entry_Dir_X");
+    float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
+    _info.entryHeading = -glm::atan(dirX, dirY);
 
     _info.entryArea = ifo.getString("Mod_Entry_Area");
 }

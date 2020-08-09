@@ -62,9 +62,9 @@ void Creature::load(const GffStruct &gffs) {
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
-    float headingSin = gffs.getFloat("XOrientation");
-    float headingCos = gffs.getFloat("YOrientation");
-    _heading = -glm::atan(headingSin, headingCos);
+    float dirX = gffs.getFloat("XOrientation");
+    float dirY = gffs.getFloat("YOrientation");
+    _heading = -glm::atan(dirX, dirY);
 
     updateTransform();
 
