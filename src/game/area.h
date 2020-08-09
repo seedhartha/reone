@@ -54,13 +54,17 @@ public:
     Area(resources::GameVersion version, const std::string &name);
 
     void load(const resources::GffStruct &are, const resources::GffStruct &git);
-    void loadParty(const glm::vec3 &position, float heading);
+    void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
+    void runOnEnterScript();
+
     bool handle(const SDL_Event &event);
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
+
     void initGL();
     void render() const;
+
     void saveTo(GameState &state) const;
     void loadState(const GameState &state);
 
@@ -116,13 +120,6 @@ private:
         Transparent
     };
 
-    struct Scripts {
-        std::shared_ptr<script::ScriptProgram> onEnter;
-        std::shared_ptr<script::ScriptProgram> onExit;
-        std::shared_ptr<script::ScriptProgram> onHeartbeat;
-        std::shared_ptr<script::ScriptProgram> onUserDefined;
-    };
-
     struct DelayedAction {
         uint32_t timestamp { 0 };
         script::ExecutionContext context;
@@ -138,12 +135,13 @@ private:
     std::map<RenderListName, render::RenderList> _renderLists;
     std::unique_ptr<NavMesh> _navMesh;
     DebugMode _debugMode { DebugMode::None };
-    Scripts _scripts;
+    std::map<ScriptType, std::shared_ptr<script::ScriptProgram>> _scripts;
     std::list<DelayedAction> _delayed;
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
 
+    std::shared_ptr<Creature> makeCharacter(const CharacterConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedActions();
     void navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);

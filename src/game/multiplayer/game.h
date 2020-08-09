@@ -48,7 +48,6 @@ private:
 
     void configure() override;
     const std::shared_ptr<Module> makeModule(const std::string &name) override;
-    void configureModule() override;
     void update() override;
     void loadNextModule() override;
 

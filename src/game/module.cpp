@@ -47,11 +47,10 @@ Module::Module(const string &name, GameVersion version, const GraphicsOptions &o
     _cameraAspect(opts.width / static_cast<float>(opts.height)) {
 }
 
-void Module::load(const GffStruct &ifo, const string &entry) {
+void Module::load(const GffStruct &ifo) {
     loadInfo(ifo);
     loadArea(ifo);
-    loadCameras(entry);
-    loadParty(entry);
+    loadCameras();
 
     _loaded = true;
 }
@@ -77,7 +76,7 @@ void Module::loadArea(const GffStruct &ifo) {
 
     shared_ptr<Area> area(makeArea());
     area->setOnModuleTransition([this](const string &module, const string &entry) {
-        if (_transitionEnabled && _onModuleTransition) {
+        if (_onModuleTransition) {
             _onModuleTransition(module, entry);
         }
     });
@@ -93,11 +92,11 @@ const shared_ptr<Area> Module::makeArea() const {
     return make_shared<Area>(_version, _info.entryArea);
 }
 
-void Module::loadCameras(const string &entry) {
-    glm::vec3 position(0.0f);
-    float heading = 0.0f;
-    getEntryPoint(entry, position, heading);
-    position += glm::vec3(0.0f, 0.0f, 1.7f);
+void Module::loadCameras() {
+    glm::vec3 position(_info.entryPosition);
+    position.z += 1.7;
+
+    float heading = _info.entryHeading;
 
     unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_cameraAspect, glm::radians(kDefaultFieldOfView)));
     firstPersonCamera->setPosition(position);
@@ -115,7 +114,32 @@ void Module::loadCameras(const string &entry) {
     }
 }
 
-void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &heading) {
+bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
+    Object *obstacle = nullptr;
+    if (_area->findObstacleByWalkmesh(from, to, kObstacleRoom | kObstacleDoor, intersection, &obstacle)) {
+        return true;
+    }
+
+    return false;
+}
+
+void Module::loadParty(const PartyConfiguration &party, const string &entry) {
+    _party = party;
+
+    glm::vec3 position(0.0f);
+    float heading = 0.0f;
+    getEntryPoint(entry, position, heading);
+
+    _area->loadParty(_party, position, heading);
+
+    update3rdPersonCameraTarget();
+    update3rdPersonCameraHeading();
+    switchTo3rdPersonCamera();
+
+    _area->runOnEnterScript();
+}
+
+void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &heading) const {
     position = _info.entryPosition;
     heading = _info.entryHeading;
 
@@ -126,29 +150,6 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
             heading = object->heading();
         }
     }
-}
-
-bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
-    Object *obstacle = nullptr;
-    if (_area->findObstacleByWalkmesh(from, to, kObstacleRoom | kObstacleDoor, intersection, &obstacle)) {
-        return true;
-    }
-
-    return false;
-}
-
-void Module::loadParty(const string &entry) {
-    if (!_loadParty) return;
-
-    glm::vec3 position(0.0f);
-    float heading = 0.0f;
-    getEntryPoint(entry, position, heading);
-
-    _area->loadParty(position, heading);
-
-    update3rdPersonCameraTarget();
-    update3rdPersonCameraHeading();
-    switchTo3rdPersonCamera();
 }
 
 void Module::update3rdPersonCameraTarget() {
@@ -209,7 +210,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         Door *door = dynamic_cast<Door *>(obstacle);
         if (door) {
             if (!door->linkedToModule().empty()) {
-                if (_transitionEnabled && _onModuleTransition) {
+                if (_onModuleTransition) {
                     _onModuleTransition(door->linkedToModule(), door->linkedTo());
                 }
             } else if (!door->isOpen() && !door->isStatic()) {
@@ -375,20 +376,17 @@ void Module::updatePlayer(float dt) {
     }
 }
 
+void Module::saveTo(GameState &state) const {
+    state.party = _party;
+    _area->saveTo(state);
+}
+
 void Module::initGL() {
     _area->initGL();
 }
 
 void Module::render() const {
     _area->render();
-}
-
-void Module::setLoadParty(bool load) {
-    _loadParty = load;
-}
-
-void Module::setTransitionEnabled(bool enabled) {
-    _transitionEnabled = enabled;
 }
 
 void Module::setOnCameraChanged(const function<void(CameraType)> &fn) {

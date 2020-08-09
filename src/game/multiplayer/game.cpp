@@ -108,15 +108,6 @@ const shared_ptr<Module> MultiplayerGame::makeModule(const string &name) {
     return shared_ptr<Module>(new MultiplayerModule(name, _mode, _version, _opts.graphics, this));
 }
 
-void MultiplayerGame::configureModule() {
-    if (_mode == MultiplayerMode::Client) {
-        _module->setLoadParty(false);
-        _module->setTransitionEnabled(false);
-    }
-
-    Game::configureModule();
-}
-
 void MultiplayerGame::onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) {
     if (shouldSendObjectUpdates(object.tag())) {
         sendSetObjectTransformCommand(object.tag(), position, heading);

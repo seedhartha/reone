@@ -113,6 +113,13 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
+enum class ScriptType {
+    OnEnter,
+    OnExit,
+    OnHeartbeat,
+    OnUserDefined
+};
+
 enum class DebugMode {
     None,
     GameObjects,
@@ -124,6 +131,19 @@ struct Options {
     audio::AudioOptions audio;
     net::NetworkOptions network;
     bool debug { false };
+};
+
+struct CharacterConfiguration {
+    Gender gender { Gender::Male };
+    ClassType clazz { ClassType::Soldier };
+    int appearance { 0 };
+};
+
+struct PartyConfiguration {
+    int memberCount { 0 };
+    CharacterConfiguration leader;
+    CharacterConfiguration member1;
+    CharacterConfiguration member2;
 };
 
 struct UpdateContext {
@@ -149,6 +169,7 @@ struct AreaState {
 
 struct GameState {
     std::map<std::string, AreaState> areas;
+    PartyConfiguration party;
 };
 
 struct HudContext {
