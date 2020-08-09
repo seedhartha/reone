@@ -105,6 +105,20 @@ Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionCon
     return Variable();
 }
 
+Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(
+        args.size() == 2 &&
+        args[0].type == VariableType::Object &&
+        args[1].type == VariableType::Action);
+
+    ExecutionContext newCtx(args[1].context);
+    newCtx.callerId = args[0].objectId;
+
+    ctx.delayCommand(SDL_GetTicks(), newCtx);
+
+    return Variable();
+}
+
 Variable RoutineManager::getEnteringObject(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Object);
     result.objectId = ctx.enteringObjectId;
@@ -114,6 +128,61 @@ Variable RoutineManager::getEnteringObject(const vector<Variable> &args, Executi
 Variable RoutineManager::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
     return Variable(args[0].objectId == ctx.playerId);
+}
+
+Variable RoutineManager::getIsObjectValid(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(!args.empty() && args[0].type == VariableType::Object);
+    return Variable(args[0].objectId != kObjectInvalid);
+}
+
+Variable RoutineManager::getFirstPC(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = ctx.playerId;
+    return move(result);
+}
+
+Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(!args.empty() && args[0].type == VariableType::String);
+
+    Variable result(VariableType::Object);
+    result.objectId = ctx.getObjectByTag ? ctx.getObjectByTag(args[0].strValue) : 0;
+
+    return move(result);
+}
+
+Variable RoutineManager::getLevelByClass(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(
+        !args.empty() &&
+        args[0].type == VariableType::Int &&
+        args[1].type == VariableType::Object);
+
+    int clazz = args[0].intValue;
+    int objectId = args.size() < 2 ? 0 : args[1].objectId;
+
+    // TODO: return value based on class
+
+    return Variable(1);
+}
+
+Variable RoutineManager::getGender(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(!args.empty() && args[0].type == VariableType::Object);
+
+    int objectId = args[0].objectId;
+
+    return Variable();
+}
+
+Variable RoutineManager::actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(!args.empty() && args[0].type == VariableType::Object);
+
+    int objectId = args[0].objectId;
+    string resRef(args.size() >= 2 ? args[1].strValue : "");
+
+    if (ctx.startDialog) {
+        ctx.startDialog(objectId, resRef);
+    }
+
+    return Variable();
 }
 
 } // namespace script

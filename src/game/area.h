@@ -92,9 +92,10 @@ public:
     // Callbacks
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setOnPlayerChanged(const std::function<void()> &fn);
+    void setOnStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
 
 protected:
-    uint32_t _idCounter { 0 };
+    uint32_t _idCounter { 2 };
     std::map<ObjectType, ObjectList> _objects;
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
@@ -140,6 +141,7 @@ private:
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
+    std::function<void(const Object &, const std::string &)> _onStartDialog;
 
     std::shared_ptr<Creature> makeCharacter(const CharacterConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedActions();

@@ -153,7 +153,7 @@ void DialogGui::onReplyClicked(int index) {
     }
 }
 
-void DialogGui::startDialog(const string &resRef, const string &owner) {
+void DialogGui::startDialog(const Object &owner, const string &resRef) {
     shared_ptr<GffStruct> dlg(ResMan.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         if (_onDialogFinished) _onDialogFinished();
@@ -162,7 +162,7 @@ void DialogGui::startDialog(const string &resRef, const string &owner) {
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
-    _currentSpeaker = owner;
+    _currentSpeaker = owner.tag();
     if (_onSpeakerChanged) {
         _onSpeakerChanged("", _currentSpeaker);
     }
@@ -182,10 +182,12 @@ void DialogGui::loadStartEntry() {
             break;
         }
     }
-    if (entryIdx != -1) {
-        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
-        loadCurrentEntry();
+    if (entryIdx == -1) {
+        if (_onDialogFinished) _onDialogFinished();
+        return;
     }
+    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+    loadCurrentEntry();
 }
 
 bool DialogGui::checkCondition(const string &script) {

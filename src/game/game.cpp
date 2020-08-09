@@ -176,6 +176,8 @@ void Game::loadDialogGui() {
         Creature *prevSpeaker = !from.empty() ? static_cast<Creature *>(_module->area().find(from).get()) : nullptr;
         Creature *speaker = !to.empty() ? static_cast<Creature *>(_module->area().find(to).get()) : nullptr;
 
+        if (speaker == player) return;
+
         if (prevSpeaker) {
             prevSpeaker->playDefaultAnimation();
         }
@@ -204,9 +206,9 @@ void Game::configureModule() {
         _nextModule = name;
         _nextEntry = entry;
     });
-    _module->setStartDialog([this](const string &resRef, const string &owner) {
+    _module->setStartDialog([this](const Object &object, const string &resRef) {
         _screen = Screen::Dialog;
-        _dialog->startDialog(resRef, owner);
+        _dialog->startDialog(object, resRef);
     });
 }
 

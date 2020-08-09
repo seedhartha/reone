@@ -43,7 +43,7 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("FloatToString", String, vector<VariableType> { Float, Int, Int });
     _routines.emplace_back("PrintInteger", Void, vector<VariableType> { Int });
     _routines.emplace_back("PrintObject", Void, vector<VariableType> { Object });
-    _routines.emplace_back("AssignCommand", Void, vector<VariableType> { Object, Action });
+    _routines.emplace_back("AssignCommand", Void, vector<VariableType> { Object, Action }, bind(&RoutineManager::assignCommand, this, _1, _2));
     _routines.emplace_back("DelayCommand", Void, vector<VariableType> { Float, Action }, bind(&RoutineManager::delayCommand, this, _1, _2));
     _routines.emplace_back("ExecuteScript", Void, vector<VariableType> { String, Object, Int });
     _routines.emplace_back("ClearAllActions", Void, vector<VariableType>());
@@ -79,7 +79,7 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("ActionSpeakString", Void, vector<VariableType> { String, Int });
     _routines.emplace_back("ActionPlayAnimation", Void, vector<VariableType> { Int, Float, Float });
     _routines.emplace_back("GetDistanceToObject", Float, vector<VariableType> { Object });
-    _routines.emplace_back("GetIsObjectValid", Int, vector<VariableType> { Object });
+    _routines.emplace_back("GetIsObjectValid", Int, vector<VariableType> { Object }, bind(&RoutineManager::getIsObjectValid, this, _1, _2));
     _routines.emplace_back("ActionOpenDoor", Void, vector<VariableType> { Object });
     _routines.emplace_back("ActionCloseDoor", Void, vector<VariableType> { Object });
     _routines.emplace_back("SetCameraFacing", Void, vector<VariableType> { Float });
@@ -237,11 +237,11 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("GetWaypointByTag", Object, vector<VariableType> { String });
     _routines.emplace_back("GetTransitionTarget", Object, vector<VariableType> { Object });
     _routines.emplace_back("EffectLinkEffects", Effect, vector<VariableType> { Effect, Effect });
-    _routines.emplace_back("GetObjectByTag", Object, vector<VariableType> { String, Int });
+    _routines.emplace_back("GetObjectByTag", Object, vector<VariableType> { String, Int }, bind(&RoutineManager::getObjectByTag, this, _1, _2));
     _routines.emplace_back("AdjustAlignment", Void, vector<VariableType> { Object, Int, Int });
     _routines.emplace_back("ActionWait", Void, vector<VariableType> { Float });
     _routines.emplace_back("SetAreaTransitionBMP", Void, vector<VariableType> { Int, String });
-    _routines.emplace_back("ActionStartConversation", Void, vector<VariableType> { Object, String, Int, Int, Int, String, String, String, String, String, String, Int });
+    _routines.emplace_back("ActionStartConversation", Void, vector<VariableType> { Object, String, Int, Int, Int, String, String, String, String, String, String, Int }, bind(&RoutineManager::actionStartConversation, this, _1, _2));
     _routines.emplace_back("ActionPauseConversation", Void, vector<VariableType>());
     _routines.emplace_back("ActionResumeConversation", Void, vector<VariableType>());
     _routines.emplace_back("EffectBeam", Effect, vector<VariableType> { Int, Object, Int, Int });
@@ -380,7 +380,7 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("GetNextItemInInventory", Object, vector<VariableType> { Object });
     _routines.emplace_back("GetClassByPosition", Int, vector<VariableType> { Int, Object });
     _routines.emplace_back("GetLevelByPosition", Int, vector<VariableType> { Int, Object });
-    _routines.emplace_back("GetLevelByClass", Int, vector<VariableType> { Int, Object });
+    _routines.emplace_back("GetLevelByClass", Int, vector<VariableType> { Int, Object }, bind(&RoutineManager::getLevelByClass, this, _1, _2));
     _routines.emplace_back("GetDamageDealtByType", Int, vector<VariableType> { Int });
     _routines.emplace_back("GetTotalDamageDealt", Int, vector<VariableType>());
     _routines.emplace_back("GetLastDamager", Object, vector<VariableType>());
@@ -395,7 +395,7 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("VersusAlignmentEffect", Effect, vector<VariableType> { Effect, Int, Int });
     _routines.emplace_back("VersusRacialTypeEffect", Effect, vector<VariableType> { Effect, Int });
     _routines.emplace_back("VersusTrapEffect", Effect, vector<VariableType> { Effect });
-    _routines.emplace_back("GetGender", Int, vector<VariableType> { Object });
+    _routines.emplace_back("GetGender", Int, vector<VariableType> { Object }, bind(&RoutineManager::getGender, this, _1, _2));
     _routines.emplace_back("GetIsTalentValid", Int, vector<VariableType> { Talent });
     _routines.emplace_back("ActionMoveAwayFromLocation", Void, vector<VariableType> { Location, Int, Float });
     _routines.emplace_back("GetAttemptedAttackTarget", Object, vector<VariableType>());
@@ -585,8 +585,8 @@ void RoutineManager::addKotorRoutines() {
     _routines.emplace_back("GetPlaceableIllumination", Int, vector<VariableType> { Object });
     _routines.emplace_back("GetIsPlaceableObjectActionPossible", Int, vector<VariableType> { Object, Int });
     _routines.emplace_back("DoPlaceableObjectAction", Void, vector<VariableType> { Object, Int });
-    _routines.emplace_back("GetFirstPC", Object, vector<VariableType>());
-    _routines.emplace_back("GetNextPC", Object, vector<VariableType>());
+    _routines.emplace_back("GetFirstPC", Object, vector<VariableType>(), bind(&RoutineManager::getFirstPC, this, _1, _2));
+    _routines.emplace_back("GetNextPC", Object, vector<VariableType>(), bind(&RoutineManager::getFirstPC, this, _1, _2));
     _routines.emplace_back("SetTrapDetectedBy", Int, vector<VariableType> { Object, Object });
     _routines.emplace_back("GetIsTrapped", Int, vector<VariableType> { Object });
     _routines.emplace_back("SetEffectIcon", Effect, vector<VariableType> { Effect, Int });
