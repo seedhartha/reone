@@ -51,7 +51,7 @@ public:
 
     int run();
 
-    void loadModule(const std::string &name, std::string entry = "");
+    void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
 
     bool handle(const SDL_Event &event) override;
 

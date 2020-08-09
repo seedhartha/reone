@@ -59,10 +59,7 @@ static const float kElevationTestOffset = 0.1f;
 static const float kElevationTestDistance = 1.0f;
 static const float kKeepPathDuration = 1000.0f;
 
-static const int kCarthAppearance = 6;
-static const int kBastilaAppearance = 4;
-static const int kAttonAppearance = 452;
-static const int kKreiaAppearance = 455;
+static const int kRevanAppearance = 22;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
@@ -195,10 +192,10 @@ void Area::loadCameraStyle(const GffStruct &are) {
 }
 
 void Area::loadScripts(const GffStruct &are) {
-    _scripts.onEnter = ScriptMan.find(are.getString("OnEnter"));
-    _scripts.onExit = ScriptMan.find(are.getString("OnExit"));
-    _scripts.onHeartbeat = ScriptMan.find(are.getString("OnHeartbeat"));
-    _scripts.onUserDefined = ScriptMan.find(are.getString("OnUserDefined"));
+    _scripts[ScriptType::OnEnter] = ScriptMan.find(are.getString("OnEnter"));
+    _scripts[ScriptType::OnExit] = ScriptMan.find(are.getString("OnExit"));
+    _scripts[ScriptType::OnHeartbeat] = ScriptMan.find(are.getString("OnHeartbeat"));
+    _scripts[ScriptType::OnUserDefined] = ScriptMan.find(are.getString("OnUserDefined"));
 }
 
 void Area::landObject(Object &object) {
@@ -208,56 +205,43 @@ void Area::landObject(Object &object) {
     }
 }
 
-void Area::loadParty(const glm::vec3 &position, float heading) {
-    shared_ptr<Creature> partyLeader(makeCreature());
-    partyLeader->setTag(kPartyLeaderTag);
-    partyLeader->equip("g_a_clothes01");
-
-    shared_ptr<Creature> partyMember1(makeCreature());
-    partyMember1->setTag(kPartyMember1Tag);
-    partyMember1->equip("g_a_clothes01");
-
-    switch (_version) {
-        case GameVersion::KotOR:
-            partyLeader->load(kCarthAppearance, position, heading);
-            partyMember1->load(kBastilaAppearance, position, heading);
-            break;
-        case GameVersion::TheSithLords:
-            partyLeader->load(kAttonAppearance, position, heading);
-            partyMember1->load(kKreiaAppearance, position, heading);
-            break;
-    }
-
+void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading) {
+    shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
+    _objects[ObjectType::Creature].push_back(partyLeader);
+    landObject(*partyLeader);
     _player = partyLeader;
     _partyLeader = partyLeader;
-    _partyMember1 = partyMember1;
 
-    _objects[ObjectType::Creature].push_back(_partyLeader);
-    _objects[ObjectType::Creature].push_back(_partyMember1);
+    if (party.memberCount > 0) {
+        shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
+        landObject(*partyMember);
+        _objects[ObjectType::Creature].push_back(partyMember);
+        _partyMember1 = partyMember;
 
-    landObject(*_partyLeader);
-    landObject(*_partyMember1);
-
-    Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
-    static_cast<Creature &>(*_partyMember1).enqueue(move(action));
-
-    // DEBUG: everyone follows player
-    //for (auto &crit : _objects[ObjectType::Creature]) {
-    //    if (crit->tag().empty()) continue;
-    //    static_cast<Creature &>(*crit).enqueue(Creature::Action(Creature::ActionType::Follow, _player, kCompanionFollowDistance));
-    //}
-
-    if (_scriptsEnabled && _scripts.onEnter) {
-        ExecutionContext ctx;
-        if (_player) {
-            ctx.playerId = _player->id();
-            ctx.enteringObjectId = ctx.playerId;
-            ctx.delayCommand = [this](uint32_t timestamp, const ExecutionContext &ctx) {
-                _delayed.push_back(DelayedAction { timestamp, ctx });
-            };
-        }
-        ScriptExecution(_scripts.onEnter, ctx).run();
+        Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
+        partyMember->enqueue(move(action));
     }
+
+    if (party.memberCount > 1) {
+        shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
+        landObject(*partyMember);
+        _objects[ObjectType::Creature].push_back(partyMember);
+        _partyMember2 = partyMember;
+
+        Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
+        partyMember->enqueue(move(action));
+    }
+}
+
+shared_ptr<Creature> Area::makeCharacter(const CharacterConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
+    int appearance = character.appearance;
+    if (appearance == 0) appearance = kRevanAppearance;
+
+    shared_ptr<Creature> creature(makeCreature());
+    creature->setTag(tag);
+    creature->load(appearance, position, heading);
+
+    return move(creature);
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -473,6 +457,20 @@ void Area::updateTriggers(const Creature &creature) {
             }
             break;
         }
+    }
+}
+
+void Area::runOnEnterScript() {
+    if (_scriptsEnabled && _scripts[ScriptType::OnEnter]) {
+        ExecutionContext ctx;
+        if (_player) {
+            ctx.playerId = _player->id();
+            ctx.enteringObjectId = ctx.playerId;
+            ctx.delayCommand = [this](uint32_t timestamp, const ExecutionContext &ctx) {
+                _delayed.push_back(DelayedAction { timestamp, ctx });
+            };
+        }
+        ScriptExecution(_scripts[ScriptType::OnEnter], ctx).run();
     }
 }
 

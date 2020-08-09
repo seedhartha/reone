@@ -31,21 +31,25 @@ public:
     PortraitsGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void loadPortraits(Gender gender);
+    void loadPortraits(const CharacterConfiguration &info);
 
-    void setOnPortraitSelected(const std::function<void(const std::string &)> &fn);
+    void setOnPortraitSelected(const std::function<void(const CharacterConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
 
 private:
     struct Portrait {
         std::string resRef;
         std::shared_ptr<render::Texture> image;
+        int appearanceNumber { 0 };
+        int appearanceS { 0 };
+        int appearanceL { 0 };
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
+    CharacterConfiguration _character;
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };
-    std::function<void(const std::string &)> _onPortraitSelected;
+    std::function<void(const CharacterConfiguration &)> _onPortraitSelected;
     std::function<void()> _onCancel;
 
     void setButtonColors(const std::string &tag);

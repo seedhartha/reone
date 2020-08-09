@@ -84,7 +84,7 @@ void Game::loadMainMenu() {
         _screen = Screen::ClassSelection;
     });
     mainMenu->setOnExit([this]() { _quit = true; });
-    mainMenu->setOnModuleSelected([this](const string &name) { loadModule(name); });
+    mainMenu->setOnModuleSelected([this](const string &name) { loadModule(name, PartyConfiguration()); });
     _mainMenu = move(mainMenu);
 }
 
@@ -92,10 +92,10 @@ void Game::loadClassSelectionGui() {
     unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_opts.graphics));
     gui->load(_version);
     gui->initGL();
-    gui->setOnClassSelected([this](Gender gender, ClassType clazz) {
+    gui->setOnClassSelected([this](const CharacterConfiguration &character) {
         _classSelection->resetFocus();
         if (!_portraits) loadPortraitsGui();
-        _portraits->loadPortraits(gender);
+        _portraits->loadPortraits(character);
         _screen = Screen::Portraits;
     });
     gui->setOnCancel([this]() {
@@ -109,9 +109,14 @@ void Game::loadPortraitsGui() {
     unique_ptr<PortraitsGui> gui(new PortraitsGui(_opts.graphics));
     gui->load(_version);
     gui->initGL();
-    gui->setOnPortraitSelected([this](const string &portrait) {
+    gui->setOnPortraitSelected([this](const CharacterConfiguration &character) {
         _portraits->resetFocus();
-        loadModule(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+
+        PartyConfiguration party;
+        party.leader = character;
+
+        loadModule(moduleName, party);
     });
     gui->setOnCancel([this]() {
         _screen = Screen::ClassSelection;
@@ -119,7 +124,7 @@ void Game::loadPortraitsGui() {
     _portraits = move(gui);
 }
 
-void Game::loadModule(const string &name, string entry) {
+void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Loading module " + name);
     ResMan.loadModule(name);
 
@@ -128,7 +133,8 @@ void Game::loadModule(const string &name, string entry) {
     _module = makeModule(name);
     configureModule();
 
-    _module->load(*ifo, entry);
+    _module->load(*ifo);
+    _module->loadParty(party, entry);
     _module->area().loadState(_state);
     _module->initGL();
 
@@ -242,9 +248,9 @@ void Game::loadNextModule() {
     jobs.await();
 
     if (_module) {
-        _module->area().saveTo(_state);
+        _module->saveTo(_state);
     }
-    loadModule(_nextModule, _nextEntry);
+    loadModule(_nextModule, _state.party, _nextEntry);
 
     _nextModule.clear();
     _nextEntry.clear();

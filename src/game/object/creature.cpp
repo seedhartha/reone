@@ -144,11 +144,13 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
     const string &modelName = table.getString(row, modelColumn);
     _model = make_unique<ModelInstance>(resources.findModel(modelName));
 
+    string texName(table.getString(row, texColumn));
     if (bodyEquipped) {
-        string texName(table.getString(row, texColumn));
         texName += str(boost::format("%02d") % it->second->textureVariation());
-        _model->changeTexture(texName);
+    } else {
+        texName += "01";
     }
+    _model->changeTexture(texName);
 
     it = _equipment.find(kInventorySlotRightWeapon);
     if (it != _equipment.end()) {
@@ -192,12 +194,9 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
 void Creature::load(int appearance, const glm::vec3 &position, float heading) {
     _position = position;
     _heading = heading;
-
     updateTransform();
 
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> appearanceTable(resources.find2DA("appearance"));
-
+    shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
     loadAppearance(*appearanceTable, appearance);
     loadPortrait(appearance);
 }
@@ -205,14 +204,18 @@ void Creature::load(int appearance, const glm::vec3 &position, float heading) {
 void Creature::loadPortrait(int appearance) {
     ResourceManager &resources = ResourceManager::instance();
     shared_ptr<TwoDaTable> portraits(resources.find2DA("portraits"));
-    string resRef(portraits->getStringFromRowByColumnValue("baseresref", "appearancenumber", to_string(appearance), ""));
+    string appearanceString(to_string(appearance));
+    string resRef(portraits->getStringFromRowByColumnValue("baseresref", "appearancenumber", appearanceString, ""));
 
     if (resRef.empty()) {
-        resRef = portraits->getStringFromRowByColumnValue("baseresref", "appearance_s", to_string(appearance), "");
+        resRef = portraits->getStringFromRowByColumnValue("baseresref", "appearance_s", appearanceString, "");
+    }
+    if (resRef.empty()) {
+        resRef = portraits->getStringFromRowByColumnValue("baseresref", "appearance_l", appearanceString, "");
     }
 
     boost::to_lower(resRef);
-    _portrait = resources.findTexture(resRef, TextureType::Diffuse);
+    _portrait = resources.findTexture(resRef, TextureType::GUI);
 }
 
 void Creature::initGL() {

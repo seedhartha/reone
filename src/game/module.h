@@ -46,8 +46,12 @@ class Module : public render::IRenderRoot, public render::IEventHandler {
 public:
     Module(const std::string &name, resources::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(const resources::GffStruct &ifo, const std::string &entry = "");
+    void load(const resources::GffStruct &ifo);
+    void loadParty(const PartyConfiguration &party, const std::string &entry = "");
+
     void update(float dt, GuiContext &guiCtx);
+
+    void saveTo(GameState &state) const;
 
     virtual const std::shared_ptr<Area> makeArea() const;
 
@@ -56,10 +60,6 @@ public:
     void render() const override;
 
     void update3rdPersonCameraHeading();
-
-    // Setters
-    void setLoadParty(bool load);
-    void setTransitionEnabled(bool enabled);
 
     // Getters
     const std::string &name() const;
@@ -84,14 +84,13 @@ private:
     render::GraphicsOptions _opts;
     float _cameraAspect { 0.0f };
     std::shared_ptr<Area> _area;
+    PartyConfiguration _party;
     render::CameraType _cameraType { render::CameraType::FirstPerson };
     std::shared_ptr<render::FirstPersonCamera> _firstPersonCamera;
     std::shared_ptr<render::ThirdPersonCamera> _thirdPersonCamera;
     bool _moveForward { false };
     bool _moveBackward { false };
     DebugMode _debugMode { DebugMode::None };
-    bool _loadParty { true };
-    bool _transitionEnabled { true };
 
     // Callbacks
     std::function<void(render::CameraType)> _onCameraChanged;
@@ -100,9 +99,7 @@ private:
 
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
-    void loadCameras(const std::string &entry);
-    void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading);
-    void loadParty(const std::string &entry);
+    void loadCameras();
     bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
@@ -110,6 +107,7 @@ private:
     void cycleDebugMode(bool forward);
     void updatePlayer(float dt);
     bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
+    void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
     void update3rdPersonCameraTarget();
     void switchTo3rdPersonCamera();
     void resetInput();
