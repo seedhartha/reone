@@ -69,8 +69,15 @@ private:
 
     // Routine implementations
     Variable delayCommand(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable assignCommand(const std::vector<Variable> &args, ExecutionContext &ctx);
     Variable getEnteringObject(const std::vector<Variable> &args, ExecutionContext &ctx);
     Variable getIsPC(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable getIsObjectValid(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable getFirstPC(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable getObjectByTag(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable getLevelByClass(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable getGender(const std::vector<Variable> &args, ExecutionContext &ctx);
+    Variable actionStartConversation(const std::vector<Variable> &args, ExecutionContext &ctx);
 };
 
 #define RoutineMan script::RoutineManager::instance()

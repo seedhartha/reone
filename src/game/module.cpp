@@ -84,6 +84,17 @@ void Module::loadArea(const GffStruct &ifo) {
         update3rdPersonCameraTarget();
         switchTo3rdPersonCamera();
     });
+    area->setOnStartDialog([this](const Object &object, const string &resRef) {
+        if (!_startDialog) return;
+
+        const Creature &creature = static_cast<const Creature &>(object);
+
+        string finalResRef(resRef);
+        if (resRef.empty()) finalResRef = creature.conversation();
+        if (resRef.empty()) return;
+
+        _startDialog(object, finalResRef);
+    });
     area->load(*are, *git);
     _area = move(area);
 }
@@ -223,7 +234,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
             if (!creature->conversation().empty() && _startDialog) {
                 resetInput();
                 getCamera()->resetInput();
-                _startDialog(creature->conversation(), creature->tag());
+                _startDialog(*creature, creature->conversation());
             }
         }
 
@@ -397,7 +408,7 @@ void Module::setOnModuleTransition(const function<void(const string &, const str
     _onModuleTransition = fn;
 }
 
-void Module::setStartDialog(const function<void(const string &, const string &)> &fn) {
+void Module::setStartDialog(const function<void(const Object &, const string &)> &fn) {
     _startDialog = fn;
 }
 

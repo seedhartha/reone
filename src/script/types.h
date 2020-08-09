@@ -27,6 +27,9 @@ namespace reone {
 
 namespace script {
 
+const uint32_t kObjectSelf = 0;
+const uint32_t kObjectInvalid = 1;
+
 class ScriptProgram;
 struct Variable;
 
@@ -43,6 +46,8 @@ struct ExecutionContext {
     uint32_t playerId { 0xffffffff };
     uint32_t enteringObjectId { 0xffffffff };
     std::function<void(uint32_t, const ExecutionContext &)> delayCommand;
+    std::function<uint32_t(const std::string &)> getObjectByTag;
+    std::function<void(int, const std::string &)> startDialog;
 };
 
 } // namespace script

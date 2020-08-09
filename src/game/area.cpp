@@ -469,6 +469,16 @@ void Area::runOnEnterScript() {
             ctx.delayCommand = [this](uint32_t timestamp, const ExecutionContext &ctx) {
                 _delayed.push_back(DelayedAction { timestamp, ctx });
             };
+            ctx.getObjectByTag = [this](const string &tag) {
+                shared_ptr<Object> object(find(tag));
+                return object ? object->id() : 0;
+            };
+            ctx.startDialog = [this](int objectId, const string &resRef) {
+                shared_ptr<Object> object(find(objectId));
+                if (object && _onStartDialog) {
+                    _onStartDialog(*object, resRef);
+                }
+            };
         }
         ScriptExecution(_scripts[ScriptType::OnEnter], ctx).run();
     }
@@ -787,6 +797,10 @@ void Area::setOnModuleTransition(const function<void(const string &, const strin
 
 void Area::setOnPlayerChanged(const function<void()> &fn) {
     _onPlayerChanged = fn;
+}
+
+void Area::setOnStartDialog(const function<void(const Object &, const string &)> &fn) {
+    _onStartDialog = fn;
 }
 
 } // namespace game

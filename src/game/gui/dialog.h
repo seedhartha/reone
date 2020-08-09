@@ -22,6 +22,7 @@
 #include "../../resources/types.h"
 
 #include "../dialog.h"
+#include "../object/object.h"
 
 namespace reone {
 
@@ -32,7 +33,7 @@ public:
     DialogGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void startDialog(const std::string &resRef, const std::string &owner);
+    void startDialog(const Object &owner, const std::string &resRef);
 
     void setOnSpeakerChanged(const std::function<void(const std::string &, const std::string &)> &fn);
     void setOnDialogFinished(const std::function<void()> &fn);
