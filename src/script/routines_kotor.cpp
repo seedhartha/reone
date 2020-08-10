@@ -1,5 +1,5 @@
 /*
- * Copyright ©  Vsevolod Kremianskii
+ * Copyright © 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
