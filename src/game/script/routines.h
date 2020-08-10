@@ -15,13 +15,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "../../resources/types.h"
+#include "../../script/routine.h"
+#include "../../script/types.h"
+#include "../../script/variable.h"
+
+#include "callbacks.h"
 
 namespace reone {
 
 namespace game {
 
-void initScriptRoutines(resources::GameVersion version);
+class RoutineManager : public script::IRoutineProvider {
+public:
+    static RoutineManager &instance();
+
+    void init(resources::GameVersion version, IRoutineCallbacks *callbacks);
+    void deinit();
+
+    const script::Routine &get(int index) override;
+
+private:
+    IRoutineCallbacks *_callbacks { nullptr };
+    std::vector<script::Routine> _routines;
+
+    RoutineManager() = default;
+    RoutineManager(const RoutineManager &) = delete;
+    ~RoutineManager();
+
+    RoutineManager &operator=(const RoutineManager &) = delete;
+
+    void addKotorRoutines();
+    void addTslRoutines();
+
+    void add(const std::string &name, script::VariableType retType, const std::vector<script::VariableType> &argTypes);
+
+    void add(
+        const std::string &name,
+        script::VariableType retType,
+        const std::vector<script::VariableType> &argTypes,
+        const std::function<script::Variable(const std::vector<script::Variable>&, script::ExecutionContext &ctx)> &fn);
+
+    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getFirstPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+};
+
+#define RoutineMan RoutineManager::instance()
 
 } // namespace game
 

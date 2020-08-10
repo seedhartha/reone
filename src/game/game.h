@@ -42,7 +42,7 @@ namespace game {
  * @see reone::gui::GUI
  * @see reone::render::RenderWindow
  */
-class Game : public render::IEventHandler {
+class Game : public render::IEventHandler, public IRoutineCallbacks {
 public:
     Game(
         resources::GameVersion version,
@@ -54,6 +54,11 @@ public:
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
 
     bool handle(const SDL_Event &event) override;
+
+    void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
+    std::shared_ptr<Object> getObjectByTag(const std::string &tag) override;
+    std::shared_ptr<Object> getPlayer() override;
+    void startDialog(uint32_t objectId, const std::string &resRef) override;
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };

@@ -60,10 +60,13 @@ public:
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
+    void delayAction(uint32_t timestamp, const script::ExecutionContext &ctx);
 
+    // Rendering
     void initGL();
     void render() const;
 
+    // Load/save
     void saveTo(GameState &state) const;
     void loadState(const GameState &state);
 
@@ -94,7 +97,7 @@ public:
     void setOnStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
 
 protected:
-    uint32_t _idCounter { 2 };
+    uint32_t _idCounter { 1000 };
     std::map<ObjectType, ObjectList> _objects;
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
@@ -135,7 +138,7 @@ private:
     std::map<RenderListName, render::RenderList> _renderLists;
     std::unique_ptr<NavMesh> _navMesh;
     DebugMode _debugMode { DebugMode::None };
-    std::map<ScriptType, std::shared_ptr<script::ScriptProgram>> _scripts;
+    std::map<ScriptType, std::string> _scripts;
     std::list<DelayedAction> _delayed;
 
     // Callbacks

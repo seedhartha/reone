@@ -15,10 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "routines_common.h"
-
-#include <cassert>
-#include <cstdint>
+#include "routines.h"
 
 #include "SDL2/SDL_timer.h"
 
@@ -30,21 +27,19 @@ namespace reone {
 
 namespace game {
 
-Variable delayCommand(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(
         args.size() == 2 &&
         args[0].type == VariableType::Float &&
         args[1].type == VariableType::Action);
 
-    if (ctx.delayCommand) {
-        uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
-        ctx.delayCommand(timestamp, args[1].context);
-    }
+    uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
+    _callbacks->delayCommand(timestamp, args[1].context);
 
     return Variable();
 }
 
-Variable assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(
         args.size() == 2 &&
         args[0].type == VariableType::Object &&
@@ -52,44 +47,50 @@ Variable assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
 
     ExecutionContext newCtx(args[1].context);
     newCtx.callerId = args[0].objectId;
+    newCtx.triggererId = kObjectInvalid;
 
-    ctx.delayCommand(SDL_GetTicks(), newCtx);
+    _callbacks->delayCommand(SDL_GetTicks(), move(newCtx));
 
     return Variable();
 }
 
-Variable getEnteringObject(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getEnteringObject(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Object);
-    result.objectId = ctx.enteringObjectId;
+    result.objectId = ctx.triggererId;
     return move(result);
 }
 
-Variable getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
-    return Variable(args[0].objectId == ctx.playerId);
+    shared_ptr<Object> player(_callbacks->getPlayer());
+
+    return Variable(args[0].objectId == player->id());
 }
 
-Variable getIsObjectValid(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getIsObjectValid(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
     return Variable(args[0].objectId != kObjectInvalid);
 }
 
-Variable getFirstPC(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getFirstPC(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> player(_callbacks->getPlayer());
+
     Variable result(VariableType::Object);
-    result.objectId = ctx.playerId;
+    result.objectId = player->id();
+
     return move(result);
 }
 
-Variable getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
 
     Variable result(VariableType::Object);
-    result.objectId = ctx.getObjectByTag ? ctx.getObjectByTag(args[0].strValue) : 0;
+    result.objectId = _callbacks->getObjectByTag(args[0].strValue)->id();
 
     return move(result);
 }
 
-Variable getLevelByClass(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getLevelByClass(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(
         !args.empty() &&
         args[0].type == VariableType::Int &&
@@ -103,7 +104,7 @@ Variable getLevelByClass(const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable(1);
 }
 
-Variable getGender(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::getGender(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
 
     int objectId = args[0].objectId;
@@ -111,15 +112,13 @@ Variable getGender(const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable();
 }
 
-Variable actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable RoutineManager::actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
 
     int objectId = args[0].objectId;
     string resRef(args.size() >= 2 ? args[1].strValue : "");
 
-    if (ctx.startDialog) {
-        ctx.startDialog(objectId, resRef);
-    }
+    _callbacks->startDialog(objectId, resRef);
 
     return Variable();
 }

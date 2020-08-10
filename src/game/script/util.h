@@ -20,43 +20,16 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <vector>
+
+#include "../../script/program.h"
 
 namespace reone {
 
-namespace script {
+namespace game {
 
-const uint32_t kObjectSelf = 0;
-const uint32_t kObjectInvalid = 1;
-const uint32_t kObjectModule = 2;
-const uint32_t kObjectArea = 3;
+int runScript(const std::string &resRef, uint32_t callerId, uint32_t triggererId);
+int runScript(const std::shared_ptr<script::ScriptProgram> &program, uint32_t callerId, uint32_t triggererId);
 
-struct Variable;
-class ScriptProgram;
-class Routine;
-
-struct ExecutionState {
-    std::shared_ptr<ScriptProgram> program;
-    std::vector<Variable> globals;
-    std::vector<Variable> locals;
-    uint32_t insOffset { 0 };
-};
-
-class IRoutineProvider {
-public:
-    virtual ~IRoutineProvider() {
-    }
-
-    virtual const Routine &get(int index) = 0;
-};
-
-struct ExecutionContext {
-    IRoutineProvider *routines { nullptr };
-    std::shared_ptr<ExecutionState> savedState;
-    uint32_t callerId { kObjectInvalid };
-    uint32_t triggererId { kObjectInvalid };
-};
-
-} // namespace script
+} // namespace game
 
 } // namespace reone

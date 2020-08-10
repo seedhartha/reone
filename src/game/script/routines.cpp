@@ -17,24 +17,63 @@
 
 #include "routines.h"
 
+#include <cassert>
+
+#include "../../core/log.h"
+
+#include "../game.h"
+
+using namespace std;
+
 using namespace reone::resources;
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-extern void initKotorRoutines();
-extern void initTslRoutines();
+RoutineManager &RoutineManager::instance() {
+    static RoutineManager instance;
+    return instance;
+}
 
-void initScriptRoutines(GameVersion version) {
+void RoutineManager::init(GameVersion version, IRoutineCallbacks *callbacks) {
+    _callbacks = callbacks;
+
     switch (version) {
-        case GameVersion::TheSithLords:
-            initTslRoutines();
+        case GameVersion::KotOR:
+            addKotorRoutines();
             break;
-        default:
-            initKotorRoutines();
+        case GameVersion::TheSithLords:
+            addTslRoutines();
             break;
     }
+}
+
+RoutineManager::~RoutineManager() {
+    deinit();
+}
+
+void RoutineManager::deinit() {
+    _routines.clear();
+}
+
+void RoutineManager::add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes) {
+    _routines.emplace_back(name, retType, argTypes);
+}
+
+void RoutineManager::add(
+    const std::string &name,
+    VariableType retType,
+    const std::vector<VariableType> &argTypes,
+    const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn) {
+
+    _routines.emplace_back(name, retType, argTypes, fn);
+}
+
+const Routine &RoutineManager::get(int index) {
+    assert(index >= 0 && index < _routines.size());
+    return _routines[index];
 }
 
 } // namespace game

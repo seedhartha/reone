@@ -23,7 +23,7 @@
 
 #include "../core/log.h"
 
-#include "routines.h"
+#include "routine.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -196,7 +196,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
 }
 
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
-    const Routine &routine = RoutineMan.get(ins.routine);
+    const Routine &routine = _context.routines->get(ins.routine);
     debug("Script: calling routine " + routine.name());
 
     vector<Variable> args;

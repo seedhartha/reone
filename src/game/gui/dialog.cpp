@@ -25,6 +25,8 @@
 #include "../../resources/resources.h"
 #include "../../script/execution.h"
 
+#include "../script/routines.h"
+#include "../script/util.h"
 #include "../types.h"
 
 using namespace std;
@@ -190,8 +192,7 @@ void DialogGui::loadStartEntry() {
 }
 
 bool DialogGui::checkCondition(const string &script) {
-    shared_ptr<ScriptProgram> program(ResMan.findScript(script));
-    return ScriptExecution(program, ExecutionContext()).run() != 0;
+    return runScript(script, kObjectInvalid, kObjectInvalid) != 0;
 }
 
 void DialogGui::loadCurrentEntry() {
@@ -230,7 +231,7 @@ void DialogGui::loadCurrentEntry() {
     }
 
     if (!_currentEntry->script.empty()) {
-        ScriptExecution(ResMan.findScript(_currentEntry->script), ExecutionContext()).run();
+        runScript(_currentEntry->script, kObjectInvalid, kObjectInvalid);
     }
     if (replyCount == 0 && _onDialogFinished) {
         if (_onSpeakerChanged) {

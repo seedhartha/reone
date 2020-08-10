@@ -15,31 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "util.h"
 
-#include "../module.h"
+#include "../../resources/resources.h"
+#include "../../script/execution.h"
+#include "../../script/types.h"
+
+#include "routines.h"
+
+using namespace std;
+
+using namespace reone::resources;
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-class IMultiplayerCallbacks;
+int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId) {
+    shared_ptr<ScriptProgram> program(ResMan.findScript(resRef));
+    return runScript(move(program), callerId, triggererId);
+}
 
-class MultiplayerModule : public Module {
-public:
-    MultiplayerModule(
-        const std::string &name,
-        MultiplayerMode mode,
-        resources::GameVersion version,
-        const render::GraphicsOptions &opts,
-        IMultiplayerCallbacks *callbacks);
+int runScript(const std::shared_ptr<ScriptProgram> &program, uint32_t callerId, uint32_t triggererId) {
+    ExecutionContext ctx;
+    ctx.routines = &RoutineMan;
+    ctx.callerId = callerId;
+    ctx.triggererId = triggererId;
 
-private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
-
-    const std::shared_ptr<Area> makeArea() const override;
-};
+    return ScriptExecution(program, move(ctx)).run();
+}
 
 } // namespace game
 
