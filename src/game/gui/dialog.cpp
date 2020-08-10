@@ -207,11 +207,16 @@ void DialogGui::loadCurrentEntry() {
             _onSpeakerChanged(prevSpeaker, _currentSpeaker);
         }
     }
+
+    shared_ptr<AudioStream> voice;
     if (!_currentEntry->voResRef.empty()) {
-        shared_ptr<AudioStream> voice(ResMan.findAudio(_currentEntry->voResRef));
-        if (voice) {
-            _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);
-        }
+        voice = ResMan.findAudio(_currentEntry->voResRef);
+    }
+    if (!voice && !_currentEntry->sound.empty()) {
+        voice = ResMan.findAudio(_currentEntry->sound);
+    }
+    if (voice) {
+        _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);
     }
 
     Control &message = getControl("LBL_MESSAGE");
