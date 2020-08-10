@@ -29,7 +29,7 @@ public:
 
     void load(const resources::GffStruct &gffs) override;
     void initGL() override;
-    void render(const glm::vec2 &offset, const std::string &textOverride) const override;
+    void render(const glm::ivec2 &offset, const std::string &textOverride) const override;
 
     void setCanScrollUp(bool scroll);
     void setCanScrollDown(bool scroll);

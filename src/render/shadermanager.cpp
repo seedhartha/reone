@@ -463,7 +463,7 @@ void ShaderManager::setUniform(unsigned int ordinal, const string &name, const v
     GLint loc = glGetUniformLocation(ordinal, name.c_str());
     if (loc == -1) return;
 
-    glUniformMatrix4fv(loc, arr.size(), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
+    glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
 }
 
 } // namespace render

@@ -63,7 +63,7 @@ void SoundInstance::deinit() {
         _source = 0;
     }
     if (!_buffers.empty()) {
-        alDeleteBuffers(_buffers.size(), &_buffers[0]);
+        alDeleteBuffers(static_cast<int>(_buffers.size()), &_buffers[0]);
         _buffers.clear();
     }
 }

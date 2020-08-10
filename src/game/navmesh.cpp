@@ -54,11 +54,11 @@ void NavMesh::compute(const atomic_bool &cancel) {
         const glm::vec3 &center = aabb.center();
         size = aabb.size();
 
-        int xCellCount = glm::floor(size.x / kCellSize);
+        int xCellCount = static_cast<int>(glm::floor(size.x / kCellSize));
         if (xCellCount % 2 != 0) xCellCount++;
         int xccHalf = xCellCount / 2;
 
-        int yCellCount = glm::floor(size.y / kCellSize);
+        int yCellCount = static_cast<int>(glm::floor(size.y / kCellSize));
         if (yCellCount % 2 != 0) yCellCount++;
         int yccHalf = yCellCount / 2;
 
@@ -94,7 +94,7 @@ void NavMesh::compute(const atomic_bool &cancel) {
         }
     }
 
-    int vertexCount = _vertices.size();
+    int vertexCount = static_cast<int>(_vertices.size());
 
     for (int i = 0; i < vertexCount - 1; ++i) {
         for (int j = i + 1; j < vertexCount; ++j) {

@@ -37,8 +37,8 @@ namespace reone {
 namespace gui {
 
 GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
-    _screenCenter.x = 0.5f * _gfxOpts.width;
-    _screenCenter.y = 0.5f * _gfxOpts.height;
+    _screenCenter.x = _gfxOpts.width / 2;
+    _screenCenter.y = _gfxOpts.height / 2;
 }
 
 void GUI::load(const string &resRef, BackgroundType background) {
@@ -51,8 +51,8 @@ void GUI::load(const string &resRef, BackgroundType background) {
 
     switch (_scaling) {
         case ScalingMode::Center:
-            _controlOffset.x = _screenCenter.x - 0.5f * _resolutionX;
-            _controlOffset.y = _screenCenter.y - 0.5f * _resolutionY;
+            _controlOffset.x = _screenCenter.x - _resolutionX / 2;
+            _controlOffset.y = _screenCenter.y - _resolutionY / 2;
             break;
         case ScalingMode::Stretch:
             stretchControl(*_rootControl);
@@ -129,7 +129,7 @@ void GUI::loadBackground(BackgroundType type) {
 bool GUI::handle(const SDL_Event &event) {
     switch (event.type) {
         case SDL_MOUSEMOTION: {
-            glm::vec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
+            glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
             updateFocus(ctrlCoords.x, ctrlCoords.y);
             if (_focus) {
                 _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
@@ -139,7 +139,7 @@ bool GUI::handle(const SDL_Event &event) {
         case SDL_MOUSEBUTTONUP:
             if (_focus && event.button.button == SDL_BUTTON_LEFT) {
                 debug("GUI: control clicked on: " + _focus->tag());
-                glm::vec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
+                glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 return _focus->handleClick(ctrlCoords.x, ctrlCoords.y);
             }
             break;

@@ -390,7 +390,7 @@ void Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float dis
 void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     glm::vec3 origin(creature.position());
     shared_ptr<Creature::Path> path(creature.path());
-    int pointCount = path->points.size();
+    size_t pointCount = path->points.size();
     glm::vec3 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
 
     if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
@@ -404,7 +404,7 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
 }
 
 void Area::selectNextPathPoint(Creature::Path &path) {;
-    int pointCount = path.points.size();
+    size_t pointCount = path.points.size();
     if (path.pointIdx < pointCount) path.pointIdx++;
 }
 

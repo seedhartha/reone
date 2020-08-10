@@ -52,8 +52,8 @@ void Font::load(const shared_ptr<Texture> &texture) {
     _glyphWidths.resize(_glyphCount);
 
     for (int i = 0; i < _glyphCount; ++i) {
-        glm::highp_dvec3 ul(features.upperLeftCoords[i]);
-        glm::highp_dvec3 lr(features.lowerRightCoords[i]);
+        glm::vec3 ul(features.upperLeftCoords[i]);
+        glm::vec3 lr(features.lowerRightCoords[i]);
 
         float w = lr.x - ul.x;
         float h = ul.y - lr.y;

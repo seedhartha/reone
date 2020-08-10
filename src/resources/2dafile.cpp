@@ -51,7 +51,7 @@ const string &TwoDaTable::getString(int row, const string &column) const {
     if (it == _headers.end()) {
         throw logic_error("2DA: column not found: " + column);
     }
-    int idx = distance(_headers.begin(), it);
+    int idx = static_cast<int>(distance(_headers.begin(), it));
 
     return _rows[row].values[idx];
 }
@@ -78,8 +78,8 @@ float TwoDaTable::getFloat(int row, const string &column, float defValue) const 
 }
 
 const string &TwoDaTable::getStringFromRowByColumnValue(const string &column, const string &rowByColumn, const string &columnValue, const string &defValue) const {
-    int columnIdx = distance(_headers.begin(), find(_headers.begin(), _headers.end(), column));
-    int rowByColumnIdx = distance(_headers.begin(), find(_headers.begin(), _headers.end(), rowByColumn));
+    int columnIdx = static_cast<int>(distance(_headers.begin(), find(_headers.begin(), _headers.end(), column)));
+    int rowByColumnIdx = static_cast<int>(distance(_headers.begin(), find(_headers.begin(), _headers.end(), rowByColumn)));
 
     for (auto &row : _rows) {
         if (row.values[rowByColumnIdx] == columnValue) {
@@ -153,7 +153,7 @@ void TwoDaFile::loadLabels() {
 void TwoDaFile::loadRows() {
     _table->_rows.reserve(_rowCount);
 
-    int columnCount = _table->_headers.size();
+    int columnCount = static_cast<int>(_table->_headers.size());
     int cellCount = _rowCount * columnCount;
     vector<uint16_t> offsets(cellCount);
 

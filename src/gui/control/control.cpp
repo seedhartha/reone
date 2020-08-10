@@ -211,7 +211,7 @@ void Control::initGL() {
     if (_text.font) _text.font->initGL();
 }
 
-void Control::render(const glm::vec2 &offset, const string &textOverride) const {
+void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -233,7 +233,7 @@ void Control::render(const glm::vec2 &offset, const string &textOverride) const 
     }
 }
 
-void Control::drawBorder(const Border &border, const glm::vec2 &offset) const {
+void Control::drawBorder(const Border &border, const glm::ivec2 &offset) const {
     ShaderManager &shaders = ShaderManager::instance();
     GUIQuad &quad = GUIQuad::instance();
 
@@ -352,9 +352,9 @@ void Control::drawBorder(const Border &border, const glm::vec2 &offset) const {
     }
 }
 
-void Control::drawText(const string &text, const glm::vec2 &offset) const {
+void Control::drawText(const string &text, const glm::ivec2 &offset) const {
     float textWidth = _text.font->measure(text);
-    int lineCount = glm::ceil(textWidth / static_cast<float>(_extent.width));
+    int lineCount = static_cast<int>(glm::ceil(textWidth / static_cast<float>(_extent.width)));
 
     TextGravity gravity;
     switch (_text.align) {
@@ -366,7 +366,7 @@ void Control::drawText(const string &text, const glm::vec2 &offset) const {
             break;
     }
 
-    glm::vec2 position;
+    glm::ivec2 position;
     glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
     if (lineCount == 1) {
@@ -376,11 +376,11 @@ void Control::drawText(const string &text, const glm::vec2 &offset) const {
 
     } else {
         vector<string> lines(breakText(text, _extent.width));
-        getTextPosition(position, lines.size());
+        getTextPosition(position, static_cast<int>(lines.size()));
 
         for (auto &line : lines) {
             glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
-            position.y += _text.font->height();
+            position.y += static_cast<int>(_text.font->height());
             _text.font->render(line, transform, color, gravity);
         }
     }
@@ -411,13 +411,13 @@ vector<string> Control::breakText(const string &text, int maxWidth) const {
     return move(lines);
 }
 
-void Control::getTextPosition(glm::vec2 &position, int lineCount) const {
+void Control::getTextPosition(glm::ivec2 &position, int lineCount) const {
     switch (_text.align) {
         case TextAlign::CenterBottom:
-            position.y = _extent.top + _extent.height - (lineCount - 0.5f) * _text.font->height();
+            position.y = _extent.top + _extent.height - static_cast<int>((lineCount - 0.5f) * _text.font->height());
             break;
         default:
-            position.y = _extent.top + 0.5f * _extent.height;
+            position.y = _extent.top + _extent.height / 2;
             break;
     }
     switch (_text.align) {
@@ -425,16 +425,16 @@ void Control::getTextPosition(glm::vec2 &position, int lineCount) const {
             position.x = _extent.left;
             break;
         default:
-            position.x = _extent.left + 0.5f * _extent.width;
+            position.x = _extent.left + _extent.width / 2;
             break;
     }
 }
 
 void Control::stretch(float x, float y) {
-    _extent.left *= x;
-    _extent.top *= y;
-    _extent.width *= x;
-    _extent.height *= y;
+    _extent.left = static_cast<int>(_extent.left * x);
+    _extent.top = static_cast<int>(_extent.top * y);
+    _extent.width = static_cast<int>(_extent.width * x);
+    _extent.height = static_cast<int>(_extent.height * y);
     updateTransform();
 }
 

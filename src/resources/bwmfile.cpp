@@ -54,7 +54,7 @@ void BwmFile::loadVertices() {
     _vertices.reserve(3 * _vertexCount);
     seek(_vertexOffset);
 
-    for (int i = 0; i < _vertexCount; ++i) {
+    for (uint32_t i = 0; i < _vertexCount; ++i) {
         _vertices.push_back(readFloat());
         _vertices.push_back(readFloat());
         _vertices.push_back(readFloat());
@@ -65,7 +65,7 @@ void BwmFile::loadFaces() {
     _indices.reserve(3 * _faceCount);
     seek(_faceOffset);
 
-    for (int i = 0; i < _faceCount; ++i) {
+    for (uint32_t i = 0; i < _faceCount; ++i) {
         _indices.push_back(readUint32());
         _indices.push_back(readUint32());
         _indices.push_back(readUint32());
@@ -76,7 +76,7 @@ void BwmFile::loadFaceTypes() {
     _faceTypes.reserve(_faceCount);
     seek(_faceTypeOffset);
 
-    for (int i = 0; i < _faceCount; ++i) {
+    for (uint32_t i = 0; i < _faceCount; ++i) {
         _faceTypes.push_back(readUint32());
     }
 }
@@ -86,11 +86,11 @@ void BwmFile::makeWalkmesh() {
     _walkmesh->_vertices.reserve(_vertexCount);
     _walkmesh->_walkableFaces.reserve(_faceCount);
 
-    for (int i = 0; i < 3 * _vertexCount; i += 3) {
+    for (uint32_t i = 0; i < 3 * _vertexCount; i += 3) {
         _walkmesh->_vertices.push_back(glm::make_vec3(&_vertices[i]));
     }
 
-    for (int i = 0; i < _faceCount; ++i) {
+    for (uint32_t i = 0; i < _faceCount; ++i) {
         uint32_t type = _faceTypes[i];
         bool walkable = find(g_walkableTypes.begin(), g_walkableTypes.end(), type) != g_walkableTypes.end();
 

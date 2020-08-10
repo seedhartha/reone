@@ -26,8 +26,8 @@ namespace reone {
 namespace game {
 
 static void putString(const string &s, ByteArray &arr) {
-    int off = arr.size();
-    int len = s.length();
+    int off = static_cast<int>(arr.size());
+    int len = static_cast<int>(s.length());
     arr.resize(off + len + 1);
     arr[off++] = len;
     if (len > 0) {
@@ -154,7 +154,7 @@ ByteArray Command::bytes() const {
             putFloat(_position.y, data);
             putFloat(_position.z, data);
             putFloat(_heading, data);
-            putUint8(_equipment.size(), data);
+            putUint8(static_cast<uint8_t>(_equipment.size()), data);
             for (auto &item : _equipment) {
                 putString(item, data);
             }

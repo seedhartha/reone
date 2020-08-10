@@ -88,7 +88,7 @@ int ScriptExecution::run() {
     if (_context.savedState) {
         vector<Variable> globals(_context.savedState->globals);
         copy(globals.begin(), globals.end(), back_inserter(_stack));
-        _globalCount = _stack.size();
+        _globalCount = static_cast<int>(_stack.size());
 
         vector<Variable> locals(_context.savedState->locals);
         copy(locals.begin(), locals.end(), back_inserter(_stack));
@@ -120,8 +120,8 @@ void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
     int count = ins.size / 4;
     assert(count == 1);
 
-    int srcIdx = _stack.size() - count;
-    int dstIdx = _stack.size() + ins.stackOffset / 4;
+    int srcIdx = static_cast<int>(_stack.size()) - count;
+    int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
     for (int i = 0; i < count; ++i) {
         _stack[dstIdx++] = _stack[srcIdx++];
@@ -166,7 +166,7 @@ void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
     int count = ins.size / 4;
     assert(count == 1);
 
-    int srcIdx = _stack.size() + ins.stackOffset / 4;
+    int srcIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
     for (int i = 0; i < count; ++i) {
         _stack.push_back(_stack[srcIdx++]);
@@ -478,12 +478,12 @@ void ScriptExecution::executeReturn(const Instruction &ins) {
 }
 
 void ScriptExecution::executeDecRelToSP(const Instruction &ins) {
-    int dstIdx = _stack.size() + ins.stackOffset / 4;
+    int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
 }
 
 void ScriptExecution::executeIncRelToSP(const Instruction &ins) {
-    int dstIdx = _stack.size() + ins.stackOffset / 4;
+    int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue++;
 }
 
@@ -541,7 +541,7 @@ void ScriptExecution::executeIncRelToBP(const Instruction &ins) {
 void ScriptExecution::executeSaveBP(const Instruction &ins) {
     assert(!_stack.empty());
     _savedGlobalCount = _globalCount;
-    _globalCount = _stack.size();
+    _globalCount = static_cast<int>(_stack.size());
 }
 
 void ScriptExecution::executeRestoreBP(const Instruction &ins) {
@@ -558,7 +558,7 @@ void ScriptExecution::executeStoreState(const Instruction &ins) {
     }
 
     count = ins.sizeLocals / 4;
-    srcIdx = _stack.size() - count;
+    srcIdx = static_cast<int>(_stack.size()) - count;
 
     _savedState.locals.clear();
     for (int i = 0; i < count; ++i) {

@@ -24,7 +24,7 @@ using namespace std;
 
 namespace reone {
 
-static default_random_engine g_generator(time(nullptr));
+static default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
 
 int random(int min, int max) {
     uniform_int_distribution<int> dist(min, max);

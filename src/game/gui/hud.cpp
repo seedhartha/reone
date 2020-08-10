@@ -140,7 +140,7 @@ string HUD::getResRef(GameVersion version) const {
 }
 
 void HUD::update(const HudContext &ctx) {
-    int partySize = ctx.partyPortraits.size();
+    size_t partySize = ctx.partyPortraits.size();
     if (partySize > 0) {
         Control &label = getControl("LBL_CHAR1");
         label.border().fill = ctx.partyPortraits[0];

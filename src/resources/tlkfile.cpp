@@ -51,7 +51,7 @@ void TlkFile::loadStrings() {
     _table = make_shared<TalkTable>();
     _table->_strings.reserve(_stringCount);
 
-    for (int i = 0; i < _stringCount; ++i) {
+    for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
 
         string soundResRef(readFixedString(16));

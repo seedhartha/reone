@@ -37,7 +37,7 @@ void AudioStream::fill(int frameIdx, uint32_t buffer) {
         throw out_of_range("Frame index out of range: " + to_string(frameIdx));
     }
     Frame &frame = _frames[frameIdx];
-    alBufferData(buffer, getALAudioFormat(frame.format), &frame.samples[0], frame.samples.size(), frame.sampleRate);
+    alBufferData(buffer, getALAudioFormat(frame.format), &frame.samples[0], static_cast<int>(frame.samples.size()), frame.sampleRate);
 }
 
 int AudioStream::getALAudioFormat(AudioFormat format) const {
@@ -56,7 +56,7 @@ int AudioStream::getALAudioFormat(AudioFormat format) const {
 }
 
 int AudioStream::frameCount() const {
-    return _frames.size();
+    return static_cast<int>(_frames.size());
 }
 
 const AudioStream::Frame &AudioStream::getFrame(int index) const {
