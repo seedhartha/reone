@@ -26,9 +26,9 @@ namespace reone {
 
 namespace game {
 
-class PortraitsGui : public gui::GUI {
+class PortraitSelectionGui : public gui::GUI {
 public:
-    PortraitsGui(const render::GraphicsOptions &opts);
+    PortraitSelectionGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
     void loadPortraits(const CharacterConfiguration &info);
