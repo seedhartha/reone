@@ -92,7 +92,7 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
-    _appearance = row;
+    _config.appearance = row;
     _modelType = parseModelType(table.getString(row, "modeltype"));
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
     _runSpeed = table.getFloat(row, "rundist", 0.0f);
@@ -191,14 +191,10 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
     }
 }
 
-void Creature::load(int appearance, const glm::vec3 &position, float heading) {
-    _position = position;
-    _heading = heading;
-    updateTransform();
-
+void Creature::load(const CreatureConfiguration &config) {
     shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
-    loadAppearance(*appearanceTable, appearance);
-    loadPortrait(appearance);
+    loadAppearance(*appearanceTable, config.appearance);
+    loadPortrait(config.appearance);
 }
 
 void Creature::loadPortrait(int appearance) {
@@ -352,8 +348,16 @@ void Creature::setPathUpdating() {
     _pathUpdating = true;
 }
 
+Gender Creature::gender() const {
+    return _config.gender;
+}
+
+int Creature::getClassLevel(ClassType clazz) const {
+    return _config.clazz == clazz ? 1 : 0;
+}
+
 int Creature::appearance() const {
-    return _appearance;
+    return _config.appearance;
 }
 
 shared_ptr<Texture> Creature::portrait() const {

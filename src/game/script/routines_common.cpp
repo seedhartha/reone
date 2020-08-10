@@ -19,6 +19,8 @@
 
 #include "SDL2/SDL_timer.h"
 
+#include "../object/creature.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -96,20 +98,23 @@ Variable RoutineManager::getLevelByClass(const vector<Variable> &args, Execution
         args[0].type == VariableType::Int &&
         args[1].type == VariableType::Object);
 
-    int clazz = args[0].intValue;
-    int objectId = args.size() < 2 ? 0 : args[1].objectId;
+    ClassType clazz = static_cast<ClassType>(args[0].intValue);
 
-    // TODO: return value based on class
+    int objectId = args.size() < 2 ? kObjectSelf : args[1].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    Creature &creature = static_cast<Creature &>(*object);
 
-    return Variable(1);
+    return Variable(creature.getClassLevel(clazz));
 }
 
 Variable RoutineManager::getGender(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
 
     int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    Creature &creature = static_cast<Creature &>(*object);
 
-    return Variable();
+    return Variable(static_cast<int>(creature.gender()));
 }
 
 Variable RoutineManager::actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -117,7 +122,6 @@ Variable RoutineManager::actionStartConversation(const vector<Variable> &args, E
 
     int objectId = args[0].objectId;
     string resRef(args.size() >= 2 ? args[1].strValue : "");
-
     _callbacks->startDialog(objectId, resRef);
 
     return Variable();

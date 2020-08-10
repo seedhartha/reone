@@ -56,6 +56,7 @@ public:
     bool handle(const SDL_Event &event) override;
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
+    std::shared_ptr<Object> getObjectById(uint32_t id) override;
     std::shared_ptr<Object> getObjectByTag(const std::string &tag) override;
     std::shared_ptr<Object> getPlayer() override;
     void startDialog(uint32_t objectId, const std::string &resRef) override;

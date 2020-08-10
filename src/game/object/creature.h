@@ -56,17 +56,24 @@ public:
 
     Creature(uint32_t id);
 
+    // Loading
     void load(const resources::GffStruct &gffs);
-    void load(int appearance, const glm::vec3 &position, float heading);
+    void load(const CreatureConfiguration &config);
 
     void initGL() override;
+
+    void equip(const std::string &resRef);
+
+    // Animations
     void playDefaultAnimation();
     void playGreetingAnimation();
     void playTalkAnimation();
+
+    // Actions
     void clearActions();
     void enqueue(const Action &action);
-    void equip(const std::string &resRef);
 
+    // Load/save
     void saveTo(AreaState &state) const override;
     void loadState(const AreaState &state) override;
 
@@ -77,6 +84,8 @@ public:
     void setPathUpdating();
 
     // Getters
+    Gender gender() const;
+    int getClassLevel(ClassType clazz) const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
     const std::string &conversation() const;
@@ -97,7 +106,7 @@ private:
         Character
     };
 
-    int _appearance { 0 };
+    CreatureConfiguration _config;
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
     std::map<InventorySlot, std::shared_ptr<Item>> _equipment;

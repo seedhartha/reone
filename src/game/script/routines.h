@@ -51,9 +51,6 @@ private:
 
     RoutineManager &operator=(const RoutineManager &) = delete;
 
-    void addKotorRoutines();
-    void addTslRoutines();
-
     void add(const std::string &name, script::VariableType retType, const std::vector<script::VariableType> &argTypes);
 
     void add(
@@ -61,6 +58,11 @@ private:
         script::VariableType retType,
         const std::vector<script::VariableType> &argTypes,
         const std::function<script::Variable(const std::vector<script::Variable>&, script::ExecutionContext &ctx)> &fn);
+
+    void addKotorRoutines();
+    void addTslRoutines();
+
+    std::shared_ptr<Object> getObjectById(uint32_t id, const script::ExecutionContext &ctx) const;
 
     script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);

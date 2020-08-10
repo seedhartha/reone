@@ -235,13 +235,12 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
     }
 }
 
-shared_ptr<Creature> Area::makeCharacter(const CharacterConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
-    int appearance = character.appearance;
-    if (appearance == 0) appearance = kRevanAppearance;
-
+shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
     shared_ptr<Creature> creature(makeCreature());
     creature->setTag(tag);
-    creature->load(appearance, position, heading);
+    creature->load(character);
+    creature->setPosition(position);
+    creature->setHeading(heading);
 
     return move(creature);
 }

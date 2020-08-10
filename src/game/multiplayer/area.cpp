@@ -83,7 +83,12 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
         creature->equip(item);
     }
 
-    creature->load(cmd.appearance(), cmd.position(), cmd.heading());
+    CreatureConfiguration config;
+    config.appearance = cmd.appearance();
+
+    creature->load(move(config));
+    creature->setPosition(cmd.position());
+    creature->setHeading(cmd.heading());
     creature->initGL();
 
     switch (cmd.role()) {

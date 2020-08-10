@@ -34,6 +34,7 @@ public:
     }
 
     virtual void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) = 0;
+    virtual std::shared_ptr<Object> getObjectById(uint32_t id) = 0;
     virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag) = 0;
     virtual std::shared_ptr<Object> getPlayer() = 0;
     virtual void startDialog(uint32_t objectId, const std::string &resRef) = 0;
