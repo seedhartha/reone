@@ -24,7 +24,7 @@
 #include "../render/camera/camera.h"
 #include "../render/types.h"
 #include "../resources/types.h"
-#include "../script/manager.h"
+#include "../script/scripts.h"
 #include "../script/variable.h"
 
 #include "multiplayer/command.h"

@@ -196,7 +196,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
 }
 
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
-    const RoutineDecl &routine = RoutineMan.get(ins.routine);
+    const Routine &routine = RoutineMan.get(ins.routine);
     debug("Script: calling routine " + routine.name());
 
     vector<Variable> args;
