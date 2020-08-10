@@ -145,7 +145,7 @@ private:
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _onStartDialog;
 
-    std::shared_ptr<Creature> makeCharacter(const CharacterConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
+    std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedActions();
     void navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);

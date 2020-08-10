@@ -94,7 +94,7 @@ void Game::loadClassSelectionGui() {
     unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_opts.graphics));
     gui->load(_version);
     gui->initGL();
-    gui->setOnClassSelected([this](const CharacterConfiguration &character) {
+    gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();
         if (!_portraitsGui) loadPortraitsGui();
         _portraitsGui->loadPortraits(character);
@@ -111,7 +111,7 @@ void Game::loadPortraitsGui() {
     unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_opts.graphics));
     gui->load(_version);
     gui->initGL();
-    gui->setOnPortraitSelected([this](const CharacterConfiguration &character) {
+    gui->setOnPortraitSelected([this](const CreatureConfiguration &character) {
         _portraitsGui->resetFocus();
         string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
@@ -301,6 +301,10 @@ bool Game::handle(const SDL_Event &event) {
 
 void Game::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
     _module->area().delayAction(timestamp, ctx);
+}
+
+shared_ptr<Object> Game::getObjectById(uint32_t id) {
+    return _module->area().find(id);
 }
 
 shared_ptr<Object> Game::getObjectByTag(const string &tag) {

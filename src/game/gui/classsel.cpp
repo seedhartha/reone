@@ -161,7 +161,7 @@ void ClassSelectionGui::onClick(const string &control) {
     if (idx != -1) {
         ClassButton &button = _classButtons[idx];
         if (_onClassSelected) {
-            CharacterConfiguration character;
+            CreatureConfiguration character;
             character.gender = button.gender;
             character.clazz = button.clazz;
             _onClassSelected(move(character));
@@ -173,7 +173,7 @@ void ClassSelectionGui::onClick(const string &control) {
     }
 }
 
-void ClassSelectionGui::setOnClassSelected(const function<void(const CharacterConfiguration &)> &fn) {
+void ClassSelectionGui::setOnClassSelected(const function<void(const CreatureConfiguration &)> &fn) {
     _onClassSelected = fn;
 }
 

@@ -32,7 +32,7 @@ public:
 
     void load(resources::GameVersion version);
 
-    void setOnClassSelected(const std::function<void(const CharacterConfiguration &)> &fn);
+    void setOnClassSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
 
 private:
@@ -47,7 +47,7 @@ private:
     glm::vec2 _defaultButtonSize { 0.0f };
     glm::vec2 _enlargedButtonSize { 0.0f };
     std::vector<ClassButton> _classButtons;
-    std::function<void(const CharacterConfiguration &)> _onClassSelected;
+    std::function<void(const CreatureConfiguration &)> _onClassSelected;
     std::function<void()> _onCancel;
 
     void configureClassButtons();

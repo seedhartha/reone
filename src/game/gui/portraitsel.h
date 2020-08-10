@@ -31,9 +31,9 @@ public:
     PortraitSelectionGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void loadPortraits(const CharacterConfiguration &info);
+    void loadPortraits(const CreatureConfiguration &info);
 
-    void setOnPortraitSelected(const std::function<void(const CharacterConfiguration &)> &fn);
+    void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
 
 private:
@@ -46,10 +46,10 @@ private:
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
-    CharacterConfiguration _character;
+    CreatureConfiguration _character;
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };
-    std::function<void(const CharacterConfiguration &)> _onPortraitSelected;
+    std::function<void(const CreatureConfiguration &)> _onPortraitSelected;
     std::function<void()> _onCancel;
 
     void setButtonColors(const std::string &tag);

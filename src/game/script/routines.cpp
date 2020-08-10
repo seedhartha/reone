@@ -76,6 +76,25 @@ const Routine &RoutineManager::get(int index) {
     return _routines[index];
 }
 
+shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
+    uint32_t finalId = 0;
+
+    switch (id) {
+        case kObjectSelf:
+            finalId = ctx.callerId;
+            break;
+        case kObjectInvalid:
+        case kObjectModule:
+        case kObjectArea:
+            throw logic_error("Invalid object id: " + to_string(id));
+        default:
+            finalId = id;
+            break;
+    }
+
+    return _callbacks->getObjectById(finalId);
+}
+
 } // namespace game
 
 } // namespace reone

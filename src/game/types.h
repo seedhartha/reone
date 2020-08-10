@@ -133,7 +133,7 @@ struct Options {
     bool debug { false };
 };
 
-struct CharacterConfiguration {
+struct CreatureConfiguration {
     Gender gender { Gender::Male };
     ClassType clazz { ClassType::Soldier };
     int appearance { 0 };
@@ -141,9 +141,9 @@ struct CharacterConfiguration {
 
 struct PartyConfiguration {
     int memberCount { 0 };
-    CharacterConfiguration leader;
-    CharacterConfiguration member1;
-    CharacterConfiguration member2;
+    CreatureConfiguration leader;
+    CreatureConfiguration member1;
+    CreatureConfiguration member2;
 };
 
 struct UpdateContext {

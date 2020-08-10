@@ -71,7 +71,7 @@ void PortraitSelectionGui::setButtonColors(const string &tag) {
     control.setHilight(move(hilight));
 }
 
-void PortraitSelectionGui::loadPortraits(const CharacterConfiguration &info) {
+void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
     if (!_portraits.empty() && info.gender == _character.gender) return;
 
     _character = info;
@@ -148,7 +148,7 @@ void PortraitSelectionGui::onClick(const string &control) {
                     appearance = _portraits[_currentPortrait].appearanceNumber;
                     break;
             }
-            CharacterConfiguration charGenInfo(_character);
+            CreatureConfiguration charGenInfo(_character);
             charGenInfo.appearance = appearance;
             _onPortraitSelected(charGenInfo);
         }
@@ -158,7 +158,7 @@ void PortraitSelectionGui::onClick(const string &control) {
     }
 }
 
-void PortraitSelectionGui::setOnPortraitSelected(const function<void(const CharacterConfiguration &)> &fn) {
+void PortraitSelectionGui::setOnPortraitSelected(const function<void(const CreatureConfiguration &)> &fn) {
     _onPortraitSelected = fn;
 }
 
