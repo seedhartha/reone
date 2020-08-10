@@ -30,7 +30,7 @@
 #include "../core/streamutil.h"
 #include "../render/mesh/aabb.h"
 #include "../resources/lytfile.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 #include "../resources/visfile.h"
 #include "../script/execution.h"
 

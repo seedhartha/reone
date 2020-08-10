@@ -23,7 +23,7 @@
 
 #include "../core/log.h"
 
-#include "manager.h"
+#include "resources.h"
 
 using namespace std;
 

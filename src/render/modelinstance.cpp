@@ -22,7 +22,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../core/log.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 
 #include "mesh/aabb.h"
 

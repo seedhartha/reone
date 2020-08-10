@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 using namespace std;
 

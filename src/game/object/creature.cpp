@@ -22,7 +22,7 @@
 #include "../../core/log.h"
 #include "../../core/streamutil.h"
 #include "../../net/types.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 #include "../templates.h"
 

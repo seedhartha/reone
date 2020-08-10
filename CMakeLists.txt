@@ -119,10 +119,10 @@ set(HEADERS
     src/resources/gfffile.h
     src/resources/keyfile.h
     src/resources/lytfile.h
-    src/resources/manager.h
     src/resources/mdlfile.h
     src/resources/mp3file.h
     src/resources/ncsfile.h
+    src/resources/resources.h
     src/resources/rimfile.h
     src/resources/tgafile.h
     src/resources/tlkfile.h
@@ -218,10 +218,10 @@ set(SOURCES
     src/resources/gfffile.cpp
     src/resources/keyfile.cpp
     src/resources/lytfile.cpp
-    src/resources/manager.cpp
     src/resources/mdlfile.cpp
     src/resources/mp3file.cpp
     src/resources/ncsfile.cpp
+    src/resources/resources.cpp
     src/resources/rimfile.cpp
     src/resources/tgafile.cpp
     src/resources/tlkfile.cpp

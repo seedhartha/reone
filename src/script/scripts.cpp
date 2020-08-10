@@ -21,7 +21,7 @@
 
 #include "../core/log.h"
 #include "../core/streamutil.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 #include "../resources/ncsfile.h"
 
 using namespace std;
