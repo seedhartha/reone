@@ -52,12 +52,12 @@ set(HEADERS
     src/game/area.h
     src/game/dialog.h
     src/game/game.h
-    src/game/gui/classselection.h
+    src/game/gui/classsel.h
     src/game/gui/debug.h
     src/game/gui/dialog.h
     src/game/gui/hud.h
     src/game/gui/mainmenu.h
-    src/game/gui/portraits.h
+    src/game/gui/portraitsel.h
     src/game/item.h
     src/game/navmesh.h
     src/game/module.h
@@ -152,13 +152,13 @@ set(SOURCES
     src/game/area.cpp
     src/game/dialog.cpp
     src/game/game.cpp
-    src/game/gui/classselection.cpp
+    src/game/gui/classsel.cpp
     src/game/gui/colors.cpp
     src/game/gui/debug.cpp
     src/game/gui/dialog.cpp
     src/game/gui/hud.cpp
     src/game/gui/mainmenu.cpp
-    src/game/gui/portraits.cpp
+    src/game/gui/portraitsel.cpp
     src/game/item.cpp
     src/game/module.cpp
     src/game/multiplayer/area.cpp

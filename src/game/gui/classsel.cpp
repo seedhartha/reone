@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "classselection.h"
+#include "classsel.h"
 
 #include "../../resources/resources.h"
 

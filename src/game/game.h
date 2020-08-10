@@ -22,12 +22,12 @@
 #include "../render/window.h"
 #include "../resources/types.h"
 
-#include "gui/classselection.h"
+#include "gui/classsel.h"
 #include "gui/debug.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
-#include "gui/portraits.h"
+#include "gui/portraitsel.h"
 
 #include "module.h"
 
@@ -72,7 +72,7 @@ private:
         None,
         MainMenu,
         ClassSelection,
-        Portraits,
+        PortraitSelection,
         InGame,
         Dialog
     };
@@ -87,11 +87,11 @@ private:
 
     // GUI
     std::shared_ptr<MainMenu> _mainMenu;
-    std::shared_ptr<ClassSelectionGui> _classSelection;
-    std::shared_ptr<PortraitsGui> _portraits;
+    std::shared_ptr<ClassSelectionGui> _classesGui;
+    std::shared_ptr<PortraitSelectionGui> _portraitsGui;
     std::shared_ptr<HUD> _hud;
-    std::shared_ptr<DialogGui> _dialog;
-    std::shared_ptr<DebugGui> _debug;
+    std::shared_ptr<DialogGui> _dialogGui;
+    std::shared_ptr<DebugGui> _debugGui;
 
     void loadMainMenu();
     void loadClassSelectionGui();

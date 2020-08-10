@@ -80,7 +80,7 @@ void Game::loadMainMenu() {
     mainMenu->initGL();
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
-        if (!_classSelection) loadClassSelectionGui();
+        if (!_classesGui) loadClassSelectionGui();
         _screen = Screen::ClassSelection;
     });
     mainMenu->setOnExit([this]() { _quit = true; });
@@ -93,24 +93,24 @@ void Game::loadClassSelectionGui() {
     gui->load(_version);
     gui->initGL();
     gui->setOnClassSelected([this](const CharacterConfiguration &character) {
-        _classSelection->resetFocus();
-        if (!_portraits) loadPortraitsGui();
-        _portraits->loadPortraits(character);
-        _screen = Screen::Portraits;
+        _classesGui->resetFocus();
+        if (!_portraitsGui) loadPortraitsGui();
+        _portraitsGui->loadPortraits(character);
+        _screen = Screen::PortraitSelection;
     });
     gui->setOnCancel([this]() {
-        _classSelection->resetFocus();
+        _classesGui->resetFocus();
         _screen = Screen::MainMenu;
     });
-    _classSelection = move(gui);
+    _classesGui = move(gui);
 }
 
 void Game::loadPortraitsGui() {
-    unique_ptr<PortraitsGui> gui(new PortraitsGui(_opts.graphics));
+    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_opts.graphics));
     gui->load(_version);
     gui->initGL();
     gui->setOnPortraitSelected([this](const CharacterConfiguration &character) {
-        _portraits->resetFocus();
+        _portraitsGui->resetFocus();
         string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
         PartyConfiguration party;
@@ -121,7 +121,7 @@ void Game::loadPortraitsGui() {
     gui->setOnCancel([this]() {
         _screen = Screen::ClassSelection;
     });
-    _portraits = move(gui);
+    _portraitsGui = move(gui);
 }
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
@@ -146,8 +146,8 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     }
 
     if (!_hud) loadHUD();
-    if (!_debug) loadDebugGui();
-    if (!_dialog) loadDialogGui();
+    if (!_debugGui) loadDebugGui();
+    if (!_dialogGui) loadDialogGui();
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
@@ -164,7 +164,7 @@ void Game::loadDebugGui() {
     unique_ptr<DebugGui> debug(new DebugGui(_opts.graphics));
     debug->load();
     debug->initGL();
-    _debug = move(debug);
+    _debugGui = move(debug);
 }
 
 void Game::loadDialogGui() {
@@ -191,7 +191,7 @@ void Game::loadDialogGui() {
     dialog->setOnDialogFinished([this]() {
         _screen = Screen::InGame;
     });
-    _dialog = move(dialog);
+    _dialogGui = move(dialog);
 }
 
 const shared_ptr<Module> Game::makeModule(const string &name) {
@@ -208,7 +208,7 @@ void Game::configureModule() {
     });
     _module->setStartDialog([this](const Object &object, const string &resRef) {
         _screen = Screen::Dialog;
-        _dialog->startDialog(object, resRef);
+        _dialogGui->startDialog(object, resRef);
     });
 }
 
@@ -239,7 +239,7 @@ void Game::update() {
             _hud->update(guiCtx.hud);
         }
 
-        _debug->update(guiCtx.debug);
+        _debugGui->update(guiCtx.debug);
     }
 }
 
@@ -271,13 +271,13 @@ shared_ptr<GUI> Game::currentGUI() const {
         case Screen::MainMenu:
             return _mainMenu;
         case Screen::ClassSelection:
-            return _classSelection;
-        case Screen::Portraits:
-            return _portraits;
+            return _classesGui;
+        case Screen::PortraitSelection:
+            return _portraitsGui;
         case Screen::InGame:
             return _hud;
         case Screen::Dialog:
-            return _dialog;
+            return _dialogGui;
         default:
             return nullptr;
     }
@@ -311,7 +311,7 @@ void Game::renderWorld() {
 void Game::renderGUI() {
     switch (_screen) {
         case Screen::InGame:
-            _debug->render();
+            _debugGui->render();
             if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
             break;
         default:

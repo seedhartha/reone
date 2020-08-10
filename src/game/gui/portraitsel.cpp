@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "portraits.h"
+#include "portraitsel.h"
 
 #include "../../core/random.h"
 #include "../../resources/resources.h"
@@ -32,10 +32,10 @@ namespace reone {
 
 namespace game {
 
-PortraitsGui::PortraitsGui(const GraphicsOptions &opts) : GUI(opts) {
+PortraitSelectionGui::PortraitSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
 }
 
-void PortraitsGui::load(GameVersion version) {
+void PortraitSelectionGui::load(GameVersion version) {
     string resRef;
     BackgroundType background;
 
@@ -59,7 +59,7 @@ void PortraitsGui::load(GameVersion version) {
     setButtonColors("BTN_BACK");
 }
 
-void PortraitsGui::setButtonColors(const string &tag) {
+void PortraitSelectionGui::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
@@ -71,7 +71,7 @@ void PortraitsGui::setButtonColors(const string &tag) {
     control.setHilight(move(hilight));
 }
 
-void PortraitsGui::loadPortraits(const CharacterConfiguration &info) {
+void PortraitSelectionGui::loadPortraits(const CharacterConfiguration &info) {
     if (!_portraits.empty() && info.gender == _character.gender) return;
 
     _character = info;
@@ -111,7 +111,7 @@ void PortraitsGui::loadPortraits(const CharacterConfiguration &info) {
     loadCurrentPortrait();
 }
 
-void PortraitsGui::loadCurrentPortrait() {
+void PortraitSelectionGui::loadCurrentPortrait() {
     Control &control = getControl("LBL_PORTRAIT");
 
     Control::Border border(control.border());
@@ -120,7 +120,7 @@ void PortraitsGui::loadCurrentPortrait() {
     control.setBorder(move(border));
 }
 
-void PortraitsGui::onClick(const string &control) {
+void PortraitSelectionGui::onClick(const string &control) {
     int portraitCount = static_cast<int>(_portraits.size());
 
     if (control == "BTN_ARRL") {
@@ -158,11 +158,11 @@ void PortraitsGui::onClick(const string &control) {
     }
 }
 
-void PortraitsGui::setOnPortraitSelected(const function<void(const CharacterConfiguration &)> &fn) {
+void PortraitSelectionGui::setOnPortraitSelected(const function<void(const CharacterConfiguration &)> &fn) {
     _onPortraitSelected = fn;
 }
 
-void PortraitsGui::setOnCancel(const function<void()> &fn) {
+void PortraitSelectionGui::setOnCancel(const function<void()> &fn) {
     _onCancel = fn;
 }
 
