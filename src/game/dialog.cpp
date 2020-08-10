@@ -33,9 +33,12 @@ void Dialog::reset() {
     _entries.clear();
     _replies.clear();
     _startEntries.clear();
+    _endScript.clear();
 }
 
 void Dialog::load(const string &resRef, const GffStruct &dlg) {
+    _endScript = dlg.getString("EndConversation");
+
     for (auto &entry : dlg.getList("EntryList")) {
         _entries.push_back(getEntryReply(entry));
     }
@@ -98,6 +101,10 @@ const Dialog::EntryReply &Dialog::getEntry(int index) const {
 const Dialog::EntryReply &Dialog::getReply(int index) const {
     assert(index >= 0 && index < _replies.size());
     return _replies[index];
+}
+
+const string &Dialog::endScript() const {
+    return _endScript;
 }
 
 } // namespace game
