@@ -24,7 +24,7 @@
 #include "../../gui/control/panel.h"
 #include "../../resources/manager.h"
 #include "../../script/execution.h"
-#include "../../script/manager.h"
+#include "../../script/scripts.h"
 
 #include "../types.h"
 

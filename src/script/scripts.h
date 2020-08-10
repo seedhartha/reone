@@ -17,38 +17,28 @@
 
 #pragma once
 
-#include <vector>
+#include <string>
+#include <memory>
 
-#include "routine.h"
+#include "program.h"
 
 namespace reone {
 
 namespace script {
 
-class RoutineManager {
+class ScriptManager {
 public:
-    static RoutineManager &instance();
+    static ScriptManager &instance();
 
-    void add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes);
-
-    void add(
-        const std::string &name,
-        VariableType retType,
-        const std::vector<VariableType> &argTypes,
-        const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn);
-
-    const Routine &get(int index);
+    std::shared_ptr<ScriptProgram> find(const std::string &name);
 
 private:
-    std::vector<Routine> _routines;
-
-    RoutineManager() = default;
-
-    RoutineManager(const RoutineManager &) = delete;
-    RoutineManager &operator=(const RoutineManager &) = delete;
+    ScriptManager() = default;
+    ScriptManager(const ScriptManager &) = delete;
+    ScriptManager &operator=(const ScriptManager &) = delete;
 };
 
-#define RoutineMan RoutineManager::instance()
+#define ScriptMan ScriptManager::instance()
 
 } // namespace script
 

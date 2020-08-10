@@ -75,6 +75,8 @@ set(HEADERS
     src/game/object/trigger.h
     src/game/object/waypoint.h
     src/game/room.h
+    src/game/script/routines.h
+    src/game/script/routines_common.h
     src/game/templates.h
     src/game/types.h
     src/gui/control/button.h
@@ -131,9 +133,10 @@ set(HEADERS
     src/resources/visfile.h
     src/resources/wavfile.h
     src/script/execution.h
-    src/script/manager.h
     src/script/program.h
+    src/script/routine.h
     src/script/routines.h
+    src/script/scripts.h
     src/script/types.h
     src/script/variable.h)
 
@@ -172,6 +175,10 @@ set(SOURCES
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
     src/game/room.cpp
+    src/game/script/routines.cpp
+    src/game/script/routines_common.cpp
+    src/game/script/routines_kotor.cpp
+    src/game/script/routines_tsl.cpp
     src/game/templates.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp
@@ -224,11 +231,10 @@ set(SOURCES
     src/resources/visfile.cpp
     src/resources/wavfile.cpp
     src/script/execution.cpp
-    src/script/manager.cpp
     src/script/program.cpp
+    src/script/routine.cpp
     src/script/routines.cpp
-    src/script/routines_kotor.cpp
-    src/script/routines_tsl.cpp
+    src/script/scripts.cpp
     src/script/variable.cpp)
 
 add_executable(reone ${HEADERS} ${SOURCES})

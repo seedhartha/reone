@@ -17,37 +17,24 @@
 
 #include "routines.h"
 
-#include <cassert>
-
-#include "../core/log.h"
-
-using namespace std;
+using namespace reone::resources;
 
 namespace reone {
 
-namespace script {
+namespace game {
 
-RoutineManager &RoutineManager::instance() {
-    static RoutineManager instance;
-    return instance;
-}
+extern void initKotorRoutines();
+extern void initTslRoutines();
 
-void RoutineManager::add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes) {
-    _routines.emplace_back(name, retType, argTypes);
-}
-
-void RoutineManager::add(
-    const std::string &name,
-    VariableType retType,
-    const std::vector<VariableType> &argTypes,
-    const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn) {
-
-    _routines.emplace_back(name, retType, argTypes, fn);
-}
-
-const Routine &RoutineManager::get(int index) {
-    assert(index >= 0 && index < _routines.size());
-    return _routines[index];
+void initScriptRoutines(GameVersion version) {
+    switch (version) {
+        case GameVersion::TheSithLords:
+            initTslRoutines();
+            break;
+        default:
+            initKotorRoutines();
+            break;
+    }
 }
 
 } // namespace game

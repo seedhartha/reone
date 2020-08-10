@@ -15,31 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <string>
-#include <memory>
-
-#include "program.h"
+#include "../../resources/types.h"
 
 namespace reone {
 
-namespace script {
+namespace game {
 
-class ScriptManager {
-public:
-    static ScriptManager &instance();
+void initScriptRoutines(resources::GameVersion version);
 
-    std::shared_ptr<ScriptProgram> find(const std::string &name);
-
-private:
-    ScriptManager() = default;
-    ScriptManager(const ScriptManager &) = delete;
-    ScriptManager &operator=(const ScriptManager &) = delete;
-};
-
-#define ScriptMan script::ScriptManager::instance()
-
-} // namespace script
+} // namespace game
 
 } // namespace reone

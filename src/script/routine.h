@@ -17,38 +17,32 @@
 
 #pragma once
 
-#include <vector>
+#include <string>
 
-#include "routine.h"
+#include "variable.h"
 
 namespace reone {
 
 namespace script {
 
-class RoutineManager {
+class Routine {
 public:
-    static RoutineManager &instance();
+    Routine() = default;
+    Routine(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes);
+    Routine(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes, const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn);
 
-    void add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes);
+    Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) const;
 
-    void add(
-        const std::string &name,
-        VariableType retType,
-        const std::vector<VariableType> &argTypes,
-        const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn);
-
-    const Routine &get(int index);
+    const std::string &name() const;
+    VariableType returnType() const;
+    VariableType argumentType(int index) const;
 
 private:
-    std::vector<Routine> _routines;
-
-    RoutineManager() = default;
-
-    RoutineManager(const RoutineManager &) = delete;
-    RoutineManager &operator=(const RoutineManager &) = delete;
+    std::string _name;
+    VariableType _returnType { VariableType::Void };
+    std::vector<VariableType> _argumentTypes;
+    std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> _func;
 };
-
-#define RoutineMan RoutineManager::instance()
 
 } // namespace script
 

@@ -24,7 +24,8 @@
 #include "../core/log.h"
 #include "../core/streamutil.h"
 #include "../resources/manager.h"
-#include "../script/routines.h"
+
+#include "script/routines.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -33,7 +34,6 @@ using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
-using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -55,7 +55,7 @@ int Game::run() {
 
     ResMan.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
-    RoutineMan.init(_version);
+    initScriptRoutines(_version);
 
     configure();
     _renderWindow.show();
