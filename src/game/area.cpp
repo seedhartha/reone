@@ -192,10 +192,10 @@ void Area::loadCameraStyle(const GffStruct &are) {
 }
 
 void Area::loadScripts(const GffStruct &are) {
-    _scripts[ScriptType::OnEnter] = ScriptMan.find(are.getString("OnEnter"));
-    _scripts[ScriptType::OnExit] = ScriptMan.find(are.getString("OnExit"));
-    _scripts[ScriptType::OnHeartbeat] = ScriptMan.find(are.getString("OnHeartbeat"));
-    _scripts[ScriptType::OnUserDefined] = ScriptMan.find(are.getString("OnUserDefined"));
+    _scripts[ScriptType::OnEnter] = ResMan.findScript(are.getString("OnEnter"));
+    _scripts[ScriptType::OnExit] = ResMan.findScript(are.getString("OnExit"));
+    _scripts[ScriptType::OnHeartbeat] = ResMan.findScript(are.getString("OnHeartbeat"));
+    _scripts[ScriptType::OnUserDefined] = ResMan.findScript(are.getString("OnUserDefined"));
 }
 
 void Area::landObject(Object &object) {
