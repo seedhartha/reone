@@ -127,12 +127,7 @@ void DialogGui::configureReplies() {
 void DialogGui::onReplyClicked(int index) {
     const Dialog::EntryReply &reply = _dialog->getReply(index);
     if (reply.entries.empty()) {
-        if (_onDialogFinished) {
-            if (_onSpeakerChanged) {
-                _onSpeakerChanged(_currentSpeaker, "");
-            }
-            _onDialogFinished();
-        }
+        finish();
         return;
     }
     int entryIdx = -1;
@@ -151,6 +146,18 @@ void DialogGui::onReplyClicked(int index) {
     if (entryIdx != -1) {
         _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
         loadCurrentEntry();
+    }
+}
+
+void DialogGui::finish() {
+    if (!_dialog->endScript().empty()) {
+        runScript(_dialog->endScript(), kObjectInvalid, kObjectInvalid);
+    }
+    if (_onSpeakerChanged) {
+        _onSpeakerChanged(_currentSpeaker, "");
+    }
+    if (_onDialogFinished) {
+        _onDialogFinished();
     }
 }
 
@@ -238,12 +245,7 @@ void DialogGui::loadCurrentEntry() {
     if (!_currentEntry->script.empty()) {
         runScript(_currentEntry->script, kObjectInvalid, kObjectInvalid);
     }
-    if (replyCount == 0 && _onDialogFinished) {
-        if (_onSpeakerChanged) {
-            _onSpeakerChanged(_currentSpeaker, "");
-        }
-        _onDialogFinished();
-    }
+    if (replyCount == 0) finish();
 }
 
 void DialogGui::setOnSpeakerChanged(const function<void(const string&, const string &)> &fn) {

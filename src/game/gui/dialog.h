@@ -56,6 +56,7 @@ private:
     void loadStartEntry();
     bool checkCondition(const std::string &script);
     void loadCurrentEntry();
+    void finish();
 };
 
 } // namespace game

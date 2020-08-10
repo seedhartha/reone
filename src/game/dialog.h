@@ -53,11 +53,13 @@ public:
     const std::vector<EntryReplyLink> &startEntries() const;
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
+    const std::string &endScript() const;
 
 private:
     std::vector<EntryReplyLink> _startEntries;
     std::vector<EntryReply> _entries;
     std::vector<EntryReply> _replies;
+    std::string _endScript;
     int _entryIndex { -1 };
 
     Dialog(const Dialog &) = delete;
