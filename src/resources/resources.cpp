@@ -50,24 +50,27 @@ namespace resources {
 static const char kKeyFileName[] = "chitin.key";
 static const char kPatchFileName[] = "patch.erf";
 static const char kTalkTableFileName[] = "dialog.tlk";
+
 static const char kModulesDirectoryName[] = "modules";
-static const char kTexturePackDirectoryName[] = "texturepacks";
-static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
-static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+static const char kOverrideDirectoryName[] = "override";
 static const char kMusicDirectoryName[] = "streammusic";
 static const char kSoundsDirectoryName[] = "streamsounds";
-static const char kWavesDirectoryName[] = "streamwaves";
 static const char kVoiceDirectoryName[] = "streamvoice";
+static const char kWavesDirectoryName[] = "streamwaves";
+static const char kTexturePackDirectoryName[] = "texturepacks";
 
-static map<string, shared_ptr<ByteArray>> g_resCache;
+static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+
 static map<string, shared_ptr<TwoDaTable>> g_2daCache;
-static map<string, shared_ptr<GffStruct>> g_gffCache;
-static map<string, shared_ptr<TalkTable>> g_talkTableCache;
 static map<string, shared_ptr<AudioStream>> g_audioCache;
-static map<string, shared_ptr<Model>> g_modelCache;
-static map<string, shared_ptr<Walkmesh>> g_walkmeshCache;
-static map<string, shared_ptr<Texture>> g_texCache;
 static map<string, shared_ptr<Font>> g_fontCache;
+static map<string, shared_ptr<GffStruct>> g_gffCache;
+static map<string, shared_ptr<Model>> g_modelCache;
+static map<string, shared_ptr<ByteArray>> g_resCache;
+static map<string, shared_ptr<TalkTable>> g_talkTableCache;
+static map<string, shared_ptr<Texture>> g_texCache;
+static map<string, shared_ptr<Walkmesh>> g_walkmeshCache;
 
 static map<string, string> g_fontOverride = {
     { "fnt_d16x16", "fnt_d16x16b" }
@@ -90,17 +93,14 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
         addErfProvider(patchPath);
     }
 
-    fs::path tlkPath(getPathIgnoreCase(gamePath, kTalkTableFileName));
-    _tlkFile.load(tlkPath);
-
     fs::path texPacksPath(getPathIgnoreCase(gamePath, kTexturePackDirectoryName));
-    fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
     fs::path guiTexPackPath(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    addErfProvider(guiTexPackPath);
+    addErfProvider(texPackPath);
+
     fs::path musicPath(getPathIgnoreCase(gamePath, kMusicDirectoryName));
     fs::path soundsPath(getPathIgnoreCase(gamePath, kSoundsDirectoryName));
-
-    addErfProvider(texPackPath);
-    addErfProvider(guiTexPackPath);
     addFolderProvider(musicPath);
     addFolderProvider(soundsPath);
 
@@ -116,6 +116,12 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
             break;
         }
     }
+
+    fs::path overridePath(getPathIgnoreCase(gamePath, kOverrideDirectoryName));
+    addFolderProvider(overridePath);
+
+    fs::path tlkPath(getPathIgnoreCase(gamePath, kTalkTableFileName));
+    _tlkFile.load(tlkPath);
 
     _version = version;
     _gamePath = gamePath;
@@ -135,14 +141,15 @@ void ResourceManager::deinit() {
 }
 
 void ResourceManager::clearCaches() {
-    g_resCache.clear();
     g_2daCache.clear();
-    g_gffCache.clear();
     g_audioCache.clear();
-    g_modelCache.clear();
-    g_walkmeshCache.clear();
-    g_texCache.clear();
     g_fontCache.clear();
+    g_gffCache.clear();
+    g_modelCache.clear();
+    g_resCache.clear();
+    g_talkTableCache.clear();
+    g_texCache.clear();
+    g_walkmeshCache.clear();
 }
 
 void ResourceManager::addErfProvider(const boost::filesystem::path &path) {
