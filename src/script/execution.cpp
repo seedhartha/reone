@@ -83,7 +83,6 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 
 int ScriptExecution::run() {
     uint32_t insOff = kStartInstructionOffset;
-    _stack.push_back(Variable(0));
 
     if (_context.savedState) {
         vector<Variable> globals(_context.savedState->globals);
@@ -111,9 +110,9 @@ int ScriptExecution::run() {
         insOff = _nextInstruction;
     }
 
-    assert(_stack.front().type == VariableType::Int);
+    if (_stack.empty() || _stack.back().type != VariableType::Int) return -1;
 
-    return _stack.front().intValue;
+    return _stack.back().intValue;
 }
 
 void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
@@ -226,9 +225,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
         case VariableType::Void:
             break;
         case VariableType::Vector:
-            _stack.push_back(retValue.vecValue.x);
-            _stack.push_back(retValue.vecValue.y);
             _stack.push_back(retValue.vecValue.z);
+            _stack.push_back(retValue.vecValue.y);
+            _stack.push_back(retValue.vecValue.x);
             break;
         default:
             _stack.push_back(retValue);
@@ -237,9 +236,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
 }
 
 Variable ScriptExecution::getVectorFromStack() {
-    float x = getFloatFromStack().floatValue;
-    float y = getFloatFromStack().floatValue;
     float z = getFloatFromStack().floatValue;
+    float y = getFloatFromStack().floatValue;
+    float x = getFloatFromStack().floatValue;
 
     return glm::vec3(x, y, z);
 }

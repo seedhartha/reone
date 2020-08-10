@@ -19,6 +19,8 @@
 
 #include "SDL2/SDL_timer.h"
 
+#include "../../core/log.h"
+
 #include "../object/creature.h"
 
 using namespace std;
@@ -85,9 +87,10 @@ Variable RoutineManager::getFirstPC(const vector<Variable> &args, ExecutionConte
 
 Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
+    shared_ptr<Object> object(_callbacks->getObjectByTag(args[0].strValue));
 
     Variable result(VariableType::Object);
-    result.objectId = _callbacks->getObjectByTag(args[0].strValue)->id();
+    result.objectId = object ? object->id() : kObjectInvalid;
 
     return move(result);
 }
@@ -102,6 +105,11 @@ Variable RoutineManager::getLevelByClass(const vector<Variable> &args, Execution
 
     int objectId = args.size() < 2 ? kObjectSelf : args[1].objectId;
     shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (!object) {
+        warn("Object not found by id: " + to_string(objectId));
+        return 0;
+    }
+
     Creature &creature = static_cast<Creature &>(*object);
 
     return Variable(creature.getClassLevel(clazz));
