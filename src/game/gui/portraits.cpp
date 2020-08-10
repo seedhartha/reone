@@ -107,7 +107,7 @@ void PortraitsGui::loadPortraits(const CharacterConfiguration &info) {
         }
     }
 
-    _currentPortrait = random(0, _portraits.size() - 1);
+    _currentPortrait = random(0, static_cast<int>(_portraits.size()) - 1);
     loadCurrentPortrait();
 }
 
@@ -121,13 +121,17 @@ void PortraitsGui::loadCurrentPortrait() {
 }
 
 void PortraitsGui::onClick(const string &control) {
+    int portraitCount = static_cast<int>(_portraits.size());
+
     if (control == "BTN_ARRL") {
         _currentPortrait--;
-        if (_currentPortrait == -1) _currentPortrait = _portraits.size() - 1;
+        if (_currentPortrait == -1) {
+            _currentPortrait = portraitCount - 1;
+        }
         loadCurrentPortrait();
 
     } else if (control == "BTN_ARRR") {
-        _currentPortrait = ++_currentPortrait % _portraits.size();
+        _currentPortrait = ++_currentPortrait % portraitCount;
         loadCurrentPortrait();
 
     } else if (control == "BTN_ACCEPT") {

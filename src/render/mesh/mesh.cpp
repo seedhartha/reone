@@ -34,9 +34,9 @@ void Mesh::computeAABB() {
 
     const float *pv = &_vertices[_offsets.vertexCoords / sizeof(float)];
     int stride = _offsets.stride / sizeof(float);
-    int vertexCount = _vertices.size() / stride;
+    size_t vertexCount = _vertices.size() / stride;
 
-    for (int i = 0; i < vertexCount; ++i) {
+    for (size_t i = 0; i < vertexCount; ++i) {
         _aabb.expand(glm::make_vec3(pv));
         pv += stride;
     }
@@ -105,7 +105,7 @@ void Mesh::deinitGL() {
 }
 
 void Mesh::render(uint32_t mode) const {
-    render(mode, _indices.size(), 0);
+    render(mode, static_cast<int>(_indices.size()), 0);
 }
 
 void Mesh::render(uint32_t mode, int count, int offset) const {

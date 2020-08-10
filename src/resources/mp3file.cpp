@@ -64,7 +64,7 @@ mad_flow Mp3File::inputFunc(void *playbuf, mad_stream *stream) {
     if (mp3->_done) {
         return MAD_FLOW_BREAK;
     }
-    mad_stream_buffer(stream, reinterpret_cast<unsigned char *>(&mp3->_input[0]), mp3->_input.size());
+    mad_stream_buffer(stream, reinterpret_cast<unsigned char *>(&mp3->_input[0]), static_cast<int>(mp3->_input.size()));
     mp3->_done = true;
 
     return MAD_FLOW_CONTINUE;

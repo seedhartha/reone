@@ -152,7 +152,7 @@ void WavFile::loadIMAADPCM(uint32_t chunkSize) {
     frame.sampleRate = _sampleRate;
     frame.samples.reserve(2 * (chunkSize - 4 * _channelCount * chunkSize / _blockAlign));
 
-    int off = 0;
+    uint32_t off = 0;
     while (off < chunkSize) {
         if (off % _blockAlign == 0) {
             for (int i = 0; i < _channelCount; ++i) {
@@ -187,7 +187,7 @@ void WavFile::loadIMAADPCM(uint32_t chunkSize) {
     _stream->add(move(frame));
 }
 
-audio::AudioFormat WavFile::getAudioFormat() const {
+AudioFormat WavFile::getAudioFormat() const {
     switch (_audioFormat) {
         case WavAudioFormat::PCM:
             switch (_bitsPerSample) {
@@ -203,6 +203,9 @@ audio::AudioFormat WavFile::getAudioFormat() const {
                 throw logic_error("WAV: IMA ADPCM: invalid bits per sample: " + to_string(_bitsPerSample));
             }
             return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
+        default:
+            throw logic_error("WAV: invalid audio format: " + to_string(static_cast<int>(_audioFormat)));
+
     }
 }
 

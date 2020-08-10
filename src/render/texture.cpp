@@ -56,7 +56,7 @@ void Texture::initGL() {
     } else {
         glBindTexture(GL_TEXTURE_2D, _textureId);
         const Layer &layer = _layers.front();
-        int mipMapCount = layer.mipMaps.size();
+        int mipMapCount = static_cast<int>(layer.mipMaps.size());
         assert(mipMapCount > 0);
 
         if (mipMapCount > 1) {
@@ -101,7 +101,7 @@ void Texture::fillTextureTarget(uint32_t target, int level, int width, int heigh
 
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, data.size(), &data[0]);
+            glCompressedTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, static_cast<int>(data.size()), &data[0]);
             break;
     }
 }

@@ -123,10 +123,10 @@ void ClassSelectionGui::setClassButtonEnlarged(int index, bool enlarged) {
     Control &control(*button.control);
     Control::Extent extent(control.extent());
 
-    extent.width = enlarged ? _enlargedButtonSize.x : _defaultButtonSize.x;
-    extent.height = enlarged ? _enlargedButtonSize.y : _defaultButtonSize.y;
-    extent.left = button.center.x - extent.width / 2;
-    extent.top = button.center.y - extent.height / 2;
+    extent.width = static_cast<int>(enlarged ? _enlargedButtonSize.x : _defaultButtonSize.x);
+    extent.height = static_cast<int>(enlarged ? _enlargedButtonSize.y : _defaultButtonSize.y);
+    extent.left = static_cast<int>(button.center.x - 0.5f * extent.width);
+    extent.top = static_cast<int>(button.center.y - 0.5f * extent.height);
 
     control.setExtent(move(extent));
 }

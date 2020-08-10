@@ -105,7 +105,7 @@ const shared_ptr<Area> Module::makeArea() const {
 
 void Module::loadCameras() {
     glm::vec3 position(_info.entryPosition);
-    position.z += 1.7;
+    position.z += 1.7f;
 
     float heading = _info.entryHeading;
 

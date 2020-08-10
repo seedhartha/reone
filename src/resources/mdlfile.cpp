@@ -231,7 +231,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
     uint32_t pos = tell();
     seek(kMdlDataOffset + keyOffset);
 
-    for (int i = 0; i < keyCount; ++i) {
+    for (uint32_t i = 0; i < keyCount; ++i) {
         ControllerType type = static_cast<ControllerType>(readUint32());
 
         ignore(2);
@@ -464,7 +464,7 @@ void MdlFile::readSkin(ModelNode &node) {
     map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + bonesOffset);
 
-    for (int i = 0; i < boneCount; ++i) {
+    for (uint32_t i = 0; i < boneCount; ++i) {
         uint16_t boneIdx = static_cast<uint16_t>(readFloat());
         if (boneIdx == 0xffff) continue;
 

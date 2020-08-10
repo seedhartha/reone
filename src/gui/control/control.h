@@ -78,7 +78,7 @@ public:
     virtual bool handleMouseWheel(int x, int y);
     virtual bool handleClick(int x, int y);
     virtual void initGL();
-    virtual void render(const glm::vec2 &offset, const std::string &textOverride = "") const;
+    virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
     virtual void stretch(float x, float y);
 
     void setVisible(bool visible);
@@ -126,10 +126,10 @@ private:
     void loadBorder(const resources::GffStruct &gffs);
     void loadText(const resources::GffStruct &gffs);
     void loadHilight(const resources::GffStruct &gffs);
-    void drawBorder(const Border &border, const glm::vec2 &offset) const;
-    void drawText(const std::string &text, const glm::vec2 &offset) const;
+    void drawBorder(const Border &border, const glm::ivec2 &offset) const;
+    void drawText(const std::string &text, const glm::ivec2 &offset) const;
     std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
-    void getTextPosition(glm::vec2 &position, int lineCount) const;
+    void getTextPosition(glm::ivec2 &position, int lineCount) const;
 };
 
 } // namespace gui

@@ -51,7 +51,7 @@ void ScrollBar::initGL() {
     if (_dir.image) _dir.image->initGL();
 }
 
-void ScrollBar::render(const glm::vec2 &offset, const string &textOverride) const {
+void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
     ShaderMan.activate(ShaderProgram::BasicDiffuse);

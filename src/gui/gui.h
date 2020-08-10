@@ -53,8 +53,8 @@ protected:
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };
-    glm::vec2 _screenCenter { 0.0f };
-    glm::vec2 _controlOffset { 0.0f };
+    glm::ivec2 _screenCenter { 0 };
+    glm::ivec2 _controlOffset { 0 };
     std::shared_ptr<render::Texture> _background;
     std::shared_ptr<Control> _rootControl;
     std::vector<std::shared_ptr<Control>> _controls;

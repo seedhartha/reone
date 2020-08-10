@@ -59,7 +59,7 @@ private:
     Connection(const Connection &) = delete;
     Connection &operator=(const Connection &) = delete;
 
-    void handleRead(int bytesRead, const boost::system::error_code &ec);
+    void handleRead(size_t bytesRead, const boost::system::error_code &ec);
     void handleWrite(std::shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec);
 };
 

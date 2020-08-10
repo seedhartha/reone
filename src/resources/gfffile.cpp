@@ -146,12 +146,12 @@ int GffStruct::getInt(const string &name) const {
     const GffField *field = find(name);
     assert(field);
 
-    return field->asInt();
+    return static_cast<int>(field->asInt());
 }
 
 int GffStruct::getInt(const string &name, int defaultValue) const {
     const GffField *field = find(name);
-    return field ? field->asInt() : defaultValue;
+    return field ? static_cast<int>(field->asInt()) : defaultValue;
 }
 
 float GffStruct::getFloat(const string &name) const {

@@ -95,7 +95,7 @@ void BinaryFile::load(const fs::path &path) {
 }
 
 uint32_t BinaryFile::tell() const {
-    return _in->tellg();
+    return static_cast<uint32_t>(_in->tellg());
 }
 
 void BinaryFile::ignore(int size) {

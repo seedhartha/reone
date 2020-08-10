@@ -98,7 +98,7 @@ Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionCon
         args[1].type == VariableType::Action);
 
     if (ctx.delayCommand) {
-        uint32_t timestamp = SDL_GetTicks() + args[0].floatValue * 1000.0f;
+        uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
         ctx.delayCommand(timestamp, args[1].context);
     }
 

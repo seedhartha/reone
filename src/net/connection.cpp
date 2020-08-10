@@ -17,8 +17,7 @@
 
 #include "connection.h"
 
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
+#include <boost/asio.hpp>
 
 #include "../core/log.h"
 
@@ -27,13 +26,13 @@ using namespace std::placeholders;
 
 using namespace boost::system;
 
-namespace asio = boost::asio;
+using tcp = boost::asio::ip::tcp;
 
 namespace reone {
 
 namespace net {
 
-Connection::Connection(shared_ptr<boost::asio::ip::tcp::socket> &socket) : _socket(move(socket)) {
+Connection::Connection(shared_ptr<tcp::socket> &socket) : _socket(move(socket)) {
 }
 
 void Connection::open() {
@@ -44,7 +43,7 @@ void Connection::open() {
         bind(&Connection::handleRead, this, _2, _1));
 }
 
-void Connection::handleRead(int bytesRead, const boost::system::error_code &ec) {
+void Connection::handleRead(size_t bytesRead, const boost::system::error_code &ec) {
     if (ec) {
         if (ec != boost::asio::error::eof) {
             error("TCP: read failed: " + ec.message());
@@ -103,18 +102,21 @@ void Connection::close() {
 
 void Connection::send(const ByteArray &data) {
     ByteArray data2(data);
-    int cmdLength = data2.size();
+    int cmdLength = static_cast<int>(data2.size());
     data2.insert(data2.begin(), (cmdLength >> 8) & 0xff);
     data2.insert(data2.begin(), cmdLength & 0xff);
 
-    shared_ptr<asio::streambuf> buffer(new asio::streambuf());
+    shared_ptr<boost::asio::streambuf> buffer(new boost::asio::streambuf());
     ostream out(buffer.get());
     out.write(&data2[0], data2.size());
 
-    asio::async_write(*_socket, *buffer, bind(&Connection::handleWrite, this, buffer, _1));
+    boost::asio::async_write(
+        *_socket,
+        *buffer,
+        bind(&Connection::handleWrite, this, buffer, _1));
 }
 
-void Connection::handleWrite(shared_ptr<asio::streambuf> &buffer, const boost::system::error_code &ec) {
+void Connection::handleWrite(shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec) {
     buffer.reset();
 
     if (ec) {

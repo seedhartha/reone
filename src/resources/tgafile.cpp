@@ -89,7 +89,7 @@ void TgaFile::loadTexture() {
             pi[0] = buf[i];
             pi[1] = buf[i];
             pi[2] = buf[i];
-            pi[3] = 0xff;
+            pi[3] = static_cast<char>(0xff);
             pi += 4;
         }
 
