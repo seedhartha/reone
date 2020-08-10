@@ -18,7 +18,7 @@
 #include "mainmenu.h"
 
 #include "../../gui/control/listbox.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 using namespace std;
 

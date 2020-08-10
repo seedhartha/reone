@@ -18,7 +18,7 @@
 #include "portraits.h"
 
 #include "../../core/random.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 #include "../types.h"
 

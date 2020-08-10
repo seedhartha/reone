@@ -22,7 +22,7 @@
 #include "../render/camera/firstperson.h"
 #include "../render/camera/thirdperson.h"
 #include "../resources/gfffile.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 
 #include "object/door.h"
 

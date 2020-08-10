@@ -22,7 +22,7 @@
 #include "../../audio/player.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 #include "../../script/execution.h"
 #include "../../script/scripts.h"
 

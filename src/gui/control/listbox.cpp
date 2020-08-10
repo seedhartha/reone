@@ -24,7 +24,7 @@
 #include "../../core/log.h"
 #include "../../render/mesh/guiquad.h"
 #include "../../render/shadermanager.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 #include "button.h"
 #include "scrollbar.h"

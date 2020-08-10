@@ -20,7 +20,7 @@
 #include <map>
 
 #include "../core/log.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 
 using namespace std;
 

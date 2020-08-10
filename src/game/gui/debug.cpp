@@ -18,7 +18,7 @@
 #include "debug.h"
 
 #include "../../gui/control/label.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 #include "../types.h"
 

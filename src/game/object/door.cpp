@@ -21,7 +21,7 @@
 
 #include "../../core/streamutil.h"
 #include "../../render/modelinstance.h"
-#include "../../resources/manager.h"
+#include "../../resources/resources.h"
 
 using namespace std;
 

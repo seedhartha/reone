@@ -23,7 +23,7 @@
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
-#include "../resources/manager.h"
+#include "../resources/resources.h"
 
 #include "script/routines.h"
 
