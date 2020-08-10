@@ -40,7 +40,11 @@ namespace game {
 
 static const float kDefaultFieldOfView = 75.0f;
 
-Module::Module(const string &name, GameVersion version, const GraphicsOptions &opts) :
+Module::Module(
+    const string &name,
+    GameVersion version,
+    const GraphicsOptions &opts
+) :
     _name(name),
     _version(version),
     _opts(opts),

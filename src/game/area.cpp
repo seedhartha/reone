@@ -38,6 +38,8 @@
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
+#include "script/routines.h"
+#include "script/util.h"
 
 using namespace std;
 
@@ -65,7 +67,7 @@ static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(resources::GameVersion version, const string &name) : _version(version), _name(name), _navMesh(new NavMesh()) {
+Area::Area(GameVersion version, const string &name) : _version(version), _name(name), _navMesh(new NavMesh()) {
     _objects.insert(make_pair(ObjectType::Creature, ObjectList()));
     _objects.insert(make_pair(ObjectType::Door, ObjectList()));
     _objects.insert(make_pair(ObjectType::Placeable, ObjectList()));
@@ -192,10 +194,10 @@ void Area::loadCameraStyle(const GffStruct &are) {
 }
 
 void Area::loadScripts(const GffStruct &are) {
-    _scripts[ScriptType::OnEnter] = ResMan.findScript(are.getString("OnEnter"));
-    _scripts[ScriptType::OnExit] = ResMan.findScript(are.getString("OnExit"));
-    _scripts[ScriptType::OnHeartbeat] = ResMan.findScript(are.getString("OnHeartbeat"));
-    _scripts[ScriptType::OnUserDefined] = ResMan.findScript(are.getString("OnUserDefined"));
+    _scripts[ScriptType::OnEnter] = are.getString("OnEnter");
+    _scripts[ScriptType::OnExit] = are.getString("OnExit");
+    _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
+    _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
 }
 
 void Area::landObject(Object &object) {
@@ -460,27 +462,16 @@ void Area::updateTriggers(const Creature &creature) {
     }
 }
 
+void Area::delayAction(uint32_t timestamp, const ExecutionContext &ctx) {
+    DelayedAction action;
+    action.timestamp = timestamp;
+    action.context = ctx;
+    _delayed.push_back(action);
+}
+
 void Area::runOnEnterScript() {
-    if (_scriptsEnabled && _scripts[ScriptType::OnEnter]) {
-        ExecutionContext ctx;
-        if (_player) {
-            ctx.playerId = _player->id();
-            ctx.enteringObjectId = ctx.playerId;
-            ctx.delayCommand = [this](uint32_t timestamp, const ExecutionContext &ctx) {
-                _delayed.push_back(DelayedAction { timestamp, ctx });
-            };
-            ctx.getObjectByTag = [this](const string &tag) {
-                shared_ptr<Object> object(find(tag));
-                return object ? object->id() : 0;
-            };
-            ctx.startDialog = [this](int objectId, const string &resRef) {
-                shared_ptr<Object> object(find(objectId));
-                if (object && _onStartDialog) {
-                    _onStartDialog(*object, resRef);
-                }
-            };
-        }
-        ScriptExecution(_scripts[ScriptType::OnEnter], ctx).run();
+    if (_scriptsEnabled && !_scripts[ScriptType::OnEnter].empty()) {
+        runScript(_scripts[ScriptType::OnEnter], kObjectArea, _player->id());
     }
 }
 

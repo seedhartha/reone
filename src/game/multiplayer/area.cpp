@@ -26,8 +26,13 @@ namespace reone {
 
 namespace game {
 
-MultiplayerArea::MultiplayerArea(MultiplayerMode mode, resources::GameVersion version, const string &name, IMultiplayerCallbacks *callbacks) :
-    Area(version, name), _callbacks(callbacks) {
+MultiplayerArea::MultiplayerArea(
+    MultiplayerMode mode,
+    resources::GameVersion version,
+    const string &name,
+    IMultiplayerCallbacks *mpCallbacks
+) :
+    Area(version, name), _callbacks(mpCallbacks) {
 
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }

@@ -17,39 +17,28 @@
 
 #pragma once
 
-#include <vector>
+#include <memory>
+#include <string>
 
-#include "routine.h"
+#include "../../script/types.h"
+
+#include "../object/object.h"
 
 namespace reone {
 
-namespace script {
+namespace game {
 
-class RoutineManager {
+class IRoutineCallbacks {
 public:
-    static RoutineManager &instance();
+    virtual ~IRoutineCallbacks() {
+    }
 
-    void add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes);
-
-    void add(
-        const std::string &name,
-        VariableType retType,
-        const std::vector<VariableType> &argTypes,
-        const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn);
-
-    const Routine &get(int index);
-
-private:
-    std::vector<Routine> _routines;
-
-    RoutineManager() = default;
-
-    RoutineManager(const RoutineManager &) = delete;
-    RoutineManager &operator=(const RoutineManager &) = delete;
+    virtual void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) = 0;
+    virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag) = 0;
+    virtual std::shared_ptr<Object> getPlayer() = 0;
+    virtual void startDialog(uint32_t objectId, const std::string &resRef) = 0;
 };
 
-#define RoutineMan RoutineManager::instance()
-
-} // namespace script
+} // namespace game
 
 } // namespace reone

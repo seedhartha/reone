@@ -27,6 +27,8 @@
 
 #include "area.h"
 
+#include "script/callbacks.h"
+
 namespace reone {
 
 namespace game {
@@ -44,7 +46,10 @@ struct ModuleInfo {
  */
 class Module : public render::IRenderRoot, public render::IEventHandler {
 public:
-    Module(const std::string &name, resources::GameVersion version, const render::GraphicsOptions &opts);
+    Module(
+        const std::string &name,
+        resources::GameVersion version,
+        const render::GraphicsOptions &opts);
 
     void load(const resources::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");

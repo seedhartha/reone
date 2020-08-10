@@ -34,6 +34,7 @@ using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
+using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -55,15 +56,16 @@ int Game::run() {
 
     ResMan.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
-    initScriptRoutines(_version);
+    RoutineMan.init(_version, this);
 
     configure();
     _renderWindow.show();
     runMainLoop();
 
     TheJobExecutor.deinit();
-    ResMan.deinit();
+    RoutineMan.deinit();
     TheAudioPlayer.deinit();
+    ResMan.deinit();
     _renderWindow.deinit();
 
     return 0;
@@ -295,6 +297,26 @@ bool Game::handle(const SDL_Event &event) {
     }
 
     return false;
+}
+
+void Game::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
+    _module->area().delayAction(timestamp, ctx);
+}
+
+shared_ptr<Object> Game::getObjectByTag(const string &tag) {
+    return _module->area().find(tag);
+}
+
+shared_ptr<Object> Game::getPlayer() {
+    return _module->area().player();
+}
+
+void Game::startDialog(uint32_t objectId, const std::string &resRef) {
+    std::shared_ptr<Object> object(_module->area().find(objectId));
+    if (!object) return;
+
+    _screen = Screen::Dialog;
+    _dialogGui->startDialog(*object, resRef);
 }
 
 void Game::renderWorld() {
