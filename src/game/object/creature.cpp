@@ -23,14 +23,17 @@
 #include "../../core/streamutil.h"
 #include "../../net/types.h"
 #include "../../resources/resources.h"
+#include "../../script/types.h"
 
 #include "../templates.h"
+#include "../script/util.h"
 
 using namespace std;
 
 using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resources;
+using namespace reone::script;
 
 namespace reone {
 
@@ -89,6 +92,8 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
     loadAppearance(*appearanceTable, appearance);
 
     _conversation = gffs.getString("Conversation");
+
+    _scripts[ScriptType::Spawn] = gffs.getString("ScriptSpawn");
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
@@ -257,6 +262,12 @@ void Creature::equip(const string &resRef) {
             break;
         default:
             break;
+    }
+}
+
+void Creature::runSpawnScript() {
+    if (!_scripts[ScriptType::Spawn].empty()) {
+        runScript(_scripts[ScriptType::Spawn], _id, kObjectInvalid, -1);
     }
 }
 

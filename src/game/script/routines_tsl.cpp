@@ -39,7 +39,7 @@ namespace game {
 #define Action VariableType::Action
 
 void RoutineManager::addTslRoutines() {
-    add("Random", Int, { Int });
+    add("Random", Int, { Int }, bind(&RoutineManager::random, this, _1, _2));
     add("PrintString", Void, { String });
     add("PrintFloat", Void, { Float, Int, Int });
     add("FloatToString", String, { Float, Int, Int });
@@ -61,9 +61,9 @@ void RoutineManager::addTslRoutines() {
     add("GetTimeMillisecond", Int, { });
     add("ActionRandomWalk", Void, { });
     add("ActionMoveToLocation", Void, { Location, Int });
-    add("ActionMoveToObject", Void, { Object, Int, Float });
+    add("ActionMoveToObject", Void, { Object, Int, Float }, bind(&RoutineManager::actionMoveToObject, this, _1, _2));
     add("ActionMoveAwayFromObject", Void, { Object, Int, Float });
-    add("GetArea", Object, { Object });
+    add("GetArea", Object, { Object }, bind(&RoutineManager::getArea, this, _1, _2));
     add("GetEnteringObject", Object, { }, bind(&RoutineManager::getEnteringObject, this, _1, _2));
     add("GetExitingObject", Object, { });
     add("GetPosition", Vector, { Object });
@@ -82,8 +82,8 @@ void RoutineManager::addTslRoutines() {
     add("ActionPlayAnimation", Void, { Int, Float, Float });
     add("GetDistanceToObject", Float, { Object });
     add("GetIsObjectValid", Int, { Object }, bind(&RoutineManager::getIsObjectValid, this, _1, _2));
-    add("ActionOpenDoor", Void, { Object });
-    add("ActionCloseDoor", Void, { Object });
+    add("ActionOpenDoor", Void, { Object }, bind(&RoutineManager::actionOpenDoor, this, _1, _2));
+    add("ActionCloseDoor", Void, { Object }, bind(&RoutineManager::actionCloseDoor, this, _1, _2));
     add("SetCameraFacing", Void, { Float });
     add("PlaySound", Void, { String });
     add("GetSpellTargetObject", Object, { });
@@ -170,8 +170,8 @@ void RoutineManager::addTslRoutines() {
     add("GetFirstObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
     add("GetNextObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
     add("EffectEntangle", Effect, { });
-    add("SignalEvent", Void, { Object, Event });
-    add("EventUserDefined", Event, { Int });
+    add("SignalEvent", Void, { Object, Event }, bind(&RoutineManager::signalEvent, this, _1, _2));
+    add("EventUserDefined", Event, { Int }, bind(&RoutineManager::eventUserDefined, this, _1, _2));
     add("EffectDeath", Effect, { Int, Int, Int });
     add("EffectKnockdown", Effect, { });
     add("ActionGiveItem", Void, { Object, Object });
@@ -236,7 +236,7 @@ void RoutineManager::addTslRoutines() {
     add("GetGlobalString", String, { String });
     add("GetListenPatternNumber", Int, { });
     add("ActionJumpToObject", Void, { Object, Int });
-    add("GetWaypointByTag", Object, { String });
+    add("GetWaypointByTag", Object, { String }, bind(&RoutineManager::getWaypointByTag, this, _1, _2));
     add("GetTransitionTarget", Object, { Object });
     add("EffectLinkEffects", Effect, { Effect, Effect });
     add("GetObjectByTag", Object, { String, Int }, bind(&RoutineManager::getObjectByTag, this, _1, _2));
@@ -269,7 +269,7 @@ void RoutineManager::addTslRoutines() {
     add("GetNearestObject", Object, { Int, Object, Int });
     add("GetNearestObjectToLocation", Object, { Int, Location, Int });
     add("GetNearestObjectByTag", Object, { String, Object, Int });
-    add("IntToFloat", Float, { Int });
+    add("IntToFloat", Float, { Int }, bind(&RoutineManager::intToFloat, this, _1, _2));
     add("FloatToInt", Int, { Float });
     add("StringToInt", Int, { String });
     add("StringToFloat", Float, { String });
@@ -286,7 +286,7 @@ void RoutineManager::addTslRoutines() {
     add("EventSpellCastAt", Event, { Object, Int, Int });
     add("GetLastSpellCaster", Object, { });
     add("GetLastSpell", Int, { });
-    add("GetUserDefinedEventNumber", Int, { });
+    add("GetUserDefinedEventNumber", Int, { }, bind(&RoutineManager::getUserDefinedEventNumber, this, _1, _2));
     add("GetSpellId", Int, { });
     add("RandomName", String, { });
     add("EffectPoison", Effect, { Int });
@@ -333,7 +333,7 @@ void RoutineManager::addTslRoutines() {
     add("GetLastPlayerDied", Object, { });
     add("GetModuleItemLost", Object, { });
     add("GetModuleItemLostBy", Object, { });
-    add("ActionDoCommand", Void, { Action });
+    add("ActionDoCommand", Void, { Action }, bind(&RoutineManager::actionDoCommand, this, _1, _2));
     add("EventConversation", Event, { });
     add("SetEncounterDifficulty", Void, { Int, Object });
     add("GetEncounterDifficulty", Int, { Object });

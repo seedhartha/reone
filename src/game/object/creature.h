@@ -32,6 +32,8 @@ class Creature : public Object {
 public:
     enum class ActionType {
         MoveToPoint = 0,
+        OpenDoor = 5,
+        CloseDoor = 6,
         Follow = 35,
         FollowLeader = 38,
         QueueEmpty = 65534
@@ -54,6 +56,23 @@ public:
         int pointIdx { 0 };
     };
 
+    enum class ScriptType {
+        UserDefined,
+        OnNotice,
+        SpellAt,
+        Attacked,
+        Damaged,
+        Disturbed,
+        EndRound,
+        EndDialogu,
+        Dialogue,
+        Spawn,
+        Rested,
+        Death,
+        UserDefine,
+        OnBlocked
+    };
+
     Creature(uint32_t id);
 
     // Loading
@@ -63,6 +82,7 @@ public:
     void initGL() override;
 
     void equip(const std::string &resRef);
+    void runSpawnScript();
 
     // Animations
     void playDefaultAnimation();
@@ -116,6 +136,7 @@ private:
     std::atomic_bool _pathUpdating { false };
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
+    std::map<ScriptType, std::string> _scripts;
 
     // Loading
     void loadBlueprint(const resources::GffStruct &gffs);

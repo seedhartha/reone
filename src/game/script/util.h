@@ -27,8 +27,8 @@ namespace reone {
 
 namespace game {
 
-int runScript(const std::string &resRef, uint32_t callerId, uint32_t triggererId);
-int runScript(const std::shared_ptr<script::ScriptProgram> &program, uint32_t callerId, uint32_t triggererId);
+int runScript(const std::string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber);
+int runScript(const std::shared_ptr<script::ScriptProgram> &program, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber);
 
 } // namespace game
 

@@ -44,7 +44,6 @@ private:
     std::vector<uint32_t> _returnOffsets;
     uint32_t _nextInstruction { 0 };
     int _globalCount { 0 };
-    int _savedGlobalCount { 0 };
     ExecutionState _savedState;
 
     ScriptExecution(const ScriptExecution &) = delete;

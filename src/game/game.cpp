@@ -300,7 +300,7 @@ bool Game::handle(const SDL_Event &event) {
 }
 
 void Game::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
-    _module->area().delayAction(timestamp, ctx);
+    _module->area().delayCommand(timestamp, ctx);
 }
 
 shared_ptr<Object> Game::getObjectById(uint32_t id) {
@@ -311,16 +311,80 @@ shared_ptr<Object> Game::getObjectByTag(const string &tag) {
     return _module->area().find(tag);
 }
 
+shared_ptr<Object> Game::getWaypointByTag(const string &tag) {
+    return _module->area().find(tag, ObjectType::Waypoint);
+}
+
 shared_ptr<Object> Game::getPlayer() {
     return _module->area().player();
 }
 
-void Game::startDialog(uint32_t objectId, const std::string &resRef) {
-    std::shared_ptr<Object> object(_module->area().find(objectId));
+void Game::actionStartConversation(uint32_t objectId, const string &resRef) {
+    shared_ptr<Object> object(_module->area().find(objectId));
     if (!object) return;
 
+    string finalResRef(resRef);
+    if (finalResRef.empty()) {
+        Creature *creature = dynamic_cast<Creature *>(object.get());
+        if (!creature->conversation().empty()) {
+            finalResRef = creature->conversation();
+        }
+    }
+
     _screen = Screen::Dialog;
-    _dialogGui->startDialog(*object, resRef);
+    _dialogGui->startDialog(*object, finalResRef);
+}
+
+int Game::eventUserDefined(int eventNumber) {
+    return _module->area().eventUserDefined(eventNumber);
+}
+
+void Game::signalEvent(int eventId) {
+    _module->area().signalEvent(eventId);
+}
+
+bool Game::getGlobalBoolean(const string &name) const {
+    auto it = _state.globalBooleans.find(name);
+    return it != _state.globalBooleans.end() ? it->second : false;
+}
+
+int Game::getGlobalNumber(const string &name) const {
+    auto it = _state.globalNumbers.find(name);
+    return it != _state.globalNumbers.end() ? it->second : 0;
+}
+
+bool Game::getLocalBoolean(uint32_t objectId, int index) const {
+    assert(index >= 0 && index <= 63);
+
+    auto objectIt = _state.localBooleans.find(objectId);
+    if (objectIt == _state.localBooleans.end()) return false;
+
+    auto boolIt = objectIt->second.find(index);
+    if (boolIt == objectIt->second.end()) return false;
+
+    return boolIt->second;
+}
+
+int Game::getLocalNumber(uint32_t objectId) const {
+    auto it = _state.localNumbers.find(objectId);
+    return it != _state.localNumbers.end() ? it->second : 0;
+}
+
+void Game::setGlobalBoolean(const string &name, bool value) {
+    _state.globalBooleans[name] = value;
+}
+
+void Game::setGlobalNumber(const string &name, int value) {
+    _state.globalNumbers[name] = value;
+}
+
+void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
+    assert(index >= 0 && index <= 63);
+    _state.localBooleans[objectId][index] = value;
+}
+
+void Game::setLocalNumber(uint32_t objectId, int value) {
+    _state.localNumbers[objectId] = value;
 }
 
 void Game::renderWorld() {

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <list>
+#include <map>
 
 #include "../gui/types.h"
 #include "../net/types.h"
@@ -60,7 +61,10 @@ public:
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
-    void delayAction(uint32_t timestamp, const script::ExecutionContext &ctx);
+
+    void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
+    int eventUserDefined(int eventNumber);
+    void signalEvent(int eventId);
 
     // Rendering
     void initGL();
@@ -123,10 +127,21 @@ private:
         Transparent
     };
 
-    struct DelayedAction {
+    enum class ScriptType {
+        OnEnter,
+        OnExit,
+        OnHeartbeat,
+        OnUserDefined
+    };
+
+    struct DelayedCommand {
         uint32_t timestamp { 0 };
         script::ExecutionContext context;
         bool executed { false };
+    };
+
+    struct UserDefinedEvent {
+        int eventNumber { 0 };
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -139,14 +154,16 @@ private:
     std::unique_ptr<NavMesh> _navMesh;
     DebugMode _debugMode { DebugMode::None };
     std::map<ScriptType, std::string> _scripts;
-    std::list<DelayedAction> _delayed;
+    std::list<DelayedCommand> _delayed;
+    std::map<int, UserDefinedEvent> _events;
+    int _eventCounter { 0 };
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _onStartDialog;
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
-    void updateDelayedActions();
+    void updateDelayedCommands();
     void navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);

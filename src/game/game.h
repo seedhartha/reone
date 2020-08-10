@@ -55,11 +55,29 @@ public:
 
     bool handle(const SDL_Event &event) override;
 
+    // Commands/actions
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
+    void actionStartConversation(uint32_t objectId, const std::string &resRef) override;
+
+    // Events
+    int eventUserDefined(int eventNumber) override;
+    void signalEvent(int eventId) override;
+
+    // Getters
     std::shared_ptr<Object> getObjectById(uint32_t id) override;
     std::shared_ptr<Object> getObjectByTag(const std::string &tag) override;
+    std::shared_ptr<Object> getWaypointByTag(const std::string &tag) override;
     std::shared_ptr<Object> getPlayer() override;
-    void startDialog(uint32_t objectId, const std::string &resRef) override;
+    bool getGlobalBoolean(const std::string &name) const override;
+    int getGlobalNumber(const std::string &name) const override;
+    bool getLocalBoolean(uint32_t objectId, int index) const override;
+    int getLocalNumber(uint32_t objectId) const override;
+
+    // Setters
+    void setGlobalBoolean(const std::string &name, bool value) override;
+    void setGlobalNumber(const std::string &name, int value) override;
+    void setLocalBoolean(uint32_t objectId, int index, bool value) override;
+    void setLocalNumber(uint32_t objectId, int value) override;
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };

@@ -64,16 +64,46 @@ private:
 
     std::shared_ptr<Object> getObjectById(uint32_t id, const script::ExecutionContext &ctx) const;
 
-    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    // Math routines
+    script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // Getter routines
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getFirstPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // Setter routines
+    script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // Command routines
+    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // Event routines
+    script::Variable eventUserDefined(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable signalEvent(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getUserDefinedEventNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // Actions
+    script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 };
 
 #define RoutineMan RoutineManager::instance()

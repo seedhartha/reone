@@ -32,16 +32,17 @@ namespace reone {
 
 namespace game {
 
-int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId) {
+int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
     shared_ptr<ScriptProgram> program(ResMan.findScript(resRef));
-    return runScript(move(program), callerId, triggererId);
+    return runScript(move(program), callerId, triggererId, userDefinedEventNumber);
 }
 
-int runScript(const std::shared_ptr<ScriptProgram> &program, uint32_t callerId, uint32_t triggererId) {
+int runScript(const std::shared_ptr<ScriptProgram> &program, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
     ExecutionContext ctx;
     ctx.routines = &RoutineMan;
     ctx.callerId = callerId;
     ctx.triggererId = triggererId;
+    ctx.userDefinedEventNumber = userDefinedEventNumber;
 
     return ScriptExecution(program, move(ctx)).run();
 }

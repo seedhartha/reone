@@ -82,6 +82,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 }
 
 int ScriptExecution::run() {
+    debug("Script: executing program: " + _program->name());
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {
@@ -104,15 +105,17 @@ int ScriptExecution::run() {
         }
         _nextInstruction = ins.nextOffset;
 
-        debug("Script: " + describeByteCode(ins.byteCode));
+        debug("Script: " + describeInstruction(ins));
         handler->second(ins);
 
         insOff = _nextInstruction;
     }
 
-    if (_stack.empty() || _stack.back().type != VariableType::Int) return -1;
+    if (!_stack.empty() && _stack.back().type == VariableType::Int) {
+        return _stack.back().intValue;
+    }
 
-    return _stack.back().intValue;
+    return -1;
 }
 
 void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
@@ -190,7 +193,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             _stack.push_back(ins.strValue);
             break;
         default:
-            break;
+            throw logic_error("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -538,13 +541,14 @@ void ScriptExecution::executeIncRelToBP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeSaveBP(const Instruction &ins) {
-    assert(!_stack.empty());
-    _savedGlobalCount = _globalCount;
     _globalCount = static_cast<int>(_stack.size());
+    _stack.push_back(_globalCount);
 }
 
 void ScriptExecution::executeRestoreBP(const Instruction &ins) {
-    _globalCount = _savedGlobalCount;
+    assert(!_stack.empty() && _stack.back().type == VariableType::Int);
+    _globalCount = _stack.back().intValue;
+    _stack.pop_back();
 }
 
 void ScriptExecution::executeStoreState(const Instruction &ins) {

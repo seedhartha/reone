@@ -250,7 +250,7 @@ bool Area::handle(const SDL_Event &event) {
 }
 
 void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
-    updateDelayedActions();
+    updateDelayedCommands();
 
     for (auto &creature : _objects[ObjectType::Creature]) {
         updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
@@ -324,24 +324,24 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     }
 }
 
-void Area::updateDelayedActions() {
+void Area::updateDelayedCommands() {
     uint32_t now = SDL_GetTicks();
 
-    for (auto &action : _delayed) {
-        if (now >= action.timestamp) {
-            shared_ptr<ScriptProgram> program(action.context.savedState->program);
+    for (auto &command : _delayed) {
+        if (now >= command.timestamp) {
+            shared_ptr<ScriptProgram> program(command.context.savedState->program);
 
-            debug("Executing delayed action from " + program->name());
-            ScriptExecution(program, action.context).run();
+            debug("Executing delayed command from " + program->name());
+            ScriptExecution(program, command.context).run();
 
-            action.executed = true;
+            command.executed = true;
         }
     }
 
     auto it = remove_if(
         _delayed.begin(),
         _delayed.end(),
-        [](const DelayedAction &action) { return action.executed; });
+        [](const DelayedCommand &command) { return command.executed; });
 
     _delayed.erase(it, _delayed.end());
 }
@@ -355,7 +355,7 @@ void Area::updateCreature(Creature &creature, float dt) {
     switch (action.type) {
         case Creature::ActionType::MoveToPoint:
         case Creature::ActionType::Follow:
-            dest = action.type == Creature::ActionType::Follow ? action.object->position() : action.point;
+            dest = (action.type == Creature::ActionType::Follow || action.object) ? action.object->position() : action.point;
             navigateCreature(creature, dest, action.distance, dt);
             break;
 
@@ -394,17 +394,18 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     size_t pointCount = path->points.size();
     glm::vec3 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
 
-    if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
-        selectNextPathPoint(*path);
-    } else if (moveCreatureTowards(creature, dest, dt)) {
-        selectNextPathPoint(*path);
-        creature.setMovementType(MovementType::Run);
-    } else {
-        creature.setMovementType(MovementType::None);
-    }
+if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
+    selectNextPathPoint(*path);
+} else if (moveCreatureTowards(creature, dest, dt)) {
+    selectNextPathPoint(*path);
+    creature.setMovementType(MovementType::Run);
+} else {
+    creature.setMovementType(MovementType::None);
+}
 }
 
-void Area::selectNextPathPoint(Creature::Path &path) {;
+void Area::selectNextPathPoint(Creature::Path &path) {
+    ;
     size_t pointCount = path.points.size();
     if (path.pointIdx < pointCount) path.pointIdx++;
 }
@@ -461,16 +462,39 @@ void Area::updateTriggers(const Creature &creature) {
     }
 }
 
-void Area::delayAction(uint32_t timestamp, const ExecutionContext &ctx) {
-    DelayedAction action;
+void Area::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
+    DelayedCommand action;
     action.timestamp = timestamp;
     action.context = ctx;
     _delayed.push_back(action);
 }
 
+int Area::eventUserDefined(int eventNumber) {
+    int id = _eventCounter++;
+
+    UserDefinedEvent event { eventNumber };
+    _events.insert(make_pair(id, move(event)));
+
+    return id;
+}
+
+void Area::signalEvent(int eventId) {
+    auto it = _events.find(eventId);
+    if (it == _events.end()) {
+        warn("Event not found by id: " + to_string(eventId));
+        return;
+    }
+    if (!_scripts[ScriptType::OnUserDefined].empty()) {
+        runScript(_scripts[ScriptType::OnUserDefined], kObjectArea, kObjectInvalid, it->second.eventNumber);
+    }
+    _events.erase(it);
+}
+
 void Area::runOnEnterScript() {
-    if (_scriptsEnabled && !_scripts[ScriptType::OnEnter].empty()) {
-        runScript(_scripts[ScriptType::OnEnter], kObjectArea, _player->id());
+    if (_scriptsEnabled) {
+        if (!_scripts[ScriptType::OnEnter].empty()) {
+            runScript(_scripts[ScriptType::OnEnter], kObjectArea, _player->id(), -1);
+        }
     }
 }
 

@@ -151,6 +151,7 @@ private:
 };
 
 const std::string &describeByteCode(ByteCode code);
+std::string describeInstruction(const Instruction &ins);
 
 } // namespace script
 
