@@ -28,7 +28,8 @@ public:
     Door(uint32_t id);
 
     void load(const resources::GffStruct &gffs);
-    virtual void open(const std::shared_ptr<Object> &trigerrer);
+    virtual void open(const std::shared_ptr<Object> &triggerrer);
+    void close(const std::shared_ptr<Object> &triggerrer);
     void saveTo(AreaState &state) const override;
     void loadState(const AreaState &state) override;
 

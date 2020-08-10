@@ -113,13 +113,6 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
-enum class ScriptType {
-    OnEnter,
-    OnExit,
-    OnHeartbeat,
-    OnUserDefined
-};
-
 enum class DebugMode {
     None,
     GameObjects,
@@ -170,6 +163,10 @@ struct AreaState {
 struct GameState {
     std::map<std::string, AreaState> areas;
     PartyConfiguration party;
+    std::map<std::string, bool> globalBooleans;
+    std::map<std::string, int> globalNumbers;
+    std::map<uint32_t, std::map<int, bool>> localBooleans;
+    std::map<uint32_t, int> localNumbers;
 };
 
 struct HudContext {

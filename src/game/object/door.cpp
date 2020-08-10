@@ -80,9 +80,20 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 
-void Door::open(const shared_ptr<Object> &trigerrer) {
-    animate("opened1");
+void Door::open(const shared_ptr<Object> &triggerrer) {
+    if (_model) {
+        _model->setDefaultAnimation("opened1");
+        _model->animate("opening1");
+    }
     _open = true;
+}
+
+void Door::close(const shared_ptr<Object> &triggerrer) {
+    if (_model) {
+        _model->setDefaultAnimation("closed1");
+        _model->animate("closing1");
+    }
+    _open = false;
 }
 
 void Door::saveTo(AreaState &state) const {

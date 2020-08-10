@@ -101,6 +101,34 @@ const string &describeByteCode(ByteCode code) {
     return desc->second;
 }
 
+string describeInstruction(const Instruction &ins) {
+    string byteCodeDesc(describeByteCode(ins.byteCode));
+    switch (ins.byteCode) {
+        case ByteCode::PushConstant:
+            switch (ins.type) {
+                case InstructionType::Int:
+                    byteCodeDesc += " " + to_string(ins.intValue);
+                    break;
+                case InstructionType::Float:
+                    byteCodeDesc += " " + to_string(ins.floatValue);
+                    break;
+                case InstructionType::String:
+                    byteCodeDesc += " \"" + ins.strValue + "\"";
+                    break;
+                case InstructionType::Object:
+                    byteCodeDesc += " " + to_string(ins.objectId);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return move(byteCodeDesc);
+}
+
 } // namespace script
 
 } // namespace reone

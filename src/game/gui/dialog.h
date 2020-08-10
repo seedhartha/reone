@@ -40,6 +40,7 @@ public:
 
 private:
     resources::GameVersion _version { resources::GameVersion::KotOR };
+    const Object *_owner { nullptr };
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;

@@ -151,7 +151,7 @@ void DialogGui::onReplyClicked(int index) {
 
 void DialogGui::finish() {
     if (!_dialog->endScript().empty()) {
-        runScript(_dialog->endScript(), kObjectInvalid, kObjectInvalid);
+        runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
     }
     if (_onSpeakerChanged) {
         _onSpeakerChanged(_currentSpeaker, "");
@@ -167,6 +167,7 @@ void DialogGui::startDialog(const Object &owner, const string &resRef) {
         if (_onDialogFinished) _onDialogFinished();
         return;
     }
+    _owner = &owner;
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
@@ -199,7 +200,8 @@ void DialogGui::loadStartEntry() {
 }
 
 bool DialogGui::checkCondition(const string &script) {
-    return runScript(script, kObjectInvalid, kObjectInvalid) != 0;
+    int result = runScript(script, _owner->id(), kObjectInvalid, -1);
+    return result == -1 || result == 1;
 }
 
 void DialogGui::loadCurrentEntry() {
@@ -243,7 +245,7 @@ void DialogGui::loadCurrentEntry() {
     }
 
     if (!_currentEntry->script.empty()) {
-        runScript(_currentEntry->script, kObjectInvalid, kObjectInvalid);
+        runScript(_currentEntry->script, _owner->id(), kObjectInvalid, -1);
     }
     if (replyCount == 0) finish();
 }

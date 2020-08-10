@@ -33,11 +33,29 @@ public:
     virtual ~IRoutineCallbacks() {
     }
 
+    // Commands/actions
     virtual void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) = 0;
+    virtual void actionStartConversation(uint32_t objectId, const std::string &resRef) = 0;
+
+    // Events
+    virtual int eventUserDefined(int eventNumber) = 0;
+    virtual void signalEvent(int eventId) = 0;
+
+    // Getters
     virtual std::shared_ptr<Object> getObjectById(uint32_t id) = 0;
     virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag) = 0;
+    virtual std::shared_ptr<Object> getWaypointByTag(const std::string &tag) = 0;
     virtual std::shared_ptr<Object> getPlayer() = 0;
-    virtual void startDialog(uint32_t objectId, const std::string &resRef) = 0;
+    virtual bool getGlobalBoolean(const std::string &name) const = 0;
+    virtual int getGlobalNumber(const std::string &name) const = 0;
+    virtual bool getLocalBoolean(uint32_t objectId, int index) const = 0;
+    virtual int getLocalNumber(uint32_t objectId) const = 0;
+
+    // Setters
+    virtual void setGlobalBoolean(const std::string &name, bool value) = 0;
+    virtual void setGlobalNumber(const std::string &name, int value) = 0;
+    virtual void setLocalBoolean(uint32_t objectId, int index, bool value) = 0;
+    virtual void setLocalNumber(uint32_t objectId, int value) = 0;
 };
 
 } // namespace game

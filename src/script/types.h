@@ -55,6 +55,7 @@ struct ExecutionContext {
     std::shared_ptr<ExecutionState> savedState;
     uint32_t callerId { kObjectInvalid };
     uint32_t triggererId { kObjectInvalid };
+    int userDefinedEventNumber { -1 };
 };
 
 } // namespace script
