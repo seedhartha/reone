@@ -30,6 +30,7 @@
 #include "bwmfile.h"
 #include "folder.h"
 #include "mdlfile.h"
+#include "ncsfile.h"
 #include "rimfile.h"
 #include "tgafile.h"
 #include "tpcfile.h"
@@ -40,6 +41,7 @@ using namespace std;
 
 using namespace reone::audio;
 using namespace reone::render;
+using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -67,6 +69,7 @@ static map<string, shared_ptr<AudioStream>> g_audioCache;
 static map<string, shared_ptr<Font>> g_fontCache;
 static map<string, shared_ptr<GffStruct>> g_gffCache;
 static map<string, shared_ptr<Model>> g_modelCache;
+static map<string, shared_ptr<ScriptProgram>> g_scripts;
 static map<string, shared_ptr<ByteArray>> g_resCache;
 static map<string, shared_ptr<TalkTable>> g_talkTableCache;
 static map<string, shared_ptr<Texture>> g_texCache;
@@ -146,6 +149,7 @@ void ResourceManager::clearCaches() {
     g_fontCache.clear();
     g_gffCache.clear();
     g_modelCache.clear();
+    g_scripts.clear();
     g_resCache.clear();
     g_talkTableCache.clear();
     g_texCache.clear();
@@ -454,6 +458,25 @@ shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
     }
 
     auto pair = g_fontCache.insert(make_pair(resRef2, font));
+
+    return pair.first->second;
+}
+
+shared_ptr<ScriptProgram> ResourceManager::findScript(const string &resRef) {
+    auto it = g_scripts.find(resRef);
+    if (it != g_scripts.end()) return it->second;
+
+    debug("Loading script program " + resRef);
+    shared_ptr<ScriptProgram> program;
+    shared_ptr<ByteArray> ncsData(ResMan.find(resRef, ResourceType::CompiledScript));
+
+    if (ncsData) {
+        NcsFile ncs(resRef);
+        ncs.load(wrap(ncsData));
+        program = ncs.program();
+    }
+
+    auto pair = g_scripts.insert(make_pair(resRef, program));
 
     return pair.first->second;
 }

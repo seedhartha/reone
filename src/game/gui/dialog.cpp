@@ -24,7 +24,6 @@
 #include "../../gui/control/panel.h"
 #include "../../resources/resources.h"
 #include "../../script/execution.h"
-#include "../../script/scripts.h"
 
 #include "../types.h"
 
@@ -191,7 +190,7 @@ void DialogGui::loadStartEntry() {
 }
 
 bool DialogGui::checkCondition(const string &script) {
-    shared_ptr<ScriptProgram> program(ScriptMan.find(script));
+    shared_ptr<ScriptProgram> program(ResMan.findScript(script));
     return ScriptExecution(program, ExecutionContext()).run() != 0;
 }
 
@@ -231,7 +230,7 @@ void DialogGui::loadCurrentEntry() {
     }
 
     if (!_currentEntry->script.empty()) {
-        ScriptExecution(ScriptMan.find(_currentEntry->script), ExecutionContext()).run();
+        ScriptExecution(ResMan.findScript(_currentEntry->script), ExecutionContext()).run();
     }
     if (replyCount == 0 && _onDialogFinished) {
         if (_onSpeakerChanged) {

@@ -28,6 +28,7 @@
 #include "../render/font.h"
 #include "../render/model.h"
 #include "../render/walkmesh.h"
+#include "../script/program.h"
 
 #include "2dafile.h"
 #include "gfffile.h"
@@ -56,6 +57,7 @@ public:
     std::shared_ptr<render::Walkmesh> findWalkmesh(const std::string &resRef, ResourceType type);
     std::shared_ptr<render::Texture> findTexture(const std::string &resRef, render::TextureType type);
     std::shared_ptr<render::Font> findFont(const std::string &resRef);
+    std::shared_ptr<script::ScriptProgram> findScript(const std::string &resRef);
 
     const TalkTableString &getString(int32_t ref) const;
 
