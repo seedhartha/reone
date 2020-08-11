@@ -42,6 +42,8 @@ namespace reone {
 
 namespace game {
 
+static const int kAppearanceDarthRevan = 22;
+
 Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
     _version(version),
     _path(path),
@@ -86,7 +88,12 @@ void Game::loadMainMenu() {
         _screen = Screen::ClassSelection;
     });
     mainMenu->setOnExit([this]() { _quit = true; });
-    mainMenu->setOnModuleSelected([this](const string &name) { loadModule(name, PartyConfiguration()); });
+    mainMenu->setOnModuleSelected([this](const string &name) {
+        PartyConfiguration party;
+        party.leader.appearance = kAppearanceDarthRevan;
+
+        loadModule(name, party);
+    });
     _mainMenu = move(mainMenu);
 }
 

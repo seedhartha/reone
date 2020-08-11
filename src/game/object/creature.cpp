@@ -203,20 +203,23 @@ void Creature::load(const CreatureConfiguration &config) {
 }
 
 void Creature::loadPortrait(int appearance) {
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> portraits(resources.find2DA("portraits"));
+    shared_ptr<TwoDaTable> portraits(ResMan.find2DA("portraits"));
     string appearanceString(to_string(appearance));
-    string resRef(portraits->getStringFromRowByColumnValue("baseresref", "appearancenumber", appearanceString, ""));
 
-    if (resRef.empty()) {
-        resRef = portraits->getStringFromRowByColumnValue("baseresref", "appearance_s", appearanceString, "");
+    const TwoDaRow *row = portraits->findRow([&appearanceString](const TwoDaRow &r) {
+        return
+            r.getString("appearancenumber") == appearanceString ||
+            r.getString("appearance_s") == appearanceString ||
+            r.getString("appearance_l") == appearanceString;
+    });
+    if (!row) {
+        warn("Creature: portrait not found: " + appearanceString);
+        return;
     }
-    if (resRef.empty()) {
-        resRef = portraits->getStringFromRowByColumnValue("baseresref", "appearance_l", appearanceString, "");
-    }
-
+    string resRef(row->getString("baseresref"));
     boost::to_lower(resRef);
-    _portrait = resources.findTexture(resRef, TextureType::GUI);
+
+    _portrait = ResMan.findTexture(resRef, TextureType::GUI);
 }
 
 void Creature::initGL() {

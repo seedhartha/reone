@@ -61,8 +61,6 @@ static const float kElevationTestOffset = 0.1f;
 static const float kElevationTestDistance = 1.0f;
 static const float kKeepPathDuration = 1000.0f;
 
-static const int kRevanAppearance = 22;
-
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";

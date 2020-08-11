@@ -19,24 +19,36 @@
 
 #include "binfile.h"
 
+#include <map>
+
 namespace reone {
 
 namespace resources {
 
-struct TwoDaRow {
-    std::vector<std::string> values;
+class TwoDaRow {
+public:
+    void add(const std::string &column, const std::string &value);
+
+    const std::string &getString(const std::string &column) const;
+    int getInt(const std::string &column) const;
+    float getFloat(const std::string &column) const;
+
+    const std::map<std::string, std::string> &values() const;
+
+private:
+    std::map<std::string, std::string> _values;
 };
 
 class TwoDaTable {
 public:
     TwoDaTable() = default;
 
-    int getColumnIndex(const std::string &name) const;
+    const TwoDaRow *findRow(const std::function<bool(const TwoDaRow &)> &pred) const;
+    const TwoDaRow *findRowByColumnValue(const std::string &columnName, const std::string &columnValue) const;
     const std::string &getString(int row, const std::string &column) const;
-    int getInt(int row, const std::string &column, int defValue) const;
-    uint32_t getUint(int row, const std::string &column, uint32_t defValue) const;
-    float getFloat(int row, const std::string &column, float defValue) const;
-    const std::string &getStringFromRowByColumnValue(const std::string &column, const std::string &rowByColumn, const std::string &columnValue, const std::string &defValue) const;
+    int getInt(int row, const std::string &column, int defValue = 0) const;
+    uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
+    float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
 
     const std::vector<std::string> &headers() const;
     const std::vector<TwoDaRow> &rows() const;
