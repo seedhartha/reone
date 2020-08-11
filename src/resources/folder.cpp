@@ -49,6 +49,7 @@ void Folder::loadDirectory(const fs::path &path) {
         boost::to_lower(resRef);
 
         string ext(childPath.extension().string().substr(1));
+        boost::to_lower(ext);
 
         Resource res;
         res.path = childPath;
