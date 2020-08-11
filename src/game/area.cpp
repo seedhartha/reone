@@ -116,9 +116,9 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
     }
 
     JobExecutor::instance().enqueue([this](const atomic_bool &cancel) {
-        info("Computing navigation mesh");
+        debug("Area: compute nav mesh");
         _navMesh->compute(cancel);
-        info("Finished computing NavMesh");
+        debug("Area: nav mesh computed");
     });
 }
 
@@ -331,7 +331,7 @@ void Area::updateDelayedCommands() {
         if (now >= command.timestamp) {
             shared_ptr<ScriptProgram> program(command.context.savedState->program);
 
-            debug("Executing delayed command from " + program->name());
+            debug(boost::format("Area: run delayed: %s %08x") % program->name() % command.context.savedState->insOffset);
             ScriptExecution(program, command.context).run();
 
             command.executed = true;

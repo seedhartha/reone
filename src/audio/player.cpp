@@ -39,7 +39,7 @@ AudioPlayer &AudioPlayer::instance() {
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
     if (_opts.musicVolume == 0 && _opts.soundVolume == 0) {
-        info("Music and sound volume set to 0, disabling audio");
+        info("Audio disabled");
         return;
     }
 
