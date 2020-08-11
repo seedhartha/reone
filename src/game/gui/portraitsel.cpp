@@ -75,23 +75,17 @@ void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
     if (!_portraits.empty() && info.gender == _character.gender) return;
 
     _character = info;
-    string sex = to_string(_character.gender == Gender::Female ? 1 : 0);
 
     shared_ptr<TwoDaTable> portraits(ResMan.find2DA("portraits"));
-    int baseResRefIdx = portraits->getColumnIndex("baseresref");
-    int sexIdx = portraits->getColumnIndex("sex");
-    int forPcIdx = portraits->getColumnIndex("forpc");
-    int appearanceNumberIdx = portraits->getColumnIndex("appearancenumber");
-    int appearanceSIdx = portraits->getColumnIndex("appearance_s");
-    int appearanceLIdx = portraits->getColumnIndex("appearance_l");
+    int sex = _character.gender == Gender::Female ? 1 : 0;
 
     _portraits.clear();
     for (auto &row : portraits->rows()) {
-        if (row.values[forPcIdx] == "1" && row.values[sexIdx] == sex) {
-            string resRef(row.values[baseResRefIdx]);
-            int appearanceNumber(stoi(row.values[appearanceNumberIdx]));
-            int appearanceS(stoi(row.values[appearanceSIdx]));
-            int appearanceL(stoi(row.values[appearanceLIdx]));
+        if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
+            string resRef(row.getString("baseresref"));
+            int appearanceNumber = row.getInt("appearancenumber");
+            int appearanceS = row.getInt("appearance_s");
+            int appearanceL = row.getInt("appearance_l");
 
             shared_ptr<Texture> image(ResMan.findTexture(resRef, TextureType::GUI));
             image->initGL();

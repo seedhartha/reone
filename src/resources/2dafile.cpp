@@ -34,26 +34,57 @@ namespace resources {
 static const int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
-int TwoDaTable::getColumnIndex(const std::string &name) const {
-    for (int i = 0; i < _headers.size(); ++i) {
-        if (_headers[i] == name) {
-            return i;
+void TwoDaRow::add(const string &column, const string &value) {
+    _values.insert(make_pair(column, value));
+}
+
+const string &TwoDaRow::getString(const string &column) const {
+    auto val = _values.find(column);
+    assert(val != _values.end());
+
+    return val->second;
+}
+
+int TwoDaRow::getInt(const string &column) const {
+    return stoi(getString(column));
+}
+
+float TwoDaRow::getFloat(const string &column) const {
+    return stof(getString(column));
+}
+
+const map<string, string> &TwoDaRow::values() const {
+    return _values;
+}
+
+const TwoDaRow *TwoDaTable::findRow(const function<bool(const TwoDaRow &)> &pred) const {
+    auto row = find_if(_rows.begin(), _rows.end(), pred);
+    return row != _rows.end() ? &*row : nullptr;
+}
+
+const TwoDaRow *TwoDaTable::findRowByColumnValue(const string &columnName, const string &columnValue) const {
+    if (find(_headers.begin(), _headers.end(), columnName) == _headers.end()) {
+        throw logic_error("2DA: column not found: " + columnName);
+    }
+    for (auto &row : _rows) {
+        if (row.getString(columnName) == columnValue) {
+            return &row;
         }
     }
-    return -1;
+    warn(boost::format("2DA: cell not found: %s %s") % columnName % columnValue);
+
+    return nullptr;
 }
 
 const string &TwoDaTable::getString(int row, const string &column) const {
-    if (row >= _rows.size()) {
+    if (row < 0 || row >= _rows.size()) {
         throw out_of_range("2DA: row index out of range: " + to_string(row));
     }
-    auto it = find(_headers.begin(), _headers.end(), column);
-    if (it == _headers.end()) {
+    if (find(_headers.begin(), _headers.end(), column) == _headers.end()) {
         throw logic_error("2DA: column not found: " + column);
     }
-    int idx = static_cast<int>(distance(_headers.begin(), it));
 
-    return _rows[row].values[idx];
+    return _rows[row].getString(column);
 }
 
 int TwoDaTable::getInt(int row, const string &column, int defValue) const {
@@ -75,21 +106,6 @@ float TwoDaTable::getFloat(int row, const string &column, float defValue) const 
     if (value.empty()) return defValue;
 
     return stof(value);
-}
-
-const string &TwoDaTable::getStringFromRowByColumnValue(const string &column, const string &rowByColumn, const string &columnValue, const string &defValue) const {
-    int columnIdx = static_cast<int>(distance(_headers.begin(), find(_headers.begin(), _headers.end(), column)));
-    int rowByColumnIdx = static_cast<int>(distance(_headers.begin(), find(_headers.begin(), _headers.end(), rowByColumn)));
-
-    for (auto &row : _rows) {
-        if (row.values[rowByColumnIdx] == columnValue) {
-            return row.values[columnIdx];
-        }
-    }
-
-    warn(boost::format("2DA: cell not found: %s %s %s") % column % rowByColumn % columnValue);
-
-    return defValue;
 }
 
 const vector<string> &TwoDaTable::headers() const {
@@ -166,12 +182,13 @@ void TwoDaFile::loadRows() {
 
     for (int i = 0; i < _rowCount; ++i) {
         TwoDaRow row;
-        row.values.resize(columnCount);
 
         for (int j = 0; j < columnCount; ++j) {
+            const string &name = _table->_headers[j];
             int cellIdx = i * columnCount + j;
             uint32_t off = pos + offsets[cellIdx];
-            row.values[j] = readString(off);
+
+            row.add(name, readString(off));
         }
 
         _table->_rows.push_back(row);

@@ -43,11 +43,9 @@ void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
     auto &rows = table->rows();
 
     for (auto &row : rows) {
-        auto &values = row.values;
         pt::ptree child;
-        for (int i = 0; i < headers.size(); ++i) {
-            const string &val = values[i];
-            child.put(headers[i], val);
+        for (auto &value : row.values()) {
+            child.put(value.first, value.second);
         }
         children.push_back(make_pair("", child));
     }
