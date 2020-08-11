@@ -218,11 +218,11 @@ void DialogGui::loadCurrentEntry() {
     }
 
     shared_ptr<AudioStream> voice;
-    if (!_currentEntry->voResRef.empty()) {
-        voice = ResMan.findAudio(_currentEntry->voResRef);
-    }
-    if (!voice && !_currentEntry->sound.empty()) {
+    if (!_currentEntry->sound.empty()) {
         voice = ResMan.findAudio(_currentEntry->sound);
+    }
+    if (!voice && !_currentEntry->voResRef.empty()) {
+        voice = ResMan.findAudio(_currentEntry->voResRef);
     }
     if (voice) {
         _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);
