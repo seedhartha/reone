@@ -64,7 +64,7 @@ void Program::loadOptions() {
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
-        ("debug", po::value<bool>()->default_value(false), "enable debug mode");
+        ("debug", po::value<int>()->default_value(0), "debug level (0-3)");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
@@ -90,9 +90,9 @@ void Program::loadOptions() {
     _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
     _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
-    _gameOpts.debug = _vars["debug"].as<bool>();
+    _gameOpts.debug = _vars["debug"].as<int>();
 
-    setDebugLogEnabled(_gameOpts.debug);
+    setDebugLevel(_gameOpts.debug);
 
     initGameVersion();
     initMultiplayerMode();

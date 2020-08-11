@@ -30,10 +30,14 @@ enum class LogLevel {
     Debug
 };
 
-static bool g_debugEnabled = false;
+static uint32_t g_debugLevel = 0;
 
-void setDebugLogEnabled(bool enabled) {
-    g_debugEnabled = enabled;
+void setDebugLevel(uint32_t level) {
+    g_debugLevel = level;
+}
+
+uint32_t getDebugLevel() {
+    return g_debugLevel;
 }
 
 inline static const char *describeLogLevel(LogLevel level) {
@@ -80,16 +84,16 @@ void info(const boost::format &s) {
     log(cout, LogLevel::Info, str(s));
 }
 
-void debug(const string &s) {
-    if (g_debugEnabled) {
+void debug(const string &s, uint32_t level) {
+    assert(level > 0);
+
+    if (level <= g_debugLevel) {
         log(cout, LogLevel::Debug, s);
     }
 }
 
-void debug(const boost::format &s) {
-    if (g_debugEnabled) {
-        log(cout, LogLevel::Debug, str(s));
-    }
+void debug(const boost::format &s, uint32_t level) {
+    return debug(str(s), level);
 }
 
 } // namespace reone
