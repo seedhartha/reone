@@ -392,18 +392,17 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     size_t pointCount = path->points.size();
     glm::vec3 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
 
-if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
-    selectNextPathPoint(*path);
-} else if (moveCreatureTowards(creature, dest, dt)) {
-    selectNextPathPoint(*path);
-    creature.setMovementType(MovementType::Run);
-} else {
-    creature.setMovementType(MovementType::None);
-}
+    if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
+        selectNextPathPoint(*path);
+    } else if (moveCreatureTowards(creature, dest, dt)) {
+        selectNextPathPoint(*path);
+        creature.setMovementType(MovementType::Run);
+    } else {
+        creature.setMovementType(MovementType::None);
+    }
 }
 
 void Area::selectNextPathPoint(Creature::Path &path) {
-    ;
     size_t pointCount = path.points.size();
     if (path.pointIdx < pointCount) path.pointIdx++;
 }
