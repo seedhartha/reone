@@ -15,32 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "program.h"
+#pragma once
 
-#include <stdexcept>
-
-#include <boost/format.hpp>
-
-using namespace std;
+#include <string>
 
 namespace reone {
 
 namespace script {
 
-ScriptProgram::ScriptProgram(const string &name) : _name(name) {
-}
+enum class ByteCode;
 
-const string &ScriptProgram::name() const {
-    return _name;
-}
+struct Instruction;
 
-uint32_t ScriptProgram::length() const {
-    return _length;
-}
-
-const Instruction &ScriptProgram::getInstruction(uint32_t offset) const {
-    return _instructions.find(offset)->second;
-}
+std::string describeInstruction(const Instruction &ins);
+const std::string &describeByteCode(ByteCode code);
 
 } // namespace script
 

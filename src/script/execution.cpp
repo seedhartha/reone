@@ -24,6 +24,7 @@
 #include "../core/log.h"
 
 #include "routine.h"
+#include "util.h"
 
 using namespace std;
 using namespace std::placeholders;
