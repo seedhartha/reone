@@ -56,7 +56,7 @@ void MainMenu::load(GameVersion version) {
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
 
-    if (!_opts.debug) {
+    if (_opts.debug == 0) {
         hideControl("BTN_WARP");
     }
     _version = version;

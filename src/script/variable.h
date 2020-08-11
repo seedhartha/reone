@@ -73,6 +73,8 @@ struct Variable {
     bool operator<=(const Variable &other) const;
     bool operator>(const Variable &other) const;
     bool operator>=(const Variable &other) const;
+
+    const std::string toString() const;
 };
 
 } // namespace script

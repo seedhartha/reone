@@ -200,6 +200,28 @@ bool Variable::operator>=(const Variable &other) const {
     }
 }
 
+const string Variable::toString() const {
+    switch (type) {
+        case VariableType::Void:
+            return "void";
+        case VariableType::Int:
+            return to_string(intValue);
+        case VariableType::Float:
+            return to_string(floatValue);
+        case VariableType::Object:
+            return to_string(objectId);
+        case VariableType::String:
+            return str(boost::format("\"%s\"") % strValue);
+        case VariableType::Effect:
+        case VariableType::Event:
+        case VariableType::Location:
+        case VariableType::Talent:
+            return to_string(engineTypeId);
+        default:
+            return "[not implemented]";
+    }
+}
+
 } // namespace script
 
 } // namespace reone

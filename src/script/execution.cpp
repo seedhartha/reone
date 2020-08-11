@@ -82,7 +82,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 }
 
 int ScriptExecution::run() {
-    debug("Script: executing program: " + _program->name());
+    debug("Script: " + _program->name());
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {
@@ -100,12 +100,14 @@ int ScriptExecution::run() {
         const Instruction &ins = _program->getInstruction(insOff);
         auto handler = _handlers.find(ins.byteCode);
         if (handler == _handlers.end()) {
-            warn("Script: instruction not implemented: " + describeByteCode(ins.byteCode));
-            return 1;
+            warn("Script: not implemented: " + describeByteCode(ins.byteCode));
+            return -1;
         }
         _nextInstruction = ins.nextOffset;
 
-        debug("Script: " + describeInstruction(ins));
+        if (getDebugLevel() >= 2) {
+            debug("Script: " + describeInstruction(ins), 3);
+        }
         handler->second(ins);
 
         insOff = _nextInstruction;
@@ -199,9 +201,8 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
 
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     const Routine &routine = _context.routines->get(ins.routine);
-    debug("Script: calling routine " + routine.name());
-
     vector<Variable> args;
+
     for (int i = 0; i < ins.argCount; ++i) {
         switch (routine.argumentType(i)) {
             case VariableType::Vector:
@@ -223,6 +224,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     }
 
     Variable retValue = routine.invoke(args, _context);
+    if (getDebugLevel() >= 2) {
+        debug(boost::format("Script: %s -> %s") % routine.name() % retValue.toString(), 2);
+    }
 
     switch (routine.returnType()) {
         case VariableType::Void:
