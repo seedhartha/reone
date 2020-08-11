@@ -219,7 +219,7 @@ shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType t
     if (it != g_resCache.end()) {
         return it->second;
     }
-    debug("Loading resource " + cacheKey);
+    debug("Resources: load " + cacheKey, 2);
 
     shared_ptr<ByteArray> data = find(_transientProviders, resRef, type);
     if (!data) {
@@ -240,7 +240,7 @@ shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType t
         }
     }
     if (!data) {
-        warn("Resource not found: " + cacheKey);
+        warn("Resources: not found: " + cacheKey);
     }
 
     auto pair = g_resCache.insert(make_pair(cacheKey, move(data)));
@@ -249,7 +249,7 @@ shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType t
 }
 
 string ResourceManager::getCacheKey(const string &resRef, resources::ResourceType type) const {
-    return str(boost::format("%s:%s") % resRef % getExtByResType(type));
+    return str(boost::format("%s.%s") % resRef % getExtByResType(type));
 }
 
 shared_ptr<ByteArray> ResourceManager::find(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
@@ -269,8 +269,6 @@ shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
     if (it != g_2daCache.end()) {
         return it->second;
     }
-    debug("Loading 2DA table " + resRef);
-
     shared_ptr<ByteArray> twoDaData(find(resRef, ResourceType::TwoDa));
     shared_ptr<TwoDaTable> table;
 
@@ -278,8 +276,6 @@ shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
         TwoDaFile twoDa;
         twoDa.load(wrap(twoDaData));
         table = twoDa.table();
-    } else {
-        warn("2DA table not found: " + resRef);
     }
 
     auto pair = g_2daCache.insert(make_pair(resRef, table));
@@ -293,8 +289,6 @@ shared_ptr<GffStruct> ResourceManager::findGFF(const string &resRef, ResourceTyp
     if (it != g_gffCache.end()) {
         return it->second;
     }
-    debug("Loading GFF " + cacheKey);
-
     shared_ptr<ByteArray> gffData(find(resRef, type));
     shared_ptr<GffStruct> gffs;
 
@@ -302,8 +296,6 @@ shared_ptr<GffStruct> ResourceManager::findGFF(const string &resRef, ResourceTyp
         GffFile gff;
         gff.load(wrap(gffData));
         gffs = gff.top();
-    } else {
-        warn("GFF file not found: " + cacheKey);
     }
 
     auto pair = g_gffCache.insert(make_pair(cacheKey, gffs));
@@ -316,8 +308,6 @@ shared_ptr<TalkTable> ResourceManager::findTalkTable(const string &resRef) {
     if (it != g_talkTableCache.end()) {
         return it->second;
     }
-    debug("Loading talk table " + resRef);
-
     shared_ptr<ByteArray> tlkData(find(resRef, ResourceType::Conversation));
     shared_ptr<TalkTable> table;
 
@@ -325,8 +315,6 @@ shared_ptr<TalkTable> ResourceManager::findTalkTable(const string &resRef) {
         TlkFile tlk;
         tlk.load(wrap(tlkData));
         table = tlk.table();
-    } else {
-        warn("TLK file not found: " + resRef);
     }
 
     auto pair = g_talkTableCache.insert(make_pair(resRef, table));
@@ -339,7 +327,6 @@ shared_ptr<AudioStream> ResourceManager::findAudio(const string &resRef) {
     if (it != g_audioCache.end()) {
         return it->second;
     }
-    debug("Loading audio stream " + resRef);
 
     shared_ptr<ByteArray> wavData(find(resRef, ResourceType::Wav));
     shared_ptr<AudioStream> stream;
@@ -348,8 +335,6 @@ shared_ptr<AudioStream> ResourceManager::findAudio(const string &resRef) {
         WavFile wav;
         wav.load(wrap(wavData));
         stream = wav.stream();
-    } else {
-        warn("Audio stream not found: " + resRef);
     }
 
     auto pair = g_audioCache.insert(make_pair(resRef, stream));
@@ -362,8 +347,6 @@ shared_ptr<Model> ResourceManager::findModel(const string &resRef) {
     if (it != g_modelCache.end()) {
         return it->second;
     }
-    debug("Loading model " + resRef);
-
     shared_ptr<ByteArray> mdlData(find(resRef, ResourceType::Model));
     shared_ptr<ByteArray> mdxData(find(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
@@ -372,8 +355,6 @@ shared_ptr<Model> ResourceManager::findModel(const string &resRef) {
         MdlFile mdl(_version);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
-    } else {
-        warn("Model not found: " + resRef);
     }
 
     auto pair = g_modelCache.insert(make_pair(resRef, model));
@@ -386,8 +367,6 @@ shared_ptr<Walkmesh> ResourceManager::findWalkmesh(const string &resRef, Resourc
     if (it != g_walkmeshCache.end()) {
         return it->second;
     }
-    debug("Loading walkmesh " + resRef);
-
     shared_ptr<ByteArray> bwmData(find(resRef, type));
     shared_ptr<Walkmesh> walkmesh;
 
@@ -407,7 +386,6 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
     if (it != g_texCache.end()) {
         return it->second;
     }
-    debug("Loading texture " + resRef);
     bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
     shared_ptr<Texture> texture;
 
@@ -427,9 +405,6 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
             texture = tga.texture();
         }
     }
-    if (!texture) {
-        warn("Texture not found: " + resRef);
-    }
 
     auto pair = g_texCache.insert(make_pair(resRef, texture));
 
@@ -438,26 +413,22 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
 
 shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
     auto fontOverride = g_fontOverride.find(resRef);
-    const string &resRef2 = fontOverride != g_fontOverride.end() ? fontOverride->second : resRef;
+    const string &finalResRef = fontOverride != g_fontOverride.end() ? fontOverride->second : resRef;
 
-    auto it = g_fontCache.find(resRef2);
+    auto it = g_fontCache.find(finalResRef);
     if (it != g_fontCache.end()) {
         return it->second;
     }
-    debug("Loading font " + resRef2);
 
     shared_ptr<Font> font;
-    shared_ptr<Texture> texture(findTexture(resRef2, TextureType::GUI));
+    shared_ptr<Texture> texture(findTexture(finalResRef, TextureType::GUI));
 
     if (texture) {
         font = make_shared<Font>();
         font->load(texture);
     }
-    if (!font) {
-        warn("Font not found: " + resRef2);
-    }
 
-    auto pair = g_fontCache.insert(make_pair(resRef2, font));
+    auto pair = g_fontCache.insert(make_pair(finalResRef, font));
 
     return pair.first->second;
 }
@@ -466,7 +437,6 @@ shared_ptr<ScriptProgram> ResourceManager::findScript(const string &resRef) {
     auto it = g_scripts.find(resRef);
     if (it != g_scripts.end()) return it->second;
 
-    debug("Loading script program " + resRef);
     shared_ptr<ScriptProgram> program;
     shared_ptr<ByteArray> ncsData(ResMan.find(resRef, ResourceType::CompiledScript));
 

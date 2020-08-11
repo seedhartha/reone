@@ -72,7 +72,7 @@ void Module::loadInfo(const GffStruct &ifo) {
 }
 
 void Module::loadArea(const GffStruct &ifo) {
-    reone::info("Loading area " + _info.entryArea);
+    reone::info("Module: load area: " + _info.entryArea);
 
     ResourceManager &resources = ResourceManager::instance();
     shared_ptr<GffStruct> are(resources.findGFF(_info.entryArea, ResourceType::Area));

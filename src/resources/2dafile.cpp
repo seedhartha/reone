@@ -87,7 +87,7 @@ const string &TwoDaTable::getStringFromRowByColumnValue(const string &column, co
         }
     }
 
-    warn(boost::format("Cell not found: %s %s %s") % column % rowByColumn % columnValue);
+    warn(boost::format("2DA: cell not found: %s %s %s") % column % rowByColumn % columnValue);
 
     return defValue;
 }

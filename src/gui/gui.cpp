@@ -42,6 +42,8 @@ GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
 }
 
 void GUI::load(const string &resRef, BackgroundType background) {
+    info("GUI: load " + resRef);
+
     shared_ptr<GffStruct> gui(ResMan.findGFF(resRef, ResourceType::Gui));
     assert(gui);
 
@@ -138,7 +140,7 @@ bool GUI::handle(const SDL_Event &event) {
         }
         case SDL_MOUSEBUTTONUP:
             if (_focus && event.button.button == SDL_BUTTON_LEFT) {
-                debug("GUI: control clicked on: " + _focus->tag());
+                debug("GUI: click: " + _focus->tag());
                 glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 return _focus->handleClick(ctrlCoords.x, ctrlCoords.y);
             }

@@ -127,7 +127,7 @@ void Game::loadPortraitsGui() {
 }
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
-    info("Loading module " + name);
+    info("Game: load module: " + name);
     ResMan.loadModule(name);
 
     shared_ptr<GffStruct> ifo(ResMan.findGFF("module", ResourceType::ModuleInfo));

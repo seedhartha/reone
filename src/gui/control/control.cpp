@@ -66,7 +66,7 @@ unique_ptr<Control> Control::makeControl(const GffStruct &gffs) {
             control = make_unique<ScrollBar>();
             break;
         default:
-            warn("Unsupported control type: " + to_string(static_cast<int>(controlType)));
+            warn("GUI: unsupported control type: " + to_string(static_cast<int>(controlType)));
             return nullptr;
     }
 
