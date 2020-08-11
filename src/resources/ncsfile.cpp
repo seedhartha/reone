@@ -192,6 +192,10 @@ void NcsFile::readInstruction(uint32_t &offset) {
             assert(ins.type == InstructionType::Int || ins.type == InstructionType::Float);
             break;
 
+        case ByteCode::OnesComplement:
+            assert(ins.type == InstructionType::Int);
+            break;
+
         case ByteCode::AdjustSP:
             assert(ins.type == InstructionType::None);
             ins.stackOffset = readInt32BE();

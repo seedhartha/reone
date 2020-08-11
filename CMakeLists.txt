@@ -137,6 +137,7 @@ set(HEADERS
     src/script/program.h
     src/script/routine.h
     src/script/types.h
+    src/script/util.h
     src/script/variable.h)
 
 set(SOURCES
@@ -233,6 +234,7 @@ set(SOURCES
     src/script/execution.cpp
     src/script/program.cpp
     src/script/routine.cpp
+    src/script/util.cpp
     src/script/variable.cpp)
 
 add_executable(reone ${HEADERS} ${SOURCES})

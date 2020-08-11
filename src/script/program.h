@@ -56,6 +56,7 @@ enum class ByteCode {
     Divide = 0x17,
     Mod = 0x18,
     Negate = 0x19,
+    OnesComplement = 0x1a,
     AdjustSP = 0x1b,
     Jump = 0x1d,
     JumpToSubroutine = 0x1e,
@@ -149,9 +150,6 @@ private:
 
     friend class resources::NcsFile;
 };
-
-const std::string &describeByteCode(ByteCode code);
-std::string describeInstruction(const Instruction &ins);
 
 } // namespace script
 
