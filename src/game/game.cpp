@@ -180,27 +180,36 @@ void Game::loadDialogGui() {
     unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
     dialog->load(_version);
     dialog->initGL();
-    dialog->setOnSpeakerChanged([this](const string &from, const string &to) {
-        Object *player = _module->area().player().get();
-        Creature *prevSpeaker = !from.empty() ? static_cast<Creature *>(_module->area().find(from).get()) : nullptr;
-        Creature *speaker = !to.empty() ? static_cast<Creature *>(_module->area().find(to).get()) : nullptr;
-
-        if (speaker == player) return;
-
-        if (prevSpeaker) {
-            prevSpeaker->playDefaultAnimation();
-        }
-        if (player && speaker) {
-            player->face(*speaker);
-            speaker->face(*player);
-            speaker->playTalkAnimation();
-            _module->update3rdPersonCameraHeading();
-        }
+    dialog->setGetObjectIdByTagFunc([this](const string &tag) {
+        shared_ptr<Object> object(_module->area().find(tag, ObjectType::Creature));
+        return object ? object->id() : 0;
     });
+    dialog->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
     dialog->setOnDialogFinished([this]() {
         _screen = Screen::InGame;
     });
     _dialogGui = move(dialog);
+}
+
+void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
+    shared_ptr<Object> player(_module->area().player());
+    shared_ptr<Object> prevSpeaker = from != 0 ? _module->area().find(from, ObjectType::Creature) : nullptr;
+    shared_ptr<Object> speaker = to != 0 ? _module->area().find(to, ObjectType::Creature) : nullptr;
+    if (speaker == player) return;
+
+    debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
+
+    if (prevSpeaker) {
+        static_cast<Creature &>(*prevSpeaker).playDefaultAnimation();
+    }
+    if (player && speaker) {
+        player->face(*speaker);
+        speaker->face(*player);
+
+        static_cast<Creature &>(*speaker).playTalkAnimation();
+
+        _module->update3rdPersonCameraHeading();
+    }
 }
 
 const shared_ptr<Module> Game::makeModule(const string &name) {
