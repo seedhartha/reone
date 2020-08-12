@@ -150,11 +150,6 @@ Variable RoutineManager::getLocalBoolean(const vector<Variable> &args, Execution
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Int);
 
-    if (args[1].intValue < 0 || args[1].intValue > 63) {
-        warn("Invalid local boolean index: " + to_string(args[1].intValue));
-        return Variable(false);
-    }
-
     return _callbacks->getLocalBoolean(args[0].objectId, args[1].intValue);
 }
 
@@ -164,12 +159,7 @@ Variable RoutineManager::getLocalNumber(const vector<Variable> &args, ExecutionC
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Int);
 
-    if (args[1].intValue != 0) {
-        warn("Unexpected local number index: " + to_string(args[1].intValue));
-        return Variable(0);
-    }
-
-    return _callbacks->getLocalNumber(args[0].objectId);
+    return _callbacks->getLocalNumber(args[0].objectId, args[1].intValue);
 }
 
 Variable RoutineManager::setGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -213,7 +203,7 @@ Variable RoutineManager::setLocalNumber(const vector<Variable> &args, ExecutionC
         args[1].type == VariableType::Int &&
         args[2].type == VariableType::Int);
 
-    _callbacks->setLocalNumber(args[0].objectId, args[2].intValue);
+    _callbacks->setLocalNumber(args[0].objectId, args[1].intValue, args[2].intValue);
 
     return Variable();
 }
