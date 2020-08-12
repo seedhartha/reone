@@ -260,8 +260,8 @@ Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionCont
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Event);
 
-    if ((args[0].objectId == kObjectArea) ||
-        (args[0].objectId == kObjectSelf) && (ctx.callerId == kObjectArea)) {
+    if (args[0].objectId == kObjectArea ||
+        (args[0].objectId == kObjectSelf && ctx.callerId == kObjectArea)) {
 
         _callbacks->signalEvent(args[1].engineTypeId);
     
