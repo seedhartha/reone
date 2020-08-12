@@ -361,7 +361,7 @@ int Game::getGlobalNumber(const string &name) const {
 }
 
 bool Game::getLocalBoolean(uint32_t objectId, int index) const {
-    assert(index >= 0 && index <= 63);
+    assert(index >= 0);
 
     auto objectIt = _state.localBooleans.find(objectId);
     if (objectIt == _state.localBooleans.end()) return false;
@@ -372,9 +372,14 @@ bool Game::getLocalBoolean(uint32_t objectId, int index) const {
     return boolIt->second;
 }
 
-int Game::getLocalNumber(uint32_t objectId) const {
-    auto it = _state.localNumbers.find(objectId);
-    return it != _state.localNumbers.end() ? it->second : 0;
+int Game::getLocalNumber(uint32_t objectId, int index) const {
+    auto objectIt = _state.localNumbers.find(objectId);
+    if (objectIt == _state.localNumbers.end()) return 0;
+
+    auto numberIt = objectIt->second.find(index);
+    if (numberIt == objectIt->second.end()) return 0;
+
+    return numberIt->second;
 }
 
 void Game::setGlobalBoolean(const string &name, bool value) {
@@ -386,12 +391,13 @@ void Game::setGlobalNumber(const string &name, int value) {
 }
 
 void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
-    assert(index >= 0 && index <= 63);
+    assert(index >= 0);
     _state.localBooleans[objectId][index] = value;
 }
 
-void Game::setLocalNumber(uint32_t objectId, int value) {
-    _state.localNumbers[objectId] = value;
+void Game::setLocalNumber(uint32_t objectId, int index, int value) {
+    assert(index >= 0);
+    _state.localBooleans[objectId][index] = value;
 }
 
 void Game::renderWorld() {

@@ -71,13 +71,13 @@ public:
     bool getGlobalBoolean(const std::string &name) const override;
     int getGlobalNumber(const std::string &name) const override;
     bool getLocalBoolean(uint32_t objectId, int index) const override;
-    int getLocalNumber(uint32_t objectId) const override;
+    int getLocalNumber(uint32_t objectId, int index) const override;
 
     // Setters
     void setGlobalBoolean(const std::string &name, bool value) override;
     void setGlobalNumber(const std::string &name, int value) override;
     void setLocalBoolean(uint32_t objectId, int index, bool value) override;
-    void setLocalNumber(uint32_t objectId, int value) override;
+    void setLocalNumber(uint32_t objectId, int index, int value) override;
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };
