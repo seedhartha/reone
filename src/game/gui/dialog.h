@@ -35,7 +35,8 @@ public:
     void load(resources::GameVersion version);
     void startDialog(const Object &owner, const std::string &resRef);
 
-    void setOnSpeakerChanged(const std::function<void(const std::string &, const std::string &)> &fn);
+    void setGetObjectIdByTagFunc(const std::function<uint32_t(const std::string &)> &fn);
+    void setOnSpeakerChanged(const std::function<void(uint32_t, uint32_t)> &fn);
     void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
@@ -44,8 +45,9 @@ private:
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
-    std::string _currentSpeaker;
-    std::function<void(const std::string &, const std::string &)> _onSpeakerChanged;
+    uint32_t _currentSpeaker { 0 };
+    std::function<uint32_t(const std::string &)> _getObjectIdByTag;
+    std::function<void(uint32_t, uint32_t)> _onSpeakerChanged;
     std::function<void()> _onDialogFinished;
 
     bool handleKeyDown(SDL_Scancode key) override;

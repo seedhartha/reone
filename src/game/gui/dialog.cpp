@@ -153,8 +153,8 @@ void DialogGui::finish() {
     if (!_dialog->endScript().empty()) {
         runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
     }
-    if (_onSpeakerChanged) {
-        _onSpeakerChanged(_currentSpeaker, "");
+    if (_onSpeakerChanged && _currentSpeaker != 0) {
+        _onSpeakerChanged(_currentSpeaker, 0);
     }
     if (_onDialogFinished) {
         _onDialogFinished();
@@ -171,9 +171,9 @@ void DialogGui::startDialog(const Object &owner, const string &resRef) {
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
-    _currentSpeaker = owner.tag();
+    _currentSpeaker = owner.id();
     if (_onSpeakerChanged) {
-        _onSpeakerChanged("", _currentSpeaker);
+        _onSpeakerChanged(0, _currentSpeaker);
     }
 
     loadStartEntry();
@@ -209,10 +209,14 @@ void DialogGui::loadCurrentEntry() {
 
     assert(_currentEntry);
 
-    if (!_currentEntry->speaker.empty() && _currentSpeaker != _currentEntry->speaker) {
-        string prevSpeaker(_currentSpeaker);
-        _currentSpeaker = _currentEntry->speaker;
+    uint32_t speaker = _currentSpeaker;
+    if (!_currentEntry->speaker.empty() && _getObjectIdByTag) {
+        speaker = _getObjectIdByTag(_currentEntry->speaker);
+    }
+    if (_currentSpeaker != speaker) {
         if (_onSpeakerChanged) {
+            uint32_t prevSpeaker = _currentSpeaker;
+            _currentSpeaker = speaker;
             _onSpeakerChanged(prevSpeaker, _currentSpeaker);
         }
     }
@@ -268,7 +272,11 @@ bool DialogGui::handleKeyUp(SDL_Scancode key) {
     return false;
 }
 
-void DialogGui::setOnSpeakerChanged(const function<void(const string&, const string &)> &fn) {
+void DialogGui::setGetObjectIdByTagFunc(const function<uint32_t(const string &)> &fn) {
+    _getObjectIdByTag = fn;
+}
+
+void DialogGui::setOnSpeakerChanged(const function<void(uint32_t, uint32_t)> &fn) {
     _onSpeakerChanged = fn;
 }
 
