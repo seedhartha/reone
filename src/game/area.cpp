@@ -113,7 +113,7 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
         _objects[ObjectType::Trigger].push_back(move(trigger));
     }
 
-    JobExecutor::instance().enqueue([this](const atomic_bool &cancel) {
+    TheJobExecutor.enqueue([this](const atomic_bool &cancel) {
         debug("Area: compute nav mesh");
         _navMesh->compute(cancel);
         debug("Area: nav mesh computed");
@@ -500,7 +500,7 @@ void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
 
     creature.setPathUpdating();
 
-    JobExecutor::instance().enqueue([=, &creature](const atomic_bool &) {
+    TheJobExecutor.enqueue([=, &creature](const atomic_bool &) {
         glm::vec3 origin(creature.position());
         vector<glm::vec3> points(_navMesh->findPath(origin, dest));
         uint32_t now = SDL_GetTicks();
