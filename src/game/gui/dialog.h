@@ -48,6 +48,9 @@ private:
     std::function<void(const std::string &, const std::string &)> _onSpeakerChanged;
     std::function<void()> _onDialogFinished;
 
+    bool handleKeyDown(SDL_Scancode key) override;
+    bool handleKeyUp(SDL_Scancode key) override;
+
     void addTopFrame();
     void addBottomFrame();
     void addFrame(int top, int height);

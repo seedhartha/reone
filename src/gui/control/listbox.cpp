@@ -171,12 +171,21 @@ void ListBox::setExtent(const Extent &extent) {
     updateItems();
 }
 
+const ListBox::Item &ListBox::getItemAt(int index) const {
+    assert(index >= 0 && index < _items.size());
+    return _items[index];
+}
+
 Control &ListBox::protoItem() const {
     return *_protoItem;
 }
 
 Control &ListBox::scrollBar() const {
     return *_scrollBar;
+}
+
+int ListBox::itemCount() const {
+    return static_cast<int>(_items.size());
 }
 
 } // namespace gui

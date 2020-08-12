@@ -130,6 +130,12 @@ void GUI::loadBackground(BackgroundType type) {
 
 bool GUI::handle(const SDL_Event &event) {
     switch (event.type) {
+        case SDL_KEYDOWN:
+            return handleKeyDown(event.key.keysym.scancode);
+
+        case SDL_KEYUP:
+            return handleKeyUp(event.key.keysym.scancode);
+
         case SDL_MOUSEMOTION: {
             glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
             updateFocus(ctrlCoords.x, ctrlCoords.y);
@@ -151,6 +157,14 @@ bool GUI::handle(const SDL_Event &event) {
             break;
     }
 
+    return false;
+}
+
+bool GUI::handleKeyDown(SDL_Scancode key) {
+    return false;
+}
+
+bool GUI::handleKeyUp(SDL_Scancode key) {
     return false;
 }
 
