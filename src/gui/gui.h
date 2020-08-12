@@ -69,6 +69,9 @@ protected:
 
     Control &getControl(const std::string &tag) const;
 
+    virtual bool handleKeyDown(SDL_Scancode key);
+    virtual bool handleKeyUp(SDL_Scancode key);
+
     virtual void onFocusChanged(const std::string &control, bool focus);
     virtual void onClick(const std::string &control);
     virtual void onItemClicked(const std::string &control, const std::string &item);

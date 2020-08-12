@@ -250,6 +250,24 @@ void DialogGui::loadCurrentEntry() {
     if (replyCount == 0) finish();
 }
 
+bool DialogGui::handleKeyDown(SDL_Scancode key) {
+    return false;
+}
+
+bool DialogGui::handleKeyUp(SDL_Scancode key) {
+    if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
+        ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
+        int itemIdx = key - SDL_SCANCODE_1;
+        if (itemIdx < replies.itemCount()) {
+            const ListBox::Item &item = replies.getItemAt(itemIdx);
+            onReplyClicked(stoi(item.tag));
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void DialogGui::setOnSpeakerChanged(const function<void(const string&, const string &)> &fn) {
     _onSpeakerChanged = fn;
 }

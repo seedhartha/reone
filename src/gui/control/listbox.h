@@ -51,8 +51,11 @@ public:
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
 
+    const Item &getItemAt(int index) const;
+
     Control &protoItem() const;
     Control &scrollBar() const;
+    int itemCount() const;
 
 private:
     std::shared_ptr<Control> _protoItem;
