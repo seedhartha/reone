@@ -32,8 +32,12 @@ enum {
 };
 
 const TalkTableString &TalkTable::getString(int32_t ref) const {
-    assert(ref > 0 && ref < _strings.size());
+    assert(ref >= 0 && ref < _strings.size());
     return _strings[ref];
+}
+
+int TalkTable::stringCount() const {
+    return static_cast<int>(_strings.size());
 }
 
 TlkFile::TlkFile() : BinaryFile(8, "TLK V3.0") {

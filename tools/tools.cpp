@@ -55,6 +55,8 @@ unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
         return make_unique<RimTool>();
     } else if (ext == ".2da") {
         return make_unique<TwoDaTool>();
+    } else if (ext == ".tlk") {
+        return make_unique<TlkTool>();
     } else {
         return make_unique<GffTool>();
     }
