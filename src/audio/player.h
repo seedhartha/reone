@@ -30,11 +30,6 @@ namespace reone {
 
 namespace audio {
 
-enum class AudioType {
-    Music,
-    Sound
-};
-
 class AudioPlayer {
 public:
     static AudioPlayer &instance();

@@ -80,6 +80,7 @@ set(HEADERS
     src/game/script/util.h
     src/game/templates.h
     src/game/types.h
+    src/game/util.h
     src/gui/control/button.h
     src/gui/control/control.h
     src/gui/control/label.h
@@ -183,6 +184,7 @@ set(SOURCES
     src/game/script/routines_tsl.cpp
     src/game/script/util.cpp
     src/game/templates.cpp
+    src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp
     src/gui/control/label.cpp

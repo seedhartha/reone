@@ -15,29 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "util.h"
+
+#include "../audio/player.h"
+#include "../resources/resources.h"
+
+using namespace std;
+
+using namespace reone::audio;
+using namespace reone::resources;
 
 namespace reone {
 
-namespace audio {
+namespace game {
 
-enum class AudioFormat {
-    Mono8,
-    Mono16,
-    Stereo8,
-    Stereo16
-};
+shared_ptr<SoundInstance> playMusic(const string &resRef) {
+    shared_ptr<AudioStream> stream(ResMan.findAudio(resRef));
+    return TheAudioPlayer.play(stream, AudioType::Music);
+}
 
-enum class AudioType {
-    Music,
-    Sound
-};
-
-struct AudioOptions {
-    int soundVolume { 85 };
-    int musicVolume { 85 };
-};
-
-} // namespace audio
+} // namespace util
 
 } // namespace reone

@@ -17,11 +17,15 @@
 
 #include "mainmenu.h"
 
+#include "../../audio/player.h"
 #include "../../gui/control/listbox.h"
 #include "../../resources/resources.h"
 
+#include "../util.h"
+
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
@@ -91,7 +95,9 @@ void MainMenu::setButtonColors(const string &tag) {
 
 void MainMenu::onClick(const string &control) {
     if (control == "BTN_NEWGAME") {
-        if (_onNewGame) _onNewGame();
+        if (_onNewGame) {
+            _onNewGame();
+        }
     } else if (control == "BTN_EXIT") {
         if (_onExit) _onExit();
     } else if (control == "BTN_WARP") {

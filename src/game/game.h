@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../audio/soundinstance.h"
 #include "../audio/types.h"
 #include "../gui/gui.h"
 #include "../render/window.h"
@@ -115,6 +116,7 @@ private:
     Screen _screen { Screen::None };
     std::string _nextEntry;
     GameState _state;
+    std::shared_ptr<audio::SoundInstance> _music;
 
     // GUI
     std::shared_ptr<MainMenu> _mainMenu;
