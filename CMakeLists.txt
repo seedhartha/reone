@@ -150,6 +150,8 @@ set(SOURCES
     src/core/random.cpp
     src/core/streamutil.cpp
     src/game/area.cpp
+    src/game/area_actions.cpp
+    src/game/area_render.cpp
     src/game/dialog.cpp
     src/game/game.cpp
     src/game/gui/classsel.cpp

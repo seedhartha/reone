@@ -168,6 +168,7 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
+    void fillRenderLists(const glm::vec3 &cameraPosition);
     void addToDebugContext(const render::RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
     void addToDebugContext(const Object &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
     bool findElevationAt(const glm::vec3 &position, float &z) const;
