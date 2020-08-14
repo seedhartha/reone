@@ -102,6 +102,8 @@ private:
     script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionPauseConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionResumeConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 };

@@ -20,6 +20,8 @@
 #include <queue>
 
 #include "../../resources/2dafile.h"
+#include "../../script/types.h"
+
 #include "../item.h"
 
 #include "object.h"
@@ -36,7 +38,12 @@ public:
         CloseDoor = 6,
         Follow = 35,
         FollowLeader = 38,
-        QueueEmpty = 65534
+        QueueEmpty = 65534,
+
+        DoCommand = 0x1000,
+        StartConversation = 0x1001,
+        PauseConversation = 0x1002,
+        ResumeConversation = 0x1003
     };
 
     struct Action {
@@ -44,9 +51,12 @@ public:
         glm::vec3 point { 0.0f };
         std::shared_ptr<Object> object;
         float distance { 1.0f };
+        script::ExecutionContext context;
+        std::string resRef;
 
         Action(ActionType type);
-        Action(ActionType, const std::shared_ptr<Object> &object, float distance);
+        Action(ActionType type, const std::shared_ptr<Object> &object, float distance);
+        Action(ActionType type, const script::ExecutionContext &ctx);
     };
 
     struct Path {
@@ -91,7 +101,8 @@ public:
 
     // Actions
     void clearActions();
-    void enqueue(const Action &action);
+    void enqueueAction(const Action &action);
+    void popCurrentAction();
 
     // Load/save
     void saveTo(AreaState &state) const override;
@@ -110,6 +121,7 @@ public:
     std::shared_ptr<render::Texture> portrait() const;
     const std::string &conversation() const;
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    bool hasActions() const;
     const Action &currentAction() const;
     std::shared_ptr<Path> &path();
     bool isPathUpdating() const;
@@ -131,7 +143,7 @@ private:
     std::shared_ptr<render::Texture> _portrait;
     std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
     std::string _conversation;
-    std::vector<Action> _actions;
+    std::list<Action> _actions;
     std::shared_ptr<Path> _path;
     std::atomic_bool _pathUpdating { false };
     float _walkSpeed { 0.0f };
