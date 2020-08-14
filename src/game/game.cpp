@@ -61,6 +61,14 @@ int Game::run() {
     TheAudioPlayer.init(_opts.audio);
     RoutineMan.init(_version, this);
 
+    Cursor cursor;
+    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::GUI);
+    cursor.pressed->initGL();
+    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::GUI);
+    cursor.unpressed->initGL();
+
+    _renderWindow.setCursor(cursor);
+
     configure();
     _renderWindow.show();
     runMainLoop();
