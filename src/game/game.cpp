@@ -335,22 +335,6 @@ shared_ptr<Object> Game::getPlayer() {
     return _module->area().player();
 }
 
-void Game::actionStartConversation(uint32_t objectId, const string &resRef) {
-    shared_ptr<Object> object(_module->area().find(objectId));
-    if (!object) return;
-
-    string finalResRef(resRef);
-    if (finalResRef.empty()) {
-        Creature *creature = dynamic_cast<Creature *>(object.get());
-        if (!creature->conversation().empty()) {
-            finalResRef = creature->conversation();
-        }
-    }
-
-    _screen = Screen::Dialog;
-    _dialogGui->startDialog(*object, finalResRef);
-}
-
 int Game::eventUserDefined(int eventNumber) {
     return _module->area().eventUserDefined(eventNumber);
 }

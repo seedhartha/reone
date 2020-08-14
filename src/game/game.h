@@ -57,9 +57,8 @@ public:
 
     // Routine callbacks
 
-    // Commands/actions
+    // Commands
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
-    void actionStartConversation(uint32_t objectId, const std::string &resRef) override;
 
     // Events
     int eventUserDefined(int eventNumber) override;

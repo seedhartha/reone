@@ -33,9 +33,8 @@ public:
     virtual ~IRoutineCallbacks() {
     }
 
-    // Commands/actions
+    // Commands
     virtual void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) = 0;
-    virtual void actionStartConversation(uint32_t objectId, const std::string &resRef) = 0;
 
     // Events
     virtual int eventUserDefined(int eventNumber) = 0;

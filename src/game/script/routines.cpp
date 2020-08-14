@@ -86,7 +86,7 @@ shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionCon
         case kObjectInvalid:
         case kObjectModule:
         case kObjectArea:
-            throw logic_error("Invalid object id: " + to_string(id));
+            throw logic_error("Routine: invalid object id: " + to_string(id));
         default:
             finalId = id;
             break;

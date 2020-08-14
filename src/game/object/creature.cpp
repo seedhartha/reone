@@ -52,6 +52,9 @@ Creature::Action::Action(ActionType type) : type(type) {
 Creature::Action::Action(ActionType type, const shared_ptr<Object> &object, float distance) : type(type), object(object), distance(distance) {
 }
 
+Creature::Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
+}
+
 Creature::Creature(uint32_t id) : Object(id) {
     _type = ObjectType::Creature;
     _drawDistance = 2048.0f;
@@ -243,13 +246,16 @@ void Creature::playTalkAnimation() {
 }
 
 void Creature::clearActions() {
-    while (!_actions.empty() && _actions.back().type != ActionType::QueueEmpty) {
-        _actions.pop_back();
-    }
+    _actions.clear();
 }
 
-void Creature::enqueue(const Action &action) {
+void Creature::enqueueAction(const Action &action) {
     _actions.push_back(action);
+}
+
+void Creature::popCurrentAction() {
+    assert(!_actions.empty());
+    _actions.pop_front();
 }
 
 void Creature::equip(const string &resRef) {
@@ -386,8 +392,13 @@ const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {
     return _equipment;
 }
 
+bool Creature::hasActions() const {
+    return !_actions.empty();
+}
+
 const Creature::Action &Creature::currentAction() const {
-    return _actions.back();
+    assert(!_actions.empty());
+    return _actions.front();
 }
 
 shared_ptr<Creature::Path> &Creature::path() {

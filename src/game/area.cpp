@@ -219,7 +219,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         _partyMember1 = partyMember;
 
         Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
-        partyMember->enqueue(move(action));
+        partyMember->enqueueAction(move(action));
     }
 
     if (party.memberCount > 1) {
@@ -229,7 +229,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         _partyMember2 = partyMember;
 
         Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
-        partyMember->enqueue(move(action));
+        partyMember->enqueueAction(move(action));
     }
 }
 
@@ -345,30 +345,46 @@ void Area::updateDelayedCommands() {
 }
 
 void Area::updateCreature(Creature &creature, float dt) {
+    if (!creature.hasActions()) return;
+
     const Creature::Action &action = creature.currentAction();
-    if (action.type == Creature::ActionType::QueueEmpty) return;
-
-    glm::vec3 dest;
-
     switch (action.type) {
         case Creature::ActionType::MoveToPoint:
-        case Creature::ActionType::Follow:
-            dest = (action.type == Creature::ActionType::Follow || action.object) ? action.object->position() : action.point;
-            navigateCreature(creature, dest, action.distance, dt);
+        case Creature::ActionType::Follow: {
+            glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? action.object->position() : action.point;
+            bool reached = navigateCreature(creature, dest, action.distance, dt);
+            if (reached && action.type == Creature::ActionType::MoveToPoint) {
+                creature.popCurrentAction();
+            }
             break;
+        }
+        case Creature::ActionType::DoCommand: {
+            ExecutionContext ctx(action.context);
+            ctx.callerId = creature.id();
 
+            ScriptExecution(action.context.savedState->program, move(ctx)).run();
+            break;
+        }
+        case Creature::ActionType::StartConversation:
+            if (_onStartDialog) {
+                _onStartDialog(creature, action.resRef);
+            }
+            creature.popCurrentAction();
+            break;
         default:
+            warn("Area: action not implemented: " + to_string(static_cast<int>(action.type)));
+            creature.popCurrentAction();
             break;
     }
 }
 
-void Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
+bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
     glm::vec3 origin(creature.position());
     float distToDest = glm::distance2(glm::vec2(origin), glm::vec2(dest));
 
     if (distToDest <= distance) {
         creature.setMovementType(MovementType::None);
-        return;
+        return true;
     }
 
     bool updatePath = true;
@@ -384,6 +400,8 @@ void Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float dis
     if (updatePath) {
         updateCreaturePath(creature, dest);
     }
+
+    return false;
 }
 
 void Area::advanceCreatureOnPath(Creature &creature, float dt) {
