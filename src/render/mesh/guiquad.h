@@ -31,6 +31,8 @@ private:
     GUIQuad();
 };
 
+#define TheGUIQuad render::GUIQuad::instance()
+
 } // namespace render
 
 } // namespace reone

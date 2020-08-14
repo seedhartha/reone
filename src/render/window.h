@@ -22,11 +22,17 @@
 
 #include "camera/camera.h"
 
+#include "texture.h"
 #include "types.h"
 
 namespace reone {
 
 namespace render {
+
+struct Cursor {
+    std::shared_ptr<Texture> pressed;
+    std::shared_ptr<Texture> unpressed;
+};
 
 class RenderWindow {
 public:
@@ -39,6 +45,7 @@ public:
     void render(const std::shared_ptr<Camera> &camera) const;
 
     void setRelativeMouseMode(bool enabled);
+    void setCursor(const Cursor &cursor);
 
     void setRenderWorldFunc(const std::function<void()> &fn);
     void setRenderGUIFunc(const std::function<void()> &fn);
@@ -48,6 +55,8 @@ private:
     IEventHandler *_eventHandler { nullptr };
     SDL_Window *_window { nullptr };
     SDL_GLContext _context { nullptr };
+    bool _relativeMouseMode { false };
+    Cursor _cursor;
     std::function<void()> _onRenderWorld;
     std::function<void()> _onRenderGUI;
 
@@ -55,6 +64,7 @@ private:
     bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);
     void renderWorld(const std::shared_ptr<Camera> &camera) const;
     void renderGUI() const;
+    void renderCursor() const;
 };
 
 } // namespace render

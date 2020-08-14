@@ -162,10 +162,45 @@ void RenderWindow::renderGUI() const {
     ShaderManager::instance().setGlobalUniforms(uniforms);
 
     if (_onRenderGUI) _onRenderGUI();
+    if (!_relativeMouseMode) renderCursor();
+}
+
+void RenderWindow::renderCursor() const {
+    shared_ptr<Texture> texture;
+
+    int x, y;
+    uint32_t state = SDL_GetMouseState(&x, &y);
+    texture = state & SDL_BUTTON(1) ? _cursor.pressed : _cursor.unpressed;
+
+    if (!texture) return;
+
+    glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
+    transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
+
+    ShaderMan.activate(ShaderProgram::BasicDiffuse);
+    ShaderMan.setUniform("model", transform);
+    ShaderMan.setUniform("color", glm::vec3(1.0f));
+    ShaderMan.setUniform("alpha", 1.0f);
+
+    glActiveTexture(0);
+    texture->bind();
+
+    TheGUIQuad.render(GL_TRIANGLES);
+
+    texture->unbind();
+
+    ShaderMan.deactivate();
 }
 
 void RenderWindow::setRelativeMouseMode(bool enabled) {
     SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
+    _relativeMouseMode = enabled;
+}
+
+void RenderWindow::setCursor(const Cursor &cursor) {
+    bool hasTexture = cursor.pressed && cursor.unpressed;
+    SDL_ShowCursor(hasTexture ? 0 : 1);
+    _cursor = cursor;
 }
 
 void RenderWindow::setRenderWorldFunc(const function<void()> &fn) {
