@@ -17,27 +17,16 @@
 
 #pragma once
 
+#include <string>
+
+#include "../audio/soundinstance.h"
+
 namespace reone {
 
-namespace audio {
+namespace game {
 
-enum class AudioFormat {
-    Mono8,
-    Mono16,
-    Stereo8,
-    Stereo16
-};
+std::shared_ptr<audio::SoundInstance> playMusic(const std::string &resRef);
 
-enum class AudioType {
-    Music,
-    Sound
-};
-
-struct AudioOptions {
-    int soundVolume { 85 };
-    int musicVolume { 85 };
-};
-
-} // namespace audio
+} // namespace util
 
 } // namespace reone

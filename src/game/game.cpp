@@ -26,6 +26,7 @@
 #include "../resources/resources.h"
 
 #include "script/routines.h"
+#include "util.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -76,6 +77,16 @@ int Game::run() {
 void Game::configure() {
     loadMainMenu();
     _screen = Screen::MainMenu;
+
+    if (_music) _music->stop();
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            _music = playMusic("mus_sion");
+            break;
+        default:
+            _music = playMusic("mus_theme_cult");
+            break;
+    }
 }
 
 void Game::loadMainMenu() {
@@ -85,6 +96,17 @@ void Game::loadMainMenu() {
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
         if (!_classesGui) loadClassSelectionGui();
+
+        if (_music) _music->stop();
+        switch (_version) {
+            case GameVersion::TheSithLords:
+                _music = playMusic("mus_main");
+                break;
+            default:
+                _music = playMusic("mus_theme_rep");
+                break;
+        }
+
         _screen = Screen::ClassSelection;
     });
     mainMenu->setOnExit([this]() { _quit = true; });
@@ -147,11 +169,10 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     _module->area().loadState(_state);
     _module->initGL();
 
-    TheAudioPlayer.reset();
+    if (_music) _music->stop();
     string musicName(_module->area().music());
     if (!musicName.empty()) {
-        shared_ptr<AudioStream> music(ResMan.findAudio(musicName));
-        TheAudioPlayer.play(music, AudioType::Music);
+        _music = playMusic(musicName);
     }
 
     if (!_hud) loadHUD();
