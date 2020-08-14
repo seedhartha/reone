@@ -87,6 +87,11 @@ public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
+class TlkTool : public Tool {
+public:
+    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+};
+
 class GffTool : public Tool {
 public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;

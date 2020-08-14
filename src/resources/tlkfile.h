@@ -33,7 +33,9 @@ class TlkFile;
 struct TalkTable {
 public:
     TalkTable() = default;
+
     const TalkTableString &getString(int32_t ref) const;
+    int stringCount() const;
 
 private:
     std::vector<TalkTableString> _strings;

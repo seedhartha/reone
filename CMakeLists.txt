@@ -267,6 +267,7 @@ if(BUILD_TOOLS)
         src/resources/gfffile.h
         src/resources/keyfile.h
         src/resources/rimfile.h
+        src/resources/tlkfile.h
         src/resources/util.h
         tools/program.h
         tools/tools.h)
@@ -281,6 +282,7 @@ if(BUILD_TOOLS)
         src/resources/gfffile.cpp
         src/resources/keyfile.cpp
         src/resources/rimfile.cpp
+        src/resources/tlkfile.cpp
         src/resources/util.cpp
         tools/main.cpp
         tools/2datool.cpp
@@ -290,6 +292,7 @@ if(BUILD_TOOLS)
         tools/keytool.cpp
         tools/program.cpp
         tools/rimtool.cpp
+        tools/tlktool.cpp
         tools/tools.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})

@@ -29,6 +29,11 @@ namespace reone {
 
 namespace game {
 
+static map<Gender, int> g_genderStrRefs {
+    { Gender::Male, 646 },
+    { Gender::Female, 647 }
+};
+
 static map<ClassType, int> g_classStrRefs {
     { ClassType::Scout, 133 },
     { ClassType::Soldier, 134 },
@@ -36,6 +41,15 @@ static map<ClassType, int> g_classStrRefs {
     { ClassType::JediGuardian, 353 },
     { ClassType::JediConsular, 354 },
     { ClassType::JediSentinel, 355 }
+};
+
+static map<ClassType, int> g_classDescStrRefs {
+    { ClassType::Scoundrel, 32109 },
+    { ClassType::Scout, 32110 },
+    { ClassType::Soldier, 32111 },
+    { ClassType::JediConsular, 48031 },
+    { ClassType::JediSentinel, 48032 },
+    { ClassType::JediGuardian, 48033 }
 };
 
 ClassSelectionGui::ClassSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
@@ -142,8 +156,14 @@ void ClassSelectionGui::onFocusChanged(const string &control, bool focus) {
     }
 
     ClassButton &button = _classButtons[idx];
-    string text(ResMan.getString(g_classStrRefs[button.clazz]).text);
-    getControl("LBL_CLASS").setTextMessage(text);
+
+    string classText(ResMan.getString(g_genderStrRefs[button.gender]).text);
+    classText += " " + ResMan.getString(g_classStrRefs[button.clazz]).text;
+
+    string descText(ResMan.getString(g_classDescStrRefs[button.clazz]).text);
+
+    getControl("LBL_CLASS").setTextMessage(classText);
+    getControl("LBL_DESC").setTextMessage(descText);
 }
 
 int ClassSelectionGui::getClassButtonIndexByTag(const string &tag) const {

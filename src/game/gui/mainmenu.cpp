@@ -51,6 +51,8 @@ void MainMenu::load(GameVersion version) {
     }
 
     GUI::load(resRef, background);
+    hideControl("BTN_MOREGAMES");
+    hideControl("BTN_TSLRCM");
     hideControl("LB_MODULES");
     hideControl("LBL_NEWCONTENT");
     hideControl("LBL_BW");
