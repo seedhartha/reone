@@ -28,7 +28,6 @@
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
-#include "../render/mesh/aabb.h"
 #include "../resources/lytfile.h"
 #include "../resources/resources.h"
 #include "../resources/visfile.h"
@@ -59,7 +58,6 @@ static const float kPartyMemberFollowDistance = 4.0f;
 static const float kMaxDistanceToTestCollision = 64.0f;
 static const float kElevationTestOffset = 0.1f;
 static const float kElevationTestDistance = 1.0f;
-static const float kKeepPathDuration = 1000.0f;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
@@ -264,37 +262,19 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember2).portrait());
     }
 
-    auto &opaque = _renderLists[RenderListName::Opaque];
-    auto &transparent = _renderLists[RenderListName::Transparent];
-
-    opaque.clear();
-    transparent.clear();
-
     for (auto &room : _rooms) {
         shared_ptr<ModelInstance> model(room->model());
-        if (!model) continue;
-
-        model->update(updateCtx.deltaTime);
-
-        glm::mat4 transform(glm::translate(glm::mat4(1.0f), room->position()));
-        model->fillRenderLists(transform, opaque, transparent);
+        if (model) {
+            model->update(updateCtx.deltaTime);
+        }
     }
     for (auto &pair : _objects) {
         for (auto &object : pair.second) {
             object->update(updateCtx);
-
-            shared_ptr<ModelInstance> model(object->model());
-            if (!model) continue;
-
-            glm::mat4 transform(object->transform());
-            model->fillRenderLists(transform, opaque, transparent);
         }
     }
 
-    sort(
-        transparent.begin(),
-        transparent.end(),
-        [&](const RenderListItem &left, const RenderListItem &right) { return glm::distance2(left.center, updateCtx.cameraPosition) > glm::distance2(right.center, updateCtx.cameraPosition); });
+    fillRenderLists(updateCtx.cameraPosition);
 
     switch (_debugMode) {
         case DebugMode::ModelNodes:
@@ -342,87 +322,6 @@ void Area::updateDelayedCommands() {
         [](const DelayedCommand &command) { return command.executed; });
 
     _delayed.erase(it, _delayed.end());
-}
-
-void Area::updateCreature(Creature &creature, float dt) {
-    if (!creature.hasActions()) return;
-
-    const Creature::Action &action = creature.currentAction();
-    switch (action.type) {
-        case Creature::ActionType::MoveToPoint:
-        case Creature::ActionType::Follow: {
-            glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? action.object->position() : action.point;
-            bool reached = navigateCreature(creature, dest, action.distance, dt);
-            if (reached && action.type == Creature::ActionType::MoveToPoint) {
-                creature.popCurrentAction();
-            }
-            break;
-        }
-        case Creature::ActionType::DoCommand: {
-            ExecutionContext ctx(action.context);
-            ctx.callerId = creature.id();
-
-            ScriptExecution(action.context.savedState->program, move(ctx)).run();
-            break;
-        }
-        case Creature::ActionType::StartConversation:
-            if (_onStartDialog) {
-                _onStartDialog(creature, action.resRef);
-            }
-            creature.popCurrentAction();
-            break;
-        default:
-            warn("Area: action not implemented: " + to_string(static_cast<int>(action.type)));
-            creature.popCurrentAction();
-            break;
-    }
-}
-
-bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
-    glm::vec3 origin(creature.position());
-    float distToDest = glm::distance2(glm::vec2(origin), glm::vec2(dest));
-
-    if (distToDest <= distance) {
-        creature.setMovementType(MovementType::None);
-        return true;
-    }
-
-    bool updatePath = true;
-    shared_ptr<Creature::Path> path(creature.path());
-
-    if (path) {
-        uint32_t now = SDL_GetTicks();
-        if (path->destination == dest || now - path->timeFound <= kKeepPathDuration) {
-            advanceCreatureOnPath(creature, dt);
-            updatePath = false;
-        }
-    }
-    if (updatePath) {
-        updateCreaturePath(creature, dest);
-    }
-
-    return false;
-}
-
-void Area::advanceCreatureOnPath(Creature &creature, float dt) {
-    glm::vec3 origin(creature.position());
-    shared_ptr<Creature::Path> path(creature.path());
-    size_t pointCount = path->points.size();
-    glm::vec3 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
-
-    if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
-        selectNextPathPoint(*path);
-    } else if (moveCreatureTowards(creature, dest, dt)) {
-        selectNextPathPoint(*path);
-        creature.setMovementType(MovementType::Run);
-    } else {
-        creature.setMovementType(MovementType::None);
-    }
-}
-
-void Area::selectNextPathPoint(Creature::Path &path) {
-    size_t pointCount = path.points.size();
-    if (path.pointIdx < pointCount) path.pointIdx++;
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt) {
@@ -513,31 +412,6 @@ void Area::runOnEnterScript() {
     }
 }
 
-void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
-    if (creature.isPathUpdating()) return;
-
-    creature.setPathUpdating();
-
-    TheJobExecutor.enqueue([=, &creature](const atomic_bool &) {
-        glm::vec3 origin(creature.position());
-        vector<glm::vec3> points(_navMesh->findPath(origin, dest));
-        uint32_t now = SDL_GetTicks();
-
-#ifdef DEBUG_PATH
-        vector<string> pointsStr;
-        pointsStr.reserve(points.size());
-
-        for (auto &point : points) {
-            pointsStr.push_back(str(boost::format("%.0f %.0f") % point.x % point.y));
-        }
-
-        debug(boost::join(pointsStr, " | "));
-#endif
-
-        creature.setPath(dest, move(points), now);
-    });
-}
-
 void Area::addToDebugContext(const RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
     glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
     glm::vec3 position(item.transform[3]);
@@ -564,43 +438,6 @@ void Area::addToDebugContext(const Object &object, const UpdateContext &updateCt
 
 void Area::setDebugMode(DebugMode mode) {
     _debugMode = mode;
-}
-
-void Area::initGL() {
-    for (auto &room : _rooms) {
-        shared_ptr<ModelInstance> model(room->model());
-        if (model) model->initGL();
-    }
-    for (auto &pair : _objects) {
-        for (auto &object : pair.second) {
-            object->initGL();
-        }
-    }
-}
-
-void Area::render() const {
-    for (auto &item : _renderLists.find(RenderListName::Opaque)->second) {
-        item.model->render(*item.node, item.transform, _debugMode == DebugMode::ModelNodes);
-    }
-    for (auto &item : _renderLists.find(RenderListName::Transparent)->second) {
-        item.model->render(*item.node, item.transform, _debugMode == DebugMode::ModelNodes);
-    }
-
-    if (_debugMode == DebugMode::GameObjects) {
-        AABBMesh &aabb = AABBMesh::instance();
-        for (auto &list : _objects) {
-            if (list.first != ObjectType::Creature &&
-                list.first != ObjectType::Door &&
-                list.first != ObjectType::Placeable) continue;
-
-            for (auto &object : list.second) {
-                shared_ptr<ModelInstance> model(object->model());
-                if (!model) return;
-
-                aabb.render(model->model()->aabb(), object->transform());
-            }
-        }
-    }
 }
 
 void Area::saveTo(GameState &state) const {
