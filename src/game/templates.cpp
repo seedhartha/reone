@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-static map<string, shared_ptr<Item>> g_itemCache = map<string, shared_ptr<Item>>();
+static map<string, shared_ptr<Item>> g_itemCache;
 
 TemplateManager &TemplateManager::instance() {
     static TemplateManager instance;
@@ -42,17 +42,16 @@ shared_ptr<Item> TemplateManager::findItem(const string &resRef) {
     if (it != g_itemCache.end()) {
         return it->second;
     }
-    debug("Loading item blueprint " + resRef);
+    debug("Templates: load item: " + resRef);
 
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<GffStruct> uti(resources.findGFF(resRef, ResourceType::ItemBlueprint));
+    shared_ptr<GffStruct> uti(ResMan.findGFF(resRef, ResourceType::ItemBlueprint));
     shared_ptr<Item> item;
 
     if (uti) {
         item.reset(new Item());
         item->load(resRef, *uti);
     } else {
-        warn("Item blueprint not found: " + resRef);
+        warn("Templates: item not found: " + resRef);
     }
 
     auto pair = g_itemCache.insert(make_pair(resRef, item));

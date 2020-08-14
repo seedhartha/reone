@@ -59,8 +59,6 @@ Creature::Creature(uint32_t id) : Object(id) {
     _type = ObjectType::Creature;
     _drawDistance = 2048.0f;
     _fadeDistance = 0.25f * _drawDistance;
-
-    _actions.push_back(Action(ActionType::QueueEmpty));
 }
 
 void Creature::load(const GffStruct &gffs) {
