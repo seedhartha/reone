@@ -479,10 +479,10 @@ shared_ptr<Object> Area::find(uint32_t id) const {
     return nullptr;
 }
 
-shared_ptr<Object> Area::find(const string &tag) const {
+shared_ptr<Object> Area::find(const string &tag, int nth) const {
     shared_ptr<Object> object;
     for (auto &list : _objects) {
-        object = find(tag, list.first);
+        object = find(tag, list.first, nth);
         if (object) return object;
     }
 
@@ -500,15 +500,15 @@ shared_ptr<Object> Area::find(uint32_t id, ObjectType type) const {
     return it != list.end() ? *it : nullptr;
 }
 
-shared_ptr<Object> Area::find(const string &tag, ObjectType type) const {
+shared_ptr<Object> Area::find(const string &tag, ObjectType type, int nth) const {
     const ObjectList &list = _objects.find(type)->second;
+    int idx = 0;
 
-    auto it = find_if(
-        list.begin(),
-        list.end(),
-        [&tag](const shared_ptr<Object> &object) { return object->tag() == tag; });
+    for (auto &object : list) {
+        if (object->tag() == tag && idx++ == nth) return object;
+    }
 
-    return it != list.end() ? *it : nullptr;
+    return nullptr;
 }
 
 bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, Object **obstacle) const {

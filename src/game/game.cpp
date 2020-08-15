@@ -352,8 +352,8 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) {
     return _module->area().find(id);
 }
 
-shared_ptr<Object> Game::getObjectByTag(const string &tag) {
-    return _module->area().find(tag);
+shared_ptr<Object> Game::getObjectByTag(const string &tag, int nth) {
+    return _module->area().find(tag, nth);
 }
 
 shared_ptr<Object> Game::getWaypointByTag(const string &tag) {

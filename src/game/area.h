@@ -76,9 +76,9 @@ public:
 
     // Object search
     std::shared_ptr<Object> find(uint32_t id) const;
-    std::shared_ptr<Object> find(const std::string &tag) const;
+    std::shared_ptr<Object> find(const std::string &tag, int nth = 0) const;
     std::shared_ptr<Object> find(uint32_t id, ObjectType type) const;
-    std::shared_ptr<Object> find(const std::string &tag, ObjectType type) const;
+    std::shared_ptr<Object> find(const std::string &tag, ObjectType type, int nth = 0) const;
     bool findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, Object **obstacle) const;
     bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const Object *except, Object **obstacle) const;
 

@@ -67,7 +67,7 @@ public:
 
     // Objects
     std::shared_ptr<Object> getObjectById(uint32_t id) override;
-    std::shared_ptr<Object> getObjectByTag(const std::string &tag) override;
+    std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth) override;
     std::shared_ptr<Object> getWaypointByTag(const std::string &tag) override;
     std::shared_ptr<Object> getPlayer() override;
 

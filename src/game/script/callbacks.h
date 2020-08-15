@@ -42,7 +42,7 @@ public:
 
     // Objects
     virtual std::shared_ptr<Object> getObjectById(uint32_t id) = 0;
-    virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag) = 0;
+    virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth = 0) = 0;
     virtual std::shared_ptr<Object> getWaypointByTag(const std::string &tag) = 0;
     virtual std::shared_ptr<Object> getPlayer() = 0;
 
