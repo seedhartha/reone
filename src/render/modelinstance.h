@@ -52,7 +52,8 @@ class ModelInstance {
 public:
     ModelInstance(const std::shared_ptr<Model> &model);
 
-    void animate(const std::string &name, int flags = 0);
+    void animate(const std::string &parent, const std::string &anim, int flags = 0);
+    void animate(const std::string &anim, int flags = 0);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void changeTexture(const std::string &resRef);
     void update(float dt);

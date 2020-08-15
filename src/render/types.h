@@ -43,7 +43,8 @@ enum class TextureBlending {
 };
 
 enum AnimationFlags {
-    kAnimationLoop = 1
+    kAnimationLoop = 1,
+    kAnimationPropagate = 2
 };
 
 enum class CameraType {

@@ -43,14 +43,34 @@ RenderListItem::RenderListItem(const ModelInstance *model, const ModelNode *node
 ModelInstance::ModelInstance(const shared_ptr<Model> &model) : _model(model) {
 }
 
-void ModelInstance::animate(const string &name, int flags) {
-    if (!_model || _animState.name == name) return;
+void ModelInstance::animate(const string &parent, const string &anim, int flags) {
+    if (!_model) return;
 
-    _animState.nextAnimation = name;
+    shared_ptr<ModelNode> node(_model->findNodeByName(parent));
+    if (!node) {
+        warn("ModelInstance: node not found: " + parent);
+        return;
+    }
+
+    auto attached = _attachedModels.find(node->nodeNumber());
+    if (attached == _attachedModels.end()) {
+        warn("ModelInstance: attached model not found: " + to_string(node->nodeNumber()));
+        return;
+    }
+
+    attached->second->animate(anim, flags);
+}
+
+void ModelInstance::animate(const string &anim, int flags) {
+    if (!_model || _animState.name == anim) return;
+
+    _animState.nextAnimation = anim;
     _animState.nextFlags = flags;
 
-    for (auto &pair : _attachedModels) {
-        pair.second->animate(name, flags);
+    if (flags & kAnimationPropagate) {
+        for (auto &pair : _attachedModels) {
+            pair.second->animate(anim, flags);
+        }
     }
 }
 
@@ -334,7 +354,7 @@ ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skelet
 }
 
 void ModelInstance::playDefaultAnimation() {
-    animate(_defaultAnimation, kAnimationLoop);
+    animate(_defaultAnimation, kAnimationLoop | kAnimationPropagate);
 }
 
 void ModelInstance::show() {
