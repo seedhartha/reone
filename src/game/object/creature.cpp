@@ -39,12 +39,17 @@ namespace reone {
 
 namespace game {
 
-static string g_creaturePauseAnimation = "cpause1";
-static string g_characterPauseAnimation = "pause1";
-static string g_creatureWalkAnimation = "cwalk";
-static string g_characterWalkAnimation = "walk";
-static string g_creatureRunAnimation = "crun";
-static string g_characterRunAnimation = "run";
+static string g_animPauseCreature("cpause1");
+static string g_animPauseCharacter("pause1");
+static string g_animWalkCreature("cwalk");
+static string g_animWalkCharacter("walk");
+static string g_animRunCreature("crun");
+static string g_animRunCharacter("run");
+static string g_animTalkHead("talk");
+static string g_animTalkBody("tlknorm");
+static string g_animGreeting("greeting");
+
+static string g_headHookNode("headhook");
 
 Creature::Action::Action(ActionType type) : type(type) {
 }
@@ -175,7 +180,7 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 void Creature::loadHead(const TwoDaTable &table, int row) {
     ResourceManager &resources = ResourceManager::instance();
     const string &modelName = table.getString(row, "head");
-    _model->attach("headhook", resources.findModel(modelName));
+    _model->attach(g_headHookNode, resources.findModel(modelName));
 }
 
 void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
@@ -236,11 +241,12 @@ void Creature::playDefaultAnimation() {
 void Creature::playGreetingAnimation() {
     if (_movementType != MovementType::None) return;
 
-    animate("greeting");
+    animate(g_animGreeting, kAnimationPropagate);
 }
 
 void Creature::playTalkAnimation() {
-    animate("tlknorm", kAnimationLoop);
+    animate(g_animTalkBody, kAnimationLoop);
+    animate(g_headHookNode, g_animTalkHead, kAnimationLoop);
 }
 
 void Creature::clearActions() {
@@ -311,10 +317,10 @@ void Creature::setMovementType(MovementType type) {
 
     switch (type) {
         case MovementType::Walk:
-            _model->animate(getWalkAnimation(), kAnimationLoop);
+            _model->animate(getWalkAnimation(), kAnimationLoop | kAnimationPropagate);
             break;
         case MovementType::Run:
-            _model->animate(getRunAnimation(), kAnimationLoop);
+            _model->animate(getRunAnimation(), kAnimationLoop | kAnimationPropagate);
             break;
         default:
             _model->playDefaultAnimation();
@@ -327,27 +333,27 @@ void Creature::setMovementType(MovementType type) {
 const string &Creature::getPauseAnimation() {
     switch (_modelType) {
         case ModelType::Creature:
-            return g_creaturePauseAnimation;
+            return g_animPauseCreature;
         default:
-            return g_characterPauseAnimation;
+            return g_animPauseCharacter;
     }
 }
 
 const string &Creature::getWalkAnimation() {
     switch (_modelType) {
         case ModelType::Creature:
-            return g_creatureWalkAnimation;
+            return g_animWalkCreature;
         default:
-            return g_characterWalkAnimation;
+            return g_animWalkCharacter;
     }
 }
 
 const string &Creature::getRunAnimation() {
     switch (_modelType) {
         case ModelType::Creature:
-            return g_creatureRunAnimation;
+            return g_animRunCreature;
         default:
-            return g_characterRunAnimation;
+            return g_animRunCharacter;
     }
 }
 

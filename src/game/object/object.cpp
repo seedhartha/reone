@@ -32,6 +32,12 @@ namespace game {
 Object::Object(uint32_t id) : _id(id) {
 }
 
+void Object::animate(const string &parent, const string &anim, int flags) {
+    if (_model) {
+        _model->animate(parent, anim, flags);
+    }
+}
+
 void Object::animate(const string &anim, int flags) {
     if (_model) {
         _model->animate(anim, flags);
