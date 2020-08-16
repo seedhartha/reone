@@ -52,7 +52,7 @@ void Connection::handleRead(size_t bytesRead, const boost::system::error_code &e
         return;
     }
 
-    debug(boost::format("TCP: received %d bytes from %s") % bytesRead % _socket->remote_endpoint());
+    debug(boost::format("TCP: received %d bytes from %s") % bytesRead % _socket->remote_endpoint(), 3);
 
     if (_cmdLength == 0) {
         char buf[2];

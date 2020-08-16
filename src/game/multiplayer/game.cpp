@@ -152,7 +152,7 @@ void MultiplayerGame::onCommandReceived(const ByteArray &data) {
     Command cmd;
     cmd.load(data);
 
-    debug("Command received: " + to_string(static_cast<int>(cmd.type())));
+    debug("Command received: " + to_string(static_cast<int>(cmd.type())), 2);
 
     lock_guard<recursive_mutex> lock(_commandsMutex);
     _commands.push(cmd);
