@@ -39,6 +39,8 @@ private:
     TemplateManager &operator=(const TemplateManager &) = delete;
 };
 
+#define TheTemplateManager game::TemplateManager::instance()
+
 } // namespace game
 
 } // namespace reone

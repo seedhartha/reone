@@ -78,9 +78,7 @@ void Creature::load(const GffStruct &gffs) {
     updateTransform();
 
     string templResRef(gffs.getString("TemplateResRef"));
-    ResourceManager &resources = ResourceManager::instance();
-
-    shared_ptr<GffStruct> utc(resources.findGFF(templResRef, ResourceType::CreatureBlueprint));
+    shared_ptr<GffStruct> utc(ResMan.findGFF(templResRef, ResourceType::CreatureBlueprint));
     loadBlueprint(*utc);
 }
 
@@ -92,8 +90,7 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
         equip(item.getString("EquippedRes"));
     }
 
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> appearanceTable(resources.find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
     int appearance = gffs.getInt("Appearance_Type");
     loadAppearance(*appearanceTable, appearance);
 
@@ -203,6 +200,9 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
 }
 
 void Creature::load(const CreatureConfiguration &config) {
+    for (auto &item : config.equipment) {
+        equip(item);
+    }
     shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
     loadAppearance(*appearanceTable, config.appearance);
     loadPortrait(config.appearance);
@@ -263,8 +263,7 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    TemplateManager &templates = TemplateManager::instance();
-    shared_ptr<Item> item(templates.findItem(resRef));
+    shared_ptr<Item> item(TheTemplateManager.findItem(resRef));
 
     switch (item->type()) {
         case ItemType::Armor:

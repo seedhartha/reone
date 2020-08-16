@@ -130,6 +130,7 @@ struct CreatureConfiguration {
     Gender gender { Gender::Male };
     ClassType clazz { ClassType::Soldier };
     int appearance { 0 };
+    std::vector<std::string> equipment;
 };
 
 struct PartyConfiguration {
