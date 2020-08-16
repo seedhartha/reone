@@ -125,33 +125,16 @@ void DialogGui::configureReplies() {
 }
 
 void DialogGui::onReplyClicked(int index) {
-    const Dialog::EntryReply &reply = _dialog->getReply(index);
-    if (reply.entries.empty()) {
-        finish();
-        return;
+    if (!_pickReplyEnabled) return;
+    if (_onReplyPicked) {
+        _onReplyPicked(index);
     }
-    int entryIdx = -1;
-
-    for (auto &link : reply.entries) {
-        if (link.active.empty()) {
-            entryIdx = link.index;
-            continue;
-        }
-        if (checkCondition(link.active)) {
-            entryIdx = link.index;
-            break;
-        }
-    }
-
-    if (entryIdx != -1) {
-        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
-        loadCurrentEntry();
-    }
+    pickReply(index);
 }
 
 void DialogGui::finish() {
     if (!_dialog->endScript().empty()) {
-        runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
+        runScript(_dialog->endScript(), _ownerId, kObjectInvalid, -1);
     }
     if (_onSpeakerChanged && _currentSpeaker != 0) {
         _onSpeakerChanged(_currentSpeaker, 0);
@@ -161,17 +144,17 @@ void DialogGui::finish() {
     }
 }
 
-void DialogGui::startDialog(const Object &owner, const string &resRef) {
+void DialogGui::startDialog(uint32_t ownerId, const string &resRef) {
     shared_ptr<GffStruct> dlg(ResMan.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         if (_onDialogFinished) _onDialogFinished();
         return;
     }
-    _owner = &owner;
+    _ownerId = ownerId;
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
-    _currentSpeaker = owner.id();
+    _currentSpeaker = _ownerId;
     if (_onSpeakerChanged) {
         _onSpeakerChanged(0, _currentSpeaker);
     }
@@ -200,7 +183,7 @@ void DialogGui::loadStartEntry() {
 }
 
 bool DialogGui::checkCondition(const string &script) {
-    int result = runScript(script, _owner->id(), kObjectInvalid, -1);
+    int result = runScript(script, _ownerId, kObjectInvalid, -1);
     return result == -1 || result == 1;
 }
 
@@ -249,9 +232,34 @@ void DialogGui::loadCurrentEntry() {
     }
 
     if (!_currentEntry->script.empty()) {
-        runScript(_currentEntry->script, _owner->id(), kObjectInvalid, -1);
+        runScript(_currentEntry->script, _ownerId, kObjectInvalid, -1);
     }
     if (replyCount == 0) finish();
+}
+
+void DialogGui::pickReply(uint32_t index) {
+    const Dialog::EntryReply &reply = _dialog->getReply(index);
+    if (reply.entries.empty()) {
+        finish();
+        return;
+    }
+    int entryIdx = -1;
+
+    for (auto &link : reply.entries) {
+        if (link.active.empty()) {
+            entryIdx = link.index;
+            continue;
+        }
+        if (checkCondition(link.active)) {
+            entryIdx = link.index;
+            break;
+        }
+    }
+
+    if (entryIdx != -1) {
+        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+        loadCurrentEntry();
+    }
 }
 
 bool DialogGui::handleKeyDown(SDL_Scancode key) {
@@ -272,8 +280,16 @@ bool DialogGui::handleKeyUp(SDL_Scancode key) {
     return false;
 }
 
+void DialogGui::setPickReplyEnabled(bool enabled) {
+    _pickReplyEnabled = enabled;
+}
+
 void DialogGui::setGetObjectIdByTagFunc(const function<uint32_t(const string &)> &fn) {
     _getObjectIdByTag = fn;
+}
+
+void DialogGui::setOnReplyPicked(const function<void(uint32_t)> &fn) {
+    _onReplyPicked = fn;
 }
 
 void DialogGui::setOnSpeakerChanged(const function<void(uint32_t, uint32_t)> &fn) {

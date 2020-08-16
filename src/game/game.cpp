@@ -227,36 +227,47 @@ void Game::loadDialogGui() {
     unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
     dialog->load(_version);
     dialog->initGL();
+    dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
         shared_ptr<Object> object(_module->area().find(tag, ObjectType::Creature));
         return object ? object->id() : 0;
     });
+    dialog->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
     dialog->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
-    dialog->setOnDialogFinished([this]() {
-        _screen = Screen::InGame;
-    });
+    dialog->setOnDialogFinished(bind(&Game::onDialogFinished, this));
     _dialogGui = move(dialog);
+}
+
+void Game::onDialogReplyPicked(uint32_t index) {
 }
 
 void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
     shared_ptr<Object> player(_module->area().player());
+    shared_ptr<Object> partyLeader(_module->area().partyLeader());
     shared_ptr<Object> prevSpeaker = from != 0 ? _module->area().find(from, ObjectType::Creature) : nullptr;
     shared_ptr<Object> speaker = to != 0 ? _module->area().find(to, ObjectType::Creature) : nullptr;
-    if (speaker == player) return;
+    if (speaker == partyLeader) return;
 
     debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
 
     if (prevSpeaker) {
         static_cast<Creature &>(*prevSpeaker).setTalking(false);
     }
-    if (player && speaker) {
-        player->face(*speaker);
-        speaker->face(*player);
-
-        static_cast<Creature &>(*speaker).setTalking(true);
-
-        _module->update3rdPersonCameraHeading();
+    if (speaker) {
+        if (player) {
+            player->face(*speaker);
+            _module->update3rdPersonCameraHeading();
+        }
+        if (partyLeader) {
+            partyLeader->face(*speaker);
+            speaker->face(*partyLeader);
+            static_cast<Creature &>(*speaker).setTalking(true);
+        }
     }
+}
+
+void Game::onDialogFinished() {
+    _screen = Screen::InGame;
 }
 
 const shared_ptr<Module> Game::makeModule(const string &name) {
@@ -271,10 +282,14 @@ void Game::configureModule() {
         _nextModule = name;
         _nextEntry = entry;
     });
-    _module->setStartDialog([this](const Object &object, const string &resRef) {
-        _screen = Screen::Dialog;
-        _dialogGui->startDialog(object, resRef);
+    _module->setStartDialog([this](const Object &owner, const string &resRef) {
+        startDialog(owner.id(), resRef);
     });
+}
+
+void Game::startDialog(uint32_t ownerId, const string &resRef) {
+    _screen = Screen::Dialog;
+    _dialogGui->startDialog(ownerId, resRef);
 }
 
 void Game::runMainLoop() {

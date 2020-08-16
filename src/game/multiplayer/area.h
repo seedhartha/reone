@@ -49,6 +49,7 @@ private:
     void executeSetObjectTransform(const Command &cmd);
     void executeSetObjectAnimation(const Command &cmd);
     void executeSetCreatureMovementType(const Command &cmd);
+    void executeSetCreatureTalking(const Command &cmd);
     void executeSetDoorOpen(const Command &cmd);
 };
 

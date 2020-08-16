@@ -42,6 +42,8 @@ MultiplayerGame::MultiplayerGame(
     const Options &opts
 ) :
     Game(version, path, opts), _mode(mode) {
+
+    _pickDialogReplyEnabled = _mode == MultiplayerMode::Server;
 }
 
 void MultiplayerGame::configure() {
@@ -189,7 +191,20 @@ void MultiplayerGame::update() {
 
             default:
                 if (_module && _nextModule.empty()) {
-                    static_cast<MultiplayerArea &>(_module->area()).execute(cmd);
+                    switch (cmd.type()) {
+                        case CommandType::StartDialog:
+                            startDialog(cmd.objectId(), cmd.resRef());
+                            break;
+                        case CommandType::PickDialogReply:
+                            _dialogGui->pickReply(cmd.replyIndex());
+                            break;
+                        case CommandType::FinishDialog:
+                            _screen = Screen::InGame;
+                            break;
+                        default:
+                            static_cast<MultiplayerArea &>(_module->area()).execute(cmd);
+                            break;
+                    }
                     _commandsIn.pop();
                 } else {
                     skip = true;
@@ -280,11 +295,48 @@ void MultiplayerGame::onCreatureMovementTypeChanged(const MultiplayerCreature &c
     }
 }
 
+void MultiplayerGame::onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) {
+    if (shouldSendObjectUpdates(creature.id())) {
+        sendSetCreatureTalking(creature.id(), talking);
+    }
+}
+
+void MultiplayerGame::startDialog(uint32_t ownerId, const string &resRef) {
+    Game::startDialog(ownerId, resRef);
+
+    if (_mode == MultiplayerMode::Server) {
+        sendStartDialog(ownerId, resRef);
+    }
+}
+
+void MultiplayerGame::onDialogReplyPicked(uint32_t index) {
+    if (_mode == MultiplayerMode::Client) return;
+
+    Game::onDialogReplyPicked(index);
+    sendPickDialogReply(index);
+}
+
+void MultiplayerGame::onDialogFinished() {
+    if (_mode == MultiplayerMode::Client) return;
+
+    Game::onDialogFinished();
+    sendFinishDialog();
+}
+
 void MultiplayerGame::sendSetCreatureMovementType(uint32_t objectId, MovementType type) {
     shared_ptr<net::Command> cmd(makeCommand(CommandType::SetCreatureMovementType));
     Command &cmd2 = static_cast<Command &>(*cmd);
     cmd2._objectId = objectId;
     cmd2._movementType = type;
+
+    sendCommand(cmd);
+}
+
+void MultiplayerGame::sendSetCreatureTalking(uint32_t objectId, bool talking) {
+    shared_ptr<net::Command> cmd(makeCommand(CommandType::SetCreatureTalking));
+    Command &cmd2 = static_cast<Command &>(*cmd);
+    cmd2._objectId = objectId;
+    cmd2._talking = talking;
 
     sendCommand(cmd);
 }
@@ -303,6 +355,28 @@ void MultiplayerGame::sendSetDoorOpen(uint32_t objectId, uint32_t triggerrer) {
     cmd2._triggerrer = triggerrer;
     cmd2._open = true;
 
+    sendCommand(cmd);
+}
+
+void MultiplayerGame::sendStartDialog(uint32_t ownerId, const string &resRef) {
+    shared_ptr<net::Command> cmd(makeCommand(CommandType::StartDialog));
+    Command &cmd2 = static_cast<Command &>(*cmd);
+    cmd2._objectId = ownerId;
+    cmd2._resRef = resRef;
+
+    sendCommand(cmd);
+}
+
+void MultiplayerGame::sendPickDialogReply(uint32_t index) {
+    shared_ptr<net::Command> cmd(makeCommand(CommandType::PickDialogReply));
+    Command &cmd2 = static_cast<Command &>(*cmd);
+    cmd2._replyIndex = index;
+
+    sendCommand(cmd);
+}
+
+void MultiplayerGame::sendFinishDialog() {
+    shared_ptr<net::Command> cmd(makeCommand(CommandType::FinishDialog));
     sendCommand(cmd);
 }
 

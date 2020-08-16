@@ -142,10 +142,26 @@ void Command::load(const ByteArray &data) {
             _movementType = static_cast<MovementType>(getUint8(data, offset));
             break;
 
+        case net::CommandType::SetCreatureTalking:
+            _objectId = getUint16(data, offset);
+            _talking = getUint8(data, offset);
+            break;
+
         case net::CommandType::SetDoorOpen:
             _open = getUint8(data, offset);
             _objectId = getUint16(data, offset);
             _triggerrer = getUint16(data, offset);
+            break;
+
+        case net::CommandType::StartDialog:
+            _resRef = getString(data, offset);
+            break;
+
+        case net::CommandType::PickDialogReply:
+            _replyIndex = getUint8(data, offset);
+            break;
+
+        case net::CommandType::FinishDialog:
             break;
 
         default:
@@ -201,10 +217,26 @@ ByteArray Command::bytes() const {
             putUint8(static_cast<uint8_t>(_movementType), data);
             break;
 
+        case net::CommandType::SetCreatureTalking:
+            putUint16(_objectId, data);
+            putUint8(_talking, data);
+            break;
+
         case net::CommandType::SetDoorOpen:
             putUint8(_open, data);
             putUint16(_objectId, data);
             putUint16(_triggerrer, data);
+            break;
+
+        case net::CommandType::StartDialog:
+            putString(_resRef, data);
+            break;
+
+        case net::CommandType::PickDialogReply:
+            putUint8(_replyIndex, data);
+            break;
+
+        case net::CommandType::FinishDialog:
             break;
 
         default:
@@ -254,12 +286,24 @@ MovementType Command::movementType() const {
     return _movementType;
 }
 
+bool Command::talking() const {
+    return _talking;
+}
+
 bool Command::open() const {
     return _open;
 }
 
 uint32_t Command::triggerrer() const {
     return _triggerrer;
+}
+
+const string &Command::resRef() const {
+    return _resRef;
+}
+
+uint32_t Command::replyIndex() const {
+    return _replyIndex;
 }
 
 } // namespace game

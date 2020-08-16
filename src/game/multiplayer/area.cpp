@@ -70,6 +70,9 @@ void MultiplayerArea::execute(const Command &cmd) {
         case CommandType::SetCreatureMovementType:
             executeSetCreatureMovementType(cmd);
             break;
+        case CommandType::SetCreatureTalking:
+            executeSetCreatureTalking(cmd);
+            break;
         case CommandType::SetDoorOpen:
             executeSetDoorOpen(cmd);
             break;
@@ -156,6 +159,15 @@ void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
+        creature->setSynchronize(true);
+    }
+}
+
+void MultiplayerArea::executeSetCreatureTalking(const Command &cmd) {
+    shared_ptr<Object> creature(find(cmd.objectId(), ObjectType::Creature));
+    if (creature) {
+        creature->setSynchronize(false);
+        static_cast<Creature &>(*creature).setTalking(cmd.talking());
         creature->setSynchronize(true);
     }
 }

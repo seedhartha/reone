@@ -33,20 +33,26 @@ public:
     DialogGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void startDialog(const Object &owner, const std::string &resRef);
+    void startDialog(uint32_t ownerId, const std::string &resRef);
+    void pickReply(uint32_t index);
+
+    void setPickReplyEnabled(bool enabled);
 
     void setGetObjectIdByTagFunc(const std::function<uint32_t(const std::string &)> &fn);
+    void setOnReplyPicked(const std::function<void(uint32_t)> &fn);
     void setOnSpeakerChanged(const std::function<void(uint32_t, uint32_t)> &fn);
     void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
     resources::GameVersion _version { resources::GameVersion::KotOR };
-    const Object *_owner { nullptr };
+    uint32_t _ownerId { 0 };
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
     uint32_t _currentSpeaker { 0 };
+    bool _pickReplyEnabled { true };
     std::function<uint32_t(const std::string &)> _getObjectIdByTag;
+    std::function<void(uint32_t)> _onReplyPicked;
     std::function<void(uint32_t, uint32_t)> _onSpeakerChanged;
     std::function<void()> _onDialogFinished;
 
