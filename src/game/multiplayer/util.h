@@ -19,25 +19,14 @@
 
 #include <string>
 
+#include "command.h"
+
 namespace reone {
 
-namespace net {
+namespace game {
 
-enum class CommandType {
-    LoadModule,
-    LoadCreature,
-    SetPlayerRole,
-    SetObjectTransform,
-    SetObjectAnimation,
-    SetCreatureMovementType,
-    SetDoorOpen
-};
+std::string describeCommand(const Command &cmd);
 
-struct NetworkOptions {
-    std::string host;
-    int port { 0 };
-};
-
-} // namespace net
+} // namespace game
 
 } // namespace reone

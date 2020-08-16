@@ -15,28 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <string>
+#include "command.h"
 
 namespace reone {
 
 namespace net {
 
-enum class CommandType {
-    LoadModule,
-    LoadCreature,
-    SetPlayerRole,
-    SetObjectTransform,
-    SetObjectAnimation,
-    SetCreatureMovementType,
-    SetDoorOpen
-};
+Command::Command(uint32_t id, CommandType type) : _id(id), _type(type) {
+}
 
-struct NetworkOptions {
-    std::string host;
-    int port { 0 };
-};
+uint32_t Command::id() const {
+    return _id;
+}
+
+CommandType Command::type() const {
+    return _type;
+}
+
+uint32_t Command::objectId() const {
+    return _objectId;
+}
 
 } // namespace net
 

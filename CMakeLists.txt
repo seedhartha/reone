@@ -68,6 +68,7 @@ set(HEADERS
     src/game/multiplayer/door.h
     src/game/multiplayer/game.h
     src/game/multiplayer/module.h
+    src/game/multiplayer/util.h
     src/game/object/creature.h
     src/game/object/door.h
     src/game/object/object.h
@@ -91,6 +92,7 @@ set(HEADERS
     src/gui/types.h
     src/net/client.h
     src/net/connection.h
+    src/net/command.h
     src/net/server.h
     src/net/types.h
     src/program.h
@@ -170,6 +172,7 @@ set(SOURCES
     src/game/multiplayer/door.cpp
     src/game/multiplayer/game.cpp
     src/game/multiplayer/module.cpp
+    src/game/multiplayer/util.cpp
     src/game/navmesh.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
@@ -195,6 +198,7 @@ set(SOURCES
     src/main.cpp
     src/net/client.cpp
     src/net/connection.cpp
+    src/net/command.cpp
     src/net/server.cpp
     src/program.cpp
     src/render/aabb.cpp

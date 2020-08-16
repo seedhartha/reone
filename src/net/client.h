@@ -23,6 +23,7 @@
 #include <boost/asio/io_service.hpp>
 
 #include "connection.h"
+#include "command.h"
 
 namespace reone {
 
@@ -36,7 +37,7 @@ public:
     void start(const std::string &address, int port);
     void stop();
 
-    void send(const ByteArray &data);
+    void send(const std::shared_ptr<Command> &command);
 
     void setOnCommandReceived(const std::function<void(const ByteArray &)> &fn);
 

@@ -124,7 +124,7 @@ void Game::loadMainMenu() {
     mainMenu->setOnExit([this]() { _quit = true; });
     mainMenu->setOnModuleSelected([this](const string &name) {
         PartyConfiguration party;
-        party.memberCount = 1;
+        party.memberCount = 2;
         party.leader.equipment.push_back("g_a_clothes01");
         party.member1.equipment.push_back("g_a_clothes01");
 
@@ -170,6 +170,7 @@ void Game::loadPortraitsGui() {
         string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
         PartyConfiguration party;
+        party.memberCount = 1;
         party.leader = character;
 
         loadModule(moduleName, party);

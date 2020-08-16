@@ -55,7 +55,9 @@ void Server::handleAccept(shared_ptr<tcp::socket> &socket, const boost::system::
     unique_ptr<Connection> client(new Connection(socket));
     client->setTag(tag);
     client->setOnAbort([this, &client](const string &tag) { stopClient(tag); });
-    client->setOnCommandReceived(_onCommandReceived);
+    client->setOnCommandReceived([this, tag](const ByteArray &data) {
+        _onCommandReceived(tag, data);
+    });
     client->open();
     _clients.insert(make_pair(tag, move(client)));
 
@@ -101,18 +103,18 @@ void Server::stop() {
     _clients.clear();
 }
 
-void Server::send(const string &tag, const ByteArray &data) {
+void Server::send(const string &tag, const shared_ptr<Command> &command) {
     auto it = _clients.find(tag);
     if (it == _clients.end()) {
         warn("TCP: invalid client: " + tag);
         return;
     }
-    it->second->send(data);
+    it->second->send(command);
 }
 
-void Server::sendToAll(const ByteArray &data) {
+void Server::sendToAll(const shared_ptr<Command> &command) {
     for (auto &client : _clients) {
-        client.second->send(data);
+        client.second->send(command);
     }
 }
 
@@ -128,7 +130,7 @@ void Server::setOnClientDisconnected(const function<void(const string &)> &fn) {
     _onClientDisconnected = fn;
 }
 
-void Server::setOnCommandReceived(const function<void(const ByteArray &)> &fn) {
+void Server::setOnCommandReceived(const function<void(const string &, const ByteArray &)> &fn) {
     _onCommandReceived = fn;
 }
 

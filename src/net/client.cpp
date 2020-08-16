@@ -71,9 +71,9 @@ void Client::stop() {
     }
 }
 
-void Client::send(const ByteArray &data) {
+void Client::send(const shared_ptr<Command> &command) {
     assert(_connection);
-    _connection->send(data);
+    _connection->send(command);
 }
 
 void Client::setOnCommandReceived(const function<void(const ByteArray &)> &fn) {

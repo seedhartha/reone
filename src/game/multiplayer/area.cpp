@@ -22,6 +22,8 @@
 
 using namespace std;
 
+using namespace reone::net;
+
 namespace reone {
 
 namespace game {
@@ -37,8 +39,8 @@ MultiplayerArea::MultiplayerArea(
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }
 
-shared_ptr<Creature> MultiplayerArea::makeCreature() {
-    return make_unique<MultiplayerCreature>(_idCounter++, _callbacks);
+shared_ptr<Creature> MultiplayerArea::makeCreature(uint32_t id) {
+    return make_unique<MultiplayerCreature>(id > 0 ? id : _idCounter++, _callbacks);
 }
 
 shared_ptr<Door> MultiplayerArea::makeDoor() {
@@ -76,7 +78,7 @@ void MultiplayerArea::execute(const Command &cmd) {
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
-    shared_ptr<Creature> creature(makeCreature());
+    shared_ptr<Creature> creature(makeCreature(cmd.objectId()));
     creature->setTag(cmd.tag());
 
     for (auto &item : cmd.equipment()) {
@@ -89,6 +91,7 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
     creature->load(move(config));
     creature->setPosition(cmd.position());
     creature->setHeading(cmd.heading());
+    creature->setSynchronize(true);
     creature->initGL();
 
     switch (cmd.role()) {
@@ -130,7 +133,7 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
-    shared_ptr<Object> object(find(cmd.tag()));
+    shared_ptr<Object> object(find(cmd.objectId(), ObjectType::Creature));
     if (object) {
         object->setSynchronize(false);
         object->setPosition(cmd.position());
@@ -140,7 +143,7 @@ void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
-    shared_ptr<Object> object(find(cmd.tag()));
+    shared_ptr<Object> object(find(cmd.objectId(), ObjectType::Creature));
     if (object) {
         object->setSynchronize(false);
         object->animate(cmd.animation(), cmd.animationFlags());
@@ -149,7 +152,7 @@ void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
-    shared_ptr<Object> creature(find(cmd.tag(), ObjectType::Creature));
+    shared_ptr<Object> creature(find(cmd.objectId(), ObjectType::Creature));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
@@ -159,7 +162,7 @@ void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
 
 void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
     shared_ptr<Object> door(find(cmd.objectId(), ObjectType::Door));
-    shared_ptr<Object> trigerrer(find(cmd.trigerrer()));
+    shared_ptr<Object> trigerrer(find(cmd.triggerrer()));
     if (door) {
         door->setSynchronize(false);
         static_cast<Door &>(*door).open(trigerrer);

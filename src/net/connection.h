@@ -18,6 +18,8 @@
 #pragma once
 
 #include <functional>
+#include <list>
+#include <mutex>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
@@ -25,6 +27,7 @@
 
 #include "../core/types.h"
 
+#include "command.h"
 #include "types.h"
 
 namespace reone {
@@ -39,7 +42,7 @@ public:
     void open();
     void close();
 
-    void send(const ByteArray &data);
+    void send(const std::shared_ptr<Command> &command);
 
     void setTag(const std::string &tag);
 
@@ -53,14 +56,18 @@ private:
     std::string _tag;
     boost::asio::streambuf _readBuffer;
     int _cmdLength { 0 };
+    std::list<std::shared_ptr<Command>> _cmdOut;
+    std::recursive_mutex _cmdOutMutex;
     std::function<void(const std::string &)> _onAbort;
     std::function<void(const ByteArray &)> _onCommandReceived;
 
     Connection(const Connection &) = delete;
     Connection &operator=(const Connection &) = delete;
 
+    void eraseSameCommands(const Command &command);
+    void doSend(const Command &command);
     void handleRead(size_t bytesRead, const boost::system::error_code &ec);
-    void handleWrite(std::shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec);
+    void handleWrite(uint32_t commandId, std::shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec);
 };
 
 } // namespace net

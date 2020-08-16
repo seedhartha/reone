@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <list>
+#include <map>
 #include <mutex>
 
 #include "../game.h"
@@ -39,31 +41,41 @@ public:
         const Options &opts);
 
 private:
+    uint32_t _cmdCounter { 0 };
     MultiplayerMode _mode { MultiplayerMode::Server };
+    std::recursive_mutex _syncMutex;
     std::unique_ptr<net::Client> _client;
     std::unique_ptr<net::Server> _server;
-    std::recursive_mutex _commandsMutex;
-    std::queue<Command> _commands;
-    std::recursive_mutex _syncMutex;
 
+    // Commands
+    std::queue<Command> _commandsIn;
+    std::recursive_mutex _commandsInMutex;
+
+    // Game overrides
     void configure() override;
-    const std::shared_ptr<Module> makeModule(const std::string &name) override;
     void update() override;
     void loadNextModule() override;
+    const std::shared_ptr<Module> makeModule(const std::string &name) override;
 
+    // IMultiplayerCallbacks overrides
     void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) override;
     void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) override;
     void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) override;
 
-    bool shouldSendObjectUpdates(const std::string &tag) const;
+    std::shared_ptr<net::Command> makeCommand(net::CommandType type);
+    bool shouldSendObjectUpdates(uint32_t objectId) const;
     void synchronizeClient(const std::string &tag);
-    void sendLoadModuleCommand(const std::string &client, const std::string &module);
-    void sendLoadCreatureCommand(const std::string &client, CreatureRole role, const Creature &creature);
-    void sendSetPlayerRoleCommand(const std::string &client, CreatureRole role);
-    void sendSetObjectTransformCommand(const std::string &tag, const glm::vec3 &position, float heading);
-    void sendSetObjectAnimationCommand(const std::string &tag, const std::string &animation, int flags, float speed);
-    void sendSetCreatureMovementTypeCommand(const std::string &tag, MovementType type);
-    void sendSetDoorOpenCommand(uint32_t objectId, const std::string &trigerrer);
+
+    void sendLoadModule(const std::string &client, const std::string &module);
+    void sendLoadCreature(const std::string &client, CreatureRole role, const Creature &creature);
+    void sendSetPlayerRole(const std::string &client, CreatureRole role);
+    void sendSetObjectTransform(uint32_t objectId, const glm::vec3 &position, float heading);
+    void sendSetObjectAnimation(uint32_t objectId, const std::string &animation, int flags, float speed);
+    void sendSetCreatureMovementType(uint32_t objectId, MovementType type);
+    void sendSetDoorOpen(uint32_t objectId, uint32_t triggerrer);
+
+    void sendCommand(const std::shared_ptr<net::Command> &command);
+    void sendCommand(const std::string &client, const std::shared_ptr<net::Command> &command);
 
     void onClientConnected(const std::string tag);
     void onClientDisconnected(const std::string tag);
