@@ -43,7 +43,11 @@ namespace reone {
 
 namespace game {
 
+static const int kAppearanceBastila = 4;
+static const int kAppearanceCarth = 6;
 static const int kAppearanceDarthRevan = 22;
+static const int kAppearanceAtton = 452;
+static const int kAppearanceKreia = 455;
 
 Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
     _version(version),
@@ -120,7 +124,20 @@ void Game::loadMainMenu() {
     mainMenu->setOnExit([this]() { _quit = true; });
     mainMenu->setOnModuleSelected([this](const string &name) {
         PartyConfiguration party;
-        party.leader.appearance = kAppearanceDarthRevan;
+        party.memberCount = 1;
+        party.leader.equipment.push_back("g_a_clothes01");
+        party.member1.equipment.push_back("g_a_clothes01");
+
+        switch (_version) {
+            case GameVersion::TheSithLords:
+                party.leader.appearance = kAppearanceAtton;
+                party.member1.appearance = kAppearanceKreia;
+                break;
+            default:
+                party.leader.appearance = kAppearanceCarth;
+                party.member1.appearance = kAppearanceBastila;
+                break;
+        }
 
         loadModule(name, party);
     });
