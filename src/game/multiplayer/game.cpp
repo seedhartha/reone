@@ -114,9 +114,9 @@ void MultiplayerGame::onObjectTransformChanged(const Object &object, const glm::
     }
 }
 
-void MultiplayerGame::onObjectAnimationChanged(const Object &object, const string &anim, int flags) {
+void MultiplayerGame::onObjectAnimationChanged(const Object &object, const string &anim, int flags, float speed) {
     if (shouldSendObjectUpdates(object.tag())) {
-        sendSetObjectAnimationCommand(object.tag(), anim, flags);
+        sendSetObjectAnimationCommand(object.tag(), anim, flags, speed);
     }
 }
 
@@ -184,8 +184,8 @@ void MultiplayerGame::synchronizeClient(const string &tag) {
 
     sendLoadModuleCommand(tag, _module->name());
 
-    Creature &partyLeader = static_cast<Creature &>(*_module->area().partyLeader());
-    sendLoadCreatureCommand(tag, CreatureRole::PartyLeader, partyLeader);
+    shared_ptr<Object> partyLeader(_module->area().partyLeader());
+    sendLoadCreatureCommand(tag, CreatureRole::PartyLeader, static_cast<Creature &>(*partyLeader));
 
     shared_ptr<Object> partyMember1(_module->area().partyMember1());
     if (partyMember1) {
@@ -260,11 +260,12 @@ void MultiplayerGame::sendSetObjectTransformCommand(const string &tag, const glm
     }
 }
 
-void MultiplayerGame::sendSetObjectAnimationCommand(const string &tag, const string &animation, int flags) {
+void MultiplayerGame::sendSetObjectAnimationCommand(const string &tag, const string &animation, int flags, float speed) {
     Command cmd(CommandType::SetObjectAnimation);
     cmd._tag = tag;
     cmd._animation = animation;
     cmd._animationFlags = flags;
+    cmd._animationSpeed = speed;
 
     if (_mode == MultiplayerMode::Client) {
         _client->send(cmd.bytes());

@@ -73,6 +73,7 @@ private:
     float _heading { 0.0f };
     std::string _animation;
     int _animationFlags { 0 };
+    float _animationSpeed { 1.0f };
     MovementType _movementType { MovementType::None };
     bool _open { false };
     std::string _trigerrer;

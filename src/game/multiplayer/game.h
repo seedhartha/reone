@@ -52,7 +52,7 @@ private:
     void loadNextModule() override;
 
     void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) override;
-    void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags) override;
+    void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) override;
     void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) override;
 
     bool shouldSendObjectUpdates(const std::string &tag) const;
@@ -61,7 +61,7 @@ private:
     void sendLoadCreatureCommand(const std::string &client, CreatureRole role, const Creature &creature);
     void sendSetPlayerRoleCommand(const std::string &client, CreatureRole role);
     void sendSetObjectTransformCommand(const std::string &tag, const glm::vec3 &position, float heading);
-    void sendSetObjectAnimationCommand(const std::string &tag, const std::string &animation, int flags);
+    void sendSetObjectAnimationCommand(const std::string &tag, const std::string &animation, int flags, float speed);
     void sendSetCreatureMovementTypeCommand(const std::string &tag, MovementType type);
     void sendSetDoorOpenCommand(uint32_t objectId, const std::string &trigerrer);
 
