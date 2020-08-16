@@ -353,9 +353,11 @@ bool Game::handle(const SDL_Event &event) {
             if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
-        default:
-            if (currentGUI()->handle(event)) return true;
+        default: {
+            shared_ptr<GUI> gui(currentGUI());
+            if (gui && gui->handle(event)) return true;
             break;
+        }
     }
 
     return false;
@@ -456,9 +458,11 @@ void Game::renderGUI() {
             _debugGui->render();
             if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
             break;
-        default:
-            currentGUI()->render();
+        default: {
+            shared_ptr<GUI> gui(currentGUI());
+            if (gui) gui->render();
             break;
+        }
     }
 }
 

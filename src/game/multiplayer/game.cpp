@@ -62,8 +62,6 @@ void MultiplayerGame::configure() {
         default:
             break;
     }
-
-    Game::configure();
 }
 
 void MultiplayerGame::update() {
