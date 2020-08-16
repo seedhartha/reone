@@ -168,12 +168,16 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
 }
 
 void Module::update3rdPersonCameraTarget() {
-    Object *player = _area->player().get();
+    shared_ptr<Object> player(_area->player());
+    if (!player) return;
+
     _thirdPersonCamera->setTargetPosition(player->position() + player->model()->getNodeAbsolutePosition("camerahook"));
 }
 
 void Module::update3rdPersonCameraHeading() {
-    Object *player = _area->player().get();
+    shared_ptr<Object> player(_area->player());
+    if (!player) return;
+
     _thirdPersonCamera->setHeading(player->heading());
 }
 
@@ -364,7 +368,10 @@ void Module::updatePlayer(float dt) {
     if (_cameraType != CameraType::ThirdPerson) return;
 
     ThirdPersonCamera &camera = static_cast<ThirdPersonCamera &>(*_thirdPersonCamera);
-    Creature *player = static_cast<Creature *>(_area->player().get());
+    shared_ptr<Object> playerObject(_area->player());
+    if (!playerObject) return;
+
+    Creature &player = static_cast<Creature &>(*playerObject);
 
     float heading = 0.0f;
     bool movement = false;
@@ -378,16 +385,16 @@ void Module::updatePlayer(float dt) {
     }
 
     if (movement) {
-        glm::vec3 target(player->position());
+        glm::vec3 target(player.position());
         target.x -= 100.0f * glm::sin(heading);
         target.y += 100.0f * glm::cos(heading);
 
-        if (_area->moveCreatureTowards(*player, target, dt)) {
-            player->setMovementType(MovementType::Run);
+        if (_area->moveCreatureTowards(player, target, dt)) {
+            player.setMovementType(MovementType::Run);
             update3rdPersonCameraTarget();
         }
     } else {
-        player->setMovementType(MovementType::None);
+        player.setMovementType(MovementType::None);
     }
 }
 

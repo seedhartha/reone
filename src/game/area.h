@@ -114,7 +114,7 @@ protected:
 
     void landObject(Object &object);
 
-    virtual std::shared_ptr<Creature> makeCreature();
+    virtual std::shared_ptr<Creature> makeCreature(uint32_t id = 0);
     virtual std::shared_ptr<Door> makeDoor();
     virtual std::shared_ptr<Placeable> makePlaceable();
     virtual std::shared_ptr<Waypoint> makeWaypoint();

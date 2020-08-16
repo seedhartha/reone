@@ -85,11 +85,13 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
         shared_ptr<Creature> creature(makeCreature());
         creature->load(gffs);
         landObject(*creature);
+        creature->setSynchronize(true);
         _objects[ObjectType::Creature].push_back(move(creature));
     }
     for (auto &gffs : git.getList("Door List")) {
         shared_ptr<Door> door(makeDoor());
         door->load(gffs);
+        door->setSynchronize(true);
         _objects[ObjectType::Door].push_back(move(door));
     }
     for (auto &gffs : git.getList("Placeable List")) {
@@ -118,8 +120,8 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
     });
 }
 
-shared_ptr<Creature> Area::makeCreature() {
-    return make_unique<Creature>(_idCounter++);
+shared_ptr<Creature> Area::makeCreature(uint32_t id) {
+    return make_unique<Creature>(id > 0 ? id : _idCounter++);
 }
 
 shared_ptr<Door> Area::makeDoor() {
@@ -204,15 +206,19 @@ void Area::landObject(Object &object) {
 }
 
 void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading) {
-    shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
-    _objects[ObjectType::Creature].push_back(partyLeader);
-    landObject(*partyLeader);
-    _player = partyLeader;
-    _partyLeader = partyLeader;
-
     if (party.memberCount > 0) {
+        shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
+        _objects[ObjectType::Creature].push_back(partyLeader);
+        landObject(*partyLeader);
+        partyLeader->setSynchronize(true);
+        _player = partyLeader;
+        _partyLeader = partyLeader;
+    }
+
+    if (party.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
+        partyMember->setSynchronize(true);
         _objects[ObjectType::Creature].push_back(partyMember);
         _partyMember1 = partyMember;
 
@@ -220,9 +226,10 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         partyMember->enqueueAction(move(action));
     }
 
-    if (party.memberCount > 1) {
+    if (party.memberCount > 2) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
         landObject(*partyMember);
+        partyMember->setSynchronize(true);
         _objects[ObjectType::Creature].push_back(partyMember);
         _partyMember2 = partyMember;
 

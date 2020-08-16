@@ -22,33 +22,23 @@
 
 #include "../../core/types.h"
 #include "../../game/types.h"
+#include "../../net/command.h"
 
 namespace reone {
 
 namespace game {
 
-enum class CommandType {
-    LoadModule,
-    LoadCreature,
-    SetPlayerRole,
-    SetObjectTransform,
-    SetObjectAnimation,
-    SetCreatureMovementType,
-    SetDoorOpen
-};
-
-class Command {
+class Command : public net::Command {
 public:
     Command() = default;
-    Command(CommandType type);
+    Command(uint32_t id, net::CommandType type);
 
     void load(const ByteArray &data);
-    ByteArray bytes() const;
+
+    ByteArray bytes() const override;
 
     // Getters
-    CommandType type() const;
     const std::string &module() const;
-    uint32_t objectId() const;
     const std::string &tag() const;
     CreatureRole role() const;
     int appearance() const;
@@ -59,12 +49,10 @@ public:
     int animationFlags() const;
     MovementType movementType() const;
     bool open() const;
-    const std::string &trigerrer() const;
+    uint32_t triggerrer() const;
 
 private:
-    CommandType _type { CommandType::LoadModule };
     std::string _module;
-    uint32_t _objectId { 0 };
     std::string _tag;
     CreatureRole _role { CreatureRole::None };
     int _appearance { 0 };
@@ -76,7 +64,7 @@ private:
     float _animationSpeed { 1.0f };
     MovementType _movementType { MovementType::None };
     bool _open { false };
-    std::string _trigerrer;
+    uint32_t _triggerrer { 0 };
 
     friend class MultiplayerGame;
 };

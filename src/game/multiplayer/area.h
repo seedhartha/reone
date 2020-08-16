@@ -40,7 +40,7 @@ public:
 private:
     IMultiplayerCallbacks *_callbacks { nullptr };
 
-    std::shared_ptr<Creature> makeCreature() override;
+    std::shared_ptr<Creature> makeCreature(uint32_t id) override;
     std::shared_ptr<Door> makeDoor() override;
     void updateCreature(Creature &creature, float dt) override;
 

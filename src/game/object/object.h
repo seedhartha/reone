@@ -66,7 +66,7 @@ protected:
     glm::mat4 _transform { 1.0f };
     std::shared_ptr<render::ModelInstance> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
-    bool _synchronize { true };
+    bool _synchronize { false };
 
     Object(uint32_t id);
     Object(Object &&) = default;

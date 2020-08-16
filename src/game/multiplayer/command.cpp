@@ -44,6 +44,13 @@ static void putUint16(uint16_t val, ByteArray &arr) {
     arr.push_back((val >> 8) & 0xff);
 }
 
+static void putUint32(uint32_t val, ByteArray &arr) {
+    arr.push_back(val & 0xff);
+    arr.push_back((val >> 8) & 0xff);
+    arr.push_back((val >> 16) & 0xff);
+    arr.push_back((val >> 24) & 0xff);
+}
+
 static void putFloat(float val, ByteArray &arr) {
     uint32_t intVal = *reinterpret_cast<uint32_t *>(&val);
     arr.push_back(intVal & 0xff);
@@ -69,28 +76,37 @@ static uint16_t getUint16(const ByteArray &arr, int &offset) {
     return val;
 }
 
+static uint32_t getUint32(const ByteArray &arr, int &offset) {
+    uint32_t val = *reinterpret_cast<const uint32_t *>(&arr[offset]);
+    offset += sizeof(uint32_t);
+    return val;
+}
+
 static float getFloat(const ByteArray &arr, int &offset) {
     float val = *reinterpret_cast<const float *>(&arr[offset]);
     offset += sizeof(float);
     return val;
 }
 
-Command::Command(CommandType type) : _type(type) {
+Command::Command(uint32_t id, net::CommandType type) : net::Command(id, type) {
 }
 
 void Command::load(const ByteArray &data) {
-    _type = static_cast<CommandType>(data[0]);
+    _type = static_cast<net::CommandType>(data[0]);
 
     int offset = 1;
     int equipmentCount = 0;
 
+    _id = getUint32(data, offset);
+
     switch (_type) {
-        case CommandType::LoadModule:
+        case net::CommandType::LoadModule:
             _module = getString(data, offset);
             break;
 
-        case CommandType::LoadCreature:
+        case net::CommandType::LoadCreature:
             _role = static_cast<CreatureRole>(getUint8(data, offset));
+            _objectId = getUint16(data, offset);
             _tag = getString(data, offset);
             _appearance = getUint16(data, offset);
             _position.x = getFloat(data, offset);
@@ -103,51 +119,53 @@ void Command::load(const ByteArray &data) {
             }
             break;
 
-        case CommandType::SetPlayerRole:
+        case net::CommandType::SetPlayerRole:
             _role = static_cast<CreatureRole>(getUint8(data, offset));
             break;
 
-        case CommandType::SetObjectTransform:
-            _tag = getString(data, offset);
+        case net::CommandType::SetObjectTransform:
+            _objectId = getUint16(data, offset);
             _position.x = getFloat(data, offset);
             _position.y = getFloat(data, offset);
             _position.z = getFloat(data, offset);
             _heading = getFloat(data, offset);
             break;
 
-        case CommandType::SetObjectAnimation:
-            _tag = getString(data, offset);
+        case net::CommandType::SetObjectAnimation:
+            _objectId = getUint16(data, offset);
             _animationFlags = getUint8(data, offset);
             _animation = getString(data, offset);
             break;
 
-        case CommandType::SetCreatureMovementType:
-            _tag = getString(data, offset);
+        case net::CommandType::SetCreatureMovementType:
+            _objectId = getUint16(data, offset);
             _movementType = static_cast<MovementType>(getUint8(data, offset));
             break;
 
-        case CommandType::SetDoorOpen:
+        case net::CommandType::SetDoorOpen:
             _open = getUint8(data, offset);
             _objectId = getUint16(data, offset);
-            _trigerrer = getString(data, offset);
+            _triggerrer = getUint16(data, offset);
             break;
 
         default:
-            throw runtime_error("Unsupported command type: " + to_string(static_cast<int>(_type)));
+            throw runtime_error("Command: unsupported type: " + to_string(static_cast<int>(_type)));
     }
 }
 
 ByteArray Command::bytes() const {
     ByteArray data;
     putUint8(static_cast<uint8_t>(_type), data);
+    putUint32(_id, data);
 
     switch (_type) {
-        case CommandType::LoadModule:
+        case net::CommandType::LoadModule:
             putString(_module, data);
             break;
 
-        case CommandType::LoadCreature:
+        case net::CommandType::LoadCreature:
             putUint8(static_cast<uint8_t>(_role), data);
+            putUint16(_objectId, data);
             putString(_tag, data);
             putUint16(_appearance, data);
             putFloat(_position.x, data);
@@ -160,52 +178,44 @@ ByteArray Command::bytes() const {
             }
             break;
 
-        case CommandType::SetPlayerRole:
+        case net::CommandType::SetPlayerRole:
             putUint8(static_cast<uint8_t>(_role), data);
             break;
 
-        case CommandType::SetObjectTransform:
-            putString(_tag, data);
+        case net::CommandType::SetObjectTransform:
+            putUint16(_objectId, data);
             putFloat(_position.x, data);
             putFloat(_position.y, data);
             putFloat(_position.z, data);
             putFloat(_heading, data);
             break;
 
-        case CommandType::SetObjectAnimation:
-            putString(_tag, data);
+        case net::CommandType::SetObjectAnimation:
+            putUint16(_objectId, data);
             putUint8(_animationFlags, data);
             putString(_animation, data);
             break;
 
-        case CommandType::SetCreatureMovementType:
-            putString(_tag, data);
+        case net::CommandType::SetCreatureMovementType:
+            putUint16(_objectId, data);
             putUint8(static_cast<uint8_t>(_movementType), data);
             break;
 
-        case CommandType::SetDoorOpen:
+        case net::CommandType::SetDoorOpen:
             putUint8(_open, data);
             putUint16(_objectId, data);
-            putString(_trigerrer, data);
+            putUint16(_triggerrer, data);
             break;
 
         default:
-            throw runtime_error("Unsupported command type: " + to_string(static_cast<int>(_type)));
+            throw runtime_error("Command: unsupported type: " + to_string(static_cast<int>(_type)));
     }
 
     return move(data);
 }
 
-CommandType Command::type() const {
-    return _type;
-}
-
 const string &Command::module() const {
     return _module;
-}
-
-uint32_t Command::objectId() const {
-    return _objectId;
 }
 
 const string &Command::tag() const {
@@ -248,8 +258,8 @@ bool Command::open() const {
     return _open;
 }
 
-const string &Command::trigerrer() const {
-    return _trigerrer;
+uint32_t Command::triggerrer() const {
+    return _triggerrer;
 }
 
 } // namespace game

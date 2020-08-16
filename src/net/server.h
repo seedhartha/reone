@@ -25,6 +25,7 @@
 #include <boost/asio/ip/tcp.hpp>
 
 #include "connection.h"
+#include "command.h"
 #include "types.h"
 
 namespace reone {
@@ -41,15 +42,15 @@ public:
     void start(int port);
     void stop();
 
-    void send(const std::string &client, const ByteArray &data);
-    void sendToAll(const ByteArray &data);
+    void send(const std::string &client, const std::shared_ptr<Command> &command);
+    void sendToAll(const std::shared_ptr<Command> &command);
 
     const ServerClients &clients() const;
 
     // Callbacks
     void setOnClientConnected(const std::function<void(const std::string &)> &fn);
     void setOnClientDisconnected(const std::function<void(const std::string &)> &fn);
-    void setOnCommandReceived(const std::function<void(const ByteArray &)> &fn);
+    void setOnCommandReceived(const std::function<void(const std::string &, const ByteArray &)> &fn);
 
 private:
     boost::asio::io_service _service;
@@ -60,7 +61,7 @@ private:
     // Callbacks
     std::function<void(const std::string &)> _onClientConnected;
     std::function<void(const std::string &)> _onClientDisconnected;
-    std::function<void(const ByteArray &)> _onCommandReceived;
+    std::function<void(const std::string &, const ByteArray &)> _onCommandReceived;
 
     Server(const Server &) = delete;
     Server &operator=(const Server &) = delete;

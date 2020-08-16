@@ -46,13 +46,13 @@ void Connection::open() {
 void Connection::handleRead(size_t bytesRead, const boost::system::error_code &ec) {
     if (ec) {
         if (ec != boost::asio::error::eof) {
-            error("TCP: read failed: " + ec.message());
+            error("Connection: read failed: " + ec.message());
         }
         if (_onAbort) _onAbort(_tag);
         return;
     }
 
-    debug(boost::format("TCP: received %d bytes from %s") % bytesRead % _socket->remote_endpoint(), 3);
+    debug(boost::format("Connection: %d bytes received from %s") % bytesRead % _socket->remote_endpoint(), 3);
 
     if (_cmdLength == 0) {
         char buf[2];
@@ -61,7 +61,7 @@ void Connection::handleRead(size_t bytesRead, const boost::system::error_code &e
         _cmdLength = *reinterpret_cast<const uint16_t *>(buf);
 
         if (_cmdLength == 0) {
-            error("TCP: invalid command length: " + to_string(_cmdLength));
+            error("Connection: invalid command length: " + to_string(_cmdLength));
             if (_onAbort) _onAbort(_tag);
             return;
         }
@@ -100,28 +100,68 @@ void Connection::close() {
     }
 }
 
-void Connection::send(const ByteArray &data) {
-    ByteArray data2(data);
-    int cmdLength = static_cast<int>(data2.size());
-    data2.insert(data2.begin(), (cmdLength >> 8) & 0xff);
-    data2.insert(data2.begin(), cmdLength & 0xff);
+void Connection::send(const shared_ptr<Command> &command) {
+    lock_guard<recursive_mutex> lock(_cmdOutMutex);
+    eraseSameCommands(*command);
+    _cmdOut.push_back(command);
+
+    if (_cmdOut.size() == 1) {
+        doSend(*command);
+    }
+}
+
+void Connection::eraseSameCommands(const Command &command) {
+    switch (command.type()) {
+        case net::CommandType::SetObjectTransform:
+        case net::CommandType::SetObjectAnimation:
+        case net::CommandType::SetCreatureMovementType:
+            break;
+        default:
+            return;
+    }
+
+    auto cmdToErase = remove_if(
+        _cmdOut.begin(),
+        _cmdOut.end(),
+        [&command](const shared_ptr<Command> &item) { return item->type() == command.type() && item->objectId() == command.objectId(); });
+
+    _cmdOut.erase(cmdToErase, _cmdOut.end());
+}
+
+void Connection::doSend(const Command &command) {
+    ByteArray data(command.bytes());
+    int cmdLength = static_cast<int>(data.size());
+    data.insert(data.begin(), (cmdLength >> 8) & 0xff);
+    data.insert(data.begin(), cmdLength & 0xff);
 
     shared_ptr<boost::asio::streambuf> buffer(new boost::asio::streambuf());
     ostream out(buffer.get());
-    out.write(&data2[0], data2.size());
+    out.write(&data[0], data.size());
 
     boost::asio::async_write(
         *_socket,
         *buffer,
-        bind(&Connection::handleWrite, this, buffer, _1));
+        bind(&Connection::handleWrite, this, command.id(), buffer, _1));
 }
 
-void Connection::handleWrite(shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec) {
+void Connection::handleWrite(uint32_t commandId, shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec) {
     buffer.reset();
 
     if (ec) {
-        error("TCP: write failed: " + ec.message());
+        error("Connection: write failed: " + ec.message());
         if (_onAbort) _onAbort(_tag);
+    }
+    lock_guard<recursive_mutex> lock(_cmdOutMutex);
+    auto command = find_if(
+        _cmdOut.begin(),
+        _cmdOut.end(),
+        [&commandId](const shared_ptr<Command> &cmd) { return cmd->id() == commandId; });
+
+    if (command != _cmdOut.end()) {
+        _cmdOut.erase(command);
+    }
+    if (!_cmdOut.empty()) {
+        doSend(*_cmdOut.front());
     }
 }
 
