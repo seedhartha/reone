@@ -52,8 +52,8 @@ class ModelInstance {
 public:
     ModelInstance(const std::shared_ptr<Model> &model);
 
-    void animate(const std::string &parent, const std::string &anim, int flags = 0);
-    void animate(const std::string &anim, int flags = 0);
+    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void changeTexture(const std::string &resRef);
     void update(float dt);
@@ -78,8 +78,10 @@ private:
     struct AnimationState {
         std::string nextAnimation;
         int nextFlags { 0 };
+        float nextSpeed { 1.0f };
         std::string name;
         int flags { 0 };
+        float speed { 1.0f };
         std::shared_ptr<Animation> animation;
         const Model *model { nullptr };
         float time { 0.0f };

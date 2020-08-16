@@ -246,7 +246,7 @@ void Creature::playGreetingAnimation() {
 
 void Creature::playTalkAnimation() {
     animate(g_animTalkBody, kAnimationLoop);
-    animate(g_headHookNode, g_animTalkHead, kAnimationLoop);
+    animate(g_headHookNode, g_animTalkHead, kAnimationLoop, 0.25f);
 }
 
 void Creature::clearActions() {

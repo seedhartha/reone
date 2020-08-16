@@ -29,8 +29,8 @@ namespace game {
 
 class Object {
 public:
-    virtual void animate(const std::string &parent, const std::string &anim, int flags = 0);
-    virtual void animate(const std::string &anim, int flags = 0);
+    virtual void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    virtual void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     virtual void update(const UpdateContext &ctx);
     virtual void initGL();
     virtual void saveTo(AreaState &state) const;

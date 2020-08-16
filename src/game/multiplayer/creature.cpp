@@ -40,10 +40,10 @@ const string &MultiplayerCreature::clientTag() const {
     return _clientTag;
 }
 
-void MultiplayerCreature::animate(const string &anim, int flags) {
+void MultiplayerCreature::animate(const string &anim, int flags, float speed) {
     Object::animate(anim, flags);
     if (_synchronize) {
-        _callbacks->onObjectAnimationChanged(*this, anim, flags);
+        _callbacks->onObjectAnimationChanged(*this, anim, flags, speed);
     }
 }
 

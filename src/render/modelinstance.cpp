@@ -43,7 +43,7 @@ RenderListItem::RenderListItem(const ModelInstance *model, const ModelNode *node
 ModelInstance::ModelInstance(const shared_ptr<Model> &model) : _model(model) {
 }
 
-void ModelInstance::animate(const string &parent, const string &anim, int flags) {
+void ModelInstance::animate(const string &parent, const string &anim, int flags, float speed) {
     if (!_model) return;
 
     shared_ptr<ModelNode> node(_model->findNodeByName(parent));
@@ -58,18 +58,19 @@ void ModelInstance::animate(const string &parent, const string &anim, int flags)
         return;
     }
 
-    attached->second->animate(anim, flags);
+    attached->second->animate(anim, flags, speed);
 }
 
-void ModelInstance::animate(const string &anim, int flags) {
+void ModelInstance::animate(const string &anim, int flags, float speed) {
     if (!_model || _animState.name == anim) return;
 
     _animState.nextAnimation = anim;
     _animState.nextFlags = flags;
+    _animState.nextSpeed = speed;
 
     if (flags & kAnimationPropagate) {
         for (auto &pair : _attachedModels) {
-            pair.second->animate(anim, flags);
+            pair.second->animate(anim, flags, speed);
         }
     }
 }
@@ -130,6 +131,7 @@ void ModelInstance::startNextAnimation() {
     _animState.model = model;
     _animState.name = _animState.nextAnimation;
     _animState.flags = _animState.nextFlags;
+    _animState.speed = _animState.nextSpeed;
     _animState.time = 0.0f;
     _animState.localTransforms.clear();
 
@@ -139,7 +141,7 @@ void ModelInstance::startNextAnimation() {
 
 void ModelInstance::advanceAnimation(float dt, const set<string> &skipNodes) {
     float length = _animState.animation->length();
-    float time = _animState.time + dt;
+    float time = _animState.time + _animState.speed * dt;
 
     if (_animState.flags & kAnimationLoop) {
         _animState.time = glm::mod(time, length);
