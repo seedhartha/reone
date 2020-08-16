@@ -48,8 +48,11 @@ public:
     const std::string &animation() const;
     int animationFlags() const;
     MovementType movementType() const;
+    bool talking() const;
     bool open() const;
     uint32_t triggerrer() const;
+    const std::string &resRef() const;
+    uint32_t replyIndex() const;
 
 private:
     std::string _module;
@@ -63,8 +66,11 @@ private:
     int _animationFlags { 0 };
     float _animationSpeed { 1.0f };
     MovementType _movementType { MovementType::None };
+    bool _talking { false };
     bool _open { false };
     uint32_t _triggerrer { 0 };
+    std::string _resRef;
+    uint32_t _replyIndex { 0 };
 
     friend class MultiplayerGame;
 };

@@ -56,11 +56,15 @@ private:
     void update() override;
     void loadNextModule() override;
     const std::shared_ptr<Module> makeModule(const std::string &name) override;
+    void startDialog(uint32_t ownerId, const std::string &resRef) override;
+    void onDialogReplyPicked(uint32_t index) override;
+    void onDialogFinished() override;
 
     // IMultiplayerCallbacks overrides
     void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) override;
     void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) override;
     void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) override;
+    void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) override;
 
     std::shared_ptr<net::Command> makeCommand(net::CommandType type);
     bool shouldSendObjectUpdates(uint32_t objectId) const;
@@ -72,7 +76,11 @@ private:
     void sendSetObjectTransform(uint32_t objectId, const glm::vec3 &position, float heading);
     void sendSetObjectAnimation(uint32_t objectId, const std::string &animation, int flags, float speed);
     void sendSetCreatureMovementType(uint32_t objectId, MovementType type);
+    void sendSetCreatureTalking(uint32_t objectId, bool talking);
     void sendSetDoorOpen(uint32_t objectId, uint32_t triggerrer);
+    void sendStartDialog(uint32_t ownerId, const std::string &resRef);
+    void sendPickDialogReply(uint32_t index);
+    void sendFinishDialog();
 
     void sendCommand(const std::shared_ptr<net::Command> &command);
     void sendCommand(const std::string &client, const std::shared_ptr<net::Command> &command);

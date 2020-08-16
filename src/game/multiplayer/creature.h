@@ -35,12 +35,13 @@ public:
     const std::string &clientTag() const;
 
 private:
-    IMultiplayerCallbacks *_callbacks { nullptr };;
+    IMultiplayerCallbacks *_callbacks { nullptr };
     std::string _clientTag;
 
     void animate(const std::string &anim, int flags, float speed) override;
     void updateTransform() override;
     void setMovementType(MovementType type) override;
+    void setTalking(bool talking) override;
 };
 
 } // namespace game

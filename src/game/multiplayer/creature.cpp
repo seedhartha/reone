@@ -63,6 +63,15 @@ void MultiplayerCreature::setMovementType(MovementType type) {
     }
 }
 
+void MultiplayerCreature::setTalking(bool talking) {
+    if (talking == _talking) return;
+
+    Creature::setTalking(talking);
+    if (_synchronize) {
+        _callbacks->onCreatureTalkingChanged(*this, talking);
+    }
+}
+
 } // namespace game
 
 } // namespace reone

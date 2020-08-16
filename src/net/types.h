@@ -30,7 +30,11 @@ enum class CommandType {
     SetObjectTransform,
     SetObjectAnimation,
     SetCreatureMovementType,
-    SetDoorOpen
+    SetCreatureTalking,
+    SetDoorOpen,
+    StartDialog,
+    PickDialogReply,
+    FinishDialog
 };
 
 struct NetworkOptions {

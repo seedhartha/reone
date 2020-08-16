@@ -30,6 +30,7 @@ public:
     virtual void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) = 0;
     virtual void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) = 0;
     virtual void onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<Object> &trigerrer) = 0;
+    virtual void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) = 0;
 };
 
 } // namespace game

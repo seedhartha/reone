@@ -36,7 +36,11 @@ static map<net::CommandType, string> g_cmdDesc = {
     { net::CommandType::SetObjectTransform, "SetObjectTransform" },
     { net::CommandType::SetObjectAnimation, "SetObjectAnimation" },
     { net::CommandType::SetCreatureMovementType, "SetCreatureMovementType" },
-    { net::CommandType::SetDoorOpen, "SetDoorOpen" }
+    { net::CommandType::SetCreatureTalking, "SetCreatureTalking" },
+    { net::CommandType::SetDoorOpen, "SetDoorOpen" },
+    { net::CommandType::StartDialog, "StartDialog" },
+    { net::CommandType::PickDialogReply, "PickDialogReply" },
+    { net::CommandType::FinishDialog, "FinishDialog" }
 };
 
 static const string &describeCommandType(net::CommandType type) {

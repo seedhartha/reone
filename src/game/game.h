@@ -88,18 +88,6 @@ public:
     // END Routine callbacks
 
 protected:
-    resources::GameVersion _version { resources::GameVersion::KotOR };
-    Options _opts;
-    std::shared_ptr<Module> _module;
-    std::string _nextModule;
-
-    virtual void configure();
-    virtual const std::shared_ptr<Module> makeModule(const std::string &name);
-    virtual void configureModule();
-    virtual void update();
-    virtual void loadNextModule();
-
-private:
     enum class Screen {
         None,
         MainMenu,
@@ -109,11 +97,28 @@ private:
         Dialog
     };
 
+    resources::GameVersion _version { resources::GameVersion::KotOR };
+    Options _opts;
+    std::shared_ptr<Module> _module;
+    std::string _nextModule;
+    Screen _screen { Screen::None };
+    std::shared_ptr<DialogGui> _dialogGui;
+    bool _pickDialogReplyEnabled { true };
+
+    virtual void configure();
+    virtual const std::shared_ptr<Module> makeModule(const std::string &name);
+    virtual void configureModule();
+    virtual void update();
+    virtual void loadNextModule();
+    virtual void startDialog(uint32_t ownerId, const std::string &resRef);
+    virtual void onDialogReplyPicked(uint32_t index);
+    virtual void onDialogFinished();
+
+private:
     boost::filesystem::path _path;
     render::RenderWindow _renderWindow;
     uint32_t _ticks { 0 };
     bool _quit { false };
-    Screen _screen { Screen::None };
     std::string _nextEntry;
     GameState _state;
     std::shared_ptr<audio::SoundInstance> _music;
@@ -123,7 +128,6 @@ private:
     std::shared_ptr<ClassSelectionGui> _classesGui;
     std::shared_ptr<PortraitSelectionGui> _portraitsGui;
     std::shared_ptr<HUD> _hud;
-    std::shared_ptr<DialogGui> _dialogGui;
     std::shared_ptr<DebugGui> _debugGui;
 
     void loadMainMenu();
