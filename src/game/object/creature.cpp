@@ -323,11 +323,28 @@ void Creature::setMovementType(MovementType type) {
             _model->animate(getRunAnimation(), kAnimationLoop | kAnimationPropagate);
             break;
         default:
-            _model->playDefaultAnimation();
+            if (_talking) {
+                playTalkAnimation();
+            } else {
+                _model->playDefaultAnimation();
+            }
             break;
     }
 
     _movementType = type;
+}
+
+void Creature::setTalking(bool talking) {
+    if (_talking == talking) return;
+
+    if (_movementType == MovementType::None) {
+        if (talking) {
+            playTalkAnimation();
+        } else {
+            playDefaultAnimation();
+        }
+    }
+    _talking = talking;
 }
 
 const string &Creature::getPauseAnimation() {

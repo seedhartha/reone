@@ -111,6 +111,7 @@ public:
     // Setters
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);
+    virtual void setTalking(bool talking);
     void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
     void setPathUpdating();
 
@@ -130,6 +131,7 @@ public:
 
 protected:
     MovementType _movementType { MovementType::None };
+    bool _talking { false };
 
 private:
     enum class ModelType {

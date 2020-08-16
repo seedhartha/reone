@@ -229,13 +229,13 @@ void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
     debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
 
     if (prevSpeaker) {
-        static_cast<Creature &>(*prevSpeaker).playDefaultAnimation();
+        static_cast<Creature &>(*prevSpeaker).setTalking(false);
     }
     if (player && speaker) {
         player->face(*speaker);
         speaker->face(*player);
 
-        static_cast<Creature &>(*speaker).playTalkAnimation();
+        static_cast<Creature &>(*speaker).setTalking(true);
 
         _module->update3rdPersonCameraHeading();
     }
