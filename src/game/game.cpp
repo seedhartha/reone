@@ -66,9 +66,9 @@ int Game::run() {
     RoutineMan.init(_version, this);
 
     Cursor cursor;
-    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::GUI);
+    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
     cursor.pressed->initGL();
-    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::GUI);
+    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::Cursor);
     cursor.unpressed->initGL();
 
     _renderWindow.setCursor(cursor);

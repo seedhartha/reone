@@ -89,6 +89,7 @@ protected:
     double readDouble();
     std::string readFixedString(int size);
     std::string readFixedString(uint32_t off, int size);
+    std::string readFixedStringWide(int len);
     std::string readString(uint32_t off);
     std::string readString(uint32_t off, int size);
 

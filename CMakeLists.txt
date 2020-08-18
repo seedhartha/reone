@@ -118,6 +118,7 @@ set(HEADERS
     src/resources/biffile.h
     src/resources/binfile.h
     src/resources/bwmfile.h
+    src/resources/curfile.h
     src/resources/erffile.h
     src/resources/folder.h
     src/resources/gfffile.h
@@ -126,6 +127,7 @@ set(HEADERS
     src/resources/mdlfile.h
     src/resources/mp3file.h
     src/resources/ncsfile.h
+    src/resources/pefile.h
     src/resources/resources.h
     src/resources/rimfile.h
     src/resources/tgafile.h
@@ -222,6 +224,7 @@ set(SOURCES
     src/resources/biffile.cpp
     src/resources/binfile.cpp
     src/resources/bwmfile.cpp
+    src/resources/curfile.cpp
     src/resources/erffile.cpp
     src/resources/folder.cpp
     src/resources/gfffile.cpp
@@ -230,6 +233,7 @@ set(SOURCES
     src/resources/mdlfile.cpp
     src/resources/mp3file.cpp
     src/resources/ncsfile.cpp
+    src/resources/pefile.cpp
     src/resources/resources.cpp
     src/resources/rimfile.cpp
     src/resources/tgafile.cpp

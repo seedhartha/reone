@@ -25,6 +25,7 @@ namespace reone {
 
 namespace resources {
 
+class CurFile;
 class TgaFile;
 class TpcFile;
 
@@ -90,6 +91,7 @@ private:
     int glInternalPixelFormat() const;
     uint32_t glPixelFormat() const;
 
+    friend class resources::CurFile;
     friend class resources::TgaFile;
     friend class resources::TpcFile;
 };

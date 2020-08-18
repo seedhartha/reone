@@ -28,6 +28,7 @@
 #include "erffile.h"
 #include "biffile.h"
 #include "bwmfile.h"
+#include "curfile.h"
 #include "folder.h"
 #include "mdlfile.h"
 #include "ncsfile.h"
@@ -52,6 +53,8 @@ namespace resources {
 static const char kKeyFileName[] = "chitin.key";
 static const char kPatchFileName[] = "patch.erf";
 static const char kTalkTableFileName[] = "dialog.tlk";
+static const char kExeFileNameKotor[] = "swkotor.exe";
+static const char kExeFileNameTsl[] = "swkotor2.exe";
 
 static const char kModulesDirectoryName[] = "modules";
 static const char kOverrideDirectoryName[] = "override";
@@ -63,6 +66,16 @@ static const char kTexturePackDirectoryName[] = "texturepacks";
 
 static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
 static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+
+static map<string, uint32_t> g_cursorNameByResRefKotor = {
+    { "gui_mp_defaultu", 4 },
+    { "gui_mp_defaultd", 5 }
+};
+
+static map<string, uint32_t> g_cursorNameByResRefTsl = {
+    { "gui_mp_defaultu", 3 },
+    { "gui_mp_defaultd", 4 }
+};
 
 static map<string, shared_ptr<TwoDaTable>> g_2daCache;
 static map<string, shared_ptr<AudioStream>> g_audioCache;
@@ -108,14 +121,14 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
     addFolderProvider(soundsPath);
 
     switch (version) {
-        case GameVersion::KotOR: {
-            fs::path wavesPath(getPathIgnoreCase(gamePath, kWavesDirectoryName));
-            addFolderProvider(wavesPath);
-            break;
-        }
         case GameVersion::TheSithLords: {
             fs::path voicePath(getPathIgnoreCase(gamePath, kVoiceDirectoryName));
             addFolderProvider(voicePath);
+            break;
+        }
+        default: {
+            fs::path wavesPath(getPathIgnoreCase(gamePath, kWavesDirectoryName));
+            addFolderProvider(wavesPath);
             break;
         }
     }
@@ -125,6 +138,9 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
 
     fs::path tlkPath(getPathIgnoreCase(gamePath, kTalkTableFileName));
     _tlkFile.load(tlkPath);
+
+    fs::path exePath(getPathIgnoreCase(gamePath, version == GameVersion::TheSithLords ? kExeFileNameTsl : kExeFileNameKotor));
+    _exeFile.load(exePath);
 
     _version = version;
     _gamePath = gamePath;
@@ -386,10 +402,28 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
     if (it != g_texCache.end()) {
         return it->second;
     }
+    bool tryCur = type == TextureType::Cursor;
     bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
     shared_ptr<Texture> texture;
 
-    if (tryTpc) {
+    if (tryCur) {
+        uint32_t name;
+        switch (_version) {
+            case GameVersion::TheSithLords:
+                name = g_cursorNameByResRefTsl.find(resRef)->second;
+                break;
+            default:
+                name = g_cursorNameByResRefKotor.find(resRef)->second;
+                break;
+        }
+        shared_ptr<ByteArray> curData(_exeFile.find(name, PEResourceType::Cursor));
+        if (curData) {
+            CurFile cur(resRef);
+            cur.load(wrap(curData));
+            texture = cur.texture();
+        }
+    }
+    if (!texture && tryTpc) {
         shared_ptr<ByteArray> tpcData(find(resRef, ResourceType::Texture));
         if (tpcData) {
             TpcFile tpc(resRef, type);

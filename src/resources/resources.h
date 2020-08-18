@@ -33,6 +33,7 @@
 #include "2dafile.h"
 #include "gfffile.h"
 #include "keyfile.h"
+#include "pefile.h"
 #include "tlkfile.h"
 
 namespace reone {
@@ -68,6 +69,7 @@ private:
     boost::filesystem::path _gamePath;
     KeyFile _keyFile;
     TlkFile _tlkFile;
+    PEFile _exeFile;
     std::vector<std::string> _moduleNames;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders;
