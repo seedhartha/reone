@@ -17,6 +17,8 @@
 
 #include "binfile.h"
 
+#include <codecvt>
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -216,6 +218,17 @@ string BinaryFile::readFixedString(uint32_t off, int size) {
 
     string s(readFixedString(size));
     _in->seekg(pos);
+
+    return move(s);
+}
+
+string BinaryFile::readFixedStringWide(int len) {
+    u16string ws;
+    ws.resize(len);
+    _in->read(reinterpret_cast<char *>(&ws[0]), 2 * len);
+
+    wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> conv;
+    string s(conv.to_bytes(ws));
 
     return move(s);
 }
