@@ -276,6 +276,28 @@ static const GLchar kDiffuseLightmapBumpyShinyFragmentShader[] = "#version 330\n
             color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
         }";
 
+static const GLchar kDiffuseBumpmapFragmentShader[] = "#version 330\n\
+        \n\
+        uniform sampler2D diffuse;\n\
+        uniform sampler2D bumpmap;\n\
+        uniform vec3 cameraPosition;\n\
+        uniform float alpha;\n\
+        \n\
+        in vec3 fragPosition;\n\
+        in vec3 fragNormal;\n\
+        in vec2 fragTexCoords;\n\
+        in vec2 fragLightmapCoords;\n\
+        \n\
+        out vec4 color;\n\
+        \n\
+        void main() {\n\
+            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
+            vec4 bumpmapSample = texture(bumpmap, fragTexCoords);\n\
+            \n\
+            vec4 objectColor = diffuseSample;\n\
+            color = vec4(objectColor.rgb, alpha);\n\
+        }";
+
 static const GLchar kTextFragmentShader[] = "#version 330\n\
         \n\
         uniform sampler2D font;\n\
@@ -305,6 +327,7 @@ void ShaderManager::initGL() {
     initShader(ShaderName::FragmentDiffuseLightmap, GL_FRAGMENT_SHADER, kDiffuseLightmapFragmentShader);
     initShader(ShaderName::FragmentDiffuseLightmapEnvmap, GL_FRAGMENT_SHADER, kDiffuseLightmapEnvmapFragmentShader);
     initShader(ShaderName::FragmentDiffuseLightmapBumpyShiny, GL_FRAGMENT_SHADER, kDiffuseLightmapBumpyShinyFragmentShader);
+    initShader(ShaderName::FragmentDiffuseBumpmap, GL_FRAGMENT_SHADER, kDiffuseBumpmapFragmentShader);
     initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, kTextFragmentShader);
 
     initProgram(ShaderProgram::BasicWhite, ShaderName::VertexBasic, ShaderName::FragmentWhite);
@@ -317,6 +340,7 @@ void ShaderManager::initGL() {
     initProgram(ShaderProgram::SkeletalDiffuse, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuse);
     initProgram(ShaderProgram::SkeletalDiffuseEnvmap, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseEnvmap);
     initProgram(ShaderProgram::SkeletalDiffuseBumpyShiny, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseBumpyShiny);
+    initProgram(ShaderProgram::SkeletalDiffuseBumpmap, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseBumpmap);
     initProgram(ShaderProgram::GUIText, ShaderName::VertexGUI, ShaderName::FragmentText);
 }
 

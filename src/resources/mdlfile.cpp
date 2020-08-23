@@ -442,6 +442,9 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
             if (!features.bumpyShinyTexture.empty()) {
                 mesh->_bumpyShiny = resources.findTexture(features.bumpyShinyTexture, TextureType::EnvironmentMap);
             }
+            if (!features.bumpMapTexture.empty()) {
+                mesh->_bumpmap = resources.findTexture(features.bumpMapTexture, TextureType::Bumpmap);
+            }
         }
     }
     if (!lightmap.empty()) {
