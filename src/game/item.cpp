@@ -18,11 +18,13 @@
 #include "item.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include "../resources/resources.h"
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
@@ -32,11 +34,17 @@ namespace game {
 void Item::load(const string &resRef, const GffStruct &uti) {
     _resRef = resRef;
 
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> baseItems(resources.find2DA("baseitems"));
+    ResourceManager &resources = ResMan;
+    _localizedName = ResMan.getString(uti.getInt("LocalizedName")).text;
 
+    shared_ptr<TwoDaTable> baseItems(resources.find2DA("baseitems"));
     int baseItem = uti.getInt("BaseItem");
     uint32_t itemType = baseItems->getUint(baseItem, "equipableslots", 0);
+
+    string itemClass(baseItems->getString(baseItem, "itemclass"));
+    _itemClass = boost::to_lower_copy(itemClass);
+
+    string iconResRef;
 
     if ((itemType >> kInventorySlotBody) & 1) {
         const string &baseBodyVar = baseItems->getString(baseItem, "bodyvar");
@@ -48,14 +56,23 @@ void Item::load(const string &resRef, const GffStruct &uti) {
         _bodyVariation = bodyVariation;
         _textureVariation = textureVar;
 
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % textureVar);
+
     } else if ((itemType >> kInventorySlotRightWeapon) & 1) {
-        const string &itemClass = baseItems->getString(baseItem, "itemclass");
         int modelVariation = uti.getInt("ModelVariation", 1);
 
         _type = ItemType::RightWeapon;
-        _itemClass = itemClass;
         _modelVariation = modelVariation;
+
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % modelVariation);
+
+    } else {
+        int modelVariation = uti.getInt("ModelVariation", 1);
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % modelVariation);
     }
+
+    _icon = ResMan.findTexture(iconResRef, TextureType::GUI);
+    if (_icon) _icon->initGL();
 }
 
 const string &Item::resRef() const {
@@ -64,6 +81,10 @@ const string &Item::resRef() const {
 
 ItemType Item::type() const {
     return _type;
+}
+
+const string &Item::localizedName() const {
+    return _localizedName;
 }
 
 const string &Item::baseBodyVariation() const {
@@ -84,6 +105,10 @@ const string &Item::itemClass() const {
 
 int Item::modelVariation() const {
     return _modelVariation;
+}
+
+shared_ptr<render::Texture> Item::icon() const {
+    return _icon;
 }
 
 } // namespace game

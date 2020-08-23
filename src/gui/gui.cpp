@@ -54,8 +54,8 @@ void GUI::load(const string &resRef, BackgroundType background) {
 
     switch (_scaling) {
         case ScalingMode::Center:
-            _controlOffset.x = _screenCenter.x - _resolutionX / 2;
-            _controlOffset.y = _screenCenter.y - _resolutionY / 2;
+            _rootOffset.x = _screenCenter.x - _resolutionX / 2;
+            _rootOffset.y = _screenCenter.y - _resolutionY / 2;
             break;
         case ScalingMode::Stretch:
             stretchControl(*_rootControl);
@@ -65,8 +65,7 @@ void GUI::load(const string &resRef, BackgroundType background) {
     }
 
     const Control::Extent &rootExtent = _rootControl->extent();
-    _controlOffset.x += rootExtent.left;
-    _controlOffset.y += rootExtent.top;
+    _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
         unique_ptr<Control> control(Control::makeControl(ctrlGffs));
@@ -206,7 +205,7 @@ void GUI::initGL() {
 
 void GUI::render() const {
     if (_background) drawBackground();
-    if (_rootControl) _rootControl->render(_controlOffset);
+    if (_rootControl) _rootControl->render(_rootOffset);
 
     for (auto &control : _controls) {
         control->render(_controlOffset);

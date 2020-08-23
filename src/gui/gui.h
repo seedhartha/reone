@@ -58,6 +58,7 @@ protected:
     ScalingMode _scaling { ScalingMode::Center };
     float _aspect { 0.0f };
     glm::ivec2 _screenCenter { 0 };
+    glm::ivec2 _rootOffset { 0 };
     glm::ivec2 _controlOffset { 0 };
     std::shared_ptr<render::Texture> _background;
     std::shared_ptr<Control> _rootControl;

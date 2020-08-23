@@ -132,6 +132,9 @@ protected:
     Control(ControlType type);
     Control(ControlType type, const std::string &tag);
 
+    void drawBorder(const Border &border, const glm::ivec2 &offset) const;
+    void drawText(const std::string &text, const glm::ivec2 &offset) const;
+
 private:
     Control(const Control &) = delete;
     Control &operator=(const Control &) = delete;
@@ -141,8 +144,6 @@ private:
     void loadBorder(const resources::GffStruct &gffs);
     void loadText(const resources::GffStruct &gffs);
     void loadHilight(const resources::GffStruct &gffs);
-    void drawBorder(const Border &border, const glm::ivec2 &offset) const;
-    void drawText(const std::string &text, const glm::ivec2 &offset) const;
     std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
     void getTextPosition(glm::ivec2 &position, int lineCount) const;
 };

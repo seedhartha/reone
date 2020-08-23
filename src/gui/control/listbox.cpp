@@ -27,6 +27,7 @@
 #include "../../resources/resources.h"
 
 #include "button.h"
+#include "imagebutton.h"
 #include "scrollbar.h"
 
 using namespace std;
@@ -88,8 +89,11 @@ bool ListBox::handleMouseMotion(int x, int y) {
 }
 
 int ListBox::getItemIndex(int y) const {
+    if (!_protoItem) return -1;
+
     const Control::Extent &protoExtent = _protoItem->extent();
     int idx = (y - protoExtent.top) / (protoExtent.height + _padding) + _itemOffset;
+
     return idx >= 0 && idx < _items.size() ? idx : -1;
 }
 
@@ -139,7 +143,13 @@ void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const
         if (itemIdx >= _items.size()) break;
 
         _protoItem->setFocus(_hilightedIndex == itemIdx);
-        _protoItem->render(itemOffset, _items[itemIdx].text);
+
+        ImageButton *imageButton = dynamic_cast<ImageButton *>(_protoItem.get());
+        if (imageButton) {
+            imageButton->render(itemOffset, _items[itemIdx].text, _items[itemIdx].icon);
+        } else {
+            _protoItem->render(itemOffset, _items[itemIdx].text);
+        }
 
         itemOffset.y += protoExtent.height + _padding;
     }

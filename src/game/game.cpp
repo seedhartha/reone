@@ -205,6 +205,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     if (!_hud) loadHUD();
     if (!_debugGui) loadDebugGui();
     if (!_dialogGui) loadDialogGui();
+    if (!_containerGui) loadContainerGui();
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
@@ -237,6 +238,16 @@ void Game::loadDialogGui() {
     dialog->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
     dialog->setOnDialogFinished(bind(&Game::onDialogFinished, this));
     _dialogGui = move(dialog);
+}
+
+void Game::loadContainerGui() {
+    unique_ptr<ContainerGui> container(new ContainerGui(_opts.graphics));
+    container->load(_version);
+    container->initGL();
+    container->setOnCancel([this]() {
+        _screen = Screen::InGame;
+    });
+    _containerGui = move(container);
 }
 
 void Game::onDialogReplyPicked(uint32_t index) {
@@ -285,6 +296,10 @@ void Game::configureModule() {
     });
     _module->setStartDialog([this](const Object &owner, const string &resRef) {
         startDialog(owner.id(), resRef);
+    });
+    _module->setOpenContainer([this](const Placeable &placeable) {
+        _containerGui->openContainer(placeable);
+        _screen = Screen::Container;
     });
 }
 
@@ -367,6 +382,8 @@ shared_ptr<GUI> Game::currentGUI() const {
             return _hud;
         case Screen::Dialog:
             return _dialogGui;
+        case Screen::Container:
+            return _containerGui;
         default:
             return nullptr;
     }
@@ -388,6 +405,7 @@ void Game::drawWorld() {
     switch (_screen) {
         case Screen::InGame:
         case Screen::Dialog:
+        case Screen::Container:
             _module->render();
             break;
         default:

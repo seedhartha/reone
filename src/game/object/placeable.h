@@ -17,7 +17,11 @@
 
 #pragma once
 
+#include <vector>
+
 #include "object.h"
+
+#include "../item.h"
 
 namespace reone {
 
@@ -29,7 +33,11 @@ public:
 
     void load(const resources::GffStruct &gffs);
 
+    const std::vector<std::shared_ptr<Item>> &items() const;
+
 private:
+    std::vector<std::shared_ptr<Item>> _items;
+
     void loadBlueprint(const resources::GffStruct &gffs);
 };
 

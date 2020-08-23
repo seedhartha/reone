@@ -31,6 +31,7 @@
 #include "../../resources/resources.h"
 
 #include "button.h"
+#include "imagebutton.h"
 #include "label.h"
 #include "listbox.h"
 #include "panel.h"
@@ -55,6 +56,9 @@ unique_ptr<Control> Control::makeControl(const GffStruct &gffs) {
             break;
         case ControlType::Label:
             control = make_unique<Label>();
+            break;
+        case ControlType::ImageButton:
+            control = make_unique<ImageButton>();
             break;
         case ControlType::Button:
             control = make_unique<Button>();
@@ -221,7 +225,7 @@ void Control::initGL() {
 void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
-    ShaderManager &shaders = ShaderManager::instance();
+    ShaderManager &shaders = ShaderMan;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);

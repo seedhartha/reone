@@ -78,6 +78,7 @@ public:
     void setOnCameraChanged(const std::function<void(render::CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
+    void setOpenContainer(const std::function<void(const Placeable &)> &fn);
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -101,6 +102,7 @@ private:
     std::function<void(render::CameraType)> _onCameraChanged;
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _startDialog;
+    std::function<void(const Placeable &)> _openContainer;
 
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
