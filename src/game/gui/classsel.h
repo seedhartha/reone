@@ -38,19 +38,21 @@ public:
 private:
     struct ClassButton {
         gui::Control *control { nullptr };
-        glm::vec2 center { 0.0f };
+        glm::ivec2 center { 0 };
         Gender gender { Gender::Male };
         ClassType clazz { ClassType::Soldier };
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
-    glm::vec2 _defaultButtonSize { 0.0f };
-    glm::vec2 _enlargedButtonSize { 0.0f };
+    glm::ivec2 _defaultButtonSize { 0 };
+    glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;
     std::function<void(const CreatureConfiguration &)> _onClassSelected;
     std::function<void()> _onCancel;
 
     void configureClassButtons();
+    void configureClassModels();
+    void configureClassModel(int index, Gender gender, ClassType clazz);
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);
     void onFocusChanged(const std::string &control, bool focus) override;

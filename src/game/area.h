@@ -23,6 +23,7 @@
 #include "../gui/types.h"
 #include "../net/types.h"
 #include "../render/camera/camera.h"
+#include "../render/renderlist.h"
 #include "../render/types.h"
 #include "../resources/types.h"
 #include "../script/variable.h"

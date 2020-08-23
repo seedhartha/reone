@@ -27,7 +27,7 @@
 
 #include "../../core/log.h"
 #include "../../render/mesh/guiquad.h"
-#include "../../render/shadermanager.h"
+#include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
 #include "button.h"
@@ -197,6 +197,12 @@ bool Control::handleClick(int x, int y) {
     return false;
 }
 
+void Control::update(float dt) {
+    if (_scene3d.model) {
+        _scene3d.model->update(dt);
+    }
+}
+
 void Control::initGL() {
     if (_border) {
         if (_border->corner) _border->corner->initGL();
@@ -209,6 +215,7 @@ void Control::initGL() {
         if (_hilight->fill) _hilight->fill->initGL();
     }
     if (_text.font) _text.font->initGL();
+    if (_scene3d.model) _scene3d.model->initGL();
 }
 
 void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
@@ -224,8 +231,6 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
     } else if (_border) {
         drawBorder(*_border, offset);
     }
-
-    shaders.deactivate();
 
     if (!textOverride.empty() || !_text.text.empty()) {
         string text(!textOverride.empty() ? textOverride : _text.text);
@@ -430,6 +435,19 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount) const {
     }
 }
 
+void Control::render3D(const glm::ivec2 &offset) const {
+    if (!_visible) return;
+
+    shared_ptr<ModelInstance> model(_scene3d.model);
+    if (!model) return;
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(offset.x, offset.y, 0.0f));
+    transform *= _scene3d.transform;
+
+    model->render(transform);
+}
+
 void Control::stretch(float x, float y) {
     _extent.left = static_cast<int>(_extent.left * x);
     _extent.top = static_cast<int>(_extent.top * y);
@@ -465,6 +483,10 @@ void Control::setText(const Text &text) {
 
 void Control::setTextMessage(const string &text) {
     _text.text = text;
+}
+
+void Control::setScene3D(const Scene3D &scene) {
+    _scene3d = scene;
 }
 
 const string &Control::tag() const {

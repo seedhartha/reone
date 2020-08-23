@@ -55,6 +55,7 @@ public:
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
 
     bool handle(const SDL_Event &event) override;
+    void render() const;
 
     // Routine callbacks
 
@@ -130,18 +131,25 @@ private:
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DebugGui> _debugGui;
 
+    // Loading
     void loadMainMenu();
     void loadClassSelectionGui();
     void loadPortraitsGui();
     void loadHUD();
     void loadDebugGui();
     void loadDialogGui();
-    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
+
+    // Rendering
+    void drawWorld();
+    void drawGUI();
+    void drawGUI3D();
+    void drawCursor();
+
     void runMainLoop();
     std::shared_ptr<gui::GUI> currentGUI() const;
     float getDeltaTime();
-    void renderWorld();
-    void renderGUI();
+
+    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
 };
 
 } // namespace game

@@ -34,11 +34,14 @@ namespace gui {
 static const int kDefaultResolutionX = 640;
 static const int kDefaultResolutionY = 480;
 
-class GUI : public render::IRenderRoot, public render::IEventHandler {
+class GUI : public render::IEventHandler {
 public:
     bool handle(const SDL_Event &event) override;
-    void initGL() override;
-    void render() const override;
+    void update(float dt);
+
+    virtual void initGL();
+    void render() const;
+    void render3D() const;
 
     void resetFocus();
 
@@ -53,6 +56,7 @@ protected:
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };
+    float _aspect { 0.0f };
     glm::ivec2 _screenCenter { 0 };
     glm::ivec2 _controlOffset { 0 };
     std::shared_ptr<render::Texture> _background;
@@ -83,7 +87,7 @@ private:
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
-    void renderBackground() const;
+    void drawBackground() const;
 };
 
 } // namespace gui

@@ -19,6 +19,9 @@
 
 #include "../../resources/resources.h"
 
+#include "../characters.h"
+#include "../object/creature.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -76,6 +79,7 @@ void ClassSelectionGui::load(GameVersion version) {
     _version = version;
 
     configureClassButtons();
+    configureClassModels();
 
     Control &backButton = getControl("BTN_BACK");
     setButtonColors(backButton);
@@ -143,6 +147,50 @@ void ClassSelectionGui::setClassButtonEnlarged(int index, bool enlarged) {
     extent.top = static_cast<int>(button.center.y - 0.5f * extent.height);
 
     control.setExtent(move(extent));
+}
+
+void ClassSelectionGui::configureClassModels() {
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            configureClassModel(0, Gender::Male, ClassType::JediConsular);
+            configureClassModel(1, Gender::Male, ClassType::JediSentinel);
+            configureClassModel(2, Gender::Male, ClassType::JediGuardian);
+            configureClassModel(3, Gender::Female, ClassType::JediGuardian);
+            configureClassModel(4, Gender::Female, ClassType::JediSentinel);
+            configureClassModel(5, Gender::Female, ClassType::JediConsular);
+            break;
+        default:
+            configureClassModel(0, Gender::Male, ClassType::Scoundrel);
+            configureClassModel(1, Gender::Male, ClassType::Scout);
+            configureClassModel(2, Gender::Male, ClassType::Soldier);
+            configureClassModel(3, Gender::Female, ClassType::Soldier);
+            configureClassModel(4, Gender::Female, ClassType::Scout);
+            configureClassModel(5, Gender::Female, ClassType::Scoundrel);
+            break;
+    }
+}
+
+void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType clazz) {
+    Control &control = getControl("3D_MODEL" + to_string(index + 1));
+    const Control::Extent &extent = control.extent();
+
+    Creature creature(0);
+    creature.load(randomCharacter(gender, clazz));
+
+    int frameHeight = _defaultButtonSize.y;
+    int x = extent.left + extent.width / 2;
+    int y = extent.top + (extent.height + frameHeight) / 2 - 12;
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+    transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+    transform = glm::scale(transform, glm::vec3(frameHeight / 2.0f));
+
+    Control::Scene3D scene;
+    scene.model = creature.model();
+    scene.transform = move(transform);
+
+    control.setScene3D(scene);
 }
 
 void ClassSelectionGui::onFocusChanged(const string &control, bool focus) {

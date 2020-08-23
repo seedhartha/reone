@@ -189,6 +189,14 @@ struct GuiContext {
     DebugContext debug;
 };
 
+struct Portrait {
+    std::string resRef;
+    std::shared_ptr<render::Texture> image;
+    int appearanceNumber { 0 };
+    int appearanceS { 0 };
+    int appearanceL { 0 };
+};
+
 glm::vec3 getKotorBaseColor();
 glm::vec3 getKotorHilightColor();
 glm::vec3 getTslBaseColor();

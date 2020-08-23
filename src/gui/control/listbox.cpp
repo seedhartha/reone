@@ -23,7 +23,7 @@
 
 #include "../../core/log.h"
 #include "../../render/mesh/guiquad.h"
-#include "../../render/shadermanager.h"
+#include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
 #include "button.h"

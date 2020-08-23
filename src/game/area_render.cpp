@@ -42,10 +42,6 @@ void Area::initGL() {
     }
 }
 
-static bool sortByDistanceToCamera(const RenderListItem &left, const RenderListItem &right, const glm::vec3 &cameraPosition) {
-    return glm::distance2(left.center, cameraPosition) > glm::distance2(right.center, cameraPosition);
-}
-
 void Area::fillRenderLists(const glm::vec3 &cameraPosition) {
     auto &opaque = _renderLists[RenderListName::Opaque];
     auto &transparent = _renderLists[RenderListName::Transparent];
@@ -70,24 +66,16 @@ void Area::fillRenderLists(const glm::vec3 &cameraPosition) {
         }
     }
 
-    sort(
-        opaque.begin(),
-        opaque.end(),
-        bind(sortByDistanceToCamera, _1, _2, cameraPosition));
-
-    sort(
-        transparent.begin(),
-        transparent.end(),
-        bind(sortByDistanceToCamera, _1, _2, cameraPosition));
+    opaque.sortByDistanceToCamera(cameraPosition);
+    transparent.sortByDistanceToCamera(cameraPosition);
 }
 
 void Area::render() const {
-    for (auto &item : _renderLists.find(RenderListName::Opaque)->second) {
-        item.model->render(*item.node, item.transform, _debugMode == DebugMode::ModelNodes);
-    }
-    for (auto &item : _renderLists.find(RenderListName::Transparent)->second) {
-        item.model->render(*item.node, item.transform, _debugMode == DebugMode::ModelNodes);
-    }
+    auto &opaque = _renderLists.find(RenderListName::Opaque)->second;
+    auto &transparent = _renderLists.find(RenderListName::Transparent)->second;
+
+    opaque.render(_debugMode == DebugMode::ModelNodes);
+    transparent.render(_debugMode == DebugMode::ModelNodes);
 
     if (_debugMode == DebugMode::GameObjects) {
         AABBMesh &aabb = AABBMesh::instance();

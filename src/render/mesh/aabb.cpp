@@ -21,7 +21,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../shadermanager.h"
+#include "../shaders.h"
 
 using namespace std;
 
@@ -71,8 +71,6 @@ void AABBMesh::render(const AABB &aabb, const glm::mat4 &transform) const {
     shaders.setUniform("alpha", 1.0f);
 
     Mesh::render(GL_LINES);
-
-    shaders.deactivate();
 }
 
 } // namespace render
