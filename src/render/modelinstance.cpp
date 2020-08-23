@@ -74,6 +74,8 @@ void ModelInstance::animate(const string &anim, int flags, float speed) {
 }
 
 void ModelInstance::attach(const string &parentNode, const shared_ptr<Model> &model) {
+    if (!model) return;
+
     shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
     if (!parent) {
         warn("Parent node not found: " + parentNode);

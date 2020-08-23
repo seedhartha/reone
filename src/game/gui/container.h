@@ -17,29 +17,31 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
+#include "../../gui/gui.h"
 
-#include "item.h"
+#include "../../resources/types.h"
+
+#include "../object/placeable.h"
 
 namespace reone {
 
 namespace game {
 
-class TemplateManager {
+class ContainerGui : public gui::GUI {
 public:
-    static TemplateManager &instance();
+    ContainerGui(const render::GraphicsOptions &opts);
 
-    std::shared_ptr<Item> findItem(const std::string &resRef);
+    void load(resources::GameVersion version);
+    void openContainer(const Placeable &placeable);
+
+    void setOnCancel(const std::function<void()> &fn);
 
 private:
-    TemplateManager() = default;
+    std::function<void()> _onCancel;
 
-    TemplateManager(const TemplateManager &) = delete;
-    TemplateManager &operator=(const TemplateManager &) = delete;
+    void configureListBox(resources::GameVersion version);
+    void onClick(const std::string &control) override;
 };
-
-#define TemplateMan game::TemplateManager::instance()
 
 } // namespace game
 

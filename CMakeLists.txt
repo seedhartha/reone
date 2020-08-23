@@ -54,6 +54,7 @@ set(HEADERS
     src/game/dialog.h
     src/game/game.h
     src/game/gui/classsel.h
+    src/game/gui/container.h
     src/game/gui/debug.h
     src/game/gui/dialog.h
     src/game/gui/hud.h
@@ -85,6 +86,7 @@ set(HEADERS
     src/game/util.h
     src/gui/control/button.h
     src/gui/control/control.h
+    src/gui/control/imagebutton.h
     src/gui/control/label.h
     src/gui/control/listbox.h
     src/gui/control/panel.h
@@ -164,6 +166,7 @@ set(SOURCES
     src/game/game.cpp
     src/game/gui/classsel.cpp
     src/game/gui/colors.cpp
+    src/game/gui/container.cpp
     src/game/gui/debug.cpp
     src/game/gui/dialog.cpp
     src/game/gui/hud.cpp
@@ -195,6 +198,7 @@ set(SOURCES
     src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp
+    src/gui/control/imagebutton.cpp
     src/gui/control/label.cpp
     src/gui/control/listbox.cpp
     src/gui/control/panel.cpp

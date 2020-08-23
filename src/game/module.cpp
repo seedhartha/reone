@@ -237,6 +237,11 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
             }
         }
 
+        Placeable *placeable = dynamic_cast<Placeable *>(obstacle);
+        if (placeable) {
+            _openContainer(*placeable);
+        }
+
         Creature *creature = dynamic_cast<Creature *>(obstacle);
         if (creature) {
             if (!creature->conversation().empty() && _startDialog) {
@@ -421,6 +426,10 @@ void Module::setOnModuleTransition(const function<void(const string &, const str
 
 void Module::setStartDialog(const function<void(const Object &, const string &)> &fn) {
     _startDialog = fn;
+}
+
+void Module::setOpenContainer(const function<void(const Placeable &)> &fn) {
+    _openContainer = fn;
 }
 
 const string &Module::name() const {

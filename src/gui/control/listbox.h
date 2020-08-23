@@ -32,6 +32,7 @@ public:
     struct Item {
         std::string tag;
         std::string text;
+        std::shared_ptr<render::Texture> icon;
     };
 
     ListBox();

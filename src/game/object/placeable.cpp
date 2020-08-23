@@ -23,6 +23,8 @@
 #include "../../render/modelinstance.h"
 #include "../../resources/resources.h"
 
+#include "../templates.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -48,8 +50,7 @@ void Placeable::load(const GffStruct &gffs) {
     updateTransform();
 
     string templResRef(gffs.getString("TemplateResRef"));
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<GffStruct> utp(resources.findGFF(templResRef, ResourceType::PlaceableBlueprint));
+    shared_ptr<GffStruct> utp(ResMan.findGFF(templResRef, ResourceType::PlaceableBlueprint));
     loadBlueprint(*utp);
 }
 
@@ -57,15 +58,27 @@ void Placeable::loadBlueprint(const resources::GffStruct &gffs) {
     _tag = gffs.getString("Tag");
     boost::to_lower(_tag);
 
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> table = resources.find2DA("placeables");
+    shared_ptr<TwoDaTable> table(ResMan.find2DA("placeables"));
 
     int appearance = gffs.getInt("Appearance");
     string model(table->getString(appearance, "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelInstance>(resources.findModel(model));
-    _walkmesh = resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
+    _model = make_unique<ModelInstance>(ResMan.findModel(model));
+    _walkmesh = ResMan.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
+
+    const GffField *itemList = gffs.find("ItemList");
+    if (itemList) {
+        for (auto &itemGffs : itemList->children()) {
+            string resRef(itemGffs.getString("InventoryRes"));
+            shared_ptr<Item> item(TemplateMan.findItem(resRef));
+            _items.push_back(move(item));
+        }
+    }
+}
+
+const vector<shared_ptr<Item>> &Placeable::items() const {
+    return _items;
 }
 
 } // namespace game

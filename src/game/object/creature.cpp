@@ -263,7 +263,7 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<Item> item(TheTemplateManager.findItem(resRef));
+    shared_ptr<Item> item(TemplateMan.findItem(resRef));
 
     switch (item->type()) {
         case ItemType::Armor:

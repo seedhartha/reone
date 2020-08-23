@@ -17,30 +17,27 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "item.h"
+#include "control.h"
 
 namespace reone {
 
-namespace game {
+namespace gui {
 
-class TemplateManager {
+class ImageButton : public Control {
 public:
-    static TemplateManager &instance();
+    ImageButton();
 
-    std::shared_ptr<Item> findItem(const std::string &resRef);
+    void initGL() override;
+    void render(const glm::ivec2 &offset, const std::string &textOverride, const std::shared_ptr<render::Texture> &icon) const;
+
+    void setIconFrame(const std::shared_ptr<render::Texture> &texture);
 
 private:
-    TemplateManager() = default;
+    std::shared_ptr<render::Texture> _iconFrame;
 
-    TemplateManager(const TemplateManager &) = delete;
-    TemplateManager &operator=(const TemplateManager &) = delete;
+    void drawIcon(const glm::ivec2 &offset, const std::shared_ptr<render::Texture> &icon) const;
 };
 
-#define TemplateMan game::TemplateManager::instance()
-
-} // namespace game
+} // namespace gui
 
 } // namespace reone

@@ -25,6 +25,7 @@ enum class ControlType {
     Invalid = -1,
     Panel = 2,
     Label = 4,
+    ImageButton = 5,
     Button = 6,
     ScrollBar = 9,
     ListBox = 11,

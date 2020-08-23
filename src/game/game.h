@@ -24,6 +24,7 @@
 #include "../resources/types.h"
 
 #include "gui/classsel.h"
+#include "gui/container.h"
 #include "gui/debug.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
@@ -55,7 +56,6 @@ public:
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
 
     bool handle(const SDL_Event &event) override;
-    void render() const;
 
     // Routine callbacks
 
@@ -95,7 +95,8 @@ protected:
         ClassSelection,
         PortraitSelection,
         InGame,
-        Dialog
+        Dialog,
+        Container
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -130,6 +131,7 @@ private:
     std::shared_ptr<PortraitSelectionGui> _portraitsGui;
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DebugGui> _debugGui;
+    std::shared_ptr<ContainerGui> _containerGui;
 
     // Loading
     void loadMainMenu();
@@ -138,6 +140,7 @@ private:
     void loadHUD();
     void loadDebugGui();
     void loadDialogGui();
+    void loadContainerGui();
 
     // Rendering
     void drawWorld();
