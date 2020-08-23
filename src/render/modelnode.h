@@ -47,6 +47,9 @@ public:
 
     void initGL();
 
+    bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
+    bool getOrientation(float time, glm::quat &orientation) const;
+
     int index() const;
     const ModelNode *parent() const;
     uint16_t nodeNumber() const;
@@ -55,8 +58,6 @@ public:
     const glm::quat &orientation() const;
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
-    bool getPosition(float time, glm::vec3 &position) const;
-    bool getOrientation(float time, glm::quat &orientation) const;
     float alpha() const;
     std::shared_ptr<ModelMesh> mesh() const;
     std::shared_ptr<Skin> skin() const;

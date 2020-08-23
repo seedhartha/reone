@@ -166,7 +166,7 @@ void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::m
             glm::mat4 localTransform(glm::translate(glm::mat4(1.0f), refNode->position()));
 
             glm::vec3 position;
-            if (animNode.getPosition(time, position)) {
+            if (animNode.getPosition(time, position, _model->animationScale())) {
                 localTransform = glm::translate(localTransform, move(position));
             }
 

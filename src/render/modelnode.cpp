@@ -35,6 +35,58 @@ void ModelNode::initGL() {
     }
 }
 
+bool ModelNode::getPosition(float time, glm::vec3 &position, float scale) const {
+    if (_positionFrames.empty()) return false;
+
+    const PositionKeyframe *left = &_positionFrames.front();
+    const PositionKeyframe *right = left;
+
+    for (auto it = _positionFrames.begin(); it != _positionFrames.end(); ++it) {
+        if (it->time >= time) {
+            right = &*it;
+            if (it != _positionFrames.begin()) left = &*(it - 1);
+            break;
+        }
+    }
+
+    if (left == right) {
+        position = left->position * scale;
+        return true;
+    }
+
+    float factor = (time - left->time) / (right->time - left->time);
+
+    position = glm::mix(left->position, right->position, factor) * scale;
+
+    return true;
+}
+
+bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
+    if (_orientationFrames.empty()) return false;
+
+    const OrientationKeyframe *left = &_orientationFrames.front();
+    const OrientationKeyframe *right = left;
+
+    for (auto it = _orientationFrames.begin(); it != _orientationFrames.end(); ++it) {
+        if (it->time >= time) {
+            right = &*it;
+            if (it != _orientationFrames.begin()) left = &*(it - 1);
+            break;
+        }
+    }
+
+    if (left == right) {
+        orientation = left->orientation;
+        return true;
+    }
+
+    float factor = (time - left->time) / (right->time - left->time);
+
+    orientation = glm::slerp(left->orientation, right->orientation, factor);
+
+    return true;
+}
+
 int ModelNode::index() const {
     return _index;
 }
@@ -65,58 +117,6 @@ const glm::mat4 &ModelNode::absoluteTransform() const {
 
 const glm::mat4 &ModelNode::absoluteTransformInverse() const {
     return _absTransformInv;
-}
-
-bool ModelNode::getPosition(float time, glm::vec3 &position) const {
-    if (_positionFrames.empty()) return false;
-
-    const PositionKeyframe *left = &_positionFrames.front();
-    const PositionKeyframe *right = left;
-
-    for (auto it = _positionFrames.begin(); it != _positionFrames.end(); ++it) {
-        if (it->time >= time) {
-            right = &*it;
-            if (it != _positionFrames.begin()) left = &*(it - 1);
-            break;
-        }
-    }
-
-    if (left == right) {
-        position = left->position;
-        return true;
-    }
-
-    float factor = (time - left->time) / (right->time - left->time);
-
-    position = glm::mix(left->position, right->position, factor);
-
-    return true;
-}
-
-bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
-    if (_orientationFrames.empty()) return false;
-
-    const OrientationKeyframe *left = &_orientationFrames.front();
-    const OrientationKeyframe *right = left;
-
-    for (auto it = _orientationFrames.begin(); it != _orientationFrames.end(); ++it) {
-        if (it->time >= time) {
-            right = &*it;
-            if (it != _orientationFrames.begin()) left = &*(it - 1);
-            break;
-        }
-    }
-
-    if (left == right) {
-        orientation = left->orientation;
-        return true;
-    }
-
-    float factor = (time - left->time) / (right->time - left->time);
-
-    orientation = glm::slerp(left->orientation, right->orientation, factor);
-
-    return true;
 }
 
 float ModelNode::alpha() const {

@@ -116,6 +116,7 @@ void MdlFile::doLoad() {
     }
 
     _model = make_unique<Model>(_name, move(rootNode), anims, superModel);
+    _model->setAnimationScale(scale);
 }
 
 void MdlFile::openMDX() {
