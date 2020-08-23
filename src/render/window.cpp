@@ -22,14 +22,13 @@
 #include "GL/glew.h"
 
 #include "SDL2/SDL.h"
-#include "SDL2/SDL_opengl.h"
 
 #include "glm/ext.hpp"
 
 #include "mesh/aabb.h"
 #include "mesh/guiquad.h"
 
-#include "shadermanager.h"
+#include "shaders.h"
 
 using namespace std;
 
@@ -128,44 +127,13 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
     }
 }
 
-void RenderWindow::render(const shared_ptr<Camera> &camera) const {
+void RenderWindow::clear() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    renderWorld(camera);
-    renderGUI();
-
-    SDL_GL_SwapWindow(_window);
 }
 
-void RenderWindow::renderWorld(const shared_ptr<Camera> &camera) const {
-    if (!camera) return;
+void RenderWindow::drawCursor() const {
+    if (_relativeMouseMode) return;
 
-    glEnable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = camera->projection();
-    uniforms.view = camera->view();
-    uniforms.cameraPosition = camera->position();
-
-    ShaderManager::instance().setGlobalUniforms(uniforms);
-
-    if (_onRenderWorld) _onRenderWorld();
-}
-
-void RenderWindow::renderGUI() const {
-    glDisable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.width), static_cast<float>(_opts.height), 0.0f);
-    uniforms.view = glm::mat4(1.0f);
-
-    ShaderManager::instance().setGlobalUniforms(uniforms);
-
-    if (_onRenderGUI) _onRenderGUI();
-    if (!_relativeMouseMode) renderCursor();
-}
-
-void RenderWindow::renderCursor() const {
     shared_ptr<Texture> texture;
 
     int x, y;
@@ -177,10 +145,11 @@ void RenderWindow::renderCursor() const {
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    ShaderMan.activate(ShaderProgram::BasicDiffuse);
-    ShaderMan.setUniform("model", transform);
-    ShaderMan.setUniform("color", glm::vec3(1.0f));
-    ShaderMan.setUniform("alpha", 1.0f);
+    ShaderManager &shaders = ShaderMan;
+    shaders.activate(ShaderProgram::BasicDiffuse);
+    shaders.setUniform("model", transform);
+    shaders.setUniform("color", glm::vec3(1.0f));
+    shaders.setUniform("alpha", 1.0f);
 
     glActiveTexture(0);
     texture->bind();
@@ -188,8 +157,10 @@ void RenderWindow::renderCursor() const {
     TheGUIQuad.render(GL_TRIANGLES);
 
     texture->unbind();
+}
 
-    ShaderMan.deactivate();
+void RenderWindow::swapBuffers() const {
+    SDL_GL_SwapWindow(_window);
 }
 
 void RenderWindow::setRelativeMouseMode(bool enabled) {
@@ -201,14 +172,6 @@ void RenderWindow::setCursor(const Cursor &cursor) {
     bool hasTexture = cursor.pressed && cursor.unpressed;
     SDL_ShowCursor(hasTexture ? 0 : 1);
     _cursor = cursor;
-}
-
-void RenderWindow::setRenderWorldFunc(const function<void()> &fn) {
-    _onRenderWorld = fn;
-}
-
-void RenderWindow::setRenderGUIFunc(const function<void()> &fn) {
-    _onRenderGUI = fn;
 }
 
 } // namespace render

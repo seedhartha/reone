@@ -43,9 +43,9 @@ enum class ShaderProgram {
 };
 
 struct ShaderUniforms {
-    glm::mat4 projection;
-    glm::mat4 view;
-    glm::vec3 cameraPosition;
+    glm::mat4 projection { 1.0f };
+    glm::mat4 view { 1.0f };
+    glm::vec3 cameraPosition { 0.0f };
 };
 
 class ShaderManager {

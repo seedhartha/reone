@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <stack>
 #include <stdexcept>
 
 #include "GL/glew.h"
@@ -36,11 +37,8 @@ namespace reone {
 
 namespace render {
 
-RenderListItem::RenderListItem(const ModelInstance *model, const ModelNode *node, const glm::mat4 &transform) :
-    model(model), node(node), transform(transform) {
-}
-
 ModelInstance::ModelInstance(const shared_ptr<Model> &model) : _model(model) {
+    assert(_model);
 }
 
 void ModelInstance::animate(const string &parent, const string &anim, int flags, float speed) {
@@ -95,7 +93,7 @@ void ModelInstance::update(float dt) {
 }
 
 void ModelInstance::doUpdate(float dt, const set<string> &skipNodes) {
-    if (!_model || !_visible) return;
+    if (!_visible) return;
 
     if (!_animState.nextAnimation.empty()) {
         startNextAnimation();
@@ -188,26 +186,26 @@ void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::m
 }
 
 void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform) {
-    glm::mat4 transform2(transform);
+    glm::mat4 finalTransform(transform);
     bool animApplied = false;
 
     if (!_animState.name.empty()) {
         auto it = _animState.localTransforms.find(node.name());
         if (it != _animState.localTransforms.end()) {
-            transform2 *= it->second;
+            finalTransform *= it->second;
             animApplied = true;
         }
     }
     if (!animApplied) {
-        transform2 = glm::translate(transform2, node.position());
-        transform2 *= glm::mat4_cast(node.orientation());
+        finalTransform = glm::translate(finalTransform, node.position());
+        finalTransform *= glm::mat4_cast(node.orientation());
     }
 
-    _nodeTransforms.insert(make_pair(node.nodeNumber(), transform2));
-    _boneTransforms.insert(make_pair(node.index(), transform2 * node.absoluteTransformInverse()));
+    _nodeTransforms.insert(make_pair(node.nodeNumber(), finalTransform));
+    _boneTransforms.insert(make_pair(node.index(), finalTransform * node.absoluteTransformInverse()));
 
     for (auto &child : node.children()) {
-        updateNodeTansforms(*child, transform2);
+        updateNodeTansforms(*child, finalTransform);
     }
 }
 
@@ -220,18 +218,23 @@ void ModelInstance::fillRenderLists(const glm::mat4 &transform, RenderList &opaq
         shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
         if (!parent) continue;
 
-        glm::mat4 transform2(transform * getNodeTransform(*parent));
-        pair.second->fillRenderLists(transform2, opaque, transparent);
+        glm::mat4 finalTransform(transform * getNodeTransform(*parent));
+        pair.second->fillRenderLists(finalTransform, opaque, transparent);
     }
 }
 
 void ModelInstance::fillRenderLists(const ModelNode &node, const glm::mat4 &transform, RenderList &opaque, RenderList &transparent) {
-    glm::mat4 transform2(transform * getNodeTransform(node));
-    shared_ptr<ModelMesh> mesh(node.mesh());
-    RenderListItem item(this, &node, transform2);
+    glm::mat4 finalTransform(transform * getNodeTransform(node));
 
-    if (mesh && mesh->shouldRender() && (mesh->hasDiffuseTexture() || _textureOverride)) {
-        item.center = transform2 * glm::vec4(mesh->aabb().center(), 1.0f);
+    if (shouldRender(node)) {
+        shared_ptr<ModelMesh> mesh(node.mesh());
+
+        RenderListItem item;
+        item.model = this;
+        item.node = &node;
+        item.transform = finalTransform;
+        item.origin = finalTransform * glm::vec4(mesh->aabb().center(), 1.0f);
+
         if (mesh->isTransparent() || node.alpha() < 1.0f) {
             transparent.push_back(move(item));
         } else {
@@ -242,6 +245,13 @@ void ModelInstance::fillRenderLists(const ModelNode &node, const glm::mat4 &tran
     for (auto &child : node.children()) {
         fillRenderLists(*child, transform, opaque, transparent);
     }
+}
+
+bool ModelInstance::shouldRender(const ModelNode &node) const {
+    shared_ptr<ModelMesh> mesh(node.mesh());
+    if (!mesh) return false;
+
+    return mesh->shouldRender() && (mesh->hasDiffuseTexture() || _textureOverride);
 }
 
 glm::mat4 ModelInstance::getNodeTransform(const ModelNode &node) const {
@@ -262,16 +272,33 @@ void ModelInstance::initGL() {
     }
 }
 
-void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bool debug) const {
-    shared_ptr<ModelMesh> mesh(node.mesh());
-    renderMesh(node, transform);
+void ModelInstance::render(const glm::mat4 &transform) const {
+    if (!_visible) return;
 
-    if (debug) {
-        AABBMesh::instance().render(mesh->aabb(), transform);
+    stack<const ModelNode *> stack;
+    stack.push(&_model->rootNode());
+
+    while (!stack.empty()) {
+        const ModelNode &node = *stack.top();
+        stack.pop();
+
+        if (shouldRender(node)) {
+            render(node, transform * getNodeTransform(node), false);
+        }
+        for (auto &child : node.children()) {
+            stack.push(&*child);
+        }
+    }
+
+    for (auto &attached : _attachedModels) {
+        shared_ptr<ModelNode> parent(_model->findNodeByNumber(attached.first));
+        if (!parent) continue;
+
+        attached.second->render(transform * getNodeTransform(*parent));
     }
 }
 
-void ModelInstance::renderMesh(const ModelNode &node, const glm::mat4 &transform) const {
+void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bool debug) const {
     shared_ptr<ModelMesh> mesh(node.mesh());
     shared_ptr<ModelNode::Skin> skin(node.skin());
     bool skeletal = skin && !_animState.name.empty();
@@ -304,17 +331,20 @@ void ModelInstance::renderMesh(const ModelNode &node, const glm::mat4 &transform
             uint16_t boneIdx = pair.first;
             uint16_t nodeIdx = pair.second;
 
-            auto tIt = _boneTransforms.find(nodeIdx);
-            if (tIt == _boneTransforms.end()) continue;
+            auto bone = _boneTransforms.find(nodeIdx);
+            if (bone == _boneTransforms.end()) continue;
 
-            bones[boneIdx] = tIt->second;
+            bones[boneIdx] = bone->second;
         }
 
         shaders.setUniform("bones", bones);
     }
 
     mesh->render(_textureOverride);
-    shaders.deactivate();
+
+    if (debug) {
+        AABBMesh::instance().render(mesh->aabb(), transform);
+    }
 }
 
 ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {

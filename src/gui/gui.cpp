@@ -24,7 +24,7 @@
 #include "../core/log.h"
 #include "../resources/resources.h"
 #include "../render/mesh/guiquad.h"
-#include "../render/shadermanager.h"
+#include "../render/shaders.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -37,6 +37,7 @@ namespace reone {
 namespace gui {
 
 GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
+    _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
 }
@@ -188,6 +189,12 @@ void GUI::updateFocus(int x, int y) {
 void GUI::onFocusChanged(const string &control, bool focus) {
 }
 
+void GUI::update(float dt) {
+    for (auto &control : _controls) {
+        control->update(dt);
+    }
+}
+
 void GUI::initGL() {
     if (_background) _background->initGL();
     if (_rootControl) _rootControl->initGL();
@@ -198,7 +205,7 @@ void GUI::initGL() {
 }
 
 void GUI::render() const {
-    if (_background) renderBackground();
+    if (_background) drawBackground();
     if (_rootControl) _rootControl->render(_controlOffset);
 
     for (auto &control : _controls) {
@@ -206,7 +213,7 @@ void GUI::render() const {
     }
 }
 
-void GUI::renderBackground() const {
+void GUI::drawBackground() const {
     glm::mat4 transform(glm::scale(glm::mat4(1.0f), glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f)));
 
     ShaderManager &shaders = ShaderManager::instance();
@@ -218,10 +225,15 @@ void GUI::renderBackground() const {
     glActiveTexture(0);
     _background->bind();
 
-    GUIQuad::instance().render(GL_TRIANGLES);
+    TheGUIQuad.render(GL_TRIANGLES);
 
     _background->unbind();
-    shaders.deactivate();
+}
+
+void GUI::render3D() const {
+    for (auto &control : _controls) {
+        control->render3D(_controlOffset);
+    }
 }
 
 void GUI::resetFocus() {

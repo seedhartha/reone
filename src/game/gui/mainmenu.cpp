@@ -67,6 +67,27 @@ void MainMenu::load(GameVersion version) {
     }
     _version = version;
     configureButtons();
+
+    if (_version == GameVersion::KotOR) {
+        Control &control = getControl("LBL_3DVIEW");
+        const Control::Extent &extent = control.extent();
+        float scale = extent.height / 2.8f;
+
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.9286f * extent.height, 0.0f));
+        transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+        transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::scale(transform, glm::vec3(scale));
+
+        Control::Scene3D scene;
+        scene.model = make_shared<ModelInstance>(ResMan.findModel("mainmenu"));
+        scene.transform = move(transform);
+
+        control.setScene3D(scene);
+
+        scene.model->setDefaultAnimation("default");
+        scene.model->playDefaultAnimation();
+    }
 }
 
 void MainMenu::configureButtons() {

@@ -40,15 +40,17 @@ public:
 
     void init();
     void deinit();
+
     void show();
     void processEvents(bool &quit);
-    void render(const std::shared_ptr<Camera> &camera) const;
+
+    // Rendering
+    void clear() const;
+    void drawCursor() const;
+    void swapBuffers() const;
 
     void setRelativeMouseMode(bool enabled);
     void setCursor(const Cursor &cursor);
-
-    void setRenderWorldFunc(const std::function<void()> &fn);
-    void setRenderGUIFunc(const std::function<void()> &fn);
 
 private:
     GraphicsOptions _opts;
@@ -62,9 +64,6 @@ private:
 
     bool handleEvent(const SDL_Event &event, bool &quit);
     bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);
-    void renderWorld(const std::shared_ptr<Camera> &camera) const;
-    void renderGUI() const;
-    void renderCursor() const;
 };
 
 } // namespace render

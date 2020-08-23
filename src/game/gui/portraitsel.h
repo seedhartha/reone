@@ -37,14 +37,6 @@ public:
     void setOnCancel(const std::function<void()> &fn);
 
 private:
-    struct Portrait {
-        std::string resRef;
-        std::shared_ptr<render::Texture> image;
-        int appearanceNumber { 0 };
-        int appearanceS { 0 };
-        int appearanceL { 0 };
-    };
-
     resources::GameVersion _version { resources::GameVersion::KotOR };
     CreatureConfiguration _character;
     std::vector<Portrait> _portraits;

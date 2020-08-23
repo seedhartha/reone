@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "shadermanager.h"
+#include "shaders.h"
 
 #include <stdexcept>
 
@@ -394,21 +394,23 @@ unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
 }
 
 void ShaderManager::deactivate() {
-    if (_activeProgram != ShaderProgram::None) {
-        glUseProgram(0);
-        _activeProgram = ShaderProgram::None;
-        _activeOrdinal = 0;
-    }
+    if (_activeProgram == ShaderProgram::None) return;
+
+    glUseProgram(0);
+    _activeProgram = ShaderProgram::None;
+    _activeOrdinal = 0;
 }
 
 void ShaderManager::setGlobalUniforms(const ShaderUniforms &uniforms) {
     for (auto &pair : _programs) {
-        unsigned int ordinal = pair.second;
-        glUseProgram(ordinal);
-        setUniform(ordinal, "projection", uniforms.projection);
-        setUniform(ordinal, "view", uniforms.view);
-        setUniform(ordinal, "cameraPosition", uniforms.cameraPosition);
+        activate(pair.first);
+
+        setUniform(_activeOrdinal, "projection", uniforms.projection);
+        setUniform(_activeOrdinal, "view", uniforms.view);
+        setUniform(_activeOrdinal, "cameraPosition", uniforms.cameraPosition);
     }
+
+    deactivate();
 }
 
 void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::mat4 &m) {

@@ -287,13 +287,12 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         case DebugMode::ModelNodes:
             for (auto &list : _renderLists) {
                 for (auto &item : list.second) {
-                    if (glm::distance2(item.center, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
+                    if (glm::distance2(item.origin, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
 
                     addToDebugContext(item, updateCtx, guiCtx.debug);
                 }
             }
             break;
-
         case DebugMode::GameObjects:
             for (auto &list : _objects) {
                 for (auto &object : list.second) {
@@ -303,7 +302,6 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
                 }
             }
             break;
-
         default:
             break;
     }
@@ -420,13 +418,15 @@ void Area::runOnEnterScript() {
 }
 
 void Area::addToDebugContext(const RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
+    const ModelNode &node = *item.node;
+
     glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
     glm::vec3 position(item.transform[3]);
 
     DebugObject object;
-    object.tag = item.node->name();
-    object.text = str(boost::format("%s %s") % item.model->name() % item.node->name());
-    object.screenCoords = glm::project(item.center, updateCtx.view, updateCtx.projection, viewport);
+    object.tag = node.name();
+    object.text = str(boost::format("%s %s") % item.model->name() % node.name());
+    object.screenCoords = glm::project(item.origin, updateCtx.view, updateCtx.projection, viewport);
 
     debugCtx.objects.push_back(move(object));
 }

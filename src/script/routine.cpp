@@ -40,8 +40,17 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     if (_func) {
         return _func(args, ctx);
     }
+    Variable result(_returnType);
 
-    return Variable(_returnType);
+    switch (_returnType) {
+        case VariableType::Object:
+            result.objectId = kObjectInvalid;
+            break;
+        default:
+            break;
+    }
+
+    return move(result);
 }
 
 const string &Routine::name() const {

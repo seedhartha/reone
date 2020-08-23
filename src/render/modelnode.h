@@ -27,6 +27,8 @@ namespace reone {
 
 namespace render {
 
+class Model;
+
 /**
  * Part of a 3D model, which is a tree-like data structure. Contains
  * position and orientation keyframes, which are used in animation.

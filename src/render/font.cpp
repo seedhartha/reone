@@ -25,7 +25,7 @@
 
 #include "glm/ext.hpp"
 
-#include "shadermanager.h"
+#include "shaders.h"
 
 using namespace std;
 
@@ -155,7 +155,6 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     glBindVertexArray(0);
 
     _texture->unbind();
-    shaders.deactivate();
 }
 
 float Font::measure(const string &text) const {

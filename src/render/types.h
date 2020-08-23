@@ -77,12 +77,6 @@ struct CameraStyle {
     float viewAngle { 0.0f };
 };
 
-class IRenderRoot {
-public:
-    virtual void initGL() = 0;
-    virtual void render() const = 0;
-};
-
 class IEventHandler {
 public:
     virtual bool handle(const SDL_Event &event) = 0;

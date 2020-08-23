@@ -24,6 +24,7 @@
 #include "glm/vec3.hpp"
 
 #include "../../render/font.h"
+#include "../../render/modelinstance.h"
 #include "../../render/texture.h"
 #include "../../resources/gfffile.h"
 #include "../types.h"
@@ -71,14 +72,26 @@ public:
         TextAlign align { TextAlign::CenterCenter };
     };
 
+    struct Scene3D {
+        std::shared_ptr<render::ModelInstance> model;
+        glm::mat4 transform { 1.0f };
+    };
+
     static std::unique_ptr<Control> makeControl(const resources::GffStruct &gffs);
 
     virtual void load(const resources::GffStruct &gffs);
+
+    // Event handling
     virtual bool handleMouseMotion(int x, int y);
     virtual bool handleMouseWheel(int x, int y);
     virtual bool handleClick(int x, int y);
+
+    // Rendering
     virtual void initGL();
     virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
+    virtual void render3D(const glm::ivec2 &offset) const;
+
+    virtual void update(float dt);
     virtual void stretch(float x, float y);
 
     void setVisible(bool visible);
@@ -88,6 +101,7 @@ public:
     void setHilight(const Border &hilight);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
+    void setScene3D(const Scene3D &scene);
 
     const std::string &tag() const;
     const Extent &extent() const;
@@ -107,6 +121,7 @@ protected:
     std::shared_ptr<Border> _border;
     std::shared_ptr<Border> _hilight;
     Text _text;
+    Scene3D _scene3d;
     int _padding { 0 };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };

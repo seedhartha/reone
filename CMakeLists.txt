@@ -50,6 +50,7 @@ set(HEADERS
     src/core/streamutil.h
     src/core/types.h
     src/game/area.h
+    src/game/characters.h
     src/game/dialog.h
     src/game/game.h
     src/game/gui/classsel.h
@@ -109,7 +110,8 @@ set(HEADERS
     src/render/model.h
     src/render/modelinstance.h
     src/render/modelnode.h
-    src/render/shadermanager.h
+    src/render/renderlist.h
+    src/render/shaders.h
     src/render/texture.h
     src/render/types.h
     src/render/walkmesh.h
@@ -157,6 +159,7 @@ set(SOURCES
     src/game/area.cpp
     src/game/area_actions.cpp
     src/game/area_render.cpp
+    src/game/characters.cpp
     src/game/dialog.cpp
     src/game/game.cpp
     src/game/gui/classsel.cpp
@@ -216,7 +219,8 @@ set(SOURCES
     src/render/model.cpp
     src/render/modelinstance.cpp
     src/render/modelnode.cpp
-    src/render/shadermanager.cpp
+    src/render/renderlist.cpp
+    src/render/shaders.cpp
     src/render/texture.cpp
     src/render/walkmesh.cpp
     src/render/window.cpp

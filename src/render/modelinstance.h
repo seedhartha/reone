@@ -21,25 +21,12 @@
 
 #include "aabb.h"
 #include "model.h"
-#include "shadermanager.h"
+#include "renderlist.h"
+#include "shaders.h"
 
 namespace reone {
 
 namespace render {
-
-class ModelInstance;
-
-struct RenderListItem {
-    const ModelInstance *model { nullptr };
-    const ModelNode *node { nullptr };
-    glm::mat4 transform { 1.0f };
-    glm::vec3 center { 0.0f };
-
-    RenderListItem() = default;
-    RenderListItem(const ModelInstance *model, const ModelNode *node, const glm::mat4 &transform);
-};
-
-typedef std::vector<RenderListItem> RenderList;
 
 /**
  * Encapsulates model state changes (e.g. animation, attachments).
@@ -52,14 +39,17 @@ class ModelInstance {
 public:
     ModelInstance(const std::shared_ptr<Model> &model);
 
+    // Rendering
+    void initGL();
+    void render(const glm::mat4 &transform) const;
+    void render(const ModelNode &node, const glm::mat4 &transform, bool debug) const;
+
     void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
     void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void changeTexture(const std::string &resRef);
     void update(float dt);
     void fillRenderLists(const glm::mat4 &transform, RenderList &opaque, RenderList &transparent);
-    void initGL();
-    void render(const ModelNode &node, const glm::mat4 &transform, bool debug) const;
     void playDefaultAnimation();
 
     void show();
@@ -105,8 +95,8 @@ private:
     void updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const std::set<std::string> &skipNodes);
     void updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform);
     void fillRenderLists(const ModelNode &node, const glm::mat4 &transform, RenderList &opaque, RenderList &transparent);
+    bool shouldRender(const ModelNode &node) const;
     glm::mat4 getNodeTransform(const ModelNode &node) const;
-    void renderMesh(const ModelNode &node, const glm::mat4 &transform) const;
     ShaderProgram getShaderProgram(const ModelMesh &mesh, bool skeletal) const;
 };
 

@@ -22,7 +22,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../../render/mesh/guiquad.h"
-#include "../../render/shadermanager.h"
+#include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
 using namespace std;
@@ -65,7 +65,6 @@ void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) con
     if (_canScrollDown) drawDownArrow(offset);
 
     _dir.image->unbind();
-    ShaderMan.deactivate();
 }
 
 void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {

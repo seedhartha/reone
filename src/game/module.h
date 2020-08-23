@@ -44,27 +44,27 @@ struct ModuleInfo {
  *
  * @see reone::game::Area
  */
-class Module : public render::IRenderRoot, public render::IEventHandler {
+class Module : public render::IEventHandler {
 public:
     Module(
         const std::string &name,
         resources::GameVersion version,
         const render::GraphicsOptions &opts);
 
+    // Loading
     void load(const resources::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
 
-    void update(float dt, GuiContext &guiCtx);
+    // Rendering
+    void initGL();
+    void render() const;
 
+    bool handle(const SDL_Event &event) override;
+    void update(float dt, GuiContext &guiCtx);
+    void update3rdPersonCameraHeading();
     void saveTo(GameState &state) const;
 
     virtual const std::shared_ptr<Area> makeArea() const;
-
-    bool handle(const SDL_Event &event) override;
-    void initGL() override;
-    void render() const override;
-
-    void update3rdPersonCameraHeading();
 
     // Getters
     const std::string &name() const;

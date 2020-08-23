@@ -17,6 +17,8 @@
 
 #include "game.h"
 
+#include "GL/glew.h"
+
 #include "SDL2/SDL.h"
 
 #include "../audio/player.h"
@@ -58,12 +60,12 @@ Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
 
 int Game::run() {
     _renderWindow.init();
-    _renderWindow.setRenderWorldFunc(bind(&Game::renderWorld, this));
-    _renderWindow.setRenderGUIFunc(bind(&Game::renderGUI, this));
 
     ResMan.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
     RoutineMan.init(_version, this);
+
+    configure();
 
     Cursor cursor;
     cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
@@ -72,9 +74,8 @@ int Game::run() {
     cursor.unpressed->initGL();
 
     _renderWindow.setCursor(cursor);
-
-    configure();
     _renderWindow.show();
+
     runMainLoop();
 
     TheJobExecutor.deinit();
@@ -299,8 +300,13 @@ void Game::runMainLoop() {
         _renderWindow.processEvents(_quit);
         update();
 
-        shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
-        _renderWindow.render(camera);
+        _renderWindow.clear();
+        drawWorld();
+        drawGUI();
+        drawGUI3D();
+        drawCursor();
+
+        _renderWindow.swapBuffers();
     }
 }
 
@@ -309,8 +315,11 @@ void Game::update() {
         loadNextModule();
     }
     float dt = getDeltaTime();
-    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
 
+    shared_ptr<GUI> gui(currentGUI());
+    if (gui) gui->update(dt);
+
+    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
     if (updModule && _module) {
         GuiContext guiCtx;
         _module->update(dt, guiCtx);
@@ -318,9 +327,9 @@ void Game::update() {
         if (_module->cameraType() == CameraType::ThirdPerson) {
             _hud->update(guiCtx.hud);
         }
-
         _debugGui->update(guiCtx.debug);
     }
+
 }
 
 void Game::loadNextModule() {
@@ -361,6 +370,86 @@ shared_ptr<GUI> Game::currentGUI() const {
         default:
             return nullptr;
     }
+}
+
+void Game::drawWorld() {
+    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
+    if (!camera) return;
+
+    glEnable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = camera->projection();
+    uniforms.view = camera->view();
+    uniforms.cameraPosition = camera->position();
+
+    ShaderMan.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::InGame:
+        case Screen::Dialog:
+            _module->render();
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::drawGUI() {
+    glDisable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
+
+    ShaderMan.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::InGame:
+            _debugGui->render();
+            if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
+            break;
+        default: {
+            shared_ptr<GUI> gui(currentGUI());
+            if (gui) gui->render();
+            break;
+        }
+    }
+}
+
+void Game::drawGUI3D() {
+    glEnable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(
+        0.0f,
+        static_cast<float>(_opts.graphics.width),
+        static_cast<float>(_opts.graphics.height),
+        0.0f,
+        -1024.0f,
+        1024.0f);
+
+    ShaderMan.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::MainMenu:
+        case Screen::ClassSelection:
+        case Screen::PortraitSelection:
+            currentGUI()->render3D();
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::drawCursor() {
+    glDisable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
+
+    ShaderMan.setGlobalUniforms(uniforms);
+
+    _renderWindow.drawCursor();
 }
 
 bool Game::handle(const SDL_Event &event) {
@@ -455,31 +544,6 @@ void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
     assert(index >= 0);
     _state.localBooleans[objectId][index] = value;
-}
-
-void Game::renderWorld() {
-    switch (_screen) {
-        case Screen::InGame:
-        case Screen::Dialog:
-            if (_module) _module->render();
-            break;
-        default:
-            break;
-    }
-}
-
-void Game::renderGUI() {
-    switch (_screen) {
-        case Screen::InGame:
-            _debugGui->render();
-            if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
-            break;
-        default: {
-            shared_ptr<GUI> gui(currentGUI());
-            if (gui) gui->render();
-            break;
-        }
-    }
 }
 
 } // namespace game
