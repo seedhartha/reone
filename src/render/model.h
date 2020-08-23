@@ -48,9 +48,12 @@ public:
 
     const std::string &name() const;
     const ModelNode &rootNode() const;
+    float animationScale() const;
     std::shared_ptr<Model> superModel() const;
     const AABB &aabb() const;
     float radiusXY() const;
+
+    void setAnimationScale(float scale);
 
 private:
     std::string _name;
@@ -61,6 +64,7 @@ private:
     std::map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
     float _radiusXY { 0.0f };
+    float _animationScale { 1.0f };
 
     Model(const Model &) = delete;
     Model &operator=(const Model &) = delete;

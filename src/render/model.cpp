@@ -92,6 +92,10 @@ const ModelNode &Model::rootNode() const {
     return *_rootNode;
 }
 
+float Model::animationScale() const {
+    return _animationScale;
+}
+
 shared_ptr<Model> Model::superModel() const {
     return _superModel;
 }
@@ -102,6 +106,10 @@ const AABB &Model::aabb() const {
 
 float Model::radiusXY() const {
     return _radiusXY;
+}
+
+void Model::setAnimationScale(float scale) {
+    _animationScale = scale;
 }
 
 } // namespace render
