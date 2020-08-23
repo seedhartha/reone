@@ -52,6 +52,7 @@ public:
     bool hasEnvmapTexture() const;
     bool hasLightmapTexture() const;
     bool hasBumpyShinyTexture() const;
+    bool hasBumpmapTexture() const;
 
     const std::shared_ptr<Texture> &diffuseTexture() const;
 
@@ -61,6 +62,7 @@ private:
     std::shared_ptr<Texture> _envmap;
     std::shared_ptr<Texture> _lightmap;
     std::shared_ptr<Texture> _bumpyShiny;
+    std::shared_ptr<Texture> _bumpmap;
 
     friend class resources::MdlFile;
 };

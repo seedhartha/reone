@@ -33,7 +33,7 @@ enum class TextureType {
     Diffuse,
     Lightmap,
     EnvironmentMap,
-    BumpMap,
+    Bumpmap,
     GUI,
     Cursor
 };

@@ -39,6 +39,7 @@ enum class ShaderProgram {
     SkeletalDiffuse,
     SkeletalDiffuseEnvmap,
     SkeletalDiffuseBumpyShiny,
+    SkeletalDiffuseBumpmap,
     GUIText
 };
 
@@ -75,6 +76,7 @@ private:
         FragmentDiffuseLightmap,
         FragmentDiffuseLightmapEnvmap,
         FragmentDiffuseLightmapBumpyShiny,
+        FragmentDiffuseBumpmap,
         FragmentText
     };
 

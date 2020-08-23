@@ -321,6 +321,9 @@ void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bo
     if (mesh->hasBumpyShinyTexture()) {
         shaders.setUniform("bumpyShiny", 3);
     }
+    if (mesh->hasBumpmapTexture()) {
+        shaders.setUniform("bumpmap", 4);
+    }
 
     if (skeletal) {
         shaders.setUniform("absTransform", node.absoluteTransform());
@@ -355,13 +358,16 @@ ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skelet
     bool hasEnvmap = mesh.hasEnvmapTexture();
     bool hasLightmap = mesh.hasLightmapTexture();
     bool hasBumpyShiny = mesh.hasBumpyShinyTexture();
+    bool hasBumpmap = mesh.hasBumpmapTexture();
 
     if (skeletal) {
-        if (hasEnvmap && !hasLightmap && !hasBumpyShiny) {
+        if (hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
             program = ShaderProgram::SkeletalDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap) {
+        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap && !hasBumpmap) {
             program = ShaderProgram::SkeletalDiffuseBumpyShiny;
-        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny) {
+        } else if (hasBumpmap && !hasEnvmap && !hasLightmap && !hasBumpyShiny) {
+            program = ShaderProgram::SkeletalDiffuseBumpmap;
+        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
             program = ShaderProgram::SkeletalDiffuse;
         }
     } else {

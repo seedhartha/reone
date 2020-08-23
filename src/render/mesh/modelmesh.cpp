@@ -39,6 +39,7 @@ void ModelMesh::initGL() {
     if (_lightmap) _lightmap->initGL();
     if (_envmap) _envmap->initGL();
     if (_bumpyShiny) _bumpyShiny->initGL();
+    if (_bumpmap) _bumpmap->initGL();
 }
 
 void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
@@ -62,6 +63,10 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
         glActiveTexture(GL_TEXTURE3);
         _bumpyShiny->bind();
     }
+    if (_bumpmap) {
+        glActiveTexture(GL_TEXTURE4);
+        _bumpmap->bind();
+    }
 
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     if (additive) {
@@ -78,6 +83,10 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
         glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
     }
 
+    if (_bumpmap) {
+        glActiveTexture(GL_TEXTURE4);
+        _bumpmap->unbind();
+    }
     if (_bumpyShiny) {
         glActiveTexture(GL_TEXTURE3);
         _bumpyShiny->unbind();
@@ -123,6 +132,10 @@ bool ModelMesh::hasLightmapTexture() const {
 
 bool ModelMesh::hasBumpyShinyTexture() const {
     return static_cast<bool>(_bumpyShiny);
+}
+
+bool ModelMesh::hasBumpmapTexture() const {
+    return static_cast<bool>(_bumpmap);
 }
 
 const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
