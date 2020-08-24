@@ -31,285 +31,310 @@ namespace reone {
 
 namespace render {
 
-static const GLchar kBasicVertexShader[] = "#version 330\n\
-        \n\
-        uniform mat4 projection;\n\
-        uniform mat4 view;\n\
-        uniform mat4 model;\n\
-        \n\
-        layout(location = 0) in vec3 position;\n\
-        layout(location = 1) in vec3 normal;\n\
-        layout(location = 2) in vec2 texCoords;\n\
-        layout(location = 3) in vec2 lightmapCoords;\n\
-        \n\
-        out vec3 fragPosition;\n\
-        out vec3 fragNormal;\n\
-        out vec2 fragTexCoords;\n\
-        out vec2 fragLightmapCoords;\n\
-        \n\
-        void main() {\n\
-            gl_Position = projection * view * model * vec4(position, 1);\n\
-            fragPosition = vec3(model * vec4(position, 1));\n\
-            fragNormal = mat3(transpose(inverse(model))) * normal;\n\
-            fragTexCoords = texCoords;\n\
-            fragLightmapCoords = lightmapCoords;\n\
-        }";
+static const GLchar kBasicVertexShader[] = R"END(
+#version 330
 
-static const GLchar kSkeletalVertexShader[] = "#version 330\n\
-        \n\
-        const int MAX_BONES = 128;\n\
-        \n\
-        uniform mat4 projection;\n\
-        uniform mat4 view;\n\
-        uniform mat4 model;\n\
-        uniform mat4 absTransform;\n\
-        uniform mat4 absTransformInv;\n\
-        uniform mat4 bones[MAX_BONES];\n\
-        \n\
-        layout(location = 0) in vec3 position;\n\
-        layout(location = 1) in vec3 normal;\n\
-        layout(location = 2) in vec2 texCoords;\n\
-        layout(location = 4) in vec4 boneWeights;\n\
-        layout(location = 5) in vec4 boneIndices;\n\
-        \n\
-        out vec3 fragPosition;\n\
-        out vec3 fragNormal;\n\
-        out vec2 fragTexCoords;\n\
-        \n\
-        void main() {\n\
-            float weight0 = boneWeights.x;\n\
-            float weight1 = boneWeights.y;\n\
-            float weight2 = boneWeights.z;\n\
-            float weight3 = boneWeights.w;\n\
-            \n\
-            int index0 = int(boneIndices.x);\n\
-            int index1 = int(boneIndices.y);\n\
-            int index2 = int(boneIndices.z);\n\
-            int index3 = int(boneIndices.w);\n\
-            \n\
-            vec3 newPosition = vec3(0, 0, 0);\n\
-            vec4 position4 = vec4(position, 1);\n\
-            \n\
-            if (index0 != -1) {\n\
-                newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;\n\
-            }\n\
-            if (index1 != -1) {\n\
-                newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;\n\
-            }\n\
-            if (index2 != -1) {\n\
-                newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;\n\
-            }\n\
-            if (index3 != -1) {\n\
-                newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;\n\
-            }\n\
-            \n\
-            gl_Position = projection * view * model * vec4(newPosition, 1);\n\
-            fragPosition = vec3(model * vec4(position, 1));\n\
-            fragNormal = mat3(transpose(inverse(model))) * normal;\n\
-            fragTexCoords = texCoords;\n\
-        }";
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
-static const GLchar kGUIVertexShader[] = "#version 330\n\
-        \n\
-        uniform mat4 projection;\n\
-        uniform mat4 view;\n\
-        uniform mat4 model;\n\
-        \n\
-        layout(location = 0) in vec3 position;\n\
-        layout(location = 2) in vec2 texCoords;\n\
-        \n\
-        out vec2 fragTexCoords;\n\
-        \n\
-        void main() {\n\
-            gl_Position = projection * view * model * vec4(position, 1);\n\
-            fragTexCoords = texCoords;\n\
-        }";
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texCoords;
+layout(location = 3) in vec2 lightmapCoords;
 
-static const GLchar kWhiteFragmentShader[] = "#version 330\n\
-        \n\
-        uniform float alpha;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            color = vec4(1, 1, 1, alpha);\n\
-        }";
+out vec3 fragPosition;
+out vec3 fragNormal;
+out vec2 fragTexCoords;
+out vec2 fragLightmapCoords;
 
-static const GLchar kDiffuseFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform vec3 color;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec2 fragTexCoords;\n\
-        \n\
-        out vec4 fragColor;\n\
-        \n\
-        void main() {\n\
-            vec4 objectColor = texture(diffuse, fragTexCoords);\n\
-            fragColor = vec4(objectColor.rgb * color, alpha * objectColor.a);\n\
-        }";
+void main() {
+    gl_Position = projection * view * model * vec4(position, 1);
+    fragPosition = vec3(model * vec4(position, 1));
+    fragNormal = mat3(transpose(inverse(model))) * normal;
+    fragTexCoords = texCoords;
+    fragLightmapCoords = lightmapCoords;
+}
+)END";
 
-static const GLchar kDiffuseEnvmapFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform samplerCube envmap;\n\
-        uniform vec3 cameraPosition;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec3 fragPosition;\n\
-        in vec3 fragNormal;\n\
-        in vec2 fragTexCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec3 I = normalize(fragPosition - cameraPosition);\n\
-            vec3 R = reflect(I, normalize(fragNormal));\n\
-            vec4 envmapSample = texture(envmap, R);\n\
-            \n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 objectColor = diffuseSample;\n\
-            objectColor += envmapSample * (1 - diffuseSample.a);\n\
-            \n\
-            color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
-        }";
+static const GLchar kSkeletalVertexShader[] = R"END(
+#version 330
 
-static const GLchar kDiffuseBumpyShinyFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform samplerCube bumpyShiny;\n\
-        uniform vec3 cameraPosition;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec3 fragPosition;\n\
-        in vec3 fragNormal;\n\
-        in vec2 fragTexCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec3 I = normalize(fragPosition - cameraPosition);\n\
-            vec3 R = reflect(I, fragNormal);\n\
-            vec4 bumpyShinySample = texture(bumpyShiny, R);\n\
-            \n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 objectColor = vec4(diffuseSample.rgb, 1);\n\
-            objectColor += bumpyShinySample * (1 - diffuseSample.a);\n\
-            \n\
-            color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
-        }";
+const int MAX_BONES = 128;
 
-static const GLchar kDiffuseLightmapFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform sampler2D lightmap;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec2 fragTexCoords;\n\
-        in vec2 fragLightmapCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 lightmapSample = texture(lightmap, fragLightmapCoords);\n\
-            \n\
-            vec4 objectColor = vec4((diffuseSample.rgb * lightmapSample.rgb), diffuseSample.a);\n\
-            color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
-        }";
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+uniform mat4 absTransform;
+uniform mat4 absTransformInv;
+uniform mat4 bones[MAX_BONES];
 
-static const GLchar kDiffuseLightmapEnvmapFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform sampler2D lightmap;\n\
-        uniform samplerCube envmap;\n\
-        uniform vec3 cameraPosition;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec3 fragPosition;\n\
-        in vec3 fragNormal;\n\
-        in vec2 fragTexCoords;\n\
-        in vec2 fragLightmapCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec3 I = normalize(fragPosition - cameraPosition);\n\
-            vec3 R = reflect(I, normalize(fragNormal));\n\
-            vec4 envmapSample = texture(envmap, R);\n\
-            \n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 lightmapSample = texture(lightmap, fragLightmapCoords);\n\
-            \n\
-            vec4 objectColor = diffuseSample * lightmapSample;\n\
-            objectColor += envmapSample * (1 - diffuseSample.a);\n\
-            \n\
-            color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
-        }";
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texCoords;
+layout(location = 4) in vec4 boneWeights;
+layout(location = 5) in vec4 boneIndices;
 
-static const GLchar kDiffuseLightmapBumpyShinyFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform sampler2D lightmap;\n\
-        uniform samplerCube bumpyShiny;\n\
-        uniform vec3 cameraPosition;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec3 fragPosition;\n\
-        in vec3 fragNormal;\n\
-        in vec2 fragTexCoords;\n\
-        in vec2 fragLightmapCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec3 I = normalize(fragPosition - cameraPosition);\n\
-            vec3 R = reflect(I, fragNormal);\n\
-            vec4 bumpyShinySample = texture(bumpyShiny, R);\n\
-            \n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 lightmapSample = texture(lightmap, fragLightmapCoords);\n\
-            \n\
-            vec4 objectColor = diffuseSample * lightmapSample;\n\
-            objectColor += bumpyShinySample * (1 - diffuseSample.a);\n\
-            color = vec4(objectColor.rgb, alpha * objectColor.a);\n\
-        }";
+out vec3 fragPosition;
+out vec3 fragNormal;
+out vec2 fragTexCoords;
 
-static const GLchar kDiffuseBumpmapFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D diffuse;\n\
-        uniform sampler2D bumpmap;\n\
-        uniform vec3 cameraPosition;\n\
-        uniform float alpha;\n\
-        \n\
-        in vec3 fragPosition;\n\
-        in vec3 fragNormal;\n\
-        in vec2 fragTexCoords;\n\
-        in vec2 fragLightmapCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            vec4 diffuseSample = texture(diffuse, fragTexCoords);\n\
-            vec4 bumpmapSample = texture(bumpmap, fragTexCoords);\n\
-            \n\
-            vec4 objectColor = diffuseSample;\n\
-            color = vec4(objectColor.rgb, alpha);\n\
-        }";
+void main() {
+    float weight0 = boneWeights.x;
+    float weight1 = boneWeights.y;
+    float weight2 = boneWeights.z;
+    float weight3 = boneWeights.w;
 
-static const GLchar kTextFragmentShader[] = "#version 330\n\
-        \n\
-        uniform sampler2D font;\n\
-        uniform vec3 textColor;\n\
-        \n\
-        in vec2 fragTexCoords;\n\
-        \n\
-        out vec4 color;\n\
-        \n\
-        void main() {\n\
-            color = vec4(textColor, texture(font, fragTexCoords).a);\n\
-        }";
+    int index0 = int(boneIndices.x);
+    int index1 = int(boneIndices.y);
+    int index2 = int(boneIndices.z);
+    int index3 = int(boneIndices.w);
+
+    vec3 newPosition = vec3(0, 0, 0);
+    vec4 position4 = vec4(position, 1);
+
+    if (index0 != -1) {
+        newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
+    }
+    if (index1 != -1) {
+        newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
+    }
+    if (index2 != -1) {
+        newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
+    }
+    if (index3 != -1) {
+        newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
+    }
+
+    gl_Position = projection * view * model * vec4(newPosition, 1);
+    fragPosition = vec3(model * vec4(position, 1));
+    fragNormal = mat3(transpose(inverse(model))) * normal;
+    fragTexCoords = texCoords;
+}
+)END";
+
+static const GLchar kGUIVertexShader[] = R"END(
+#version 330
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+layout(location = 0) in vec3 position;
+layout(location = 2) in vec2 texCoords;
+
+out vec2 fragTexCoords;
+
+void main() {
+    gl_Position = projection * view * model * vec4(position, 1);
+    fragTexCoords = texCoords;
+}
+)END";
+
+static const GLchar kWhiteFragmentShader[] = R"END(
+#version 330
+
+uniform float alpha;
+
+out vec4 color;
+
+void main() {
+    color = vec4(1, 1, 1, alpha);
+}
+)END";
+
+static const GLchar kDiffuseFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform vec3 color;
+uniform float alpha;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec4 objectColor = texture(diffuse, fragTexCoords);
+    fragColor = vec4(objectColor.rgb * color, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseEnvmapFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform samplerCube envmap;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+
+out vec4 color;
+
+void main() {
+    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 R = reflect(I, normalize(fragNormal));
+    vec4 envmapSample = texture(envmap, R);
+
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 objectColor = diffuseSample;
+    objectColor += envmapSample * (1 - diffuseSample.a);
+
+    color = vec4(objectColor.rgb, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseBumpyShinyFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform samplerCube bumpyShiny;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+
+out vec4 color;
+
+void main() {
+    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 R = reflect(I, fragNormal);
+    vec4 bumpyShinySample = texture(bumpyShiny, R);
+
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 objectColor = vec4(diffuseSample.rgb, 1);
+    objectColor += bumpyShinySample * (1 - diffuseSample.a);
+
+    color = vec4(objectColor.rgb, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseLightmapFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform sampler2D lightmap;
+uniform float alpha;
+
+in vec2 fragTexCoords;
+in vec2 fragLightmapCoords;
+
+out vec4 color;
+
+void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+
+    vec4 objectColor = vec4((diffuseSample.rgb * lightmapSample.rgb), diffuseSample.a);
+    color = vec4(objectColor.rgb, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseLightmapEnvmapFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform sampler2D lightmap;
+uniform samplerCube envmap;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+in vec2 fragLightmapCoords;
+
+out vec4 color;
+
+void main() {
+    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 R = reflect(I, normalize(fragNormal));
+    vec4 envmapSample = texture(envmap, R);
+
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+
+    vec4 objectColor = diffuseSample * lightmapSample;
+    objectColor += envmapSample * (1 - diffuseSample.a);
+
+    color = vec4(objectColor.rgb, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseLightmapBumpyShinyFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform sampler2D lightmap;
+uniform samplerCube bumpyShiny;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+in vec2 fragLightmapCoords;
+
+out vec4 color;
+
+void main() {
+    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 R = reflect(I, fragNormal);
+    vec4 bumpyShinySample = texture(bumpyShiny, R);
+
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+
+    vec4 objectColor = diffuseSample * lightmapSample;
+    objectColor += bumpyShinySample * (1 - diffuseSample.a);
+
+    color = vec4(objectColor.rgb, alpha * objectColor.a);
+}
+)END";
+
+static const GLchar kDiffuseBumpmapFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D diffuse;
+uniform sampler2D bumpmap;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+in vec2 fragLightmapCoords;
+
+out vec4 color;
+
+void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 bumpmapSample = texture(bumpmap, fragTexCoords);
+
+    vec4 objectColor = diffuseSample;
+    color = vec4(objectColor.rgb, alpha);
+}
+)END";
+
+static const GLchar kTextFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D font;
+uniform vec3 textColor;
+
+in vec2 fragTexCoords;
+
+out vec4 color;
+
+void main() {
+    color = vec4(textColor, texture(font, fragTexCoords).a);
+}
+)END";
 
 ShaderManager &ShaderManager::instance() {
     static ShaderManager instance;
@@ -356,7 +381,7 @@ void ShaderManager::initShader(ShaderName name, unsigned int type, const char *s
 
     if (!success) {
         glGetShaderInfoLog(shader, sizeof(log), &logSize, log);
-        throw runtime_error("Shader compilation failed: " + string(log, logSize));
+        throw runtime_error("Shaders: compilation failed: " + string(log, logSize));
     }
 
     _shaders.insert(make_pair(name, shader));
@@ -378,7 +403,7 @@ void ShaderManager::initProgram(ShaderProgram program, ShaderName vertexShader, 
 
     if (!success) {
         glGetProgramInfoLog(ordinal, sizeof(log), &logSize, log);
-        throw runtime_error("Program linking failed: " + string(log, logSize));
+        throw runtime_error("Shaders: program linking failed: " + string(log, logSize));
     }
 
     _programs.insert(make_pair(program, ordinal));
@@ -412,7 +437,7 @@ void ShaderManager::activate(ShaderProgram program) {
 unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
     auto it = _programs.find(program);
     if (it == _programs.end()) {
-        throw invalid_argument("Shader program not found: " + to_string(static_cast<int>(program)));
+        throw invalid_argument("Shaders: program not found: " + to_string(static_cast<int>(program)));
     }
     return it->second;
 }
