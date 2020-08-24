@@ -39,6 +39,12 @@ class Model;
  */
 class ModelNode {
 public:
+    struct Light {
+        int priority { 1 };
+        bool ambientOnly { false };
+        bool affectDynamic { false };
+    };
+
     struct Skin {
         std::map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     };
@@ -58,7 +64,11 @@ public:
     const glm::quat &orientation() const;
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
+    const glm::vec3 &color() const;
     float alpha() const;
+    float radius() const;
+    float multiplier() const;
+    std::shared_ptr<Light> light() const;
     std::shared_ptr<ModelMesh> mesh() const;
     std::shared_ptr<Skin> skin() const;
     const std::vector<std::shared_ptr<ModelNode>> &children() const;
@@ -84,7 +94,11 @@ private:
     glm::mat4 _absTransformInv { 1.0f };
     std::vector<PositionKeyframe> _positionFrames;
     std::vector<OrientationKeyframe> _orientationFrames;
+    glm::vec3 _color { 0.0f };
     float _alpha { 1.0f };
+    float _radius { 0.0f };
+    float _multiplier { 1.0f };
+    std::shared_ptr<Light> _light;
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
     std::vector<std::shared_ptr<ModelNode>> _children;

@@ -119,8 +119,24 @@ const glm::mat4 &ModelNode::absoluteTransformInverse() const {
     return _absTransformInv;
 }
 
+const glm::vec3 &ModelNode::color() const {
+    return _color;
+}
+
 float ModelNode::alpha() const {
     return _alpha;
+}
+
+float ModelNode::radius() const {
+    return _radius;
+}
+
+float ModelNode::multiplier() const {
+    return _multiplier;
+}
+
+shared_ptr<ModelNode::Light> ModelNode::light() const {
+    return _light;
 }
 
 shared_ptr<ModelMesh> ModelNode::mesh() const {

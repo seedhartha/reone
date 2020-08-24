@@ -55,7 +55,10 @@ enum {
 enum class ControllerType {
     Position = 8,
     Orientation = 20,
-    Alpha = 132
+    Color = 76,
+    Radius = 88,
+    Alpha = 132,
+    Multiplier = 140
 };
 
 MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
@@ -202,7 +205,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     readControllers(controllerKeyCount, controllerKeyOffset, controllerData, *node);
 
     if (flags & kNodeHasLight) {
-        ignore(92);
+        readLight(*node);
     }
     if (flags & kNodeHasEmitter) {
         ignore(216);
@@ -251,10 +254,24 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
             case ControllerType::Orientation:
                 readOrientationController(rowCount, columnCount, timeIndex, dataIndex, data, node);
                 break;
+            case ControllerType::Color:
+                // TODO: multiple rows
+                readColorController(dataIndex, data, node);
+                break;
             case ControllerType::Alpha:
+                // TODO: multiple rows
                 readAlphaController(dataIndex, data, node);
                 break;
+            case ControllerType::Radius:
+                // TODO: multiple rows
+                readRadiusController(dataIndex, data, node);
+                break;
+            case ControllerType::Multiplier:
+                // TODO: multiple rows
+                readMultiplierController(dataIndex, data, node);
+                break;
             default:
+                debug(boost::format("MDL: unsupported controller type: \"%s\" %d") % _name % static_cast<int>(type), 3);
                 break;
         }
     }
@@ -339,8 +356,37 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
     }
 }
 
+void MdlFile::readColorController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._color.r = data[dataIndex + 0];
+    node._color.g = data[dataIndex + 1];
+    node._color.b = data[dataIndex + 2];
+}
+
 void MdlFile::readAlphaController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._alpha = data[dataIndex];
+}
+
+void MdlFile::readRadiusController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._radius = data[dataIndex];
+}
+
+void MdlFile::readMultiplierController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._multiplier = data[dataIndex];
+}
+
+void MdlFile::readLight(ModelNode &node) {
+    node._light = make_shared<ModelNode::Light>();
+
+    ignore(64);
+
+    node._light->priority = readInt32();
+    node._light->ambientOnly = static_cast<bool>(readInt32());
+
+    ignore(4);
+
+    node._light->affectDynamic = static_cast<bool>(readInt32());
+
+    ignore(12);
 }
 
 unique_ptr<ModelMesh> MdlFile::readMesh() {
