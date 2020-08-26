@@ -17,11 +17,11 @@
 
 #include "area.h"
 
-#include "creature.h"
-#include "door.h"
+#include "../object/factory.h"
 
 using namespace std;
 
+using namespace reone::resources;
 using namespace reone::net;
 
 namespace reone {
@@ -29,22 +29,15 @@ namespace reone {
 namespace game {
 
 MultiplayerArea::MultiplayerArea(
+    uint32_t id,
+    GameVersion version,
     MultiplayerMode mode,
-    resources::GameVersion version,
-    const string &name,
-    IMultiplayerCallbacks *mpCallbacks
+    ObjectFactory *objectFactory,
+    IMultiplayerCallbacks *callbacks
 ) :
-    Area(version, name), _callbacks(mpCallbacks) {
+    Area(id, version, objectFactory), _callbacks(callbacks) {
 
     _scriptsEnabled = mode == MultiplayerMode::Server;
-}
-
-shared_ptr<Creature> MultiplayerArea::makeCreature(uint32_t id) {
-    return make_unique<MultiplayerCreature>(id > 0 ? id : _idCounter++, _callbacks);
-}
-
-shared_ptr<Door> MultiplayerArea::makeDoor() {
-    return make_unique<MultiplayerDoor>(_idCounter++, _callbacks);
 }
 
 void MultiplayerArea::updateCreature(Creature &creature, float dt) {
@@ -81,7 +74,7 @@ void MultiplayerArea::execute(const Command &cmd) {
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
-    shared_ptr<Creature> creature(makeCreature(cmd.objectId()));
+    shared_ptr<Creature> creature(new MultiplayerCreature(cmd.objectId(), _callbacks));
     creature->setTag(cmd.tag());
 
     for (auto &item : cmd.equipment()) {
@@ -136,7 +129,7 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
-    shared_ptr<Object> object(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> object(find(cmd.objectId(), ObjectType::Creature));
     if (object) {
         object->setSynchronize(false);
         object->setPosition(cmd.position());
@@ -146,7 +139,7 @@ void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
-    shared_ptr<Object> object(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> object(find(cmd.objectId(), ObjectType::Creature));
     if (object) {
         object->setSynchronize(false);
         object->animate(cmd.animation(), cmd.animationFlags());
@@ -155,7 +148,7 @@ void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
-    shared_ptr<Object> creature(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> creature(find(cmd.objectId(), ObjectType::Creature));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
@@ -164,7 +157,7 @@ void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureTalking(const Command &cmd) {
-    shared_ptr<Object> creature(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> creature(find(cmd.objectId(), ObjectType::Creature));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setTalking(cmd.talking());

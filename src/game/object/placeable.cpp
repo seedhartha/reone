@@ -34,7 +34,7 @@ namespace reone {
 
 namespace game {
 
-Placeable::Placeable(uint32_t id) : Object(id) {
+Placeable::Placeable(uint32_t id) : SpatialObject(id) {
     _type = ObjectType::Placeable;
     _drawDistance = 4096.0f;
     _fadeDistance = 0.25f * _drawDistance;

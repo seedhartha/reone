@@ -39,32 +39,22 @@ struct ModuleInfo {
     float entryHeading { 0.0f };
 };
 
-/**
- * Isolated portion of the game.
- *
- * @see reone::game::Area
- */
-class Module : public render::IEventHandler {
+class Module : public Object {
 public:
-    Module(
-        const std::string &name,
-        resources::GameVersion version,
-        const render::GraphicsOptions &opts);
+    Module(uint32_t id, resources::GameVersion version, ObjectFactory *objectFactory, const render::GraphicsOptions &opts);
 
     // Loading
-    void load(const resources::GffStruct &ifo);
+    void load(const std::string &name, const resources::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
 
     // Rendering
     void initGL();
     void render() const;
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
     void update3rdPersonCameraHeading();
     void saveTo(GameState &state) const;
-
-    virtual const std::shared_ptr<Area> makeArea() const;
 
     // Getters
     const std::string &name() const;
@@ -85,6 +75,7 @@ protected:
     ModuleInfo _info;
 
 private:
+    ObjectFactory *_objectFactory { nullptr };
     std::string _name;
     bool _loaded { false };
     render::GraphicsOptions _opts;

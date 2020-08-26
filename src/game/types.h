@@ -56,6 +56,8 @@ enum class ClassType {
 
 enum class ObjectType {
     None,
+    Module,
+    Area,
     Creature,
     Door,
     Placeable,

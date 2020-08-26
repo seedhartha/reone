@@ -28,8 +28,6 @@ namespace script {
 
 const uint32_t kObjectSelf = 0;
 const uint32_t kObjectInvalid = 1;
-const uint32_t kObjectModule = 2;
-const uint32_t kObjectArea = 3;
 
 struct Variable;
 class ScriptProgram;

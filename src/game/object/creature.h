@@ -25,13 +25,13 @@
 
 #include "../item.h"
 
-#include "object.h"
+#include "spatial.h"
 
 namespace reone {
 
 namespace game {
 
-class Creature : public Object {
+class Creature : public SpatialObject {
 public:
     enum class ActionType {
         MoveToPoint = 0,

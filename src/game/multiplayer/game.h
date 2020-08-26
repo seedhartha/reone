@@ -52,10 +52,10 @@ private:
     std::recursive_mutex _commandsInMutex;
 
     // Game overrides
+    void initObjectFactory() override;
     void configure() override;
     void update() override;
     void loadNextModule() override;
-    const std::shared_ptr<Module> makeModule(const std::string &name) override;
     void startDialog(uint32_t ownerId, const std::string &resRef) override;
     void onDialogReplyPicked(uint32_t index) override;
     void onDialogFinished() override;

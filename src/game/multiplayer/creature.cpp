@@ -41,14 +41,14 @@ const string &MultiplayerCreature::clientTag() const {
 }
 
 void MultiplayerCreature::animate(const string &anim, int flags, float speed) {
-    Object::animate(anim, flags);
+    SpatialObject::animate(anim, flags);
     if (_synchronize) {
         _callbacks->onObjectAnimationChanged(*this, anim, flags, speed);
     }
 }
 
 void MultiplayerCreature::updateTransform() {
-    Object::updateTransform();
+    SpatialObject::updateTransform();
     if (_synchronize) {
         _callbacks->onObjectTransformChanged(*this, _position, _heading);
     }

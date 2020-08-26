@@ -22,6 +22,7 @@
 #include "../../core/log.h"
 #include "../../core/random.h"
 
+#include "../area.h"
 #include "../object/creature.h"
 #include "../object/door.h"
 
@@ -133,7 +134,7 @@ Variable RoutineManager::getArea(const vector<Variable> &args, ExecutionContext 
     assert(!args.empty() && args[0].type == VariableType::Object);
 
     Variable result(VariableType::Object);
-    result.objectId = kObjectArea;
+    result.objectId = _callbacks->getArea()->id();
 
     return move(result);
 }
@@ -254,13 +255,11 @@ Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionCont
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Event);
 
-    if (args[0].objectId == kObjectArea ||
-        (args[0].objectId == kObjectSelf && ctx.callerId == kObjectArea)) {
-
-        _callbacks->signalEvent(args[1].engineTypeId);
-    
+    shared_ptr<Object> subject(getObjectById(args[0].objectId, ctx));
+    if (subject) {
+        _callbacks->signalEvent(subject->id(), args[1].engineTypeId);
     } else {
-        warn("Routine: invalid callee: " + to_string(args[0].objectId));
+        warn("Routine: object not found by id: " + to_string(args[0].objectId));
     }
 
     return Variable();

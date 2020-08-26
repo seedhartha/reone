@@ -42,19 +42,15 @@ namespace reone {
 
 namespace game {
 
-typedef std::vector<std::shared_ptr<Object>> ObjectList;
+typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
-/*
- * Game object container. Building block of a module.
- *
- * @see reone::game::Module
- * @see reone::game::Object
- */
-class Area {
+class ObjectFactory;
+
+class Area : public Object {
 public:
-    Area(resources::GameVersion version, const std::string &name);
+    Area(uint32_t id, resources::GameVersion version, ObjectFactory *objectFactory);
 
-    void load(const resources::GffStruct &are, const resources::GffStruct &git);
+    void load(const std::string &name, const resources::GffStruct &are, const resources::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
     void runOnEnterScript();
 
@@ -76,25 +72,25 @@ public:
     void loadState(const GameState &state);
 
     // Object search
-    std::shared_ptr<Object> find(uint32_t id) const;
-    std::shared_ptr<Object> find(const std::string &tag, int nth = 0) const;
-    std::shared_ptr<Object> find(uint32_t id, ObjectType type) const;
-    std::shared_ptr<Object> find(const std::string &tag, ObjectType type, int nth = 0) const;
-    bool findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, Object **obstacle) const;
-    bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const Object *except, Object **obstacle) const;
-
-    // Setters
-    void setDebugMode(DebugMode mode);
+    std::shared_ptr<SpatialObject> find(uint32_t id) const;
+    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
+    std::shared_ptr<SpatialObject> find(uint32_t id, ObjectType type) const;
+    std::shared_ptr<SpatialObject> find(const std::string &tag, ObjectType type, int nth = 0) const;
+    bool findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const;
+    bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const;
 
     // General getters
     const render::CameraStyle &cameraStyle() const;
     const std::string &music() const;
 
     // Party getters
-    std::shared_ptr<Object> player() const;
-    std::shared_ptr<Object> partyLeader() const;
-    std::shared_ptr<Object> partyMember1() const;
-    std::shared_ptr<Object> partyMember2() const;
+    std::shared_ptr<SpatialObject> player() const;
+    std::shared_ptr<SpatialObject> partyLeader() const;
+    std::shared_ptr<SpatialObject> partyMember1() const;
+    std::shared_ptr<SpatialObject> partyMember2() const;
+
+    // Setters
+    void setDebugMode(DebugMode mode);
 
     // Callbacks
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
@@ -102,24 +98,19 @@ public:
     void setOnStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
 
 protected:
-    uint32_t _idCounter { 1000 };
+    ObjectFactory *_objectFactory { nullptr };
     std::map<ObjectType, ObjectList> _objects;
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
 
     // Party
-    std::shared_ptr<Object> _player;
-    std::shared_ptr<Object> _partyLeader;
-    std::shared_ptr<Object> _partyMember1;
-    std::shared_ptr<Object> _partyMember2;
+    std::shared_ptr<SpatialObject> _player;
+    std::shared_ptr<SpatialObject> _partyLeader;
+    std::shared_ptr<SpatialObject> _partyMember1;
+    std::shared_ptr<SpatialObject> _partyMember2;
 
-    void landObject(Object &object);
+    void landObject(SpatialObject &object);
 
-    virtual std::shared_ptr<Creature> makeCreature(uint32_t id = 0);
-    virtual std::shared_ptr<Door> makeDoor();
-    virtual std::shared_ptr<Placeable> makePlaceable();
-    virtual std::shared_ptr<Waypoint> makeWaypoint();
-    virtual std::shared_ptr<Trigger> makeTrigger();
     virtual void updateCreature(Creature &creature, float dt);
 
 private:
@@ -171,7 +162,7 @@ private:
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     void fillRenderLists(const glm::vec3 &cameraPosition);
     void addToDebugContext(const render::RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
-    void addToDebugContext(const Object &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
+    void addToDebugContext(const SpatialObject &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
     bool findElevationAt(const glm::vec3 &position, float &z) const;
 
     // Loading

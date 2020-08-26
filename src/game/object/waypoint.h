@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include "object.h"
+#include "spatial.h"
+
+#include "../../resources/gfffile.h"
 
 namespace reone {
 
 namespace game {
 
-class Waypoint : public Object {
+class Waypoint : public SpatialObject {
 public:
     Waypoint(uint32_t id);
 

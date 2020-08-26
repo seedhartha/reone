@@ -69,12 +69,14 @@ set(HEADERS
     src/game/multiplayer/creature.h
     src/game/multiplayer/door.h
     src/game/multiplayer/game.h
-    src/game/multiplayer/module.h
+    src/game/multiplayer/objectfactory.h
     src/game/multiplayer/util.h
     src/game/object/creature.h
     src/game/object/door.h
+    src/game/object/factory.h
     src/game/object/object.h
     src/game/object/placeable.h
+    src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/waypoint.h
     src/game/room.h
@@ -179,13 +181,15 @@ set(SOURCES
     src/game/multiplayer/creature.cpp
     src/game/multiplayer/door.cpp
     src/game/multiplayer/game.cpp
-    src/game/multiplayer/module.cpp
+    src/game/multiplayer/objectfactory.cpp
     src/game/multiplayer/util.cpp
     src/game/navmesh.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
+    src/game/object/factory.cpp
     src/game/object/object.cpp
     src/game/object/placeable.cpp
+    src/game/object/spatial.cpp
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
     src/game/room.cpp

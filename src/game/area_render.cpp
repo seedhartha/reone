@@ -86,7 +86,7 @@ void Area::render() const {
 
             for (auto &object : list.second) {
                 shared_ptr<ModelInstance> model(object->model());
-                if (!model) return;
+                if (!model) continue;
 
                 aabb.render(model->model()->aabb(), object->transform());
             }

@@ -28,19 +28,23 @@ namespace reone {
 
 namespace game {
 
+class Area;
+class Module;
+
 class IRoutineCallbacks {
 public:
-    virtual ~IRoutineCallbacks() {
-    }
+    virtual ~IRoutineCallbacks() = default;
 
     // Commands
     virtual void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) = 0;
 
     // Events
     virtual int eventUserDefined(int eventNumber) = 0;
-    virtual void signalEvent(int eventId) = 0;
+    virtual void signalEvent(uint32_t objectId, int eventId) = 0;
 
     // Objects
+    virtual Module *getModule() = 0;
+    virtual Area *getArea() = 0;
     virtual std::shared_ptr<Object> getObjectById(uint32_t id) = 0;
     virtual std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth = 0) = 0;
     virtual std::shared_ptr<Object> getWaypointByTag(const std::string &tag) = 0;

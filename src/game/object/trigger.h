@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include "object.h"
+#include "spatial.h"
+
+#include "../../resources/gfffile.h"
 
 namespace reone {
 
 namespace game {
 
-class Trigger : public Object {
+class Trigger : public SpatialObject {
 public:
     Trigger(uint32_t id);
 

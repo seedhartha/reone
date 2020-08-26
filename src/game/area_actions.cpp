@@ -40,7 +40,10 @@ void Area::updateCreature(Creature &creature, float dt) {
     switch (action.type) {
         case Creature::ActionType::MoveToPoint:
         case Creature::ActionType::Follow: {
-            glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? action.object->position() : action.point;
+            SpatialObject *spatial = dynamic_cast<SpatialObject *>(action.object.get());
+            assert(spatial);
+
+            glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? spatial->position() : action.point;
             bool reached = navigateCreature(creature, dest, action.distance, dt);
             if (reached && action.type == Creature::ActionType::MoveToPoint) {
                 creature.popCurrentAction();

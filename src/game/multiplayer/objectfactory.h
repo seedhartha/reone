@@ -17,28 +17,25 @@
 
 #pragma once
 
-#include "../module.h"
+#include "../object/factory.h"
+
+#include "callbacks.h"
 
 namespace reone {
 
 namespace game {
 
-class IMultiplayerCallbacks;
-
-class MultiplayerModule : public Module {
+class MultiplayerObjectFactory : public ObjectFactory {
 public:
-    MultiplayerModule(
-        const std::string &name,
-        MultiplayerMode mode,
-        resources::GameVersion version,
-        const render::GraphicsOptions &opts,
-        IMultiplayerCallbacks *callbacks);
+    MultiplayerObjectFactory(resources::GameVersion version, MultiplayerMode mode, IMultiplayerCallbacks *callbacks, const Options &opts);
+
+    std::unique_ptr<Area> newArea();
+    std::unique_ptr<Creature> newCreature();
+    std::unique_ptr<Door> newDoor();
 
 private:
     MultiplayerMode _mode { MultiplayerMode::None };
     IMultiplayerCallbacks *_callbacks { nullptr };
-
-    const std::shared_ptr<Area> makeArea() const override;
 };
 
 } // namespace game

@@ -27,6 +27,7 @@
 #include "../core/streamutil.h"
 #include "../resources/resources.h"
 
+#include "object/factory.h"
 #include "script/routines.h"
 #include "util.h"
 
@@ -56,6 +57,12 @@ Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
     _path(path),
     _opts(opts),
     _renderWindow(opts.graphics, this) {
+
+    initObjectFactory();
+}
+
+void Game::initObjectFactory() {
+    _objectFactory = make_unique<ObjectFactory>(_version, _opts);
 }
 
 int Game::run() {
@@ -188,10 +195,10 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 
     shared_ptr<GffStruct> ifo(ResMan.findGFF("module", ResourceType::ModuleInfo));
 
-    _module = makeModule(name);
+    _module = _objectFactory->newModule();
     configureModule();
 
-    _module->load(*ifo);
+    _module->load(name, *ifo);
     _module->loadParty(party, entry);
     _module->area().loadState(_state);
     _module->initGL();
@@ -254,10 +261,10 @@ void Game::onDialogReplyPicked(uint32_t index) {
 }
 
 void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
-    shared_ptr<Object> player(_module->area().player());
-    shared_ptr<Object> partyLeader(_module->area().partyLeader());
-    shared_ptr<Object> prevSpeaker = from != 0 ? _module->area().find(from, ObjectType::Creature) : nullptr;
-    shared_ptr<Object> speaker = to != 0 ? _module->area().find(to, ObjectType::Creature) : nullptr;
+    shared_ptr<SpatialObject> player(_module->area().player());
+    shared_ptr<SpatialObject> partyLeader(_module->area().partyLeader());
+    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area().find(from, ObjectType::Creature) : nullptr;
+    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area().find(to, ObjectType::Creature) : nullptr;
     if (speaker == partyLeader) return;
 
     debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
@@ -280,10 +287,6 @@ void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
 
 void Game::onDialogFinished() {
     _screen = Screen::InGame;
-}
-
-const shared_ptr<Module> Game::makeModule(const string &name) {
-    return make_shared<Module>(name, _version, _opts.graphics);
 }
 
 void Game::configureModule() {
@@ -490,6 +493,14 @@ void Game::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
     _module->area().delayCommand(timestamp, ctx);
 }
 
+Module *Game::getModule() {
+    return _module.get();
+}
+
+Area *Game::getArea() {
+    return &_module->area();
+}
+
 shared_ptr<Object> Game::getObjectById(uint32_t id) {
     return _module->area().find(id);
 }
@@ -510,8 +521,14 @@ int Game::eventUserDefined(int eventNumber) {
     return _module->area().eventUserDefined(eventNumber);
 }
 
-void Game::signalEvent(int eventId) {
-    _module->area().signalEvent(eventId);
+void Game::signalEvent(uint32_t objectId, int eventId) {
+    assert(objectId >= 2);
+    Area &area = _module->area();
+    if (objectId != area.id()) {
+        warn("Game: event object is not an area");
+        return;
+    }
+    area.signalEvent(eventId);
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

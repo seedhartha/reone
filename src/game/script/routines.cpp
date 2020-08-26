@@ -84,8 +84,6 @@ shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionCon
             finalId = ctx.callerId;
             break;
         case kObjectInvalid:
-        case kObjectModule:
-        case kObjectArea:
             warn("Routine: invalid object id: " + to_string(id));
             return nullptr;
         default:
