@@ -75,7 +75,8 @@ void ContainerGui::openContainer(const Placeable &placeable) {
     lbItems.clearItems();
 
     for (auto &item : placeable.items()) {
-        lbItems.add({ item->resRef(), item->localizedName(), item->icon() });
+        const ItemTemplate &templ = item->getTemplate();
+        lbItems.add({ templ.resRef(), templ.localizedName(), templ.icon() });
     }
 }
 

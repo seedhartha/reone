@@ -28,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-SpatialObject::SpatialObject(uint32_t id) : Object(id) {
+SpatialObject::SpatialObject(uint32_t id, ObjectType type) : Object(id, type) {
 }
 
 float SpatialObject::distanceTo(const glm::vec3 &point) const {

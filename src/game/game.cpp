@@ -153,7 +153,7 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadClassSelectionGui() {
-    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_opts.graphics));
+    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_objectFactory.get(), _opts.graphics));
     gui->load(_version);
     gui->initGL();
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {

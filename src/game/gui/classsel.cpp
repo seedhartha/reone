@@ -55,7 +55,10 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelectionGui::ClassSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
+ClassSelectionGui::ClassSelectionGui(ObjectFactory *objectFactory, const GraphicsOptions &opts) :
+    GUI(opts), _objectFactory(objectFactory) {
+
+    assert(_objectFactory);
 }
 
 void ClassSelectionGui::load(GameVersion version) {
@@ -174,8 +177,8 @@ void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType 
     Control &control = getControl("3D_MODEL" + to_string(index + 1));
     const Control::Extent &extent = control.extent();
 
-    Creature creature(0);
-    creature.load(randomCharacter(gender, clazz));
+    unique_ptr<Creature> creature(_objectFactory->newCreature());
+    creature->load(randomCharacter(gender, clazz));
 
     int frameHeight = _defaultButtonSize.y;
     int x = extent.left + extent.width / 2;
@@ -187,7 +190,7 @@ void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType 
     transform = glm::scale(transform, glm::vec3(frameHeight / 2.0f));
 
     Control::Scene3D scene;
-    scene.model = creature.model();
+    scene.model = creature->model();
     scene.transform = move(transform);
 
     control.setScene3D(scene);

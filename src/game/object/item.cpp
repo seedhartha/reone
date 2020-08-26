@@ -15,31 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <memory>
-#include <string>
-
 #include "item.h"
 
 namespace reone {
 
 namespace game {
 
-class TemplateManager {
-public:
-    static TemplateManager &instance();
+Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
+}
 
-    std::shared_ptr<Item> findItem(const std::string &resRef);
+void Item::load(const ItemTemplate *templ) {
+    _template = templ;
+}
 
-private:
-    TemplateManager() = default;
-
-    TemplateManager(const TemplateManager &) = delete;
-    TemplateManager &operator=(const TemplateManager &) = delete;
-};
-
-#define TemplateMan game::TemplateManager::instance()
+const ItemTemplate &Item::getTemplate() const {
+    return *_template;
+}
 
 } // namespace game
 

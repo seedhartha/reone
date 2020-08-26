@@ -27,7 +27,7 @@ class IMultiplayerCallbacks;
 
 class MultiplayerCreature : public Creature {
 public:
-    MultiplayerCreature(uint32_t id, IMultiplayerCallbacks *callbacks);
+    MultiplayerCreature(uint32_t id, ObjectFactory *objectFactory, IMultiplayerCallbacks *callbacks);
 
     void setClientTag(const std::string &clientTag);
 

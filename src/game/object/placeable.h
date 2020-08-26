@@ -19,23 +19,27 @@
 
 #include <vector>
 
-#include "../item.h"
+#include "../../resources/gfffile.h"
 
+#include "item.h"
 #include "spatial.h"
 
 namespace reone {
 
 namespace game {
 
+class ObjectFactory;
+
 class Placeable : public SpatialObject {
 public:
-    Placeable(uint32_t id);
+    Placeable(uint32_t id, ObjectFactory *objectFactory);
 
     void load(const resources::GffStruct &gffs);
 
     const std::vector<std::shared_ptr<Item>> &items() const;
 
 private:
+    ObjectFactory *_objectFactory { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
 
     void loadBlueprint(const resources::GffStruct &gffs);

@@ -63,11 +63,12 @@ static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
 Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
-    Object(id), _version(version), _objectFactory(factory), _navMesh(new NavMesh()) {
+    Object(id, ObjectType::Area),
+    _version(version),
+    _objectFactory(factory),
+    _navMesh(new NavMesh()) {
 
     assert(_objectFactory);
-
-    _type = ObjectType::Area;
 
     _objects.insert(make_pair(ObjectType::Creature, ObjectList()));
     _objects.insert(make_pair(ObjectType::Door, ObjectList()));

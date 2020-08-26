@@ -42,10 +42,12 @@ namespace game {
 static const float kDefaultFieldOfView = 75.0f;
 
 Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, const GraphicsOptions &opts) :
-    Object(id), _version(version), _objectFactory(objectFactory), _opts(opts) {
+    Object(id, ObjectType::Module),
+    _version(version),
+    _objectFactory(objectFactory),
+    _opts(opts) {
 
     assert(_objectFactory);
-    _type = ObjectType::Module;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
 

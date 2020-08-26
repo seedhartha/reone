@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
-#include "../resources/resources.h"
+#include "../../resources/resources.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void Item::load(const string &resRef, const GffStruct &uti) {
+void ItemTemplate::load(const string &resRef, const GffStruct &uti) {
     _resRef = resRef;
 
     ResourceManager &resources = ResMan;
@@ -75,39 +75,39 @@ void Item::load(const string &resRef, const GffStruct &uti) {
     if (_icon) _icon->initGL();
 }
 
-const string &Item::resRef() const {
+const string &ItemTemplate::resRef() const {
     return _resRef;
 }
 
-ItemType Item::type() const {
+ItemType ItemTemplate::type() const {
     return _type;
 }
 
-const string &Item::localizedName() const {
+const string &ItemTemplate::localizedName() const {
     return _localizedName;
 }
 
-const string &Item::baseBodyVariation() const {
+const string &ItemTemplate::baseBodyVariation() const {
     return _baseBodyVariation;
 }
 
-int Item::bodyVariation() const {
+int ItemTemplate::bodyVariation() const {
     return _bodyVariation;
 }
 
-int Item::textureVariation() const {
+int ItemTemplate::textureVariation() const {
     return _textureVariation;
 }
 
-const string &Item::itemClass() const {
+const string &ItemTemplate::itemClass() const {
     return _itemClass;
 }
 
-int Item::modelVariation() const {
+int ItemTemplate::modelVariation() const {
     return _modelVariation;
 }
 
-shared_ptr<render::Texture> Item::icon() const {
+shared_ptr<Texture> ItemTemplate::icon() const {
     return _icon;
 }
 

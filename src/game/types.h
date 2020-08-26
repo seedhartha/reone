@@ -62,7 +62,8 @@ enum class ObjectType {
     Door,
     Placeable,
     Waypoint,
-    Trigger
+    Trigger,
+    Item
 };
 
 enum ObstacleMask {

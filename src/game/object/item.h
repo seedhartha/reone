@@ -17,39 +17,24 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../template/item.h"
 
-#include <cstdint>
-#include <string>
+#include "object.h"
 
 namespace reone {
 
 namespace game {
 
-class Object {
+class Item : public Object {
 public:
-    virtual void update(const UpdateContext &ctx);
+    Item(uint32_t id);
 
-    virtual void saveTo(AreaState &state) const;
-    virtual void loadState(const AreaState &state);
+    void load(const ItemTemplate *templ);
 
-    uint32_t id() const;
-    ObjectType type() const;
-    const std::string &tag() const;
-
-    void setSynchronize(bool synchronize);
-
-protected:
-    uint32_t _id { 0 };
-    ObjectType _type { ObjectType::None };
-    std::string _tag;
-    bool _synchronize { false };
-
-    Object(uint32_t id, ObjectType type);
+    const ItemTemplate &getTemplate() const;
 
 private:
-    Object(const Object &) = delete;
-    Object &operator=(const Object &) = delete;
+    const ItemTemplate *_template { nullptr };
 };
 
 } // namespace game

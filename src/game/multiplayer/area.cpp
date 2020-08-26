@@ -74,7 +74,7 @@ void MultiplayerArea::execute(const Command &cmd) {
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
-    shared_ptr<Creature> creature(new MultiplayerCreature(cmd.objectId(), _callbacks));
+    shared_ptr<Creature> creature(new MultiplayerCreature(cmd.objectId(), _objectFactory, _callbacks));
     creature->setTag(cmd.tag());
 
     for (auto &item : cmd.equipment()) {

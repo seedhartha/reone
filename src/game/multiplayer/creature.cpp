@@ -25,7 +25,8 @@ namespace reone {
 
 namespace game {
 
-MultiplayerCreature::MultiplayerCreature(uint32_t id, IMultiplayerCallbacks *callbacks) : Creature(id), _callbacks(callbacks) {
+MultiplayerCreature::MultiplayerCreature(uint32_t id, ObjectFactory *objectFactory, IMultiplayerCallbacks *callbacks) :
+    Creature(id, objectFactory), _callbacks(callbacks) {
 }
 
 void MultiplayerCreature::setClientTag(const string &clientTag) {

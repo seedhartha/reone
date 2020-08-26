@@ -47,6 +47,7 @@ public:
     virtual std::unique_ptr<Door> newDoor();
     virtual std::unique_ptr<Waypoint> newWaypoint();
     virtual std::unique_ptr<Trigger> newTrigger();
+    virtual std::unique_ptr<Item> newItem();
 
 protected:
     resources::GameVersion _version { resources::GameVersion::KotOR };

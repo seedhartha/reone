@@ -38,11 +38,11 @@ unique_ptr<Area> ObjectFactory::newArea() {
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {
-    return make_unique<Creature>(_counter++);
+    return make_unique<Creature>(_counter++, this);
 }
 
 unique_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return make_unique<Placeable>(_counter++);
+    return make_unique<Placeable>(_counter++, this);
 }
 
 unique_ptr<Door> ObjectFactory::newDoor() {
@@ -55,6 +55,10 @@ unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
 
 unique_ptr<Trigger> ObjectFactory::newTrigger() {
     return make_unique<Trigger>(_counter++);
+}
+
+unique_ptr<Item> ObjectFactory::newItem() {
+    return make_unique<Item>(_counter++);
 }
 
 } // namespace game

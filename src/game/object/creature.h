@@ -21,15 +21,17 @@
 #include <queue>
 
 #include "../../resources/2dafile.h"
+#include "../../resources/gfffile.h"
 #include "../../script/types.h"
 
-#include "../item.h"
-
+#include "item.h"
 #include "spatial.h"
 
 namespace reone {
 
 namespace game {
+
+class ObjectFactory;
 
 class Creature : public SpatialObject {
 public:
@@ -84,7 +86,7 @@ public:
         OnBlocked
     };
 
-    Creature(uint32_t id);
+    Creature(uint32_t id, ObjectFactory *objectFactory);
 
     // Loading
     void load(const resources::GffStruct &gffs);
@@ -141,6 +143,7 @@ private:
         Character
     };
 
+    ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
