@@ -60,7 +60,6 @@ set(HEADERS
     src/game/gui/hud.h
     src/game/gui/mainmenu.h
     src/game/gui/portraitsel.h
-    src/game/item.h
     src/game/navmesh.h
     src/game/module.h
     src/game/multiplayer/area.h
@@ -74,6 +73,7 @@ set(HEADERS
     src/game/object/creature.h
     src/game/object/door.h
     src/game/object/factory.h
+    src/game/object/item.h
     src/game/object/object.h
     src/game/object/placeable.h
     src/game/object/spatial.h
@@ -83,7 +83,8 @@ set(HEADERS
     src/game/script/callbacks.h
     src/game/script/routines.h
     src/game/script/util.h
-    src/game/templates.h
+    src/game/template/item.h
+    src/game/template/templates.h
     src/game/types.h
     src/game/util.h
     src/gui/control/button.h
@@ -174,7 +175,6 @@ set(SOURCES
     src/game/gui/hud.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitsel.cpp
-    src/game/item.cpp
     src/game/module.cpp
     src/game/multiplayer/area.cpp
     src/game/multiplayer/command.cpp
@@ -187,6 +187,7 @@ set(SOURCES
     src/game/object/creature.cpp
     src/game/object/door.cpp
     src/game/object/factory.cpp
+    src/game/object/item.cpp
     src/game/object/object.cpp
     src/game/object/placeable.cpp
     src/game/object/spatial.cpp
@@ -198,7 +199,8 @@ set(SOURCES
     src/game/script/routines_kotor.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/util.cpp
-    src/game/templates.cpp
+    src/game/template/item.cpp
+    src/game/template/templates.cpp
     src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp

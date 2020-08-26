@@ -25,7 +25,8 @@
 #include "../../resources/resources.h"
 #include "../../script/types.h"
 
-#include "../templates.h"
+#include "../object/factory.h"
+#include "../template/templates.h"
 #include "../script/util.h"
 
 using namespace std;
@@ -60,8 +61,10 @@ Creature::Action::Action(ActionType type, const shared_ptr<Object> &object, floa
 Creature::Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
 }
 
-Creature::Creature(uint32_t id) : SpatialObject(id) {
-    _type = ObjectType::Creature;
+Creature::Creature(uint32_t id, ObjectFactory *objectFactory) :
+    SpatialObject(id, ObjectType::Creature), _objectFactory(objectFactory) {
+
+    assert(_objectFactory);
     _drawDistance = 2048.0f;
     _fadeDistance = 0.25f * _drawDistance;
 }
@@ -133,7 +136,7 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 }
 
 void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = ResMan;
 
     string modelColumn("model");
     string texColumn("tex");
@@ -141,8 +144,8 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     auto it = _equipment.find(kInventorySlotBody);
     if (it != _equipment.end()) {
-        modelColumn += it->second->baseBodyVariation();
-        texColumn += it->second->baseBodyVariation();
+        modelColumn += it->second->getTemplate().baseBodyVariation();
+        texColumn += it->second->getTemplate().baseBodyVariation();
         bodyEquipped = true;
     } else {
         modelColumn += "a";
@@ -154,7 +157,7 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     string texName(table.getString(row, texColumn));
     if (bodyEquipped) {
-        texName += str(boost::format("%02d") % it->second->textureVariation());
+        texName += str(boost::format("%02d") % it->second->getTemplate().textureVariation());
     } else {
         texName += "01";
     }
@@ -162,8 +165,8 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     it = _equipment.find(kInventorySlotRightWeapon);
     if (it != _equipment.end()) {
-        string weaponModelName(it->second->itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->modelVariation());
+        string weaponModelName(it->second->getTemplate().itemClass());
+        weaponModelName += str(boost::format("_%03d") % it->second->getTemplate().modelVariation());
         _model->attach("rhand", resources.findModel(weaponModelName));
     }
 
@@ -193,8 +196,8 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
 
     auto it = _equipment.find(kInventorySlotRightWeapon);
     if (it != _equipment.end()) {
-        string weaponModelName(it->second->itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->modelVariation());
+        string weaponModelName(it->second->getTemplate().itemClass());
+        weaponModelName += str(boost::format("_%03d") % it->second->getTemplate().modelVariation());
         _model->attach("rhand", resources.findModel(weaponModelName));
     }
 }
@@ -263,9 +266,12 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<Item> item(TemplateMan.findItem(resRef));
+    shared_ptr<ItemTemplate> itemTempl(TemplateMan.findItem(resRef));
 
-    switch (item->type()) {
+    shared_ptr<Item> item(_objectFactory->newItem());
+    item->load(itemTempl.get());
+
+    switch (item->getTemplate().type()) {
         case ItemType::Armor:
             _equipment[kInventorySlotBody] = move(item);
             break;

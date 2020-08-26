@@ -43,7 +43,7 @@ unique_ptr<Area> MultiplayerObjectFactory::newArea() {
 }
 
 unique_ptr<Creature> MultiplayerObjectFactory::newCreature() {
-    return make_unique<MultiplayerCreature>(_counter++, _callbacks);
+    return make_unique<MultiplayerCreature>(_counter++, this, _callbacks);
 }
 
 unique_ptr<Door> MultiplayerObjectFactory::newDoor() {

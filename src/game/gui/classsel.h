@@ -20,6 +20,7 @@
 #include "../../gui/gui.h"
 #include "../../resources/types.h"
 
+#include "../object/factory.h"
 #include "../types.h"
 
 namespace reone {
@@ -28,7 +29,7 @@ namespace game {
 
 class ClassSelectionGui : public gui::GUI {
 public:
-    ClassSelectionGui(const render::GraphicsOptions &opts);
+    ClassSelectionGui(ObjectFactory *objectFactory, const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
 
@@ -43,6 +44,7 @@ private:
         ClassType clazz { ClassType::Soldier };
     };
 
+    ObjectFactory *_objectFactory { nullptr };
     resources::GameVersion _version { resources::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };

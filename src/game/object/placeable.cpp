@@ -23,7 +23,9 @@
 #include "../../render/modelinstance.h"
 #include "../../resources/resources.h"
 
-#include "../templates.h"
+#include "../template/templates.h"
+
+#include "factory.h"
 
 using namespace std;
 
@@ -34,8 +36,11 @@ namespace reone {
 
 namespace game {
 
-Placeable::Placeable(uint32_t id) : SpatialObject(id) {
-    _type = ObjectType::Placeable;
+Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory) :
+    SpatialObject(id, ObjectType::Placeable),
+    _objectFactory(objectFactory) {
+
+    assert(_objectFactory);
     _drawDistance = 4096.0f;
     _fadeDistance = 0.25f * _drawDistance;
 }
@@ -54,7 +59,7 @@ void Placeable::load(const GffStruct &gffs) {
     loadBlueprint(*utp);
 }
 
-void Placeable::loadBlueprint(const resources::GffStruct &gffs) {
+void Placeable::loadBlueprint(const GffStruct &gffs) {
     _tag = gffs.getString("Tag");
     boost::to_lower(_tag);
 
@@ -71,7 +76,11 @@ void Placeable::loadBlueprint(const resources::GffStruct &gffs) {
     if (itemList) {
         for (auto &itemGffs : itemList->children()) {
             string resRef(itemGffs.getString("InventoryRes"));
-            shared_ptr<Item> item(TemplateMan.findItem(resRef));
+            shared_ptr<ItemTemplate> itemTempl(TemplateMan.findItem(resRef));
+
+            shared_ptr<Item> item(_objectFactory->newItem());
+            item->load(itemTempl.get());
+
             _items.push_back(move(item));
         }
     }

@@ -19,8 +19,8 @@
 
 #include <map>
 
-#include "../core/log.h"
-#include "../resources/resources.h"
+#include "../../core/log.h"
+#include "../../resources/resources.h"
 
 using namespace std;
 
@@ -30,25 +30,25 @@ namespace reone {
 
 namespace game {
 
-static map<string, shared_ptr<Item>> g_itemCache;
+static map<string, shared_ptr<ItemTemplate>> g_itemCache;
 
 TemplateManager &TemplateManager::instance() {
     static TemplateManager instance;
     return instance;
 }
 
-shared_ptr<Item> TemplateManager::findItem(const string &resRef) {
+shared_ptr<ItemTemplate> TemplateManager::findItem(const string &resRef) {
     auto it = g_itemCache.find(resRef);
     if (it != g_itemCache.end()) {
         return it->second;
     }
-    debug("Templates: load item: " + resRef);
+    debug("Templates: load item: " + resRef, 2);
 
     shared_ptr<GffStruct> uti(ResMan.findGFF(resRef, ResourceType::ItemBlueprint));
-    shared_ptr<Item> item;
+    shared_ptr<ItemTemplate> item;
 
     if (uti) {
-        item.reset(new Item());
+        item.reset(new ItemTemplate());
         item->load(resRef, *uti);
     } else {
         warn("Templates: item not found: " + resRef);

@@ -145,7 +145,7 @@ void MultiplayerGame::sendLoadCreature(const string &client, CreatureRole role, 
     cmd2._equipment.clear();
 
     for (auto &pair : creature.equipment()) {
-        cmd2._equipment.push_back(pair.second->resRef());
+        cmd2._equipment.push_back(pair.second->getTemplate().resRef());
     }
 
     sendCommand(client, cmd);

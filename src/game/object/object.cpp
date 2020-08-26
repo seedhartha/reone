@@ -26,7 +26,7 @@ namespace reone {
 
 namespace game {
 
-Object::Object(uint32_t id) : _id(id) {
+Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
 }
 
 void Object::update(const UpdateContext &ctx) {

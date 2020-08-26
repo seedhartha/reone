@@ -64,7 +64,7 @@ protected:
     float _drawDistance { kDefaultDrawDistance };
     float _fadeDistance { kDefaultFadeDistance };
 
-    SpatialObject(uint32_t id);
+    SpatialObject(uint32_t id, ObjectType type);
 
     virtual void updateTransform();
 };

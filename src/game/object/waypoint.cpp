@@ -27,8 +27,7 @@ namespace reone {
 
 namespace game {
 
-Waypoint::Waypoint(uint32_t id) : SpatialObject(id) {
-    _type = ObjectType::Waypoint;
+Waypoint::Waypoint(uint32_t id) : SpatialObject(id, ObjectType::Waypoint) {
 }
 
 void Waypoint::load(const GffStruct &gffs) {

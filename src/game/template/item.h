@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "../resources/gfffile.h"
+#include "../../resources/gfffile.h"
 
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 
 namespace game {
 
-class Item {
+class ItemTemplate {
 public:
-    Item() = default;
+    ItemTemplate() = default;
 
     void load(const std::string &resRef, const resources::GffStruct &uti);
 
@@ -52,8 +52,8 @@ private:
     int _modelVariation { 0 };
     std::shared_ptr<render::Texture> _icon;
 
-    Item(const Item &) = delete;
-    Item &operator=(const Item &) = delete;
+    ItemTemplate(const ItemTemplate &) = delete;
+    ItemTemplate &operator=(const ItemTemplate &) = delete;
 };
 
 } // namespace game
