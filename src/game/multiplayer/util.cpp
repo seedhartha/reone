@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include "util.h"
 
 #include <map>
@@ -25,25 +23,27 @@
 
 using namespace std;
 
+using namespace reone::net;
+
 namespace reone {
 
 namespace game {
 
-static map<net::CommandType, string> g_cmdDesc = {
-    { net::CommandType::LoadModule, "LoadModule" },
-    { net::CommandType::LoadCreature, "LoadCreature" },
-    { net::CommandType::SetPlayerRole, "SetPlayerRole" },
-    { net::CommandType::SetObjectTransform, "SetObjectTransform" },
-    { net::CommandType::SetObjectAnimation, "SetObjectAnimation" },
-    { net::CommandType::SetCreatureMovementType, "SetCreatureMovementType" },
-    { net::CommandType::SetCreatureTalking, "SetCreatureTalking" },
-    { net::CommandType::SetDoorOpen, "SetDoorOpen" },
-    { net::CommandType::StartDialog, "StartDialog" },
-    { net::CommandType::PickDialogReply, "PickDialogReply" },
-    { net::CommandType::FinishDialog, "FinishDialog" }
+static map<CommandType, string> g_cmdDesc = {
+    { CommandType::LoadModule, "LoadModule" },
+    { CommandType::LoadCreature, "LoadCreature" },
+    { CommandType::SetPlayerRole, "SetPlayerRole" },
+    { CommandType::SetObjectTransform, "SetObjectTransform" },
+    { CommandType::SetObjectAnimation, "SetObjectAnimation" },
+    { CommandType::SetCreatureMovementType, "SetCreatureMovementType" },
+    { CommandType::SetCreatureTalking, "SetCreatureTalking" },
+    { CommandType::SetDoorOpen, "SetDoorOpen" },
+    { CommandType::StartDialog, "StartDialog" },
+    { CommandType::PickDialogReply, "PickDialogReply" },
+    { CommandType::FinishDialog, "FinishDialog" }
 };
 
-static const string &describeCommandType(net::CommandType type) {
+static const string &describeCommandType(CommandType type) {
     auto desc = g_cmdDesc.find(type);
     if (desc == g_cmdDesc.end()) {
         auto pair = g_cmdDesc.insert(make_pair(type, to_string(static_cast<int>(type))));
@@ -56,9 +56,9 @@ static const string &describeCommandType(net::CommandType type) {
 string describeCommand(const Command &command) {
     string desc(describeCommandType(command.type()));
     switch (command.type()) {
-        case net::CommandType::SetObjectTransform:
-        case net::CommandType::SetObjectAnimation:
-        case net::CommandType::SetCreatureMovementType:
+        case CommandType::SetObjectTransform:
+        case CommandType::SetObjectAnimation:
+        case CommandType::SetCreatureMovementType:
             desc += str(boost::format(" {id=%d,objectId=%d}") % command.id() % command.objectId());
             break;
         default:
