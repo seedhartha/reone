@@ -102,7 +102,7 @@ public:
 
     // Actions
     void clearActions();
-    void enqueueAction(const Action &action);
+    void enqueueAction(Action action);
     void popCurrentAction();
 
     // Load/save
