@@ -15,34 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <vector>
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-
-#include "types.h"
+#include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
-class ModelInstance;
-class ModelNode;
+SceneNode::SceneNode(const glm::mat4 &transform) : _transform(transform) {
+}
 
-struct RenderListItem {
-    const ModelInstance *model { nullptr };
-    const ModelNode *node { nullptr };
-    glm::mat4 transform { 1.0f };
-    glm::vec3 origin { 0.0f };
-};
+const glm::mat4 &SceneNode::transform() const {
+    return _transform;
+}
 
-class RenderList : public std::vector<RenderListItem> {
-public:
-    void sortByDistanceToCamera(const glm::vec3 &cameraPosition);
-    void render(bool debug) const;
-};
+float SceneNode::distanceToCamera() const {
+    return _distanceToCamera;
+}
+
+void SceneNode::setDistanceToCamera(float distance) {
+    _distanceToCamera = distance;
+}
 
 } // namespace render
 

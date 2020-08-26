@@ -21,12 +21,13 @@
 
 #include "aabb.h"
 #include "model.h"
-#include "renderlist.h"
 #include "shaders.h"
 
 namespace reone {
 
 namespace render {
+
+class SceneGraph;
 
 /**
  * Encapsulates model state changes (e.g. animation, attachments).
@@ -41,15 +42,15 @@ public:
 
     // Rendering
     void initGL();
+    void fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug);
     void render(const glm::mat4 &transform) const;
-    void render(const ModelNode &node, const glm::mat4 &transform, bool debug) const;
+    void render(const ModelNode &node, const glm::mat4 &transform) const;
 
     void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
     void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void changeTexture(const std::string &resRef);
     void update(float dt);
-    void fillRenderLists(const glm::mat4 &transform, RenderList &opaque, RenderList &transparent);
     void playDefaultAnimation();
 
     void show();
@@ -94,7 +95,6 @@ private:
     void advanceAnimation(float dt, const std::set<std::string> &skipNodes);
     void updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const std::set<std::string> &skipNodes);
     void updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform);
-    void fillRenderLists(const ModelNode &node, const glm::mat4 &transform, RenderList &opaque, RenderList &transparent);
     bool shouldRender(const ModelNode &node) const;
     glm::mat4 getNodeTransform(const ModelNode &node) const;
     ShaderProgram getShaderProgram(const ModelMesh &mesh, bool skeletal) const;

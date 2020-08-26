@@ -17,22 +17,23 @@
 
 #pragma once
 
-#include "mesh.h"
+#include "../aabb.h"
+
+#include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
+class AABBSceneNode : public SceneNode {
 public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
+    AABBSceneNode(const AABB &abbb, const glm::mat4 &transform);
+
+    const AABB &aabb() const;
 
 private:
-    AABBMesh();
+    AABB _aabb;
 };
-
-#define TheAABBMesh AABBMesh::instance()
 
 } // namespace render
 

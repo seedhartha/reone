@@ -17,22 +17,30 @@
 
 #pragma once
 
-#include "mesh.h"
+#include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
+class SceneNode {
 public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
+    const glm::mat4 &transform() const;
+    float distanceToCamera() const;
+
+    void setDistanceToCamera(float distance);
+
+protected:
+    SceneNode(const glm::mat4 &transform);
 
 private:
-    AABBMesh();
-};
+    glm::mat4 _transform { 1.0f };
+    float _distanceToCamera { 0.0f };
 
-#define TheAABBMesh AABBMesh::instance()
+    SceneNode(const SceneNode &) = delete;
+    SceneNode &operator=(const SceneNode &) = delete;
+};
 
 } // namespace render
 

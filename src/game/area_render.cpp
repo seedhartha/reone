@@ -42,56 +42,48 @@ void Area::initGL() {
     }
 }
 
-void Area::fillRenderLists(const glm::vec3 &cameraPosition) {
-    auto &opaque = _renderLists[RenderListName::Opaque];
-    auto &transparent = _renderLists[RenderListName::Transparent];
-
-    opaque.clear();
-    transparent.clear();
+void Area::updateSceneGraph(const glm::vec3 &cameraPosition) {
+    _sceneGraph.clear();
 
     for (auto &room : _rooms) {
         shared_ptr<ModelInstance> model(room->model());
         if (!model) continue;
 
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), room->position()));
-        model->fillRenderLists(transform, opaque, transparent);
+        model->fill(_sceneGraph, transform, _debugMode == DebugMode::ModelNodes);
     }
-    for (auto &pair : _objects) {
-        for (auto &object : pair.second) {
+    for (auto &list : _objects) {
+        for (auto &object : list.second) {
             shared_ptr<ModelInstance> model(object->model());
             if (!model) continue;
 
-            glm::mat4 transform(object->transform());
-            model->fillRenderLists(transform, opaque, transparent);
+            model->fill(_sceneGraph, object->transform(), _debugMode == DebugMode::ModelNodes);
         }
     }
+    switch (_debugMode) {
+        case DebugMode::GameObjects:
+            for (auto &list : _objects) {
+                ObjectType type = list.first;
+                if (type != ObjectType::Creature && type != ObjectType::Placeable && type != ObjectType::Door) continue;
 
-    opaque.sortByDistanceToCamera(cameraPosition);
-    transparent.sortByDistanceToCamera(cameraPosition);
+                for (auto &object : list.second) {
+                    shared_ptr<ModelInstance> model(object->model());
+                    if (!model) continue;
+
+                    shared_ptr<AABBSceneNode> node(new AABBSceneNode(model->model()->aabb(), object->transform()));
+                    _sceneGraph.add(node);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    _sceneGraph.prepare(cameraPosition);
 }
 
 void Area::render() const {
-    auto &opaque = _renderLists.find(RenderListName::Opaque)->second;
-    auto &transparent = _renderLists.find(RenderListName::Transparent)->second;
-
-    opaque.render(_debugMode == DebugMode::ModelNodes);
-    transparent.render(_debugMode == DebugMode::ModelNodes);
-
-    if (_debugMode == DebugMode::GameObjects) {
-        AABBMesh &aabb = AABBMesh::instance();
-        for (auto &list : _objects) {
-            if (list.first != ObjectType::Creature &&
-                list.first != ObjectType::Door &&
-                list.first != ObjectType::Placeable) continue;
-
-            for (auto &object : list.second) {
-                shared_ptr<ModelInstance> model(object->model());
-                if (!model) continue;
-
-                aabb.render(model->model()->aabb(), object->transform());
-            }
-        }
-    }
+    _sceneGraph.render();
 }
 
 } // namespace game

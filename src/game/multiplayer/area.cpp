@@ -105,7 +105,6 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
     }
 
     landObject(*creature);
-
     _objects[ObjectType::Creature].push_back(move(creature));
 }
 

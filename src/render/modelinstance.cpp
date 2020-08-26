@@ -26,6 +26,8 @@
 #include "../resources/resources.h"
 
 #include "mesh/aabb.h"
+#include "scene/modelnode.h"
+#include "scene/scenegraph.h"
 
 #include "modelinstance.h"
 
@@ -211,41 +213,46 @@ void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &
     }
 }
 
-void ModelInstance::fillRenderLists(const glm::mat4 &transform, RenderList &opaque, RenderList &transparent) {
-    if (!_model || !_visible) return;
-
-    fillRenderLists(_model->rootNode(), transform, opaque, transparent);
-
+void ModelInstance::initGL() {
+    if (_model) {
+        _model->initGL();
+    }
     for (auto &pair : _attachedModels) {
-        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
-        if (!parent) continue;
-
-        glm::mat4 finalTransform(transform * getNodeTransform(*parent));
-        pair.second->fillRenderLists(finalTransform, opaque, transparent);
+        pair.second->initGL();
     }
 }
 
-void ModelInstance::fillRenderLists(const ModelNode &node, const glm::mat4 &transform, RenderList &opaque, RenderList &transparent) {
-    glm::mat4 finalTransform(transform * getNodeTransform(node));
+void ModelInstance::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug) {
+    if (!_model || !_visible) return;
 
-    if (shouldRender(node)) {
-        shared_ptr<ModelMesh> mesh(node.mesh());
+    stack<const ModelNode *> nodes;
+    nodes.push(&_model->rootNode());
 
-        RenderListItem item;
-        item.model = this;
-        item.node = &node;
-        item.transform = finalTransform;
-        item.origin = finalTransform * glm::vec4(mesh->aabb().center(), 1.0f);
+    while (!nodes.empty()) {
+        const ModelNode &node = *nodes.top();
+        nodes.pop();
 
-        if (mesh->isTransparent() || node.alpha() < 1.0f) {
-            transparent.push_back(move(item));
-        } else {
-            opaque.push_back(move(item));
+        if (shouldRender(node)) {
+            glm::mat4 transform(baseTransform * getNodeTransform(node));
+
+            shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(this, &node, transform));
+            scene.add(sceneNode);
+
+            if (debug) {
+                shared_ptr<AABBSceneNode> aabbNode(new AABBSceneNode(node.mesh()->aabb(), transform));
+                scene.add(aabbNode);
+            }
+        }
+        for (auto &child : node.children()) {
+            nodes.push(child.get());
         }
     }
-
-    for (auto &child : node.children()) {
-        fillRenderLists(*child, transform, opaque, transparent);
+    for (auto &pair : _attachedModels) {
+        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
+        if (!parent) continue;
+    
+        glm::mat4 finalTransform(baseTransform * getNodeTransform(*parent));
+        pair.second->fill(scene, finalTransform, debug);
     }
 }
 
@@ -265,30 +272,21 @@ glm::mat4 ModelInstance::getNodeTransform(const ModelNode &node) const {
     return it != _nodeTransforms.end() ? it->second : node.absoluteTransform();
 }
 
-void ModelInstance::initGL() {
-    if (_model) {
-        _model->initGL();
-    }
-    for (auto &pair : _attachedModels) {
-        pair.second->initGL();
-    }
-}
-
 void ModelInstance::render(const glm::mat4 &transform) const {
     if (!_visible) return;
 
-    stack<const ModelNode *> stack;
-    stack.push(&_model->rootNode());
+    stack<const ModelNode *> nodes;
+    nodes.push(&_model->rootNode());
 
-    while (!stack.empty()) {
-        const ModelNode &node = *stack.top();
-        stack.pop();
+    while (!nodes.empty()) {
+        const ModelNode &node = *nodes.top();
+        nodes.pop();
 
         if (shouldRender(node)) {
-            render(node, transform * getNodeTransform(node), false);
+            render(node, transform * getNodeTransform(node));
         }
         for (auto &child : node.children()) {
-            stack.push(&*child);
+            nodes.push(child.get());
         }
     }
 
@@ -300,7 +298,7 @@ void ModelInstance::render(const glm::mat4 &transform) const {
     }
 }
 
-void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bool debug) const {
+void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform) const {
     shared_ptr<ModelMesh> mesh(node.mesh());
     shared_ptr<ModelNode::Skin> skin(node.skin());
     bool skeletal = skin && !_animState.name.empty();
@@ -346,10 +344,6 @@ void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform, bo
     }
 
     mesh->render(_textureOverride);
-
-    if (debug) {
-        AABBMesh::instance().render(mesh->aabb(), transform);
-    }
 }
 
 ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {
@@ -363,7 +357,7 @@ ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skelet
     if (skeletal) {
         if (hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
             program = ShaderProgram::SkeletalDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap && !hasBumpmap) {
+        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap /* && !hasBumpmap */) {
             program = ShaderProgram::SkeletalDiffuseBumpyShiny;
         } else if (hasBumpmap && !hasEnvmap && !hasLightmap && !hasBumpyShiny) {
             program = ShaderProgram::SkeletalDiffuseBumpmap;

@@ -23,12 +23,11 @@
 #include "../gui/types.h"
 #include "../net/types.h"
 #include "../render/camera/camera.h"
-#include "../render/renderlist.h"
+#include "../render/scene/scenegraph.h"
 #include "../render/types.h"
 #include "../resources/types.h"
 #include "../script/variable.h"
 
-#include "multiplayer/command.h"
 #include "navmesh.h"
 #include "object/creature.h"
 #include "object/door.h"
@@ -114,11 +113,6 @@ protected:
     virtual void updateCreature(Creature &creature, float dt);
 
 private:
-    enum class RenderListName {
-        Opaque,
-        Transparent
-    };
-
     enum class ScriptType {
         OnEnter,
         OnExit,
@@ -142,13 +136,13 @@ private:
     std::unique_ptr<resources::Visibility> _visibility;
     render::CameraStyle _cameraStyle;
     std::string _music;
-    std::map<RenderListName, render::RenderList> _renderLists;
     std::unique_ptr<NavMesh> _navMesh;
     DebugMode _debugMode { DebugMode::None };
     std::map<ScriptType, std::string> _scripts;
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
+    render::SceneGraph _sceneGraph;
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
@@ -160,9 +154,7 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    void fillRenderLists(const glm::vec3 &cameraPosition);
-    void addToDebugContext(const render::RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
-    void addToDebugContext(const SpatialObject &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const;
+    void updateSceneGraph(const glm::vec3 &cameraPosition);
     bool findElevationAt(const glm::vec3 &position, float &z) const;
 
     // Loading

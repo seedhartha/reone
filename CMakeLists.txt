@@ -115,7 +115,11 @@ set(HEADERS
     src/render/model.h
     src/render/modelinstance.h
     src/render/modelnode.h
-    src/render/renderlist.h
+    src/render/scene/aabbnode.h
+    src/render/scene/lightnode.h
+    src/render/scene/modelnode.h
+    src/render/scene/scenegraph.h
+    src/render/scene/scenenode.h
     src/render/shaders.h
     src/render/texture.h
     src/render/types.h
@@ -229,7 +233,11 @@ set(SOURCES
     src/render/model.cpp
     src/render/modelinstance.cpp
     src/render/modelnode.cpp
-    src/render/renderlist.cpp
+    src/render/scene/aabbnode.cpp
+    src/render/scene/lightnode.cpp
+    src/render/scene/modelnode.cpp
+    src/render/scene/scenegraph.cpp
+    src/render/scene/scenenode.cpp
     src/render/shaders.cpp
     src/render/texture.cpp
     src/render/walkmesh.cpp

@@ -17,22 +17,36 @@
 
 #pragma once
 
-#include "mesh.h"
+#include <memory>
+#include <vector>
+
+#include "glm/vec3.hpp"
+
+#include "aabbnode.h"
+#include "modelnode.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
+class SceneGraph {
 public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
+    SceneGraph() = default;
+
+    void clear();
+    void add(const std::shared_ptr<ModelSceneNode> &node);
+    void add(const std::shared_ptr<AABBSceneNode> &node);
+    void prepare(const glm::vec3 &cameraPosition);
+    void render() const;
 
 private:
-    AABBMesh();
-};
+    std::vector<std::shared_ptr<ModelSceneNode>> _opaqueModels;
+    std::vector<std::shared_ptr<ModelSceneNode>> _transparentModels;
+    std::vector<std::shared_ptr<AABBSceneNode>> _aabbNodes;
 
-#define TheAABBMesh AABBMesh::instance()
+    SceneGraph(const SceneGraph &) = delete;
+    SceneGraph &operator=(const SceneGraph &) = delete;
+};
 
 } // namespace render
 
