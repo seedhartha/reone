@@ -28,9 +28,10 @@ namespace game {
 class MultiplayerArea : public Area {
 public:
     MultiplayerArea(
-        MultiplayerMode mode,
+        uint32_t id,
         resources::GameVersion version,
-        const std::string &name,
+        MultiplayerMode mode,
+        ObjectFactory *objectFactory,
         IMultiplayerCallbacks *callbacks);
 
     void execute(const Command &cmd);
@@ -40,8 +41,6 @@ public:
 private:
     IMultiplayerCallbacks *_callbacks { nullptr };
 
-    std::shared_ptr<Creature> makeCreature(uint32_t id) override;
-    std::shared_ptr<Door> makeDoor() override;
     void updateCreature(Creature &creature, float dt) override;
 
     void executeLoadCreature(const Command &cmd);

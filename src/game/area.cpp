@@ -17,6 +17,8 @@
 
 #include "area.h"
 
+#include <cassert>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
@@ -33,10 +35,7 @@
 #include "../resources/visfile.h"
 #include "../script/execution.h"
 
-#include "object/door.h"
-#include "object/placeable.h"
-#include "object/trigger.h"
-#include "object/waypoint.h"
+#include "object/factory.h"
 #include "script/routines.h"
 #include "script/util.h"
 
@@ -63,7 +62,13 @@ static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(GameVersion version, const string &name) : _version(version), _name(name), _navMesh(new NavMesh()) {
+Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
+    Object(id), _version(version), _objectFactory(factory), _navMesh(new NavMesh()) {
+
+    assert(_objectFactory);
+
+    _type = ObjectType::Area;
+
     _objects.insert(make_pair(ObjectType::Creature, ObjectList()));
     _objects.insert(make_pair(ObjectType::Door, ObjectList()));
     _objects.insert(make_pair(ObjectType::Placeable, ObjectList()));
@@ -74,7 +79,9 @@ Area::Area(GameVersion version, const string &name) : _version(version), _name(n
     _renderLists.insert(make_pair(RenderListName::Transparent, RenderList()));
 }
 
-void Area::load(const GffStruct &are, const GffStruct &git) {
+void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
+    _name = name;
+
     loadProperties(git.getStruct("AreaProperties"));
     loadVisibility();
     loadLayout();
@@ -82,20 +89,20 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
     loadScripts(are);
 
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(makeCreature());
+        shared_ptr<Creature> creature(_objectFactory->newCreature());
         creature->load(gffs);
         landObject(*creature);
         creature->setSynchronize(true);
         _objects[ObjectType::Creature].push_back(move(creature));
     }
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(makeDoor());
+        shared_ptr<Door> door(_objectFactory->newDoor());
         door->load(gffs);
         door->setSynchronize(true);
         _objects[ObjectType::Door].push_back(move(door));
     }
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(makePlaceable());
+        shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
         placeable->load(gffs);
         if (placeable->walkmesh()) {
             _navMesh->add(placeable->walkmesh(), placeable->transform());
@@ -103,12 +110,12 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
         _objects[ObjectType::Placeable].push_back(move(placeable));
     }
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(makeWaypoint());
+        shared_ptr<Waypoint> waypoint(_objectFactory->newWaypoint());
         waypoint->load(gffs);
         _objects[ObjectType::Waypoint].push_back(move(waypoint));
     }
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(makeTrigger());
+        shared_ptr<Trigger> trigger(_objectFactory->newTrigger());
         trigger->load(gffs);
         _objects[ObjectType::Trigger].push_back(move(trigger));
     }
@@ -118,26 +125,6 @@ void Area::load(const GffStruct &are, const GffStruct &git) {
         _navMesh->compute(cancel);
         debug("Area: nav mesh computed");
     });
-}
-
-shared_ptr<Creature> Area::makeCreature(uint32_t id) {
-    return make_unique<Creature>(id > 0 ? id : _idCounter++);
-}
-
-shared_ptr<Door> Area::makeDoor() {
-    return make_unique<Door>(_idCounter++);
-}
-
-shared_ptr<Placeable> Area::makePlaceable() {
-    return make_unique<Placeable>(_idCounter++);
-}
-
-shared_ptr<Waypoint> Area::makeWaypoint() {
-    return make_unique<Waypoint>(_idCounter++);
-}
-
-shared_ptr<Trigger> Area::makeTrigger() {
-    return make_unique<Trigger>(_idCounter++);
 }
 
 void Area::loadProperties(const GffStruct &gffs) {
@@ -198,7 +185,7 @@ void Area::loadScripts(const GffStruct &are) {
     _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
 }
 
-void Area::landObject(Object &object) {
+void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
     if (findElevationAt(position, position.z)) {
         object.setPosition(position);
@@ -239,7 +226,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
 }
 
 shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
-    shared_ptr<Creature> creature(makeCreature());
+    shared_ptr<Creature> creature(_objectFactory->newCreature());
     creature->setTag(tag);
     creature->load(character);
     creature->setPosition(position);
@@ -341,7 +328,7 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float
     newPosition.x += creature.runSpeed() * dir.x * dt;
     newPosition.y += creature.runSpeed() * dir.y * dt;
 
-    Object *obstacle = nullptr;
+    SpatialObject *obstacle = nullptr;
     glm::vec3 intersection(0.0f);
 
     if (findObstacleByAABB(position, newPosition + 1.0f * dir, kObstacleCreature, &creature, &obstacle)) {
@@ -404,7 +391,7 @@ void Area::signalEvent(int eventId) {
         return;
     }
     if (!_scripts[ScriptType::OnUserDefined].empty()) {
-        runScript(_scripts[ScriptType::OnUserDefined], kObjectArea, kObjectInvalid, it->second.eventNumber);
+        runScript(_scripts[ScriptType::OnUserDefined], _id, kObjectInvalid, it->second.eventNumber);
     }
     _events.erase(it);
 }
@@ -412,7 +399,7 @@ void Area::signalEvent(int eventId) {
 void Area::runOnEnterScript() {
     if (_scriptsEnabled) {
         if (!_scripts[ScriptType::OnEnter].empty()) {
-            runScript(_scripts[ScriptType::OnEnter], kObjectArea, _player->id(), -1);
+            runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
         }
     }
 }
@@ -431,7 +418,7 @@ void Area::addToDebugContext(const RenderListItem &item, const UpdateContext &up
     debugCtx.objects.push_back(move(object));
 }
 
-void Area::addToDebugContext(const Object &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
+void Area::addToDebugContext(const SpatialObject &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
     glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
     glm::vec3 position(object.position());
 
@@ -476,8 +463,8 @@ void Area::loadState(const GameState &state) {
     }
 }
 
-shared_ptr<Object> Area::find(uint32_t id) const {
-    shared_ptr<Object> object;
+shared_ptr<SpatialObject> Area::find(uint32_t id) const {
+    shared_ptr<SpatialObject> object;
     for (auto &list : _objects) {
         object = find(id, list.first);
         if (object) return object;
@@ -486,8 +473,8 @@ shared_ptr<Object> Area::find(uint32_t id) const {
     return nullptr;
 }
 
-shared_ptr<Object> Area::find(const string &tag, int nth) const {
-    shared_ptr<Object> object;
+shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
+    shared_ptr<SpatialObject> object;
     for (auto &list : _objects) {
         object = find(tag, list.first, nth);
         if (object) return object;
@@ -496,18 +483,18 @@ shared_ptr<Object> Area::find(const string &tag, int nth) const {
     return nullptr;
 }
 
-shared_ptr<Object> Area::find(uint32_t id, ObjectType type) const {
+shared_ptr<SpatialObject> Area::find(uint32_t id, ObjectType type) const {
     const ObjectList &list = _objects.find(type)->second;
 
     auto it = find_if(
         list.begin(),
         list.end(),
-        [&id](const shared_ptr<Object> &object) { return object->id() == id; });
+        [&id](const shared_ptr<SpatialObject> &object) { return object->id() == id; });
 
     return it != list.end() ? *it : nullptr;
 }
 
-shared_ptr<Object> Area::find(const string &tag, ObjectType type, int nth) const {
+shared_ptr<SpatialObject> Area::find(const string &tag, ObjectType type, int nth) const {
     const ObjectList &list = _objects.find(type)->second;
     int idx = 0;
 
@@ -518,8 +505,8 @@ shared_ptr<Object> Area::find(const string &tag, ObjectType type, int nth) const
     return nullptr;
 }
 
-bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, Object **obstacle) const {
-    vector<pair<Object *, float>> candidates;
+bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const {
+    vector<pair<SpatialObject *, float>> candidates;
 
     for (auto &list : _objects) {
         if (list.first != ObjectType::Door && list.first != ObjectType::Placeable) continue;
@@ -540,10 +527,10 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
     sort(
         candidates.begin(),
         candidates.end(),
-        [](const pair<Object *, float> &left, const pair<Object *, float> &right) { return left.second < right.second; });
+        [](const pair<SpatialObject *, float> &left, const pair<SpatialObject *, float> &right) { return left.second < right.second; });
 
     for (auto &pair : candidates) {
-        Object &object = *pair.first;
+        SpatialObject &object = *pair.first;
 
         glm::mat4 invObjectTransform(glm::inverse(object.transform()));
         glm::vec3 relFrom(invObjectTransform * glm::vec4(from, 1.0f));
@@ -573,8 +560,8 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
     return false;
 }
 
-bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const Object *except, Object **obstacle) const {
-    vector<pair<Object *, float>> candidates;
+bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const {
+    vector<pair<SpatialObject *, float>> candidates;
 
     for (auto &list : _objects) {
         if (list.first != ObjectType::Creature &&
@@ -600,10 +587,10 @@ bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int ma
     sort(
         candidates.begin(),
         candidates.end(),
-        [](const pair<Object *, float> &left, const pair<Object *, float> &right) { return left.second < right.second; });
+        [](const pair<SpatialObject *, float> &left, const pair<SpatialObject *, float> &right) { return left.second < right.second; });
 
     for (auto &pair : candidates) {
-        Object *object = pair.first;
+        SpatialObject *object = pair.first;
         AABB aabb(object->model()->model()->aabb() * object->transform());
         float distance = 0.0f;
 
@@ -620,7 +607,7 @@ bool Area::findElevationAt(const glm::vec3 &position, float &z) const {
     glm::vec3 from(position + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
     glm::vec3 to(from + glm::vec3(0.0f, 0.0f, -kElevationTestDistance));
     glm::vec3 intersection(0.0f);
-    Object *obstacle = nullptr;
+    SpatialObject *obstacle = nullptr;
 
     if (findObstacleByWalkmesh(from, to, kObstacleDoor | kObstaclePlaceable, intersection, &obstacle)) {
         return false;
@@ -648,19 +635,19 @@ const string &Area::music() const {
     return _music;
 }
 
-shared_ptr<Object> Area::player() const {
+shared_ptr<SpatialObject> Area::player() const {
     return _player;
 }
 
-shared_ptr<Object> Area::partyLeader() const {
+shared_ptr<SpatialObject> Area::partyLeader() const {
     return _partyLeader;
 }
 
-shared_ptr<Object> Area::partyMember1() const {
+shared_ptr<SpatialObject> Area::partyMember1() const {
     return _partyMember1;
 }
 
-shared_ptr<Object> Area::partyMember2() const {
+shared_ptr<SpatialObject> Area::partyMember2() const {
     return _partyMember2;
 }
 

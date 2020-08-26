@@ -32,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-Door::Door(uint32_t id) : Object(id) {
+Door::Door(uint32_t id) : SpatialObject(id) {
     _type = ObjectType::Door;
     _drawDistance = FLT_MAX;
     _fadeDistance = 0.25f * _drawDistance;

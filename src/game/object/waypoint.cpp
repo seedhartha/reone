@@ -19,13 +19,15 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "glm/glm.hpp"
+
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-Waypoint::Waypoint(uint32_t id) : Object(id) {
+Waypoint::Waypoint(uint32_t id) : SpatialObject(id) {
     _type = ObjectType::Waypoint;
 }
 

@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-Trigger::Trigger(uint32_t id) : Object(id) {
+Trigger::Trigger(uint32_t id) : SpatialObject(id) {
     _type = ObjectType::Trigger;
 }
 

@@ -15,31 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
+#include "objectfactory.h"
 
 #include "area.h"
+#include "creature.h"
+#include "door.h"
 
 using namespace std;
 
-using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-MultiplayerModule::MultiplayerModule(
-    const string &name,
-    MultiplayerMode mode,
+MultiplayerObjectFactory::MultiplayerObjectFactory(
     GameVersion version,
-    const GraphicsOptions &opts,
-    IMultiplayerCallbacks *callbacks
+    MultiplayerMode mode,
+    IMultiplayerCallbacks *callbacks,
+    const Options &opts
 ) :
-    Module(name, version, opts), _callbacks(callbacks) {
+    ObjectFactory(version, opts), _mode(mode), _callbacks(callbacks) {
 }
 
-const shared_ptr<Area> MultiplayerModule::makeArea() const {
-    return shared_ptr<Area>(new MultiplayerArea(_mode, _version, _info.entryArea, _callbacks));
+unique_ptr<Area> MultiplayerObjectFactory::newArea() {
+    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _callbacks);
+}
+
+unique_ptr<Creature> MultiplayerObjectFactory::newCreature() {
+    return make_unique<MultiplayerCreature>(_counter++, _callbacks);
+}
+
+unique_ptr<Door> MultiplayerObjectFactory::newDoor() {
+    return make_unique<MultiplayerDoor>(_counter++, _callbacks);
 }
 
 } // namespace game

@@ -60,7 +60,7 @@ Creature::Action::Action(ActionType type, const shared_ptr<Object> &object, floa
 Creature::Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
 }
 
-Creature::Creature(uint32_t id) : Object(id) {
+Creature::Creature(uint32_t id) : SpatialObject(id) {
     _type = ObjectType::Creature;
     _drawDistance = 2048.0f;
     _fadeDistance = 0.25f * _drawDistance;
@@ -229,7 +229,7 @@ void Creature::loadPortrait(int appearance) {
 }
 
 void Creature::initGL() {
-    Object::initGL();
+    SpatialObject::initGL();
 
     if (_portrait) _portrait->initGL();
 }

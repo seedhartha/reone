@@ -31,6 +31,7 @@
 #include "gui/mainmenu.h"
 #include "gui/portraitsel.h"
 
+#include "area.h"
 #include "module.h"
 
 namespace reone {
@@ -64,9 +65,11 @@ public:
 
     // Events
     int eventUserDefined(int eventNumber) override;
-    void signalEvent(int eventId) override;
+    void signalEvent(uint32_t objectId, int eventId) override;
 
     // Objects
+    Module *getModule() override;
+    Area *getArea() override;
     std::shared_ptr<Object> getObjectById(uint32_t id) override;
     std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth) override;
     std::shared_ptr<Object> getWaypointByTag(const std::string &tag) override;
@@ -101,14 +104,15 @@ protected:
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
     Options _opts;
+    std::unique_ptr<ObjectFactory> _objectFactory;
     std::shared_ptr<Module> _module;
     std::string _nextModule;
     Screen _screen { Screen::None };
     std::shared_ptr<DialogGui> _dialogGui;
     bool _pickDialogReplyEnabled { true };
 
+    virtual void initObjectFactory();
     virtual void configure();
-    virtual const std::shared_ptr<Module> makeModule(const std::string &name);
     virtual void configureModule();
     virtual void update();
     virtual void loadNextModule();

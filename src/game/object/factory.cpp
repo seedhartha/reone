@@ -15,43 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "object.h"
+#include "factory.h"
 
 using namespace std;
 
-using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-Object::Object(uint32_t id) : _id(id) {
+ObjectFactory::ObjectFactory(GameVersion version, const Options &opts) :
+    _version(version), _options(opts) {
 }
 
-void Object::update(const UpdateContext &ctx) {
+unique_ptr<Module> ObjectFactory::newModule() {
+    return make_unique<Module>(_counter++, _version, this, _options.graphics);
 }
 
-void Object::saveTo(AreaState &state) const {
+unique_ptr<Area> ObjectFactory::newArea() {
+    return make_unique<Area>(_counter++, _version, this);
 }
 
-void Object::loadState(const AreaState &state) {
+unique_ptr<Creature> ObjectFactory::newCreature() {
+    return make_unique<Creature>(_counter++);
 }
 
-void Object::setSynchronize(bool synchronize) {
-    _synchronize = synchronize;
+unique_ptr<Placeable> ObjectFactory::newPlaceable() {
+    return make_unique<Placeable>(_counter++);
 }
 
-uint32_t Object::id() const {
-    return _id;
+unique_ptr<Door> ObjectFactory::newDoor() {
+    return make_unique<Door>(_counter++);
 }
 
-ObjectType Object::type() const {
-    return _type;
+unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
+    return make_unique<Waypoint>(_counter++);
 }
 
-const string &Object::tag() const {
-    return _tag;
+unique_ptr<Trigger> ObjectFactory::newTrigger() {
+    return make_unique<Trigger>(_counter++);
 }
 
 } // namespace game

@@ -20,7 +20,7 @@
 #include "../../core/log.h"
 
 #include "area.h"
-#include "module.h"
+#include "objectfactory.h"
 #include "util.h"
 
 using namespace std;
@@ -44,6 +44,10 @@ MultiplayerGame::MultiplayerGame(
     Game(version, path, opts), _mode(mode) {
 
     _pickDialogReplyEnabled = _mode == MultiplayerMode::Server;
+}
+
+void MultiplayerGame::initObjectFactory() {
+    _objectFactory = unique_ptr<ObjectFactory>(new MultiplayerObjectFactory(_version, _mode, this, _opts));
 }
 
 void MultiplayerGame::configure() {
@@ -378,10 +382,6 @@ void MultiplayerGame::sendPickDialogReply(uint32_t index) {
 void MultiplayerGame::sendFinishDialog() {
     shared_ptr<net::Command> cmd(makeCommand(CommandType::FinishDialog));
     sendCommand(cmd);
-}
-
-const shared_ptr<Module> MultiplayerGame::makeModule(const string &name) {
-    return shared_ptr<Module>(new MultiplayerModule(name, _mode, _version, _opts.graphics, this));
 }
 
 } // namespace game

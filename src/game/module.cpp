@@ -25,6 +25,7 @@
 #include "../resources/resources.h"
 
 #include "object/door.h"
+#include "object/factory.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -40,18 +41,17 @@ namespace game {
 
 static const float kDefaultFieldOfView = 75.0f;
 
-Module::Module(
-    const string &name,
-    GameVersion version,
-    const GraphicsOptions &opts
-) :
-    _name(name),
-    _version(version),
-    _opts(opts),
-    _cameraAspect(opts.width / static_cast<float>(opts.height)) {
+Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, const GraphicsOptions &opts) :
+    Object(id), _version(version), _objectFactory(objectFactory), _opts(opts) {
+
+    assert(_objectFactory);
+    _type = ObjectType::Module;
+    _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
 
-void Module::load(const GffStruct &ifo) {
+void Module::load(const string &name, const GffStruct &ifo) {
+    _name = name;
+
     loadInfo(ifo);
     loadArea(ifo);
     loadCameras();
@@ -78,7 +78,7 @@ void Module::loadArea(const GffStruct &ifo) {
     shared_ptr<GffStruct> are(resources.findGFF(_info.entryArea, ResourceType::Area));
     shared_ptr<GffStruct> git(resources.findGFF(_info.entryArea, ResourceType::GameInstance));
 
-    shared_ptr<Area> area(makeArea());
+    shared_ptr<Area> area(_objectFactory->newArea());
     area->setOnModuleTransition([this](const string &module, const string &entry) {
         if (_onModuleTransition) {
             _onModuleTransition(module, entry);
@@ -99,12 +99,8 @@ void Module::loadArea(const GffStruct &ifo) {
 
         _startDialog(object, finalResRef);
     });
-    area->load(*are, *git);
+    area->load(_info.entryArea, *are, *git);
     _area = move(area);
-}
-
-const shared_ptr<Area> Module::makeArea() const {
-    return make_shared<Area>(_version, _info.entryArea);
 }
 
 void Module::loadCameras() {
@@ -130,7 +126,7 @@ void Module::loadCameras() {
 }
 
 bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
-    Object *obstacle = nullptr;
+    SpatialObject *obstacle = nullptr;
     if (_area->findObstacleByWalkmesh(from, to, kObstacleRoom | kObstacleDoor, intersection, &obstacle)) {
         return true;
     }
@@ -159,7 +155,7 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
     heading = _info.entryHeading;
 
     if (!waypoint.empty()) {
-        shared_ptr<Object> object(_area->find(waypoint, ObjectType::Waypoint));
+        shared_ptr<SpatialObject> object(_area->find(waypoint, ObjectType::Waypoint));
         if (object) {
             position = object->position();
             heading = object->heading();
@@ -168,14 +164,14 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
 }
 
 void Module::update3rdPersonCameraTarget() {
-    shared_ptr<Object> player(_area->player());
+    shared_ptr<SpatialObject> player(_area->player());
     if (!player) return;
 
     _thirdPersonCamera->setTargetPosition(player->position() + player->model()->getNodeAbsolutePosition("camerahook"));
 }
 
 void Module::update3rdPersonCameraHeading() {
-    shared_ptr<Object> player(_area->player());
+    shared_ptr<SpatialObject> player(_area->player());
     if (!player) return;
 
     _thirdPersonCamera->setHeading(player->heading());
@@ -218,9 +214,9 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     glm::vec3 fromWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 0.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 1.0f), camera->view(), camera->projection(), viewport));
 
-    shared_ptr<Object> player(_area->player());
-    Object *except = player ? player.get() : nullptr;
-    Object *obstacle = nullptr;
+    shared_ptr<SpatialObject> player(_area->player());
+    SpatialObject *except = player ? player.get() : nullptr;
+    SpatialObject *obstacle = nullptr;
 
     if (_area->findObstacleByAABB(fromWorld, toWorld, kObstacleCreature | kObstacleDoor | kObstaclePlaceable, except, &obstacle)) {
         assert(obstacle);

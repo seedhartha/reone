@@ -19,15 +19,15 @@
 
 #include <vector>
 
-#include "object.h"
-
 #include "../item.h"
+
+#include "spatial.h"
 
 namespace reone {
 
 namespace game {
 
-class Placeable : public Object {
+class Placeable : public SpatialObject {
 public:
     Placeable(uint32_t id);
 
