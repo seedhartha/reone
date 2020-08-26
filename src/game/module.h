@@ -26,7 +26,6 @@
 #include "../render/camera/thirdperson.h"
 
 #include "area.h"
-
 #include "script/callbacks.h"
 
 namespace reone {
@@ -38,6 +37,8 @@ struct ModuleInfo {
     glm::vec3 entryPosition { 0.0f };
     float entryHeading { 0.0f };
 };
+
+class ObjectFactory;
 
 class Module : public Object {
 public:

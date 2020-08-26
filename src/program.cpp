@@ -24,6 +24,7 @@
 #include "core/log.h"
 #include "core/pathutil.h"
 #include "game/multiplayer/game.h"
+#include "game/object/factory.h"
 
 using namespace std;
 
