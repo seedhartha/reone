@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <queue>
 
 #include "../../resources/2dafile.h"
