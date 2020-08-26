@@ -253,8 +253,8 @@ void Creature::clearActions() {
     _actions.clear();
 }
 
-void Creature::enqueueAction(const Action &action) {
-    _actions.push_back(action);
+void Creature::enqueueAction(Action action) {
+    _actions.emplace_back(std::move(action));
 }
 
 void Creature::popCurrentAction() {
