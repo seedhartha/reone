@@ -27,6 +27,7 @@
 #include "../../net/server.h"
 
 #include "callbacks.h"
+#include "command.h"
 
 namespace reone {
 

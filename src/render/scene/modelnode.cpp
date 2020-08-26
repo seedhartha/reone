@@ -15,24 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "modelnode.h"
 
-#include "mesh.h"
+using namespace std;
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
-public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
+ModelSceneNode::ModelSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform) :
+    SceneNode(transform), _model(model), _modelNode(modelNode) {
 
-private:
-    AABBMesh();
-};
+    assert(_model && _modelNode);
+    _origin = glm::vec4(_modelNode->mesh()->aabb().center(), 1.0f) * transform;
+}
 
-#define TheAABBMesh AABBMesh::instance()
+bool ModelSceneNode::isTransparent() const {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
+}
+
+const ModelInstance *ModelSceneNode::model() const {
+    return _model;
+}
+
+const ModelNode *ModelSceneNode::modelNode() const {
+    return _modelNode;
+}
+
+const glm::vec3 &ModelSceneNode::origin() const {
+    return _origin;
+}
 
 } // namespace render
 

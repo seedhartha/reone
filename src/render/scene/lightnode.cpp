@@ -15,24 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "mesh.h"
+#include "lightnode.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
-public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
-
-private:
-    AABBMesh();
-};
-
-#define TheAABBMesh AABBMesh::instance()
+LightSceneNode::LightSceneNode(const glm::mat4 &transform) : SceneNode(transform) {
+}
 
 } // namespace render
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../area.h"
+#include "../multiplayer/command.h"
 
 #include "creature.h"
 

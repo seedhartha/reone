@@ -17,22 +17,30 @@
 
 #pragma once
 
-#include "mesh.h"
+#include "../modelinstance.h"
+#include "../modelnode.h"
+
+#include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
+class ModelSceneNode : public SceneNode {
 public:
-    static AABBMesh &instance();
-    void render(const AABB &aabb, const glm::mat4 &transform) const;
+    ModelSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
+
+    bool isTransparent() const;
+
+    const ModelInstance *model() const;
+    const ModelNode *modelNode() const;
+    const glm::vec3 &origin() const;
 
 private:
-    AABBMesh();
+    const ModelInstance *_model { nullptr };
+    const ModelNode *_modelNode { nullptr };
+    glm::vec3 _origin { 0.0f };
 };
-
-#define TheAABBMesh AABBMesh::instance()
 
 } // namespace render
 

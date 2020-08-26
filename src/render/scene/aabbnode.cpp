@@ -15,30 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "renderlist.h"
-
-#include <algorithm>
-
-#include "glm/gtx/norm.hpp"
-
-#include "modelinstance.h"
-
-using namespace std;
+#include "aabbnode.h"
 
 namespace reone {
 
 namespace render {
 
-void RenderList::sortByDistanceToCamera(const glm::vec3 &cameraPosition) {
-    sort(begin(), end(), [&cameraPosition](const RenderListItem &left, const RenderListItem &right) {
-        return glm::distance2(left.origin, cameraPosition) > glm::distance2(right.origin, cameraPosition);
-    });
+AABBSceneNode::AABBSceneNode(const AABB &aabb, const glm::mat4 &transform) : SceneNode(transform), _aabb(aabb) {
 }
 
-void RenderList::render(bool debug) const {
-    for (auto &item : *this) {
-        item.model->render(*item.node, item.transform, debug);
-    }
+const AABB &AABBSceneNode::aabb() const {
+    return _aabb;
 }
 
 } // namespace render

@@ -75,9 +75,6 @@ Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
     _objects.insert(make_pair(ObjectType::Placeable, ObjectList()));
     _objects.insert(make_pair(ObjectType::Waypoint, ObjectList()));
     _objects.insert(make_pair(ObjectType::Trigger, ObjectList()));
-
-    _renderLists.insert(make_pair(RenderListName::Opaque, RenderList()));
-    _renderLists.insert(make_pair(RenderListName::Transparent, RenderList()));
 }
 
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
@@ -202,7 +199,6 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         _player = partyLeader;
         _partyLeader = partyLeader;
     }
-
     if (party.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
@@ -213,7 +209,6 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
         partyMember->enqueueAction(move(action));
     }
-
     if (party.memberCount > 2) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
         landObject(*partyMember);
@@ -246,7 +241,6 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     for (auto &creature : _objects[ObjectType::Creature]) {
         updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
     }
-
     if (_partyLeader) {
         guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyLeader).portrait());
     }
@@ -256,42 +250,36 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     if (_partyMember2) {
         guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember2).portrait());
     }
-
     for (auto &room : _rooms) {
         shared_ptr<ModelInstance> model(room->model());
         if (model) {
             model->update(updateCtx.deltaTime);
         }
     }
-    for (auto &pair : _objects) {
-        for (auto &object : pair.second) {
+    for (auto &list : _objects) {
+        for (auto &object : list.second) {
             object->update(updateCtx);
         }
     }
+    updateSceneGraph(updateCtx.cameraPosition);
 
-    fillRenderLists(updateCtx.cameraPosition);
+    if (_debugMode != DebugMode::None) {
+        guiCtx.debug.objects.clear();
+        glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
-    switch (_debugMode) {
-        case DebugMode::ModelNodes:
-            for (auto &list : _renderLists) {
-                for (auto &item : list.second) {
-                    if (glm::distance2(item.origin, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
+        for (auto &list : _objects) {
+            for (auto &object : list.second) {
+                glm::vec3 position(object->position());
+                if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
 
-                    addToDebugContext(item, updateCtx, guiCtx.debug);
-                }
+                DebugObject debugObj;
+                debugObj.tag = object->tag();
+                debugObj.text = object->tag();
+                debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
+
+                guiCtx.debug.objects.push_back(move(debugObj));
             }
-            break;
-        case DebugMode::GameObjects:
-            for (auto &list : _objects) {
-                for (auto &object : list.second) {
-                    if (glm::distance2(object->position(), updateCtx.cameraPosition) > kDrawDebugDistance) continue;
-
-                    addToDebugContext(*object, updateCtx, guiCtx.debug);
-                }
-            }
-            break;
-        default:
-            break;
+        }
     }
 }
 
@@ -403,32 +391,6 @@ void Area::runOnEnterScript() {
             runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
         }
     }
-}
-
-void Area::addToDebugContext(const RenderListItem &item, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
-    const ModelNode &node = *item.node;
-
-    glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
-    glm::vec3 position(item.transform[3]);
-
-    DebugObject object;
-    object.tag = node.name();
-    object.text = str(boost::format("%s %s") % item.model->name() % node.name());
-    object.screenCoords = glm::project(item.origin, updateCtx.view, updateCtx.projection, viewport);
-
-    debugCtx.objects.push_back(move(object));
-}
-
-void Area::addToDebugContext(const SpatialObject &object, const UpdateContext &updateCtx, DebugContext &debugCtx) const {
-    glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
-    glm::vec3 position(object.position());
-
-    DebugObject debugObj;
-    debugObj.tag = object.tag();
-    debugObj.text = str(boost::format("%s %.2f %.2f %.2f") % object.tag() % position.x % position.y % position.z);
-    debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
-
-    debugCtx.objects.push_back(move(debugObj));
 }
 
 void Area::setDebugMode(DebugMode mode) {
