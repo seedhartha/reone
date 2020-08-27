@@ -72,7 +72,6 @@ void ItemTemplate::load(const string &resRef, const GffStruct &uti) {
     }
 
     _icon = ResMan.findTexture(iconResRef, TextureType::GUI);
-    if (_icon) _icon->initGL();
 }
 
 const string &ItemTemplate::resRef() const {

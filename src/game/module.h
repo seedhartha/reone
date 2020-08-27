@@ -48,13 +48,10 @@ public:
     void load(const std::string &name, const resources::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
 
-    // Rendering
-    void initGL();
-    void render() const;
-
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
     void update3rdPersonCameraHeading();
+    void render() const;
     void saveTo(GameState &state) const;
 
     // Getters

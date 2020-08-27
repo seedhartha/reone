@@ -88,7 +88,6 @@ void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
             int appearanceL = row.getInt("appearance_l");
 
             shared_ptr<Texture> image(ResMan.findTexture(resRef, TextureType::GUI));
-            image->initGL();
 
             Portrait portrait;
             portrait.resRef = move(resRef);

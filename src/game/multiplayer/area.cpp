@@ -88,7 +88,6 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
     creature->setPosition(cmd.position());
     creature->setHeading(cmd.heading());
     creature->setSynchronize(true);
-    creature->initGL();
 
     switch (cmd.role()) {
         case CreatureRole::PartyLeader:

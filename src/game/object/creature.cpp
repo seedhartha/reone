@@ -231,12 +231,6 @@ void Creature::loadPortrait(int appearance) {
     _portrait = ResMan.findTexture(resRef, TextureType::GUI);
 }
 
-void Creature::initGL() {
-    SpatialObject::initGL();
-
-    if (_portrait) _portrait->initGL();
-}
-
 void Creature::playDefaultAnimation() {
     if (_model) _model->playDefaultAnimation();
 }

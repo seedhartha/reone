@@ -57,14 +57,11 @@ public:
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
+    void render() const;
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
     void signalEvent(int eventId);
-
-    // Rendering
-    void initGL();
-    void render() const;
 
     // Load/save
     void saveTo(GameState &state) const;

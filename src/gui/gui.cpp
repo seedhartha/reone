@@ -194,15 +194,6 @@ void GUI::update(float dt) {
     }
 }
 
-void GUI::initGL() {
-    if (_background) _background->initGL();
-    if (_rootControl) _rootControl->initGL();
-
-    for (auto &control : _controls) {
-        control->initGL();
-    }
-}
-
 void GUI::render() const {
     if (_background) drawBackground();
     if (_rootControl) _rootControl->render(_rootOffset);
@@ -215,7 +206,7 @@ void GUI::render() const {
 void GUI::drawBackground() const {
     glm::mat4 transform(glm::scale(glm::mat4(1.0f), glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f)));
 
-    ShaderManager &shaders = ShaderManager::instance();
+    ShaderManager &shaders = ShaderMan;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("model", transform);
     shaders.setUniform("color", glm::vec3(1.0f));

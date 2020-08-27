@@ -30,7 +30,6 @@ public:
     DebugGui(const render::GraphicsOptions &opts);
 
     void load();
-    void initGL() override;
     void update(const DebugContext &ctx);
 
 private:

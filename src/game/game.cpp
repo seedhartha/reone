@@ -76,9 +76,7 @@ int Game::run() {
 
     Cursor cursor;
     cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.pressed->initGL();
     cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::Cursor);
-    cursor.unpressed->initGL();
 
     _renderWindow.setCursor(cursor);
     _renderWindow.show();
@@ -112,7 +110,6 @@ void Game::configure() {
 void Game::loadMainMenu() {
     unique_ptr<MainMenu> mainMenu(new MainMenu(_opts));
     mainMenu->load(_version);
-    mainMenu->initGL();
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
         if (!_classesGui) loadClassSelectionGui();
@@ -155,7 +152,6 @@ void Game::loadMainMenu() {
 void Game::loadClassSelectionGui() {
     unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_objectFactory.get(), _opts.graphics));
     gui->load(_version);
-    gui->initGL();
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();
         if (!_portraitsGui) loadPortraitsGui();
@@ -172,7 +168,6 @@ void Game::loadClassSelectionGui() {
 void Game::loadPortraitsGui() {
     unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_opts.graphics));
     gui->load(_version);
-    gui->initGL();
     gui->setOnPortraitSelected([this](const CreatureConfiguration &character) {
         _portraitsGui->resetFocus();
         string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
@@ -201,7 +196,6 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     _module->load(name, *ifo);
     _module->loadParty(party, entry);
     _module->area().loadState(_state);
-    _module->initGL();
 
     if (_music) _music->stop();
     string musicName(_module->area().music());
@@ -221,21 +215,18 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 void Game::loadHUD() {
     unique_ptr<HUD> hud(new HUD(_opts.graphics));
     hud->load(_version);
-    hud->initGL();
     _hud = move(hud);
 }
 
 void Game::loadDebugGui() {
     unique_ptr<DebugGui> debug(new DebugGui(_opts.graphics));
     debug->load();
-    debug->initGL();
     _debugGui = move(debug);
 }
 
 void Game::loadDialogGui() {
     unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
     dialog->load(_version);
-    dialog->initGL();
     dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
         shared_ptr<Object> object(_module->area().find(tag));
@@ -250,7 +241,6 @@ void Game::loadDialogGui() {
 void Game::loadContainerGui() {
     unique_ptr<ContainerGui> container(new ContainerGui(_opts.graphics));
     container->load(_version);
-    container->initGL();
     container->setOnCancel([this]() {
         _screen = Screen::InGame;
     });

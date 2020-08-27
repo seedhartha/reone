@@ -406,10 +406,6 @@ void Module::saveTo(GameState &state) const {
     _area->saveTo(state);
 }
 
-void Module::initGL() {
-    _area->initGL();
-}
-
 void Module::render() const {
     _area->render();
 }

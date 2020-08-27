@@ -43,7 +43,6 @@ class ModelMesh : public Mesh {
 public:
     ModelMesh(bool render);
 
-    void initGL();
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
 
     bool shouldRender() const;

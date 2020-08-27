@@ -41,7 +41,6 @@ public:
     ModelInstance(const std::shared_ptr<Model> &model);
 
     // Rendering
-    void initGL();
     void fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug);
     void render(const glm::mat4 &transform) const;
     void render(const ModelNode &node, const glm::mat4 &transform) const;

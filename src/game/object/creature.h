@@ -92,8 +92,6 @@ public:
     void load(const resources::GffStruct &gffs);
     void load(const CreatureConfiguration &config);
 
-    void initGL() override;
-
     void equip(const std::string &resRef);
     void runSpawnScript();
 

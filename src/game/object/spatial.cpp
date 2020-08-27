@@ -70,12 +70,6 @@ void SpatialObject::update(const UpdateContext &ctx) {
     _model->update(ctx.deltaTime);
 }
 
-void SpatialObject::initGL() {
-    if (!_model) return;
-
-    _model->initGL();
-}
-
 void SpatialObject::animate(const string &anim, int flags, float speed) {
     if (!_model) return;
 
