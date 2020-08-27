@@ -69,12 +69,6 @@ Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
     _navMesh(new NavMesh()) {
 
     assert(_objectFactory);
-
-    _objects.insert(make_pair(ObjectType::Creature, ObjectList()));
-    _objects.insert(make_pair(ObjectType::Door, ObjectList()));
-    _objects.insert(make_pair(ObjectType::Placeable, ObjectList()));
-    _objects.insert(make_pair(ObjectType::Waypoint, ObjectList()));
-    _objects.insert(make_pair(ObjectType::Trigger, ObjectList()));
 }
 
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
@@ -91,13 +85,13 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
         creature->load(gffs);
         landObject(*creature);
         creature->setSynchronize(true);
-        _objects[ObjectType::Creature].push_back(move(creature));
+        add(creature);
     }
     for (auto &gffs : git.getList("Door List")) {
         shared_ptr<Door> door(_objectFactory->newDoor());
         door->load(gffs);
         door->setSynchronize(true);
-        _objects[ObjectType::Door].push_back(move(door));
+        add(door);
     }
     for (auto &gffs : git.getList("Placeable List")) {
         shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
@@ -105,17 +99,17 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
         if (placeable->walkmesh()) {
             _navMesh->add(placeable->walkmesh(), placeable->transform());
         }
-        _objects[ObjectType::Placeable].push_back(move(placeable));
+        add(placeable);
     }
     for (auto &gffs : git.getList("WaypointList")) {
         shared_ptr<Waypoint> waypoint(_objectFactory->newWaypoint());
         waypoint->load(gffs);
-        _objects[ObjectType::Waypoint].push_back(move(waypoint));
+        add(waypoint);
     }
     for (auto &gffs : git.getList("TriggerList")) {
         shared_ptr<Trigger> trigger(_objectFactory->newTrigger());
         trigger->load(gffs);
-        _objects[ObjectType::Trigger].push_back(move(trigger));
+        add(trigger);
     }
 
     TheJobExecutor.enqueue([this](const atomic_bool &cancel) {
@@ -126,7 +120,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 }
 
 void Area::loadProperties(const GffStruct &gffs) {
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = ResMan;
     shared_ptr<TwoDaTable> musicTable(resources.find2DA("ambientmusic"));
 
     int musicIdx = gffs.getInt("MusicDay");
@@ -136,7 +130,7 @@ void Area::loadProperties(const GffStruct &gffs) {
 }
 
 void Area::loadLayout() {
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = ResMan;
 
     LytFile lyt;
     lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
@@ -156,19 +150,15 @@ void Area::loadLayout() {
 }
 
 void Area::loadVisibility() {
-    ResourceManager &resources = ResourceManager::instance();
-
     VisFile vis;
-    vis.load(wrap(resources.find(_name, ResourceType::Vis)));
+    vis.load(wrap(ResMan.find(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
-
-    ResourceManager &resources = ResourceManager::instance();
-    shared_ptr<TwoDaTable> styleTable(resources.find2DA("camerastyle"));
+    shared_ptr<TwoDaTable> styleTable(ResMan.find2DA("camerastyle"));
 
     _cameraStyle.distance = styleTable->getFloat(styleIdx, "distance", 0.0f);
     _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);
@@ -193,9 +183,9 @@ void Area::landObject(SpatialObject &object) {
 void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading) {
     if (party.memberCount > 0) {
         shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
-        _objects[ObjectType::Creature].push_back(partyLeader);
         landObject(*partyLeader);
         partyLeader->setSynchronize(true);
+        add(partyLeader);
         _player = partyLeader;
         _partyLeader = partyLeader;
     }
@@ -203,7 +193,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
         partyMember->setSynchronize(true);
-        _objects[ObjectType::Creature].push_back(partyMember);
+        add(partyMember);
         _partyMember1 = partyMember;
 
         Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
@@ -213,7 +203,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
         landObject(*partyMember);
         partyMember->setSynchronize(true);
-        _objects[ObjectType::Creature].push_back(partyMember);
+        add(partyMember);
         _partyMember2 = partyMember;
 
         Creature::Action action(Creature::ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
@@ -238,7 +228,7 @@ bool Area::handle(const SDL_Event &event) {
 void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     updateDelayedCommands();
 
-    for (auto &creature : _objects[ObjectType::Creature]) {
+    for (auto &creature : _objectsByType[ObjectType::Creature]) {
         updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
     }
     if (_partyLeader) {
@@ -256,29 +246,25 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
             model->update(updateCtx.deltaTime);
         }
     }
-    for (auto &list : _objects) {
-        for (auto &object : list.second) {
-            object->update(updateCtx);
-        }
+    for (auto &object : _objects) {
+        object->update(updateCtx);
     }
     updateSceneGraph(updateCtx.cameraPosition);
 
-    if (_debugMode != DebugMode::None) {
+    if (_debugMode == DebugMode::GameObjects) {
         guiCtx.debug.objects.clear();
         glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
-        for (auto &list : _objects) {
-            for (auto &object : list.second) {
-                glm::vec3 position(object->position());
-                if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
+        for (auto &object : _objects) {
+            glm::vec3 position(object->position());
+            if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
 
-                DebugObject debugObj;
-                debugObj.tag = object->tag();
-                debugObj.text = object->tag();
-                debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
+            DebugObject debugObj;
+            debugObj.tag = object->tag();
+            debugObj.text = object->tag();
+            debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
 
-                guiCtx.debug.objects.push_back(move(debugObj));
-            }
+            guiCtx.debug.objects.push_back(move(debugObj));
         }
     }
 }
@@ -339,7 +325,7 @@ void Area::updateTriggers(const Creature &creature) {
     glm::vec2 intersection;
     float distance;
 
-    for (auto &object : _objects[ObjectType::Trigger]) {
+    for (auto &object : _objectsByType[ObjectType::Trigger]) {
         Trigger &trigger = static_cast<Trigger &>(*object);
         if (trigger.distanceTo(liftedPosition) > kMaxDistanceToTestCollision) continue;
 
@@ -400,7 +386,7 @@ void Area::setDebugMode(DebugMode mode) {
 void Area::saveTo(GameState &state) const {
     AreaState areaState;
 
-    for (auto &list : _objects) {
+    for (auto &list : _objectsByType) {
         if (list.first != ObjectType::Creature && list.first != ObjectType::Door) continue;
 
         for (auto &object : list.second) {
@@ -417,7 +403,7 @@ void Area::loadState(const GameState &state) {
 
     const AreaState &areaState = it->second;
 
-    for (auto &list : _objects) {
+    for (auto &list : _objectsByType) {
         if (list.first != ObjectType::Creature && list.first != ObjectType::Door) continue;
 
         for (auto &object : list.second) {
@@ -426,52 +412,10 @@ void Area::loadState(const GameState &state) {
     }
 }
 
-shared_ptr<SpatialObject> Area::find(uint32_t id) const {
-    shared_ptr<SpatialObject> object;
-    for (auto &list : _objects) {
-        object = find(id, list.first);
-        if (object) return object;
-    }
-
-    return nullptr;
-}
-
-shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
-    shared_ptr<SpatialObject> object;
-    for (auto &list : _objects) {
-        object = find(tag, list.first, nth);
-        if (object) return object;
-    }
-
-    return nullptr;
-}
-
-shared_ptr<SpatialObject> Area::find(uint32_t id, ObjectType type) const {
-    const ObjectList &list = _objects.find(type)->second;
-
-    auto it = find_if(
-        list.begin(),
-        list.end(),
-        [&id](const shared_ptr<SpatialObject> &object) { return object->id() == id; });
-
-    return it != list.end() ? *it : nullptr;
-}
-
-shared_ptr<SpatialObject> Area::find(const string &tag, ObjectType type, int nth) const {
-    const ObjectList &list = _objects.find(type)->second;
-    int idx = 0;
-
-    for (auto &object : list) {
-        if (object->tag() == tag && idx++ == nth) return object;
-    }
-
-    return nullptr;
-}
-
 bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const {
     vector<pair<SpatialObject *, float>> candidates;
 
-    for (auto &list : _objects) {
+    for (auto &list : _objectsByType) {
         if (list.first != ObjectType::Door && list.first != ObjectType::Placeable) continue;
         if (list.first == ObjectType::Door && (mask & kObstacleDoor) == 0) continue;
         if (list.first == ObjectType::Placeable && (mask & kObstaclePlaceable) == 0) continue;
@@ -526,7 +470,7 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
 bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const {
     vector<pair<SpatialObject *, float>> candidates;
 
-    for (auto &list : _objects) {
+    for (auto &list : _objectsByType) {
         if (list.first != ObjectType::Creature &&
             list.first != ObjectType::Door &&
             list.first != ObjectType::Placeable) continue;

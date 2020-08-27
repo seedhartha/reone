@@ -238,7 +238,7 @@ void Game::loadDialogGui() {
     dialog->initGL();
     dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
-        shared_ptr<Object> object(_module->area().find(tag, ObjectType::Creature));
+        shared_ptr<Object> object(_module->area().find(tag));
         return object ? object->id() : 0;
     });
     dialog->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
@@ -263,8 +263,8 @@ void Game::onDialogReplyPicked(uint32_t index) {
 void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
     shared_ptr<SpatialObject> player(_module->area().player());
     shared_ptr<SpatialObject> partyLeader(_module->area().partyLeader());
-    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area().find(from, ObjectType::Creature) : nullptr;
-    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area().find(to, ObjectType::Creature) : nullptr;
+    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area().find(from) : nullptr;
+    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area().find(to) : nullptr;
     if (speaker == partyLeader) return;
 
     debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
@@ -510,7 +510,7 @@ shared_ptr<Object> Game::getObjectByTag(const string &tag, int nth) {
 }
 
 shared_ptr<Object> Game::getWaypointByTag(const string &tag) {
-    return _module->area().find(tag, ObjectType::Waypoint);
+    return _module->area().find(tag);
 }
 
 shared_ptr<Object> Game::getPlayer() {

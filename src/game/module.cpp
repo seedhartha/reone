@@ -157,7 +157,7 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
     heading = _info.entryHeading;
 
     if (!waypoint.empty()) {
-        shared_ptr<SpatialObject> object(_area->find(waypoint, ObjectType::Waypoint));
+        shared_ptr<SpatialObject> object(_area->find(waypoint));
         if (object) {
             position = object->position();
             heading = object->heading();
