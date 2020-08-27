@@ -18,7 +18,6 @@
 #pragma once
 
 #include <list>
-#include <map>
 
 #include "../gui/types.h"
 #include "../net/types.h"
@@ -34,6 +33,7 @@
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
+#include "objectcontainer.h"
 #include "room.h"
 #include "types.h"
 
@@ -45,7 +45,7 @@ typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
 class ObjectFactory;
 
-class Area : public Object {
+class Area : public Object, public ObjectContainer {
 public:
     Area(uint32_t id, resources::GameVersion version, ObjectFactory *objectFactory);
 
@@ -71,10 +71,6 @@ public:
     void loadState(const GameState &state);
 
     // Object search
-    std::shared_ptr<SpatialObject> find(uint32_t id) const;
-    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
-    std::shared_ptr<SpatialObject> find(uint32_t id, ObjectType type) const;
-    std::shared_ptr<SpatialObject> find(const std::string &tag, ObjectType type, int nth = 0) const;
     bool findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const;
     bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const;
 
@@ -98,7 +94,6 @@ public:
 
 protected:
     ObjectFactory *_objectFactory { nullptr };
-    std::map<ObjectType, ObjectList> _objects;
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
 

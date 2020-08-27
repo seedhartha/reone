@@ -79,6 +79,7 @@ set(HEADERS
     src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/waypoint.h
+    src/game/objectcontainer.h
     src/game/room.h
     src/game/script/callbacks.h
     src/game/script/routines.h
@@ -197,6 +198,7 @@ set(SOURCES
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
+    src/game/objectcontainer.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp

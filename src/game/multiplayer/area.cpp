@@ -105,7 +105,7 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
     }
 
     landObject(*creature);
-    _objects[ObjectType::Creature].push_back(move(creature));
+    add(creature);
 }
 
 void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
@@ -128,7 +128,7 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
-    shared_ptr<SpatialObject> object(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> object(find(cmd.objectId()));
     if (object) {
         object->setSynchronize(false);
         object->setPosition(cmd.position());
@@ -138,7 +138,7 @@ void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
-    shared_ptr<SpatialObject> object(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> object(find(cmd.objectId()));
     if (object) {
         object->setSynchronize(false);
         object->animate(cmd.animation(), cmd.animationFlags());
@@ -147,7 +147,7 @@ void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
-    shared_ptr<SpatialObject> creature(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> creature(find(cmd.objectId()));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
@@ -156,7 +156,7 @@ void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetCreatureTalking(const Command &cmd) {
-    shared_ptr<SpatialObject> creature(find(cmd.objectId(), ObjectType::Creature));
+    shared_ptr<SpatialObject> creature(find(cmd.objectId()));
     if (creature) {
         creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setTalking(cmd.talking());
@@ -165,7 +165,7 @@ void MultiplayerArea::executeSetCreatureTalking(const Command &cmd) {
 }
 
 void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
-    shared_ptr<Object> door(find(cmd.objectId(), ObjectType::Door));
+    shared_ptr<Object> door(find(cmd.objectId()));
     shared_ptr<Object> trigerrer(find(cmd.triggerrer()));
     if (door) {
         door->setSynchronize(false);
@@ -175,7 +175,7 @@ void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
 }
 
 const shared_ptr<Object> MultiplayerArea::findCreatureByClientTag(const string &clientTag) const {
-    auto creatures = _objects.find(ObjectType::Creature)->second;
+    auto creatures = _objectsByType.find(ObjectType::Creature)->second;
     auto it = find_if(
         creatures.begin(),
         creatures.end(),

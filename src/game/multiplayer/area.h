@@ -18,8 +18,8 @@
 #pragma once
 
 #include "../area.h"
-#include "../multiplayer/command.h"
 
+#include "command.h"
 #include "creature.h"
 
 namespace reone {

@@ -35,10 +35,8 @@ void Area::initGL() {
         shared_ptr<ModelInstance> model(room->model());
         if (model) model->initGL();
     }
-    for (auto &pair : _objects) {
-        for (auto &object : pair.second) {
-            object->initGL();
-        }
+    for (auto &object : _objects) {
+        object->initGL();
     }
 }
 
@@ -52,17 +50,15 @@ void Area::updateSceneGraph(const glm::vec3 &cameraPosition) {
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), room->position()));
         model->fill(_sceneGraph, transform, _debugMode == DebugMode::ModelNodes);
     }
-    for (auto &list : _objects) {
-        for (auto &object : list.second) {
-            shared_ptr<ModelInstance> model(object->model());
-            if (!model) continue;
+    for (auto &object : _objects) {
+        shared_ptr<ModelInstance> model(object->model());
+        if (!model) continue;
 
-            model->fill(_sceneGraph, object->transform(), _debugMode == DebugMode::ModelNodes);
-        }
+        model->fill(_sceneGraph, object->transform(), _debugMode == DebugMode::ModelNodes);
     }
     switch (_debugMode) {
         case DebugMode::GameObjects:
-            for (auto &list : _objects) {
+            for (auto &list : _objectsByType) {
                 ObjectType type = list.first;
                 if (type != ObjectType::Creature && type != ObjectType::Placeable && type != ObjectType::Door) continue;
 
