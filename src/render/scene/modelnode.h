@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "../model/modelnode.h"
 #include "../modelinstance.h"
-#include "../modelnode.h"
 
 #include "scenenode.h"
 

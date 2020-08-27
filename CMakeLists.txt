@@ -104,7 +104,6 @@ set(HEADERS
     src/net/types.h
     src/program.h
     src/render/aabb.h
-    src/render/animation.h
     src/render/camera/camera.h
     src/render/camera/firstperson.h
     src/render/camera/thirdperson.h
@@ -113,9 +112,10 @@ set(HEADERS
     src/render/mesh/guiquad.h
     src/render/mesh/mesh.h
     src/render/mesh/modelmesh.h
-    src/render/model.h
+    src/render/model/model.h
+    src/render/model/animation.h
+    src/render/model/modelnode.h
     src/render/modelinstance.h
-    src/render/modelnode.h
     src/render/scene/aabbnode.h
     src/render/scene/lightnode.h
     src/render/scene/modelnode.h
@@ -223,7 +223,6 @@ set(SOURCES
     src/net/server.cpp
     src/program.cpp
     src/render/aabb.cpp
-    src/render/animation.cpp
     src/render/camera/camera.cpp
     src/render/camera/firstperson.cpp
     src/render/camera/thirdperson.cpp
@@ -232,9 +231,10 @@ set(SOURCES
     src/render/mesh/guiquad.cpp
     src/render/mesh/mesh.cpp
     src/render/mesh/modelmesh.cpp
-    src/render/model.cpp
+    src/render/model/model.cpp
+    src/render/model/animation.cpp
+    src/render/model/modelnode.cpp
     src/render/modelinstance.cpp
-    src/render/modelnode.cpp
     src/render/scene/aabbnode.cpp
     src/render/scene/lightnode.cpp
     src/render/scene/modelnode.cpp

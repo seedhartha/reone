@@ -20,7 +20,7 @@
 #include <set>
 
 #include "aabb.h"
-#include "model.h"
+#include "model/model.h"
 #include "shaders.h"
 
 namespace reone {

@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "aabb.h"
+#include "../aabb.h"
+
 #include "animation.h"
 
 namespace reone {
