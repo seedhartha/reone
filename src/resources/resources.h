@@ -26,7 +26,7 @@
 
 #include "../audio/stream.h"
 #include "../render/font.h"
-#include "../render/model.h"
+#include "../render/model/model.h"
 #include "../render/walkmesh.h"
 #include "../script/program.h"
 

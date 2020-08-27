@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../render/model.h"
+#include "../render/model/model.h"
 
 #include "binfile.h"
 #include "types.h"
