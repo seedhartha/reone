@@ -27,7 +27,6 @@ class ImageButton : public Control {
 public:
     ImageButton();
 
-    void initGL() override;
     void render(const glm::ivec2 &offset, const std::string &textOverride, const std::shared_ptr<render::Texture> &icon) const;
 
     void setIconFrame(const std::shared_ptr<render::Texture> &texture);

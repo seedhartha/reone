@@ -30,18 +30,6 @@ namespace render {
 ModelMesh::ModelMesh(bool render) : _render(render) {
 }
 
-void ModelMesh::initGL() {
-    if (_glInited) return;
-
-    Mesh::initGL();
-
-    if (_diffuse) _diffuse->initGL();
-    if (_lightmap) _lightmap->initGL();
-    if (_envmap) _envmap->initGL();
-    if (_bumpyShiny) _bumpyShiny->initGL();
-    if (_bumpmap) _bumpmap->initGL();
-}
-
 void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     const shared_ptr<Texture> &diffuse = diffuseOverride ? diffuseOverride : _diffuse;
     bool additive = false;

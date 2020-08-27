@@ -371,6 +371,7 @@ shared_ptr<Model> ResourceManager::findModel(const string &resRef) {
         MdlFile mdl(_version);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
+        model->initGL();
     }
 
     auto pair = g_modelCache.insert(make_pair(resRef, model));
@@ -439,6 +440,7 @@ shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureTy
             texture = tga.texture();
         }
     }
+    if (texture) texture->initGL();
 
     auto pair = g_texCache.insert(make_pair(resRef, texture));
 
@@ -460,6 +462,7 @@ shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
     if (texture) {
         font = make_shared<Font>();
         font->load(texture);
+        font->initGL();
     }
 
     auto pair = g_fontCache.insert(make_pair(finalResRef, font));

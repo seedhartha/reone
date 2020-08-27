@@ -32,10 +32,6 @@ namespace gui {
 ImageButton::ImageButton() : Control(ControlType::ImageButton) {
 }
 
-void ImageButton::initGL() {
-    if (_iconFrame) _iconFrame->initGL();
-}
-
 void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, const shared_ptr<Texture> &icon) const {
     if (!_visible) return;
 

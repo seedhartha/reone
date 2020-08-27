@@ -121,13 +121,6 @@ bool ListBox::handleClick(int x, int y) {
     return false;
 }
 
-void ListBox::initGL() {
-    Control::initGL();
-
-    if (_protoItem) _protoItem->initGL();
-    if (_scrollBar) _scrollBar->initGL();
-}
-
 void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 

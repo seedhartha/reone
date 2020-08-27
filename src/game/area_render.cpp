@@ -30,16 +30,6 @@ namespace reone {
 
 namespace game {
 
-void Area::initGL() {
-    for (auto &room : _rooms) {
-        shared_ptr<ModelInstance> model(room->model());
-        if (model) model->initGL();
-    }
-    for (auto &object : _objects) {
-        object->initGL();
-    }
-}
-
 void Area::updateSceneGraph(const glm::vec3 &cameraPosition) {
     _sceneGraph.clear();
 

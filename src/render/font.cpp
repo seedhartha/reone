@@ -105,8 +105,6 @@ void Font::initGL() {
     glBindVertexArray(0);
 
     _glInited = true;
-
-    if (_texture) _texture->initGL();
 }
 
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {

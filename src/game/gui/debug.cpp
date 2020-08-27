@@ -42,11 +42,6 @@ void DebugGui::load() {
     assert(_font);
 }
 
-void DebugGui::initGL() {
-    GUI::initGL();
-    _font->initGL();
-}
-
 void DebugGui::update(const DebugContext &ctx) {
     _controls.clear();
 

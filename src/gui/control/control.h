@@ -87,7 +87,6 @@ public:
     virtual bool handleClick(int x, int y);
 
     // Rendering
-    virtual void initGL();
     virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
     virtual void render3D(const glm::ivec2 &offset) const;
 

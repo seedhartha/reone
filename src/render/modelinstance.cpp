@@ -87,9 +87,7 @@ void ModelInstance::attach(const string &parentNode, const shared_ptr<Model> &mo
 }
 
 void ModelInstance::changeTexture(const string &resRef) {
-    ResourceManager &resources = ResourceManager::instance();
-    _textureOverride = resources.findTexture(resRef, TextureType::Diffuse);
-    if (_textureOverride) _textureOverride->initGL();
+    _textureOverride = ResMan.findTexture(resRef, TextureType::Diffuse);
 }
 
 void ModelInstance::update(float dt) {
@@ -210,15 +208,6 @@ void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &
 
     for (auto &child : node.children()) {
         updateNodeTansforms(*child, finalTransform);
-    }
-}
-
-void ModelInstance::initGL() {
-    if (_model) {
-        _model->initGL();
-    }
-    for (auto &pair : _attachedModels) {
-        pair.second->initGL();
     }
 }
 

@@ -207,21 +207,6 @@ void Control::update(float dt) {
     }
 }
 
-void Control::initGL() {
-    if (_border) {
-        if (_border->corner) _border->corner->initGL();
-        if (_border->edge) _border->edge->initGL();
-        if (_border->fill) _border->fill->initGL();
-    }
-    if (_hilight) {
-        if (_hilight->corner) _hilight->corner->initGL();
-        if (_hilight->edge) _hilight->edge->initGL();
-        if (_hilight->fill) _hilight->fill->initGL();
-    }
-    if (_text.font) _text.font->initGL();
-    if (_scene3d.model) _scene3d.model->initGL();
-}
-
 void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
