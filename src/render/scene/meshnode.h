@@ -26,9 +26,9 @@ namespace reone {
 
 namespace render {
 
-class ModelSceneNode : public SceneNode {
+class MeshSceneNode : public SceneNode {
 public:
-    ModelSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
+    MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
 
     bool isTransparent() const;
 

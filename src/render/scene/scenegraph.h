@@ -23,7 +23,7 @@
 #include "glm/vec3.hpp"
 
 #include "aabbnode.h"
-#include "modelnode.h"
+#include "meshnode.h"
 
 namespace reone {
 
@@ -34,14 +34,14 @@ public:
     SceneGraph() = default;
 
     void clear();
-    void add(const std::shared_ptr<ModelSceneNode> &node);
+    void add(const std::shared_ptr<MeshSceneNode> &node);
     void add(const std::shared_ptr<AABBSceneNode> &node);
     void prepare(const glm::vec3 &cameraPosition);
     void render() const;
 
 private:
-    std::vector<std::shared_ptr<ModelSceneNode>> _opaqueModels;
-    std::vector<std::shared_ptr<ModelSceneNode>> _transparentModels;
+    std::vector<std::shared_ptr<MeshSceneNode>> _opaqueMeshes;
+    std::vector<std::shared_ptr<MeshSceneNode>> _transparentMeshes;
     std::vector<std::shared_ptr<AABBSceneNode>> _aabbNodes;
 
     SceneGraph(const SceneGraph &) = delete;

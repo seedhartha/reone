@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "modelnode.h"
+#include "meshnode.h"
 
 using namespace std;
 
@@ -23,27 +23,27 @@ namespace reone {
 
 namespace render {
 
-ModelSceneNode::ModelSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform) :
+MeshSceneNode::MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform) :
     SceneNode(transform), _model(model), _modelNode(modelNode) {
 
     assert(_model && _modelNode);
     _origin = glm::vec4(_modelNode->mesh()->aabb().center(), 1.0f) * transform;
 }
 
-bool ModelSceneNode::isTransparent() const {
+bool MeshSceneNode::isTransparent() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
 }
 
-const ModelInstance *ModelSceneNode::model() const {
+const ModelInstance *MeshSceneNode::model() const {
     return _model;
 }
 
-const ModelNode *ModelSceneNode::modelNode() const {
+const ModelNode *MeshSceneNode::modelNode() const {
     return _modelNode;
 }
 
-const glm::vec3 &ModelSceneNode::origin() const {
+const glm::vec3 &MeshSceneNode::origin() const {
     return _origin;
 }
 

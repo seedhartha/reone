@@ -30,16 +30,16 @@ namespace reone {
 namespace render {
 
 void SceneGraph::clear() {
-    _opaqueModels.clear();
-    _transparentModels.clear();
+    _opaqueMeshes.clear();
+    _transparentMeshes.clear();
     _aabbNodes.clear();
 }
 
-void SceneGraph::add(const shared_ptr<ModelSceneNode> &node) {
+void SceneGraph::add(const shared_ptr<MeshSceneNode> &node) {
     if (node->isTransparent()) {
-        _transparentModels.push_back(node);
+        _transparentMeshes.push_back(node);
     } else {
-        _opaqueModels.push_back(node);
+        _opaqueMeshes.push_back(node);
     }
 }
 
@@ -48,19 +48,19 @@ void SceneGraph::add(const shared_ptr<AABBSceneNode> &node) {
 }
 
 void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
-    for (auto &node : _transparentModels) {
+    for (auto &node : _transparentMeshes) {
         node->setDistanceToCamera(glm::distance2(node->origin(), cameraPosition));
     }
-    std::sort(_transparentModels.begin(), _transparentModels.end(), [](const shared_ptr<ModelSceneNode> &left, const shared_ptr<ModelSceneNode> &right) {
+    std::sort(_transparentMeshes.begin(), _transparentMeshes.end(), [](const shared_ptr<MeshSceneNode> &left, const shared_ptr<MeshSceneNode> &right) {
         return left->distanceToCamera() > right->distanceToCamera();
     });
 }
 
 void SceneGraph::render() const {
-    for (auto &node : _opaqueModels) {
+    for (auto &node : _opaqueMeshes) {
         node->model()->render(*node->modelNode(), node->transform());
     }
-    for (auto &node : _transparentModels) {
+    for (auto &node : _transparentMeshes) {
         node->model()->render(*node->modelNode(), node->transform());
     }
     AABBMesh &aabb = TheAABBMesh;

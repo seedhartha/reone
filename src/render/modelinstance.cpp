@@ -26,7 +26,7 @@
 #include "../resources/resources.h"
 
 #include "mesh/aabb.h"
-#include "scene/modelnode.h"
+#include "scene/meshnode.h"
 #include "scene/scenegraph.h"
 
 #include "modelinstance.h"
@@ -224,7 +224,7 @@ void ModelInstance::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool
         if (shouldRender(node)) {
             glm::mat4 transform(baseTransform * getNodeTransform(node));
 
-            shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(this, &node, transform));
+            shared_ptr<MeshSceneNode> sceneNode(new MeshSceneNode(this, &node, transform));
             scene.add(sceneNode);
 
             if (debug) {
