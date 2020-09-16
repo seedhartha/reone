@@ -17,30 +17,25 @@
 
 #pragma once
 
-#include "../model/modelnode.h"
-
-#include "scenenode.h"
+#include <cstdint>
 
 namespace reone {
 
 namespace render {
 
-class ModelInstance;
-
-class MeshSceneNode : public SceneNode {
+class FpsCounter {
 public:
-    MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
+    void reset();
+    void update(float dt);
 
-    bool isTransparent() const;
-
-    const ModelInstance *model() const;
-    const ModelNode *modelNode() const;
-    const glm::vec3 &origin() const;
+    bool hasAverage() const;
+    float getAverage() const;
 
 private:
-    const ModelInstance *_model { nullptr };
-    const ModelNode *_modelNode { nullptr };
-    glm::vec3 _origin { 0.0f };
+    uint32_t _startTicks { 0 };
+    int _frameCount { 0 };
+    bool _hasAverage { false };
+    float _average { 0.0f };
 };
 
 } // namespace render

@@ -323,6 +323,7 @@ void Game::update() {
         loadNextModule();
     }
     float dt = getDeltaTime();
+    _renderWindow.update(dt);
 
     shared_ptr<GUI> gui(currentGUI());
     if (gui) gui->update(dt);

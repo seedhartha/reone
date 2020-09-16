@@ -15,33 +15,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "fps.h"
 
-#include "../model/modelnode.h"
-
-#include "scenenode.h"
+#include "SDL2/SDL.h"
 
 namespace reone {
 
 namespace render {
 
-class ModelInstance;
+static const int kMeasurePeriodMillis = 500;
 
-class MeshSceneNode : public SceneNode {
-public:
-    MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
+void FpsCounter::reset() {
+    _startTicks = SDL_GetTicks();
+    _frameCount = 0;
+    _hasAverage = false;
+}
 
-    bool isTransparent() const;
+void FpsCounter::update(float dt) {
+    ++_frameCount;
 
-    const ModelInstance *model() const;
-    const ModelNode *modelNode() const;
-    const glm::vec3 &origin() const;
+    uint32_t ticks = SDL_GetTicks();
+    if (_startTicks == 0) {
+        _startTicks = ticks;
+        return;
+    }
 
-private:
-    const ModelInstance *_model { nullptr };
-    const ModelNode *_modelNode { nullptr };
-    glm::vec3 _origin { 0.0f };
-};
+    uint32_t delta = ticks - _startTicks;
+    if (delta > kMeasurePeriodMillis) {
+        _average = _frameCount / (delta / 1000.0f);
+        _hasAverage = true;
+    }
+}
+
+bool FpsCounter::hasAverage() const {
+    return _hasAverage;
+}
+
+float FpsCounter::getAverage() const {
+    return _average;
+}
 
 } // namespace render
 
