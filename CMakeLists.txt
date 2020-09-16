@@ -108,6 +108,7 @@ set(HEADERS
     src/render/camera/firstperson.h
     src/render/camera/thirdperson.h
     src/render/font.h
+    src/render/fps.h
     src/render/mesh/aabb.h
     src/render/mesh/guiquad.h
     src/render/mesh/mesh.h
@@ -227,6 +228,7 @@ set(SOURCES
     src/render/camera/firstperson.cpp
     src/render/camera/thirdperson.cpp
     src/render/font.cpp
+    src/render/fps.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/guiquad.cpp
     src/render/mesh/mesh.cpp

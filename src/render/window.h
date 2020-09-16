@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "camera/camera.h"
-
+#include "fps.h"
 #include "texture.h"
 #include "types.h"
 
@@ -43,6 +43,7 @@ public:
 
     void show();
     void processEvents(bool &quit);
+    void update(float dt);
 
     // Rendering
     void clear() const;
@@ -59,6 +60,7 @@ private:
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };
     Cursor _cursor;
+    FpsCounter _fps;
     std::function<void()> _onRenderWorld;
     std::function<void()> _onRenderGUI;
 

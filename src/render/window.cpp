@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include <boost/format.hpp>
+
 #include "GL/glew.h"
 
 #include "SDL2/SDL.h"
@@ -124,6 +126,15 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
 
         default:
             return false;
+    }
+}
+
+void RenderWindow::update(float dt) {
+    _fps.update(dt);
+
+    if (_fps.hasAverage()) {
+        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fps.getAverage())).c_str());
+        _fps.reset();
     }
 }
 
