@@ -22,7 +22,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/modelinstance.h"
+#include "../../render/scene/modelnode.h"
 #include "../../render/walkmesh.h"
 
 namespace reone {
@@ -51,14 +51,14 @@ public:
     void setPosition(const glm::vec3 &position);
     void setHeading(float heading);
 
-    std::shared_ptr<render::ModelInstance> model() const;
+    std::shared_ptr<render::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
 
 protected:
     glm::vec3 _position { 0.0f };
     float _heading { 0.0f };
     glm::mat4 _transform { 1.0f };
-    std::shared_ptr<render::ModelInstance> _model;
+    std::shared_ptr<render::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
     float _fadeDistance { kDefaultFadeDistance };

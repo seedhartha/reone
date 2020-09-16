@@ -427,7 +427,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount) const {
 void Control::render3D(const glm::ivec2 &offset) const {
     if (!_visible) return;
 
-    shared_ptr<ModelInstance> model(_scene3d.model);
+    shared_ptr<ModelSceneNode> model(_scene3d.model);
     if (!model) return;
 
     glm::mat4 transform(1.0f);

@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../core/streamutil.h"
-#include "../../render/modelinstance.h"
+#include "../../render/scene/modelnode.h"
 #include "../../resources/resources.h"
 
 using namespace std;
@@ -75,7 +75,7 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     string model(table->getString(type, "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelInstance>(resources.findModel(model));
+    _model = make_unique<ModelSceneNode>(resources.findModel(model));
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 

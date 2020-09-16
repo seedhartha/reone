@@ -136,7 +136,7 @@ void Area::loadLayout() {
     lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        unique_ptr<ModelInstance> model(new ModelInstance(resources.findModel(lytRoom.name)));
+        unique_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
         model->animate("animloop1", kAnimationLoop);
 
         shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
@@ -241,7 +241,7 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember2).portrait());
     }
     for (auto &room : _rooms) {
-        shared_ptr<ModelInstance> model(room->model());
+        shared_ptr<ModelSceneNode> model(room->model());
         if (model) {
             model->update(updateCtx.deltaTime);
         }

@@ -25,20 +25,20 @@ namespace reone {
 
 namespace render {
 
-class ModelInstance;
+class ModelSceneNode;
 
 class MeshSceneNode : public SceneNode {
 public:
-    MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform);
+    MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode, const glm::mat4 &transform);
 
     bool isTransparent() const;
 
-    const ModelInstance *model() const;
+    const ModelSceneNode *model() const;
     const ModelNode *modelNode() const;
     const glm::vec3 &origin() const;
 
 private:
-    const ModelInstance *_model { nullptr };
+    const ModelSceneNode *_model { nullptr };
     const ModelNode *_modelNode { nullptr };
     glm::vec3 _origin { 0.0f };
 };

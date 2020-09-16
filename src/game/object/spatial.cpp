@@ -108,7 +108,7 @@ void SpatialObject::setHeading(float heading) {
     updateTransform();
 }
 
-shared_ptr<ModelInstance> SpatialObject::model() const {
+shared_ptr<ModelSceneNode> SpatialObject::model() const {
     return _model;
 }
 

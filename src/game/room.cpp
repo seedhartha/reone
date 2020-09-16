@@ -28,7 +28,7 @@ namespace game {
 Room::Room(
     const string &name,
     const glm::vec3 &position,
-    const shared_ptr<render::ModelInstance> &model,
+    const shared_ptr<render::ModelSceneNode> &model,
     const shared_ptr<render::Walkmesh> &walkmesh
 ) :
     _name(name), _position(position), _model(model), _walkmesh(walkmesh) {
@@ -38,7 +38,7 @@ const glm::vec3 &Room::position() const {
     return _position;
 }
 
-shared_ptr<ModelInstance> Room::model() const {
+shared_ptr<ModelSceneNode> Room::model() const {
     return _model;
 }
 

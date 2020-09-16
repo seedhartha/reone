@@ -22,14 +22,14 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../core/log.h"
-#include "../resources/resources.h"
+#include "../../core/log.h"
+#include "../../resources/resources.h"
 
-#include "mesh/aabb.h"
-#include "scene/meshnode.h"
-#include "scene/scenegraph.h"
+#include "../mesh/aabb.h"
+#include "../scene/meshnode.h"
+#include "../scene/scenegraph.h"
 
-#include "modelinstance.h"
+#include "modelnode.h"
 
 using namespace std;
 
@@ -39,11 +39,11 @@ namespace reone {
 
 namespace render {
 
-ModelInstance::ModelInstance(const shared_ptr<Model> &model) : _model(model) {
+ModelSceneNode::ModelSceneNode(const shared_ptr<Model> &model) : _model(model) {
     assert(_model);
 }
 
-void ModelInstance::animate(const string &parent, const string &anim, int flags, float speed) {
+void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {
     if (!_model) return;
 
     shared_ptr<ModelNode> node(_model->findNodeByName(parent));
@@ -61,7 +61,7 @@ void ModelInstance::animate(const string &parent, const string &anim, int flags,
     attached->second->animate(anim, flags, speed);
 }
 
-void ModelInstance::animate(const string &anim, int flags, float speed) {
+void ModelSceneNode::animate(const string &anim, int flags, float speed) {
     if (!_model || _animState.name == anim) return;
 
     _animState.nextAnimation = anim;
@@ -75,7 +75,7 @@ void ModelInstance::animate(const string &anim, int flags, float speed) {
     }
 }
 
-void ModelInstance::attach(const string &parentNode, const shared_ptr<Model> &model) {
+void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &model) {
     if (!model) return;
 
     shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
@@ -83,18 +83,18 @@ void ModelInstance::attach(const string &parentNode, const shared_ptr<Model> &mo
         warn("Parent node not found: " + parentNode);
         return;
     }
-    _attachedModels.insert(make_pair(parent->nodeNumber(), make_unique<ModelInstance>(model)));
+    _attachedModels.insert(make_pair(parent->nodeNumber(), make_unique<ModelSceneNode>(model)));
 }
 
-void ModelInstance::changeTexture(const string &resRef) {
+void ModelSceneNode::changeTexture(const string &resRef) {
     _textureOverride = ResMan.findTexture(resRef, TextureType::Diffuse);
 }
 
-void ModelInstance::update(float dt) {
+void ModelSceneNode::update(float dt) {
     doUpdate(dt, set<string>());
 }
 
-void ModelInstance::doUpdate(float dt, const set<string> &skipNodes) {
+void ModelSceneNode::doUpdate(float dt, const set<string> &skipNodes) {
     if (!_visible) return;
 
     if (!_animState.nextAnimation.empty()) {
@@ -122,7 +122,7 @@ void ModelInstance::doUpdate(float dt, const set<string> &skipNodes) {
     }
 }
 
-void ModelInstance::startNextAnimation() {
+void ModelSceneNode::startNextAnimation() {
     const Model *model = nullptr;
     shared_ptr<Animation> anim(_model->findAnimation(_animState.nextAnimation, &model));
     if (!anim) return;
@@ -139,7 +139,7 @@ void ModelInstance::startNextAnimation() {
     _animState.nextFlags = 0;
 }
 
-void ModelInstance::advanceAnimation(float dt, const set<string> &skipNodes) {
+void ModelSceneNode::advanceAnimation(float dt, const set<string> &skipNodes) {
     float length = _animState.animation->length();
     float time = _animState.time + _animState.speed * dt;
 
@@ -156,7 +156,7 @@ void ModelInstance::advanceAnimation(float dt, const set<string> &skipNodes) {
     updateAnimTransforms(*_animState.animation->rootNode(), glm::mat4(1.0f), _animState.time, skipNodes);
 }
 
-void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const set<string> &skipNodes) {
+void ModelSceneNode::updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const set<string> &skipNodes) {
     string name(animNode.name());
     glm::mat4 absTransform(transform);
 
@@ -187,7 +187,7 @@ void ModelInstance::updateAnimTransforms(const ModelNode &animNode, const glm::m
     }
 }
 
-void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform) {
+void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform) {
     glm::mat4 finalTransform(transform);
     bool animApplied = false;
 
@@ -211,7 +211,7 @@ void ModelInstance::updateNodeTansforms(const ModelNode &node, const glm::mat4 &
     }
 }
 
-void ModelInstance::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug) {
+void ModelSceneNode::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug) {
     if (!_model || !_visible) return;
 
     stack<const ModelNode *> nodes;
@@ -245,14 +245,14 @@ void ModelInstance::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool
     }
 }
 
-bool ModelInstance::shouldRender(const ModelNode &node) const {
+bool ModelSceneNode::shouldRender(const ModelNode &node) const {
     shared_ptr<ModelMesh> mesh(node.mesh());
     if (!mesh) return false;
 
     return mesh->shouldRender() && (mesh->hasDiffuseTexture() || _textureOverride);
 }
 
-glm::mat4 ModelInstance::getNodeTransform(const ModelNode &node) const {
+glm::mat4 ModelSceneNode::getNodeTransform(const ModelNode &node) const {
     if (node.mesh() && node.skin()) {
         return node.absoluteTransform();
     }
@@ -261,7 +261,7 @@ glm::mat4 ModelInstance::getNodeTransform(const ModelNode &node) const {
     return it != _nodeTransforms.end() ? it->second : node.absoluteTransform();
 }
 
-void ModelInstance::render(const glm::mat4 &transform) const {
+void ModelSceneNode::render(const glm::mat4 &transform) const {
     if (!_visible) return;
 
     stack<const ModelNode *> nodes;
@@ -287,7 +287,7 @@ void ModelInstance::render(const glm::mat4 &transform) const {
     }
 }
 
-void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform) const {
+void ModelSceneNode::render(const ModelNode &node, const glm::mat4 &transform) const {
     shared_ptr<ModelMesh> mesh(node.mesh());
     shared_ptr<ModelNode::Skin> skin(node.skin());
     bool skeletal = skin && !_animState.name.empty();
@@ -335,7 +335,7 @@ void ModelInstance::render(const ModelNode &node, const glm::mat4 &transform) co
     mesh->render(_textureOverride);
 }
 
-ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {
+ShaderProgram ModelSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {
     ShaderProgram program = ShaderProgram::None;
 
     bool hasEnvmap = mesh.hasEnvmapTexture();
@@ -376,11 +376,11 @@ ShaderProgram ModelInstance::getShaderProgram(const ModelMesh &mesh, bool skelet
     return program;
 }
 
-void ModelInstance::playDefaultAnimation() {
+void ModelSceneNode::playDefaultAnimation() {
     animate(_defaultAnimation, kAnimationLoop | kAnimationPropagate);
 }
 
-void ModelInstance::show() {
+void ModelSceneNode::show() {
     _visible = true;
 
     for (auto &pair : _attachedModels) {
@@ -388,7 +388,7 @@ void ModelInstance::show() {
     }
 }
 
-void ModelInstance::hide() {
+void ModelSceneNode::hide() {
     _visible = false;
 
     for (auto &pair : _attachedModels) {
@@ -396,7 +396,7 @@ void ModelInstance::hide() {
     }
 }
 
-void ModelInstance::setAlpha(float alpha) {
+void ModelSceneNode::setAlpha(float alpha) {
     _alpha = alpha;
 
     for (auto &pair : _attachedModels) {
@@ -404,11 +404,11 @@ void ModelInstance::setAlpha(float alpha) {
     }
 }
 
-void ModelInstance::setDefaultAnimation(const string &name) {
+void ModelSceneNode::setDefaultAnimation(const string &name) {
     _defaultAnimation = name;
 }
 
-glm::vec3 ModelInstance::getNodeAbsolutePosition(const string &name) const {
+glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
     glm::vec3 position(0.0f);
 
     shared_ptr<ModelNode> node(_model->findNodeByName(name));
@@ -426,15 +426,15 @@ glm::vec3 ModelInstance::getNodeAbsolutePosition(const string &name) const {
     return node->absoluteTransform()[3];
 }
 
-const string &ModelInstance::name() const {
+const string &ModelSceneNode::name() const {
     return _model->name();
 }
 
-shared_ptr<Model> ModelInstance::model() const {
+shared_ptr<Model> ModelSceneNode::model() const {
     return _model;
 }
 
-bool ModelInstance::visible() const {
+bool ModelSceneNode::visible() const {
     return _visible;
 }
 
