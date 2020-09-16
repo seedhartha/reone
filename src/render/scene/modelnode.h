@@ -19,9 +19,9 @@
 
 #include <set>
 
-#include "aabb.h"
-#include "model/model.h"
-#include "shaders.h"
+#include "../aabb.h"
+#include "../model/model.h"
+#include "../shaders.h"
 
 namespace reone {
 
@@ -36,9 +36,9 @@ class SceneGraph;
  * @see reone::render::Model
  * @see reone::render::AnimationState
  */
-class ModelInstance {
+class ModelSceneNode {
 public:
-    ModelInstance(const std::shared_ptr<Model> &model);
+    ModelSceneNode(const std::shared_ptr<Model> &model);
 
     // Rendering
     void fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug);
@@ -82,7 +82,7 @@ private:
     std::map<uint16_t, glm::mat4> _nodeTransforms;
     std::map<uint16_t, glm::mat4> _boneTransforms;
     AnimationState _animState;
-    std::map<uint16_t, std::unique_ptr<ModelInstance>> _attachedModels;
+    std::map<uint16_t, std::unique_ptr<ModelSceneNode>> _attachedModels;
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
     bool _visible { true };

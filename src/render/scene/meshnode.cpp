@@ -23,7 +23,7 @@ namespace reone {
 
 namespace render {
 
-MeshSceneNode::MeshSceneNode(const ModelInstance *model, const ModelNode *modelNode, const glm::mat4 &transform) :
+MeshSceneNode::MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode, const glm::mat4 &transform) :
     SceneNode(transform), _model(model), _modelNode(modelNode) {
 
     assert(_model && _modelNode);
@@ -35,7 +35,7 @@ bool MeshSceneNode::isTransparent() const {
     return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
 }
 
-const ModelInstance *MeshSceneNode::model() const {
+const ModelSceneNode *MeshSceneNode::model() const {
     return _model;
 }
 

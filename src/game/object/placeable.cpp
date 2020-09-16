@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../core/streamutil.h"
-#include "../../render/modelinstance.h"
+#include "../../render/scene/modelnode.h"
 #include "../../resources/resources.h"
 
 #include "../template/templates.h"
@@ -69,7 +69,7 @@ void Placeable::loadBlueprint(const GffStruct &gffs) {
     string model(table->getString(appearance, "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelInstance>(ResMan.findModel(model));
+    _model = make_unique<ModelSceneNode>(ResMan.findModel(model));
     _walkmesh = ResMan.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 
     const GffField *itemList = gffs.find("ItemList");

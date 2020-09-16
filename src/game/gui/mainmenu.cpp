@@ -80,7 +80,7 @@ void MainMenu::load(GameVersion version) {
         transform = glm::scale(transform, glm::vec3(scale));
 
         Control::Scene3D scene;
-        scene.model = make_shared<ModelInstance>(ResMan.findModel("mainmenu"));
+        scene.model = make_shared<ModelSceneNode>(ResMan.findModel("mainmenu"));
         scene.transform = move(transform);
 
         control.setScene3D(scene);

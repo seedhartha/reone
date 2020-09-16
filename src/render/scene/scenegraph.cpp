@@ -22,7 +22,8 @@
 #include "glm/gtx/norm.hpp"
 
 #include "../mesh/aabb.h"
-#include "../modelinstance.h"
+
+#include "modelnode.h"
 
 using namespace std;
 

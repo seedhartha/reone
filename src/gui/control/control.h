@@ -24,7 +24,7 @@
 #include "glm/vec3.hpp"
 
 #include "../../render/font.h"
-#include "../../render/modelinstance.h"
+#include "../../render/scene/modelnode.h"
 #include "../../render/texture.h"
 #include "../../resources/gfffile.h"
 #include "../types.h"
@@ -73,7 +73,7 @@ public:
     };
 
     struct Scene3D {
-        std::shared_ptr<render::ModelInstance> model;
+        std::shared_ptr<render::ModelSceneNode> model;
         glm::mat4 transform { 1.0f };
     };
 

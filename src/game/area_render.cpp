@@ -34,14 +34,14 @@ void Area::updateSceneGraph(const glm::vec3 &cameraPosition) {
     _sceneGraph.clear();
 
     for (auto &room : _rooms) {
-        shared_ptr<ModelInstance> model(room->model());
+        shared_ptr<ModelSceneNode> model(room->model());
         if (!model) continue;
 
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), room->position()));
         model->fill(_sceneGraph, transform, _debugMode == DebugMode::ModelNodes);
     }
     for (auto &object : _objects) {
-        shared_ptr<ModelInstance> model(object->model());
+        shared_ptr<ModelSceneNode> model(object->model());
         if (!model) continue;
 
         model->fill(_sceneGraph, object->transform(), _debugMode == DebugMode::ModelNodes);
@@ -53,7 +53,7 @@ void Area::updateSceneGraph(const glm::vec3 &cameraPosition) {
                 if (type != ObjectType::Creature && type != ObjectType::Placeable && type != ObjectType::Door) continue;
 
                 for (auto &object : list.second) {
-                    shared_ptr<ModelInstance> model(object->model());
+                    shared_ptr<ModelSceneNode> model(object->model());
                     if (!model) continue;
 
                     shared_ptr<AABBSceneNode> node(new AABBSceneNode(model->model()->aabb(), object->transform()));
