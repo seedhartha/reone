@@ -23,48 +23,16 @@
 #include "../model/model.h"
 #include "../shaders.h"
 
+#include "scenenode.h"
+
 namespace reone {
 
 namespace render {
 
-class SceneGraph;
+class MeshSceneNode;
 
-/**
- * Encapsulates model state changes (e.g. animation, attachments).
- * Contains a pointer to the actual model.
- *
- * @see reone::render::Model
- * @see reone::render::AnimationState
- */
-class ModelSceneNode {
+class ModelSceneNode : public SceneNode {
 public:
-    ModelSceneNode(const std::shared_ptr<Model> &model);
-
-    // Rendering
-    void fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug);
-    void render(const glm::mat4 &transform) const;
-    void render(const ModelNode &node, const glm::mat4 &transform) const;
-
-    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
-    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
-    void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
-    void changeTexture(const std::string &resRef);
-    void update(float dt);
-    void playDefaultAnimation();
-
-    void show();
-    void hide();
-
-    void setAlpha(float alpha);
-    void setDefaultAnimation(const std::string &name);
-
-    glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
-
-    const std::string &name() const;
-    std::shared_ptr<Model> model() const;
-    bool visible() const;
-
-private:
     struct AnimationState {
         std::string nextAnimation;
         int nextFlags { 0 };
@@ -76,19 +44,46 @@ private:
         const Model *model { nullptr };
         float time { 0.0f };
         std::map<std::string, glm::mat4> localTransforms;
+        std::map<uint16_t, glm::mat4> boneTransforms;
     };
 
+    ModelSceneNode(const std::shared_ptr<Model> &model);
+
+    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
+    void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
+    void changeTexture(const std::string &resRef);
+    void update(float dt);
+    void playDefaultAnimation();
+
+    void show();
+    void hide();
+
+    glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
+
+    const std::string &name() const;
+    std::shared_ptr<Model> model() const;
+    const AnimationState &animationState() const;
+    std::shared_ptr<Texture> textureOverride() const;
+    bool visible() const;
+    float alpha() const;
+
+    void setAlpha(float alpha);
+    void setDefaultAnimation(const std::string &name);
+
+private:
     std::shared_ptr<Model> _model;
     std::map<uint16_t, glm::mat4> _nodeTransforms;
-    std::map<uint16_t, glm::mat4> _boneTransforms;
     AnimationState _animState;
-    std::map<uint16_t, std::unique_ptr<ModelSceneNode>> _attachedModels;
+    std::map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
+    std::map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
     bool _visible { true };
     float _alpha { 1.0f };
     bool _drawAABB { false };
 
+    void initMeshes();
     void doUpdate(float dt, const std::set<std::string> &skipNodes);
     void startNextAnimation();
     void advanceAnimation(float dt, const std::set<std::string> &skipNodes);
@@ -96,7 +91,6 @@ private:
     void updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform);
     bool shouldRender(const ModelNode &node) const;
     glm::mat4 getNodeTransform(const ModelNode &node) const;
-    ShaderProgram getShaderProgram(const ModelMesh &mesh, bool skeletal) const;
 };
 
 } // namespace render

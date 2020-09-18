@@ -55,11 +55,11 @@ void Door::load(const GffStruct &gffs) {
         _transitionDestin = resources.getString(transDestStrRef).text;
     }
 
-    updateTransform();
-
     string templResRef(gffs.getString("TemplateResRef"));
     shared_ptr<GffStruct> utd(resources.findGFF(templResRef, ResourceType::DoorBlueprint));
     loadBlueprint(*utd);
+
+    updateTransform();
 }
 
 void Door::loadBlueprint(const GffStruct &gffs) {

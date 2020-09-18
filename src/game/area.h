@@ -100,6 +100,7 @@ protected:
     std::shared_ptr<SpatialObject> _partyMember1;
     std::shared_ptr<SpatialObject> _partyMember2;
 
+    void add(const std::shared_ptr<SpatialObject> &object) override;
     void landObject(SpatialObject &object);
 
     virtual void updateCreature(Creature &creature, float dt);
@@ -146,7 +147,6 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    void updateSceneGraph(const glm::vec3 &cameraPosition);
     bool findElevationAt(const glm::vec3 &position, float &z) const;
 
     // Loading

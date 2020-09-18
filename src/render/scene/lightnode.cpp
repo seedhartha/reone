@@ -21,9 +21,6 @@ namespace reone {
 
 namespace render {
 
-LightSceneNode::LightSceneNode(const glm::mat4 &transform) : SceneNode(transform) {
-}
-
 } // namespace render
 
 } // namespace reone

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace render {
 
-AABBSceneNode::AABBSceneNode(const AABB &aabb, const glm::mat4 &transform) : SceneNode(transform), _aabb(aabb) {
+AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
 }
 
 const AABB &AABBSceneNode::aabb() const {

@@ -17,29 +17,45 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
 
 namespace reone {
 
 namespace render {
 
+class SceneGraph;
+
 class SceneNode {
 public:
-    const glm::mat4 &transform() const;
-    float distanceToCamera() const;
+    void addChild(const std::shared_ptr<SceneNode> &node);
+    virtual void fill(SceneGraph *graph);
+    virtual void render() const;
 
-    void setDistanceToCamera(float distance);
+    const SceneNode *parent() const;
+    const glm::mat4 &localTransform() const;
+    const glm::mat4 &absoluteTransform() const;
+    const std::vector<std::shared_ptr<SceneNode>> &children() const;
+
+    void setParent(const SceneNode *parent);
+    virtual void setLocalTransform(const glm::mat4 &transform);
 
 protected:
-    SceneNode(const glm::mat4 &transform);
+    const SceneNode *_parent { nullptr };
+    glm::mat4 _localTransform { 1.0f };
+    glm::mat4 _absoluteTransform { 1.0f };
+
+    SceneNode() = default;
 
 private:
-    glm::mat4 _transform { 1.0f };
-    float _distanceToCamera { 0.0f };
+    std::vector<std::shared_ptr<SceneNode>> _children;
 
     SceneNode(const SceneNode &) = delete;
     SceneNode &operator=(const SceneNode &) = delete;
+
+    void updateAbsoluteTransform();
 };
 
 } // namespace render

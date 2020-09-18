@@ -17,23 +17,65 @@
 
 #include "scenenode.h"
 
+#include "scenegraph.h"
+
+using namespace std;
+
 namespace reone {
 
 namespace render {
 
-SceneNode::SceneNode(const glm::mat4 &transform) : _transform(transform) {
+void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
+    assert(node);
+    node->setParent(this);
+    _children.push_back(node);
 }
 
-const glm::mat4 &SceneNode::transform() const {
-    return _transform;
+void SceneNode::fill(SceneGraph *graph) {
+    for (auto &child : _children) {
+        child->fill(graph);
+    }
 }
 
-float SceneNode::distanceToCamera() const {
-    return _distanceToCamera;
+void SceneNode::render() const {
+    for (auto &child : _children) {
+        child->render();
+    }
 }
 
-void SceneNode::setDistanceToCamera(float distance) {
-    _distanceToCamera = distance;
+const SceneNode *SceneNode::parent() const {
+    return _parent;
+}
+
+const glm::mat4 &SceneNode::localTransform() const {
+    return _localTransform;
+}
+
+const glm::mat4 &SceneNode::absoluteTransform() const {
+    return _absoluteTransform;
+}
+
+const vector<shared_ptr<SceneNode>> &SceneNode::children() const {
+    return _children;
+}
+
+void SceneNode::setParent(const SceneNode *parent) {
+    _parent = parent;
+    updateAbsoluteTransform();
+}
+
+void SceneNode::updateAbsoluteTransform() {
+    _absoluteTransform = _parent ? _parent->_absoluteTransform : glm::mat4(1.0f);
+    _absoluteTransform *= _localTransform;
+
+    for (auto &child : _children) {
+        child->updateAbsoluteTransform();
+    }
+}
+
+void SceneNode::setLocalTransform(const glm::mat4 &transform) {
+    _localTransform = transform;
+    updateAbsoluteTransform();
 }
 
 } // namespace render

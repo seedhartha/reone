@@ -18,12 +18,7 @@
 #include "scenegraph.h"
 
 #include <algorithm>
-
-#include "glm/gtx/norm.hpp"
-
-#include "../mesh/aabb.h"
-
-#include "modelnode.h"
+#include <cassert>
 
 using namespace std;
 
@@ -31,43 +26,42 @@ namespace reone {
 
 namespace render {
 
-void SceneGraph::clear() {
-    _opaqueMeshes.clear();
-    _transparentMeshes.clear();
-    _aabbNodes.clear();
+void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
+    assert(node);
+    _rootNodes.push_back(node);
 }
 
-void SceneGraph::add(const shared_ptr<MeshSceneNode> &node) {
-    if (node->isTransparent()) {
-        _transparentMeshes.push_back(node);
-    } else {
-        _opaqueMeshes.push_back(node);
-    }
+void SceneGraph::addOpaqueMesh(MeshSceneNode *node) {
+    assert(node);
+    _opaqueMeshes.push_back(node);
 }
 
-void SceneGraph::add(const shared_ptr<AABBSceneNode> &node) {
-    _aabbNodes.push_back(node);
+void SceneGraph::addTransparentMesh(MeshSceneNode *node) {
+    assert(node);
+    _transparentMeshes.push_back(node);
 }
 
 void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
-    for (auto &node : _transparentMeshes) {
-        node->setDistanceToCamera(glm::distance2(node->origin(), cameraPosition));
+    _opaqueMeshes.clear();
+    _transparentMeshes.clear();
+
+    for (auto &node : _rootNodes) {
+        node->fill(this);
     }
-    std::sort(_transparentMeshes.begin(), _transparentMeshes.end(), [](const shared_ptr<MeshSceneNode> &left, const shared_ptr<MeshSceneNode> &right) {
+    for (auto &mesh : _transparentMeshes) {
+        mesh->updateDistanceToCamera(cameraPosition);
+    }
+    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [](const MeshSceneNode *left, const MeshSceneNode *right) {
         return left->distanceToCamera() > right->distanceToCamera();
     });
 }
 
 void SceneGraph::render() const {
-    for (auto &node : _opaqueMeshes) {
-        node->model()->render(*node->modelNode(), node->transform());
+    for (auto &mesh : _opaqueMeshes) {
+        mesh->render();
     }
-    for (auto &node : _transparentMeshes) {
-        node->model()->render(*node->modelNode(), node->transform());
-    }
-    AABBMesh &aabb = TheAABBMesh;
-    for (auto &node : _aabbNodes) {
-        aabb.render(node->aabb(), node->transform());
+    for (auto &mesh : _transparentMeshes) {
+        mesh->render();
     }
 }
 

@@ -78,11 +78,11 @@ void Creature::load(const GffStruct &gffs) {
     float dirY = gffs.getFloat("YOrientation");
     _heading = -glm::atan(dirX, dirY);
 
-    updateTransform();
-
     string templResRef(gffs.getString("TemplateResRef"));
     shared_ptr<GffStruct> utc(ResMan.findGFF(templResRef, ResourceType::CreatureBlueprint));
     loadBlueprint(*utc);
+
+    updateTransform();
 }
 
 void Creature::loadBlueprint(const GffStruct &gffs) {

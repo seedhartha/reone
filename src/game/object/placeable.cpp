@@ -52,11 +52,11 @@ void Placeable::load(const GffStruct &gffs) {
 
     _heading = gffs.getFloat("Bearing");
 
-    updateTransform();
-
     string templResRef(gffs.getString("TemplateResRef"));
     shared_ptr<GffStruct> utp(ResMan.findGFF(templResRef, ResourceType::PlaceableBlueprint));
     loadBlueprint(*utp);
+
+    updateTransform();
 }
 
 void Placeable::loadBlueprint(const GffStruct &gffs) {

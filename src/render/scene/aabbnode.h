@@ -27,7 +27,7 @@ namespace render {
 
 class AABBSceneNode : public SceneNode {
 public:
-    AABBSceneNode(const AABB &abbb, const glm::mat4 &transform);
+    AABBSceneNode(const AABB &abbb);
 
     const AABB &aabb() const;
 
