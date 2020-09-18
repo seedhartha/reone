@@ -55,6 +55,7 @@ public:
 
     bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
+    const glm::vec3 &getCenterOfAABB() const;
 
     int index() const;
     const ModelNode *parent() const;

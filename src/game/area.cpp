@@ -136,15 +136,17 @@ void Area::loadLayout() {
     lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        unique_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
+        model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->animate("animloop1", kAnimationLoop);
+        _sceneGraph.addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
         if (walkmesh) {
             _navMesh->add(walkmesh, glm::mat4(1.0f));
         }
 
-        unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, move(model), move(walkmesh)));
+        unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
         _rooms.push_back(move(room));
     }
 }
@@ -171,6 +173,15 @@ void Area::loadScripts(const GffStruct &are) {
     _scripts[ScriptType::OnExit] = are.getString("OnExit");
     _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
     _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
+}
+
+void Area::add(const shared_ptr<SpatialObject> &object) {
+    ObjectContainer::add(object);
+
+    shared_ptr<ModelSceneNode> sceneNode(object->model());
+    if (sceneNode) {
+        _sceneGraph.addRoot(sceneNode);
+    }
 }
 
 void Area::landObject(SpatialObject &object) {
@@ -249,7 +260,7 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     for (auto &object : _objects) {
         object->update(updateCtx);
     }
-    updateSceneGraph(updateCtx.cameraPosition);
+    _sceneGraph.prepare(updateCtx.cameraPosition);
 
     if (_debugMode == DebugMode::GameObjects) {
         guiCtx.debug.objects.clear();
@@ -341,6 +352,10 @@ void Area::updateTriggers(const Creature &creature) {
             break;
         }
     }
+}
+
+void Area::render() const {
+    _sceneGraph.render();
 }
 
 void Area::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {

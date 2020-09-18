@@ -169,7 +169,6 @@ set(SOURCES
     src/core/streamutil.cpp
     src/game/area.cpp
     src/game/area_actions.cpp
-    src/game/area_render.cpp
     src/game/characters.cpp
     src/game/dialog.cpp
     src/game/game.cpp

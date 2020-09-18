@@ -87,6 +87,10 @@ bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
     return true;
 }
 
+const glm::vec3 &ModelNode::getCenterOfAABB() const {
+    return _mesh->aabb().center();
+}
+
 int ModelNode::index() const {
     return _index;
 }

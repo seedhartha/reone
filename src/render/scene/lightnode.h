@@ -25,7 +25,7 @@ namespace render {
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(const glm::mat4 &transform);
+    LightSceneNode() = default;
 };
 
 } // namespace render

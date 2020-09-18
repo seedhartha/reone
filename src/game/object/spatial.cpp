@@ -101,6 +101,10 @@ void SpatialObject::setPosition(const glm::vec3 &position) {
 void SpatialObject::updateTransform() {
     _transform = glm::translate(glm::mat4(1.0f), _position);
     _transform *= glm::eulerAngleZ(_heading);
+
+    if (_model) {
+        _model->setLocalTransform(_transform);
+    }
 }
 
 void SpatialObject::setHeading(float heading) {

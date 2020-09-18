@@ -41,6 +41,28 @@ namespace render {
 
 ModelSceneNode::ModelSceneNode(const shared_ptr<Model> &model) : _model(model) {
     assert(_model);
+    initMeshes();
+}
+
+void ModelSceneNode::initMeshes() {
+    stack<const ModelNode *> nodes;
+    nodes.push(&_model->rootNode());
+
+    while (!nodes.empty()) {
+        const ModelNode *node = nodes.top();
+        nodes.pop();
+
+        for (auto &child : node->children()) {
+            nodes.push(child.get());
+        }
+        if (!shouldRender(*node)) continue;
+
+        shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
+        mesh->setLocalTransform(node->absoluteTransform());
+        addChild(mesh);
+
+        _meshes.insert(make_pair(node->nodeNumber(), mesh));
+    }
 }
 
 void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {
@@ -83,7 +105,11 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
         warn("Parent node not found: " + parentNode);
         return;
     }
-    _attachedModels.insert(make_pair(parent->nodeNumber(), make_unique<ModelSceneNode>(model)));
+    shared_ptr<ModelSceneNode> attached(new ModelSceneNode(model));
+    attached->setLocalTransform(parent->absoluteTransform());
+    addChild(attached);
+
+    _attachedModels.insert(make_pair(parent->nodeNumber(), attached));
 }
 
 void ModelSceneNode::changeTexture(const string &resRef) {
@@ -105,7 +131,7 @@ void ModelSceneNode::doUpdate(float dt, const set<string> &skipNodes) {
     }
 
     _nodeTransforms.clear();
-    _boneTransforms.clear();
+    _animState.boneTransforms.clear();
     updateNodeTansforms(_model->rootNode(), glm::mat4(1.0f));
 
     for (auto &pair : _attachedModels) {
@@ -204,44 +230,19 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
     }
 
     _nodeTransforms.insert(make_pair(node.nodeNumber(), finalTransform));
-    _boneTransforms.insert(make_pair(node.index(), finalTransform * node.absoluteTransformInverse()));
+    _animState.boneTransforms.insert(make_pair(node.index(), finalTransform * node.absoluteTransformInverse()));
+
+    auto &meshNode = _meshes.find(node.nodeNumber());
+    if (meshNode != _meshes.end()) {
+        meshNode->second->setLocalTransform(finalTransform);
+    }
+    auto &attached = _attachedModels.find(node.nodeNumber());
+    if (attached != _attachedModels.end()) {
+        attached->second->setLocalTransform(finalTransform);
+    }
 
     for (auto &child : node.children()) {
         updateNodeTansforms(*child, finalTransform);
-    }
-}
-
-void ModelSceneNode::fill(SceneGraph &scene, const glm::mat4 &baseTransform, bool debug) {
-    if (!_model || !_visible) return;
-
-    stack<const ModelNode *> nodes;
-    nodes.push(&_model->rootNode());
-
-    while (!nodes.empty()) {
-        const ModelNode &node = *nodes.top();
-        nodes.pop();
-
-        if (shouldRender(node)) {
-            glm::mat4 transform(baseTransform * getNodeTransform(node));
-
-            shared_ptr<MeshSceneNode> sceneNode(new MeshSceneNode(this, &node, transform));
-            scene.add(sceneNode);
-
-            if (debug) {
-                shared_ptr<AABBSceneNode> aabbNode(new AABBSceneNode(node.mesh()->aabb(), transform));
-                scene.add(aabbNode);
-            }
-        }
-        for (auto &child : node.children()) {
-            nodes.push(child.get());
-        }
-    }
-    for (auto &pair : _attachedModels) {
-        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
-        if (!parent) continue;
-    
-        glm::mat4 finalTransform(baseTransform * getNodeTransform(*parent));
-        pair.second->fill(scene, finalTransform, debug);
     }
 }
 
@@ -259,121 +260,6 @@ glm::mat4 ModelSceneNode::getNodeTransform(const ModelNode &node) const {
     auto it = _nodeTransforms.find(node.nodeNumber());
 
     return it != _nodeTransforms.end() ? it->second : node.absoluteTransform();
-}
-
-void ModelSceneNode::render(const glm::mat4 &transform) const {
-    if (!_visible) return;
-
-    stack<const ModelNode *> nodes;
-    nodes.push(&_model->rootNode());
-
-    while (!nodes.empty()) {
-        const ModelNode &node = *nodes.top();
-        nodes.pop();
-
-        if (shouldRender(node)) {
-            render(node, transform * getNodeTransform(node));
-        }
-        for (auto &child : node.children()) {
-            nodes.push(child.get());
-        }
-    }
-
-    for (auto &attached : _attachedModels) {
-        shared_ptr<ModelNode> parent(_model->findNodeByNumber(attached.first));
-        if (!parent) continue;
-
-        attached.second->render(transform * getNodeTransform(*parent));
-    }
-}
-
-void ModelSceneNode::render(const ModelNode &node, const glm::mat4 &transform) const {
-    shared_ptr<ModelMesh> mesh(node.mesh());
-    shared_ptr<ModelNode::Skin> skin(node.skin());
-    bool skeletal = skin && !_animState.name.empty();
-    ShaderProgram program = getShaderProgram(*mesh, skeletal);
-
-    ShaderManager &shaders = ShaderManager::instance();
-    shaders.activate(program);
-    shaders.setUniform("model", transform);
-    shaders.setUniform("color", glm::vec3(1.0f));
-    shaders.setUniform("alpha", _alpha * node.alpha());
-
-    if (mesh->hasEnvmapTexture()) {
-        shaders.setUniform("envmap", 1);
-    }
-    if (mesh->hasLightmapTexture()) {
-        shaders.setUniform("lightmap", 2);
-    }
-    if (mesh->hasBumpyShinyTexture()) {
-        shaders.setUniform("bumpyShiny", 3);
-    }
-    if (mesh->hasBumpmapTexture()) {
-        shaders.setUniform("bumpmap", 4);
-    }
-
-    if (skeletal) {
-        shaders.setUniform("absTransform", node.absoluteTransform());
-        shaders.setUniform("absTransformInv", node.absoluteTransformInverse());
-
-        const map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
-        vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
-
-        for (auto &pair : nodeIdxByBoneIdx) {
-            uint16_t boneIdx = pair.first;
-            uint16_t nodeIdx = pair.second;
-
-            auto bone = _boneTransforms.find(nodeIdx);
-            if (bone == _boneTransforms.end()) continue;
-
-            bones[boneIdx] = bone->second;
-        }
-
-        shaders.setUniform("bones", bones);
-    }
-
-    mesh->render(_textureOverride);
-}
-
-ShaderProgram ModelSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {
-    ShaderProgram program = ShaderProgram::None;
-
-    bool hasEnvmap = mesh.hasEnvmapTexture();
-    bool hasLightmap = mesh.hasLightmapTexture();
-    bool hasBumpyShiny = mesh.hasBumpyShinyTexture();
-    bool hasBumpmap = mesh.hasBumpmapTexture();
-
-    if (skeletal) {
-        if (hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
-            program = ShaderProgram::SkeletalDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap /* && !hasBumpmap */) {
-            program = ShaderProgram::SkeletalDiffuseBumpyShiny;
-        } else if (hasBumpmap && !hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::SkeletalDiffuseBumpmap;
-        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
-            program = ShaderProgram::SkeletalDiffuse;
-        }
-    } else {
-        if (hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap) {
-            program = ShaderProgram::BasicDiffuseBumpyShiny;
-        } else if (hasLightmap && !hasEnvmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseLightmap;
-        } else if (hasEnvmap && hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseLightmapEnvmap;
-        } else if (hasLightmap && hasBumpyShiny && !hasEnvmap) {
-            program = ShaderProgram::BasicDiffuseLightmapBumpyShiny;
-        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuse;
-        }
-    }
-
-    if (program == ShaderProgram::None) {
-        throw logic_error("Shader program not selected");
-    }
-
-    return program;
 }
 
 void ModelSceneNode::playDefaultAnimation() {
@@ -394,18 +280,6 @@ void ModelSceneNode::hide() {
     for (auto &pair : _attachedModels) {
         pair.second->hide();
     }
-}
-
-void ModelSceneNode::setAlpha(float alpha) {
-    _alpha = alpha;
-
-    for (auto &pair : _attachedModels) {
-        pair.second->setAlpha(alpha);
-    }
-}
-
-void ModelSceneNode::setDefaultAnimation(const string &name) {
-    _defaultAnimation = name;
 }
 
 glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
@@ -434,8 +308,32 @@ shared_ptr<Model> ModelSceneNode::model() const {
     return _model;
 }
 
+const ModelSceneNode::AnimationState &ModelSceneNode::animationState() const {
+    return _animState;
+}
+
+shared_ptr<Texture> ModelSceneNode::textureOverride() const {
+    return _textureOverride;
+}
+
 bool ModelSceneNode::visible() const {
     return _visible;
+}
+
+float ModelSceneNode::alpha() const {
+    return _alpha;
+}
+
+void ModelSceneNode::setAlpha(float alpha) {
+    _alpha = alpha;
+
+    for (auto &pair : _attachedModels) {
+        pair.second->setAlpha(alpha);
+    }
+}
+
+void ModelSceneNode::setDefaultAnimation(const string &name) {
+    _defaultAnimation = name;
 }
 
 } // namespace render

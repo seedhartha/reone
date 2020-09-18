@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include "glm/vec3.hpp"
+
 #include "../model/modelnode.h"
+#include "../shaders.h"
 
 #include "scenenode.h"
 
@@ -29,18 +32,23 @@ class ModelSceneNode;
 
 class MeshSceneNode : public SceneNode {
 public:
-    MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode, const glm::mat4 &transform);
+    MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode);
 
-    bool isTransparent() const;
+    void fill(SceneGraph *graph) override;
+    void updateDistanceToCamera(const glm::vec3 &cameraPosition);
+    void render() const override;
 
     const ModelSceneNode *model() const;
     const ModelNode *modelNode() const;
-    const glm::vec3 &origin() const;
+    float distanceToCamera() const;
 
 private:
     const ModelSceneNode *_model { nullptr };
     const ModelNode *_modelNode { nullptr };
-    glm::vec3 _origin { 0.0f };
+    float _distanceToCamera { 0.0f };
+
+    bool isTransparent() const;
+    ShaderProgram getShaderProgram(const ModelMesh &mesh, bool skeletal) const;
 };
 
 } // namespace render

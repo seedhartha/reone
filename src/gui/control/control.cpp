@@ -434,7 +434,8 @@ void Control::render3D(const glm::ivec2 &offset) const {
     transform = glm::translate(transform, glm::vec3(offset.x, offset.y, 0.0f));
     transform *= _scene3d.transform;
 
-    model->render(transform);
+    model->setLocalTransform(transform);
+    model->render();
 }
 
 void Control::stretch(float x, float y) {

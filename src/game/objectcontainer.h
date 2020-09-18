@@ -42,7 +42,7 @@ protected:
     std::map<std::string, ObjectList> _objectsByTag;
 
     void clear();
-    void add(const std::shared_ptr<SpatialObject> &object);
+    virtual void add(const std::shared_ptr<SpatialObject> &object);
 };
 
 } // namespace game
