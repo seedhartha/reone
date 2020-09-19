@@ -294,6 +294,7 @@ endif()
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
+        src/core/debug.h
         src/core/log.h
         src/core/pathutil.h
         src/core/types.h
@@ -310,6 +311,7 @@ if(BUILD_TOOLS)
         tools/tools.h)
 
     set(TOOLS_SOURCES
+        src/core/debug.cpp
         src/core/log.cpp
         src/core/pathutil.cpp
         src/resources/2dafile.cpp
