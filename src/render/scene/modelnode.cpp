@@ -232,11 +232,11 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
     _nodeTransforms.insert(make_pair(node.nodeNumber(), finalTransform));
     _animState.boneTransforms.insert(make_pair(node.index(), finalTransform * node.absoluteTransformInverse()));
 
-    auto &meshNode = _meshes.find(node.nodeNumber());
+    auto meshNode = _meshes.find(node.nodeNumber());
     if (meshNode != _meshes.end()) {
         meshNode->second->setLocalTransform(finalTransform);
     }
-    auto &attached = _attachedModels.find(node.nodeNumber());
+    auto attached = _attachedModels.find(node.nodeNumber());
     if (attached != _attachedModels.end()) {
         attached->second->setLocalTransform(finalTransform);
     }
