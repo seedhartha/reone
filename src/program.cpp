@@ -21,6 +21,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "core/debug.h"
 #include "core/log.h"
 #include "core/pathutil.h"
 #include "game/multiplayer/game.h"
@@ -84,16 +85,16 @@ void Program::loadOptions() {
 
     _help = _vars.count("help") > 0;
     _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
-    _gameOpts.graphics.width = _vars["width"].as<int>();
-    _gameOpts.graphics.height = _vars["height"].as<int>();
-    _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
-    _gameOpts.audio.musicVolume = _vars["musicvol"].as<int>();
-    _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
-    _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
-    _gameOpts.network.port = _vars["port"].as<int>();
-    _gameOpts.debug = _vars["debug"].as<int>();
+    _options.graphics.width = _vars["width"].as<int>();
+    _options.graphics.height = _vars["height"].as<int>();
+    _options.graphics.fullscreen = _vars["fullscreen"].as<bool>();
+    _options.audio.musicVolume = _vars["musicvol"].as<int>();
+    _options.audio.soundVolume = _vars["soundvol"].as<int>();
+    _options.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
+    _options.network.port = _vars["port"].as<int>();
+    _options.debug = _vars["debug"].as<int>();
 
-    setDebugLevel(_gameOpts.debug);
+    setDebugLevel(_options.debug);
 
     initGameVersion();
     initMultiplayerMode();
@@ -118,11 +119,11 @@ int Program::runGame() {
     switch (_multiplayer) {
         case MultiplayerMode::Client:
         case MultiplayerMode::Server:
-            game.reset(new MultiplayerGame(_multiplayer, _version, _gamePath, _gameOpts));
+            game.reset(new MultiplayerGame(_multiplayer, _version, _gamePath, _options));
             break;
 
         default:
-            game.reset(new Game(_version, _gamePath, _gameOpts));
+            game.reset(new Game(_version, _gamePath, _options));
             break;
     }
 
