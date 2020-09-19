@@ -22,10 +22,8 @@
 #include <boost/program_options.hpp>
 
 #include "core/debug.h"
-#include "core/log.h"
 #include "core/pathutil.h"
 #include "game/multiplayer/game.h"
-#include "game/object/factory.h"
 
 using namespace std;
 
@@ -95,7 +93,6 @@ void Program::loadOptions() {
     _options.debug = _vars["debug"].as<int>();
 
     setDebugLevel(_options.debug);
-
     initGameVersion();
     initMultiplayerMode();
 }
