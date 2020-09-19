@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "debug.h"
+
 using namespace std;
 
 namespace reone {
@@ -29,16 +31,6 @@ enum class LogLevel {
     Info,
     Debug
 };
-
-static uint32_t g_debugLevel = 0;
-
-void setDebugLevel(uint32_t level) {
-    g_debugLevel = level;
-}
-
-uint32_t getDebugLevel() {
-    return g_debugLevel;
-}
 
 inline static const char *describeLogLevel(LogLevel level) {
     switch (level) {
@@ -87,7 +79,7 @@ void info(const boost::format &s) {
 void debug(const string &s, uint32_t level) {
     assert(level > 0);
 
-    if (level <= g_debugLevel) {
+    if (level <= getDebugLevel()) {
         log(cout, LogLevel::Debug, s);
     }
 }

@@ -18,19 +18,10 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-
-#include <boost/format.hpp>
 
 namespace reone {
 
-void error(const std::string &s);
-void error(const boost::format &s);
-void warn(const std::string &s);
-void warn(const boost::format &s);
-void info(const std::string &s);
-void info(const boost::format &s);
-void debug(const std::string &s, uint32_t level = 1);
-void debug(const boost::format &s, uint32_t level = 1);
+void setDebugLevel(uint32_t level);
+uint32_t getDebugLevel();
 
 } // namespace reone

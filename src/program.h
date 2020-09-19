@@ -47,7 +47,7 @@ private:
     boost::program_options::variables_map _vars;
     bool _help { false };
     boost::filesystem::path _gamePath;
-    game::Options _gameOpts;
+    game::Options _options;
     resources::GameVersion _version { resources::GameVersion::KotOR };
     game::MultiplayerMode _multiplayer { game::MultiplayerMode::None };
 

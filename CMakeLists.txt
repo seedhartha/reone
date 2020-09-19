@@ -43,6 +43,7 @@ set(HEADERS
     src/audio/soundinstance.h
     src/audio/stream.h
     src/audio/types.h
+    src/core/debug.h
     src/core/jobs.h
     src/core/log.h
     src/core/pathutil.h
@@ -162,6 +163,7 @@ set(SOURCES
     src/audio/player.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
+    src/core/debug.cpp
     src/core/jobs.cpp
     src/core/log.cpp
     src/core/pathutil.cpp
