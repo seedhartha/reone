@@ -65,6 +65,12 @@ void ModelSceneNode::initMeshes() {
     }
 }
 
+void ModelSceneNode::fill(SceneGraph *graph) {
+    if (!_visible || !_onScreen) return;
+
+    SceneNode::fill(graph);
+}
+
 void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {
     if (!_model) return;
 
@@ -121,7 +127,7 @@ void ModelSceneNode::update(float dt) {
 }
 
 void ModelSceneNode::doUpdate(float dt, const set<string> &skipNodes) {
-    if (!_visible) return;
+    if (!_visible || !_onScreen) return;
 
     if (!_animState.nextAnimation.empty()) {
         startNextAnimation();
@@ -134,9 +140,9 @@ void ModelSceneNode::doUpdate(float dt, const set<string> &skipNodes) {
     _animState.boneTransforms.clear();
     updateNodeTansforms(_model->rootNode(), glm::mat4(1.0f));
 
-    for (auto &pair : _attachedModels) {
+    for (auto &attached : _attachedModels) {
         set<string> skipNodes;
-        shared_ptr<ModelNode> parent(_model->findNodeByNumber(pair.first));
+        shared_ptr<ModelNode> parent(_model->findNodeByNumber(attached.first));
 
         const ModelNode *pn = &*parent;
         while (pn) {
@@ -144,7 +150,7 @@ void ModelSceneNode::doUpdate(float dt, const set<string> &skipNodes) {
             pn = pn->parent();
         }
 
-        pair.second->doUpdate(dt, skipNodes);
+        attached.second->doUpdate(dt, skipNodes);
     }
 }
 
@@ -266,22 +272,6 @@ void ModelSceneNode::playDefaultAnimation() {
     animate(_defaultAnimation, kAnimationLoop | kAnimationPropagate);
 }
 
-void ModelSceneNode::show() {
-    _visible = true;
-
-    for (auto &pair : _attachedModels) {
-        pair.second->show();
-    }
-}
-
-void ModelSceneNode::hide() {
-    _visible = false;
-
-    for (auto &pair : _attachedModels) {
-        pair.second->hide();
-    }
-}
-
 glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
     glm::vec3 position(0.0f);
 
@@ -316,19 +306,39 @@ shared_ptr<Texture> ModelSceneNode::textureOverride() const {
     return _textureOverride;
 }
 
-bool ModelSceneNode::visible() const {
+bool ModelSceneNode::isVisible() const {
     return _visible;
+}
+
+bool ModelSceneNode::isOnScreen() const {
+    return _onScreen;
 }
 
 float ModelSceneNode::alpha() const {
     return _alpha;
 }
 
+void ModelSceneNode::setVisible(bool visible) {
+    _visible = visible;
+
+    for (auto &attached : _attachedModels) {
+        attached.second->setVisible(visible);
+    }
+}
+
+void ModelSceneNode::setOnScreen(bool onScreen) {
+    _onScreen = onScreen;
+
+    for (auto &attached : _attachedModels) {
+        attached.second->setOnScreen(onScreen);
+    }
+}
+
 void ModelSceneNode::setAlpha(float alpha) {
     _alpha = alpha;
 
-    for (auto &pair : _attachedModels) {
-        pair.second->setAlpha(alpha);
+    for (auto &attached : _attachedModels) {
+        attached.second->setAlpha(alpha);
     }
 }
 

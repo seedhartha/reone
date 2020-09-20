@@ -49,6 +49,8 @@ public:
 
     ModelSceneNode(const std::shared_ptr<Model> &model);
 
+    void fill(SceneGraph *graph) override;
+
     void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
     void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
@@ -56,18 +58,18 @@ public:
     void update(float dt);
     void playDefaultAnimation();
 
-    void show();
-    void hide();
-
     glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
 
     const std::string &name() const;
     std::shared_ptr<Model> model() const;
     const AnimationState &animationState() const;
     std::shared_ptr<Texture> textureOverride() const;
-    bool visible() const;
+    bool isVisible() const;
+    bool isOnScreen() const;
     float alpha() const;
 
+    void setVisible(bool visible);
+    void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setDefaultAnimation(const std::string &name);
 
@@ -80,6 +82,7 @@ private:
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
     bool _visible { true };
+    bool _onScreen { true };
     float _alpha { 1.0f };
     bool _drawAABB { false };
 

@@ -101,6 +101,7 @@ protected:
     std::shared_ptr<SpatialObject> _partyMember2;
 
     void add(const std::shared_ptr<SpatialObject> &object) override;
+    void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
 
     virtual void updateCreature(Creature &creature, float dt);
@@ -125,7 +126,7 @@ private:
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
     std::string _name;
-    std::vector<std::shared_ptr<Room>> _rooms;
+    std::map<std::string, std::shared_ptr<Room>> _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
     render::CameraStyle _cameraStyle;
     std::string _music;
@@ -147,7 +148,9 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    bool findElevationAt(const glm::vec3 &position, float &z) const;
+    bool findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
+    bool findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
+    void updateRoomVisibility();
 
     // Loading
     void loadProperties(const resources::GffStruct &gffs);

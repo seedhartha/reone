@@ -147,7 +147,7 @@ void Area::loadLayout() {
         }
 
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
-        _rooms.push_back(move(room));
+        _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
 
@@ -182,11 +182,24 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     if (sceneNode) {
         _sceneGraph.addRoot(sceneNode);
     }
+
+    determineObjectRoom(*object);
+}
+
+void Area::determineObjectRoom(SpatialObject &object) {
+    glm::vec3 position(object.position());
+    Room *room = nullptr;
+
+    if (findRoomElevationAt(position, room, position.z)) {
+        object.setRoom(room);
+    }
 }
 
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
-    if (findElevationAt(position, position.z)) {
+    Room *room = nullptr;
+
+    if (findRoomElevationAt(position, room, position.z)) {
         object.setPosition(position);
     }
 }
@@ -252,14 +265,13 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember2).portrait());
     }
     for (auto &room : _rooms) {
-        shared_ptr<ModelSceneNode> model(room->model());
-        if (model) {
-            model->update(updateCtx.deltaTime);
-        }
+        room.second->update(updateCtx.deltaTime);
     }
     for (auto &object : _objects) {
         object->update(updateCtx);
     }
+    updateRoomVisibility();
+
     _sceneGraph.prepare(updateCtx.cameraPosition);
 
     if (_debugMode == DebugMode::GameObjects) {
@@ -315,13 +327,15 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float
     newPosition.y += creature.runSpeed() * dir.y * dt;
 
     SpatialObject *obstacle = nullptr;
-    glm::vec3 intersection(0.0f);
+    Room *room = nullptr;
 
     if (findObstacleByAABB(position, newPosition + 1.0f * dir, kObstacleCreature, &creature, &obstacle)) {
         return false;
     }
-    if (findElevationAt(newPosition, newPosition.z)) {
+    if (findElevationAt(newPosition, room, newPosition.z)) {
+        creature.setRoom(room);
         creature.setPosition(newPosition);
+
         if (&creature == &*_partyLeader) {
             updateTriggers(creature);
         }
@@ -468,7 +482,7 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
     if ((mask & kObstacleRoom) == 0) return false;
 
     for (auto &room : _rooms) {
-        shared_ptr<Walkmesh> walkmesh(room->walkmesh());
+        const Walkmesh *walkmesh = room.second->walkmesh();
         if (!walkmesh) continue;
 
         AABB aabb(walkmesh->aabb());
@@ -525,7 +539,7 @@ bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int ma
     return false;
 }
 
-bool Area::findElevationAt(const glm::vec3 &position, float &z) const {
+bool Area::findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const {
     glm::vec3 from(position + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
     glm::vec3 to(from + glm::vec3(0.0f, 0.0f, -kElevationTestDistance));
     glm::vec3 intersection(0.0f);
@@ -534,19 +548,49 @@ bool Area::findElevationAt(const glm::vec3 &position, float &z) const {
     if (findObstacleByWalkmesh(from, to, kObstacleDoor | kObstaclePlaceable, intersection, &obstacle)) {
         return false;
     }
-    for (auto &room : _rooms) {
-        shared_ptr<Walkmesh> walkmesh(room->walkmesh());
+    if (findRoomElevationAt(position, roomAt, z)) {
+        return true;
+    }
+
+    return false;
+}
+
+bool Area::findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const {
+    glm::vec3 from(position + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
+    for (auto &pair : _rooms) {
+        Room *room = pair.second.get();
+
+        const Walkmesh *walkmesh = room->walkmesh();
         if (!walkmesh) continue;
 
         AABB aabb(walkmesh->aabb());
         if (!aabb.contains(glm::vec2(position))) continue;
 
         if (room->walkmesh()->findElevationAt(from, z)) {
+            roomAt = room;
             return true;
         }
     }
 
     return false;
+}
+
+void Area::updateRoomVisibility() {
+    Room *playerRoom = _player->room();
+    if (!playerRoom) return;
+
+    for (auto &room : _rooms) {
+        room.second->setVisible(false);
+    }
+    playerRoom->setVisible(true);
+
+    auto adjRooms = _visibility->equal_range(playerRoom->name());
+    for (auto adjRoom = adjRooms.first; adjRoom != adjRooms.second; adjRoom++) {
+        auto room = _rooms.find(adjRoom->second);
+        if (room != _rooms.end()) {
+            room->second->setVisible(true);
+        }
+    }
 }
 
 const CameraStyle &Area::cameraStyle() const {
