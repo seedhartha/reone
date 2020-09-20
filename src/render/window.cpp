@@ -70,18 +70,19 @@ void RenderWindow::init() {
     SDL_GL_SetSwapInterval(0);
     glewInit();
 
-    ShaderManager::instance().initGL();
-    AABBMesh::instance().initGL();
-    GUIQuad::instance().initGL();
+    ShaderMan.initGL();
+    TheAABBMesh.initGL();
+    TheGUIQuad.initGL();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderWindow::deinit() {
-    GUIQuad::instance().deinitGL();
-    AABBMesh::instance().deinitGL();
-    ShaderManager::instance().deinitGL();
+    TheGUIQuad.deinitGL();
+    TheAABBMesh.deinitGL();
+    TheGUIQuad.deinitGL();
+
     SDL_GL_DeleteContext(_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();

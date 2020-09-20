@@ -44,9 +44,9 @@ private:
     boost::program_options::variables_map _vars;
     bool _help { false };
     boost::filesystem::path _gamePath;
-    game::Options _options;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
-    game::MultiplayerMode _multiplayer { game::MultiplayerMode::None };
+    game::Options _gameOpts;
+    resources::GameVersion _gameVersion { resources::GameVersion::KotOR };
+    game::MultiplayerMode _multiplayerMode { game::MultiplayerMode::None };
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;

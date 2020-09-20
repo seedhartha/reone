@@ -40,10 +40,6 @@ namespace game {
 
 /**
  * Entry point for the game logic. Contains the main game loop.
- *
- * @see reone::game::Module
- * @see reone::gui::GUI
- * @see reone::render::RenderWindow
  */
 class Game : public render::IEventHandler, public IRoutineCallbacks {
 public:
@@ -53,9 +49,7 @@ public:
         const Options &opts);
 
     int run();
-
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
-
     bool handle(const SDL_Event &event) override;
 
     // Routine callbacks
@@ -122,7 +116,7 @@ protected:
 
 private:
     boost::filesystem::path _path;
-    render::RenderWindow _renderWindow;
+    render::RenderWindow _window;
     uint32_t _ticks { 0 };
     bool _quit { false };
     std::string _nextEntry;
@@ -145,6 +139,7 @@ private:
     void loadDebugGui();
     void loadDialogGui();
     void loadContainerGui();
+    void loadCursor();
 
     // Rendering
     void drawWorld();
