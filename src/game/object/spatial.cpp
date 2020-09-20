@@ -20,6 +20,8 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/norm.hpp"
 
+#include "../room.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -55,17 +57,13 @@ void SpatialObject::update(const UpdateContext &ctx) {
     glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
     glm::vec3 screenCoords = glm::project(_position, ctx.view, ctx.projection, viewport);
     float distanceToCamera = glm::distance2(_position, ctx.cameraPosition);
-    bool visible = distanceToCamera < _drawDistance && screenCoords.z < 1.0f;
+    bool onScreen = distanceToCamera < _drawDistance && screenCoords.z < 1.0f;
     float alpha = 1.0f;
 
     if (_drawDistance != _fadeDistance && distanceToCamera > _fadeDistance) {
         alpha = 1.0f - (distanceToCamera - _fadeDistance) / (_drawDistance - _fadeDistance);
     }
-    if (visible) {
-        _model->show();
-    } else {
-        _model->hide();
-    }
+    _model->setOnScreen(onScreen);
     _model->setAlpha(alpha);
     _model->update(ctx.deltaTime);
 }
@@ -82,6 +80,10 @@ void SpatialObject::animate(const string &parent, const string &anim, int flags,
     _model->animate(parent, anim, flags, speed);
 }
 
+Room *SpatialObject::room() const {
+    return _room;
+}
+
 const glm::vec3 &SpatialObject::position() const {
     return _position;
 }
@@ -93,6 +95,26 @@ float SpatialObject::heading() const {
 const glm::mat4 &SpatialObject::transform() const {
     return _transform;
 }
+
+shared_ptr<ModelSceneNode> SpatialObject::model() const {
+    return _model;
+}
+
+shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
+    return _walkmesh;
+}
+
+void SpatialObject::setRoom(Room *room) {
+    if (_room) {
+        _room->removeTenant(this);
+    }
+    _room = room;
+
+    if (_room) {
+        _room->addTenant(this);
+    }
+}
+
 void SpatialObject::setPosition(const glm::vec3 &position) {
     _position = position;
     updateTransform();
@@ -112,12 +134,10 @@ void SpatialObject::setHeading(float heading) {
     updateTransform();
 }
 
-shared_ptr<ModelSceneNode> SpatialObject::model() const {
-    return _model;
-}
-
-shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
-    return _walkmesh;
+void SpatialObject::setVisible(bool visible) {
+    if (_model) {
+        _model->setVisible(visible);
+    }
 }
 
 } // namespace game

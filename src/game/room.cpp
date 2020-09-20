@@ -17,6 +17,8 @@
 
 #include "room.h"
 
+#include "object/spatial.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -28,22 +30,49 @@ namespace game {
 Room::Room(
     const string &name,
     const glm::vec3 &position,
-    const shared_ptr<render::ModelSceneNode> &model,
-    const shared_ptr<render::Walkmesh> &walkmesh
+    const std::shared_ptr<ModelSceneNode> &model,
+    const std::shared_ptr<Walkmesh> &walkmesh
 ) :
     _name(name), _position(position), _model(model), _walkmesh(walkmesh) {
+}
+
+void Room::addTenant(SpatialObject *object) {
+    _tenants.insert(object);
+}
+
+void Room::removeTenant(SpatialObject *object) {
+    _tenants.erase(object);
+}
+
+void Room::update(float dt) {
+    if (_model) {
+        _model->update(dt);
+    }
+}
+
+const string &Room::name() const {
+    return _name;
 }
 
 const glm::vec3 &Room::position() const {
     return _position;
 }
 
-shared_ptr<ModelSceneNode> Room::model() const {
-    return _model;
+const ModelSceneNode *Room::model() const {
+    return _model.get();
 }
 
-shared_ptr<Walkmesh> Room::walkmesh() const {
-    return _walkmesh;
+const Walkmesh *Room::walkmesh() const {
+    return _walkmesh.get();
+}
+
+void Room::setVisible(bool visible) {
+    if (_model) {
+        _model->setVisible(visible);
+    }
+    for (auto &tenant : _tenants) {
+        tenant->setVisible(visible);
+    }
 }
 
 } // namespace game

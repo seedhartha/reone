@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 #include "glm/vec3.hpp"
 
@@ -28,6 +29,8 @@ namespace reone {
 
 namespace game {
 
+class SpatialObject;
+
 class Room {
 public:
     Room(
@@ -36,15 +39,23 @@ public:
         const std::shared_ptr<render::ModelSceneNode> &model,
         const std::shared_ptr<render::Walkmesh> &walkmesh);
 
+    void addTenant(SpatialObject *object);
+    void removeTenant(SpatialObject *object);
+    void update(float dt);
+
+    const std::string &name() const;
     const glm::vec3 &position() const;
-    std::shared_ptr<render::ModelSceneNode> model() const;
-    std::shared_ptr<render::Walkmesh> walkmesh() const;
+    const render::ModelSceneNode *model() const;
+    const render::Walkmesh *walkmesh() const;
+
+    void setVisible(bool visible);
 
 private:
     std::string _name;
     glm::vec3 _position { 0.0f };
     std::shared_ptr<render::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
+    std::set<SpatialObject *> _tenants;
 };
 
 } // namespace game

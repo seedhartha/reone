@@ -32,6 +32,8 @@ namespace game {
 static const float kDefaultDrawDistance = 1024.0f;
 static const float kDefaultFadeDistance = 256.0f;
 
+class Room;
+
 class SpatialObject : public Object {
 public:
     void update(const UpdateContext &ctx) override;
@@ -44,15 +46,17 @@ public:
     virtual void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     virtual void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
 
+    Room *room() const;
     const glm::vec3 &position() const;
     float heading() const;
     const glm::mat4 &transform() const;
-
-    void setPosition(const glm::vec3 &position);
-    void setHeading(float heading);
-
     std::shared_ptr<render::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
+
+    void setRoom(Room *room);
+    void setPosition(const glm::vec3 &position);
+    void setHeading(float heading);
+    void setVisible(bool visible);
 
 protected:
     glm::vec3 _position { 0.0f };
@@ -62,6 +66,7 @@ protected:
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
     float _fadeDistance { kDefaultFadeDistance };
+    Room *_room { nullptr };
 
     SpatialObject(uint32_t id, ObjectType type);
 
