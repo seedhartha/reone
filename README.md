@@ -2,17 +2,13 @@
 
 [![Build Status](https://travis-ci.com/seedhartha/reone.svg?branch=master)](https://travis-ci.com/seedhartha/reone)
 
-reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords.
+reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. We aim to provide an engine that is flexible, performant and portable.
 
-You must legally own a game to run it using reone – we do not endorse piracy.
-
-## Features
-
-Currently, reone has functional resource management, rendering, audio, GUI, scripting and networking subsystems – actual gameplay implementation is very limited. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
+Currently, the most fundamental engine subsystems are already implemented. Actual gameplay, however, is very limited. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
 ## Similar projects
 
-reone is not the only KotOR recreation project out there. Below is my opinion on alternative engines, as the project leader:
+reone is not the only KotOR recreation project out there. Below is my opinion, as the project leader, on alternative engines:
 
 * [xoreos](https://github.com/xoreos/xoreos) – a much more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, somewhat bloated, unoptimized and is not very active anymore.
 * [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – while a fascinating undertaking, I do not believe JavaScript to be the right tool for the job. Still, very useful to have as a reference.
@@ -23,6 +19,8 @@ reone is not the only KotOR recreation project out there. Below is my opinion on
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
 Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
+
+You must legally own a game to run it using reone – we do not endorse piracy.
 
 ## Usage
 
