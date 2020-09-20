@@ -76,6 +76,8 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     boost::to_lower(model);
 
     _model = make_unique<ModelSceneNode>(resources.findModel(model));
+    _model->setAffectedByLight(true);
+
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 

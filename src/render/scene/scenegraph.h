@@ -22,6 +22,7 @@
 
 #include "glm/vec3.hpp"
 
+#include "lightnode.h"
 #include "meshnode.h"
 
 namespace reone {
@@ -35,13 +36,17 @@ public:
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void addOpaqueMesh(MeshSceneNode *node);
     void addTransparentMesh(MeshSceneNode *node);
+    void addLight(LightSceneNode *node);
     void prepare(const glm::vec3 &cameraPosition);
     void render() const;
+
+    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
 private:
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;
     std::vector<MeshSceneNode *> _opaqueMeshes;
     std::vector<MeshSceneNode *> _transparentMeshes;
+    std::vector<LightSceneNode *> _lights;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

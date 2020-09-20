@@ -23,9 +23,18 @@ namespace reone {
 
 namespace render {
 
+class ModelNode;
+
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode() = default;
+    LightSceneNode(const ModelNode *modelNode);
+
+    void fill(SceneGraph *graph) override;
+
+    const ModelNode &modelNode() const;
+
+private:
+    const ModelNode *_modelNode { nullptr };
 };
 
 } // namespace render

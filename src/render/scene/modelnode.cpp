@@ -41,10 +41,10 @@ namespace render {
 
 ModelSceneNode::ModelSceneNode(const shared_ptr<Model> &model) : _model(model) {
     assert(_model);
-    initMeshes();
+    initChildren();
 }
 
-void ModelSceneNode::initMeshes() {
+void ModelSceneNode::initChildren() {
     stack<const ModelNode *> nodes;
     nodes.push(&_model->rootNode());
 
@@ -55,13 +55,22 @@ void ModelSceneNode::initMeshes() {
         for (auto &child : node->children()) {
             nodes.push(child.get());
         }
-        if (!shouldRender(*node)) continue;
+        if (shouldRender(*node)) {
+            shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
+            mesh->setLocalTransform(node->absoluteTransform());
+            addChild(mesh);
 
-        shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
-        mesh->setLocalTransform(node->absoluteTransform());
-        addChild(mesh);
+            _meshes.insert(make_pair(node->nodeNumber(), mesh));
+        }
 
-        _meshes.insert(make_pair(node->nodeNumber(), mesh));
+        shared_ptr<ModelNode::Light> modelLight(node->light());
+        if (modelLight) {
+            shared_ptr<LightSceneNode> light(new LightSceneNode(node));
+            light->setLocalTransform(node->absoluteTransform());
+            addChild(light);
+
+            _lights.insert(make_pair(node->nodeNumber(), light));
+        }
     }
 }
 
@@ -113,6 +122,7 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
     }
     shared_ptr<ModelSceneNode> attached(new ModelSceneNode(model));
     attached->setLocalTransform(parent->absoluteTransform());
+    attached->setAffectedByLight(_affectedByLight);
     addChild(attached);
 
     _attachedModels.insert(make_pair(parent->nodeNumber(), attached));
@@ -242,6 +252,10 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
     if (meshNode != _meshes.end()) {
         meshNode->second->setLocalTransform(finalTransform);
     }
+    auto lightNode = _lights.find(node.nodeNumber());
+    if (lightNode != _lights.end()) {
+        lightNode->second->setLocalTransform(finalTransform);
+    }
     auto attached = _attachedModels.find(node.nodeNumber());
     if (attached != _attachedModels.end()) {
         attached->second->setLocalTransform(finalTransform);
@@ -318,6 +332,10 @@ float ModelSceneNode::alpha() const {
     return _alpha;
 }
 
+bool ModelSceneNode::isAffectedByLight() const {
+    return _affectedByLight;
+}
+
 void ModelSceneNode::setVisible(bool visible) {
     _visible = visible;
 
@@ -344,6 +362,10 @@ void ModelSceneNode::setAlpha(float alpha) {
 
 void ModelSceneNode::setDefaultAnimation(const string &name) {
     _defaultAnimation = name;
+}
+
+void ModelSceneNode::setAffectedByLight(bool affected) {
+    _affectedByLight = affected;
 }
 
 } // namespace render

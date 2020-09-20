@@ -29,6 +29,7 @@ namespace reone {
 
 namespace render {
 
+class LightSceneNode;
 class MeshSceneNode;
 
 class ModelSceneNode : public SceneNode {
@@ -67,17 +68,20 @@ public:
     bool isVisible() const;
     bool isOnScreen() const;
     float alpha() const;
+    bool isAffectedByLight() const;
 
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setDefaultAnimation(const std::string &name);
+    void setAffectedByLight(bool affected);
 
 private:
     std::shared_ptr<Model> _model;
     std::map<uint16_t, glm::mat4> _nodeTransforms;
     AnimationState _animState;
     std::map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
+    std::map<uint16_t, std::shared_ptr<LightSceneNode>> _lights;
     std::map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
@@ -85,8 +89,9 @@ private:
     bool _onScreen { true };
     float _alpha { 1.0f };
     bool _drawAABB { false };
+    bool _affectedByLight { false };
 
-    void initMeshes();
+    void initChildren();
     void doUpdate(float dt, const std::set<std::string> &skipNodes);
     void startNextAnimation();
     void advanceAnimation(float dt, const std::set<std::string> &skipNodes);
