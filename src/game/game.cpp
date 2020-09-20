@@ -56,7 +56,7 @@ Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
     _version(version),
     _path(path),
     _opts(opts),
-    _renderWindow(opts.graphics, this) {
+    _window(opts.graphics, this) {
 
     initObjectFactory();
 }
@@ -66,20 +66,16 @@ void Game::initObjectFactory() {
 }
 
 int Game::run() {
-    _renderWindow.init();
+    _window.init();
 
     ResMan.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
     RoutineMan.init(_version, this);
 
     configure();
+    loadCursor();
 
-    Cursor cursor;
-    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::Cursor);
-
-    _renderWindow.setCursor(cursor);
-    _renderWindow.show();
+    _window.show();
 
     runMainLoop();
 
@@ -87,7 +83,8 @@ int Game::run() {
     RoutineMan.deinit();
     TheAudioPlayer.deinit();
     ResMan.deinit();
-    _renderWindow.deinit();
+
+    _window.deinit();
 
     return 0;
 }
@@ -96,7 +93,6 @@ void Game::configure() {
     loadMainMenu();
     _screen = Screen::MainMenu;
 
-    if (_music) _music->stop();
     switch (_version) {
         case GameVersion::TheSithLords:
             _music = playMusic("mus_sion");
@@ -114,7 +110,9 @@ void Game::loadMainMenu() {
         _mainMenu->resetFocus();
         if (!_classesGui) loadClassSelectionGui();
 
-        if (_music) _music->stop();
+        if (_music) {
+            _music->stop();
+        }
         switch (_version) {
             case GameVersion::TheSithLords:
                 _music = playMusic("mus_main");
@@ -123,7 +121,6 @@ void Game::loadMainMenu() {
                 _music = playMusic("mus_theme_rep");
                 break;
         }
-
         _screen = Screen::ClassSelection;
     });
     mainMenu->setOnExit([this]() { _quit = true; });
@@ -155,6 +152,7 @@ void Game::loadClassSelectionGui() {
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();
         if (!_portraitsGui) loadPortraitsGui();
+
         _portraitsGui->loadPortraits(character);
         _screen = Screen::PortraitSelection;
     });
@@ -197,7 +195,9 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     _module->loadParty(party, entry);
     _module->area().loadState(_state);
 
-    if (_music) _music->stop();
+    if (_music) {
+        _music->stop();
+    }
     string musicName(_module->area().music());
     if (!musicName.empty()) {
         _music = playMusic(musicName);
@@ -281,7 +281,7 @@ void Game::onDialogFinished() {
 
 void Game::configureModule() {
     _module->setOnCameraChanged([this](CameraType type) {
-        _renderWindow.setRelativeMouseMode(type == CameraType::FirstPerson);
+        _window.setRelativeMouseMode(type == CameraType::FirstPerson);
     });
     _module->setOnModuleTransition([this](const string &name, const string &entry) {
         _nextModule = name;
@@ -301,20 +301,28 @@ void Game::startDialog(uint32_t ownerId, const string &resRef) {
     _dialogGui->startDialog(ownerId, resRef);
 }
 
+void Game::loadCursor() {
+    Cursor cursor;
+    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
+    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::Cursor);
+
+    _window.setCursor(cursor);
+}
+
 void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        _renderWindow.processEvents(_quit);
+        _window.processEvents(_quit);
         update();
 
-        _renderWindow.clear();
+        _window.clear();
         drawWorld();
         drawGUI();
         drawGUI3D();
         drawCursor();
 
-        _renderWindow.swapBuffers();
+        _window.swapBuffers();
     }
 }
 
@@ -323,11 +331,12 @@ void Game::update() {
         loadNextModule();
     }
     float dt = getDeltaTime();
-    _renderWindow.update(dt);
+    _window.update(dt);
 
     shared_ptr<GUI> gui(currentGUI());
-    if (gui) gui->update(dt);
-
+    if (gui) {
+        gui->update(dt);
+    }
     bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
     if (updModule && _module) {
         GuiContext guiCtx;
@@ -461,7 +470,7 @@ void Game::drawCursor() {
 
     ShaderMan.setGlobalUniforms(uniforms);
 
-    _renderWindow.drawCursor();
+    _window.drawCursor();
 }
 
 bool Game::handle(const SDL_Event &event) {

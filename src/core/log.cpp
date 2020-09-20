@@ -43,7 +43,7 @@ inline static const char *describeLogLevel(LogLevel level) {
         case LogLevel::Debug:
             return "DEBUG";
         default:
-            throw logic_error("Invalid log level: " + to_string(static_cast<int>(level)));
+            throw invalid_argument("Invalid log level: " + to_string(static_cast<int>(level)));
     }
 }
 
