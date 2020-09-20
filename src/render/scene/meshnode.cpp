@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include <boost/format.hpp>
+
 #include "glm/gtx/norm.hpp"
 
 #include "modelnode.h"
@@ -48,7 +50,7 @@ void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
     _distanceToCamera = glm::distance2(center, cameraPosition);
 }
 
-void MeshSceneNode::render() const {
+void MeshSceneNode::render(const SceneGraph *graph) const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
     const ModelSceneNode::AnimationState &animState = _model->animationState();
@@ -94,7 +96,24 @@ void MeshSceneNode::render() const {
         shaders.setUniform("bones", bones);
     }
 
+    if (graph && _model->isAffectedByLight()) {
+        static std::vector<LightSceneNode *> lights;
+        graph->getLightsAt(_absoluteTransform[3], lights);
+
+        int lightCount = static_cast<int>(lights.size());
+        shaders.setUniform("lightCount", lightCount);
+
+        for (int i = 0; i < lightCount; ++i) {
+            shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), lights[i]->modelNode().light()->ambientOnly);
+            shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(lights[i]->absoluteTransform()[3]));
+            shaders.setUniform(str(boost::format("lights[%d].color") % i), lights[i]->modelNode().color());
+            shaders.setUniform(str(boost::format("lights[%d].multiplier") % i), lights[i]->modelNode().multiplier());
+        }
+    }
+
     mesh->render(_model->textureOverride());
+
+    shaders.setUniform("lightCount", 0);
 }
 
 ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {

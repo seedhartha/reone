@@ -26,6 +26,8 @@ namespace reone {
 
 namespace render {
 
+static const int kMaxLightCount = 4;
+
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
     assert(node);
     _rootNodes.push_back(node);
@@ -41,9 +43,15 @@ void SceneGraph::addTransparentMesh(MeshSceneNode *node) {
     _transparentMeshes.push_back(node);
 }
 
+void SceneGraph::addLight(LightSceneNode *node) {
+    assert(node);
+    _lights.push_back(node);
+}
+
 void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
+    _lights.clear();
 
     for (auto &node : _rootNodes) {
         node->fill(this);
@@ -58,10 +66,31 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
 
 void SceneGraph::render() const {
     for (auto &mesh : _opaqueMeshes) {
-        mesh->render();
+        mesh->render(this);
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->render();
+        mesh->render(this);
+    }
+}
+
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
+    lights.clear();
+
+    for (auto &light : _lights) {
+        const ModelNode &modelNode = light->modelNode();
+        float radius = modelNode.radius();
+
+        if (light->distanceTo(position) > radius * radius) continue;
+
+        lights.push_back(light);
+    }
+
+    sort(lights.begin(), lights.end(), [](const LightSceneNode *left, const LightSceneNode *right) {
+        return left->modelNode().light()->priority < right->modelNode().light()->priority;
+    });
+
+    if (lights.size() > kMaxLightCount) {
+        lights.erase(lights.begin() + kMaxLightCount, lights.end());
     }
 }
 

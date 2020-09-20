@@ -32,7 +32,9 @@ class SceneNode {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
     virtual void fill(SceneGraph *graph);
-    virtual void render() const;
+    virtual void render(const SceneGraph *graph) const;
+
+    float distanceTo(const glm::vec3 &point) const;
 
     const SceneNode *parent() const;
     const glm::mat4 &localTransform() const;

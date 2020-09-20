@@ -17,9 +17,25 @@
 
 #include "lightnode.h"
 
+#include "../model/modelnode.h"
+
+#include "scenegraph.h"
+
 namespace reone {
 
 namespace render {
+
+LightSceneNode::LightSceneNode(const ModelNode *modelNode) : _modelNode(modelNode) {
+    assert(_modelNode);
+}
+
+void LightSceneNode::fill(SceneGraph *graph) {
+    graph->addLight(this);
+}
+
+const ModelNode &LightSceneNode::modelNode() const {
+    return *_modelNode;
+}
 
 } // namespace render
 

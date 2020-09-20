@@ -146,17 +146,44 @@ void main() {
 static const GLchar kDiffuseFragmentShader[] = R"END(
 #version 330
 
+#define MAX_LIGHTS 4
+
+uniform struct Light {
+    bool ambientOnly;
+    vec3 position;
+    vec3 color;
+    float multiplier;
+} lights[MAX_LIGHTS];
+
 uniform sampler2D diffuse;
 uniform vec3 color;
 uniform float alpha;
+uniform int lightCount;
 
+in vec3 fragPosition;
+in vec3 fragNormal;
 in vec2 fragTexCoords;
 
 out vec4 fragColor;
 
 void main() {
+    vec3 finalColor = vec3(0.0);
+    if (lightCount > 0) {
+        vec3 norm = normalize(fragNormal);
+        for (int i = 0; i < lightCount; ++i) {
+            if (lights[i].ambientOnly) {
+                finalColor += lights[i].color * lights[i].multiplier;
+            } else {
+                vec3 lightDir = normalize(lights[i].position - fragPosition);
+                float diff = max(dot(norm, lightDir), 0.0);
+                finalColor += diff * lights[i].color;
+            }
+        }
+    } else {
+        finalColor = color;
+    }
     vec4 objectColor = texture(diffuse, fragTexCoords);
-    fragColor = vec4(objectColor.rgb * color, alpha * objectColor.a);
+    fragColor = vec4(objectColor.rgb * finalColor, alpha * objectColor.a);
 }
 )END";
 

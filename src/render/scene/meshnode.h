@@ -36,7 +36,7 @@ public:
 
     void fill(SceneGraph *graph) override;
     void updateDistanceToCamera(const glm::vec3 &cameraPosition);
-    void render() const override;
+    void render(const SceneGraph *graph) const override;
 
     const ModelSceneNode *model() const;
     const ModelNode *modelNode() const;

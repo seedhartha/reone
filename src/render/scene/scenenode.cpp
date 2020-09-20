@@ -37,10 +37,14 @@ void SceneNode::fill(SceneGraph *graph) {
     }
 }
 
-void SceneNode::render() const {
+void SceneNode::render(const SceneGraph *graph) const {
     for (auto &child : _children) {
-        child->render();
+        child->render(graph);
     }
+}
+
+float SceneNode::distanceTo(const glm::vec3 &point) const {
+    return glm::distance2(glm::vec3(_absoluteTransform[3]), point);
 }
 
 const SceneNode *SceneNode::parent() const {

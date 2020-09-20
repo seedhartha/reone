@@ -154,6 +154,7 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     const string &modelName = table.getString(row, modelColumn);
     _model = make_unique<ModelSceneNode>(resources.findModel(modelName));
+    _model->setAffectedByLight(true);
 
     string texName(table.getString(row, texColumn));
     if (bodyEquipped) {
@@ -188,6 +189,7 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
 
     const string &modelName = table.getString(row, "race");
     _model = make_unique<ModelSceneNode>(resources.findModel(modelName));
+    _model->setAffectedByLight(true);
 
     const string &raceTexName = table.getString(row, "racetex");
     if (!raceTexName.empty()) {
