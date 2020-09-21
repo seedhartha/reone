@@ -37,6 +37,14 @@ const ModelNode &LightSceneNode::modelNode() const {
     return *_modelNode;
 }
 
+float LightSceneNode::distanceToObject() const {
+    return _distanceToObject;
+}
+
+void LightSceneNode::setDistanceToObject(float distance) {
+    _distanceToObject = distance;
+}
+
 } // namespace render
 
 } // namespace reone

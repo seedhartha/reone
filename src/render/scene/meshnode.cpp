@@ -21,8 +21,6 @@
 
 #include <boost/format.hpp>
 
-#include "glm/gtx/norm.hpp"
-
 #include "modelnode.h"
 #include "scenegraph.h"
 
@@ -45,9 +43,13 @@ void MeshSceneNode::fill(SceneGraph *graph) {
     SceneNode::fill(graph);
 }
 
+bool MeshSceneNode::isTransparent() const {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
+}
+
 void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
-    glm::vec3 center(glm::vec4(_modelNode->getCenterOfAABB(), 1.0f) * _absoluteTransform);
-    _distanceToCamera = glm::distance2(center, cameraPosition);
+    _distanceToCamera = glm::distance2(_center, cameraPosition);
 }
 
 void MeshSceneNode::render(const SceneGraph *graph) const {
@@ -98,7 +100,7 @@ void MeshSceneNode::render(const SceneGraph *graph) const {
 
     if (graph && _model->isAffectedByLight()) {
         static std::vector<LightSceneNode *> lights;
-        graph->getLightsAt(_absoluteTransform[3], lights);
+        graph->getLightsAt(_center, lights);
 
         int lightCount = static_cast<int>(lights.size());
         shaders.setUniform("lightCount", lightCount);
@@ -107,7 +109,6 @@ void MeshSceneNode::render(const SceneGraph *graph) const {
             shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), lights[i]->modelNode().light()->ambientOnly);
             shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(lights[i]->absoluteTransform()[3]));
             shaders.setUniform(str(boost::format("lights[%d].color") % i), lights[i]->modelNode().color());
-            shaders.setUniform(str(boost::format("lights[%d].multiplier") % i), lights[i]->modelNode().multiplier());
         }
     }
 
@@ -157,11 +158,6 @@ ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh, bool skelet
     return program;
 }
 
-bool MeshSceneNode::isTransparent() const {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
-}
-
 const ModelSceneNode *MeshSceneNode::model() const {
     return _model;
 }
@@ -172,6 +168,15 @@ const ModelNode *MeshSceneNode::modelNode() const {
 
 float MeshSceneNode::distanceToCamera() const {
     return _distanceToCamera;
+}
+
+void MeshSceneNode::updateAbsoluteTransform() {
+    SceneNode::updateAbsoluteTransform();
+    updateCenter();
+}
+
+void MeshSceneNode::updateCenter() {
+    _center = _absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f);
 }
 
 } // namespace render

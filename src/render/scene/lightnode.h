@@ -32,9 +32,13 @@ public:
     void fill(SceneGraph *graph) override;
 
     const ModelNode &modelNode() const;
+    float distanceToObject() const;
+
+    void setDistanceToObject(float distance);
 
 private:
     const ModelNode *_modelNode { nullptr };
+    float _distanceToObject { 0.0f };
 };
 
 } // namespace render
