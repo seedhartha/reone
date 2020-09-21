@@ -29,8 +29,8 @@ LightSceneNode::LightSceneNode(const ModelNode *modelNode) : _modelNode(modelNod
     assert(_modelNode);
 }
 
-void LightSceneNode::fill(SceneGraph *graph) {
-    graph->addLight(this);
+void LightSceneNode::fillSceneGraph() {
+    TheSceneGraph.addLight(this);
 }
 
 const ModelNode &LightSceneNode::modelNode() const {

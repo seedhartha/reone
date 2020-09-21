@@ -74,10 +74,10 @@ void ModelSceneNode::initChildren() {
     }
 }
 
-void ModelSceneNode::fill(SceneGraph *graph) {
+void ModelSceneNode::fillSceneGraph() {
     if (!_visible || !_onScreen) return;
 
-    SceneNode::fill(graph);
+    SceneNode::fillSceneGraph();
 }
 
 void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {
@@ -122,7 +122,7 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
     }
     shared_ptr<ModelSceneNode> attached(new ModelSceneNode(model));
     attached->setLocalTransform(parent->absoluteTransform());
-    attached->setAffectedByLight(_affectedByLight);
+    attached->setLightingEnabled(_lightingEnabled);
     addChild(attached);
 
     _attachedModels.insert(make_pair(parent->nodeNumber(), attached));
@@ -282,8 +282,31 @@ glm::mat4 ModelSceneNode::getNodeTransform(const ModelNode &node) const {
     return it != _nodeTransforms.end() ? it->second : node.absoluteTransform();
 }
 
+void ModelSceneNode::updateAbsoluteTransform() {
+    SceneNode::updateAbsoluteTransform();
+    _lightingDirty = true;
+}
+
 void ModelSceneNode::playDefaultAnimation() {
     animate(_defaultAnimation, kAnimationLoop | kAnimationPropagate);
+}
+
+void ModelSceneNode::updateLighting() {
+    if (!_lightingEnabled || !_lightingDirty) return;
+
+    _lightsAffectedBy.clear();
+    glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
+
+    TheSceneGraph.getLightsAt(center, _lightsAffectedBy);
+    _lightingDirty = false;
+
+    for (auto &attached : _attachedModels) {
+        attached.second->setLightsAffectedBy(_lightsAffectedBy);
+    }
+}
+
+void ModelSceneNode::setLightingIsDirty() {
+    _lightingDirty = true;
 }
 
 glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
@@ -332,15 +355,24 @@ float ModelSceneNode::alpha() const {
     return _alpha;
 }
 
-bool ModelSceneNode::isAffectedByLight() const {
-    return _affectedByLight;
+bool ModelSceneNode::isLightingEnabled() const {
+    return _lightingEnabled;
+}
+
+const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
+    return _lightsAffectedBy;
 }
 
 void ModelSceneNode::setVisible(bool visible) {
+    if (_visible == visible) return;
+
     _visible = visible;
 
     for (auto &attached : _attachedModels) {
         attached.second->setVisible(visible);
+    }
+    if (visible) {
+        _lightingDirty = true;
     }
 }
 
@@ -364,8 +396,12 @@ void ModelSceneNode::setDefaultAnimation(const string &name) {
     _defaultAnimation = name;
 }
 
-void ModelSceneNode::setAffectedByLight(bool affected) {
-    _affectedByLight = affected;
+void ModelSceneNode::setLightingEnabled(bool enabled) {
+    _lightingEnabled = enabled;
+}
+
+void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {
+    _lightsAffectedBy = lights;
 }
 
 } // namespace render

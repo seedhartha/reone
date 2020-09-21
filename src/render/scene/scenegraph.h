@@ -31,8 +31,9 @@ namespace render {
 
 class SceneGraph {
 public:
-    SceneGraph() = default;
+    static SceneGraph &instance();
 
+    void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void addOpaqueMesh(MeshSceneNode *node);
     void addTransparentMesh(MeshSceneNode *node);
@@ -48,9 +49,12 @@ private:
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
 
+    SceneGraph() = default;
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 };
+
+#define TheSceneGraph render::SceneGraph::instance()
 
 } // namespace render
 

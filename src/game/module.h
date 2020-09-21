@@ -51,7 +51,6 @@ public:
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
     void update3rdPersonCameraHeading();
-    void render() const;
     void saveTo(GameState &state) const;
 
     // Getters

@@ -70,7 +70,7 @@ void Placeable::loadBlueprint(const GffStruct &gffs) {
     boost::to_lower(model);
 
     _model = make_unique<ModelSceneNode>(ResMan.findModel(model));
-    _model->setAffectedByLight(true);
+    _model->setLightingEnabled(true);
 
     _walkmesh = ResMan.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 

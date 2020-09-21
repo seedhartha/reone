@@ -34,13 +34,14 @@ MeshSceneNode::MeshSceneNode(const ModelSceneNode *model, const ModelNode *model
     assert(_model && _modelNode);
 }
 
-void MeshSceneNode::fill(SceneGraph *graph) {
+void MeshSceneNode::fillSceneGraph() {
+    SceneGraph &scene = TheSceneGraph;
     if (isTransparent()) {
-        graph->addTransparentMesh(this);
+        scene.addTransparentMesh(this);
     } else {
-        graph->addOpaqueMesh(this);
+        scene.addOpaqueMesh(this);
     }
-    SceneNode::fill(graph);
+    SceneNode::fillSceneGraph();
 }
 
 bool MeshSceneNode::isTransparent() const {
@@ -52,7 +53,7 @@ void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
     _distanceToCamera = glm::distance2(_center, cameraPosition);
 }
 
-void MeshSceneNode::render(const SceneGraph *graph) const {
+void MeshSceneNode::render() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
     const ModelSceneNode::AnimationState &animState = _model->animationState();
@@ -98,23 +99,29 @@ void MeshSceneNode::render(const SceneGraph *graph) const {
         shaders.setUniform("bones", bones);
     }
 
-    if (graph && _model->isAffectedByLight()) {
-        static std::vector<LightSceneNode *> lights;
-        graph->getLightsAt(_center, lights);
+    int lightCount = 0;
 
-        int lightCount = static_cast<int>(lights.size());
+    if (_model->isLightingEnabled()) {
+        const vector<LightSceneNode *> &lights = _model->lightsAffectedBy();
+        lightCount = static_cast<int>(lights.size());
+
+        shaders.setUniform("lightingEnabled", true);
         shaders.setUniform("lightCount", lightCount);
 
         for (int i = 0; i < lightCount; ++i) {
-            shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), lights[i]->modelNode().light()->ambientOnly);
-            shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(lights[i]->absoluteTransform()[3]));
-            shaders.setUniform(str(boost::format("lights[%d].color") % i), lights[i]->modelNode().color());
+            LightSceneNode *light = lights[i];
+            shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), light->modelNode().light()->ambientOnly);
+            shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(light->absoluteTransform()[3]));
+            shaders.setUniform(str(boost::format("lights[%d].color") % i), light->modelNode().color());
+            shaders.setUniform(str(boost::format("lights[%d].multiplier") % i), light->modelNode().multiplier());
         }
     }
 
     mesh->render(_model->textureOverride());
 
-    shaders.setUniform("lightCount", 0);
+    if (_model->isLightingEnabled()) {
+        shaders.setUniform("lightingEnabled", false);
+    }
 }
 
 ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {

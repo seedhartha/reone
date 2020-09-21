@@ -30,6 +30,7 @@
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
+#include "../render/scene/scenegraph.h"
 #include "../resources/lytfile.h"
 #include "../resources/resources.h"
 #include "../resources/visfile.h"
@@ -131,6 +132,7 @@ void Area::loadProperties(const GffStruct &gffs) {
 
 void Area::loadLayout() {
     ResourceManager &resources = ResMan;
+    SceneGraph &scene = TheSceneGraph;
 
     LytFile lyt;
     lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
@@ -139,7 +141,7 @@ void Area::loadLayout() {
         shared_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->animate("animloop1", kAnimationLoop);
-        _sceneGraph.addRoot(model);
+        scene.addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
         if (walkmesh) {
@@ -180,7 +182,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 
     shared_ptr<ModelSceneNode> sceneNode(object->model());
     if (sceneNode) {
-        _sceneGraph.addRoot(sceneNode);
+        TheSceneGraph.addRoot(sceneNode);
     }
 
     determineObjectRoom(*object);
@@ -270,9 +272,8 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     for (auto &object : _objects) {
         object->update(updateCtx);
     }
-    updateRoomVisibility();
 
-    _sceneGraph.prepare(updateCtx.cameraPosition);
+    TheSceneGraph.prepare(updateCtx.cameraPosition);
 
     if (_debugMode == DebugMode::GameObjects) {
         guiCtx.debug.objects.clear();
@@ -366,10 +367,6 @@ void Area::updateTriggers(const Creature &creature) {
             break;
         }
     }
-}
-
-void Area::render() const {
-    _sceneGraph.render();
 }
 
 void Area::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {

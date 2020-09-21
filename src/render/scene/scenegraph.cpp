@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <cassert>
 
+#include "modelnode.h"
+
 using namespace std;
 
 namespace reone {
@@ -27,6 +29,18 @@ namespace reone {
 namespace render {
 
 static const int kMaxLightCount = 8;
+
+SceneGraph &SceneGraph::instance() {
+    static SceneGraph graph;
+    return graph;
+}
+
+void SceneGraph::clear() {
+    _opaqueMeshes.clear();
+    _transparentMeshes.clear();
+    _lights.clear();
+    _rootNodes.clear();
+}
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
     assert(node);
@@ -54,7 +68,13 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
     _lights.clear();
 
     for (auto &node : _rootNodes) {
-        node->fill(this);
+        node->fillSceneGraph();
+    }
+    for (auto &node : _rootNodes) {
+        ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(node.get());
+        if (modelNode) {
+            modelNode->updateLighting();
+        }
     }
     for (auto &mesh : _transparentMeshes) {
         mesh->updateDistanceToCamera(cameraPosition);
@@ -66,10 +86,10 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
 
 void SceneGraph::render() const {
     for (auto &mesh : _opaqueMeshes) {
-        mesh->render(this);
+        mesh->render();
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->render(this);
+        mesh->render();
     }
 }
 

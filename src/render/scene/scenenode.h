@@ -31,8 +31,8 @@ class SceneGraph;
 class SceneNode {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
-    virtual void fill(SceneGraph *graph);
-    virtual void render(const SceneGraph *graph) const;
+    virtual void fillSceneGraph();
+    virtual void render() const;
 
     float distanceTo(const glm::vec3 &point) const;
 
