@@ -50,31 +50,48 @@ public:
 
     ModelSceneNode(const std::shared_ptr<Model> &model);
 
-    void fill(SceneGraph *graph) override;
-
-    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
-    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void changeTexture(const std::string &resRef);
     void update(float dt);
-    void playDefaultAnimation();
+    void fillSceneGraph() override;
 
     glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
 
     const std::string &name() const;
     std::shared_ptr<Model> model() const;
-    const AnimationState &animationState() const;
     std::shared_ptr<Texture> textureOverride() const;
     bool isVisible() const;
     bool isOnScreen() const;
     float alpha() const;
-    bool isAffectedByLight() const;
 
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
+
+    // Animation
+
+    void playDefaultAnimation();
+    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
+
+    const AnimationState &animationState() const;
+
     void setDefaultAnimation(const std::string &name);
-    void setAffectedByLight(bool affected);
+
+    // END Animation
+
+    // Dynamic lighting
+
+    void updateLighting();
+    void setLightingIsDirty();
+
+    bool isLightingEnabled() const;
+    const std::vector<LightSceneNode *> &lightsAffectedBy() const;
+
+    void setLightingEnabled(bool affected);
+    void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
+
+    // END Dynamic lighting
 
 private:
     std::shared_ptr<Model> _model;
@@ -89,7 +106,9 @@ private:
     bool _onScreen { true };
     float _alpha { 1.0f };
     bool _drawAABB { false };
-    bool _affectedByLight { false };
+    bool _lightingEnabled { false };
+    std::vector<LightSceneNode *> _lightsAffectedBy;
+    bool _lightingDirty { true };
 
     void initChildren();
     void doUpdate(float dt, const std::set<std::string> &skipNodes);
@@ -99,6 +118,7 @@ private:
     void updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform);
     bool shouldRender(const ModelNode &node) const;
     glm::mat4 getNodeTransform(const ModelNode &node) const;
+    void updateAbsoluteTransform() override;
 };
 
 } // namespace render

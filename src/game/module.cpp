@@ -144,6 +144,7 @@ void Module::loadParty(const PartyConfiguration &party, const string &entry) {
     getEntryPoint(entry, position, heading);
 
     _area->loadParty(_party, position, heading);
+    _area->updateRoomVisibility();
 
     update3rdPersonCameraTarget();
     update3rdPersonCameraHeading();
@@ -395,7 +396,9 @@ void Module::updatePlayer(float dt) {
         if (_area->moveCreatureTowards(player, target, dt)) {
             player.setMovementType(MovementType::Run);
             update3rdPersonCameraTarget();
+            _area->updateRoomVisibility();
         }
+
     } else {
         player.setMovementType(MovementType::None);
     }
@@ -404,10 +407,6 @@ void Module::updatePlayer(float dt) {
 void Module::saveTo(GameState &state) const {
     state.party = _party;
     _area->saveTo(state);
-}
-
-void Module::render() const {
-    _area->render();
 }
 
 void Module::setOnCameraChanged(const function<void(CameraType)> &fn) {

@@ -27,7 +27,11 @@ namespace game {
 
 class MultiplayerObjectFactory : public ObjectFactory {
 public:
-    MultiplayerObjectFactory(resources::GameVersion version, MultiplayerMode mode, IMultiplayerCallbacks *callbacks, const Options &opts);
+    MultiplayerObjectFactory(
+        resources::GameVersion version,
+        MultiplayerMode mode,
+        IMultiplayerCallbacks *callbacks,
+        const Options &opts);
 
     std::unique_ptr<Area> newArea();
     std::unique_ptr<Creature> newCreature();

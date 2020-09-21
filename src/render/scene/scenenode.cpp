@@ -33,15 +33,15 @@ void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
     _children.push_back(node);
 }
 
-void SceneNode::fill(SceneGraph *graph) {
+void SceneNode::fillSceneGraph() {
     for (auto &child : _children) {
-        child->fill(graph);
+        child->fillSceneGraph();
     }
 }
 
-void SceneNode::render(const SceneGraph *graph) const {
+void SceneNode::render() const {
     for (auto &child : _children) {
-        child->render(graph);
+        child->render();
     }
 }
 

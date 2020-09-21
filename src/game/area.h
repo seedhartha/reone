@@ -22,7 +22,6 @@
 #include "../gui/types.h"
 #include "../net/types.h"
 #include "../render/camera/camera.h"
-#include "../render/scene/scenegraph.h"
 #include "../render/types.h"
 #include "../resources/types.h"
 #include "../script/variable.h"
@@ -47,7 +46,10 @@ class ObjectFactory;
 
 class Area : public Object, public ObjectContainer {
 public:
-    Area(uint32_t id, resources::GameVersion version, ObjectFactory *objectFactory);
+    Area(
+        uint32_t id,
+        resources::GameVersion version,
+        ObjectFactory *objectFactory);
 
     void load(const std::string &name, const resources::GffStruct &are, const resources::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
@@ -57,7 +59,7 @@ public:
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
     void updateTriggers(const Creature &creature);
-    void render() const;
+    void updateRoomVisibility();
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
@@ -136,7 +138,6 @@ private:
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
-    render::SceneGraph _sceneGraph;
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
@@ -150,7 +151,6 @@ private:
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     bool findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
     bool findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
-    void updateRoomVisibility();
 
     // Loading
     void loadProperties(const resources::GffStruct &gffs);

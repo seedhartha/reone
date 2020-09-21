@@ -29,7 +29,7 @@ class LightSceneNode : public SceneNode {
 public:
     LightSceneNode(const ModelNode *modelNode);
 
-    void fill(SceneGraph *graph) override;
+    void fillSceneGraph() override;
 
     const ModelNode &modelNode() const;
     float distanceToObject() const;

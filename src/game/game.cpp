@@ -25,6 +25,7 @@
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
+#include "../render/scene/scenegraph.h"
 #include "../resources/resources.h"
 
 #include "object/factory.h"
@@ -359,6 +360,7 @@ void Game::loadNextModule() {
     if (_module) {
         _module->saveTo(_state);
     }
+    TheSceneGraph.clear();
     loadModule(_nextModule, _state.party, _nextEntry);
 
     _nextModule.clear();
@@ -409,7 +411,7 @@ void Game::drawWorld() {
         case Screen::InGame:
         case Screen::Dialog:
         case Screen::Container:
-            _module->render();
+            TheSceneGraph.render();
             break;
         default:
             break;
