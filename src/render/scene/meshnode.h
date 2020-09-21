@@ -45,10 +45,14 @@ public:
 private:
     const ModelSceneNode *_model { nullptr };
     const ModelNode *_modelNode { nullptr };
+    glm::vec3 _center { 0.0f };
     float _distanceToCamera { 0.0f };
 
     bool isTransparent() const;
+
     ShaderProgram getShaderProgram(const ModelMesh &mesh, bool skeletal) const;
+    void updateAbsoluteTransform() override;
+    void updateCenter();
 };
 
 } // namespace render

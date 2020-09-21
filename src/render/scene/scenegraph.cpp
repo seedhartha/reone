@@ -26,7 +26,7 @@ namespace reone {
 
 namespace render {
 
-static const int kMaxLightCount = 4;
+static const int kMaxLightCount = 8;
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
     assert(node);
@@ -77,16 +77,24 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
     lights.clear();
 
     for (auto &light : _lights) {
+        float distance = light->distanceTo(position);
         const ModelNode &modelNode = light->modelNode();
         float radius = modelNode.radius();
 
-        if (light->distanceTo(position) > radius * radius) continue;
+        if (distance > radius * radius) continue;
 
+        light->setDistanceToObject(distance);
         lights.push_back(light);
     }
 
     sort(lights.begin(), lights.end(), [](const LightSceneNode *left, const LightSceneNode *right) {
-        return left->modelNode().light()->priority < right->modelNode().light()->priority;
+        int leftPriority = left->modelNode().light()->priority;
+        int rightPriority = right->modelNode().light()->priority;
+
+        if (leftPriority < rightPriority) return true;
+        if (leftPriority > rightPriority) return false;
+
+        return left->distanceToObject() < right->distanceToObject();
     });
 
     if (lights.size() > kMaxLightCount) {

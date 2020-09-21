@@ -51,13 +51,13 @@ protected:
 
     SceneNode() = default;
 
+    virtual void updateAbsoluteTransform();
+
 private:
     std::vector<std::shared_ptr<SceneNode>> _children;
 
     SceneNode(const SceneNode &) = delete;
     SceneNode &operator=(const SceneNode &) = delete;
-
-    void updateAbsoluteTransform();
 };
 
 } // namespace render
