@@ -250,15 +250,15 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
 
     auto meshNode = _meshes.find(node.nodeNumber());
     if (meshNode != _meshes.end()) {
-        meshNode->second->setLocalTransform(finalTransform);
+        meshNode->second->setLocalTransform(getNodeTransform(node));
     }
     auto lightNode = _lights.find(node.nodeNumber());
     if (lightNode != _lights.end()) {
-        lightNode->second->setLocalTransform(finalTransform);
+        lightNode->second->setLocalTransform(getNodeTransform(node));
     }
     auto attached = _attachedModels.find(node.nodeNumber());
     if (attached != _attachedModels.end()) {
-        attached->second->setLocalTransform(finalTransform);
+        attached->second->setLocalTransform(getNodeTransform(node));
     }
 
     for (auto &child : node.children()) {
