@@ -124,6 +124,8 @@ void MeshSceneNode::render() const {
     if (_model->isLightingEnabled()) {
         shaders.setUniform("lightingEnabled", false);
     }
+
+    SceneNode::render();
 }
 
 ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {

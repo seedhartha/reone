@@ -29,6 +29,8 @@ class AABBSceneNode : public SceneNode {
 public:
     AABBSceneNode(const AABB &abbb);
 
+    void render() const override;
+
     const AABB &aabb() const;
 
 private:

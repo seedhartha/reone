@@ -26,6 +26,7 @@
 #include "../../resources/resources.h"
 
 #include "../mesh/aabb.h"
+#include "../scene/aabbnode.h"
 #include "../scene/meshnode.h"
 #include "../scene/scenegraph.h"
 
@@ -58,6 +59,10 @@ void ModelSceneNode::initChildren() {
         if (shouldRender(*node)) {
             shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
             mesh->setLocalTransform(node->absoluteTransform());
+
+            shared_ptr<AABBSceneNode> aabb(new AABBSceneNode(node->mesh()->aabb()));
+            mesh->addChild(aabb);
+
             addChild(mesh);
 
             _meshes.insert(make_pair(node->nodeNumber(), mesh));
@@ -248,17 +253,18 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
     _nodeTransforms.insert(make_pair(node.nodeNumber(), finalTransform));
     _animState.boneTransforms.insert(make_pair(node.index(), finalTransform * node.absoluteTransformInverse()));
 
+    glm::mat4 nodeTransform(getNodeTransform(node));
     auto meshNode = _meshes.find(node.nodeNumber());
     if (meshNode != _meshes.end()) {
-        meshNode->second->setLocalTransform(getNodeTransform(node));
+        meshNode->second->setLocalTransform(nodeTransform);
     }
     auto lightNode = _lights.find(node.nodeNumber());
     if (lightNode != _lights.end()) {
-        lightNode->second->setLocalTransform(getNodeTransform(node));
+        lightNode->second->setLocalTransform(nodeTransform);
     }
     auto attached = _attachedModels.find(node.nodeNumber());
     if (attached != _attachedModels.end()) {
-        attached->second->setLocalTransform(getNodeTransform(node));
+        attached->second->setLocalTransform(nodeTransform);
     }
 
     for (auto &child : node.children()) {

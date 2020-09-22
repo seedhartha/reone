@@ -158,6 +158,7 @@ private:
     void loadVisibility();
     void loadCameraStyle(const resources::GffStruct &are);
     void loadScripts(const resources::GffStruct &are);
+    void loadAmbientColor(const resources::GffStruct &are);
 };
 
 } // namespace game
