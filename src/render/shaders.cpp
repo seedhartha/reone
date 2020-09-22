@@ -167,6 +167,8 @@ in vec2 fragLightmapCoords;
 out vec4 fragColor;
 
 vec3 getAggregateLightColor() {
+    if (lightCount == 0) return vec3(1.0);
+
     vec3 aggregate = vec3(0.0);
     vec3 normal = normalize(fragNormal);
 

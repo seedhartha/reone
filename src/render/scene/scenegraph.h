@@ -41,7 +41,7 @@ public:
     void prepare(const glm::vec3 &cameraPosition);
     void render() const;
 
-    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
+    void getLightsAt(const glm::vec3 &position, float distanceToCamera, std::vector<LightSceneNode *> &lights) const;
 
 private:
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;

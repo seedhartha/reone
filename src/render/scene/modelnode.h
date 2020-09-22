@@ -82,7 +82,7 @@ public:
 
     // Dynamic lighting
 
-    void updateLighting();
+    void updateLighting(const glm::vec3 &cameraPosition);
     void setLightingIsDirty();
 
     bool isLightingEnabled() const;
