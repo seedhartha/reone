@@ -43,11 +43,16 @@ public:
 
     void getLightsAt(const glm::vec3 &position, float distanceToCamera, std::vector<LightSceneNode *> &lights) const;
 
+    const glm::vec3 &ambientLightColor() const;
+
+    void setAmbientLightColor(const glm::vec3 &color);
+
 private:
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;
     std::vector<MeshSceneNode *> _opaqueMeshes;
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
+    glm::vec3 _ambientLightColor { 1.0f };
 
     SceneGraph() = default;
     SceneGraph(const SceneGraph &) = delete;

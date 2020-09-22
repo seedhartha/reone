@@ -137,7 +137,6 @@ static const GLchar kSharedFragmentShaderCode[] = R"END(
 const int MAX_LIGHTS = 8;
 
 uniform struct Light {
-    bool ambientOnly;
     vec3 position;
     float radius;
     vec3 color;
@@ -155,6 +154,7 @@ uniform samplerCube bumpyShiny;
 
 uniform bool lightingEnabled;
 uniform int lightCount;
+uniform vec3 ambientLightColor;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -164,26 +164,23 @@ in vec2 fragLightmapCoords;
 out vec4 fragColor;
 
 vec3 getAggregateLightColor() {
-    if (lightCount == 0) return vec3(1.0);
+    vec3 result = ambientLightColor;
 
-    vec3 aggregate = vec3(0.0);
+    if (lightCount == 0) {
+        return result;
+    }
     vec3 normal = normalize(fragNormal);
 
     for (int i = 0; i < lightCount; ++i) {
-        if (lights[i].ambientOnly) {
-            aggregate += lights[i].multiplier * lights[i].color;
+        vec3 fragToLight = lights[i].position - fragPosition;
+        vec3 lightDir = normalize(fragToLight);
+        float diff = max(dot(normal, lightDir), 0.0);
+        float attenuation = smoothstep(lights[i].radius, 0.0, length(fragToLight));
 
-        } else {
-            vec3 fragToLight = lights[i].position - fragPosition;
-            vec3 lightDir = normalize(fragToLight);
-            float diff = max(dot(normal, lightDir), 0.0);
-            float attenuation = smoothstep(lights[i].radius, 0.0, length(fragToLight));
-
-            aggregate += diff * lights[i].multiplier * lights[i].color * attenuation;
-        }
+        result += diff * lights[i].multiplier * lights[i].color * attenuation;
     }
 
-    return clamp(aggregate, 0.1, 1.0);
+    return min(result, 1.0);
 }
 )END";
 

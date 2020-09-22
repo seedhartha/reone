@@ -107,6 +107,7 @@ void MeshSceneNode::render() const {
 
         shaders.setUniform("lightingEnabled", true);
         shaders.setUniform("lightCount", lightCount);
+        shaders.setUniform("ambientLightColor", TheSceneGraph.ambientLightColor());
 
         for (int i = 0; i < lightCount; ++i) {
             LightSceneNode *light = lights[i];
