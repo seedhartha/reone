@@ -80,15 +80,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
     loadLayout();
     loadCameraStyle(are);
     loadScripts(are);
-
-    int ambientColorValue = are.getInt("DynAmbientColor");
-    glm::vec3 ambientColor(
-        ambientColorValue & 0xff,
-        (ambientColorValue >> 8) & 0xff,
-        (ambientColorValue >> 16) & 0xff);
-
-    ambientColor /= 255.0f;
-    TheSceneGraph.setAmbientLightColor(ambientColor);
+    loadAmbientColor(are);
 
     for (auto &gffs : git.getList("Creature List")) {
         shared_ptr<Creature> creature(_objectFactory->newCreature());
@@ -184,6 +176,17 @@ void Area::loadScripts(const GffStruct &are) {
     _scripts[ScriptType::OnExit] = are.getString("OnExit");
     _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
     _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
+}
+
+void Area::loadAmbientColor(const GffStruct &are) {
+    int ambientColorValue = are.getInt("DynAmbientColor");
+    glm::vec3 ambientColor(
+        ambientColorValue & 0xff,
+        (ambientColorValue >> 8) & 0xff,
+        (ambientColorValue >> 16) & 0xff);
+
+    ambientColor /= 255.0f;
+    TheSceneGraph.setAmbientLightColor(ambientColor);
 }
 
 void Area::add(const shared_ptr<SpatialObject> &object) {
@@ -416,6 +419,7 @@ void Area::runOnEnterScript() {
 
 void Area::setDebugMode(DebugMode mode) {
     _debugMode = mode;
+    TheSceneGraph.setAABBEnabled(mode == DebugMode::ModelNodes);
 }
 
 void Area::saveTo(GameState &state) const {

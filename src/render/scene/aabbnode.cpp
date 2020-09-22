@@ -17,11 +17,21 @@
 
 #include "aabbnode.h"
 
+#include "../mesh/aabb.h"
+
+#include "scenegraph.h"
+
 namespace reone {
 
 namespace render {
 
 AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
+}
+
+void AABBSceneNode::render() const {
+    if (!TheSceneGraph.isAABBEnabled()) return;
+
+    TheAABBMesh.render(_aabb, _absoluteTransform);
 }
 
 const AABB &AABBSceneNode::aabb() const {
