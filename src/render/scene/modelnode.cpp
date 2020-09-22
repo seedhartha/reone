@@ -291,13 +291,14 @@ void ModelSceneNode::playDefaultAnimation() {
     animate(_defaultAnimation, kAnimationLoop | kAnimationPropagate);
 }
 
-void ModelSceneNode::updateLighting() {
+void ModelSceneNode::updateLighting(const glm::vec3 &cameraPosition) {
     if (!_lightingEnabled || !_lightingDirty) return;
 
     _lightsAffectedBy.clear();
     glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
+    float distanceToCamera = glm::distance2(center, cameraPosition);
 
-    TheSceneGraph.getLightsAt(center, _lightsAffectedBy);
+    TheSceneGraph.getLightsAt(center, distanceToCamera, _lightsAffectedBy);
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {
