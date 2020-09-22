@@ -136,13 +136,10 @@ static const GLchar kSharedFragmentShaderCode[] = R"END(
 
 const int MAX_LIGHTS = 8;
 
-const float ATTENUATION_CONST = 1.0;
-const float ATTENUATION_LINEAR = 0.09;
-const float ATTENUATION_QUADRATIC = 0.032;
-
 uniform struct Light {
     bool ambientOnly;
     vec3 position;
+    float radius;
     vec3 color;
     float multiplier;
 } lights[MAX_LIGHTS];
@@ -180,9 +177,7 @@ vec3 getAggregateLightColor() {
             vec3 fragToLight = lights[i].position - fragPosition;
             vec3 lightDir = normalize(fragToLight);
             float diff = max(dot(normal, lightDir), 0.0);
-
-            float distance = length(fragToLight);
-            float attenuation = 1.0 / (ATTENUATION_CONST + ATTENUATION_LINEAR * distance + ATTENUATION_QUADRATIC * (distance * distance));
+            float attenuation = smoothstep(lights[i].radius, 0.0, length(fragToLight));
 
             aggregate += diff * lights[i].multiplier * lights[i].color * attenuation;
         }

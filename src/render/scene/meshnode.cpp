@@ -112,6 +112,7 @@ void MeshSceneNode::render() const {
             LightSceneNode *light = lights[i];
             shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), light->modelNode().light()->ambientOnly);
             shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(light->absoluteTransform()[3]));
+            shaders.setUniform(str(boost::format("lights[%d].radius") % i), light->modelNode().radius());
             shaders.setUniform(str(boost::format("lights[%d].color") % i), light->modelNode().color());
             shaders.setUniform(str(boost::format("lights[%d].multiplier") % i), light->modelNode().multiplier());
         }
