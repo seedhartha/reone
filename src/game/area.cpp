@@ -81,6 +81,15 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
     loadCameraStyle(are);
     loadScripts(are);
 
+    int ambientColorValue = are.getInt("DynAmbientColor");
+    glm::vec3 ambientColor(
+        ambientColorValue & 0xff,
+        (ambientColorValue >> 8) & 0xff,
+        (ambientColorValue >> 16) & 0xff);
+
+    ambientColor /= 255.0f;
+    TheSceneGraph.setAmbientLightColor(ambientColor);
+
     for (auto &gffs : git.getList("Creature List")) {
         shared_ptr<Creature> creature(_objectFactory->newCreature());
         creature->load(gffs);

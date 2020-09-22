@@ -29,7 +29,7 @@ namespace reone {
 namespace render {
 
 static const int kMaxLightCount = 8;
-static const float kDistanceMaxLights = 256.0f;
+static const float kDistanceMaxLights = 512.0f;
 
 SceneGraph &SceneGraph::instance() {
     static SceneGraph graph;
@@ -98,6 +98,8 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, float distanceToCamera, 
     lights.clear();
 
     for (auto &light : _lights) {
+        if (light->modelNode().light()->ambientOnly) continue;
+
         float distance = light->distanceTo(position);
         const ModelNode &modelNode = light->modelNode();
         float radius = modelNode.radius();
@@ -123,6 +125,14 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, float distanceToCamera, 
     if (lights.size() > lightCount) {
         lights.erase(lights.begin() + lightCount, lights.end());
     }
+}
+
+const glm::vec3 &SceneGraph::ambientLightColor() const {
+    return _ambientLightColor;
+}
+
+void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
+    _ambientLightColor = color;
 }
 
 } // namespace render
