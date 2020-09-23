@@ -28,6 +28,7 @@
 #include "../render/scene/scenegraph.h"
 #include "../resources/resources.h"
 
+#include "blueprint/blueprints.h"
 #include "object/factory.h"
 #include "script/routines.h"
 #include "util.h"
@@ -186,6 +187,7 @@ void Game::loadPortraitsGui() {
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
     Resources.loadModule(name);
+    Blueprints.clearCache();
 
     shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
 

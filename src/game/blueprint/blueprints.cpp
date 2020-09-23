@@ -40,6 +40,15 @@ BlueprintManager &BlueprintManager::instance() {
     return instance;
 }
 
+void BlueprintManager::clearCache() {
+    g_creatureCache.clear();
+    g_doorCache.clear();
+    g_itemCache.clear();
+    g_placeableCache.clear();
+    g_triggerCache.clear();
+    g_waypointCache.clear();
+}
+
 shared_ptr<CreatureBlueprint> BlueprintManager::findCreature(const string &resRef) {
     return find<CreatureBlueprint>(resRef, ResourceType::CreatureBlueprint, g_creatureCache);
 }
@@ -77,7 +86,7 @@ shared_ptr<T> BlueprintManager::find(const string &resRef, ResourceType type, ma
         blueprint.reset(new T());
         blueprint->load(resRef, *gff);
     } else {
-        warn(boost::format("Blueprint: not found: %s %d") % resRef % static_cast<int>(type));
+        warn(boost::format("Blueprints: not found: %s %d") % resRef % static_cast<int>(type));
     }
     auto pair = cache.insert(make_pair(resRef, blueprint));
 
