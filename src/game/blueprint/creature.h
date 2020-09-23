@@ -18,6 +18,8 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <vector>
 
 #include "../../resources/gfffile.h"
 
@@ -31,7 +33,34 @@ public:
 
     void load(const std::string &resRef, const resources::GffStruct &utc);
 
+    const std::string &tag() const;
+    const std::vector<std::string> &equipment() const;
+    int appearance() const;
+    const std::string &conversation() const;
+
 private:
+    enum class ScriptType {
+        OnNotice,
+        SpellAt,
+        Attacked,
+        Damaged,
+        Disturbed,
+        EndRound,
+        EndDialogu,
+        Dialogue,
+        Spawn,
+        Rested,
+        Death,
+        UserDefine,
+        OnBlocked
+    };
+
+    std::string _tag;
+    std::vector<std::string> _equipment;
+    int _appearance { 0 };
+    std::string _conversation;
+    std::map<ScriptType, std::string> _scripts;
+
     CreatureBlueprint(const CreatureBlueprint &) = delete;
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 };

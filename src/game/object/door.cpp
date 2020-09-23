@@ -23,6 +23,8 @@
 #include "../../render/scene/modelnode.h"
 #include "../../resources/resources.h"
 
+#include "../blueprint/blueprints.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -56,23 +58,20 @@ void Door::load(const GffStruct &gffs) {
     }
 
     string templResRef(gffs.getString("TemplateResRef"));
-    shared_ptr<GffStruct> utd(resources.findGFF(templResRef, ResourceType::DoorBlueprint));
-    loadBlueprint(*utd);
+    boost::to_lower(templResRef);
 
+    loadBlueprint(templResRef);
     updateTransform();
 }
 
-void Door::loadBlueprint(const GffStruct &gffs) {
-    _tag = gffs.getString("Tag");
-    boost::to_lower(_tag);
+void Door::loadBlueprint(const string &resRef) {
+    _blueprint = Blueprints.findDoor(resRef);
+    _tag = _blueprint->tag();
 
-    _static = gffs.getInt("Static", 0) != 0;
-
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = ResMan;
     shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
 
-    int type = gffs.getInt("GenericType");
-    string model(table->getString(type, "modelname"));
+    string model(table->getString(_blueprint->genericType(), "modelname"));
     boost::to_lower(model);
 
     _model = make_unique<ModelSceneNode>(resources.findModel(model));
@@ -121,7 +120,7 @@ bool Door::isOpen() const {
 }
 
 bool Door::isStatic() const {
-    return _static;
+    return _blueprint->isStatic();
 }
 
 const string &Door::linkedToModule() const {

@@ -21,6 +21,8 @@
 
 #include "../../resources/gfffile.h"
 
+#include "../blueprint/placeable.h"
+
 #include "item.h"
 #include "spatial.h"
 
@@ -40,9 +42,10 @@ public:
 
 private:
     ObjectFactory *_objectFactory { nullptr };
+    std::shared_ptr<PlaceableBlueprint> _blueprint;
     std::vector<std::shared_ptr<Item>> _items;
 
-    void loadBlueprint(const resources::GffStruct &gffs);
+    void loadBlueprint(const std::string &resRef);
 };
 
 } // namespace game

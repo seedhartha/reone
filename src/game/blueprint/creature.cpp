@@ -17,6 +17,8 @@
 
 #include "creature.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 
 using namespace reone::resources;
@@ -26,6 +28,35 @@ namespace reone {
 namespace game {
 
 void CreatureBlueprint::load(const string &resRef, const GffStruct &utc) {
+    _tag = utc.getString("Tag");
+    boost::to_lower(_tag);
+
+    for (auto &item : utc.getList("Equip_ItemList")) {
+        string itemResRef(item.getString("EquippedRes"));
+        boost::to_lower(itemResRef);
+
+        _equipment.push_back(move(itemResRef));
+    }
+
+    _appearance = utc.getInt("Appearance_Type");
+    _conversation = utc.getString("Conversation");
+    _scripts[ScriptType::Spawn] = utc.getString("ScriptSpawn");
+}
+
+const string &CreatureBlueprint::tag() const {
+    return _tag;
+}
+
+const vector<string> &CreatureBlueprint::equipment() const {
+    return _equipment;
+}
+
+int CreatureBlueprint::appearance() const {
+    return _appearance;
+}
+
+const string &CreatureBlueprint::conversation() const {
+    return _conversation;
 }
 
 } // namespace game

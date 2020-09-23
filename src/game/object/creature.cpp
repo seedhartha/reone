@@ -79,27 +79,21 @@ void Creature::load(const GffStruct &gffs) {
     _heading = -glm::atan(dirX, dirY);
 
     string templResRef(gffs.getString("TemplateResRef"));
-    shared_ptr<GffStruct> utc(ResMan.findGFF(templResRef, ResourceType::CreatureBlueprint));
-    loadBlueprint(*utc);
+    boost::to_lower(templResRef);
 
+    loadBlueprint(templResRef);
     updateTransform();
 }
 
-void Creature::loadBlueprint(const GffStruct &gffs) {
-    _tag = gffs.getString("Tag");
-    boost::to_lower(_tag);
+void Creature::loadBlueprint(const string &resRef) {
+    _blueprint = Blueprints.findCreature(resRef);
+    _tag = _blueprint->tag();
 
-    for (auto &item : gffs.getList("Equip_ItemList")) {
-        equip(item.getString("EquippedRes"));
+    for (auto &item : _blueprint->equipment()) {
+        equip(item);
     }
-
     shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
-    int appearance = gffs.getInt("Appearance_Type");
-    loadAppearance(*appearanceTable, appearance);
-
-    _conversation = gffs.getString("Conversation");
-
-    _scripts[ScriptType::Spawn] = gffs.getString("ScriptSpawn");
+    loadAppearance(*appearanceTable, _blueprint->appearance());
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
@@ -279,12 +273,6 @@ void Creature::equip(const string &resRef) {
     }
 }
 
-void Creature::runSpawnScript() {
-    if (!_scripts[ScriptType::Spawn].empty()) {
-        runScript(_scripts[ScriptType::Spawn], _id, kObjectInvalid, -1);
-    }
-}
-
 void Creature::saveTo(AreaState &state) const {
     if (_tag.empty()) return;
 
@@ -407,7 +395,7 @@ shared_ptr<Texture> Creature::portrait() const {
 }
 
 const string &Creature::conversation() const {
-    return _conversation;
+    return _blueprint->conversation();
 }
 
 const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {

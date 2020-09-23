@@ -17,6 +17,8 @@
 
 #include "placeable.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 
 using namespace reone::resources;
@@ -26,6 +28,32 @@ namespace reone {
 namespace game {
 
 void PlaceableBlueprint::load(const string &resRef, const GffStruct &utp) {
+    _tag = utp.getString("Tag");
+    boost::to_lower(_tag);
+
+    _appearance = utp.getInt("Appearance");
+
+    const GffField *itemList = utp.find("ItemList");
+    if (itemList) {
+        for (auto &item : itemList->children()) {
+            string resRef(item.getString("InventoryRes"));
+            boost::to_lower(resRef);
+
+            _items.push_back(move(resRef));
+        }
+    }
+}
+
+const string &PlaceableBlueprint::tag() const {
+    return _tag;
+}
+
+int PlaceableBlueprint::appearance() const {
+    return _appearance;
+}
+
+const vector<string> &PlaceableBlueprint::items() const {
+    return _items;
 }
 
 } // namespace game

@@ -24,6 +24,8 @@
 #include "../../resources/gfffile.h"
 #include "../../script/types.h"
 
+#include "../blueprint/creature.h"
+
 #include "item.h"
 #include "spatial.h"
 
@@ -69,23 +71,6 @@ public:
         int pointIdx { 0 };
     };
 
-    enum class ScriptType {
-        UserDefined,
-        OnNotice,
-        SpellAt,
-        Attacked,
-        Damaged,
-        Disturbed,
-        EndRound,
-        EndDialogu,
-        Dialogue,
-        Spawn,
-        Rested,
-        Death,
-        UserDefine,
-        OnBlocked
-    };
-
     Creature(uint32_t id, ObjectFactory *objectFactory);
 
     // Loading
@@ -93,7 +78,6 @@ public:
     void load(const CreatureConfiguration &config);
 
     void equip(const std::string &resRef);
-    void runSpawnScript();
 
     // Animations
     void playDefaultAnimation();
@@ -143,19 +127,18 @@ private:
 
     ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
+    std::shared_ptr<CreatureBlueprint> _blueprint;
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
     std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
-    std::string _conversation;
     std::list<Action> _actions;
     std::shared_ptr<Path> _path;
     std::atomic_bool _pathUpdating { false };
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
-    std::map<ScriptType, std::string> _scripts;
 
     // Loading
-    void loadBlueprint(const resources::GffStruct &gffs);
+    void loadBlueprint(const std::string &resRef);
     void loadAppearance(const resources::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
     void loadCharacterAppearance(const resources::TwoDaTable &table, int row);

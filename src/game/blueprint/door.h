@@ -31,7 +31,16 @@ public:
 
     void load(const std::string &resRef, const resources::GffStruct &utd);
 
+    const std::string &tag() const;
+    bool isStatic() const;
+    int genericType() const;
+
 private:
+    std::string _resRef;
+    std::string _tag;
+    bool _static { false };
+    int _genericType { 0 };
+
     DoorBlueprint(const DoorBlueprint &) = delete;
     DoorBlueprint &operator=(const DoorBlueprint &) = delete;
 };
