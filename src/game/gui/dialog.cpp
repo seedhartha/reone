@@ -84,7 +84,7 @@ void DialogGui::addFrame(int top, int height) {
     extent.height = height;
 
     Control::Border border;
-    border.fill = ResMan.findTexture("blackfill", TextureType::Diffuse);
+    border.fill = Resources.findTexture("blackfill", TextureType::Diffuse);
 
     frame->setExtent(move(extent));
     frame->setBorder(move(border));
@@ -145,7 +145,7 @@ void DialogGui::finish() {
 }
 
 void DialogGui::startDialog(uint32_t ownerId, const string &resRef) {
-    shared_ptr<GffStruct> dlg(ResMan.findGFF(resRef, ResourceType::Conversation));
+    shared_ptr<GffStruct> dlg(Resources.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         if (_onDialogFinished) _onDialogFinished();
         return;
@@ -206,10 +206,10 @@ void DialogGui::loadCurrentEntry() {
 
     shared_ptr<AudioStream> voice;
     if (!_currentEntry->sound.empty()) {
-        voice = ResMan.findAudio(_currentEntry->sound);
+        voice = Resources.findAudio(_currentEntry->sound);
     }
     if (!voice && !_currentEntry->voResRef.empty()) {
-        voice = ResMan.findAudio(_currentEntry->voResRef);
+        voice = Resources.findAudio(_currentEntry->voResRef);
     }
     if (voice) {
         _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);

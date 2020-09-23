@@ -76,7 +76,7 @@ void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
 
     _character = info;
 
-    shared_ptr<TwoDaTable> portraits(ResMan.find2DA("portraits"));
+    shared_ptr<TwoDaTable> portraits(Resources.find2DA("portraits"));
     int sex = _character.gender == Gender::Female ? 1 : 0;
 
     _portraits.clear();
@@ -87,7 +87,7 @@ void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
             int appearanceS = row.getInt("appearance_s");
             int appearanceL = row.getInt("appearance_l");
 
-            shared_ptr<Texture> image(ResMan.findTexture(resRef, TextureType::GUI));
+            shared_ptr<Texture> image(Resources.findTexture(resRef, TextureType::GUI));
 
             Portrait portrait;
             portrait.resRef = move(resRef);

@@ -38,7 +38,7 @@ DebugGui::DebugGui(const GraphicsOptions &opts) : GUI(opts) {
 }
 
 void DebugGui::load() {
-    _font = ResMan.findFont(kFontResRef);
+    _font = Resources.findFont(kFontResRef);
     assert(_font);
 }
 

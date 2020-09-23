@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
-    shared_ptr<ScriptProgram> program(ResMan.findScript(resRef));
+    shared_ptr<ScriptProgram> program(Resources.findScript(resRef));
     return runScript(move(program), callerId, triggererId, userDefinedEventNumber);
 }
 

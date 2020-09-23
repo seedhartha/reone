@@ -92,7 +92,7 @@ void Creature::loadBlueprint(const string &resRef) {
     for (auto &item : _blueprint->equipment()) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(Resources.find2DA("appearance"));
     loadAppearance(*appearanceTable, _blueprint->appearance());
 }
 
@@ -130,7 +130,7 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 }
 
 void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
-    ResourceManager &resources = ResMan;
+    ResourceManager &resources = Resources;
 
     string modelColumn("model");
     string texColumn("tex");
@@ -202,13 +202,13 @@ void Creature::load(const CreatureConfiguration &config) {
     for (auto &item : config.equipment) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(ResMan.find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(Resources.find2DA("appearance"));
     loadAppearance(*appearanceTable, config.appearance);
     loadPortrait(config.appearance);
 }
 
 void Creature::loadPortrait(int appearance) {
-    shared_ptr<TwoDaTable> portraits(ResMan.find2DA("portraits"));
+    shared_ptr<TwoDaTable> portraits(Resources.find2DA("portraits"));
     string appearanceString(to_string(appearance));
 
     const TwoDaRow *row = portraits->findRow([&appearanceString](const TwoDaRow &r) {
@@ -224,7 +224,7 @@ void Creature::loadPortrait(int appearance) {
     string resRef(row->getString("baseresref"));
     boost::to_lower(resRef);
 
-    _portrait = ResMan.findTexture(resRef, TextureType::GUI);
+    _portrait = Resources.findTexture(resRef, TextureType::GUI);
 }
 
 void Creature::playDefaultAnimation() {

@@ -475,7 +475,7 @@ shared_ptr<ScriptProgram> ResourceManager::findScript(const string &resRef) {
     if (it != g_scripts.end()) return it->second;
 
     shared_ptr<ScriptProgram> program;
-    shared_ptr<ByteArray> ncsData(ResMan.find(resRef, ResourceType::CompiledScript));
+    shared_ptr<ByteArray> ncsData(Resources.find(resRef, ResourceType::CompiledScript));
 
     if (ncsData) {
         NcsFile ncs(resRef);

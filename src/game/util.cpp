@@ -30,7 +30,7 @@ namespace reone {
 namespace game {
 
 shared_ptr<SoundInstance> playMusic(const string &resRef) {
-    shared_ptr<AudioStream> stream(ResMan.findAudio(resRef));
+    shared_ptr<AudioStream> stream(Resources.findAudio(resRef));
     return TheAudioPlayer.play(stream, AudioType::Music);
 }
 

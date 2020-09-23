@@ -70,7 +70,7 @@ shared_ptr<T> BlueprintManager::find(const string &resRef, ResourceType type, ma
     if (it != cache.end()) {
         return it->second;
     }
-    shared_ptr<GffStruct> gff(ResMan.findGFF(resRef, type));
+    shared_ptr<GffStruct> gff(Resources.findGFF(resRef, type));
     shared_ptr<T> blueprint;
 
     if (gff) {

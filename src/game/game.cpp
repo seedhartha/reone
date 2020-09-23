@@ -69,7 +69,7 @@ void Game::initObjectFactory() {
 int Game::run() {
     _window.init();
 
-    ResMan.init(_version, _path);
+    Resources.init(_version, _path);
     TheAudioPlayer.init(_opts.audio);
     RoutineMan.init(_version, this);
 
@@ -83,7 +83,7 @@ int Game::run() {
     TheJobExecutor.deinit();
     RoutineMan.deinit();
     TheAudioPlayer.deinit();
-    ResMan.deinit();
+    Resources.deinit();
 
     _window.deinit();
 
@@ -185,9 +185,9 @@ void Game::loadPortraitsGui() {
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
-    ResMan.loadModule(name);
+    Resources.loadModule(name);
 
-    shared_ptr<GffStruct> ifo(ResMan.findGFF("module", ResourceType::ModuleInfo));
+    shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
 
     _module = _objectFactory->newModule();
     configureModule();
@@ -304,8 +304,8 @@ void Game::startDialog(uint32_t ownerId, const string &resRef) {
 
 void Game::loadCursor() {
     Cursor cursor;
-    cursor.pressed = ResMan.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = ResMan.findTexture("gui_mp_defaultu", TextureType::Cursor);
+    cursor.pressed = Resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
+    cursor.unpressed = Resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
 
     _window.setCursor(cursor);
 }

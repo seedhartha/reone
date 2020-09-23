@@ -68,7 +68,7 @@ void Door::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints.findDoor(resRef);
     _tag = _blueprint->tag();
 
-    ResourceManager &resources = ResMan;
+    ResourceManager &resources = Resources;
     shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
 
     string model(table->getString(_blueprint->genericType(), "modelname"));

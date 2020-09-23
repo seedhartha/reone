@@ -47,10 +47,10 @@ void ContainerGui::load(GameVersion version) {
     }
     GUI::load(resRef, BackgroundType::None);
 
-    string btnMessage(ResMan.getString(kSwitchToResRef).text + " " + ResMan.getString(kGiveItemResRef).text);
+    string btnMessage(Resources.getString(kSwitchToResRef).text + " " + Resources.getString(kGiveItemResRef).text);
     getControl("BTN_GIVEITEMS").setTextMessage(btnMessage);
 
-    string lblMessage(ResMan.getString(kInventoryResRef).text);
+    string lblMessage(Resources.getString(kInventoryResRef).text);
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
     configureListBox(version);
@@ -66,7 +66,7 @@ void ContainerGui::configureListBox(GameVersion version) {
     protoItem.setText(text);
 
     if (version == GameVersion::KotOR) {
-        protoItem.setIconFrame(ResMan.findTexture("lbl_hex", TextureType::GUI));
+        protoItem.setIconFrame(Resources.findTexture("lbl_hex", TextureType::GUI));
     }
 }
 

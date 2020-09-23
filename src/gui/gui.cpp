@@ -45,7 +45,7 @@ GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
 void GUI::load(const string &resRef, BackgroundType background) {
     info("GUI: load " + resRef);
 
-    shared_ptr<GffStruct> gui(ResMan.findGFF(resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(Resources.findGFF(resRef, ResourceType::Gui));
     assert(gui);
 
     loadBackground(background);
