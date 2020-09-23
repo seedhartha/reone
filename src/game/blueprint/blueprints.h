@@ -38,6 +38,8 @@ class BlueprintManager {
 public:
     static BlueprintManager &instance();
 
+    void clearCache();
+
     std::shared_ptr<CreatureBlueprint> findCreature(const std::string &resRef);
     std::shared_ptr<DoorBlueprint> findDoor(const std::string &resRef);
     std::shared_ptr<ItemBlueprint> findItem(const std::string &resRef);
