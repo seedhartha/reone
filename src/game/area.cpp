@@ -65,10 +65,10 @@ static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
+Area::Area(uint32_t id, GameVersion version, ObjectFactory *objectFactory) :
     Object(id, ObjectType::Area),
     _version(version),
-    _objectFactory(factory),
+    _objectFactory(objectFactory),
     _navMesh(new NavMesh()) {
 
     assert(_objectFactory);
@@ -77,55 +77,14 @@ Area::Area(uint32_t id, GameVersion version, ObjectFactory *factory) :
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
     _name = name;
 
-    loadProperties(git.getStruct("AreaProperties"));
-    loadVisibility();
-    loadLayout();
-    loadPath();
-    loadCameraStyle(are);
-    loadScripts(are);
-    loadAmbientColor(are);
-
-    for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_objectFactory->newCreature());
-        creature->load(gffs);
-        landObject(*creature);
-        creature->setSynchronize(true);
-        add(creature);
-    }
-    for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_objectFactory->newDoor());
-        door->load(gffs);
-        door->setSynchronize(true);
-        add(door);
-    }
-    for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
-        placeable->load(gffs);
-        add(placeable);
-    }
-    for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_objectFactory->newWaypoint());
-        waypoint->load(gffs);
-        add(waypoint);
-    }
-    for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_objectFactory->newTrigger());
-        trigger->load(gffs);
-        add(trigger);
-    }
+    loadLYT();
+    loadVIS();
+    loadPTH();
+    loadARE(are);
+    loadGIT(git);
 }
 
-void Area::loadProperties(const GffStruct &gffs) {
-    ResourceManager &resources = Resources;
-    shared_ptr<TwoDaTable> musicTable(resources.find2DA("ambientmusic"));
-
-    int musicIdx = gffs.getInt("MusicDay");
-    if (musicIdx) {
-        _music = musicTable->getString(musicIdx, "resource");
-    }
-}
-
-void Area::loadLayout() {
+void Area::loadLYT() {
     ResourceManager &resources = Resources;
     SceneGraph &scene = TheSceneGraph;
 
@@ -146,14 +105,14 @@ void Area::loadLayout() {
     }
 }
 
-void Area::loadVisibility() {
+void Area::loadVIS() {
     VisFile vis;
     vis.load(wrap(Resources.find(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
 }
 
-void Area::loadPath() {
+void Area::loadPTH() {
     shared_ptr<GffStruct> pth(Resources.findGFF(_name, ResourceType::Path));
     assert(pth);
 
@@ -175,6 +134,12 @@ void Area::loadPath() {
     }
 }
 
+void Area::loadARE(const GffStruct &are) {
+    loadCameraStyle(are);
+    loadAmbientColor(are);
+    loadScripts(are);
+}
+
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
     shared_ptr<TwoDaTable> styleTable(Resources.find2DA("camerastyle"));
@@ -183,13 +148,6 @@ void Area::loadCameraStyle(const GffStruct &are) {
     _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);
     _cameraStyle.viewAngle = styleTable->getFloat(styleIdx, "viewangle", 0.0f);
     _cameraStyle.height = styleTable->getFloat(styleIdx, "height", 0.0f);
-}
-
-void Area::loadScripts(const GffStruct &are) {
-    _scripts[ScriptType::OnEnter] = are.getString("OnEnter");
-    _scripts[ScriptType::OnExit] = are.getString("OnExit");
-    _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
-    _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
 }
 
 void Area::loadAmbientColor(const GffStruct &are) {
@@ -201,6 +159,75 @@ void Area::loadAmbientColor(const GffStruct &are) {
 
     ambientColor /= 255.0f;
     TheSceneGraph.setAmbientLightColor(ambientColor);
+}
+
+void Area::loadScripts(const GffStruct &are) {
+    _scripts[ScriptType::OnEnter] = are.getString("OnEnter");
+    _scripts[ScriptType::OnExit] = are.getString("OnExit");
+    _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
+    _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
+}
+
+void Area::loadGIT(const GffStruct &git) {
+    loadProperties(git);
+    loadCreatures(git);
+    loadDoors(git);
+    loadPlaceables(git);
+    loadWaypoints(git);
+    loadTriggers(git);
+}
+
+void Area::loadProperties(const GffStruct &git) {
+    const GffStruct &gffs = git.getStruct("AreaProperties");
+    shared_ptr<TwoDaTable> musicTable(Resources.find2DA("ambientmusic"));
+
+    int musicIdx = gffs.getInt("MusicDay");
+    if (musicIdx) {
+        _music = musicTable->getString(musicIdx, "resource");
+    }
+}
+
+void Area::loadCreatures(const GffStruct &git) {
+    for (auto &gffs : git.getList("Creature List")) {
+        shared_ptr<Creature> creature(_objectFactory->newCreature());
+        creature->load(gffs);
+        landObject(*creature);
+        creature->setSynchronize(true);
+        add(creature);
+    }
+}
+
+void Area::loadDoors(const GffStruct &git) {
+    for (auto &gffs : git.getList("Door List")) {
+        shared_ptr<Door> door(_objectFactory->newDoor());
+        door->load(gffs);
+        door->setSynchronize(true);
+        add(door);
+    }
+}
+
+void Area::loadPlaceables(const GffStruct &git) {
+    for (auto &gffs : git.getList("Placeable List")) {
+        shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
+        placeable->load(gffs);
+        add(placeable);
+    }
+}
+
+void Area::loadWaypoints(const GffStruct &git) {
+    for (auto &gffs : git.getList("WaypointList")) {
+        shared_ptr<Waypoint> waypoint(_objectFactory->newWaypoint());
+        waypoint->load(gffs);
+        add(waypoint);
+    }
+}
+
+void Area::loadTriggers(const GffStruct &git) {
+    for (auto &gffs : git.getList("TriggerList")) {
+        shared_ptr<Trigger> trigger(_objectFactory->newTrigger());
+        trigger->load(gffs);
+        add(trigger);
+    }
 }
 
 void Area::add(const shared_ptr<SpatialObject> &object) {
