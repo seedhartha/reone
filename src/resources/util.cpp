@@ -73,7 +73,7 @@ static map<ResourceType, string> g_extByType = {
     { ResourceType::PlotManager, "ptm" },
     { ResourceType::PlotWizardBlueprint, "ptt" },
     { ResourceType::AreaLayout, "lyt" },
-    { ResourceType::Vis, "vys" },
+    { ResourceType::Vis, "vis" },
     { ResourceType::Texture, "tpc" },
     { ResourceType::Mdx, "mdx" } };
 
