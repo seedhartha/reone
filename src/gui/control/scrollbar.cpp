@@ -43,7 +43,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     const GffField *dir = gffs.find("DIR");
     if (dir) {
         string image(dir->asStruct().getString("IMAGE"));
-        _dir.image = ResMan.findTexture(image, TextureType::Diffuse);
+        _dir.image = Resources.findTexture(image, TextureType::Diffuse);
     }
 }
 

@@ -134,7 +134,7 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
 }
 
 void ModelSceneNode::changeTexture(const string &resRef) {
-    _textureOverride = ResMan.findTexture(resRef, TextureType::Diffuse);
+    _textureOverride = Resources.findTexture(resRef, TextureType::Diffuse);
 }
 
 void ModelSceneNode::update(float dt) {

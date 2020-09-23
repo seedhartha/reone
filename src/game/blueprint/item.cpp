@@ -34,8 +34,8 @@ namespace game {
 void ItemBlueprint::load(const string &resRef, const GffStruct &uti) {
     _resRef = resRef;
 
-    ResourceManager &resources = ResMan;
-    _localizedName = ResMan.getString(uti.getInt("LocalizedName")).text;
+    ResourceManager &resources = Resources;
+    _localizedName = Resources.getString(uti.getInt("LocalizedName")).text;
 
     shared_ptr<TwoDaTable> baseItems(resources.find2DA("baseitems"));
     int baseItem = uti.getInt("BaseItem");
@@ -71,7 +71,7 @@ void ItemBlueprint::load(const string &resRef, const GffStruct &uti) {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % modelVariation);
     }
 
-    _icon = ResMan.findTexture(iconResRef, TextureType::GUI);
+    _icon = Resources.findTexture(iconResRef, TextureType::GUI);
 }
 
 const string &ItemBlueprint::resRef() const {

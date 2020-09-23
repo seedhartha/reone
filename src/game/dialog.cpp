@@ -63,7 +63,7 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
 
     EntryReply entry;
     entry.speaker = gffs.getString("Speaker");
-    entry.text = strRef == -1 ? "" : ResMan.getString(strRef).text;
+    entry.text = strRef == -1 ? "" : Resources.getString(strRef).text;
     entry.voResRef = gffs.getString("VO_ResRef");
     entry.script = gffs.getString("Script");
     entry.sound = gffs.getString("Sound");

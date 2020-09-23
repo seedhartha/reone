@@ -122,7 +122,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 }
 
 void Area::loadProperties(const GffStruct &gffs) {
-    ResourceManager &resources = ResMan;
+    ResourceManager &resources = Resources;
     shared_ptr<TwoDaTable> musicTable(resources.find2DA("ambientmusic"));
 
     int musicIdx = gffs.getInt("MusicDay");
@@ -132,7 +132,7 @@ void Area::loadProperties(const GffStruct &gffs) {
 }
 
 void Area::loadLayout() {
-    ResourceManager &resources = ResMan;
+    ResourceManager &resources = Resources;
     SceneGraph &scene = TheSceneGraph;
 
     LytFile lyt;
@@ -156,14 +156,14 @@ void Area::loadLayout() {
 
 void Area::loadVisibility() {
     VisFile vis;
-    vis.load(wrap(ResMan.find(_name, ResourceType::Vis)));
+    vis.load(wrap(Resources.find(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
-    shared_ptr<TwoDaTable> styleTable(ResMan.find2DA("camerastyle"));
+    shared_ptr<TwoDaTable> styleTable(Resources.find2DA("camerastyle"));
 
     _cameraStyle.distance = styleTable->getFloat(styleIdx, "distance", 0.0f);
     _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);

@@ -63,15 +63,15 @@ void Placeable::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints.findPlaceable(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table(ResMan.find2DA("placeables"));
+    shared_ptr<TwoDaTable> table(Resources.find2DA("placeables"));
 
     string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(ResMan.findModel(model));
+    _model = make_unique<ModelSceneNode>(Resources.findModel(model));
     _model->setLightingEnabled(true);
 
-    _walkmesh = ResMan.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
+    _walkmesh = Resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 
     for (auto &itemResRef : _blueprint->items()) {
         shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(itemResRef));
