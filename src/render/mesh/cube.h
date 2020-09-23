@@ -15,30 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabbnode.h"
+#pragma once
 
-#include "../../core/debug.h"
-
-#include "../mesh/aabb.h"
-
-#include "scenegraph.h"
+#include "mesh.h"
 
 namespace reone {
 
 namespace render {
 
-AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
-}
+class CubeMesh : public Mesh {
+public:
+    static CubeMesh &instance();
 
-void AABBSceneNode::render() const {
-    if (getDebugMode() != DebugMode::ModelNodes) return;
+    void render(const glm::mat4 &transform) const;
 
-    TheAABBMesh.render(_aabb, _absoluteTransform);
-}
+private:
+    CubeMesh();
+};
 
-const AABB &AABBSceneNode::aabb() const {
-    return _aabb;
-}
+#define TheCubeMesh render::CubeMesh::instance()
 
 } // namespace render
 

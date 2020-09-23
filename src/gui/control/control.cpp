@@ -210,7 +210,7 @@ void Control::update(float dt) {
 void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
-    ShaderManager &shaders = ShaderMan;
+    ShaderManager &shaders = Shaders;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
@@ -435,7 +435,7 @@ void Control::render3D(const glm::ivec2 &offset) const {
     transform *= _scene3d.transform;
 
     model->setLocalTransform(transform);
-    model->render();
+    model->renderImmediate();
 }
 
 void Control::stretch(float x, float y) {

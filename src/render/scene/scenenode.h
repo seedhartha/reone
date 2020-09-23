@@ -33,6 +33,7 @@ public:
     void addChild(const std::shared_ptr<SceneNode> &node);
     virtual void fillSceneGraph();
     virtual void render() const;
+    virtual void renderImmediate() const;
 
     float distanceTo(const glm::vec3 &point) const;
 
@@ -48,14 +49,13 @@ protected:
     const SceneNode *_parent { nullptr };
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
+    std::vector<std::shared_ptr<SceneNode>> _children;
 
     SceneNode() = default;
 
     virtual void updateAbsoluteTransform();
 
 private:
-    std::vector<std::shared_ptr<SceneNode>> _children;
-
     SceneNode(const SceneNode &) = delete;
     SceneNode &operator=(const SceneNode &) = delete;
 };

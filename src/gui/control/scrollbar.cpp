@@ -50,9 +50,9 @@ void ScrollBar::load(const GffStruct &gffs) {
 void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
-    ShaderMan.activate(ShaderProgram::BasicDiffuse);
-    ShaderMan.setUniform("color", glm::vec3(1.0f));
-    ShaderMan.setUniform("alpha", 1.0f);
+    Shaders.activate(ShaderProgram::BasicDiffuse);
+    Shaders.setUniform("color", glm::vec3(1.0f));
+    Shaders.setUniform("alpha", 1.0f);
 
     glActiveTexture(0);
     _dir.image->bind();
@@ -67,7 +67,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
     glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f)));
     arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    ShaderMan.setUniform("model", arrowTransform);
+    Shaders.setUniform("model", arrowTransform);
 
     GUIQuad::instance().render(GL_TRIANGLES);
 }
@@ -77,7 +77,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
     arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
     arrowTransform = glm::rotate(arrowTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    ShaderMan.setUniform("model", arrowTransform);
+    Shaders.setUniform("model", arrowTransform);
 
     GUIQuad::instance().render(GL_TRIANGLES);
 }

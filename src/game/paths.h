@@ -15,31 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabbnode.h"
+#pragma once
 
-#include "../../core/debug.h"
+#include <vector> 
 
-#include "../mesh/aabb.h"
+#include <glm/vec2.hpp>
 
-#include "scenegraph.h"
+#include "../resources/gfffile.h"
 
 namespace reone {
 
-namespace render {
+namespace game {
 
-AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
-}
+class Paths {
+public:
+    struct Point {
+        float x { 0.0f };
+        float y { 0.0f };
+        std::vector<int> adjPoints;
+    };
 
-void AABBSceneNode::render() const {
-    if (getDebugMode() != DebugMode::ModelNodes) return;
+    Paths() = default;
 
-    TheAABBMesh.render(_aabb, _absoluteTransform);
-}
+    void load(const resources::GffStruct &pth);
 
-const AABB &AABBSceneNode::aabb() const {
-    return _aabb;
-}
+    const std::vector<Point> &points() const;
 
-} // namespace render
+private:
+    std::vector<Point> _points;
+
+    Paths(const Paths &) = delete;
+    Paths &operator=(const Paths &) = delete;
+};
+
+} // namespace game
 
 } // namespace reone

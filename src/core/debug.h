@@ -21,7 +21,17 @@
 
 namespace reone {
 
-void setDebugLevel(uint32_t level);
+enum class DebugMode {
+    None,
+    GameObjects,
+    ModelNodes,
+    Path
+};
+
 uint32_t getDebugLevel();
+DebugMode getDebugMode();
+
+void setDebugLevel(uint32_t level);
+void setDebugMode(DebugMode mode);
 
 } // namespace reone

@@ -58,12 +58,11 @@ void ModelSceneNode::initChildren() {
         }
         if (shouldRender(*node)) {
             shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
+            mesh->setParent(this);
             mesh->setLocalTransform(node->absoluteTransform());
 
             shared_ptr<AABBSceneNode> aabb(new AABBSceneNode(node->mesh()->aabb()));
             mesh->addChild(aabb);
-
-            addChild(mesh);
 
             _meshes.insert(make_pair(node->nodeNumber(), mesh));
         }
@@ -71,8 +70,8 @@ void ModelSceneNode::initChildren() {
         shared_ptr<ModelNode::Light> modelLight(node->light());
         if (modelLight) {
             shared_ptr<LightSceneNode> light(new LightSceneNode(node));
+            light->setParent(this);
             light->setLocalTransform(node->absoluteTransform());
-            addChild(light);
 
             _lights.insert(make_pair(node->nodeNumber(), light));
         }
@@ -82,7 +81,20 @@ void ModelSceneNode::initChildren() {
 void ModelSceneNode::fillSceneGraph() {
     if (!_visible || !_onScreen) return;
 
+    for (auto &mesh : _meshes) {
+        mesh.second->fillSceneGraph();
+    }
+    for (auto &light : _lights) {
+        light.second->fillSceneGraph();
+    }
     SceneNode::fillSceneGraph();
+}
+
+void ModelSceneNode::renderImmediate() const {
+    for (auto &mesh : _meshes) {
+        mesh.second->render();
+    }
+    SceneNode::renderImmediate();
 }
 
 void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {

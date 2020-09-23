@@ -41,8 +41,6 @@ void Area::updateCreature(Creature &creature, float dt) {
         case Creature::ActionType::MoveToPoint:
         case Creature::ActionType::Follow: {
             SpatialObject *spatial = dynamic_cast<SpatialObject *>(action.object.get());
-            assert(spatial);
-
             glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? spatial->position() : action.point;
             bool reached = navigateCreature(creature, dest, action.distance, dt);
             if (reached && action.type == Creature::ActionType::MoveToPoint) {
@@ -70,9 +68,9 @@ void Area::updateCreature(Creature &creature, float dt) {
     }
 }
 
-bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
-    glm::vec3 origin(creature.position());
-    float distToDest = glm::distance2(glm::vec2(origin), glm::vec2(dest));
+bool Area::navigateCreature(Creature &creature, const glm::vec2 &dest, float distance, float dt) {
+    glm::vec2 origin(creature.position());
+    float distToDest = glm::distance2(origin, dest);
 
     if (distToDest <= distance) {
         creature.setMovementType(MovementType::None);
@@ -97,16 +95,18 @@ bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float dis
 }
 
 void Area::advanceCreatureOnPath(Creature &creature, float dt) {
-    glm::vec3 origin(creature.position());
     shared_ptr<Creature::Path> path(creature.path());
     size_t pointCount = path->points.size();
-    glm::vec3 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
 
-    if (glm::distance2(glm::vec2(origin), glm::vec2(dest)) <= 1.0f) {
+    glm::vec2 origin(creature.position());
+    glm::vec2 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
+
+    if (glm::distance2(origin, dest) <= 1.0f) {
         selectNextPathPoint(*path);
+
     } else if (moveCreatureTowards(creature, dest, dt)) {
-        selectNextPathPoint(*path);
         creature.setMovementType(MovementType::Run);
+
     } else {
         creature.setMovementType(MovementType::None);
     }
@@ -117,26 +117,15 @@ void Area::selectNextPathPoint(Creature::Path &path) {
     if (path.pointIdx < pointCount) path.pointIdx++;
 }
 
-void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
+void Area::updateCreaturePath(Creature &creature, const glm::vec2 &dest) {
     if (creature.isPathUpdating()) return;
 
     creature.setPathUpdating();
 
     TheJobExecutor.enqueue([=, &creature](const atomic_bool &) {
-        glm::vec3 origin(creature.position());
-        vector<glm::vec3> points(_navMesh->findPath(origin, dest));
+        glm::vec2 origin(creature.position());
+        vector<glm::vec2> points(_navMesh->findPath(origin, dest));
         uint32_t now = SDL_GetTicks();
-
-#ifdef DEBUG_PATH
-        vector<string> pointsStr;
-        pointsStr.reserve(points.size());
-
-        for (auto &point : points) {
-            pointsStr.push_back(str(boost::format("%.0f %.0f") % point.x % point.y));
-        }
-
-        debug(boost::join(pointsStr, " | "));
-#endif
 
         creature.setPath(dest, move(points), now);
     });

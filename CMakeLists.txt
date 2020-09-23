@@ -88,6 +88,7 @@ set(HEADERS
     src/game/object/trigger.h
     src/game/object/waypoint.h
     src/game/objectcontainer.h
+    src/game/paths.h
     src/game/room.h
     src/game/script/callbacks.h
     src/game/script/routines.h
@@ -116,6 +117,7 @@ set(HEADERS
     src/render/font.h
     src/render/fps.h
     src/render/mesh/aabb.h
+    src/render/mesh/cube.h
     src/render/mesh/guiquad.h
     src/render/mesh/mesh.h
     src/render/mesh/modelmesh.h
@@ -123,6 +125,7 @@ set(HEADERS
     src/render/model/animation.h
     src/render/model/modelnode.h
     src/render/scene/aabbnode.h
+    src/render/scene/cubenode.h
     src/render/scene/lightnode.h
     src/render/scene/meshnode.h
     src/render/scene/modelnode.h
@@ -213,6 +216,7 @@ set(SOURCES
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
     src/game/objectcontainer.cpp
+    src/game/paths.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp
@@ -241,6 +245,7 @@ set(SOURCES
     src/render/font.cpp
     src/render/fps.cpp
     src/render/mesh/aabb.cpp
+    src/render/mesh/cube.cpp
     src/render/mesh/guiquad.cpp
     src/render/mesh/mesh.cpp
     src/render/mesh/modelmesh.cpp
@@ -248,6 +253,7 @@ set(SOURCES
     src/render/model/animation.cpp
     src/render/model/modelnode.cpp
     src/render/scene/aabbnode.cpp
+    src/render/scene/cubenode.cpp
     src/render/scene/lightnode.cpp
     src/render/scene/meshnode.cpp
     src/render/scene/modelnode.cpp

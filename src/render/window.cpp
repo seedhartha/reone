@@ -28,6 +28,7 @@
 #include "glm/ext.hpp"
 
 #include "mesh/aabb.h"
+#include "mesh/cube.h"
 #include "mesh/guiquad.h"
 
 #include "shaders.h"
@@ -70,7 +71,8 @@ void RenderWindow::init() {
     SDL_GL_SetSwapInterval(0);
     glewInit();
 
-    ShaderMan.initGL();
+    Shaders.initGL();
+    TheCubeMesh.initGL();
     TheAABBMesh.initGL();
     TheGUIQuad.initGL();
 
@@ -81,7 +83,8 @@ void RenderWindow::init() {
 void RenderWindow::deinit() {
     TheGUIQuad.deinitGL();
     TheAABBMesh.deinitGL();
-    TheGUIQuad.deinitGL();
+    TheCubeMesh.deinitGL();
+    Shaders.deinitGL();
 
     SDL_GL_DeleteContext(_context);
     SDL_DestroyWindow(_window);
@@ -157,7 +160,7 @@ void RenderWindow::drawCursor() const {
     glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    ShaderManager &shaders = ShaderMan;
+    ShaderManager &shaders = Shaders;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("model", transform);
     shaders.setUniform("color", glm::vec3(1.0f));

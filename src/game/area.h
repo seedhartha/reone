@@ -34,7 +34,6 @@
 #include "object/waypoint.h"
 #include "objectcontainer.h"
 #include "room.h"
-#include "types.h"
 
 namespace reone {
 
@@ -57,7 +56,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    bool moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt);
+    bool moveCreatureTowards(Creature &creature, const glm::vec2 &point, float dt);
     void updateTriggers(const Creature &creature);
     void updateRoomVisibility();
 
@@ -82,9 +81,6 @@ public:
     std::shared_ptr<SpatialObject> partyLeader() const;
     std::shared_ptr<SpatialObject> partyMember1() const;
     std::shared_ptr<SpatialObject> partyMember2() const;
-
-    // Setters
-    void setDebugMode(DebugMode mode);
 
     // Callbacks
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
@@ -133,7 +129,6 @@ private:
     render::CameraStyle _cameraStyle;
     std::string _music;
     std::unique_ptr<NavMesh> _navMesh;
-    DebugMode _debugMode { DebugMode::None };
     std::map<ScriptType, std::string> _scripts;
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
@@ -145,17 +140,18 @@ private:
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedCommands();
-    bool navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
+    bool navigateCreature(Creature &creature, const glm::vec2 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
-    void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    bool findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
-    bool findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const;
+    void updateCreaturePath(Creature &creature, const glm::vec2 &dest);
+    bool findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
+    bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
 
     // Loading
     void loadProperties(const resources::GffStruct &gffs);
     void loadLayout();
     void loadVisibility();
+    void loadPath();
     void loadCameraStyle(const resources::GffStruct &are);
     void loadScripts(const resources::GffStruct &are);
     void loadAmbientColor(const resources::GffStruct &are);

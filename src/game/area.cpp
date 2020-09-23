@@ -27,9 +27,11 @@
 
 #include "SDL2/SDL.h"
 
+#include "../core/debug.h"
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
+#include "../render/scene/cubenode.h"
 #include "../render/scene/scenegraph.h"
 #include "../resources/lytfile.h"
 #include "../resources/resources.h"
@@ -37,6 +39,7 @@
 #include "../script/execution.h"
 
 #include "object/factory.h"
+#include "paths.h"
 #include "script/routines.h"
 #include "script/util.h"
 
@@ -56,8 +59,7 @@ static const float kDrawDebugDistance = 64.0f;
 static const float kPartyMemberFollowDistance = 4.0f;
 
 static const float kMaxDistanceToTestCollision = 64.0f;
-static const float kElevationTestOffset = 0.1f;
-static const float kElevationTestDistance = 1.0f;
+static const float kElevationTestRadius = 1024.0f;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
@@ -78,6 +80,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
     loadProperties(git.getStruct("AreaProperties"));
     loadVisibility();
     loadLayout();
+    loadPath();
     loadCameraStyle(are);
     loadScripts(are);
     loadAmbientColor(are);
@@ -98,9 +101,6 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
     for (auto &gffs : git.getList("Placeable List")) {
         shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
         placeable->load(gffs);
-        if (placeable->walkmesh()) {
-            _navMesh->add(placeable->walkmesh(), placeable->transform());
-        }
         add(placeable);
     }
     for (auto &gffs : git.getList("WaypointList")) {
@@ -113,12 +113,6 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
         trigger->load(gffs);
         add(trigger);
     }
-
-    TheJobExecutor.enqueue([this](const atomic_bool &cancel) {
-        debug("Area: compute nav mesh");
-        _navMesh->compute(cancel);
-        debug("Area: nav mesh computed");
-    });
 }
 
 void Area::loadProperties(const GffStruct &gffs) {
@@ -142,14 +136,12 @@ void Area::loadLayout() {
         shared_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->animate("animloop1", kAnimationLoop);
+
         scene.addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
-        if (walkmesh) {
-            _navMesh->add(walkmesh, glm::mat4(1.0f));
-        }
-
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
+
         _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
@@ -159,6 +151,28 @@ void Area::loadVisibility() {
     vis.load(wrap(Resources.find(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
+}
+
+void Area::loadPath() {
+    shared_ptr<GffStruct> pth(Resources.findGFF(_name, ResourceType::Path));
+    assert(pth);
+
+    Paths paths;
+    paths.load(*pth);
+
+    _navMesh->load(paths);
+
+    for (auto &point : paths.points()) {
+        Room *room = nullptr;
+        float z = 0.0f;
+
+        if (!findRoomElevationAt(glm::vec2(point.x, point.y), room, z)) continue;
+
+        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(0.5f));
+        aabb->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(point.x, point.y, z + 0.25f)));
+
+        TheSceneGraph.addRoot(aabb);
+    }
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
@@ -287,7 +301,7 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
 
     TheSceneGraph.prepare(updateCtx.cameraPosition);
 
-    if (_debugMode == DebugMode::GameObjects) {
+    if (getDebugMode() == DebugMode::GameObjects) {
         guiCtx.debug.objects.clear();
         glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -327,10 +341,10 @@ void Area::updateDelayedCommands() {
     _delayed.erase(it, _delayed.end());
 }
 
-bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float dt) {
+bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &point, float dt) {
     glm::vec3 position(creature.position());
-    glm::vec3 delta = point - position;
-    glm::vec3 dir(glm::normalize(delta));
+    glm::vec2 delta = point - glm::vec2(position);
+    glm::vec2 dir(glm::normalize(delta));
 
     float heading = -glm::atan(dir.x, dir.y);
     creature.setHeading(heading);
@@ -342,7 +356,7 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float
     SpatialObject *obstacle = nullptr;
     Room *room = nullptr;
 
-    if (findObstacleByAABB(position, newPosition + 1.0f * dir, kObstacleCreature, &creature, &obstacle)) {
+    if (findObstacleByAABB(position, newPosition + 1.0f * glm::vec3(dir, 0.0f), kObstacleCreature, &creature, &obstacle)) {
         return false;
     }
     if (findElevationAt(newPosition, room, newPosition.z)) {
@@ -358,8 +372,8 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec3 &point, float
 }
 
 void Area::updateTriggers(const Creature &creature) {
-    glm::vec3 liftedPosition(creature.position() + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
-    glm::vec3 down(0.0f, 0.0f, -kElevationTestDistance);
+    glm::vec3 liftedPosition(glm::vec2(creature.position()), kElevationTestRadius);
+    glm::vec3 down(0.0f, 0.0f, -1.0f);
     glm::vec2 intersection;
     float distance;
 
@@ -415,11 +429,6 @@ void Area::runOnEnterScript() {
             runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
         }
     }
-}
-
-void Area::setDebugMode(DebugMode mode) {
-    _debugMode = mode;
-    TheSceneGraph.setAABBEnabled(mode == DebugMode::ModelNodes);
 }
 
 void Area::saveTo(GameState &state) const {
@@ -549,9 +558,9 @@ bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int ma
     return false;
 }
 
-bool Area::findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const {
-    glm::vec3 from(position + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
-    glm::vec3 to(from + glm::vec3(0.0f, 0.0f, -kElevationTestDistance));
+bool Area::findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const {
+    glm::vec3 from(position, kElevationTestRadius);
+    glm::vec3 to(position, -kElevationTestRadius);
     glm::vec3 intersection(0.0f);
     SpatialObject *obstacle = nullptr;
 
@@ -565,8 +574,8 @@ bool Area::findElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) c
     return false;
 }
 
-bool Area::findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &z) const {
-    glm::vec3 from(position + glm::vec3(0.0f, 0.0f, kElevationTestOffset));
+bool Area::findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const {
+    glm::vec3 from(position, kElevationTestRadius);
     for (auto &pair : _rooms) {
         Room *room = pair.second.get();
 
@@ -574,7 +583,7 @@ bool Area::findRoomElevationAt(const glm::vec3 &position, Room *&roomAt, float &
         if (!walkmesh) continue;
 
         AABB aabb(walkmesh->aabb());
-        if (!aabb.contains(glm::vec2(position))) continue;
+        if (!aabb.contains(position)) continue;
 
         if (room->walkmesh()->findElevationAt(from, z)) {
             roomAt = room;
