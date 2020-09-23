@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "../../resources/gfffile.h"
 
@@ -31,7 +32,15 @@ public:
 
     void load(const std::string &resRef, const resources::GffStruct &utp);
 
+    const std::string &tag() const;
+    int appearance() const;
+    const std::vector<std::string> &items() const;
+
 private:
+    std::string _tag;
+    int _appearance { 0 };
+    std::vector<std::string> _items;
+
     PlaceableBlueprint(const PlaceableBlueprint &) = delete;
     PlaceableBlueprint &operator=(const PlaceableBlueprint &) = delete;
 };

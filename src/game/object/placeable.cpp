@@ -53,20 +53,19 @@ void Placeable::load(const GffStruct &gffs) {
     _heading = gffs.getFloat("Bearing");
 
     string templResRef(gffs.getString("TemplateResRef"));
-    shared_ptr<GffStruct> utp(ResMan.findGFF(templResRef, ResourceType::PlaceableBlueprint));
-    loadBlueprint(*utp);
+    boost::to_lower(templResRef);
 
+    loadBlueprint(templResRef);
     updateTransform();
 }
 
-void Placeable::loadBlueprint(const GffStruct &gffs) {
-    _tag = gffs.getString("Tag");
-    boost::to_lower(_tag);
+void Placeable::loadBlueprint(const string &resRef) {
+    _blueprint = Blueprints.findPlaceable(resRef);
+    _tag = _blueprint->tag();
 
     shared_ptr<TwoDaTable> table(ResMan.find2DA("placeables"));
 
-    int appearance = gffs.getInt("Appearance");
-    string model(table->getString(appearance, "modelname"));
+    string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);
 
     _model = make_unique<ModelSceneNode>(ResMan.findModel(model));
@@ -74,17 +73,13 @@ void Placeable::loadBlueprint(const GffStruct &gffs) {
 
     _walkmesh = ResMan.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 
-    const GffField *itemList = gffs.find("ItemList");
-    if (itemList) {
-        for (auto &itemGffs : itemList->children()) {
-            string resRef(itemGffs.getString("InventoryRes"));
-            shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(resRef));
+    for (auto &itemResRef : _blueprint->items()) {
+        shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(itemResRef));
 
-            shared_ptr<Item> item(_objectFactory->newItem());
-            item->load(itemTempl.get());
+        shared_ptr<Item> item(_objectFactory->newItem());
+        item->load(itemTempl.get());
 
-            _items.push_back(move(item));
-        }
+        _items.push_back(move(item));
     }
 }
 

@@ -17,6 +17,8 @@
 
 #include "door.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 
 using namespace reone::resources;
@@ -26,6 +28,23 @@ namespace reone {
 namespace game {
 
 void DoorBlueprint::load(const string &resRef, const GffStruct &utd) {
+    _tag = utd.getString("Tag");
+    boost::to_lower(_tag);
+
+    _static = utd.getInt("Static", 0) != 0;
+    _genericType = utd.getInt("GenericType");
+}
+
+const string &DoorBlueprint::tag() const {
+    return _tag;
+}
+
+bool DoorBlueprint::isStatic() const {
+    return _static;
+}
+
+int DoorBlueprint::genericType() const {
+    return _genericType;
 }
 
 } // namespace game

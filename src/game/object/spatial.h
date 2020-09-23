@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "object.h"
 
 #include "glm/mat4x4.hpp"

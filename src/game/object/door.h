@@ -21,6 +21,8 @@
 
 #include "../../resources/gfffile.h"
 
+#include "../blueprint/door.h"
+
 namespace reone {
 
 namespace game {
@@ -42,13 +44,13 @@ public:
     const std::string &transitionDestin() const;
 
 private:
+    std::shared_ptr<DoorBlueprint> _blueprint;
     bool _open { false };
-    bool _static { false };
     std::string _linkedToModule;
     std::string _linkedTo;
     std::string _transitionDestin;
 
-    void loadBlueprint(const resources::GffStruct &gffs);
+    void loadBlueprint(const std::string &resRef);
 };
 
 } // namespace game
