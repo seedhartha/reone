@@ -54,20 +54,20 @@ public:
 
     // Routine callbacks
 
-    // Commands
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
-
-    // Events
     int eventUserDefined(int eventNumber) override;
     void signalEvent(uint32_t objectId, int eventId) override;
 
     // Objects
+
     Module *getModule() override;
     Area *getArea() override;
     std::shared_ptr<Object> getObjectById(uint32_t id) override;
     std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth) override;
     std::shared_ptr<Object> getWaypointByTag(const std::string &tag) override;
     std::shared_ptr<Object> getPlayer() override;
+
+    // END Objects
 
     // Globals/locals
 
@@ -130,6 +130,9 @@ private:
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DebugGui> _debugGui;
     std::shared_ptr<ContainerGui> _containerGui;
+
+    Game(const Game &) = delete;
+    Game &operator=(const Game &) = delete;
 
     // Loading
     void loadMainMenu();

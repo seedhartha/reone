@@ -76,6 +76,7 @@ void Program::loadOptions() {
         .run();
 
     po::store(parsedCmdLineOpts, _vars);
+
     if (fs::exists(kConfigFilename)) {
         po::store(po::parse_config_file(kConfigFilename, _commonOpts), _vars);
     }
@@ -112,13 +113,11 @@ void Program::initMultiplayerMode() {
 
 int Program::runGame() {
     unique_ptr<Game> game;
-
     switch (_multiplayerMode) {
         case MultiplayerMode::Client:
         case MultiplayerMode::Server:
             game.reset(new MultiplayerGame(_multiplayerMode, _gameVersion, _gamePath, _gameOpts));
             break;
-
         default:
             game.reset(new Game(_gameVersion, _gamePath, _gameOpts));
             break;

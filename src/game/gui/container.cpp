@@ -75,8 +75,8 @@ void ContainerGui::openContainer(const Placeable &placeable) {
     lbItems.clearItems();
 
     for (auto &item : placeable.items()) {
-        const ItemTemplate &templ = item->getTemplate();
-        lbItems.add({ templ.resRef(), templ.localizedName(), templ.icon() });
+        const ItemBlueprint &blueprint = item->getTemplate();
+        lbItems.add({ blueprint.resRef(), blueprint.localizedName(), blueprint.icon() });
     }
 }
 

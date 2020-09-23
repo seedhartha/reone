@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void ItemTemplate::load(const string &resRef, const GffStruct &uti) {
+void ItemBlueprint::load(const string &resRef, const GffStruct &uti) {
     _resRef = resRef;
 
     ResourceManager &resources = ResMan;
@@ -74,39 +74,39 @@ void ItemTemplate::load(const string &resRef, const GffStruct &uti) {
     _icon = ResMan.findTexture(iconResRef, TextureType::GUI);
 }
 
-const string &ItemTemplate::resRef() const {
+const string &ItemBlueprint::resRef() const {
     return _resRef;
 }
 
-ItemType ItemTemplate::type() const {
+ItemType ItemBlueprint::type() const {
     return _type;
 }
 
-const string &ItemTemplate::localizedName() const {
+const string &ItemBlueprint::localizedName() const {
     return _localizedName;
 }
 
-const string &ItemTemplate::baseBodyVariation() const {
+const string &ItemBlueprint::baseBodyVariation() const {
     return _baseBodyVariation;
 }
 
-int ItemTemplate::bodyVariation() const {
+int ItemBlueprint::bodyVariation() const {
     return _bodyVariation;
 }
 
-int ItemTemplate::textureVariation() const {
+int ItemBlueprint::textureVariation() const {
     return _textureVariation;
 }
 
-const string &ItemTemplate::itemClass() const {
+const string &ItemBlueprint::itemClass() const {
     return _itemClass;
 }
 
-int ItemTemplate::modelVariation() const {
+int ItemBlueprint::modelVariation() const {
     return _modelVariation;
 }
 
-shared_ptr<Texture> ItemTemplate::icon() const {
+shared_ptr<Texture> ItemBlueprint::icon() const {
     return _icon;
 }
 

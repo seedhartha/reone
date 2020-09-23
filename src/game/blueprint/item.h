@@ -25,9 +25,9 @@ namespace reone {
 
 namespace game {
 
-class ItemTemplate {
+class ItemBlueprint {
 public:
-    ItemTemplate() = default;
+    ItemBlueprint() = default;
 
     void load(const std::string &resRef, const resources::GffStruct &uti);
 
@@ -52,8 +52,8 @@ private:
     int _modelVariation { 0 };
     std::shared_ptr<render::Texture> _icon;
 
-    ItemTemplate(const ItemTemplate &) = delete;
-    ItemTemplate &operator=(const ItemTemplate &) = delete;
+    ItemBlueprint(const ItemBlueprint &) = delete;
+    ItemBlueprint &operator=(const ItemBlueprint &) = delete;
 };
 
 } // namespace game

@@ -28,7 +28,9 @@
 namespace reone {
 
 /**
- * Encapsulates program-level logic (i.e., option management).
+ * Encapsulates program-level logic (i.e., option management). Launches a game.
+ *
+ * @see game::Game
  */
 class Program {
 public:

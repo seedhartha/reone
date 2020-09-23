@@ -23,7 +23,7 @@
 #include "../../render/scene/modelnode.h"
 #include "../../resources/resources.h"
 
-#include "../template/templates.h"
+#include "../blueprint/blueprints.h"
 
 #include "factory.h"
 
@@ -78,7 +78,7 @@ void Placeable::loadBlueprint(const GffStruct &gffs) {
     if (itemList) {
         for (auto &itemGffs : itemList->children()) {
             string resRef(itemGffs.getString("InventoryRes"));
-            shared_ptr<ItemTemplate> itemTempl(TemplateMan.findItem(resRef));
+            shared_ptr<ItemBlueprint> itemTempl(BlueprintMan.findItem(resRef));
 
             shared_ptr<Item> item(_objectFactory->newItem());
             item->load(itemTempl.get());

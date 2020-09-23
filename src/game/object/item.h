@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../template/item.h"
+#include "../blueprint/item.h"
 
 #include "object.h"
 
@@ -29,12 +29,12 @@ class Item : public Object {
 public:
     Item(uint32_t id);
 
-    void load(const ItemTemplate *templ);
+    void load(const ItemBlueprint *templ);
 
-    const ItemTemplate &getTemplate() const;
+    const ItemBlueprint &getTemplate() const;
 
 private:
-    const ItemTemplate *_template { nullptr };
+    const ItemBlueprint *_blueprint { nullptr };
 };
 
 } // namespace game
