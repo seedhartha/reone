@@ -148,13 +148,20 @@ private:
     bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
 
     // Loading
-    void loadProperties(const resources::GffStruct &gffs);
-    void loadLayout();
-    void loadVisibility();
-    void loadPath();
+    void loadLYT();
+    void loadVIS();
+    void loadPTH();
+    void loadARE(const resources::GffStruct &are);
     void loadCameraStyle(const resources::GffStruct &are);
-    void loadScripts(const resources::GffStruct &are);
     void loadAmbientColor(const resources::GffStruct &are);
+    void loadScripts(const resources::GffStruct &are);
+    void loadGIT(const resources::GffStruct &gffs);
+    void loadProperties(const resources::GffStruct &git);
+    void loadCreatures(const resources::GffStruct &git);
+    void loadDoors(const resources::GffStruct &git);
+    void loadPlaceables(const resources::GffStruct &git);
+    void loadWaypoints(const resources::GffStruct &git);
+    void loadTriggers(const resources::GffStruct &git);
 };
 
 } // namespace game
