@@ -51,6 +51,13 @@ set(HEADERS
     src/core/streamutil.h
     src/core/types.h
     src/game/area.h
+    src/game/blueprint/blueprints.h
+    src/game/blueprint/creature.h
+    src/game/blueprint/door.h
+    src/game/blueprint/item.h
+    src/game/blueprint/placeable.h
+    src/game/blueprint/trigger.h
+    src/game/blueprint/waypoint.h
     src/game/characters.h
     src/game/dialog.h
     src/game/game.h
@@ -85,8 +92,6 @@ set(HEADERS
     src/game/script/callbacks.h
     src/game/script/routines.h
     src/game/script/util.h
-    src/game/blueprint/item.h
-    src/game/blueprint/blueprints.h
     src/game/types.h
     src/game/util.h
     src/gui/control/button.h
@@ -171,6 +176,13 @@ set(SOURCES
     src/core/streamutil.cpp
     src/game/area.cpp
     src/game/area_actions.cpp
+    src/game/blueprint/blueprints.cpp
+    src/game/blueprint/creature.cpp
+    src/game/blueprint/door.cpp
+    src/game/blueprint/item.cpp
+    src/game/blueprint/placeable.cpp
+    src/game/blueprint/trigger.cpp
+    src/game/blueprint/waypoint.cpp
     src/game/characters.cpp
     src/game/dialog.cpp
     src/game/game.cpp
@@ -207,8 +219,6 @@ set(SOURCES
     src/game/script/routines_kotor.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/util.cpp
-    src/game/blueprint/item.cpp
-    src/game/blueprint/blueprints.cpp
     src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp

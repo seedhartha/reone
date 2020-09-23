@@ -78,7 +78,7 @@ void Placeable::loadBlueprint(const GffStruct &gffs) {
     if (itemList) {
         for (auto &itemGffs : itemList->children()) {
             string resRef(itemGffs.getString("InventoryRes"));
-            shared_ptr<ItemBlueprint> itemTempl(BlueprintMan.findItem(resRef));
+            shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(resRef));
 
             shared_ptr<Item> item(_objectFactory->newItem());
             item->load(itemTempl.get());

@@ -17,10 +17,18 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
 
+#include "../../resources/types.h"
+
+#include "creature.h"
+#include "door.h"
 #include "item.h"
+#include "placeable.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 
@@ -30,16 +38,24 @@ class BlueprintManager {
 public:
     static BlueprintManager &instance();
 
+    std::shared_ptr<CreatureBlueprint> findCreature(const std::string &resRef);
+    std::shared_ptr<DoorBlueprint> findDoor(const std::string &resRef);
     std::shared_ptr<ItemBlueprint> findItem(const std::string &resRef);
+    std::shared_ptr<PlaceableBlueprint> findPlaceable(const std::string &resRef);
+    std::shared_ptr<TriggerBlueprint> findTrigger(const std::string &resRef);
+    std::shared_ptr<WaypointBlueprint> findWaypoint(const std::string &resRef);
 
 private:
     BlueprintManager() = default;
 
     BlueprintManager(const BlueprintManager &) = delete;
     BlueprintManager &operator=(const BlueprintManager &) = delete;
+
+    template <class T>
+    std::shared_ptr<T> find(const std::string &resRef, resources::ResourceType type, std::map<std::string, std::shared_ptr<T>> &cache);
 };
 
-#define BlueprintMan game::BlueprintManager::instance()
+#define Blueprints game::BlueprintManager::instance()
 
 } // namespace game
 
