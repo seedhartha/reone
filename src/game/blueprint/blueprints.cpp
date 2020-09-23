@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "templates.h"
+#include "blueprints.h"
 
 #include <map>
 
@@ -30,14 +30,14 @@ namespace reone {
 
 namespace game {
 
-static map<string, shared_ptr<ItemTemplate>> g_itemCache;
+static map<string, shared_ptr<ItemBlueprint>> g_itemCache;
 
-TemplateManager &TemplateManager::instance() {
-    static TemplateManager instance;
+BlueprintManager &BlueprintManager::instance() {
+    static BlueprintManager instance;
     return instance;
 }
 
-shared_ptr<ItemTemplate> TemplateManager::findItem(const string &resRef) {
+shared_ptr<ItemBlueprint> BlueprintManager::findItem(const string &resRef) {
     auto it = g_itemCache.find(resRef);
     if (it != g_itemCache.end()) {
         return it->second;
@@ -45,10 +45,10 @@ shared_ptr<ItemTemplate> TemplateManager::findItem(const string &resRef) {
     debug("Templates: load item: " + resRef, 2);
 
     shared_ptr<GffStruct> uti(ResMan.findGFF(resRef, ResourceType::ItemBlueprint));
-    shared_ptr<ItemTemplate> item;
+    shared_ptr<ItemBlueprint> item;
 
     if (uti) {
-        item.reset(new ItemTemplate());
+        item.reset(new ItemBlueprint());
         item->load(resRef, *uti);
     } else {
         warn("Templates: item not found: " + resRef);

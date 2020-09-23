@@ -25,8 +25,8 @@
 #include "../../resources/resources.h"
 #include "../../script/types.h"
 
+#include "../blueprint/blueprints.h"
 #include "../object/factory.h"
-#include "../template/templates.h"
 #include "../script/util.h"
 
 using namespace std;
@@ -262,7 +262,7 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<ItemTemplate> itemTempl(TemplateMan.findItem(resRef));
+    shared_ptr<ItemBlueprint> itemTempl(BlueprintMan.findItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(itemTempl.get());

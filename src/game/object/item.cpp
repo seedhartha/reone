@@ -24,12 +24,12 @@ namespace game {
 Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
-void Item::load(const ItemTemplate *templ) {
-    _template = templ;
+void Item::load(const ItemBlueprint *blueprint) {
+    _blueprint = blueprint;
 }
 
-const ItemTemplate &Item::getTemplate() const {
-    return *_template;
+const ItemBlueprint &Item::getTemplate() const {
+    return *_blueprint;
 }
 
 } // namespace game

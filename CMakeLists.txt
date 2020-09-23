@@ -85,8 +85,8 @@ set(HEADERS
     src/game/script/callbacks.h
     src/game/script/routines.h
     src/game/script/util.h
-    src/game/template/item.h
-    src/game/template/templates.h
+    src/game/blueprint/item.h
+    src/game/blueprint/blueprints.h
     src/game/types.h
     src/game/util.h
     src/gui/control/button.h
@@ -207,8 +207,8 @@ set(SOURCES
     src/game/script/routines_kotor.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/util.cpp
-    src/game/template/item.cpp
-    src/game/template/templates.cpp
+    src/game/blueprint/item.cpp
+    src/game/blueprint/blueprints.cpp
     src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp

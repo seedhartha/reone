@@ -26,20 +26,20 @@ namespace reone {
 
 namespace game {
 
-class TemplateManager {
+class BlueprintManager {
 public:
-    static TemplateManager &instance();
+    static BlueprintManager &instance();
 
-    std::shared_ptr<ItemTemplate> findItem(const std::string &resRef);
+    std::shared_ptr<ItemBlueprint> findItem(const std::string &resRef);
 
 private:
-    TemplateManager() = default;
+    BlueprintManager() = default;
 
-    TemplateManager(const TemplateManager &) = delete;
-    TemplateManager &operator=(const TemplateManager &) = delete;
+    BlueprintManager(const BlueprintManager &) = delete;
+    BlueprintManager &operator=(const BlueprintManager &) = delete;
 };
 
-#define TemplateMan game::TemplateManager::instance()
+#define BlueprintMan game::BlueprintManager::instance()
 
 } // namespace game
 
