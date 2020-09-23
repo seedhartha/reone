@@ -43,10 +43,8 @@ public:
 
     void getLightsAt(const glm::vec3 &position, float distanceToCamera, std::vector<LightSceneNode *> &lights) const;
 
-    bool isAABBEnabled() const;
     const glm::vec3 &ambientLightColor() const;
 
-    void setAABBEnabled(bool enabled);
     void setAmbientLightColor(const glm::vec3 &color);
 
 private:
@@ -54,7 +52,6 @@ private:
     std::vector<MeshSceneNode *> _opaqueMeshes;
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
-    bool _aabbEnabled { false };
     glm::vec3 _ambientLightColor { 1.0f };
 
     SceneGraph() = default;

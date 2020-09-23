@@ -355,7 +355,7 @@ void Game::update() {
 
 void Game::loadNextModule() {
     info("Awaiting async jobs completion");
-    JobExecutor &jobs = JobExecutor::instance();
+    JobExecutor &jobs = TheJobExecutor;
     jobs.cancel();
     jobs.await();
 
@@ -407,7 +407,7 @@ void Game::drawWorld() {
     uniforms.view = camera->view();
     uniforms.cameraPosition = camera->position();
 
-    ShaderMan.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(uniforms);
 
     switch (_screen) {
         case Screen::InGame:
@@ -426,7 +426,7 @@ void Game::drawGUI() {
     ShaderUniforms uniforms;
     uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
 
-    ShaderMan.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(uniforms);
 
     switch (_screen) {
         case Screen::InGame:
@@ -453,7 +453,7 @@ void Game::drawGUI3D() {
         -1024.0f,
         1024.0f);
 
-    ShaderMan.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(uniforms);
 
     switch (_screen) {
         case Screen::MainMenu:
@@ -472,7 +472,7 @@ void Game::drawCursor() {
     ShaderUniforms uniforms;
     uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
 
-    ShaderMan.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(uniforms);
 
     _window.drawCursor();
 }

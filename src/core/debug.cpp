@@ -20,13 +20,22 @@
 namespace reone {
 
 static uint32_t g_debugLevel = 0;
+static DebugMode g_debugMode = DebugMode::None;
+
+uint32_t getDebugLevel() {
+    return g_debugLevel;
+}
+
+DebugMode getDebugMode() {
+    return g_debugMode;
+}
 
 void setDebugLevel(uint32_t level) {
     g_debugLevel = level;
 }
 
-uint32_t getDebugLevel() {
-    return g_debugLevel;
+void setDebugMode(DebugMode mode) {
+    g_debugMode = mode;
 }
 
 } // namespace reone

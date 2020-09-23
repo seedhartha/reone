@@ -86,6 +86,9 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
 }
 
 void SceneGraph::render() const {
+    for (auto &node : _rootNodes) {
+        node->render();
+    }
     for (auto &mesh : _opaqueMeshes) {
         mesh->render();
     }
@@ -127,16 +130,8 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, float distanceToCamera, 
     }
 }
 
-bool SceneGraph::isAABBEnabled() const {
-    return _aabbEnabled;
-}
-
 const glm::vec3 &SceneGraph::ambientLightColor() const {
     return _ambientLightColor;
-}
-
-void SceneGraph::setAABBEnabled(bool enabled) {
-    _aabbEnabled = enabled;
 }
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {

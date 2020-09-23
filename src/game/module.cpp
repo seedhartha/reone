@@ -17,6 +17,7 @@
 
 #include "module.h"
 
+#include "../core/debug.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
 #include "../render/camera/firstperson.h"
@@ -336,19 +337,23 @@ void Module::toggleCameraType() {
 }
 
 void Module::cycleDebugMode(bool forward) {
-    switch (_debugMode) {
+    DebugMode mode = getDebugMode();
+    switch (mode) {
         case DebugMode::None:
-            _debugMode = forward ? DebugMode::GameObjects : DebugMode::ModelNodes;
+            mode = forward ? DebugMode::GameObjects : DebugMode::Path;
             break;
         case DebugMode::GameObjects:
-            _debugMode = forward ? DebugMode::ModelNodes : DebugMode::None;
+            mode = forward ? DebugMode::ModelNodes : DebugMode::None;
             break;
         case DebugMode::ModelNodes:
-            _debugMode = forward ? DebugMode::None : DebugMode::GameObjects;
+            mode = forward ? DebugMode::Path : DebugMode::GameObjects;
+            break;
+        case DebugMode::Path:
+        default:
+            mode = forward ? DebugMode::None : DebugMode::ModelNodes;
             break;
     }
-
-    _area->setDebugMode(_debugMode);
+    setDebugMode(mode);
 }
 
 void Module::update(float dt, GuiContext &guiCtx) {

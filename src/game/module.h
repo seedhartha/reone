@@ -84,7 +84,6 @@ private:
     std::shared_ptr<render::ThirdPersonCamera> _thirdPersonCamera;
     bool _moveForward { false };
     bool _moveBackward { false };
-    DebugMode _debugMode { DebugMode::None };
 
     // Callbacks
     std::function<void(render::CameraType)> _onCameraChanged;

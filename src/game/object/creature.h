@@ -65,8 +65,8 @@ public:
     };
 
     struct Path {
-        glm::vec3 destination { 0.0f };
-        std::vector<glm::vec3> points;
+        glm::vec2 destination { 0.0f };
+        std::vector<glm::vec2> points;
         uint32_t timeFound { 0 };
         int pointIdx { 0 };
     };
@@ -97,7 +97,7 @@ public:
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);
     virtual void setTalking(bool talking);
-    void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
+    void setPath(const glm::vec2 &dest, std::vector<glm::vec2> &&points, uint32_t timeFound);
     void setPathUpdating();
 
     // Getters
@@ -105,7 +105,7 @@ public:
     int getClassLevel(ClassType clazz) const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
-    const std::string &conversation() const;
+    std::string conversation() const;
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
     bool hasActions() const;
     const Action &currentAction() const;

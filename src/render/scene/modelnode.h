@@ -54,6 +54,7 @@ public:
     void changeTexture(const std::string &resRef);
     void update(float dt);
     void fillSceneGraph() override;
+    void renderImmediate() const override;
 
     glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
 

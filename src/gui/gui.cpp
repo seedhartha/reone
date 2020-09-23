@@ -206,7 +206,7 @@ void GUI::render() const {
 void GUI::drawBackground() const {
     glm::mat4 transform(glm::scale(glm::mat4(1.0f), glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f)));
 
-    ShaderManager &shaders = ShaderMan;
+    ShaderManager &shaders = Shaders;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("model", transform);
     shaders.setUniform("color", glm::vec3(1.0f));

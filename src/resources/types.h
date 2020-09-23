@@ -80,6 +80,7 @@ enum class ResourceType : uint16_t {
     PlotWizardBlueprint = 2066,
     AreaLayout = 3000,
     Vis = 3001,
+    Path = 3003,
     Texture = 3007,
     Mdx = 3008
 };

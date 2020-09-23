@@ -60,7 +60,7 @@ void MeshSceneNode::render() const {
     bool skeletal = skin && !animState.name.empty();
     ShaderProgram program = getShaderProgram(*mesh, skeletal);
 
-    ShaderManager &shaders = ShaderMan;
+    ShaderManager &shaders = Shaders;
     shaders.activate(program);
     shaders.setUniform("model", _absoluteTransform);
     shaders.setUniform("color", glm::vec3(1.0f));

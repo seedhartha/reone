@@ -116,12 +116,6 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
-enum class DebugMode {
-    None,
-    GameObjects,
-    ModelNodes
-};
-
 struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;

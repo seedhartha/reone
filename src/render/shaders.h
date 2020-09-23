@@ -101,7 +101,7 @@ private:
     void setUniform(unsigned int ordinal, const std::string &name, const std::vector<glm::mat4> &arr);
 };
 
-#define ShaderMan render::ShaderManager::instance()
+#define Shaders render::ShaderManager::instance()
 
 } // namespace render
 

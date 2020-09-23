@@ -35,7 +35,7 @@ ImageButton::ImageButton() : Control(ControlType::ImageButton) {
 void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, const shared_ptr<Texture> &icon) const {
     if (!_visible) return;
 
-    ShaderManager &shaders = ShaderMan;
+    ShaderManager &shaders = Shaders;
     shaders.activate(ShaderProgram::BasicDiffuse);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
@@ -61,7 +61,7 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
     transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-    ShaderMan.setUniform("model", transform);
+    Shaders.setUniform("model", transform);
     glActiveTexture(0);
 
     if (_iconFrame) {

@@ -15,29 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabbnode.h"
+#include "cubenode.h"
+
+#include <glm/ext.hpp>
 
 #include "../../core/debug.h"
 
-#include "../mesh/aabb.h"
-
-#include "scenegraph.h"
+#include "../mesh/cube.h"
 
 namespace reone {
 
 namespace render {
 
-AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
+CubeSceneNode::CubeSceneNode(float size) : _size(size) {
 }
 
-void AABBSceneNode::render() const {
-    if (getDebugMode() != DebugMode::ModelNodes) return;
+void CubeSceneNode::render() const {
+    if (getDebugMode() != DebugMode::Path) return;
 
-    TheAABBMesh.render(_aabb, _absoluteTransform);
-}
-
-const AABB &AABBSceneNode::aabb() const {
-    return _aabb;
+    TheCubeMesh.render(glm::scale(_absoluteTransform, glm::vec3(_size)));
 }
 
 } // namespace render

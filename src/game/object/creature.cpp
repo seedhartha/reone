@@ -363,12 +363,25 @@ const string &Creature::getRunAnimation() {
     }
 }
 
-void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
+void Creature::setPath(const glm::vec2 &dest, vector<glm::vec2> &&points, uint32_t timeFound) {
+    int pointIdx = 0;
+    if (_path) {
+        bool lastPointReached = _path->pointIdx == _path->points.size();
+        if (!lastPointReached) {
+            glm::vec2 &nextPoint = _path->points[_path->pointIdx];
+            for (int i = 0; i < points.size(); ++i) {
+                if (points[i] == nextPoint) {
+                    pointIdx = i;
+                    break;
+                }
+            }
+        }
+    }
     unique_ptr<Path> path(new Path());
-
     path->destination = dest;
     path->points = points;
     path->timeFound = timeFound;
+    path->pointIdx = pointIdx;
 
     _path = move(path);
     _pathUpdating = false;
@@ -394,8 +407,8 @@ shared_ptr<Texture> Creature::portrait() const {
     return _portrait;
 }
 
-const string &Creature::conversation() const {
-    return _blueprint->conversation();
+string Creature::conversation() const {
+    return _blueprint ? _blueprint->conversation() : "";
 }
 
 const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {
