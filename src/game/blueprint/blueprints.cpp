@@ -17,8 +17,6 @@
 
 #include "blueprints.h"
 
-#include <map>
-
 #include "../../core/log.h"
 #include "../../resources/resources.h"
 
@@ -30,31 +28,58 @@ namespace reone {
 
 namespace game {
 
+static map<string, shared_ptr<CreatureBlueprint>> g_creatureCache;
+static map<string, shared_ptr<DoorBlueprint>> g_doorCache;
 static map<string, shared_ptr<ItemBlueprint>> g_itemCache;
+static map<string, shared_ptr<PlaceableBlueprint>> g_placeableCache;
+static map<string, shared_ptr<TriggerBlueprint>> g_triggerCache;
+static map<string, shared_ptr<WaypointBlueprint>> g_waypointCache;
 
 BlueprintManager &BlueprintManager::instance() {
     static BlueprintManager instance;
     return instance;
 }
 
+shared_ptr<CreatureBlueprint> BlueprintManager::findCreature(const string &resRef) {
+    return find<CreatureBlueprint>(resRef, ResourceType::CreatureBlueprint, g_creatureCache);
+}
+
+shared_ptr<DoorBlueprint> BlueprintManager::findDoor(const string &resRef) {
+    return find<DoorBlueprint>(resRef, ResourceType::DoorBlueprint, g_doorCache);
+}
+
 shared_ptr<ItemBlueprint> BlueprintManager::findItem(const string &resRef) {
-    auto it = g_itemCache.find(resRef);
-    if (it != g_itemCache.end()) {
+    return find<ItemBlueprint>(resRef, ResourceType::ItemBlueprint, g_itemCache);
+}
+
+shared_ptr<PlaceableBlueprint> BlueprintManager::findPlaceable(const string &resRef) {
+    return find<PlaceableBlueprint>(resRef, ResourceType::PlaceableBlueprint, g_placeableCache);
+}
+
+shared_ptr<TriggerBlueprint> BlueprintManager::findTrigger(const string &resRef) {
+    return find<TriggerBlueprint>(resRef, ResourceType::TriggerBlueprint, g_triggerCache);
+}
+
+shared_ptr<WaypointBlueprint> BlueprintManager::findWaypoint(const string &resRef) {
+    return find<WaypointBlueprint>(resRef, ResourceType::WaypointBlueprint, g_waypointCache);
+}
+
+template <class T>
+shared_ptr<T> BlueprintManager::find(const string &resRef, ResourceType type, map<string, shared_ptr<T>> &cache) {
+    auto it = cache.find(resRef);
+    if (it != cache.end()) {
         return it->second;
     }
-    debug("Templates: load item: " + resRef, 2);
+    shared_ptr<GffStruct> gff(ResMan.findGFF(resRef, type));
+    shared_ptr<T> blueprint;
 
-    shared_ptr<GffStruct> uti(ResMan.findGFF(resRef, ResourceType::ItemBlueprint));
-    shared_ptr<ItemBlueprint> item;
-
-    if (uti) {
-        item.reset(new ItemBlueprint());
-        item->load(resRef, *uti);
+    if (gff) {
+        blueprint.reset(new T());
+        blueprint->load(resRef, *gff);
     } else {
-        warn("Templates: item not found: " + resRef);
+        warn(boost::format("Blueprint: not found: %s %d") % resRef % static_cast<int>(type));
     }
-
-    auto pair = g_itemCache.insert(make_pair(resRef, item));
+    auto pair = cache.insert(make_pair(resRef, blueprint));
 
     return pair.first->second;
 }

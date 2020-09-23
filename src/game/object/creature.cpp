@@ -262,7 +262,7 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<ItemBlueprint> itemTempl(BlueprintMan.findItem(resRef));
+    shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(itemTempl.get());
