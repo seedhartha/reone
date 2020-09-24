@@ -31,6 +31,7 @@
 #include "curfile.h"
 #include "folder.h"
 #include "mdlfile.h"
+#include "mp3file.h"
 #include "ncsfile.h"
 #include "rimfile.h"
 #include "tgafile.h"
@@ -229,7 +230,7 @@ void ResourceManager::initModuleNames() {
     sort(_moduleNames.begin(), _moduleNames.end());
 }
 
-shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType type) {
+shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType type, bool logNotFound) {
     string cacheKey(getCacheKey(resRef, type));
     auto it = g_resCache.find(cacheKey);
     if (it != g_resCache.end()) {
@@ -255,7 +256,7 @@ shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType t
             data = make_shared<ByteArray>(bif.getResourceData(key.resIdx));
         }
     }
-    if (!data) {
+    if (!data && logNotFound) {
         warn("Resources: not found: " + cacheKey);
     }
 
@@ -343,16 +344,23 @@ shared_ptr<AudioStream> ResourceManager::findAudio(const string &resRef) {
     if (it != g_audioCache.end()) {
         return it->second;
     }
-
-    shared_ptr<ByteArray> wavData(find(resRef, ResourceType::Wav));
+    shared_ptr<ByteArray> mp3Data(find(resRef, ResourceType::Mp3, false));
     shared_ptr<AudioStream> stream;
 
-    if (wavData) {
-        WavFile wav;
-        wav.load(wrap(wavData));
-        stream = wav.stream();
-    }
+    if (mp3Data) {
+        Mp3File mp3;
+        mp3.load(wrap(mp3Data));
+        stream = mp3.stream();
 
+    } else {
+        shared_ptr<ByteArray> wavData(find(resRef, ResourceType::Wav));
+
+        if (wavData) {
+            WavFile wav;
+            wav.load(wrap(wavData));
+            stream = wav.stream();
+        }
+    }
     auto pair = g_audioCache.insert(make_pair(resRef, stream));
 
     return pair.first->second;

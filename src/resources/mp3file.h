@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <istream>
 #include <memory>
 
 #include "mad.h"
@@ -31,7 +32,9 @@ class Mp3File {
 public:
     Mp3File() = default;
 
+    void load(const std::shared_ptr<std::istream> &stream);
     void load(ByteArray &&data);
+
     std::shared_ptr<audio::AudioStream> stream() const;
 
 private:

@@ -49,7 +49,7 @@ public:
     void clearCaches();
     void loadModule(const std::string &name);
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type);
+    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<TwoDaTable> find2DA(const std::string &resRef);
     std::shared_ptr<GffStruct> findGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<TalkTable> findTalkTable(const std::string &resRef);

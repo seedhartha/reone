@@ -82,7 +82,8 @@ enum class ResourceType : uint16_t {
     Vis = 3001,
     Path = 3003,
     Texture = 3007,
-    Mdx = 3008
+    Mdx = 3008,
+    Mp3 = 4000
 };
 
 typedef std::multimap<std::string, std::string> Visibility;

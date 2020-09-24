@@ -40,6 +40,18 @@ static inline int scale(mad_fixed_t sample) {
     return sample >> (MAD_F_FRACBITS + 1 - 16);
 }
 
+void Mp3File::load(const shared_ptr<istream> &stream) {
+    stream->seekg(0, ios::end);
+    size_t size = stream->tellg();
+
+    ByteArray data(size);
+
+    stream->seekg(0);
+    stream->read(&data[0], size);
+
+    load(move(data));
+}
+
 void Mp3File::load(ByteArray &&data) {
     _input = data;
     _stream = make_shared<AudioStream>();
