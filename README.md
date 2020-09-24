@@ -12,19 +12,20 @@ Currently, the most fundamental engine subsystems are already implemented. Actua
 
 ## Similar projects
 
-reone is not the only KotOR recreation project out there. Below is my opinion, as the project leader, on alternative engines:
+reone is not the only project aiming to reimplement the Odyssey engine – there are at least four alternatives:
 
-* [xoreos](https://github.com/xoreos/xoreos) – a much more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, somewhat bloated, unoptimized and is not very active anymore.
-* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – while a fascinating undertaking, I do not believe JavaScript to be the right tool for the job. Still, very useful to have as a reference.
-* [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – yet to be investigated, but my personal preference is for C++ and a custom rendering engine.
+* [xoreos](https://github.com/xoreos/xoreos) – a more established and a much more ambitious project, which I had contributed to and use alot as a reference. However, it is not very active anymore and I find it to be too complex and unoptimized for my taste.
+* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a JavaScript-based remake.
+* [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – a Unity-based reimplementation.
+* The Northern Lights by [Lachlan O'Neill](https://github.com/lachjames) – another Unity-based reimplementation and a level editor.
 
 ## Installation
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
-Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
+To run a game using reone, you must legally own it – we do not endorse piracy. Nowadays both games can be downloaded from [Steam](https://store.steampowered.com/) or [GOG.com](https://www.gog.com/). Keep in mind that reone is tested against vanilla versions of the games – mod support is not guaranteed.
 
-You must legally own a game to run it using reone – we do not endorse piracy.
+Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
 
 ## Usage
 
