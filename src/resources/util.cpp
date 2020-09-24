@@ -76,9 +76,11 @@ static map<ResourceType, string> g_extByType = {
     { ResourceType::Vis, "vis" },
     { ResourceType::Path, "pth" },
     { ResourceType::Texture, "tpc" },
-    { ResourceType::Mdx, "mdx" } };
+    { ResourceType::Mdx, "mdx" },
+    { ResourceType::Mp3, "mp3" } };
 
 static map<string, ResourceType> g_typeByExt;
+static bool g_typeByExtInited = false;
 
 const string &getExtByResType(ResourceType type) {
     auto it = g_extByType.find(type);
@@ -90,10 +92,11 @@ const string &getExtByResType(ResourceType type) {
 }
 
 ResourceType getResTypeByExt(const string &ext) {
-    if (g_typeByExt.empty()) {
+    if (!g_typeByExtInited) {
         for (auto &entry : g_extByType) {
             g_typeByExt.insert(make_pair(entry.second, entry.first));
         }
+        g_typeByExtInited = true;
     }
     auto it = g_typeByExt.find(ext);
     if (it == g_typeByExt.end()) {
