@@ -81,6 +81,7 @@ enum class ResourceType : uint16_t {
     AreaLayout = 3000,
     Vis = 3001,
     Path = 3003,
+    Lip = 3004,
     Texture = 3007,
     Mdx = 3008,
     Mp3 = 4000
