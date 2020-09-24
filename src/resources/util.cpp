@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "../core/log.h"
+
 #include "types.h"
 
 using namespace std;
@@ -75,6 +77,7 @@ static map<ResourceType, string> g_extByType = {
     { ResourceType::AreaLayout, "lyt" },
     { ResourceType::Vis, "vis" },
     { ResourceType::Path, "pth" },
+    { ResourceType::Lip, "lip" },
     { ResourceType::Texture, "tpc" },
     { ResourceType::Mdx, "mdx" },
     { ResourceType::Mp3, "mp3" } };
@@ -100,7 +103,8 @@ ResourceType getResTypeByExt(const string &ext) {
     }
     auto it = g_typeByExt.find(ext);
     if (it == g_typeByExt.end()) {
-        throw runtime_error("Resource type not found by extension: " + ext);
+        warn("Resource type not found by extension: " + ext);
+        return ResourceType::Invalid;
     }
 
     return it->second;
