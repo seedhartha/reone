@@ -29,7 +29,6 @@ namespace reone {
 namespace render {
 
 static const int kMaxLightCount = 8;
-static const float kDistanceMaxLights = 512.0f;
 
 SceneGraph &SceneGraph::instance() {
     static SceneGraph graph;
@@ -74,7 +73,7 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
     for (auto &node : _rootNodes) {
         ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(node.get());
         if (modelNode) {
-            modelNode->updateLighting(cameraPosition);
+            modelNode->updateLighting();
         }
     }
     for (auto &mesh : _transparentMeshes) {
@@ -97,7 +96,7 @@ void SceneGraph::render() const {
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, float distanceToCamera, vector<LightSceneNode *> &lights) const {
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
     lights.clear();
 
     for (auto &light : _lights) {
@@ -123,10 +122,8 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, float distanceToCamera, 
         return left->distanceToObject() < right->distanceToObject();
     });
 
-    int lightCount = glm::clamp(static_cast<int>(kMaxLightCount * kDistanceMaxLights / distanceToCamera), 1, kMaxLightCount);
-
-    if (lights.size() > lightCount) {
-        lights.erase(lights.begin() + lightCount, lights.end());
+    if (lights.size() > kMaxLightCount) {
+        lights.erase(lights.begin() + kMaxLightCount, lights.end());
     }
 }
 

@@ -53,6 +53,21 @@ void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
     _distanceToCamera = glm::distance2(_center, cameraPosition);
 }
 
+static const string &getLightUniformName(int index, const char *propName) {
+    static map<int, map<const char *, string>> cache;
+    auto &cacheByIndex = cache[index];
+
+    auto nameIt = cacheByIndex.find(propName);
+    if (nameIt != cacheByIndex.end()) {
+        return nameIt->second;
+    }
+
+    string name(str(boost::format("lights[%d].%s") % index % propName));
+    auto pair = cacheByIndex.insert(make_pair(propName, name));
+
+    return pair.first->second;
+}
+
 void MeshSceneNode::render() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
@@ -111,11 +126,11 @@ void MeshSceneNode::render() const {
 
         for (int i = 0; i < lightCount; ++i) {
             LightSceneNode *light = lights[i];
-            shaders.setUniform(str(boost::format("lights[%d].ambientOnly") % i), light->modelNode().light()->ambientOnly);
-            shaders.setUniform(str(boost::format("lights[%d].position") % i), glm::vec3(light->absoluteTransform()[3]));
-            shaders.setUniform(str(boost::format("lights[%d].radius") % i), light->modelNode().radius());
-            shaders.setUniform(str(boost::format("lights[%d].color") % i), light->modelNode().color());
-            shaders.setUniform(str(boost::format("lights[%d].multiplier") % i), light->modelNode().multiplier());
+            shaders.setUniform(getLightUniformName(i, "ambientOnly"), light->modelNode().light()->ambientOnly);
+            shaders.setUniform(getLightUniformName(i, "position"), glm::vec3(light->absoluteTransform()[3]));
+            shaders.setUniform(getLightUniformName(i, "radius"), light->modelNode().radius());
+            shaders.setUniform(getLightUniformName(i, "color"), light->modelNode().color());
+            shaders.setUniform(getLightUniformName(i, "multiplier"), light->modelNode().multiplier());
         }
     }
 
