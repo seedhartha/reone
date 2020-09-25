@@ -32,6 +32,7 @@
 #include "gui/portraitsel.h"
 
 #include "area.h"
+#include "console.h"
 #include "module.h"
 
 namespace reone {
@@ -122,6 +123,7 @@ private:
     std::string _nextEntry;
     GameState _state;
     std::shared_ptr<audio::SoundInstance> _music;
+    Console _console;
 
     // GUI
     std::shared_ptr<MainMenu> _mainMenu;

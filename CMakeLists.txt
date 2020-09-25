@@ -59,6 +59,7 @@ set(HEADERS
     src/game/blueprint/trigger.h
     src/game/blueprint/waypoint.h
     src/game/characters.h
+    src/game/console.h
     src/game/dialog.h
     src/game/game.h
     src/game/gui/classsel.h
@@ -187,6 +188,7 @@ set(SOURCES
     src/game/blueprint/trigger.cpp
     src/game/blueprint/waypoint.cpp
     src/game/characters.cpp
+    src/game/console.cpp
     src/game/dialog.cpp
     src/game/game.cpp
     src/game/gui/classsel.cpp

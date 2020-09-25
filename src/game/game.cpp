@@ -58,7 +58,8 @@ Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
     _version(version),
     _path(path),
     _opts(opts),
-    _window(opts.graphics, this) {
+    _window(opts.graphics, this),
+    _console(opts.graphics) {
 
     initObjectFactory();
 }
@@ -77,6 +78,7 @@ int Game::run() {
     configure();
     loadCursor();
 
+    _console.load();
     _window.show();
 
     runMainLoop();
@@ -431,7 +433,12 @@ void Game::drawGUI() {
     switch (_screen) {
         case Screen::InGame:
             _debugGui->render();
-            if (_module->cameraType() == CameraType::ThirdPerson) _hud->render();
+            if (_module->cameraType() == CameraType::ThirdPerson) {
+                _hud->render();
+            }
+            if (_console.isOpen()) {
+                _console.render();
+            }
             break;
         default: {
             shared_ptr<GUI> gui(currentGUI());
@@ -480,6 +487,7 @@ void Game::drawCursor() {
 bool Game::handle(const SDL_Event &event) {
     switch (_screen) {
         case Screen::InGame:
+            if (_console.handle(event)) return true;
             if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
