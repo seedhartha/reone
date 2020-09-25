@@ -308,63 +308,57 @@ void ScriptExecution::executeBitwiseAnd(const Instruction &ins) {
 }
 
 void ScriptExecution::executeEqual(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool equal = _stack[stackSize - 2] == _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left == right);
+    _stack.pop_back();
+    _stack.push_back(equal);
 }
 
 void ScriptExecution::executeNotEqual(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool notEqual = _stack[stackSize - 2] != _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left != right);
+    _stack.pop_back();
+    _stack.push_back(notEqual);
 }
 
 void ScriptExecution::executeGreaterThanOrEqual(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool ge = _stack[stackSize - 2] >= _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left >= right);
+    _stack.pop_back();
+    _stack.push_back(ge);
 }
 
 void ScriptExecution::executeGreaterThan(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool greater = _stack[stackSize - 2] > _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left > right);
+    _stack.pop_back();
+    _stack.push_back(greater);
 }
 
 void ScriptExecution::executeLessThan(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool less = _stack[stackSize - 2] < _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left < right);
+    _stack.pop_back();
+    _stack.push_back(less);
 }
 
 void ScriptExecution::executeLessThanOrEqual(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    bool le = _stack[stackSize - 2] <= _stack[stackSize - 1];
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left <= right);
+    _stack.pop_back();
+    _stack.push_back(le);
 }
 
 void ScriptExecution::executeShiftLeft(const Instruction &ins) {
@@ -390,43 +384,39 @@ void ScriptExecution::executeUnsignedShiftRight(const Instruction &ins) {
 }
 
 void ScriptExecution::executeAdd(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    Variable result(_stack[stackSize - 2] + _stack[stackSize - 1]);
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left + right);
+    _stack.pop_back();
+    _stack.push_back(move(result));
 }
 
 void ScriptExecution::executeSubtract(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    Variable result(_stack[stackSize - 2] - _stack[stackSize - 1]);
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left - right);
+    _stack.pop_back();
+    _stack.push_back(move(result));
 }
 
 void ScriptExecution::executeMultiply(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    Variable result(_stack[stackSize - 2] * _stack[stackSize - 1]);
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left * right);
+    _stack.pop_back();
+    _stack.push_back(move(result));
 }
 
 void ScriptExecution::executeDivide(const Instruction &ins) {
-    const Variable &right = _stack.back();
-    _stack.pop_back();
+    size_t stackSize = _stack.size();
+    Variable result(_stack[stackSize - 2] / _stack[stackSize - 1]);
 
-    const Variable &left = _stack.back();
     _stack.pop_back();
-
-    _stack.push_back(left / right);
+    _stack.pop_back();
+    _stack.push_back(move(result));
 }
 
 void ScriptExecution::executeMod(const Instruction &ins) {
@@ -468,10 +458,10 @@ void ScriptExecution::executeJumpToSubroutine(const Instruction &ins) {
 }
 
 void ScriptExecution::executeJumpIfZero(const Instruction &ins) {
-    const Variable &var = _stack.back();
+    bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
-    if (var.intValue == 0) {
+    if (zero) {
         _nextInstruction = ins.jumpOffset;
     }
 }
@@ -496,19 +486,17 @@ void ScriptExecution::executeIncRelToSP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeLogicalNot(const Instruction &ins) {
-    const Variable &var = _stack.back();
+    bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
-    assert(var.type == VariableType::Int);
-
-    _stack.push_back(!var.intValue);
+    _stack.push_back(zero);
 }
 
 void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
-    const Variable &var = _stack.back();
+    bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
-    if (var.intValue != 0) {
+    if (!zero) {
         _nextInstruction = ins.jumpOffset;
     }
 }
