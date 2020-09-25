@@ -20,14 +20,21 @@
 #include "program.h"
 #include "src/core/log.h"
 
+using namespace std;
+
 using namespace reone;
 
 int main(int argc, char **argv) {
     try {
         return tools::Program(argc, argv).run();
     }
-    catch (const std::exception &e) {
-        error(e.what());
+    catch (const exception &ex) {
+        try {
+            error(ex.what());
+        }
+        catch (...) {
+        }
+
         return 1;
     }
 }

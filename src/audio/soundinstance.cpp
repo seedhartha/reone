@@ -96,7 +96,7 @@ void SoundInstance::update() {
         }
         _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
         alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
-        _nextBuffer = (++_nextBuffer) % 2;
+        _nextBuffer = (_nextBuffer + 1) % 2;
     }
 }
 
