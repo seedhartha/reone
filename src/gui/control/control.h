@@ -79,6 +79,8 @@ public:
 
     static std::unique_ptr<Control> makeControl(const resources::GffStruct &gffs);
 
+    virtual ~Control() = default;
+
     virtual void load(const resources::GffStruct &gffs);
 
     // Event handling

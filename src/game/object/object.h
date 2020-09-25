@@ -28,6 +28,8 @@ namespace game {
 
 class Object {
 public:
+    virtual ~Object() = default;
+
     virtual void update(const UpdateContext &ctx);
 
     virtual void saveTo(AreaState &state) const;
