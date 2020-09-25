@@ -102,6 +102,7 @@ void SoundInstance::update() {
 
 void SoundInstance::stop() {
     alSourceStop(_source);
+    _state = State::Stopped;
 }
 
 bool SoundInstance::stopped() const {
