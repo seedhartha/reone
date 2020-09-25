@@ -40,12 +40,15 @@ addons:
       name: "seedhartha/reone"
       description: "Game engine, capable of running KotOR and TSL"
     notification_email: vkremianskii@gmail.com
-    build_command_prepend: "mkdir build || true; cd build; cmake .. -DUSE_EXTERNAL_GLM=ON -DCMAKE_BUILD_TYPE=Release"
+    build_command_prepend: "mkdir build; cd build; cmake .. -DUSE_EXTERNAL_GLM=ON -DCMAKE_BUILD_TYPE=Release"
     build_command: "make"
     branch_pattern: coverity_scan
 
 script:
-  - mkdir build
-  - cd build
-  - cmake .. -DUSE_EXTERNAL_GLM=ON -DCMAKE_BUILD_TYPE=Release
-  - make
+  - |
+    if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then
+      mkdir build;
+      cd build;
+      cmake .. -DUSE_EXTERNAL_GLM=ON -DCMAKE_BUILD_TYPE=Release;
+      make;
+    fi
