@@ -124,7 +124,7 @@ void PortraitSelectionGui::onClick(const string &control) {
         loadCurrentPortrait();
 
     } else if (control == "BTN_ARRR") {
-        _currentPortrait = ++_currentPortrait % portraitCount;
+        _currentPortrait = (_currentPortrait + 1) % portraitCount;
         loadCurrentPortrait();
 
     } else if (control == "BTN_ACCEPT") {

@@ -88,7 +88,7 @@ mad_flow Mp3File::headerFunc(void *playbuf, mad_header const *header) {
 
 mad_flow Mp3File::outputFunc(void *playbuf, mad_header const *header, mad_pcm *pcm) {
     Mp3File *mp3 = reinterpret_cast<Mp3File *>(playbuf);
-    int sampleCount = pcm->length;
+    unsigned short sampleCount = pcm->length;
     mad_fixed_t *chLeft = pcm->samples[0];
     mad_fixed_t *chRight = pcm->samples[1];
 
@@ -101,6 +101,7 @@ mad_flow Mp3File::outputFunc(void *playbuf, mad_header const *header, mad_pcm *p
         int sample = scale(*chLeft++);
         frame.samples.push_back((sample >> 0) & 0xff);
         frame.samples.push_back((sample >> 8) & 0xff);
+
         if (pcm->channels == 2) {
             sample = scale(*chRight++);
             frame.samples.push_back((sample >> 0) & 0xff);

@@ -93,7 +93,13 @@ void Server::stop() {
         _thread.join();
     }
     if (_acceptor) {
-        if (_acceptor->is_open()) _acceptor->close();
+        if (_acceptor->is_open()) {
+            try {
+                _acceptor->close();
+            }
+            catch (const boost::system::system_error &) {
+            }
+        }
         _acceptor.reset();
     }
 

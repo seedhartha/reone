@@ -63,7 +63,13 @@ void Client::stop() {
         _connection.reset();
     }
     if (_socket) {
-        if (_socket->is_open()) _socket->close();
+        if (_socket->is_open()) {
+            try {
+                _socket->close();
+            }
+            catch (const boost::system::system_error &) {
+            }
+        }
         _socket.reset();
     }
     if (_thread.joinable()) {

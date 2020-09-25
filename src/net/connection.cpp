@@ -24,9 +24,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace boost::system;
-
-using tcp = boost::asio::ip::tcp;
+using boost::asio::ip::tcp;
 
 namespace reone {
 
@@ -94,10 +92,16 @@ Connection::~Connection() {
 }
 
 void Connection::close() {
-    if (_socket) {
-        if (_socket->is_open()) _socket->close();
-        _socket.reset();
+    if (!_socket) return;
+
+    if (_socket->is_open()) {
+        try {
+            _socket->close();
+        }
+        catch (const boost::system::system_error &) {
+        }
     }
+    _socket.reset();
 }
 
 void Connection::send(const shared_ptr<Command> &command) {
