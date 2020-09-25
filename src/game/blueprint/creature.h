@@ -18,7 +18,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "../../resources/gfffile.h"
@@ -59,7 +59,7 @@ private:
     std::vector<std::string> _equipment;
     int _appearance { 0 };
     std::string _conversation;
-    std::map<ScriptType, std::string> _scripts;
+    std::unordered_map<ScriptType, std::string> _scripts;
 
     CreatureBlueprint(const CreatureBlueprint &) = delete;
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;

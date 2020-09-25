@@ -511,7 +511,7 @@ void MdlFile::readSkin(ModelNode &node) {
     node._mesh->_offsets.boneWeights = boneWeightsOffset;
     node._mesh->_offsets.boneIndices = boneIndicesOffset;
 
-    map<uint16_t, uint16_t> nodeIdxByBoneIdx;
+    unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + bonesOffset);
 
     for (uint32_t i = 0; i < boneCount; ++i) {

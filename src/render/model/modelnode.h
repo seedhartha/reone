@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 #include "glm/gtx/quaternion.hpp"
 
@@ -46,7 +46,7 @@ public:
     };
 
     struct Skin {
-        std::map<uint16_t, uint16_t> nodeIdxByBoneIdx;
+        std::unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     };
 
     ModelNode(int index, const ModelNode *parent = nullptr);

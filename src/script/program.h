@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 namespace reone {
 
@@ -143,7 +143,7 @@ public:
 private:
     std::string _name;
     uint32_t _length { 0 };
-    std::map<uint32_t, Instruction> _instructions;
+    std::unordered_map<uint32_t, Instruction> _instructions;
 
     ScriptProgram(const ScriptProgram &) = delete;
     ScriptProgram &operator=(const ScriptProgram &) = delete;

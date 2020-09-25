@@ -18,6 +18,7 @@
 #include "meshnode.h"
 
 #include <stdexcept>
+#include <unordered_map>
 
 #include <boost/format.hpp>
 
@@ -54,7 +55,7 @@ void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
 }
 
 static const string &getLightUniformName(int index, const char *propName) {
-    static map<int, map<const char *, string>> cache;
+    static unordered_map<int, unordered_map<const char *, string>> cache;
     auto &cacheByIndex = cache[index];
 
     auto nameIt = cacheByIndex.find(propName);
@@ -98,7 +99,7 @@ void MeshSceneNode::render() const {
         shaders.setUniform("absTransform", _modelNode->absoluteTransform());
         shaders.setUniform("absTransformInv", _modelNode->absoluteTransformInverse());
 
-        const map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
+        const unordered_map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
         vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
 
         for (auto &pair : nodeIdxByBoneIdx) {

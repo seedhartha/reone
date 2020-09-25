@@ -19,7 +19,7 @@
 
 #include "binfile.h"
 
-#include <map>
+#include <unordered_map>
 
 namespace reone {
 
@@ -33,10 +33,10 @@ public:
     int getInt(const std::string &column) const;
     float getFloat(const std::string &column) const;
 
-    const std::map<std::string, std::string> &values() const;
+    const std::unordered_map<std::string, std::string> &values() const;
 
 private:
-    std::map<std::string, std::string> _values;
+    std::unordered_map<std::string, std::string> _values;
 };
 
 class TwoDaTable {

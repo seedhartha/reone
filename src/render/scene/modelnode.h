@@ -18,6 +18,7 @@
 #pragma once
 
 #include <set>
+#include <unordered_map>
 
 #include "../aabb.h"
 #include "../model/model.h"
@@ -44,8 +45,8 @@ public:
         std::shared_ptr<Animation> animation;
         const Model *model { nullptr };
         float time { 0.0f };
-        std::map<std::string, glm::mat4> localTransforms;
-        std::map<uint16_t, glm::mat4> boneTransforms;
+        std::unordered_map<std::string, glm::mat4> localTransforms;
+        std::unordered_map<uint16_t, glm::mat4> boneTransforms;
     };
 
     ModelSceneNode(const std::shared_ptr<Model> &model);
@@ -96,11 +97,11 @@ public:
 
 private:
     std::shared_ptr<Model> _model;
-    std::map<uint16_t, glm::mat4> _nodeTransforms;
+    std::unordered_map<uint16_t, glm::mat4> _nodeTransforms;
     AnimationState _animState;
-    std::map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
-    std::map<uint16_t, std::shared_ptr<LightSceneNode>> _lights;
-    std::map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
+    std::unordered_map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
+    std::unordered_map<uint16_t, std::shared_ptr<LightSceneNode>> _lights;
+    std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
     bool _visible { true };
