@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "modelnode.h"
 
 namespace reone {
@@ -39,7 +41,7 @@ private:
     float _length { 0.0f };
     float _transitionTime { 0.0f };
     std::shared_ptr<ModelNode> _rootNode;
-    std::map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
+    std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
     Animation(const Animation &) = delete;
     Animation &operator=(const Animation &) = delete;

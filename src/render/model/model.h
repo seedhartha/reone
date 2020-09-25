@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "../aabb.h"
 
 #include "animation.h"
@@ -27,11 +29,10 @@ namespace render {
 
 /**
  * Tree-like data structure, representing a 3D model. Contains model nodes
- * and animations. Models are cached and reused between model instances.
+ * and animations. Models are cached and reused between model scene nodes.
  *
  * @see reone::render::ModelNode
  * @see reone::render::Animation
- * @see reone::render::ModelInstance
  */
 class Model {
 public:
@@ -59,10 +60,10 @@ public:
 private:
     std::string _name;
     std::shared_ptr<ModelNode> _rootNode;
-    std::map<std::string, std::shared_ptr<Animation>> _animations;
+    std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
-    std::map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
-    std::map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
+    std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
+    std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
     float _radiusXY { 0.0f };
     float _animationScale { 1.0f };

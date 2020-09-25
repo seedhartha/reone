@@ -18,8 +18,8 @@
 #pragma once
 
 #include <cstdint>
-#include <map>
 #include <memory>
+#include <unordered_map>
 
 #include "object/spatial.h"
 #include "types.h"
@@ -37,9 +37,9 @@ public:
 
 protected:
     ObjectList _objects;
-    std::map<ObjectType, ObjectList> _objectsByType;
-    std::map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
-    std::map<std::string, ObjectList> _objectsByTag;
+    std::unordered_map<ObjectType, ObjectList> _objectsByType;
+    std::unordered_map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
+    std::unordered_map<std::string, ObjectList> _objectsByTag;
 
     void clear();
     virtual void add(const std::shared_ptr<SpatialObject> &object);

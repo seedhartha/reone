@@ -21,6 +21,7 @@
 #include <memory>
 #include <set>
 #include <queue>
+#include <unordered_map>
 
 #include "paths.h"
 
@@ -51,7 +52,7 @@ private:
     };
 
     std::vector<glm::vec2> _vertices;
-    std::map<uint16_t, std::vector<Edge>> _edges;
+    std::unordered_map<uint16_t, std::vector<Edge>> _edges;
 
     NavMesh(const NavMesh &) = delete;
     NavMesh &operator=(const NavMesh &) = delete;

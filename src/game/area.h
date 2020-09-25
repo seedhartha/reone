@@ -124,12 +124,12 @@ private:
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
     std::string _name;
-    std::map<std::string, std::shared_ptr<Room>> _rooms;
+    std::unordered_map<std::string, std::shared_ptr<Room>> _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
     render::CameraStyle _cameraStyle;
     std::string _music;
     std::unique_ptr<NavMesh> _navMesh;
-    std::map<ScriptType, std::string> _scripts;
+    std::unordered_map<ScriptType, std::string> _scripts;
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };

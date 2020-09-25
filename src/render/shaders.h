@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "glm/glm.hpp"
@@ -80,8 +80,8 @@ private:
         FragmentText
     };
 
-    std::map<ShaderName, unsigned int> _shaders;
-    std::map<ShaderProgram, unsigned int> _programs;
+    std::unordered_map<ShaderName, unsigned int> _shaders;
+    std::unordered_map<ShaderProgram, unsigned int> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     unsigned int _activeOrdinal { 0 };
 

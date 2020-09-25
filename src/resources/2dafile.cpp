@@ -53,7 +53,7 @@ float TwoDaRow::getFloat(const string &column) const {
     return stof(getString(column));
 }
 
-const map<string, string> &TwoDaRow::values() const {
+const unordered_map<string, string> &TwoDaRow::values() const {
     return _values;
 }
 

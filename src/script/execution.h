@@ -18,9 +18,9 @@
 #pragma once
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "program.h"
 #include "types.h"
@@ -39,7 +39,7 @@ public:
 private:
     std::shared_ptr<ScriptProgram> _program;
     ExecutionContext _context;
-    std::map<ByteCode, std::function<void(const Instruction &)>> _handlers;
+    std::unordered_map<ByteCode, std::function<void(const Instruction &)>> _handlers;
     std::vector<Variable> _stack;
     std::vector<uint32_t> _returnOffsets;
     uint32_t _nextInstruction { 0 };
