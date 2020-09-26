@@ -130,7 +130,7 @@ private:
     std::shared_ptr<ClassSelectionGui> _classesGui;
     std::shared_ptr<PortraitSelectionGui> _portraitsGui;
     std::shared_ptr<HUD> _hud;
-    std::shared_ptr<DebugGui> _debugGui;
+    std::shared_ptr<DebugOverlay> _debugOverlay;
     std::shared_ptr<ContainerGui> _containerGui;
 
     Game(const Game &) = delete;
@@ -141,7 +141,7 @@ private:
     void loadClassSelectionGui();
     void loadPortraitsGui();
     void loadHUD();
-    void loadDebugGui();
+    void loadDebugOverlay();
     void loadDialogGui();
     void loadContainerGui();
     void loadCursor();
