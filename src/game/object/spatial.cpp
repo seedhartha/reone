@@ -35,6 +35,10 @@ namespace game {
 SpatialObject::SpatialObject(uint32_t id, ObjectType type) : Object(id, type) {
 }
 
+float SpatialObject::distanceTo(const glm::vec2 &point) const {
+    return glm::distance2(glm::vec2(_position), point);
+}
+
 float SpatialObject::distanceTo(const glm::vec3 &point) const {
     return glm::distance2(_position, point);
 }
