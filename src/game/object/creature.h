@@ -65,8 +65,8 @@ public:
     };
 
     struct Path {
-        glm::vec2 destination { 0.0f };
-        std::vector<glm::vec2> points;
+        glm::vec3 destination { 0.0f };
+        std::vector<glm::vec3> points;
         uint32_t timeFound { 0 };
         int pointIdx { 0 };
     };
@@ -97,8 +97,6 @@ public:
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);
     virtual void setTalking(bool talking);
-    void setPath(const glm::vec2 &dest, std::vector<glm::vec2> &&points, uint32_t timeFound);
-    void setPathUpdating();
 
     // Getters
     Gender gender() const;
@@ -109,10 +107,17 @@ public:
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
     bool hasActions() const;
     const Action &currentAction() const;
-    std::shared_ptr<Path> &path();
-    bool isPathUpdating() const;
     float walkSpeed() const;
     float runSpeed() const;
+
+    // Pathfinding
+
+    std::shared_ptr<Path> &path();
+
+    void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
+    void clearPath();
+
+    // END Pathfinding
 
 protected:
     MovementType _movementType { MovementType::None };
@@ -133,7 +138,6 @@ private:
     std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
     std::list<Action> _actions;
     std::shared_ptr<Path> _path;
-    std::atomic_bool _pathUpdating { false };
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
 

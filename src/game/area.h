@@ -140,10 +140,10 @@ private:
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedCommands();
-    bool navigateCreature(Creature &creature, const glm::vec2 &dest, float distance, float dt);
+    bool navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
-    void updateCreaturePath(Creature &creature, const glm::vec2 &dest);
+    void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     bool findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
     bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
 
