@@ -215,7 +215,7 @@ void GUI::drawBackground() const {
     glActiveTexture(0);
     _background->bind();
 
-    TheGUIQuad.render(GL_TRIANGLES);
+    DefaultGuiQuad.render(GL_TRIANGLES);
 
     _background->unbind();
 }

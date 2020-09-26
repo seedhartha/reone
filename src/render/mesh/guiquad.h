@@ -25,13 +25,19 @@ namespace render {
 
 class GUIQuad : public Mesh {
 public:
-    static GUIQuad &instance();
+    static GUIQuad &getDefault();
+    static GUIQuad &getXFlipped();
+    static GUIQuad &getYFlipped();
+    static GUIQuad &getXYFlipped();
 
 private:
-    GUIQuad();
+    GUIQuad(std::vector<float> &&vertices);
 };
 
-#define TheGUIQuad render::GUIQuad::instance()
+#define DefaultGuiQuad render::GUIQuad::getDefault()
+#define FlipXGuiQuad render::GUIQuad::getXFlipped()
+#define FlipYGuiQuad render::GUIQuad::getYFlipped()
+#define FlipXYGuiQuad render::GUIQuad::getXYFlipped()
 
 } // namespace render
 

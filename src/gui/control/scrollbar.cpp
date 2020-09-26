@@ -69,7 +69,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
 
     Shaders.setUniform("model", arrowTransform);
 
-    GUIQuad::instance().render(GL_TRIANGLES);
+    DefaultGuiQuad.render(GL_TRIANGLES);
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
@@ -79,7 +79,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
 
     Shaders.setUniform("model", arrowTransform);
 
-    GUIQuad::instance().render(GL_TRIANGLES);
+    DefaultGuiQuad.render(GL_TRIANGLES);
 }
 
 void ScrollBar::setCanScrollUp(bool scroll) {
