@@ -77,7 +77,9 @@ public:
         glm::mat4 transform { 1.0f };
     };
 
-    static std::unique_ptr<Control> makeControl(const resources::GffStruct &gffs);
+    static ControlType getType(const resources::GffStruct &gffs);
+    static std::string getTag(const resources::GffStruct &gffs);
+    static std::unique_ptr<Control> of(ControlType type, const std::string &tag);
 
     virtual ~Control() = default;
 
@@ -103,6 +105,7 @@ public:
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
     void setScene3D(const Scene3D &scene);
+    void setPadding(int padding);
 
     const std::string &tag() const;
     const Extent &extent() const;
@@ -133,8 +136,8 @@ protected:
     Control(ControlType type);
     Control(ControlType type, const std::string &tag);
 
-    void drawBorder(const Border &border, const glm::ivec2 &offset) const;
-    void drawText(const std::string &text, const glm::ivec2 &offset) const;
+    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
+    void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;
 
 private:
     Control(const Control &) = delete;
@@ -146,7 +149,7 @@ private:
     void loadText(const resources::GffStruct &gffs);
     void loadHilight(const resources::GffStruct &gffs);
     std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
-    void getTextPosition(glm::ivec2 &position, int lineCount) const;
+    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size) const;
 };
 
 } // namespace gui

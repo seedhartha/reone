@@ -28,7 +28,7 @@ void Item::load(const ItemBlueprint *blueprint) {
     _blueprint = blueprint;
 }
 
-const ItemBlueprint &Item::getTemplate() const {
+const ItemBlueprint &Item::blueprint() const {
     return *_blueprint;
 }
 

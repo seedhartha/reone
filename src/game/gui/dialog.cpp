@@ -99,7 +99,7 @@ void DialogGui::configureMessage() {
     extent.top = -_rootControl->extent().top;
 
     Control::Text text(message.text());
-    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
+    text.color = getBaseColor(_version);
 
     message.setExtent(move(extent));
     message.setText(move(text));
@@ -110,10 +110,10 @@ void DialogGui::configureReplies() {
     Control &protoItem = replies.protoItem();
 
     Control::Border hilight;
-    hilight.color = _version == GameVersion::KotOR ? getKotorHilightColor() : getTslHilightColor();
+    hilight.color = getHilightColor(_version);
 
     Control::Text text(protoItem.text());
-    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
+    text.color = getBaseColor(_version);
 
     protoItem.setHilight(move(hilight));
     protoItem.setText(move(text));
@@ -219,7 +219,7 @@ void DialogGui::loadCurrentEntry() {
     message.setTextMessage(_currentEntry->text);
 
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-    replies.clearItems();
+    replies.clear();
 
     int replyCount = 0;
     for (auto &link : _currentEntry->replies) {

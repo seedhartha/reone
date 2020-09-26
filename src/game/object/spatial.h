@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "object.h"
 
@@ -34,6 +35,7 @@ namespace game {
 static const float kDefaultDrawDistance = 1024.0f;
 static const float kDefaultFadeDistance = 256.0f;
 
+class Item;
 class Room;
 
 class SpatialObject : public Object {
@@ -44,9 +46,7 @@ public:
     bool contains(const glm::vec3 &point) const;
 
     void face(const SpatialObject &other);
-
-    virtual void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
-    virtual void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    void moveItemsTo(SpatialObject &other);
 
     Room *room() const;
     const glm::vec3 &position() const;
@@ -54,11 +54,19 @@ public:
     const glm::mat4 &transform() const;
     std::shared_ptr<render::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
+    const std::vector<std::shared_ptr<Item>> &items() const;
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
     void setHeading(float heading);
     void setVisible(bool visible);
+
+    // Animation
+
+    virtual void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
+    virtual void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+
+    // END Animation
 
 protected:
     glm::vec3 _position { 0.0f };
@@ -69,6 +77,7 @@ protected:
     float _drawDistance { kDefaultDrawDistance };
     float _fadeDistance { kDefaultFadeDistance };
     Room *_room { nullptr };
+    std::vector<std::shared_ptr<Item>> _items;
 
     SpatialObject(uint32_t id, ObjectType type);
 

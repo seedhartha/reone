@@ -182,9 +182,7 @@ const vector<GffStruct> &GffStruct::getList(const string &name) const {
 
 glm::vec3 GffStruct::getVector(const string &name) const {
     const GffField *field = find(name);
-    assert(field);
-
-    return field->asVector();
+    return field ? field->asVector() : glm::vec3(0.0f);
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {

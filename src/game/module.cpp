@@ -238,8 +238,10 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         }
 
         Placeable *placeable = dynamic_cast<Placeable *>(obstacle);
-        if (placeable) {
-            _openContainer(*placeable);
+        if (placeable && placeable->blueprint().hasInventory()) {
+            if (_openContainer) {
+                _openContainer(placeable);
+            }
         }
 
         Creature *creature = dynamic_cast<Creature *>(obstacle);
@@ -247,7 +249,10 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
             if (!creature->conversation().empty() && _startDialog) {
                 resetInput();
                 getCamera()->resetInput();
-                _startDialog(*creature, creature->conversation());
+
+                if (_startDialog) {
+                    _startDialog(*creature, creature->conversation());
+                }
             }
         }
 
@@ -426,7 +431,7 @@ void Module::setStartDialog(const function<void(const Object &, const string &)>
     _startDialog = fn;
 }
 
-void Module::setOpenContainer(const function<void(const Placeable &)> &fn) {
+void Module::setOpenContainer(const function<void(SpatialObject *)> &fn) {
     _openContainer = fn;
 }
 

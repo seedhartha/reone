@@ -17,6 +17,7 @@
 
 #include "hud.h"
 
+#include "../../core/log.h"
 #include "../../gui/control/label.h"
 
 using namespace std;
@@ -173,6 +174,18 @@ void HUD::update(const HudContext &ctx) {
     } else {
         hideControl("LBL_CHAR2");
         hideControl("LBL_BACK2");
+    }
+}
+
+void HUD::setOnEquipmentClick(const function<void()> &fn) {
+    _onEquipmentClick = fn;
+}
+
+void HUD::onClick(const string &control) {
+    if (control == "BTN_EQU") {
+        if (_onEquipmentClick) {
+            _onEquipmentClick();
+        }
     }
 }
 

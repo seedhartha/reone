@@ -40,17 +40,22 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
 
+    glm::ivec2 borderOffset(offset);
+    borderOffset.x += _extent.height;
+
+    glm::ivec2 size(_extent.width - _extent.height, _extent.height);
+
     if (_focus && _hilight) {
-        drawBorder(*_hilight, offset);
+        drawBorder(*_hilight, borderOffset, size);
     } else if (_border) {
-        drawBorder(*_border, offset);
+        drawBorder(*_border, borderOffset, size);
     }
 
     drawIcon(offset, icon);
 
     if (!textOverride.empty() || !_text.text.empty()) {
         string text(!textOverride.empty() ? textOverride : _text.text);
-        drawText(text, offset + glm::ivec2(_extent.height, 0.0f));
+        drawText(text, borderOffset, size);
     }
 }
 
@@ -61,7 +66,18 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
     transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-    Shaders.setUniform("model", transform);
+    glm::vec3 frameColor(1.0f);
+    if (_focus && _hilight) {
+        frameColor = _hilight->color;
+    } else if (_border) {
+        frameColor = _border->color;
+    }
+
+    ShaderManager &shaders = Shaders;
+    shaders.setUniform("model", transform);
+    shaders.setUniform("color", frameColor);
+    shaders.setUniform("alpha", 1.0f);
+
     glActiveTexture(0);
 
     if (_iconFrame) {
@@ -69,6 +85,8 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
         DefaultGuiQuad.render(GL_TRIANGLES);
         _iconFrame->unbind();
     }
+
+    shaders.setUniform("color", glm::vec3(1.0f));
 
     if (icon) {
         icon->bind();

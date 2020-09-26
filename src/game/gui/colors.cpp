@@ -15,30 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "glm/vec3.hpp"
+#include "../types.h"
+
+using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-glm::vec3 getKotorBaseColor() {
-    static glm::vec3 color(0.0f, 0.639216f, 0.952941f);
-    return color;
+static glm::vec3 g_kotorBaseColor(0.0f, 0.639216f, 0.952941f);
+static glm::vec3 g_kotorHilightColor(0.980392f, 1.0f, 0.0f);
+static glm::vec3 g_tslBaseColor(0.192157f, 0.768627f, 0.647059f);
+static glm::vec3 g_tslHilightColor(0.768627f, 0.768627f, 0.686275f);
+
+glm::vec3 getBaseColor(GameVersion version) {
+    switch (version) {
+        case GameVersion::TheSithLords:
+            return g_tslBaseColor;
+        default:
+            return g_kotorBaseColor;
+    }
 }
 
-glm::vec3 getKotorHilightColor() {
-    static glm::vec3 color(0.980392f, 1.0f, 0.0f);
-    return color;
-}
-
-glm::vec3 getTslBaseColor() {
-    static glm::vec3 color(0.192157f, 0.768627f, 0.647059f);
-    return color;
-}
-
-glm::vec3 getTslHilightColor() {
-    static glm::vec3 color(0.768627f, 0.768627f, 0.686275f);
-    return color;
+glm::vec3 getHilightColor(GameVersion version) {
+    switch (version) {
+        case GameVersion::TheSithLords:
+            return g_tslHilightColor;
+        default:
+            return g_kotorHilightColor;
+    }
 }
 
 } // namespace game

@@ -32,6 +32,7 @@ void PlaceableBlueprint::load(const string &resRef, const GffStruct &utp) {
     boost::to_lower(_tag);
 
     _appearance = utp.getInt("Appearance");
+    _hasInventory = utp.getInt("HasInventory") != 0;
 
     const GffField *itemList = utp.find("ItemList");
     if (itemList) {
@@ -50,6 +51,10 @@ const string &PlaceableBlueprint::tag() const {
 
 int PlaceableBlueprint::appearance() const {
     return _appearance;
+}
+
+bool PlaceableBlueprint::hasInventory() const {
+    return _hasInventory;
 }
 
 const vector<string> &PlaceableBlueprint::items() const {

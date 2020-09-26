@@ -31,7 +31,7 @@ public:
 
     void load(const ItemBlueprint *templ);
 
-    const ItemBlueprint &getTemplate() const;
+    const ItemBlueprint &blueprint() const;
 
 private:
     const ItemBlueprint *_blueprint { nullptr };

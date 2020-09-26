@@ -106,11 +106,11 @@ void MainMenu::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
-    text.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
+    text.color = getBaseColor(_version);
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = _version == GameVersion::KotOR ? getKotorHilightColor() : getTslHilightColor();
+    hilight.color = getHilightColor(_version);
     control.setHilight(move(hilight));
 }
 

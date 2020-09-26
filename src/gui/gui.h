@@ -68,6 +68,8 @@ protected:
 
     void load(const std::string &resRef, BackgroundType background);
     void loadBackground(BackgroundType type);
+    void loadControl(const resources::GffStruct &gffs);
+    virtual void configureControl(Control &control);
     void showControl(const std::string &tag);
     void hideControl(const std::string &tag);
 

@@ -50,7 +50,11 @@ void GUI::load(const string &resRef, BackgroundType background) {
 
     loadBackground(background);
 
-    _rootControl = Control::makeControl(*gui);
+    ControlType type = Control::getType(*gui);
+    string tag(Control::getTag(*gui));
+
+    _rootControl = Control::of(type, tag);
+    _rootControl->load(*gui);
 
     switch (_scaling) {
         case ScalingMode::Center:
@@ -68,39 +72,8 @@ void GUI::load(const string &resRef, BackgroundType background) {
     _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
-        unique_ptr<Control> control(Control::makeControl(ctrlGffs));
-        if (!control) continue;
-
-        switch (_scaling) {
-            case ScalingMode::PositionRelativeToCenter:
-                positionRelativeToCenter(*control);
-                break;
-            case ScalingMode::Stretch:
-                stretchControl(*control);
-                break;
-            default:
-                break;
-        }
-        control->setOnClick(bind(&GUI::onClick, this, _1));
-        _controls.push_back(move(control));
+        loadControl(ctrlGffs);
     }
-}
-
-void GUI::positionRelativeToCenter(Control &control) {
-    Control::Extent extent(control.extent());
-    if (extent.left >= 0.5f * _resolutionX) {
-        extent.left = extent.left - _resolutionX + _gfxOpts.width;
-    }
-    if (extent.top >= 0.5f * _resolutionY) {
-        extent.top = extent.top - _resolutionY + _gfxOpts.height;
-    }
-    control.setExtent(move(extent));
-}
-
-void GUI::stretchControl(Control &control) {
-    float aspectX = _gfxOpts.width / static_cast<float>(_resolutionX);
-    float aspectY = _gfxOpts.height / static_cast<float>(_resolutionY);
-    control.stretch(aspectX, aspectY);
 }
 
 void GUI::loadBackground(BackgroundType type) {
@@ -126,6 +99,51 @@ void GUI::loadBackground(BackgroundType type) {
 
     _background = ResourceManager::instance().findTexture(resRef, TextureType::Diffuse);
     assert(_background);
+}
+
+void GUI::stretchControl(Control &control) {
+    float aspectX = _gfxOpts.width / static_cast<float>(_resolutionX);
+    float aspectY = _gfxOpts.height / static_cast<float>(_resolutionY);
+    control.stretch(aspectX, aspectY);
+}
+
+void GUI::loadControl(const GffStruct &gffs) {
+    ControlType type = Control::getType(gffs);
+    string tag(Control::getTag(gffs));
+
+    unique_ptr<Control> control(Control::of(type, tag));
+    if (!control) return;
+
+    configureControl(*control);
+    control->load(gffs);
+    control->setOnClick(bind(&GUI::onClick, this, _1));
+
+    switch (_scaling) {
+        case ScalingMode::PositionRelativeToCenter:
+            positionRelativeToCenter(*control);
+            break;
+        case ScalingMode::Stretch:
+            stretchControl(*control);
+            break;
+        default:
+            break;
+    }
+
+    _controls.push_back(move(control));
+}
+
+void GUI::configureControl(Control &control) {
+}
+
+void GUI::positionRelativeToCenter(Control &control) {
+    Control::Extent extent(control.extent());
+    if (extent.left >= 0.5f * _resolutionX) {
+        extent.left = extent.left - _resolutionX + _gfxOpts.width;
+    }
+    if (extent.top >= 0.5f * _resolutionY) {
+        extent.top = extent.top - _resolutionY + _gfxOpts.height;
+    }
+    control.setExtent(move(extent));
 }
 
 bool GUI::handle(const SDL_Event &event) {

@@ -17,33 +17,33 @@
 
 #pragma once
 
-#include <vector>
+#include "../../gui/gui.h"
+#include "../../resources/types.h"
 
-#include "../../resources/gfffile.h"
-
-#include "../blueprint/placeable.h"
-
-#include "spatial.h"
+#include "../object/spatial.h"
 
 namespace reone {
 
 namespace game {
 
-class ObjectFactory;
-
-class Placeable : public SpatialObject {
+class EquipmentGui : public gui::GUI {
 public:
-    Placeable(uint32_t id, ObjectFactory *objectFactory);
+    EquipmentGui(const render::GraphicsOptions &opts);
 
-    void load(const resources::GffStruct &gffs);
+    void load(resources::GameVersion version);
+    void open(SpatialObject *owner);
 
-    const PlaceableBlueprint &blueprint() const;
+    void setOnClose(const std::function<void()> &fn);
 
 private:
-    ObjectFactory *_objectFactory { nullptr };
-    std::shared_ptr<PlaceableBlueprint> _blueprint;
+    SpatialObject *_owner { nullptr };
+    std::function<void()> _onClose;
 
-    void loadBlueprint(const std::string &resRef);
+    std::string getResRef(resources::GameVersion version) const;
+    void configureItemsListBox(resources::GameVersion version);
+
+    void configureControl(gui::Control &control) override;
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

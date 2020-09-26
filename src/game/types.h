@@ -29,6 +29,7 @@
 #include "../net/types.h"
 #include "../render/texture.h"
 #include "../render/types.h"
+#include "../resources/types.h"
 
 namespace reone {
 
@@ -194,10 +195,8 @@ struct Portrait {
     int appearanceL { 0 };
 };
 
-glm::vec3 getKotorBaseColor();
-glm::vec3 getKotorHilightColor();
-glm::vec3 getTslBaseColor();
-glm::vec3 getTslHilightColor();
+glm::vec3 getBaseColor(resources::GameVersion version);
+glm::vec3 getHilightColor(resources::GameVersion version);
 
 } // namespace game
 

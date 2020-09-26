@@ -22,6 +22,8 @@
 
 #include "../room.h"
 
+#include "item.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -49,6 +51,13 @@ void SpatialObject::face(const SpatialObject &other) {
     glm::vec2 dir(glm::normalize(other._position - _position));
     _heading = -glm::atan(dir.x, dir.y);
     updateTransform();
+}
+
+void SpatialObject::moveItemsTo(SpatialObject &other) {
+    for (auto &item : _items) {
+        other._items.push_back(item);
+    }
+    _items.clear();
 }
 
 void SpatialObject::update(const UpdateContext &ctx) {
@@ -102,6 +111,10 @@ shared_ptr<ModelSceneNode> SpatialObject::model() const {
 
 shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
     return _walkmesh;
+}
+
+const vector<shared_ptr<Item>> &SpatialObject::items() const {
+    return _items;
 }
 
 void SpatialObject::setRoom(Room *room) {

@@ -27,6 +27,7 @@
 #include "gui/container.h"
 #include "gui/debug.h"
 #include "gui/dialog.h"
+#include "gui/equip.h"
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
 #include "gui/portraitsel.h"
@@ -94,7 +95,8 @@ protected:
         PortraitSelection,
         InGame,
         Dialog,
-        Container
+        Container,
+        Equipment
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
@@ -132,6 +134,7 @@ private:
     std::shared_ptr<HUD> _hud;
     std::shared_ptr<DebugOverlay> _debugOverlay;
     std::shared_ptr<ContainerGui> _containerGui;
+    std::shared_ptr<EquipmentGui> _equipmentGui;
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
@@ -145,6 +148,7 @@ private:
     void loadDialogGui();
     void loadContainerGui();
     void loadCursor();
+    void loadEquipmentGui();
 
     // Rendering
     void drawWorld();
