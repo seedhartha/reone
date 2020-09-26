@@ -34,6 +34,11 @@ void PlaceableBlueprint::load(const string &resRef, const GffStruct &utp) {
     _appearance = utp.getInt("Appearance");
     _hasInventory = utp.getInt("HasInventory") != 0;
 
+    loadItems(utp);
+    loadScripts(utp);
+}
+
+void PlaceableBlueprint::loadItems(const GffStruct &utp) {
     const GffField *itemList = utp.find("ItemList");
     if (itemList) {
         for (auto &item : itemList->children()) {
@@ -43,6 +48,19 @@ void PlaceableBlueprint::load(const string &resRef, const GffStruct &utp) {
             _items.push_back(move(resRef));
         }
     }
+}
+
+void PlaceableBlueprint::loadScripts(const GffStruct &utp) {
+    _scripts.insert(make_pair(ScriptType::OnInvDisturbed, utp.getString("OnInvDisturbed")));
+}
+
+bool PlaceableBlueprint::getScript(ScriptType type, string &resRef) const {
+    auto script = _scripts.find(type);
+    if (script == _scripts.end()) return false;
+
+    resRef = script->second;
+
+    return true;
 }
 
 const string &PlaceableBlueprint::tag() const {
