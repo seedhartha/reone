@@ -135,6 +135,7 @@ static const GLchar kSharedFragmentShaderCode[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
+const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
 
 uniform struct Light {
     vec3 position;
@@ -144,6 +145,7 @@ uniform struct Light {
 } lights[MAX_LIGHTS];
 
 uniform vec3 cameraPosition;
+uniform vec3 color;
 uniform float alpha;
 
 uniform sampler2D diffuse;
@@ -156,6 +158,9 @@ uniform bool lightingEnabled;
 uniform int lightCount;
 uniform vec3 ambientLightColor;
 
+uniform bool selfIllumEnabled;
+uniform vec3 selfIllumColor;
+
 in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 fragTexCoords;
@@ -163,13 +168,10 @@ in vec2 fragLightmapCoords;
 
 out vec4 fragColor;
 
-vec3 getAggregateLightColor() {
-    vec3 result = ambientLightColor;
+void applyLighting(vec3 normal, inout vec3 color) {
+    color += ambientLightColor;
 
-    if (lightCount == 0) {
-        return result;
-    }
-    vec3 normal = normalize(fragNormal);
+    if (lightCount == 0) return;
 
     for (int i = 0; i < lightCount; ++i) {
         vec3 fragToLight = lights[i].position - fragPosition;
@@ -177,10 +179,15 @@ vec3 getAggregateLightColor() {
         float diff = max(dot(normal, lightDir), 0.0);
         float attenuation = smoothstep(lights[i].radius, 0.0, length(fragToLight));
 
-        result += diff * lights[i].multiplier * lights[i].color * attenuation;
+        color += diff * lights[i].multiplier * lights[i].color * attenuation;
     }
+}
 
-    return min(result, 1.0);
+void applySelfIllum(inout vec3 color) {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    float luminosity = dot(diffuseSample.rgb, RGB_TO_LUMINOSITY);
+
+    color += smoothstep(0.0, 1.0, luminosity) * selfIllumColor;
 }
 )END";
 
@@ -191,56 +198,76 @@ void main() {
 )END";
 
 static const GLchar kDiffuseFragmentShader[] = R"END(
-uniform vec3 color;
-
 void main() {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec3 finalColor = vec3(0.0);
+    vec3 normal = normalize(fragNormal);
+    vec3 lightColor = vec3(0.0);
 
     if (lightingEnabled) {
-        finalColor = diffuseSample.rgb * getAggregateLightColor();
+        applyLighting(normal, lightColor);
+        lightColor = min(lightColor, 1.0);
     } else {
-        finalColor = diffuseSample.rgb * color;
+        lightColor = color;
     }
-    fragColor = vec4(finalColor, alpha * diffuseSample.a);
+    if (selfIllumEnabled) {
+        applySelfIllum(lightColor);
+    }
+
+    fragColor = vec4(lightColor * diffuseSample.rgb, alpha * diffuseSample.a);
 }
 )END";
 
 static const GLchar kDiffuseEnvmapFragmentShader[] = R"END(
 void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+
     vec3 normal = normalize(fragNormal);
     vec3 I = normalize(fragPosition - cameraPosition);
     vec3 R = reflect(I, normal);
     vec4 envmapSample = texture(envmap, R);
 
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec3 surfaceColor = diffuseSample.rgb;
+    surfaceColor += envmapSample.rgb * (1.0 - diffuseSample.a);
 
-    vec3 finalColor = diffuseSample.rgb;
-    finalColor += envmapSample.rgb * (1.0 - diffuseSample.a);
-
+    vec3 lightColor = vec3(0.0);
     if (lightingEnabled) {
-        finalColor *= getAggregateLightColor();
+        applyLighting(normal, lightColor);
+        lightColor = min(lightColor, 1.0);
+    } else {
+        lightColor = color;
     }
-    fragColor = vec4(finalColor, alpha);
+    if (selfIllumEnabled) {
+        applySelfIllum(lightColor);
+    }
+
+    fragColor = vec4(lightColor * surfaceColor, alpha);
 }
 )END";
 
 static const GLchar kDiffuseBumpyShinyFragmentShader[] = R"END(
 void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+
     vec3 normal = normalize(fragNormal);
     vec3 I = normalize(fragPosition - cameraPosition);
     vec3 R = reflect(I, normal);
     vec4 bumpyShinySample = texture(bumpyShiny, R);
 
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec3 surfaceColor = diffuseSample.rgb;
+    surfaceColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
 
-    vec3 finalColor = diffuseSample.rgb;
-    finalColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
-
+    vec3 lightColor = vec3(0.0);
     if (lightingEnabled) {
-        finalColor *= getAggregateLightColor();
+        applyLighting(normal, lightColor);
+        lightColor = min(lightColor, 1.0);
+    } else {
+        lightColor = color;
     }
-    fragColor = vec4(finalColor, alpha);
+    if (selfIllumEnabled) {
+        applySelfIllum(lightColor);
+    }
+
+    fragColor = vec4(lightColor * surfaceColor, alpha);
 }
 )END";
 
@@ -248,43 +275,43 @@ static const GLchar kDiffuseLightmapFragmentShader[] = R"END(
 void main() {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
     vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
-    vec3 finalColor = (diffuseSample * lightmapSample).rgb;
+    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
 
-    fragColor = vec4(finalColor, alpha * diffuseSample.a);
+    fragColor = vec4(surfaceColor, alpha * diffuseSample.a);
 }
 )END";
 
 static const GLchar kDiffuseLightmapEnvmapFragmentShader[] = R"END(
 void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+
     vec3 normal = normalize(fragNormal);
     vec3 I = normalize(fragPosition - cameraPosition);
     vec3 R = reflect(I, normal);
     vec4 envmapSample = texture(envmap, R);
 
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
+    surfaceColor += envmapSample.rgb * (1.0 - diffuseSample.a);
 
-    vec3 finalColor = (diffuseSample * lightmapSample).rgb;
-    finalColor += envmapSample.rgb * (1.0 - diffuseSample.a);
-
-    fragColor = vec4(finalColor, alpha);
+    fragColor = vec4(surfaceColor, alpha);
 }
 )END";
 
 static const GLchar kDiffuseLightmapBumpyShinyFragmentShader[] = R"END(
 void main() {
+    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+
     vec3 normal = normalize(fragNormal);
     vec3 I = normalize(fragPosition - cameraPosition);
     vec3 R = reflect(I, normal);
     vec4 bumpyShinySample = texture(bumpyShiny, R);
 
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
+    surfaceColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
 
-    vec3 finalColor = (diffuseSample * lightmapSample).rgb;
-    finalColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
-
-    fragColor = vec4(finalColor, alpha);
+    fragColor = vec4(surfaceColor, alpha);
 }
 )END";
 
@@ -292,12 +319,21 @@ static const GLchar kDiffuseBumpmapFragmentShader[] = R"END(
 void main() {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
     vec4 bumpmapSample = texture(bumpmap, fragTexCoords);
-    vec3 finalColor = diffuseSample.rgb;
+    vec3 surfaceColor = diffuseSample.rgb;
 
+    vec3 normal = normalize(fragNormal);
+    vec3 lightColor = vec3(0.0);
     if (lightingEnabled) {
-        finalColor *= getAggregateLightColor();
+        applyLighting(normal, lightColor);
+        lightColor = min(lightColor, 1.0);
+    } else {
+        lightColor = color;
     }
-    fragColor = vec4(finalColor, alpha);
+    if (selfIllumEnabled) {
+        applySelfIllum(lightColor);
+    }
+
+    fragColor = vec4(lightColor * surfaceColor, alpha);
 }
 )END";
 

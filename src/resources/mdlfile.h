@@ -50,6 +50,7 @@ private:
     void readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readOrientationController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readSelfIllumColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readAlphaController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readRadiusController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readMultiplierController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);

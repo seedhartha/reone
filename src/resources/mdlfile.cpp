@@ -57,6 +57,7 @@ enum class ControllerType {
     Orientation = 20,
     Color = 76,
     Radius = 88,
+    SelfIllumColor = 100,
     Alpha = 132,
     Multiplier = 140
 };
@@ -195,6 +196,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     vector<float> controllerData(readArray<float>(kMdlDataOffset + controllerDataOffset, controllerDataCount));
 
     unique_ptr<ModelNode> node(new ModelNode(_nodeIndex++, parent));
+    node->_flags = flags;
     node->_nodeNumber = nodeNumber;
     node->_name = name;
     node->_position = position;
@@ -257,6 +259,13 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
             case ControllerType::Color:
                 // TODO: multiple rows
                 readColorController(dataIndex, data, node);
+                break;
+            case ControllerType::SelfIllumColor:
+                if (node._flags & kNodeHasMesh) {
+                    // TODO: multiple rows
+                    node._selfIllumEnabled = true;
+                    readSelfIllumColorController(dataIndex, data, node);
+                }
                 break;
             case ControllerType::Alpha:
                 // TODO: multiple rows
@@ -360,6 +369,12 @@ void MdlFile::readColorController(uint16_t dataIndex, const vector<float> &data,
     node._color.r = data[dataIndex + 0];
     node._color.g = data[dataIndex + 1];
     node._color.b = data[dataIndex + 2];
+}
+
+void MdlFile::readSelfIllumColorController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._selfIllumColor.r = data[dataIndex + 0];
+    node._selfIllumColor.g = data[dataIndex + 1];
+    node._selfIllumColor.b = data[dataIndex + 2];
 }
 
 void MdlFile::readAlphaController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {

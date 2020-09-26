@@ -127,6 +127,14 @@ const glm::vec3 &ModelNode::color() const {
     return _color;
 }
 
+bool ModelNode::isSelfIllumEnabled() const {
+    return _selfIllumEnabled;
+}
+
+const glm::vec3 &ModelNode::selfIllumColor() const {
+    return _selfIllumColor;
+}
+
 float ModelNode::alpha() const {
     return _alpha;
 }
