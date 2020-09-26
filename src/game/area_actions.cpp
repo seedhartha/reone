@@ -95,13 +95,33 @@ bool Area::navigateCreature(Creature &creature, const glm::vec2 &dest, float dis
 }
 
 void Area::advanceCreatureOnPath(Creature &creature, float dt) {
+    glm::vec2 origin(creature.position());
     shared_ptr<Creature::Path> path(creature.path());
     size_t pointCount = path->points.size();
+    glm::vec2 dest;
+    float distToDest;
 
-    glm::vec2 origin(creature.position());
-    glm::vec2 dest(path->pointIdx == pointCount ? path->destination : path->points[path->pointIdx]);
+    if (path->pointIdx == pointCount) {
+        dest = path->destination;
+        distToDest = glm::distance2(origin, dest);
 
-    if (glm::distance2(origin, dest) <= 1.0f) {
+    } else {
+        const glm::vec2 &nextPoint = path->points[path->pointIdx];
+        float distToNextPoint = glm::distance2(origin, nextPoint);
+        float distToPathDest = glm::distance2(origin, path->destination);
+
+        if (distToPathDest < distToNextPoint) {
+            dest = path->destination;
+            distToDest = distToPathDest;
+            path->pointIdx = static_cast<int>(pointCount);
+
+        } else {
+            dest = nextPoint;
+            distToDest = distToNextPoint;
+        }
+    }
+
+    if (distToDest <= 1.0f) {
         selectNextPathPoint(*path);
 
     } else if (moveCreatureTowards(creature, dest, dt)) {
@@ -114,7 +134,9 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
 
 void Area::selectNextPathPoint(Creature::Path &path) {
     size_t pointCount = path.points.size();
-    if (path.pointIdx < pointCount) path.pointIdx++;
+    if (path.pointIdx < pointCount) {
+        path.pointIdx++;
+    }
 }
 
 void Area::updateCreaturePath(Creature &creature, const glm::vec2 &dest) {
