@@ -95,7 +95,7 @@ mad_flow Mp3File::outputFunc(void *playbuf, mad_header const *header, mad_pcm *p
     AudioStream::Frame frame;
     frame.format = pcm->channels == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
     frame.sampleRate = pcm->samplerate;
-    frame.samples.reserve(pcm->channels * sampleCount * sizeof(int16_t));
+    frame.samples.reserve(static_cast<uint64_t>(pcm->channels) * sampleCount * sizeof(int16_t));
 
     while (sampleCount--) {
         int sample = scale(*chLeft++);
