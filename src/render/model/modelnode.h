@@ -66,6 +66,8 @@ public:
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
     const glm::vec3 &color() const;
+    bool isSelfIllumEnabled() const;
+    const glm::vec3 &selfIllumColor() const;
     float alpha() const;
     float radius() const;
     float multiplier() const;
@@ -87,6 +89,7 @@ private:
 
     int _index { 0 };
     const ModelNode *_parent { nullptr };
+    uint16_t _flags { 0 };
     uint16_t _nodeNumber { 0 };
     std::string _name;
     glm::vec3 _position { 0.0f };
@@ -96,6 +99,8 @@ private:
     std::vector<PositionKeyframe> _positionFrames;
     std::vector<OrientationKeyframe> _orientationFrames;
     glm::vec3 _color { 0.0f };
+    bool _selfIllumEnabled { false };
+    glm::vec3 _selfIllumColor { 0.0f };
     float _alpha { 1.0f };
     float _radius { 0.0f };
     float _multiplier { 1.0f };

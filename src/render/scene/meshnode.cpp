@@ -115,6 +115,11 @@ void MeshSceneNode::render() const {
         shaders.setUniform("bones", bones);
     }
 
+    if (_modelNode->isSelfIllumEnabled()) {
+        shaders.setUniform("selfIllumEnabled", true);
+        shaders.setUniform("selfIllumColor", _modelNode->selfIllumColor());
+    }
+
     int lightCount = 0;
 
     if (_model->isLightingEnabled()) {
@@ -139,6 +144,9 @@ void MeshSceneNode::render() const {
 
     if (_model->isLightingEnabled()) {
         shaders.setUniform("lightingEnabled", false);
+    }
+    if (_modelNode->isSelfIllumEnabled()) {
+        shaders.setUniform("selfIllumEnabled", false);
     }
 
     SceneNode::render();
