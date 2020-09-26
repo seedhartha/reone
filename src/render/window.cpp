@@ -74,14 +74,20 @@ void RenderWindow::init() {
     Shaders.initGL();
     TheCubeMesh.initGL();
     TheAABBMesh.initGL();
-    TheGUIQuad.initGL();
+    DefaultGuiQuad.initGL();
+    FlipXGuiQuad.initGL();
+    FlipYGuiQuad.initGL();
+    FlipXYGuiQuad.initGL();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderWindow::deinit() {
-    TheGUIQuad.deinitGL();
+    DefaultGuiQuad.deinitGL();
+    FlipXGuiQuad.deinitGL();
+    FlipYGuiQuad.deinitGL();
+    FlipXYGuiQuad.deinitGL();
     TheAABBMesh.deinitGL();
     TheCubeMesh.deinitGL();
     Shaders.deinitGL();
@@ -169,7 +175,7 @@ void RenderWindow::drawCursor() const {
     glActiveTexture(0);
     texture->bind();
 
-    TheGUIQuad.render(GL_TRIANGLES);
+    DefaultGuiQuad.render(GL_TRIANGLES);
 
     texture->unbind();
 }

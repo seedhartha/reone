@@ -132,7 +132,7 @@ void Console::render() const {
     shaders.setUniform("color", glm::vec3(0.0f));
     shaders.setUniform("alpha", 0.5f);
 
-    TheGUIQuad.render(GL_TRIANGLES);
+    DefaultGuiQuad.render(GL_TRIANGLES);
 
     string text("> " + _inputText);
 

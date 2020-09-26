@@ -66,13 +66,13 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
 
     if (_iconFrame) {
         _iconFrame->bind();
-        TheGUIQuad.render(GL_TRIANGLES);
+        DefaultGuiQuad.render(GL_TRIANGLES);
         _iconFrame->unbind();
     }
 
     if (icon) {
         icon->bind();
-        TheGUIQuad.render(GL_TRIANGLES);
+        DefaultGuiQuad.render(GL_TRIANGLES);
         icon->unbind();
     }
 }
