@@ -209,7 +209,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     }
 
     if (!_hud) loadHUD();
-    if (!_debugGui) loadDebugGui();
+    if (!_debugOverlay) loadDebugOverlay();
     if (!_dialogGui) loadDialogGui();
     if (!_containerGui) loadContainerGui();
 
@@ -223,10 +223,10 @@ void Game::loadHUD() {
     _hud = move(hud);
 }
 
-void Game::loadDebugGui() {
-    unique_ptr<DebugGui> debug(new DebugGui(_opts.graphics));
+void Game::loadDebugOverlay() {
+    unique_ptr<DebugOverlay> debug(new DebugOverlay(_opts.graphics));
     debug->load();
-    _debugGui = move(debug);
+    _debugOverlay = move(debug);
 }
 
 void Game::loadDialogGui() {
@@ -350,7 +350,7 @@ void Game::update() {
         if (_module->cameraType() == CameraType::ThirdPerson) {
             _hud->update(guiCtx.hud);
         }
-        _debugGui->update(guiCtx.debug);
+        _debugOverlay->update(guiCtx.debug);
     }
 
 }
@@ -432,7 +432,8 @@ void Game::drawGUI() {
 
     switch (_screen) {
         case Screen::InGame:
-            _debugGui->render();
+            _debugOverlay->render();
+
             if (_module->cameraType() == CameraType::ThirdPerson) {
                 _hud->render();
             }
@@ -440,6 +441,7 @@ void Game::drawGUI() {
                 _console.render();
             }
             break;
+
         default: {
             shared_ptr<GUI> gui(currentGUI());
             if (gui) gui->render();

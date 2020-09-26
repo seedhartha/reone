@@ -17,7 +17,11 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include <memory>
+#include <vector>
+
+#include "../../render/font.h"
+#include "../../render/types.h"
 
 #include "../types.h"
 
@@ -25,15 +29,19 @@ namespace reone {
 
 namespace game {
 
-class DebugGui : public gui::GUI {
+class DebugOverlay {
 public:
-    DebugGui(const render::GraphicsOptions &opts);
+    DebugOverlay(const render::GraphicsOptions &opts);
 
     void load();
     void update(const DebugContext &ctx);
 
+    void render() const;
+
 private:
+    render::GraphicsOptions _opts;
     std::shared_ptr<render::Font> _font;
+    std::vector<DebugObject> _objects;
 };
 
 } // namespace game

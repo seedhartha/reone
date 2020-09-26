@@ -17,14 +17,12 @@
 
 #include "debug.h"
 
-#include "../../gui/control/label.h"
 #include "../../resources/resources.h"
 
 #include "../types.h"
 
 using namespace std;
 
-using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -34,37 +32,29 @@ namespace game {
 
 static const char kFontResRef[] = "fnt_d16x16b";
 
-DebugGui::DebugGui(const GraphicsOptions &opts) : GUI(opts) {
+DebugOverlay::DebugOverlay(const GraphicsOptions &opts) : _opts(opts) {
 }
 
-void DebugGui::load() {
+void DebugOverlay::load() {
     _font = Resources.findFont(kFontResRef);
     assert(_font);
 }
 
-void DebugGui::update(const DebugContext &ctx) {
-    _controls.clear();
+void DebugOverlay::update(const DebugContext &ctx) {
+    _objects = ctx.objects;
+}
 
-    for (auto &object : ctx.objects) {
+void DebugOverlay::render() const {
+    glm::mat4 transform;
+    glm::vec3 red(1.0f, 0.0f, 0.0f);
+
+    for (auto &object : _objects) {
         if (object.screenCoords.z >= 1.0f) continue;
 
-        float textWidth = _font->measure(object.text);
-        Control::Extent extent(
-            static_cast<int>(_gfxOpts.width * object.screenCoords.x - 0.5f * textWidth),
-            static_cast<int>(_gfxOpts.height * (1.0f - object.screenCoords.y)),
-            static_cast<int>(textWidth),
-            static_cast<int>(_font->height()));
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(_opts.width * object.screenCoords.x, _opts.height * (1.0f - object.screenCoords.y), 0.0f));
 
-        Control::Text text;
-        text.text = object.text;
-        text.font = _font;
-        text.color = glm::vec3(1.0f, 0.0f, 0.0f);
-
-        unique_ptr<Label> label(new Label(object.tag));
-        label->setExtent(extent);
-        label->setText(text);
-
-        _controls.push_back(move(label));
+        _font->render(object.tag, transform, red);
     }
 }
 
