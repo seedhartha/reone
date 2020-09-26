@@ -42,6 +42,7 @@ class SpatialObject : public Object {
 public:
     void update(const UpdateContext &ctx) override;
 
+    float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
     bool contains(const glm::vec3 &point) const;
 

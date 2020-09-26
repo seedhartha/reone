@@ -407,14 +407,15 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &point, float
 }
 
 void Area::updateTriggers(const Creature &creature) {
-    glm::vec3 liftedPosition(glm::vec2(creature.position()), kElevationTestRadius);
+    glm::vec2 position2d(creature.position());
+    glm::vec3 liftedPosition(position2d, kElevationTestRadius);
     glm::vec3 down(0.0f, 0.0f, -1.0f);
     glm::vec2 intersection;
     float distance;
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         Trigger &trigger = static_cast<Trigger &>(*object);
-        if (trigger.distanceTo(liftedPosition) > kMaxDistanceToTestCollision) continue;
+        if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
 
         const vector<glm::vec3> &geometry = trigger.geometry();
         bool triggered =
@@ -507,8 +508,10 @@ bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, in
             if (!object->walkmesh() ||
                 (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen())) continue;
 
+            shared_ptr<ModelSceneNode> model(object->model());
+            if (!model || !model->isVisible() || !model->isOnScreen()) continue;
+
             float distToFrom = object->distanceTo(from);
-            if (distToFrom > kMaxDistanceToTestCollision) continue;
 
             candidates.push_back(make_pair(object.get(), distToFrom));
         }
@@ -563,12 +566,14 @@ bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int ma
         if (list.first == ObjectType::Placeable && (mask & kObstaclePlaceable) == 0) continue;
 
         for (auto &object : list.second) {
-            if (!object->model() ||
+            shared_ptr<ModelSceneNode> model(object->model());
+            if (!model ||
+                !model->isVisible() ||
+                !model->isOnScreen() ||
                 (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen()) ||
                 (except && object.get() == except)) continue;
 
             float distToFrom = object->distanceTo(from);
-            if (distToFrom > kMaxDistanceToTestCollision) continue;
 
             candidates.push_back(make_pair(object.get(), distToFrom));
         }
