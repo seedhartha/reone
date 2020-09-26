@@ -174,12 +174,22 @@ void applyLighting(vec3 normal, inout vec3 color) {
     if (lightCount == 0) return;
 
     for (int i = 0; i < lightCount; ++i) {
-        vec3 fragToLight = lights[i].position - fragPosition;
-        vec3 lightDir = normalize(fragToLight);
-        float diff = max(dot(normal, lightDir), 0.0);
-        float attenuation = smoothstep(lights[i].radius, 0.0, length(fragToLight));
+        vec3 surfaceToLight = lights[i].position - fragPosition;
+        vec3 lightDir = normalize(surfaceToLight);
 
-        color += diff * lights[i].multiplier * lights[i].color * attenuation;
+        vec3 surfaceToCamera = normalize(cameraPosition - fragPosition);
+        float diffuseCoeff = max(dot(normal, lightDir), 0.0);
+        float specularCoeff = 0.0;
+
+        if (diffuseCoeff > 0.0) {
+            specularCoeff = 0.25 * pow(max(0.0, dot(surfaceToCamera, reflect(-lightDir, normal))), 32);
+        }
+        float distToLight = length(surfaceToLight);
+
+        float attenuation = clamp(1.0 - distToLight / lights[i].radius, 0.0, 1.0);
+        attenuation *= attenuation;
+
+        color += attenuation * (diffuseCoeff + specularCoeff) * lights[i].color;
     }
 }
 
@@ -187,7 +197,7 @@ void applySelfIllum(inout vec3 color) {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
     float luminosity = dot(diffuseSample.rgb, RGB_TO_LUMINOSITY);
 
-    color += smoothstep(0.0, 1.0, luminosity) * selfIllumColor;
+    color += smoothstep(0.25, 1.0, luminosity) * selfIllumColor;
 }
 )END";
 
