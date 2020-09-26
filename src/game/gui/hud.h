@@ -33,8 +33,14 @@ public:
     void load(resources::GameVersion version);
     void update(const HudContext &ctx);
 
+    void setOnEquipmentClick(const std::function<void()> &fn);
+
 private:
+    std::function<void()> _onEquipmentClick;
+
     std::string getResRef(resources::GameVersion version) const;
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

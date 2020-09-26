@@ -66,6 +66,7 @@ bool Console::handleKeyDown(const SDL_KeyboardEvent &event) {
 
     if (digit || letter || underscore ||
         event.keysym.sym == SDLK_SPACE ||
+        event.keysym.sym == SDLK_COMMA ||
         event.keysym.sym == SDLK_PERIOD) {
 
         if (underscore) {

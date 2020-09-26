@@ -129,11 +129,11 @@ void ClassSelectionGui::configureClassButtons() {
 
 void ClassSelectionGui::setButtonColors(Control &control) {
     Control::Border border(control.border());
-    border.color = _version == GameVersion::KotOR ? getKotorBaseColor() : getTslBaseColor();
+    border.color = getBaseColor(_version);
     control.setBorder(move(border));
 
     Control::Border hilight(control.hilight());
-    hilight.color = _version == GameVersion::KotOR ? getKotorHilightColor() : getTslHilightColor();
+    hilight.color = getHilightColor(_version);
     control.setHilight(move(hilight));
 }
 

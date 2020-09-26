@@ -57,14 +57,14 @@ void ListBox::updateItems() {
     }
 }
 
-void ListBox::clearItems() {
+void ListBox::clear() {
     _items.clear();
     _itemOffset = 0;
     updateItems();
 }
 
-void ListBox::add(const Item &item) {
-    _items.push_back(item);
+void ListBox::add(Item item) {
+    _items.push_back(move(item));
     updateItems();
 }
 
@@ -73,13 +73,18 @@ void ListBox::load(const GffStruct &gffs) {
 
     const GffField *protoItem = gffs.find("PROTOITEM");
     if (protoItem) {
-        _protoItem = makeControl(protoItem->asStruct());
+        const GffStruct &protoGffs = protoItem->asStruct();
+        ControlType type = _protoItemType == ControlType::Invalid ? getType(protoGffs) : _protoItemType;
+        _protoItem = of(type, getTag(protoGffs));
+        _protoItem->load(protoGffs);
         updateItems();
     }
 
     const GffField *scrollBar = gffs.find("SCROLLBAR");
     if (scrollBar) {
-        _scrollBar = makeControl(scrollBar->asStruct());
+        const GffStruct &scrollGffs = scrollBar->asStruct();
+        _scrollBar = of(getType(scrollGffs), getTag(scrollGffs));
+        _scrollBar->load(scrollGffs);
     }
 }
 
@@ -172,6 +177,10 @@ void ListBox::setFocus(bool focus) {
 void ListBox::setExtent(const Extent &extent) {
     Control::setExtent(extent);
     updateItems();
+}
+
+void ListBox::setProtoItemType(ControlType type) {
+    _protoItemType = type;
 }
 
 const ListBox::Item &ListBox::getItemAt(int index) const {

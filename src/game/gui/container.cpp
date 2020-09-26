@@ -21,6 +21,8 @@
 #include "../../gui/control/listbox.h"
 #include "../../resources/resources.h"
 
+#include "../object/item.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -53,10 +55,10 @@ void ContainerGui::load(GameVersion version) {
     string lblMessage(Resources.getString(kInventoryResRef).text);
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
-    configureListBox(version);
+    configureItemsListBox(version);
 }
 
-void ContainerGui::configureListBox(GameVersion version) {
+void ContainerGui::configureItemsListBox(GameVersion version) {
     ListBox &listBox = static_cast<ListBox &>(getControl("LB_ITEMS"));
     ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
 
@@ -66,28 +68,51 @@ void ContainerGui::configureListBox(GameVersion version) {
     protoItem.setText(text);
 
     if (version == GameVersion::KotOR) {
-        protoItem.setIconFrame(Resources.findTexture("lbl_hex", TextureType::GUI));
+        protoItem.setIconFrame(Resources.findTexture("lbl_hex_3", TextureType::GUI));
     }
 }
 
-void ContainerGui::openContainer(const Placeable &placeable) {
-    ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clearItems();
+void ContainerGui::open(SpatialObject *container) {
+    assert(container);
+    _container = container;
 
-    for (auto &item : placeable.items()) {
-        const ItemBlueprint &blueprint = item->getTemplate();
-        lbItems.add({ blueprint.resRef(), blueprint.localizedName(), blueprint.icon() });
+    ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
+    lbItems.clear();
+
+    for (auto &item : container->items()) {
+        const ItemBlueprint &blueprint = item->blueprint();
+
+        ListBox::Item lbItem;
+        lbItem.tag = blueprint.resRef();
+        lbItem.icon = blueprint.icon();
+        lbItem.text = blueprint.localizedName();
+
+        lbItems.add(move(lbItem));
     }
+}
+
+SpatialObject &ContainerGui::container() const {
+    return *_container;
 }
 
 void ContainerGui::onClick(const string &control) {
-    if (control == "BTN_CANCEL") {
-        if (_onCancel) _onCancel();
+    if (control == "BTN_OK") {
+        if (_onGetItems) {
+            _onGetItems();
+        }
+    } else if (control == "BTN_CANCEL") {
+        if (_onClose) {
+            _onClose();
+        }
     }
 }
 
-void ContainerGui::setOnCancel(const function<void()> &fn) {
-    _onCancel = fn;
+void ContainerGui::setOnGetItems(const function<void()> &fn) {
+    _onGetItems = fn;
+}
+
+void ContainerGui::setOnClose(const function<void()> &fn) {
+    _onClose = fn;
 }
 
 } // namespace game

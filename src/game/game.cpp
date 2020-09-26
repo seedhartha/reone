@@ -211,7 +211,6 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     if (!_hud) loadHUD();
     if (!_debugOverlay) loadDebugOverlay();
     if (!_dialogGui) loadDialogGui();
-    if (!_containerGui) loadContainerGui();
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
@@ -220,6 +219,17 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 void Game::loadHUD() {
     unique_ptr<HUD> hud(new HUD(_opts.graphics));
     hud->load(_version);
+    hud->setOnEquipmentClick([this]() {
+        if (!_equipmentGui) loadEquipmentGui();
+
+        _hud->resetFocus();
+
+        shared_ptr<SpatialObject> player(_module->area().player());
+        _equipmentGui->open(player.get());
+
+        _screen = Screen::Equipment;
+    });
+
     _hud = move(hud);
 }
 
@@ -246,7 +256,15 @@ void Game::loadDialogGui() {
 void Game::loadContainerGui() {
     unique_ptr<ContainerGui> container(new ContainerGui(_opts.graphics));
     container->load(_version);
-    container->setOnCancel([this]() {
+    container->setOnGetItems([this]() {
+        shared_ptr<SpatialObject> player(_module->area().player());
+
+        SpatialObject &container = _containerGui->container();
+        container.moveItemsTo(*player);
+
+        _screen = Screen::InGame;
+    });
+    container->setOnClose([this]() {
         _screen = Screen::InGame;
     });
     _containerGui = move(container);
@@ -295,8 +313,10 @@ void Game::configureModule() {
     _module->setStartDialog([this](const Object &owner, const string &resRef) {
         startDialog(owner.id(), resRef);
     });
-    _module->setOpenContainer([this](const Placeable &placeable) {
-        _containerGui->openContainer(placeable);
+    _module->setOpenContainer([this](SpatialObject *object) {
+        if (!_containerGui) loadContainerGui();
+
+        _containerGui->open(object);
         _screen = Screen::Container;
     });
 }
@@ -312,6 +332,16 @@ void Game::loadCursor() {
     cursor.unpressed = Resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
 
     _window.setCursor(cursor);
+}
+
+void Game::loadEquipmentGui() {
+    unique_ptr<EquipmentGui> equip(new EquipmentGui(_opts.graphics));
+    equip->load(_version);
+    equip->setOnClose([this]() {
+        _equipmentGui->resetFocus();
+        _screen = Screen::InGame;
+    });
+    _equipmentGui = move(equip);
 }
 
 void Game::runMainLoop() {
@@ -393,6 +423,8 @@ shared_ptr<GUI> Game::currentGUI() const {
             return _dialogGui;
         case Screen::Container:
             return _containerGui;
+        case Screen::Equipment:
+            return _equipmentGui;
         default:
             return nullptr;
     }

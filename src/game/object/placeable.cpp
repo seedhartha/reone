@@ -83,8 +83,8 @@ void Placeable::loadBlueprint(const string &resRef) {
     }
 }
 
-const vector<shared_ptr<Item>> &Placeable::items() const {
-    return _items;
+const PlaceableBlueprint &Placeable::blueprint() const {
+    return *_blueprint;
 }
 
 } // namespace game

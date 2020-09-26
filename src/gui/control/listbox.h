@@ -38,8 +38,8 @@ public:
     ListBox();
     ListBox(const std::string &tag);
 
-    void clearItems();
-    void add(const Item &item);
+    void clear();
+    void add(Item item);
 
     void load(const resources::GffStruct &gffs) override;
     bool handleMouseMotion(int x, int y) override;
@@ -50,6 +50,7 @@ public:
 
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
+    void setProtoItemType(ControlType type);
 
     const Item &getItemAt(int index) const;
 
@@ -58,12 +59,14 @@ public:
     int itemCount() const;
 
 private:
+    ControlType _protoItemType { ControlType::Invalid };
     std::shared_ptr<Control> _protoItem;
     std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;
     int _slotCount { 0 };
     int _itemOffset { 0 };
     int _hilightedIndex { -1 };
+    int _itemMargin { 0 };
 
     void updateItems();
     int getItemIndex(int y) const;

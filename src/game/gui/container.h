@@ -21,7 +21,7 @@
 
 #include "../../resources/types.h"
 
-#include "../object/placeable.h"
+#include "../object/spatial.h"
 
 namespace reone {
 
@@ -32,14 +32,20 @@ public:
     ContainerGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
-    void openContainer(const Placeable &placeable);
+    void open(SpatialObject *contanier);
 
-    void setOnCancel(const std::function<void()> &fn);
+    SpatialObject &container() const;
+
+    void setOnGetItems(const std::function<void()> &fn);
+    void setOnClose(const std::function<void()> &fn);
 
 private:
-    std::function<void()> _onCancel;
+    SpatialObject *_container { nullptr };
 
-    void configureListBox(resources::GameVersion version);
+    std::function<void()> _onGetItems;
+    std::function<void()> _onClose;
+
+    void configureItemsListBox(resources::GameVersion version);
     void onClick(const std::string &control) override;
 };
 

@@ -34,11 +34,13 @@ public:
 
     const std::string &tag() const;
     int appearance() const;
+    bool hasInventory() const;
     const std::vector<std::string> &items() const;
 
 private:
     std::string _tag;
     int _appearance { 0 };
+    bool _hasInventory { false };
     std::vector<std::string> _items;
 
     PlaceableBlueprint(const PlaceableBlueprint &) = delete;

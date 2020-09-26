@@ -140,8 +140,8 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     auto it = _equipment.find(kInventorySlotBody);
     if (it != _equipment.end()) {
-        modelColumn += it->second->getTemplate().baseBodyVariation();
-        texColumn += it->second->getTemplate().baseBodyVariation();
+        modelColumn += it->second->blueprint().baseBodyVariation();
+        texColumn += it->second->blueprint().baseBodyVariation();
         bodyEquipped = true;
     } else {
         modelColumn += "a";
@@ -154,7 +154,7 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     string texName(table.getString(row, texColumn));
     if (bodyEquipped) {
-        texName += str(boost::format("%02d") % it->second->getTemplate().textureVariation());
+        texName += str(boost::format("%02d") % it->second->blueprint().textureVariation());
     } else {
         texName += "01";
     }
@@ -162,8 +162,8 @@ void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
 
     it = _equipment.find(kInventorySlotRightWeapon);
     if (it != _equipment.end()) {
-        string weaponModelName(it->second->getTemplate().itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->getTemplate().modelVariation());
+        string weaponModelName(it->second->blueprint().itemClass());
+        weaponModelName += str(boost::format("_%03d") % it->second->blueprint().modelVariation());
         _model->attach("rhand", resources.findModel(weaponModelName));
     }
 
@@ -194,8 +194,8 @@ void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
 
     auto it = _equipment.find(kInventorySlotRightWeapon);
     if (it != _equipment.end()) {
-        string weaponModelName(it->second->getTemplate().itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->getTemplate().modelVariation());
+        string weaponModelName(it->second->blueprint().itemClass());
+        weaponModelName += str(boost::format("_%03d") % it->second->blueprint().modelVariation());
         _model->attach("rhand", resources.findModel(weaponModelName));
     }
 }
@@ -263,7 +263,7 @@ void Creature::equip(const string &resRef) {
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(itemTempl.get());
 
-    switch (item->getTemplate().type()) {
+    switch (item->blueprint().type()) {
         case ItemType::Armor:
             _equipment[kInventorySlotBody] = move(item);
             break;

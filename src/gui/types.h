@@ -28,7 +28,7 @@ enum class ControlType {
     ImageButton = 5,
     Button = 6,
     ScrollBar = 9,
-    ListBox = 11,
+    ListBox = 11
 };
 
 enum class BackgroundType {

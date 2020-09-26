@@ -66,6 +66,7 @@ set(HEADERS
     src/game/gui/container.h
     src/game/gui/debug.h
     src/game/gui/dialog.h
+    src/game/gui/equip.h
     src/game/gui/hud.h
     src/game/gui/mainmenu.h
     src/game/gui/portraitsel.h
@@ -196,6 +197,7 @@ set(SOURCES
     src/game/gui/container.cpp
     src/game/gui/debug.cpp
     src/game/gui/dialog.cpp
+    src/game/gui/equip.cpp
     src/game/gui/hud.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitsel.cpp
