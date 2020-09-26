@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "../../resources/gfffile.h"
@@ -28,9 +29,15 @@ namespace game {
 
 class PlaceableBlueprint {
 public:
+    enum class ScriptType {
+        OnInvDisturbed
+    };
+
     PlaceableBlueprint() = default;
 
     void load(const std::string &resRef, const resources::GffStruct &utp);
+
+    bool getScript(ScriptType type, std::string &resRef) const;
 
     const std::string &tag() const;
     int appearance() const;
@@ -42,9 +49,13 @@ private:
     int _appearance { 0 };
     bool _hasInventory { false };
     std::vector<std::string> _items;
+    std::unordered_map<ScriptType, std::string> _scripts;
 
     PlaceableBlueprint(const PlaceableBlueprint &) = delete;
     PlaceableBlueprint &operator=(const PlaceableBlueprint &) = delete;
+
+    void loadItems(const resources::GffStruct &utp);
+    void loadScripts(const resources::GffStruct &utp);
 };
 
 } // namespace game

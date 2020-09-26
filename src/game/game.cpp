@@ -31,6 +31,7 @@
 #include "blueprint/blueprints.h"
 #include "object/factory.h"
 #include "script/routines.h"
+#include "script/util.h"
 #include "util.h"
 
 using namespace std;
@@ -262,6 +263,13 @@ void Game::loadContainerGui() {
         SpatialObject &container = _containerGui->container();
         container.moveItemsTo(*player);
 
+        Placeable *placeable = dynamic_cast<Placeable *>(&container);
+        if (placeable) {
+            string script;
+            if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
+                runScript(script, placeable->id(), player->id(), -1);
+            }
+        }
         _screen = Screen::InGame;
     });
     container->setOnClose([this]() {
