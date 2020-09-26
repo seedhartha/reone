@@ -119,19 +119,27 @@ void Area::loadPTH() {
     Paths paths;
     paths.load(*pth);
 
-    _navMesh->load(paths);
+    const vector<Paths::Point> &points = paths.points();
+    unordered_map<int, float> pointZ;
 
-    for (auto &point : paths.points()) {
+    for (int i = 0; i < points.size(); ++i) {
+        const Paths::Point &point = points[i];
         Room *room = nullptr;
         float z = 0.0f;
 
-        if (!findRoomElevationAt(glm::vec2(point.x, point.y), room, z)) continue;
+        if (!findRoomElevationAt(glm::vec2(point.x, point.y), room, z)) {
+            warn(boost::format("Area: point %d elevation not found") % i);
+            continue;
+        }
+        pointZ.insert(make_pair(i, z));
 
         shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(0.5f));
         aabb->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(point.x, point.y, z + 0.25f)));
 
         TheSceneGraph.addRoot(aabb);
     }
+
+    _navMesh->load(paths, pointZ);
 }
 
 void Area::loadARE(const GffStruct &are) {

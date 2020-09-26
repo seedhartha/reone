@@ -17,6 +17,8 @@
 
 #include "creature.h"
 
+#include <climits>
+
 #include <boost/algorithm/string.hpp>
 
 #include "../../core/log.h"
@@ -363,12 +365,21 @@ const string &Creature::getRunAnimation() {
     }
 }
 
-void Creature::setPath(const glm::vec2 &dest, vector<glm::vec2> &&points, uint32_t timeFound) {
+void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
     int pointIdx = 0;
     if (_path) {
         bool lastPointReached = _path->pointIdx == _path->points.size();
-        if (!lastPointReached) {
-            glm::vec2 &nextPoint = _path->points[_path->pointIdx];
+        if (lastPointReached) {
+            float nearestDist = INFINITY;
+            for (int i = 0; i < points.size(); ++i) {
+                float dist = glm::distance2(_path->destination, points[i]);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    pointIdx = i;
+                }
+            }
+        } else {
+            const glm::vec3 &nextPoint = _path->points[_path->pointIdx];
             for (int i = 0; i < points.size(); ++i) {
                 if (points[i] == nextPoint) {
                     pointIdx = i;
@@ -384,11 +395,10 @@ void Creature::setPath(const glm::vec2 &dest, vector<glm::vec2> &&points, uint32
     path->pointIdx = pointIdx;
 
     _path = move(path);
-    _pathUpdating = false;
 }
 
-void Creature::setPathUpdating() {
-    _pathUpdating = true;
+void Creature::clearPath() {
+    _path.reset();
 }
 
 Gender Creature::gender() const {
@@ -426,10 +436,6 @@ const Creature::Action &Creature::currentAction() const {
 
 shared_ptr<Creature::Path> &Creature::path() {
     return _path;
-}
-
-bool Creature::isPathUpdating() const {
-    return _pathUpdating;
 }
 
 float Creature::walkSpeed() const {

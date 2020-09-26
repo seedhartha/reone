@@ -30,30 +30,34 @@ namespace game {
 NavMesh::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void NavMesh::load(const Paths &paths) {
+void NavMesh::load(const Paths &paths, const unordered_map<int, float> &pointZ) {
     const vector<Paths::Point> &points = paths.points();
     for (uint16_t i = 0; i < points.size(); ++i) {
         const Paths::Point &point = points[i];
-        _vertices.push_back(glm::vec2(point.x, point.y));
+        glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
+        _vertices.push_back(pointVec);
 
+        glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
             const Paths::Point &adjPoint = points[adjPointIdx];
-            float distance = glm::distance2(glm::vec2(point.x, point.y), glm::vec2(adjPoint.x, adjPoint.y));
+            adjPointVec = glm::vec3(adjPoint.x, adjPoint.y, pointZ.find(adjPointIdx)->second);
+
+            float distance = glm::distance2(pointVec, adjPointVec);
 
             _edges[i].push_back({ static_cast<uint16_t>(adjPointIdx), distance });
         }
     }
 }
 
-const vector<glm::vec2> NavMesh::findPath(const glm::vec2 &from, const glm::vec2 &to) const {
+const vector<glm::vec3> NavMesh::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
     if (_vertices.empty()) {
-        return vector<glm::vec2> { from, to };
+        return vector<glm::vec3> { from, to };
     }
     uint16_t fromIdx = getNearestVertex(from);
     uint16_t toIdx = getNearestVertex(to);
 
     if (fromIdx == toIdx) {
-        return vector<glm::vec2> { from, to };
+        return vector<glm::vec3> { from, to };
     }
     FindPathContext ctx;
     ctx.fromToDistance = { { fromIdx, make_pair(fromIdx, 0.0f) } };
@@ -65,11 +69,11 @@ const vector<glm::vec2> NavMesh::findPath(const glm::vec2 &from, const glm::vec2
         visit(idx, ctx);
     }
     if (ctx.fromToDistance.find(toIdx) == ctx.fromToDistance.end()) {
-        return vector<glm::vec2> { from, to };
+        return vector<glm::vec3> { from, to };
     }
 
     uint16_t idx = toIdx;
-    vector<glm::vec2> path;
+    vector<glm::vec3> path;
 
     while (true) {
         path.insert(path.begin(), _vertices[idx]);
@@ -82,7 +86,7 @@ const vector<glm::vec2> NavMesh::findPath(const glm::vec2 &from, const glm::vec2
     return move(path);
 }
 
-uint16_t NavMesh::getNearestVertex(const glm::vec2 &point) const {
+uint16_t NavMesh::getNearestVertex(const glm::vec3 &point) const {
     uint16_t index = 0xffff;
     float minDist = 0.0f;
 

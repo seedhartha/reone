@@ -23,6 +23,8 @@
 #include <queue>
 #include <unordered_map>
 
+#include "glm/vec3.hpp"
+
 #include "paths.h"
 
 namespace reone {
@@ -33,9 +35,9 @@ class NavMesh {
 public:
     NavMesh() = default;
 
-    void load(const Paths &paths);
+    void load(const Paths &paths, const std::unordered_map<int, float> &pointZ);
 
-    const std::vector<glm::vec2> findPath(const glm::vec2 &from, const glm::vec2 &to) const;
+    const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 
 private:
     struct Edge {
@@ -51,13 +53,13 @@ private:
         std::queue<uint16_t> queue;
     };
 
-    std::vector<glm::vec2> _vertices;
+    std::vector<glm::vec3> _vertices;
     std::unordered_map<uint16_t, std::vector<Edge>> _edges;
 
     NavMesh(const NavMesh &) = delete;
     NavMesh &operator=(const NavMesh &) = delete;
 
-    uint16_t getNearestVertex(const glm::vec2 &point) const;
+    uint16_t getNearestVertex(const glm::vec3 &point) const;
     void visit(uint16_t index, FindPathContext &ctx) const;
 };
 
