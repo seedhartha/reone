@@ -83,7 +83,9 @@ private:
     std::shared_ptr<render::FirstPersonCamera> _firstPersonCamera;
     std::shared_ptr<render::ThirdPersonCamera> _thirdPersonCamera;
     bool _moveForward { false };
+    bool _moveLeft { false };
     bool _moveBackward { false };
+    bool _moveRight { false };
 
     // Callbacks
     std::function<void(render::CameraType)> _onCameraChanged;
@@ -104,7 +106,7 @@ private:
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
     void update3rdPersonCameraTarget();
     void switchTo3rdPersonCamera();
-    void resetInput();
+    void resetPlayerMovement();
 };
 
 } // namespace game
