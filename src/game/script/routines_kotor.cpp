@@ -194,7 +194,7 @@ void RoutineManager::addKotorRoutines() {
     add("SetReturnStrref", Void, { Int, Int, Int });
     add("EffectForceJump", Effect, { Object, Int });
     add("EffectSleep", Effect, { });
-    add("GetItemInSlot", Object, { Int, Object });
+    add("GetItemInSlot", Object, { Int, Object }, bind(&RoutineManager::getItemInSlot, this, _1, _2));
     add("EffectTemporaryForcePoints", Effect, { Int });
     add("EffectConfused", Effect, { });
     add("EffectFrightened", Effect, { });

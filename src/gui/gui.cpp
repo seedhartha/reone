@@ -114,7 +114,7 @@ void GUI::loadControl(const GffStruct &gffs) {
     unique_ptr<Control> control(Control::of(type, tag));
     if (!control) return;
 
-    configureControl(*control);
+    preloadControl(*control);
     control->load(gffs);
     control->setOnClick(bind(&GUI::onClick, this, _1));
 
@@ -132,7 +132,16 @@ void GUI::loadControl(const GffStruct &gffs) {
     _controls.push_back(move(control));
 }
 
-void GUI::configureControl(Control &control) {
+void GUI::preloadControl(Control &control) {
+}
+
+void GUI::configureControl(const string &tag, const function<void(Control &)> &fn) {
+    for (auto &control : _controls) {
+        if (control->tag() == tag) {
+            fn(*control);
+            break;
+        }
+    }
 }
 
 void GUI::positionRelativeToCenter(Control &control) {
@@ -191,7 +200,7 @@ void GUI::updateFocus(int x, int y) {
 
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
         shared_ptr<Control> control(*it);
-        if (!control->visible()) continue;
+        if (!control->isVisible() || !control->isInteractive()) continue;
 
         const Control::Extent &extent = control->extent();
         if (extent.contains(x, y)) {
@@ -280,9 +289,6 @@ Control &GUI::getControl(const string &tag) const {
 }
 
 void GUI::onClick(const string &control) {
-}
-
-void GUI::onItemClicked(const string &control, const string &item) {
 }
 
 } // namespace gui

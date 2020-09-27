@@ -63,12 +63,13 @@ private:
     void addTslRoutines();
 
     std::shared_ptr<Object> getObjectById(uint32_t id, const script::ExecutionContext &ctx) const;
-
-    // Math routines
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
-    // Getter routines
+    // Objects
+
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -78,27 +79,33 @@ private:
     script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Objects
+
+    // Globals/locals
+
     script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // Setter routines
     script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
-    // Command routines
-    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    // END Globals/locals
 
-    // Event routines
+    // Events
+
     script::Variable eventUserDefined(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable signalEvent(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getUserDefinedEventNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
+    // END Events
+
     // Actions
+
     script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -106,6 +113,8 @@ private:
     script::Variable actionResumeConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Actions
 };
 
 #define RoutineMan RoutineManager::instance()

@@ -28,6 +28,21 @@ namespace game {
 
 class EquipmentGui : public gui::GUI {
 public:
+    enum class Slot {
+        None,
+        Implant,
+        Head,
+        Hands,
+        ArmL,
+        Body,
+        ArmR,
+        WeapL,
+        Belt,
+        WeapR,
+        WeapL2,
+        WeapR2
+    };
+
     EquipmentGui(const render::GraphicsOptions &opts);
 
     void load(resources::GameVersion version);
@@ -36,13 +51,23 @@ public:
     void setOnClose(const std::function<void()> &fn);
 
 private:
+    resources::GameVersion _version { resources::GameVersion::KotOR };
     SpatialObject *_owner { nullptr };
+    Slot _selectedSlot { Slot::None };
+    int _selectedItemIdx { -1 };
     std::function<void()> _onClose;
 
-    std::string getResRef(resources::GameVersion version) const;
-    void configureItemsListBox(resources::GameVersion version);
+    static InventorySlot getInventorySlot(Slot slot);
+    static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);
 
-    void configureControl(gui::Control &control) override;
+    std::string getResRef() const;
+    void configureItemsListBox();
+    void onItemClicked(const std::string &control, const std::string &item);
+    void selectSlot(Slot slot);
+    void updateEquipment();
+    void updateItems();
+
+    void preloadControl(gui::Control &control) override;
     void onClick(const std::string &control) override;
 };
 

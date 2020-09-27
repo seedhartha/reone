@@ -22,9 +22,7 @@ namespace reone {
 namespace gui {
 
 Label::Label() : Control(ControlType::Label) {
-}
-
-Label::Label(const std::string &tag) : Control(ControlType::Label, tag) {
+    _interactive = false;
 }
 
 } // namespace gui

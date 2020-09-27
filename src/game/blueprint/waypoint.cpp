@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-void WaypointBlueprint::load(const string &resRef, const GffStruct &utw) {
+void WaypointBlueprint::load(const GffStruct &utw) {
 }
 
 } // namespace game

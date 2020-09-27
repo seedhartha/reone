@@ -139,6 +139,23 @@ Variable RoutineManager::getArea(const vector<Variable> &args, ExecutionContext 
     return move(result);
 }
 
+Variable RoutineManager::getItemInSlot(const vector<Variable> &args, ExecutionContext &ctx) {
+    assert(!args.empty() && args[0].type == VariableType::Int);
+
+    uint32_t objectId(args.size() > 1 ? args[1].objectId : kObjectSelf);
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    shared_ptr<Object> item;
+
+    if (object) {
+        Creature &creature = static_cast<Creature &>(*object);
+        item = creature.getEquippedItem(static_cast<InventorySlot>(args[0].intValue));
+    }
+    Variable result(VariableType::Object);
+    result.objectId = item ? item->id() : kObjectInvalid;
+
+   return move(result);
+}
+
 Variable RoutineManager::getGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
     return _callbacks->getGlobalBoolean(args[0].strValue);

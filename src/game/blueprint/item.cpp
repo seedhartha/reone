@@ -31,55 +31,59 @@ namespace reone {
 
 namespace game {
 
-void ItemBlueprint::load(const string &resRef, const GffStruct &uti) {
-    _resRef = resRef;
+void ItemBlueprint::load(const GffStruct &uti) {
+    _resRef = uti.getString("TemplateResRef");
+    boost::to_lower(_resRef);
+
+    _tag = uti.getString("Tag");
+    boost::to_lower(_tag);
 
     ResourceManager &resources = Resources;
     _localizedName = Resources.getString(uti.getInt("LocalizedName")).text;
 
     shared_ptr<TwoDaTable> baseItems(resources.find2DA("baseitems"));
     int baseItem = uti.getInt("BaseItem");
-    uint32_t itemType = baseItems->getUint(baseItem, "equipableslots", 0);
+    _equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
 
     string itemClass(baseItems->getString(baseItem, "itemclass"));
     _itemClass = boost::to_lower_copy(itemClass);
 
     string iconResRef;
 
-    if ((itemType >> kInventorySlotBody) & 1) {
-        const string &baseBodyVar = baseItems->getString(baseItem, "bodyvar");
-        int bodyVariation = uti.getInt("BodyVariation", 1);
-        int textureVar = uti.getInt("TextureVar", 1);
+    if (isEquippable(kInventorySlotBody)) {
+        _baseBodyVariation = baseItems->getString(baseItem, "bodyvar");
+        boost::to_lower(_baseBodyVariation);
 
-        _type = ItemType::Armor;
-        _baseBodyVariation = boost::to_lower_copy(baseBodyVar);
-        _bodyVariation = bodyVariation;
-        _textureVariation = textureVar;
+        _bodyVariation = uti.getInt("BodyVariation", 1);
+        _textureVariation = uti.getInt("TextureVar", 1);
 
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % textureVar);
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
 
-    } else if ((itemType >> kInventorySlotRightWeapon) & 1) {
-        int modelVariation = uti.getInt("ModelVariation", 1);
-
-        _type = ItemType::RightWeapon;
-        _modelVariation = modelVariation;
-
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % modelVariation);
+    } else if (isEquippable(kInventorySlotRightWeapon)) {
+        _modelVariation = uti.getInt("ModelVariation", 1);
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
 
     } else {
-        int modelVariation = uti.getInt("ModelVariation", 1);
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % modelVariation);
+        _modelVariation = uti.getInt("ModelVariation", 1);
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
-
     _icon = Resources.findTexture(iconResRef, TextureType::GUI);
+}
+
+bool ItemBlueprint::isEquippable() const {
+    return _equipableSlots != 0;
+}
+
+bool ItemBlueprint::isEquippable(InventorySlot slot) const {
+    return (_equipableSlots >> slot) & 1;
 }
 
 const string &ItemBlueprint::resRef() const {
     return _resRef;
 }
 
-ItemType ItemBlueprint::type() const {
-    return _type;
+const string &ItemBlueprint::tag() const {
+    return _tag;
 }
 
 const string &ItemBlueprint::localizedName() const {

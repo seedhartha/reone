@@ -52,7 +52,6 @@ public:
     ModelSceneNode(const std::shared_ptr<Model> &model);
 
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
-    void changeTexture(const std::string &resRef);
     void update(float dt);
     void fillSceneGraph() override;
     void renderImmediate() const override;
@@ -66,6 +65,8 @@ public:
     bool isOnScreen() const;
     float alpha() const;
 
+    void setModel(const std::shared_ptr<Model> &model);
+    void setTextureOverride(const std::shared_ptr<Texture> &texture);
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);

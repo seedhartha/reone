@@ -100,9 +100,6 @@ void Control::Extent::getCenter(int &x, int &y) const {
 Control::Control(ControlType type) : _type(type) {
 }
 
-Control::Control(ControlType type, const string &tag) : _type(type), _tag(tag) {
-}
-
 void Control::load(const GffStruct &gffs) {
     _id = gffs.getInt("ID", -1);
     _padding = gffs.getInt("PADDING", 0);
@@ -452,6 +449,34 @@ void Control::stretch(float x, float y) {
     updateTransform();
 }
 
+const string &Control::tag() const {
+    return _tag;
+}
+
+const Control::Extent &Control::extent() const {
+    return _extent;
+}
+
+Control::Border &Control::border() const {
+    return *_border;
+}
+
+const Control::Border &Control::hilight() const {
+    return *_hilight;
+}
+
+const Control::Text &Control::text() const {
+    return _text;
+}
+
+bool Control::isVisible() const {
+    return _visible;
+}
+
+bool Control::isInteractive() const {
+    return _interactive;
+}
+
 void Control::setVisible(bool visible) {
     _visible = visible;
 }
@@ -487,30 +512,6 @@ void Control::setScene3D(const Scene3D &scene) {
 
 void Control::setPadding(int padding) {
     _padding = padding;
-}
-
-const string &Control::tag() const {
-    return _tag;
-}
-
-const Control::Extent &Control::extent() const {
-    return _extent;
-}
-
-Control::Border &Control::border() const {
-    return *_border;
-}
-
-const Control::Border &Control::hilight() const {
-    return *_hilight;
-}
-
-const Control::Text &Control::text() const {
-    return _text;
-}
-
-bool Control::visible() const {
-    return _visible;
 }
 
 void Control::setOnClick(const function<void(const string &)> &fn) {

@@ -93,12 +93,6 @@ enum class MovementType {
     Run
 };
 
-enum class ItemType {
-    None,
-    Armor,
-    RightWeapon
-};
-
 enum InventorySlot {
     kInventorySlotHead = 0,
     kInventorySlotBody = 1,

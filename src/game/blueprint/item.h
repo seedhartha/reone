@@ -29,10 +29,13 @@ class ItemBlueprint {
 public:
     ItemBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &uti);
+    void load(const resources::GffStruct &uti);
+
+    bool isEquippable() const;
+    bool isEquippable(InventorySlot slot) const;
 
     const std::string &resRef() const;
-    ItemType type() const;
+    const std::string &tag() const;
     const std::string &localizedName() const;
     const std::string &baseBodyVariation() const;
     int bodyVariation() const;
@@ -43,7 +46,7 @@ public:
 
 private:
     std::string _resRef;
-    ItemType _type { ItemType::None };
+    std::string _tag;
     std::string _localizedName;
     std::string _baseBodyVariation;
     int _bodyVariation { 0 };
@@ -51,6 +54,7 @@ private:
     std::string _itemClass;
     int _modelVariation { 0 };
     std::shared_ptr<render::Texture> _icon;
+    uint32_t _equipableSlots { 0 };
 
     ItemBlueprint(const ItemBlueprint &) = delete;
     ItemBlueprint &operator=(const ItemBlueprint &) = delete;

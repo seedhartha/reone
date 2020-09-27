@@ -97,6 +97,14 @@ public:
     virtual void update(float dt);
     virtual void stretch(float x, float y);
 
+    const std::string &tag() const;
+    const Extent &extent() const;
+    Border &border() const;
+    const Border &hilight() const;
+    const Text &text() const;
+    bool isVisible() const;
+    bool isInteractive() const;
+
     void setVisible(bool visible);
     virtual void setFocus(bool focus);
     virtual void setExtent(const Extent &extent);
@@ -106,13 +114,6 @@ public:
     void setTextMessage(const std::string &text);
     void setScene3D(const Scene3D &scene);
     void setPadding(int padding);
-
-    const std::string &tag() const;
-    const Extent &extent() const;
-    Border &border() const;
-    const Border &hilight() const;
-    const Text &text() const;
-    bool visible() const;
 
     void setOnClick(const std::function<void(const std::string &)> &fn);
     void setOnItemClicked(const std::function<void(const std::string &, const std::string &)> &fn);
@@ -130,11 +131,11 @@ protected:
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
     bool _focus { false };
+    bool _interactive { true };
     std::function<void(const std::string &)> _onClick;
     std::function<void(const std::string &, const std::string &)> _onItemClicked;
 
     Control(ControlType type);
-    Control(ControlType type, const std::string &tag);
 
     void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
     void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;

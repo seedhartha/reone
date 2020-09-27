@@ -73,42 +73,58 @@ public:
 
     Creature(uint32_t id, ObjectFactory *objectFactory);
 
-    // Loading
     void load(const resources::GffStruct &gffs);
     void load(const CreatureConfiguration &config);
 
-    void equip(const std::string &resRef);
-
-    // Animations
-    void playDefaultAnimation();
-    void playGreetingAnimation();
-    void playTalkAnimation();
-
-    // Actions
-    void clearActions();
-    void enqueueAction(Action action);
-    void popCurrentAction();
-
-    // Load/save
-    void saveTo(AreaState &state) const override;
-    void loadState(const AreaState &state) override;
-
-    // Setters
-    void setTag(const std::string &tag);
-    virtual void setMovementType(MovementType type);
-    virtual void setTalking(bool talking);
-
-    // Getters
     Gender gender() const;
     int getClassLevel(ClassType clazz) const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
     std::string conversation() const;
-    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
     bool hasActions() const;
-    const Action &currentAction() const;
     float walkSpeed() const;
     float runSpeed() const;
+
+    void setTag(const std::string &tag);
+    virtual void setMovementType(MovementType type);
+    virtual void setTalking(bool talking);
+
+    // Animations
+
+    void playDefaultAnimation();
+    void playGreetingAnimation();
+    void playTalkAnimation();
+
+    // END Animations
+
+    // Actions
+
+    void clearActions();
+    void enqueueAction(Action action);
+    void popCurrentAction();
+
+    const Action &currentAction() const;
+
+    // END Actions
+
+    // Load/save
+
+    void saveTo(AreaState &state) const override;
+    void loadState(const AreaState &state) override;
+
+    // END Load/save
+
+    // Equipment
+
+    void equip(const std::string &resRef);
+    void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    void unequip(const std::shared_ptr<Item> &item);
+
+    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+
+    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+
+    // END Equipment
 
     // Pathfinding
 
@@ -145,11 +161,13 @@ private:
     void loadBlueprint(const std::string &resRef);
     void loadAppearance(const resources::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
-    void loadCharacterAppearance(const resources::TwoDaTable &table, int row);
-    void loadHead(const resources::TwoDaTable &table, int row);
-    void loadDefaultAppearance(const resources::TwoDaTable &table, int row);
 
     ModelType parseModelType(const std::string &s) const;
+    void updateAppearance();
+    std::string getBodyModelName() const;
+    std::string getBodyTextureName() const;
+    std::string getHeadModelName() const;
+    std::string getWeaponModelName(InventorySlot slot) const;
 
     const std::string &getPauseAnimation();
     const std::string &getWalkAnimation();

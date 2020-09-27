@@ -104,19 +104,7 @@ void Creature::loadAppearance(const TwoDaTable &table, int row) {
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
     _runSpeed = table.getFloat(row, "rundist", 0.0f);
 
-    switch (_modelType) {
-        case ModelType::Character:
-            loadCharacterAppearance(table, row);
-            break;
-        default:
-            loadDefaultAppearance(table, row);
-            break;
-    }
-
-    if (_model) {
-        _model->setDefaultAnimation(getPauseAnimation());
-        _model->playDefaultAnimation();
-    }
+    updateAppearance();
 }
 
 Creature::ModelType Creature::parseModelType(const string &s) const {
@@ -131,73 +119,144 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
     throw logic_error("Unsupported model type: " + s);
 }
 
-void Creature::loadCharacterAppearance(const TwoDaTable &table, int row) {
-    ResourceManager &resources = Resources;
+void Creature::updateAppearance() {
+    string bodyModelName(getBodyModelName());
+    string bodyTextureName(getBodyTextureName());
+    string headModelName(getHeadModelName());
+    string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
+    string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
 
-    string modelColumn("model");
-    string texColumn("tex");
-    bool bodyEquipped = false;
+    // Body
 
-    auto it = _equipment.find(kInventorySlotBody);
-    if (it != _equipment.end()) {
-        modelColumn += it->second->blueprint().baseBodyVariation();
-        texColumn += it->second->blueprint().baseBodyVariation();
-        bodyEquipped = true;
+    if (!_model) {
+        _model = make_unique<ModelSceneNode>(Resources.findModel(bodyModelName));
+        _model->setLightingEnabled(true);
     } else {
-        modelColumn += "a";
-        texColumn += "a";
+        _model->setModel(Resources.findModel(bodyModelName));
     }
 
-    const string &modelName = table.getString(row, modelColumn);
-    _model = make_unique<ModelSceneNode>(resources.findModel(modelName));
-    _model->setLightingEnabled(true);
+    // Body texture
 
-    string texName(table.getString(row, texColumn));
-    if (bodyEquipped) {
-        texName += str(boost::format("%02d") % it->second->blueprint().textureVariation());
+    shared_ptr<Texture> texture;
+    if (!bodyTextureName.empty()) {
+        texture = Resources.findTexture(bodyTextureName, TextureType::Diffuse);
+    }
+    _model->setTextureOverride(texture);
+
+    // Head
+
+    shared_ptr<Model> headModel;
+    if (!headModelName.empty()) {
+        headModel = Resources.findModel(headModelName);
+    }
+    _model->attach(g_headHookNode, headModel);
+
+    // Right weapon
+
+    shared_ptr<Model> leftWeaponModel;
+    if (!leftWeaponModelName.empty()) {
+        leftWeaponModel = Resources.findModel(leftWeaponModelName);
+    }
+    _model->attach("lhand", leftWeaponModel);
+
+    // Right weapon
+
+    shared_ptr<Model> rightWeaponModel;
+    if (!rightWeaponModelName.empty()) {
+        rightWeaponModel = Resources.findModel(rightWeaponModelName);
+    }
+    _model->attach("rhand", rightWeaponModel);
+
+    // Animation
+
+    _model->setDefaultAnimation(getPauseAnimation());
+    _model->playDefaultAnimation();
+}
+
+string Creature::getBodyModelName() const {
+    string column;
+
+    if (_modelType == ModelType::Character) {
+        column = "model";
+
+        shared_ptr<Item> bodyItem(getEquippedItem(kInventorySlotBody));
+        if (bodyItem) {
+            string baseBodyVar(bodyItem->blueprint().baseBodyVariation());
+            column += baseBodyVar;
+        } else {
+            column += "a";
+        }
+
+    } else {
+        column = "race";
+    }
+
+    shared_ptr<TwoDaTable> appearance(Resources.find2DA("appearance"));
+
+    string modelName(appearance->getString(_config.appearance, column));
+    boost::to_lower(modelName);
+
+    return move(modelName);
+}
+
+string Creature::getBodyTextureName() const {
+    string column;
+    shared_ptr<Item> bodyItem(getEquippedItem(kInventorySlotBody));
+
+    if (_modelType == ModelType::Character) {
+        column = "tex";
+
+        if (bodyItem) {
+            string baseBodyVar(bodyItem->blueprint().baseBodyVariation());
+            column += baseBodyVar;
+        } else {
+            column += "a";
+        }
+    } else {
+        column = "racetex";
+    }
+
+    shared_ptr<TwoDaTable> appearance(Resources.find2DA("appearance"));
+
+    string texName(appearance->getString(_config.appearance, column));
+    boost::to_lower(texName);
+
+    if (bodyItem) {
+        texName += str(boost::format("%02d") % bodyItem->blueprint().textureVariation());
     } else {
         texName += "01";
     }
-    _model->changeTexture(texName);
 
-    it = _equipment.find(kInventorySlotRightWeapon);
-    if (it != _equipment.end()) {
-        string weaponModelName(it->second->blueprint().itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->blueprint().modelVariation());
-        _model->attach("rhand", resources.findModel(weaponModelName));
-    }
-
-    int headIdx = table.getInt(row, "normalhead", -1);
-    if (headIdx == -1) return;
-
-    shared_ptr<TwoDaTable> headTable(resources.find2DA("heads"));
-    loadHead(*headTable, headIdx);
+    return move(texName);
 }
 
-void Creature::loadHead(const TwoDaTable &table, int row) {
-    ResourceManager &resources = ResourceManager::instance();
-    const string &modelName = table.getString(row, "head");
-    _model->attach(g_headHookNode, resources.findModel(modelName));
+string Creature::getHeadModelName() const {
+    if (_modelType != ModelType::Character) return "";
+
+    ResourceManager &resources = Resources;
+    shared_ptr<TwoDaTable> appearance(resources.find2DA("appearance"));
+
+    int headIdx = appearance->getInt(_config.appearance, "normalhead", -1);
+    if (headIdx == -1) return "";
+
+    shared_ptr<TwoDaTable> heads(resources.find2DA("heads"));
+
+    string modelName(heads->getString(headIdx, "head"));
+    boost::to_lower(modelName);
+
+    return move(modelName);
 }
 
-void Creature::loadDefaultAppearance(const TwoDaTable &table, int row) {
-    ResourceManager &resources = ResourceManager::instance();
+string Creature::getWeaponModelName(InventorySlot slot) const {
+    shared_ptr<Item> bodyItem(getEquippedItem(slot));
+    if (!bodyItem) return "";
 
-    const string &modelName = table.getString(row, "race");
-    _model = make_unique<ModelSceneNode>(resources.findModel(modelName));
-    _model->setLightingEnabled(true);
+    string modelName(bodyItem->blueprint().itemClass());
+    boost::to_lower(modelName);
 
-    const string &raceTexName = table.getString(row, "racetex");
-    if (!raceTexName.empty()) {
-        _model->changeTexture(boost::to_lower_copy(raceTexName));
-    }
+    modelName += str(boost::format("_%03d") % bodyItem->blueprint().modelVariation());
 
-    auto it = _equipment.find(kInventorySlotRightWeapon);
-    if (it != _equipment.end()) {
-        string weaponModelName(it->second->blueprint().itemClass());
-        weaponModelName += str(boost::format("_%03d") % it->second->blueprint().modelVariation());
-        _model->attach("rhand", resources.findModel(weaponModelName));
-    }
+    return move(modelName);
 }
 
 void Creature::load(const CreatureConfiguration &config) {
@@ -258,21 +317,46 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(resRef));
+    shared_ptr<ItemBlueprint> blueprint(Blueprints.findItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
-    item->load(itemTempl.get());
+    item->load(blueprint.get());
 
-    switch (item->blueprint().type()) {
-        case ItemType::Armor:
-            _equipment[kInventorySlotBody] = move(item);
-            break;
-        case ItemType::RightWeapon:
-            _equipment[kInventorySlotRightWeapon] = move(item);
-            break;
-        default:
-            break;
+    if (blueprint->isEquippable(kInventorySlotBody)) {
+        equip(kInventorySlotBody, item);
+    } else if (blueprint->isEquippable(kInventorySlotRightWeapon)) {
+        equip(kInventorySlotRightWeapon, item);
     }
+
+    _items.push_back(item);
+}
+
+void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
+    const ItemBlueprint &blueprint = item->blueprint();
+
+    if (blueprint.isEquippable(slot)) {
+        _equipment[slot] = item;
+    }
+    if (_model) {
+        updateAppearance();
+    }
+}
+
+void Creature::unequip(const shared_ptr<Item> &item) {
+    for (auto &equipped : _equipment) {
+        if (equipped.second == item) {
+            _equipment.erase(equipped.first);
+            break;
+        }
+    }
+    if (_model) {
+        updateAppearance();
+    }
+}
+
+shared_ptr<Item> Creature::getEquippedItem(InventorySlot slot) const {
+    auto equipped = _equipment.find(slot);
+    return equipped != _equipment.end() ? equipped->second : nullptr;
 }
 
 void Creature::saveTo(AreaState &state) const {

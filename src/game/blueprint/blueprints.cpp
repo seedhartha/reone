@@ -84,7 +84,7 @@ shared_ptr<T> BlueprintManager::find(const string &resRef, ResourceType type, ma
 
     if (gff) {
         blueprint.reset(new T());
-        blueprint->load(resRef, *gff);
+        blueprint->load(*gff);
     } else {
         warn(boost::format("Blueprints: not found: %s %d") % resRef % static_cast<int>(type));
     }
