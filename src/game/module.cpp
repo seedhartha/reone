@@ -247,7 +247,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         Creature *creature = dynamic_cast<Creature *>(obstacle);
         if (creature) {
             if (!creature->conversation().empty() && _startDialog) {
-                resetInput();
+                resetPlayerMovement();
                 getCamera()->resetInput();
 
                 if (_startDialog) {
@@ -262,9 +262,11 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     return false;
 }
 
-void Module::resetInput() {
+void Module::resetPlayerMovement() {
     _moveForward = false;
+    _moveLeft = false;
     _moveBackward = false;
+    _moveRight = false;
 }
 
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
@@ -273,8 +275,16 @@ bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
             _moveForward = true;
             return true;
 
+        case SDL_SCANCODE_Z:
+            _moveLeft = true;
+            return true;
+
         case SDL_SCANCODE_S:
             _moveBackward = true;
+            return true;
+
+        case SDL_SCANCODE_C:
+            _moveRight = true;
             return true;
 
         default:
@@ -302,8 +312,16 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
             _moveForward = false;
             return true;
 
+        case SDL_SCANCODE_Z:
+            _moveLeft = false;
+            return true;
+
         case SDL_SCANCODE_S:
             _moveBackward = false;
+            return true;
+
+        case SDL_SCANCODE_C:
+            _moveRight = false;
             return true;
 
         case SDL_SCANCODE_X:
@@ -388,14 +406,18 @@ void Module::updatePlayer(float dt) {
     Creature &player = static_cast<Creature &>(*playerObject);
 
     float heading = 0.0f;
-    bool movement = false;
+    bool movement = true;
 
     if (_moveForward) {
         heading = camera.heading();
-        movement = true;
     } else if (_moveBackward) {
         heading = camera.heading() + glm::pi<float>();
-        movement = true;
+    } else if (_moveLeft) {
+        heading = camera.heading() + glm::half_pi<float>();
+    } else if (_moveRight) {
+        heading = camera.heading() - glm::half_pi<float>();
+    } else {
+        movement = false;
     }
 
     if (movement) {
