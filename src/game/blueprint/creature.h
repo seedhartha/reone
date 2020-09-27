@@ -31,7 +31,7 @@ class CreatureBlueprint {
 public:
     CreatureBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &utc);
+    void load(const resources::GffStruct &utc);
 
     const std::string &tag() const;
     const std::vector<std::string> &equipment() const;

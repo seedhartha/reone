@@ -29,14 +29,13 @@ class DoorBlueprint {
 public:
     DoorBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &utd);
+    void load(const resources::GffStruct &utd);
 
     const std::string &tag() const;
     bool isStatic() const;
     int genericType() const;
 
 private:
-    std::string _resRef;
     std::string _tag;
     bool _static { false };
     int _genericType { 0 };

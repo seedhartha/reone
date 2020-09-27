@@ -31,6 +31,7 @@ class SceneGraph;
 class SceneNode {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
+    void removeChild(const std::shared_ptr<SceneNode> &node);
     virtual void fillSceneGraph();
     virtual void render() const;
     virtual void renderImmediate() const;

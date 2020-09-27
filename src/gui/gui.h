@@ -69,7 +69,8 @@ protected:
     void load(const std::string &resRef, BackgroundType background);
     void loadBackground(BackgroundType type);
     void loadControl(const resources::GffStruct &gffs);
-    virtual void configureControl(Control &control);
+    virtual void preloadControl(Control &control);
+    void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
     void showControl(const std::string &tag);
     void hideControl(const std::string &tag);
 
@@ -80,7 +81,6 @@ protected:
 
     virtual void onFocusChanged(const std::string &control, bool focus);
     virtual void onClick(const std::string &control);
-    virtual void onItemClicked(const std::string &control, const std::string &item);
 
 private:
     GUI(const GUI &) = delete;

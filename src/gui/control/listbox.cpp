@@ -44,9 +44,6 @@ static const int kItemPadding = 3;
 ListBox::ListBox() : Control(ControlType::ListBox) {
 }
 
-ListBox::ListBox(const string &tag) : Control(ControlType::ListBox, tag) {
-}
-
 void ListBox::updateItems() {
     if (!_protoItem) return;
 

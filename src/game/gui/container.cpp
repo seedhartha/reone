@@ -67,9 +67,13 @@ void ContainerGui::configureItemsListBox(GameVersion version) {
 
     protoItem.setText(text);
 
-    if (version == GameVersion::KotOR) {
-        protoItem.setIconFrame(Resources.findTexture("lbl_hex_3", TextureType::GUI));
+    string frameTex;
+    if (version == GameVersion::TheSithLords) {
+        frameTex = "uibit_eqp_itm1";
+    } else {
+        frameTex = "lbl_hex_3";
     }
+    protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
 }
 
 void ContainerGui::open(SpatialObject *container) {
@@ -83,7 +87,7 @@ void ContainerGui::open(SpatialObject *container) {
         const ItemBlueprint &blueprint = item->blueprint();
 
         ListBox::Item lbItem;
-        lbItem.tag = blueprint.resRef();
+        lbItem.tag = blueprint.tag();
         lbItem.icon = blueprint.icon();
         lbItem.text = blueprint.localizedName();
 

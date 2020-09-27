@@ -29,7 +29,7 @@ class WaypointBlueprint {
 public:
     WaypointBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &utw);
+    void load(const resources::GffStruct &utw);
 
 private:
     WaypointBlueprint(const WaypointBlueprint &) = delete;

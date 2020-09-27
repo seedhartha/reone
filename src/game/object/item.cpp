@@ -26,6 +26,7 @@ Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 
 void Item::load(const ItemBlueprint *blueprint) {
     _blueprint = blueprint;
+    _tag = _blueprint->tag();
 }
 
 const ItemBlueprint &Item::blueprint() const {

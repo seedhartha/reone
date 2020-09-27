@@ -26,7 +26,6 @@ namespace gui {
 class Label : public Control {
 public:
     Label();
-    Label(const std::string &tag);
 };
 
 } // namespace gui

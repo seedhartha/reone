@@ -27,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-void CreatureBlueprint::load(const string &resRef, const GffStruct &utc) {
+void CreatureBlueprint::load(const GffStruct &utc) {
     _tag = utc.getString("Tag");
     boost::to_lower(_tag);
 

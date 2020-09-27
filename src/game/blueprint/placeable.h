@@ -35,7 +35,7 @@ public:
 
     PlaceableBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &utp);
+    void load(const resources::GffStruct &utp);
 
     bool getScript(ScriptType type, std::string &resRef) const;
 

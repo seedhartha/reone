@@ -130,23 +130,27 @@ void ModelSceneNode::animate(const string &anim, int flags, float speed) {
 }
 
 void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &model) {
-    if (!model) return;
-
     shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
     if (!parent) {
         warn("Parent node not found: " + parentNode);
         return;
     }
-    shared_ptr<ModelSceneNode> attached(new ModelSceneNode(model));
-    attached->setLocalTransform(parent->absoluteTransform());
-    attached->setLightingEnabled(_lightingEnabled);
-    addChild(attached);
+    uint16_t parentNumber = parent->nodeNumber();
 
-    _attachedModels.insert(make_pair(parent->nodeNumber(), attached));
-}
+    auto attached = _attachedModels.find(parentNumber);
+    if (attached != _attachedModels.end()) {
+        removeChild(attached->second);
+        _attachedModels.erase(attached);
+    }
 
-void ModelSceneNode::changeTexture(const string &resRef) {
-    _textureOverride = Resources.findTexture(resRef, TextureType::Diffuse);
+    if (model) {
+        shared_ptr<ModelSceneNode> child(new ModelSceneNode(model));
+        child->setLocalTransform(parent->absoluteTransform());
+        child->setLightingEnabled(_lightingEnabled);
+        addChild(child);
+
+        _attachedModels.insert(make_pair(parentNumber, child));
+    }
 }
 
 void ModelSceneNode::update(float dt) {
@@ -379,6 +383,25 @@ bool ModelSceneNode::isLightingEnabled() const {
 
 const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
     return _lightsAffectedBy;
+}
+
+void ModelSceneNode::setModel(const shared_ptr<Model> &model) {
+    _model = model;
+    assert(_model);
+
+    _meshes.clear();
+    _lights.clear();
+
+    for (auto &attached : _attachedModels) {
+        removeChild(attached.second);
+    }
+    _attachedModels.clear();
+
+    initChildren();
+}
+
+void ModelSceneNode::setTextureOverride(const shared_ptr<Texture> &texture) {
+    _textureOverride = texture;
 }
 
 void ModelSceneNode::setVisible(bool visible) {

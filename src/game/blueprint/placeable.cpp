@@ -27,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-void PlaceableBlueprint::load(const string &resRef, const GffStruct &utp) {
+void PlaceableBlueprint::load(const GffStruct &utp) {
     _tag = utp.getString("Tag");
     boost::to_lower(_tag);
 
@@ -56,7 +56,7 @@ void PlaceableBlueprint::loadScripts(const GffStruct &utp) {
 
 bool PlaceableBlueprint::getScript(ScriptType type, string &resRef) const {
     auto script = _scripts.find(type);
-    if (script == _scripts.end()) return false;
+    if (script == _scripts.end() || script->second.empty()) return false;
 
     resRef = script->second;
 

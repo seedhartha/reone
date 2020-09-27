@@ -17,13 +17,17 @@
 
 #include "equip.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../../gui/control/imagebutton.h"
 #include "../../gui/control/listbox.h"
 #include "../../resources/resources.h"
 
+#include "../object/creature.h"
 #include "../object/item.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::render;
@@ -33,47 +37,100 @@ namespace reone {
 
 namespace game {
 
+static const int kStrRefNone = 363;
+
+static unordered_map<EquipmentGui::Slot, string> g_slotNames = {
+    { EquipmentGui::Slot::Implant, "IMPLANT"},
+    { EquipmentGui::Slot::Head, "HEAD"},
+    { EquipmentGui::Slot::Hands, "HANDS"},
+    { EquipmentGui::Slot::ArmL, "ARM_L"},
+    { EquipmentGui::Slot::Body, "BODY"},
+    { EquipmentGui::Slot::ArmR, "ARM_R"},
+    { EquipmentGui::Slot::WeapL, "WEAP_L"},
+    { EquipmentGui::Slot::Belt, "BELT"},
+    { EquipmentGui::Slot::WeapR, "WEAP_R"},
+    { EquipmentGui::Slot::WeapL2, "WEAP_L2"},
+    { EquipmentGui::Slot::WeapR2, "WEAP_R2"}
+};
+
 EquipmentGui::EquipmentGui(const GraphicsOptions &opts) : GUI(opts) {
 }
 
 void EquipmentGui::load(GameVersion version) {
-    if (version == GameVersion::TheSithLords) {
+    _version = version;
+
+    if (_version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
-    GUI::load(getResRef(version), BackgroundType::Menu);
+    GUI::load(getResRef(), BackgroundType::Menu);
 
     hideControl("LB_DESC");
     hideControl("LBL_CANTEQUIP");
 
-    configureItemsListBox(version);
+    configureItemsListBox();
 }
 
-string EquipmentGui::getResRef(GameVersion version) const {
+string EquipmentGui::getResRef() const {
     string resRef("equip");
-    if (version == GameVersion::TheSithLords) {
+    if (_version == GameVersion::TheSithLords) {
         resRef += "_p";
     }
 
     return resRef;
 };
 
-void EquipmentGui::configureItemsListBox(GameVersion version) {
+void EquipmentGui::configureItemsListBox() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.setPadding(5);
+    lbItems.setOnItemClicked(bind(&EquipmentGui::onItemClicked, this, _1, _2));
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
 
     Control::Border border(protoItem.border());
-    border.color = getBaseColor(version);
+    border.color = getBaseColor(_version);
     protoItem.setBorder(border);
 
     Control::Border hilight(protoItem.hilight());
-    hilight.color = getHilightColor(version);
+    hilight.color = getHilightColor(_version);
     protoItem.setHilight(hilight);
 
-    if (version == GameVersion::KotOR) {
-        protoItem.setIconFrame(Resources.findTexture("lbl_hex_3", TextureType::GUI));
+    string frameTex;
+    if (_version == GameVersion::TheSithLords) {
+        frameTex = "uibit_eqp_itm1";
+    } else {
+        frameTex = "lbl_hex_3";
+    }
+    protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
+}
+
+void EquipmentGui::onItemClicked(const string &control, const string &item) {
+    if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
+
+    shared_ptr<Item> itemObj;
+
+    if (item != "[none]") {
+        for (auto &ownerItem : _owner->items()) {
+            if (ownerItem->tag() == item) {
+                itemObj = ownerItem;
+                break;
+            }
+        }
+    }
+
+    Creature &owner = static_cast<Creature &>(*_owner);
+    InventorySlot slot = getInventorySlot(_selectedSlot);
+    shared_ptr<Item> equipped = owner.getEquippedItem(slot);
+
+    if (equipped != itemObj) {
+        if (equipped) {
+            owner.unequip(equipped);
+        }
+        if (itemObj) {
+            owner.equip(slot, itemObj);
+        }
+        updateEquipment();
+        selectSlot(Slot::None);
     }
 }
 
@@ -81,36 +138,185 @@ void EquipmentGui::open(SpatialObject *owner) {
     assert(owner);
     _owner = owner;
 
-    ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clear();
-
-    for (auto &item : owner->items()) {
-        const ItemBlueprint &blueprint = item->blueprint();
-
-        ListBox::Item lbItem;
-        lbItem.tag = blueprint.resRef();
-        lbItem.text = blueprint.localizedName();
-        lbItem.icon = blueprint.icon();
-
-        lbItems.add(move(lbItem));
-    }
+    updateEquipment();
+    selectSlot(Slot::None);
 }
 
 void EquipmentGui::setOnClose(const function<void()> &fn) {
     _onClose = fn;
 }
 
-void EquipmentGui::configureControl(Control &control) {
+void EquipmentGui::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
         static_cast<ListBox &>(control).setProtoItemType(ControlType::ImageButton);
     }
 }
 
 void EquipmentGui::onClick(const string &control) {
-    if (control == "BTN_BACK") {
-        if (_onClose) {
-            _onClose();
+    if (control == "BTN_EQUIP" || control == "BTN_BACK") {
+        if (_selectedSlot == Slot::None) {
+            if (_onClose) {
+                _onClose();
+            }
+        } else {
+            selectSlot(Slot::None);
         }
+    } else if (boost::starts_with(control, "BTN_INV_")) {
+        for (auto &name : g_slotNames) {
+            string slotName(control.substr(8));
+            if (name.second == slotName) {
+                selectSlot(name.first);
+                break;
+            }
+        }
+    }
+}
+
+void EquipmentGui::selectSlot(Slot slot) {
+    bool noneSelected = slot == Slot::None;
+
+    for (auto &name : g_slotNames) {
+        configureControl("LBL_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
+        configureControl("BTN_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
+    }
+
+    getControl("LB_DESC").setVisible(!noneSelected);
+    getControl("LBL_SLOTNAME").setVisible(noneSelected);
+
+    if (_version == GameVersion::KotOR) {
+        getControl("LBL_PORT_BORD").setVisible(noneSelected);
+        getControl("LBL_PORTRAIT").setVisible(noneSelected);
+        getControl("LBL_TXTBAR").setVisible(noneSelected);
+    }
+    _selectedSlot = slot;
+
+    updateItems();
+}
+
+void EquipmentGui::updateEquipment() {
+    Creature &owner = static_cast<Creature &>(*_owner);
+    const map<InventorySlot, shared_ptr<Item>> &equipment = owner.equipment();
+
+    for (auto &name : g_slotNames) {
+        string tag("LBL_INV_" + name.second);
+        configureControl(tag, [&name, &equipment](Control &control) {
+            InventorySlot slot = getInventorySlot(name.first);
+            Control::Border border(control.border());
+
+            auto equipped = equipment.find(slot);
+            if (equipped != equipment.end()) {
+                border.fill = equipped->second->blueprint().icon();
+            } else {
+                border.fill = getEmptySlotIcon(name.first);
+            }
+            control.setBorder(border);
+        });
+    }
+}
+
+InventorySlot EquipmentGui::getInventorySlot(Slot slot) {
+    switch (slot) {
+        case Slot::Implant:
+            return InventorySlot::kInventorySlotImplant;
+        case Slot::Head:
+            return InventorySlot::kInventorySlotHead;
+        case Slot::Hands:
+            return InventorySlot::kInventorySlotHands;
+        case Slot::ArmL:
+            return InventorySlot::kInventorySlotLeftArm;
+        case Slot::Body:
+            return InventorySlot::kInventorySlotBody;
+        case Slot::ArmR:
+            return InventorySlot::kInventorySlotRightArm;
+        case Slot::WeapL:
+            return InventorySlot::kInventorySlotLeftWeapon;
+        case Slot::Belt:
+            return InventorySlot::kInventorySlotBelt;
+        case Slot::WeapR:
+            return InventorySlot::kInventorySlotRightWeapon;
+        case Slot::WeapL2:
+            return InventorySlot::kInventorySlotLeftWeapon2;
+        case Slot::WeapR2:
+            return InventorySlot::kInventorySlotRightWeapon2;
+        default:
+            throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
+    }
+}
+
+shared_ptr<Texture> EquipmentGui::getEmptySlotIcon(Slot slot) {
+    static unordered_map<Slot, shared_ptr<Texture>> icons;
+
+    auto icon = icons.find(slot);
+    if (icon != icons.end()) return icon->second;
+
+    string resRef;
+    switch (slot) {
+        case Slot::Implant:
+            resRef = "iimplant";
+            break;
+        case Slot::Head:
+            resRef = "ihead";
+            break;
+        case Slot::Hands:
+            resRef = "ihands";
+            break;
+        case Slot::ArmL:
+            resRef = "iforearm_l";
+            break;
+        case Slot::Body:
+            resRef = "iarmor";
+            break;
+        case Slot::ArmR:
+            resRef = "iforearm_r";
+            break;
+        case Slot::WeapL:
+        case Slot::WeapL2:
+            resRef = "iweap_l";
+            break;
+        case Slot::Belt:
+            resRef = "ibelt";
+            break;
+        case Slot::WeapR:
+        case Slot::WeapR2:
+            resRef = "iweap_r";
+            break;
+        default:
+            return nullptr;
+    }
+
+    shared_ptr<Texture> texture(Resources.findTexture(resRef, TextureType::GUI));
+    auto pair = icons.insert(make_pair(slot, texture));
+
+    return pair.first->second;
+}
+
+void EquipmentGui::updateItems() {
+    ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
+    lbItems.clear();
+
+    if (_selectedSlot != Slot::None) {
+        ListBox::Item lbItem;
+        lbItem.tag = "[none]";
+        lbItem.text = Resources.getString(kStrRefNone).text;
+        lbItem.icon = Resources.findTexture("inone", TextureType::GUI);
+
+        lbItems.add(move(lbItem));
+    }
+    for (auto &item : _owner->items()) {
+        const ItemBlueprint &blueprint = item->blueprint();
+
+        if (_selectedSlot == Slot::None) {
+            if (!blueprint.isEquippable()) continue;
+        } else {
+            InventorySlot slot = getInventorySlot(_selectedSlot);
+            if (!blueprint.isEquippable(slot)) continue;
+        }
+        ListBox::Item lbItem;
+        lbItem.tag = blueprint.tag();
+        lbItem.text = blueprint.localizedName();
+        lbItem.icon = blueprint.icon();
+
+        lbItems.add(move(lbItem));
     }
 }
 

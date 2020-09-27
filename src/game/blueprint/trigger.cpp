@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-void TriggerBlueprint::load(const string &resRef, const GffStruct &utt) {
+void TriggerBlueprint::load(const GffStruct &utt) {
 }
 
 } // namespace game

@@ -75,8 +75,6 @@ void Door::loadBlueprint(const string &resRef) {
     boost::to_lower(model);
 
     _model = make_unique<ModelSceneNode>(resources.findModel(model));
-    _model->setLightingEnabled(true);
-
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 

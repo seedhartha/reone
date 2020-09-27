@@ -29,7 +29,7 @@ class TriggerBlueprint {
 public:
     TriggerBlueprint() = default;
 
-    void load(const std::string &resRef, const resources::GffStruct &utt);
+    void load(const resources::GffStruct &utt);
 
 private:
     TriggerBlueprint(const TriggerBlueprint &) = delete;
