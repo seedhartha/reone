@@ -197,7 +197,7 @@ void applySelfIllum(inout vec3 color) {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
     float luminosity = dot(diffuseSample.rgb, RGB_TO_LUMINOSITY);
 
-    color += smoothstep(0.25, 1.0, luminosity) * selfIllumColor;
+    color += 0.5 * smoothstep(0.5, 1.0, luminosity) * selfIllumColor;
 }
 )END";
 
