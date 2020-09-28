@@ -48,7 +48,7 @@ namespace game {
  * @see game::Module
  * @see gui::GUI
  */
-class Game : public render::IEventHandler, public IRoutineCallbacks {
+class Game : public render::IEventHandler {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
 
@@ -56,38 +56,21 @@ public:
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
     bool handle(const SDL_Event &event) override;
 
-    // Routine callbacks
-
-    void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx) override;
-    int eventUserDefined(int eventNumber) override;
-    void signalEvent(uint32_t objectId, int eventId) override;
-
-    // Objects
-
-    Module *getModule() override;
-    Area *getArea() override;
-    std::shared_ptr<Object> getObjectById(uint32_t id) override;
-    std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth) override;
-    std::shared_ptr<Object> getWaypointByTag(const std::string &tag) override;
-    std::shared_ptr<Object> getPlayer() override;
-
-    // END Objects
+    std::shared_ptr<Module> module() const;
 
     // Globals/locals
 
-    bool getGlobalBoolean(const std::string &name) const override;
-    int getGlobalNumber(const std::string &name) const override;
-    bool getLocalBoolean(uint32_t objectId, int index) const override;
-    int getLocalNumber(uint32_t objectId, int index) const override;
+    bool getGlobalBoolean(const std::string &name) const;
+    int getGlobalNumber(const std::string &name) const;
+    bool getLocalBoolean(uint32_t objectId, int idx) const;
+    int getLocalNumber(uint32_t objectId, int idx) const;
 
-    void setGlobalBoolean(const std::string &name, bool value) override;
-    void setGlobalNumber(const std::string &name, int value) override;
-    void setLocalBoolean(uint32_t objectId, int index, bool value) override;
-    void setLocalNumber(uint32_t objectId, int index, int value) override;
+    void setGlobalBoolean(const std::string &name, bool value);
+    void setGlobalNumber(const std::string &name, int value);
+    void setLocalBoolean(uint32_t objectId, int idx, bool value);
+    void setLocalNumber(uint32_t objectId, int idx, int value);
 
     // END Globals/locals
-
-    // END Routine callbacks
 
 protected:
     enum class Screen {

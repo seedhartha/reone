@@ -26,7 +26,6 @@
 #include "../render/camera/thirdperson.h"
 
 #include "area.h"
-#include "script/callbacks.h"
 
 namespace reone {
 
@@ -58,7 +57,7 @@ public:
     bool loaded() const;
     std::shared_ptr<render::Camera> getCamera() const;
     const ModuleInfo &info() const;
-    Area &area() const;
+    std::shared_ptr<Area> area() const;
     render::CameraType cameraType() const;
 
     // Callbacks

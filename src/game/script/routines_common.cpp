@@ -23,6 +23,7 @@
 #include "../../core/random.h"
 
 #include "../area.h"
+#include "../game.h"
 #include "../object/creature.h"
 #include "../object/door.h"
 
@@ -52,7 +53,7 @@ Variable RoutineManager::getEnteringObject(const vector<Variable> &args, Executi
 
 Variable RoutineManager::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::Object);
-    shared_ptr<Object> player(_callbacks->getPlayer());
+    shared_ptr<Object> player(_game->module()->area()->player());
 
     return Variable(args[0].objectId == player->id());
 }
@@ -63,7 +64,7 @@ Variable RoutineManager::getIsObjectValid(const vector<Variable> &args, Executio
 }
 
 Variable RoutineManager::getFirstPC(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> player(_callbacks->getPlayer());
+    shared_ptr<Object> player(_game->module()->area()->player());
 
     Variable result(VariableType::Object);
     result.objectId = player->id();
@@ -82,7 +83,7 @@ Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionC
         tag = "party-leader";
     }
     int nth = args.size() >= 2 ? args[1].intValue : 0;
-    shared_ptr<Object> object(_callbacks->getObjectByTag(tag, nth));
+    shared_ptr<Object> object(_game->module()->area()->find(tag, nth));
 
     Variable result(VariableType::Object);
     result.objectId = object ? object->id() : kObjectInvalid;
@@ -92,7 +93,7 @@ Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionC
 
 Variable RoutineManager::getWaypointByTag(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
-    shared_ptr<Object> object(_callbacks->getWaypointByTag(args[0].strValue));
+    shared_ptr<Object> object(_game->module()->area()->find(args[0].strValue));
 
     Variable result(VariableType::Object);
     result.objectId = object ? object->id() : kObjectInvalid;
@@ -134,7 +135,7 @@ Variable RoutineManager::getArea(const vector<Variable> &args, ExecutionContext 
     assert(!args.empty() && args[0].type == VariableType::Object);
 
     Variable result(VariableType::Object);
-    result.objectId = _callbacks->getArea()->id();
+    result.objectId = _game->module()->area()->id();
 
     return move(result);
 }
@@ -158,12 +159,12 @@ Variable RoutineManager::getItemInSlot(const vector<Variable> &args, ExecutionCo
 
 Variable RoutineManager::getGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
-    return _callbacks->getGlobalBoolean(args[0].strValue);
+    return _game->getGlobalBoolean(args[0].strValue);
 }
 
 Variable RoutineManager::getGlobalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
     assert(!args.empty() && args[0].type == VariableType::String);
-    return _callbacks->getGlobalNumber(args[0].strValue);
+    return _game->getGlobalNumber(args[0].strValue);
 }
 
 Variable RoutineManager::getLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -172,7 +173,7 @@ Variable RoutineManager::getLocalBoolean(const vector<Variable> &args, Execution
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Int);
 
-    return _callbacks->getLocalBoolean(args[0].objectId, args[1].intValue);
+    return _game->getLocalBoolean(args[0].objectId, args[1].intValue);
 }
 
 Variable RoutineManager::getLocalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -181,7 +182,7 @@ Variable RoutineManager::getLocalNumber(const vector<Variable> &args, ExecutionC
         args[0].type == VariableType::Object &&
         args[1].type == VariableType::Int);
 
-    return _callbacks->getLocalNumber(args[0].objectId, args[1].intValue);
+    return _game->getLocalNumber(args[0].objectId, args[1].intValue);
 }
 
 Variable RoutineManager::setGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -190,7 +191,7 @@ Variable RoutineManager::setGlobalBoolean(const vector<Variable> &args, Executio
         args[0].type == VariableType::String &&
         args[1].type == VariableType::Int);
 
-    _callbacks->setGlobalBoolean(args[0].strValue, args[1].intValue);
+    _game->setGlobalBoolean(args[0].strValue, args[1].intValue);
 
     return Variable();
 }
@@ -201,7 +202,7 @@ Variable RoutineManager::setGlobalNumber(const vector<Variable> &args, Execution
         args[0].type == VariableType::String &&
         args[1].type == VariableType::Int);
 
-    _callbacks->setGlobalNumber(args[0].strValue, args[1].intValue);
+    _game->setGlobalNumber(args[0].strValue, args[1].intValue);
 
     return Variable();
 }
@@ -213,7 +214,7 @@ Variable RoutineManager::setLocalBoolean(const vector<Variable> &args, Execution
         args[1].type == VariableType::Int && args[1].intValue >= 0 && args[1].intValue <= 63 &&
         args[2].type == VariableType::Int);
 
-    _callbacks->setLocalBoolean(args[0].objectId, args[1].intValue, args[2].intValue);
+    _game->setLocalBoolean(args[0].objectId, args[1].intValue, args[2].intValue);
 
     return Variable();
 }
@@ -225,7 +226,7 @@ Variable RoutineManager::setLocalNumber(const vector<Variable> &args, ExecutionC
         args[1].type == VariableType::Int &&
         args[2].type == VariableType::Int);
 
-    _callbacks->setLocalNumber(args[0].objectId, args[1].intValue, args[2].intValue);
+    _game->setLocalNumber(args[0].objectId, args[1].intValue, args[2].intValue);
 
     return Variable();
 }
@@ -237,7 +238,7 @@ Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionCon
         args[1].type == VariableType::Action);
 
     uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
-    _callbacks->delayCommand(timestamp, args[1].context);
+    _game->module()->area()->delayCommand(timestamp, args[1].context);
 
     return Variable();
 }
@@ -252,7 +253,7 @@ Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionCo
     newCtx.callerId = args[0].objectId;
     newCtx.triggererId = kObjectInvalid;
 
-    _callbacks->delayCommand(SDL_GetTicks(), move(newCtx));
+    _game->module()->area()->delayCommand(SDL_GetTicks(), move(newCtx));
 
     return Variable();
 }
@@ -261,7 +262,7 @@ Variable RoutineManager::eventUserDefined(const vector<Variable> &args, Executio
     assert(!args.empty() && args[0].type == VariableType::Int);
 
     Variable result(VariableType::Event);
-    result.engineTypeId = _callbacks->eventUserDefined(args[0].intValue);
+    result.engineTypeId = _game->module()->area()->eventUserDefined(args[0].intValue);
 
     return move(result);
 }
@@ -274,7 +275,11 @@ Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionCont
 
     shared_ptr<Object> subject(getObjectById(args[0].objectId, ctx));
     if (subject) {
-        _callbacks->signalEvent(subject->id(), args[1].engineTypeId);
+        if (subject->type() == ObjectType::Area) {
+            static_cast<Area &>(*subject).signalEvent(args[1].engineTypeId);
+        } else {
+            warn("Routine: event object is not an area");
+        }
     } else {
         warn("Routine: object not found by id: " + to_string(args[0].objectId));
     }
