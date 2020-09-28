@@ -36,6 +36,7 @@ enum class ShaderProgram {
     BasicDiffuseLightmap,
     BasicDiffuseLightmapEnvmap,
     BasicDiffuseLightmapBumpyShiny,
+    BasicDiffuseGaussianBlur,
     SkeletalDiffuse,
     SkeletalDiffuseEnvmap,
     SkeletalDiffuseBumpyShiny,
@@ -60,6 +61,7 @@ public:
     void setGlobalUniforms(const ShaderUniforms &uniforms);
     void setUniform(const std::string &name, int value);
     void setUniform(const std::string &name, float value);
+    void setUniform(const std::string &name, const glm::vec2 &v);
     void setUniform(const std::string &name, const glm::vec3 &v);
     void setUniform(const std::string &name, const glm::mat4 &m);
     void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
@@ -77,6 +79,7 @@ private:
         FragmentDiffuseLightmapEnvmap,
         FragmentDiffuseLightmapBumpyShiny,
         FragmentDiffuseBumpmap,
+        FragmentDiffuseGaussianBlur,
         FragmentText
     };
 
@@ -96,6 +99,7 @@ private:
     unsigned int getOrdinal(ShaderProgram program) const;
     void setUniform(unsigned int ordinal, const std::string &name, int value);
     void setUniform(unsigned int ordinal, const std::string &name, float value);
+    void setUniform(unsigned int ordinal, const std::string &name, const glm::vec2 &v);
     void setUniform(unsigned int ordinal, const std::string &name, const glm::vec3 &v);
     void setUniform(unsigned int ordinal, const std::string &name, const glm::mat4 &m);
     void setUniform(unsigned int ordinal, const std::string &name, const std::vector<glm::mat4> &arr);

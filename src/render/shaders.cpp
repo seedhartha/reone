@@ -347,6 +347,23 @@ void main() {
 }
 )END";
 
+static const GLchar kGaussianBlurFragmentShader[] = R"END(
+uniform vec2 resolution;
+uniform vec2 direction;
+
+void main() {
+    vec2 uv = vec2(gl_FragCoord.xy / resolution.xy);
+    vec2 off1 = vec2(1.3333333333333333) * direction;
+
+    vec4 color = vec4(0.0);
+    color += texture2D(diffuse, uv) * 0.29411764705882354;
+    color += texture2D(diffuse, uv + (off1 / resolution)) * 0.35294117647058826;
+    color += texture2D(diffuse, uv - (off1 / resolution)) * 0.35294117647058826;
+
+    fragColor = color;
+}
+)END";
+
 static const GLchar kTextFragmentShader[] = R"END(
 uniform sampler2D font;
 uniform vec3 textColor;
@@ -373,6 +390,7 @@ void ShaderManager::initGL() {
     initShader(ShaderName::FragmentDiffuseLightmapEnvmap, GL_FRAGMENT_SHADER, kDiffuseLightmapEnvmapFragmentShader);
     initShader(ShaderName::FragmentDiffuseLightmapBumpyShiny, GL_FRAGMENT_SHADER, kDiffuseLightmapBumpyShinyFragmentShader);
     initShader(ShaderName::FragmentDiffuseBumpmap, GL_FRAGMENT_SHADER, kDiffuseBumpmapFragmentShader);
+    initShader(ShaderName::FragmentDiffuseGaussianBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
     initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, kTextFragmentShader);
 
     initProgram(ShaderProgram::BasicWhite, ShaderName::VertexBasic, ShaderName::FragmentWhite);
@@ -382,6 +400,7 @@ void ShaderManager::initGL() {
     initProgram(ShaderProgram::BasicDiffuseLightmap, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmap);
     initProgram(ShaderProgram::BasicDiffuseLightmapEnvmap, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmapEnvmap);
     initProgram(ShaderProgram::BasicDiffuseLightmapBumpyShiny, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmapBumpyShiny);
+    initProgram(ShaderProgram::BasicDiffuseGaussianBlur, ShaderName::VertexBasic, ShaderName::FragmentDiffuseGaussianBlur);
     initProgram(ShaderProgram::SkeletalDiffuse, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuse);
     initProgram(ShaderProgram::SkeletalDiffuseEnvmap, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseEnvmap);
     initProgram(ShaderProgram::SkeletalDiffuseBumpyShiny, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseBumpyShiny);
@@ -514,6 +533,17 @@ void ShaderManager::setUniform(unsigned int ordinal, const string &name, float v
     if (loc == -1) return;
 
     glUniform1f(loc, value);
+}
+
+void ShaderManager::setUniform(const string &name, const glm::vec2 &v) {
+    setUniform(_activeOrdinal, name, v);
+}
+
+void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::vec2 &v) {
+    GLint loc = glGetUniformLocation(ordinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniform2f(loc, v.x, v.y);
 }
 
 void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
