@@ -21,6 +21,6 @@
 
 namespace reone {
 
-boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const std::string &relPath);
+boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const std::string &relPath, bool logNotFound = true);
 
 } // namespace reone

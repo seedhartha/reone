@@ -48,8 +48,9 @@ void RenderWindow::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
-    if (_opts.fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
-
+    if (_opts.fullscreen) {
+        flags |= SDL_WINDOW_FULLSCREEN;
+    }
     _window = SDL_CreateWindow(
         "reone",
         SDL_WINDOWPOS_UNDEFINED,
@@ -61,13 +62,11 @@ void RenderWindow::init() {
     if (!_window) {
         throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
     }
-
     _context = SDL_GL_CreateContext(_window);
 
     if (!_context) {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
-
     SDL_GL_SetSwapInterval(0);
     glewInit();
 

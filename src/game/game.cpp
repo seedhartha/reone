@@ -58,7 +58,7 @@ static const int kAppearanceKreia = 455;
 
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
-    _opts(opts),
+    _options(opts),
     _window(opts.graphics, this),
     _console(opts.graphics) {
 
@@ -67,21 +67,16 @@ Game::Game(const fs::path &path, const Options &opts) :
 }
 
 void Game::initGameVersion() {
-    fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe"));
+    fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe", false));
     _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
 }
 
 void Game::initObjectFactory() {
-    _objectFactory = make_unique<ObjectFactory>(_version, _opts);
+    _objectFactory = make_unique<ObjectFactory>(_version, _options);
 }
 
 int Game::run() {
-    _window.init();
-
-    Resources.init(_version, _path);
-    TheAudioPlayer.init(_opts.audio);
-    RoutineMan.init(_version, this);
-
+    initSubsystems();
     configure();
     loadCursor();
 
@@ -89,15 +84,17 @@ int Game::run() {
     _window.show();
 
     runMainLoop();
-
-    TheJobExecutor.deinit();
-    RoutineMan.deinit();
-    TheAudioPlayer.deinit();
-    Resources.deinit();
-
-    _window.deinit();
+    deinitSubsystems();
 
     return 0;
+}
+
+void Game::initSubsystems() {
+    _window.init();
+
+    Resources.init(_version, _path);
+    TheAudioPlayer.init(_options.audio);
+    Routines.init(_version, this);
 }
 
 void Game::configure() {
@@ -114,8 +111,199 @@ void Game::configure() {
     }
 }
 
+void Game::runMainLoop() {
+    _ticks = SDL_GetTicks();
+
+    while (!_quit) {
+        _window.processEvents(_quit);
+
+        update();
+        drawAll();
+    }
+}
+
+void Game::update() {
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    float dt = getDeltaTime();
+    _window.update(dt);
+
+    shared_ptr<GUI> gui(currentGUI());
+    if (gui) {
+        gui->update(dt);
+    }
+    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
+
+    if (updModule && _module) {
+        GuiContext guiCtx;
+        _module->update(dt, guiCtx);
+
+        if (_module->cameraType() == CameraType::ThirdPerson) {
+            _hud->update(guiCtx.hud);
+        }
+        _targetOverlay->setContext(guiCtx.target);
+        _debugOverlay->update(guiCtx.debug);
+    }
+
+}
+
+void Game::loadNextModule() {
+    info("Awaiting async jobs completion");
+    JobExecutor &jobs = TheJobExecutor;
+    jobs.cancel();
+    jobs.await();
+
+    if (_module) {
+        _module->saveTo(_state);
+    }
+    TheSceneGraph.clear();
+    loadModule(_nextModule, _state.party, _nextEntry);
+
+    _nextModule.clear();
+    _nextEntry.clear();
+}
+
+float Game::getDeltaTime() {
+    uint32_t ticks = SDL_GetTicks();
+    float dt = (ticks - _ticks) / 1000.0f;
+    _ticks = ticks;
+
+    return dt;
+}
+
+shared_ptr<GUI> Game::currentGUI() const {
+    switch (_screen) {
+        case Screen::MainMenu:
+            return _mainMenu;
+        case Screen::ClassSelection:
+            return _classesGui;
+        case Screen::PortraitSelection:
+            return _portraitsGui;
+        case Screen::InGame:
+            return _hud;
+        case Screen::Dialog:
+            return _dialogGui;
+        case Screen::Container:
+            return _containerGui;
+        case Screen::Equipment:
+            return _equipmentGui;
+        default:
+            return nullptr;
+    }
+}
+
+void Game::drawAll() {
+    _window.clear();
+
+    drawWorld();
+    drawGUI();
+    drawGUI3D();
+    drawCursor();
+
+    _window.swapBuffers();
+}
+
+void Game::drawWorld() {
+    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
+    if (!camera) return;
+
+    glEnable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = camera->projection();
+    uniforms.view = camera->view();
+    uniforms.cameraPosition = camera->position();
+
+    Shaders.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::InGame:
+        case Screen::Dialog:
+        case Screen::Container:
+            TheSceneGraph.render();
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::drawGUI() {
+    glDisable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+
+    Shaders.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::InGame:
+            _targetOverlay->render();
+            _debugOverlay->render();
+
+            if (_module->cameraType() == CameraType::ThirdPerson) {
+                _hud->render();
+            }
+            if (_console.isOpen()) {
+                _console.render();
+            }
+            break;
+
+        default: {
+            shared_ptr<GUI> gui(currentGUI());
+            if (gui) gui->render();
+            break;
+        }
+    }
+}
+
+void Game::drawGUI3D() {
+    glEnable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(
+        0.0f,
+        static_cast<float>(_options.graphics.width),
+        static_cast<float>(_options.graphics.height),
+        0.0f,
+        -1024.0f,
+        1024.0f);
+
+    Shaders.setGlobalUniforms(uniforms);
+
+    switch (_screen) {
+        case Screen::MainMenu:
+        case Screen::ClassSelection:
+        case Screen::PortraitSelection:
+            currentGUI()->render3D();
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::drawCursor() {
+    glDisable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+
+    Shaders.setGlobalUniforms(uniforms);
+
+    _window.drawCursor();
+}
+
+void Game::deinitSubsystems() {
+    TheJobExecutor.deinit();
+    Routines.deinit();
+    TheAudioPlayer.deinit();
+    Resources.deinit();
+
+    _window.deinit();
+}
+
 void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(_opts));
+    unique_ptr<MainMenu> mainMenu(new MainMenu(_options));
     mainMenu->load(_version);
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
@@ -158,7 +346,7 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadClassSelectionGui() {
-    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_objectFactory.get(), _opts.graphics));
+    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_objectFactory.get(), _options.graphics));
     gui->load(_version);
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();
@@ -175,7 +363,7 @@ void Game::loadClassSelectionGui() {
 }
 
 void Game::loadPortraitsGui() {
-    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_opts.graphics));
+    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_options.graphics));
     gui->load(_version);
     gui->setOnPortraitSelected([this](const CreatureConfiguration &character) {
         _portraitsGui->resetFocus();
@@ -225,7 +413,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 }
 
 void Game::loadHUD() {
-    unique_ptr<HUD> hud(new HUD(_opts.graphics));
+    unique_ptr<HUD> hud(new HUD(_options.graphics));
     hud->load(_version);
     hud->setOnEquipmentClick([this]() {
         if (!_equipmentGui) loadEquipmentGui();
@@ -242,13 +430,13 @@ void Game::loadHUD() {
 }
 
 void Game::loadDebugOverlay() {
-    unique_ptr<DebugOverlay> debug(new DebugOverlay(_opts.graphics));
+    unique_ptr<DebugOverlay> debug(new DebugOverlay(_options.graphics));
     debug->load();
     _debugOverlay = move(debug);
 }
 
 void Game::loadDialogGui() {
-    unique_ptr<DialogGui> dialog(new DialogGui(_opts.graphics));
+    unique_ptr<DialogGui> dialog(new DialogGui(_options.graphics));
     dialog->load(_version);
     dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
@@ -262,7 +450,7 @@ void Game::loadDialogGui() {
 }
 
 void Game::loadContainerGui() {
-    unique_ptr<ContainerGui> container(new ContainerGui(_opts.graphics));
+    unique_ptr<ContainerGui> container(new ContainerGui(_options.graphics));
     container->load(_version);
     container->setOnGetItems([this]() {
         shared_ptr<SpatialObject> player(_module->area().player());
@@ -341,16 +529,8 @@ void Game::startDialog(uint32_t ownerId, const string &resRef) {
     _dialogGui->startDialog(ownerId, resRef);
 }
 
-void Game::loadCursor() {
-    Cursor cursor;
-    cursor.pressed = Resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = Resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
-
-    _window.setCursor(cursor);
-}
-
 void Game::loadEquipmentGui() {
-    unique_ptr<EquipmentGui> equip(new EquipmentGui(_opts.graphics));
+    unique_ptr<EquipmentGui> equip(new EquipmentGui(_options.graphics));
     equip->load(_version);
     equip->setOnClose([this]() {
         _equipmentGui->resetFocus();
@@ -360,185 +540,17 @@ void Game::loadEquipmentGui() {
 }
 
 void Game::loadTargetOverlay() {
-    unique_ptr<TargetOverlay> overlay(new TargetOverlay(_opts.graphics));
+    unique_ptr<TargetOverlay> overlay(new TargetOverlay(_options.graphics));
     overlay->load();
     _targetOverlay = move(overlay);
 }
 
-void Game::runMainLoop() {
-    _ticks = SDL_GetTicks();
+void Game::loadCursor() {
+    Cursor cursor;
+    cursor.pressed = Resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
+    cursor.unpressed = Resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
 
-    while (!_quit) {
-        _window.processEvents(_quit);
-        update();
-
-        _window.clear();
-        drawWorld();
-        drawGUI();
-        drawGUI3D();
-        drawCursor();
-
-        _window.swapBuffers();
-    }
-}
-
-void Game::update() {
-    if (!_nextModule.empty()) {
-        loadNextModule();
-    }
-    float dt = getDeltaTime();
-    _window.update(dt);
-
-    shared_ptr<GUI> gui(currentGUI());
-    if (gui) {
-        gui->update(dt);
-    }
-    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
-    if (updModule && _module) {
-        GuiContext guiCtx;
-        _module->update(dt, guiCtx);
-
-        if (_module->cameraType() == CameraType::ThirdPerson) {
-            _hud->update(guiCtx.hud);
-        }
-        _targetOverlay->setContext(guiCtx.target);
-        _debugOverlay->update(guiCtx.debug);
-    }
-
-}
-
-void Game::loadNextModule() {
-    info("Awaiting async jobs completion");
-    JobExecutor &jobs = TheJobExecutor;
-    jobs.cancel();
-    jobs.await();
-
-    if (_module) {
-        _module->saveTo(_state);
-    }
-    TheSceneGraph.clear();
-    loadModule(_nextModule, _state.party, _nextEntry);
-
-    _nextModule.clear();
-    _nextEntry.clear();
-}
-
-float Game::getDeltaTime() {
-    uint32_t ticks = SDL_GetTicks();
-    float dt = (ticks - _ticks) / 1000.0f;
-    _ticks = ticks;
-
-    return dt;
-}
-
-shared_ptr<GUI> Game::currentGUI() const {
-    switch (_screen) {
-        case Screen::MainMenu:
-            return _mainMenu;
-        case Screen::ClassSelection:
-            return _classesGui;
-        case Screen::PortraitSelection:
-            return _portraitsGui;
-        case Screen::InGame:
-            return _hud;
-        case Screen::Dialog:
-            return _dialogGui;
-        case Screen::Container:
-            return _containerGui;
-        case Screen::Equipment:
-            return _equipmentGui;
-        default:
-            return nullptr;
-    }
-}
-
-void Game::drawWorld() {
-    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
-    if (!camera) return;
-
-    glEnable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = camera->projection();
-    uniforms.view = camera->view();
-    uniforms.cameraPosition = camera->position();
-
-    Shaders.setGlobalUniforms(uniforms);
-
-    switch (_screen) {
-        case Screen::InGame:
-        case Screen::Dialog:
-        case Screen::Container:
-            TheSceneGraph.render();
-            break;
-        default:
-            break;
-    }
-}
-
-void Game::drawGUI() {
-    glDisable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
-
-    Shaders.setGlobalUniforms(uniforms);
-
-    switch (_screen) {
-        case Screen::InGame:
-            _targetOverlay->render();
-            _debugOverlay->render();
-
-            if (_module->cameraType() == CameraType::ThirdPerson) {
-                _hud->render();
-            }
-            if (_console.isOpen()) {
-                _console.render();
-            }
-            break;
-
-        default: {
-            shared_ptr<GUI> gui(currentGUI());
-            if (gui) gui->render();
-            break;
-        }
-    }
-}
-
-void Game::drawGUI3D() {
-    glEnable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(
-        0.0f,
-        static_cast<float>(_opts.graphics.width),
-        static_cast<float>(_opts.graphics.height),
-        0.0f,
-        -1024.0f,
-        1024.0f);
-
-    Shaders.setGlobalUniforms(uniforms);
-
-    switch (_screen) {
-        case Screen::MainMenu:
-        case Screen::ClassSelection:
-        case Screen::PortraitSelection:
-            currentGUI()->render3D();
-            break;
-        default:
-            break;
-    }
-}
-
-void Game::drawCursor() {
-    glDisable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_opts.graphics.width), static_cast<float>(_opts.graphics.height), 0.0f);
-
-    Shaders.setGlobalUniforms(uniforms);
-
-    _window.drawCursor();
+    _window.setCursor(cursor);
 }
 
 bool Game::handle(const SDL_Event &event) {
