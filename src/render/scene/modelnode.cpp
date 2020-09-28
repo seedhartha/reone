@@ -349,6 +349,11 @@ glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
     return node->absoluteTransform()[3];
 }
 
+glm::vec3 ModelSceneNode::getCenterOfAABB() const {
+    glm::vec3 center(_model->aabb().center());
+    return _absoluteTransform * glm::vec4(center, 1.0f);
+}
+
 const string &ModelSceneNode::name() const {
     return _model->name();
 }

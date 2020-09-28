@@ -69,6 +69,7 @@ Creature::Creature(uint32_t id, ObjectFactory *objectFactory) :
     assert(_objectFactory);
     _drawDistance = 2048.0f;
     _fadeDistance = 0.25f * _drawDistance;
+    _selectable = true;
 }
 
 void Creature::load(const GffStruct &gffs) {

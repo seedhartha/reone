@@ -93,6 +93,10 @@ void SpatialObject::animate(const string &parent, const string &anim, int flags,
     _model->animate(parent, anim, flags, speed);
 }
 
+bool SpatialObject::isSelectable() const {
+    return _selectable;
+}
+
 Room *SpatialObject::room() const {
     return _room;
 }

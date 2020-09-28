@@ -212,6 +212,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     if (!_hud) loadHUD();
     if (!_debugOverlay) loadDebugOverlay();
     if (!_dialogGui) loadDialogGui();
+    if (!_targetOverlay) loadTargetOverlay();
 
     _ticks = SDL_GetTicks();
     _screen = Screen::InGame;
@@ -352,6 +353,12 @@ void Game::loadEquipmentGui() {
     _equipmentGui = move(equip);
 }
 
+void Game::loadTargetOverlay() {
+    unique_ptr<TargetOverlay> overlay(new TargetOverlay(_opts.graphics));
+    overlay->load();
+    _targetOverlay = move(overlay);
+}
+
 void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
@@ -388,6 +395,7 @@ void Game::update() {
         if (_module->cameraType() == CameraType::ThirdPerson) {
             _hud->update(guiCtx.hud);
         }
+        _targetOverlay->setContext(guiCtx.target);
         _debugOverlay->update(guiCtx.debug);
     }
 
@@ -472,6 +480,7 @@ void Game::drawGUI() {
 
     switch (_screen) {
         case Screen::InGame:
+            _targetOverlay->render();
             _debugOverlay->render();
 
             if (_module->cameraType() == CameraType::ThirdPerson) {

@@ -70,6 +70,7 @@ set(HEADERS
     src/game/gui/hud.h
     src/game/gui/mainmenu.h
     src/game/gui/portraitsel.h
+    src/game/gui/target.h
     src/game/navmesh.h
     src/game/module.h
     src/game/multiplayer/area.h
@@ -201,6 +202,7 @@ set(SOURCES
     src/game/gui/hud.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitsel.cpp
+    src/game/gui/target.cpp
     src/game/module.cpp
     src/game/multiplayer/area.cpp
     src/game/multiplayer/command.cpp

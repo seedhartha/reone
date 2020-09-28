@@ -43,6 +43,7 @@ Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory) :
     assert(_objectFactory);
     _drawDistance = 4096.0f;
     _fadeDistance = 0.25f * _drawDistance;
+    _selectable = true;
 }
 
 void Placeable::load(const GffStruct &gffs) {

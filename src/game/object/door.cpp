@@ -37,10 +37,11 @@ namespace game {
 Door::Door(uint32_t id) : SpatialObject(id, ObjectType::Door) {
     _drawDistance = FLT_MAX;
     _fadeDistance = 0.25f * _drawDistance;
+    _selectable = true;
 }
 
 void Door::load(const GffStruct &gffs) {
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = Resources;
 
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
@@ -84,6 +85,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
         _model->animate("opening1");
     }
     _open = true;
+    _selectable = false;
 }
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
@@ -92,6 +94,7 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
         _model->animate("closing1");
     }
     _open = false;
+    _selectable = true;
 }
 
 void Door::saveTo(AreaState &state) const {

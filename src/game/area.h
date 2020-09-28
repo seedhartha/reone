@@ -55,10 +55,14 @@ public:
     void runOnEnterScript();
 
     bool handle(const SDL_Event &event);
-    void update(const UpdateContext &updateCtx, GuiContext &guiCtx);
+    void update(const UpdateContext &updateCtx);
+    void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &point, float dt);
     void updateTriggers(const Creature &creature);
     void updateRoomVisibility();
+    void selectNearestObject();
+    void hilight(uint32_t objectId);
+    void select(uint32_t objectId);
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
@@ -73,6 +77,7 @@ public:
     bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const;
 
     // General getters
+    uint32_t selectedObjectId() const;
     const render::CameraStyle &cameraStyle() const;
     const std::string &music() const;
 
@@ -133,6 +138,8 @@ private:
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
+    int _hilightedObjectId { -1 };
+    int _selectedObjectId { -1 };
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
@@ -146,8 +153,15 @@ private:
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     bool findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
     bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
+    void updateSelection();
+    void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
+    glm::vec3 getScreenCenterOfObject(uint32_t objectId, const UpdateContext &ctx) const;
+    void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
+    void selectNextObject(bool reverse = false);
+    void getSelectableObjects(std::vector<uint32_t> &ids) const;
 
     // Loading
+
     void loadLYT();
     void loadVIS();
     void loadPTH();
@@ -162,6 +176,15 @@ private:
     void loadPlaceables(const resources::GffStruct &git);
     void loadWaypoints(const resources::GffStruct &git);
     void loadTriggers(const resources::GffStruct &git);
+
+    // END Loading
+
+    // Events
+
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleKeyUp(const SDL_KeyboardEvent &event);
+
+    // END Events
 };
 
 } // namespace game

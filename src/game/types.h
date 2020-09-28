@@ -166,6 +166,13 @@ struct HudContext {
     std::vector<std::shared_ptr<render::Texture>> partyPortraits;
 };
 
+struct TargetContext {
+    bool hasHilighted { false };
+    bool hasSelected { false };
+    glm::vec3 hilightedScreenCoords { 0.0f };
+    glm::vec3 selectedScreenCoords { 0.0f };
+};
+
 struct DebugObject {
     std::string tag;
     std::string text;
@@ -178,6 +185,7 @@ struct DebugContext {
 
 struct GuiContext {
     HudContext hud;
+    TargetContext target;
     DebugContext debug;
 };
 

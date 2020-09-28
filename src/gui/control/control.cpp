@@ -238,13 +238,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     GUIQuad &flipYQuad = FlipYGuiQuad;
     GUIQuad &flipXYQuad = FlipXYGuiQuad;
 
-    glActiveTexture(0);
+    glActiveTexture(GL_TEXTURE0);
 
     if (border.fill) {
         int x = _extent.left + border.dimension + offset.x;
         int y = _extent.top + border.dimension + offset.y;
         int w = size.x - 2 * border.dimension;
         int h = size.y - 2 * border.dimension;
+
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
         transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
