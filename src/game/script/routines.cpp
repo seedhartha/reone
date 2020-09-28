@@ -37,8 +37,8 @@ RoutineManager &RoutineManager::instance() {
     return instance;
 }
 
-void RoutineManager::init(GameVersion version, IRoutineCallbacks *callbacks) {
-    _callbacks = callbacks;
+void RoutineManager::init(GameVersion version, Game *game) {
+    _game = game;
 
     switch (version) {
         case GameVersion::KotOR:
@@ -78,7 +78,6 @@ const Routine &RoutineManager::get(int index) {
 
 shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
     uint32_t finalId = 0;
-
     switch (id) {
         case kObjectSelf:
             finalId = ctx.callerId;
@@ -91,7 +90,17 @@ shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionCon
             break;
     }
 
-    return _callbacks->getObjectById(finalId);
+    shared_ptr<Module> module(_game->module());
+    if (finalId == module->id()) {
+        return module;
+    }
+
+    shared_ptr<Area> area(module->area());
+    if (finalId == area->id()) {
+        return area;
+    }
+
+    return area->find(finalId);
 }
 
 } // namespace game

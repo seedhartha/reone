@@ -500,8 +500,8 @@ const ModuleInfo &Module::info() const {
     return _info;
 }
 
-Area &Module::area() const {
-    return *_area;
+shared_ptr<Area> Module::area() const {
+    return _area;
 }
 
 CameraType Module::cameraType() const {

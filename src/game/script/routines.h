@@ -26,23 +26,25 @@
 #include "../../script/types.h"
 #include "../../script/variable.h"
 
-#include "callbacks.h"
+#include "../object/object.h"
 
 namespace reone {
 
 namespace game {
 
+class Game;
+
 class RoutineManager : public script::IRoutineProvider {
 public:
     static RoutineManager &instance();
 
-    void init(resources::GameVersion version, IRoutineCallbacks *callbacks);
+    void init(resources::GameVersion version, Game *game);
     void deinit();
 
     const script::Routine &get(int index) override;
 
 private:
-    IRoutineCallbacks *_callbacks { nullptr };
+    Game *_game { nullptr };
     std::vector<script::Routine> _routines;
 
     RoutineManager() = default;

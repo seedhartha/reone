@@ -77,16 +77,16 @@ void MultiplayerGame::synchronizeClient(const string &tag) {
     lock_guard<recursive_mutex> syncLock(_syncMutex);
     sendLoadModule(tag, _module->name());
 
-    shared_ptr<Object> partyLeader(_module->area().partyLeader());
+    shared_ptr<Object> partyLeader(_module->area()->partyLeader());
     sendLoadCreature(tag, CreatureRole::PartyLeader, static_cast<Creature &>(*partyLeader));
 
-    shared_ptr<Object> partyMember1(_module->area().partyMember1());
+    shared_ptr<Object> partyMember1(_module->area()->partyMember1());
     if (partyMember1) {
         Creature &creature = static_cast<Creature &>(*partyMember1);
         sendLoadCreature(tag, CreatureRole::PartyMember1, creature);
     }
 
-    shared_ptr<Object> partyMember2(_module->area().partyMember2());
+    shared_ptr<Object> partyMember2(_module->area()->partyMember2());
     if (partyMember2) {
         Creature &creature = static_cast<Creature &>(*partyMember2);
         sendLoadCreature(tag, CreatureRole::PartyMember2, creature);
@@ -157,8 +157,8 @@ void MultiplayerGame::sendSetPlayerRole(const string &client, CreatureRole role)
 void MultiplayerGame::onClientDisconnected(const string tag) {
     if (!_module || !_module->loaded()) return;
 
-    const MultiplayerArea &area = static_cast<MultiplayerArea &>(_module->area());
-    shared_ptr<Object> object(area.findCreatureByClientTag(tag));
+    shared_ptr<Area> area(_module->area());
+    shared_ptr<Object> object(static_cast<MultiplayerArea &>(*area).findCreatureByClientTag(tag));
     if (object) {
         static_cast<MultiplayerCreature &>(*object).setClientTag("");
     }
@@ -201,7 +201,7 @@ void MultiplayerGame::update() {
                             _screen = Screen::InGame;
                             break;
                         default:
-                            static_cast<MultiplayerArea &>(_module->area()).execute(cmd);
+                            static_cast<MultiplayerArea &>(*_module->area()).execute(cmd);
                             break;
                     }
                     _commandsIn.pop();
@@ -234,7 +234,7 @@ void MultiplayerGame::onObjectTransformChanged(const Object &object, const glm::
 bool MultiplayerGame::shouldSendObjectUpdates(uint32_t objectId) const {
     if (!_module || !_module->loaded()) return false;
 
-    shared_ptr<Object> player(_module->area().player());
+    shared_ptr<Object> player(_module->area()->player());
 
     switch (_mode) {
         case MultiplayerMode::Server:

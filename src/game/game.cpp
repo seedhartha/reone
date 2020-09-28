@@ -393,12 +393,12 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 
     _module->load(name, *ifo);
     _module->loadParty(party, entry);
-    _module->area().loadState(_state);
+    _module->area()->loadState(_state);
 
     if (_music) {
         _music->stop();
     }
-    string musicName(_module->area().music());
+    string musicName(_module->area()->music());
     if (!musicName.empty()) {
         _music = playMusic(musicName);
     }
@@ -420,7 +420,7 @@ void Game::loadHUD() {
 
         _hud->resetFocus();
 
-        shared_ptr<SpatialObject> player(_module->area().player());
+        shared_ptr<SpatialObject> player(_module->area()->player());
         _equipmentGui->open(player.get());
 
         _screen = Screen::Equipment;
@@ -440,7 +440,7 @@ void Game::loadDialogGui() {
     dialog->load(_version);
     dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
-        shared_ptr<Object> object(_module->area().find(tag));
+        shared_ptr<Object> object(_module->area()->find(tag));
         return object ? object->id() : 0;
     });
     dialog->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
@@ -453,7 +453,7 @@ void Game::loadContainerGui() {
     unique_ptr<ContainerGui> container(new ContainerGui(_options.graphics));
     container->load(_version);
     container->setOnGetItems([this]() {
-        shared_ptr<SpatialObject> player(_module->area().player());
+        shared_ptr<SpatialObject> player(_module->area()->player());
 
         SpatialObject &container = _containerGui->container();
         container.moveItemsTo(*player);
@@ -477,10 +477,10 @@ void Game::onDialogReplyPicked(uint32_t index) {
 }
 
 void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
-    shared_ptr<SpatialObject> player(_module->area().player());
-    shared_ptr<SpatialObject> partyLeader(_module->area().partyLeader());
-    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area().find(from) : nullptr;
-    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area().find(to) : nullptr;
+    shared_ptr<SpatialObject> player(_module->area()->player());
+    shared_ptr<SpatialObject> partyLeader(_module->area()->partyLeader());
+    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area()->find(from) : nullptr;
+    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area()->find(to) : nullptr;
     if (speaker == partyLeader) return;
 
     debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
@@ -570,46 +570,8 @@ bool Game::handle(const SDL_Event &event) {
     return false;
 }
 
-void Game::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
-    _module->area().delayCommand(timestamp, ctx);
-}
-
-Module *Game::getModule() {
-    return _module.get();
-}
-
-Area *Game::getArea() {
-    return &_module->area();
-}
-
-shared_ptr<Object> Game::getObjectById(uint32_t id) {
-    return _module->area().find(id);
-}
-
-shared_ptr<Object> Game::getObjectByTag(const string &tag, int nth) {
-    return _module->area().find(tag, nth);
-}
-
-shared_ptr<Object> Game::getWaypointByTag(const string &tag) {
-    return _module->area().find(tag);
-}
-
-shared_ptr<Object> Game::getPlayer() {
-    return _module->area().player();
-}
-
-int Game::eventUserDefined(int eventNumber) {
-    return _module->area().eventUserDefined(eventNumber);
-}
-
-void Game::signalEvent(uint32_t objectId, int eventId) {
-    assert(objectId >= 2);
-    Area &area = _module->area();
-    if (objectId != area.id()) {
-        warn("Game: event object is not an area");
-        return;
-    }
-    area.signalEvent(eventId);
+shared_ptr<Module> Game::module() const {
+    return _module;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

@@ -93,7 +93,6 @@ set(HEADERS
     src/game/objectcontainer.h
     src/game/paths.h
     src/game/room.h
-    src/game/script/callbacks.h
     src/game/script/routines.h
     src/game/script/util.h
     src/game/types.h
