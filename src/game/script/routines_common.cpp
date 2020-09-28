@@ -36,12 +36,10 @@ namespace reone {
 namespace game {
 
 Variable RoutineManager::random(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Int);
     return reone::random(0, args[0].intValue - 1);
 }
 
 Variable RoutineManager::intToFloat(const vector<Variable> & args, ExecutionContext & ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Int);
     return static_cast<float>(args[0].intValue);
 }
 
@@ -52,14 +50,11 @@ Variable RoutineManager::getEnteringObject(const vector<Variable> &args, Executi
 }
 
 Variable RoutineManager::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
     shared_ptr<Object> player(_game->module()->area()->player());
-
     return Variable(args[0].objectId == player->id());
 }
 
 Variable RoutineManager::getIsObjectValid(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
     return Variable(args[0].objectId != kObjectInvalid);
 }
 
@@ -73,11 +68,6 @@ Variable RoutineManager::getFirstPC(const vector<Variable> &args, ExecutionConte
 }
 
 Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        !args.empty() &&
-        args[0].type == VariableType::String &&
-        (args.size() < 2 || args[1].type == VariableType::Int));
-
     string tag(args[0].strValue);
     if (tag.empty()) {
         tag = "party-leader";
@@ -92,7 +82,6 @@ Variable RoutineManager::getObjectByTag(const vector<Variable> &args, ExecutionC
 }
 
 Variable RoutineManager::getWaypointByTag(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::String);
     shared_ptr<Object> object(_game->module()->area()->find(args[0].strValue));
 
     Variable result(VariableType::Object);
@@ -102,11 +91,6 @@ Variable RoutineManager::getWaypointByTag(const vector<Variable> &args, Executio
 }
 
 Variable RoutineManager::getLevelByClass(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        !args.empty() &&
-        args[0].type == VariableType::Int &&
-        args[1].type == VariableType::Object);
-
     ClassType clazz = static_cast<ClassType>(args[0].intValue);
 
     int objectId = args.size() < 2 ? kObjectSelf : args[1].objectId;
@@ -122,8 +106,6 @@ Variable RoutineManager::getLevelByClass(const vector<Variable> &args, Execution
 }
 
 Variable RoutineManager::getGender(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
-
     int objectId = args[0].objectId;
     shared_ptr<Object> object(getObjectById(objectId, ctx));
     Creature &creature = static_cast<Creature &>(*object);
@@ -132,8 +114,6 @@ Variable RoutineManager::getGender(const vector<Variable> &args, ExecutionContex
 }
 
 Variable RoutineManager::getArea(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
-
     Variable result(VariableType::Object);
     result.objectId = _game->module()->area()->id();
 
@@ -141,8 +121,6 @@ Variable RoutineManager::getArea(const vector<Variable> &args, ExecutionContext 
 }
 
 Variable RoutineManager::getItemInSlot(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Int);
-
     uint32_t objectId(args.size() > 1 ? args[1].objectId : kObjectSelf);
     shared_ptr<Object> object(getObjectById(objectId, ctx));
     shared_ptr<Object> item;
@@ -158,85 +136,42 @@ Variable RoutineManager::getItemInSlot(const vector<Variable> &args, ExecutionCo
 }
 
 Variable RoutineManager::getGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::String);
     return _game->getGlobalBoolean(args[0].strValue);
 }
 
 Variable RoutineManager::getGlobalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::String);
     return _game->getGlobalNumber(args[0].strValue);
 }
 
 Variable RoutineManager::getLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Int);
-
     return _game->getLocalBoolean(args[0].objectId, args[1].intValue);
 }
 
 Variable RoutineManager::getLocalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Int);
-
     return _game->getLocalNumber(args[0].objectId, args[1].intValue);
 }
 
 Variable RoutineManager::setGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::String &&
-        args[1].type == VariableType::Int);
-
     _game->setGlobalBoolean(args[0].strValue, args[1].intValue);
-
     return Variable();
 }
 
 Variable RoutineManager::setGlobalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::String &&
-        args[1].type == VariableType::Int);
-
     _game->setGlobalNumber(args[0].strValue, args[1].intValue);
-
     return Variable();
 }
 
 Variable RoutineManager::setLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 3 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Int && args[1].intValue >= 0 && args[1].intValue <= 63 &&
-        args[2].type == VariableType::Int);
-
     _game->setLocalBoolean(args[0].objectId, args[1].intValue, args[2].intValue);
-
     return Variable();
 }
 
 Variable RoutineManager::setLocalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 3 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Int &&
-        args[2].type == VariableType::Int);
-
     _game->setLocalNumber(args[0].objectId, args[1].intValue, args[2].intValue);
-
     return Variable();
 }
 
 Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::Float &&
-        args[1].type == VariableType::Action);
-
     uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
     _game->module()->area()->delayCommand(timestamp, args[1].context);
 
@@ -244,11 +179,6 @@ Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionCon
 }
 
 Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Action);
-
     ExecutionContext newCtx(args[1].context);
     newCtx.callerId = args[0].objectId;
     newCtx.triggererId = kObjectInvalid;
@@ -259,8 +189,6 @@ Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionCo
 }
 
 Variable RoutineManager::eventUserDefined(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Int);
-
     Variable result(VariableType::Event);
     result.engineTypeId = _game->module()->area()->eventUserDefined(args[0].intValue);
 
@@ -268,11 +196,6 @@ Variable RoutineManager::eventUserDefined(const vector<Variable> &args, Executio
 }
 
 Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        args.size() == 2 &&
-        args[0].type == VariableType::Object &&
-        args[1].type == VariableType::Event);
-
     shared_ptr<Object> subject(getObjectById(args[0].objectId, ctx));
     if (subject) {
         if (subject->type() == ObjectType::Area) {
@@ -288,13 +211,10 @@ Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionCont
 }
 
 Variable RoutineManager::getUserDefinedEventNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(args.empty());
     return ctx.userDefinedEventNumber;
 }
 
 Variable RoutineManager::actionDoCommand(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Action);
-
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     Creature *creature = dynamic_cast<Creature *>(subject.get());
     if (creature) {
@@ -306,16 +226,12 @@ Variable RoutineManager::actionDoCommand(const vector<Variable> &args, Execution
 }
 
 Variable RoutineManager::actionMoveToObject(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(
-        !args.empty() && args[0].type == VariableType::Object &&
-        (args.size() < 2 || args[1].type == VariableType::Int) &&
-        (args.size() < 3 || args[2].type == VariableType::Float));
-
     int objectId = args[0].objectId;
     float distance = args.size() >= 2 ? args[2].floatValue : 1.0f;
 
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     shared_ptr<Object> object(getObjectById(objectId, ctx));
+
     if (subject) {
         Creature &creature = static_cast<Creature &>(*subject);
         Creature::Action action(Creature::ActionType::MoveToPoint, object, distance);
@@ -328,8 +244,6 @@ Variable RoutineManager::actionMoveToObject(const vector<Variable> &args, Execut
 }
 
 Variable RoutineManager::actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
-
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     Creature *creature = dynamic_cast<Creature *>(subject ? subject.get() : nullptr);
 
@@ -351,8 +265,6 @@ Variable RoutineManager::actionStartConversation(const vector<Variable> &args, E
 }
 
 Variable RoutineManager::actionPauseConversation(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(args.empty());
-
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     Creature *creature = dynamic_cast<Creature *>(subject ? subject.get() : nullptr);
 
@@ -367,8 +279,6 @@ Variable RoutineManager::actionPauseConversation(const vector<Variable> &args, E
 }
 
 Variable RoutineManager::actionResumeConversation(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(args.empty());
-
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     Creature *creature = dynamic_cast<Creature *>(subject ? subject.get() : nullptr);
 
@@ -383,11 +293,10 @@ Variable RoutineManager::actionResumeConversation(const vector<Variable> &args, 
 }
 
 Variable RoutineManager::actionOpenDoor(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
-
     int objectId = args[0].objectId;
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     shared_ptr<Object> object(getObjectById(objectId, ctx));
+
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
@@ -406,11 +315,10 @@ Variable RoutineManager::actionOpenDoor(const vector<Variable> &args, ExecutionC
 }
 
 Variable RoutineManager::actionCloseDoor(const vector<Variable> &args, ExecutionContext &ctx) {
-    assert(!args.empty() && args[0].type == VariableType::Object);
-
     int objectId = args[0].objectId;
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     shared_ptr<Object> object(getObjectById(objectId, ctx));
+
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {

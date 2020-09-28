@@ -101,6 +101,7 @@ int ScriptExecution::run() {
     while (insOff < _program->length()) {
         const Instruction &ins = _program->getInstruction(insOff);
         auto handler = _handlers.find(ins.byteCode);
+
         if (handler == _handlers.end()) {
             warn("Script: not implemented: " + describeByteCode(ins.byteCode));
             return -1;
@@ -170,8 +171,6 @@ void ScriptExecution::executeReserve(const Instruction &ins) {
 
 void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
     int count = ins.size / 4;
-    assert(count == 1);
-
     int srcIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
     for (int i = 0; i < count; ++i) {
@@ -197,16 +196,22 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             _stack.push_back(ins.strValue);
             break;
         default:
-            throw logic_error("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
+            throw invalid_argument("Script: invalid instruction type: " + to_string(static_cast<int>(ins.type)));
     }
 }
 
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     const Routine &routine = _context.routines->get(ins.routine);
+
+    if (ins.argCount > routine.argumentCount()) {
+        throw runtime_error("Script: too many routine arguments");
+    }
     vector<Variable> args;
 
     for (int i = 0; i < ins.argCount; ++i) {
-        switch (routine.argumentType(i)) {
+        VariableType type = routine.argumentType(i);
+
+        switch (type) {
             case VariableType::Vector:
                 args.push_back(getVectorFromStack());
                 break;
@@ -217,19 +222,22 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
                 args.push_back(ctx);
                 break;
             }
-
             default:
-                args.push_back(_stack.back());
+                Variable var(_stack.back());
+
+                if (var.type != type) {
+                    throw runtime_error("Script: invalid argument variable type");
+                }
+                args.push_back(move(var));
                 _stack.pop_back();
                 break;
         }
     }
-
     Variable retValue = routine.invoke(args, _context);
+
     if (getDebugLevel() >= 2) {
         debug(boost::format("Script: %s -> %s") % routine.name() % retValue.toString(), 2);
     }
-
     switch (routine.returnType()) {
         case VariableType::Void:
             break;
@@ -254,7 +262,10 @@ Variable ScriptExecution::getVectorFromStack() {
 
 Variable ScriptExecution::getFloatFromStack() {
     Variable var(_stack.back());
-    assert(var.type == VariableType::Float);
+
+    if (var.type != VariableType::Float) {
+        throw runtime_error("Script: invalid variable type for a vector component");
+    }
     _stack.pop_back();
 
     return move(var);
