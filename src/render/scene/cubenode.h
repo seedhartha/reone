@@ -25,7 +25,7 @@ namespace render {
 
 class CubeSceneNode : public SceneNode {
 public:
-    CubeSceneNode(float size);
+    CubeSceneNode(SceneGraph *sceneGraph, float size);
 
     void render() const override;
 

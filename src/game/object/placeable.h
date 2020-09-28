@@ -33,7 +33,7 @@ class ObjectFactory;
 
 class Placeable : public SpatialObject {
 public:
-    Placeable(uint32_t id, ObjectFactory *objectFactory);
+    Placeable(uint32_t id, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph);
 
     void load(const resources::GffStruct &gffs);
 

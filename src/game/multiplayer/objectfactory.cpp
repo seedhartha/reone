@@ -33,22 +33,23 @@ namespace game {
 MultiplayerObjectFactory::MultiplayerObjectFactory(
     GameVersion version,
     MultiplayerMode mode,
+    render::SceneGraph *sceneGraph,
     IMultiplayerCallbacks *callbacks,
     const Options &opts
 ) :
-    ObjectFactory(version, opts), _mode(mode), _callbacks(callbacks) {
+    ObjectFactory(version, sceneGraph, opts), _mode(mode), _callbacks(callbacks) {
 }
 
 unique_ptr<Area> MultiplayerObjectFactory::newArea() {
-    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _callbacks);
+    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _sceneGraph, _callbacks);
 }
 
 unique_ptr<Creature> MultiplayerObjectFactory::newCreature() {
-    return make_unique<MultiplayerCreature>(_counter++, this, _callbacks);
+    return make_unique<MultiplayerCreature>(_counter++, this, _sceneGraph, _callbacks);
 }
 
 unique_ptr<Door> MultiplayerObjectFactory::newDoor() {
-    return make_unique<MultiplayerDoor>(_counter++, _callbacks);
+    return make_unique<MultiplayerDoor>(_counter++, _sceneGraph, _callbacks);
 }
 
 } // namespace game

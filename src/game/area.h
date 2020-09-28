@@ -22,6 +22,7 @@
 #include "../gui/types.h"
 #include "../net/types.h"
 #include "../render/camera/camera.h"
+#include "../render/scene/scenegraph.h"
 #include "../render/types.h"
 #include "../resources/types.h"
 #include "../script/variable.h"
@@ -47,7 +48,8 @@ public:
     Area(
         uint32_t id,
         resources::GameVersion version,
-        ObjectFactory *objectFactory);
+        ObjectFactory *objectFactory,
+        render::SceneGraph *sceneGraph);
 
     void load(const std::string &name, const resources::GffStruct &are, const resources::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
@@ -96,6 +98,7 @@ public:
 
 protected:
     ObjectFactory *_objectFactory { nullptr };
+    render::SceneGraph *_sceneGraph { nullptr };
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
 

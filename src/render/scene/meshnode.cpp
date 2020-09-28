@@ -31,16 +31,17 @@ namespace reone {
 
 namespace render {
 
-MeshSceneNode::MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode) : _model(model), _modelNode(modelNode) {
+MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *model, const ModelNode *modelNode) :
+    SceneNode(sceneGraph), _model(model), _modelNode(modelNode) {
+
     assert(_model && _modelNode);
 }
 
 void MeshSceneNode::fillSceneGraph() {
-    SceneGraph &scene = TheSceneGraph;
     if (isTransparent()) {
-        scene.addTransparentMesh(this);
+        _sceneGraph->addTransparentMesh(this);
     } else {
-        scene.addOpaqueMesh(this);
+        _sceneGraph->addOpaqueMesh(this);
     }
     SceneNode::fillSceneGraph();
 }
@@ -128,7 +129,7 @@ void MeshSceneNode::render() const {
 
         shaders.setUniform("lightingEnabled", true);
         shaders.setUniform("lightCount", lightCount);
-        shaders.setUniform("ambientLightColor", TheSceneGraph.ambientLightColor());
+        shaders.setUniform("ambientLightColor", _sceneGraph->ambientLightColor());
 
         for (int i = 0; i < lightCount; ++i) {
             LightSceneNode *light = lights[i];

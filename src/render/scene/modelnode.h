@@ -49,7 +49,7 @@ public:
         std::unordered_map<uint16_t, glm::mat4> boneTransforms;
     };
 
-    ModelSceneNode(const std::shared_ptr<Model> &model);
+    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<Model> &model);
 
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void update(float dt);

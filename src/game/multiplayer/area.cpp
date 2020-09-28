@@ -34,9 +34,10 @@ MultiplayerArea::MultiplayerArea(
     GameVersion version,
     MultiplayerMode mode,
     ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
     IMultiplayerCallbacks *callbacks
 ) :
-    Area(id, version, objectFactory), _callbacks(callbacks) {
+    Area(id, version, objectFactory, sceneGraph), _callbacks(callbacks) {
 
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }
@@ -75,7 +76,7 @@ void MultiplayerArea::execute(const Command &cmd) {
     }
 }
 void MultiplayerArea::executeLoadCreature(const Command &cmd) {
-    shared_ptr<Creature> creature(new MultiplayerCreature(cmd.objectId(), _objectFactory, _callbacks));
+    shared_ptr<Creature> creature(new MultiplayerCreature(cmd.objectId(), _objectFactory, _sceneGraph, _callbacks));
     creature->setTag(cmd.tag());
 
     for (auto &item : cmd.equipment()) {

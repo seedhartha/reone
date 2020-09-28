@@ -42,7 +42,7 @@ MultiplayerGame::MultiplayerGame(MultiplayerMode mode, const fs::path &path, con
 }
 
 void MultiplayerGame::initObjectFactory() {
-    _objectFactory = unique_ptr<ObjectFactory>(new MultiplayerObjectFactory(_version, _mode, this, _options));
+    _objectFactory = unique_ptr<ObjectFactory>(new MultiplayerObjectFactory(_version, _mode, &_sceneGraph, this, _options));
 }
 
 void MultiplayerGame::configure() {

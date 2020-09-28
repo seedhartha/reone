@@ -33,6 +33,7 @@ public:
         resources::GameVersion version,
         MultiplayerMode mode,
         ObjectFactory *objectFactory,
+        render::SceneGraph *sceneGraph,
         IMultiplayerCallbacks *callbacks);
 
     void execute(const Command &cmd);

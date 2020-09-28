@@ -21,13 +21,14 @@
 
 #include "glm/glm.hpp"
 
+using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-Waypoint::Waypoint(uint32_t id) : SpatialObject(id, ObjectType::Waypoint) {
+Waypoint::Waypoint(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Waypoint, sceneGraph) {
 }
 
 void Waypoint::load(const GffStruct &gffs) {

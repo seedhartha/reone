@@ -20,6 +20,7 @@
 #include "../audio/soundinstance.h"
 #include "../audio/types.h"
 #include "../gui/gui.h"
+#include "../render/scene/scenegraph.h"
 #include "../render/window.h"
 #include "../resources/types.h"
 
@@ -87,6 +88,7 @@ protected:
     Options _options;
     resources::GameVersion _version { resources::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
+    render::SceneGraph _sceneGraph;
     std::shared_ptr<Module> _module;
     std::string _nextModule;
     Screen _screen { Screen::MainMenu };

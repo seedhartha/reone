@@ -31,7 +31,7 @@ namespace render {
 
 class SceneGraph {
 public:
-    static SceneGraph &instance();
+    SceneGraph() = default;
 
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
@@ -54,12 +54,9 @@ private:
     std::vector<LightSceneNode *> _lights;
     glm::vec3 _ambientLightColor { 1.0f };
 
-    SceneGraph() = default;
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 };
-
-#define TheSceneGraph render::SceneGraph::instance()
 
 } // namespace render
 

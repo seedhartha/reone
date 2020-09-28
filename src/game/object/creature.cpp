@@ -63,8 +63,8 @@ Creature::Action::Action(ActionType type, const shared_ptr<Object> &object, floa
 Creature::Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
 }
 
-Creature::Creature(uint32_t id, ObjectFactory *objectFactory) :
-    SpatialObject(id, ObjectType::Creature), _objectFactory(objectFactory) {
+Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
 
     assert(_objectFactory);
     _drawDistance = 2048.0f;
@@ -130,7 +130,7 @@ void Creature::updateAppearance() {
     // Body
 
     if (!_model) {
-        _model = make_unique<ModelSceneNode>(Resources.findModel(bodyModelName));
+        _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(bodyModelName));
         _model->setLightingEnabled(true);
     } else {
         _model->setModel(Resources.findModel(bodyModelName));

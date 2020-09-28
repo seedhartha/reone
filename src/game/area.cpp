@@ -66,10 +66,11 @@ static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(uint32_t id, GameVersion version, ObjectFactory *objectFactory) :
+Area::Area(uint32_t id, GameVersion version, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
     Object(id, ObjectType::Area),
     _version(version),
     _objectFactory(objectFactory),
+    _sceneGraph(sceneGraph),
     _navMesh(new NavMesh()) {
 
     assert(_objectFactory);
@@ -87,17 +88,16 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     ResourceManager &resources = Resources;
-    SceneGraph &scene = TheSceneGraph;
 
     LytFile lyt;
     lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(resources.findModel(lytRoom.name)));
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, resources.findModel(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->animate("animloop1", kAnimationLoop);
 
-        scene.addRoot(model);
+        _sceneGraph->addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
@@ -134,10 +134,10 @@ void Area::loadPTH() {
         }
         pointZ.insert(make_pair(i, z));
 
-        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(0.5f));
+        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(_sceneGraph, 0.5f));
         aabb->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(point.x, point.y, z + 0.25f)));
 
-        TheSceneGraph.addRoot(aabb);
+        _sceneGraph->addRoot(aabb);
     }
 
     _navMesh->load(paths, pointZ);
@@ -167,7 +167,8 @@ void Area::loadAmbientColor(const GffStruct &are) {
         (ambientColorValue >> 16) & 0xff);
 
     ambientColor /= 255.0f;
-    TheSceneGraph.setAmbientLightColor(ambientColor);
+
+    _sceneGraph->setAmbientLightColor(ambientColor);
 }
 
 void Area::loadScripts(const GffStruct &are) {
@@ -248,7 +249,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     shared_ptr<ModelSceneNode> sceneNode(object->model());
 
     if (sceneNode) {
-        TheSceneGraph.addRoot(sceneNode);
+        _sceneGraph->addRoot(sceneNode);
     }
     determineObjectRoom(*object);
 }
@@ -427,7 +428,7 @@ void Area::update(const UpdateContext &updateCtx) {
 
     updateSelection();
 
-    TheSceneGraph.prepare(updateCtx.cameraPosition);
+    _sceneGraph->prepare(updateCtx.cameraPosition);
 }
 
 void Area::updateDelayedCommands() {
