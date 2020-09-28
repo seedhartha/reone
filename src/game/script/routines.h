@@ -117,7 +117,7 @@ private:
     // END Actions
 };
 
-#define RoutineMan RoutineManager::instance()
+#define Routines RoutineManager::instance()
 
 } // namespace game
 

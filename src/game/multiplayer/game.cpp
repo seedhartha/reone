@@ -42,7 +42,7 @@ MultiplayerGame::MultiplayerGame(MultiplayerMode mode, const fs::path &path, con
 }
 
 void MultiplayerGame::initObjectFactory() {
-    _objectFactory = unique_ptr<ObjectFactory>(new MultiplayerObjectFactory(_version, _mode, this, _opts));
+    _objectFactory = unique_ptr<ObjectFactory>(new MultiplayerObjectFactory(_version, _mode, this, _options));
 }
 
 void MultiplayerGame::configure() {
@@ -52,14 +52,14 @@ void MultiplayerGame::configure() {
             _server->setOnClientConnected(bind(&MultiplayerGame::onClientConnected, this, _1));
             _server->setOnClientDisconnected(bind(&MultiplayerGame::onClientDisconnected, this, _1));
             _server->setOnCommandReceived(bind(&MultiplayerGame::onCommandReceived, this, _2));
-            _server->start(_opts.network.port);
+            _server->start(_options.network.port);
             Game::configure();
             break;
 
         case MultiplayerMode::Client:
             _client.reset(new Client());
             _client->setOnCommandReceived(bind(&MultiplayerGame::onCommandReceived, this, _1));
-            _client->start(_opts.network.host, _opts.network.port);
+            _client->start(_options.network.host, _options.network.port);
             break;
 
         default:

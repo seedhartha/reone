@@ -28,7 +28,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath) {
+fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath, bool logNotFound) {
     vector<string> tokens;
     boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
 
@@ -45,8 +45,9 @@ fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath) {
             return getPathIgnoreCase(entry.path(), relPath2);
         }
     }
-
-    debug(boost::format("Path not found: %s %s") % basePath % relPath);
+    if (logNotFound) {
+        debug(boost::format("Path not found: %s %s") % basePath % relPath);
+    }
 
     return "";
 }

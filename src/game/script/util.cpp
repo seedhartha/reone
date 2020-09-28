@@ -39,7 +39,7 @@ int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int
 
 int runScript(const std::shared_ptr<ScriptProgram> &program, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
     ExecutionContext ctx;
-    ctx.routines = &RoutineMan;
+    ctx.routines = &Routines;
     ctx.callerId = callerId;
     ctx.triggererId = triggererId;
     ctx.userDefinedEventNumber = userDefinedEventNumber;

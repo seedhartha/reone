@@ -101,12 +101,12 @@ protected:
         Equipment
     };
 
+    Options _options;
     resources::GameVersion _version { resources::GameVersion::KotOR };
-    Options _opts;
     std::unique_ptr<ObjectFactory> _objectFactory;
     std::shared_ptr<Module> _module;
     std::string _nextModule;
-    Screen _screen { Screen::None };
+    Screen _screen { Screen::MainMenu };
     std::shared_ptr<DialogGui> _dialogGui;
     bool _pickDialogReplyEnabled { true };
 
@@ -130,6 +130,7 @@ private:
     Console _console;
 
     // GUI
+
     std::shared_ptr<MainMenu> _mainMenu;
     std::shared_ptr<ClassSelectionGui> _classesGui;
     std::shared_ptr<PortraitSelectionGui> _portraitsGui;
@@ -139,12 +140,26 @@ private:
     std::shared_ptr<EquipmentGui> _equipmentGui;
     std::shared_ptr<TargetOverlay> _targetOverlay;
 
+    // END GUI
+
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
+    void runMainLoop();
+    std::shared_ptr<gui::GUI> currentGUI() const;
+    float getDeltaTime();
+    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
+
+    // Initialization
+
     void initGameVersion();
+    void initSubsystems();
+    void deinitSubsystems();
+
+    // END Initialization
 
     // Loading
+
     void loadMainMenu();
     void loadClassSelectionGui();
     void loadPortraitsGui();
@@ -156,17 +171,17 @@ private:
     void loadEquipmentGui();
     void loadTargetOverlay();
 
+    // END Loading
+
     // Rendering
+
+    void drawAll();
     void drawWorld();
     void drawGUI();
     void drawGUI3D();
     void drawCursor();
 
-    void runMainLoop();
-    std::shared_ptr<gui::GUI> currentGUI() const;
-    float getDeltaTime();
-
-    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
+    // END Rendering
 };
 
 } // namespace game
