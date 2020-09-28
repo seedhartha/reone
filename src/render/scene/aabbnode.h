@@ -27,7 +27,7 @@ namespace render {
 
 class AABBSceneNode : public SceneNode {
 public:
-    AABBSceneNode(const AABB &abbb);
+    AABBSceneNode(SceneGraph *sceneGraph, const AABB &abbb);
 
     void render() const override;
 

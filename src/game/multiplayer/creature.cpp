@@ -21,12 +21,14 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
 namespace game {
 
-MultiplayerCreature::MultiplayerCreature(uint32_t id, ObjectFactory *objectFactory, IMultiplayerCallbacks *callbacks) :
-    Creature(id, objectFactory), _callbacks(callbacks) {
+MultiplayerCreature::MultiplayerCreature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks) :
+    Creature(id, objectFactory, sceneGraph), _callbacks(callbacks) {
 }
 
 void MultiplayerCreature::setClientTag(const string &clientTag) {

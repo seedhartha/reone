@@ -27,7 +27,7 @@ class ModelNode;
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(const ModelNode *modelNode);
+    LightSceneNode(SceneGraph *sceneGraph, const ModelNode *modelNode);
 
     void fillSceneGraph() override;
 

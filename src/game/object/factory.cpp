@@ -19,14 +19,15 @@
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-ObjectFactory::ObjectFactory(GameVersion version, const Options &opts) :
-    _version(version), _options(opts) {
+ObjectFactory::ObjectFactory(GameVersion version, SceneGraph *sceneGraph, const Options &opts) :
+    _version(version), _sceneGraph(sceneGraph), _options(opts) {
 }
 
 unique_ptr<Module> ObjectFactory::newModule() {
@@ -34,27 +35,27 @@ unique_ptr<Module> ObjectFactory::newModule() {
 }
 
 unique_ptr<Area> ObjectFactory::newArea() {
-    return make_unique<Area>(_counter++, _version, this);
+    return make_unique<Area>(_counter++, _version, this, _sceneGraph);
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {
-    return make_unique<Creature>(_counter++, this);
+    return make_unique<Creature>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return make_unique<Placeable>(_counter++, this);
+    return make_unique<Placeable>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<Door> ObjectFactory::newDoor() {
-    return make_unique<Door>(_counter++);
+    return make_unique<Door>(_counter++, _sceneGraph);
 }
 
 unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return make_unique<Waypoint>(_counter++);
+    return make_unique<Waypoint>(_counter++, _sceneGraph);
 }
 
 unique_ptr<Trigger> ObjectFactory::newTrigger() {
-    return make_unique<Trigger>(_counter++);
+    return make_unique<Trigger>(_counter++, _sceneGraph);
 }
 
 unique_ptr<Item> ObjectFactory::newItem() {

@@ -23,13 +23,14 @@
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resources;
 
 namespace reone {
 
 namespace game {
 
-Trigger::Trigger(uint32_t id) : SpatialObject(id, ObjectType::Trigger) {
+Trigger::Trigger(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Trigger, sceneGraph) {
 }
 
 void Trigger::load(const GffStruct &gffs) {

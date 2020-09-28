@@ -25,12 +25,12 @@ namespace reone {
 
 namespace render {
 
-LightSceneNode::LightSceneNode(const ModelNode *modelNode) : _modelNode(modelNode) {
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, const ModelNode *modelNode) : SceneNode(sceneGraph), _modelNode(modelNode) {
     assert(_modelNode);
 }
 
 void LightSceneNode::fillSceneGraph() {
-    TheSceneGraph.addLight(this);
+    _sceneGraph->addLight(this);
 }
 
 const ModelNode &LightSceneNode::modelNode() const {

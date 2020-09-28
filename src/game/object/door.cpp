@@ -34,7 +34,7 @@ namespace reone {
 
 namespace game {
 
-Door::Door(uint32_t id) : SpatialObject(id, ObjectType::Door) {
+Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Door, sceneGraph) {
     _drawDistance = FLT_MAX;
     _fadeDistance = 0.25f * _drawDistance;
     _selectable = true;
@@ -75,7 +75,7 @@ void Door::loadBlueprint(const string &resRef) {
     string model(table->getString(_blueprint->genericType(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(resources.findModel(model));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, resources.findModel(model));
     _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
 }
 

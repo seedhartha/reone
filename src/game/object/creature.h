@@ -71,7 +71,7 @@ public:
         int pointIdx { 0 };
     };
 
-    Creature(uint32_t id, ObjectFactory *objectFactory);
+    Creature(uint32_t id, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph);
 
     void load(const resources::GffStruct &gffs);
     void load(const CreatureConfiguration &config);

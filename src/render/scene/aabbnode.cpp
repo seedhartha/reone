@@ -27,7 +27,7 @@ namespace reone {
 
 namespace render {
 
-AABBSceneNode::AABBSceneNode(const AABB &aabb) : _aabb(aabb) {
+AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNode(sceneGraph), _aabb(aabb) {
 }
 
 void AABBSceneNode::render() const {

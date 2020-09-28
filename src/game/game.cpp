@@ -72,7 +72,7 @@ void Game::initGameVersion() {
 }
 
 void Game::initObjectFactory() {
-    _objectFactory = make_unique<ObjectFactory>(_version, _options);
+    _objectFactory = make_unique<ObjectFactory>(_version, &_sceneGraph, _options);
 }
 
 int Game::run() {
@@ -157,7 +157,7 @@ void Game::loadNextModule() {
     if (_module) {
         _module->saveTo(_state);
     }
-    TheSceneGraph.clear();
+    _sceneGraph.clear();
     loadModule(_nextModule, _state.party, _nextEntry);
 
     _nextModule.clear();
@@ -221,7 +221,7 @@ void Game::drawWorld() {
         case Screen::InGame:
         case Screen::Dialog:
         case Screen::Container:
-            TheSceneGraph.render();
+            _sceneGraph.render();
             break;
         default:
             break;

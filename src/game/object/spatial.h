@@ -72,6 +72,7 @@ public:
     // END Animation
 
 protected:
+    render::SceneGraph *_sceneGraph { nullptr };
     glm::vec3 _position { 0.0f };
     float _heading { 0.0f };
     glm::mat4 _transform { 1.0f };
@@ -83,7 +84,7 @@ protected:
     std::vector<std::shared_ptr<Item>> _items;
     bool _selectable { false };
 
-    SpatialObject(uint32_t id, ObjectType type);
+    SpatialObject(uint32_t id, ObjectType type, render::SceneGraph *sceneGraph);
 
     virtual void updateTransform();
 };

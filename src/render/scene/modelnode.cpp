@@ -40,7 +40,7 @@ namespace reone {
 
 namespace render {
 
-ModelSceneNode::ModelSceneNode(const shared_ptr<Model> &model) : _model(model) {
+ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model) : SceneNode(sceneGraph), _model(model) {
     assert(_model);
     initChildren();
 }
@@ -57,11 +57,11 @@ void ModelSceneNode::initChildren() {
             nodes.push(child.get());
         }
         if (shouldRender(*node)) {
-            shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(this, node));
+            shared_ptr<MeshSceneNode> mesh(new MeshSceneNode(_sceneGraph, this, node));
             mesh->setParent(this);
             mesh->setLocalTransform(node->absoluteTransform());
 
-            shared_ptr<AABBSceneNode> aabb(new AABBSceneNode(node->mesh()->aabb()));
+            shared_ptr<AABBSceneNode> aabb(new AABBSceneNode(_sceneGraph, node->mesh()->aabb()));
             mesh->addChild(aabb);
 
             _meshes.insert(make_pair(node->nodeNumber(), mesh));
@@ -69,7 +69,7 @@ void ModelSceneNode::initChildren() {
 
         shared_ptr<ModelNode::Light> modelLight(node->light());
         if (modelLight) {
-            shared_ptr<LightSceneNode> light(new LightSceneNode(node));
+            shared_ptr<LightSceneNode> light(new LightSceneNode(_sceneGraph, node));
             light->setParent(this);
             light->setLocalTransform(node->absoluteTransform());
 
@@ -144,7 +144,7 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
     }
 
     if (model) {
-        shared_ptr<ModelSceneNode> child(new ModelSceneNode(model));
+        shared_ptr<ModelSceneNode> child(new ModelSceneNode(_sceneGraph, model));
         child->setLocalTransform(parent->absoluteTransform());
         child->setLightingEnabled(_lightingEnabled);
         addChild(child);
@@ -319,7 +319,7 @@ void ModelSceneNode::updateLighting() {
     _lightsAffectedBy.clear();
     glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
 
-    TheSceneGraph.getLightsAt(center, _lightsAffectedBy);
+    _sceneGraph->getLightsAt(center, _lightsAffectedBy);
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {

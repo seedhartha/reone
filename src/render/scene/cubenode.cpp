@@ -27,7 +27,7 @@ namespace reone {
 
 namespace render {
 
-CubeSceneNode::CubeSceneNode(float size) : _size(size) {
+CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sceneGraph), _size(size) {
 }
 
 void CubeSceneNode::render() const {

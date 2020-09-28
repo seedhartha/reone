@@ -47,12 +47,13 @@ public:
     virtual void setLocalTransform(const glm::mat4 &transform);
 
 protected:
+    SceneGraph *_sceneGraph { nullptr };
     const SceneNode *_parent { nullptr };
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     std::vector<std::shared_ptr<SceneNode>> _children;
 
-    SceneNode() = default;
+    SceneNode(SceneGraph *sceneGraph);
 
     virtual void updateAbsoluteTransform();
 

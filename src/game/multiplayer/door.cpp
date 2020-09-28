@@ -21,11 +21,14 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
 namespace game {
 
-MultiplayerDoor::MultiplayerDoor(uint32_t id, IMultiplayerCallbacks *callbacks) : Door(id), _callbacks(callbacks) {
+MultiplayerDoor::MultiplayerDoor(uint32_t id, SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks) :
+    Door(id, sceneGraph), _callbacks(callbacks) {
 }
 
 void MultiplayerDoor::open(const shared_ptr<Object> &trigerrer) {

@@ -30,11 +30,6 @@ namespace render {
 
 static const int kMaxLightCount = 8;
 
-SceneGraph &SceneGraph::instance() {
-    static SceneGraph graph;
-    return graph;
-}
-
 void SceneGraph::clear() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();

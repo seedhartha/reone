@@ -29,6 +29,9 @@ namespace reone {
 
 namespace render {
 
+SceneNode::SceneNode(SceneGraph *sceneGraph) : _sceneGraph(sceneGraph) {
+}
+
 void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
     assert(node);
     node->setParent(this);

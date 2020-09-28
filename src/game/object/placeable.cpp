@@ -36,8 +36,8 @@ namespace reone {
 
 namespace game {
 
-Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory) :
-    SpatialObject(id, ObjectType::Placeable),
+Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Placeable, sceneGraph),
     _objectFactory(objectFactory) {
 
     assert(_objectFactory);
@@ -69,7 +69,7 @@ void Placeable::loadBlueprint(const string &resRef) {
     string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(Resources.findModel(model));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(model));
     _model->setLightingEnabled(true);
 
     _walkmesh = Resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);

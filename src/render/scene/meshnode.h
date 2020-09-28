@@ -32,7 +32,7 @@ class ModelSceneNode;
 
 class MeshSceneNode : public SceneNode {
 public:
-    MeshSceneNode(const ModelSceneNode *model, const ModelNode *modelNode);
+    MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *model, const ModelNode *modelNode);
 
     void fillSceneGraph() override;
     void updateDistanceToCamera(const glm::vec3 &cameraPosition);

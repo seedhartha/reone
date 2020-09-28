@@ -27,7 +27,7 @@ class IMultiplayerCallbacks;
 
 class MultiplayerDoor : public Door {
 public:
-    MultiplayerDoor(uint32_t id, IMultiplayerCallbacks *callbacks);
+    MultiplayerDoor(uint32_t id, render::SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks);
 
     void open(const std::shared_ptr<Object> &trigerrer) override;
 
