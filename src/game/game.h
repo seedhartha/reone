@@ -42,14 +42,15 @@ namespace reone {
 namespace game {
 
 /**
- * Entry point for the game logic. Contains the main game loop.
+ * Entry point for the game logic. Delegates work to instances of `Module` and
+ * `GUI`. Contains the main game loop.
+ *
+ * @see game::Module
+ * @see gui::GUI
  */
 class Game : public render::IEventHandler, public IRoutineCallbacks {
 public:
-    Game(
-        resources::GameVersion version,
-        const boost::filesystem::path &path,
-        const Options &opts);
+    Game(const boost::filesystem::path &path, const Options &opts);
 
     int run();
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
@@ -140,6 +141,8 @@ private:
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
+
+    void initGameVersion();
 
     // Loading
     void loadMainMenu();

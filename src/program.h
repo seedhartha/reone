@@ -28,7 +28,8 @@
 namespace reone {
 
 /**
- * Encapsulates program-level logic (i.e., option management). Launches a game.
+ * Encapsulates the program-level logic (i.e., option management). Starts a
+ * `Game` instance.
  *
  * @see game::Game
  */
@@ -39,23 +40,31 @@ public:
     int run();
 
 private:
+    bool _showHelp { false };
+    boost::filesystem::path _gamePath;
+    game::Options _gameOpts;
+    game::MultiplayerMode _multiplayerMode { game::MultiplayerMode::None };
+
+    // Command line arguments
+
     int _argc { 0 };
     char **_argv { nullptr };
+
+    // END Command line arguments
+
+    // Intermediate options
+
     boost::program_options::options_description _commonOpts;
     boost::program_options::options_description _cmdLineOpts { "Usage" };
     boost::program_options::variables_map _vars;
-    bool _help { false };
-    boost::filesystem::path _gamePath;
-    game::Options _gameOpts;
-    resources::GameVersion _gameVersion { resources::GameVersion::KotOR };
-    game::MultiplayerMode _multiplayerMode { game::MultiplayerMode::None };
+
+    // END Intermediate options
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
     void loadOptions();
-    void initGameVersion();
-    void initMultiplayerMode();
+    void applyOptions();
     int runGame();
 };
 

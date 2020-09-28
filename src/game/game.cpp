@@ -24,6 +24,7 @@
 #include "../audio/player.h"
 #include "../core/jobs.h"
 #include "../core/log.h"
+#include "../core/pathutil.h"
 #include "../core/streamutil.h"
 #include "../render/scene/scenegraph.h"
 #include "../resources/resources.h"
@@ -55,14 +56,19 @@ static const int kAppearanceDarthRevan = 22;
 static const int kAppearanceAtton = 452;
 static const int kAppearanceKreia = 455;
 
-Game::Game(GameVersion version, const fs::path &path, const Options &opts) :
-    _version(version),
+Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _opts(opts),
     _window(opts.graphics, this),
     _console(opts.graphics) {
 
+    initGameVersion();
     initObjectFactory();
+}
+
+void Game::initGameVersion() {
+    fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe"));
+    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
 }
 
 void Game::initObjectFactory() {
