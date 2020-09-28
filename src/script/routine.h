@@ -36,6 +36,7 @@ public:
 
     const std::string &name() const;
     VariableType returnType() const;
+    int argumentCount() const;
     VariableType argumentType(int index) const;
 
 private:

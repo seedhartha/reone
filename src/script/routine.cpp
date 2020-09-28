@@ -61,6 +61,10 @@ VariableType Routine::returnType() const {
     return _returnType;
 }
 
+int Routine::argumentCount() const {
+    return static_cast<int>(_argumentTypes.size());
+}
+
 VariableType Routine::argumentType(int index) const {
     assert(index >= 0 && index < _argumentTypes.size());
     return _argumentTypes[index];
