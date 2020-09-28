@@ -181,19 +181,25 @@ void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType 
     creature->load(randomCharacter(gender, clazz));
 
     int frameHeight = _defaultButtonSize.y;
-    int x = extent.left + extent.width / 2;
-    int y = extent.top + (extent.height + frameHeight) / 2 - 12;
+    int x = extent.width / 2;
+    int y = (extent.height + frameHeight) / 2 - 12;
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
     transform = glm::scale(transform, glm::vec3(frameHeight / 2.0f));
 
-    Control::Scene3D scene;
-    scene.model = creature->model();
-    scene.transform = move(transform);
+    shared_ptr<ModelSceneNode> model(creature->model());
+    model->setLocalTransform(transform);
 
-    control.setScene3D(scene);
+    unique_ptr<Framebuffer> framebuffer(new Framebuffer(extent.width, extent.height));
+    framebuffer->init();
+
+    Control::Scene3D scene;
+    scene.model = model;
+    scene.framebuffer = move(framebuffer);
+
+    control.setScene3D(move(scene));
 }
 
 void ClassSelectionGui::onFocusChanged(const string &control, bool focus) {

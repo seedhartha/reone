@@ -53,6 +53,7 @@ private:
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
     glm::vec3 _ambientLightColor { 1.0f };
+    uint32_t _textureId { 0 };
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

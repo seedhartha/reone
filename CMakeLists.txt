@@ -116,6 +116,7 @@ set(HEADERS
     src/render/camera/firstperson.h
     src/render/camera/thirdperson.h
     src/render/font.h
+    src/render/framebuffer.h
     src/render/fps.h
     src/render/mesh/aabb.h
     src/render/mesh/cube.h
@@ -246,6 +247,7 @@ set(SOURCES
     src/render/camera/firstperson.cpp
     src/render/camera/thirdperson.cpp
     src/render/font.cpp
+    src/render/framebuffer.cpp
     src/render/fps.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/cube.cpp

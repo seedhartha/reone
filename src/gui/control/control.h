@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 
@@ -24,6 +25,7 @@
 #include "glm/vec3.hpp"
 
 #include "../../render/font.h"
+#include "../../render/framebuffer.h"
 #include "../../render/scene/modelnode.h"
 #include "../../render/texture.h"
 #include "../../resources/gfffile.h"
@@ -74,7 +76,7 @@ public:
 
     struct Scene3D {
         std::shared_ptr<render::ModelSceneNode> model;
-        glm::mat4 transform { 1.0f };
+        std::unique_ptr<render::Framebuffer> framebuffer;
     };
 
     static ControlType getType(const resources::GffStruct &gffs);
@@ -112,7 +114,7 @@ public:
     void setHilight(const Border &hilight);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
-    void setScene3D(const Scene3D &scene);
+    void setScene3D(Scene3D scene);
     void setPadding(int padding);
 
     void setOnClick(const std::function<void(const std::string &)> &fn);

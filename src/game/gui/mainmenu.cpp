@@ -35,7 +35,9 @@ namespace reone {
 
 namespace game {
 
-MainMenu::MainMenu(const Options &opts) : GUI(opts.graphics), _opts(opts) {
+MainMenu::MainMenu(SceneGraph *sceneGraph, const Options &opts) :
+    GUI(opts.graphics), _sceneGraph(sceneGraph), _opts(opts) {
+
     _resolutionX = 800;
     _resolutionY = 600;
 }
@@ -80,14 +82,19 @@ void MainMenu::load(GameVersion version) {
         transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
         transform = glm::scale(transform, glm::vec3(scale));
 
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, Resources.findModel("mainmenu")));
+        model->setLocalTransform(transform);
+        model->setDefaultAnimation("default");
+        model->playDefaultAnimation();
+
+        unique_ptr<Framebuffer> framebuffer(new Framebuffer(extent.width, extent.height));
+        framebuffer->init();
+
         Control::Scene3D scene;
-        scene.model = make_shared<ModelSceneNode>(nullptr, Resources.findModel("mainmenu"));
-        scene.transform = move(transform);
+        scene.model = move(model);
+        scene.framebuffer = move(framebuffer);
 
-        control.setScene3D(scene);
-
-        scene.model->setDefaultAnimation("default");
-        scene.model->playDefaultAnimation();
+        control.setScene3D(move(scene));
     }
 }
 
