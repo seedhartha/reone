@@ -17,6 +17,7 @@
 
 #include "area.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include <boost/algorithm/string.hpp>
@@ -57,9 +58,9 @@ namespace game {
 
 static const float kDrawDebugDistance = 64.0f;
 static const float kPartyMemberFollowDistance = 4.0f;
-
 static const float kMaxDistanceToTestCollision = 64.0f;
 static const float kElevationTestRadius = 1024.0f;
+static const float kSelectionDistance = 64.0f;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
@@ -309,23 +310,95 @@ shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character,
 }
 
 bool Area::handle(const SDL_Event &event) {
+    switch (event.type) {
+        case SDL_KEYDOWN:
+            return handleKeyDown(event.key);
+        case SDL_KEYUP:
+            return handleKeyUp(event.key);
+    }
+
     return false;
 }
 
-void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
+bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
+    switch (event.keysym.scancode) {
+        case SDL_SCANCODE_Q:
+            selectNextObject(true);
+            return true;
+
+        case SDL_SCANCODE_E:
+            selectNextObject();
+            return true;
+    }
+
+    return false;
+}
+
+void Area::selectNextObject(bool reverse) {
+    static vector<uint32_t> selectables;
+
+    selectables.clear();
+    getSelectableObjects(selectables);
+
+    if (selectables.empty()) {
+        _selectedObjectId = -1;
+        return;
+    }
+    if (_selectedObjectId == -1) {
+        _selectedObjectId = selectables.front();
+        return;
+    }
+    if (reverse) {
+        auto selected = std::find(selectables.rbegin(), selectables.rend(), _selectedObjectId);
+        if (selected != selectables.rend()) {
+            selected++;
+        }
+        _selectedObjectId = selected != selectables.rend() ? *selected : selectables.back();
+
+    } else {
+        auto selected = std::find(selectables.begin(), selectables.end(), _selectedObjectId);
+        if (selected != selectables.end()) {
+            selected++;
+        }
+        _selectedObjectId = selected != selectables.end() ? *selected : selectables.front();
+    }
+}
+
+void Area::getSelectableObjects(vector<uint32_t> &ids) const {
+    static vector<pair<uint32_t, float>> selectables;
+
+    glm::vec3 origin(_player->position());
+    selectables.clear();
+
+    for (auto &object : _objects) {
+        if (!object->isSelectable() || object.get() == _player.get()) continue;
+
+        shared_ptr<ModelSceneNode> model(object->model());
+        if (!model || !model->isVisible()) continue;
+
+        float dist = object->distanceTo(origin);
+        if (dist > kSelectionDistance) continue;
+
+        selectables.push_back(make_pair(object->id(), dist));
+    }
+
+    sort(selectables.begin(), selectables.end(), [](const pair<uint32_t, float> &left, const pair<uint32_t, float> &right) {
+        return left.second < right.second;
+    });
+    for (auto &selectable : selectables) {
+        ids.push_back(selectable.first);
+    }
+}
+
+bool Area::handleKeyUp(const SDL_KeyboardEvent &event) {
+    return false;
+}
+
+void Area::update(const UpdateContext &updateCtx) {
     updateDelayedCommands();
 
     for (auto &creature : _objectsByType[ObjectType::Creature]) {
         updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
-    }
-    if (_partyLeader) {
-        guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyLeader).portrait());
-    }
-    if (_partyMember1) {
-        guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember1).portrait());
-    }
-    if (_partyMember2) {
-        guiCtx.hud.partyPortraits.push_back(static_cast<Creature &>(*_partyMember2).portrait());
     }
     for (auto &room : _rooms) {
         room.second->update(updateCtx.deltaTime);
@@ -334,24 +407,9 @@ void Area::update(const UpdateContext &updateCtx, GuiContext &guiCtx) {
         object->update(updateCtx);
     }
 
+    updateSelection();
+
     TheSceneGraph.prepare(updateCtx.cameraPosition);
-
-    if (getDebugMode() == DebugMode::GameObjects) {
-        guiCtx.debug.objects.clear();
-        glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
-
-        for (auto &object : _objects) {
-            glm::vec3 position(object->position());
-            if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
-
-            DebugObject debugObj;
-            debugObj.tag = object->tag();
-            debugObj.text = object->tag();
-            debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
-
-            guiCtx.debug.objects.push_back(move(debugObj));
-        }
-    }
 }
 
 void Area::updateDelayedCommands() {
@@ -650,6 +708,95 @@ void Area::updateRoomVisibility() {
             room->second->setVisible(true);
         }
     }
+}
+
+void Area::selectNearestObject() {
+    _selectedObjectId = -1;
+    selectNextObject();
+}
+
+void Area::hilight(uint32_t objectId) {
+    _hilightedObjectId = objectId;
+}
+
+void Area::select(uint32_t objectId) {
+    _selectedObjectId = objectId;
+}
+
+void Area::updateSelection() {
+    if (_hilightedObjectId != -1) {
+        shared_ptr<SpatialObject> object(find(_hilightedObjectId));
+        if (!object || !object->isSelectable()) {
+            _hilightedObjectId = -1;
+        }
+    }
+    if (_selectedObjectId != -1) {
+        shared_ptr<SpatialObject> object(find(_selectedObjectId));
+        if (!object || !object->isSelectable()) {
+            _selectedObjectId = -1;
+        }
+    }
+}
+
+void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
+    addPartyMemberPortrait(_partyLeader, guiCtx);
+    addPartyMemberPortrait(_partyMember1, guiCtx);
+    addPartyMemberPortrait(_partyMember2, guiCtx);
+
+    if (_hilightedObjectId != -1) {
+        glm::vec3 coords(getScreenCenterOfObject(_hilightedObjectId, updateCtx));
+        if (coords.z < 1.0f) {
+            guiCtx.target.hasHilighted = true;
+            guiCtx.target.hilightedScreenCoords = coords;
+        }
+    }
+    if (_selectedObjectId != -1) {
+        glm::vec3 coords(getScreenCenterOfObject(_selectedObjectId, updateCtx));
+        if (coords.z < 1.0f) {
+            guiCtx.target.hasSelected = true;
+            guiCtx.target.selectedScreenCoords = coords;
+        }
+    }
+
+    addDebugInfo(updateCtx, guiCtx);
+}
+
+void Area::addPartyMemberPortrait(const shared_ptr<SpatialObject> &object, GuiContext &ctx) {
+    if (object) {
+        ctx.hud.partyPortraits.push_back(static_cast<Creature &>(*object).portrait());
+    }
+}
+
+glm::vec3 Area::getScreenCenterOfObject(uint32_t objectId, const UpdateContext &ctx) const {
+    static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
+
+    shared_ptr<SpatialObject> object(find(objectId));
+    glm::vec3 center(object->model()->getCenterOfAABB());
+
+    return glm::project(center, ctx.view, ctx.projection, viewport);
+}
+
+void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {
+    if (getDebugMode() == DebugMode::GameObjects) {
+        guiCtx.debug.objects.clear();
+        glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
+
+        for (auto &object : _objects) {
+            glm::vec3 position(object->position());
+            if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
+
+            DebugObject debugObj;
+            debugObj.tag = object->tag();
+            debugObj.text = object->tag();
+            debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
+
+            guiCtx.debug.objects.push_back(move(debugObj));
+        }
+    }
+}
+
+uint32_t Area::selectedObjectId() const {
+    return _selectedObjectId;
 }
 
 const CameraStyle &Area::cameraStyle() const {

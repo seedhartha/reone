@@ -93,12 +93,6 @@ private:
     std::function<void(const Object &, const std::string &)> _startDialog;
     std::function<void(SpatialObject *)> _openContainer;
 
-    void loadInfo(const resources::GffStruct &ifo);
-    void loadArea(const resources::GffStruct &ifo);
-    void loadCameras();
-    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
     void toggleCameraType();
     void cycleDebugMode(bool forward);
     void updatePlayer(float dt);
@@ -107,6 +101,24 @@ private:
     void update3rdPersonCameraTarget();
     void switchTo3rdPersonCamera();
     void resetPlayerMovement();
+    SpatialObject *getObjectAt(int x, int y) const;
+
+    // Loading
+
+    void loadInfo(const resources::GffStruct &ifo);
+    void loadArea(const resources::GffStruct &ifo);
+    void loadCameras();
+
+    // END Loading
+
+    // Events
+
+    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
+    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleKeyUp(const SDL_KeyboardEvent &event);
+
+    // END Events
 };
 
 } // namespace game

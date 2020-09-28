@@ -57,6 +57,7 @@ public:
     void renderImmediate() const override;
 
     glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
+    glm::vec3 getCenterOfAABB() const;
 
     const std::string &name() const;
     std::shared_ptr<Model> model() const;

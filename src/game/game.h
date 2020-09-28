@@ -31,6 +31,7 @@
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
 #include "gui/portraitsel.h"
+#include "gui/target.h"
 
 #include "area.h"
 #include "console.h"
@@ -135,6 +136,7 @@ private:
     std::shared_ptr<DebugOverlay> _debugOverlay;
     std::shared_ptr<ContainerGui> _containerGui;
     std::shared_ptr<EquipmentGui> _equipmentGui;
+    std::shared_ptr<TargetOverlay> _targetOverlay;
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
@@ -149,6 +151,7 @@ private:
     void loadContainerGui();
     void loadCursor();
     void loadEquipmentGui();
+    void loadTargetOverlay();
 
     // Rendering
     void drawWorld();

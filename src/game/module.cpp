@@ -196,6 +196,9 @@ bool Module::handle(const SDL_Event &event) {
     if (getCamera()->handle(event)) return true;
 
     switch (event.type) {
+        case SDL_MOUSEMOTION:
+            if (handleMouseMotion(event.motion)) return true;
+            break;
         case SDL_MOUSEBUTTONUP:
             if (handleMouseButtonUp(event.button)) return true;
             break;
@@ -212,54 +215,76 @@ bool Module::handle(const SDL_Event &event) {
     return false;
 }
 
-bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+    const SpatialObject *object = getObjectAt(event.x, event.y);
+    _area->hilight(object ? object->id() : -1);
+
+    return true;
+}
+
+SpatialObject *Module::getObjectAt(int x, int y) const {
     shared_ptr<Camera> camera(getCamera());
     glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
-    glm::vec3 fromWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 0.0f), camera->view(), camera->projection(), viewport));
-    glm::vec3 toWorld(glm::unProject(glm::vec3(event.x, _opts.height - event.y, 1.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), camera->view(), camera->projection(), viewport));
 
     shared_ptr<SpatialObject> player(_area->player());
     SpatialObject *except = player ? player.get() : nullptr;
     SpatialObject *obstacle = nullptr;
 
-    if (_area->findObstacleByAABB(fromWorld, toWorld, kObstacleCreature | kObstacleDoor | kObstaclePlaceable, except, &obstacle)) {
-        assert(obstacle);
-        debug(boost::format("Object '%s' clicked on") % obstacle->tag());
+    _area->findObstacleByAABB(fromWorld, toWorld, kObstacleCreature | kObstacleDoor | kObstaclePlaceable, except, &obstacle);
 
-        Door *door = dynamic_cast<Door *>(obstacle);
-        if (door) {
-            if (!door->linkedToModule().empty()) {
-                if (_onModuleTransition) {
-                    _onModuleTransition(door->linkedToModule(), door->linkedTo());
-                }
-            } else if (!door->isOpen() && !door->isStatic()) {
-                door->open(player);
-            }
-        }
+    return obstacle;
+}
 
-        Placeable *placeable = dynamic_cast<Placeable *>(obstacle);
-        if (placeable && placeable->blueprint().hasInventory()) {
-            if (_openContainer) {
-                _openContainer(placeable);
-            }
-        }
+bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+    SpatialObject *object = getObjectAt(event.x, event.y);
+    if (!object) {
+        return false;
+    }
+    debug(boost::format("Object '%s' clicked on") % object->tag());
 
-        Creature *creature = dynamic_cast<Creature *>(obstacle);
-        if (creature) {
-            if (!creature->conversation().empty() && _startDialog) {
-                resetPlayerMovement();
-                getCamera()->resetInput();
-
-                if (_startDialog) {
-                    _startDialog(*creature, creature->conversation());
-                }
-            }
-        }
-
+    uint32_t selectedObjectId = _area->selectedObjectId();
+    if (object->id() != selectedObjectId) {
+        _area->select(object->id());
         return true;
     }
 
-    return false;
+    Door *door = dynamic_cast<Door *>(object);
+    if (door) {
+        if (!door->linkedToModule().empty()) {
+            if (_onModuleTransition) {
+                _onModuleTransition(door->linkedToModule(), door->linkedTo());
+            }
+        } else if (!door->isOpen() && !door->isStatic()) {
+            shared_ptr<SpatialObject> player(_area->player());
+            door->open(player);
+        }
+        return true;
+    }
+
+    Placeable *placeable = dynamic_cast<Placeable *>(object);
+    if (placeable && placeable->blueprint().hasInventory()) {
+        if (_openContainer) {
+            _openContainer(placeable);
+        }
+        return true;
+    }
+
+    Creature *creature = dynamic_cast<Creature *>(object);
+    if (creature) {
+        if (!creature->conversation().empty() && _startDialog) {
+            resetPlayerMovement();
+            getCamera()->resetInput();
+
+            if (_startDialog) {
+                _startDialog(*creature, creature->conversation());
+            }
+        }
+        return true;
+    }
+
+    return true;
 }
 
 void Module::resetPlayerMovement() {
@@ -393,7 +418,8 @@ void Module::update(float dt, GuiContext &guiCtx) {
     ctx.projection = camera->projection();
     ctx.view = camera->view();
 
-    _area->update(ctx, guiCtx);
+    _area->update(ctx);
+    _area->fill(ctx, guiCtx);
 }
 
 void Module::updatePlayer(float dt) {
@@ -429,6 +455,7 @@ void Module::updatePlayer(float dt) {
             player.setMovementType(MovementType::Run);
             update3rdPersonCameraTarget();
             _area->updateRoomVisibility();
+            _area->selectNearestObject();
         }
 
     } else {

@@ -49,6 +49,8 @@ public:
     void face(const SpatialObject &other);
     void moveItemsTo(SpatialObject &other);
 
+    bool isSelectable() const;
+
     Room *room() const;
     const glm::vec3 &position() const;
     float heading() const;
@@ -79,6 +81,7 @@ protected:
     float _fadeDistance { kDefaultFadeDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
+    bool _selectable { false };
 
     SpatialObject(uint32_t id, ObjectType type);
 
