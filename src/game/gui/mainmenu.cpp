@@ -18,6 +18,7 @@
 #include "mainmenu.h"
 
 #include "../../audio/player.h"
+#include "../../core/debug.h"
 #include "../../gui/control/listbox.h"
 #include "../../resources/resources.h"
 
@@ -62,7 +63,7 @@ void MainMenu::load(GameVersion version) {
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
 
-    if (_opts.debug == 0) {
+    if (getDebugLevel() == 0) {
         hideControl("BTN_WARP");
     }
     _version = version;

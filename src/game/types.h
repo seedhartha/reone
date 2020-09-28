@@ -115,7 +115,6 @@ struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
     net::NetworkOptions network;
-    uint32_t debug { 0 };
 };
 
 struct CreatureConfiguration {

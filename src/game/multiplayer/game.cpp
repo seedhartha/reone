@@ -35,13 +35,8 @@ namespace reone {
 
 namespace game {
 
-MultiplayerGame::MultiplayerGame(
-    MultiplayerMode mode,
-    GameVersion version,
-    const fs::path &path,
-    const Options &opts
-) :
-    Game(version, path, opts), _mode(mode) {
+MultiplayerGame::MultiplayerGame(MultiplayerMode mode, const fs::path &path, const Options &opts) :
+    Game(path, opts), _mode(mode) {
 
     _pickDialogReplyEnabled = _mode == MultiplayerMode::Server;
 }

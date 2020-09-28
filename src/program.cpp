@@ -22,7 +22,6 @@
 #include <boost/program_options.hpp>
 
 #include "core/debug.h"
-#include "core/pathutil.h"
 #include "game/multiplayer/game.h"
 
 using namespace std;
@@ -46,8 +45,9 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 
 int Program::run() {
     loadOptions();
+    applyOptions();
 
-    if (_help) {
+    if (_showHelp) {
         cout << _cmdLineOpts << endl;
         return 0;
     }
@@ -81,8 +81,10 @@ void Program::loadOptions() {
         po::store(po::parse_config_file(kConfigFilename, _commonOpts), _vars);
     }
     po::notify(_vars);
+}
 
-    _help = _vars.count("help") > 0;
+void Program::applyOptions() {
+    _showHelp = _vars.count("help") > 0;
     _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
     _gameOpts.graphics.width = _vars["width"].as<int>();
     _gameOpts.graphics.height = _vars["height"].as<int>();
@@ -91,19 +93,9 @@ void Program::loadOptions() {
     _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
     _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
     _gameOpts.network.port = _vars["port"].as<int>();
-    _gameOpts.debug = _vars["debug"].as<int>();
 
-    setDebugLevel(_gameOpts.debug);
-    initGameVersion();
-    initMultiplayerMode();
-}
+    setDebugLevel(_vars["debug"].as<int>());
 
-void Program::initGameVersion() {
-    fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
-    _gameVersion = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
-}
-
-void Program::initMultiplayerMode() {
     if (_vars.count("serve") > 0) {
         _multiplayerMode = MultiplayerMode::Server;
     } else if (_vars.count("join") > 0) {
@@ -116,10 +108,10 @@ int Program::runGame() {
     switch (_multiplayerMode) {
         case MultiplayerMode::Client:
         case MultiplayerMode::Server:
-            game.reset(new MultiplayerGame(_multiplayerMode, _gameVersion, _gamePath, _gameOpts));
+            game.reset(new MultiplayerGame(_multiplayerMode, _gamePath, _gameOpts));
             break;
         default:
-            game.reset(new Game(_gameVersion, _gamePath, _gameOpts));
+            game.reset(new Game(_gamePath, _gameOpts));
             break;
     }
 

@@ -37,7 +37,6 @@ class MultiplayerGame : public Game, private IMultiplayerCallbacks {
 public:
     MultiplayerGame(
         MultiplayerMode mode,
-        resources::GameVersion version,
         const boost::filesystem::path &path,
         const Options &opts);
 
