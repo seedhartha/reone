@@ -32,7 +32,6 @@
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
-#include "objectcontainer.h"
 #include "room.h"
 
 namespace reone {
@@ -43,7 +42,7 @@ typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
 class ObjectFactory;
 
-class Area : public Object, public ObjectContainer {
+class Area : public Object {
 public:
     Area(
         uint32_t id,
@@ -67,6 +66,9 @@ public:
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
     void signalEvent(int eventId);
+
+    std::shared_ptr<SpatialObject> find(uint32_t id) const;
+    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
 
     // Load/save
     void saveTo(GameState &state) const;
@@ -97,13 +99,18 @@ protected:
     bool _scriptsEnabled { true };
     std::function<void()> _onPlayerChanged;
 
+    ObjectList _objects;
+    std::unordered_map<ObjectType, ObjectList> _objectsByType;
+    std::unordered_map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
+    std::unordered_map<std::string, ObjectList> _objectsByTag;
+
     // Party
     std::shared_ptr<SpatialObject> _player;
     std::shared_ptr<SpatialObject> _partyLeader;
     std::shared_ptr<SpatialObject> _partyMember1;
     std::shared_ptr<SpatialObject> _partyMember2;
 
-    void add(const std::shared_ptr<SpatialObject> &object) override;
+    virtual void add(const std::shared_ptr<SpatialObject> &object);
     void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
 

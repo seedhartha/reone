@@ -240,13 +240,16 @@ void Area::loadTriggers(const GffStruct &git) {
 }
 
 void Area::add(const shared_ptr<SpatialObject> &object) {
-    ObjectContainer::add(object);
+    _objects.push_back(object);
+    _objectsByType[object->type()].push_back(object);
+    _objectById.insert(make_pair(object->id(), object));
+    _objectsByTag[object->tag()].push_back(object);
 
     shared_ptr<ModelSceneNode> sceneNode(object->model());
+
     if (sceneNode) {
         TheSceneGraph.addRoot(sceneNode);
     }
-
     determineObjectRoom(*object);
 }
 
@@ -257,6 +260,21 @@ void Area::determineObjectRoom(SpatialObject &object) {
     if (findRoomElevationAt(position, room, position.z)) {
         object.setRoom(room);
     }
+}
+
+shared_ptr<SpatialObject> Area::find(uint32_t id) const {
+    auto object = _objectById.find(id);
+    if (object == _objectById.end()) return nullptr;
+
+    return object->second;
+}
+
+shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
+    auto objects = _objectsByTag.find(tag);
+    if (objects == _objectsByTag.end()) return nullptr;
+    if (nth >= objects->second.size()) return nullptr;
+
+    return objects->second[nth];
 }
 
 void Area::landObject(SpatialObject &object) {
