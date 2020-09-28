@@ -258,16 +258,10 @@ void Game::drawGUI() {
 }
 
 void Game::drawGUI3D() {
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
     ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(
-        0.0f,
-        static_cast<float>(_options.graphics.width),
-        static_cast<float>(_options.graphics.height),
-        0.0f,
-        -1024.0f,
-        1024.0f);
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
 
     Shaders.setGlobalUniforms(uniforms);
 
@@ -303,7 +297,7 @@ void Game::deinitSubsystems() {
 }
 
 void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(_options));
+    unique_ptr<MainMenu> mainMenu(new MainMenu(&_sceneGraph, _options));
     mainMenu->load(_version);
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();

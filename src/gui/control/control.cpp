@@ -434,12 +434,57 @@ void Control::render3D(const glm::ivec2 &offset) const {
     shared_ptr<ModelSceneNode> model(_scene3d.model);
     if (!model) return;
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(offset.x, offset.y, 0.0f));
-    transform *= _scene3d.transform;
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
 
-    model->setLocalTransform(transform);
-    model->renderImmediate();
+    ShaderManager &shaders = Shaders;
+    ShaderUniforms uniforms;
+    Framebuffer *framebuffer = _scene3d.framebuffer.get();
+
+    // Render to framebuffer
+
+    uniforms.projection = glm::ortho(
+        0.0f,
+        static_cast<float>(framebuffer->width()),
+        static_cast<float>(framebuffer->height()),
+        0.0f,
+        -1024.0f,
+        1024.0f);
+
+    shaders.setGlobalUniforms(uniforms);
+
+    framebuffer->bind();
+
+    glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, framebuffer->width(), framebuffer->height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    _scene3d.model->renderImmediate();
+
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+    framebuffer->unbind();
+
+    // Render control
+
+    uniforms.projection = glm::ortho(0.0f, static_cast<float>(viewport[2]), static_cast<float>(viewport[3]), 0.0f);
+    shaders.setGlobalUniforms(uniforms);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
+
+    shaders.activate(ShaderProgram::BasicDiffuse);
+    shaders.setUniform("model", transform);
+    shaders.setUniform("color", glm::vec3(1.0f));
+    shaders.setUniform("alpha", 1.0f);
+
+    glActiveTexture(GL_TEXTURE0);
+    framebuffer->bindTexture();
+
+    DefaultGuiQuad.render(GL_TRIANGLES);
+
+    framebuffer->unbindTexture();
 }
 
 void Control::stretch(float x, float y) {
@@ -507,8 +552,8 @@ void Control::setTextMessage(const string &text) {
     _text.text = text;
 }
 
-void Control::setScene3D(const Scene3D &scene) {
-    _scene3d = scene;
+void Control::setScene3D(Scene3D scene) {
+    _scene3d = move(scene);
 }
 
 void Control::setPadding(int padding) {
