@@ -36,7 +36,7 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
     if (!_visible) return;
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::BasicDiffuse);
+    shaders.activate(ShaderProgram::ModelDiffuse);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
 

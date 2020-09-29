@@ -128,7 +128,7 @@ void Console::render() const {
     model = glm::scale(model, glm::vec3(_opts.width, height, 1.0f));
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::BasicDiffuse);
+    shaders.activate(ShaderProgram::ModelDiffuse);
     shaders.setUniform("model", model);
     shaders.setUniform("color", glm::vec3(0.0f));
     shaders.setUniform("alpha", 0.5f);

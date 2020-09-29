@@ -56,7 +56,7 @@ void TargetOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords)
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::BasicDiffuse);
+    shaders.activate(ShaderProgram::ModelDiffuse);
     shaders.setUniform("model", transform);
     shaders.setUniform("alpha", 1.0f);
 

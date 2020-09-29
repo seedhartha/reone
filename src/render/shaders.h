@@ -29,18 +29,15 @@ namespace render {
 
 enum class ShaderProgram {
     None,
-    BasicWhite,
-    BasicDiffuse,
-    BasicDiffuseEnvmap,
-    BasicDiffuseBumpyShiny,
-    BasicDiffuseLightmap,
-    BasicDiffuseLightmapEnvmap,
-    BasicDiffuseLightmapBumpyShiny,
-    BasicDiffuseGaussianBlur,
-    SkeletalDiffuse,
-    SkeletalDiffuseEnvmap,
-    SkeletalDiffuseBumpyShiny,
-    SkeletalDiffuseBumpmap,
+    ModelDiffuse,
+    ModelWhite,
+    ModelDiffuseBumpmap,
+    ModelDiffuseBumpyShiny,
+    ModelDiffuseEnvmap,
+    ModelDiffuseGaussianBlur,
+    ModelDiffuseLightmap,
+    ModelDiffuseLightmapBumpyShiny,
+    ModelDiffuseLightmapEnvmap,
     GUIText
 };
 
@@ -68,18 +65,17 @@ public:
 
 private:
     enum class ShaderName {
-        VertexBasic,
-        VertexSkeletal,
+        VertexModel,
         VertexGUI,
         FragmentWhite,
         FragmentDiffuse,
-        FragmentDiffuseEnvmap,
-        FragmentDiffuseBumpyShiny,
-        FragmentDiffuseLightmap,
-        FragmentDiffuseLightmapEnvmap,
-        FragmentDiffuseLightmapBumpyShiny,
         FragmentDiffuseBumpmap,
+        FragmentDiffuseBumpyShiny,
+        FragmentDiffuseEnvmap,
         FragmentDiffuseGaussianBlur,
+        FragmentDiffuseLightmap,
+        FragmentDiffuseLightmapBumpyShiny,
+        FragmentDiffuseLightmapEnvmap,
         FragmentText
     };
 

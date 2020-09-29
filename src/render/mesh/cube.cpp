@@ -62,7 +62,7 @@ CubeMesh::CubeMesh() {
 
 void CubeMesh::render(const glm::mat4 &transform) const {
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::BasicWhite);
+    shaders.activate(ShaderProgram::ModelWhite);
     shaders.setUniform("model", transform);
     shaders.setUniform("alpha", 1.0f);
 

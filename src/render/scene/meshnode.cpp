@@ -75,7 +75,7 @@ void MeshSceneNode::render() const {
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
     const ModelSceneNode::AnimationState &animState = _model->animationState();
     bool skeletal = skin && !animState.name.empty();
-    ShaderProgram program = getShaderProgram(*mesh, skeletal);
+    ShaderProgram program = getShaderProgram(*mesh);
 
     ShaderManager &shaders = Shaders;
     shaders.activate(program);
@@ -97,6 +97,7 @@ void MeshSceneNode::render() const {
     }
 
     if (skeletal) {
+        shaders.setUniform("skeletalEnabled", true);
         shaders.setUniform("absTransform", _modelNode->absoluteTransform());
         shaders.setUniform("absTransformInv", _modelNode->absoluteTransformInverse());
 
@@ -149,42 +150,35 @@ void MeshSceneNode::render() const {
     if (_modelNode->isSelfIllumEnabled()) {
         shaders.setUniform("selfIllumEnabled", false);
     }
+    if (skeletal) {
+        shaders.setUniform("skeletalEnabled", false);
+    }
 
     SceneNode::render();
 }
 
-ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh, bool skeletal) const {
+ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh) const {
     ShaderProgram program = ShaderProgram::None;
 
-    bool hasEnvmap = mesh.hasEnvmapTexture();
     bool hasLightmap = mesh.hasLightmapTexture();
+    bool hasEnvmap = mesh.hasEnvmapTexture();
     bool hasBumpyShiny = mesh.hasBumpyShinyTexture();
     bool hasBumpmap = mesh.hasBumpmapTexture();
 
-    if (skeletal) {
-        if (hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
-            program = ShaderProgram::SkeletalDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap /* && !hasBumpmap */) {
-            program = ShaderProgram::SkeletalDiffuseBumpyShiny;
-        } else if (hasBumpmap && !hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::SkeletalDiffuseBumpmap;
-        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny && !hasBumpmap) {
-            program = ShaderProgram::SkeletalDiffuse;
-        }
+    if (hasLightmap && !hasEnvmap && !hasBumpyShiny) {
+        program = ShaderProgram::ModelDiffuseLightmap;
+    } else if (hasLightmap && hasEnvmap && !hasBumpyShiny) {
+        program = ShaderProgram::ModelDiffuseLightmapEnvmap;
+    } else if (hasLightmap && !hasEnvmap && hasBumpyShiny) {
+        program = ShaderProgram::ModelDiffuseLightmapBumpyShiny;
+    } else if (!hasLightmap && hasEnvmap && !hasBumpyShiny) {
+        program = ShaderProgram::ModelDiffuseEnvmap;
+    } else if (!hasLightmap && !hasEnvmap && hasBumpyShiny) {
+        program = ShaderProgram::ModelDiffuseBumpyShiny;
+    } else if (!hasLightmap && !hasEnvmap && !hasBumpyShiny && hasBumpmap) {
+        program = ShaderProgram::ModelDiffuseBumpmap;
     } else {
-        if (hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseEnvmap;
-        } else if (hasBumpyShiny && !hasEnvmap && !hasLightmap) {
-            program = ShaderProgram::BasicDiffuseBumpyShiny;
-        } else if (hasLightmap && !hasEnvmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseLightmap;
-        } else if (hasEnvmap && hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuseLightmapEnvmap;
-        } else if (hasLightmap && hasBumpyShiny && !hasEnvmap) {
-            program = ShaderProgram::BasicDiffuseLightmapBumpyShiny;
-        } else if (!hasEnvmap && !hasLightmap && !hasBumpyShiny) {
-            program = ShaderProgram::BasicDiffuse;
-        }
+        program = ShaderProgram::ModelDiffuse;
     }
 
     if (program == ShaderProgram::None) {
