@@ -71,7 +71,7 @@ Area::Area(uint32_t id, GameVersion version, ObjectFactory *objectFactory, Scene
     _version(version),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph),
-    _navMesh(new NavMesh()) {
+    _pathfinding(new Pathfinding()) {
 
     assert(_objectFactory);
 }
@@ -140,7 +140,7 @@ void Area::loadPTH() {
         _sceneGraph->addRoot(aabb);
     }
 
-    _navMesh->load(paths, pointZ);
+    _pathfinding->load(paths, pointZ);
 }
 
 void Area::loadARE(const GffStruct &are) {

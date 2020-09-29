@@ -141,7 +141,7 @@ void Area::selectNextPathPoint(Creature::Path &path) {
 
 void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
     const glm::vec3 &origin = creature.position();
-    vector<glm::vec3> points(_navMesh->findPath(origin, dest));
+    vector<glm::vec3> points(_pathfinding->findPath(origin, dest));
     uint32_t now = SDL_GetTicks();
 
     creature.setPath(dest, move(points), now);
