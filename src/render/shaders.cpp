@@ -380,6 +380,7 @@ void ShaderManager::initGL() {
     initProgram(ShaderProgram::ModelDiffuseLightmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmap);
     initProgram(ShaderProgram::ModelDiffuseLightmapEnvmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapEnvmap);
     initProgram(ShaderProgram::ModelDiffuseLightmapBumpyShiny, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapBumpyShiny);
+    initProgram(ShaderProgram::GUIDiffuse, ShaderName::VertexGUI, ShaderName::FragmentDiffuse);
     initProgram(ShaderProgram::GUIText, ShaderName::VertexGUI, ShaderName::FragmentText);
 }
 

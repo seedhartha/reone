@@ -38,6 +38,7 @@ enum class ShaderProgram {
     ModelDiffuseLightmap,
     ModelDiffuseLightmapBumpyShiny,
     ModelDiffuseLightmapEnvmap,
+    GUIDiffuse,
     GUIText
 };
 
