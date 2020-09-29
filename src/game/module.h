@@ -22,10 +22,10 @@
 #include "SDL2/SDL_events.h"
 
 #include "../net/types.h"
-#include "../render/camera/firstperson.h"
-#include "../render/camera/thirdperson.h"
 
 #include "area.h"
+#include "camera/firstperson.h"
+#include "camera/thirdperson.h"
 
 namespace reone {
 
@@ -55,13 +55,13 @@ public:
     // Getters
     const std::string &name() const;
     bool loaded() const;
-    std::shared_ptr<render::Camera> getCamera() const;
+    std::shared_ptr<Camera> getCamera() const;
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
-    render::CameraType cameraType() const;
+    CameraType cameraType() const;
 
     // Callbacks
-    void setOnCameraChanged(const std::function<void(render::CameraType)> &fn);
+    void setOnCameraChanged(const std::function<void(CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
     void setOpenContainer(const std::function<void(SpatialObject *)> &fn);
@@ -79,16 +79,16 @@ private:
     float _cameraAspect { 0.0f };
     std::shared_ptr<Area> _area;
     PartyConfiguration _party;
-    render::CameraType _cameraType { render::CameraType::FirstPerson };
-    std::shared_ptr<render::FirstPersonCamera> _firstPersonCamera;
-    std::shared_ptr<render::ThirdPersonCamera> _thirdPersonCamera;
+    CameraType _cameraType { CameraType::FirstPerson };
+    std::shared_ptr<FirstPersonCamera> _firstPersonCamera;
+    std::shared_ptr<ThirdPersonCamera> _thirdPersonCamera;
     bool _moveForward { false };
     bool _moveLeft { false };
     bool _moveBackward { false };
     bool _moveRight { false };
 
     // Callbacks
-    std::function<void(render::CameraType)> _onCameraChanged;
+    std::function<void(CameraType)> _onCameraChanged;
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _startDialog;
     std::function<void(SpatialObject *)> _openContainer;

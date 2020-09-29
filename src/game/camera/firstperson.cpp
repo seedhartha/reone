@@ -21,9 +21,11 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace game {
 
 static const float kMovementSpeed = 5.0f;
 static const float kMouseMultiplier = glm::pi<float>() / 2000.0f;
@@ -50,23 +52,25 @@ bool FirstPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
         _heading - event.xrel * kMouseMultiplier,
         glm::two_pi<float>());
 
-    constexpr float quarterPi = glm::quarter_pi<float>();
-
     _pitch = glm::clamp(
         _pitch - event.yrel * kMouseMultiplier,
-        -quarterPi,
-        quarterPi);
+        -glm::quarter_pi<float>(),
+        glm::quarter_pi<float>());
 
-    updateView();
+    updateSceneNode();
 
     return true;
 }
 
-void FirstPersonCamera::updateView() {
+void FirstPersonCamera::updateSceneNode() {
     glm::quat orientation(glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f));
     orientation *= glm::quat(glm::vec3(_pitch, _heading, 0.0f));
 
-    _sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), _position) * glm::mat4_cast(orientation));
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, _position);
+    transform *= glm::mat4_cast(orientation);
+
+    _sceneNode->setLocalTransform(transform);
 }
 
 bool FirstPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
@@ -116,38 +120,39 @@ bool FirstPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void FirstPersonCamera::update(float dt) {
+    float headingSin = glm::sin(_heading) * kMovementSpeed * dt;
+    float headingCos = glm::cos(_heading) * kMovementSpeed * dt;
+    float pitchSin = glm::sin(_pitch) * kMovementSpeed * dt;
     bool positionChanged = false;
-    float sinYawAdj = glm::sin(_heading) * kMovementSpeed * dt;
-    float cosYawAdj = glm::cos(_heading) * kMovementSpeed * dt;
-    float sinPitchAdj = glm::sin(_pitch) * kMovementSpeed * dt;
 
     if (_moveForward) {
-        _position.x -= sinYawAdj;
-        _position.y += cosYawAdj;
-        _position.z += sinPitchAdj;
+        _position.x -= headingSin;
+        _position.y += headingCos;
+        _position.z += pitchSin;
         positionChanged = true;
     }
     if (_moveLeft) {
-        _position.x -= cosYawAdj;
-        _position.y -= sinYawAdj;
+        _position.x -= headingCos;
+        _position.y -= headingSin;
         positionChanged = true;
     }
     if (_moveBackward) {
-        _position.x += sinYawAdj;
-        _position.y -= cosYawAdj;
-        _position.z -= sinPitchAdj;
+        _position.x += headingSin;
+        _position.y -= headingCos;
+        _position.z -= pitchSin;
         positionChanged = true;
     }
     if (_moveRight) {
-        _position.x += cosYawAdj;
-        _position.y += sinYawAdj;
+        _position.x += headingCos;
+        _position.y += headingSin;
         positionChanged = true;
     }
-
-    if (positionChanged) updateView();
+    if (positionChanged) {
+        updateSceneNode();
+    }
 }
 
-void FirstPersonCamera::resetInput() {
+void FirstPersonCamera::clearUserInput() {
     _moveForward = false;
     _moveLeft = false;
     _moveBackward = false;
@@ -156,14 +161,14 @@ void FirstPersonCamera::resetInput() {
 
 void FirstPersonCamera::setPosition(const glm::vec3 &pos) {
     _position = pos;
-    updateView();
+    updateSceneNode();
 }
 
 void FirstPersonCamera::setHeading(float heading) {
     _heading = heading;
-    updateView();
+    updateSceneNode();
 }
 
-} // namespace render
+} // namespace game
 
 } // namespace reone

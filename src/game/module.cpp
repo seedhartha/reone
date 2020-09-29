@@ -20,8 +20,6 @@
 #include "../core/debug.h"
 #include "../core/log.h"
 #include "../core/streamutil.h"
-#include "../render/camera/firstperson.h"
-#include "../render/camera/thirdperson.h"
 #include "../resources/gfffile.h"
 #include "../resources/resources.h"
 
@@ -276,7 +274,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     if (creature) {
         if (!creature->conversation().empty() && _startDialog) {
             resetPlayerMovement();
-            getCamera()->resetInput();
+            getCamera()->clearUserInput();
 
             if (_startDialog) {
                 _startDialog(*creature, creature->conversation());
@@ -374,7 +372,7 @@ void Module::toggleCameraType() {
 
         case CameraType::ThirdPerson:
             _cameraType = CameraType::FirstPerson;
-            _firstPersonCamera->setPosition(_thirdPersonCamera->position());
+            _firstPersonCamera->setPosition(_thirdPersonCamera->sceneNode()->absoluteTransform()[3]);
             _firstPersonCamera->setHeading(_thirdPersonCamera->heading());
             changed = true;
             break;
@@ -415,7 +413,7 @@ void Module::update(float dt, GuiContext &guiCtx) {
 
     UpdateContext ctx;
     ctx.deltaTime = dt;
-    ctx.cameraPosition = camera->position();
+    ctx.cameraPosition = camera->sceneNode()->absoluteTransform()[3];
     ctx.projection = camera->sceneNode()->projection();
     ctx.view = camera->sceneNode()->view();
 

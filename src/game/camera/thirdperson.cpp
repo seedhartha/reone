@@ -21,9 +21,11 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace game {
 
 static const float kMinRotationSpeed = 1.0f;
 static const float kMaxRotationSpeed = 2.5f;
@@ -87,55 +89,57 @@ void ThirdPersonCamera::update(float dt) {
     if (!_rotateCW && !_rotateCCW) return;
 
     _rotationSpeed += kRotationAcceleration * dt;
+
     if (_rotationSpeed > kMaxRotationSpeed) {
         _rotationSpeed = kMaxRotationSpeed;
     }
     _heading += (_rotateCCW ? 1.0f : -1.0f) * _rotationSpeed * dt;
     _heading = glm::mod(_heading, glm::two_pi<float>());
 
-    updateView();
+    updateSceneNode();
 }
 
-void ThirdPersonCamera::updateView() {
-    _position = _targetPosition;
-    _position.x += _style.distance * glm::sin(_heading);
-    _position.y -= _style.distance * glm::cos(_heading);
-    _position.z += _style.height;
+void ThirdPersonCamera::updateSceneNode() {
+    glm::vec3 position(_targetPosition);
+    position.x += _style.distance * glm::sin(_heading);
+    position.y -= _style.distance * glm::cos(_heading);
+    position.z += _style.height;
 
     if (_findObstacleFunc) {
         glm::vec3 intersection { 0.0f };
-        if (_findObstacleFunc(_targetPosition, _position, intersection)) {
-            _position = intersection;
+        if (_findObstacleFunc(_targetPosition, position, intersection)) {
+            position = intersection;
         }
     }
-    glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - _position), glm::vec3(0.0f, 0.0f, 1.0f)));
+    glm::vec3 up(0.0f, 0.0f, 1.0f);
+    glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - position), up));
 
-    glm::mat4 transform(glm::translate(glm::mat4(1.0f), _position));
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, position);
     transform *= glm::mat4_cast(orientation);
 
     _sceneNode->setLocalTransform(transform);
-
 }
 
-void ThirdPersonCamera::resetInput() {
+void ThirdPersonCamera::clearUserInput() {
     _rotateCCW = false;
     _rotateCW = false;
 }
 
 void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {
     _targetPosition = position;
-    updateView();
+    updateSceneNode();
 }
 
 void ThirdPersonCamera::setHeading(float heading) {
     _heading = heading;
-    updateView();
+    updateSceneNode();
 }
 
 void ThirdPersonCamera::setFindObstacleFunc(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
     _findObstacleFunc = fn;
 }
 
-} // namespace render
+} // namespace game
 
 } // namespace reone

@@ -334,9 +334,9 @@ bool Area::handle(const SDL_Event &event) {
             return handleKeyDown(event.key);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
+        default:
+            return false;
     }
-
-    return false;
 }
 
 bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
@@ -348,9 +348,10 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
         case SDL_SCANCODE_E:
             selectNextObject();
             return true;
-    }
 
-    return false;
+        default:
+            return false;
+    }
 }
 
 void Area::selectNextObject(bool reverse) {

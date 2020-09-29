@@ -19,23 +19,21 @@
 
 #include <functional>
 
-#include "camera.h"
-
 #include "../types.h"
+
+#include "camera.h"
 
 namespace reone {
 
-namespace render {
-
-class SceneGraph;
+namespace game {
 
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear = 0.1f, float zFar = 10000.0f);
+    ThirdPersonCamera(render::SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear = 0.1f, float zFar = 10000.0f);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void resetInput() override;
+    void clearUserInput() override;
 
     void setTargetPosition(const glm::vec3 &position);
     void setHeading(float heading);
@@ -50,11 +48,11 @@ private:
     float _rotationSpeed { 0.0f };
     std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> _findObstacleFunc;
 
-    void updateView();
+    void updateSceneNode();
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
 };
 
-} // namespace render
+} // namespace game
 
 } // namespace reone

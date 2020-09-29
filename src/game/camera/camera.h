@@ -15,26 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camera.h"
+#pragma once
 
-using namespace std;
+#include <memory>
+
+#include "SDL2/SDL_events.h"
+
+#include "glm/vec3.hpp"
+
+#include "../../render/scene/cameranode.h"
 
 namespace reone {
 
-namespace render {
+namespace game {
 
-const glm::vec3 &Camera::position() const {
-    return _position;
-}
+class Camera {
+public:
+    virtual bool handle(const SDL_Event &event) = 0;
+    virtual void update(float dt) = 0;
+    virtual void clearUserInput() = 0;
 
-float Camera::heading() const {
-    return _heading;
-}
+    float heading() const;
+    std::shared_ptr<render::CameraSceneNode> sceneNode() const;
 
-shared_ptr<CameraSceneNode> Camera::sceneNode() const {
-    return _sceneNode;
-}
+protected:
+    float _heading { 0.0f };
+    std::shared_ptr<render::CameraSceneNode> _sceneNode;
+};
 
-} // namespace render
+} // namespace game
 
 } // namespace reone

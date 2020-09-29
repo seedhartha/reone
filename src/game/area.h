@@ -21,12 +21,12 @@
 
 #include "../gui/types.h"
 #include "../net/types.h"
-#include "../render/camera/camera.h"
 #include "../render/scene/scenegraph.h"
 #include "../render/types.h"
 #include "../resources/types.h"
 #include "../script/variable.h"
 
+#include "camera/camera.h"
 #include "navmesh.h"
 #include "object/creature.h"
 #include "object/door.h"
@@ -82,7 +82,7 @@ public:
 
     // General getters
     uint32_t selectedObjectId() const;
-    const render::CameraStyle &cameraStyle() const;
+    const CameraStyle &cameraStyle() const;
     const std::string &music() const;
 
     // Party getters
@@ -141,7 +141,7 @@ private:
     std::string _name;
     std::unordered_map<std::string, std::shared_ptr<Room>> _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
-    render::CameraStyle _cameraStyle;
+    CameraStyle _cameraStyle;
     std::string _music;
     std::unique_ptr<NavMesh> _navMesh;
     std::unordered_map<ScriptType, std::string> _scripts;
