@@ -27,9 +27,11 @@ namespace reone {
 
 namespace render {
 
+class SceneGraph;
+
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(float aspect, const CameraStyle &style, float zNear = 0.1f, float zFar = 10000.0f);
+    ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear = 0.1f, float zFar = 10000.0f);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;

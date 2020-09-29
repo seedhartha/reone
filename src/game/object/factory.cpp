@@ -31,7 +31,7 @@ ObjectFactory::ObjectFactory(GameVersion version, SceneGraph *sceneGraph, const 
 }
 
 unique_ptr<Module> ObjectFactory::newModule() {
-    return make_unique<Module>(_counter++, _version, this, _options.graphics);
+    return make_unique<Module>(_counter++, _version, this, _sceneGraph, _options.graphics);
 }
 
 unique_ptr<Area> ObjectFactory::newArea() {

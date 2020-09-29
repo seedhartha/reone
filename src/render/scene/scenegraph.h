@@ -22,6 +22,7 @@
 
 #include "glm/vec3.hpp"
 
+#include "cameranode.h"
 #include "lightnode.h"
 #include "meshnode.h"
 
@@ -45,6 +46,7 @@ public:
 
     const glm::vec3 &ambientLightColor() const;
 
+    void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setAmbientLightColor(const glm::vec3 &color);
 
 private:
@@ -52,6 +54,7 @@ private:
     std::vector<MeshSceneNode *> _opaqueMeshes;
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
+    std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 1.0f };
     uint32_t _textureId { 0 };
 

@@ -205,27 +205,19 @@ void Game::drawAll() {
 }
 
 void Game::drawWorld() {
-    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
-    if (!camera) return;
-
-    glEnable(GL_DEPTH_TEST);
-
-    ShaderUniforms uniforms;
-    uniforms.projection = camera->projection();
-    uniforms.view = camera->view();
-    uniforms.cameraPosition = camera->position();
-
-    Shaders.setGlobalUniforms(uniforms);
-
     switch (_screen) {
         case Screen::InGame:
         case Screen::Dialog:
         case Screen::Container:
-            _sceneGraph.render();
             break;
         default:
-            break;
+            return;
     }
+    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
+    if (!camera) return;
+
+    _sceneGraph.setActiveCamera(camera->sceneNode());
+    _sceneGraph.render();
 }
 
 void Game::drawGUI() {
@@ -258,7 +250,7 @@ void Game::drawGUI() {
 }
 
 void Game::drawGUI3D() {
-    //glEnable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 
     ShaderUniforms uniforms;
     uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);

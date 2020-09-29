@@ -19,6 +19,8 @@
 
 #include "glm/ext.hpp"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -26,8 +28,8 @@ namespace render {
 static const float kMovementSpeed = 5.0f;
 static const float kMouseMultiplier = glm::pi<float>() / 2000.0f;
 
-FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, float zNear, float zFar) {
-    _projection = glm::perspective(fovy, aspect, zNear, zFar);
+FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, fovy, aspect, zNear, zFar);
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {
@@ -64,8 +66,7 @@ void FirstPersonCamera::updateView() {
     glm::quat orientation(glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f));
     orientation *= glm::quat(glm::vec3(_pitch, _heading, 0.0f));
 
-    _view = glm::translate(glm::mat4(1.0f), _position) * glm::mat4_cast(orientation);
-    _view = glm::inverse(_view);
+    _sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), _position) * glm::mat4_cast(orientation));
 }
 
 bool FirstPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
