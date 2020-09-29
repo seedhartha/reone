@@ -26,7 +26,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../../core/log.h"
-#include "../../render/mesh/guiquad.h"
+#include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
@@ -232,11 +232,11 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
 }
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const {
-    ShaderManager &shaders = ShaderManager::instance();
-    GUIQuad &defaultQuad = DefaultGuiQuad;
-    GUIQuad &flipXQuad = FlipXGuiQuad;
-    GUIQuad &flipYQuad = FlipYGuiQuad;
-    GUIQuad &flipXYQuad = FlipXYGuiQuad;
+    ShaderManager &shaders = Shaders;
+    Quad &defaultQuad = DefaultQuad;
+    Quad &xFlippedQuad = XFlippedQuad;
+    Quad &yFlippedQuad = YFlippedQuad;
+    Quad &xyFlippedQuad = XYFlippedQuad;
 
     glActiveTexture(GL_TEXTURE0);
 
@@ -294,7 +294,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, height, 1.0f));
             edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
             shaders.setUniform("model", edgeTransform);
-            flipXQuad.render(GL_TRIANGLES);
+            xFlippedQuad.render(GL_TRIANGLES);
         }
 
         if (width > 0.0f) {
@@ -311,7 +311,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + size.y - border.dimension, 0.0f));
             edgeTransform = glm::scale(edgeTransform, glm::vec3(width, border.dimension, 1.0f));
             shaders.setUniform("model", edgeTransform);
-            flipYQuad.render(GL_TRIANGLES);
+            yFlippedQuad.render(GL_TRIANGLES);
         }
 
         border.edge->unbind();
@@ -332,19 +332,19 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + size.y - border.dimension, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         shaders.setUniform("model", cornerTransform);
-        flipYQuad.render(GL_TRIANGLES);
+        yFlippedQuad.render(GL_TRIANGLES);
 
         // Top right corner
         cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + size.x - border.dimension, y, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         shaders.setUniform("model", cornerTransform);
-        flipXQuad.render(GL_TRIANGLES);
+        xFlippedQuad.render(GL_TRIANGLES);
 
         // Bottom right corner
         cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
         cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
         shaders.setUniform("model", cornerTransform);
-        flipXYQuad.render(GL_TRIANGLES);
+        xyFlippedQuad.render(GL_TRIANGLES);
 
         border.corner->unbind();
     }
@@ -482,7 +482,7 @@ void Control::render3D(const glm::ivec2 &offset) const {
     glActiveTexture(GL_TEXTURE0);
     framebuffer->bindTexture();
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 
     framebuffer->unbindTexture();
 }

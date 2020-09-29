@@ -23,7 +23,7 @@
 
 #include "../core/log.h"
 #include "../render/font.h"
-#include "../render/mesh/guiquad.h"
+#include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../resources/resources.h"
 
@@ -133,7 +133,7 @@ void Console::render() const {
     shaders.setUniform("color", glm::vec3(0.0f));
     shaders.setUniform("alpha", 0.5f);
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 
     string text("> " + _inputText);
 

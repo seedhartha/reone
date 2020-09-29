@@ -21,7 +21,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../../render/mesh/guiquad.h"
+#include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
@@ -69,7 +69,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
 
     Shaders.setUniform("model", arrowTransform);
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
@@ -79,7 +79,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
 
     Shaders.setUniform("model", arrowTransform);
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 }
 
 void ScrollBar::setCanScrollUp(bool scroll) {

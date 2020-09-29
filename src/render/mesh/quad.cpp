@@ -1,3 +1,4 @@
+
 /*
  * Copyright © 2020 Vsevolod Kremianskii
  *
@@ -15,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "guiquad.h"
+#include "quad.h"
 
 using namespace std;
 
@@ -55,27 +56,27 @@ static vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };
 
 static Mesh::VertexOffsets g_offsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, 5 * sizeof(float) };
 
-GUIQuad &GUIQuad::getDefault() {
-    static GUIQuad quad(move(g_defaultVertices));
+Quad &Quad::getDefault() {
+    static Quad quad(move(g_defaultVertices));
     return quad;
 }
 
-GUIQuad &GUIQuad::getXFlipped() {
-    static GUIQuad quad(move(g_flipXVertices));
+Quad &Quad::getXFlipped() {
+    static Quad quad(move(g_flipXVertices));
     return quad;
 }
 
-GUIQuad &GUIQuad::getYFlipped() {
-    static GUIQuad quad(move(g_flipYVertices));
+Quad &Quad::getYFlipped() {
+    static Quad quad(move(g_flipYVertices));
     return quad;
 }
 
-GUIQuad &GUIQuad::getXYFlipped() {
-    static GUIQuad quad(move(g_flipXYVertices));
+Quad &Quad::getXYFlipped() {
+    static Quad quad(move(g_flipXYVertices));
     return quad;
 }
 
-GUIQuad::GUIQuad(vector<float> &&vertices) {
+Quad::Quad(vector<float> &&vertices) {
     _vertices = move(vertices);
     _indices = g_indices;
     _offsets = g_offsets;

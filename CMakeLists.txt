@@ -120,7 +120,7 @@ set(HEADERS
     src/render/fps.h
     src/render/mesh/aabb.h
     src/render/mesh/cube.h
-    src/render/mesh/guiquad.h
+    src/render/mesh/quad.h
     src/render/mesh/mesh.h
     src/render/mesh/modelmesh.h
     src/render/model/model.h
@@ -251,7 +251,7 @@ set(SOURCES
     src/render/fps.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/cube.cpp
-    src/render/mesh/guiquad.cpp
+    src/render/mesh/quad.cpp
     src/render/mesh/mesh.cpp
     src/render/mesh/modelmesh.cpp
     src/render/model/model.cpp

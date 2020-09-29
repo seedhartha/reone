@@ -19,7 +19,7 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/guiquad.h"
+#include "../../render/mesh/quad.h"
 
 using namespace std;
 
@@ -82,7 +82,7 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
 
     if (_iconFrame) {
         _iconFrame->bind();
-        DefaultGuiQuad.render(GL_TRIANGLES);
+        DefaultQuad.render(GL_TRIANGLES);
         _iconFrame->unbind();
     }
 
@@ -90,7 +90,7 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
 
     if (icon) {
         icon->bind();
-        DefaultGuiQuad.render(GL_TRIANGLES);
+        DefaultQuad.render(GL_TRIANGLES);
         icon->unbind();
     }
 }
