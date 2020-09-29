@@ -213,7 +213,7 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
     if (!_visible) return;
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIDiffuse);
+    shaders.activate(ShaderProgram::GUIGUI);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
 
@@ -474,7 +474,7 @@ void Control::render3D(const glm::ivec2 &offset) const {
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
 
-    shaders.activate(ShaderProgram::GUIDiffuse);
+    shaders.activate(ShaderProgram::GUIGUI);
     shaders.setUniform("model", transform);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);

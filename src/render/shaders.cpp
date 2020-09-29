@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include <boost/format.hpp>
+
 #include "GL/glew.h"
 
 #include "SDL2/SDL_opengl.h"
@@ -30,6 +32,24 @@ using namespace std;
 namespace reone {
 
 namespace render {
+
+static const GLchar kGUIVertexShader[] = R"END(
+#version 330
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+layout(location = 0) in vec3 position;
+layout(location = 2) in vec2 texCoords;
+
+out vec2 fragTexCoords;
+
+void main() {
+    gl_Position = projection * view * model * vec4(position, 1.0);
+    fragTexCoords = texCoords;
+}
+)END";
 
 static const GLchar kModelVertexShader[] = R"END(
 #version 330
@@ -92,25 +112,36 @@ void main() {
 }
 )END";
 
-static const GLchar kGUIVertexShader[] = R"END(
+static const GLchar kWhiteFragmentShader[] = R"END(
 #version 330
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
+uniform float alpha;
 
-layout(location = 0) in vec3 position;
-layout(location = 2) in vec2 texCoords;
-
-out vec2 fragTexCoords;
+out vec4 fragColor;
 
 void main() {
-    gl_Position = projection * view * model * vec4(position, 1.0);
-    fragTexCoords = texCoords;
+    fragColor = vec4(1.0, 1.0, 1.0, alpha);
 }
 )END";
 
-static const GLchar kSharedFragmentShaderCode[] = R"END(
+static const GLchar kGUIFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D image;
+uniform vec3 color;
+uniform float alpha;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec4 imageSample = texture(image, fragTexCoords);
+    fragColor = vec4(color * imageSample.rgb, alpha * imageSample.a);
+}
+)END";
+
+static const GLchar kModelFragmentShader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
@@ -123,9 +154,12 @@ uniform struct Light {
     float multiplier;
 } lights[MAX_LIGHTS];
 
-uniform vec3 cameraPosition;
-uniform vec3 color;
-uniform float alpha;
+uniform bool lightmapEnabled;
+uniform bool envmapEnabled;
+uniform bool bumpyShinyEnabled;
+uniform bool bumpmapEnabled;
+uniform bool lightingEnabled;
+uniform bool selfIllumEnabled;
 
 uniform sampler2D diffuse;
 uniform sampler2D lightmap;
@@ -133,11 +167,11 @@ uniform sampler2D bumpmap;
 uniform samplerCube envmap;
 uniform samplerCube bumpyShiny;
 
-uniform bool lightingEnabled;
+uniform vec3 cameraPosition;
+uniform float alpha;
+
 uniform int lightCount;
 uniform vec3 ambientLightColor;
-
-uniform bool selfIllumEnabled;
 uniform vec3 selfIllumColor;
 
 in vec3 fragPosition;
@@ -146,6 +180,19 @@ in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
 
 out vec4 fragColor;
+
+void applyLightmap(inout vec3 color) {
+    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+    color *= lightmapSample.rgb;
+}
+
+void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
+    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 R = reflect(I, normal);
+    vec4 sample = texture(image, R);
+
+    color += sample.rgb * a;
+}
 
 void applyLighting(vec3 normal, inout vec3 color) {
     color += ambientLightColor;
@@ -178,177 +225,58 @@ void applySelfIllum(inout vec3 color) {
 
     color += 0.5 * smoothstep(0.5, 1.0, luminosity) * selfIllumColor;
 }
-)END";
 
-static const GLchar kWhiteFragmentShader[] = R"END(
-void main() {
-    fragColor = vec4(1.0, 1.0, 1.0, alpha);
-}
-)END";
-
-static const GLchar kDiffuseFragmentShader[] = R"END(
 void main() {
     vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec3 normal = normalize(fragNormal);
-    vec3 lightColor = vec3(0.0);
-
-    if (lightingEnabled) {
-        applyLighting(normal, lightColor);
-        lightColor = min(lightColor, 1.0);
-    } else {
-        lightColor = color;
-    }
-    if (selfIllumEnabled) {
-        applySelfIllum(lightColor);
-    }
-
-    fragColor = vec4(lightColor * diffuseSample.rgb, alpha * diffuseSample.a);
-}
-)END";
-
-static const GLchar kDiffuseEnvmapFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-
-    vec3 normal = normalize(fragNormal);
-    vec3 I = normalize(fragPosition - cameraPosition);
-    vec3 R = reflect(I, normal);
-    vec4 envmapSample = texture(envmap, R);
-
     vec3 surfaceColor = diffuseSample.rgb;
-    surfaceColor += envmapSample.rgb * (1.0 - diffuseSample.a);
-
     vec3 lightColor = vec3(0.0);
+    vec3 normal = normalize(fragNormal);
+
+    if (lightmapEnabled) {
+        applyLightmap(surfaceColor);
+    }
+    if (envmapEnabled) {
+        applyEnvmap(envmap, normal, 1.0 - diffuseSample.a, surfaceColor);
+    } else if (bumpyShinyEnabled) {
+        applyEnvmap(bumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor);
+    }
     if (lightingEnabled) {
         applyLighting(normal, lightColor);
         lightColor = min(lightColor, 1.0);
     } else {
-        lightColor = color;
+        lightColor = vec3(1.0);
     }
     if (selfIllumEnabled) {
         applySelfIllum(lightColor);
     }
+    float finalAlpha = alpha;
 
-    fragColor = vec4(lightColor * surfaceColor, alpha);
-}
-)END";
-
-static const GLchar kDiffuseBumpyShinyFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-
-    vec3 normal = normalize(fragNormal);
-    vec3 I = normalize(fragPosition - cameraPosition);
-    vec3 R = reflect(I, normal);
-    vec4 bumpyShinySample = texture(bumpyShiny, R);
-
-    vec3 surfaceColor = diffuseSample.rgb;
-    surfaceColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
-
-    vec3 lightColor = vec3(0.0);
-    if (lightingEnabled) {
-        applyLighting(normal, lightColor);
-        lightColor = min(lightColor, 1.0);
-    } else {
-        lightColor = color;
+    if (!envmapEnabled && !bumpyShinyEnabled) {
+        finalAlpha *= diffuseSample.a;
     }
-    if (selfIllumEnabled) {
-        applySelfIllum(lightColor);
-    }
-
-    fragColor = vec4(lightColor * surfaceColor, alpha);
-}
-)END";
-
-static const GLchar kDiffuseLightmapFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
-    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
-
-    fragColor = vec4(surfaceColor, alpha * diffuseSample.a);
-}
-)END";
-
-static const GLchar kDiffuseLightmapEnvmapFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
-
-    vec3 normal = normalize(fragNormal);
-    vec3 I = normalize(fragPosition - cameraPosition);
-    vec3 R = reflect(I, normal);
-    vec4 envmapSample = texture(envmap, R);
-
-    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
-    surfaceColor += envmapSample.rgb * (1.0 - diffuseSample.a);
-
-    fragColor = vec4(surfaceColor, alpha);
-}
-)END";
-
-static const GLchar kDiffuseLightmapBumpyShinyFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
-
-    vec3 normal = normalize(fragNormal);
-    vec3 I = normalize(fragPosition - cameraPosition);
-    vec3 R = reflect(I, normal);
-    vec4 bumpyShinySample = texture(bumpyShiny, R);
-
-    vec3 surfaceColor = (diffuseSample * lightmapSample).rgb;
-    surfaceColor += bumpyShinySample.rgb * (1.0 - diffuseSample.a);
-
-    fragColor = vec4(surfaceColor, alpha);
-}
-)END";
-
-static const GLchar kDiffuseBumpmapFragmentShader[] = R"END(
-void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
-    vec4 bumpmapSample = texture(bumpmap, fragTexCoords);
-    vec3 surfaceColor = diffuseSample.rgb;
-
-    vec3 normal = normalize(fragNormal);
-    vec3 lightColor = vec3(0.0);
-    if (lightingEnabled) {
-        applyLighting(normal, lightColor);
-        lightColor = min(lightColor, 1.0);
-    } else {
-        lightColor = color;
-    }
-    if (selfIllumEnabled) {
-        applySelfIllum(lightColor);
-    }
-
-    fragColor = vec4(lightColor * surfaceColor, alpha);
+    fragColor = vec4(lightColor * surfaceColor, finalAlpha);
 }
 )END";
 
 static const GLchar kGaussianBlurFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D image;
 uniform vec2 resolution;
 uniform vec2 direction;
 
+out vec4 fragColor;
+
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / resolution.xy);
+    vec2 uv = vec2(gl_FragCoord.xy / resolution);
     vec2 off1 = vec2(1.3333333333333333) * direction;
 
     vec4 color = vec4(0.0);
-    color += texture2D(diffuse, uv) * 0.29411764705882354;
-    color += texture2D(diffuse, uv + (off1 / resolution)) * 0.35294117647058826;
-    color += texture2D(diffuse, uv - (off1 / resolution)) * 0.35294117647058826;
+    color += texture2D(image, uv) * 0.29411764705882354;
+    color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
+    color += texture2D(image, uv - (off1 / resolution)) * 0.35294117647058826;
 
     fragColor = color;
-}
-)END";
-
-static const GLchar kTextFragmentShader[] = R"END(
-uniform sampler2D font;
-uniform vec3 textColor;
-
-void main() {
-    fragColor = vec4(textColor, texture(font, fragTexCoords).a);
 }
 )END";
 
@@ -358,30 +286,16 @@ ShaderManager &ShaderManager::instance() {
 }
 
 void ShaderManager::initGL() {
-    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
     initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kGUIVertexShader);
+    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
     initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kWhiteFragmentShader);
-    initShader(ShaderName::FragmentDiffuse, GL_FRAGMENT_SHADER, kDiffuseFragmentShader);
-    initShader(ShaderName::FragmentDiffuseEnvmap, GL_FRAGMENT_SHADER, kDiffuseEnvmapFragmentShader);
-    initShader(ShaderName::FragmentDiffuseBumpyShiny, GL_FRAGMENT_SHADER, kDiffuseBumpyShinyFragmentShader);
-    initShader(ShaderName::FragmentDiffuseLightmap, GL_FRAGMENT_SHADER, kDiffuseLightmapFragmentShader);
-    initShader(ShaderName::FragmentDiffuseLightmapEnvmap, GL_FRAGMENT_SHADER, kDiffuseLightmapEnvmapFragmentShader);
-    initShader(ShaderName::FragmentDiffuseLightmapBumpyShiny, GL_FRAGMENT_SHADER, kDiffuseLightmapBumpyShinyFragmentShader);
-    initShader(ShaderName::FragmentDiffuseBumpmap, GL_FRAGMENT_SHADER, kDiffuseBumpmapFragmentShader);
-    initShader(ShaderName::FragmentDiffuseGaussianBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
-    initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, kTextFragmentShader);
+    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, kGUIFragmentShader);
+    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, kModelFragmentShader);
+    initShader(ShaderName::FragmentGaussianBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
 
+    initProgram(ShaderProgram::GUIGUI, ShaderName::VertexGUI, ShaderName::FragmentGUI);
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::ModelDiffuse, ShaderName::VertexModel, ShaderName::FragmentDiffuse);
-    initProgram(ShaderProgram::ModelDiffuseBumpmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseBumpmap);
-    initProgram(ShaderProgram::ModelDiffuseBumpyShiny, ShaderName::VertexModel, ShaderName::FragmentDiffuseBumpyShiny);
-    initProgram(ShaderProgram::ModelDiffuseEnvmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseEnvmap);
-    initProgram(ShaderProgram::ModelDiffuseGaussianBlur, ShaderName::VertexModel, ShaderName::FragmentDiffuseGaussianBlur);
-    initProgram(ShaderProgram::ModelDiffuseLightmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmap);
-    initProgram(ShaderProgram::ModelDiffuseLightmapEnvmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapEnvmap);
-    initProgram(ShaderProgram::ModelDiffuseLightmapBumpyShiny, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapBumpyShiny);
-    initProgram(ShaderProgram::GUIDiffuse, ShaderName::VertexGUI, ShaderName::FragmentDiffuse);
-    initProgram(ShaderProgram::GUIText, ShaderName::VertexGUI, ShaderName::FragmentText);
+    initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 }
 
 void ShaderManager::initShader(ShaderName name, unsigned int type, const char *source) {
@@ -390,18 +304,13 @@ void ShaderManager::initShader(ShaderName name, unsigned int type, const char *s
     char log[512];
     GLsizei logSize;
 
-    if (type == GL_FRAGMENT_SHADER) {
-        vector<const GLchar *> strings = { kSharedFragmentShaderCode, source };
-        glShaderSource(shader, 2, &strings[0], nullptr);
-    } else {
-        glShaderSource(shader, 1, &source, nullptr);
-    }
+    glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
     if (!success) {
         glGetShaderInfoLog(shader, sizeof(log), &logSize, log);
-        throw runtime_error("Shaders: compilation failed: " + string(log, logSize));
+        throw runtime_error(str(boost::format("Shader %d compilation failed: %s") % static_cast<int>(name) % string(log, logSize)));
     }
 
     _shaders.insert(make_pair(name, shader));

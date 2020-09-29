@@ -29,17 +29,9 @@ namespace render {
 
 enum class ShaderProgram {
     None,
-    ModelDiffuse,
+    GUIGUI,
     ModelWhite,
-    ModelDiffuseBumpmap,
-    ModelDiffuseBumpyShiny,
-    ModelDiffuseEnvmap,
-    ModelDiffuseGaussianBlur,
-    ModelDiffuseLightmap,
-    ModelDiffuseLightmapBumpyShiny,
-    ModelDiffuseLightmapEnvmap,
-    GUIDiffuse,
-    GUIText
+    ModelModel
 };
 
 struct ShaderUniforms {
@@ -66,18 +58,12 @@ public:
 
 private:
     enum class ShaderName {
-        VertexModel,
         VertexGUI,
+        VertexModel,
         FragmentWhite,
-        FragmentDiffuse,
-        FragmentDiffuseBumpmap,
-        FragmentDiffuseBumpyShiny,
-        FragmentDiffuseEnvmap,
-        FragmentDiffuseGaussianBlur,
-        FragmentDiffuseLightmap,
-        FragmentDiffuseLightmapBumpyShiny,
-        FragmentDiffuseLightmapEnvmap,
-        FragmentText
+        FragmentGUI,
+        FragmentModel,
+        FragmentGaussianBlur
     };
 
     std::unordered_map<ShaderName, unsigned int> _shaders;

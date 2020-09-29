@@ -110,9 +110,9 @@ void Font::initGL() {
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
-    ShaderManager &shaders = ShaderManager::instance();
-    shaders.activate(ShaderProgram::GUIText);
-    shaders.setUniform("textColor", color);
+    ShaderManager &shaders = Shaders;
+    shaders.activate(ShaderProgram::GUIGUI);
+    shaders.setUniform("color", color);
 
     assert(_texture);
     glActiveTexture(GL_TEXTURE0);

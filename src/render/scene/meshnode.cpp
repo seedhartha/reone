@@ -75,24 +75,26 @@ void MeshSceneNode::render() const {
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
     const ModelSceneNode::AnimationState &animState = _model->animationState();
     bool skeletal = skin && !animState.name.empty();
-    ShaderProgram program = getShaderProgram(*mesh);
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(program);
+    shaders.activate(ShaderProgram::ModelModel);
     shaders.setUniform("model", _absoluteTransform);
-    shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", _model->alpha() * _modelNode->alpha());
 
     if (mesh->hasEnvmapTexture()) {
+        shaders.setUniform("envmapEnabled", true);
         shaders.setUniform("envmap", 1);
     }
     if (mesh->hasLightmapTexture()) {
+        shaders.setUniform("lightmapEnabled", true);
         shaders.setUniform("lightmap", 2);
     }
     if (mesh->hasBumpyShinyTexture()) {
+        shaders.setUniform("bumpyShinyEnabled", true);
         shaders.setUniform("bumpyShiny", 3);
     }
     if (mesh->hasBumpmapTexture()) {
+        shaders.setUniform("bumpmapEnabled", true);
         shaders.setUniform("bumpmap", 4);
     }
 
@@ -144,48 +146,29 @@ void MeshSceneNode::render() const {
 
     mesh->render(_model->textureOverride());
 
+    if (skeletal) {
+        shaders.setUniform("skeletalEnabled", false);
+    }
     if (_model->isLightingEnabled()) {
         shaders.setUniform("lightingEnabled", false);
     }
     if (_modelNode->isSelfIllumEnabled()) {
         shaders.setUniform("selfIllumEnabled", false);
     }
-    if (skeletal) {
-        shaders.setUniform("skeletalEnabled", false);
+    if (mesh->hasEnvmapTexture()) {
+        shaders.setUniform("envmapEnabled", false);
+    }
+    if (mesh->hasLightmapTexture()) {
+        shaders.setUniform("lightmapEnabled", false);
+    }
+    if (mesh->hasBumpyShinyTexture()) {
+        shaders.setUniform("bumpyShinyEnabled", false);
+    }
+    if (mesh->hasBumpmapTexture()) {
+        shaders.setUniform("bumpmapEnabled", false);
     }
 
     SceneNode::render();
-}
-
-ShaderProgram MeshSceneNode::getShaderProgram(const ModelMesh &mesh) const {
-    ShaderProgram program = ShaderProgram::None;
-
-    bool hasLightmap = mesh.hasLightmapTexture();
-    bool hasEnvmap = mesh.hasEnvmapTexture();
-    bool hasBumpyShiny = mesh.hasBumpyShinyTexture();
-    bool hasBumpmap = mesh.hasBumpmapTexture();
-
-    if (hasLightmap && !hasEnvmap && !hasBumpyShiny) {
-        program = ShaderProgram::ModelDiffuseLightmap;
-    } else if (hasLightmap && hasEnvmap && !hasBumpyShiny) {
-        program = ShaderProgram::ModelDiffuseLightmapEnvmap;
-    } else if (hasLightmap && !hasEnvmap && hasBumpyShiny) {
-        program = ShaderProgram::ModelDiffuseLightmapBumpyShiny;
-    } else if (!hasLightmap && hasEnvmap && !hasBumpyShiny) {
-        program = ShaderProgram::ModelDiffuseEnvmap;
-    } else if (!hasLightmap && !hasEnvmap && hasBumpyShiny) {
-        program = ShaderProgram::ModelDiffuseBumpyShiny;
-    } else if (!hasLightmap && !hasEnvmap && !hasBumpyShiny && hasBumpmap) {
-        program = ShaderProgram::ModelDiffuseBumpmap;
-    } else {
-        program = ShaderProgram::ModelDiffuse;
-    }
-
-    if (program == ShaderProgram::None) {
-        throw logic_error("Shader program not selected");
-    }
-
-    return program;
 }
 
 const ModelSceneNode *MeshSceneNode::model() const {
