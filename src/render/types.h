@@ -48,11 +48,6 @@ enum AnimationFlags {
     kAnimationPropagate = 2
 };
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson
-};
-
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
@@ -68,13 +63,6 @@ struct TextureFeatures {
     float fontHeight { 0.0f };
     std::vector<glm::vec3> upperLeftCoords;
     std::vector<glm::vec3> lowerRightCoords;
-};
-
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
 };
 
 class IEventHandler {

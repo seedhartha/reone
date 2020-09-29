@@ -58,6 +58,9 @@ set(HEADERS
     src/game/blueprint/placeable.h
     src/game/blueprint/trigger.h
     src/game/blueprint/waypoint.h
+    src/game/camera/camera.h
+    src/game/camera/firstperson.h
+    src/game/camera/thirdperson.h
     src/game/characters.h
     src/game/console.h
     src/game/dialog.h
@@ -112,9 +115,6 @@ set(HEADERS
     src/net/types.h
     src/program.h
     src/render/aabb.h
-    src/render/camera/camera.h
-    src/render/camera/firstperson.h
-    src/render/camera/thirdperson.h
     src/render/font.h
     src/render/framebuffer.h
     src/render/fps.h
@@ -189,6 +189,9 @@ set(SOURCES
     src/game/blueprint/placeable.cpp
     src/game/blueprint/trigger.cpp
     src/game/blueprint/waypoint.cpp
+    src/game/camera/camera.cpp
+    src/game/camera/firstperson.cpp
+    src/game/camera/thirdperson.cpp
     src/game/characters.cpp
     src/game/console.cpp
     src/game/dialog.cpp
@@ -244,9 +247,6 @@ set(SOURCES
     src/net/server.cpp
     src/program.cpp
     src/render/aabb.cpp
-    src/render/camera/camera.cpp
-    src/render/camera/firstperson.cpp
-    src/render/camera/thirdperson.cpp
     src/render/font.cpp
     src/render/framebuffer.cpp
     src/render/fps.cpp

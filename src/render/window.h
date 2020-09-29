@@ -20,7 +20,6 @@
 #include <functional>
 #include <memory>
 
-#include "camera/camera.h"
 #include "fps.h"
 #include "texture.h"
 #include "types.h"
