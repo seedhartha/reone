@@ -90,21 +90,13 @@ void main() {
     int index2 = int(boneIndices.z);
     int index3 = int(boneIndices.w);
 
-    vec3 newPosition = vec3(0, 0, 0);
     vec4 position4 = vec4(position, 1);
 
-    if (index0 != -1) {
-        newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
-    }
-    if (index1 != -1) {
-        newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
-    }
-    if (index2 != -1) {
-        newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
-    }
-    if (index3 != -1) {
-        newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
-    }
+    vec3 newPosition = vec3(0, 0, 0);
+    newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
+    newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
+    newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
+    newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
 
     gl_Position = projection * view * model * vec4(newPosition, 1);
     fragPosition = vec3(model * vec4(position, 1));
