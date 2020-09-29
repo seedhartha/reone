@@ -29,8 +29,8 @@ static const float kMinRotationSpeed = 1.0f;
 static const float kMaxRotationSpeed = 2.5f;
 static const float kRotationAcceleration = 1.0f;
 
-ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, float zNear, float zFar) {
-    _projection = glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar);
+ThirdPersonCamera::ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) {
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::radians(style.viewAngle), aspect, zNear, zFar);
     _style = style;
 }
 
@@ -110,10 +110,11 @@ void ThirdPersonCamera::updateView() {
     }
     glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - _position), glm::vec3(0.0f, 0.0f, 1.0f)));
 
-    _view = glm::translate(glm::mat4(1.0f), _position);
-    _view *= glm::mat4_cast(orientation);
+    glm::mat4 transform(glm::translate(glm::mat4(1.0f), _position));
+    transform *= glm::mat4_cast(orientation);
 
-    _view = glm::inverse(_view);
+    _sceneNode->setLocalTransform(transform);
+
 }
 
 void ThirdPersonCamera::resetInput() {

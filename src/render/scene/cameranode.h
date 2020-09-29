@@ -15,25 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camera.h"
+#pragma once
 
-using namespace std;
+#include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
-const glm::vec3 &Camera::position() const {
-    return _position;
-}
+class CameraSceneNode : public SceneNode {
+public:
+    CameraSceneNode(SceneGraph *sceneGraph, float fovy, float aspect, float near, float far);
 
-float Camera::heading() const {
-    return _heading;
-}
+    const glm::mat4 &projection() const;
+    const glm::mat4 &view() const;
 
-shared_ptr<CameraSceneNode> Camera::sceneNode() const {
-    return _sceneNode;
-}
+private:
+    float _fovy { 0.0f };
+    float _aspect { 0.0f };
+    float _zNear { 0.0f };
+    float _zFar { 0.0f };
+    glm::mat4 _projection { 1.0f };
+    glm::mat4 _view { 1.0f };
+
+    void updateAbsoluteTransform() override;
+
+    void updateView();
+};
 
 } // namespace render
 

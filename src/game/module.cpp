@@ -42,10 +42,11 @@ namespace game {
 
 static const float kDefaultFieldOfView = 75.0f;
 
-Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, const GraphicsOptions &opts) :
+Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, SceneGraph *sceneGraph, const GraphicsOptions &opts) :
     Object(id, ObjectType::Module),
     _version(version),
     _objectFactory(objectFactory),
+    _sceneGraph(sceneGraph),
     _opts(opts) {
 
     assert(_objectFactory);
@@ -112,12 +113,12 @@ void Module::loadCameras() {
 
     float heading = _info.entryHeading;
 
-    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_cameraAspect, glm::radians(kDefaultFieldOfView)));
+    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView)));
     firstPersonCamera->setPosition(position);
     firstPersonCamera->setHeading(heading);
     _firstPersonCamera = move(firstPersonCamera);
 
-    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_cameraAspect, _area->cameraStyle()));
+    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_sceneGraph, _cameraAspect, _area->cameraStyle()));
     thirdPersonCamera->setFindObstacleFunc(bind(&Module::findObstacle, this, _1, _2, _3));
     thirdPersonCamera->setTargetPosition(position);
     thirdPersonCamera->setHeading(heading);
@@ -225,8 +226,8 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 SpatialObject *Module::getObjectAt(int x, int y) const {
     shared_ptr<Camera> camera(getCamera());
     glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
-    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), camera->view(), camera->projection(), viewport));
-    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), camera->sceneNode()->view(), camera->sceneNode()->projection(), viewport));
+    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), camera->sceneNode()->view(), camera->sceneNode()->projection(), viewport));
 
     shared_ptr<SpatialObject> player(_area->player());
     SpatialObject *except = player ? player.get() : nullptr;
@@ -415,8 +416,8 @@ void Module::update(float dt, GuiContext &guiCtx) {
     UpdateContext ctx;
     ctx.deltaTime = dt;
     ctx.cameraPosition = camera->position();
-    ctx.projection = camera->projection();
-    ctx.view = camera->view();
+    ctx.projection = camera->sceneNode()->projection();
+    ctx.view = camera->sceneNode()->view();
 
     _area->update(ctx);
     _area->fill(ctx, guiCtx);

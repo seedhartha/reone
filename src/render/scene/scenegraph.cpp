@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <cassert>
 
+#include "GL/glew.h"
+
 #include "modelnode.h"
 
 using namespace std;
@@ -80,6 +82,17 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
 }
 
 void SceneGraph::render() const {
+    if (!_activeCamera) return;
+
+    glEnable(GL_DEPTH_TEST);
+
+    ShaderUniforms uniforms;
+    uniforms.projection = _activeCamera->projection();
+    uniforms.view = _activeCamera->view();
+    uniforms.cameraPosition = _activeCamera->absoluteTransform()[3];
+
+    Shaders.setGlobalUniforms(uniforms);
+
     for (auto &node : _rootNodes) {
         node->render();
     }
@@ -124,6 +137,10 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
 
 const glm::vec3 &SceneGraph::ambientLightColor() const {
     return _ambientLightColor;
+}
+
+void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
+    _activeCamera = camera;
 }
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {

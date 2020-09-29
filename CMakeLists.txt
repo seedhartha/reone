@@ -127,6 +127,7 @@ set(HEADERS
     src/render/model/animation.h
     src/render/model/modelnode.h
     src/render/scene/aabbnode.h
+    src/render/scene/cameranode.h
     src/render/scene/cubenode.h
     src/render/scene/lightnode.h
     src/render/scene/meshnode.h
@@ -258,6 +259,7 @@ set(SOURCES
     src/render/model/animation.cpp
     src/render/model/modelnode.cpp
     src/render/scene/aabbnode.cpp
+    src/render/scene/cameranode.cpp
     src/render/scene/cubenode.cpp
     src/render/scene/lightnode.cpp
     src/render/scene/meshnode.cpp
