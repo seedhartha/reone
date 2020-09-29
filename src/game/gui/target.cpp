@@ -19,7 +19,7 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/guiquad.h"
+#include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
@@ -63,7 +63,7 @@ void TargetOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords)
     glActiveTexture(GL_TEXTURE0);
     texture.bind();
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 
     texture.unbind();
 }

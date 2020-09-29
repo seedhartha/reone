@@ -29,7 +29,7 @@
 
 #include "mesh/aabb.h"
 #include "mesh/cube.h"
-#include "mesh/guiquad.h"
+#include "mesh/quad.h"
 
 #include "shaders.h"
 
@@ -73,20 +73,20 @@ void RenderWindow::init() {
     Shaders.initGL();
     TheCubeMesh.initGL();
     TheAABBMesh.initGL();
-    DefaultGuiQuad.initGL();
-    FlipXGuiQuad.initGL();
-    FlipYGuiQuad.initGL();
-    FlipXYGuiQuad.initGL();
+    DefaultQuad.initGL();
+    XFlippedQuad.initGL();
+    YFlippedQuad.initGL();
+    XYFlippedQuad.initGL();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderWindow::deinit() {
-    DefaultGuiQuad.deinitGL();
-    FlipXGuiQuad.deinitGL();
-    FlipYGuiQuad.deinitGL();
-    FlipXYGuiQuad.deinitGL();
+    DefaultQuad.deinitGL();
+    XFlippedQuad.deinitGL();
+    YFlippedQuad.deinitGL();
+    XYFlippedQuad.deinitGL();
     TheAABBMesh.deinitGL();
     TheCubeMesh.deinitGL();
     Shaders.deinitGL();
@@ -174,7 +174,7 @@ void RenderWindow::drawCursor() const {
     glActiveTexture(0);
     texture->bind();
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 
     texture->unbind();
 }

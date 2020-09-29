@@ -23,7 +23,7 @@
 
 #include "../core/log.h"
 #include "../resources/resources.h"
-#include "../render/mesh/guiquad.h"
+#include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 
 using namespace std;
@@ -242,7 +242,7 @@ void GUI::drawBackground() const {
     glActiveTexture(0);
     _background->bind();
 
-    DefaultGuiQuad.render(GL_TRIANGLES);
+    DefaultQuad.render(GL_TRIANGLES);
 
     _background->unbind();
 }

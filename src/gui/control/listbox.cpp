@@ -22,7 +22,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../../core/log.h"
-#include "../../render/mesh/guiquad.h"
+#include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resources/resources.h"
 

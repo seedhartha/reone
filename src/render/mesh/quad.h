@@ -23,21 +23,21 @@ namespace reone {
 
 namespace render {
 
-class GUIQuad : public Mesh {
+class Quad : public Mesh {
 public:
-    static GUIQuad &getDefault();
-    static GUIQuad &getXFlipped();
-    static GUIQuad &getYFlipped();
-    static GUIQuad &getXYFlipped();
+    static Quad &getDefault();
+    static Quad &getXFlipped();
+    static Quad &getYFlipped();
+    static Quad &getXYFlipped();
 
 private:
-    GUIQuad(std::vector<float> &&vertices);
+    Quad(std::vector<float> &&vertices);
 };
 
-#define DefaultGuiQuad render::GUIQuad::getDefault()
-#define FlipXGuiQuad render::GUIQuad::getXFlipped()
-#define FlipYGuiQuad render::GUIQuad::getYFlipped()
-#define FlipXYGuiQuad render::GUIQuad::getXYFlipped()
+#define DefaultQuad render::Quad::getDefault()
+#define XFlippedQuad render::Quad::getXFlipped()
+#define YFlippedQuad render::Quad::getYFlipped()
+#define XYFlippedQuad render::Quad::getXYFlipped()
 
 } // namespace render
 
