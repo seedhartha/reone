@@ -50,7 +50,6 @@ private:
 
     bool isTransparent() const;
 
-    ShaderProgram getShaderProgram(const ModelMesh &mesh) const;
     void updateAbsoluteTransform() override;
     void updateCenter();
 };

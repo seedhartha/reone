@@ -50,7 +50,7 @@ void ScrollBar::load(const GffStruct &gffs) {
 void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
-    Shaders.activate(ShaderProgram::ModelDiffuse);
+    Shaders.activate(ShaderProgram::GUIGUI);
     Shaders.setUniform("color", glm::vec3(1.0f));
     Shaders.setUniform("alpha", 1.0f);
 

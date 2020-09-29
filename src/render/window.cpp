@@ -166,7 +166,7 @@ void RenderWindow::drawCursor() const {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIDiffuse);
+    shaders.activate(ShaderProgram::GUIGUI);
     shaders.setUniform("model", transform);
     shaders.setUniform("color", glm::vec3(1.0f));
     shaders.setUniform("alpha", 1.0f);
