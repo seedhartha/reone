@@ -66,7 +66,7 @@ void AABBMesh::render(const AABB &aabb, const glm::mat4 &transform) const {
     glm::mat4 transform2(transform * aabb.transform());
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::BasicWhite);
+    shaders.activate(ShaderProgram::ModelWhite);
     shaders.setUniform("model", transform2);
     shaders.setUniform("alpha", 1.0f);
 

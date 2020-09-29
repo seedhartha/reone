@@ -31,33 +31,7 @@ namespace reone {
 
 namespace render {
 
-static const GLchar kBasicVertexShader[] = R"END(
-#version 330
-
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 texCoords;
-layout(location = 3) in vec2 lightmapCoords;
-
-out vec3 fragPosition;
-out vec3 fragNormal;
-out vec2 fragTexCoords;
-out vec2 fragLightmapCoords;
-
-void main() {
-    gl_Position = projection * view * model * vec4(position, 1);
-    fragPosition = vec3(model * vec4(position, 1));
-    fragNormal = mat3(transpose(inverse(model))) * normal;
-    fragTexCoords = texCoords;
-    fragLightmapCoords = lightmapCoords;
-}
-)END";
-
-static const GLchar kSkeletalVertexShader[] = R"END(
+static const GLchar kModelVertexShader[] = R"END(
 #version 330
 
 const int MAX_BONES = 128;
@@ -65,6 +39,8 @@ const int MAX_BONES = 128;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+
+uniform bool skeletalEnabled;
 uniform mat4 absTransform;
 uniform mat4 absTransformInv;
 uniform mat4 bones[MAX_BONES];
@@ -72,36 +48,47 @@ uniform mat4 bones[MAX_BONES];
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoords;
+layout(location = 3) in vec2 lightmapCoords;
 layout(location = 4) in vec4 boneWeights;
 layout(location = 5) in vec4 boneIndices;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
 out vec2 fragTexCoords;
+out vec2 fragLightmapCoords;
 
 void main() {
-    float weight0 = boneWeights.x;
-    float weight1 = boneWeights.y;
-    float weight2 = boneWeights.z;
-    float weight3 = boneWeights.w;
+    vec3 newPosition = vec3(0.0);
 
-    int index0 = int(boneIndices.x);
-    int index1 = int(boneIndices.y);
-    int index2 = int(boneIndices.z);
-    int index3 = int(boneIndices.w);
+    if (skeletalEnabled) {
+        float weight0 = boneWeights.x;
+        float weight1 = boneWeights.y;
+        float weight2 = boneWeights.z;
+        float weight3 = boneWeights.w;
 
-    vec4 position4 = vec4(position, 1);
+        int index0 = int(boneIndices.x);
+        int index1 = int(boneIndices.y);
+        int index2 = int(boneIndices.z);
+        int index3 = int(boneIndices.w);
 
-    vec3 newPosition = vec3(0, 0, 0);
-    newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
-    newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
-    newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
-    newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
+        vec4 position4 = vec4(position, 1.0);
 
-    gl_Position = projection * view * model * vec4(newPosition, 1);
-    fragPosition = vec3(model * vec4(position, 1));
+        newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
+        newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
+        newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
+        newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
+
+    } else {
+        newPosition = position;
+    }
+
+    vec4 newPosition4 = vec4(newPosition, 1.0);
+
+    gl_Position = projection * view * model * newPosition4;
+    fragPosition = vec3(model * newPosition4);
     fragNormal = mat3(transpose(inverse(model))) * normal;
     fragTexCoords = texCoords;
+    fragLightmapCoords = lightmapCoords;
 }
 )END";
 
@@ -118,7 +105,7 @@ layout(location = 2) in vec2 texCoords;
 out vec2 fragTexCoords;
 
 void main() {
-    gl_Position = projection * view * model * vec4(position, 1);
+    gl_Position = projection * view * model * vec4(position, 1.0);
     fragTexCoords = texCoords;
 }
 )END";
@@ -371,8 +358,7 @@ ShaderManager &ShaderManager::instance() {
 }
 
 void ShaderManager::initGL() {
-    initShader(ShaderName::VertexBasic, GL_VERTEX_SHADER, kBasicVertexShader);
-    initShader(ShaderName::VertexSkeletal, GL_VERTEX_SHADER, kSkeletalVertexShader);
+    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
     initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kGUIVertexShader);
     initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kWhiteFragmentShader);
     initShader(ShaderName::FragmentDiffuse, GL_FRAGMENT_SHADER, kDiffuseFragmentShader);
@@ -385,18 +371,15 @@ void ShaderManager::initGL() {
     initShader(ShaderName::FragmentDiffuseGaussianBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
     initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, kTextFragmentShader);
 
-    initProgram(ShaderProgram::BasicWhite, ShaderName::VertexBasic, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::BasicDiffuse, ShaderName::VertexBasic, ShaderName::FragmentDiffuse);
-    initProgram(ShaderProgram::BasicDiffuseEnvmap, ShaderName::VertexBasic, ShaderName::FragmentDiffuseEnvmap);
-    initProgram(ShaderProgram::BasicDiffuseBumpyShiny, ShaderName::VertexBasic, ShaderName::FragmentDiffuseBumpyShiny);
-    initProgram(ShaderProgram::BasicDiffuseLightmap, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmap);
-    initProgram(ShaderProgram::BasicDiffuseLightmapEnvmap, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmapEnvmap);
-    initProgram(ShaderProgram::BasicDiffuseLightmapBumpyShiny, ShaderName::VertexBasic, ShaderName::FragmentDiffuseLightmapBumpyShiny);
-    initProgram(ShaderProgram::BasicDiffuseGaussianBlur, ShaderName::VertexBasic, ShaderName::FragmentDiffuseGaussianBlur);
-    initProgram(ShaderProgram::SkeletalDiffuse, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuse);
-    initProgram(ShaderProgram::SkeletalDiffuseEnvmap, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseEnvmap);
-    initProgram(ShaderProgram::SkeletalDiffuseBumpyShiny, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseBumpyShiny);
-    initProgram(ShaderProgram::SkeletalDiffuseBumpmap, ShaderName::VertexSkeletal, ShaderName::FragmentDiffuseBumpmap);
+    initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
+    initProgram(ShaderProgram::ModelDiffuse, ShaderName::VertexModel, ShaderName::FragmentDiffuse);
+    initProgram(ShaderProgram::ModelDiffuseBumpmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseBumpmap);
+    initProgram(ShaderProgram::ModelDiffuseBumpyShiny, ShaderName::VertexModel, ShaderName::FragmentDiffuseBumpyShiny);
+    initProgram(ShaderProgram::ModelDiffuseEnvmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseEnvmap);
+    initProgram(ShaderProgram::ModelDiffuseGaussianBlur, ShaderName::VertexModel, ShaderName::FragmentDiffuseGaussianBlur);
+    initProgram(ShaderProgram::ModelDiffuseLightmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmap);
+    initProgram(ShaderProgram::ModelDiffuseLightmapEnvmap, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapEnvmap);
+    initProgram(ShaderProgram::ModelDiffuseLightmapBumpyShiny, ShaderName::VertexModel, ShaderName::FragmentDiffuseLightmapBumpyShiny);
     initProgram(ShaderProgram::GUIText, ShaderName::VertexGUI, ShaderName::FragmentText);
 }
 
