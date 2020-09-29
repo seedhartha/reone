@@ -27,12 +27,12 @@
 #include "../script/variable.h"
 
 #include "camera/camera.h"
-#include "navmesh.h"
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
+#include "pathfinding.h"
 #include "room.h"
 
 namespace reone {
@@ -143,7 +143,7 @@ private:
     std::unique_ptr<resources::Visibility> _visibility;
     CameraStyle _cameraStyle;
     std::string _music;
-    std::unique_ptr<NavMesh> _navMesh;
+    std::unique_ptr<Pathfinding> _pathfinding;
     std::unordered_map<ScriptType, std::string> _scripts;
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;

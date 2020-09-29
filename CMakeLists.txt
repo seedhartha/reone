@@ -74,7 +74,6 @@ set(HEADERS
     src/game/gui/mainmenu.h
     src/game/gui/portraitsel.h
     src/game/gui/target.h
-    src/game/navmesh.h
     src/game/module.h
     src/game/multiplayer/area.h
     src/game/multiplayer/callbacks.h
@@ -93,6 +92,7 @@ set(HEADERS
     src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/waypoint.h
+    src/game/pathfinding.h
     src/game/paths.h
     src/game/room.h
     src/game/script/routines.h
@@ -214,7 +214,6 @@ set(SOURCES
     src/game/multiplayer/game.cpp
     src/game/multiplayer/objectfactory.cpp
     src/game/multiplayer/util.cpp
-    src/game/navmesh.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
     src/game/object/factory.cpp
@@ -224,6 +223,7 @@ set(SOURCES
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
+    src/game/pathfinding.cpp
     src/game/paths.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
