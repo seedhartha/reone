@@ -52,6 +52,7 @@ namespace game {
 class Game : public render::IEventHandler {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
+    virtual ~Game() = default;
 
     int run();
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
