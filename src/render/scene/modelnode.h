@@ -56,7 +56,7 @@ public:
     void fillSceneGraph() override;
     void renderImmediate() const override;
 
-    glm::vec3 getNodeAbsolutePosition(const std::string &name) const;
+    bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
 
     const std::string &name() const;

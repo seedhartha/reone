@@ -126,6 +126,10 @@ const vector<shared_ptr<Item>> &SpatialObject::items() const {
     return _items;
 }
 
+glm::vec3 SpatialObject::selectablePosition() const {
+    return _model->getCenterOfAABB();
+}
+
 void SpatialObject::setRoom(Room *room) {
     if (_room) {
         _room->removeTenant(this);

@@ -764,14 +764,14 @@ void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     addPartyMemberPortrait(_partyMember2, guiCtx);
 
     if (_hilightedObjectId != -1) {
-        glm::vec3 coords(getScreenCenterOfObject(_hilightedObjectId, updateCtx));
+        glm::vec3 coords(getSelectableScreenCoords(_hilightedObjectId, updateCtx));
         if (coords.z < 1.0f) {
             guiCtx.target.hasHilighted = true;
             guiCtx.target.hilightedScreenCoords = coords;
         }
     }
     if (_selectedObjectId != -1) {
-        glm::vec3 coords(getScreenCenterOfObject(_selectedObjectId, updateCtx));
+        glm::vec3 coords(getSelectableScreenCoords(_selectedObjectId, updateCtx));
         if (coords.z < 1.0f) {
             guiCtx.target.hasSelected = true;
             guiCtx.target.selectedScreenCoords = coords;
@@ -787,13 +787,13 @@ void Area::addPartyMemberPortrait(const shared_ptr<SpatialObject> &object, GuiCo
     }
 }
 
-glm::vec3 Area::getScreenCenterOfObject(uint32_t objectId, const UpdateContext &ctx) const {
+glm::vec3 Area::getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const {
     static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
     shared_ptr<SpatialObject> object(find(objectId));
-    glm::vec3 center(object->model()->getCenterOfAABB());
+    glm::vec3 position(object->selectablePosition());
 
-    return glm::project(center, ctx.view, ctx.projection, viewport);
+    return glm::project(position, ctx.view, ctx.projection, viewport);
 }
 
 void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {

@@ -58,6 +58,7 @@ public:
     std::shared_ptr<render::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
     const std::vector<std::shared_ptr<Item>> &items() const;
+    virtual glm::vec3 selectablePosition() const;
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);

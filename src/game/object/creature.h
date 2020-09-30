@@ -84,6 +84,7 @@ public:
     bool hasActions() const;
     float walkSpeed() const;
     float runSpeed() const;
+    glm::vec3 selectablePosition() const override;
 
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);

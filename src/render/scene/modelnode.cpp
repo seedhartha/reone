@@ -41,7 +41,6 @@ namespace reone {
 namespace render {
 
 ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model) : SceneNode(sceneGraph), _model(model) {
-    assert(_model);
     initChildren();
 }
 
@@ -136,13 +135,12 @@ void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &m
         return;
     }
     uint16_t parentNumber = parent->nodeNumber();
+    auto maybeAttached = _attachedModels.find(parentNumber);
 
-    auto attached = _attachedModels.find(parentNumber);
-    if (attached != _attachedModels.end()) {
-        removeChild(attached->second);
-        _attachedModels.erase(attached);
+    if (maybeAttached != _attachedModels.end()) {
+        removeChild(maybeAttached->second);
+        _attachedModels.erase(maybeAttached);
     }
-
     if (model) {
         shared_ptr<ModelSceneNode> child(new ModelSceneNode(_sceneGraph, model));
         child->setLocalTransform(parent->absoluteTransform());
@@ -331,9 +329,7 @@ void ModelSceneNode::setLightingIsDirty() {
     _lightingDirty = true;
 }
 
-glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
-    glm::vec3 position(0.0f);
-
+bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &position) const {
     shared_ptr<ModelNode> node(_model->findNodeByName(name));
     if (!node) {
         shared_ptr<Model> superModel(_model->superModel());
@@ -341,17 +337,15 @@ glm::vec3 ModelSceneNode::getNodeAbsolutePosition(const string &name) const {
             node = superModel->findNodeByName(name);
         }
     }
-    if (!node) {
-        warn(boost::format("Model node not found: %s %s") % _model->name() % name);
-        return glm::vec3(0.0f);
-    }
+    if (!node) return false;
 
-    return node->absoluteTransform()[3];
+    position = node->absoluteTransform()[3];
+
+    return true;
 }
 
 glm::vec3 ModelSceneNode::getCenterOfAABB() const {
-    glm::vec3 center(_model->aabb().center());
-    return _absoluteTransform * glm::vec4(center, 1.0f);
+    return _absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f);
 }
 
 const string &ModelSceneNode::name() const {
