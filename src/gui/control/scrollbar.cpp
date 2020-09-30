@@ -50,10 +50,6 @@ void ScrollBar::load(const GffStruct &gffs) {
 void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
-    Shaders.activate(ShaderProgram::GUIGUI);
-    Shaders.setUniform("color", glm::vec3(1.0f));
-    Shaders.setUniform("alpha", 1.0f);
-
     glActiveTexture(0);
     _dir.image->bind();
 
@@ -64,21 +60,27 @@ void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) con
 }
 
 void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
-    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f)));
-    arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    Shaders.setUniform("model", arrowTransform);
+    LocalUniforms locals;
+    locals.model = move(transform);
 
+    Shaders.activate(ShaderProgram::GUIGUI, locals);
     DefaultQuad.render(GL_TRIANGLES);
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
-    glm::mat4 arrowTransform(glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f)));
-    arrowTransform = glm::scale(arrowTransform, glm::vec3(_extent.width, _extent.width, 1.0f));
-    arrowTransform = glm::rotate(arrowTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
+    transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    Shaders.setUniform("model", arrowTransform);
+    LocalUniforms locals;
+    locals.model = move(transform);
 
+    Shaders.activate(ShaderProgram::GUIGUI, locals);
     DefaultQuad.render(GL_TRIANGLES);
 }
 

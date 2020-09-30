@@ -123,24 +123,26 @@ void Console::executeInputText() {
 
 void Console::render() const {
     float height = kLineCount * _font->height();
+    {
+        glm::mat4 transform(1.0f);
+        transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
-    glm::mat4 model(1.0f);
-    model = glm::scale(model, glm::vec3(_opts.width, height, 1.0f));
+        LocalUniforms locals;
+        locals.model = move(transform);
+        locals.color = glm::vec3(0.0f);
+        locals.alpha = 0.5f;
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("model", model);
-    shaders.setUniform("color", glm::vec3(0.0f));
-    shaders.setUniform("alpha", 0.5f);
-
+        Shaders.activate(ShaderProgram::GUIGUI, locals);
+    }
     DefaultQuad.render(GL_TRIANGLES);
 
     string text("> " + _inputText);
+    {
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
-
-    _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
+        _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
+    }
 }
 
 bool Console::isOpen() const {

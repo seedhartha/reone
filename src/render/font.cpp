@@ -111,8 +111,6 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     if (text.empty()) return;
 
     ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("color", color);
 
     assert(_texture);
     glActiveTexture(GL_TEXTURE0);
@@ -139,8 +137,11 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     glm::mat4 textTransform(glm::translate(transform, textOffset));
 
     for (auto &glyph : text) {
-        assert(glyph < _glyphCount);
-        shaders.setUniform("model", textTransform);
+        LocalUniforms locals;
+        locals.model = textTransform;
+        locals.color = color;
+
+        shaders.activate(ShaderProgram::GUIGUI, locals);
 
         int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
         glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));

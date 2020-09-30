@@ -23,6 +23,8 @@
 #include "../../render/shaders.h"
 #include "../../resources/resources.h"
 
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resources;
 
@@ -55,10 +57,10 @@ void TargetOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords)
     transform = glm::translate(transform, glm::vec3((_opts.width * screenCoords.x) - width / 2, (_opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("model", transform);
-    shaders.setUniform("alpha", 1.0f);
+    LocalUniforms locals;
+    locals.model = move(transform);
+
+    Shaders.activate(ShaderProgram::GUIGUI, locals);
 
     glActiveTexture(GL_TEXTURE0);
     texture.bind();

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -34,10 +35,56 @@ enum class ShaderProgram {
     ModelModel
 };
 
-struct ShaderUniforms {
+struct GlobalUniforms {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
     glm::vec3 cameraPosition { 0.0f };
+};
+
+struct FeatureUniforms {
+    bool lightmapEnabled { false };
+    bool envmapEnabled { false };
+    bool bumpyShinyEnabled { false };
+    bool bumpmapEnabled { false };
+    bool skeletalEnabled { false };
+    bool lightingEnabled { false };
+    bool selfIllumEnabled { false };
+};
+
+struct TextureUniforms {
+    int lightmap { 0 };
+    int envmap { 0 };
+    int bumpyShiny { 0 };
+    int bumpmap { 0 };
+};
+
+struct SkeletalUniforms {
+    glm::mat4 absTransform { 1.0f };
+    glm::mat4 absTransformInv { 1.0f };
+    std::vector<glm::mat4> bones;
+};
+
+struct ShaderLight {
+    glm::vec3 position { 0.0f };
+    glm::vec3 color { 1.0f };
+    float radius { 1.0f };
+};
+
+struct LightingUniforms {
+    glm::vec3 ambientColor { 1.0f };
+    std::vector<ShaderLight> lights;
+};
+
+struct LocalUniforms {
+    FeatureUniforms features;
+    TextureUniforms textures;
+    SkeletalUniforms skeletal;
+    LightingUniforms lighting;
+
+    glm::mat4 model { 1.0f };
+    glm::vec3 color { 1.0f };
+    float alpha { 1.0f };
+    glm::vec3 selfIllumColor { 1.0f };
 };
 
 class ShaderManager {
@@ -46,15 +93,10 @@ public:
 
     void initGL();
     void deinitGL();
-    void activate(ShaderProgram program);
+    void activate(ShaderProgram program, const LocalUniforms &uniforms);
     void deactivate();
-    void setGlobalUniforms(const ShaderUniforms &uniforms);
-    void setUniform(const std::string &name, int value);
-    void setUniform(const std::string &name, float value);
-    void setUniform(const std::string &name, const glm::vec2 &v);
-    void setUniform(const std::string &name, const glm::vec3 &v);
-    void setUniform(const std::string &name, const glm::mat4 &m);
-    void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
+
+    void setGlobalUniforms(const GlobalUniforms &globals);
 
 private:
     enum class ShaderName {
@@ -66,10 +108,10 @@ private:
         FragmentGaussianBlur
     };
 
-    std::unordered_map<ShaderName, unsigned int> _shaders;
-    std::unordered_map<ShaderProgram, unsigned int> _programs;
+    std::unordered_map<ShaderName, uint32_t> _shaders;
+    std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
-    unsigned int _activeOrdinal { 0 };
+    uint32_t _activeOrdinal { 0 };
 
     ShaderManager() = default;
     ShaderManager(const ShaderManager &) = delete;
@@ -80,12 +122,13 @@ private:
     void initShader(ShaderName name, unsigned int type, const char *source);
     void initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader);
     unsigned int getOrdinal(ShaderProgram program) const;
-    void setUniform(unsigned int ordinal, const std::string &name, int value);
-    void setUniform(unsigned int ordinal, const std::string &name, float value);
-    void setUniform(unsigned int ordinal, const std::string &name, const glm::vec2 &v);
-    void setUniform(unsigned int ordinal, const std::string &name, const glm::vec3 &v);
-    void setUniform(unsigned int ordinal, const std::string &name, const glm::mat4 &m);
-    void setUniform(unsigned int ordinal, const std::string &name, const std::vector<glm::mat4> &arr);
+    void setLocalUniforms(const LocalUniforms &locals);
+    void setUniform(const std::string &name, int value);
+    void setUniform(const std::string &name, float value);
+    void setUniform(const std::string &name, const glm::vec2 &v);
+    void setUniform(const std::string &name, const glm::vec3 &v);
+    void setUniform(const std::string &name, const glm::mat4 &m);
+    void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
 };
 
 #define Shaders render::ShaderManager::instance()
