@@ -61,7 +61,9 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 1.0f };
     uint32_t _textureId { 0 };
-    Framebuffer _framebuffer;
+    Framebuffer _geometryFramebuffer;
+    Framebuffer _vBlurFramebuffer;
+    Framebuffer _hBlurFramebuffer;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

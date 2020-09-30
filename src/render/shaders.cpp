@@ -116,10 +116,12 @@ static const GLchar kWhiteFragmentShader[] = R"END(
 
 uniform float uAlpha;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     fragColor = vec4(1.0, 1.0, 1.0, uAlpha);
+    fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
 }
 )END";
 
@@ -132,11 +134,13 @@ uniform float uAlpha;
 
 in vec2 fragTexCoords;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     vec4 textureSample = texture(uTexture, fragTexCoords);
     fragColor = vec4(uColor * textureSample.rgb, uAlpha * textureSample.a);
+    fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
 }
 )END";
 
@@ -179,7 +183,8 @@ in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
 
 void applyLightmap(inout vec3 color) {
     vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
@@ -219,13 +224,6 @@ void applyLighting(vec3 normal, inout vec3 color) {
     }
 }
 
-void applySelfIllum(inout vec3 color) {
-    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
-    float luminosity = dot(diffuseSample.rgb, RGB_TO_LUMINOSITY);
-
-    color += 0.5 * smoothstep(0.5, 1.0, luminosity) * uSelfIllumColor;
-}
-
 void main() {
     vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
     vec3 surfaceColor = diffuseSample.rgb;
@@ -246,15 +244,19 @@ void main() {
     } else {
         lightColor = vec3(1.0);
     }
-    if (uSelfIllumEnabled) {
-        applySelfIllum(lightColor);
-    }
     float finalAlpha = uAlpha;
 
     if (!uEnvmapEnabled && !uBumpyShinyEnabled) {
         finalAlpha *= diffuseSample.a;
     }
     fragColor = vec4(lightColor * surfaceColor, finalAlpha);
+
+    if (uSelfIllumEnabled) {
+        vec3 color = uSelfIllumColor * diffuseSample.rgb;
+        fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
+    } else {
+        fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
+    }
 }
 )END";
 
@@ -269,14 +271,34 @@ out vec4 fragColor;
 
 void main() {
     vec2 uv = vec2(gl_FragCoord.xy / uResolution);
-    vec2 off1 = vec2(1.3333333333333333) * uDirection;
-
     vec4 color = vec4(0.0);
-    color += texture2D(uTexture, uv) * 0.29411764705882354;
-    color += texture2D(uTexture, uv + (off1 / uResolution)) * 0.35294117647058826;
-    color += texture2D(uTexture, uv - (off1 / uResolution)) * 0.35294117647058826;
+    vec2 off1 = vec2(1.3846153846) * uDirection;
+    vec2 off2 = vec2(3.2307692308) * uDirection;
+    color += texture2D(uTexture, uv) * 0.2270270270;
+    color += texture2D(uTexture, uv + (off1 / uResolution)) * 0.3162162162;
+    color += texture2D(uTexture, uv - (off1 / uResolution)) * 0.3162162162;
+    color += texture2D(uTexture, uv + (off2 / uResolution)) * 0.0702702703;
+    color += texture2D(uTexture, uv - (off2 / uResolution)) * 0.0702702703;
 
     fragColor = color;
+}
+)END";
+
+static const GLchar kBloomFragmentShader[] = R"END(
+#version 330
+
+uniform sampler2D uGeometry;
+uniform sampler2D uBloom;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 geometryColor = texture(uGeometry, fragTexCoords).rgb;
+    vec3 bloomColor = texture(uBloom, fragTexCoords).rgb;
+
+    fragColor = vec4(geometryColor + bloomColor, 1.0);
 }
 )END";
 
@@ -291,9 +313,12 @@ void ShaderManager::initGL() {
     initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kWhiteFragmentShader);
     initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, kGUIFragmentShader);
     initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, kModelFragmentShader);
-    initShader(ShaderName::FragmentGaussianBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
+    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
+    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, kBloomFragmentShader);
 
     initProgram(ShaderProgram::GUIGUI, ShaderName::VertexGUI, ShaderName::FragmentGUI);
+    initProgram(ShaderProgram::GUIBlur, ShaderName::VertexGUI, ShaderName::FragmentBlur);
+    initProgram(ShaderProgram::GUIBloom, ShaderName::VertexGUI, ShaderName::FragmentBloom);
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 }
@@ -431,6 +456,13 @@ void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
     }
     if (locals.features.selfIllumEnabled) {
         setUniform("uSelfIllumColor", locals.selfIllumColor);
+    }
+    if (locals.features.blurEnabled) {
+        setUniform("uResolution", locals.blur.resolution);
+        setUniform("uDirection", locals.blur.direction);
+    }
+    if (locals.features.bloomEnabled) {
+        setUniform("uBloom", locals.textures.bloom);
     }
 }
 

@@ -31,6 +31,8 @@ namespace render {
 enum class ShaderProgram {
     None,
     GUIGUI,
+    GUIBlur,
+    GUIBloom,
     ModelWhite,
     ModelModel
 };
@@ -49,6 +51,8 @@ struct FeatureUniforms {
     bool skeletalEnabled { false };
     bool lightingEnabled { false };
     bool selfIllumEnabled { false };
+    bool blurEnabled { false };
+    bool bloomEnabled { false };
 };
 
 struct TextureUniforms {
@@ -56,6 +60,7 @@ struct TextureUniforms {
     int envmap { 0 };
     int bumpyShiny { 0 };
     int bumpmap { 0 };
+    int bloom { 0 };
 };
 
 struct SkeletalUniforms {
@@ -75,11 +80,17 @@ struct LightingUniforms {
     std::vector<ShaderLight> lights;
 };
 
+struct GaussianBlurUniforms {
+    glm::vec2 resolution { 0.0f };
+    glm::vec2 direction { 0.0f };
+};
+
 struct LocalUniforms {
     FeatureUniforms features;
     TextureUniforms textures;
     SkeletalUniforms skeletal;
     LightingUniforms lighting;
+    GaussianBlurUniforms blur;
 
     glm::mat4 model { 1.0f };
     glm::vec3 color { 1.0f };
@@ -105,7 +116,8 @@ private:
         FragmentWhite,
         FragmentGUI,
         FragmentModel,
-        FragmentGaussianBlur
+        FragmentBlur,
+        FragmentBloom
     };
 
     std::unordered_map<ShaderName, uint32_t> _shaders;

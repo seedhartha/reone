@@ -33,12 +33,19 @@ namespace reone {
 namespace render {
 
 static const int kMaxLightCount = 8;
+static const int kBlurPassCount = 1;
 
-SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts), _framebuffer(opts.width, opts.height) {
+SceneGraph::SceneGraph(const GraphicsOptions &opts) :
+    _opts(opts),
+    _geometryFramebuffer(opts.width, opts.height, 2),
+    _vBlurFramebuffer(opts.width, opts.height),
+    _hBlurFramebuffer(opts.width, opts.height) {
 }
 
 void SceneGraph::init() {
-    _framebuffer.init();
+    _geometryFramebuffer.init();
+    _vBlurFramebuffer.init();
+    _hBlurFramebuffer.init();
 }
 
 void SceneGraph::clear() {
@@ -95,7 +102,11 @@ void SceneGraph::render() const {
 
     ShaderManager &shaders = Shaders;
     {
-        _framebuffer.bind();
+        // Render geometry
+        _geometryFramebuffer.bind();
+
+        static const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, buffers);
 
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -117,28 +128,98 @@ void SceneGraph::render() const {
             mesh->render();
         }
 
-        _framebuffer.unbind();
+        _geometryFramebuffer.unbind();
+    }
+    float w = static_cast<float>(_opts.width);
+    float h = static_cast<float>(_opts.height);
+
+    GlobalUniforms globals;
+    globals.projection = glm::ortho(0.0f, w, h, 0.0f);
+
+    shaders.setGlobalUniforms(globals);
+    
+    for (int i = 0; i < kBlurPassCount; ++i) {
+        {
+            // Apply horizontal blur
+            _hBlurFramebuffer.bind();
+
+            glEnable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glm::mat4 transform(1.0f);
+            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.features.blurEnabled = true;
+            locals.blur.resolution = glm::vec2(w, h);
+            locals.blur.direction = glm::vec2(1.0f, 0.0f);
+
+            shaders.activate(ShaderProgram::GUIBlur, locals);
+
+            glActiveTexture(GL_TEXTURE0);
+            if (i == 0) {
+                _geometryFramebuffer.bindColorBuffer(1);
+            } else {
+                _vBlurFramebuffer.bindColorBuffer(0);
+            }
+
+            DefaultQuad.render(GL_TRIANGLES);
+
+            _geometryFramebuffer.unbindColorBuffer();
+            _hBlurFramebuffer.unbind();
+        }
+        {
+            // Apply vertical blur
+            _vBlurFramebuffer.bind();
+
+            glEnable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glm::mat4 transform(1.0f);
+            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.features.blurEnabled = true;
+            locals.blur.resolution = glm::vec2(_opts.width, _opts.height);
+            locals.blur.direction = glm::vec2(0.0f, 1.0f);
+
+            shaders.activate(ShaderProgram::GUIBlur, locals);
+
+            glActiveTexture(GL_TEXTURE0);
+            _hBlurFramebuffer.bindColorBuffer(0);
+
+            DefaultQuad.render(GL_TRIANGLES);
+
+            _hBlurFramebuffer.unbindColorBuffer();
+            _vBlurFramebuffer.unbind();
+        }
     }
     {
-        GlobalUniforms globals;
-        globals.projection = glm::ortho(0.0f, static_cast<float>(_opts.width), static_cast<float>(_opts.height), 0.0f);
-
-        shaders.setGlobalUniforms(globals);
-
         glm::mat4 transform(1.0f);
-        transform = glm::scale(transform, glm::vec3(_framebuffer.width(), _framebuffer.height(), 1.0f));
+        transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
         LocalUniforms locals;
         locals.model = move(transform);
+        locals.features.bloomEnabled = true;
+        locals.textures.bloom = 1;
 
-        shaders.activate(ShaderProgram::GUIGUI, locals);
+        shaders.activate(ShaderProgram::GUIBloom, locals);
 
         glActiveTexture(GL_TEXTURE0);
-        _framebuffer.bindTexture();
+        _geometryFramebuffer.bindColorBuffer(0);
+
+        glActiveTexture(GL_TEXTURE1);
+        _vBlurFramebuffer.bindColorBuffer(0);
 
         DefaultQuad.render(GL_TRIANGLES);
 
-        _framebuffer.unbindTexture();
+        glActiveTexture(GL_TEXTURE1);
+        _vBlurFramebuffer.unbindColorBuffer();
+
+        glActiveTexture(GL_TEXTURE0);
+        _geometryFramebuffer.unbindColorBuffer();
     }
 }
 
