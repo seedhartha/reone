@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 namespace reone {
 
@@ -25,15 +26,15 @@ namespace render {
 
 class Framebuffer {
 public:
-    Framebuffer(int w, int h);
+    Framebuffer(int w, int h, int colorBufferCount = 1);
     ~Framebuffer();
 
     void init();
     void deinit();
     void bind() const;
     void unbind() const;
-    void bindTexture() const;
-    void unbindTexture() const;
+    void bindColorBuffer(int n) const;
+    void unbindColorBuffer() const;
 
     int width() const;
     int height() const;
@@ -41,10 +42,11 @@ public:
 private:
     int _width { 0 };
     int _height { 0 };
+    int _colorBufferCount { 0 };
     bool _inited { false };
     uint32_t _framebuffer { 0 };
-    uint32_t _texture { 0 };
-    uint32_t _renderbuffer { 0 };
+    std::vector<uint32_t> _colorBuffers;
+    uint32_t _depthBuffer { 0 };
 };
 
 } // namespace render

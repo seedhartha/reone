@@ -546,11 +546,11 @@ void Control::render3D(const glm::ivec2 &offset) const {
         shaders.activate(ShaderProgram::GUIGUI, locals);
     }
     glActiveTexture(GL_TEXTURE0);
-    framebuffer->bindTexture();
+    framebuffer->bindColorBuffer(0);
 
     DefaultQuad.render(GL_TRIANGLES);
 
-    framebuffer->unbindTexture();
+    framebuffer->unbindColorBuffer();
 }
 
 void Control::stretch(float x, float y) {

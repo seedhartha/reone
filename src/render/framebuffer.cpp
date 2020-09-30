@@ -27,7 +27,7 @@ namespace reone {
 
 namespace render {
 
-Framebuffer::Framebuffer(int w, int h) : _width(w), _height(h) {
+Framebuffer::Framebuffer(int w, int h, int colorBufferCount) : _width(w), _height(h), _colorBufferCount(colorBufferCount) {
 }
 
 Framebuffer::~Framebuffer() {
@@ -37,24 +37,30 @@ Framebuffer::~Framebuffer() {
 void Framebuffer::init() {
     if (_inited) return;
 
-    glGenTextures(1, &_texture);
-    glBindTexture(GL_TEXTURE_2D, _texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    _colorBuffers.resize(_colorBufferCount);
+    glGenTextures(_colorBufferCount, &_colorBuffers[0]);
 
-    glGenRenderbuffers(1, &_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _renderbuffer);
+    for (int i = 0; i < _colorBufferCount; ++i) {
+        glBindTexture(GL_TEXTURE_2D, _colorBuffers[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glGenRenderbuffers(1, &_depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, _depthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glGenFramebuffers(1, &_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderbuffer);
+
+    for (int i = 0; i < _colorBufferCount; ++i) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _colorBuffers[i], 0);
+    }
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthBuffer);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         throw runtime_error("Control: framebuffer is not complete");
@@ -68,8 +74,10 @@ void Framebuffer::deinit() {
     if (!_inited) return;
 
     glDeleteFramebuffers(1, &_framebuffer);
-    glDeleteTextures(1, &_texture);
-    glDeleteRenderbuffers(1, &_renderbuffer);
+    glDeleteTextures(_colorBufferCount, &_colorBuffers[0]);
+    glDeleteRenderbuffers(1, &_depthBuffer);
+
+    _inited = false;
 }
 
 void Framebuffer::bind() const {
@@ -80,12 +88,12 @@ void Framebuffer::unbind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::bindTexture() const {
-    glBindTexture(GL_TEXTURE_2D, _texture);
+void Framebuffer::bindColorBuffer(int n) const {
+    glBindTexture(GL_TEXTURE_2D, _colorBuffers[n]);
 }
 
-void Framebuffer::unbindTexture() const {
-    glBindTexture(GL_TEXTURE_2D, _texture);
+void Framebuffer::unbindColorBuffer() const {
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 int Framebuffer::width() const {
