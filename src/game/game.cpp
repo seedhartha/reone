@@ -60,6 +60,7 @@ Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _options(opts),
     _window(opts.graphics, this),
+    _sceneGraph(opts.graphics),
     _console(opts.graphics) {
 
     initGameVersion();
@@ -91,6 +92,7 @@ int Game::run() {
 
 void Game::initSubsystems() {
     _window.init();
+    _sceneGraph.init();
 
     Resources.init(_version, _path);
     TheAudioPlayer.init(_options.audio);

@@ -22,6 +22,8 @@
 
 #include "GL/glew.h"
 
+#include "../mesh/quad.h"
+
 #include "modelnode.h"
 
 using namespace std;
@@ -31,6 +33,13 @@ namespace reone {
 namespace render {
 
 static const int kMaxLightCount = 8;
+
+SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts), _framebuffer(opts.width, opts.height) {
+}
+
+void SceneGraph::init() {
+    _framebuffer.init();
+}
 
 void SceneGraph::clear() {
     _opaqueMeshes.clear();
@@ -84,23 +93,52 @@ void SceneGraph::prepare(const glm::vec3 &cameraPosition) {
 void SceneGraph::render() const {
     if (!_activeCamera) return;
 
-    glEnable(GL_DEPTH_TEST);
+    ShaderManager &shaders = Shaders;
+    {
+        _framebuffer.bind();
 
-    GlobalUniforms globals;
-    globals.projection = _activeCamera->projection();
-    globals.view = _activeCamera->view();
-    globals.cameraPosition = _activeCamera->absoluteTransform()[3];
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Shaders.setGlobalUniforms(globals);
+        GlobalUniforms globals;
+        globals.projection = _activeCamera->projection();
+        globals.view = _activeCamera->view();
+        globals.cameraPosition = _activeCamera->absoluteTransform()[3];
 
-    for (auto &node : _rootNodes) {
-        node->render();
+        shaders.setGlobalUniforms(globals);
+
+        for (auto &node : _rootNodes) {
+            node->render();
+        }
+        for (auto &mesh : _opaqueMeshes) {
+            mesh->render();
+        }
+        for (auto &mesh : _transparentMeshes) {
+            mesh->render();
+        }
+
+        _framebuffer.unbind();
     }
-    for (auto &mesh : _opaqueMeshes) {
-        mesh->render();
-    }
-    for (auto &mesh : _transparentMeshes) {
-        mesh->render();
+    {
+        GlobalUniforms globals;
+        globals.projection = glm::ortho(0.0f, static_cast<float>(_opts.width), static_cast<float>(_opts.height), 0.0f);
+
+        shaders.setGlobalUniforms(globals);
+
+        glm::mat4 transform(1.0f);
+        transform = glm::scale(transform, glm::vec3(_framebuffer.width(), _framebuffer.height(), 1.0f));
+
+        LocalUniforms locals;
+        locals.model = move(transform);
+
+        shaders.activate(ShaderProgram::GUIGUI, locals);
+
+        glActiveTexture(GL_TEXTURE0);
+        _framebuffer.bindTexture();
+
+        DefaultQuad.render(GL_TRIANGLES);
+
+        _framebuffer.unbindTexture();
     }
 }
 

@@ -72,19 +72,19 @@ void Framebuffer::deinit() {
     glDeleteRenderbuffers(1, &_renderbuffer);
 }
 
-void Framebuffer::bind() {
+void Framebuffer::bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 }
 
-void Framebuffer::unbind() {
+void Framebuffer::unbind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::bindTexture() {
+void Framebuffer::bindTexture() const {
     glBindTexture(GL_TEXTURE_2D, _texture);
 }
 
-void Framebuffer::unbindTexture() {
+void Framebuffer::unbindTexture() const {
     glBindTexture(GL_TEXTURE_2D, _texture);
 }
 

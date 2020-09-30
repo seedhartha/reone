@@ -30,10 +30,10 @@ public:
 
     void init();
     void deinit();
-    void bind();
-    void unbind();
-    void bindTexture();
-    void unbindTexture();
+    void bind() const;
+    void unbind() const;
+    void bindTexture() const;
+    void unbindTexture() const;
 
     int width() const;
     int height() const;
