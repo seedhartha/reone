@@ -47,6 +47,9 @@ private:
     uint32_t _framebuffer { 0 };
     std::vector<uint32_t> _colorBuffers;
     uint32_t _depthBuffer { 0 };
+
+    Framebuffer(const Framebuffer &) = delete;
+    Framebuffer &operator=(const Framebuffer &) = delete;
 };
 
 } // namespace render
