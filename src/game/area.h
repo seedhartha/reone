@@ -165,7 +165,7 @@ private:
     bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
     void updateSelection();
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
-    glm::vec3 getScreenCenterOfObject(uint32_t objectId, const UpdateContext &ctx) const;
+    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
     void selectNextObject(bool reverse = false);
     void getSelectableObjects(std::vector<uint32_t> &ids) const;

@@ -170,7 +170,14 @@ void Module::update3rdPersonCameraTarget() {
     shared_ptr<SpatialObject> player(_area->player());
     if (!player) return;
 
-    _thirdPersonCamera->setTargetPosition(player->position() + player->model()->getNodeAbsolutePosition("camerahook"));
+    glm::vec3 position;
+
+    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
+        position += player->position();
+    } else {
+        position = player->position();
+    }
+    _thirdPersonCamera->setTargetPosition(position);
 }
 
 void Module::update3rdPersonCameraHeading() {

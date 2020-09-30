@@ -531,6 +531,16 @@ float Creature::runSpeed() const {
     return _runSpeed;
 }
 
+glm::vec3 Creature::selectablePosition() const {
+    glm::vec3 position;
+
+    if (_model->getNodeAbsolutePosition(g_headHookNode, position)) {
+        return _model->absoluteTransform() * glm::vec4(position, 1.0f);
+    }
+
+    return _model->getCenterOfAABB();
+}
+
 } // namespace game
 
 } // namespace reone
