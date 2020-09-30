@@ -86,12 +86,12 @@ void SceneGraph::render() const {
 
     glEnable(GL_DEPTH_TEST);
 
-    ShaderUniforms uniforms;
-    uniforms.projection = _activeCamera->projection();
-    uniforms.view = _activeCamera->view();
-    uniforms.cameraPosition = _activeCamera->absoluteTransform()[3];
+    GlobalUniforms globals;
+    globals.projection = _activeCamera->projection();
+    globals.view = _activeCamera->view();
+    globals.cameraPosition = _activeCamera->absoluteTransform()[3];
 
-    Shaders.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(globals);
 
     for (auto &node : _rootNodes) {
         node->render();

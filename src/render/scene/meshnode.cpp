@@ -55,53 +55,36 @@ void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
     _distanceToCamera = glm::distance2(_center, cameraPosition);
 }
 
-static const string &getLightUniformName(int index, const char *propName) {
-    static unordered_map<int, unordered_map<const char *, string>> cache;
-    auto &cacheByIndex = cache[index];
-
-    auto nameIt = cacheByIndex.find(propName);
-    if (nameIt != cacheByIndex.end()) {
-        return nameIt->second;
-    }
-
-    string name(str(boost::format("lights[%d].%s") % index % propName));
-    auto pair = cacheByIndex.insert(make_pair(propName, name));
-
-    return pair.first->second;
-}
-
 void MeshSceneNode::render() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
     const ModelSceneNode::AnimationState &animState = _model->animationState();
     bool skeletal = skin && !animState.name.empty();
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::ModelModel);
-    shaders.setUniform("model", _absoluteTransform);
-    shaders.setUniform("alpha", _model->alpha() * _modelNode->alpha());
+    LocalUniforms locals;
+    locals.model = _absoluteTransform;
+    locals.alpha = _model->alpha() * _modelNode->alpha();
 
     if (mesh->hasEnvmapTexture()) {
-        shaders.setUniform("envmapEnabled", true);
-        shaders.setUniform("envmap", 1);
+        locals.features.envmapEnabled = true;
+        locals.textures.envmap = 1;
     }
     if (mesh->hasLightmapTexture()) {
-        shaders.setUniform("lightmapEnabled", true);
-        shaders.setUniform("lightmap", 2);
+        locals.features.lightmapEnabled = true;
+        locals.textures.lightmap = 2;
     }
     if (mesh->hasBumpyShinyTexture()) {
-        shaders.setUniform("bumpyShinyEnabled", true);
-        shaders.setUniform("bumpyShiny", 3);
+        locals.features.bumpyShinyEnabled = true;
+        locals.textures.bumpyShiny = 3;
     }
     if (mesh->hasBumpmapTexture()) {
-        shaders.setUniform("bumpmapEnabled", true);
-        shaders.setUniform("bumpmap", 4);
+        locals.features.bumpmapEnabled = true;
+        locals.textures.bumpmap = 4;
     }
-
     if (skeletal) {
-        shaders.setUniform("skeletalEnabled", true);
-        shaders.setUniform("absTransform", _modelNode->absoluteTransform());
-        shaders.setUniform("absTransformInv", _modelNode->absoluteTransformInverse());
+        locals.features.skeletalEnabled = true;
+        locals.skeletal.absTransform = _modelNode->absoluteTransform();
+        locals.skeletal.absTransformInv = _modelNode->absoluteTransformInverse();
 
         const unordered_map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
         vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
@@ -116,57 +99,33 @@ void MeshSceneNode::render() const {
             bones[boneIdx] = bone->second;
         }
 
-        shaders.setUniform("bones", bones);
+        locals.skeletal.bones = move(bones);
     }
-
     if (_modelNode->isSelfIllumEnabled()) {
-        shaders.setUniform("selfIllumEnabled", true);
-        shaders.setUniform("selfIllumColor", _modelNode->selfIllumColor());
+        locals.features.selfIllumEnabled = true;
+        locals.selfIllumColor = _modelNode->selfIllumColor();
     }
-
     int lightCount = 0;
 
     if (_model->isLightingEnabled()) {
         const vector<LightSceneNode *> &lights = _model->lightsAffectedBy();
-        lightCount = static_cast<int>(lights.size());
 
-        shaders.setUniform("lightingEnabled", true);
-        shaders.setUniform("lightCount", lightCount);
-        shaders.setUniform("ambientLightColor", _sceneGraph->ambientLightColor());
+        locals.features.lightingEnabled = true;
+        locals.lighting.ambientColor = _sceneGraph->ambientLightColor();
+        locals.lighting.lights.clear();
 
-        for (int i = 0; i < lightCount; ++i) {
-            LightSceneNode *light = lights[i];
-            shaders.setUniform(getLightUniformName(i, "ambientOnly"), light->modelNode().light()->ambientOnly);
-            shaders.setUniform(getLightUniformName(i, "position"), glm::vec3(light->absoluteTransform()[3]));
-            shaders.setUniform(getLightUniformName(i, "radius"), light->modelNode().radius());
-            shaders.setUniform(getLightUniformName(i, "color"), light->modelNode().color());
-            shaders.setUniform(getLightUniformName(i, "multiplier"), light->modelNode().multiplier());
+        for (auto &light : lights) {
+            ShaderLight shaderLight;
+            shaderLight.position = light->absoluteTransform()[3];
+            shaderLight.radius = light->modelNode().radius();
+            shaderLight.color = light->modelNode().color();
+
+            locals.lighting.lights.push_back(move(shaderLight));
         }
     }
+    Shaders.activate(ShaderProgram::ModelModel, locals);
 
     mesh->render(_model->textureOverride());
-
-    if (skeletal) {
-        shaders.setUniform("skeletalEnabled", false);
-    }
-    if (_model->isLightingEnabled()) {
-        shaders.setUniform("lightingEnabled", false);
-    }
-    if (_modelNode->isSelfIllumEnabled()) {
-        shaders.setUniform("selfIllumEnabled", false);
-    }
-    if (mesh->hasEnvmapTexture()) {
-        shaders.setUniform("envmapEnabled", false);
-    }
-    if (mesh->hasLightmapTexture()) {
-        shaders.setUniform("lightmapEnabled", false);
-    }
-    if (mesh->hasBumpyShinyTexture()) {
-        shaders.setUniform("bumpyShinyEnabled", false);
-    }
-    if (mesh->hasBumpmapTexture()) {
-        shaders.setUniform("bumpmapEnabled", false);
-    }
 
     SceneNode::render();
 }

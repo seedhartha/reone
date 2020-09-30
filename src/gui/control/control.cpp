@@ -212,11 +212,6 @@ void Control::update(float dt) {
 void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_visible) return;
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("color", glm::vec3(1.0f));
-    shaders.setUniform("alpha", 1.0f);
-
     glm::ivec2 size(_extent.width, _extent.height);
 
     if (_focus && _hilight) {
@@ -233,6 +228,7 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const {
     ShaderManager &shaders = Shaders;
+
     Quad &defaultQuad = DefaultQuad;
     Quad &xFlippedQuad = XFlippedQuad;
     Quad &yFlippedQuad = YFlippedQuad;
@@ -241,15 +237,22 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     glActiveTexture(GL_TEXTURE0);
 
     if (border.fill) {
-        int x = _extent.left + border.dimension + offset.x;
-        int y = _extent.top + border.dimension + offset.y;
-        int w = size.x - 2 * border.dimension;
-        int h = size.y - 2 * border.dimension;
+        {
+            int x = _extent.left + border.dimension + offset.x;
+            int y = _extent.top + border.dimension + offset.y;
+            int w = size.x - 2 * border.dimension;
+            int h = size.y - 2 * border.dimension;
 
-        glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)));
-        transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-        shaders.setUniform("model", transform);
+            LocalUniforms locals;
+            locals.model = move(transform);
+
+            shaders.activate(ShaderProgram::GUIGUI, locals);
+        }
+
         border.fill->bind();
 
         GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
@@ -261,20 +264,17 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
             glBlendFunc(GL_ONE, GL_ONE);
         }
-
         defaultQuad.render(GL_TRIANGLES);
 
         if (additive) {
             glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
         }
-
         border.fill->unbind();
     }
     if (border.edge) {
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
-        glm::mat4 edgeTransform(1.0f);
-        shaders.setUniform("color", border.color);
+
         border.edge->bind();
 
         if (height > 0.0f) {
@@ -282,18 +282,34 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             int y = _extent.top + border.dimension + offset.y;
 
             // Left edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-            edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, height, 1.0f));
-            edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-            edgeTransform = glm::rotate(edgeTransform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-            shaders.setUniform("model", edgeTransform);
+            {
+                glm::mat4 transform(1.0f);
+                transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+                transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
+                transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+                transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+
+                LocalUniforms locals;
+                locals.model = move(transform);
+                locals.color = border.color;
+
+                shaders.activate(ShaderProgram::GUIGUI, locals);
+            }
             defaultQuad.render(GL_TRIANGLES);
 
             // Right edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + size.x, y, 0.0f));
-            edgeTransform = glm::scale(edgeTransform, glm::vec3(border.dimension, height, 1.0f));
-            edgeTransform = glm::rotate(edgeTransform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-            shaders.setUniform("model", edgeTransform);
+            {
+                glm::mat4 transform(1.0f);
+                transform = glm::translate(transform, glm::vec3(x + size.x, y, 0.0f));
+                transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
+                transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+                LocalUniforms locals;
+                locals.model = move(transform);
+                locals.color = border.color;
+
+                shaders.activate(ShaderProgram::GUIGUI, locals);
+            }
             xFlippedQuad.render(GL_TRIANGLES);
         }
 
@@ -302,15 +318,31 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             int y = _extent.top + offset.y;
 
             // Top edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-            edgeTransform = glm::scale(edgeTransform, glm::vec3(width, border.dimension, 1.0f));
-            shaders.setUniform("model", edgeTransform);
+            {
+                glm::mat4 transform(1.0f);
+                transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+                transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
+
+                LocalUniforms locals;
+                locals.model = move(transform);
+                locals.color = border.color;
+
+                shaders.activate(ShaderProgram::GUIGUI, locals);
+            }
             defaultQuad.render(GL_TRIANGLES);
 
             // Bottom edge
-            edgeTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + size.y - border.dimension, 0.0f));
-            edgeTransform = glm::scale(edgeTransform, glm::vec3(width, border.dimension, 1.0f));
-            shaders.setUniform("model", edgeTransform);
+            {
+                glm::mat4 transform(1.0f);
+                transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
+                transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
+
+                LocalUniforms locals;
+                locals.model = move(transform);
+                locals.color = border.color;
+
+                shaders.activate(ShaderProgram::GUIGUI, locals);
+            }
             yFlippedQuad.render(GL_TRIANGLES);
         }
 
@@ -319,31 +351,63 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     if (border.corner) {
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
-        glm::mat4 cornerTransform(1.0f);
+
         border.corner->bind();
 
         // Top left corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
-        shaders.setUniform("model", cornerTransform);
+        {
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+            transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.color = border.color;
+
+            shaders.activate(ShaderProgram::GUIGUI, locals);
+        }
         defaultQuad.render(GL_TRIANGLES);
 
         // Bottom left corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + size.y - border.dimension, 0.0f));
-        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
-        shaders.setUniform("model", cornerTransform);
+        {
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
+            transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.color = border.color;
+
+            shaders.activate(ShaderProgram::GUIGUI, locals);
+        }
         yFlippedQuad.render(GL_TRIANGLES);
 
         // Top right corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + size.x - border.dimension, y, 0.0f));
-        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
-        shaders.setUniform("model", cornerTransform);
+        {
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y, 0.0f));
+            transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.color = border.color;
+
+            shaders.activate(ShaderProgram::GUIGUI, locals);
+        }
         xFlippedQuad.render(GL_TRIANGLES);
 
         // Bottom right corner
-        cornerTransform = glm::translate(glm::mat4(1.0f), glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
-        cornerTransform = glm::scale(cornerTransform, glm::vec3(border.dimension, border.dimension, 1.0f));
-        shaders.setUniform("model", cornerTransform);
+        {
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
+            transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
+
+            LocalUniforms locals;
+            locals.model = move(transform);
+            locals.color = border.color;
+
+            shaders.activate(ShaderProgram::GUIGUI, locals);
+        }
         xyFlippedQuad.render(GL_TRIANGLES);
 
         border.corner->unbind();
@@ -438,21 +502,21 @@ void Control::render3D(const glm::ivec2 &offset) const {
     glGetIntegerv(GL_VIEWPORT, viewport);
 
     ShaderManager &shaders = Shaders;
-    ShaderUniforms uniforms;
     Framebuffer *framebuffer = _scene3d.framebuffer.get();
 
     // Render to framebuffer
+    {
+        GlobalUniforms globals;
+        globals.projection = glm::ortho(
+            0.0f,
+            static_cast<float>(framebuffer->width()),
+            static_cast<float>(framebuffer->height()),
+            0.0f,
+            -1024.0f,
+            1024.0f);
 
-    uniforms.projection = glm::ortho(
-        0.0f,
-        static_cast<float>(framebuffer->width()),
-        static_cast<float>(framebuffer->height()),
-        0.0f,
-        -1024.0f,
-        1024.0f);
-
-    shaders.setGlobalUniforms(uniforms);
-
+        shaders.setGlobalUniforms(globals);
+    }
     framebuffer->bind();
 
     glEnable(GL_DEPTH_TEST);
@@ -466,19 +530,21 @@ void Control::render3D(const glm::ivec2 &offset) const {
     framebuffer->unbind();
 
     // Render control
+    {
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
 
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(viewport[2]), static_cast<float>(viewport[3]), 0.0f);
-    shaders.setGlobalUniforms(uniforms);
+        GlobalUniforms globals;
+        globals.projection = glm::ortho(0.0f, static_cast<float>(viewport[2]), static_cast<float>(viewport[3]), 0.0f);
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
+        shaders.setGlobalUniforms(globals);
 
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("model", transform);
-    shaders.setUniform("color", glm::vec3(1.0f));
-    shaders.setUniform("alpha", 1.0f);
+        LocalUniforms locals;
+        locals.model = move(transform);
 
+        shaders.activate(ShaderProgram::GUIGUI, locals);
+    }
     glActiveTexture(GL_TEXTURE0);
     framebuffer->bindTexture();
 

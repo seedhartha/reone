@@ -36,18 +36,18 @@ namespace render {
 static const GLchar kGUIVertexShader[] = R"END(
 #version 330
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
+uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uModel;
 
-layout(location = 0) in vec3 position;
-layout(location = 2) in vec2 texCoords;
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aTexCoords;
 
 out vec2 fragTexCoords;
 
 void main() {
-    gl_Position = projection * view * model * vec4(position, 1.0);
-    fragTexCoords = texCoords;
+    gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
+    fragTexCoords = aTexCoords;
 }
 )END";
 
@@ -56,21 +56,21 @@ static const GLchar kModelVertexShader[] = R"END(
 
 const int MAX_BONES = 128;
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
+uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uModel;
 
-uniform bool skeletalEnabled;
-uniform mat4 absTransform;
-uniform mat4 absTransformInv;
-uniform mat4 bones[MAX_BONES];
+uniform bool uSkeletalEnabled;
+uniform mat4 uAbsTransform;
+uniform mat4 uAbsTransformInv;
+uniform mat4 uBones[MAX_BONES];
 
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 texCoords;
-layout(location = 3) in vec2 lightmapCoords;
-layout(location = 4) in vec4 boneWeights;
-layout(location = 5) in vec4 boneIndices;
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexCoords;
+layout(location = 3) in vec2 aLightmapCoords;
+layout(location = 4) in vec4 aBoneWeights;
+layout(location = 5) in vec4 aBoneIndices;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
@@ -80,64 +80,63 @@ out vec2 fragLightmapCoords;
 void main() {
     vec3 newPosition = vec3(0.0);
 
-    if (skeletalEnabled) {
-        float weight0 = boneWeights.x;
-        float weight1 = boneWeights.y;
-        float weight2 = boneWeights.z;
-        float weight3 = boneWeights.w;
+    if (uSkeletalEnabled) {
+        float weight0 = aBoneWeights.x;
+        float weight1 = aBoneWeights.y;
+        float weight2 = aBoneWeights.z;
+        float weight3 = aBoneWeights.w;
 
-        int index0 = int(boneIndices.x);
-        int index1 = int(boneIndices.y);
-        int index2 = int(boneIndices.z);
-        int index3 = int(boneIndices.w);
+        int index0 = int(aBoneIndices.x);
+        int index1 = int(aBoneIndices.y);
+        int index2 = int(aBoneIndices.z);
+        int index3 = int(aBoneIndices.w);
 
-        vec4 position4 = vec4(position, 1.0);
+        vec4 position4 = vec4(aPosition, 1.0);
 
-        newPosition += weight0 * (absTransformInv * bones[index0] * absTransform * position4).xyz;
-        newPosition += weight1 * (absTransformInv * bones[index1] * absTransform * position4).xyz;
-        newPosition += weight2 * (absTransformInv * bones[index2] * absTransform * position4).xyz;
-        newPosition += weight3 * (absTransformInv * bones[index3] * absTransform * position4).xyz;
+        newPosition += weight0 * (uAbsTransformInv * uBones[index0] * uAbsTransform * position4).xyz;
+        newPosition += weight1 * (uAbsTransformInv * uBones[index1] * uAbsTransform * position4).xyz;
+        newPosition += weight2 * (uAbsTransformInv * uBones[index2] * uAbsTransform * position4).xyz;
+        newPosition += weight3 * (uAbsTransformInv * uBones[index3] * uAbsTransform * position4).xyz;
 
     } else {
-        newPosition = position;
+        newPosition = aPosition;
     }
-
     vec4 newPosition4 = vec4(newPosition, 1.0);
 
-    gl_Position = projection * view * model * newPosition4;
-    fragPosition = vec3(model * newPosition4);
-    fragNormal = mat3(transpose(inverse(model))) * normal;
-    fragTexCoords = texCoords;
-    fragLightmapCoords = lightmapCoords;
+    gl_Position = uProjection * uView * uModel * newPosition4;
+    fragPosition = vec3(uModel * newPosition4);
+    fragNormal = mat3(transpose(inverse(uModel))) * aNormal;
+    fragTexCoords = aTexCoords;
+    fragLightmapCoords = aLightmapCoords;
 }
 )END";
 
 static const GLchar kWhiteFragmentShader[] = R"END(
 #version 330
 
-uniform float alpha;
+uniform float uAlpha;
 
 out vec4 fragColor;
 
 void main() {
-    fragColor = vec4(1.0, 1.0, 1.0, alpha);
+    fragColor = vec4(1.0, 1.0, 1.0, uAlpha);
 }
 )END";
 
 static const GLchar kGUIFragmentShader[] = R"END(
 #version 330
 
-uniform sampler2D image;
-uniform vec3 color;
-uniform float alpha;
+uniform sampler2D uTexture;
+uniform vec3 uColor;
+uniform float uAlpha;
 
 in vec2 fragTexCoords;
 
 out vec4 fragColor;
 
 void main() {
-    vec4 imageSample = texture(image, fragTexCoords);
-    fragColor = vec4(color * imageSample.rgb, alpha * imageSample.a);
+    vec4 textureSample = texture(uTexture, fragTexCoords);
+    fragColor = vec4(uColor * textureSample.rgb, uAlpha * textureSample.a);
 }
 )END";
 
@@ -147,32 +146,33 @@ static const GLchar kModelFragmentShader[] = R"END(
 const int MAX_LIGHTS = 8;
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
 
-uniform struct Light {
+struct Light {
     vec3 position;
-    float radius;
     vec3 color;
-    float multiplier;
-} lights[MAX_LIGHTS];
+    float radius;
+};
 
-uniform bool lightmapEnabled;
-uniform bool envmapEnabled;
-uniform bool bumpyShinyEnabled;
-uniform bool bumpmapEnabled;
-uniform bool lightingEnabled;
-uniform bool selfIllumEnabled;
+uniform bool uLightmapEnabled;
+uniform bool uEnvmapEnabled;
+uniform bool uBumpyShinyEnabled;
+uniform bool uBumpmapEnabled;
+uniform bool uSkeletalEnabled;
+uniform bool uLightingEnabled;
+uniform bool uSelfIllumEnabled;
 
-uniform sampler2D diffuse;
-uniform sampler2D lightmap;
-uniform sampler2D bumpmap;
-uniform samplerCube envmap;
-uniform samplerCube bumpyShiny;
+uniform sampler2D uDiffuse;
+uniform sampler2D uLightmap;
+uniform sampler2D uBumpmap;
+uniform samplerCube uEnvmap;
+uniform samplerCube uBumpyShiny;
 
-uniform vec3 cameraPosition;
-uniform float alpha;
+uniform vec3 uCameraPosition;
+uniform float uAlpha;
 
-uniform int lightCount;
-uniform vec3 ambientLightColor;
-uniform vec3 selfIllumColor;
+uniform int uLightCount;
+uniform vec3 uAmbientLightColor;
+uniform vec3 uSelfIllumColor;
+uniform Light uLights[MAX_LIGHTS];
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -182,12 +182,12 @@ in vec2 fragLightmapCoords;
 out vec4 fragColor;
 
 void applyLightmap(inout vec3 color) {
-    vec4 lightmapSample = texture(lightmap, fragLightmapCoords);
+    vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
     color *= lightmapSample.rgb;
 }
 
 void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
-    vec3 I = normalize(fragPosition - cameraPosition);
+    vec3 I = normalize(fragPosition - uCameraPosition);
     vec3 R = reflect(I, normal);
     vec4 sample = texture(image, R);
 
@@ -195,15 +195,15 @@ void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
 }
 
 void applyLighting(vec3 normal, inout vec3 color) {
-    color += ambientLightColor;
+    color += uAmbientLightColor;
 
-    if (lightCount == 0) return;
+    if (uLightCount == 0) return;
 
-    for (int i = 0; i < lightCount; ++i) {
-        vec3 surfaceToLight = lights[i].position - fragPosition;
+    for (int i = 0; i < uLightCount; ++i) {
+        vec3 surfaceToLight = uLights[i].position - fragPosition;
         vec3 lightDir = normalize(surfaceToLight);
 
-        vec3 surfaceToCamera = normalize(cameraPosition - fragPosition);
+        vec3 surfaceToCamera = normalize(uCameraPosition - fragPosition);
         float diffuseCoeff = max(dot(normal, lightDir), 0.0);
         float specularCoeff = 0.0;
 
@@ -212,46 +212,46 @@ void applyLighting(vec3 normal, inout vec3 color) {
         }
         float distToLight = length(surfaceToLight);
 
-        float attenuation = clamp(1.0 - distToLight / lights[i].radius, 0.0, 1.0);
+        float attenuation = clamp(1.0 - distToLight / uLights[i].radius, 0.0, 1.0);
         attenuation *= attenuation;
 
-        color += attenuation * (diffuseCoeff + specularCoeff) * lights[i].color;
+        color += attenuation * (diffuseCoeff + specularCoeff) * uLights[i].color;
     }
 }
 
 void applySelfIllum(inout vec3 color) {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
     float luminosity = dot(diffuseSample.rgb, RGB_TO_LUMINOSITY);
 
-    color += 0.5 * smoothstep(0.5, 1.0, luminosity) * selfIllumColor;
+    color += 0.5 * smoothstep(0.5, 1.0, luminosity) * uSelfIllumColor;
 }
 
 void main() {
-    vec4 diffuseSample = texture(diffuse, fragTexCoords);
+    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
     vec3 surfaceColor = diffuseSample.rgb;
     vec3 lightColor = vec3(0.0);
     vec3 normal = normalize(fragNormal);
 
-    if (lightmapEnabled) {
+    if (uLightmapEnabled) {
         applyLightmap(surfaceColor);
     }
-    if (envmapEnabled) {
-        applyEnvmap(envmap, normal, 1.0 - diffuseSample.a, surfaceColor);
-    } else if (bumpyShinyEnabled) {
-        applyEnvmap(bumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor);
+    if (uEnvmapEnabled) {
+        applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);
+    } else if (uBumpyShinyEnabled) {
+        applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor);
     }
-    if (lightingEnabled) {
+    if (uLightingEnabled) {
         applyLighting(normal, lightColor);
         lightColor = min(lightColor, 1.0);
     } else {
         lightColor = vec3(1.0);
     }
-    if (selfIllumEnabled) {
+    if (uSelfIllumEnabled) {
         applySelfIllum(lightColor);
     }
-    float finalAlpha = alpha;
+    float finalAlpha = uAlpha;
 
-    if (!envmapEnabled && !bumpyShinyEnabled) {
+    if (!uEnvmapEnabled && !uBumpyShinyEnabled) {
         finalAlpha *= diffuseSample.a;
     }
     fragColor = vec4(lightColor * surfaceColor, finalAlpha);
@@ -261,20 +261,20 @@ void main() {
 static const GLchar kGaussianBlurFragmentShader[] = R"END(
 #version 330
 
-uniform sampler2D image;
-uniform vec2 resolution;
-uniform vec2 direction;
+uniform sampler2D uTexture;
+uniform vec2 uResolution;
+uniform vec2 uDirection;
 
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / resolution);
-    vec2 off1 = vec2(1.3333333333333333) * direction;
+    vec2 uv = vec2(gl_FragCoord.xy / uResolution);
+    vec2 off1 = vec2(1.3333333333333333) * uDirection;
 
     vec4 color = vec4(0.0);
-    color += texture2D(image, uv) * 0.29411764705882354;
-    color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
-    color += texture2D(image, uv - (off1 / resolution)) * 0.35294117647058826;
+    color += texture2D(uTexture, uv) * 0.29411764705882354;
+    color += texture2D(uTexture, uv + (off1 / uResolution)) * 0.35294117647058826;
+    color += texture2D(uTexture, uv - (off1 / uResolution)) * 0.35294117647058826;
 
     fragColor = color;
 }
@@ -354,13 +354,15 @@ void ShaderManager::deinitGL() {
     _shaders.clear();
 }
 
-void ShaderManager::activate(ShaderProgram program) {
-    if (_activeProgram == program) return;
+void ShaderManager::activate(ShaderProgram program, const LocalUniforms &locals) {
+    if (_activeProgram != program) {
+        unsigned int ordinal = getOrdinal(program);
+        glUseProgram(ordinal);
 
-    unsigned int ordinal = getOrdinal(program);
-    glUseProgram(ordinal);
-    _activeProgram = program;
-    _activeOrdinal = ordinal;
+        _activeProgram = program;
+        _activeOrdinal = ordinal;
+    }
+    setLocalUniforms(locals);
 }
 
 unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
@@ -371,6 +373,109 @@ unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
     return it->second;
 }
 
+static const string &getLightUniformName(int index, const char *propName) {
+    static unordered_map<int, unordered_map<const char *, string>> cache;
+    auto &cacheByIndex = cache[index];
+    auto maybeName = cacheByIndex.find(propName);
+
+    if (maybeName != cacheByIndex.end()) {
+        return maybeName->second;
+    }
+    string name(str(boost::format("uLights[%d].%s") % index % propName));
+    auto pair = cacheByIndex.insert(make_pair(propName, name));
+
+    return pair.first->second;
+}
+
+void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
+    setUniform("uModel", locals.model);
+    setUniform("uColor", locals.color);
+    setUniform("uAlpha", locals.alpha);
+    setUniform("uLightmapEnabled", locals.features.lightmapEnabled);
+    setUniform("uEnvmapEnabled", locals.features.envmapEnabled);
+    setUniform("uLightmapEnabled", locals.features.lightmapEnabled);
+    setUniform("uBumpyShinyEnabled", locals.features.bumpyShinyEnabled);
+    setUniform("uBumpmapEnabled", locals.features.bumpmapEnabled);
+    setUniform("uSkeletalEnabled", locals.features.skeletalEnabled);
+    setUniform("uLightingEnabled", locals.features.lightingEnabled);
+    setUniform("uSelfIllumEnabled", locals.features.selfIllumEnabled);
+
+    if (locals.features.lightmapEnabled) {
+        setUniform("uLightmap", locals.textures.lightmap);
+    }
+    if (locals.features.envmapEnabled) {
+        setUniform("uEnvmap", locals.textures.envmap);
+    }
+    if (locals.features.bumpyShinyEnabled) {
+        setUniform("uBumpyShiny", locals.textures.bumpyShiny);
+    }
+    if (locals.features.bumpmapEnabled) {
+        setUniform("uBumpmap", locals.textures.bumpmap);
+    }
+    if (locals.features.skeletalEnabled) {
+        setUniform("uAbsTransform", locals.skeletal.absTransform);
+        setUniform("uAbsTransformInv", locals.skeletal.absTransformInv);
+        setUniform("uBones", locals.skeletal.bones);
+    }
+    if (locals.features.lightingEnabled) {
+        int lightCount = static_cast<int>(locals.lighting.lights.size());
+        setUniform("uLightCount", lightCount);
+        setUniform("uAmbientLightColor", locals.lighting.ambientColor);
+
+        for (int i = 0; i < lightCount; ++i) {
+            const ShaderLight &light = locals.lighting.lights[i];
+            setUniform(getLightUniformName(i, "position"), light.position);
+            setUniform(getLightUniformName(i, "color"), light.color);
+            setUniform(getLightUniformName(i, "radius"), light.radius);
+        }
+    }
+    if (locals.features.selfIllumEnabled) {
+        setUniform("uSelfIllumColor", locals.selfIllumColor);
+    }
+}
+
+void ShaderManager::setUniform(const string &name, const glm::mat4 &m) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
+}
+
+void ShaderManager::setUniform(const string &name, int value) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniform1i(loc, value);
+}
+
+void ShaderManager::setUniform(const string &name, float value) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniform1f(loc, value);
+}
+
+void ShaderManager::setUniform(const string &name, const glm::vec2 &v) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniform2f(loc, v.x, v.y);
+}
+
+void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniform3f(loc, v.x, v.y, v.z);
+}
+
+void ShaderManager::setUniform(const string &name, const vector<glm::mat4> &arr) {
+    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+    if (loc == -1) return;
+
+    glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
+}
+
 void ShaderManager::deactivate() {
     if (_activeProgram == ShaderProgram::None) return;
 
@@ -379,82 +484,19 @@ void ShaderManager::deactivate() {
     _activeOrdinal = 0;
 }
 
-void ShaderManager::setGlobalUniforms(const ShaderUniforms &uniforms) {
-    for (auto &pair : _programs) {
-        activate(pair.first);
+void ShaderManager::setGlobalUniforms(const GlobalUniforms &globals) {
+    uint32_t ordinal = _activeOrdinal;
 
-        setUniform(_activeOrdinal, "projection", uniforms.projection);
-        setUniform(_activeOrdinal, "view", uniforms.view);
-        setUniform(_activeOrdinal, "cameraPosition", uniforms.cameraPosition);
+    for (auto &program : _programs) {
+        glUseProgram(program.second);
+        _activeOrdinal = program.second;
+
+        setUniform("uProjection", globals.projection);
+        setUniform("uView", globals.view);
+        setUniform("uCameraPosition", globals.cameraPosition);
     }
-
-    deactivate();
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::mat4 &m) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
-}
-
-void ShaderManager::setUniform(const string &name, int value) {
-    setUniform(_activeOrdinal, name, value);
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, int value) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform1i(loc, value);
-}
-
-void ShaderManager::setUniform(const string &name, float value) {
-    setUniform(_activeOrdinal, name, value);
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, float value) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform1f(loc, value);
-}
-
-void ShaderManager::setUniform(const string &name, const glm::vec2 &v) {
-    setUniform(_activeOrdinal, name, v);
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::vec2 &v) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform2f(loc, v.x, v.y);
-}
-
-void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
-    setUniform(_activeOrdinal, name, v);
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, const glm::vec3 &v) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform3f(loc, v.x, v.y, v.z);
-}
-
-void ShaderManager::setUniform(const string &name, const glm::mat4 &m) {
-    setUniform(_activeOrdinal, name, m);
-}
-
-void ShaderManager::setUniform(const string &name, const vector<glm::mat4> &arr) {
-    setUniform(_activeOrdinal, name, arr);
-}
-
-void ShaderManager::setUniform(unsigned int ordinal, const string &name, const vector<glm::mat4> &arr) {
-    GLint loc = glGetUniformLocation(ordinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
+    glUseProgram(ordinal);
+    _activeOrdinal = ordinal;
 }
 
 } // namespace render

@@ -35,11 +35,6 @@ ImageButton::ImageButton() : Control(ControlType::ImageButton) {
 void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, const shared_ptr<Texture> &icon) const {
     if (!_visible) return;
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::GUIGUI);
-    shaders.setUniform("color", glm::vec3(1.0f));
-    shaders.setUniform("alpha", 1.0f);
-
     glm::ivec2 borderOffset(offset);
     borderOffset.x += _extent.height;
 
@@ -62,22 +57,25 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
 void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &icon) const {
     if (!_iconFrame && !icon) return;
 
+    ShaderManager &shaders = Shaders;
+
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
+    {
+        glm::vec3 frameColor(1.0f);
+        if (_focus && _hilight) {
+            frameColor = _hilight->color;
+        } else if (_border) {
+            frameColor = _border->color;
+        }
 
-    glm::vec3 frameColor(1.0f);
-    if (_focus && _hilight) {
-        frameColor = _hilight->color;
-    } else if (_border) {
-        frameColor = _border->color;
+        LocalUniforms locals;
+        locals.model = transform;
+        locals.color = move(frameColor);
+
+        shaders.activate(ShaderProgram::GUIGUI, locals);
     }
-
-    ShaderManager &shaders = Shaders;
-    shaders.setUniform("model", transform);
-    shaders.setUniform("color", frameColor);
-    shaders.setUniform("alpha", 1.0f);
-
     glActiveTexture(0);
 
     if (_iconFrame) {
@@ -85,9 +83,12 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
         DefaultQuad.render(GL_TRIANGLES);
         _iconFrame->unbind();
     }
+    {
+        LocalUniforms locals;
+        locals.model = transform;
 
-    shaders.setUniform("color", glm::vec3(1.0f));
-
+        shaders.activate(ShaderProgram::GUIGUI, locals);
+    }
     if (icon) {
         icon->bind();
         DefaultQuad.render(GL_TRIANGLES);

@@ -223,10 +223,10 @@ void Game::drawWorld() {
 void Game::drawGUI() {
     glDisable(GL_DEPTH_TEST);
 
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+    GlobalUniforms globals;
+    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
 
-    Shaders.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(globals);
 
     switch (_screen) {
         case Screen::InGame:
@@ -252,10 +252,10 @@ void Game::drawGUI() {
 void Game::drawGUI3D() {
     glDisable(GL_DEPTH_TEST);
 
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+    GlobalUniforms globals;
+    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
 
-    Shaders.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(globals);
 
     switch (_screen) {
         case Screen::MainMenu:
@@ -271,10 +271,11 @@ void Game::drawGUI3D() {
 void Game::drawCursor() {
     glDisable(GL_DEPTH_TEST);
 
-    ShaderUniforms uniforms;
-    uniforms.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+    GlobalUniforms globals;
+    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+    globals.view = glm::mat4(1.0f);
 
-    Shaders.setGlobalUniforms(uniforms);
+    Shaders.setGlobalUniforms(globals);
 
     _window.drawCursor();
 }

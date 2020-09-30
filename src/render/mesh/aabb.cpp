@@ -63,12 +63,12 @@ AABBMesh::AABBMesh() {
 }
 
 void AABBMesh::render(const AABB &aabb, const glm::mat4 &transform) const {
-    glm::mat4 transform2(transform * aabb.transform());
+    glm::mat4 finalTransform(transform * aabb.transform());
 
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::ModelWhite);
-    shaders.setUniform("model", transform2);
-    shaders.setUniform("alpha", 1.0f);
+    LocalUniforms locals;
+    locals.model = finalTransform;
+
+    Shaders.activate(ShaderProgram::ModelWhite, locals);
 
     Mesh::render(GL_LINES);
 }

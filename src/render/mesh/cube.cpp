@@ -61,10 +61,10 @@ CubeMesh::CubeMesh() {
 }
 
 void CubeMesh::render(const glm::mat4 &transform) const {
-    ShaderManager &shaders = Shaders;
-    shaders.activate(ShaderProgram::ModelWhite);
-    shaders.setUniform("model", transform);
-    shaders.setUniform("alpha", 1.0f);
+    LocalUniforms locals;
+    locals.model = transform;
+
+    Shaders.activate(ShaderProgram::ModelWhite, locals);
 
     Mesh::render(GL_TRIANGLES);
 }
