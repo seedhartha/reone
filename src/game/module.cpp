@@ -57,6 +57,7 @@ void Module::load(const string &name, const GffStruct &ifo) {
     loadInfo(ifo);
     loadArea(ifo);
     loadCameras();
+    loadPlayer();
 
     _loaded = true;
 }
@@ -127,6 +128,10 @@ void Module::loadCameras() {
     }
 }
 
+void Module::loadPlayer() {
+    _player = make_unique<Player>(this, _area.get(), _thirdPersonCamera.get());
+}
+
 bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
     SpatialObject *obstacle = nullptr;
     if (_area->findObstacleByWalkmesh(from, to, kObstacleRoom | kObstacleDoor, intersection, &obstacle)) {
@@ -145,6 +150,8 @@ void Module::loadParty(const PartyConfiguration &party, const string &entry) {
 
     _area->loadParty(_party, position, heading);
     _area->updateRoomVisibility();
+
+    _player->setCreature(static_cast<Creature *>(_area->player().get()));
 
     update3rdPersonCameraTarget();
     update3rdPersonCameraHeading();
@@ -199,7 +206,10 @@ void Module::switchTo3rdPersonCamera() {
 
 bool Module::handle(const SDL_Event &event) {
     if (!_loaded) return false;
+
     if (getCamera()->handle(event)) return true;
+    if (_player->handle(event)) return true;
+    if (_area->handle(event)) return true;
 
     switch (event.type) {
         case SDL_MOUSEMOTION:
@@ -208,15 +218,10 @@ bool Module::handle(const SDL_Event &event) {
         case SDL_MOUSEBUTTONUP:
             if (handleMouseButtonUp(event.button)) return true;
             break;
-        case SDL_KEYDOWN:
-            if (handleKeyDown(event.key)) return true;
-            break;
         case SDL_KEYUP:
             if (handleKeyUp(event.key)) return true;
             break;
     }
-
-    if (_area->handle(event)) return true;
 
     return false;
 }
@@ -280,8 +285,8 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     Creature *creature = dynamic_cast<Creature *>(object);
     if (creature) {
         if (!creature->conversation().empty() && _startDialog) {
-            resetPlayerMovement();
-            getCamera()->clearUserInput();
+            _player->stopMovement();
+            getCamera()->stopMovement();
 
             if (_startDialog) {
                 _startDialog(*creature, creature->conversation());
@@ -291,38 +296,6 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     }
 
     return true;
-}
-
-void Module::resetPlayerMovement() {
-    _moveForward = false;
-    _moveLeft = false;
-    _moveBackward = false;
-    _moveRight = false;
-}
-
-bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W:
-            _moveForward = true;
-            return true;
-
-        case SDL_SCANCODE_Z:
-            _moveLeft = true;
-            return true;
-
-        case SDL_SCANCODE_S:
-            _moveBackward = true;
-            return true;
-
-        case SDL_SCANCODE_C:
-            _moveRight = true;
-            return true;
-
-        default:
-            break;
-    }
-
-    return false;
 }
 
 bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
@@ -339,31 +312,9 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
             cycleDebugMode(true);
             return true;
 
-        case SDL_SCANCODE_W:
-            _moveForward = false;
-            return true;
-
-        case SDL_SCANCODE_Z:
-            _moveLeft = false;
-            return true;
-
-        case SDL_SCANCODE_S:
-            _moveBackward = false;
-            return true;
-
-        case SDL_SCANCODE_C:
-            _moveRight = false;
-            return true;
-
-        case SDL_SCANCODE_X:
-            static_cast<Creature &>(*_area->player()).playGreetingAnimation();
-            return true;
-
         default:
-            break;
+            return false;
     }
-
-    return false;
 }
 
 void Module::toggleCameraType() {
@@ -416,8 +367,9 @@ void Module::update(float dt, GuiContext &guiCtx) {
     shared_ptr<Camera> camera(getCamera());
     camera->update(dt);
 
-    updatePlayer(dt);
-
+    if (_cameraType == CameraType::ThirdPerson) {
+        _player->update(dt);
+    }
     UpdateContext ctx;
     ctx.deltaTime = dt;
     ctx.cameraPosition = camera->sceneNode()->absoluteTransform()[3];
@@ -426,47 +378,6 @@ void Module::update(float dt, GuiContext &guiCtx) {
 
     _area->update(ctx);
     _area->fill(ctx, guiCtx);
-}
-
-void Module::updatePlayer(float dt) {
-    if (_cameraType != CameraType::ThirdPerson) return;
-
-    ThirdPersonCamera &camera = static_cast<ThirdPersonCamera &>(*_thirdPersonCamera);
-    shared_ptr<Object> playerObject(_area->player());
-    if (!playerObject) return;
-
-    Creature &player = static_cast<Creature &>(*playerObject);
-
-    float heading = 0.0f;
-    bool movement = true;
-
-    if (_moveForward) {
-        heading = camera.heading();
-    } else if (_moveBackward) {
-        heading = camera.heading() + glm::pi<float>();
-    } else if (_moveLeft) {
-        heading = camera.heading() + glm::half_pi<float>();
-    } else if (_moveRight) {
-        heading = camera.heading() - glm::half_pi<float>();
-    } else {
-        movement = false;
-    }
-
-    if (movement) {
-        glm::vec3 target(player.position());
-        target.x -= 100.0f * glm::sin(heading);
-        target.y += 100.0f * glm::cos(heading);
-
-        if (_area->moveCreatureTowards(player, target, dt)) {
-            player.setMovementType(MovementType::Run);
-            update3rdPersonCameraTarget();
-            _area->updateRoomVisibility();
-            _area->selectNearestObject();
-        }
-
-    } else {
-        player.setMovementType(MovementType::None);
-    }
 }
 
 void Module::saveTo(GameState &state) const {
