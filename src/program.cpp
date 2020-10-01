@@ -44,8 +44,8 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
 
 int Program::run() {
+    initOptions();
     loadOptions();
-    applyOptions();
 
     if (_showHelp) {
         cout << _cmdLineOpts << endl;
@@ -55,7 +55,7 @@ int Program::run() {
     return runGame();
 }
 
-void Program::loadOptions() {
+void Program::initOptions() {
     _commonOpts.add_options()
         ("game", po::value<string>(), "path to game directory")
         ("width", po::value<int>()->default_value(800), "window width")
@@ -70,35 +70,36 @@ void Program::loadOptions() {
         ("help", "print this message")
         ("serve", "start multiplayer game")
         ("join", po::value<string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
+}
 
+void Program::loadOptions() {
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_cmdLineOpts)
         .run();
 
-    po::store(parsedCmdLineOpts, _vars);
+    po::variables_map vars;
+    po::store(parsedCmdLineOpts, vars);
 
     if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file(kConfigFilename, _commonOpts), _vars);
+        po::store(po::parse_config_file(kConfigFilename, _commonOpts), vars);
     }
-    po::notify(_vars);
-}
+    po::notify(vars);
 
-void Program::applyOptions() {
-    _showHelp = _vars.count("help") > 0;
-    _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
-    _gameOpts.graphics.width = _vars["width"].as<int>();
-    _gameOpts.graphics.height = _vars["height"].as<int>();
-    _gameOpts.graphics.fullscreen = _vars["fullscreen"].as<bool>();
-    _gameOpts.audio.musicVolume = _vars["musicvol"].as<int>();
-    _gameOpts.audio.soundVolume = _vars["soundvol"].as<int>();
-    _gameOpts.network.host = _vars.count("join") ? _vars["join"].as<string>() : "";
-    _gameOpts.network.port = _vars["port"].as<int>();
+    _showHelp = vars.count("help") > 0;
+    _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    _gameOpts.graphics.width = vars["width"].as<int>();
+    _gameOpts.graphics.height = vars["height"].as<int>();
+    _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();
+    _gameOpts.audio.musicVolume = vars["musicvol"].as<int>();
+    _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
+    _gameOpts.network.host = vars.count("join") > 0 ? vars["join"].as<string>() : "";
+    _gameOpts.network.port = vars["port"].as<int>();
 
-    setDebugLevel(_vars["debug"].as<int>());
+    setDebugLevel(vars["debug"].as<int>());
 
-    if (_vars.count("serve") > 0) {
+    if (vars.count("serve") > 0) {
         _multiplayerMode = MultiplayerMode::Server;
-    } else if (_vars.count("join") > 0) {
+    } else if (vars.count("join") > 0) {
         _multiplayerMode = MultiplayerMode::Client;
     }
 }
