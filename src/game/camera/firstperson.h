@@ -29,7 +29,7 @@ public:
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void clearUserInput() override;
+    void stopMovement() override;
 
     void setPosition(const glm::vec3 &position);
     void setHeading(float heading);

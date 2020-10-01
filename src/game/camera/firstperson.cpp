@@ -152,7 +152,7 @@ void FirstPersonCamera::update(float dt) {
     }
 }
 
-void FirstPersonCamera::clearUserInput() {
+void FirstPersonCamera::stopMovement() {
     _moveForward = false;
     _moveLeft = false;
     _moveBackward = false;

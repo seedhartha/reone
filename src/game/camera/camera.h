@@ -33,7 +33,8 @@ class Camera {
 public:
     virtual bool handle(const SDL_Event &event) = 0;
     virtual void update(float dt) = 0;
-    virtual void clearUserInput() = 0;
+
+    virtual void stopMovement() = 0;
 
     float heading() const;
     std::shared_ptr<render::CameraSceneNode> sceneNode() const;

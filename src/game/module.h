@@ -26,6 +26,7 @@
 #include "area.h"
 #include "camera/firstperson.h"
 #include "camera/thirdperson.h"
+#include "player.h"
 
 namespace reone {
 
@@ -49,6 +50,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
+    void update3rdPersonCameraTarget();
     void update3rdPersonCameraHeading();
     void saveTo(GameState &state) const;
 
@@ -82,10 +84,7 @@ private:
     CameraType _cameraType { CameraType::FirstPerson };
     std::shared_ptr<FirstPersonCamera> _firstPersonCamera;
     std::shared_ptr<ThirdPersonCamera> _thirdPersonCamera;
-    bool _moveForward { false };
-    bool _moveLeft { false };
-    bool _moveBackward { false };
-    bool _moveRight { false };
+    std::unique_ptr<Player> _player;
 
     // Callbacks
     std::function<void(CameraType)> _onCameraChanged;
@@ -95,12 +94,9 @@ private:
 
     void toggleCameraType();
     void cycleDebugMode(bool forward);
-    void updatePlayer(float dt);
     bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
-    void update3rdPersonCameraTarget();
     void switchTo3rdPersonCamera();
-    void resetPlayerMovement();
     SpatialObject *getObjectAt(int x, int y) const;
 
     // Loading
@@ -108,6 +104,7 @@ private:
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
     void loadCameras();
+    void loadPlayer();
 
     // END Loading
 
@@ -115,7 +112,6 @@ private:
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
 
     // END Events

@@ -121,7 +121,7 @@ void ThirdPersonCamera::updateSceneNode() {
     _sceneNode->setLocalTransform(transform);
 }
 
-void ThirdPersonCamera::clearUserInput() {
+void ThirdPersonCamera::stopMovement() {
     _rotateCCW = false;
     _rotateCW = false;
 }

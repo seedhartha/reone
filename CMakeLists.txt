@@ -94,6 +94,7 @@ set(HEADERS
     src/game/object/waypoint.h
     src/game/pathfinding.h
     src/game/paths.h
+    src/game/player.h
     src/game/room.h
     src/game/script/routines.h
     src/game/script/util.h
@@ -225,6 +226,7 @@ set(SOURCES
     src/game/object/waypoint.cpp
     src/game/pathfinding.cpp
     src/game/paths.cpp
+    src/game/player.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp
