@@ -17,9 +17,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include "tools.h"
 
@@ -42,10 +43,6 @@ private:
         Convert
     };
 
-    int _argc { 0 };
-    char **_argv { nullptr };
-    boost::program_options::options_description _cmdLineOpts { "Usage" };
-    boost::program_options::variables_map _vars;
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     boost::filesystem::path _inputFilePath;
@@ -54,13 +51,21 @@ private:
     Command _command { Command::None };
     std::unique_ptr<Tool> _tool;
 
+    // Command line arguments
+
+    int _argc { 0 };
+    char **_argv { nullptr };
+
+    // END Command line arguments
+
+    boost::program_options::options_description _cmdLineOpts { "Usage" };
+
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
+    void initOptions();
     void loadOptions();
-    void initKeyPath();
     void initGameVersion();
-    void initCommand();
     void initTool();
 };
 

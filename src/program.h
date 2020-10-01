@@ -19,7 +19,6 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include "game/types.h"
 #include "net/types.h"
@@ -56,15 +55,14 @@ private:
 
     boost::program_options::options_description _commonOpts;
     boost::program_options::options_description _cmdLineOpts { "Usage" };
-    boost::program_options::variables_map _vars;
 
     // END Intermediate options
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
+    void initOptions();
     void loadOptions();
-    void applyOptions();
     int runGame();
 };
 

@@ -19,9 +19,8 @@
 
 #include <iostream>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/positional_options.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "src/core/pathutil.h"
 
@@ -40,6 +39,7 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
 
 int Program::run() {
+    initOptions();
     loadOptions();
 
     switch (_command) {
@@ -60,7 +60,7 @@ int Program::run() {
     return 0;
 }
 
-void Program::loadOptions() {
+void Program::initOptions() {
     _cmdLineOpts.add_options()
         ("help", "print this message")
         ("list", "list file contents")
@@ -69,7 +69,9 @@ void Program::loadOptions() {
         ("game", po::value<string>(), "path to game directory")
         ("dest", po::value<string>(), "path to destination directory")
         ("input-file", po::value<string>(), "path to input file");
+}
 
+void Program::loadOptions() {
     po::positional_options_description positional;
     positional.add("input-file", 1);
 
@@ -78,38 +80,29 @@ void Program::loadOptions() {
         .positional(positional)
         .run();
 
-    po::store(parsedCmdLineOpts, _vars);
-    po::notify(_vars);
+    po::variables_map vars;
+    po::store(parsedCmdLineOpts, vars);
+    po::notify(vars);
 
-    _gamePath = _vars.count("game") ? _vars["game"].as<string>() : fs::current_path();
-    _destPath = _vars.count("dest") ? _vars["dest"].as<string>() : fs::current_path();
-    _inputFilePath = _vars.count("input-file") ? _vars["input-file"].as<string>() : "";
-
-    initKeyPath();
-    initGameVersion();
-    initCommand();
-    initTool();
-}
-
-void Program::initKeyPath() {
+    _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    _destPath = vars.count("dest") > 0 ? vars["dest"].as<string>() : fs::current_path();
+    _inputFilePath = vars.count("input-file") > 0 ? vars["input-file"].as<string>() : "";
     _keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+
+    if (vars.count("help")) {
+        _command = Command::Help;
+    } else if (vars.count("list")) {
+        _command = Command::List;
+    } else if (vars.count("extract")) {
+        _command = Command::Extract;
+    } else if (vars.count("convert")) {
+        _command = Command::Convert;
+    }
 }
 
 void Program::initGameVersion() {
     fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
     _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
-}
-
-void Program::initCommand() {
-    if (_vars.count("help")) {
-        _command = Command::Help;
-    } else if (_vars.count("list")) {
-        _command = Command::List;
-    } else if (_vars.count("extract")) {
-        _command = Command::Extract;
-    } else if (_vars.count("convert")) {
-        _command = Command::Convert;
-    }
 }
 
 void Program::initTool() {
