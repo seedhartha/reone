@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <map>
 
-#include "area.h"
+#include "object/area.h"
 
 using namespace std;
 

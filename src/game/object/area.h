@@ -19,25 +19,26 @@
 
 #include <list>
 
-#include "../gui/types.h"
-#include "../net/types.h"
-#include "../render/scene/scenegraph.h"
-#include "../render/types.h"
-#include "../resources/types.h"
-#include "../script/variable.h"
+#include "../../gui/types.h"
+#include "../../net/types.h"
+#include "../../render/scene/scenegraph.h"
+#include "../../render/types.h"
+#include "../../resources/types.h"
+#include "../../script/variable.h"
 
-#include "actions.h"
-#include "camera/firstperson.h"
-#include "camera/thirdperson.h"
-#include "collisiondetect.h"
-#include "object/creature.h"
-#include "object/door.h"
-#include "object/placeable.h"
-#include "object/trigger.h"
-#include "object/waypoint.h"
-#include "objectselect.h"
-#include "pathfinder.h"
-#include "room.h"
+#include "../actions.h"
+#include "../camera/firstperson.h"
+#include "../camera/thirdperson.h"
+#include "../collisiondetect.h"
+#include "../objectselect.h"
+#include "../pathfinder.h"
+#include "../room.h"
+
+#include "creature.h"
+#include "door.h"
+#include "placeable.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 

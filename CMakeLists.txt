@@ -51,7 +51,6 @@ set(HEADERS
     src/core/streamutil.h
     src/core/types.h
     src/game/actions.h
-    src/game/area.h
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
     src/game/blueprint/door.h
@@ -76,7 +75,6 @@ set(HEADERS
     src/game/gui/mainmenu.h
     src/game/gui/portraitselect.h
     src/game/gui/target.h
-    src/game/module.h
     src/game/multiplayer/area.h
     src/game/multiplayer/callbacks.h
     src/game/multiplayer/command.h
@@ -85,10 +83,12 @@ set(HEADERS
     src/game/multiplayer/game.h
     src/game/multiplayer/objectfactory.h
     src/game/multiplayer/util.h
+    src/game/object/area.h
     src/game/object/creature.h
     src/game/object/door.h
     src/game/object/factory.h
     src/game/object/item.h
+    src/game/object/module.h
     src/game/object/object.h
     src/game/object/placeable.h
     src/game/object/spatial.h
@@ -185,7 +185,6 @@ set(SOURCES
     src/core/random.cpp
     src/core/streamutil.cpp
     src/game/actions.cpp
-    src/game/area.cpp
     src/game/blueprint/blueprints.cpp
     src/game/blueprint/creature.cpp
     src/game/blueprint/door.cpp
@@ -211,7 +210,6 @@ set(SOURCES
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitselect.cpp
     src/game/gui/target.cpp
-    src/game/module.cpp
     src/game/multiplayer/area.cpp
     src/game/multiplayer/command.cpp
     src/game/multiplayer/creature.cpp
@@ -219,10 +217,12 @@ set(SOURCES
     src/game/multiplayer/game.cpp
     src/game/multiplayer/objectfactory.cpp
     src/game/multiplayer/util.cpp
+    src/game/object/area.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
     src/game/object/factory.cpp
     src/game/object/item.cpp
+    src/game/object/module.cpp
     src/game/object/object.cpp
     src/game/object/placeable.cpp
     src/game/object/spatial.cpp

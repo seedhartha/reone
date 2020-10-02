@@ -23,12 +23,12 @@
 #include "../../render/scene/scenegraph.h"
 #include "../../resources/types.h"
 
-#include "../area.h"
-#include "../module.h"
 #include "../types.h"
 
+#include "area.h"
 #include "creature.h"
 #include "door.h"
+#include "module.h"
 #include "placeable.h"
 #include "trigger.h"
 #include "waypoint.h"

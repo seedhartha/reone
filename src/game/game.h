@@ -24,6 +24,7 @@
 #include "../render/window.h"
 #include "../resources/types.h"
 
+#include "console.h"
 #include "gui/classselect.h"
 #include "gui/container.h"
 #include "gui/debug.h"
@@ -33,10 +34,8 @@
 #include "gui/mainmenu.h"
 #include "gui/portraitselect.h"
 #include "gui/target.h"
-
-#include "area.h"
-#include "console.h"
-#include "module.h"
+#include "object/area.h"
+#include "object/module.h"
 
 namespace reone {
 
