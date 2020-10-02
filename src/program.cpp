@@ -22,7 +22,7 @@
 #include <boost/program_options.hpp>
 
 #include "core/debug.h"
-#include "game/multiplayer/game.h"
+#include "game/mp/game.h"
 
 using namespace std;
 

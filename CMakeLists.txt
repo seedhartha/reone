@@ -75,14 +75,14 @@ set(HEADERS
     src/game/gui/mainmenu.h
     src/game/gui/portraitselect.h
     src/game/gui/target.h
-    src/game/multiplayer/area.h
-    src/game/multiplayer/callbacks.h
-    src/game/multiplayer/command.h
-    src/game/multiplayer/creature.h
-    src/game/multiplayer/door.h
-    src/game/multiplayer/game.h
-    src/game/multiplayer/objectfactory.h
-    src/game/multiplayer/util.h
+    src/game/mp/area.h
+    src/game/mp/callbacks.h
+    src/game/mp/command.h
+    src/game/mp/creature.h
+    src/game/mp/door.h
+    src/game/mp/game.h
+    src/game/mp/objectfactory.h
+    src/game/mp/util.h
     src/game/object/area.h
     src/game/object/creature.h
     src/game/object/door.h
@@ -210,13 +210,13 @@ set(SOURCES
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitselect.cpp
     src/game/gui/target.cpp
-    src/game/multiplayer/area.cpp
-    src/game/multiplayer/command.cpp
-    src/game/multiplayer/creature.cpp
-    src/game/multiplayer/door.cpp
-    src/game/multiplayer/game.cpp
-    src/game/multiplayer/objectfactory.cpp
-    src/game/multiplayer/util.cpp
+    src/game/mp/area.cpp
+    src/game/mp/command.cpp
+    src/game/mp/creature.cpp
+    src/game/mp/door.cpp
+    src/game/mp/game.cpp
+    src/game/mp/objectfactory.cpp
+    src/game/mp/util.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
