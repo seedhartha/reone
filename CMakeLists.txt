@@ -50,6 +50,7 @@ set(HEADERS
     src/core/random.h
     src/core/streamutil.h
     src/core/types.h
+    src/game/actions.h
     src/game/area.h
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
@@ -183,8 +184,8 @@ set(SOURCES
     src/core/pathutil.cpp
     src/core/random.cpp
     src/core/streamutil.cpp
+    src/game/actions.cpp
     src/game/area.cpp
-    src/game/area_actions.cpp
     src/game/blueprint/blueprints.cpp
     src/game/blueprint/creature.cpp
     src/game/blueprint/door.cpp

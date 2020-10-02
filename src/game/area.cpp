@@ -79,7 +79,8 @@ Area::Area(
     _sceneGraph(sceneGraph),
     _opts(opts),
     _collisionDetector(this),
-    _objectSelector(this) {
+    _objectSelector(this),
+    _actionExecutor(this) {
 
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
@@ -424,7 +425,7 @@ void Area::update(const UpdateContext &updateCtx) {
     updateDelayedCommands();
 
     for (auto &creature : _objectsByType[ObjectType::Creature]) {
-        updateCreature(static_cast<Creature &>(*creature), updateCtx.deltaTime);
+        _actionExecutor.executeActions(static_cast<Creature &>(*creature), updateCtx.deltaTime);
     }
     for (auto &room : _rooms) {
         room.second->update(updateCtx.deltaTime);
@@ -458,6 +459,10 @@ void Area::updateDelayedCommands() {
         [](const DelayedCommand &command) { return command.executed; });
 
     _delayed.erase(it, _delayed.end());
+}
+
+void Area::updateCreature(Creature &creature, float dt) {
+    _actionExecutor.executeActions(creature, dt);
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -732,6 +737,12 @@ Camera *Area::getCamera() const {
     return _cameraType == CameraType::ThirdPerson ? _thirdPersonCamera.get() : static_cast<Camera *>(_firstPersonCamera.get());
 }
 
+void Area::startDialog(Creature &creature, const string &resRef) {
+    if (_onStartDialog) {
+        _onStartDialog(creature, resRef);
+    }
+}
+
 const CameraStyle &Area::cameraStyle() const {
     return _cameraStyle;
 }
@@ -754,6 +765,10 @@ const ObjectList &Area::objects() const {
 
 const CollisionDetector &Area::collisionDetector() const {
     return _collisionDetector;
+}
+
+const Pathfinder &Area::pathfinder() const {
+    return _pathfinder;
 }
 
 ThirdPersonCamera *Area::thirdPersonCamera() {
