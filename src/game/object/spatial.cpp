@@ -114,6 +114,10 @@ const glm::mat4 &SpatialObject::transform() const {
     return _transform;
 }
 
+bool SpatialObject::visible() const {
+    return _visible;
+}
+
 shared_ptr<ModelSceneNode> SpatialObject::model() const {
     return _model;
 }
@@ -161,6 +165,10 @@ void SpatialObject::setHeading(float heading) {
 }
 
 void SpatialObject::setVisible(bool visible) {
+    if (_visible == visible) return;
+
+    _visible = visible;
+
     if (_model) {
         _model->setVisible(visible);
     }

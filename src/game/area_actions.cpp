@@ -124,7 +124,7 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     if (distToDest <= 1.0f) {
         selectNextPathPoint(*path);
 
-    } else if (moveCreatureTowards(creature, dest, dt)) {
+    } else if (moveCreatureTowards(creature, dest, true, dt)) {
         creature.setMovementType(MovementType::Run);
 
     } else {
@@ -141,7 +141,7 @@ void Area::selectNextPathPoint(Creature::Path &path) {
 
 void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
     const glm::vec3 &origin = creature.position();
-    vector<glm::vec3> points(_pathfinding->findPath(origin, dest));
+    vector<glm::vec3> points(_pathfinding.findPath(origin, dest));
     uint32_t now = SDL_GetTicks();
 
     creature.setPath(dest, move(points), now);

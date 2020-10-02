@@ -35,7 +35,7 @@ unique_ptr<Module> ObjectFactory::newModule() {
 }
 
 unique_ptr<Area> ObjectFactory::newArea() {
-    return make_unique<Area>(_counter++, _version, this, _sceneGraph);
+    return make_unique<Area>(_counter++, _version, this, _sceneGraph, _options.graphics);
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {

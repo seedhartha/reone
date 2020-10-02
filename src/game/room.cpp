@@ -66,7 +66,15 @@ const Walkmesh *Room::walkmesh() const {
     return _walkmesh.get();
 }
 
+bool Room::visible() const {
+    return _visible;
+}
+
 void Room::setVisible(bool visible) {
+    if (_visible == visible) return;
+
+    _visible = visible;
+
     if (_model) {
         _model->setVisible(visible);
     }

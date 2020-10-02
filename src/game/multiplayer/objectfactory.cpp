@@ -41,7 +41,7 @@ MultiplayerObjectFactory::MultiplayerObjectFactory(
 }
 
 unique_ptr<Area> MultiplayerObjectFactory::newArea() {
-    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _sceneGraph, _callbacks);
+    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _sceneGraph, _options.graphics, _callbacks);
 }
 
 unique_ptr<Creature> MultiplayerObjectFactory::newCreature() {

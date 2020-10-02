@@ -127,9 +127,9 @@ void Player::update(float dt) {
         dest.x -= 100.0f * glm::sin(heading);
         dest.y += 100.0f * glm::cos(heading);
 
-        if (_area->moveCreatureTowards(*_creature, dest, dt)) {
+        if (_area->moveCreatureTowards(*_creature, dest, true, dt)) {
             _creature->setMovementType(MovementType::Run);
-            _module->update3rdPersonCameraTarget();
+            _module->area()->update3rdPersonCameraTarget();
             _area->updateRoomVisibility();
             _area->selectNearestObject();
         }

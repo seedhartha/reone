@@ -376,6 +376,10 @@ float ModelSceneNode::alpha() const {
     return _alpha;
 }
 
+const AABB &ModelSceneNode::aabb() const {
+    return _model->aabb();
+}
+
 bool ModelSceneNode::isLightingEnabled() const {
     return _lightingEnabled;
 }

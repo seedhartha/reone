@@ -47,6 +47,7 @@ public:
     const glm::vec3 &position() const;
     const render::ModelSceneNode *model() const;
     const render::Walkmesh *walkmesh() const;
+    bool visible() const;
 
     void setVisible(bool visible);
 
@@ -56,6 +57,7 @@ private:
     std::shared_ptr<render::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     std::set<SpatialObject *> _tenants;
+    bool _visible { true };
 };
 
 } // namespace game

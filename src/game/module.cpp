@@ -38,17 +38,12 @@ namespace reone {
 
 namespace game {
 
-static const float kDefaultFieldOfView = 75.0f;
-
 Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, SceneGraph *sceneGraph, const GraphicsOptions &opts) :
     Object(id, ObjectType::Module),
     _version(version),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph),
     _opts(opts) {
-
-    assert(_objectFactory);
-    _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
 
 void Module::load(const string &name, const GffStruct &ifo) {
@@ -56,7 +51,9 @@ void Module::load(const string &name, const GffStruct &ifo) {
 
     loadInfo(ifo);
     loadArea(ifo);
-    loadCameras();
+
+    _area->loadCameras(_info.entryPosition, _info.entryHeading);
+
     loadPlayer();
 
     _loaded = true;
@@ -88,8 +85,8 @@ void Module::loadArea(const GffStruct &ifo) {
         }
     });
     area->setOnPlayerChanged([this]() {
-        update3rdPersonCameraTarget();
-        switchTo3rdPersonCamera();
+        _area->update3rdPersonCameraTarget();
+        _area->switchTo3rdPersonCamera();
     });
     area->setOnStartDialog([this](const Object &object, const string &resRef) {
         if (!_startDialog) return;
@@ -106,39 +103,8 @@ void Module::loadArea(const GffStruct &ifo) {
     _area = move(area);
 }
 
-void Module::loadCameras() {
-    glm::vec3 position(_info.entryPosition);
-    position.z += 1.7f;
-
-    float heading = _info.entryHeading;
-
-    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView)));
-    firstPersonCamera->setPosition(position);
-    firstPersonCamera->setHeading(heading);
-    _firstPersonCamera = move(firstPersonCamera);
-
-    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_sceneGraph, _cameraAspect, _area->cameraStyle()));
-    thirdPersonCamera->setFindObstacleFunc(bind(&Module::findObstacle, this, _1, _2, _3));
-    thirdPersonCamera->setTargetPosition(position);
-    thirdPersonCamera->setHeading(heading);
-    _thirdPersonCamera = move(thirdPersonCamera);
-
-    if (_onCameraChanged) {
-        _onCameraChanged(_cameraType);
-    }
-}
-
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), _thirdPersonCamera.get());
-}
-
-bool Module::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
-    SpatialObject *obstacle = nullptr;
-    if (_area->findObstacleByWalkmesh(from, to, kObstacleRoom | kObstacleDoor, intersection, &obstacle)) {
-        return true;
-    }
-
-    return false;
+    _player = make_unique<Player>(this, _area.get(), _area->thirdPersonCamera());
 }
 
 void Module::loadParty(const PartyConfiguration &party, const string &entry) {
@@ -153,9 +119,9 @@ void Module::loadParty(const PartyConfiguration &party, const string &entry) {
 
     _player->setCreature(static_cast<Creature *>(_area->player().get()));
 
-    update3rdPersonCameraTarget();
-    update3rdPersonCameraHeading();
-    switchTo3rdPersonCamera();
+    _area->update3rdPersonCameraTarget();
+    _area->update3rdPersonCameraHeading();
+    _area->switchTo3rdPersonCamera();
 
     _area->runOnEnterScript();
 }
@@ -173,41 +139,10 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
     }
 }
 
-void Module::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> player(_area->player());
-    if (!player) return;
-
-    glm::vec3 position;
-
-    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
-        position += player->position();
-    } else {
-        position = player->position();
-    }
-    _thirdPersonCamera->setTargetPosition(position);
-}
-
-void Module::update3rdPersonCameraHeading() {
-    shared_ptr<SpatialObject> player(_area->player());
-    if (!player) return;
-
-    _thirdPersonCamera->setHeading(player->heading());
-}
-
-void Module::switchTo3rdPersonCamera() {
-    if (_cameraType == CameraType::ThirdPerson) return;
-
-    _cameraType = CameraType::ThirdPerson;
-
-    if (_onCameraChanged) {
-        _onCameraChanged(_cameraType);
-    }
-}
-
 bool Module::handle(const SDL_Event &event) {
     if (!_loaded) return false;
 
-    if (getCamera()->handle(event)) return true;
+    if (_area->getCamera()->handle(event)) return true;
     if (_player->handle(event)) return true;
     if (_area->handle(event)) return true;
 
@@ -227,29 +162,14 @@ bool Module::handle(const SDL_Event &event) {
 }
 
 bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
-    const SpatialObject *object = getObjectAt(event.x, event.y);
+    const SpatialObject *object = _area->getObjectAt(event.x, event.y);
     _area->hilight(object ? object->id() : -1);
 
     return true;
 }
 
-SpatialObject *Module::getObjectAt(int x, int y) const {
-    shared_ptr<Camera> camera(getCamera());
-    glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
-    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), camera->sceneNode()->view(), camera->sceneNode()->projection(), viewport));
-    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), camera->sceneNode()->view(), camera->sceneNode()->projection(), viewport));
-
-    shared_ptr<SpatialObject> player(_area->player());
-    SpatialObject *except = player ? player.get() : nullptr;
-    SpatialObject *obstacle = nullptr;
-
-    _area->findObstacleByAABB(fromWorld, toWorld, kObstacleCreature | kObstacleDoor | kObstaclePlaceable, except, &obstacle);
-
-    return obstacle;
-}
-
 bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    SpatialObject *object = getObjectAt(event.x, event.y);
+    SpatialObject *object = _area->getObjectAt(event.x, event.y);
     if (!object) {
         return false;
     }
@@ -286,7 +206,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     if (creature) {
         if (!creature->conversation().empty() && _startDialog) {
             _player->stopMovement();
-            getCamera()->stopMovement();
+            _area->getCamera()->stopMovement();
 
             if (_startDialog) {
                 _startDialog(*creature, creature->conversation());
@@ -301,7 +221,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_V:
-            toggleCameraType();
+            _area->toggleCameraType();
             return true;
 
         case SDL_SCANCODE_LEFTBRACKET:
@@ -314,30 +234,6 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
 
         default:
             return false;
-    }
-}
-
-void Module::toggleCameraType() {
-    bool changed = false;
-
-    switch (_cameraType) {
-        case CameraType::FirstPerson:
-            if (_area->partyLeader()) {
-                _cameraType = CameraType::ThirdPerson;
-                changed = true;
-            }
-            break;
-
-        case CameraType::ThirdPerson:
-            _cameraType = CameraType::FirstPerson;
-            _firstPersonCamera->setPosition(_thirdPersonCamera->sceneNode()->absoluteTransform()[3]);
-            _firstPersonCamera->setHeading(_thirdPersonCamera->heading());
-            changed = true;
-            break;
-    }
-
-    if (changed && _onCameraChanged) {
-        _onCameraChanged(_cameraType);
     }
 }
 
@@ -364,10 +260,10 @@ void Module::cycleDebugMode(bool forward) {
 void Module::update(float dt, GuiContext &guiCtx) {
     if (!_loaded) return;
 
-    shared_ptr<Camera> camera(getCamera());
+    Camera *camera = _area->getCamera();
     camera->update(dt);
 
-    if (_cameraType == CameraType::ThirdPerson) {
+    if (_area->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     UpdateContext ctx;
@@ -383,10 +279,6 @@ void Module::update(float dt, GuiContext &guiCtx) {
 void Module::saveTo(GameState &state) const {
     state.party = _party;
     _area->saveTo(state);
-}
-
-void Module::setOnCameraChanged(const function<void(CameraType)> &fn) {
-    _onCameraChanged = fn;
 }
 
 void Module::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {
@@ -409,20 +301,12 @@ bool Module::loaded() const {
     return _loaded;
 }
 
-shared_ptr<Camera> Module::getCamera() const {
-    return _cameraType == CameraType::FirstPerson ? shared_ptr<Camera>(_firstPersonCamera) : _thirdPersonCamera;
-}
-
 const ModuleInfo &Module::info() const {
     return _info;
 }
 
 shared_ptr<Area> Module::area() const {
     return _area;
-}
-
-CameraType Module::cameraType() const {
-    return _cameraType;
 }
 
 } // namespace game

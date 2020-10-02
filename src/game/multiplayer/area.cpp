@@ -35,9 +35,10 @@ MultiplayerArea::MultiplayerArea(
     MultiplayerMode mode,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph,
+    const GraphicsOptions &opts,
     IMultiplayerCallbacks *callbacks
 ) :
-    Area(id, version, objectFactory, sceneGraph), _callbacks(callbacks) {
+    Area(id, version, objectFactory, sceneGraph, opts), _callbacks(callbacks) {
 
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }

@@ -65,6 +65,7 @@ public:
     bool isVisible() const;
     bool isOnScreen() const;
     float alpha() const;
+    const AABB &aabb() const;
 
     void setModel(const std::shared_ptr<Model> &model);
     void setTextureOverride(const std::shared_ptr<Texture> &texture);

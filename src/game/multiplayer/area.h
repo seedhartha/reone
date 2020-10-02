@@ -34,6 +34,7 @@ public:
         MultiplayerMode mode,
         ObjectFactory *objectFactory,
         render::SceneGraph *sceneGraph,
+        const render::GraphicsOptions &opts,
         IMultiplayerCallbacks *callbacks);
 
     void execute(const Command &cmd);

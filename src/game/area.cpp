@@ -56,24 +56,33 @@ namespace reone {
 
 namespace game {
 
+
+static const float kDefaultFieldOfView = 75.0f;
 static const float kDrawDebugDistance = 64.0f;
 static const float kPartyMemberFollowDistance = 4.0f;
 static const float kMaxDistanceToTestCollision = 64.0f;
-static const float kElevationTestRadius = 1024.0f;
+static const float kElevationTestZ = 1024.0f;
 static const float kSelectionDistance = 64.0f;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(uint32_t id, GameVersion version, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+Area::Area(
+    uint32_t id,
+    GameVersion version,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    const GraphicsOptions &opts
+) :
     Object(id, ObjectType::Area),
     _version(version),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph),
-    _pathfinding(new Pathfinding()) {
+    _opts(opts),
+    _collisionDetector(this) {
 
-    assert(_objectFactory);
+    _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
 
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
@@ -128,7 +137,7 @@ void Area::loadPTH() {
         Room *room = nullptr;
         float z = 0.0f;
 
-        if (!findRoomElevationAt(glm::vec2(point.x, point.y), room, z)) {
+        if (!getElevationAt(glm::vec2(point.x, point.y), room, z)) {
             warn(boost::format("Area: point %d elevation not found") % i);
             continue;
         }
@@ -140,7 +149,7 @@ void Area::loadPTH() {
         _sceneGraph->addRoot(aabb);
     }
 
-    _pathfinding->load(paths, pointZ);
+    _pathfinding.load(paths, pointZ);
 }
 
 void Area::loadARE(const GffStruct &are) {
@@ -240,6 +249,44 @@ void Area::loadTriggers(const GffStruct &git) {
     }
 }
 
+void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
+    glm::vec3 position(entryPosition);
+    position.z += 1.7f;
+
+    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView)));
+    firstPersonCamera->setPosition(position);
+    firstPersonCamera->setHeading(entryHeading);
+    _firstPersonCamera = move(firstPersonCamera);
+
+    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_sceneGraph, _cameraAspect, _cameraStyle));
+    thirdPersonCamera->setFindObstacleFunc([this](const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) {
+        glm::vec3 originToDest(dest - origin);
+        glm::vec3 dir(glm::normalize(originToDest));
+
+        RaycastProperties props;
+        props.flags = kRaycastRooms | kRaycastObjects;
+        props.origin = origin;
+        props.direction = dir;
+
+        RaycastResult result;
+
+        if (_collisionDetector.raycast(props, result)) {
+            float dist = glm::min(glm::length(originToDest), result.distance);
+            intersection = origin + dist * dir;
+            return true;
+        }
+
+        return false;
+    });
+    thirdPersonCamera->setTargetPosition(position);
+    thirdPersonCamera->setHeading(entryHeading);
+    _thirdPersonCamera = move(thirdPersonCamera);
+
+    if (_onCameraChanged) {
+        _onCameraChanged(_cameraType);
+    }
+}
+
 void Area::add(const shared_ptr<SpatialObject> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
@@ -258,7 +305,7 @@ void Area::determineObjectRoom(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
 
-    if (findRoomElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, room, position.z)) {
         object.setRoom(room);
     }
 }
@@ -282,7 +329,7 @@ void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
 
-    if (findRoomElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, room, position.z)) {
         object.setPosition(position);
     }
 }
@@ -332,8 +379,6 @@ bool Area::handle(const SDL_Event &event) {
     switch (event.type) {
         case SDL_KEYDOWN:
             return handleKeyDown(event.key);
-        case SDL_KEYUP:
-            return handleKeyUp(event.key);
         default:
             return false;
     }
@@ -410,7 +455,25 @@ void Area::getSelectableObjects(vector<uint32_t> &ids) const {
     }
 }
 
-bool Area::handleKeyUp(const SDL_KeyboardEvent &event) {
+bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) const {
+    RaycastProperties props;
+    props.origin = glm::vec3(position, kElevationTestZ);
+    props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    RaycastResult result;
+
+    props.flags = kRaycastObjects;
+
+    if (_collisionDetector.raycast(props, result)) return false;
+
+    props.flags = kRaycastRooms | kRaycastWalkable;
+
+    if (_collisionDetector.raycast(props, result)) {
+        room = result.room;
+        z = result.intersection.z;
+        return true;
+    }
+
     return false;
 }
 
@@ -454,39 +517,33 @@ void Area::updateDelayedCommands() {
     _delayed.erase(it, _delayed.end());
 }
 
-bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &point, float dt) {
+bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
     glm::vec3 position(creature.position());
-    glm::vec2 delta = point - glm::vec2(position);
+    glm::vec2 delta(dest - glm::vec2(position));
     glm::vec2 dir(glm::normalize(delta));
 
     float heading = -glm::atan(dir.x, dir.y);
     creature.setHeading(heading);
 
-    glm::vec3 newPosition(position);
-    newPosition.x += creature.runSpeed() * dir.x * dt;
-    newPosition.y += creature.runSpeed() * dir.y * dt;
+    float speed = run ? creature.runSpeed() : creature.walkSpeed();
+    float speedDt = speed * dt;
+    position.x += dir.x * speedDt;
+    position.y += dir.y * speedDt;
 
-    SpatialObject *obstacle = nullptr;
     Room *room = nullptr;
 
-    if (findObstacleByAABB(position, newPosition + 1.0f * glm::vec3(dir, 0.0f), kObstacleCreature, &creature, &obstacle)) {
-        return false;
-    }
-    if (findElevationAt(newPosition, room, newPosition.z)) {
+    if (getElevationAt(position, room, position.z)) {
         creature.setRoom(room);
-        creature.setPosition(newPosition);
-
-        if (&creature == &*_partyLeader) {
-            updateTriggers(creature);
-        }
+        creature.setPosition(position);
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 void Area::updateTriggers(const Creature &creature) {
     glm::vec2 position2d(creature.position());
-    glm::vec3 liftedPosition(position2d, kElevationTestRadius);
+    glm::vec3 liftedPosition(position2d, kElevationTestZ);
     glm::vec3 down(0.0f, 0.0f, -1.0f);
     glm::vec2 intersection;
     float distance;
@@ -574,144 +631,6 @@ void Area::loadState(const GameState &state) {
     }
 }
 
-bool Area::findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const {
-    vector<pair<SpatialObject *, float>> candidates;
-
-    for (auto &list : _objectsByType) {
-        if (list.first != ObjectType::Door && list.first != ObjectType::Placeable) continue;
-        if (list.first == ObjectType::Door && (mask & kObstacleDoor) == 0) continue;
-        if (list.first == ObjectType::Placeable && (mask & kObstaclePlaceable) == 0) continue;
-
-        for (auto &object : list.second) {
-            if (!object->walkmesh() ||
-                (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen())) continue;
-
-            shared_ptr<ModelSceneNode> model(object->model());
-            if (!model || !model->isVisible() || !model->isOnScreen()) continue;
-
-            float distToFrom = object->distanceTo(from);
-
-            candidates.push_back(make_pair(object.get(), distToFrom));
-        }
-    }
-
-    sort(
-        candidates.begin(),
-        candidates.end(),
-        [](const pair<SpatialObject *, float> &left, const pair<SpatialObject *, float> &right) { return left.second < right.second; });
-
-    for (auto &pair : candidates) {
-        SpatialObject &object = *pair.first;
-
-        glm::mat4 invObjectTransform(glm::inverse(object.transform()));
-        glm::vec3 relFrom(invObjectTransform * glm::vec4(from, 1.0f));
-        glm::vec3 relTo(invObjectTransform * glm::vec4(to, 1.0f));
-
-        if (object.walkmesh()->findObstacle(relFrom, relTo, intersection)) {
-            intersection = object.transform() * glm::vec4(intersection, 1.0f);
-            *obstacle = &object;
-            return true;
-        }
-    }
-
-    if ((mask & kObstacleRoom) == 0) return false;
-
-    for (auto &room : _rooms) {
-        const Walkmesh *walkmesh = room.second->walkmesh();
-        if (!walkmesh) continue;
-
-        AABB aabb(walkmesh->aabb());
-        if (!aabb.contains(from) && !aabb.contains(to)) continue;
-
-        if (walkmesh->findObstacle(from, to, intersection)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Area::findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const {
-    vector<pair<SpatialObject *, float>> candidates;
-
-    for (auto &list : _objectsByType) {
-        if (list.first != ObjectType::Creature &&
-            list.first != ObjectType::Door &&
-            list.first != ObjectType::Placeable) continue;
-
-        if (list.first == ObjectType::Creature && (mask & kObstacleCreature) == 0) continue;
-        if (list.first == ObjectType::Door && (mask & kObstacleDoor) == 0) continue;
-        if (list.first == ObjectType::Placeable && (mask & kObstaclePlaceable) == 0) continue;
-
-        for (auto &object : list.second) {
-            shared_ptr<ModelSceneNode> model(object->model());
-            if (!model ||
-                !model->isVisible() ||
-                !model->isOnScreen() ||
-                (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen()) ||
-                (except && object.get() == except)) continue;
-
-            float distToFrom = object->distanceTo(from);
-
-            candidates.push_back(make_pair(object.get(), distToFrom));
-        }
-    }
-
-    sort(
-        candidates.begin(),
-        candidates.end(),
-        [](const pair<SpatialObject *, float> &left, const pair<SpatialObject *, float> &right) { return left.second < right.second; });
-
-    for (auto &pair : candidates) {
-        SpatialObject *object = pair.first;
-        AABB aabb(object->model()->model()->aabb() * object->transform());
-        float distance = 0.0f;
-
-        if (aabb.intersectLine(from, to, distance) && distance > 0.0f) {
-            *obstacle = &*object;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Area::findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const {
-    glm::vec3 from(position, kElevationTestRadius);
-    glm::vec3 to(position, -kElevationTestRadius);
-    glm::vec3 intersection(0.0f);
-    SpatialObject *obstacle = nullptr;
-
-    if (findObstacleByWalkmesh(from, to, kObstacleDoor | kObstaclePlaceable, intersection, &obstacle)) {
-        return false;
-    }
-    if (findRoomElevationAt(position, roomAt, z)) {
-        return true;
-    }
-
-    return false;
-}
-
-bool Area::findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const {
-    glm::vec3 from(position, kElevationTestRadius);
-    for (auto &pair : _rooms) {
-        Room *room = pair.second.get();
-
-        const Walkmesh *walkmesh = room->walkmesh();
-        if (!walkmesh) continue;
-
-        AABB aabb(walkmesh->aabb());
-        if (!aabb.contains(position)) continue;
-
-        if (room->walkmesh()->findElevationAt(from, z)) {
-            roomAt = room;
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void Area::updateRoomVisibility() {
     Room *playerRoom = _player->room();
     if (!playerRoom) return;
@@ -741,6 +660,29 @@ void Area::hilight(uint32_t objectId) {
 
 void Area::select(uint32_t objectId) {
     _selectedObjectId = objectId;
+}
+
+SpatialObject *Area::getObjectAt(int x, int y) const {
+    Camera *camera = getCamera();
+    shared_ptr<CameraSceneNode> sceneNode(camera->sceneNode());
+
+    glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
+    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
+    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
+
+    RaycastProperties props;
+    props.flags = kRaycastObjects | kRaycastAABB;
+    props.origin = fromWorld;
+    props.direction = glm::normalize(toWorld - fromWorld);
+    props.except = _player.get();
+
+    RaycastResult result;
+
+    if (_collisionDetector.raycast(props, result)) {
+        return result.object;
+    }
+
+    return nullptr;
 }
 
 void Area::updateSelection() {
@@ -815,6 +757,65 @@ void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     }
 }
 
+void Area::update3rdPersonCameraTarget() {
+    shared_ptr<SpatialObject> player(_player);
+    if (!player) return;
+
+    glm::vec3 position;
+
+    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
+        position += player->position();
+    } else {
+        position = player->position();
+    }
+    _thirdPersonCamera->setTargetPosition(position);
+}
+
+void Area::update3rdPersonCameraHeading() {
+    shared_ptr<SpatialObject> player(_player);
+    if (!player) return;
+
+    _thirdPersonCamera->setHeading(player->heading());
+}
+
+void Area::switchTo3rdPersonCamera() {
+    if (_cameraType == CameraType::ThirdPerson) return;
+
+    _cameraType = CameraType::ThirdPerson;
+
+    if (_onCameraChanged) {
+        _onCameraChanged(_cameraType);
+    }
+}
+
+void Area::toggleCameraType() {
+    bool changed = false;
+
+    switch (_cameraType) {
+        case CameraType::FirstPerson:
+            if (_partyLeader) {
+                _cameraType = CameraType::ThirdPerson;
+                changed = true;
+            }
+            break;
+
+        case CameraType::ThirdPerson:
+            _cameraType = CameraType::FirstPerson;
+            _firstPersonCamera->setPosition(_thirdPersonCamera->sceneNode()->absoluteTransform()[3]);
+            _firstPersonCamera->setHeading(_thirdPersonCamera->heading());
+            changed = true;
+            break;
+    }
+
+    if (changed && _onCameraChanged) {
+        _onCameraChanged(_cameraType);
+    }
+}
+
+Camera *Area::getCamera() const {
+    return _cameraType == CameraType::ThirdPerson ? _thirdPersonCamera.get() : static_cast<Camera *>(_firstPersonCamera.get());
+}
+
 uint32_t Area::selectedObjectId() const {
     return _selectedObjectId;
 }
@@ -823,8 +824,28 @@ const CameraStyle &Area::cameraStyle() const {
     return _cameraStyle;
 }
 
+CameraType Area::cameraType() const {
+    return _cameraType;
+}
+
 const string &Area::music() const {
     return _music;
+}
+
+const RoomMap &Area::rooms() const {
+    return _rooms;
+}
+
+const ObjectList &Area::objects() const {
+    return _objects;
+}
+
+const CollisionDetector &Area::collisionDetector() const {
+    return _collisionDetector;
+}
+
+ThirdPersonCamera *Area::thirdPersonCamera() {
+    return _thirdPersonCamera.get();
 }
 
 shared_ptr<SpatialObject> Area::player() const {
@@ -841,6 +862,10 @@ shared_ptr<SpatialObject> Area::partyMember1() const {
 
 shared_ptr<SpatialObject> Area::partyMember2() const {
     return _partyMember2;
+}
+
+void Area::setOnCameraChanged(const function<void(CameraType)> &fn) {
+    _onCameraChanged = fn;
 }
 
 void Area::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {

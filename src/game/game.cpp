@@ -141,7 +141,7 @@ void Game::update() {
         GuiContext guiCtx;
         _module->update(dt, guiCtx);
 
-        if (_module->cameraType() == CameraType::ThirdPerson) {
+        if (_module->area()->cameraType() == CameraType::ThirdPerson) {
             _hud->update(guiCtx.hud);
         }
         _targetOverlay->setContext(guiCtx.target);
@@ -215,7 +215,7 @@ void Game::drawWorld() {
         default:
             return;
     }
-    shared_ptr<Camera> camera(_module ? _module->getCamera() : nullptr);
+    Camera *camera = _module ? _module->area()->getCamera() : nullptr;
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
@@ -235,7 +235,7 @@ void Game::drawGUI() {
             _targetOverlay->render();
             _debugOverlay->render();
 
-            if (_module->cameraType() == CameraType::ThirdPerson) {
+            if (_module->area()->cameraType() == CameraType::ThirdPerson) {
                 _hud->render();
             }
             if (_console.isOpen()) {
@@ -381,6 +381,9 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     configureModule();
 
     _module->load(name, *ifo);
+    _module->area()->setOnCameraChanged([this](CameraType type) {
+        _window.setRelativeMouseMode(type == CameraType::FirstPerson);
+    });
     _module->loadParty(party, entry);
     _module->area()->loadState(_state);
 
@@ -480,7 +483,7 @@ void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
     if (speaker) {
         if (player) {
             player->face(*speaker);
-            _module->update3rdPersonCameraHeading();
+            _module->area()->update3rdPersonCameraHeading();
         }
         if (partyLeader) {
             partyLeader->face(*speaker);
@@ -495,9 +498,6 @@ void Game::onDialogFinished() {
 }
 
 void Game::configureModule() {
-    _module->setOnCameraChanged([this](CameraType type) {
-        _window.setRelativeMouseMode(type == CameraType::FirstPerson);
-    });
     _module->setOnModuleTransition([this](const string &name, const string &entry) {
         _nextModule = name;
         _nextEntry = entry;
@@ -546,7 +546,7 @@ bool Game::handle(const SDL_Event &event) {
     switch (_screen) {
         case Screen::InGame:
             if (_console.handle(event)) return true;
-            if (_module->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
+            if (_module->area()->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
             break;
         default: {

@@ -55,6 +55,7 @@ public:
     const glm::vec3 &position() const;
     float heading() const;
     const glm::mat4 &transform() const;
+    bool visible() const;
     std::shared_ptr<render::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
     const std::vector<std::shared_ptr<Item>> &items() const;
@@ -77,6 +78,7 @@ protected:
     glm::vec3 _position { 0.0f };
     float _heading { 0.0f };
     glm::mat4 _transform { 1.0f };
+    bool _visible { true };
     std::shared_ptr<render::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
