@@ -26,6 +26,7 @@
 #include "../resources/types.h"
 #include "../script/variable.h"
 
+#include "actions.h"
 #include "camera/firstperson.h"
 #include "camera/thirdperson.h"
 #include "collisiondetect.h"
@@ -75,6 +76,7 @@ public:
     void switchTo3rdPersonCamera();
     void toggleCameraType();
     Camera *getCamera() const;
+    void startDialog(Creature &creature, const std::string &resRef);
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
@@ -94,6 +96,7 @@ public:
     const RoomMap &rooms() const;
     const ObjectList &objects() const;
     const CollisionDetector &collisionDetector() const;
+    const Pathfinder &pathfinder() const;
     ThirdPersonCamera *thirdPersonCamera();
     ObjectSelector &objectSelector();
 
@@ -133,7 +136,6 @@ protected:
     virtual void add(const std::shared_ptr<SpatialObject> &object);
     void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
-
     virtual void updateCreature(Creature &creature, float dt);
 
 private:
@@ -159,6 +161,7 @@ private:
     CollisionDetector _collisionDetector;
     Pathfinder _pathfinder;
     ObjectSelector _objectSelector;
+    ActionExecutor _actionExecutor;
     std::string _name;
     RoomMap _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
@@ -176,10 +179,6 @@ private:
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedCommands();
-    bool navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
-    void advanceCreatureOnPath(Creature &creature, float dt);
-    void selectNextPathPoint(Creature::Path &path);
-    void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);

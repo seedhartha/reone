@@ -15,13 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "area.h"
+#include "actions.h"
 
-#include "SDL2/SDL.h"
+#include <stdexcept>
 
-#include "../core/jobs.h"
+#include "SDL2/SDL_timer.h"
+
 #include "../core/log.h"
 #include "../script/execution.h"
+
+#include "area.h"
+#include "object/creature.h"
 
 using namespace std;
 
@@ -33,7 +37,13 @@ namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
 
-void Area::updateCreature(Creature &creature, float dt) {
+ActionExecutor::ActionExecutor(Area *area) : _area(area) {
+    if (!area) {
+        throw invalid_argument("Area must not be null");
+    }
+}
+
+void ActionExecutor::executeActions(Creature &creature, float dt) {
     if (!creature.hasActions()) return;
 
     const Creature::Action &action = creature.currentAction();
@@ -56,9 +66,7 @@ void Area::updateCreature(Creature &creature, float dt) {
             break;
         }
         case Creature::ActionType::StartConversation:
-            if (_onStartDialog) {
-                _onStartDialog(creature, action.resRef);
-            }
+            _area->startDialog(creature, action.resRef);
             creature.popCurrentAction();
             break;
         default:
@@ -68,7 +76,7 @@ void Area::updateCreature(Creature &creature, float dt) {
     }
 }
 
-bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
+bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
     const glm::vec3 &origin = creature.position();
     float distToDest = glm::distance2(origin, dest);
 
@@ -94,7 +102,7 @@ bool Area::navigateCreature(Creature &creature, const glm::vec3 &dest, float dis
     return false;
 }
 
-void Area::advanceCreatureOnPath(Creature &creature, float dt) {
+void ActionExecutor::advanceCreatureOnPath(Creature &creature, float dt) {
     const glm::vec3 &origin = creature.position();
     shared_ptr<Creature::Path> path(creature.path());
     size_t pointCount = path->points.size();
@@ -124,7 +132,7 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     if (distToDest <= 1.0f) {
         selectNextPathPoint(*path);
 
-    } else if (moveCreatureTowards(creature, dest, true, dt)) {
+    } else if (_area->moveCreatureTowards(creature, dest, true, dt)) {
         creature.setMovementType(MovementType::Run);
 
     } else {
@@ -132,16 +140,16 @@ void Area::advanceCreatureOnPath(Creature &creature, float dt) {
     }
 }
 
-void Area::selectNextPathPoint(Creature::Path &path) {
+void ActionExecutor::selectNextPathPoint(Creature::Path &path) {
     size_t pointCount = path.points.size();
     if (path.pointIdx < pointCount) {
         path.pointIdx++;
     }
 }
 
-void Area::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
+void ActionExecutor::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
     const glm::vec3 &origin = creature.position();
-    vector<glm::vec3> points(_pathfinder.findPath(origin, dest));
+    vector<glm::vec3> points(_area->pathfinder().findPath(origin, dest));
     uint32_t now = SDL_GetTicks();
 
     creature.setPath(dest, move(points), now);
