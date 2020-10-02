@@ -92,11 +92,13 @@ private:
 
     ResourceManager &operator=(const ResourceManager &) = delete;
 
-    void addErfProvider(const boost::filesystem::path &path);
-    void addTransientRimProvider(const boost::filesystem::path &path);
-    void addTransientErfProvider(const boost::filesystem::path &path);
-    void addFolderProvider(const boost::filesystem::path &path);
-    void initModuleNames();
+    void loadKeyFile();
+    void indexErfFile(const boost::filesystem::path &path);
+    void indexFolder(const boost::filesystem::path &path);
+    void indexExeFile();
+    void indexTransientRimFile(const boost::filesystem::path &path);
+    void indexTransientErfFile(const boost::filesystem::path &path);
+    void loadModuleNames();
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;
     std::shared_ptr<ByteArray> find(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
 };

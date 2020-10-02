@@ -105,54 +105,104 @@ ResourceManager &ResourceManager::instance() {
 }
 
 void ResourceManager::init(GameVersion version, const boost::filesystem::path &gamePath) {
-    fs::path keyPath(getPathIgnoreCase(gamePath, kKeyFileName));
-    if (keyPath.empty()) {
-        throw runtime_error(str(boost::format("Key file not found: %s %s") % gamePath % kKeyFileName));
-    }
-    _keyFile.load(keyPath);
+    _version = version;
+    _gamePath = gamePath;
+
+    loadKeyFile();
 
     if (version == GameVersion::KotOR) {
         fs::path patchPath(getPathIgnoreCase(gamePath, kPatchFileName));
-        addErfProvider(patchPath);
+        indexErfFile(patchPath);
     }
-
     fs::path texPacksPath(getPathIgnoreCase(gamePath, kTexturePackDirectoryName));
     fs::path guiTexPackPath(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
     fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
-    addErfProvider(guiTexPackPath);
-    addErfProvider(texPackPath);
+
+    indexErfFile(guiTexPackPath);
+    indexErfFile(texPackPath);
 
     fs::path musicPath(getPathIgnoreCase(gamePath, kMusicDirectoryName));
     fs::path soundsPath(getPathIgnoreCase(gamePath, kSoundsDirectoryName));
-    addFolderProvider(musicPath);
-    addFolderProvider(soundsPath);
+
+    indexFolder(musicPath);
+    indexFolder(soundsPath);
 
     switch (version) {
         case GameVersion::TheSithLords: {
             fs::path voicePath(getPathIgnoreCase(gamePath, kVoiceDirectoryName));
-            addFolderProvider(voicePath);
+            indexFolder(voicePath);
             break;
         }
         default: {
             fs::path wavesPath(getPathIgnoreCase(gamePath, kWavesDirectoryName));
-            addFolderProvider(wavesPath);
+            indexFolder(wavesPath);
             break;
         }
     }
-
     fs::path overridePath(getPathIgnoreCase(gamePath, kOverrideDirectoryName));
-    addFolderProvider(overridePath);
+    indexFolder(overridePath);
 
     fs::path tlkPath(getPathIgnoreCase(gamePath, kTalkTableFileName));
     _tlkFile.load(tlkPath);
 
-    fs::path exePath(getPathIgnoreCase(gamePath, version == GameVersion::TheSithLords ? kExeFileNameTsl : kExeFileNameKotor));
-    _exeFile.load(exePath);
+    indexExeFile();
+    loadModuleNames();
+}
 
-    _version = version;
-    _gamePath = gamePath;
+void ResourceManager::loadKeyFile() {
+    fs::path path(getPathIgnoreCase(_gamePath, kKeyFileName));
 
-    initModuleNames();
+    if (path.empty()) {
+        throw runtime_error(str(boost::format("Key file not found: %s %s") % _gamePath % kKeyFileName));
+    }
+    _keyFile.load(path);
+
+    debug(boost::format("Resources: indexed: %s") % path);
+}
+
+void ResourceManager::indexErfFile(const boost::filesystem::path &path) {
+    unique_ptr<ErfFile> erf(new ErfFile());
+    erf->load(path);
+
+    _providers.push_back(move(erf));
+
+    debug(boost::format("Resources: indexed: %s") % path);
+}
+
+void ResourceManager::indexFolder(const fs::path &path) {
+    unique_ptr<Folder> folder(new Folder());
+    folder->load(path);
+
+    _providers.push_back(move(folder));
+
+    debug(boost::format("Resources: indexed: %s") % path);
+}
+
+void ResourceManager::indexExeFile() {
+    string filename(_version == GameVersion::TheSithLords ? kExeFileNameTsl : kExeFileNameKotor);
+    fs::path path(getPathIgnoreCase(_gamePath, filename));
+
+    _exeFile.load(path);
+
+    debug(boost::format("Resources: indexed: %s") % path);
+}
+
+void ResourceManager::loadModuleNames() {
+    fs::path modules(getPathIgnoreCase(_gamePath, kModulesDirectoryName));
+
+    for (auto &entry : fs::directory_iterator(modules)) {
+        string filename(entry.path().filename().string());
+        boost::to_lower(filename);
+
+        if (!boost::ends_with(filename, ".rim") || boost::ends_with(filename, "_s.rim")) continue;
+
+        string moduleName(filename.substr(0, filename.size() - 4));
+        boost::to_lower(moduleName);
+
+        _moduleNames.push_back(moduleName);
+    }
+
+    sort(_moduleNames.begin(), _moduleNames.end());
 }
 
 ResourceManager::~ResourceManager() {
@@ -185,12 +235,6 @@ void ResourceManager::clearCaches() {
     g_utwCache.clear();
 }
 
-void ResourceManager::addErfProvider(const boost::filesystem::path &path) {
-    unique_ptr<ErfFile> erf(new ErfFile());
-    erf->load(path);
-    _providers.push_back(move(erf));
-}
-
 void ResourceManager::loadModule(const string &name) {
     _transientProviders.clear();
     clearCaches();
@@ -199,47 +243,31 @@ void ResourceManager::loadModule(const string &name) {
     fs::path rimPath(getPathIgnoreCase(modulesPath, name + ".rim"));
     fs::path rimsPath(getPathIgnoreCase(modulesPath, name + "_s.rim"));
 
-    addTransientRimProvider(rimPath);
-    addTransientRimProvider(rimsPath);
+    indexTransientRimFile(rimPath);
+    indexTransientRimFile(rimsPath);
 
     if (_version == GameVersion::TheSithLords) {
         fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
-        addTransientErfProvider(dlgPath);
+        indexTransientErfFile(dlgPath);
     }
 }
 
-void ResourceManager::addTransientRimProvider(const fs::path &path) {
+void ResourceManager::indexTransientRimFile(const fs::path &path) {
     unique_ptr<RimFile> rim(new RimFile());
     rim->load(path);
+
     _transientProviders.push_back(move(rim));
+
+    debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::addTransientErfProvider(const fs::path &path) {
+void ResourceManager::indexTransientErfFile(const fs::path &path) {
     unique_ptr<ErfFile> erf(new ErfFile());
     erf->load(path);
+
     _transientProviders.push_back(move(erf));
-}
 
-void ResourceManager::addFolderProvider(const fs::path &path) {
-    unique_ptr<Folder> folder(new Folder());
-    folder->load(path);
-    _providers.push_back(move(folder));
-}
-
-void ResourceManager::initModuleNames() {
-    fs::path modules(getPathIgnoreCase(_gamePath, kModulesDirectoryName));
-
-    for (auto &entry : fs::directory_iterator(modules)) {
-        string filename(entry.path().filename().string());
-        if (!boost::ends_with(filename, ".rim") || boost::ends_with(filename, "_s.rim")) continue;
-
-        string moduleName(filename.substr(0, filename.size() - 4));
-        boost::to_lower(moduleName);
-
-        _moduleNames.push_back(moduleName);
-    }
-
-    sort(_moduleNames.begin(), _moduleNames.end());
+    debug(boost::format("Resources: indexed: %s") % path);
 }
 
 shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType type, bool logNotFound) {
