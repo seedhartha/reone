@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../gui/gui.h"
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 
 #include "../object/spatial.h"
 
@@ -45,19 +45,19 @@ public:
 
     EquipmentGui(const render::GraphicsOptions &opts);
 
-    void load(resources::GameVersion version);
+    void load(resource::GameVersion version);
     void open(SpatialObject *owner);
 
     void setOnClose(const std::function<void()> &fn);
 
 private:
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     SpatialObject *_owner { nullptr };
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
     std::function<void()> _onClose;
 
-    static InventorySlot getInventorySlot(Slot slot);
+    static resource::InventorySlot getInventorySlot(Slot slot);
     static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);
 
     std::string getResRef() const;

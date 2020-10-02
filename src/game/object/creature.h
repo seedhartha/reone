@@ -20,11 +20,10 @@
 #include <atomic>
 #include <queue>
 
-#include "../../resources/2dafile.h"
-#include "../../resources/gfffile.h"
+#include "../../resource/2dafile.h"
+#include "../../resource/blueprint/creature.h"
+#include "../../resource/gfffile.h"
 #include "../../script/types.h"
-
-#include "../blueprint/creature.h"
 
 #include "item.h"
 #include "spatial.h"
@@ -73,7 +72,7 @@ public:
 
     Creature(uint32_t id, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph);
 
-    void load(const resources::GffStruct &gffs);
+    void load(const resource::GffStruct &gffs);
     void load(const CreatureConfiguration &config);
 
     Gender gender() const;
@@ -118,12 +117,12 @@ public:
     // Equipment
 
     void equip(const std::string &resRef);
-    void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    void equip(resource::InventorySlot slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
-    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    std::shared_ptr<Item> getEquippedItem(resource::InventorySlot slot) const;
 
-    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    const std::map<resource::InventorySlot, std::shared_ptr<Item>> &equipment() const;
 
     // END Equipment
 
@@ -149,10 +148,10 @@ private:
 
     ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
-    std::shared_ptr<CreatureBlueprint> _blueprint;
+    std::shared_ptr<resource::CreatureBlueprint> _blueprint;
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
-    std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
+    std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
     std::list<Action> _actions;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
@@ -160,7 +159,7 @@ private:
 
     // Loading
     void loadBlueprint(const std::string &resRef);
-    void loadAppearance(const resources::TwoDaTable &table, int row);
+    void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
 
     ModelType parseModelType(const std::string &s) const;
@@ -168,7 +167,7 @@ private:
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
-    std::string getWeaponModelName(InventorySlot slot) const;
+    std::string getWeaponModelName(resource::InventorySlot slot) const;
 
     const std::string &getPauseAnimation();
     const std::string &getWalkAnimation();

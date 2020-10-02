@@ -22,11 +22,11 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "src/resources/gfffile.h"
+#include "src/resource/gfffile.h"
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

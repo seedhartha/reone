@@ -20,7 +20,7 @@
 #include "../../audio/player.h"
 #include "../../core/debug.h"
 #include "../../gui/control/listbox.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 
 #include "../util.h"
 
@@ -29,7 +29,7 @@ using namespace std;
 using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

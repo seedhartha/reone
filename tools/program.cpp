@@ -26,7 +26,7 @@
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;

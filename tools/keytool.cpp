@@ -21,7 +21,7 @@
 
 #include "src/core/log.h"
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 

@@ -24,10 +24,9 @@
 #include "../../core/log.h"
 #include "../../core/streamutil.h"
 #include "../../net/types.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 #include "../../script/types.h"
 
-#include "../blueprint/blueprints.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"
@@ -36,7 +35,7 @@ using namespace std;
 
 using namespace reone::net;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
@@ -90,13 +89,15 @@ void Creature::load(const GffStruct &gffs) {
 }
 
 void Creature::loadBlueprint(const string &resRef) {
-    _blueprint = Blueprints.findCreature(resRef);
+    ResourceManager &resources = Resources;
+
+    _blueprint = resources.findCreatureBlueprint(resRef);
     _tag = _blueprint->tag();
 
     for (auto &item : _blueprint->equipment()) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(Resources.find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(resources.find2DA("appearance"));
     loadAppearance(*appearanceTable, _blueprint->appearance());
 }
 
@@ -319,7 +320,7 @@ void Creature::popCurrentAction() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<ItemBlueprint> blueprint(Blueprints.findItem(resRef));
+    shared_ptr<ItemBlueprint> blueprint(Resources.findItemBlueprint(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint.get());

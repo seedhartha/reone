@@ -23,7 +23,7 @@
 #include "../../net/types.h"
 #include "../../render/scene/scenegraph.h"
 #include "../../render/types.h"
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 #include "../../script/variable.h"
 
 #include "../actions.h"
@@ -53,12 +53,12 @@ class Area : public Object {
 public:
     Area(
         uint32_t id,
-        resources::GameVersion version,
+        resource::GameVersion version,
         ObjectFactory *objectFactory,
         render::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts);
 
-    void load(const std::string &name, const resources::GffStruct &are, const resources::GffStruct &git);
+    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
     void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
     void runOnEnterScript();
@@ -157,7 +157,7 @@ private:
         int eventNumber { 0 };
     };
 
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     render::GraphicsOptions _opts;
     CollisionDetector _collisionDetector;
     Pathfinder _pathfinder;
@@ -165,7 +165,7 @@ private:
     ActionExecutor _actionExecutor;
     std::string _name;
     RoomMap _rooms;
-    std::unique_ptr<resources::Visibility> _visibility;
+    std::unique_ptr<resource::Visibility> _visibility;
     CameraStyle _cameraStyle;
     std::string _music;
     std::unordered_map<ScriptType, std::string> _scripts;
@@ -190,17 +190,17 @@ private:
     void loadLYT();
     void loadVIS();
     void loadPTH();
-    void loadARE(const resources::GffStruct &are);
-    void loadCameraStyle(const resources::GffStruct &are);
-    void loadAmbientColor(const resources::GffStruct &are);
-    void loadScripts(const resources::GffStruct &are);
-    void loadGIT(const resources::GffStruct &gffs);
-    void loadProperties(const resources::GffStruct &git);
-    void loadCreatures(const resources::GffStruct &git);
-    void loadDoors(const resources::GffStruct &git);
-    void loadPlaceables(const resources::GffStruct &git);
-    void loadWaypoints(const resources::GffStruct &git);
-    void loadTriggers(const resources::GffStruct &git);
+    void loadARE(const resource::GffStruct &are);
+    void loadCameraStyle(const resource::GffStruct &are);
+    void loadAmbientColor(const resource::GffStruct &are);
+    void loadScripts(const resource::GffStruct &are);
+    void loadGIT(const resource::GffStruct &gffs);
+    void loadProperties(const resource::GffStruct &git);
+    void loadCreatures(const resource::GffStruct &git);
+    void loadDoors(const resource::GffStruct &git);
+    void loadPlaceables(const resource::GffStruct &git);
+    void loadWaypoints(const resource::GffStruct &git);
+    void loadTriggers(const resource::GffStruct &git);
 
     // END Loading
 

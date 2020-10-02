@@ -22,7 +22,7 @@
 
 #include "game/types.h"
 #include "net/types.h"
-#include "resources/types.h"
+#include "resource/types.h"
 
 namespace reone {
 

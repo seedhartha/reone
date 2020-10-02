@@ -25,7 +25,7 @@
 #include "../render/font.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
-#include "../resources/resources.h"
+#include "../resource/resources.h"
 
 using namespace std;
 

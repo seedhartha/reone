@@ -23,7 +23,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
-#include "../resources/gfffile.h"
+#include "../resource/gfffile.h"
 
 #include "control/control.h"
 
@@ -68,7 +68,7 @@ protected:
 
     void load(const std::string &resRef, BackgroundType background);
     void loadBackground(BackgroundType type);
-    void loadControl(const resources::GffStruct &gffs);
+    void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
     void showControl(const std::string &tag);

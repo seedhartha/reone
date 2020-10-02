@@ -23,7 +23,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../../core/log.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 
 #include "../mesh/aabb.h"
 #include "../scene/aabbnode.h"
@@ -34,7 +34,7 @@
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

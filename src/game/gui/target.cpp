@@ -21,12 +21,12 @@
 
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

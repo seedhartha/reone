@@ -21,16 +21,14 @@
 
 #include "../../core/streamutil.h"
 #include "../../render/scene/modelnode.h"
-#include "../../resources/resources.h"
-
-#include "../blueprint/blueprints.h"
+#include "../../resource/resources.h"
 
 #include "objectfactory.h"
 
 using namespace std;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 
@@ -61,24 +59,26 @@ void Placeable::load(const GffStruct &gffs) {
 }
 
 void Placeable::loadBlueprint(const string &resRef) {
-    _blueprint = Blueprints.findPlaceable(resRef);
+    ResourceManager &resources = Resources;
+
+    _blueprint = resources.findPlaceableBlueprint(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table(Resources.find2DA("placeables"));
+    shared_ptr<TwoDaTable> table(resources.find2DA("placeables"));
 
     string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(model));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, resources.findModel(model));
     _model->setLightingEnabled(true);
 
-    _walkmesh = Resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
+    _walkmesh = resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
 
     for (auto &itemResRef : _blueprint->items()) {
-        shared_ptr<ItemBlueprint> itemTempl(Blueprints.findItem(itemResRef));
+        shared_ptr<ItemBlueprint> itemBlueprint(resources.findItemBlueprint(itemResRef));
 
         shared_ptr<Item> item(_objectFactory->newItem());
-        item->load(itemTempl.get());
+        item->load(itemBlueprint.get());
 
         _items.push_back(move(item));
     }

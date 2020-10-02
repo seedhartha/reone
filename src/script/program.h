@@ -22,7 +22,7 @@
 
 namespace reone {
 
-namespace resources {
+namespace resource {
 
 class NcsFile;
 
@@ -148,7 +148,7 @@ private:
     ScriptProgram(const ScriptProgram &) = delete;
     ScriptProgram &operator=(const ScriptProgram &) = delete;
 
-    friend class resources::NcsFile;
+    friend class resource::NcsFile;
 };
 
 } // namespace script

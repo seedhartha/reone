@@ -21,12 +21,12 @@
 #include <boost/format.hpp>
 
 #include "src/core/log.h"
-#include "src/resources/biffile.h"
-#include "src/resources/util.h"
+#include "src/resource/archive/biffile.h"
+#include "src/resource/util.h"
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 

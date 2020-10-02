@@ -17,7 +17,7 @@
 
 #include "classselect.h"
 
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 
 #include "../characters.h"
 #include "../object/creature.h"
@@ -26,7 +26,7 @@ using namespace std;
 
 using namespace reone::gui;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

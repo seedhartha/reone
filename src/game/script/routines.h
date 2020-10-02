@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 #include "../../script/routine.h"
 #include "../../script/types.h"
 #include "../../script/variable.h"
@@ -38,7 +38,7 @@ class RoutineManager : public script::IRoutineProvider {
 public:
     static RoutineManager &instance();
 
-    void init(resources::GameVersion version, Game *game);
+    void init(resource::GameVersion version, Game *game);
     void deinit();
 
     const script::Routine &get(int index) override;

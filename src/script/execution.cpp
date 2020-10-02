@@ -30,7 +30,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

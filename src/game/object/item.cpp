@@ -17,6 +17,8 @@
 
 #include "item.h"
 
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {

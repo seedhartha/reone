@@ -19,11 +19,11 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resources/tlkfile.h"
+#include "../src/resource/tlkfile.h"
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

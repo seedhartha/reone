@@ -19,9 +19,8 @@
 
 #include <vector>
 
-#include "../../resources/gfffile.h"
-
-#include "../blueprint/placeable.h"
+#include "../../resource/blueprint/placeable.h"
+#include "../../resource/gfffile.h"
 
 #include "spatial.h"
 
@@ -35,13 +34,13 @@ class Placeable : public SpatialObject {
 public:
     Placeable(uint32_t id, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph);
 
-    void load(const resources::GffStruct &gffs);
+    void load(const resource::GffStruct &gffs);
 
-    const PlaceableBlueprint &blueprint() const;
+    const resource::PlaceableBlueprint &blueprint() const;
 
 private:
     ObjectFactory *_objectFactory { nullptr };
-    std::shared_ptr<PlaceableBlueprint> _blueprint;
+    std::shared_ptr<resource::PlaceableBlueprint> _blueprint;
 
     void loadBlueprint(const std::string &resRef);
 };

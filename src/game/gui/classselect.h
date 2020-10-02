@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../gui/gui.h"
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 
 #include "../object/objectfactory.h"
 #include "../types.h"
@@ -31,7 +31,7 @@ class ClassSelectionGui : public gui::GUI {
 public:
     ClassSelectionGui(ObjectFactory *objectFactory, const render::GraphicsOptions &opts);
 
-    void load(resources::GameVersion version);
+    void load(resource::GameVersion version);
 
     void setOnClassSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
@@ -45,7 +45,7 @@ private:
     };
 
     ObjectFactory *_objectFactory { nullptr };
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;

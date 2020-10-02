@@ -24,7 +24,7 @@
 
 namespace reone {
 
-namespace resources {
+namespace resource {
 
 class MdlFile;
 
@@ -75,7 +75,7 @@ private:
     Mesh(const Mesh &) = delete;
     Mesh &operator=(const Mesh &) = delete;
 
-    friend class resources::MdlFile;
+    friend class resource::MdlFile;
 };
 
 } // namespace render

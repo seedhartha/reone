@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "../../render/scene/scenegraph.h"
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 
 #include "../types.h"
 
@@ -39,7 +39,7 @@ namespace game {
 
 class ObjectFactory {
 public:
-    ObjectFactory(resources::GameVersion version, render::SceneGraph *sceneGraph, const Options &opts);
+    ObjectFactory(resource::GameVersion version, render::SceneGraph *sceneGraph, const Options &opts);
 
     virtual std::unique_ptr<Module> newModule();
     virtual std::unique_ptr<Area> newArea();
@@ -51,7 +51,7 @@ public:
     virtual std::unique_ptr<Item> newItem();
 
 protected:
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     render::SceneGraph *_sceneGraph { nullptr };
     Options _options;
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved

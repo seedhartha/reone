@@ -1,0 +1,82 @@
+/*
+ * Copyright © 2020 Vsevolod Kremianskii
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "placeable.h"
+
+#include <boost/algorithm/string.hpp>
+
+using namespace std;
+
+namespace reone {
+
+namespace resource {
+
+void PlaceableBlueprint::load(const GffStruct &utp) {
+    _tag = utp.getString("Tag");
+    boost::to_lower(_tag);
+
+    _appearance = utp.getInt("Appearance");
+    _hasInventory = utp.getInt("HasInventory") != 0;
+
+    loadItems(utp);
+    loadScripts(utp);
+}
+
+void PlaceableBlueprint::loadItems(const GffStruct &utp) {
+    const GffField *itemList = utp.find("ItemList");
+    if (itemList) {
+        for (auto &item : itemList->children()) {
+            string resRef(item.getString("InventoryRes"));
+            boost::to_lower(resRef);
+
+            _items.push_back(move(resRef));
+        }
+    }
+}
+
+void PlaceableBlueprint::loadScripts(const GffStruct &utp) {
+    _scripts.insert(make_pair(ScriptType::OnInvDisturbed, utp.getString("OnInvDisturbed")));
+}
+
+bool PlaceableBlueprint::getScript(ScriptType type, string &resRef) const {
+    auto script = _scripts.find(type);
+    if (script == _scripts.end() || script->second.empty()) return false;
+
+    resRef = script->second;
+
+    return true;
+}
+
+const string &PlaceableBlueprint::tag() const {
+    return _tag;
+}
+
+int PlaceableBlueprint::appearance() const {
+    return _appearance;
+}
+
+bool PlaceableBlueprint::hasInventory() const {
+    return _hasInventory;
+}
+
+const vector<string> &PlaceableBlueprint::items() const {
+    return _items;
+}
+
+} // namespace resource
+
+} // namespace reone

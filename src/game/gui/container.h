@@ -19,7 +19,7 @@
 
 #include "../../gui/gui.h"
 
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 
 #include "../object/spatial.h"
 
@@ -31,7 +31,7 @@ class ContainerGui : public gui::GUI {
 public:
     ContainerGui(const render::GraphicsOptions &opts);
 
-    void load(resources::GameVersion version);
+    void load(resource::GameVersion version);
     void open(SpatialObject *contanier);
 
     SpatialObject &container() const;
@@ -45,7 +45,7 @@ private:
     std::function<void()> _onGetItems;
     std::function<void()> _onClose;
 
-    void configureItemsListBox(resources::GameVersion version);
+    void configureItemsListBox(resource::GameVersion version);
     void onClick(const std::string &control) override;
 };
 

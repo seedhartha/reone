@@ -27,9 +27,8 @@
 #include "../core/pathutil.h"
 #include "../core/streamutil.h"
 #include "../render/scene/scenegraph.h"
-#include "../resources/resources.h"
+#include "../resource/resources.h"
 
-#include "blueprint/blueprints.h"
 #include "object/objectfactory.h"
 #include "script/routines.h"
 #include "script/util.h"
@@ -41,7 +40,7 @@ using namespace std::placeholders;
 using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace fs = boost::filesystem;
@@ -373,7 +372,6 @@ void Game::loadPortraitsGui() {
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
     Resources.loadModule(name);
-    Blueprints.clearCache();
 
     shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
 
