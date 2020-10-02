@@ -86,10 +86,10 @@ set(HEADERS
     src/game/object/area.h
     src/game/object/creature.h
     src/game/object/door.h
-    src/game/object/factory.h
     src/game/object/item.h
     src/game/object/module.h
     src/game/object/object.h
+    src/game/object/objectfactory.h
     src/game/object/placeable.h
     src/game/object/spatial.h
     src/game/object/trigger.h
@@ -220,10 +220,10 @@ set(SOURCES
     src/game/object/area.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
-    src/game/object/factory.cpp
     src/game/object/item.cpp
     src/game/object/module.cpp
     src/game/object/object.cpp
+    src/game/object/objectfactory.cpp
     src/game/object/placeable.cpp
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp

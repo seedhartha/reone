@@ -17,7 +17,7 @@
 
 #include "area.h"
 
-#include "../object/factory.h"
+#include "../object/objectfactory.h"
 
 using namespace std;
 

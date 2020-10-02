@@ -30,7 +30,7 @@
 #include "../resources/resources.h"
 
 #include "blueprint/blueprints.h"
-#include "object/factory.h"
+#include "object/objectfactory.h"
 #include "script/routines.h"
 #include "script/util.h"
 #include "util.h"

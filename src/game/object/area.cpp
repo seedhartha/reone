@@ -43,7 +43,7 @@
 #include "../script/routines.h"
 #include "../script/util.h"
 
-#include "factory.h"
+#include "objectfactory.h"
 
 using namespace std;
 
