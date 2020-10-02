@@ -112,7 +112,7 @@ private:
     ModelNode(const ModelNode &) = delete;
     ModelNode &operator=(const ModelNode &) = delete;
 
-    friend class resources::MdlFile;
+    friend class resource::MdlFile;
 };
 
 } // namespace render

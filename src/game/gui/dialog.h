@@ -19,9 +19,9 @@
 
 #include "../../audio/soundinstance.h"
 #include "../../gui/gui.h"
-#include "../../resources/types.h"
+#include "../../resource/dlgfile.h"
+#include "../../resource/types.h"
 
-#include "../dialog.h"
 #include "../object/object.h"
 
 namespace reone {
@@ -32,7 +32,7 @@ class DialogGui : public gui::GUI {
 public:
     DialogGui(const render::GraphicsOptions &opts);
 
-    void load(resources::GameVersion version);
+    void load(resource::GameVersion version);
     void startDialog(uint32_t ownerId, const std::string &resRef);
     void pickReply(uint32_t index);
 
@@ -44,10 +44,10 @@ public:
     void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     uint32_t _ownerId { 0 };
-    std::shared_ptr<Dialog> _dialog;
-    std::shared_ptr<Dialog::EntryReply> _currentEntry;
+    std::shared_ptr<resource::DlgFile> _dialog;
+    std::shared_ptr<resource::DlgFile::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
     uint32_t _currentSpeaker { 0 };
     bool _pickReplyEnabled { true };

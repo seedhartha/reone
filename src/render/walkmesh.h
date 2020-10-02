@@ -23,7 +23,7 @@
 
 namespace reone {
 
-namespace resources {
+namespace resource {
 
 class BwmFile;
 
@@ -55,7 +55,7 @@ private:
 
     void computeAABB();
 
-    friend class resources::BwmFile;
+    friend class resource::BwmFile;
 };
 
 } // namespace render

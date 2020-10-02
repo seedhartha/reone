@@ -24,11 +24,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "src/resources/keyfile.h"
+#include "src/resource/archive/keyfile.h"
 
 namespace reone {
 
-namespace resources {
+namespace resource {
 
 class GffStruct;
 
@@ -54,7 +54,7 @@ private:
     void throwNotImplemented() const;
 };
 
-std::unique_ptr<Tool> getToolByPath(resources::GameVersion version, const boost::filesystem::path &path);
+std::unique_ptr<Tool> getToolByPath(resource::GameVersion version, const boost::filesystem::path &path);
 
 class KeyTool : public Tool {
 public:
@@ -67,7 +67,7 @@ public:
     void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
 
 private:
-    int getFileIndexByFilename(const std::vector<resources::KeyFile::FileEntry> &files, const std::string &filename) const;
+    int getFileIndexByFilename(const std::vector<resource::KeyFile::FileEntry> &files, const std::string &filename) const;
 };
 
 class ErfTool : public Tool {
@@ -97,7 +97,7 @@ public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 
 private:
-    boost::property_tree::ptree getPropertyTree(const resources::GffStruct &gffs) const;
+    boost::property_tree::ptree getPropertyTree(const resource::GffStruct &gffs) const;
 };
 
 } // namespace tools

@@ -21,14 +21,12 @@
 
 #include "../../core/streamutil.h"
 #include "../../render/scene/modelnode.h"
-#include "../../resources/resources.h"
-
-#include "../blueprint/blueprints.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 
@@ -66,10 +64,11 @@ void Door::load(const GffStruct &gffs) {
 }
 
 void Door::loadBlueprint(const string &resRef) {
-    _blueprint = Blueprints.findDoor(resRef);
+    ResourceManager &resources = Resources;
+
+    _blueprint = resources.findDoorBlueprint(resRef);
     _tag = _blueprint->tag();
 
-    ResourceManager &resources = Resources;
     shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
 
     string model(table->getString(_blueprint->genericType(), "modelname"));

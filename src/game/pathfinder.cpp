@@ -23,6 +23,8 @@
 
 using namespace std;
 
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
@@ -30,16 +32,16 @@ namespace game {
 Pathfinder::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void Pathfinder::load(const Paths &paths, const unordered_map<int, float> &pointZ) {
-    const vector<Paths::Point> &points = paths.points();
+void Pathfinder::load(const PthFile &paths, const unordered_map<int, float> &pointZ) {
+    const vector<PthFile::Point> &points = paths.points();
     for (uint16_t i = 0; i < points.size(); ++i) {
-        const Paths::Point &point = points[i];
+        const PthFile::Point &point = points[i];
         glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
         _vertices.push_back(pointVec);
 
         glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
-            const Paths::Point &adjPoint = points[adjPointIdx];
+            const PthFile::Point &adjPoint = points[adjPointIdx];
             adjPointVec = glm::vec3(adjPoint.x, adjPoint.y, pointZ.find(adjPointIdx)->second);
 
             float distance = glm::distance2(pointVec, adjPointVec);

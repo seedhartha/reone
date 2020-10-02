@@ -19,7 +19,7 @@
 
 #include "../../gui/gui.h"
 #include "../../render/scene/scenegraph.h"
-#include "../../resources/types.h"
+#include "../../resource/types.h"
 
 #include "../types.h"
 
@@ -31,7 +31,7 @@ class MainMenu : public gui::GUI {
 public:
     MainMenu(render::SceneGraph *sceneGraph, const Options &opts);
 
-    void load(resources::GameVersion version);
+    void load(resource::GameVersion version);
     void onClick(const std::string &control) override;
 
     void setOnNewGame(const std::function<void()> &fn);
@@ -41,7 +41,7 @@ public:
 private:
     render::SceneGraph *_sceneGraph { nullptr };
     Options _opts;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     std::function<void()> _onNewGame;
     std::function<void()> _onExit;
     std::function<void(const std::string &)> _onModuleSelected;

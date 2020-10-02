@@ -28,7 +28,7 @@
 #include "../../core/log.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 
 #include "button.h"
 #include "imagebutton.h"
@@ -40,7 +40,7 @@
 using namespace std;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

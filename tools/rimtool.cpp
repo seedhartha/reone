@@ -20,12 +20,12 @@
 #include <boost/format.hpp>
 
 #include "src/core/log.h"
-#include "src/resources/rimfile.h"
-#include "src/resources/util.h"
+#include "src/resource/archive/rimfile.h"
+#include "src/resource/util.h"
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 

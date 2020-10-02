@@ -17,7 +17,7 @@
 
 #include "../types.h"
 
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

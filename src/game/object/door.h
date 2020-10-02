@@ -19,9 +19,8 @@
 
 #include "spatial.h"
 
-#include "../../resources/gfffile.h"
-
-#include "../blueprint/door.h"
+#include "../../resource/blueprint/door.h"
+#include "../../resource/gfffile.h"
 
 namespace reone {
 
@@ -31,7 +30,7 @@ class Door : public SpatialObject {
 public:
     Door(uint32_t id, render::SceneGraph *sceneGraph);
 
-    void load(const resources::GffStruct &gffs);
+    void load(const resource::GffStruct &gffs);
     virtual void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
     void saveTo(AreaState &state) const override;
@@ -44,7 +43,7 @@ public:
     const std::string &transitionDestin() const;
 
 private:
-    std::shared_ptr<DoorBlueprint> _blueprint;
+    std::shared_ptr<resource::DoorBlueprint> _blueprint;
     bool _open { false };
     std::string _linkedToModule;
     std::string _linkedTo;

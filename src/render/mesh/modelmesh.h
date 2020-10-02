@@ -25,7 +25,7 @@
 
 namespace reone {
 
-namespace resources {
+namespace resource {
 
 class MdlFile;
 
@@ -63,7 +63,7 @@ private:
     std::shared_ptr<Texture> _bumpyShiny;
     std::shared_ptr<Texture> _bumpmap;
 
-    friend class resources::MdlFile;
+    friend class resource::MdlFile;
 };
 
 } // namespace resources

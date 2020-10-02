@@ -28,7 +28,7 @@ using namespace std;
 
 using namespace reone::game;
 using namespace reone::net;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;

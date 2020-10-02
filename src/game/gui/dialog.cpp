@@ -22,7 +22,7 @@
 #include "../../audio/player.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 #include "../../script/execution.h"
 
 #include "../script/routines.h"
@@ -34,7 +34,7 @@ using namespace std;
 using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
@@ -151,7 +151,7 @@ void DialogGui::startDialog(uint32_t ownerId, const string &resRef) {
         return;
     }
     _ownerId = ownerId;
-    _dialog.reset(new Dialog());
+    _dialog.reset(new DlgFile());
     _dialog->load(resRef, *dlg);
 
     _currentSpeaker = _ownerId;
@@ -178,7 +178,7 @@ void DialogGui::loadStartEntry() {
         if (_onDialogFinished) _onDialogFinished();
         return;
     }
-    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+    _currentEntry.reset(new DlgFile::EntryReply(_dialog->getEntry(entryIdx)));
     loadCurrentEntry();
 }
 
@@ -238,7 +238,7 @@ void DialogGui::loadCurrentEntry() {
 }
 
 void DialogGui::pickReply(uint32_t index) {
-    const Dialog::EntryReply &reply = _dialog->getReply(index);
+    const DlgFile::EntryReply &reply = _dialog->getReply(index);
     if (reply.entries.empty()) {
         finish();
         return;
@@ -257,7 +257,7 @@ void DialogGui::pickReply(uint32_t index) {
     }
 
     if (entryIdx != -1) {
-        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+        _currentEntry.reset(new DlgFile::EntryReply(_dialog->getEntry(entryIdx)));
         loadCurrentEntry();
     }
 }

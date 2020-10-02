@@ -19,7 +19,7 @@
 
 #include "spatial.h"
 
-#include "../../resources/gfffile.h"
+#include "../../resource/gfffile.h"
 
 namespace reone {
 
@@ -29,7 +29,7 @@ class Trigger : public SpatialObject {
 public:
     Trigger(uint32_t id, render::SceneGraph *sceneGraph);
 
-    void load(const resources::GffStruct &gffs);
+    void load(const resource::GffStruct &gffs);
 
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;

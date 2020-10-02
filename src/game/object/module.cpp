@@ -20,8 +20,8 @@
 #include "../../core/debug.h"
 #include "../../core/log.h"
 #include "../../core/streamutil.h"
-#include "../../resources/gfffile.h"
-#include "../../resources/resources.h"
+#include "../../resource/gfffile.h"
+#include "../../resource/resources.h"
 
 #include "door.h"
 #include "objectfactory.h"
@@ -32,7 +32,7 @@ using namespace std::placeholders;
 using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

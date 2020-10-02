@@ -30,7 +30,7 @@ class MultiplayerArea : public Area {
 public:
     MultiplayerArea(
         uint32_t id,
-        resources::GameVersion version,
+        resource::GameVersion version,
         MultiplayerMode mode,
         ObjectFactory *objectFactory,
         render::SceneGraph *sceneGraph,

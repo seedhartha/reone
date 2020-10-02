@@ -27,7 +27,7 @@ class ScrollBar : public Control {
 public:
     ScrollBar();
 
-    void load(const resources::GffStruct &gffs) override;
+    void load(const resource::GffStruct &gffs) override;
     void render(const glm::ivec2 &offset, const std::string &textOverride) const override;
 
     void setCanScrollUp(bool scroll);

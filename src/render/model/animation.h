@@ -46,7 +46,7 @@ private:
     Animation(const Animation &) = delete;
     Animation &operator=(const Animation &) = delete;
 
-    friend class resources::MdlFile;
+    friend class resource::MdlFile;
 };
 
 } // namespace render

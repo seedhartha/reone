@@ -28,7 +28,7 @@
 #include "../../render/framebuffer.h"
 #include "../../render/scene/modelnode.h"
 #include "../../render/texture.h"
-#include "../../resources/gfffile.h"
+#include "../../resource/gfffile.h"
 #include "../types.h"
 
 namespace reone {
@@ -79,13 +79,13 @@ public:
         std::unique_ptr<render::Framebuffer> framebuffer;
     };
 
-    static ControlType getType(const resources::GffStruct &gffs);
-    static std::string getTag(const resources::GffStruct &gffs);
+    static ControlType getType(const resource::GffStruct &gffs);
+    static std::string getTag(const resource::GffStruct &gffs);
     static std::unique_ptr<Control> of(ControlType type, const std::string &tag);
 
     virtual ~Control() = default;
 
-    virtual void load(const resources::GffStruct &gffs);
+    virtual void load(const resource::GffStruct &gffs);
 
     // Event handling
     virtual bool handleMouseMotion(int x, int y);
@@ -147,10 +147,10 @@ private:
     Control &operator=(const Control &) = delete;
 
     void updateTransform();
-    void loadExtent(const resources::GffStruct &gffs);
-    void loadBorder(const resources::GffStruct &gffs);
-    void loadText(const resources::GffStruct &gffs);
-    void loadHilight(const resources::GffStruct &gffs);
+    void loadExtent(const resource::GffStruct &gffs);
+    void loadBorder(const resource::GffStruct &gffs);
+    void loadText(const resource::GffStruct &gffs);
+    void loadHilight(const resource::GffStruct &gffs);
     std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
     void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size) const;
 };

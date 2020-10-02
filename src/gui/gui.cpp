@@ -22,7 +22,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../core/log.h"
-#include "../resources/resources.h"
+#include "../resource/resources.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 
@@ -30,7 +30,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

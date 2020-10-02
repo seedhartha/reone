@@ -29,7 +29,7 @@
 #include "../net/types.h"
 #include "../render/texture.h"
 #include "../render/types.h"
-#include "../resources/types.h"
+#include "../resource/types.h"
 
 namespace reone {
 
@@ -84,24 +84,6 @@ enum class MovementType {
     None,
     Walk,
     Run
-};
-
-enum InventorySlot {
-    kInventorySlotHead = 0,
-    kInventorySlotBody = 1,
-    kInventorySlotHands = 3,
-    kInventorySlotRightWeapon = 4,
-    kInventorySlotLeftWeapon = 5,
-    kInventorySlotLeftArm = 7,
-    kInventorySlotRightArm = 8,
-    kInventorySlotImplant = 9,
-    kInventorySlotBelt = 10,
-    kInventorySlotCWeaponL = 14,
-    kInventorySlotCWeaponR = 15,
-    kInventorySlotCWeaponB = 16,
-    kInventorySlotCArmour = 17,
-    kInventorySlotRightWeapon2 = 18,
-    kInventorySlotLeftWeapon2 = 19
 };
 
 enum class CameraType {
@@ -201,8 +183,8 @@ struct CameraStyle {
     float viewAngle { 0.0f };
 };
 
-glm::vec3 getBaseColor(resources::GameVersion version);
-glm::vec3 getHilightColor(resources::GameVersion version);
+glm::vec3 getBaseColor(resource::GameVersion version);
+glm::vec3 getHilightColor(resource::GameVersion version);
 
 } // namespace game
 

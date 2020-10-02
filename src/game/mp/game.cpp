@@ -27,7 +27,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::net;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 

@@ -41,7 +41,7 @@ public:
     void clear();
     void add(Item item);
 
-    void load(const resources::GffStruct &gffs) override;
+    void load(const resource::GffStruct &gffs) override;
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;

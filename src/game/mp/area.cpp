@@ -22,7 +22,7 @@
 using namespace std;
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::net;
 
 namespace reone {

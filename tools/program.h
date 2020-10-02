@@ -47,7 +47,7 @@ private:
     boost::filesystem::path _destPath;
     boost::filesystem::path _inputFilePath;
     boost::filesystem::path _keyPath;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     Command _command { Command::None };
     std::unique_ptr<Tool> _tool;
 

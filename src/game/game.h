@@ -22,7 +22,7 @@
 #include "../gui/gui.h"
 #include "../render/scene/scenegraph.h"
 #include "../render/window.h"
-#include "../resources/types.h"
+#include "../resource/types.h"
 
 #include "console.h"
 #include "gui/classselect.h"
@@ -86,7 +86,7 @@ protected:
     };
 
     Options _options;
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     render::SceneGraph _sceneGraph;
     std::shared_ptr<Module> _module;

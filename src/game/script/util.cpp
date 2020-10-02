@@ -17,7 +17,7 @@
 
 #include "util.h"
 
-#include "../../resources/resources.h"
+#include "../../resource/resources.h"
 #include "../../script/execution.h"
 #include "../../script/types.h"
 
@@ -25,7 +25,7 @@
 
 using namespace std;
 
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {

@@ -41,10 +41,10 @@ class ObjectFactory;
 
 class Module : public Object {
 public:
-    Module(uint32_t id, resources::GameVersion version, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    Module(uint32_t id, resource::GameVersion version, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
 
     // Loading
-    void load(const std::string &name, const resources::GffStruct &ifo);
+    void load(const std::string &name, const resource::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
 
     bool handle(const SDL_Event &event);
@@ -63,7 +63,7 @@ public:
     void setOpenContainer(const std::function<void(SpatialObject *)> &fn);
 
 protected:
-    resources::GameVersion _version { resources::GameVersion::KotOR };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     ModuleInfo _info;
 
 private:
@@ -86,8 +86,8 @@ private:
 
     // Loading
 
-    void loadInfo(const resources::GffStruct &ifo);
-    void loadArea(const resources::GffStruct &ifo);
+    void loadInfo(const resource::GffStruct &ifo);
+    void loadArea(const resource::GffStruct &ifo);
     void loadPlayer();
 
     // END Loading

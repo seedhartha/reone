@@ -29,6 +29,7 @@
 
 using namespace std;
 
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {

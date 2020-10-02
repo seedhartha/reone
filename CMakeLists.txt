@@ -51,20 +51,12 @@ set(HEADERS
     src/core/streamutil.h
     src/core/types.h
     src/game/actions.h
-    src/game/blueprint/blueprints.h
-    src/game/blueprint/creature.h
-    src/game/blueprint/door.h
-    src/game/blueprint/item.h
-    src/game/blueprint/placeable.h
-    src/game/blueprint/trigger.h
-    src/game/blueprint/waypoint.h
     src/game/camera/camera.h
     src/game/camera/firstperson.h
     src/game/camera/thirdperson.h
     src/game/characters.h
     src/game/collisiondetect.h
     src/game/console.h
-    src/game/dialog.h
     src/game/game.h
     src/game/gui/classselect.h
     src/game/gui/container.h
@@ -96,7 +88,6 @@ set(HEADERS
     src/game/object/waypoint.h
     src/game/objectselect.h
     src/game/pathfinder.h
-    src/game/paths.h
     src/game/player.h
     src/game/room.h
     src/game/script/routines.h
@@ -143,30 +134,38 @@ set(HEADERS
     src/render/types.h
     src/render/walkmesh.h
     src/render/window.h
-    src/resources/2dafile.h
-    src/resources/biffile.h
-    src/resources/binfile.h
-    src/resources/bwmfile.h
-    src/resources/curfile.h
-    src/resources/erffile.h
-    src/resources/folder.h
-    src/resources/gfffile.h
-    src/resources/keyfile.h
-    src/resources/lytfile.h
-    src/resources/mdlfile.h
-    src/resources/mp3file.h
-    src/resources/ncsfile.h
-    src/resources/pefile.h
-    src/resources/resources.h
-    src/resources/rimfile.h
-    src/resources/tgafile.h
-    src/resources/tlkfile.h
-    src/resources/tpcfile.h
-    src/resources/types.h
-    src/resources/txifile.h
-    src/resources/util.h
-    src/resources/visfile.h
-    src/resources/wavfile.h
+    src/resource/2dafile.h
+    src/resource/archive/biffile.h
+    src/resource/archive/erffile.h
+    src/resource/archive/keyfile.h
+    src/resource/archive/pefile.h
+    src/resource/archive/rimfile.h
+    src/resource/audio/mp3file.h
+    src/resource/audio/wavfile.h
+    src/resource/binfile.h
+    src/resource/blueprint/creature.h
+    src/resource/blueprint/door.h
+    src/resource/blueprint/item.h
+    src/resource/blueprint/placeable.h
+    src/resource/blueprint/trigger.h
+    src/resource/blueprint/waypoint.h
+    src/resource/bwmfile.h
+    src/resource/dlgfile.h
+    src/resource/folder.h
+    src/resource/gfffile.h
+    src/resource/image/curfile.h
+    src/resource/image/tgafile.h
+    src/resource/image/tpcfile.h
+    src/resource/image/txifile.h
+    src/resource/lytfile.h
+    src/resource/mdlfile.h
+    src/resource/ncsfile.h
+    src/resource/pthfile.h
+    src/resource/resources.h
+    src/resource/tlkfile.h
+    src/resource/types.h
+    src/resource/util.h
+    src/resource/visfile.h
     src/script/execution.h
     src/script/program.h
     src/script/routine.h
@@ -185,20 +184,12 @@ set(SOURCES
     src/core/random.cpp
     src/core/streamutil.cpp
     src/game/actions.cpp
-    src/game/blueprint/blueprints.cpp
-    src/game/blueprint/creature.cpp
-    src/game/blueprint/door.cpp
-    src/game/blueprint/item.cpp
-    src/game/blueprint/placeable.cpp
-    src/game/blueprint/trigger.cpp
-    src/game/blueprint/waypoint.cpp
     src/game/camera/camera.cpp
     src/game/camera/firstperson.cpp
     src/game/camera/thirdperson.cpp
     src/game/characters.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
-    src/game/dialog.cpp
     src/game/game.cpp
     src/game/gui/classselect.cpp
     src/game/gui/colors.cpp
@@ -230,7 +221,6 @@ set(SOURCES
     src/game/object/waypoint.cpp
     src/game/objectselect.cpp
     src/game/pathfinder.cpp
-    src/game/paths.cpp
     src/game/player.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
@@ -277,29 +267,37 @@ set(SOURCES
     src/render/texture.cpp
     src/render/walkmesh.cpp
     src/render/window.cpp
-    src/resources/2dafile.cpp
-    src/resources/biffile.cpp
-    src/resources/binfile.cpp
-    src/resources/bwmfile.cpp
-    src/resources/curfile.cpp
-    src/resources/erffile.cpp
-    src/resources/folder.cpp
-    src/resources/gfffile.cpp
-    src/resources/keyfile.cpp
-    src/resources/lytfile.cpp
-    src/resources/mdlfile.cpp
-    src/resources/mp3file.cpp
-    src/resources/ncsfile.cpp
-    src/resources/pefile.cpp
-    src/resources/resources.cpp
-    src/resources/rimfile.cpp
-    src/resources/tgafile.cpp
-    src/resources/tlkfile.cpp
-    src/resources/tpcfile.cpp
-    src/resources/txifile.cpp
-    src/resources/util.cpp
-    src/resources/visfile.cpp
-    src/resources/wavfile.cpp
+    src/resource/2dafile.cpp
+    src/resource/archive/biffile.cpp
+    src/resource/archive/erffile.cpp
+    src/resource/archive/keyfile.cpp
+    src/resource/archive/pefile.cpp
+    src/resource/archive/rimfile.cpp
+    src/resource/audio/mp3file.cpp
+    src/resource/audio/wavfile.cpp
+    src/resource/binfile.cpp
+    src/resource/blueprint/creature.cpp
+    src/resource/blueprint/door.cpp
+    src/resource/blueprint/item.cpp
+    src/resource/blueprint/placeable.cpp
+    src/resource/blueprint/trigger.cpp
+    src/resource/blueprint/waypoint.cpp
+    src/resource/bwmfile.cpp
+    src/resource/dlgfile.cpp
+    src/resource/folder.cpp
+    src/resource/gfffile.cpp
+    src/resource/image/curfile.cpp
+    src/resource/image/tgafile.cpp
+    src/resource/image/tpcfile.cpp
+    src/resource/image/txifile.cpp
+    src/resource/lytfile.cpp
+    src/resource/mdlfile.cpp
+    src/resource/ncsfile.cpp
+    src/resource/pthfile.cpp
+    src/resource/resources.cpp
+    src/resource/tlkfile.cpp
+    src/resource/util.cpp
+    src/resource/visfile.cpp
     src/script/execution.cpp
     src/script/program.cpp
     src/script/routine.cpp
@@ -328,15 +326,15 @@ if(BUILD_TOOLS)
         src/core/log.h
         src/core/pathutil.h
         src/core/types.h
-        src/resources/2dafile.h
-        src/resources/biffile.h
-        src/resources/binfile.h
-        src/resources/erffile.h
-        src/resources/gfffile.h
-        src/resources/keyfile.h
-        src/resources/rimfile.h
-        src/resources/tlkfile.h
-        src/resources/util.h
+        src/resource/2dafile.h
+        src/resource/archive/biffile.h
+        src/resource/archive/erffile.h
+        src/resource/archive/keyfile.h
+        src/resource/archive/rimfile.h
+        src/resource/binfile.h
+        src/resource/gfffile.h
+        src/resource/tlkfile.h
+        src/resource/util.h
         tools/program.h
         tools/tools.h)
 
@@ -344,15 +342,15 @@ if(BUILD_TOOLS)
         src/core/debug.cpp
         src/core/log.cpp
         src/core/pathutil.cpp
-        src/resources/2dafile.cpp
-        src/resources/biffile.cpp
-        src/resources/binfile.cpp
-        src/resources/erffile.cpp
-        src/resources/gfffile.cpp
-        src/resources/keyfile.cpp
-        src/resources/rimfile.cpp
-        src/resources/tlkfile.cpp
-        src/resources/util.cpp
+        src/resource/2dafile.cpp
+        src/resource/archive/biffile.cpp
+        src/resource/archive/erffile.cpp
+        src/resource/archive/keyfile.cpp
+        src/resource/archive/rimfile.cpp
+        src/resource/binfile.cpp
+        src/resource/gfffile.cpp
+        src/resource/tlkfile.cpp
+        src/resource/util.cpp
         tools/main.cpp
         tools/2datool.cpp
         tools/biftool.cpp

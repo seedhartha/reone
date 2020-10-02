@@ -73,7 +73,7 @@ private:
 
     void init(const std::shared_ptr<ModelNode> &node);
 
-    friend class resources::MdlFile;
+    friend class resource::MdlFile;
 };
 
 } // namespace render

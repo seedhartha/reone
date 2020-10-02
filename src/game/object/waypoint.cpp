@@ -22,7 +22,7 @@
 #include "glm/glm.hpp"
 
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

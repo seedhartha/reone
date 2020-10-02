@@ -18,12 +18,12 @@
 #include "util.h"
 
 #include "../audio/player.h"
-#include "../resources/resources.h"
+#include "../resource/resources.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::resources;
+using namespace reone::resource;
 
 namespace reone {
 

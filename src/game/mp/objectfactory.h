@@ -28,7 +28,7 @@ namespace game {
 class MultiplayerObjectFactory : public ObjectFactory {
 public:
     MultiplayerObjectFactory(
-        resources::GameVersion version,
+        resource::GameVersion version,
         MultiplayerMode mode,
         render::SceneGraph *sceneGraph,
         IMultiplayerCallbacks *callbacks,

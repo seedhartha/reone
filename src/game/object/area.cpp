@@ -34,12 +34,12 @@
 #include "../../core/streamutil.h"
 #include "../../render/scene/cubenode.h"
 #include "../../render/scene/scenegraph.h"
-#include "../../resources/lytfile.h"
-#include "../../resources/resources.h"
-#include "../../resources/visfile.h"
+#include "../../resource/lytfile.h"
+#include "../../resource/pthfile.h"
+#include "../../resource/resources.h"
+#include "../../resource/visfile.h"
 #include "../../script/execution.h"
 
-#include "../paths.h"
 #include "../script/routines.h"
 #include "../script/util.h"
 
@@ -50,7 +50,7 @@ using namespace std;
 using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
-using namespace reone::resources;
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
@@ -127,14 +127,14 @@ void Area::loadPTH() {
     shared_ptr<GffStruct> pth(Resources.findGFF(_name, ResourceType::Path));
     assert(pth);
 
-    Paths paths;
+    PthFile paths;
     paths.load(*pth);
 
-    const vector<Paths::Point> &points = paths.points();
+    const vector<PthFile::Point> &points = paths.points();
     unordered_map<int, float> pointZ;
 
     for (int i = 0; i < points.size(); ++i) {
-        const Paths::Point &point = points[i];
+        const PthFile::Point &point = points[i];
         Room *room = nullptr;
         float z = 0.0f;
 
