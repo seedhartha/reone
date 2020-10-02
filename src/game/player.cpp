@@ -19,10 +19,10 @@
 
 #include <stdexcept>
 
-#include "area.h"
 #include "camera/camera.h"
-#include "module.h"
+#include "object/area.h"
 #include "object/creature.h"
+#include "object/module.h"
 
 using namespace std;
 

@@ -28,21 +28,22 @@
 
 #include "SDL2/SDL.h"
 
-#include "../core/debug.h"
-#include "../core/jobs.h"
-#include "../core/log.h"
-#include "../core/streamutil.h"
-#include "../render/scene/cubenode.h"
-#include "../render/scene/scenegraph.h"
-#include "../resources/lytfile.h"
-#include "../resources/resources.h"
-#include "../resources/visfile.h"
-#include "../script/execution.h"
+#include "../../core/debug.h"
+#include "../../core/jobs.h"
+#include "../../core/log.h"
+#include "../../core/streamutil.h"
+#include "../../render/scene/cubenode.h"
+#include "../../render/scene/scenegraph.h"
+#include "../../resources/lytfile.h"
+#include "../../resources/resources.h"
+#include "../../resources/visfile.h"
+#include "../../script/execution.h"
 
-#include "object/factory.h"
-#include "paths.h"
-#include "script/routines.h"
-#include "script/util.h"
+#include "../paths.h"
+#include "../script/routines.h"
+#include "../script/util.h"
+
+#include "factory.h"
 
 using namespace std;
 

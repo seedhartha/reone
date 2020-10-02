@@ -22,8 +22,8 @@
 #include "../../core/log.h"
 #include "../../core/random.h"
 
-#include "../area.h"
 #include "../game.h"
+#include "../object/area.h"
 #include "../object/creature.h"
 #include "../object/door.h"
 

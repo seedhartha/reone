@@ -24,7 +24,7 @@
 #include "../core/log.h"
 #include "../script/execution.h"
 
-#include "area.h"
+#include "object/area.h"
 #include "object/creature.h"
 
 using namespace std;

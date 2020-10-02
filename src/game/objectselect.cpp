@@ -21,7 +21,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "area.h"
+#include "object/area.h"
 
 using namespace std;
 

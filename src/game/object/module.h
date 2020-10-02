@@ -21,10 +21,11 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../net/types.h"
+#include "../../net/types.h"
+
+#include "../player.h"
 
 #include "area.h"
-#include "player.h"
 
 namespace reone {
 

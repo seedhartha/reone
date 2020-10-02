@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../area.h"
+#include "../object/area.h"
 
 #include "command.h"
 #include "creature.h"

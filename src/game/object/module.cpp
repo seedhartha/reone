@@ -17,14 +17,14 @@
 
 #include "module.h"
 
-#include "../core/debug.h"
-#include "../core/log.h"
-#include "../core/streamutil.h"
-#include "../resources/gfffile.h"
-#include "../resources/resources.h"
+#include "../../core/debug.h"
+#include "../../core/log.h"
+#include "../../core/streamutil.h"
+#include "../../resources/gfffile.h"
+#include "../../resources/resources.h"
 
-#include "object/door.h"
-#include "object/factory.h"
+#include "door.h"
+#include "factory.h"
 
 using namespace std;
 using namespace std::placeholders;
