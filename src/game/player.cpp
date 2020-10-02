@@ -131,7 +131,7 @@ void Player::update(float dt) {
             _creature->setMovementType(MovementType::Run);
             _module->area()->update3rdPersonCameraTarget();
             _area->updateRoomVisibility();
-            _area->selectNearestObject();
+            _area->objectSelector().selectNearest();
         }
     } else {
         _creature->setMovementType(MovementType::None);

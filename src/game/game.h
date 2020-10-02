@@ -24,14 +24,14 @@
 #include "../render/window.h"
 #include "../resources/types.h"
 
-#include "gui/classsel.h"
+#include "gui/classselect.h"
 #include "gui/container.h"
 #include "gui/debug.h"
 #include "gui/dialog.h"
 #include "gui/equip.h"
 #include "gui/hud.h"
 #include "gui/mainmenu.h"
-#include "gui/portraitsel.h"
+#include "gui/portraitselect.h"
 #include "gui/target.h"
 
 #include "area.h"
