@@ -25,7 +25,7 @@
 
 #include "../blueprint/blueprints.h"
 
-#include "factory.h"
+#include "objectfactory.h"
 
 using namespace std;
 

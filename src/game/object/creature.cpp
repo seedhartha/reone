@@ -28,8 +28,9 @@
 #include "../../script/types.h"
 
 #include "../blueprint/blueprints.h"
-#include "../object/factory.h"
 #include "../script/util.h"
+
+#include "objectfactory.h"
 
 using namespace std;
 

@@ -24,7 +24,7 @@
 #include "../../resources/resources.h"
 
 #include "door.h"
-#include "factory.h"
+#include "objectfactory.h"
 
 using namespace std;
 using namespace std::placeholders;

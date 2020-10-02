@@ -20,7 +20,7 @@
 #include "../../gui/gui.h"
 #include "../../resources/types.h"
 
-#include "../object/factory.h"
+#include "../object/objectfactory.h"
 #include "../types.h"
 
 namespace reone {
