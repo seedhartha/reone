@@ -62,6 +62,7 @@ set(HEADERS
     src/game/camera/firstperson.h
     src/game/camera/thirdperson.h
     src/game/characters.h
+    src/game/collisiondetect.h
     src/game/console.h
     src/game/dialog.h
     src/game/game.h
@@ -92,7 +93,7 @@ set(HEADERS
     src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/waypoint.h
-    src/game/pathfinding.h
+    src/game/pathfinder.h
     src/game/paths.h
     src/game/player.h
     src/game/room.h
@@ -194,6 +195,7 @@ set(SOURCES
     src/game/camera/firstperson.cpp
     src/game/camera/thirdperson.cpp
     src/game/characters.cpp
+    src/game/collisiondetect.cpp
     src/game/console.cpp
     src/game/dialog.cpp
     src/game/game.cpp
@@ -224,7 +226,7 @@ set(SOURCES
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
-    src/game/pathfinding.cpp
+    src/game/pathfinder.cpp
     src/game/paths.cpp
     src/game/player.cpp
     src/game/room.cpp

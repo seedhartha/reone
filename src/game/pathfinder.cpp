@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pathfinding.h"
+#include "pathfinder.h"
 
 #include "glm/gtx/norm.hpp"
 
@@ -27,10 +27,10 @@ namespace reone {
 
 namespace game {
 
-Pathfinding::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
+Pathfinder::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void Pathfinding::load(const Paths &paths, const unordered_map<int, float> &pointZ) {
+void Pathfinder::load(const Paths &paths, const unordered_map<int, float> &pointZ) {
     const vector<Paths::Point> &points = paths.points();
     for (uint16_t i = 0; i < points.size(); ++i) {
         const Paths::Point &point = points[i];
@@ -49,7 +49,7 @@ void Pathfinding::load(const Paths &paths, const unordered_map<int, float> &poin
     }
 }
 
-const vector<glm::vec3> Pathfinding::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
+const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
     if (_vertices.empty()) {
         return vector<glm::vec3> { from, to };
     }
@@ -86,7 +86,7 @@ const vector<glm::vec3> Pathfinding::findPath(const glm::vec3 &from, const glm::
     return move(path);
 }
 
-uint16_t Pathfinding::getNearestVertex(const glm::vec3 &point) const {
+uint16_t Pathfinder::getNearestVertex(const glm::vec3 &point) const {
     uint16_t index = 0xffff;
     float minDist = 0.0f;
 
@@ -102,7 +102,7 @@ uint16_t Pathfinding::getNearestVertex(const glm::vec3 &point) const {
     return index;
 }
 
-void Pathfinding::visit(uint16_t index, FindPathContext &ctx) const {
+void Pathfinder::visit(uint16_t index, FindPathContext &ctx) const {
     if (ctx.visited.find(index) != ctx.visited.end()) return;
 
     float dist = ctx.fromToDistance[index].second;

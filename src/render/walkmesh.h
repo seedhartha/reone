@@ -33,19 +33,18 @@ namespace render {
 
 class Walkmesh {
 public:
+    Walkmesh() = default;
+
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const;
+
+    const AABB &aabb() const;
+
+private:
     struct Face {
         uint32_t type { 0 };
         std::vector<uint16_t> indices;
     };
 
-    Walkmesh() = default;
-
-    bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
-    bool findElevationAt(const glm::vec3 &position, float &z) const;
-
-    const AABB &aabb() const;
-
-private:
     std::vector<glm::vec3> _vertices;
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;

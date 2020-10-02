@@ -20,6 +20,8 @@
 #include "glm/gtx/intersect.hpp"
 #include "glm/gtx/norm.hpp"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
@@ -32,41 +34,16 @@ void Walkmesh::computeAABB() {
     }
 }
 
-bool Walkmesh::findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const {
-    glm::vec3 delta(to - from);
-    glm::vec3 dir(glm::normalize(delta));
+bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const {
+    const vector<Face> &faces = walkable ? _walkableFaces : _nonWalkableFaces;
+    glm::vec2 baryPosition(0.0f);
 
-    for (auto &face : _nonWalkableFaces) {
+    for (auto &face : faces) {
         const glm::vec3 &p0 = _vertices[face.indices[0]];
         const glm::vec3 &p1 = _vertices[face.indices[1]];
         const glm::vec3 &p2 = _vertices[face.indices[2]];
 
-        glm::vec2 baryIntersection { 0.0f };
-        float distance = 0.0f;
-
-        if (glm::intersectRayTriangle(from, dir, p0, p1, p2, baryIntersection, distance) &&
-            distance >= 0.0f &&
-            distance * distance <= glm::length2(delta)) {
-
-            intersection = from + dir * distance;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Walkmesh::findElevationAt(const glm::vec3 &position, float &z) const {
-    for (auto &face : _walkableFaces) {
-        const glm::vec3 &p0 = _vertices[face.indices[0]];
-        const glm::vec3 &p1 = _vertices[face.indices[1]];
-        const glm::vec3 &p2 = _vertices[face.indices[2]];
-
-        glm::vec2 intersection(0.0f);
-        float distance = 0.0f;
-
-        if (glm::intersectRayTriangle(position, glm::vec3(0.0f, 0.0f, -1.0f), p0, p1, p2, intersection, distance)) {
-            z = position.z - distance;
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, distance) && distance >= 0.0f) {
             return true;
         }
     }

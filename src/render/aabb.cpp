@@ -85,6 +85,7 @@ void AABB::expand(const AABB &aabb) {
         _min = aabb._min;
         _max = aabb._max;
         _empty = false;
+
     } else {
         if (aabb._min.x < _min.x) _min.x = aabb._min.x;
         if (aabb._min.y < _min.y) _min.y = aabb._min.y;
@@ -93,7 +94,6 @@ void AABB::expand(const AABB &aabb) {
         if (aabb._max.y > _max.y) _max.y = aabb._max.y;
         if (aabb._max.z > _max.z) _max.z = aabb._max.z;
     }
-
     updateTransform();
 }
 
@@ -118,19 +118,17 @@ bool AABB::contains(const glm::vec3 &p) const {
         p.z >= _min.z && p.z <= _max.z;
 }
 
-bool AABB::intersectLine(const glm::vec3 &from, const glm::vec3 &to, float &distance) const {
-    if (contains(from) || contains(to)) return true;
+bool AABB::intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const {
+    if (contains(origin)) return true;
 
-    glm::vec3 delta(to - from);
-    glm::vec3 dir(glm::normalize(delta));
     glm::vec3 dirfrac(1.0f / dir);
 
-    float t1 = (_min.x - from.x) * dirfrac.x;
-    float t2 = (_max.x - from.x) * dirfrac.x;
-    float t3 = (_min.y - from.y) * dirfrac.y;
-    float t4 = (_max.y - from.y) * dirfrac.y;
-    float t5 = (_min.z - from.z) * dirfrac.z;
-    float t6 = (_max.z - from.z) * dirfrac.z;
+    float t1 = (_min.x - origin.x) * dirfrac.x;
+    float t2 = (_max.x - origin.x) * dirfrac.x;
+    float t3 = (_min.y - origin.y) * dirfrac.y;
+    float t4 = (_max.y - origin.y) * dirfrac.y;
+    float t5 = (_min.z - origin.z) * dirfrac.z;
+    float t6 = (_max.z - origin.z) * dirfrac.z;
 
     float tmin = glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6));
     float tmax = glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6));
@@ -138,10 +136,7 @@ bool AABB::intersectLine(const glm::vec3 &from, const glm::vec3 &to, float &dist
     if (tmax < 0.0f) return false;
     if (tmin > tmax) return false;
 
-    float tmin2 = tmin * tmin;
-    if (tmin2 > glm::length2(delta)) return false;
-
-    distance = tmin2;
+    distance = tmin * tmin;
 
     return true;
 }

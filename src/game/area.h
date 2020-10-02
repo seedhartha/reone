@@ -26,19 +26,22 @@
 #include "../resources/types.h"
 #include "../script/variable.h"
 
-#include "camera/camera.h"
+#include "camera/firstperson.h"
+#include "camera/thirdperson.h"
+#include "collisiondetect.h"
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
-#include "pathfinding.h"
+#include "pathfinder.h"
 #include "room.h"
 
 namespace reone {
 
 namespace game {
 
+typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
 class ObjectFactory;
@@ -49,21 +52,31 @@ public:
         uint32_t id,
         resources::GameVersion version,
         ObjectFactory *objectFactory,
-        render::SceneGraph *sceneGraph);
+        render::SceneGraph *sceneGraph,
+        const render::GraphicsOptions &opts);
 
     void load(const std::string &name, const resources::GffStruct &are, const resources::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
+    void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
     void runOnEnterScript();
 
     bool handle(const SDL_Event &event);
     void update(const UpdateContext &updateCtx);
+
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    bool moveCreatureTowards(Creature &creature, const glm::vec2 &point, float dt);
+    bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void updateTriggers(const Creature &creature);
     void updateRoomVisibility();
     void selectNearestObject();
     void hilight(uint32_t objectId);
     void select(uint32_t objectId);
+    SpatialObject *getObjectAt(int x, int y) const;
+
+    void update3rdPersonCameraTarget();
+    void update3rdPersonCameraHeading();
+    void switchTo3rdPersonCamera();
+    void toggleCameraType();
+    Camera *getCamera() const;
 
     void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
@@ -76,14 +89,15 @@ public:
     void saveTo(GameState &state) const;
     void loadState(const GameState &state);
 
-    // Object search
-    bool findObstacleByWalkmesh(const glm::vec3 &from, const glm::vec3 &to, int mask, glm::vec3 &intersection, SpatialObject **obstacle) const;
-    bool findObstacleByAABB(const glm::vec3 &from, const glm::vec3 &to, int mask, const SpatialObject *except, SpatialObject **obstacle) const;
-
     // General getters
     uint32_t selectedObjectId() const;
     const CameraStyle &cameraStyle() const;
+    CameraType cameraType() const;
     const std::string &music() const;
+    const RoomMap &rooms() const;
+    const ObjectList &objects() const;
+    const CollisionDetector &collisionDetector() const;
+    ThirdPersonCamera *thirdPersonCamera();
 
     // Party getters
     std::shared_ptr<SpatialObject> player() const;
@@ -92,6 +106,7 @@ public:
     std::shared_ptr<SpatialObject> partyMember2() const;
 
     // Callbacks
+    void setOnCameraChanged(const std::function<void(CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setOnPlayerChanged(const std::function<void()> &fn);
     void setOnStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
@@ -100,6 +115,10 @@ protected:
     ObjectFactory *_objectFactory { nullptr };
     render::SceneGraph *_sceneGraph { nullptr };
     bool _scriptsEnabled { true };
+    float _cameraAspect { 0.0f };
+    CameraType _cameraType { CameraType::FirstPerson };
+    std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
+    std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::function<void()> _onPlayerChanged;
 
     ObjectList _objects;
@@ -138,12 +157,14 @@ private:
     };
 
     resources::GameVersion _version { resources::GameVersion::KotOR };
+    render::GraphicsOptions _opts;
+    CollisionDetector _collisionDetector;
+    Pathfinder _pathfinding;
     std::string _name;
-    std::unordered_map<std::string, std::shared_ptr<Room>> _rooms;
+    RoomMap _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
     CameraStyle _cameraStyle;
     std::string _music;
-    std::unique_ptr<Pathfinding> _pathfinding;
     std::unordered_map<ScriptType, std::string> _scripts;
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
@@ -154,6 +175,7 @@ private:
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _onStartDialog;
+    std::function<void(CameraType)> _onCameraChanged;
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateDelayedCommands();
@@ -161,8 +183,7 @@ private:
     void advanceCreatureOnPath(Creature &creature, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
-    bool findElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
-    bool findRoomElevationAt(const glm::vec2 &position, Room *&roomAt, float &z) const;
+    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
     void updateSelection();
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
@@ -192,7 +213,6 @@ private:
     // Events
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
 
     // END Events
 };

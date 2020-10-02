@@ -31,9 +31,9 @@ namespace reone {
 
 namespace game {
 
-class Pathfinding {
+class Pathfinder {
 public:
-    Pathfinding() = default;
+    Pathfinder() = default;
 
     void load(const Paths &paths, const std::unordered_map<int, float> &pointZ);
 
@@ -56,8 +56,8 @@ private:
     std::vector<glm::vec3> _vertices;
     std::unordered_map<uint16_t, std::vector<Edge>> _edges;
 
-    Pathfinding(const Pathfinding &) = delete;
-    Pathfinding &operator=(const Pathfinding &) = delete;
+    Pathfinder(const Pathfinder &) = delete;
+    Pathfinder &operator=(const Pathfinder &) = delete;
 
     uint16_t getNearestVertex(const glm::vec3 &point) const;
     void visit(uint16_t index, FindPathContext &ctx) const;

@@ -24,8 +24,6 @@
 #include "../net/types.h"
 
 #include "area.h"
-#include "camera/firstperson.h"
-#include "camera/thirdperson.h"
 #include "player.h"
 
 namespace reone {
@@ -50,20 +48,15 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
-    void update3rdPersonCameraTarget();
-    void update3rdPersonCameraHeading();
     void saveTo(GameState &state) const;
 
     // Getters
     const std::string &name() const;
     bool loaded() const;
-    std::shared_ptr<Camera> getCamera() const;
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
-    CameraType cameraType() const;
 
     // Callbacks
-    void setOnCameraChanged(const std::function<void(CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
     void setOpenContainer(const std::function<void(SpatialObject *)> &fn);
@@ -78,32 +71,22 @@ private:
     std::string _name;
     bool _loaded { false };
     render::GraphicsOptions _opts;
-    float _cameraAspect { 0.0f };
     std::shared_ptr<Area> _area;
     PartyConfiguration _party;
-    CameraType _cameraType { CameraType::FirstPerson };
-    std::shared_ptr<FirstPersonCamera> _firstPersonCamera;
-    std::shared_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<Player> _player;
 
     // Callbacks
-    std::function<void(CameraType)> _onCameraChanged;
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
     std::function<void(const Object &, const std::string &)> _startDialog;
     std::function<void(SpatialObject *)> _openContainer;
 
-    void toggleCameraType();
     void cycleDebugMode(bool forward);
-    bool findObstacle(const glm::vec3 &from, const glm::vec3 &to, glm::vec3 &intersection) const;
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
-    void switchTo3rdPersonCamera();
-    SpatialObject *getObjectAt(int x, int y) const;
 
     // Loading
 
     void loadInfo(const resources::GffStruct &ifo);
     void loadArea(const resources::GffStruct &ifo);
-    void loadCameras();
     void loadPlayer();
 
     // END Loading

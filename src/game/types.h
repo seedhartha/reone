@@ -67,13 +67,6 @@ enum class ObjectType {
     Item
 };
 
-enum ObstacleMask {
-    kObstacleRoom = 1,
-    kObstacleCreature = 2,
-    kObstacleDoor = 4,
-    kObstaclePlaceable = 8
-};
-
 enum class MultiplayerMode {
     None,
     Server,

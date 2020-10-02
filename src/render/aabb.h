@@ -37,7 +37,7 @@ public:
 
     bool contains(const glm::vec2 &point) const;
     bool contains(const glm::vec3 &point) const;
-    bool intersectLine(const glm::vec3 &from, const glm::vec3 &to, float &distance) const;
+    bool intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const;
 
     glm::vec3 size() const;
 
