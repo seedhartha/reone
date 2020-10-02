@@ -163,7 +163,7 @@ bool Module::handle(const SDL_Event &event) {
 
 bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     const SpatialObject *object = _area->getObjectAt(event.x, event.y);
-    _area->hilight(object ? object->id() : -1);
+    _area->objectSelector().hilight(object ? object->id() : -1);
 
     return true;
 }
@@ -175,9 +175,9 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     }
     debug(boost::format("Object '%s' clicked on") % object->tag());
 
-    uint32_t selectedObjectId = _area->selectedObjectId();
+    uint32_t selectedObjectId = _area->objectSelector().selectedObjectId();
     if (object->id() != selectedObjectId) {
-        _area->select(object->id());
+        _area->objectSelector().select(object->id());
         return true;
     }
 

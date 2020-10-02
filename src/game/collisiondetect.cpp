@@ -107,7 +107,6 @@ bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResu
 
     for (auto &pair : _area->rooms()) {
         Room &room = *pair.second;
-        if (!room.visible()) continue;
 
         const Walkmesh *walkmesh = room.walkmesh();
         if (!walkmesh) continue;

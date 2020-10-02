@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "portraitsel.h"
+#include "portraitselect.h"
 
 #include "../../core/random.h"
 #include "../../resources/resources.h"

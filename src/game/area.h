@@ -34,6 +34,7 @@
 #include "object/placeable.h"
 #include "object/trigger.h"
 #include "object/waypoint.h"
+#include "objectselect.h"
 #include "pathfinder.h"
 #include "room.h"
 
@@ -67,9 +68,6 @@ public:
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void updateTriggers(const Creature &creature);
     void updateRoomVisibility();
-    void selectNearestObject();
-    void hilight(uint32_t objectId);
-    void select(uint32_t objectId);
     SpatialObject *getObjectAt(int x, int y) const;
 
     void update3rdPersonCameraTarget();
@@ -90,7 +88,6 @@ public:
     void loadState(const GameState &state);
 
     // General getters
-    uint32_t selectedObjectId() const;
     const CameraStyle &cameraStyle() const;
     CameraType cameraType() const;
     const std::string &music() const;
@@ -98,6 +95,7 @@ public:
     const ObjectList &objects() const;
     const CollisionDetector &collisionDetector() const;
     ThirdPersonCamera *thirdPersonCamera();
+    ObjectSelector &objectSelector();
 
     // Party getters
     std::shared_ptr<SpatialObject> player() const;
@@ -159,7 +157,8 @@ private:
     resources::GameVersion _version { resources::GameVersion::KotOR };
     render::GraphicsOptions _opts;
     CollisionDetector _collisionDetector;
-    Pathfinder _pathfinding;
+    Pathfinder _pathfinder;
+    ObjectSelector _objectSelector;
     std::string _name;
     RoomMap _rooms;
     std::unique_ptr<resources::Visibility> _visibility;
@@ -169,8 +168,6 @@ private:
     std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
-    int _hilightedObjectId { -1 };
-    int _selectedObjectId { -1 };
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
@@ -184,12 +181,9 @@ private:
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
-    void updateSelection();
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
-    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    void selectNextObject(bool reverse = false);
-    void getSelectableObjects(std::vector<uint32_t> &ids) const;
+    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
 
     // Loading
 
