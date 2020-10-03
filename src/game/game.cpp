@@ -182,6 +182,8 @@ shared_ptr<GUI> Game::currentGUI() const {
             return _loadingScreen;
         case GameScreen::ClassSelection:
             return _classesGui;
+        case GameScreen::QuickOrCustom:
+            return _quickOrCustom;
         case GameScreen::PortraitSelection:
             return _portraitsGui;
         case GameScreen::InGame:
@@ -538,6 +540,13 @@ void Game::loadLoadingScreen() {
     screen->load();
 
     _loadingScreen = move(screen);
+}
+
+void Game::loadQuickOrCustom() {
+    unique_ptr<QuickOrCustom> quickOrCustom(new QuickOrCustom(_version, _options.graphics));
+    quickOrCustom->load();
+
+    _quickOrCustom = move(quickOrCustom);
 }
 
 void Game::loadCursor() {
