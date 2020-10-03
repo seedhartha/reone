@@ -31,14 +31,14 @@
 #include "../script/program.h"
 
 #include "2dafile.h"
-#include "archive/keyfile.h"
-#include "archive/pefile.h"
 #include "blueprint/creature.h"
 #include "blueprint/door.h"
 #include "blueprint/item.h"
 #include "blueprint/placeable.h"
 #include "blueprint/trigger.h"
 #include "blueprint/waypoint.h"
+#include "collection/keyfile.h"
+#include "collection/pefile.h"
 #include "gfffile.h"
 #include "tlkfile.h"
 
@@ -92,7 +92,7 @@ private:
 
     ResourceManager &operator=(const ResourceManager &) = delete;
 
-    void loadKeyFile();
+    void indexKeyFile();
     void indexErfFile(const boost::filesystem::path &path);
     void indexFolder(const boost::filesystem::path &path);
     void indexExeFile();

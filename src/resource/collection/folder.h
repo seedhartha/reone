@@ -21,9 +21,9 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../core/types.h"
+#include "../../core/types.h"
 
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 

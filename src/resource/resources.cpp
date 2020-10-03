@@ -25,13 +25,13 @@
 #include "../core/pathutil.h"
 #include "../core/streamutil.h"
 
-#include "archive/biffile.h"
-#include "archive/erffile.h"
-#include "archive/rimfile.h"
 #include "audio/mp3file.h"
 #include "audio/wavfile.h"
 #include "bwmfile.h"
-#include "folder.h"
+#include "collection/biffile.h"
+#include "collection/erffile.h"
+#include "collection/folder.h"
+#include "collection/rimfile.h"
 #include "image/curfile.h"
 #include "image/tgafile.h"
 #include "image/tpcfile.h"
@@ -108,7 +108,7 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
     _version = version;
     _gamePath = gamePath;
 
-    loadKeyFile();
+    indexKeyFile();
 
     if (version == GameVersion::KotOR) {
         fs::path patchPath(getPathIgnoreCase(gamePath, kPatchFileName));
@@ -149,7 +149,7 @@ void ResourceManager::init(GameVersion version, const boost::filesystem::path &g
     loadModuleNames();
 }
 
-void ResourceManager::loadKeyFile() {
+void ResourceManager::indexKeyFile() {
     fs::path path(getPathIgnoreCase(_gamePath, kKeyFileName));
 
     if (path.empty()) {

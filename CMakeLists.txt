@@ -135,11 +135,6 @@ set(HEADERS
     src/render/walkmesh.h
     src/render/window.h
     src/resource/2dafile.h
-    src/resource/archive/biffile.h
-    src/resource/archive/erffile.h
-    src/resource/archive/keyfile.h
-    src/resource/archive/pefile.h
-    src/resource/archive/rimfile.h
     src/resource/audio/mp3file.h
     src/resource/audio/wavfile.h
     src/resource/binfile.h
@@ -150,8 +145,13 @@ set(HEADERS
     src/resource/blueprint/trigger.h
     src/resource/blueprint/waypoint.h
     src/resource/bwmfile.h
+    src/resource/collection/biffile.h
+    src/resource/collection/erffile.h
+    src/resource/collection/folder.h
+    src/resource/collection/keyfile.h
+    src/resource/collection/pefile.h
+    src/resource/collection/rimfile.h
     src/resource/dlgfile.h
-    src/resource/folder.h
     src/resource/gfffile.h
     src/resource/image/curfile.h
     src/resource/image/tgafile.h
@@ -268,11 +268,6 @@ set(SOURCES
     src/render/walkmesh.cpp
     src/render/window.cpp
     src/resource/2dafile.cpp
-    src/resource/archive/biffile.cpp
-    src/resource/archive/erffile.cpp
-    src/resource/archive/keyfile.cpp
-    src/resource/archive/pefile.cpp
-    src/resource/archive/rimfile.cpp
     src/resource/audio/mp3file.cpp
     src/resource/audio/wavfile.cpp
     src/resource/binfile.cpp
@@ -283,8 +278,13 @@ set(SOURCES
     src/resource/blueprint/trigger.cpp
     src/resource/blueprint/waypoint.cpp
     src/resource/bwmfile.cpp
+    src/resource/collection/biffile.cpp
+    src/resource/collection/erffile.cpp
+    src/resource/collection/folder.cpp
+    src/resource/collection/keyfile.cpp
+    src/resource/collection/pefile.cpp
+    src/resource/collection/rimfile.cpp
     src/resource/dlgfile.cpp
-    src/resource/folder.cpp
     src/resource/gfffile.cpp
     src/resource/image/curfile.cpp
     src/resource/image/tgafile.cpp
@@ -327,11 +327,11 @@ if(BUILD_TOOLS)
         src/core/pathutil.h
         src/core/types.h
         src/resource/2dafile.h
-        src/resource/archive/biffile.h
-        src/resource/archive/erffile.h
-        src/resource/archive/keyfile.h
-        src/resource/archive/rimfile.h
         src/resource/binfile.h
+        src/resource/collection/biffile.h
+        src/resource/collection/erffile.h
+        src/resource/collection/keyfile.h
+        src/resource/collection/rimfile.h
         src/resource/gfffile.h
         src/resource/tlkfile.h
         src/resource/util.h
@@ -343,11 +343,11 @@ if(BUILD_TOOLS)
         src/core/log.cpp
         src/core/pathutil.cpp
         src/resource/2dafile.cpp
-        src/resource/archive/biffile.cpp
-        src/resource/archive/erffile.cpp
-        src/resource/archive/keyfile.cpp
-        src/resource/archive/rimfile.cpp
         src/resource/binfile.cpp
+        src/resource/collection/biffile.cpp
+        src/resource/collection/erffile.cpp
+        src/resource/collection/keyfile.cpp
+        src/resource/collection/rimfile.cpp
         src/resource/gfffile.cpp
         src/resource/tlkfile.cpp
         src/resource/util.cpp
