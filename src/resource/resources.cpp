@@ -104,47 +104,15 @@ ResourceManager &ResourceManager::instance() {
     return instance;
 }
 
-void ResourceManager::init(GameVersion version, const boost::filesystem::path &gamePath) {
+void ResourceManager::init(GameVersion version, const fs::path &gamePath) {
     _version = version;
     _gamePath = gamePath;
 
     indexKeyFile();
-
-    if (version == GameVersion::KotOR) {
-        fs::path patchPath(getPathIgnoreCase(gamePath, kPatchFileName));
-        indexErfFile(patchPath);
-    }
-    fs::path texPacksPath(getPathIgnoreCase(gamePath, kTexturePackDirectoryName));
-    fs::path guiTexPackPath(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
-
-    indexErfFile(guiTexPackPath);
-    indexErfFile(texPackPath);
-
-    fs::path musicPath(getPathIgnoreCase(gamePath, kMusicDirectoryName));
-    fs::path soundsPath(getPathIgnoreCase(gamePath, kSoundsDirectoryName));
-
-    indexFolder(musicPath);
-    indexFolder(soundsPath);
-
-    switch (version) {
-        case GameVersion::TheSithLords: {
-            fs::path voicePath(getPathIgnoreCase(gamePath, kVoiceDirectoryName));
-            indexFolder(voicePath);
-            break;
-        }
-        default: {
-            fs::path wavesPath(getPathIgnoreCase(gamePath, kWavesDirectoryName));
-            indexFolder(wavesPath);
-            break;
-        }
-    }
-    fs::path overridePath(getPathIgnoreCase(gamePath, kOverrideDirectoryName));
-    indexFolder(overridePath);
-
-    fs::path tlkPath(getPathIgnoreCase(gamePath, kTalkTableFileName));
-    _tlkFile.load(tlkPath);
-
+    indexTexturePacks();
+    indexAudioFiles();
+    indexOverrideDirectory();
+    indexTalkTable();
     indexExeFile();
     loadModuleNames();
 }
@@ -160,7 +128,20 @@ void ResourceManager::indexKeyFile() {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexErfFile(const boost::filesystem::path &path) {
+void ResourceManager::indexTexturePacks() {
+    if (_version == GameVersion::KotOR) {
+        fs::path patchPath(getPathIgnoreCase(_gamePath, kPatchFileName));
+        indexErfFile(patchPath);
+    }
+    fs::path texPacksPath(getPathIgnoreCase(_gamePath, kTexturePackDirectoryName));
+    fs::path guiTexPackPath(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    fs::path texPackPath(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+
+    indexErfFile(guiTexPackPath);
+    indexErfFile(texPackPath);
+}
+
+void ResourceManager::indexErfFile(const fs::path &path) {
     unique_ptr<ErfFile> erf(new ErfFile());
     erf->load(path);
 
@@ -169,11 +150,44 @@ void ResourceManager::indexErfFile(const boost::filesystem::path &path) {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexFolder(const fs::path &path) {
+void ResourceManager::indexAudioFiles() {
+    fs::path musicPath(getPathIgnoreCase(_gamePath, kMusicDirectoryName));
+    fs::path soundsPath(getPathIgnoreCase(_gamePath, kSoundsDirectoryName));
+
+    indexDirectory(musicPath);
+    indexDirectory(soundsPath);
+
+    switch (_version) {
+        case GameVersion::TheSithLords: {
+            fs::path voicePath(getPathIgnoreCase(_gamePath, kVoiceDirectoryName));
+            indexDirectory(voicePath);
+            break;
+        }
+        default: {
+            fs::path wavesPath(getPathIgnoreCase(_gamePath, kWavesDirectoryName));
+            indexDirectory(wavesPath);
+            break;
+        }
+    }
+}
+
+void ResourceManager::indexDirectory(const fs::path &path) {
     unique_ptr<Folder> folder(new Folder());
     folder->load(path);
 
     _providers.push_back(move(folder));
+
+    debug(boost::format("Resources: indexed: %s") % path);
+}
+
+void ResourceManager::indexOverrideDirectory() {
+    fs::path path(getPathIgnoreCase(_gamePath, kOverrideDirectoryName));
+    indexDirectory(path);
+}
+
+void ResourceManager::indexTalkTable() {
+    fs::path path(getPathIgnoreCase(_gamePath, kTalkTableFileName));
+    _tlkFile.load(path);
 
     debug(boost::format("Resources: indexed: %s") % path);
 }
