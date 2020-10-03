@@ -30,14 +30,15 @@ namespace reone {
 
 namespace game {
 
-HUD::HUD(const render::GraphicsOptions &opts) : GUI(opts) {
+HUD::HUD(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
     _scaling = ScalingMode::PositionRelativeToCenter;
 }
 
-void HUD::load(GameVersion version) {
-    GUI::load(getResRef(version), BackgroundType::None);
+void HUD::load() {
+    GUI::load();
 
     hideControl("BTN_CLEARALL");
     hideControl("BTN_TARGET0");
@@ -129,15 +130,6 @@ void HUD::load(GameVersion version) {
     hideControl("BTN_ACTION5");
     hideControl("BTN_ACTIONUP5");
     hideControl("BTN_ACTIONDOWN5");
-}
-
-string HUD::getResRef(GameVersion version) const {
-    string resRef("mipc28x6");
-    if (version == GameVersion::TheSithLords) {
-        resRef += "_p";
-    }
-
-    return resRef;
 }
 
 void HUD::update(const HudContext &ctx) {

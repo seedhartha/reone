@@ -40,27 +40,23 @@ namespace game {
 static const float kKotorModelScale = 1.3f;
 static const float kKotorModelOffsetY = 1.25f;
 
-MainMenu::MainMenu(const Options &opts) : GUI(opts.graphics) {
+MainMenu::MainMenu(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    switch (version) {
+        case GameVersion::TheSithLords:
+            _resRef = "mainmenu8x6_p";
+            break;
+        default:
+            _resRef = "mainmenu16x12";
+            _backgroundType = BackgroundType::Menu;
+            break;
+    }
     _resolutionX = 800;
     _resolutionY = 600;
 }
 
-void MainMenu::load(GameVersion version) {
-    string resRef;
-    BackgroundType background;
+void MainMenu::load() {
+    GUI::load();
 
-    switch (version) {
-        case GameVersion::TheSithLords:
-            resRef = "mainmenu8x6_p";
-            background = BackgroundType::None;
-            break;
-        default:
-            resRef = "mainmenu16x12";
-            background = BackgroundType::Menu;
-            break;
-    }
-
-    GUI::load(resRef, background);
     hideControl("BTN_MOREGAMES");
     hideControl("BTN_TSLRCM");
     hideControl("LB_MODULES");
@@ -71,7 +67,6 @@ void MainMenu::load(GameVersion version) {
     if (getDebugLevel() == 0) {
         hideControl("BTN_WARP");
     }
-    _version = version;
     configureButtons();
 
     if (_version == GameVersion::KotOR) {

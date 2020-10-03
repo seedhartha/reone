@@ -29,9 +29,9 @@ namespace game {
 
 class ContainerGui : public gui::GUI {
 public:
-    ContainerGui(const render::GraphicsOptions &opts);
+    ContainerGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void open(SpatialObject *contanier);
 
     SpatialObject &container() const;
@@ -45,7 +45,7 @@ private:
     std::function<void()> _onGetItems;
     std::function<void()> _onClose;
 
-    void configureItemsListBox(resource::GameVersion version);
+    void configureItemsListBox();
     void onClick(const std::string &control) override;
 };
 

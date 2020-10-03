@@ -28,17 +28,15 @@ namespace game {
 
 class HUD : public gui::GUI {
 public:
-    HUD(const render::GraphicsOptions &opts);
+    HUD(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void update(const HudContext &ctx);
 
     void setOnEquipmentClick(const std::function<void()> &fn);
 
 private:
     std::function<void()> _onEquipmentClick;
-
-    std::string getResRef(resource::GameVersion version) const;
 
     void onClick(const std::string &control) override;
 };

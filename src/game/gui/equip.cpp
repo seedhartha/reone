@@ -53,32 +53,24 @@ static unordered_map<EquipmentGui::Slot, string> g_slotNames = {
     { EquipmentGui::Slot::WeapR2, "WEAP_R2"}
 };
 
-EquipmentGui::EquipmentGui(const GraphicsOptions &opts) : GUI(opts) {
-}
-
-void EquipmentGui::load(GameVersion version) {
-    _version = version;
+EquipmentGui::EquipmentGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("equip");
+    _backgroundType = BackgroundType::Menu;
 
     if (_version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
-    GUI::load(getResRef(), BackgroundType::Menu);
+}
+
+void EquipmentGui::load() {
+    GUI::load();
 
     hideControl("LB_DESC");
     hideControl("LBL_CANTEQUIP");
 
     configureItemsListBox();
 }
-
-string EquipmentGui::getResRef() const {
-    string resRef("equip");
-    if (_version == GameVersion::TheSithLords) {
-        resRef += "_p";
-    }
-
-    return resRef;
-};
 
 void EquipmentGui::configureItemsListBox() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));

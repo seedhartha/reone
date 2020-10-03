@@ -28,9 +28,9 @@ namespace game {
 
 class MainMenu : public gui::GUI {
 public:
-    MainMenu(const Options &opts);
+    MainMenu(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void onClick(const std::string &control) override;
 
     void setOnNewGame(const std::function<void()> &fn);
@@ -38,7 +38,6 @@ public:
     void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     std::function<void()> _onNewGame;
     std::function<void()> _onExit;
     std::function<void(const std::string &)> _onModuleSelected;

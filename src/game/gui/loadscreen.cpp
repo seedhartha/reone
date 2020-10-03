@@ -15,28 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "loadscreen.h"
+
+using namespace reone::gui;
+using namespace reone::render;
+using namespace reone::resource;
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    ImageButton = 5,
-    Button = 6,
-    ScrollBar = 9,
-    ListBox = 11
-};
+LoadingScreen::LoadingScreen(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("loadscreen");
+    _backgroundType = BackgroundType::Load;
+}
 
-enum class BackgroundType {
-    None,
-    Menu,
-    Load
-};
-
-} // namespace gui
+} // namespace game
 
 } // namespace reone
