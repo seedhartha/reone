@@ -100,7 +100,7 @@ void Area::loadLYT() {
     ResourceManager &resources = Resources;
 
     LytFile lyt;
-    lyt.load(wrap(resources.find(_name, ResourceType::AreaLayout)));
+    lyt.load(wrap(resources.findRaw(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, resources.findModel(lytRoom.name)));
@@ -118,19 +118,18 @@ void Area::loadLYT() {
 
 void Area::loadVIS() {
     VisFile vis;
-    vis.load(wrap(Resources.find(_name, ResourceType::Vis)));
+    vis.load(wrap(Resources.findRaw(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
 }
 
 void Area::loadPTH() {
     shared_ptr<GffStruct> pth(Resources.findGFF(_name, ResourceType::Path));
-    assert(pth);
 
-    PthFile paths;
-    paths.load(*pth);
+    PthFile path;
+    path.load(*pth);
 
-    const vector<PthFile::Point> &points = paths.points();
+    const vector<PthFile::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
     for (int i = 0; i < points.size(); ++i) {
@@ -150,7 +149,7 @@ void Area::loadPTH() {
         _sceneGraph->addRoot(aabb);
     }
 
-    _pathfinder.load(paths, pointZ);
+    _pathfinder.load(path, pointZ);
 }
 
 void Area::loadARE(const GffStruct &are) {

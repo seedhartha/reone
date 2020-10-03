@@ -284,17 +284,44 @@ void ResourceManager::indexTransientErfFile(const fs::path &path) {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType type, bool logNotFound) {
+template <class T>
+static shared_ptr<T> findResource(const string &key, map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
+    auto res = cache.find(key);
+    if (res != cache.end()) {
+        return res->second;
+    };
+    auto pair = cache.insert(make_pair(key, getter()));
+
+    return pair.first->second;
+}
+
+shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
+    return findResource<TwoDaTable>(resRef, g_2daCache, [this, &resRef]() {
+        shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::TwoDa));
+        shared_ptr<TwoDaTable> table;
+
+        if (data) {
+            TwoDaFile file;
+            file.load(wrap(data));
+            table = file.table();
+        }
+
+        return move(table);
+    });
+}
+
+shared_ptr<ByteArray> ResourceManager::findRaw(const string &resRef, ResourceType type, bool logNotFound) {
     string cacheKey(getCacheKey(resRef, type));
-    auto it = g_resCache.find(cacheKey);
-    if (it != g_resCache.end()) {
-        return it->second;
+    auto res = g_resCache.find(cacheKey);
+
+    if (res != g_resCache.end()) {
+        return res->second;
     }
     debug("Resources: load " + cacheKey, 2);
 
-    shared_ptr<ByteArray> data = find(_transientProviders, resRef, type);
+    shared_ptr<ByteArray> data = findRaw(_transientProviders, resRef, type);
     if (!data) {
-        data = find(_providers, resRef, type);
+        data = findRaw(_providers, resRef, type);
     }
     if (!data) {
         KeyFile::KeyEntry key;
@@ -313,7 +340,6 @@ shared_ptr<ByteArray> ResourceManager::find(const string &resRef, ResourceType t
     if (!data && logNotFound) {
         warn("Resources: not found: " + cacheKey);
     }
-
     auto pair = g_resCache.insert(make_pair(cacheKey, move(data)));
 
     return pair.first->second;
@@ -323,327 +349,227 @@ string ResourceManager::getCacheKey(const string &resRef, resource::ResourceType
     return str(boost::format("%s.%s") % resRef % getExtByResType(type));
 }
 
-shared_ptr<ByteArray> ResourceManager::find(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
-    for (auto it = providers.rbegin(); it != providers.rend(); ++it) {
-        const unique_ptr<IResourceProvider> &provider = *it;
-        if (!provider->supports(type)) continue;
+shared_ptr<ByteArray> ResourceManager::findRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
+    for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
+        if (!(*provider)->supports(type)) continue;
 
-        shared_ptr<ByteArray> data(provider->find(resRef, type));
-        if (data) return data;
+        shared_ptr<ByteArray> data((*provider)->find(resRef, type));
+        if (data) {
+            return data;
+        }
     }
 
     return nullptr;
 }
 
-shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
-    auto it = g_2daCache.find(resRef);
-    if (it != g_2daCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> twoDaData(find(resRef, ResourceType::TwoDa));
-    shared_ptr<TwoDaTable> table;
-
-    if (twoDaData) {
-        TwoDaFile twoDa;
-        twoDa.load(wrap(twoDaData));
-        table = twoDa.table();
-    }
-
-    auto pair = g_2daCache.insert(make_pair(resRef, table));
-
-    return pair.first->second;
-}
-
 shared_ptr<GffStruct> ResourceManager::findGFF(const string &resRef, ResourceType type) {
     string cacheKey(getCacheKey(resRef, type));
-    auto it = g_gffCache.find(cacheKey);
-    if (it != g_gffCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> gffData(find(resRef, type));
-    shared_ptr<GffStruct> gffs;
 
-    if (gffData) {
-        GffFile gff;
-        gff.load(wrap(gffData));
-        gffs = gff.top();
-    }
+    return findResource<GffStruct>(cacheKey, g_gffCache, [this, &resRef, &type]() {
+        shared_ptr<ByteArray> data(findRaw(resRef, type));
+        shared_ptr<GffStruct> gffs;
 
-    auto pair = g_gffCache.insert(make_pair(cacheKey, gffs));
+        if (data) {
+            GffFile gff;
+            gff.load(wrap(data));
+            gffs = gff.top();
+        }
 
-    return pair.first->second;
+        return move(gffs);
+    });
 }
 
 shared_ptr<TalkTable> ResourceManager::findTalkTable(const string &resRef) {
-    auto it = g_talkTableCache.find(resRef);
-    if (it != g_talkTableCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> tlkData(find(resRef, ResourceType::Conversation));
-    shared_ptr<TalkTable> table;
+    return findResource<TalkTable>(resRef, g_talkTableCache, [this, &resRef]() {
+        shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::Conversation));
+        shared_ptr<TalkTable> table;
 
-    if (tlkData) {
-        TlkFile tlk;
-        tlk.load(wrap(tlkData));
-        table = tlk.table();
-    }
+        if (data) {
+            TlkFile tlk;
+            tlk.load(wrap(data));
+            table = tlk.table();
+        }
 
-    auto pair = g_talkTableCache.insert(make_pair(resRef, table));
-
-    return pair.first->second;
+        return move(table);
+    });
 }
 
 shared_ptr<AudioStream> ResourceManager::findAudio(const string &resRef) {
-    auto it = g_audioCache.find(resRef);
-    if (it != g_audioCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> mp3Data(find(resRef, ResourceType::Mp3, false));
-    shared_ptr<AudioStream> stream;
+    return findResource<AudioStream>(resRef, g_audioCache, [this, &resRef]() {
+        shared_ptr<ByteArray> mp3Data(findRaw(resRef, ResourceType::Mp3, false));
+        shared_ptr<AudioStream> stream;
 
-    if (mp3Data) {
-        Mp3File mp3;
-        mp3.load(wrap(mp3Data));
-        stream = mp3.stream();
+        if (mp3Data) {
+            Mp3File mp3;
+            mp3.load(wrap(mp3Data));
+            stream = mp3.stream();
 
-    } else {
-        shared_ptr<ByteArray> wavData(find(resRef, ResourceType::Wav));
-
-        if (wavData) {
-            WavFile wav;
-            wav.load(wrap(wavData));
-            stream = wav.stream();
+        } else {
+            shared_ptr<ByteArray> wavData(findRaw(resRef, ResourceType::Wav));
+            if (wavData) {
+                WavFile wav;
+                wav.load(wrap(wavData));
+                stream = wav.stream();
+            }
         }
-    }
-    auto pair = g_audioCache.insert(make_pair(resRef, stream));
 
-    return pair.first->second;
+        return move(stream);
+    });
 }
 
 shared_ptr<Model> ResourceManager::findModel(const string &resRef) {
-    auto it = g_modelCache.find(resRef);
-    if (it != g_modelCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> mdlData(find(resRef, ResourceType::Model));
-    shared_ptr<ByteArray> mdxData(find(resRef, ResourceType::Mdx));
-    shared_ptr<Model> model;
+    return findResource<Model>(resRef, g_modelCache, [this, &resRef]() {
+        shared_ptr<ByteArray> mdlData(findRaw(resRef, ResourceType::Model));
+        shared_ptr<ByteArray> mdxData(findRaw(resRef, ResourceType::Mdx));
+        shared_ptr<Model> model;
 
-    if (mdlData && mdxData) {
-        MdlFile mdl(_version);
-        mdl.load(wrap(mdlData), wrap(mdxData));
-        model = mdl.model();
-        model->initGL();
-    }
+        if (mdlData && mdxData) {
+            MdlFile mdl(_version);
+            mdl.load(wrap(mdlData), wrap(mdxData));
+            model = mdl.model();
+            if (model) {
+                model->initGL();
+            }
+        }
 
-    auto pair = g_modelCache.insert(make_pair(resRef, model));
-
-    return pair.first->second;
+        return move(model);
+    });
 }
 
 shared_ptr<Walkmesh> ResourceManager::findWalkmesh(const string &resRef, ResourceType type) {
-    auto it = g_walkmeshCache.find(resRef);
-    if (it != g_walkmeshCache.end()) {
-        return it->second;
-    }
-    shared_ptr<ByteArray> bwmData(find(resRef, type));
-    shared_ptr<Walkmesh> walkmesh;
+    return findResource<Walkmesh>(resRef, g_walkmeshCache, [this, &resRef, &type]() {
+        shared_ptr<ByteArray> data(findRaw(resRef, type));
+        shared_ptr<Walkmesh> walkmesh;
 
-    if (bwmData) {
-        BwmFile bwm;
-        bwm.load(wrap(bwmData));
-        walkmesh = bwm.walkmesh();
-    }
+        if (data) {
+            BwmFile bwm;
+            bwm.load(wrap(data));
+            walkmesh = bwm.walkmesh();
+        }
 
-    auto pair = g_walkmeshCache.insert(make_pair(resRef, walkmesh));
-
-    return pair.first->second;
+        return move(walkmesh);
+    });
 }
 
 shared_ptr<Texture> ResourceManager::findTexture(const string &resRef, TextureType type) {
-    auto it = g_texCache.find(resRef);
-    if (it != g_texCache.end()) {
-        return it->second;
-    }
-    bool tryCur = type == TextureType::Cursor;
-    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
-    shared_ptr<Texture> texture;
+    return findResource<Texture>(resRef, g_texCache, [this, &resRef, &type]() {
+        bool tryCur = type == TextureType::Cursor;
+        bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
+        shared_ptr<Texture> texture;
 
-    if (tryCur) {
-        uint32_t name;
-        switch (_version) {
-            case GameVersion::TheSithLords:
-                name = g_cursorNameByResRefTsl.find(resRef)->second;
-                break;
-            default:
-                name = g_cursorNameByResRefKotor.find(resRef)->second;
-                break;
+        if (tryCur) {
+            uint32_t name;
+            switch (_version) {
+                case GameVersion::TheSithLords:
+                    name = g_cursorNameByResRefTsl.find(resRef)->second;
+                    break;
+                default:
+                    name = g_cursorNameByResRefKotor.find(resRef)->second;
+                    break;
+            }
+            shared_ptr<ByteArray> curData(_exeFile.find(name, PEResourceType::Cursor));
+            if (curData) {
+                CurFile cur(resRef);
+                cur.load(wrap(curData));
+                texture = cur.texture();
+            }
         }
-        shared_ptr<ByteArray> curData(_exeFile.find(name, PEResourceType::Cursor));
-        if (curData) {
-            CurFile cur(resRef);
-            cur.load(wrap(curData));
-            texture = cur.texture();
+        if (!texture && tryTpc) {
+            shared_ptr<ByteArray> tpcData(findRaw(resRef, ResourceType::Texture));
+            if (tpcData) {
+                TpcFile tpc(resRef, type);
+                tpc.load(wrap(tpcData));
+                texture = tpc.texture();
+            }
         }
-    }
-    if (!texture && tryTpc) {
-        shared_ptr<ByteArray> tpcData(find(resRef, ResourceType::Texture));
-        if (tpcData) {
-            TpcFile tpc(resRef, type);
-            tpc.load(wrap(tpcData));
-            texture = tpc.texture();
+        if (!texture) {
+            shared_ptr<ByteArray> tgaData(findRaw(resRef, ResourceType::Tga));
+            if (tgaData) {
+                TgaFile tga(resRef, type);
+                tga.load(wrap(tgaData));
+                texture = tga.texture();
+            }
         }
-    }
-    if (!texture) {
-        shared_ptr<ByteArray> tgaData(find(resRef, ResourceType::Tga));
-        if (tgaData) {
-            TgaFile tga(resRef, type);
-            tga.load(wrap(tgaData));
-            texture = tga.texture();
+        if (texture) {
+            texture->initGL();
         }
-    }
-    if (texture) texture->initGL();
 
-    auto pair = g_texCache.insert(make_pair(resRef, texture));
-
-    return pair.first->second;
+        return move(texture);
+    });
 }
 
 shared_ptr<Font> ResourceManager::findFont(const string &resRef) {
     auto fontOverride = g_fontOverride.find(resRef);
     const string &finalResRef = fontOverride != g_fontOverride.end() ? fontOverride->second : resRef;
 
-    auto it = g_fontCache.find(finalResRef);
-    if (it != g_fontCache.end()) {
-        return it->second;
-    }
+    return findResource<Font>(finalResRef, g_fontCache, [this, &finalResRef]() {
+        shared_ptr<Texture> texture(findTexture(finalResRef, TextureType::GUI));
+        shared_ptr<Font> font;
 
-    shared_ptr<Font> font;
-    shared_ptr<Texture> texture(findTexture(finalResRef, TextureType::GUI));
+        if (texture) {
+            font = make_shared<Font>();
+            font->load(texture);
+            if (font) {
+                font->initGL();
+            }
+        }
 
-    if (texture) {
-        font = make_shared<Font>();
-        font->load(texture);
-        font->initGL();
-    }
-
-    auto pair = g_fontCache.insert(make_pair(finalResRef, font));
-
-    return pair.first->second;
+        return move(font);
+    });
 }
 
 shared_ptr<ScriptProgram> ResourceManager::findScript(const string &resRef) {
-    auto it = g_scripts.find(resRef);
-    if (it != g_scripts.end()) return it->second;
+    return findResource<ScriptProgram>(resRef, g_scripts, [this, &resRef]() {
+        shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::CompiledScript));
+        shared_ptr<ScriptProgram> program;
 
-    shared_ptr<ScriptProgram> program;
-    shared_ptr<ByteArray> ncsData(Resources.find(resRef, ResourceType::CompiledScript));
+        if (data) {
+            NcsFile ncs(resRef);
+            ncs.load(wrap(data));
+            program = ncs.program();
+        }
 
-    if (ncsData) {
-        NcsFile ncs(resRef);
-        ncs.load(wrap(ncsData));
-        program = ncs.program();
-    }
-
-    auto pair = g_scripts.insert(make_pair(resRef, program));
-
-    return pair.first->second;
+        return move(program);
+    });
 }
 
 shared_ptr<CreatureBlueprint> ResourceManager::findCreatureBlueprint(const string &resRef) {
-    auto it = g_utcCache.find(resRef);
-    if (it != g_utcCache.end()) return it->second;
+    return findBlueprint<CreatureBlueprint>(resRef, ResourceType::CreatureBlueprint, g_utcCache);
+}
 
-    shared_ptr<CreatureBlueprint> blueprint;
-    shared_ptr<GffStruct> utc(Resources.findGFF(resRef, ResourceType::CreatureBlueprint));
+template <class T>
+shared_ptr<T> ResourceManager::findBlueprint(const string &resRef, ResourceType type, map<string, shared_ptr<T>> &cache) {
+    return findResource<T>(resRef, cache, [this, &resRef, &type]() {
+        shared_ptr<GffStruct> data(findGFF(resRef, type));
+        shared_ptr<T> blueprint;
 
-    if (utc) {
-        blueprint.reset(new CreatureBlueprint());
-        blueprint->load(*utc);
-    }
-    auto pair = g_utcCache.insert(make_pair(resRef, blueprint));
+        if (data) {
+            blueprint.reset(new T());
+            blueprint->load(*data);
+        }
 
-    return pair.first->second;
+        return move(blueprint);
+    });
 }
 
 shared_ptr<DoorBlueprint> ResourceManager::findDoorBlueprint(const string &resRef) {
-    auto it = g_utdCache.find(resRef);
-    if (it != g_utdCache.end()) return it->second;
-
-    shared_ptr<DoorBlueprint> blueprint;
-    shared_ptr<GffStruct> utd(Resources.findGFF(resRef, ResourceType::DoorBlueprint));
-
-    if (utd) {
-        blueprint.reset(new DoorBlueprint());
-        blueprint->load(*utd);
-    }
-    auto pair = g_utdCache.insert(make_pair(resRef, blueprint));
-
-    return pair.first->second;
+    return findBlueprint<DoorBlueprint>(resRef, ResourceType::DoorBlueprint, g_utdCache);
 }
 
 shared_ptr<ItemBlueprint> ResourceManager::findItemBlueprint(const string &resRef) {
-    auto it = g_utiCache.find(resRef);
-    if (it != g_utiCache.end()) return it->second;
-
-    shared_ptr<ItemBlueprint> blueprint;
-    shared_ptr<GffStruct> uti(Resources.findGFF(resRef, ResourceType::ItemBlueprint));
-
-    if (uti) {
-        blueprint.reset(new ItemBlueprint());
-        blueprint->load(*uti);
-    }
-    auto pair = g_utiCache.insert(make_pair(resRef, blueprint));
-
-    return pair.first->second;
+    return findBlueprint<ItemBlueprint>(resRef, ResourceType::ItemBlueprint, g_utiCache);
 }
 
 shared_ptr<PlaceableBlueprint> ResourceManager::findPlaceableBlueprint(const string &resRef) {
-    auto it = g_utpCache.find(resRef);
-    if (it != g_utpCache.end()) return it->second;
-
-    shared_ptr<PlaceableBlueprint> blueprint;
-    shared_ptr<GffStruct> utp(Resources.findGFF(resRef, ResourceType::PlaceableBlueprint));
-
-    if (utp) {
-        blueprint.reset(new PlaceableBlueprint());
-        blueprint->load(*utp);
-    }
-    auto pair = g_utpCache.insert(make_pair(resRef, blueprint));
-
-    return pair.first->second;
+    return findBlueprint<PlaceableBlueprint>(resRef, ResourceType::PlaceableBlueprint, g_utpCache);
 }
 
 shared_ptr<TriggerBlueprint> ResourceManager::findTriggerBlueprint(const string &resRef) {
-    auto it = g_uttCache.find(resRef);
-    if (it != g_uttCache.end()) return it->second;
-
-    shared_ptr<TriggerBlueprint> blueprint;
-    shared_ptr<GffStruct> utt(Resources.findGFF(resRef, ResourceType::TriggerBlueprint));
-
-    if (utt) {
-        blueprint.reset(new TriggerBlueprint());
-        blueprint->load(*utt);
-    }
-    auto pair = g_uttCache.insert(make_pair(resRef, blueprint));
-
-    return pair.first->second;
+    return findBlueprint<TriggerBlueprint>(resRef, ResourceType::TriggerBlueprint, g_uttCache);
 }
 
 shared_ptr<WaypointBlueprint> ResourceManager::findWaypointBlueprint(const string &resRef) {
-    auto it = g_utwCache.find(resRef);
-    if (it != g_utwCache.end()) return it->second;
-
-    shared_ptr<WaypointBlueprint> blueprint;
-    shared_ptr<GffStruct> utw(Resources.findGFF(resRef, ResourceType::WaypointBlueprint));
-
-    if (utw) {
-        blueprint.reset(new WaypointBlueprint());
-        blueprint->load(*utw);
-    }
-    auto pair = g_utwCache.insert(make_pair(resRef, blueprint));
-
-    return pair.first->second;
+    return findBlueprint<WaypointBlueprint>(resRef, ResourceType::WaypointBlueprint, g_utwCache);
 }
 
 const TalkTableString &ResourceManager::getString(int32_t ref) const {
