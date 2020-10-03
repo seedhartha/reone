@@ -36,6 +36,7 @@
 #include "gui/mainmenu.h"
 #include "gui/portraitselect.h"
 #include "gui/target.h"
+#include "gui/quickorcustom.h"
 #include "object/area.h"
 #include "object/module.h"
 #include "types.h"
@@ -118,6 +119,7 @@ private:
     std::shared_ptr<EquipmentGui> _equipmentGui;
     std::shared_ptr<TargetOverlay> _targetOverlay;
     std::shared_ptr<LoadingScreen> _loadingScreen;
+    std::shared_ptr<QuickOrCustom> _quickOrCustom;
 
     // END GUI
 
@@ -151,6 +153,7 @@ private:
     void loadEquipmentGui();
     void loadTargetOverlay();
     void loadLoadingScreen();
+    void loadQuickOrCustom();
 
     // END Loading
 

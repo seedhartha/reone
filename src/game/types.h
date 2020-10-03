@@ -40,6 +40,7 @@ enum class GameScreen {
     MainMenu,
     Loading,
     ClassSelection,
+    QuickOrCustom,
     PortraitSelection,
     InGame,
     Dialog,

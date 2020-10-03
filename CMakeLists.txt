@@ -68,6 +68,7 @@ set(HEADERS
     src/game/gui/mainmenu.h
     src/game/gui/portraitselect.h
     src/game/gui/target.h
+    src/game/gui/quickorcustom.h
     src/game/mp/area.h
     src/game/mp/callbacks.h
     src/game/mp/command.h
@@ -205,6 +206,7 @@ set(SOURCES
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitselect.cpp
     src/game/gui/target.cpp
+    src/game/gui/quickorcustom.cpp
     src/game/mp/area.cpp
     src/game/mp/command.cpp
     src/game/mp/creature.cpp
