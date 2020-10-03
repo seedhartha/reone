@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -136,6 +137,7 @@ private:
     unsigned int getOrdinal(ShaderProgram program) const;
     void setLocalUniforms(const LocalUniforms &locals);
     void setUniform(const std::string &name, int value);
+    void setUniform(const std::string &name, const std::function<void(int)> &setter);
     void setUniform(const std::string &name, float value);
     void setUniform(const std::string &name, const glm::vec2 &v);
     void setUniform(const std::string &name, const glm::vec3 &v);

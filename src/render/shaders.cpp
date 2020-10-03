@@ -467,45 +467,57 @@ void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
 }
 
 void ShaderManager::setUniform(const string &name, const glm::mat4 &m) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
+    setUniform(name, [this, &m](int loc) {
+        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
+    });
+}
 
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
+void ShaderManager::setUniform(const string &name, const function<void(int)> &setter) {
+    static unordered_map<uint32_t, unordered_map<string, GLint>> locsByProgram;
+
+    unordered_map<string, GLint> &locs = locsByProgram[_activeOrdinal];
+    auto maybeLoc = locs.find(name);
+    GLint loc = 0;
+
+    if (maybeLoc != locs.end()) {
+        loc = maybeLoc->second;
+    } else {
+        loc = glGetUniformLocation(_activeOrdinal, name.c_str());
+        locs.insert(make_pair(name, loc));
+    }
+    if (loc != -1) {
+        setter(loc);
+    }
 }
 
 void ShaderManager::setUniform(const string &name, int value) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform1i(loc, value);
+    setUniform(name, [this, &value](int loc) {
+        glUniform1i(loc, value);
+    });
 }
 
 void ShaderManager::setUniform(const string &name, float value) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform1f(loc, value);
+    setUniform(name, [this, &value](int loc) {
+        glUniform1f(loc, value);
+    });
 }
 
 void ShaderManager::setUniform(const string &name, const glm::vec2 &v) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform2f(loc, v.x, v.y);
+    setUniform(name, [this, &v](int loc) {
+        glUniform2f(loc, v.x, v.y);
+    });
 }
 
 void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniform3f(loc, v.x, v.y, v.z);
+    setUniform(name, [this, &v](int loc) {
+        glUniform3f(loc, v.x, v.y, v.z);
+    });
 }
 
 void ShaderManager::setUniform(const string &name, const vector<glm::mat4> &arr) {
-    GLint loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-    if (loc == -1) return;
-
-    glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
+    setUniform(name, [this, &arr](int loc) {
+        glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
+    });
 }
 
 void ShaderManager::deactivate() {
