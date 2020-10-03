@@ -20,6 +20,7 @@
 #include "../audio/soundinstance.h"
 #include "../audio/types.h"
 #include "../gui/gui.h"
+#include "../render/pipeline/world.h"
 #include "../render/scene/scenegraph.h"
 #include "../render/window.h"
 #include "../resource/types.h"
@@ -89,6 +90,7 @@ protected:
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     render::SceneGraph _sceneGraph;
+    render::WorldRenderPipeline _worldPipeline;
     std::shared_ptr<Module> _module;
     std::string _nextModule;
     Screen _screen { Screen::MainMenu };
@@ -163,7 +165,6 @@ private:
     void drawAll();
     void drawWorld();
     void drawGUI();
-    void drawGUI3D();
     void drawCursor();
 
     // END Rendering

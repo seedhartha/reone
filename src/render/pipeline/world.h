@@ -17,32 +17,33 @@
 
 #pragma once
 
-#include "../object/objectfactory.h"
-
-#include "callbacks.h"
+#include "../framebuffer.h"
+#include "../types.h"
 
 namespace reone {
 
-namespace game {
+namespace render {
 
-class MultiplayerObjectFactory : public ObjectFactory {
+class SceneGraph;
+
+class WorldRenderPipeline {
 public:
-    MultiplayerObjectFactory(
-        resource::GameVersion version,
-        MultiplayerMode mode,
-        render::SceneGraph *sceneGraph,
-        IMultiplayerCallbacks *callbacks,
-        const render::GraphicsOptions &opts);
+    WorldRenderPipeline(SceneGraph *sceneGraph, const GraphicsOptions &opts);
 
-    std::unique_ptr<Area> newArea();
-    std::unique_ptr<Creature> newCreature();
-    std::unique_ptr<Door> newDoor();
+    void init();
+    void render() const;
 
 private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
+    SceneGraph *_sceneGraph { nullptr };
+    GraphicsOptions _opts;
+    Framebuffer _geometry;
+    Framebuffer _verticalBlur;
+    Framebuffer _horizontalBlur;
+
+    WorldRenderPipeline(const WorldRenderPipeline &) = delete;
+    WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
 };
 
-} // namespace game
+} // namespace render
 
 } // namespace reone

@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include "glm/mat4x4.hpp"
+
 #include "texture.h"
 
 namespace reone {

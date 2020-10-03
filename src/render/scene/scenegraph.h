@@ -22,8 +22,6 @@
 
 #include "glm/vec3.hpp"
 
-#include "../framebuffer.h"
-
 #include "cameranode.h"
 #include "lightnode.h"
 #include "meshnode.h"
@@ -36,13 +34,12 @@ class SceneGraph {
 public:
     SceneGraph(const GraphicsOptions &opts);
 
-    void init();
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void addOpaqueMesh(MeshSceneNode *node);
     void addTransparentMesh(MeshSceneNode *node);
     void addLight(LightSceneNode *node);
-    void prepare(const glm::vec3 &cameraPosition);
+    void prepare();
     void render() const;
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
@@ -59,11 +56,8 @@ private:
     std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
     std::shared_ptr<CameraSceneNode> _activeCamera;
-    glm::vec3 _ambientLightColor { 1.0f };
+    glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    Framebuffer _geometryFramebuffer;
-    Framebuffer _vBlurFramebuffer;
-    Framebuffer _hBlurFramebuffer;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

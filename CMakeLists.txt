@@ -121,6 +121,8 @@ set(HEADERS
     src/render/model/model.h
     src/render/model/animation.h
     src/render/model/modelnode.h
+    src/render/pipeline/control.h
+    src/render/pipeline/world.h
     src/render/scene/aabbnode.h
     src/render/scene/cameranode.h
     src/render/scene/cubenode.h
@@ -255,6 +257,8 @@ set(SOURCES
     src/render/model/model.cpp
     src/render/model/animation.cpp
     src/render/model/modelnode.cpp
+    src/render/pipeline/control.cpp
+    src/render/pipeline/world.cpp
     src/render/scene/aabbnode.cpp
     src/render/scene/cameranode.cpp
     src/render/scene/cubenode.cpp

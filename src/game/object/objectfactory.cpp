@@ -26,16 +26,16 @@ namespace reone {
 
 namespace game {
 
-ObjectFactory::ObjectFactory(GameVersion version, SceneGraph *sceneGraph, const Options &opts) :
+ObjectFactory::ObjectFactory(GameVersion version, SceneGraph *sceneGraph, const GraphicsOptions &opts) :
     _version(version), _sceneGraph(sceneGraph), _options(opts) {
 }
 
 unique_ptr<Module> ObjectFactory::newModule() {
-    return make_unique<Module>(_counter++, _version, this, _sceneGraph, _options.graphics);
+    return make_unique<Module>(_counter++, _version, this, _sceneGraph, _options);
 }
 
 unique_ptr<Area> ObjectFactory::newArea() {
-    return make_unique<Area>(_counter++, _version, this, _sceneGraph, _options.graphics);
+    return make_unique<Area>(_counter++, _version, this, _sceneGraph, _options);
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {

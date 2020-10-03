@@ -60,6 +60,7 @@ Game::Game(const fs::path &path, const Options &opts) :
     _options(opts),
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
+    _worldPipeline(&_sceneGraph, opts.graphics),
     _console(opts.graphics) {
 
     initGameVersion();
@@ -72,7 +73,7 @@ void Game::initGameVersion() {
 }
 
 void Game::initObjectFactory() {
-    _objectFactory = make_unique<ObjectFactory>(_version, &_sceneGraph, _options);
+    _objectFactory = make_unique<ObjectFactory>(_version, &_sceneGraph, _options.graphics);
 }
 
 int Game::run() {
@@ -91,7 +92,7 @@ int Game::run() {
 
 void Game::initSubsystems() {
     _window.init();
-    _sceneGraph.init();
+    _worldPipeline.init();
 
     Resources.init(_version, _path);
     TheAudioPlayer.init(_options.audio);
@@ -199,7 +200,6 @@ void Game::drawAll() {
 
     drawWorld();
     drawGUI();
-    drawGUI3D();
     drawCursor();
 
     _window.swapBuffers();
@@ -218,7 +218,7 @@ void Game::drawWorld() {
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.render();
+    _worldPipeline.render();
 }
 
 void Game::drawGUI() {
@@ -244,28 +244,12 @@ void Game::drawGUI() {
 
         default: {
             shared_ptr<GUI> gui(currentGUI());
-            if (gui) gui->render();
+            if (gui) {
+                gui->render();
+                gui->render3D();
+            }
             break;
         }
-    }
-}
-
-void Game::drawGUI3D() {
-    glDisable(GL_DEPTH_TEST);
-
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
-
-    Shaders.setGlobalUniforms(globals);
-
-    switch (_screen) {
-        case Screen::MainMenu:
-        case Screen::ClassSelection:
-        case Screen::PortraitSelection:
-            currentGUI()->render3D();
-            break;
-        default:
-            break;
     }
 }
 
@@ -291,7 +275,7 @@ void Game::deinitSubsystems() {
 }
 
 void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(&_sceneGraph, _options));
+    unique_ptr<MainMenu> mainMenu(new MainMenu(_options));
     mainMenu->load(_version);
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
@@ -334,7 +318,7 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadClassSelectionGui() {
-    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_objectFactory.get(), _options.graphics));
+    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_options.graphics));
     gui->load(_version);
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();

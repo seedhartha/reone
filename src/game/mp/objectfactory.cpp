@@ -35,13 +35,13 @@ MultiplayerObjectFactory::MultiplayerObjectFactory(
     MultiplayerMode mode,
     render::SceneGraph *sceneGraph,
     IMultiplayerCallbacks *callbacks,
-    const Options &opts
+    const GraphicsOptions &opts
 ) :
     ObjectFactory(version, sceneGraph, opts), _mode(mode), _callbacks(callbacks) {
 }
 
 unique_ptr<Area> MultiplayerObjectFactory::newArea() {
-    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _sceneGraph, _options.graphics, _callbacks);
+    return make_unique<MultiplayerArea>(_counter++, _version, _mode, this, _sceneGraph, _options, _callbacks);
 }
 
 unique_ptr<Creature> MultiplayerObjectFactory::newCreature() {

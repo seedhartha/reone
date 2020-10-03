@@ -32,6 +32,9 @@ namespace reone {
 
 namespace game {
 
+static const float kModelSize = 1.05f;
+static const float kModelOffsetY = 0.9f;
+
 static map<Gender, int> g_genderStrRefs {
     { Gender::Male, 646 },
     { Gender::Female, 647 }
@@ -55,10 +58,7 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelectionGui::ClassSelectionGui(ObjectFactory *objectFactory, const GraphicsOptions &opts) :
-    GUI(opts), _objectFactory(objectFactory) {
-
-    assert(_objectFactory);
+ClassSelectionGui::ClassSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
 }
 
 void ClassSelectionGui::load(GameVersion version) {
@@ -175,29 +175,47 @@ void ClassSelectionGui::configureClassModels() {
 
 void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType clazz) {
     Control &control = getControl("3D_MODEL" + to_string(index + 1));
-    const Control::Extent &extent = control.extent();
 
-    unique_ptr<Creature> creature(_objectFactory->newCreature());
+    Control::Extent extent(control.extent());
+    extent.left = _classButtons[index].center.x - _defaultButtonSize.x / 2;
+    extent.top = _classButtons[index].center.y - _defaultButtonSize.y / 2;
+    extent.width = _defaultButtonSize.x;
+    extent.height = _defaultButtonSize.y;
+    control.setExtent(extent);
+
+    unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_gfxOpts));
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, sceneGraph.get(), _gfxOpts));
+
+    unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(randomCharacter(gender, clazz));
 
-    int frameHeight = _defaultButtonSize.y;
-    int x = extent.width / 2;
-    int y = (extent.height + frameHeight) / 2 - 12;
+    shared_ptr<ModelSceneNode> model(creature->model());
+
+    float aspect = extent.width / static_cast<float>(extent.height);
+
+    glm::mat4 projection(glm::ortho(
+        -aspect * kModelSize,
+        aspect * kModelSize,
+        -kModelSize + kModelOffsetY,
+        kModelSize + kModelOffsetY,
+        0.1f,
+        10.0f));
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+    transform = glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f));
     transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    transform = glm::scale(transform, glm::vec3(frameHeight / 2.0f));
+    transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection));
+    camera->setLocalTransform(transform);
 
-    shared_ptr<ModelSceneNode> model(creature->model());
-    model->setLocalTransform(transform);
+    sceneGraph->addRoot(model);
+    sceneGraph->setAmbientLightColor(glm::vec3(1.0f));
+    sceneGraph->setActiveCamera(camera);
 
-    unique_ptr<Framebuffer> framebuffer(new Framebuffer(extent.width, extent.height));
-    framebuffer->init();
-
-    Control::Scene3D scene;
-    scene.model = model;
-    scene.framebuffer = move(framebuffer);
+    unique_ptr<Control::Scene3D> scene(new Control::Scene3D());
+    scene->model = model;
+    scene->sceneGraph = move(sceneGraph);
 
     control.setScene3D(move(scene));
 }
