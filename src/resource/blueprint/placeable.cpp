@@ -31,6 +31,7 @@ void PlaceableBlueprint::load(const GffStruct &utp) {
 
     _appearance = utp.getInt("Appearance");
     _hasInventory = utp.getInt("HasInventory") != 0;
+    _usable = utp.getInt("Useable") != 0;
 
     loadItems(utp);
     loadScripts(utp);
@@ -71,6 +72,10 @@ int PlaceableBlueprint::appearance() const {
 
 bool PlaceableBlueprint::hasInventory() const {
     return _hasInventory;
+}
+
+bool PlaceableBlueprint::isUsable() const {
+    return _usable;
 }
 
 const vector<string> &PlaceableBlueprint::items() const {

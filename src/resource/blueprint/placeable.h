@@ -42,12 +42,14 @@ public:
     const std::string &tag() const;
     int appearance() const;
     bool hasInventory() const;
+    bool isUsable() const;
     const std::vector<std::string> &items() const;
 
 private:
     std::string _tag;
     int _appearance { 0 };
     bool _hasInventory { false };
+    bool _usable { false };
     std::vector<std::string> _items;
     std::unordered_map<ScriptType, std::string> _scripts;
 
