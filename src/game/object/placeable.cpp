@@ -41,7 +41,6 @@ Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *scen
     assert(_objectFactory);
     _drawDistance = 4096.0f;
     _fadeDistance = 0.25f * _drawDistance;
-    _selectable = true;
 }
 
 void Placeable::load(const GffStruct &gffs) {
@@ -82,6 +81,8 @@ void Placeable::loadBlueprint(const string &resRef) {
 
         _items.push_back(move(item));
     }
+
+    _selectable = _blueprint->isUsable();
 }
 
 const PlaceableBlueprint &Placeable::blueprint() const {
