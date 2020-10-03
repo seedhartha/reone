@@ -41,6 +41,8 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 int Program::run() {
     initOptions();
     loadOptions();
+    initGameVersion();
+    initTool();
 
     switch (_command) {
         case Command::List:
