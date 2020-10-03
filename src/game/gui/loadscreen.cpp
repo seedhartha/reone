@@ -17,6 +17,10 @@
 
 #include "loadscreen.h"
 
+#include "../../resource/resources.h"
+
+using namespace std;
+
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
@@ -28,6 +32,20 @@ namespace game {
 LoadingScreen::LoadingScreen(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
     _resRef = getResRef("loadscreen");
     _backgroundType = BackgroundType::Load;
+
+    if (version == GameVersion::TheSithLords) {
+        _resolutionX = 800;
+        _resolutionY = 600;
+    }
+}
+
+void LoadingScreen::load() {
+    GUI::load();
+
+    configureRootContol([this](Control &control) {
+        string resRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
+        control.setBorderFill(resRef);
+    });
 }
 
 } // namespace game

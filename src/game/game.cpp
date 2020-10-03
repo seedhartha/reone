@@ -101,7 +101,7 @@ void Game::initSubsystems() {
 
 void Game::configure() {
     loadMainMenu();
-    _screen = Screen::MainMenu;
+    _screen = GameScreen::MainMenu;
 
     switch (_version) {
         case GameVersion::TheSithLords:
@@ -135,7 +135,7 @@ void Game::update() {
     if (gui) {
         gui->update(dt);
     }
-    bool updModule = _screen == Screen::InGame || _screen == Screen::Dialog;
+    bool updModule = _screen == GameScreen::InGame || _screen == GameScreen::Dialog;
 
     if (updModule && _module) {
         GuiContext guiCtx;
@@ -176,19 +176,21 @@ float Game::getDeltaTime() {
 
 shared_ptr<GUI> Game::currentGUI() const {
     switch (_screen) {
-        case Screen::MainMenu:
+        case GameScreen::MainMenu:
             return _mainMenu;
-        case Screen::ClassSelection:
+        case GameScreen::Loading:
+            return _loadingScreen;
+        case GameScreen::ClassSelection:
             return _classesGui;
-        case Screen::PortraitSelection:
+        case GameScreen::PortraitSelection:
             return _portraitsGui;
-        case Screen::InGame:
+        case GameScreen::InGame:
             return _hud;
-        case Screen::Dialog:
+        case GameScreen::Dialog:
             return _dialogGui;
-        case Screen::Container:
+        case GameScreen::Container:
             return _containerGui;
-        case Screen::Equipment:
+        case GameScreen::Equipment:
             return _equipmentGui;
         default:
             return nullptr;
@@ -207,9 +209,9 @@ void Game::drawAll() {
 
 void Game::drawWorld() {
     switch (_screen) {
-        case Screen::InGame:
-        case Screen::Dialog:
-        case Screen::Container:
+        case GameScreen::InGame:
+        case GameScreen::Dialog:
+        case GameScreen::Container:
             break;
         default:
             return;
@@ -230,7 +232,7 @@ void Game::drawGUI() {
     Shaders.setGlobalUniforms(globals);
 
     switch (_screen) {
-        case Screen::InGame:
+        case GameScreen::InGame:
             _targetOverlay->render();
             _debugOverlay->render();
 
@@ -279,20 +281,23 @@ void Game::loadMainMenu() {
     mainMenu->load();
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
-        if (!_classesGui) loadClassSelectionGui();
 
-        if (_music) {
-            _music->stop();
-        }
-        switch (_version) {
-            case GameVersion::TheSithLords:
-                _music = playMusic("mus_main");
-                break;
-            default:
-                _music = playMusic("mus_theme_rep");
-                break;
-        }
-        _screen = Screen::ClassSelection;
+        withLoadingScreen([this]() {
+            if (!_classesGui) loadClassSelectionGui();
+
+            if (_music) {
+                _music->stop();
+            }
+            switch (_version) {
+                case GameVersion::TheSithLords:
+                    _music = playMusic("mus_main");
+                    break;
+                default:
+                    _music = playMusic("mus_theme_rep");
+                    break;
+            }
+            _screen = GameScreen::ClassSelection;
+        });
     });
     mainMenu->setOnExit([this]() { _quit = true; });
     mainMenu->setOnModuleSelected([this](const string &name) {
@@ -317,6 +322,15 @@ void Game::loadMainMenu() {
     _mainMenu = move(mainMenu);
 }
 
+void Game::withLoadingScreen(const function<void()> &fn) {
+    if (!_loadingScreen) loadLoadingScreen();
+
+    _screen = GameScreen::Loading;
+
+    drawAll();
+    fn();
+}
+
 void Game::loadClassSelectionGui() {
     unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_version, _options.graphics));
     gui->load();
@@ -325,11 +339,11 @@ void Game::loadClassSelectionGui() {
         if (!_portraitsGui) loadPortraitsGui();
 
         _portraitsGui->loadPortraits(character);
-        _screen = Screen::PortraitSelection;
+        _screen = GameScreen::PortraitSelection;
     });
     gui->setOnCancel([this]() {
         _classesGui->resetFocus();
-        _screen = Screen::MainMenu;
+        _screen = GameScreen::MainMenu;
     });
     _classesGui = move(gui);
 }
@@ -348,42 +362,45 @@ void Game::loadPortraitsGui() {
         loadModule(moduleName, party);
     });
     gui->setOnCancel([this]() {
-        _screen = Screen::ClassSelection;
+        _screen = GameScreen::ClassSelection;
     });
     _portraitsGui = move(gui);
 }
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
-    Resources.loadModule(name);
 
-    shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
+    withLoadingScreen([this, &name, &party, &entry]() {
+        Resources.loadModule(name);
 
-    _module = _objectFactory->newModule();
-    configureModule();
+        shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
 
-    _module->load(name, *ifo);
-    _module->area()->setOnCameraChanged([this](CameraType type) {
-        _window.setRelativeMouseMode(type == CameraType::FirstPerson);
+        _module = _objectFactory->newModule();
+        configureModule();
+
+        _module->load(name, *ifo);
+        _module->area()->setOnCameraChanged([this](CameraType type) {
+            _window.setRelativeMouseMode(type == CameraType::FirstPerson);
+        });
+        _module->loadParty(party, entry);
+        _module->area()->loadState(_state);
+
+        if (_music) {
+            _music->stop();
+        }
+        string musicName(_module->area()->music());
+        if (!musicName.empty()) {
+            _music = playMusic(musicName);
+        }
+
+        if (!_hud) loadHUD();
+        if (!_debugOverlay) loadDebugOverlay();
+        if (!_dialogGui) loadDialogGui();
+        if (!_targetOverlay) loadTargetOverlay();
+
+        _ticks = SDL_GetTicks();
+        _screen = GameScreen::InGame;
     });
-    _module->loadParty(party, entry);
-    _module->area()->loadState(_state);
-
-    if (_music) {
-        _music->stop();
-    }
-    string musicName(_module->area()->music());
-    if (!musicName.empty()) {
-        _music = playMusic(musicName);
-    }
-
-    if (!_hud) loadHUD();
-    if (!_debugOverlay) loadDebugOverlay();
-    if (!_dialogGui) loadDialogGui();
-    if (!_targetOverlay) loadTargetOverlay();
-
-    _ticks = SDL_GetTicks();
-    _screen = Screen::InGame;
 }
 
 void Game::loadHUD() {
@@ -397,7 +414,7 @@ void Game::loadHUD() {
         shared_ptr<SpatialObject> player(_module->area()->player());
         _equipmentGui->open(player.get());
 
-        _screen = Screen::Equipment;
+        _screen = GameScreen::Equipment;
     });
 
     _hud = move(hud);
@@ -439,10 +456,10 @@ void Game::loadContainerGui() {
                 runScript(script, placeable->id(), player->id(), -1);
             }
         }
-        _screen = Screen::InGame;
+        _screen = GameScreen::InGame;
     });
     container->setOnClose([this]() {
-        _screen = Screen::InGame;
+        _screen = GameScreen::InGame;
     });
     _containerGui = move(container);
 }
@@ -476,7 +493,7 @@ void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
 }
 
 void Game::onDialogFinished() {
-    _screen = Screen::InGame;
+    _screen = GameScreen::InGame;
 }
 
 void Game::configureModule() {
@@ -491,12 +508,12 @@ void Game::configureModule() {
         if (!_containerGui) loadContainerGui();
 
         _containerGui->open(object);
-        _screen = Screen::Container;
+        _screen = GameScreen::Container;
     });
 }
 
 void Game::startDialog(uint32_t ownerId, const string &resRef) {
-    _screen = Screen::Dialog;
+    _screen = GameScreen::Dialog;
     _dialogGui->startDialog(ownerId, resRef);
 }
 
@@ -505,7 +522,7 @@ void Game::loadEquipmentGui() {
     equip->load();
     equip->setOnClose([this]() {
         _equipmentGui->resetFocus();
-        _screen = Screen::InGame;
+        _screen = GameScreen::InGame;
     });
     _equipmentGui = move(equip);
 }
@@ -514,6 +531,13 @@ void Game::loadTargetOverlay() {
     unique_ptr<TargetOverlay> overlay(new TargetOverlay(_options.graphics));
     overlay->load();
     _targetOverlay = move(overlay);
+}
+
+void Game::loadLoadingScreen() {
+    unique_ptr<LoadingScreen> screen(new LoadingScreen(_version, _options.graphics));
+    screen->load();
+
+    _loadingScreen = move(screen);
 }
 
 void Game::loadCursor() {
@@ -526,7 +550,7 @@ void Game::loadCursor() {
 
 bool Game::handle(const SDL_Event &event) {
     switch (_screen) {
-        case Screen::InGame:
+        case GameScreen::InGame:
             if (_console.handle(event)) return true;
             if (_module->area()->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
             if (_module->handle(event)) return true;
