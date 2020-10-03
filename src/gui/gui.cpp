@@ -230,6 +230,12 @@ void GUI::render() const {
     }
 }
 
+void GUI::render3D() const {
+    for (auto &control : _controls) {
+        control->render3D(_controlOffset);
+    }
+}
+
 void GUI::drawBackground() const {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
@@ -245,12 +251,6 @@ void GUI::drawBackground() const {
     DefaultQuad.render(GL_TRIANGLES);
 
     _background->unbind();
-}
-
-void GUI::render3D() const {
-    for (auto &control : _controls) {
-        control->render3D(_controlOffset);
-    }
 }
 
 void GUI::resetFocus() {

@@ -29,7 +29,7 @@ namespace game {
 
 class ClassSelectionGui : public gui::GUI {
 public:
-    ClassSelectionGui(ObjectFactory *objectFactory, const render::GraphicsOptions &opts);
+    ClassSelectionGui(const render::GraphicsOptions &opts);
 
     void load(resource::GameVersion version);
 
@@ -44,7 +44,6 @@ private:
         ClassType clazz { ClassType::Soldier };
     };
 
-    ObjectFactory *_objectFactory { nullptr };
     resource::GameVersion _version { resource::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };

@@ -26,7 +26,9 @@
 
 #include "../../render/font.h"
 #include "../../render/framebuffer.h"
+#include "../../render/pipeline/control.h"
 #include "../../render/scene/modelnode.h"
+#include "../../render/scene/scenegraph.h"
 #include "../../render/texture.h"
 #include "../../resource/gfffile.h"
 #include "../types.h"
@@ -76,7 +78,7 @@ public:
 
     struct Scene3D {
         std::shared_ptr<render::ModelSceneNode> model;
-        std::unique_ptr<render::Framebuffer> framebuffer;
+        std::unique_ptr<render::SceneGraph> sceneGraph;
     };
 
     static ControlType getType(const resource::GffStruct &gffs);
@@ -94,7 +96,7 @@ public:
 
     // Rendering
     virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
-    virtual void render3D(const glm::ivec2 &offset) const;
+    void render3D(const glm::ivec2 &offset) const;
 
     virtual void update(float dt);
     virtual void stretch(float x, float y);
@@ -114,7 +116,7 @@ public:
     void setHilight(const Border &hilight);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
-    void setScene3D(Scene3D scene);
+    void setScene3D(std::unique_ptr<Scene3D> scene);
     void setPadding(int padding);
 
     void setOnClick(const std::function<void(const std::string &)> &fn);
@@ -128,7 +130,7 @@ protected:
     std::shared_ptr<Border> _border;
     std::shared_ptr<Border> _hilight;
     Text _text;
-    Scene3D _scene3d;
+    std::unique_ptr<Scene3D> _scene3d;
     int _padding { 0 };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
@@ -143,6 +145,8 @@ protected:
     void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;
 
 private:
+    std::unique_ptr<render::ControlRenderPipeline> _pipeline;
+
     Control(const Control &) = delete;
     Control &operator=(const Control &) = delete;
 

@@ -89,13 +89,6 @@ void ModelSceneNode::fillSceneGraph() {
     SceneNode::fillSceneGraph();
 }
 
-void ModelSceneNode::renderImmediate() const {
-    for (auto &mesh : _meshes) {
-        mesh.second->render();
-    }
-    SceneNode::renderImmediate();
-}
-
 void ModelSceneNode::animate(const string &parent, const string &anim, int flags, float speed) {
     if (!_model) return;
 

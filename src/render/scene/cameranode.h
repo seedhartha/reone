@@ -25,16 +25,12 @@ namespace render {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(SceneGraph *sceneGraph, float fovy, float aspect, float near, float far);
+    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
 
 private:
-    float _fovy { 0.0f };
-    float _aspect { 0.0f };
-    float _zNear { 0.0f };
-    float _zFar { 0.0f };
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
 

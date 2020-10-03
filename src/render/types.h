@@ -22,7 +22,6 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
 namespace reone {

@@ -38,7 +38,6 @@ class GUI : public render::IEventHandler {
 public:
     bool handle(const SDL_Event &event) override;
     void update(float dt);
-
     void render() const;
     void render3D() const;
 

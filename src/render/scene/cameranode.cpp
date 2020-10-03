@@ -23,10 +23,8 @@ namespace reone {
 
 namespace render {
 
-CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, float fovy, float aspect, float zNear, float zFar) :
-    SceneNode(sceneGraph), _fovy(fovy), _aspect(aspect), _zNear(zNear), _zFar(zFar) {
-
-    _projection = glm::perspective(fovy, aspect, zNear, zFar);
+CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection) :
+    SceneNode(sceneGraph), _projection(projection) {
 }
 
 void CameraSceneNode::updateAbsoluteTransform() {

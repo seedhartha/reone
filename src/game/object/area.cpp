@@ -433,10 +433,8 @@ void Area::update(const UpdateContext &updateCtx) {
     for (auto &object : _objects) {
         object->update(updateCtx);
     }
-
     _objectSelector.update();
-
-    _sceneGraph->prepare(updateCtx.cameraPosition);
+    _sceneGraph->prepare();
 }
 
 void Area::updateDelayedCommands() {

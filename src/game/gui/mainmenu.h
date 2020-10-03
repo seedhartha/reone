@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../../gui/gui.h"
-#include "../../render/scene/scenegraph.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -29,7 +28,7 @@ namespace game {
 
 class MainMenu : public gui::GUI {
 public:
-    MainMenu(render::SceneGraph *sceneGraph, const Options &opts);
+    MainMenu(const Options &opts);
 
     void load(resource::GameVersion version);
     void onClick(const std::string &control) override;
@@ -39,8 +38,6 @@ public:
     void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
 
 private:
-    render::SceneGraph *_sceneGraph { nullptr };
-    Options _opts;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::function<void()> _onNewGame;
     std::function<void()> _onExit;

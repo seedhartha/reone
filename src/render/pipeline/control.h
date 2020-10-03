@@ -17,32 +17,34 @@
 
 #pragma once
 
-#include "../object/objectfactory.h"
+#include "glm/vec2.hpp"
+#include "glm/vec4.hpp"
 
-#include "callbacks.h"
+#include "../framebuffer.h"
+#include "../types.h"
 
 namespace reone {
 
-namespace game {
+namespace render {
 
-class MultiplayerObjectFactory : public ObjectFactory {
+class SceneGraph;
+
+class ControlRenderPipeline {
 public:
-    MultiplayerObjectFactory(
-        resource::GameVersion version,
-        MultiplayerMode mode,
-        render::SceneGraph *sceneGraph,
-        IMultiplayerCallbacks *callbacks,
-        const render::GraphicsOptions &opts);
+    ControlRenderPipeline(SceneGraph *sceneGraph, const glm::ivec4 &extent);
 
-    std::unique_ptr<Area> newArea();
-    std::unique_ptr<Creature> newCreature();
-    std::unique_ptr<Door> newDoor();
+    void init();
+    void render(const glm::ivec2 &offset) const;
 
 private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
+    SceneGraph *_sceneGraph { nullptr };
+    glm::vec4 _extent { 0.0f };
+    Framebuffer _geometry;
+
+    ControlRenderPipeline(const ControlRenderPipeline &) = delete;
+    ControlRenderPipeline &operator=(const ControlRenderPipeline &) = delete;
 };
 
-} // namespace game
+} // namespace render
 
 } // namespace reone

@@ -204,8 +204,9 @@ bool Control::handleClick(int x, int y) {
 }
 
 void Control::update(float dt) {
-    if (_scene3d.model) {
-        _scene3d.model->update(dt);
+    if (_scene3d) {
+        _scene3d->model->update(dt);
+        _scene3d->sceneGraph->prepare();
     }
 }
 
@@ -219,7 +220,6 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
     } else if (_border) {
         drawBorder(*_border, offset, size);
     }
-
     if (!textOverride.empty() || !_text.text.empty()) {
         string text(!textOverride.empty() ? textOverride : _text.text);
         drawText(text, offset, size);
@@ -493,64 +493,9 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
 }
 
 void Control::render3D(const glm::ivec2 &offset) const {
-    if (!_visible) return;
+    if (!_scene3d) return;
 
-    shared_ptr<ModelSceneNode> model(_scene3d.model);
-    if (!model) return;
-
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    ShaderManager &shaders = Shaders;
-    Framebuffer *framebuffer = _scene3d.framebuffer.get();
-
-    // Render to framebuffer
-    {
-        GlobalUniforms globals;
-        globals.projection = glm::ortho(
-            0.0f,
-            static_cast<float>(framebuffer->width()),
-            static_cast<float>(framebuffer->height()),
-            0.0f,
-            -1024.0f,
-            1024.0f);
-
-        shaders.setGlobalUniforms(globals);
-    }
-    framebuffer->bind();
-
-    glEnable(GL_DEPTH_TEST);
-    glViewport(0, 0, framebuffer->width(), framebuffer->height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    _scene3d.model->renderImmediate();
-
-    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-    framebuffer->unbind();
-
-    // Render control
-    {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-        transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
-
-        GlobalUniforms globals;
-        globals.projection = glm::ortho(0.0f, static_cast<float>(viewport[2]), static_cast<float>(viewport[3]), 0.0f);
-
-        shaders.setGlobalUniforms(globals);
-
-        LocalUniforms locals;
-        locals.model = move(transform);
-
-        shaders.activate(ShaderProgram::GUIGUI, locals);
-    }
-    glActiveTexture(GL_TEXTURE0);
-    framebuffer->bindColorBuffer(0);
-
-    DefaultQuad.render(GL_TRIANGLES);
-
-    framebuffer->unbindColorBuffer();
+    _pipeline->render(offset);
 }
 
 void Control::stretch(float x, float y) {
@@ -618,8 +563,14 @@ void Control::setTextMessage(const string &text) {
     _text.text = text;
 }
 
-void Control::setScene3D(Scene3D scene) {
+void Control::setScene3D(unique_ptr<Scene3D> scene) {
     _scene3d = move(scene);
+
+    if (_scene3d) {
+        glm::ivec4 extent(_extent.left, _extent.top, _extent.width, _extent.height);
+        _pipeline = make_unique<ControlRenderPipeline>(_scene3d->sceneGraph.get(), extent);
+        _pipeline->init();
+    }
 }
 
 void Control::setPadding(int padding) {

@@ -32,7 +32,8 @@ static const float kMaxRotationSpeed = 2.5f;
 static const float kRotationAcceleration = 1.0f;
 
 ThirdPersonCamera::ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) {
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::radians(style.viewAngle), aspect, zNear, zFar);
+    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection);
     _style = style;
 }
 

@@ -34,7 +34,6 @@ public:
     void removeChild(const std::shared_ptr<SceneNode> &node);
     virtual void fillSceneGraph();
     virtual void render() const;
-    virtual void renderImmediate() const;
 
     float distanceTo(const glm::vec3 &point) const;
 

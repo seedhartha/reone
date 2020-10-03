@@ -17,6 +17,8 @@
 
 #include "tpcfile.h"
 
+#include "glm/glm.hpp"
+
 #include "../../core/streamutil.h"
 
 #include "txifile.h"

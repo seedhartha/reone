@@ -54,7 +54,6 @@ public:
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void update(float dt);
     void fillSceneGraph() override;
-    void renderImmediate() const override;
 
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;

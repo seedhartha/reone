@@ -60,12 +60,6 @@ void SceneNode::render() const {
     }
 }
 
-void SceneNode::renderImmediate() const {
-    for (auto &child : _children) {
-        child->renderImmediate();
-    }
-}
-
 float SceneNode::distanceTo(const glm::vec3 &point) const {
     return glm::distance2(glm::vec3(_absoluteTransform[3]), point);
 }
