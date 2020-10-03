@@ -55,7 +55,7 @@ public:
     void clearCaches();
     void loadModule(const std::string &name);
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type, bool logNotFound = true);
+    std::shared_ptr<ByteArray> findRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<TwoDaTable> find2DA(const std::string &resRef);
     std::shared_ptr<GffStruct> findGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<TalkTable> findTalkTable(const std::string &resRef);
@@ -104,7 +104,10 @@ private:
     void indexTransientErfFile(const boost::filesystem::path &path);
     void loadModuleNames();
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;
-    std::shared_ptr<ByteArray> find(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
+    std::shared_ptr<ByteArray> findRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
+
+    template <class T>
+    std::shared_ptr<T> findBlueprint(const std::string &resRef, ResourceType type, std::map<std::string, std::shared_ptr<T>> &cache);
 };
 
 #define Resources resource::ResourceManager::instance()

@@ -24,7 +24,7 @@ namespace reone {
 namespace resource {
 
 void PthFile::load(const GffStruct &pth) {
-    vector<int> connections;
+    static vector<int> connections;
 
     for (auto &connection : pth.getList("Path_Conections")) {
         int destination = connection.getInt("Destination");
