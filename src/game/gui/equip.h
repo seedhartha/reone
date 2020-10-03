@@ -43,15 +43,14 @@ public:
         WeapR2
     };
 
-    EquipmentGui(const render::GraphicsOptions &opts);
+    EquipmentGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void open(SpatialObject *owner);
 
     void setOnClose(const std::function<void()> &fn);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     SpatialObject *_owner { nullptr };
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
@@ -60,7 +59,6 @@ private:
     static resource::InventorySlot getInventorySlot(Slot slot);
     static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);
 
-    std::string getResRef() const;
     void configureItemsListBox();
     void onItemClicked(const std::string &control, const std::string &item);
     void selectSlot(Slot slot);

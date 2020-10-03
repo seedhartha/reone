@@ -37,17 +37,17 @@ static const int kSwitchToResRef = 47884;
 static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
-ContainerGui::ContainerGui(const GraphicsOptions &opts) : GUI(opts) {
-}
+ContainerGui::ContainerGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("container");
 
-void ContainerGui::load(GameVersion version) {
-    string resRef("container");
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 305;
         _resolutionY = 327;
-        resRef += "_p";
     }
-    GUI::load(resRef, BackgroundType::None);
+}
+
+void ContainerGui::load() {
+    GUI::load();
 
     string btnMessage(Resources.getString(kSwitchToResRef).text + " " + Resources.getString(kGiveItemResRef).text);
     getControl("BTN_GIVEITEMS").setTextMessage(btnMessage);
@@ -55,10 +55,10 @@ void ContainerGui::load(GameVersion version) {
     string lblMessage(Resources.getString(kInventoryResRef).text);
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
-    configureItemsListBox(version);
+    configureItemsListBox();
 }
 
-void ContainerGui::configureItemsListBox(GameVersion version) {
+void ContainerGui::configureItemsListBox() {
     ListBox &listBox = static_cast<ListBox &>(getControl("LB_ITEMS"));
     ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
 
@@ -68,7 +68,7 @@ void ContainerGui::configureItemsListBox(GameVersion version) {
     protoItem.setText(text);
 
     string frameTex;
-    if (version == GameVersion::TheSithLords) {
+    if (_version == GameVersion::TheSithLords) {
         frameTex = "uibit_eqp_itm1";
     } else {
         frameTex = "lbl_hex_3";

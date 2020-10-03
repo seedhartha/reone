@@ -17,26 +17,17 @@
 
 #pragma once
 
+#include "../../gui/gui.h"
+
 namespace reone {
 
-namespace gui {
+namespace game {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    ImageButton = 5,
-    Button = 6,
-    ScrollBar = 9,
-    ListBox = 11
+class LoadingScreen : public gui::GUI {
+public:
+    LoadingScreen(resource::GameVersion version, const render::GraphicsOptions &opts);
 };
 
-enum class BackgroundType {
-    None,
-    Menu,
-    Load
-};
-
-} // namespace gui
+} // namespace game
 
 } // namespace reone

@@ -58,29 +58,22 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelectionGui::ClassSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
-}
-
-void ClassSelectionGui::load(GameVersion version) {
-    string resRef;
-    BackgroundType background;
+ClassSelectionGui::ClassSelectionGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("classsel");
 
     switch (version) {
         case GameVersion::TheSithLords:
             _resolutionX = 800;
             _resolutionY = 600;
-            resRef = "classsel_p";
-            background = BackgroundType::None;
             break;
         default:
-            resRef = "classsel";
-            background = BackgroundType::Menu;
+            _backgroundType = BackgroundType::Menu;
             break;
     }
+}
 
-    GUI::load(resRef, background);
-    _version = version;
-
+void ClassSelectionGui::load() {
+    GUI::load();
     configureClassButtons();
     configureClassModels();
 

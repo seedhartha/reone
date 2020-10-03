@@ -32,28 +32,22 @@ namespace reone {
 
 namespace game {
 
-PortraitSelectionGui::PortraitSelectionGui(const GraphicsOptions &opts) : GUI(opts) {
-}
-
-void PortraitSelectionGui::load(GameVersion version) {
-    string resRef;
-    BackgroundType background;
+PortraitSelectionGui::PortraitSelectionGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("portcust");
 
     switch (version) {
         case GameVersion::TheSithLords:
             _resolutionX = 800;
             _resolutionY = 600;
-            resRef = "portcust_p";
-            background = BackgroundType::None;
             break;
         default:
-            resRef = "portcust";
-            background = BackgroundType::Menu;
+            _backgroundType = BackgroundType::Menu;
             break;
     }
+}
 
-    GUI::load(resRef, background);
-    _version = version;
+void PortraitSelectionGui::load() {
+    GUI::load();
 
     setButtonColors("BTN_ACCEPT");
     setButtonColors("BTN_BACK");

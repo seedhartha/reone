@@ -24,6 +24,7 @@
 #include "glm/vec2.hpp"
 
 #include "../resource/gfffile.h"
+#include "../resource/types.h"
 
 #include "control/control.h"
 
@@ -50,7 +51,10 @@ protected:
         Stretch
     };
 
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     render::GraphicsOptions _gfxOpts;
+    std::string _resRef;
+    BackgroundType _backgroundType { BackgroundType::None };
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };
@@ -63,9 +67,10 @@ protected:
     std::vector<std::shared_ptr<Control>> _controls;
     std::shared_ptr<Control> _focus;
 
-    GUI(const render::GraphicsOptions &opts);
+    GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(const std::string &resRef, BackgroundType background);
+    std::string getResRef(const std::string &base) const;
+    void load();
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);

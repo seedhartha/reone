@@ -64,6 +64,7 @@ set(HEADERS
     src/game/gui/dialog.h
     src/game/gui/equip.h
     src/game/gui/hud.h
+    src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/portraitselect.h
     src/game/gui/target.h
@@ -200,6 +201,7 @@ set(SOURCES
     src/game/gui/dialog.cpp
     src/game/gui/equip.cpp
     src/game/gui/hud.cpp
+    src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/portraitselect.cpp
     src/game/gui/target.cpp

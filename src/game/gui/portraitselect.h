@@ -28,16 +28,15 @@ namespace game {
 
 class PortraitSelectionGui : public gui::GUI {
 public:
-    PortraitSelectionGui(const render::GraphicsOptions &opts);
+    PortraitSelectionGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void loadPortraits(const CreatureConfiguration &info);
 
     void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     CreatureConfiguration _character;
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };

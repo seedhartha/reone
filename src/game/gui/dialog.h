@@ -30,9 +30,9 @@ namespace game {
 
 class DialogGui : public gui::GUI {
 public:
-    DialogGui(const render::GraphicsOptions &opts);
+    DialogGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
     void startDialog(uint32_t ownerId, const std::string &resRef);
     void pickReply(uint32_t index);
 
@@ -44,7 +44,6 @@ public:
     void setOnDialogFinished(const std::function<void()> &fn);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     uint32_t _ownerId { 0 };
     std::shared_ptr<resource::DlgFile> _dialog;
     std::shared_ptr<resource::DlgFile::EntryReply> _currentEntry;

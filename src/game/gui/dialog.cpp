@@ -41,21 +41,13 @@ namespace reone {
 
 namespace game {
 
-DialogGui::DialogGui(const render::GraphicsOptions &opts) : GUI(opts) {
+DialogGui::DialogGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+    _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
 
-static string getResRef(GameVersion version) {
-    string resRef("dialog");
-    if (version == GameVersion::TheSithLords) {
-        resRef += "_p";
-    }
-    return move(resRef);
-}
-
-void DialogGui::load(GameVersion version) {
-    GUI::load(getResRef(version), BackgroundType::None);
-    _version = version;
+void DialogGui::load() {
+    GUI::load();
 
     configureMessage();
     configureReplies();

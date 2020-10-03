@@ -29,9 +29,9 @@ namespace game {
 
 class ClassSelectionGui : public gui::GUI {
 public:
-    ClassSelectionGui(const render::GraphicsOptions &opts);
+    ClassSelectionGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load(resource::GameVersion version);
+    void load();
 
     void setOnClassSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);

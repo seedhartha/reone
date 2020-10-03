@@ -275,8 +275,8 @@ void Game::deinitSubsystems() {
 }
 
 void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(_options));
-    mainMenu->load(_version);
+    unique_ptr<MainMenu> mainMenu(new MainMenu(_version, _options.graphics));
+    mainMenu->load();
     mainMenu->setOnNewGame([this]() {
         _mainMenu->resetFocus();
         if (!_classesGui) loadClassSelectionGui();
@@ -318,8 +318,8 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadClassSelectionGui() {
-    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_options.graphics));
-    gui->load(_version);
+    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_version, _options.graphics));
+    gui->load();
     gui->setOnClassSelected([this](const CreatureConfiguration &character) {
         _classesGui->resetFocus();
         if (!_portraitsGui) loadPortraitsGui();
@@ -335,8 +335,8 @@ void Game::loadClassSelectionGui() {
 }
 
 void Game::loadPortraitsGui() {
-    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_options.graphics));
-    gui->load(_version);
+    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_version, _options.graphics));
+    gui->load();
     gui->setOnPortraitSelected([this](const CreatureConfiguration &character) {
         _portraitsGui->resetFocus();
         string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
@@ -387,8 +387,8 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 }
 
 void Game::loadHUD() {
-    unique_ptr<HUD> hud(new HUD(_options.graphics));
-    hud->load(_version);
+    unique_ptr<HUD> hud(new HUD(_version, _options.graphics));
+    hud->load();
     hud->setOnEquipmentClick([this]() {
         if (!_equipmentGui) loadEquipmentGui();
 
@@ -410,8 +410,8 @@ void Game::loadDebugOverlay() {
 }
 
 void Game::loadDialogGui() {
-    unique_ptr<DialogGui> dialog(new DialogGui(_options.graphics));
-    dialog->load(_version);
+    unique_ptr<DialogGui> dialog(new DialogGui(_version, _options.graphics));
+    dialog->load();
     dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
     dialog->setGetObjectIdByTagFunc([this](const string &tag) {
         shared_ptr<Object> object(_module->area()->find(tag));
@@ -424,8 +424,8 @@ void Game::loadDialogGui() {
 }
 
 void Game::loadContainerGui() {
-    unique_ptr<ContainerGui> container(new ContainerGui(_options.graphics));
-    container->load(_version);
+    unique_ptr<ContainerGui> container(new ContainerGui(_version, _options.graphics));
+    container->load();
     container->setOnGetItems([this]() {
         shared_ptr<SpatialObject> player(_module->area()->player());
 
@@ -501,8 +501,8 @@ void Game::startDialog(uint32_t ownerId, const string &resRef) {
 }
 
 void Game::loadEquipmentGui() {
-    unique_ptr<EquipmentGui> equip(new EquipmentGui(_options.graphics));
-    equip->load(_version);
+    unique_ptr<EquipmentGui> equip(new EquipmentGui(_version, _options.graphics));
+    equip->load();
     equip->setOnClose([this]() {
         _equipmentGui->resetFocus();
         _screen = Screen::InGame;
