@@ -93,8 +93,12 @@ private:
     ResourceManager &operator=(const ResourceManager &) = delete;
 
     void indexKeyFile();
+    void indexTexturePacks();
     void indexErfFile(const boost::filesystem::path &path);
-    void indexFolder(const boost::filesystem::path &path);
+    void indexAudioFiles();
+    void indexDirectory(const boost::filesystem::path &path);
+    void indexOverrideDirectory();
+    void indexTalkTable();
     void indexExeFile();
     void indexTransientRimFile(const boost::filesystem::path &path);
     void indexTransientErfFile(const boost::filesystem::path &path);
