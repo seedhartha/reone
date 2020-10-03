@@ -551,6 +551,14 @@ void Control::setBorder(const Border &border) {
     _border = make_shared<Border>(border);
 }
 
+void Control::setBorderFill(const string &resRef) {
+    if (!resRef.empty()) {
+        _border->fill = Resources.findTexture(resRef, TextureType::GUI);
+    } else {
+        _border->fill.reset();
+    }
+}
+
 void Control::setHilight(const Border &hilight) {
     _hilight = make_shared<Border>(hilight);
 }

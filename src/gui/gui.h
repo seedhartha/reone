@@ -37,6 +37,7 @@ static const int kDefaultResolutionY = 480;
 
 class GUI : public render::IEventHandler {
 public:
+    virtual void load();
     bool handle(const SDL_Event &event) override;
     void update(float dt);
     void render() const;
@@ -70,10 +71,10 @@ protected:
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     std::string getResRef(const std::string &base) const;
-    void load();
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
+    void configureRootContol(const std::function<void(Control &)> &fn);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
     void showControl(const std::string &tag);
     void hideControl(const std::string &tag);

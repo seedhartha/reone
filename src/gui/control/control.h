@@ -113,6 +113,7 @@ public:
     virtual void setFocus(bool focus);
     virtual void setExtent(const Extent &extent);
     void setBorder(const Border &border);
+    void setBorderFill(const std::string &resRef);
     void setHilight(const Border &hilight);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);

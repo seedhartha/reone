@@ -92,17 +92,17 @@ void GUI::loadBackground(BackgroundType type) {
     } else {
         resRef = "1600x1200";
     }
-
     switch (type) {
         case BackgroundType::Menu:
             resRef += "back";
             break;
+        case BackgroundType::Load:
+            resRef += "load";
+            break;
         default:
             return;
     }
-
-    _background = ResourceManager::instance().findTexture(resRef, TextureType::Diffuse);
-    assert(_background);
+    _background = Resources.findTexture(resRef, TextureType::Diffuse);
 }
 
 void GUI::stretchControl(Control &control) {
@@ -137,6 +137,10 @@ void GUI::loadControl(const GffStruct &gffs) {
 }
 
 void GUI::preloadControl(Control &control) {
+}
+
+void GUI::configureRootContol(const function<void(Control &)> &fn) {
+    fn(*_rootControl);
 }
 
 void GUI::configureControl(const string &tag, const function<void(Control &)> &fn) {

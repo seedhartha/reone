@@ -35,6 +35,18 @@ namespace reone {
 
 namespace game {
 
+enum class GameScreen {
+    None,
+    MainMenu,
+    Loading,
+    ClassSelection,
+    PortraitSelection,
+    InGame,
+    Dialog,
+    Container,
+    Equipment
+};
+
 enum class Gender {
     Male = 0,
     Female = 1,

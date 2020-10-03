@@ -32,11 +32,13 @@
 #include "gui/dialog.h"
 #include "gui/equip.h"
 #include "gui/hud.h"
+#include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/portraitselect.h"
 #include "gui/target.h"
 #include "object/area.h"
 #include "object/module.h"
+#include "types.h"
 
 namespace reone {
 
@@ -75,17 +77,6 @@ public:
     // END Globals/locals
 
 protected:
-    enum class Screen {
-        None,
-        MainMenu,
-        ClassSelection,
-        PortraitSelection,
-        InGame,
-        Dialog,
-        Container,
-        Equipment
-    };
-
     Options _options;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
@@ -93,7 +84,7 @@ protected:
     render::WorldRenderPipeline _worldPipeline;
     std::shared_ptr<Module> _module;
     std::string _nextModule;
-    Screen _screen { Screen::MainMenu };
+    GameScreen _screen { GameScreen::MainMenu };
     std::shared_ptr<DialogGui> _dialogGui;
     bool _pickDialogReplyEnabled { true };
 
@@ -126,6 +117,7 @@ private:
     std::shared_ptr<ContainerGui> _containerGui;
     std::shared_ptr<EquipmentGui> _equipmentGui;
     std::shared_ptr<TargetOverlay> _targetOverlay;
+    std::shared_ptr<LoadingScreen> _loadingScreen;
 
     // END GUI
 
@@ -136,6 +128,7 @@ private:
     std::shared_ptr<gui::GUI> currentGUI() const;
     float getDeltaTime();
     void onDialogSpeakerChanged(uint32_t from, uint32_t to);
+    void withLoadingScreen(const std::function<void()> &fn);
 
     // Initialization
 
@@ -157,6 +150,7 @@ private:
     void loadCursor();
     void loadEquipmentGui();
     void loadTargetOverlay();
+    void loadLoadingScreen();
 
     // END Loading
 

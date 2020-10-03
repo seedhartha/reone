@@ -198,7 +198,7 @@ void MultiplayerGame::update() {
                             _dialogGui->pickReply(cmd.replyIndex());
                             break;
                         case CommandType::FinishDialog:
-                            _screen = Screen::InGame;
+                            _screen = GameScreen::InGame;
                             break;
                         default:
                             static_cast<MultiplayerArea &>(*_module->area()).execute(cmd);

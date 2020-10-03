@@ -26,6 +26,8 @@ namespace game {
 class LoadingScreen : public gui::GUI {
 public:
     LoadingScreen(resource::GameVersion version, const render::GraphicsOptions &opts);
+
+    void load() override;
 };
 
 } // namespace game
