@@ -17,35 +17,34 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../resource/types.h"
+#include "../../../gui/gui.h"
+#include "../../../resource/types.h"
 
-#include "../types.h"
-
-#include "debugoverlay.h"
-#include "selectoverlay.h"
+#include "../../types.h"
 
 namespace reone {
 
 namespace game {
 
-class HUD : public gui::GUI {
+class PortraitSelection : public gui::GUI {
 public:
-    HUD(resource::GameVersion version, const render::GraphicsOptions &opts);
+    PortraitSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load() override;
+    void load();
+    void loadPortraits(const CreatureConfiguration &config);
 
-    void render() const override;
-
-    void setContext(const GuiContext &ctx);
-    void setOnEquipmentClick(const std::function<void()> &fn);
+    void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);
+    void setOnCancel(const std::function<void()> &fn);
 
 private:
-    DebugOverlay _debug;
-    SelectionOverlay _select;
+    CreatureConfiguration _character;
+    std::vector<Portrait> _portraits;
+    int _currentPortrait { 0 };
+    std::function<void(const CreatureConfiguration &)> _onPortraitSelected;
+    std::function<void()> _onCancel;
 
-    std::function<void()> _onEquipmentClick;
-
+    void setButtonColors(const std::string &tag);
+    void loadCurrentPortrait();
     void onClick(const std::string &control) override;
 };
 

@@ -17,36 +17,26 @@
 
 #pragma once
 
-#include <memory>
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-
-#include "../../render/texture.h"
-#include "../../render/types.h"
-
-#include "../types.h"
+#include "../../../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-class TargetOverlay {
+class QuickOrCustom : public gui::GUI {
 public:
-    TargetOverlay(const render::GraphicsOptions &opts);
+    QuickOrCustom(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
-    void render() const;
+    void load() override;
 
-    void setContext(const TargetContext &ctx);
+    void setOnQuickCharacter(const std::function<void()> &fn);
+    void setOnBack(const std::function<void()> &fn);
 
 private:
-    render::GraphicsOptions _opts;
-    std::shared_ptr<render::Texture> _friendlyReticle;
-    std::shared_ptr<render::Texture> _friendlyReticle2;
-    TargetContext _context;
+    std::function<void()> _onQuickChar;
+    std::function<void()> _onBack;
 
-    void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

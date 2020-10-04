@@ -78,10 +78,10 @@ void Game::initObjectFactory() {
 
 int Game::run() {
     initSubsystems();
+    loadResources();
+    openMainMenu();
     configure();
-    loadCursor();
 
-    _console.load();
     _window.show();
 
     runMainLoop();
@@ -99,10 +99,30 @@ void Game::initSubsystems() {
     Routines.init(_version, this);
 }
 
-void Game::configure() {
-    loadMainMenu();
+void Game::loadResources() {
+    loadCursor();
+    _console.load();
+}
+
+void Game::loadCursor() {
+    ResourceManager &resources = Resources;
+
+    Cursor cursor;
+    cursor.pressed = resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
+    cursor.unpressed = resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
+
+    _window.setCursor(cursor);
+}
+
+void Game::openMainMenu() {
+    if (!_mainMenu) {
+        loadMainMenu();
+    }
     _screen = GameScreen::MainMenu;
 
+    if (_music) {
+        _music->stop();
+    }
     switch (_version) {
         case GameVersion::TheSithLords:
             _music = playMusic("mus_sion");
@@ -113,90 +133,104 @@ void Game::configure() {
     }
 }
 
-void Game::runMainLoop() {
-    _ticks = SDL_GetTicks();
-
-    while (!_quit) {
-        _window.processEvents(_quit);
-
-        update();
-        drawAll();
-    }
+void Game::loadMainMenu() {
+    _mainMenu.reset(new MainMenu(_version, _options.graphics));
+    _mainMenu->load();
+    _mainMenu->setOnNewGame(bind(&Game::onNewGame, this));
+    _mainMenu->setOnExit([this]() { _quit = true; });
+    _mainMenu->setOnModuleSelected(bind(&Game::onModuleSelected, this, _1));
 }
 
-void Game::update() {
-    if (!_nextModule.empty()) {
-        loadNextModule();
+void Game::onNewGame() {
+    _mainMenu->resetFocus();
+
+    if (!_loadScreen) {
+        loadLoadingScreen();
     }
-    float dt = getDeltaTime();
-    _window.update(dt);
-
-    shared_ptr<GUI> gui(currentGUI());
-    if (gui) {
-        gui->update(dt);
-    }
-    bool updModule = _screen == GameScreen::InGame || _screen == GameScreen::Dialog;
-
-    if (updModule && _module) {
-        GuiContext guiCtx;
-        _module->update(dt, guiCtx);
-
-        if (_module->area()->cameraType() == CameraType::ThirdPerson) {
-            _hud->update(guiCtx.hud);
+    withLoadingScreen([this]() {
+        if (_music) {
+            _music->stop();
         }
-        _targetOverlay->setContext(guiCtx.target);
-        _debugOverlay->update(guiCtx.debug);
-    }
-
+        switch (_version) {
+            case GameVersion::TheSithLords:
+                _music = playMusic("mus_main");
+                break;
+            default:
+                _music = playMusic("mus_theme_rep");
+                break;
+        }
+        if (!_charGen) {
+            loadCharacterGeneration();
+        }
+        _screen = GameScreen::CharacterGeneration;
+    });
 }
 
-void Game::loadNextModule() {
-    info("Awaiting async jobs completion");
-    JobExecutor &jobs = TheJobExecutor;
-    jobs.cancel();
-    jobs.await();
+void Game::onModuleSelected(const string &name) {
+    PartyConfiguration party;
+    party.memberCount = 2;
+    party.leader.equipment.push_back("g_a_clothes01");
+    party.member1.equipment.push_back("g_a_clothes01");
 
-    if (_module) {
-        _module->saveTo(_state);
-    }
-    _sceneGraph.clear();
-    loadModule(_nextModule, _state.party, _nextEntry);
-
-    _nextModule.clear();
-    _nextEntry.clear();
-}
-
-float Game::getDeltaTime() {
-    uint32_t ticks = SDL_GetTicks();
-    float dt = (ticks - _ticks) / 1000.0f;
-    _ticks = ticks;
-
-    return dt;
-}
-
-shared_ptr<GUI> Game::currentGUI() const {
-    switch (_screen) {
-        case GameScreen::MainMenu:
-            return _mainMenu;
-        case GameScreen::Loading:
-            return _loadingScreen;
-        case GameScreen::ClassSelection:
-            return _classesGui;
-        case GameScreen::QuickOrCustom:
-            return _quickOrCustom;
-        case GameScreen::PortraitSelection:
-            return _portraitsGui;
-        case GameScreen::InGame:
-            return _hud;
-        case GameScreen::Dialog:
-            return _dialogGui;
-        case GameScreen::Container:
-            return _containerGui;
-        case GameScreen::Equipment:
-            return _equipmentGui;
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            party.leader.appearance = kAppearanceAtton;
+            party.member1.appearance = kAppearanceKreia;
+            break;
         default:
-            return nullptr;
+            party.leader.appearance = kAppearanceCarth;
+            party.member1.appearance = kAppearanceBastila;
+            break;
     }
+    loadModule(name, party);
+}
+
+
+void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
+    info("Game: load module: " + name);
+
+    withLoadingScreen([this, &name, &party, &entry]() {
+        ResourceManager &resources = Resources;
+        resources.loadModule(name);
+
+        shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
+        _module = _objectFactory->newModule();
+        configureModule();
+        _module->load(name, *ifo);
+        _module->area()->setOnCameraChanged([this](CameraType type) {
+            _window.setRelativeMouseMode(type == CameraType::FirstPerson);
+        });
+        _module->loadParty(party, entry);
+        _module->area()->loadState(_state);
+
+        if (_music) {
+            _music->stop();
+        }
+        string musicName(_module->area()->music());
+        if (!musicName.empty()) {
+            _music = playMusic(musicName);
+        }
+        if (!_hud) {
+            loadHUD();
+        }
+        if (!_dialogGui) {
+            loadDialogGui();
+        }
+        if (!_containerGui) {
+            loadContainerGui();
+        }
+        if (!_equipmentGui) {
+            loadEquipmentGui();
+        }
+        _ticks = SDL_GetTicks();
+        _screen = GameScreen::InGame;
+    });
+}
+
+void Game::withLoadingScreen(const function<void()> &block) {
+    _screen = GameScreen::Loading;
+    drawAll();
+    block();
 }
 
 void Game::drawAll() {
@@ -229,15 +263,17 @@ void Game::drawGUI() {
     glDisable(GL_DEPTH_TEST);
 
     GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
+    globals.projection = glm::ortho(
+        0.0f,
+        static_cast<float>(_options.graphics.width),
+        static_cast<float>(_options.graphics.height),
+        0.0f,
+        -100.0f, 100.0f);
 
     Shaders.setGlobalUniforms(globals);
 
     switch (_screen) {
         case GameScreen::InGame:
-            _targetOverlay->render();
-            _debugOverlay->render();
-
             if (_module->area()->cameraType() == CameraType::ThirdPerson) {
                 _hud->render();
             }
@@ -247,7 +283,7 @@ void Game::drawGUI() {
             break;
 
         default: {
-            shared_ptr<GUI> gui(currentGUI());
+            GUI *gui = getScreenGUI();
             if (gui) {
                 gui->render();
                 gui->render3D();
@@ -269,201 +305,51 @@ void Game::drawCursor() {
     _window.drawCursor();
 }
 
-void Game::deinitSubsystems() {
-    TheJobExecutor.deinit();
-    Routines.deinit();
-    TheAudioPlayer.deinit();
-    Resources.deinit();
-
-    _window.deinit();
+void Game::configureModule() {
+    _module->setOnModuleTransition([this](const string &name, const string &entry) {
+        _nextModule = name;
+        _nextEntry = entry;
+    });
+    _module->setStartDialog([this](const Object &owner, const string &resRef) {
+        startDialog(owner.id(), resRef);
+    });
+    _module->setOpenContainer([this](SpatialObject *object) {
+        _containerGui->open(object);
+        _screen = GameScreen::Container;
+    });
 }
 
-void Game::loadMainMenu() {
-    unique_ptr<MainMenu> mainMenu(new MainMenu(_version, _options.graphics));
-    mainMenu->load();
-    mainMenu->setOnNewGame([this]() {
-        _mainMenu->resetFocus();
-
-        withLoadingScreen([this]() {
-            if (!_classesGui) loadClassSelectionGui();
-
-            if (_music) {
-                _music->stop();
-            }
-            switch (_version) {
-                case GameVersion::TheSithLords:
-                    _music = playMusic("mus_main");
-                    break;
-                default:
-                    _music = playMusic("mus_theme_rep");
-                    break;
-            }
-            _screen = GameScreen::ClassSelection;
-        });
-    });
-    mainMenu->setOnExit([this]() { _quit = true; });
-    mainMenu->setOnModuleSelected([this](const string &name) {
-        PartyConfiguration party;
-        party.memberCount = 2;
-        party.leader.equipment.push_back("g_a_clothes01");
-        party.member1.equipment.push_back("g_a_clothes01");
-
-        switch (_version) {
-            case GameVersion::TheSithLords:
-                party.leader.appearance = kAppearanceAtton;
-                party.member1.appearance = kAppearanceKreia;
-                break;
-            default:
-                party.leader.appearance = kAppearanceCarth;
-                party.member1.appearance = kAppearanceBastila;
-                break;
-        }
-
-        loadModule(name, party);
-    });
-    _mainMenu = move(mainMenu);
-}
-
-void Game::withLoadingScreen(const function<void()> &fn) {
-    if (!_loadingScreen) loadLoadingScreen();
-
-    _screen = GameScreen::Loading;
-
-    drawAll();
-    fn();
-}
-
-void Game::loadClassSelectionGui() {
-    unique_ptr<ClassSelectionGui> gui(new ClassSelectionGui(_version, _options.graphics));
-    gui->load();
-    gui->setOnClassSelected([this](const CreatureConfiguration &character) {
-        _classesGui->resetFocus();
-        if (!_portraitsGui) loadPortraitsGui();
-
-        _portraitsGui->loadPortraits(character);
-        _screen = GameScreen::PortraitSelection;
-    });
-    gui->setOnCancel([this]() {
-        _classesGui->resetFocus();
-        _screen = GameScreen::MainMenu;
-    });
-    _classesGui = move(gui);
-}
-
-void Game::loadPortraitsGui() {
-    unique_ptr<PortraitSelectionGui> gui(new PortraitSelectionGui(_version, _options.graphics));
-    gui->load();
-    gui->setOnPortraitSelected([this](const CreatureConfiguration &character) {
-        _portraitsGui->resetFocus();
-        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
-
-        PartyConfiguration party;
-        party.memberCount = 1;
-        party.leader = character;
-
-        loadModule(moduleName, party);
-    });
-    gui->setOnCancel([this]() {
-        _screen = GameScreen::ClassSelection;
-    });
-    _portraitsGui = move(gui);
-}
-
-void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
-    info("Game: load module: " + name);
-
-    withLoadingScreen([this, &name, &party, &entry]() {
-        Resources.loadModule(name);
-
-        shared_ptr<GffStruct> ifo(Resources.findGFF("module", ResourceType::ModuleInfo));
-
-        _module = _objectFactory->newModule();
-        configureModule();
-
-        _module->load(name, *ifo);
-        _module->area()->setOnCameraChanged([this](CameraType type) {
-            _window.setRelativeMouseMode(type == CameraType::FirstPerson);
-        });
-        _module->loadParty(party, entry);
-        _module->area()->loadState(_state);
-
-        if (_music) {
-            _music->stop();
-        }
-        string musicName(_module->area()->music());
-        if (!musicName.empty()) {
-            _music = playMusic(musicName);
-        }
-
-        if (!_hud) loadHUD();
-        if (!_debugOverlay) loadDebugOverlay();
-        if (!_dialogGui) loadDialogGui();
-        if (!_targetOverlay) loadTargetOverlay();
-
-        _ticks = SDL_GetTicks();
-        _screen = GameScreen::InGame;
-    });
+void Game::startDialog(uint32_t ownerId, const string &resRef) {
+    _screen = GameScreen::Dialog;
+    _dialogGui->startDialog(ownerId, resRef);
 }
 
 void Game::loadHUD() {
-    unique_ptr<HUD> hud(new HUD(_version, _options.graphics));
-    hud->load();
-    hud->setOnEquipmentClick([this]() {
-        if (!_equipmentGui) loadEquipmentGui();
-
-        _hud->resetFocus();
-
-        shared_ptr<SpatialObject> player(_module->area()->player());
-        _equipmentGui->open(player.get());
-
-        _screen = GameScreen::Equipment;
-    });
-
-    _hud = move(hud);
+    _hud.reset(new HUD(_version, _options.graphics));
+    _hud->load();
+    _hud->setOnEquipmentClick(bind(&Game::onEquipmentClick, this));
 }
 
-void Game::loadDebugOverlay() {
-    unique_ptr<DebugOverlay> debug(new DebugOverlay(_options.graphics));
-    debug->load();
-    _debugOverlay = move(debug);
+void Game::onEquipmentClick() {
+    _hud->resetFocus();
+
+    shared_ptr<SpatialObject> player(_module->area()->player());
+    _equipmentGui->open(player.get());
+
+    _screen = GameScreen::Equipment;
 }
 
 void Game::loadDialogGui() {
-    unique_ptr<DialogGui> dialog(new DialogGui(_version, _options.graphics));
-    dialog->load();
-    dialog->setPickReplyEnabled(_pickDialogReplyEnabled);
-    dialog->setGetObjectIdByTagFunc([this](const string &tag) {
+    _dialogGui.reset(new DialogGui(_version, _options.graphics));
+    _dialogGui->load();
+    _dialogGui->setPickReplyEnabled(_pickDialogReplyEnabled);
+    _dialogGui->setGetObjectIdByTagFunc([this](const string &tag) {
         shared_ptr<Object> object(_module->area()->find(tag));
         return object ? object->id() : 0;
     });
-    dialog->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
-    dialog->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
-    dialog->setOnDialogFinished(bind(&Game::onDialogFinished, this));
-    _dialogGui = move(dialog);
-}
-
-void Game::loadContainerGui() {
-    unique_ptr<ContainerGui> container(new ContainerGui(_version, _options.graphics));
-    container->load();
-    container->setOnGetItems([this]() {
-        shared_ptr<SpatialObject> player(_module->area()->player());
-
-        SpatialObject &container = _containerGui->container();
-        container.moveItemsTo(*player);
-
-        Placeable *placeable = dynamic_cast<Placeable *>(&container);
-        if (placeable) {
-            string script;
-            if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
-                runScript(script, placeable->id(), player->id(), -1);
-            }
-        }
-        _screen = GameScreen::InGame;
-    });
-    container->setOnClose([this]() {
-        _screen = GameScreen::InGame;
-    });
-    _containerGui = move(container);
+    _dialogGui->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
+    _dialogGui->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
+    _dialogGui->setOnDialogFinished(bind(&Game::onDialogFinished, this));
 }
 
 void Game::onDialogReplyPicked(uint32_t index) {
@@ -498,77 +384,166 @@ void Game::onDialogFinished() {
     _screen = GameScreen::InGame;
 }
 
-void Game::configureModule() {
-    _module->setOnModuleTransition([this](const string &name, const string &entry) {
-        _nextModule = name;
-        _nextEntry = entry;
-    });
-    _module->setStartDialog([this](const Object &owner, const string &resRef) {
-        startDialog(owner.id(), resRef);
-    });
-    _module->setOpenContainer([this](SpatialObject *object) {
-        if (!_containerGui) loadContainerGui();
-
-        _containerGui->open(object);
-        _screen = GameScreen::Container;
-    });
+void Game::loadContainerGui() {
+    _containerGui.reset(new ContainerGui(_version, _options.graphics));
+    _containerGui->load();
+    _containerGui->setOnGetItems(bind(&Game::onGetItems, this));
+    _containerGui->setOnClose([this]() { _screen = GameScreen::InGame; });
 }
 
-void Game::startDialog(uint32_t ownerId, const string &resRef) {
-    _screen = GameScreen::Dialog;
-    _dialogGui->startDialog(ownerId, resRef);
+void Game::onGetItems() {
+    shared_ptr<SpatialObject> player(_module->area()->player());
+
+    SpatialObject &container = _containerGui->container();
+    container.moveItemsTo(*player);
+
+    Placeable *placeable = dynamic_cast<Placeable *>(&container);
+    if (placeable) {
+        string script;
+        if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
+            runScript(script, placeable->id(), player->id(), -1);
+        }
+    }
+    _screen = GameScreen::InGame;
 }
 
 void Game::loadEquipmentGui() {
-    unique_ptr<EquipmentGui> equip(new EquipmentGui(_version, _options.graphics));
-    equip->load();
-    equip->setOnClose([this]() {
+    _equipmentGui.reset(new EquipmentGui(_version, _options.graphics));
+    _equipmentGui->load();
+    _equipmentGui->setOnClose([this]() {
         _equipmentGui->resetFocus();
         _screen = GameScreen::InGame;
     });
-    _equipmentGui = move(equip);
 }
 
-void Game::loadTargetOverlay() {
-    unique_ptr<TargetOverlay> overlay(new TargetOverlay(_options.graphics));
-    overlay->load();
-    _targetOverlay = move(overlay);
+float Game::getDeltaTime() {
+    uint32_t ticks = SDL_GetTicks();
+    float dt = (ticks - _ticks) / 1000.0f;
+    _ticks = ticks;
+
+    return dt;
+}
+
+GUI *Game::getScreenGUI() const {
+    switch (_screen) {
+        case GameScreen::MainMenu:
+            return _mainMenu.get();
+        case GameScreen::Loading:
+            return _loadScreen.get();
+        case GameScreen::CharacterGeneration:
+            return _charGen.get();
+        case GameScreen::InGame:
+            return _hud.get();
+        case GameScreen::Dialog:
+            return _dialogGui.get();
+        case GameScreen::Container:
+            return _containerGui.get();
+        case GameScreen::Equipment:
+            return _equipmentGui.get();
+        default:
+            return nullptr;
+    }
+}
+
+void Game::configure() {
+}
+
+void Game::runMainLoop() {
+    _ticks = SDL_GetTicks();
+
+    while (!_quit) {
+        _window.processEvents(_quit);
+
+        update();
+        drawAll();
+    }
+}
+
+void Game::update() {
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    float dt = getDeltaTime();
+    _window.update(dt);
+
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->update(dt);
+    }
+    bool updModule = _screen == GameScreen::InGame || _screen == GameScreen::Dialog;
+
+    if (updModule && _module) {
+        GuiContext guiCtx;
+        _module->update(dt, guiCtx);
+
+        if (_module->area()->cameraType() == CameraType::ThirdPerson) {
+            _hud->setContext(guiCtx);
+        }
+    }
+}
+
+void Game::loadNextModule() {
+    JobExecutor &jobs = Jobs;
+    jobs.cancel();
+    jobs.await();
+
+    if (_module) {
+        _module->saveTo(_state);
+    }
+    _sceneGraph.clear();
+    loadModule(_nextModule, _state.party, _nextEntry);
+
+    _nextModule.clear();
+    _nextEntry.clear();
 }
 
 void Game::loadLoadingScreen() {
-    unique_ptr<LoadingScreen> screen(new LoadingScreen(_version, _options.graphics));
-    screen->load();
-
-    _loadingScreen = move(screen);
+    _loadScreen.reset(new LoadingScreen(_version, _options.graphics));
+    _loadScreen->load();
 }
 
-void Game::loadQuickOrCustom() {
-    unique_ptr<QuickOrCustom> quickOrCustom(new QuickOrCustom(_version, _options.graphics));
-    quickOrCustom->load();
-
-    _quickOrCustom = move(quickOrCustom);
+void Game::loadCharacterGeneration() {
+    _charGen.reset(new CharacterGeneration(_version, _options.graphics));
+    _charGen->load();
+    _charGen->setOnPlay(bind(&Game::onPlay, this, _1));
+    _charGen->setOnCancel(bind(&Game::openMainMenu, this));
 }
 
-void Game::loadCursor() {
-    Cursor cursor;
-    cursor.pressed = Resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = Resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
+void Game::onPlay(const CreatureConfiguration &config) {
+    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
-    _window.setCursor(cursor);
+    PartyConfiguration party;
+    party.memberCount = 1;
+    party.leader = config;
+
+    loadModule(moduleName, party);
+}
+
+void Game::deinitSubsystems() {
+    Jobs.deinit();
+    Routines.deinit();
+    TheAudioPlayer.deinit();
+    Resources.deinit();
+
+    _window.deinit();
 }
 
 bool Game::handle(const SDL_Event &event) {
+    GUI *gui = getScreenGUI();
+    if (gui && gui->handle(event)) {
+        return true;
+    }
     switch (_screen) {
         case GameScreen::InGame:
-            if (_console.handle(event)) return true;
-            if (_module->area()->cameraType() == CameraType::ThirdPerson && _hud->handle(event)) return true;
-            if (_module->handle(event)) return true;
+            if (_console.handle(event)) {
+                return true;
+            }
+            if (_module->handle(event)) {
+                return true;
+            }
             break;
-        default: {
-            shared_ptr<GUI> gui(currentGUI());
-            if (gui && gui->handle(event)) return true;
+        default:
             break;
-        }
     }
 
     return false;
@@ -579,35 +554,33 @@ shared_ptr<Module> Game::module() const {
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
-    auto it = _state.globalBooleans.find(name);
-    return it != _state.globalBooleans.end() ? it->second : false;
+    auto maybeValue = _state.globalBooleans.find(name);
+    return maybeValue != _state.globalBooleans.end() ? maybeValue->second : false;
 }
 
 int Game::getGlobalNumber(const string &name) const {
-    auto it = _state.globalNumbers.find(name);
-    return it != _state.globalNumbers.end() ? it->second : 0;
+    auto maybeValue = _state.globalNumbers.find(name);
+    return maybeValue != _state.globalNumbers.end() ? maybeValue->second : 0;
 }
 
 bool Game::getLocalBoolean(uint32_t objectId, int index) const {
-    assert(index >= 0);
+    auto maybeObject = _state.localBooleans.find(objectId);
+    if (maybeObject == _state.localBooleans.end()) return false;
 
-    auto objectIt = _state.localBooleans.find(objectId);
-    if (objectIt == _state.localBooleans.end()) return false;
+    auto maybeValue = maybeObject->second.find(index);
+    if (maybeValue == maybeObject->second.end()) return false;
 
-    auto boolIt = objectIt->second.find(index);
-    if (boolIt == objectIt->second.end()) return false;
-
-    return boolIt->second;
+    return maybeValue->second;
 }
 
 int Game::getLocalNumber(uint32_t objectId, int index) const {
-    auto objectIt = _state.localNumbers.find(objectId);
-    if (objectIt == _state.localNumbers.end()) return 0;
+    auto maybeObject = _state.localNumbers.find(objectId);
+    if (maybeObject == _state.localNumbers.end()) return 0;
 
-    auto numberIt = objectIt->second.find(index);
-    if (numberIt == objectIt->second.end()) return 0;
+    auto maybeValue = maybeObject->second.find(index);
+    if (maybeValue == maybeObject->second.end()) return 0;
 
-    return numberIt->second;
+    return maybeValue->second;
 }
 
 void Game::setGlobalBoolean(const string &name, bool value) {
@@ -619,12 +592,10 @@ void Game::setGlobalNumber(const string &name, int value) {
 }
 
 void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
-    assert(index >= 0);
     _state.localBooleans[objectId][index] = value;
 }
 
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
-    assert(index >= 0);
     _state.localBooleans[objectId][index] = value;
 }
 

@@ -17,34 +17,23 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../resource/types.h"
-
-#include "../types.h"
+#include "../../../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-class PortraitSelectionGui : public gui::GUI {
+class NameGui : public gui::GUI {
 public:
-    PortraitSelectionGui(resource::GameVersion version, const render::GraphicsOptions &opts);
+    NameGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
-    void loadPortraits(const CreatureConfiguration &info);
-
-    void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);
-    void setOnCancel(const std::function<void()> &fn);
+    void setOnEnd(const std::function<void()> &fn);
+    void setOnBack(const std::function<void()> &fn);
 
 private:
-    CreatureConfiguration _character;
-    std::vector<Portrait> _portraits;
-    int _currentPortrait { 0 };
-    std::function<void(const CreatureConfiguration &)> _onPortraitSelected;
-    std::function<void()> _onCancel;
+    std::function<void()> _onEnd;
+    std::function<void()> _onBack;
 
-    void setButtonColors(const std::string &tag);
-    void loadCurrentPortrait();
     void onClick(const std::string &control) override;
 };
 

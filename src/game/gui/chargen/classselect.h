@@ -17,19 +17,19 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../resource/types.h"
+#include "../../../gui/gui.h"
+#include "../../../resource/types.h"
 
-#include "../object/objectfactory.h"
-#include "../types.h"
+#include "../../object/objectfactory.h"
+#include "../../types.h"
 
 namespace reone {
 
 namespace game {
 
-class ClassSelectionGui : public gui::GUI {
+class ClassSelection : public gui::GUI {
 public:
-    ClassSelectionGui(resource::GameVersion version, const render::GraphicsOptions &opts);
+    ClassSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load();
 

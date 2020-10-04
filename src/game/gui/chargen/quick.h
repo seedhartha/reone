@@ -15,16 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "label.h"
+#pragma once
+
+#include "../../../gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-Label::Label() : Control(ControlType::Label) {
-    _focusable = false;
-}
+class QuickCharacterGeneration : public gui::GUI {
+public:
+    QuickCharacterGeneration(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-} // namespace gui
+    void load() override;
+
+    void setStep(int step);
+
+    void setOnStepSelected(const std::function<void(int)> &fn);
+    void setOnCancel(const std::function<void()> &fn);
+
+private:
+    int _step { 0 };
+
+    std::function<void(int)> _onStepSelected;
+    std::function<void()> _onCancel;
+
+    void onClick(const std::string &control) override;
+};
+
+} // namespace game
 
 } // namespace reone

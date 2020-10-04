@@ -627,16 +627,16 @@ void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     if (hilightedObjectId != -1) {
         glm::vec3 coords(getSelectableScreenCoords(hilightedObjectId, updateCtx));
         if (coords.z < 1.0f) {
-            guiCtx.target.hasHilighted = true;
-            guiCtx.target.hilightedScreenCoords = coords;
+            guiCtx.selection.hasHilighted = true;
+            guiCtx.selection.hilightedScreenCoords = coords;
         }
     }
     int selectedObjectId = _objectSelector.selectedObjectId();
     if (selectedObjectId != -1) {
         glm::vec3 coords(getSelectableScreenCoords(selectedObjectId, updateCtx));
         if (coords.z < 1.0f) {
-            guiCtx.target.hasSelected = true;
-            guiCtx.target.selectedScreenCoords = coords;
+            guiCtx.selection.hasSelected = true;
+            guiCtx.selection.selectedScreenCoords = coords;
         }
     }
     addDebugInfo(updateCtx, guiCtx);

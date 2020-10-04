@@ -40,6 +40,6 @@ private:
     JobExecutor() = default;
 };
 
-#define TheJobExecutor JobExecutor::instance()
+#define Jobs JobExecutor::instance()
 
 } // namespace reone

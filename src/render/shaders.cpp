@@ -131,6 +131,8 @@ static const GLchar kGUIFragmentShader[] = R"END(
 uniform sampler2D uTexture;
 uniform vec3 uColor;
 uniform float uAlpha;
+uniform bool uDiscardEnabled;
+uniform vec3 uDiscardColor;
 
 in vec2 fragTexCoords;
 
@@ -139,7 +141,12 @@ layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     vec4 textureSample = texture(uTexture, fragTexCoords);
-    fragColor = vec4(uColor * textureSample.rgb, uAlpha * textureSample.a);
+    vec3 finalColor = uColor * textureSample.rgb;
+
+    if (uDiscardEnabled && length(uDiscardColor - finalColor) < 0.01) {
+        discard;
+    }
+    fragColor = vec4(finalColor, uAlpha * textureSample.a);
     fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
 }
 )END";
@@ -424,6 +431,7 @@ void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
     setUniform("uSkeletalEnabled", locals.features.skeletalEnabled);
     setUniform("uLightingEnabled", locals.features.lightingEnabled);
     setUniform("uSelfIllumEnabled", locals.features.selfIllumEnabled);
+    setUniform("uDiscardEnabled", locals.features.discardEnabled);
 
     if (locals.features.lightmapEnabled) {
         setUniform("uLightmap", locals.textures.lightmap);
@@ -463,6 +471,9 @@ void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
     }
     if (locals.features.bloomEnabled) {
         setUniform("uBloom", locals.textures.bloom);
+    }
+    if (locals.features.discardEnabled) {
+        setUniform("uDiscardColor", locals.discardColor);
     }
 }
 

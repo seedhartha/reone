@@ -64,6 +64,10 @@ void MainMenu::load() {
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
 
+    setControlDisabled("BTN_LOADGAME", true);
+    setControlDisabled("BTN_MOVIES", true);
+    setControlDisabled("BTN_OPTIONS", true);
+
     if (getDebugLevel() == 0) {
         hideControl("BTN_WARP");
     }

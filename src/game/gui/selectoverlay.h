@@ -18,9 +18,11 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "../../render/font.h"
+#include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
+
+#include "../../render/texture.h"
 #include "../../render/types.h"
 
 #include "../types.h"
@@ -29,19 +31,22 @@ namespace reone {
 
 namespace game {
 
-class DebugOverlay {
+class SelectionOverlay {
 public:
-    DebugOverlay(const render::GraphicsOptions &opts);
+    SelectionOverlay(const render::GraphicsOptions &opts);
 
     void load();
-    void update(const DebugContext &ctx);
-
     void render() const;
+
+    void setContext(const SelectionContext &ctx);
 
 private:
     render::GraphicsOptions _opts;
-    std::shared_ptr<render::Font> _font;
-    std::vector<DebugObject> _objects;
+    std::shared_ptr<render::Texture> _friendlyReticle;
+    std::shared_ptr<render::Texture> _friendlyReticle2;
+    SelectionContext _context;
+
+    void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
 };
 
 } // namespace game

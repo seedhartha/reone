@@ -30,7 +30,9 @@ namespace reone {
 
 namespace game {
 
-HUD::HUD(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+HUD::HUD(GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts), _debug(opts), _select(opts) {
+
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
@@ -39,6 +41,8 @@ HUD::HUD(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) 
 
 void HUD::load() {
     GUI::load();
+    _debug.load();
+    _select.load();
 
     hideControl("BTN_CLEARALL");
     hideControl("BTN_TARGET0");
@@ -132,45 +136,10 @@ void HUD::load() {
     hideControl("BTN_ACTIONDOWN5");
 }
 
-void HUD::update(const HudContext &ctx) {
-    size_t partySize = ctx.partyPortraits.size();
-    if (partySize > 0) {
-        Control &label = getControl("LBL_CHAR1");
-        label.border().fill = ctx.partyPortraits[0];
-        label.setVisible(true);
-
-        showControl("LBL_BACK1");
-    } else {
-        hideControl("LBL_CHAR1");
-        hideControl("LBL_BACK1");
-    }
-
-    if (partySize > 1) {
-        Control &label = getControl("LBL_CHAR3");
-        label.border().fill = ctx.partyPortraits[1];
-        label.setVisible(true);
-
-        showControl("LBL_BACK3");
-    } else {
-        hideControl("LBL_CHAR3");
-        hideControl("LBL_BACK3");
-    }
-
-    if (partySize > 2) {
-        Control &label = getControl("LBL_CHAR2");
-        label.border().fill = ctx.partyPortraits[2];
-        label.setVisible(true);
-
-        showControl("LBL_CHAR2");
-        showControl("LBL_BACK2");
-    } else {
-        hideControl("LBL_CHAR2");
-        hideControl("LBL_BACK2");
-    }
-}
-
-void HUD::setOnEquipmentClick(const function<void()> &fn) {
-    _onEquipmentClick = fn;
+void HUD::render() const {
+    GUI::render();
+    _select.render();
+    _debug.render();
 }
 
 void HUD::onClick(const string &control) {
@@ -179,6 +148,47 @@ void HUD::onClick(const string &control) {
             _onEquipmentClick();
         }
     }
+}
+
+void HUD::setContext(const GuiContext &ctx) {
+    size_t partySize = ctx.hud.partyPortraits.size();
+    if (partySize > 0) {
+        Control &label = getControl("LBL_CHAR1");
+        label.border().fill = ctx.hud.partyPortraits[0];
+        label.setVisible(true);
+
+        showControl("LBL_BACK1");
+    } else {
+        hideControl("LBL_CHAR1");
+        hideControl("LBL_BACK1");
+    }
+    if (partySize > 1) {
+        Control &label = getControl("LBL_CHAR3");
+        label.border().fill = ctx.hud.partyPortraits[1];
+        label.setVisible(true);
+
+        showControl("LBL_BACK3");
+    } else {
+        hideControl("LBL_CHAR3");
+        hideControl("LBL_BACK3");
+    }
+    if (partySize > 2) {
+        Control &label = getControl("LBL_CHAR2");
+        label.border().fill = ctx.hud.partyPortraits[2];
+        label.setVisible(true);
+
+        showControl("LBL_CHAR2");
+        showControl("LBL_BACK2");
+    } else {
+        hideControl("LBL_CHAR2");
+        hideControl("LBL_BACK2");
+    }
+    _select.setContext(ctx.selection);
+    _debug.setContext(ctx.debug);
+}
+
+void HUD::setOnEquipmentClick(const function<void()> &fn) {
+    _onEquipmentClick = fn;
 }
 
 } // namespace game

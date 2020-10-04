@@ -54,6 +54,10 @@ string Control::getTag(const GffStruct &gffs) {
     return gffs.getString("TAG");
 }
 
+string Control::getParent(const GffStruct &gffs) {
+    return gffs.getString("Obj_Parent");
+}
+
 unique_ptr<Control> Control::of(ControlType type, const string &tag) {
     unique_ptr<Control> control;
     switch (type) {
@@ -153,7 +157,7 @@ void Control::loadText(const GffStruct &gffs) {
     _text.font = resources.findFont(gffs.getString("FONT"));
 
     int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? "" : resources.getString(strRef).text;
+    _text.text = strRef == -1 ? gffs.getString("TEXT") : resources.getString(strRef).text;
 
     _text.color = gffs.getVector("COLOR");
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
@@ -164,7 +168,7 @@ void Control::loadHilight(const GffStruct &gffs) {
     string edge(gffs.getString("EDGE"));
     string fill(gffs.getString("FILL"));
 
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = Resources;
     _hilight = make_shared<Border>();
 
     if (!corner.empty()) {
@@ -215,7 +219,7 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
 
     glm::ivec2 size(_extent.width, _extent.height);
 
-    if (_focus && _hilight) {
+    if (_hilight && _focus) {
         drawBorder(*_hilight, offset, size);
     } else if (_border) {
         drawBorder(*_border, offset, size);
@@ -249,6 +253,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             LocalUniforms locals;
             locals.model = move(transform);
+            locals.features.discardEnabled = _discardEnabled;
+            locals.discardColor = _discardColor;
 
             shaders.activate(ShaderProgram::GUIGUI, locals);
         }
@@ -526,16 +532,28 @@ const Control::Text &Control::text() const {
     return _text;
 }
 
+bool Control::isFocusable() const {
+    return _focusable;
+}
+
 bool Control::isVisible() const {
     return _visible;
 }
 
-bool Control::isInteractive() const {
-    return _interactive;
+bool Control::isDisabled() const {
+    return _disabled;
+}
+
+void Control::setFocusable(bool focusable) {
+    _focusable = focusable;
 }
 
 void Control::setVisible(bool visible) {
     _visible = visible;
+}
+
+void Control::setDisabled(bool disabled) {
+    _disabled = disabled;
 }
 
 void Control::setFocus(bool focus) {
@@ -583,6 +601,11 @@ void Control::setScene3D(unique_ptr<Scene3D> scene) {
 
 void Control::setPadding(int padding) {
     _padding = padding;
+}
+
+void Control::setDiscardColor(const glm::vec3 &color) {
+    _discardEnabled = true;
+    _discardColor = color;
 }
 
 void Control::setOnClick(const function<void(const string &)> &fn) {

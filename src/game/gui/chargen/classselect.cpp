@@ -17,10 +17,10 @@
 
 #include "classselect.h"
 
-#include "../../resource/resources.h"
+#include "../../../resource/resources.h"
 
-#include "../characters.h"
-#include "../object/creature.h"
+#include "../../characters.h"
+#include "../../object/creature.h"
 
 using namespace std;
 
@@ -58,7 +58,7 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelectionGui::ClassSelectionGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+ClassSelection::ClassSelection(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
     _resRef = getResRef("classsel");
 
     switch (version) {
@@ -72,7 +72,7 @@ ClassSelectionGui::ClassSelectionGui(GameVersion version, const GraphicsOptions 
     }
 }
 
-void ClassSelectionGui::load() {
+void ClassSelection::load() {
     GUI::load();
     configureClassButtons();
     configureClassModels();
@@ -81,7 +81,7 @@ void ClassSelectionGui::load() {
     setButtonColors(backButton);
 }
 
-void ClassSelectionGui::configureClassButtons() {
+void ClassSelection::configureClassButtons() {
     int x, y;
 
     Control &button1 = getControl("BTN_SEL1");
@@ -120,7 +120,7 @@ void ClassSelectionGui::configureClassButtons() {
     setClassButtonEnlarged(0, false);
 }
 
-void ClassSelectionGui::setButtonColors(Control &control) {
+void ClassSelection::setButtonColors(Control &control) {
     Control::Border border(control.border());
     border.color = getBaseColor(_version);
     control.setBorder(move(border));
@@ -130,7 +130,7 @@ void ClassSelectionGui::setButtonColors(Control &control) {
     control.setHilight(move(hilight));
 }
 
-void ClassSelectionGui::setClassButtonEnlarged(int index, bool enlarged) {
+void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
     assert(index >= 0 && index < _classButtons.size());
 
     ClassButton &button = _classButtons[index];
@@ -145,7 +145,7 @@ void ClassSelectionGui::setClassButtonEnlarged(int index, bool enlarged) {
     control.setExtent(move(extent));
 }
 
-void ClassSelectionGui::configureClassModels() {
+void ClassSelection::configureClassModels() {
     switch (_version) {
         case GameVersion::TheSithLords:
             configureClassModel(0, Gender::Male, ClassType::JediConsular);
@@ -166,7 +166,7 @@ void ClassSelectionGui::configureClassModels() {
     }
 }
 
-void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType clazz) {
+void ClassSelection::configureClassModel(int index, Gender gender, ClassType clazz) {
     Control &control = getControl("3D_MODEL" + to_string(index + 1));
 
     Control::Extent extent(control.extent());
@@ -213,7 +213,7 @@ void ClassSelectionGui::configureClassModel(int index, Gender gender, ClassType 
     control.setScene3D(move(scene));
 }
 
-void ClassSelectionGui::onFocusChanged(const string &control, bool focus) {
+void ClassSelection::onFocusChanged(const string &control, bool focus) {
     int idx = getClassButtonIndexByTag(control);
     if (idx == -1) return;
 
@@ -234,7 +234,7 @@ void ClassSelectionGui::onFocusChanged(const string &control, bool focus) {
     getControl("LBL_DESC").setTextMessage(descText);
 }
 
-int ClassSelectionGui::getClassButtonIndexByTag(const string &tag) const {
+int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
     for (int i = 0; i < _classButtons.size(); ++i) {
         if (_classButtons[i].control->tag() == tag) {
             return i;
@@ -244,7 +244,7 @@ int ClassSelectionGui::getClassButtonIndexByTag(const string &tag) const {
     return -1;
 }
 
-void ClassSelectionGui::onClick(const string &control) {
+void ClassSelection::onClick(const string &control) {
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
         ClassButton &button = _classButtons[idx];
@@ -261,11 +261,11 @@ void ClassSelectionGui::onClick(const string &control) {
     }
 }
 
-void ClassSelectionGui::setOnClassSelected(const function<void(const CreatureConfiguration &)> &fn) {
+void ClassSelection::setOnClassSelected(const function<void(const CreatureConfiguration &)> &fn) {
     _onClassSelected = fn;
 }
 
-void ClassSelectionGui::setOnCancel(const function<void()> &fn) {
+void ClassSelection::setOnCancel(const function<void()> &fn) {
     _onCancel = fn;
 }
 
