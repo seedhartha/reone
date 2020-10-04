@@ -83,6 +83,7 @@ public:
 
     static ControlType getType(const resource::GffStruct &gffs);
     static std::string getTag(const resource::GffStruct &gffs);
+    static std::string getParent(const resource::GffStruct &gffs);
     static std::unique_ptr<Control> of(ControlType type, const std::string &tag);
 
     virtual ~Control() = default;
@@ -106,10 +107,13 @@ public:
     Border &border() const;
     const Border &hilight() const;
     const Text &text() const;
+    bool isFocusable() const;
     bool isVisible() const;
-    bool isInteractive() const;
+    bool isDisabled() const;
 
+    void setFocusable(bool focusable);
     void setVisible(bool visible);
+    void setDisabled(bool disabled);
     virtual void setFocus(bool focus);
     virtual void setExtent(const Extent &extent);
     void setBorder(const Border &border);
@@ -119,6 +123,7 @@ public:
     void setTextMessage(const std::string &text);
     void setScene3D(std::unique_ptr<Scene3D> scene);
     void setPadding(int padding);
+    void setDiscardColor(const glm::vec3 &color);
 
     void setOnClick(const std::function<void(const std::string &)> &fn);
     void setOnItemClicked(const std::function<void(const std::string &, const std::string &)> &fn);
@@ -135,8 +140,12 @@ protected:
     int _padding { 0 };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
+    bool _disabled { false };
     bool _focus { false };
-    bool _interactive { true };
+    bool _focusable { true };
+    bool _discardEnabled { false };
+    glm::vec3 _discardColor { false };
+
     std::function<void(const std::string &)> _onClick;
     std::function<void(const std::string &, const std::string &)> _onItemClicked;
 

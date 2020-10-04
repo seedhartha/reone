@@ -54,6 +54,7 @@ struct FeatureUniforms {
     bool selfIllumEnabled { false };
     bool blurEnabled { false };
     bool bloomEnabled { false };
+    bool discardEnabled { false };
 };
 
 struct TextureUniforms {
@@ -97,6 +98,7 @@ struct LocalUniforms {
     glm::vec3 color { 1.0f };
     float alpha { 1.0f };
     glm::vec3 selfIllumColor { 1.0f };
+    glm::vec3 discardColor { 0.0f };
 };
 
 class ShaderManager {

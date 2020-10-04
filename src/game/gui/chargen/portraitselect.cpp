@@ -17,10 +17,10 @@
 
 #include "portraitselect.h"
 
-#include "../../core/random.h"
-#include "../../resource/resources.h"
+#include "../../../core/random.h"
+#include "../../../resource/resources.h"
 
-#include "../types.h"
+#include "../../types.h"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-PortraitSelectionGui::PortraitSelectionGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+PortraitSelection::PortraitSelection(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
     _resRef = getResRef("portcust");
 
     switch (version) {
@@ -46,14 +46,14 @@ PortraitSelectionGui::PortraitSelectionGui(GameVersion version, const GraphicsOp
     }
 }
 
-void PortraitSelectionGui::load() {
+void PortraitSelection::load() {
     GUI::load();
 
     setButtonColors("BTN_ACCEPT");
     setButtonColors("BTN_BACK");
 }
 
-void PortraitSelectionGui::setButtonColors(const string &tag) {
+void PortraitSelection::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
@@ -65,10 +65,10 @@ void PortraitSelectionGui::setButtonColors(const string &tag) {
     control.setHilight(move(hilight));
 }
 
-void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
-    if (!_portraits.empty() && info.gender == _character.gender) return;
+void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
+    if (!_portraits.empty() && config.gender == _character.gender) return;
 
-    _character = info;
+    _character = config;
 
     shared_ptr<TwoDaTable> portraits(Resources.find2DA("portraits"));
     int sex = _character.gender == Gender::Female ? 1 : 0;
@@ -98,7 +98,7 @@ void PortraitSelectionGui::loadPortraits(const CreatureConfiguration &info) {
     loadCurrentPortrait();
 }
 
-void PortraitSelectionGui::loadCurrentPortrait() {
+void PortraitSelection::loadCurrentPortrait() {
     Control &control = getControl("LBL_PORTRAIT");
 
     Control::Border border(control.border());
@@ -107,7 +107,7 @@ void PortraitSelectionGui::loadCurrentPortrait() {
     control.setBorder(move(border));
 }
 
-void PortraitSelectionGui::onClick(const string &control) {
+void PortraitSelection::onClick(const string &control) {
     int portraitCount = static_cast<int>(_portraits.size());
 
     if (control == "BTN_ARRL") {
@@ -145,11 +145,11 @@ void PortraitSelectionGui::onClick(const string &control) {
     }
 }
 
-void PortraitSelectionGui::setOnPortraitSelected(const function<void(const CreatureConfiguration &)> &fn) {
+void PortraitSelection::setOnPortraitSelected(const function<void(const CreatureConfiguration &)> &fn) {
     _onPortraitSelected = fn;
 }
 
-void PortraitSelectionGui::setOnCancel(const function<void()> &fn) {
+void PortraitSelection::setOnCancel(const function<void()> &fn) {
     _onCancel = fn;
 }
 

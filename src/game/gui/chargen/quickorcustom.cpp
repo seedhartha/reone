@@ -17,6 +17,8 @@
 
 #include "quickorcustom.h"
 
+using namespace std;
+
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
@@ -26,8 +28,38 @@ namespace reone {
 namespace game {
 
 QuickOrCustom::QuickOrCustom(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
-    _resRef = getResRef("maincg");
-    _backgroundType = BackgroundType::Menu;
+    _resRef = getResRef("qorcpnl");
+
+    if (version == GameVersion::TheSithLords) {
+        _resolutionX = 800;
+        _resolutionY = 600;
+    }
+}
+
+void QuickOrCustom::load() {
+    GUI::load();
+
+    setControlDisabled("CUST_CHAR_BTN", true);
+}
+
+void QuickOrCustom::onClick(const string &control) {
+    if (control == "QUICK_CHAR_BTN") {
+        if (_onQuickChar) {
+            _onQuickChar();
+        }
+    } else if (control == "BTN_BACK") {
+        if (_onBack) {
+            _onBack();
+        }
+    }
+}
+
+void QuickOrCustom::setOnQuickCharacter(const function<void()> &fn) {
+    _onQuickChar = fn;
+}
+
+void QuickOrCustom::setOnBack(const function<void()> &fn) {
+    _onBack = fn;
 }
 
 } // namespace game

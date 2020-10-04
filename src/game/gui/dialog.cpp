@@ -67,7 +67,7 @@ void DialogGui::addBottomFrame() {
 }
 
 void DialogGui::addFrame(int top, int height) {
-    shared_ptr<Panel> frame(new Panel());
+    unique_ptr<Panel> frame(new Panel());
 
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "glm/mat4x4.hpp"
@@ -35,15 +36,28 @@ namespace gui {
 static const int kDefaultResolutionX = 640;
 static const int kDefaultResolutionY = 480;
 
-class GUI : public render::IEventHandler {
+class GUI {
 public:
     virtual void load();
-    bool handle(const SDL_Event &event) override;
-    void update(float dt);
-    void render() const;
-    void render3D() const;
+
+    virtual bool handle(const SDL_Event &event);
+    virtual void update(float dt);
+    virtual void render() const;
+    virtual void render3D() const;
 
     void resetFocus();
+
+    void configureRootContol(const std::function<void(Control &)> &fn);
+    void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
+    void showControl(const std::string &tag);
+    void hideControl(const std::string &tag);
+
+    void setControlFocusable(const std::string &tag, bool focusable);
+    void setControlDisabled(const std::string &tag, bool disabled);
+    void setControlText(const std::string &tag, const std::string &text);
+    void setControlFocus(const std::string &tag, bool focus);
+
+    Control &getControl(const std::string &tag) const;
 
 protected:
     enum class ScalingMode {
@@ -64,9 +78,10 @@ protected:
     glm::ivec2 _rootOffset { 0 };
     glm::ivec2 _controlOffset { 0 };
     std::shared_ptr<render::Texture> _background;
-    std::shared_ptr<Control> _rootControl;
-    std::vector<std::shared_ptr<Control>> _controls;
-    std::shared_ptr<Control> _focus;
+    std::unique_ptr<Control> _rootControl;
+    std::vector<std::unique_ptr<Control>> _controls;
+    std::unordered_map<std::string, Control *> _controlByTag;
+    Control *_focus { nullptr };
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
@@ -74,12 +89,6 @@ protected:
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
-    void configureRootContol(const std::function<void(Control &)> &fn);
-    void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
-    void showControl(const std::string &tag);
-    void hideControl(const std::string &tag);
-
-    Control &getControl(const std::string &tag) const;
 
     virtual bool handleKeyDown(SDL_Scancode key);
     virtual bool handleKeyUp(SDL_Scancode key);

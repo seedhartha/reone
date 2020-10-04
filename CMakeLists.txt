@@ -58,17 +58,20 @@ set(HEADERS
     src/game/collisiondetect.h
     src/game/console.h
     src/game/game.h
-    src/game/gui/classselect.h
+    src/game/gui/chargen/chargen.h
+    src/game/gui/chargen/classselect.h
+    src/game/gui/chargen/name.h
+    src/game/gui/chargen/portraitselect.h
+    src/game/gui/chargen/quick.h
+    src/game/gui/chargen/quickorcustom.h
     src/game/gui/container.h
-    src/game/gui/debug.h
+    src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
     src/game/gui/equip.h
     src/game/gui/hud.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
-    src/game/gui/portraitselect.h
-    src/game/gui/target.h
-    src/game/gui/quickorcustom.h
+    src/game/gui/selectoverlay.h
     src/game/mp/area.h
     src/game/mp/callbacks.h
     src/game/mp/command.h
@@ -195,18 +198,21 @@ set(SOURCES
     src/game/collisiondetect.cpp
     src/game/console.cpp
     src/game/game.cpp
-    src/game/gui/classselect.cpp
+    src/game/gui/chargen/chargen.cpp
+    src/game/gui/chargen/classselect.cpp
+    src/game/gui/chargen/name.cpp
+    src/game/gui/chargen/portraitselect.cpp
+    src/game/gui/chargen/quick.cpp
+    src/game/gui/chargen/quickorcustom.cpp
     src/game/gui/colors.cpp
     src/game/gui/container.cpp
-    src/game/gui/debug.cpp
+    src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
     src/game/gui/equip.cpp
     src/game/gui/hud.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
-    src/game/gui/portraitselect.cpp
-    src/game/gui/target.cpp
-    src/game/gui/quickorcustom.cpp
+    src/game/gui/selectoverlay.cpp
     src/game/mp/area.cpp
     src/game/mp/command.cpp
     src/game/mp/creature.cpp

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "selectoverlay.h"
 
 #include "GL/glew.h"
 
@@ -32,15 +32,15 @@ namespace reone {
 
 namespace game {
 
-TargetOverlay::TargetOverlay(const GraphicsOptions &opts) : _opts(opts) {
+SelectionOverlay::SelectionOverlay(const GraphicsOptions &opts) : _opts(opts) {
 }
 
-void TargetOverlay::load() {
+void SelectionOverlay::load() {
     _friendlyReticle = Resources.findTexture("friendlyreticle", TextureType::GUI);
     _friendlyReticle2 = Resources.findTexture("friendlyreticle2", TextureType::GUI);
 }
 
-void TargetOverlay::render() const {
+void SelectionOverlay::render() const {
     if (_context.hasHilighted) {
         drawReticle(*_friendlyReticle, _context.hilightedScreenCoords);
     }
@@ -49,7 +49,7 @@ void TargetOverlay::render() const {
     }
 }
 
-void TargetOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) const {
+void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) const {
     int width = texture.width();
     int height = texture.height();
 
@@ -70,7 +70,7 @@ void TargetOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords)
     texture.unbind();
 }
 
-void TargetOverlay::setContext(const TargetContext &ctx) {
+void SelectionOverlay::setContext(const SelectionContext &ctx) {
     _context = ctx;
 }
 

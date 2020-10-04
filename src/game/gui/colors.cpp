@@ -25,8 +25,10 @@ namespace game {
 
 static glm::vec3 g_kotorBaseColor(0.0f, 0.639216f, 0.952941f);
 static glm::vec3 g_kotorHilightColor(0.980392f, 1.0f, 0.0f);
+static glm::vec3 g_kotorDisabledColor(0.0f, 0.349020f, 0.549020f);
 static glm::vec3 g_tslBaseColor(0.192157f, 0.768627f, 0.647059f);
 static glm::vec3 g_tslHilightColor(0.768627f, 0.768627f, 0.686275f);
+static glm::vec3 g_tslDisabledColor(0.513725f, 0.513725f, 0.415686f);
 
 glm::vec3 getBaseColor(GameVersion version) {
     switch (version) {
@@ -43,6 +45,15 @@ glm::vec3 getHilightColor(GameVersion version) {
             return g_tslHilightColor;
         default:
             return g_kotorHilightColor;
+    }
+}
+
+glm::vec3 getDisabledColor(GameVersion version) {
+    switch (version) {
+        case GameVersion::TheSithLords:
+            return g_tslDisabledColor;
+        default:
+            return g_kotorDisabledColor;
     }
 }
 

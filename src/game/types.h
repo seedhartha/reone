@@ -39,9 +39,7 @@ enum class GameScreen {
     None,
     MainMenu,
     Loading,
-    ClassSelection,
-    QuickOrCustom,
-    PortraitSelection,
+    CharacterGeneration,
     InGame,
     Dialog,
     Container,
@@ -158,7 +156,7 @@ struct HudContext {
     std::vector<std::shared_ptr<render::Texture>> partyPortraits;
 };
 
-struct TargetContext {
+struct SelectionContext {
     bool hasHilighted { false };
     bool hasSelected { false };
     glm::vec3 hilightedScreenCoords { 0.0f };
@@ -177,7 +175,7 @@ struct DebugContext {
 
 struct GuiContext {
     HudContext hud;
-    TargetContext target;
+    SelectionContext selection;
     DebugContext debug;
 };
 
@@ -198,6 +196,7 @@ struct CameraStyle {
 
 glm::vec3 getBaseColor(resource::GameVersion version);
 glm::vec3 getHilightColor(resource::GameVersion version);
+glm::vec3 getDisabledColor(resource::GameVersion version);
 
 } // namespace game
 

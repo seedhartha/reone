@@ -15,16 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "label.h"
+#pragma once
+
+#include <memory>
+#include <vector>
+
+#include "../../render/font.h"
+#include "../../render/types.h"
+
+#include "../types.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-Label::Label() : Control(ControlType::Label) {
-    _focusable = false;
-}
+class DebugOverlay {
+public:
+    DebugOverlay(const render::GraphicsOptions &opts);
 
-} // namespace gui
+    void load();
+
+    void render() const;
+
+    void setContext(const DebugContext &ctx);
+
+private:
+    render::GraphicsOptions _opts;
+    std::shared_ptr<render::Font> _font;
+    std::vector<DebugObject> _objects;
+};
+
+} // namespace game
 
 } // namespace reone

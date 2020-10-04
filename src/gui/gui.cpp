@@ -59,6 +59,7 @@ void GUI::load() {
 
     _rootControl = Control::of(type, tag);
     _rootControl->load(*gui);
+    _controlByTag[tag] = _rootControl.get();
 
     switch (_scaling) {
         case ScalingMode::Center:
@@ -114,6 +115,7 @@ void GUI::stretchControl(Control &control) {
 void GUI::loadControl(const GffStruct &gffs) {
     ControlType type = Control::getType(gffs);
     string tag(Control::getTag(gffs));
+    string parent(Control::getParent(gffs));
 
     unique_ptr<Control> control(Control::of(type, tag));
     if (!control) return;
@@ -133,6 +135,7 @@ void GUI::loadControl(const GffStruct &gffs) {
             break;
     }
 
+    _controlByTag[tag] = control.get();
     _controls.push_back(move(control));
 }
 
@@ -144,11 +147,9 @@ void GUI::configureRootContol(const function<void(Control &)> &fn) {
 }
 
 void GUI::configureControl(const string &tag, const function<void(Control &)> &fn) {
-    for (auto &control : _controls) {
-        if (control->tag() == tag) {
-            fn(*control);
-            break;
-        }
+    auto maybeControl = _controlByTag.find(tag);
+    if (maybeControl != _controlByTag.end()) {
+        fn(*maybeControl->second);
     }
 }
 
@@ -207,13 +208,15 @@ void GUI::updateFocus(int x, int y) {
     resetFocus();
 
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
-        shared_ptr<Control> control(*it);
-        if (!control->isVisible() || !control->isInteractive()) continue;
+        if (!(*it)->isVisible() || (*it)->isDisabled()) continue;
 
-        const Control::Extent &extent = control->extent();
+        const Control::Extent &extent = (*it)->extent();
         if (extent.contains(x, y)) {
-            _focus = control;
-            _focus->setFocus(true);
+            _focus = (*it).get();
+
+            if (_focus->isFocusable()) {
+                _focus->setFocus(true);
+            }
             onFocusChanged(_focus->tag(), true);
             return;
         }
@@ -246,6 +249,7 @@ void GUI::render3D() const {
 
 void GUI::drawBackground() const {
     glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -0.9));
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     LocalUniforms locals;
@@ -263,35 +267,43 @@ void GUI::drawBackground() const {
 
 void GUI::resetFocus() {
     if (_focus) {
-        _focus->setFocus(false);
+        if (_focus->isFocusable()) {
+            _focus->setFocus(false);
+        }
         onFocusChanged(_focus->tag(), false);
         _focus = nullptr;
     }
 }
 
 void GUI::showControl(const string &tag) {
-    for (auto &control : _controls) {
-        if (control->tag() == tag) {
-            control->setVisible(true);
-            return;
-        }
-    }
+    configureControl(tag, [](Control &ctrl) { ctrl.setVisible(true); });
 }
 
 void GUI::hideControl(const string &tag) {
-    for (auto &control : _controls) {
-        if (control->tag() == tag) {
-            control->setVisible(false);
-            return;
-        }
-    }
+    configureControl(tag, [](Control &ctrl) { ctrl.setVisible(false); });
+}
+
+void GUI::setControlFocusable(const string &tag, bool focusable) {
+    configureControl(tag, [&focusable](Control &ctrl) { ctrl.setFocusable(focusable); });
+}
+
+void GUI::setControlDisabled(const string &tag, bool disabled) {
+    configureControl(tag, [&disabled](Control &ctrl) { ctrl.setDisabled(disabled); });
+}
+
+void GUI::setControlText(const string &tag, const string &text) {
+    configureControl(tag, [&text](Control &ctrl) { ctrl.setTextMessage(text); });
+}
+
+void GUI::setControlFocus(const string &tag, bool focus) {
+    configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
 }
 
 Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),
         _controls.end(),
-        [&tag](const shared_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
+        [&tag](const unique_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
 
     return **it;
 }

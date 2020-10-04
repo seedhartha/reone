@@ -26,17 +26,13 @@
 #include "../resource/types.h"
 
 #include "console.h"
-#include "gui/classselect.h"
+#include "gui/chargen/chargen.h"
 #include "gui/container.h"
-#include "gui/debug.h"
 #include "gui/dialog.h"
 #include "gui/equip.h"
 #include "gui/hud.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
-#include "gui/portraitselect.h"
-#include "gui/target.h"
-#include "gui/quickorcustom.h"
 #include "object/area.h"
 #include "object/module.h"
 #include "types.h"
@@ -86,7 +82,7 @@ protected:
     std::shared_ptr<Module> _module;
     std::string _nextModule;
     GameScreen _screen { GameScreen::MainMenu };
-    std::shared_ptr<DialogGui> _dialogGui;
+    std::unique_ptr<DialogGui> _dialogGui;
     bool _pickDialogReplyEnabled { true };
 
     virtual void initObjectFactory();
@@ -95,8 +91,13 @@ protected:
     virtual void update();
     virtual void loadNextModule();
     virtual void startDialog(uint32_t ownerId, const std::string &resRef);
+
+    // Event handlers
+
     virtual void onDialogReplyPicked(uint32_t index);
     virtual void onDialogFinished();
+
+    // END Event handlers
 
 private:
     boost::filesystem::path _path;
@@ -110,27 +111,22 @@ private:
 
     // GUI
 
-    std::shared_ptr<MainMenu> _mainMenu;
-    std::shared_ptr<ClassSelectionGui> _classesGui;
-    std::shared_ptr<PortraitSelectionGui> _portraitsGui;
-    std::shared_ptr<HUD> _hud;
-    std::shared_ptr<DebugOverlay> _debugOverlay;
-    std::shared_ptr<ContainerGui> _containerGui;
-    std::shared_ptr<EquipmentGui> _equipmentGui;
-    std::shared_ptr<TargetOverlay> _targetOverlay;
-    std::shared_ptr<LoadingScreen> _loadingScreen;
-    std::shared_ptr<QuickOrCustom> _quickOrCustom;
+    std::unique_ptr<MainMenu> _mainMenu;
+    std::unique_ptr<LoadingScreen> _loadScreen;
+    std::unique_ptr<CharacterGeneration> _charGen;
+    std::unique_ptr<HUD> _hud;
+    std::unique_ptr<ContainerGui> _containerGui;
+    std::unique_ptr<EquipmentGui> _equipmentGui;
 
     // END GUI
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
+    void openMainMenu();
     void runMainLoop();
-    std::shared_ptr<gui::GUI> currentGUI() const;
     float getDeltaTime();
-    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
-    void withLoadingScreen(const std::function<void()> &fn);
+    gui::GUI *getScreenGUI() const;
 
     // Initialization
 
@@ -142,18 +138,15 @@ private:
 
     // Loading
 
+    void loadResources();
+    void loadCursor();
     void loadMainMenu();
-    void loadClassSelectionGui();
-    void loadPortraitsGui();
+    void loadLoadingScreen();
+    void loadCharacterGeneration();
     void loadHUD();
-    void loadDebugOverlay();
     void loadDialogGui();
     void loadContainerGui();
-    void loadCursor();
     void loadEquipmentGui();
-    void loadTargetOverlay();
-    void loadLoadingScreen();
-    void loadQuickOrCustom();
 
     // END Loading
 
@@ -165,6 +158,23 @@ private:
     void drawCursor();
 
     // END Rendering
+
+    // Event handlers
+
+    void onNewGame();
+    void onModuleSelected(const std::string &name);
+    void onPlay(const CreatureConfiguration &config);
+    void onEquipmentClick();
+    void onGetItems();
+    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
+
+    // END Event handlers
+
+    // Helper methods
+
+    void withLoadingScreen(const std::function<void()> &block);
+
+    // END Helper methods
 };
 
 } // namespace game

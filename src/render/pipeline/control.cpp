@@ -64,11 +64,16 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
     // Render control
     {
         glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 0.0f));
+        transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 100.0f));
         transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
 
         GlobalUniforms globals;
-        globals.projection = glm::ortho(0.0f, static_cast<float>(viewport[2]), static_cast<float>(viewport[3]), 0.0f);
+        globals.projection = glm::ortho(
+            0.0f,
+            static_cast<float>(viewport[2]),
+            static_cast<float>(viewport[3]),
+            0.0f,
+            -100.0f, 100.0f);
 
         shaders.setGlobalUniforms(globals);
 

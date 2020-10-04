@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "debug.h"
+#include "debugoverlay.h"
 
 #include "../../resource/resources.h"
 
@@ -40,7 +40,7 @@ void DebugOverlay::load() {
     assert(_font);
 }
 
-void DebugOverlay::update(const DebugContext &ctx) {
+void DebugOverlay::setContext(const DebugContext &ctx) {
     _objects = ctx.objects;
 }
 

@@ -42,10 +42,11 @@ LoadingScreen::LoadingScreen(GameVersion version, const GraphicsOptions &opts) :
 void LoadingScreen::load() {
     GUI::load();
 
-    configureRootContol([this](Control &control) {
+    configureRootContol([this](Control &ctrl) {
         string resRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
-        control.setBorderFill(resRef);
+        ctrl.setBorderFill(resRef);
     });
+    setControlText("LBL_HINT", "");
 }
 
 } // namespace game
