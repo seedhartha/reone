@@ -6,17 +6,16 @@
 reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. We aim to provide an engine that is flexible and modern, and can be used to:
 
 * Play KotOR and TSL from beginning to end
-* Do all sorts of experiments using original games assets
-* Create total conversion mods
+* Create mods that drastically change the gameplay or improve the visuals
 
 Currently, the most fundamental engine subsystems are already implemented. Actual gameplay, however, is very limited. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
-## Similar projects
+## Similar Projects
 
 reone is not the only project aiming to reimplement the Odyssey engine – there are at least four alternatives:
 
-* [xoreos](https://github.com/xoreos/xoreos) – a more established and a much more ambitious project, which I had contributed to and use alot as a reference. However, it is not very active anymore and I find it to be too complex and unoptimized for my taste.
-* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a JavaScript-based remake.
+* [xoreos](https://github.com/xoreos/xoreos) – a more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, not very active anymore, and I find it to be too complex and unoptimized for my taste.
+* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a fascinating JavaScript-based remake.
 * [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – a Unity-based reimplementation.
 * The Northern Lights by [Lachlan O'Neill](https://github.com/lachjames) – another Unity-based reimplementation and a level editor.
 
@@ -24,7 +23,7 @@ reone is not the only project aiming to reimplement the Odyssey engine – there
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
-To run a game using reone, you must legally own it – we do not endorse piracy. Nowadays both games can be downloaded from [Steam](https://store.steampowered.com/) or [GOG.com](https://www.gog.com/). Keep in mind that reone is tested against vanilla versions of the games – mod support is not guaranteed.
+To run a game using reone, you must legally own it – we do not endorse piracy. Nowadays both games can be downloaded from Steam or GOG.com. Keep in mind that reone is tested against vanilla versions of the games – mod support is not guaranteed.
 
 Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
 
