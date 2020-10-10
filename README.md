@@ -38,7 +38,13 @@ reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> 
 
 reone is not the only project aiming to reimplement the Odyssey engine – there are at least four alternatives:
 
-* [xoreos](https://github.com/xoreos/xoreos) – a more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, not very active anymore, and I find it to be too complex and unoptimized for my taste.
+* [xoreos](https://github.com/xoreos/xoreos) – a more ambitious and a more established project, which I had contributed to and use alot as a reference.
 * [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a fascinating JavaScript-based remake.
 * [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – a Unity-based reimplementation.
 * The Northern Lights by [Lachlan O'Neill](https://github.com/lachjames) – another Unity-based reimplementation and a level editor.
+
+In contrast, this is what reone offers:
+
+* Written in C++ – potentially faster than Unity (C#) and JavaScript implementations.
+* Modern codebase – C++14, OpenGL 3.3, no legacy code (e.g., multiple rendering paths in xoreos).
+* KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora Engine games.
