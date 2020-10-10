@@ -108,6 +108,7 @@ public:
     const Border &hilight() const;
     const Text &text() const;
     bool isFocusable() const;
+    bool isClickable() const;
     bool isVisible() const;
     bool isDisabled() const;
 
@@ -118,6 +119,7 @@ public:
     virtual void setExtent(const Extent &extent);
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
+    void setBorderColor(const glm::vec3 &color);
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);
     void setText(const Text &text);
@@ -144,6 +146,7 @@ protected:
     bool _disabled { false };
     bool _focus { false };
     bool _focusable { true };
+    bool _clickable { false };
     bool _discardEnabled { false };
     glm::vec3 _discardColor { false };
 

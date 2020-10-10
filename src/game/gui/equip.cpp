@@ -78,14 +78,8 @@ void EquipmentGui::configureItemsListBox() {
     lbItems.setOnItemClicked(bind(&EquipmentGui::onItemClicked, this, _1, _2));
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
-
-    Control::Border border(protoItem.border());
-    border.color = getBaseColor(_version);
-    protoItem.setBorder(border);
-
-    Control::Border hilight(protoItem.hilight());
-    hilight.color = getHilightColor(_version);
-    protoItem.setHilight(hilight);
+    protoItem.setBorderColor(getBaseColor(_version));
+    protoItem.setHilightColor(getHilightColor(_version));
 
     string frameTex;
     if (_version == GameVersion::TheSithLords) {

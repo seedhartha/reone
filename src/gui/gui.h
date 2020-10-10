@@ -106,6 +106,7 @@ private:
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
+    Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
     void drawBackground() const;
 };
 

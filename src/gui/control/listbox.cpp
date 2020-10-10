@@ -42,6 +42,7 @@ namespace gui {
 static const int kItemPadding = 3;
 
 ListBox::ListBox() : Control(ControlType::ListBox) {
+    _clickable = true;
 }
 
 void ListBox::updateItems() {
