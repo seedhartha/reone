@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.10)
 project(reone)
 
 option(BUILD_TOOLS "build tools executable" ON)
+option(BUILD_TESTS "build unit tests" OFF)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -354,4 +355,13 @@ if(BUILD_TOOLS)
 
     add_executable(reone-tools ${HEADERS} ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     target_link_libraries(reone-tools PRIVATE libreone)
+endif()
+
+if(BUILD_TESTS)
+    enable_testing()
+
+    add_executable(test_pathfinder ${HEADERS} tests/pathfinder.cpp)
+    target_link_libraries(test_pathfinder PRIVATE libreone)
+
+    add_test(pathfinder test_pathfinder)
 endif()

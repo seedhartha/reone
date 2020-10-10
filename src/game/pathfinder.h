@@ -22,6 +22,7 @@
 #include <set>
 #include <queue>
 #include <unordered_map>
+#include <vector>
 
 #include "glm/vec3.hpp"
 
@@ -35,7 +36,7 @@ class Pathfinder {
 public:
     Pathfinder() = default;
 
-    void load(const resource::PthFile &paths, const std::unordered_map<int, float> &pointZ);
+    void load(const std::vector<resource::PthFile::Point> &points, const std::unordered_map<int, float> &pointZ);
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 
