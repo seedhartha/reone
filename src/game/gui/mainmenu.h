@@ -30,7 +30,7 @@ class MainMenu : public gui::GUI {
 public:
     MainMenu(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
+    void load() override;
     void onClick(const std::string &control) override;
 
     void setOnNewGame(const std::function<void()> &fn);

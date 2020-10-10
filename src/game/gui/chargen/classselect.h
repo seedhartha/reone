@@ -31,7 +31,7 @@ class ClassSelection : public gui::GUI {
 public:
     ClassSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
+    void load() override;
 
     void setOnClassSelected(const std::function<void(const CreatureConfiguration &)> &fn);
     void setOnCancel(const std::function<void()> &fn);
