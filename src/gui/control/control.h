@@ -119,6 +119,7 @@ public:
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
     void setHilight(const Border &hilight);
+    void setHilightColor(const glm::vec3 &color);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
     void setScene3D(std::unique_ptr<Scene3D> scene);

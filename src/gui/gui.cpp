@@ -307,6 +307,10 @@ void GUI::setControlFocus(const string &tag, bool focus) {
     configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
 }
 
+void GUI::setControlHilightColor(const string &tag, const glm::vec3 &color) {
+    configureControl(tag, [&color](Control &ctrl) { ctrl.setHilightColor(color); });
+}
+
 Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),

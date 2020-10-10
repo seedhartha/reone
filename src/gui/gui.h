@@ -58,6 +58,7 @@ public:
     void setControlDisabled(const std::string &tag, bool disabled);
     void setControlText(const std::string &tag, const std::string &text);
     void setControlFocus(const std::string &tag, bool focus);
+    void setControlHilightColor(const std::string &tag, const glm::vec3 &color);
 
     Control &getControl(const std::string &tag) const;
 

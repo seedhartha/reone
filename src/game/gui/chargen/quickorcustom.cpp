@@ -17,6 +17,8 @@
 
 #include "quickorcustom.h"
 
+#include "../../types.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -40,6 +42,10 @@ void QuickOrCustom::load() {
     GUI::load();
 
     disableControl("CUST_CHAR_BTN");
+
+    glm::vec3 hilightColor(getHilightColor(_version));
+    setControlHilightColor("QUICK_CHAR_BTN", hilightColor);
+    setControlHilightColor("BTN_BACK", hilightColor);
 }
 
 void QuickOrCustom::onClick(const string &control) {

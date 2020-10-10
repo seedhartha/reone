@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../types.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -63,9 +65,22 @@ void QuickCharacterGeneration::setStep(int step) {
     setControlFocus("LBL_1", _step == 0);
     setControlFocus("LBL_2", _step == 1);
     setControlFocus("LBL_3", _step == 2);
+    setControlFocus("LBL_NUM1", _step == 0);
+    setControlFocus("LBL_NUM2", _step == 1);
+    setControlFocus("LBL_NUM3", _step == 2);
     setControlFocus("BTN_STEPNAME1", _step == 0);
     setControlFocus("BTN_STEPNAME2", _step == 1);
     setControlFocus("BTN_STEPNAME3", _step == 2);
+
+    glm::vec3 hilightColor(getHilightColor(_version));
+    setControlHilightColor("LBL_NUM1", hilightColor);
+    setControlHilightColor("LBL_NUM2", hilightColor);
+    setControlHilightColor("LBL_NUM3", hilightColor);
+    setControlHilightColor("BTN_STEPNAME1", hilightColor);
+    setControlHilightColor("BTN_STEPNAME2", hilightColor);
+    setControlHilightColor("BTN_STEPNAME3", hilightColor);
+    setControlHilightColor("BTN_BACK", hilightColor);
+    setControlHilightColor("BTN_CANCEL", hilightColor);
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {
