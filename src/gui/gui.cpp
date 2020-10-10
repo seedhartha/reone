@@ -283,6 +283,14 @@ void GUI::hideControl(const string &tag) {
     configureControl(tag, [](Control &ctrl) { ctrl.setVisible(false); });
 }
 
+void GUI::enableControl(const string &tag) {
+    configureControl(tag, [](Control &ctrl) { ctrl.setDisabled(false); });
+}
+
+void GUI::disableControl(const string &tag) {
+    configureControl(tag, [](Control &ctrl) { ctrl.setDisabled(true); });
+}
+
 void GUI::setControlFocusable(const string &tag, bool focusable) {
     configureControl(tag, [&focusable](Control &ctrl) { ctrl.setFocusable(focusable); });
 }

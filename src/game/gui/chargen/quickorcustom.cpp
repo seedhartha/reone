@@ -39,7 +39,7 @@ QuickOrCustom::QuickOrCustom(GameVersion version, const GraphicsOptions &opts) :
 void QuickOrCustom::load() {
     GUI::load();
 
-    setControlDisabled("CUST_CHAR_BTN", true);
+    disableControl("CUST_CHAR_BTN");
 }
 
 void QuickOrCustom::onClick(const string &control) {
