@@ -69,6 +69,16 @@ private:
     std::function<void()> _onCancel;
 
     gui::GUI *getSubGUI() const;
+
+    // Loading
+
+    void loadClassSelection();
+    void loadQuickOrCustom();
+    void loadQuickCharacterGeneration();
+    void loadPortraitSelection();
+    void loadNameGui();
+
+    // END Loading
 };
 
 } // namespace game

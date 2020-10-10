@@ -53,6 +53,14 @@ void CharacterGeneration::load() {
     setControlText("LBL_NAME", "");
     setControlText("LBL_CLASS", "");
 
+    loadClassSelection();
+    loadQuickOrCustom();
+    loadQuickCharacterGeneration();
+    loadPortraitSelection();
+    loadNameGui();
+}
+
+void CharacterGeneration::loadClassSelection() {
     _classSelection = make_unique<ClassSelection>(_version, _gfxOpts);
     _classSelection->load();
     _classSelection->setOnClassSelected([this](const CreatureConfiguration &config) {
@@ -67,7 +75,9 @@ void CharacterGeneration::load() {
             _onCancel();
         }
     });
+}
 
+void CharacterGeneration::loadQuickOrCustom() {
     _quickOrCustom = make_unique<QuickOrCustom>(_version, _gfxOpts);
     _quickOrCustom->load();
     _quickOrCustom->setOnQuickCharacter([this]() {
@@ -78,7 +88,9 @@ void CharacterGeneration::load() {
         _quickOrCustom->resetFocus();
         _screen = CharGenScreen::ClassSelection;
     });
+}
 
+void CharacterGeneration::loadQuickCharacterGeneration() {
     _quick = make_unique<QuickCharacterGeneration>(_version, _gfxOpts);
     _quick->load();
 
@@ -106,7 +118,9 @@ void CharacterGeneration::load() {
         _quick->resetFocus();
         _screen = CharGenScreen::QuickOrCustom;
     });
+}
 
+void CharacterGeneration::loadPortraitSelection() {
     _portraitSelection = make_unique<PortraitSelection>(_version, _gfxOpts);
     _portraitSelection->load();
     _portraitSelection->setOnPortraitSelected([this](const CreatureConfiguration &config) {
@@ -119,7 +133,9 @@ void CharacterGeneration::load() {
         _portraitSelection->resetFocus();
         _screen = CharGenScreen::Quick;
     });
+}
 
+void CharacterGeneration::loadNameGui() {
     _nameGui = make_unique<NameGui>(_version, _gfxOpts);
     _nameGui->load();
     _nameGui->setOnEnd([this]() {
