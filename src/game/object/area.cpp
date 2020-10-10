@@ -149,7 +149,7 @@ void Area::loadPTH() {
         _sceneGraph->addRoot(aabb);
     }
 
-    _pathfinder.load(path, pointZ);
+    _pathfinder.load(points, pointZ);
 }
 
 void Area::loadARE(const GffStruct &are) {

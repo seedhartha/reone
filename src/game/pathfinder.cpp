@@ -32,8 +32,7 @@ namespace game {
 Pathfinder::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void Pathfinder::load(const PthFile &paths, const unordered_map<int, float> &pointZ) {
-    const vector<PthFile::Point> &points = paths.points();
+void Pathfinder::load(const vector<PthFile::Point> &points, const unordered_map<int, float> &pointZ) {
     for (uint16_t i = 0; i < points.size(); ++i) {
         const PthFile::Point &point = points[i];
         glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
