@@ -581,6 +581,13 @@ void Control::setHilight(const Border &hilight) {
     _hilight = make_shared<Border>(hilight);
 }
 
+void Control::setHilightColor(const glm::vec3 &color) {
+    if (!_hilight) {
+        _hilight.reset(new Border());
+    }
+    _hilight->color = color;
+}
+
 void Control::setText(const Text &text) {
     _text = text;
 }

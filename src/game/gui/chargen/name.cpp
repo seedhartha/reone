@@ -17,6 +17,8 @@
 
 #include "name.h"
 
+#include "../../types.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -40,6 +42,10 @@ void NameGui::load() {
     GUI::load();
 
     disableControl("BTN_RANDOM");
+
+    glm::vec3 hilightColor(getHilightColor(_version));
+    setControlHilightColor("END_BTN", hilightColor);
+    setControlHilightColor("BTN_BACK", hilightColor);
 }
 
 void NameGui::onClick(const string &control) {
