@@ -30,6 +30,7 @@ namespace reone {
 namespace gui {
 
 ImageButton::ImageButton() : Control(ControlType::ImageButton) {
+    _clickable = true;
 }
 
 void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, const shared_ptr<Texture> &icon) const {

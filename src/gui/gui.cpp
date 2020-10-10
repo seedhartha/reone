@@ -180,13 +180,15 @@ bool GUI::handle(const SDL_Event &event) {
             }
             break;
         }
-        case SDL_MOUSEBUTTONUP:
-            if (_focus && event.button.button == SDL_BUTTON_LEFT) {
-                debug("GUI: click: " + _focus->tag());
-                glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
-                return _focus->handleClick(ctrlCoords.x, ctrlCoords.y);
+        case SDL_MOUSEBUTTONUP: {
+            glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
+            Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
+            if (control && event.button.button == SDL_BUTTON_LEFT) {
+                debug("GUI: click: " + control->tag());
+                return control->handleClick(ctrlCoords.x, ctrlCoords.y);
             }
             break;
+        }
 
         case SDL_MOUSEWHEEL:
             if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y)) return true;
@@ -207,20 +209,25 @@ bool GUI::handleKeyUp(SDL_Scancode key) {
 void GUI::updateFocus(int x, int y) {
     resetFocus();
 
+    Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
+    if (control) {
+        control->setFocus(true);
+        _focus = control;
+        onFocusChanged(_focus->tag(), true);
+    }
+}
+
+Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &test) const {
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
-        if (!(*it)->isVisible() || (*it)->isDisabled()) continue;
+        Control *ctrl = (*it).get();
+        if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl)) continue;
 
-        const Control::Extent &extent = (*it)->extent();
-        if (extent.contains(x, y)) {
-            _focus = (*it).get();
-
-            if (_focus->isFocusable()) {
-                _focus->setFocus(true);
-            }
-            onFocusChanged(_focus->tag(), true);
-            return;
+        if (ctrl->extent().contains(x, y)) {
+            return ctrl;
         }
     }
+
+    return nullptr;
 }
 
 void GUI::onFocusChanged(const string &control, bool focus) {

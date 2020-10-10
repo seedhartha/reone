@@ -536,6 +536,10 @@ bool Control::isFocusable() const {
     return _focusable;
 }
 
+bool Control::isClickable() const {
+    return _clickable;
+}
+
 bool Control::isVisible() const {
     return _visible;
 }
@@ -575,6 +579,10 @@ void Control::setBorderFill(const string &resRef) {
     } else {
         _border->fill.reset();
     }
+}
+
+void Control::setBorderColor(const glm::vec3 &color) {
+    _border->color = color;
 }
 
 void Control::setHilight(const Border &hilight) {
