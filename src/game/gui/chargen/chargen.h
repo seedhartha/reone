@@ -19,6 +19,8 @@
 
 #include "../../../gui/gui.h"
 
+#include "../../object/creature.h"
+
 #include "classselect.h"
 #include "name.h"
 #include "portraitselect.h"
@@ -54,6 +56,7 @@ public:
 private:
     CharGenScreen _screen { CharGenScreen::ClassSelection };
     CreatureConfiguration _character;
+    std::unique_ptr<Creature> _creature;
 
     // Sub GUI
 
@@ -77,6 +80,8 @@ private:
     void loadQuickCharacterGeneration();
     void loadPortraitSelection();
     void loadNameGui();
+
+    void loadCharacter(const CreatureConfiguration &config);
 
     // END Loading
 };

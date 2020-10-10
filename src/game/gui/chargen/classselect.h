@@ -40,8 +40,7 @@ private:
     struct ClassButton {
         gui::Control *control { nullptr };
         glm::ivec2 center { 0 };
-        Gender gender { Gender::Male };
-        ClassType clazz { ClassType::Soldier };
+        CreatureConfiguration config;
     };
 
     resource::GameVersion _version { resource::GameVersion::KotOR };

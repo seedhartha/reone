@@ -36,6 +36,12 @@ NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) : GUI(version
     }
 }
 
+void NameGui::load() {
+    GUI::load();
+
+    disableControl("BTN_RANDOM");
+}
+
 void NameGui::onClick(const string &control) {
     if (control == "END_BTN") {
         if (_onEnd) {

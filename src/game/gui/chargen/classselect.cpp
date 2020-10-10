@@ -87,32 +87,32 @@ void ClassSelection::configureClassButtons() {
     Control &button1 = getControl("BTN_SEL1");
     setButtonColors(button1);
     button1.extent().getCenter(x, y);
-    _classButtons.push_back({ &button1, glm::vec2(x, y), Gender::Male, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular });
+    _classButtons.push_back({ &button1, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     Control &button2 = getControl("BTN_SEL2");
     setButtonColors(button2);
     button2.extent().getCenter(x, y);
-    _classButtons.push_back({ &button2, glm::vec2(x, y), Gender::Male, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel });
+    _classButtons.push_back({ &button2, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button3 = getControl("BTN_SEL3");
     setButtonColors(button3);
     button3.extent().getCenter(x, y);
-    _classButtons.push_back({ &button3, glm::vec2(x, y), Gender::Male, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian });
+    _classButtons.push_back({ &button3, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button4 = getControl("BTN_SEL4");
     setButtonColors(button4);
     button4.extent().getCenter(x, y);
-    _classButtons.push_back({ &button4, glm::vec2(x, y), Gender::Female, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian });
+    _classButtons.push_back({ &button4, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button5 = getControl("BTN_SEL5");
     setButtonColors(button5);
     button5.extent().getCenter(x, y);
-    _classButtons.push_back({ &button5, glm::vec2(x, y), Gender::Female, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel });
+    _classButtons.push_back({ &button5, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button6 = getControl("BTN_SEL6");
     setButtonColors(button6);
     button6.extent().getCenter(x, y);
-    _classButtons.push_back({ &button6, glm::vec2(x, y), Gender::Female, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular });
+    _classButtons.push_back({ &button6, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     _enlargedButtonSize = glm::vec2(button1.extent().width, button1.extent().height);
     _defaultButtonSize = glm::vec2(button2.extent().width, button2.extent().height);
@@ -180,7 +180,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
     unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, sceneGraph.get(), _gfxOpts));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(randomCharacter(gender, clazz));
+    creature->load(_classButtons[index].config);
 
     shared_ptr<ModelSceneNode> model(creature->model());
 
@@ -225,10 +225,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
 
     ClassButton &button = _classButtons[idx];
 
-    string classText(Resources.getString(g_genderStrRefs[button.gender]).text);
-    classText += " " + Resources.getString(g_classStrRefs[button.clazz]).text;
+    string classText(Resources.getString(g_genderStrRefs[button.config.gender]).text);
+    classText += " " + Resources.getString(g_classStrRefs[button.config.clazz]).text;
 
-    string descText(Resources.getString(g_classDescStrRefs[button.clazz]).text);
+    string descText(Resources.getString(g_classDescStrRefs[button.config.clazz]).text);
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);
@@ -249,10 +249,7 @@ void ClassSelection::onClick(const string &control) {
     if (idx != -1) {
         ClassButton &button = _classButtons[idx];
         if (_onClassSelected) {
-            CreatureConfiguration character;
-            character.gender = button.gender;
-            character.clazz = button.clazz;
-            _onClassSelected(move(character));
+            _onClassSelected(button.config);
         }
         return;
     }

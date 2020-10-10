@@ -74,6 +74,7 @@ void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
     int sex = _character.gender == Gender::Female ? 1 : 0;
 
     _portraits.clear();
+
     for (auto &row : portraits->rows()) {
         if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
             string resRef(row.getString("baseresref"));
@@ -93,8 +94,14 @@ void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
             _portraits.push_back(move(portrait));
         }
     }
+    auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&config](const Portrait &portrait) {
+        return
+            portrait.appearanceNumber == config.appearance ||
+            portrait.appearanceS == config.appearance ||
+            portrait.appearanceL == config.appearance;
+    });
+    _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
 
-    _currentPortrait = random(0, static_cast<int>(_portraits.size()) - 1);
     loadCurrentPortrait();
 }
 

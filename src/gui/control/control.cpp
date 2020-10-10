@@ -499,7 +499,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
 }
 
 void Control::render3D(const glm::ivec2 &offset) const {
-    if (!_scene3d) return;
+    if (!_visible || !_scene3d) return;
 
     _pipeline->render(offset);
 }

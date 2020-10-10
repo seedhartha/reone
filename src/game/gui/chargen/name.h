@@ -27,6 +27,8 @@ class NameGui : public gui::GUI {
 public:
     NameGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
+    void load() override;
+
     void setOnEnd(const std::function<void()> &fn);
     void setOnBack(const std::function<void()> &fn);
 
