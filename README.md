@@ -10,15 +10,6 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 
 Currently, the most fundamental engine subsystems are already implemented. Actual gameplay, however, is very limited. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
-## Similar Projects
-
-reone is not the only project aiming to reimplement the Odyssey engine – there are at least four alternatives:
-
-* [xoreos](https://github.com/xoreos/xoreos) – a more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, not very active anymore, and I find it to be too complex and unoptimized for my taste.
-* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a fascinating JavaScript-based remake.
-* [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – a Unity-based reimplementation.
-* The Northern Lights by [Lachlan O'Neill](https://github.com/lachjames) – another Unity-based reimplementation and a level editor.
-
 ## Installation
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
@@ -41,4 +32,13 @@ reone can be configured from either a command line or a configuration file. Conf
 
 ## Contribution
 
-reone is in the early stages of development at the moment, meaning that the codebase is not entirely stable. Nevertheless, the project is open to potential contributors. Take a look at the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) and [development](https://github.com/seedhartha/reone/wiki/Development) pages in the Wiki if you want to contribute.
+reone is open to potential contributors. Take a look at the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki for an overview of the project architecture. If unsure what task to take, please consult the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) for the big picture. Alternatively, e-mail me at <vkremianskii@gmail.com>.
+
+## Similar Projects
+
+reone is not the only project aiming to reimplement the Odyssey engine – there are at least four alternatives:
+
+* [xoreos](https://github.com/xoreos/xoreos) – a more ambitious and a more established project, which I had contributed to and use alot as a reference. It is, however, not very active anymore, and I find it to be too complex and unoptimized for my taste.
+* [KotOR.js](https://github.com/KobaltBlu/KotOR.js) – a fascinating JavaScript-based remake.
+* [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) – a Unity-based reimplementation.
+* The Northern Lights by [Lachlan O'Neill](https://github.com/lachjames) – another Unity-based reimplementation and a level editor.
