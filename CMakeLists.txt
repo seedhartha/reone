@@ -108,6 +108,7 @@ set(HEADERS
     src/gui/control/panel.h
     src/gui/control/scrollbar.h
     src/gui/gui.h
+    src/gui/scenebuilder.h
     src/gui/types.h
     src/net/client.h
     src/net/connection.h
@@ -250,6 +251,7 @@ set(SOURCES
     src/gui/control/panel.cpp
     src/gui/control/scrollbar.cpp
     src/gui/gui.cpp
+    src/gui/scenebuilder.cpp
     src/net/client.cpp
     src/net/connection.cpp
     src/net/command.cpp

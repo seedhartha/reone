@@ -17,6 +17,7 @@
 
 #include "classselect.h"
 
+#include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 
 #include "../../characters.h"
@@ -32,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-static const float kModelSize = 1.05f;
+static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
 static map<Gender, int> g_genderStrRefs {
@@ -167,50 +168,41 @@ void ClassSelection::configureClassModels() {
 }
 
 void ClassSelection::configureClassModel(int index, Gender gender, ClassType clazz) {
-    Control &control = getControl("3D_MODEL" + to_string(index + 1));
-
-    Control::Extent extent(control.extent());
+    Control::Extent extent;
     extent.left = _classButtons[index].center.x - _defaultButtonSize.x / 2;
     extent.top = _classButtons[index].center.y - _defaultButtonSize.y / 2;
     extent.width = _defaultButtonSize.x;
     extent.height = _defaultButtonSize.y;
-    control.setExtent(extent);
-
-    unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_gfxOpts));
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, sceneGraph.get(), _gfxOpts));
-
-    unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(_classButtons[index].config);
-
-    shared_ptr<ModelSceneNode> model(creature->model());
 
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    glm::mat4 projection(glm::ortho(
-        -aspect * kModelSize,
-        aspect * kModelSize,
-        -kModelSize + kModelOffsetY,
-        kModelSize + kModelOffsetY,
-        0.1f,
-        10.0f));
+    glm::mat4 cameraTransform(1.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f));
-    transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection));
-    camera->setLocalTransform(transform);
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].config, sceneGraph); })
+        .modelScale(kModelScale)
+        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
+        .cameraTransform(cameraTransform)
+        .ambientLightColor(glm::vec3(1.0f))
+        .build());
 
-    sceneGraph->addRoot(model);
-    sceneGraph->setAmbientLightColor(glm::vec3(1.0f));
-    sceneGraph->setActiveCamera(camera);
-
-    unique_ptr<Control::Scene3D> scene(new Control::Scene3D());
-    scene->model = model;
-    scene->sceneGraph = move(sceneGraph);
-
+    Control &control = getControl("3D_MODEL" + to_string(index + 1));
+    control.setExtent(extent);
     control.setScene3D(move(scene));
+}
+
+shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, &sceneGraph, _gfxOpts));
+
+    unique_ptr<Creature> creature(objectFactory->newCreature());
+    creature->load(config);
+
+    return creature->model();
 }
 
 void ClassSelection::onFocusChanged(const string &control, bool focus) {
