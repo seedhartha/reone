@@ -51,6 +51,8 @@ public:
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
     void showControl(const std::string &tag);
     void hideControl(const std::string &tag);
+    void enableControl(const std::string &tag);
+    void disableControl(const std::string &tag);
 
     void setControlFocusable(const std::string &tag, bool focusable);
     void setControlDisabled(const std::string &tag, bool disabled);
