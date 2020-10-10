@@ -30,7 +30,7 @@ class PortraitSelection : public gui::GUI {
 public:
     PortraitSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
+    void load() override;
     void loadPortraits(const CreatureConfiguration &config);
 
     void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);

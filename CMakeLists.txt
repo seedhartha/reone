@@ -318,7 +318,7 @@ set(SOURCES
     src/script/variable.cpp)
 
 add_library(libreone STATIC ${HEADERS} ${SOURCES})
-target_compile_definitions(libreone PUBLIC BOOST_BIND_NO_PLACEHOLDERS)
+target_compile_definitions(libreone PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
 target_include_directories(libreone SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
 target_link_libraries(libreone PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
 

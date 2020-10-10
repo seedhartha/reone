@@ -45,7 +45,7 @@ public:
 
     EquipmentGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
+    void load() override;
     void open(SpatialObject *owner);
 
     void setOnClose(const std::function<void()> &fn);

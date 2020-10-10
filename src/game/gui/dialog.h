@@ -32,7 +32,7 @@ class DialogGui : public gui::GUI {
 public:
     DialogGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void load();
+    void load() override;
     void startDialog(uint32_t ownerId, const std::string &resRef);
     void pickReply(uint32_t index);
 
