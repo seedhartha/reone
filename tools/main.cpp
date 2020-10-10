@@ -17,8 +17,9 @@
 
 #include <stdexcept>
 
+#include "../src/core/log.h"
+
 #include "program.h"
-#include "src/core/log.h"
 
 using namespace std;
 
