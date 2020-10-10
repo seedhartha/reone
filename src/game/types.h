@@ -113,6 +113,14 @@ struct CreatureConfiguration {
     ClassType clazz { ClassType::Soldier };
     int appearance { 0 };
     std::vector<std::string> equipment;
+
+    bool operator==(const CreatureConfiguration &other) {
+        return
+            gender == other.gender &&
+            clazz == other.clazz &&
+            appearance == other.appearance &&
+            equipment == other.equipment;
+    }
 };
 
 struct PartyConfiguration {
