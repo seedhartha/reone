@@ -19,7 +19,7 @@
 
 #include <boost/format.hpp>
 
-#include "src/core/log.h"
+#include "../src/core/log.h"
 
 using namespace reone::resource;
 

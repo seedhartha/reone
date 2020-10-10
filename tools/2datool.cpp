@@ -19,7 +19,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "src/resource/2dafile.h"
+#include "../src/resource/2dafile.h"
 
 using namespace std;
 

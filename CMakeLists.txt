@@ -249,7 +249,6 @@ set(SOURCES
     src/gui/control/panel.cpp
     src/gui/control/scrollbar.cpp
     src/gui/gui.cpp
-    src/main.cpp
     src/net/client.cpp
     src/net/connection.cpp
     src/net/command.cpp
@@ -318,53 +317,30 @@ set(SOURCES
     src/script/util.cpp
     src/script/variable.cpp)
 
-add_executable(reone ${HEADERS} ${SOURCES})
-
-target_compile_definitions(reone PRIVATE BOOST_BIND_GLOBAL_PLACEHOLDERS)
-target_include_directories(reone SYSTEM PRIVATE ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
-target_link_libraries(reone PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
+add_library(libreone STATIC ${HEADERS} ${SOURCES})
+target_compile_definitions(libreone PUBLIC BOOST_BIND_NO_PLACEHOLDERS)
+target_include_directories(libreone SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+target_link_libraries(libreone PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
 
 if(WIN32)
-    target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
+    target_link_libraries(libreone PUBLIC SDL2::SDL2 OpenAL::OpenAL)
 else()
-    target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
+    target_link_libraries(libreone PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
 endif()
 
 if(USE_EXTERNAL_GLM)
-    target_include_directories(reone PRIVATE ${CMAKE_SOURCE_DIR}/external/glm)
+    target_include_directories(libreone PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
 endif()
+
+add_executable(reone ${HEADERS} src/main.cpp)
+target_link_libraries(reone PRIVATE libreone)
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
-        src/core/debug.h
-        src/core/log.h
-        src/core/pathutil.h
-        src/core/types.h
-        src/resource/2dafile.h
-        src/resource/binfile.h
-        src/resource/collection/biffile.h
-        src/resource/collection/erffile.h
-        src/resource/collection/keyfile.h
-        src/resource/collection/rimfile.h
-        src/resource/gfffile.h
-        src/resource/tlkfile.h
-        src/resource/util.h
         tools/program.h
         tools/tools.h)
 
     set(TOOLS_SOURCES
-        src/core/debug.cpp
-        src/core/log.cpp
-        src/core/pathutil.cpp
-        src/resource/2dafile.cpp
-        src/resource/binfile.cpp
-        src/resource/collection/biffile.cpp
-        src/resource/collection/erffile.cpp
-        src/resource/collection/keyfile.cpp
-        src/resource/collection/rimfile.cpp
-        src/resource/gfffile.cpp
-        src/resource/tlkfile.cpp
-        src/resource/util.cpp
         tools/main.cpp
         tools/2datool.cpp
         tools/biftool.cpp
@@ -376,14 +352,6 @@ if(BUILD_TOOLS)
         tools/tlktool.cpp
         tools/tools.cpp)
 
-    add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
-
-    target_compile_definitions(reone-tools PRIVATE BOOST_BIND_GLOBAL_PLACEHOLDERS)
-    target_include_directories(reone-tools SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-    target_include_directories(reone-tools PRIVATE ${CMAKE_SOURCE_DIR})
-    target_link_libraries(reone-tools PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-
-    if(USE_EXTERNAL_GLM)
-        target_include_directories(reone-tools PRIVATE ${CMAKE_SOURCE_DIR}/external/glm)
-    endif()
+    add_executable(reone-tools ${HEADERS} ${TOOLS_HEADERS} ${TOOLS_SOURCES})
+    target_link_libraries(reone-tools PRIVATE libreone)
 endif()
