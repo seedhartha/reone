@@ -167,7 +167,9 @@ void CharacterGeneration::loadQuickCharacterGeneration() {
                 break;
             default:
                 if (_onPlay) {
-                    _onPlay(_character);
+                    CreatureConfiguration config(_character);
+                    config.equipment.clear();
+                    _onPlay(config);
                 }
                 break;
         }
