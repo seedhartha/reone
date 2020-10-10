@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../../gui/gui.h"
+#include "../../render/scene/modelnode.h"
+#include "../../render/scene/scenegraph.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -44,6 +46,7 @@ private:
 
     void configureButtons();
     void setButtonColors(const std::string &tag);
+    std::shared_ptr<render::ModelSceneNode> getKotorModel(render::SceneGraph &sceneGraph);
     void startModuleSelection();
 };
 

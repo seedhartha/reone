@@ -22,11 +22,13 @@
 #include "../../audio/player.h"
 #include "../../core/debug.h"
 #include "../../gui/control/listbox.h"
+#include "../../gui/scenebuilder.h"
 #include "../../resource/resources.h"
 
 #include "../util.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
@@ -37,7 +39,7 @@ namespace reone {
 
 namespace game {
 
-static const float kKotorModelScale = 1.3f;
+static const float kKotorModelSize = 1.3f;
 static const float kKotorModelOffsetY = 1.25f;
 
 MainMenu::MainMenu(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
@@ -74,39 +76,22 @@ void MainMenu::load() {
     configureButtons();
 
     if (_version == GameVersion::KotOR) {
-        unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_gfxOpts));
-
         Control &control = getControl("LBL_3DVIEW");
         const Control::Extent &extent = control.extent();
-
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(sceneGraph.get(), Resources.findModel("mainmenu")));
-        model->setDefaultAnimation("default");
-        model->playDefaultAnimation();
-        model->setLightingEnabled(true);
-
         float aspect = extent.width / static_cast<float>(extent.height);
 
-        glm::mat4 projection(glm::ortho(
-            -aspect * kKotorModelScale,
-            aspect * kKotorModelScale,
-            -kKotorModelScale + kKotorModelOffsetY,
-            kKotorModelScale + kKotorModelOffsetY,
-            0.1f,
-            2.0f));
+        glm::mat4 cameraTransform(1.0f);
+        cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        glm::mat4 transform(1.0f);
-        transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection));
-        camera->setLocalTransform(transform);
-
-        sceneGraph->addRoot(model);
-        sceneGraph->setAmbientLightColor(glm::vec3(0.1f));
-        sceneGraph->setActiveCamera(camera);
-
-        unique_ptr<Control::Scene3D> scene(new Control::Scene3D());
-        scene->model = model;
-        scene->sceneGraph = move(sceneGraph);
+        unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+            .aspect(aspect)
+            .depth(0.1f, 2.0f)
+            .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+            .modelScale(kKotorModelSize)
+            .modelOffset(glm::vec2(0.0f, kKotorModelOffsetY))
+            .cameraTransform(cameraTransform)
+            .ambientLightColor(glm::vec3(0.1f))
+            .build());
 
         control.setScene3D(move(scene));
     }
@@ -134,6 +119,15 @@ void MainMenu::setButtonColors(const string &tag) {
     Control::Border hilight(control.hilight());
     hilight.color = getHilightColor(_version);
     control.setHilight(move(hilight));
+}
+
+shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
+    shared_ptr<ModelSceneNode> model(new ModelSceneNode(&sceneGraph, Resources.findModel("mainmenu")));
+    model->setDefaultAnimation("default");
+    model->playDefaultAnimation();
+    model->setLightingEnabled(true);
+
+    return move(model);
 }
 
 void MainMenu::onClick(const string &control) {

@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../../../gui/gui.h"
+#include "../../../render/scene/modelnode.h"
+#include "../../../render/scene/scenegraph.h"
 
 #include "../../object/creature.h"
 
@@ -72,6 +74,7 @@ private:
     std::function<void()> _onCancel;
 
     gui::GUI *getSubGUI() const;
+    std::shared_ptr<render::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, render::SceneGraph &sceneGraph);
 
     // Loading
 

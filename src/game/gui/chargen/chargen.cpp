@@ -19,11 +19,13 @@
 
 #include <stdexcept>
 
+#include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 
 #include "../../characters.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::render;
@@ -33,7 +35,7 @@ namespace reone {
 
 namespace game {
 
-static const float kModelSize = 1.05f;
+static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
 CharacterGeneration::CharacterGeneration(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
@@ -91,42 +93,24 @@ void CharacterGeneration::loadClassSelection() {
 void CharacterGeneration::loadCharacter(const CreatureConfiguration &config) {
     _character = config;
 
-    unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_gfxOpts));
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, sceneGraph.get(), _gfxOpts));
-
-    unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(_character);
-
-    shared_ptr<ModelSceneNode> model(creature->model());
-
     Control &lblModel = getControl("MODEL_LBL");
     const Control::Extent &extent = lblModel.extent();
-
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    glm::mat4 projection(glm::ortho(
-        -aspect * kModelSize,
-        aspect * kModelSize,
-        -kModelSize + kModelOffsetY,
-        kModelSize + kModelOffsetY,
-        0.1f,
-        10.0f));
+    glm::mat4 cameraTransform(1.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f));
-    transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection));
-    camera->setLocalTransform(transform);
-
-    sceneGraph->addRoot(model);
-    sceneGraph->setAmbientLightColor(glm::vec3(1.0f));
-    sceneGraph->setActiveCamera(camera);
-
-    unique_ptr<Control::Scene3D> scene(new Control::Scene3D());
-    scene->model = model;
-    scene->sceneGraph = move(sceneGraph);
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, config, _1))
+        .modelScale(kModelScale)
+        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
+        .cameraTransform(cameraTransform)
+        .ambientLightColor(glm::vec3(1.0f))
+        .build());
 
     lblModel.setScene3D(move(scene));
 
@@ -136,6 +120,15 @@ void CharacterGeneration::loadCharacter(const CreatureConfiguration &config) {
     if (!portrait.empty()) {
         lblPortrait.setBorderFill(portrait);
     }
+}
+
+shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, &sceneGraph, _gfxOpts));
+
+    unique_ptr<Creature> creature(objectFactory->newCreature());
+    creature->load(config);
+
+    return creature->model();
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
