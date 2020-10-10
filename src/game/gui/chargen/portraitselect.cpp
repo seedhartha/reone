@@ -66,7 +66,7 @@ void PortraitSelection::setButtonColors(const string &tag) {
 }
 
 void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
-    if (!_portraits.empty() && config.gender == _character.gender) return;
+    if (!_portraits.empty() && _character == config) return;
 
     _character = config;
 
