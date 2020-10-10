@@ -32,7 +32,7 @@ reone can be configured from either a command line or a configuration file. Conf
 
 ## Contribution
 
-reone is open to potential contributors. Take a look at the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki for an overview of the project architecture. If unsure what task to take, please consult the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) for the big picture. Alternatively, e-mail me at <vkremianskii@gmail.com>.
+reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap). For an overview of the project architecture, take a look at the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki.
 
 ## Similar Projects
 
