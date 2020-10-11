@@ -39,39 +39,41 @@ static const float kKeepPathDuration = 1000.0f;
 
 ActionExecutor::ActionExecutor(Area *area) : _area(area) {
     if (!area) {
-        throw invalid_argument("Area must not be null");
+        throw invalid_argument("area must not be null");
     }
 }
 
 void ActionExecutor::executeActions(Creature &creature, float dt) {
-    if (!creature.hasActions()) return;
+    ActionQueue &actionQueue = creature.actionQueue();
 
-    const Creature::Action &action = creature.currentAction();
-    switch (action.type) {
-        case Creature::ActionType::MoveToPoint:
-        case Creature::ActionType::Follow: {
-            SpatialObject *spatial = dynamic_cast<SpatialObject *>(action.object.get());
-            glm::vec3 dest = (action.type == Creature::ActionType::Follow || action.object) ? spatial->position() : action.point;
-            bool reached = navigateCreature(creature, dest, action.distance, dt);
-            if (reached && action.type == Creature::ActionType::MoveToPoint) {
-                creature.popCurrentAction();
+    const Action *action = actionQueue.currentAction();
+    if (!action) return;
+
+    switch (action->type) {
+        case ActionType::MoveToPoint:
+        case ActionType::Follow: {
+            SpatialObject *spatial = dynamic_cast<SpatialObject *>(action->object.get());
+            glm::vec3 dest = (action->type == ActionType::Follow || action->object) ? spatial->position() : action->point;
+            bool reached = navigateCreature(creature, dest, action->distance, dt);
+            if (reached && action->type == ActionType::MoveToPoint) {
+                actionQueue.pop();
             }
             break;
         }
-        case Creature::ActionType::DoCommand: {
-            ExecutionContext ctx(action.context);
+        case ActionType::DoCommand: {
+            ExecutionContext ctx(action->context);
             ctx.callerId = creature.id();
 
-            ScriptExecution(action.context.savedState->program, move(ctx)).run();
+            ScriptExecution(action->context.savedState->program, move(ctx)).run();
             break;
         }
-        case Creature::ActionType::StartConversation:
-            _area->startDialog(creature, action.resRef);
-            creature.popCurrentAction();
+        case ActionType::StartConversation:
+            _area->startDialog(creature, action->resRef);
+            actionQueue.pop();
             break;
         default:
-            warn("Area: action not implemented: " + to_string(static_cast<int>(action.type)));
-            creature.popCurrentAction();
+            warn("Area: action not implemented: " + to_string(static_cast<int>(action->type)));
+            actionQueue.pop();
             break;
     }
 }

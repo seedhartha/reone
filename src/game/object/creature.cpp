@@ -54,15 +54,6 @@ static string g_animGreeting("greeting");
 
 static string g_headHookNode("headhook");
 
-Creature::Action::Action(ActionType type) : type(type) {
-}
-
-Creature::Action::Action(ActionType type, const shared_ptr<Object> &object, float distance) : type(type), object(object), distance(distance) {
-}
-
-Creature::Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
-}
-
 Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
 
@@ -306,19 +297,6 @@ void Creature::playTalkAnimation() {
     animate(g_headHookNode, g_animTalkHead, kAnimationLoop, 0.25f);
 }
 
-void Creature::clearActions() {
-    _actions.clear();
-}
-
-void Creature::enqueueAction(Action action) {
-    _actions.emplace_back(std::move(action));
-}
-
-void Creature::popCurrentAction() {
-    assert(!_actions.empty());
-    _actions.pop_front();
-}
-
 void Creature::equip(const string &resRef) {
     shared_ptr<ItemBlueprint> blueprint(Resources.findItemBlueprint(resRef));
 
@@ -512,15 +490,6 @@ const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {
     return _equipment;
 }
 
-bool Creature::hasActions() const {
-    return !_actions.empty();
-}
-
-const Creature::Action &Creature::currentAction() const {
-    assert(!_actions.empty());
-    return _actions.front();
-}
-
 shared_ptr<Creature::Path> &Creature::path() {
     return _path;
 }
@@ -541,6 +510,10 @@ glm::vec3 Creature::selectablePosition() const {
     }
 
     return _model->getCenterOfAABB();
+}
+
+ActionQueue &Creature::actionQueue() {
+    return _actionQueue;
 }
 
 } // namespace game

@@ -219,8 +219,8 @@ Variable RoutineManager::actionDoCommand(const vector<Variable> &args, Execution
     shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
     Creature *creature = dynamic_cast<Creature *>(subject.get());
     if (creature) {
-        Creature::Action action(Creature::ActionType::DoCommand, args[0].context);
-        creature->enqueueAction(move(action));
+        Action action(ActionType::DoCommand, args[0].context);
+        creature->actionQueue().push(move(action));
     }
 
     return Variable();
@@ -235,8 +235,8 @@ Variable RoutineManager::actionMoveToObject(const vector<Variable> &args, Execut
 
     if (subject) {
         Creature &creature = static_cast<Creature &>(*subject);
-        Creature::Action action(Creature::ActionType::MoveToPoint, object, distance);
-        creature.enqueueAction(move(action));
+        Action action(ActionType::MoveToPoint, object, distance);
+        creature.actionQueue().push(move(action));
     } else {
         warn("Routine: object not found: " + to_string(objectId));
     }
@@ -252,11 +252,11 @@ Variable RoutineManager::actionStartConversation(const vector<Variable> &args, E
     shared_ptr<Object> object(getObjectById(objectId, ctx));
 
     if (creature) {
-        Creature::Action action(Creature::ActionType::StartConversation, ctx);
+        Action action(ActionType::StartConversation, ctx);
         action.object = object;
         action.resRef = (args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : creature->conversation();
 
-        creature->enqueueAction(move(action));
+        creature->actionQueue().push(move(action));
 
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
@@ -270,8 +270,8 @@ Variable RoutineManager::actionPauseConversation(const vector<Variable> &args, E
     Creature *creature = dynamic_cast<Creature *>(subject ? subject.get() : nullptr);
 
     if (creature) {
-        Creature::Action action(Creature::ActionType::PauseConversation, ctx);
-        creature->enqueueAction(move(action));
+        Action action(ActionType::PauseConversation, ctx);
+        creature->actionQueue().push(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
@@ -284,8 +284,8 @@ Variable RoutineManager::actionResumeConversation(const vector<Variable> &args, 
     Creature *creature = dynamic_cast<Creature *>(subject ? subject.get() : nullptr);
 
     if (creature) {
-        Creature::Action action(Creature::ActionType::ResumeConversation, ctx);
-        creature->enqueueAction(move(action));
+        Action action(ActionType::ResumeConversation, ctx);
+        creature->actionQueue().push(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
@@ -301,8 +301,8 @@ Variable RoutineManager::actionOpenDoor(const vector<Variable> &args, ExecutionC
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            Creature::Action action(Creature::ActionType::OpenDoor, object, 1.0f);
-            creature->enqueueAction(move(action));
+            Action action(ActionType::OpenDoor, object, 1.0f);
+            creature->actionQueue().push(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());
         if (door) {
@@ -323,8 +323,8 @@ Variable RoutineManager::actionCloseDoor(const vector<Variable> &args, Execution
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            Creature::Action action(Creature::ActionType::CloseDoor, object, 1.0f);
-            creature->enqueueAction(move(action));
+            Action action(ActionType::CloseDoor, object, 1.0f);
+            creature->actionQueue().push(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());
         if (door) {
