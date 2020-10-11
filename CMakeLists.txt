@@ -16,9 +16,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_TESTS "build unit tests" OFF)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" OFF)
@@ -226,6 +223,7 @@ set(SYSTEM_SOURCES
     src/script/variable.cpp)
 
 add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
+set_target_properties(libsystem PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_compile_definitions(libsystem PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
 target_include_directories(libsystem SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
 target_link_libraries(libsystem PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
@@ -349,6 +347,7 @@ set(GAME_SOURCES
     src/game/util.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
+set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_link_libraries(libgame PUBLIC libsystem)
 
 ## END libgame static library
@@ -363,6 +362,7 @@ set(REONE_SOURCES
     src/program.cpp)
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
+set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_link_libraries(reone PRIVATE libgame)
 
 ## END reone executable
@@ -387,6 +387,7 @@ if(BUILD_TOOLS)
         tools/tools.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
+    set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     target_link_libraries(reone-tools PRIVATE libgame)
 endif()
 
