@@ -413,11 +413,13 @@ endif()
 
 if(BUILD_TESTS)
     enable_testing()
-
-    add_executable(test_pathfinder tests/pathfinder.cpp)
-    target_link_libraries(test_pathfinder PRIVATE libgame)
-
-    add_test(pathfinder test_pathfinder)
+    file(GLOB TEST_FILES "tests/*.cpp")
+    foreach(TEST_FILE ${TEST_FILES})
+        get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
+        add_executable(test_${TEST_NAME} ${TEST_FILE})
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame)
+        add_test(${TEST_NAME} test_${TEST_NAME})
+    endforeach()
 endif()
 
 ## END Unit tests
