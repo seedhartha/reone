@@ -26,7 +26,7 @@
 #include "../../resource/types.h"
 #include "../../script/variable.h"
 
-#include "../actions.h"
+#include "../actionexecutor.h"
 #include "../camera/firstperson.h"
 #include "../camera/thirdperson.h"
 #include "../collisiondetect.h"
