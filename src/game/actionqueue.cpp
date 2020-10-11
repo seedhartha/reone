@@ -43,7 +43,7 @@ void ActionQueue::update() {
 }
 
 Action *ActionQueue::currentAction() {
-   return _actions.empty() ? nullptr : _actions.back().get();
+   return _actions.empty() ? nullptr : _actions.front().get();
 }
 
 } // namespace game
