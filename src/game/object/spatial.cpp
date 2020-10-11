@@ -66,6 +66,8 @@ void SpatialObject::moveItemsTo(SpatialObject &other) {
 }
 
 void SpatialObject::update(const UpdateContext &ctx) {
+    Object::update(ctx);
+
     if (!_model) return;
 
     glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);

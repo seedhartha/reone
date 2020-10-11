@@ -51,11 +51,11 @@ private:
 
     // Actions
 
-    void executeMoveToPoint(Creature &creature, const MoveToPointAction &action, float dt);
-    void executeMoveToObject(Creature &creature, const MoveToObjectAction &action, float dt);
-    void executeFollow(Creature &creature, const FollowAction &action, float dt);
-    void executeDoCommand(Creature &creature, const CommandAction &command, float dt);
-    void executeStartConversation(Creature &creature, const StartConversationAction &action, float dt);
+    void executeMoveToPoint(Creature &creature, MoveToPointAction &action, float dt);
+    void executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt);
+    void executeFollow(Creature &creature, FollowAction &action, float dt);
+    void executeDoCommand(Creature &creature, CommandAction &command, float dt);
+    void executeStartConversation(Creature &creature, StartConversationAction &action, float dt);
 
     // END Actions
 };

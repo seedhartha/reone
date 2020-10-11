@@ -46,53 +46,54 @@ ActionExecutor::ActionExecutor(Area *area) : _area(area) {
 void ActionExecutor::executeActions(Creature &creature, float dt) {
     ActionQueue &actionQueue = creature.actionQueue();
 
-    const Action *action = actionQueue.currentAction();
+    Action *action = actionQueue.currentAction();
     if (!action) return;
 
     ActionType type = action->type();
     switch (type) {
         case ActionType::MoveToPoint:
-            executeMoveToPoint(creature, *dynamic_cast<const MoveToPointAction *>(action), dt);
+            executeMoveToPoint(creature, *dynamic_cast<MoveToPointAction *>(action), dt);
             break;
         case ActionType::MoveToObject:
-            executeMoveToObject(creature, *dynamic_cast<const MoveToObjectAction *>(action), dt);
+            executeMoveToObject(creature, *dynamic_cast<MoveToObjectAction *>(action), dt);
             break;
         case ActionType::Follow:
-            executeFollow(creature, *dynamic_cast<const FollowAction *>(action), dt);
+            executeFollow(creature, *dynamic_cast<FollowAction *>(action), dt);
             break;
         case ActionType::DoCommand:
-            executeDoCommand(creature, *dynamic_cast<const CommandAction *>(action), dt);
+            executeDoCommand(creature, *dynamic_cast<CommandAction *>(action), dt);
             break;
         case ActionType::StartConversation:
-            executeStartConversation(creature, *dynamic_cast<const StartConversationAction *>(action), dt);
+            executeStartConversation(creature, *dynamic_cast<StartConversationAction *>(action), dt);
             break;
         default:
             warn("Area: action not implemented: " + to_string(static_cast<int>(type)));
-            actionQueue.pop();
+            action->isCompleted();
             break;
     }
 }
 
-void ActionExecutor::executeMoveToPoint(Creature &creature, const MoveToPointAction &action, float dt) {
+void ActionExecutor::executeMoveToPoint(Creature &creature, MoveToPointAction &action, float dt) {
     glm::vec3 dest(action.point());
+
     bool reached = navigateCreature(creature, dest, 1.0f, dt);
     if (reached) {
-        creature.actionQueue().pop();
+        action.complete();
     }
 }
 
-void ActionExecutor::executeMoveToObject(Creature &creature, const MoveToObjectAction &action, float dt) {
+void ActionExecutor::executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt) {
     const SpatialObject *object = dynamic_cast<const SpatialObject *>(action.object());
     glm::vec3 dest(object->position());
     float distance = action.distance();
-    bool reached = navigateCreature(creature, dest, distance, dt);
 
+    bool reached = navigateCreature(creature, dest, distance, dt);
     if (reached) {
-        creature.actionQueue().pop();
+        action.complete();
     }
 }
 
-void ActionExecutor::executeFollow(Creature &creature, const FollowAction &action, float dt) {
+void ActionExecutor::executeFollow(Creature &creature, FollowAction &action, float dt) {
     const SpatialObject *object = dynamic_cast<const SpatialObject *>(action.object());
     glm::vec3 dest(object->position());
     float distance = action.distance();
@@ -100,16 +101,17 @@ void ActionExecutor::executeFollow(Creature &creature, const FollowAction &actio
     navigateCreature(creature, dest, distance, dt);
 }
 
-void ActionExecutor::executeDoCommand(Creature &creature, const CommandAction &action, float dt) {
+void ActionExecutor::executeDoCommand(Creature &creature, CommandAction &action, float dt) {
     ExecutionContext ctx(action.context());
     ctx.callerId = creature.id();
 
-    ScriptExecution(action.context().savedState->program, move(ctx)).run();
+    ScriptExecution(ctx.savedState->program, move(ctx)).run();
+    action.complete();
 }
 
-void ActionExecutor::executeStartConversation(Creature &creature, const StartConversationAction &action, float dt) {
+void ActionExecutor::executeStartConversation(Creature &creature, StartConversationAction &action, float dt) {
     _area->startDialog(creature, action.dialogResRef());
-    creature.actionQueue().pop();
+    action.complete();
 }
 
 bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
