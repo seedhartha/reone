@@ -17,25 +17,20 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
-
-#include "action/action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
+class MoveToObjectAction : public ObjectAction {
 public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+    MoveToObjectAction(const std::shared_ptr<Object> &object, float distance);
 
-    const Action *currentAction() const;
+    float distance() const;
 
 private:
-    std::queue<std::unique_ptr<Action>> _actions;
+    float _distance { 0.0f };
 };
 
 } // namespace game

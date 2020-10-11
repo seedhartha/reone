@@ -15,28 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <memory>
-#include <queue>
-
-#include "action/action.h"
+#include "movetopoint.h"
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
-public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+MoveToPointAction::MoveToPointAction(const glm::vec3 &point) :
+    Action(ActionType::MoveToPoint),
+    _point(point) {
+}
 
-    const Action *currentAction() const;
-
-private:
-    std::queue<std::unique_ptr<Action>> _actions;
-};
+const glm::vec3 &MoveToPointAction::point() const {
+    return _point;
+}
 
 } // namespace game
 

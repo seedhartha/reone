@@ -15,28 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "commandaction.h"
 
-#include <memory>
-#include <queue>
-
-#include "action/action.h"
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
-public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+CommandAction::CommandAction(const ExecutionContext &ctx) : Action(ActionType::DoCommand), _context(ctx) {
+}
 
-    const Action *currentAction() const;
-
-private:
-    std::queue<std::unique_ptr<Action>> _actions;
-};
+const ExecutionContext &CommandAction::context() const {
+    return _context;
+}
 
 } // namespace game
 

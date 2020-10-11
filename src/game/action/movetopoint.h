@@ -17,25 +17,22 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
+#include "glm/vec3.hpp"
 
-#include "action/action.h"
+#include "action.h"
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
+class MoveToPointAction : public Action {
 public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+    MoveToPointAction(const glm::vec3 &point);
 
-    const Action *currentAction() const;
+    const glm::vec3 &point() const;
 
 private:
-    std::queue<std::unique_ptr<Action>> _actions;
+    glm::vec3 _point;
 };
 
 } // namespace game

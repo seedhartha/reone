@@ -17,25 +17,22 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
+#include <string>
 
-#include "action/action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
+class StartConversationAction : public ObjectAction {
 public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+    StartConversationAction(const std::shared_ptr<Object> &object, const std::string &dialogResRef);
 
-    const Action *currentAction() const;
+    const std::string &dialogResRef() const;
 
 private:
-    std::queue<std::unique_ptr<Action>> _actions;
+    std::string _dialogResRef;
 };
 
 } // namespace game

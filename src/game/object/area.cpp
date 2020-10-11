@@ -350,7 +350,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         add(partyMember);
         _partyMember1 = partyMember;
 
-        Action action(ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
+        unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().push(move(action));
     }
     if (party.memberCount > 2) {
@@ -360,7 +360,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         add(partyMember);
         _partyMember2 = partyMember;
 
-        Action action(ActionType::Follow, _partyLeader, kPartyMemberFollowDistance);
+        unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().push(move(action));
     }
 }
