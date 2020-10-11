@@ -29,7 +29,10 @@ namespace reone {
 
 namespace game {
 
-NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _input(kTextInputLetters | kTextInputWhitespace) {
+
     _resRef = getResRef("name");
 
     if (version == GameVersion::TheSithLords) {
@@ -47,6 +50,15 @@ void NameGui::load() {
     glm::vec3 hilightColor(getHilightColor(_version));
     setControlHilightColor("END_BTN", hilightColor);
     setControlHilightColor("BTN_BACK", hilightColor);
+}
+
+bool NameGui::handle(const SDL_Event &event) {
+    if (event.type == SDL_KEYDOWN && _input.handle(event)) {
+        setControlText("NAME_BOX_EDIT", _input.text());
+        return true;
+    }
+
+    return GUI::handle(event);
 }
 
 void NameGui::onClick(const string &control) {

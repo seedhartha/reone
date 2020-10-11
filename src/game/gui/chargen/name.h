@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../../gui/gui.h"
+#include "../../../gui/textinput.h"
 
 namespace reone {
 
@@ -28,11 +29,13 @@ public:
     NameGui(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
+    bool handle(const SDL_Event &event) override;
 
     void setOnEnd(const std::function<void()> &fn);
     void setOnBack(const std::function<void()> &fn);
 
 private:
+    gui::TextInput _input;
     std::function<void()> _onEnd;
     std::function<void()> _onBack;
 
