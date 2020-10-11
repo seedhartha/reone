@@ -29,6 +29,7 @@
 
 using namespace std;
 
+using namespace reone::gui;
 using namespace reone::render;
 
 namespace reone {
@@ -37,7 +38,7 @@ namespace game {
 
 static const int kLineCount = 10;
 
-Console::Console(const GraphicsOptions &opts) : _opts(opts) {
+Console::Console(const GraphicsOptions &opts) : _opts(opts), _input(kTextInputConsole) {
 }
 
 void Console::load() {
@@ -46,46 +47,14 @@ void Console::load() {
 }
 
 bool Console::handle(const SDL_Event &event) {
+    if (_open && _input.handle(event)) return true;
+
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
         default:
             return false;
     }
-}
-
-bool Console::handleKeyDown(const SDL_KeyboardEvent &event) {
-    if (!_open) return false;
-
-    bool shift = event.keysym.mod & KMOD_SHIFT;
-    bool digit = event.keysym.sym >= SDLK_0 && event.keysym.sym <= SDLK_9;
-    bool letter = event.keysym.sym >= SDLK_a && event.keysym.sym <= SDLK_z;
-    bool underscore = event.keysym.sym == SDLK_MINUS && shift;
-
-    if (digit || letter || underscore ||
-        event.keysym.sym == SDLK_SPACE ||
-        event.keysym.sym == SDLK_COMMA ||
-        event.keysym.sym == SDLK_PERIOD) {
-
-        if (underscore) {
-            _inputText += SDLK_UNDERSCORE;
-        } else if (letter && shift) {
-            _inputText += toupper(event.keysym.sym);
-        } else {
-            _inputText += event.keysym.sym;
-        }
-
-        return true;
-
-    } else if (event.keysym.sym == SDLK_BACKSPACE) {
-        if (!_inputText.empty()) {
-            _inputText.resize(_inputText.size() - 1);
-        }
-    }
-
-    return false;
 }
 
 bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
@@ -95,13 +64,14 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
                 _open = false;
                 return true;
 
-            case SDLK_RETURN:
-                if (!_inputText.empty()) {
+            case SDLK_RETURN: {
+                string text(_input.text());
+                if (!text.empty()) {
                     executeInputText();
-                    _inputText.clear();
+                    _input.clear();
                 }
                 return true;
-
+            }
             default:
                 return false;
         }
@@ -118,7 +88,7 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Console::executeInputText() {
-    debug(boost::format("Console: execute \"%s\"") % _inputText);
+    debug(boost::format("Console: execute \"%s\"") % _input.text());
 }
 
 void Console::render() const {
@@ -136,7 +106,7 @@ void Console::render() const {
     }
     DefaultQuad.render(GL_TRIANGLES);
 
-    string text("> " + _inputText);
+    string text("> " + _input.text());
     {
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));

@@ -41,6 +41,7 @@ NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) : GUI(version
 void NameGui::load() {
     GUI::load();
 
+    setControlText("NAME_BOX_EDIT", "");
     disableControl("BTN_RANDOM");
 
     glm::vec3 hilightColor(getHilightColor(_version));
