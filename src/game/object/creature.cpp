@@ -512,10 +512,6 @@ glm::vec3 Creature::selectablePosition() const {
     return _model->getCenterOfAABB();
 }
 
-ActionQueue &Creature::actionQueue() {
-    return _actionQueue;
-}
-
 } // namespace game
 
 } // namespace reone
