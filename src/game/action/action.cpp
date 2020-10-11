@@ -15,28 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "action.h"
 
-#include <memory>
-#include <queue>
-
-#include "action/action.h"
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
-public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+Action::Action(ActionType type) : _type(type) {
+}
 
-    const Action *currentAction() const;
-
-private:
-    std::queue<std::unique_ptr<Action>> _actions;
-};
+ActionType Action::type() const {
+    return _type;
+}
 
 } // namespace game
 

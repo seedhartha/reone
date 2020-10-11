@@ -17,25 +17,22 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
+#include "action.h"
 
-#include "action/action.h"
+#include "../../script/types.h"
 
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
+class CommandAction : public Action {
 public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+    CommandAction(const script::ExecutionContext &ctx);
 
-    const Action *currentAction() const;
+    const script::ExecutionContext &context() const;
 
 private:
-    std::queue<std::unique_ptr<Action>> _actions;
+    script::ExecutionContext _context;
 };
 
 } // namespace game

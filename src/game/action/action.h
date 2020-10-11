@@ -17,25 +17,38 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
-
-#include "action/action.h"
-
 namespace reone {
 
 namespace game {
 
-class ActionQueue {
-public:
-    void clear();
-    void push(std::unique_ptr<Action> action);
-    void pop();
+enum class ActionType {
+    MoveToPoint = 0,
+    OpenDoor = 5,
+    CloseDoor = 6,
+    Follow = 35,
+    FollowLeader = 38,
+    QueueEmpty = 65534,
 
-    const Action *currentAction() const;
+    DoCommand = 0x1000,
+    StartConversation = 0x1001,
+    PauseConversation = 0x1002,
+    ResumeConversation = 0x1003,
+    MoveToObject = 0x1004
+};
+
+class Action {
+public:
+    Action(ActionType type);
+    virtual ~Action() = default;
+
+    ActionType type() const;
+
+protected:
+    ActionType _type { ActionType::QueueEmpty };
 
 private:
-    std::queue<std::unique_ptr<Action>> _actions;
+    Action(const Action &) = delete;
+    Action &operator=(const Action &) = delete;
 };
 
 } // namespace game

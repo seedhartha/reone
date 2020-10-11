@@ -19,20 +19,9 @@
 
 using namespace std;
 
-using namespace reone::script;
-
 namespace reone {
 
 namespace game {
-
-Action::Action(ActionType type) : type(type) {
-}
-
-Action::Action(ActionType type, const shared_ptr<Object> &object, float distance) : type(type), object(object), distance(distance) {
-}
-
-Action::Action(ActionType type, const ExecutionContext &ctx) : type(type), context(ctx) {
-}
 
 void ActionQueue::clear() {
     while (!_actions.empty()) {
@@ -40,7 +29,7 @@ void ActionQueue::clear() {
     }
 }
 
-void ActionQueue::push(Action action) {
+void ActionQueue::push(unique_ptr<Action> action) {
     _actions.push(move(action));
 }
 
@@ -49,7 +38,7 @@ void ActionQueue::pop() {
 }
 
 const Action *ActionQueue::currentAction() const {
-   return _actions.empty() ? nullptr : &_actions.back();
+   return _actions.empty() ? nullptr : _actions.back().get();
 }
 
 } // namespace game

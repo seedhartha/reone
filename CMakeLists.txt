@@ -243,6 +243,13 @@ endif()
 ## libgame static library
 
 set(GAME_HEADERS
+    src/game/action/action.h
+    src/game/action/commandaction.h
+    src/game/action/follow.h
+    src/game/action/movetoobject.h
+    src/game/action/movetopoint.h
+    src/game/action/objectaction.h
+    src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
     src/game/camera/camera.h
@@ -295,6 +302,13 @@ set(GAME_HEADERS
     src/game/util.h)
 
 set(GAME_SOURCES
+    src/game/action/action.cpp
+    src/game/action/commandaction.cpp
+    src/game/action/follow.cpp
+    src/game/action/movetoobject.cpp
+    src/game/action/movetopoint.cpp
+    src/game/action/objectaction.cpp
+    src/game/action/startconversation.cpp
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
     src/game/camera/camera.cpp
