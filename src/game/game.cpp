@@ -549,6 +549,25 @@ bool Game::handle(const SDL_Event &event) {
     return false;
 }
 
+int Game::eventUserDefined(int eventNumber) {
+    int id = _eventCounter++;
+
+    UserDefinedEvent event { eventNumber };
+    _events.insert(make_pair(id, move(event)));
+
+    return id;
+}
+
+int Game::getUserDefinedEventNumber(int eventId) {
+    auto maybeEvent = _events.find(eventId);
+    if (maybeEvent == _events.end()) {
+        warn("Event not found by id: " + to_string(eventId));
+        return -1;
+    }
+
+    return maybeEvent->second.eventNumber;
+}
+
 shared_ptr<Module> Game::module() const {
     return _module;
 }

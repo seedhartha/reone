@@ -485,27 +485,6 @@ void Area::updateTriggers(const Creature &creature) {
     }
 }
 
-int Area::eventUserDefined(int eventNumber) {
-    int id = _eventCounter++;
-
-    UserDefinedEvent event { eventNumber };
-    _events.insert(make_pair(id, move(event)));
-
-    return id;
-}
-
-void Area::signalEvent(int eventId) {
-    auto it = _events.find(eventId);
-    if (it == _events.end()) {
-        warn("Event not found by id: " + to_string(eventId));
-        return;
-    }
-    if (!_scripts[ScriptType::OnUserDefined].empty()) {
-        runScript(_scripts[ScriptType::OnUserDefined], _id, kObjectInvalid, it->second.eventNumber);
-    }
-    _events.erase(it);
-}
-
 void Area::runOnEnterScript() {
     if (_scriptsEnabled) {
         if (!_scripts[ScriptType::OnEnter].empty()) {

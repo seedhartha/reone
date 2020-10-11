@@ -48,10 +48,14 @@ private:
     std::unique_ptr<net::Server> _server;
 
     // Commands
+
     std::queue<Command> _commandsIn;
     std::recursive_mutex _commandsInMutex;
 
+    // END Commands
+
     // Game overrides
+
     void initObjectFactory() override;
     void configure() override;
     void update() override;
@@ -60,11 +64,16 @@ private:
     void onDialogReplyPicked(uint32_t index) override;
     void onDialogFinished() override;
 
+    // END Game overrides
+
     // IMultiplayerCallbacks overrides
+
     void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) override;
     void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) override;
     void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) override;
     void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) override;
+
+    // END IMultiplayerCallbacks overrides
 
     std::shared_ptr<net::Command> makeCommand(net::CommandType type);
     bool shouldSendObjectUpdates(uint32_t objectId) const;

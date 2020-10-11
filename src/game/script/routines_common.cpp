@@ -196,7 +196,7 @@ Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionCo
 
 Variable RoutineManager::eventUserDefined(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Event);
-    result.engineTypeId = _game->module()->area()->eventUserDefined(args[0].intValue);
+    result.engineTypeId = _game->eventUserDefined(args[0].intValue);
 
     return move(result);
 }
@@ -204,10 +204,9 @@ Variable RoutineManager::eventUserDefined(const vector<Variable> &args, Executio
 Variable RoutineManager::signalEvent(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> subject(getObjectById(args[0].objectId, ctx));
     if (subject) {
-        if (subject->type() == ObjectType::Area) {
-            static_cast<Area &>(*subject).signalEvent(args[1].engineTypeId);
-        } else {
-            warn("Routine: event object is not an area");
+        int eventNumber = _game->getUserDefinedEventNumber(args[1].engineTypeId);
+        if (eventNumber != -1) {
+            subject->runUserDefinedEvent(eventNumber);
         }
     } else {
         warn("Routine: object not found by id: " + to_string(args[0].objectId));
