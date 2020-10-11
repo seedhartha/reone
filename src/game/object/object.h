@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <string>
+#include <unordered_map>
 
 #include "../actionqueue.h"
 #include "../types.h"
@@ -32,9 +33,7 @@ public:
     virtual ~Object() = default;
 
     virtual void update(const UpdateContext &ctx);
-
-    virtual void saveTo(AreaState &state) const;
-    virtual void loadState(const AreaState &state);
+    void runUserDefinedEvent(int eventNumber);
 
     uint32_t id() const;
     ObjectType type() const;
@@ -43,12 +42,27 @@ public:
 
     void setSynchronize(bool synchronize);
 
+    // Load/save
+
+    virtual void saveTo(AreaState &state) const;
+    virtual void loadState(const AreaState &state);
+
+    // END Load/save
+
 protected:
+    enum class ScriptType {
+        OnEnter,
+        OnExit,
+        OnHeartbeat,
+        OnUserDefined
+    };
+
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
     std::string _tag;
     ActionQueue _actionQueue;
     bool _synchronize { false };
+    std::unordered_map<ScriptType, std::string> _scripts;
 
     Object(uint32_t id, ObjectType type);
 

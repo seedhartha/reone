@@ -17,10 +17,16 @@
 
 #include "object.h"
 
+#include "../../core/log.h"
+#include "../../script/types.h"
+
+#include "../script/util.h"
+
 using namespace std;
 
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::script;
 
 namespace reone {
 
@@ -33,14 +39,16 @@ void Object::update(const UpdateContext &ctx) {
     _actionQueue.update();
 }
 
+void Object::runUserDefinedEvent(int eventNumber) {
+    if (!_scripts[ScriptType::OnUserDefined].empty()) {
+        runScript(_scripts[ScriptType::OnUserDefined], _id, kObjectInvalid, eventNumber);
+    }
+}
+
 void Object::saveTo(AreaState &state) const {
 }
 
 void Object::loadState(const AreaState &state) {
-}
-
-void Object::setSynchronize(bool synchronize) {
-    _synchronize = synchronize;
 }
 
 uint32_t Object::id() const {
@@ -57,6 +65,10 @@ const string &Object::tag() const {
 
 ActionQueue &Object::actionQueue() {
     return _actionQueue;
+}
+
+void Object::setSynchronize(bool synchronize) {
+    _synchronize = synchronize;
 }
 
 } // namespace game

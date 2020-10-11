@@ -59,6 +59,13 @@ public:
 
     std::shared_ptr<Module> module() const;
 
+    // Events
+
+    int eventUserDefined(int eventNumber);
+    int getUserDefinedEventNumber(int eventId);
+
+    // END Events
+
     // Globals/locals
 
     bool getGlobalBoolean(const std::string &name) const;
@@ -100,6 +107,10 @@ protected:
     // END Event handlers
 
 private:
+    struct UserDefinedEvent {
+        int eventNumber { 0 };
+    };
+
     boost::filesystem::path _path;
     render::RenderWindow _window;
     uint32_t _ticks { 0 };
@@ -108,6 +119,8 @@ private:
     GameState _state;
     std::shared_ptr<audio::SoundInstance> _music;
     Console _console;
+    std::map<int, UserDefinedEvent> _events;
+    int _eventCounter { 0 };
 
     // GUI
 
