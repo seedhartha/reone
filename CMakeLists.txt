@@ -293,6 +293,7 @@ set(GAME_HEADERS
     src/game/object/trigger.h
     src/game/object/waypoint.h
     src/game/objectselect.h
+    src/game/party.h
     src/game/pathfinder.h
     src/game/player.h
     src/game/room.h
@@ -352,6 +353,7 @@ set(GAME_SOURCES
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp
     src/game/objectselect.cpp
+    src/game/party.cpp
     src/game/pathfinder.cpp
     src/game/player.cpp
     src/game/room.cpp
