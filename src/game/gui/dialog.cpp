@@ -231,6 +231,10 @@ void DialogGui::loadCurrentEntry() {
 
 void DialogGui::pickReply(uint32_t index) {
     const DlgFile::EntryReply &reply = _dialog->getReply(index);
+
+    if (!reply.script.empty()) {
+        runScript(reply.script, _ownerId, kObjectInvalid, -1);
+    }
     if (reply.entries.empty()) {
         finish();
         return;
