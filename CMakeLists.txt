@@ -72,7 +72,6 @@ set(ENGINE_HEADERS
     src/net/command.h
     src/net/server.h
     src/net/types.h
-    src/program.h
     src/render/aabb.h
     src/render/font.h
     src/render/framebuffer.h
@@ -163,7 +162,6 @@ set(ENGINE_SOURCES
     src/net/connection.cpp
     src/net/command.cpp
     src/net/server.cpp
-    src/program.cpp
     src/render/aabb.cpp
     src/render/font.cpp
     src/render/framebuffer.cpp
@@ -357,7 +355,14 @@ target_link_libraries(libgame PUBLIC libengine)
 
 ## reone executable
 
-add_executable(reone src/main.cpp)
+set(REONE_HEADERS
+    src/program.h)
+
+set(REONE_SOURCES
+    src/main.cpp
+    src/program.cpp)
+
+add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 target_link_libraries(reone PRIVATE libgame)
 
 ## END reone executable
