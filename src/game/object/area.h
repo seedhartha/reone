@@ -79,7 +79,6 @@ public:
     Camera *getCamera() const;
     void startDialog(Creature &creature, const std::string &resRef);
 
-    void delayCommand(uint32_t timestamp, const script::ExecutionContext &ctx);
     int eventUserDefined(int eventNumber);
     void signalEvent(int eventId);
 
@@ -137,7 +136,6 @@ protected:
     virtual void add(const std::shared_ptr<SpatialObject> &object);
     void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
-    virtual void updateCreature(Creature &creature, float dt);
 
 private:
     enum class ScriptType {
@@ -145,12 +143,6 @@ private:
         OnExit,
         OnHeartbeat,
         OnUserDefined
-    };
-
-    struct DelayedCommand {
-        uint32_t timestamp { 0 };
-        script::ExecutionContext context;
-        bool executed { false };
     };
 
     struct UserDefinedEvent {
@@ -169,7 +161,6 @@ private:
     CameraStyle _cameraStyle;
     std::string _music;
     std::unordered_map<ScriptType, std::string> _scripts;
-    std::list<DelayedCommand> _delayed;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
 
@@ -179,7 +170,6 @@ private:
     std::function<void(CameraType)> _onCameraChanged;
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
-    void updateDelayedCommands();
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);

@@ -351,7 +351,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         _partyMember1 = partyMember;
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
-        partyMember->actionQueue().push(move(action));
+        partyMember->actionQueue().add(move(action));
     }
     if (party.memberCount > 2) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
@@ -361,7 +361,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         _partyMember2 = partyMember;
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
-        partyMember->actionQueue().push(move(action));
+        partyMember->actionQueue().add(move(action));
     }
 }
 
@@ -422,45 +422,18 @@ bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) cons
 }
 
 void Area::update(const UpdateContext &updateCtx) {
-    updateDelayedCommands();
+    Object::update(updateCtx);
+    _actionExecutor.executeActions(*this, updateCtx.deltaTime);
 
-    for (auto &creature : _objectsByType[ObjectType::Creature]) {
-        _actionExecutor.executeActions(static_cast<Creature &>(*creature), updateCtx.deltaTime);
-    }
     for (auto &room : _rooms) {
         room.second->update(updateCtx.deltaTime);
     }
     for (auto &object : _objects) {
         object->update(updateCtx);
+        _actionExecutor.executeActions(*object, updateCtx.deltaTime);
     }
     _objectSelector.update();
     _sceneGraph->prepare();
-}
-
-void Area::updateDelayedCommands() {
-    uint32_t now = SDL_GetTicks();
-
-    for (auto &command : _delayed) {
-        if (now >= command.timestamp) {
-            shared_ptr<ScriptProgram> program(command.context.savedState->program);
-
-            debug(boost::format("Area: run delayed: %s %08x") % program->name() % command.context.savedState->insOffset);
-            ScriptExecution(program, command.context).run();
-
-            command.executed = true;
-        }
-    }
-
-    auto it = remove_if(
-        _delayed.begin(),
-        _delayed.end(),
-        [](const DelayedCommand &command) { return command.executed; });
-
-    _delayed.erase(it, _delayed.end());
-}
-
-void Area::updateCreature(Creature &creature, float dt) {
-    _actionExecutor.executeActions(creature, dt);
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -510,13 +483,6 @@ void Area::updateTriggers(const Creature &creature) {
             break;
         }
     }
-}
-
-void Area::delayCommand(uint32_t timestamp, const ExecutionContext &ctx) {
-    DelayedCommand action;
-    action.timestamp = timestamp;
-    action.context = ctx;
-    _delayed.push_back(action);
 }
 
 int Area::eventUserDefined(int eventNumber) {

@@ -29,13 +29,23 @@ namespace game {
 class ActionQueue {
 public:
     void clear();
-    void push(std::unique_ptr<Action> action);
+    void add(std::unique_ptr<Action> action);
+    void delay(std::unique_ptr<Action> action, float seconds);
     void update();
 
     Action *currentAction();
 
 private:
+    struct DelayedAction {
+        std::unique_ptr<Action> action;
+        uint32_t timestamp { 0 };
+    };
+
     std::queue<std::unique_ptr<Action>> _actions;
+    std::vector<DelayedAction> _delayed;
+
+    void removeCompletedActions();
+    void updateDelayedActions();
 };
 
 } // namespace game

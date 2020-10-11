@@ -177,18 +177,19 @@ Variable RoutineManager::setLocalNumber(const vector<Variable> &args, ExecutionC
 }
 
 Variable RoutineManager::delayCommand(const vector<Variable> &args, ExecutionContext &ctx) {
-    uint32_t timestamp = SDL_GetTicks() + static_cast<int>(args[0].floatValue * 1000.0f);
-    _game->module()->area()->delayCommand(timestamp, args[1].context);
+    unique_ptr<CommandAction> action(new CommandAction(args[1].context));
+
+    shared_ptr<Object> object(getObjectById(ctx.callerId, ctx));
+    object->actionQueue().delay(move(action), args[0].floatValue);
 
     return Variable();
 }
 
 Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionContext &ctx) {
-    ExecutionContext newCtx(args[1].context);
-    newCtx.callerId = args[0].objectId;
-    newCtx.triggererId = kObjectInvalid;
+    unique_ptr<CommandAction> action(new CommandAction(args[1].context));
 
-    _game->module()->area()->delayCommand(SDL_GetTicks(), move(newCtx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    object->actionQueue().add(move(action));
 
     return Variable();
 }
@@ -224,7 +225,7 @@ Variable RoutineManager::actionDoCommand(const vector<Variable> &args, Execution
     Creature *creature = dynamic_cast<Creature *>(subject.get());
     if (creature) {
         unique_ptr<CommandAction> action(new CommandAction(args[0].context));
-        creature->actionQueue().push(move(action));
+        creature->actionQueue().add(move(action));
     }
 
     return Variable();
@@ -240,7 +241,7 @@ Variable RoutineManager::actionMoveToObject(const vector<Variable> &args, Execut
     if (subject) {
         Creature &creature = static_cast<Creature &>(*subject);
         unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object, distance));
-        creature.actionQueue().push(move(action));
+        creature.actionQueue().add(move(action));
     } else {
         warn("Routine: object not found: " + to_string(objectId));
     }
@@ -258,7 +259,7 @@ Variable RoutineManager::actionStartConversation(const vector<Variable> &args, E
     if (creature) {
         string dialogResRef((args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : creature->conversation());
         unique_ptr<StartConversationAction> action(new StartConversationAction(object, dialogResRef));
-        creature->actionQueue().push(move(action));
+        creature->actionQueue().add(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
@@ -272,7 +273,7 @@ Variable RoutineManager::actionPauseConversation(const vector<Variable> &args, E
 
     if (creature) {
         unique_ptr<Action> action(new Action(ActionType::PauseConversation));
-        creature->actionQueue().push(move(action));
+        creature->actionQueue().add(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
@@ -286,7 +287,7 @@ Variable RoutineManager::actionResumeConversation(const vector<Variable> &args, 
 
     if (creature) {
         unique_ptr<Action> action(new Action(ActionType::ResumeConversation));
-        creature->actionQueue().push(move(action));
+        creature->actionQueue().add(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
@@ -303,7 +304,7 @@ Variable RoutineManager::actionOpenDoor(const vector<Variable> &args, ExecutionC
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
             unique_ptr<ObjectAction> action(new ObjectAction(ActionType::OpenDoor, object));
-            creature->actionQueue().push(move(action));
+            creature->actionQueue().add(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());
         if (door) {
@@ -325,7 +326,7 @@ Variable RoutineManager::actionCloseDoor(const vector<Variable> &args, Execution
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
             unique_ptr<ObjectAction> action(new ObjectAction(ActionType::CloseDoor, object));
-            creature->actionQueue().push(move(action));
+            creature->actionQueue().add(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());
         if (door) {
