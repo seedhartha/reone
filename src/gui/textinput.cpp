@@ -71,13 +71,13 @@ bool TextInput::handleKeyDown(const SDL_KeyboardEvent &event) {
         } else {
             _text += event.keysym.sym;
         }
-
         return true;
 
     } else if (event.keysym.sym == SDLK_BACKSPACE) {
         if (!_text.empty()) {
             _text.resize(_text.size() - 1);
         }
+        return true;
     }
 
     return false;
