@@ -42,7 +42,9 @@ if(NOT USE_EXTERNAL_GLM)
     find_package(glm REQUIRED)
 endif()
 
-set(HEADERS
+## libengine static library
+
+set(ENGINE_HEADERS
     src/audio/player.h
     src/audio/soundinstance.h
     src/audio/stream.h
@@ -54,55 +56,6 @@ set(HEADERS
     src/core/random.h
     src/core/streamutil.h
     src/core/types.h
-    src/game/actions.h
-    src/game/camera/camera.h
-    src/game/camera/firstperson.h
-    src/game/camera/thirdperson.h
-    src/game/characters.h
-    src/game/collisiondetect.h
-    src/game/console.h
-    src/game/game.h
-    src/game/gui/chargen/chargen.h
-    src/game/gui/chargen/classselect.h
-    src/game/gui/chargen/name.h
-    src/game/gui/chargen/portraitselect.h
-    src/game/gui/chargen/quick.h
-    src/game/gui/chargen/quickorcustom.h
-    src/game/gui/container.h
-    src/game/gui/debugoverlay.h
-    src/game/gui/dialog.h
-    src/game/gui/equip.h
-    src/game/gui/hud.h
-    src/game/gui/loadscreen.h
-    src/game/gui/mainmenu.h
-    src/game/gui/selectoverlay.h
-    src/game/mp/area.h
-    src/game/mp/callbacks.h
-    src/game/mp/command.h
-    src/game/mp/creature.h
-    src/game/mp/door.h
-    src/game/mp/game.h
-    src/game/mp/objectfactory.h
-    src/game/mp/util.h
-    src/game/object/area.h
-    src/game/object/creature.h
-    src/game/object/door.h
-    src/game/object/item.h
-    src/game/object/module.h
-    src/game/object/object.h
-    src/game/object/objectfactory.h
-    src/game/object/placeable.h
-    src/game/object/spatial.h
-    src/game/object/trigger.h
-    src/game/object/waypoint.h
-    src/game/objectselect.h
-    src/game/pathfinder.h
-    src/game/player.h
-    src/game/room.h
-    src/game/script/routines.h
-    src/game/script/util.h
-    src/game/types.h
-    src/game/util.h
     src/gui/control/button.h
     src/gui/control/control.h
     src/gui/control/imagebutton.h
@@ -186,7 +139,7 @@ set(HEADERS
     src/script/util.h
     src/script/variable.h)
 
-set(SOURCES
+set(ENGINE_SOURCES
     src/audio/player.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
@@ -196,57 +149,6 @@ set(SOURCES
     src/core/pathutil.cpp
     src/core/random.cpp
     src/core/streamutil.cpp
-    src/game/actions.cpp
-    src/game/camera/camera.cpp
-    src/game/camera/firstperson.cpp
-    src/game/camera/thirdperson.cpp
-    src/game/characters.cpp
-    src/game/collisiondetect.cpp
-    src/game/console.cpp
-    src/game/game.cpp
-    src/game/gui/chargen/chargen.cpp
-    src/game/gui/chargen/classselect.cpp
-    src/game/gui/chargen/name.cpp
-    src/game/gui/chargen/portraitselect.cpp
-    src/game/gui/chargen/quick.cpp
-    src/game/gui/chargen/quickorcustom.cpp
-    src/game/gui/colors.cpp
-    src/game/gui/container.cpp
-    src/game/gui/debugoverlay.cpp
-    src/game/gui/dialog.cpp
-    src/game/gui/equip.cpp
-    src/game/gui/hud.cpp
-    src/game/gui/loadscreen.cpp
-    src/game/gui/mainmenu.cpp
-    src/game/gui/selectoverlay.cpp
-    src/game/mp/area.cpp
-    src/game/mp/command.cpp
-    src/game/mp/creature.cpp
-    src/game/mp/door.cpp
-    src/game/mp/game.cpp
-    src/game/mp/objectfactory.cpp
-    src/game/mp/util.cpp
-    src/game/object/area.cpp
-    src/game/object/creature.cpp
-    src/game/object/door.cpp
-    src/game/object/item.cpp
-    src/game/object/module.cpp
-    src/game/object/object.cpp
-    src/game/object/objectfactory.cpp
-    src/game/object/placeable.cpp
-    src/game/object/spatial.cpp
-    src/game/object/trigger.cpp
-    src/game/object/waypoint.cpp
-    src/game/objectselect.cpp
-    src/game/pathfinder.cpp
-    src/game/player.cpp
-    src/game/room.cpp
-    src/game/script/routines.cpp
-    src/game/script/routines_common.cpp
-    src/game/script/routines_kotor.cpp
-    src/game/script/routines_tsl.cpp
-    src/game/script/util.cpp
-    src/game/util.cpp
     src/gui/control/button.cpp
     src/gui/control/control.cpp
     src/gui/control/imagebutton.cpp
@@ -325,23 +227,142 @@ set(SOURCES
     src/script/util.cpp
     src/script/variable.cpp)
 
-add_library(libreone STATIC ${HEADERS} ${SOURCES})
-target_compile_definitions(libreone PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
-target_include_directories(libreone SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
-target_link_libraries(libreone PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
+add_library(libengine STATIC ${ENGINE_HEADERS} ${ENGINE_SOURCES})
+target_compile_definitions(libengine PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
+target_include_directories(libengine SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+target_link_libraries(libengine PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
 
 if(WIN32)
-    target_link_libraries(libreone PUBLIC SDL2::SDL2 OpenAL::OpenAL)
+    target_link_libraries(libengine PUBLIC SDL2::SDL2 OpenAL::OpenAL)
 else()
-    target_link_libraries(libreone PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
+    target_link_libraries(libengine PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
 endif()
 
 if(USE_EXTERNAL_GLM)
-    target_include_directories(libreone PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
+    target_include_directories(libengine PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
 endif()
 
-add_executable(reone ${HEADERS} src/main.cpp)
-target_link_libraries(reone PRIVATE libreone)
+## END libengine static library
+
+## libgame static library
+
+set(GAME_HEADERS
+    src/game/actions.h
+    src/game/camera/camera.h
+    src/game/camera/firstperson.h
+    src/game/camera/thirdperson.h
+    src/game/characters.h
+    src/game/collisiondetect.h
+    src/game/console.h
+    src/game/game.h
+    src/game/gui/chargen/chargen.h
+    src/game/gui/chargen/classselect.h
+    src/game/gui/chargen/name.h
+    src/game/gui/chargen/portraitselect.h
+    src/game/gui/chargen/quick.h
+    src/game/gui/chargen/quickorcustom.h
+    src/game/gui/container.h
+    src/game/gui/debugoverlay.h
+    src/game/gui/dialog.h
+    src/game/gui/equip.h
+    src/game/gui/hud.h
+    src/game/gui/loadscreen.h
+    src/game/gui/mainmenu.h
+    src/game/gui/selectoverlay.h
+    src/game/mp/area.h
+    src/game/mp/callbacks.h
+    src/game/mp/command.h
+    src/game/mp/creature.h
+    src/game/mp/door.h
+    src/game/mp/game.h
+    src/game/mp/objectfactory.h
+    src/game/mp/util.h
+    src/game/object/area.h
+    src/game/object/creature.h
+    src/game/object/door.h
+    src/game/object/item.h
+    src/game/object/module.h
+    src/game/object/object.h
+    src/game/object/objectfactory.h
+    src/game/object/placeable.h
+    src/game/object/spatial.h
+    src/game/object/trigger.h
+    src/game/object/waypoint.h
+    src/game/objectselect.h
+    src/game/pathfinder.h
+    src/game/player.h
+    src/game/room.h
+    src/game/script/routines.h
+    src/game/script/util.h
+    src/game/types.h
+    src/game/util.h)
+
+set(GAME_SOURCES
+    src/game/actions.cpp
+    src/game/camera/camera.cpp
+    src/game/camera/firstperson.cpp
+    src/game/camera/thirdperson.cpp
+    src/game/characters.cpp
+    src/game/collisiondetect.cpp
+    src/game/console.cpp
+    src/game/game.cpp
+    src/game/gui/chargen/chargen.cpp
+    src/game/gui/chargen/classselect.cpp
+    src/game/gui/chargen/name.cpp
+    src/game/gui/chargen/portraitselect.cpp
+    src/game/gui/chargen/quick.cpp
+    src/game/gui/chargen/quickorcustom.cpp
+    src/game/gui/colors.cpp
+    src/game/gui/container.cpp
+    src/game/gui/debugoverlay.cpp
+    src/game/gui/dialog.cpp
+    src/game/gui/equip.cpp
+    src/game/gui/hud.cpp
+    src/game/gui/loadscreen.cpp
+    src/game/gui/mainmenu.cpp
+    src/game/gui/selectoverlay.cpp
+    src/game/mp/area.cpp
+    src/game/mp/command.cpp
+    src/game/mp/creature.cpp
+    src/game/mp/door.cpp
+    src/game/mp/game.cpp
+    src/game/mp/objectfactory.cpp
+    src/game/mp/util.cpp
+    src/game/object/area.cpp
+    src/game/object/creature.cpp
+    src/game/object/door.cpp
+    src/game/object/item.cpp
+    src/game/object/module.cpp
+    src/game/object/object.cpp
+    src/game/object/objectfactory.cpp
+    src/game/object/placeable.cpp
+    src/game/object/spatial.cpp
+    src/game/object/trigger.cpp
+    src/game/object/waypoint.cpp
+    src/game/objectselect.cpp
+    src/game/pathfinder.cpp
+    src/game/player.cpp
+    src/game/room.cpp
+    src/game/script/routines.cpp
+    src/game/script/routines_common.cpp
+    src/game/script/routines_kotor.cpp
+    src/game/script/routines_tsl.cpp
+    src/game/script/util.cpp
+    src/game/util.cpp)
+
+add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
+target_link_libraries(libgame PUBLIC libengine)
+
+## END libgame static library
+
+## reone executable
+
+add_executable(reone src/main.cpp)
+target_link_libraries(reone PRIVATE libgame)
+
+## END reone executable
+
+## reone-tools executable
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
@@ -360,15 +381,21 @@ if(BUILD_TOOLS)
         tools/tlktool.cpp
         tools/tools.cpp)
 
-    add_executable(reone-tools ${HEADERS} ${TOOLS_HEADERS} ${TOOLS_SOURCES})
-    target_link_libraries(reone-tools PRIVATE libreone)
+    add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
+    target_link_libraries(reone-tools PRIVATE libgame)
 endif()
+
+## END reone-tools executable
+
+## Unit tests
 
 if(BUILD_TESTS)
     enable_testing()
 
-    add_executable(test_pathfinder ${HEADERS} tests/pathfinder.cpp)
-    target_link_libraries(test_pathfinder PRIVATE libreone)
+    add_executable(test_pathfinder tests/pathfinder.cpp)
+    target_link_libraries(test_pathfinder PRIVATE libgame)
 
     add_test(pathfinder test_pathfinder)
 endif()
+
+## END Unit tests
