@@ -36,7 +36,7 @@ class ActionExecutor {
 public:
     ActionExecutor(Area *area);
 
-    void executeActions(Creature &creature, float dt);
+    void executeActions(Object &object, float dt);
 
 private:
     Area *_area { nullptr };
@@ -54,7 +54,7 @@ private:
     void executeMoveToPoint(Creature &creature, MoveToPointAction &action, float dt);
     void executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt);
     void executeFollow(Creature &creature, FollowAction &action, float dt);
-    void executeDoCommand(Creature &creature, CommandAction &command, float dt);
+    void executeDoCommand(Object &object, CommandAction &command, float dt);
     void executeStartConversation(Creature &creature, StartConversationAction &action, float dt);
 
     // END Actions

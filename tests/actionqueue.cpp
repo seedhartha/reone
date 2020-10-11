@@ -27,8 +27,8 @@ using namespace reone::game;
 
 BOOST_AUTO_TEST_CASE(test_action_completion) {
     ActionQueue actionQueue;
-    actionQueue.push(make_unique<Action>(ActionType::PauseConversation));
-    actionQueue.push(make_unique<Action>(ActionType::ResumeConversation));
+    actionQueue.add(make_unique<Action>(ActionType::PauseConversation));
+    actionQueue.add(make_unique<Action>(ActionType::ResumeConversation));
 
     Action *currentAction = actionQueue.currentAction();
     BOOST_TEST((currentAction && currentAction->type() == ActionType::PauseConversation));

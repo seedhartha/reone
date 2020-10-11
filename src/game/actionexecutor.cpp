@@ -43,8 +43,8 @@ ActionExecutor::ActionExecutor(Area *area) : _area(area) {
     }
 }
 
-void ActionExecutor::executeActions(Creature &creature, float dt) {
-    ActionQueue &actionQueue = creature.actionQueue();
+void ActionExecutor::executeActions(Object &object, float dt) {
+    ActionQueue &actionQueue = object.actionQueue();
 
     Action *action = actionQueue.currentAction();
     if (!action) return;
@@ -52,22 +52,22 @@ void ActionExecutor::executeActions(Creature &creature, float dt) {
     ActionType type = action->type();
     switch (type) {
         case ActionType::MoveToPoint:
-            executeMoveToPoint(creature, *dynamic_cast<MoveToPointAction *>(action), dt);
+            executeMoveToPoint(static_cast<Creature &>(object), *dynamic_cast<MoveToPointAction *>(action), dt);
             break;
         case ActionType::MoveToObject:
-            executeMoveToObject(creature, *dynamic_cast<MoveToObjectAction *>(action), dt);
+            executeMoveToObject(static_cast<Creature &>(object), *dynamic_cast<MoveToObjectAction *>(action), dt);
             break;
         case ActionType::Follow:
-            executeFollow(creature, *dynamic_cast<FollowAction *>(action), dt);
+            executeFollow(static_cast<Creature &>(object), *dynamic_cast<FollowAction *>(action), dt);
             break;
         case ActionType::DoCommand:
-            executeDoCommand(creature, *dynamic_cast<CommandAction *>(action), dt);
+            executeDoCommand(object, *dynamic_cast<CommandAction *>(action), dt);
             break;
         case ActionType::StartConversation:
-            executeStartConversation(creature, *dynamic_cast<StartConversationAction *>(action), dt);
+            executeStartConversation(static_cast<Creature &>(object), *dynamic_cast<StartConversationAction *>(action), dt);
             break;
         default:
-            warn("Area: action not implemented: " + to_string(static_cast<int>(type)));
+            warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
             action->isCompleted();
             break;
     }
@@ -101,9 +101,9 @@ void ActionExecutor::executeFollow(Creature &creature, FollowAction &action, flo
     navigateCreature(creature, dest, distance, dt);
 }
 
-void ActionExecutor::executeDoCommand(Creature &creature, CommandAction &action, float dt) {
+void ActionExecutor::executeDoCommand(Object &object, CommandAction &action, float dt) {
     ExecutionContext ctx(action.context());
-    ctx.callerId = creature.id();
+    ctx.callerId = object.id();
 
     ScriptExecution(ctx.savedState->program, move(ctx)).run();
     action.complete();

@@ -17,6 +17,10 @@
 
 #include "actionqueue.h"
 
+#include <algorithm>
+
+#include "SDL2/SDL_timer.h"
+
 using namespace std;
 
 namespace reone {
@@ -29,17 +33,45 @@ void ActionQueue::clear() {
     }
 }
 
-void ActionQueue::push(unique_ptr<Action> action) {
+void ActionQueue::add(unique_ptr<Action> action) {
     _actions.push(move(action));
 }
 
+void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
+    DelayedAction delayed;
+    delayed.action = move(action);
+    delayed.timestamp = SDL_GetTicks() + static_cast<int>(1000.0f * seconds);
+    _delayed.push_back(move(delayed));
+}
+
 void ActionQueue::update() {
+    removeCompletedActions();
+    updateDelayedActions();
+}
+
+void ActionQueue::removeCompletedActions() {
     while (true) {
         const Action *action = currentAction();
         if (!action || !action->isCompleted()) return;
 
         _actions.pop();
     }
+}
+
+void ActionQueue::updateDelayedActions() {
+    uint32_t now = SDL_GetTicks();
+
+    for (auto &delayed : _delayed) {
+        if (now >= delayed.timestamp) {
+            _actions.push(move(delayed.action));
+        }
+    }
+    auto delayedToRemove = remove_if(
+        _delayed.begin(),
+        _delayed.end(),
+        [&now](const DelayedAction &delayed) { return now >= delayed.timestamp; });
+
+    _delayed.erase(delayedToRemove, _delayed.end());
 }
 
 Action *ActionQueue::currentAction() {

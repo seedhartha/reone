@@ -44,8 +44,6 @@ public:
 private:
     IMultiplayerCallbacks *_callbacks { nullptr };
 
-    void updateCreature(Creature &creature, float dt) override;
-
     void executeLoadCreature(const Command &cmd);
     void executeSetPlayerRole(const Command &cmd);
     void executeSetObjectTransform(const Command &cmd);

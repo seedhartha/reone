@@ -43,12 +43,6 @@ MultiplayerArea::MultiplayerArea(
     _scriptsEnabled = mode == MultiplayerMode::Server;
 }
 
-void MultiplayerArea::updateCreature(Creature &creature, float dt) {
-    if (static_cast<MultiplayerCreature &>(creature).isControlled()) return;
-
-    Area::updateCreature(creature, dt);
-}
-
 void MultiplayerArea::execute(const Command &cmd) {
     switch (cmd.type()) {
         case CommandType::LoadCreature:

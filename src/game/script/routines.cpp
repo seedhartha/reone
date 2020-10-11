@@ -72,35 +72,34 @@ void RoutineManager::add(
 }
 
 const Routine &RoutineManager::get(int index) {
-    assert(index >= 0 && index < _routines.size());
     return _routines[index];
 }
 
 shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
-    uint32_t finalId = 0;
+    uint32_t objectId = 0;
     switch (id) {
         case kObjectSelf:
-            finalId = ctx.callerId;
+            objectId = ctx.callerId;
             break;
         case kObjectInvalid:
             warn("Routine: invalid object id: " + to_string(id));
             return nullptr;
         default:
-            finalId = id;
+            objectId = id;
             break;
     }
 
     shared_ptr<Module> module(_game->module());
-    if (finalId == module->id()) {
+    if (module->id() == objectId) {
         return module;
     }
 
     shared_ptr<Area> area(module->area());
-    if (finalId == area->id()) {
+    if (area->id() == objectId) {
         return area;
     }
 
-    return area->find(finalId);
+    return area->find(objectId);
 }
 
 } // namespace game

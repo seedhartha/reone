@@ -17,8 +17,6 @@
 
 #include "action.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
