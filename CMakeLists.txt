@@ -42,9 +42,9 @@ if(NOT USE_EXTERNAL_GLM)
     find_package(glm REQUIRED)
 endif()
 
-## libengine static library
+## libsystem static library
 
-set(ENGINE_HEADERS
+set(SYSTEM_HEADERS
     src/audio/player.h
     src/audio/soundinstance.h
     src/audio/stream.h
@@ -138,7 +138,7 @@ set(ENGINE_HEADERS
     src/script/util.h
     src/script/variable.h)
 
-set(ENGINE_SOURCES
+set(SYSTEM_SOURCES
     src/audio/player.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
@@ -225,22 +225,22 @@ set(ENGINE_SOURCES
     src/script/util.cpp
     src/script/variable.cpp)
 
-add_library(libengine STATIC ${ENGINE_HEADERS} ${ENGINE_SOURCES})
-target_compile_definitions(libengine PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
-target_include_directories(libengine SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
-target_link_libraries(libengine PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
+add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
+target_compile_definitions(libsystem PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
+target_include_directories(libsystem SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+target_link_libraries(libsystem PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
 
 if(WIN32)
-    target_link_libraries(libengine PUBLIC SDL2::SDL2 OpenAL::OpenAL)
+    target_link_libraries(libsystem PUBLIC SDL2::SDL2 OpenAL::OpenAL)
 else()
-    target_link_libraries(libengine PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
+    target_link_libraries(libsystem PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
 endif()
 
 if(USE_EXTERNAL_GLM)
-    target_include_directories(libengine PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
+    target_include_directories(libsystem PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
 endif()
 
-## END libengine static library
+## END libsystem static library
 
 ## libgame static library
 
@@ -349,7 +349,7 @@ set(GAME_SOURCES
     src/game/util.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
-target_link_libraries(libgame PUBLIC libengine)
+target_link_libraries(libgame PUBLIC libsystem)
 
 ## END libgame static library
 
