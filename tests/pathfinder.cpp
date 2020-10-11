@@ -15,9 +15,13 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#define BOOST_TEST_MODULE Pathfinder
+
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
+
+#include <boost/test/included/unit_test.hpp>
 
 #include "../src/game/pathfinder.h"
 #include "../src/resource/pthfile.h"
@@ -27,7 +31,7 @@ using namespace std;
 using namespace reone::game;
 using namespace reone::resource;
 
-int main(int argc, char **argv) {
+BOOST_AUTO_TEST_CASE(test_find_path) {
     vector<PthFile::Point> points = {
         { 1.0f, 1.0f, { 1, 2 } },
         { 1.0f, 2.0f, { 0, 2 } },
@@ -41,15 +45,32 @@ int main(int argc, char **argv) {
     }
     Pathfinder pathfinder;
     pathfinder.load(points, pointZ);
-    auto path = pathfinder.findPath(glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(3.0f, 3.0f, 0.0f));
 
-    if (path.size() != 3 ||
-        path[0] != glm::vec3(1.0f, 1.0f, 0.0f) ||
-        path[1] != glm::vec3(2.0f, 2.0f, 0.0f) ||
-        path[2] != glm::vec3(3.0f, 3.0f, 0.0f)) {
+    glm::vec3 from(glm::vec3(1.0f, 1.0f, 0.0f));
+    glm::vec3 to(glm::vec3(3.0f, 3.0f, 0.0f));
+    vector<glm::vec3> path(pathfinder.findPath(from, to));
 
-        return -1;
-    }
+    bool found =
+        path.size() == 3 &&
+        path[0] == glm::vec3(1.0f, 1.0f, 0.0f) &&
+        path[1] == glm::vec3(2.0f, 2.0f, 0.0f) &&
+        path[2] == glm::vec3(3.0f, 3.0f, 0.0f);
 
-    return 0;
+    BOOST_TEST(found);
+}
+
+BOOST_AUTO_TEST_CASE(find_path_when_no_points_then_from_to_returned) {
+    Pathfinder pathfinder;
+    pathfinder.load({}, {});
+
+    glm::vec3 from(glm::vec3(1.0f, 1.0f, 0.0f));
+    glm::vec3 to(glm::vec3(3.0f, 3.0f, 0.0f));
+    vector<glm::vec3> path(pathfinder.findPath(from, to));
+
+    bool found =
+        path.size() == 2 &&
+        path[0] == glm::vec3(1.0f, 1.0f, 0.0f) &&
+        path[1] == glm::vec3(3.0f, 3.0f, 0.0f);
+
+    BOOST_TEST(found);
 }
