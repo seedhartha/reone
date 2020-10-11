@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "SDL_events.h"
+#include "SDL2/SDL_events.h"
 
 #include "../gui/textinput.h"
 #include "../render/font.h"
