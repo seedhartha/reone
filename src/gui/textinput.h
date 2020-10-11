@@ -17,44 +17,39 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
 #include <string>
 
 #include "SDL_events.h"
 
-#include "../gui/textinput.h"
-#include "../render/font.h"
-#include "../render/types.h"
-
 namespace reone {
 
-namespace game {
+namespace gui {
 
-class Console {
-public:
-    Console(const render::GraphicsOptions &opts);
-
-    void load();
-    bool handle(const SDL_Event &event);
-    void render() const;
-
-    bool isOpen() const;
-
-private:
-    std::shared_ptr<render::Font> _font;
-    render::GraphicsOptions _opts;
-    bool _open { false };
-    gui::TextInput _input;
-
-    Console(const Console &) = delete;
-    Console &operator=(const Console &) = delete;
-
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
-    void executeInputText();
+enum TextInputFlags {
+    kTextInputDigits = 1,
+    kTextInputLetters = 2,
+    kTextInputWhitespace = 4,
+    kTextInputPunctuation = 8,
+    kTextInputConsole = kTextInputDigits | kTextInputLetters | kTextInputWhitespace | kTextInputPunctuation
 };
 
-} // namespace game
+class TextInput {
+public:
+    TextInput(int mask);
+
+    void clear();
+    bool handle(const SDL_Event &event);
+
+    const std::string &text() const;
+
+private:
+    int _mask { 0 };
+    std::string _text;
+
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool isKeyAllowed(const SDL_Keysym &key) const;
+};
+
+} // namespace gui
 
 } // namespace reone
