@@ -30,9 +30,9 @@ class ActionQueue {
 public:
     void clear();
     void push(std::unique_ptr<Action> action);
-    void pop();
+    void update();
 
-    const Action *currentAction() const;
+    Action *currentAction();
 
 private:
     std::queue<std::unique_ptr<Action>> _actions;

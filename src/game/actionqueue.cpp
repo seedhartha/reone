@@ -33,11 +33,16 @@ void ActionQueue::push(unique_ptr<Action> action) {
     _actions.push(move(action));
 }
 
-void ActionQueue::pop() {
-    _actions.pop();
+void ActionQueue::update() {
+    while (true) {
+        const Action *action = currentAction();
+        if (!action || !action->isCompleted()) return;
+
+        _actions.pop();
+    }
 }
 
-const Action *ActionQueue::currentAction() const {
+Action *ActionQueue::currentAction() {
    return _actions.empty() ? nullptr : _actions.back().get();
 }
 

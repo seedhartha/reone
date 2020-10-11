@@ -41,10 +41,14 @@ public:
     Action(ActionType type);
     virtual ~Action() = default;
 
+    void complete();
+
     ActionType type() const;
+    bool isCompleted() const;
 
 protected:
     ActionType _type { ActionType::QueueEmpty };
+    bool _completed { false };
 
 private:
     Action(const Action &) = delete;

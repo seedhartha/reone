@@ -30,6 +30,14 @@ ActionType Action::type() const {
     return _type;
 }
 
+bool Action::isCompleted() const {
+    return _completed;
+}
+
+void Action::complete() {
+    _completed = true;
+}
+
 } // namespace game
 
 } // namespace reone

@@ -30,6 +30,7 @@ Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
 }
 
 void Object::update(const UpdateContext &ctx) {
+    _actionQueue.update();
 }
 
 void Object::saveTo(AreaState &state) const {
