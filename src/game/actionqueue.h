@@ -24,8 +24,6 @@
 
 #include "../script/types.h"
 
-#include "object/object.h"
-
 namespace reone {
 
 namespace game {
@@ -43,6 +41,8 @@ enum class ActionType {
     PauseConversation = 0x1002,
     ResumeConversation = 0x1003
 };
+
+class Object;
 
 struct Action {
     ActionType type { ActionType::MoveToPoint };

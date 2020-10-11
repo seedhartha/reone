@@ -54,6 +54,10 @@ const string &Object::tag() const {
     return _tag;
 }
 
+ActionQueue &Object::actionQueue() {
+    return _actionQueue;
+}
+
 } // namespace game
 
 } // namespace reone

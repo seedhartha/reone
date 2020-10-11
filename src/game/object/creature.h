@@ -25,8 +25,6 @@
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
-#include "../actionqueue.h"
-
 #include "item.h"
 #include "spatial.h"
 
@@ -58,7 +56,6 @@ public:
     float walkSpeed() const;
     float runSpeed() const;
     glm::vec3 selectablePosition() const override;
-    ActionQueue &actionQueue();
 
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);
@@ -117,7 +114,6 @@ private:
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
     std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
-    ActionQueue _actionQueue;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };

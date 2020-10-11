@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include "../types.h"
-
 #include <cstdint>
 #include <string>
+
+#include "../actionqueue.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -38,6 +39,7 @@ public:
     uint32_t id() const;
     ObjectType type() const;
     const std::string &tag() const;
+    ActionQueue &actionQueue();
 
     void setSynchronize(bool synchronize);
 
@@ -45,6 +47,7 @@ protected:
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
     std::string _tag;
+    ActionQueue _actionQueue;
     bool _synchronize { false };
 
     Object(uint32_t id, ObjectType type);
