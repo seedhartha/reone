@@ -25,6 +25,8 @@
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
+#include "../actionqueue.h"
+
 #include "item.h"
 #include "spatial.h"
 
@@ -36,33 +38,6 @@ class ObjectFactory;
 
 class Creature : public SpatialObject {
 public:
-    enum class ActionType {
-        MoveToPoint = 0,
-        OpenDoor = 5,
-        CloseDoor = 6,
-        Follow = 35,
-        FollowLeader = 38,
-        QueueEmpty = 65534,
-
-        DoCommand = 0x1000,
-        StartConversation = 0x1001,
-        PauseConversation = 0x1002,
-        ResumeConversation = 0x1003
-    };
-
-    struct Action {
-        ActionType type { ActionType::MoveToPoint };
-        glm::vec3 point { 0.0f };
-        std::shared_ptr<Object> object;
-        float distance { 1.0f };
-        script::ExecutionContext context;
-        std::string resRef;
-
-        Action(ActionType type);
-        Action(ActionType type, const std::shared_ptr<Object> &object, float distance);
-        Action(ActionType type, const script::ExecutionContext &ctx);
-    };
-
     struct Path {
         glm::vec3 destination { 0.0f };
         std::vector<glm::vec3> points;
@@ -80,10 +55,10 @@ public:
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
     std::string conversation() const;
-    bool hasActions() const;
     float walkSpeed() const;
     float runSpeed() const;
     glm::vec3 selectablePosition() const override;
+    ActionQueue &actionQueue();
 
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);
@@ -96,16 +71,6 @@ public:
     void playTalkAnimation();
 
     // END Animations
-
-    // Actions
-
-    void clearActions();
-    void enqueueAction(Action action);
-    void popCurrentAction();
-
-    const Action &currentAction() const;
-
-    // END Actions
 
     // Load/save
 
@@ -152,15 +117,18 @@ private:
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<render::Texture> _portrait;
     std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
-    std::list<Action> _actions;
+    ActionQueue _actionQueue;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
 
     // Loading
+
     void loadBlueprint(const std::string &resRef);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
+
+    // END Loading
 
     ModelType parseModelType(const std::string &s) const;
     void updateAppearance();

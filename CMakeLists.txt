@@ -243,6 +243,7 @@ endif()
 ## libgame static library
 
 set(GAME_HEADERS
+    src/game/actionqueue.h
     src/game/actions.h
     src/game/camera/camera.h
     src/game/camera/firstperson.h
@@ -294,6 +295,7 @@ set(GAME_HEADERS
     src/game/util.h)
 
 set(GAME_SOURCES
+    src/game/actionqueue.cpp
     src/game/actions.cpp
     src/game/camera/camera.cpp
     src/game/camera/firstperson.cpp
