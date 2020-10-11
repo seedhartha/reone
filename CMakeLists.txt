@@ -16,6 +16,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_TESTS "build unit tests" OFF)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" OFF)
