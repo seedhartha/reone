@@ -338,6 +338,21 @@ Variable RoutineManager::actionCloseDoor(const vector<Variable> &args, Execution
     return Variable();
 }
 
+Variable RoutineManager::isAvailableCreature(const vector<Variable> &args, ExecutionContext &ctx) {
+    // TODO: implement routine
+    return Variable(0);
+}
+
+Variable RoutineManager::addAvailableNPCByTemplate(const vector<Variable> &args, ExecutionContext &ctx) {
+    // TODO: implement routine
+    return Variable(0);
+}
+
+Variable RoutineManager::showPartySelectionGUI(const vector<Variable> &args, ExecutionContext &ctx) {
+    // TODO: implement routine
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

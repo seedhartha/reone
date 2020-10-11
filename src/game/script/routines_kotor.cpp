@@ -735,8 +735,8 @@ void RoutineManager::addKotorRoutines() {
     add("SetGlobalLocation", Void, { String, Location });
     add("AddAvailableNPCByObject", Int, { Int, Object });
     add("RemoveAvailableNPC", Int, { Int });
-    add("IsAvailableCreature", Int, { Int });
-    add("AddAvailableNPCByTemplate", Int, { Int, String });
+    add("IsAvailableCreature", Int, { Int }, bind(&RoutineManager::isAvailableCreature, this, _1, _2));
+    add("AddAvailableNPCByTemplate", Int, { Int, String }, bind(&RoutineManager::addAvailableNPCByTemplate, this, _1, _2));
     add("SpawnAvailableNPC", Object, { Int, Location });
     add("IsNPCPartyMember", Int, { Int });
     add("ActionBarkString", Void, { Int });
@@ -751,7 +751,7 @@ void RoutineManager::addKotorRoutines() {
     add("GetNPCSelectability", Int, { Int });
     add("ClearAllEffects", Void, { });
     add("GetLastConversation", String, { });
-    add("ShowPartySelectionGUI", Void, { String, Int, Int });
+    add("ShowPartySelectionGUI", Void, { String, Int, Int }, bind(&RoutineManager::showPartySelectionGUI, this, _1, _2));
     add("GetStandardFaction", Int, { Object });
     add("GivePlotXP", Void, { String, Int });
     add("GetMinOneHP", Int, { Object });

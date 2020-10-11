@@ -117,6 +117,14 @@ private:
     script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Actions
+
+    // Party
+
+    script::Variable isAvailableCreature(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable addAvailableNPCByTemplate(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Party
 };
 
 #define Routines RoutineManager::instance()
