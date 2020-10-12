@@ -26,6 +26,8 @@
 #include "../object/creature.h"
 #include "../object/item.h"
 
+#include "colors.h"
+
 using namespace std;
 using namespace std::placeholders;
 

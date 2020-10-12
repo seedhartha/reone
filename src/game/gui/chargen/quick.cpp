@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../types.h"
+#include "../colors.h"
 
 using namespace std;
 

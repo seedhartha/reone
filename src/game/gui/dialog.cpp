@@ -27,7 +27,8 @@
 
 #include "../script/routines.h"
 #include "../script/util.h"
-#include "../types.h"
+
+#include "colors.h"
 
 using namespace std;
 

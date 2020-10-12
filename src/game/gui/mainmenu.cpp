@@ -26,6 +26,8 @@
 #include "../../gui/scenebuilder.h"
 #include "../../resource/resources.h"
 
+#include "colors.h"
+
 using namespace std;
 using namespace std::placeholders;
 

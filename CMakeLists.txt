@@ -267,6 +267,7 @@ set(GAME_HEADERS
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
     src/game/gui/chargen/quickorcustom.h
+    src/game/gui/colors.h
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
