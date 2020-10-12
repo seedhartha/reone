@@ -46,6 +46,7 @@ set(SYSTEM_HEADERS
     src/audio/soundinstance.h
     src/audio/stream.h
     src/audio/types.h
+    src/audio/util.h
     src/core/debug.h
     src/core/jobs.h
     src/core/log.h
@@ -139,6 +140,7 @@ set(SYSTEM_SOURCES
     src/audio/player.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
+    src/audio/util.cpp
     src/core/debug.cpp
     src/core/jobs.cpp
     src/core/log.cpp
@@ -299,8 +301,7 @@ set(GAME_HEADERS
     src/game/room.h
     src/game/script/routines.h
     src/game/script/util.h
-    src/game/types.h
-    src/game/util.h)
+    src/game/types.h)
 
 set(GAME_SOURCES
     src/game/action/action.cpp
@@ -361,8 +362,7 @@ set(GAME_SOURCES
     src/game/script/routines_common.cpp
     src/game/script/routines_kotor.cpp
     src/game/script/routines_tsl.cpp
-    src/game/script/util.cpp
-    src/game/util.cpp)
+    src/game/script/util.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

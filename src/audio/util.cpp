@@ -17,23 +17,23 @@
 
 #include "util.h"
 
-#include "../audio/player.h"
 #include "../resource/resources.h"
+
+#include "player.h"
 
 using namespace std;
 
-using namespace reone::audio;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace audio {
 
 shared_ptr<SoundInstance> playMusic(const string &resRef) {
     shared_ptr<AudioStream> stream(Resources.findAudio(resRef));
     return TheAudioPlayer.play(stream, AudioType::Music);
 }
 
-} // namespace util
+} // namespace audio
 
 } // namespace reone
