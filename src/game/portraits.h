@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "types.h"
+#include <string>
 
 namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz);
+std::string findPortrait(int appearance);
 
 } // namespace game
 
