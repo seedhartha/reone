@@ -574,6 +574,9 @@ void Control::setBorder(const Border &border) {
 }
 
 void Control::setBorderFill(const string &resRef) {
+    if (!_border) {
+        _border = make_shared<Border>();
+    }
     if (!resRef.empty()) {
         _border->fill = Resources.findTexture(resRef, TextureType::GUI);
     } else {
@@ -602,6 +605,10 @@ void Control::setText(const Text &text) {
 
 void Control::setTextMessage(const string &text) {
     _text.text = text;
+}
+
+void Control::setTextColor(const glm::vec3 &color) {
+    _text.color = color;
 }
 
 void Control::setScene3D(unique_ptr<Scene3D> scene) {

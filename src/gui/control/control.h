@@ -124,6 +124,7 @@ public:
     void setHilightColor(const glm::vec3 &color);
     void setText(const Text &text);
     void setTextMessage(const std::string &text);
+    void setTextColor(const glm::vec3 & color);
     void setScene3D(std::unique_ptr<Scene3D> scene);
     void setPadding(int padding);
     void setDiscardColor(const glm::vec3 &color);
