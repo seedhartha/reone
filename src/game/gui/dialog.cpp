@@ -76,11 +76,8 @@ void DialogGui::addFrame(int top, int height) {
     extent.width = _gfxOpts.width;
     extent.height = height;
 
-    Control::Border border;
-    border.fill = Resources.findTexture("blackfill", TextureType::Diffuse);
-
     frame->setExtent(move(extent));
-    frame->setBorder(move(border));
+    frame->setBorderFill("blackfill");
 
     _controls.insert(_controls.begin(), move(frame));
 }
@@ -91,25 +88,16 @@ void DialogGui::configureMessage() {
     Control::Extent extent(message.extent());
     extent.top = -_rootControl->extent().top;
 
-    Control::Text text(message.text());
-    text.color = getBaseColor(_version);
-
     message.setExtent(move(extent));
-    message.setText(move(text));
+    message.setTextColor(getBaseColor(_version));
 }
 
 void DialogGui::configureReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
+
     Control &protoItem = replies.protoItem();
-
-    Control::Border hilight;
-    hilight.color = getHilightColor(_version);
-
-    Control::Text text(protoItem.text());
-    text.color = getBaseColor(_version);
-
-    protoItem.setHilight(move(hilight));
-    protoItem.setText(move(text));
+    protoItem.setHilightColor(getHilightColor(_version));
+    protoItem.setTextColor(getBaseColor(_version));
 
     replies.setOnItemClicked([this](const string &ctrl, const string &item) {
         int replyIdx = stoi(item);
