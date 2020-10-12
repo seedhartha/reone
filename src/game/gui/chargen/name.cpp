@@ -17,7 +17,7 @@
 
 #include "name.h"
 
-#include "../../types.h"
+#include "../colors.h"
 
 using namespace std;
 

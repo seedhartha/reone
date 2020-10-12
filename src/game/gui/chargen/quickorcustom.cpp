@@ -17,7 +17,7 @@
 
 #include "quickorcustom.h"
 
-#include "../../types.h"
+#include "../colors.h"
 
 using namespace std;
 

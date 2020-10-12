@@ -23,6 +23,8 @@
 #include "../../characters.h"
 #include "../../object/creature.h"
 
+#include "../colors.h"
+
 using namespace std;
 
 using namespace reone::gui;

@@ -20,7 +20,7 @@
 #include "../../../core/random.h"
 #include "../../../resource/resources.h"
 
-#include "../../types.h"
+#include "../colors.h"
 
 using namespace std;
 

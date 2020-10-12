@@ -202,10 +202,6 @@ struct CameraStyle {
     float viewAngle { 0.0f };
 };
 
-glm::vec3 getBaseColor(resource::GameVersion version);
-glm::vec3 getHilightColor(resource::GameVersion version);
-glm::vec3 getDisabledColor(resource::GameVersion version);
-
 } // namespace game
 
 } // namespace reone
