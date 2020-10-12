@@ -299,6 +299,7 @@ set(GAME_HEADERS
     src/game/party.h
     src/game/pathfinder.h
     src/game/player.h
+    src/game/portraits.h
     src/game/room.h
     src/game/script/routines.h
     src/game/script/util.h
@@ -358,6 +359,7 @@ set(GAME_SOURCES
     src/game/party.cpp
     src/game/pathfinder.cpp
     src/game/player.cpp
+    src/game/portraits.cpp
     src/game/room.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp

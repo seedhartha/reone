@@ -22,7 +22,7 @@
 #include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 
-#include "../../characters.h"
+#include "../../portraits.h"
 
 using namespace std;
 using namespace std::placeholders;

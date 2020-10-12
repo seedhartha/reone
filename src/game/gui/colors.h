@@ -17,13 +17,17 @@
 
 #pragma once
 
-#include "types.h"
+#include "glm/vec3.hpp"
+
+#include "../../resource/types.h"
 
 namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz);
+glm::vec3 getBaseColor(resource::GameVersion version);
+glm::vec3 getHilightColor(resource::GameVersion version);
+glm::vec3 getDisabledColor(resource::GameVersion version);
 
 } // namespace game
 

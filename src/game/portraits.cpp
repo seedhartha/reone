@@ -15,15 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "portraits.h"
 
-#include "types.h"
+#include "../resource/resources.h"
+
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz);
+string findPortrait(int appearance) {
+    shared_ptr<TwoDaTable> table(Resources.find2DA("portraits"));
+
+    const TwoDaRow *row = table->findRow([&appearance](const TwoDaRow &row) {
+        if (row.getInt("forpc") == 0) return false;
+
+        int appearanceNumber = row.getInt("appearancenumber");
+        int appearanceS = row.getInt("appearance_s");
+        int appearanceL = row.getInt("appearance_l");
+
+        return
+            appearanceNumber == appearance ||
+            appearanceS == appearance ||
+            appearanceL == appearance;
+    });
+
+    return row ? row->getString("baseresref") : "";
+}
 
 } // namespace game
 
