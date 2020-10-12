@@ -20,12 +20,11 @@
 #include "glm/glm.hpp"
 
 #include "../../audio/player.h"
+#include "../../audio/util.h"
 #include "../../core/debug.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
 #include "../../resource/resources.h"
-
-#include "../util.h"
 
 using namespace std;
 using namespace std::placeholders;

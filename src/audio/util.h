@@ -19,14 +19,14 @@
 
 #include <string>
 
-#include "../audio/soundinstance.h"
+#include "soundinstance.h"
 
 namespace reone {
 
-namespace game {
+namespace audio {
 
-std::shared_ptr<audio::SoundInstance> playMusic(const std::string &resRef);
+std::shared_ptr<SoundInstance> playMusic(const std::string &resRef);
 
-} // namespace util
+} // namespace audio
 
 } // namespace reone

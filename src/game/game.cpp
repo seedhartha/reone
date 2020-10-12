@@ -22,6 +22,7 @@
 #include "SDL2/SDL.h"
 
 #include "../audio/player.h"
+#include "../audio/util.h"
 #include "../core/jobs.h"
 #include "../core/log.h"
 #include "../core/pathutil.h"
@@ -32,7 +33,6 @@
 #include "object/objectfactory.h"
 #include "script/routines.h"
 #include "script/util.h"
-#include "util.h"
 
 using namespace std;
 using namespace std::placeholders;
