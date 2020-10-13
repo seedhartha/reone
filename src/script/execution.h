@@ -36,6 +36,9 @@ public:
 
     int run();
 
+    int stackSize() const;
+    const Variable &getStackVariable(int index) const;
+
 private:
     std::shared_ptr<ScriptProgram> _program;
     ExecutionContext _context;
@@ -82,6 +85,7 @@ private:
     void executeJumpToSubroutine(const Instruction &ins);
     void executeJumpIfZero(const Instruction &ins);
     void executeReturn(const Instruction &ins);
+    void executeDestruct(const Instruction &ins);
     void executeDecRelToSP(const Instruction &ins);
     void executeIncRelToSP(const Instruction &ins);
     void executeLogicalNot(const Instruction &ins);

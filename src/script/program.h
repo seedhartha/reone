@@ -136,9 +136,13 @@ class ScriptProgram {
 public:
     ScriptProgram(const std::string &name);
 
+    void add(Instruction instr);
+
     const std::string &name() const;
     uint32_t length() const;
     const Instruction &getInstruction(uint32_t offset) const;
+
+    void setLength(uint32_t length);
 
 private:
     std::string _name;
