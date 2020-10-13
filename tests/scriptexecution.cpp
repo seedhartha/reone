@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
     instr.size = 16;
     instr.stackOffset = 4;
     instr.sizeNoDestroy = 4;
-    instr.nextOffset = instr.offset + 6;
+    instr.nextOffset = instr.offset + 8;
     program->add(instr);
 
     program->setLength(instr.nextOffset);
@@ -67,4 +67,49 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
 
     BOOST_TEST((execution.stackSize() == 1));
     BOOST_TEST((execution.getStackVariable(0).intValue == 1));
+}
+
+BOOST_AUTO_TEST_CASE(test_cptopbp) {
+    Instruction instr;
+    shared_ptr<ScriptProgram> program(new ScriptProgram(""));
+
+    instr.offset = 13;
+    instr.byteCode = ByteCode::PushConstant;
+    instr.type = InstructionType::Int;
+    instr.intValue = 0;
+    instr.nextOffset = instr.offset + 6;
+    program->add(instr);
+
+    instr.offset = instr.nextOffset;
+    instr.intValue = 1;
+    instr.nextOffset = instr.offset + 6;
+    program->add(instr);
+
+    instr.offset = instr.nextOffset;
+    instr.intValue = 2;
+    instr.nextOffset = instr.offset + 6;
+    program->add(instr);
+
+    instr.offset = instr.nextOffset;
+    instr.byteCode = ByteCode::SaveBP;
+    instr.type = InstructionType::None;
+    instr.nextOffset = instr.offset + 2;
+    program->add(instr);
+
+    instr.offset = instr.nextOffset;
+    instr.byteCode = ByteCode::CopyTopBP;
+    instr.stackOffset = -8;
+    instr.size = 8;
+    instr.nextOffset = instr.offset + 8;
+    program->add(instr);
+
+    program->setLength(instr.nextOffset);
+
+    ExecutionContext context;
+    ScriptExecution execution(program, context);
+    execution.run();
+
+    BOOST_TEST((execution.stackSize() == 6));
+    BOOST_TEST((execution.getStackVariable(4).intValue == 1));
+    BOOST_TEST((execution.getStackVariable(5).intValue == 2));
 }
