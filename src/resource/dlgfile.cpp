@@ -92,12 +92,10 @@ const vector<DlgFile::EntryReplyLink> &DlgFile::startEntries() const {
 }
 
 const DlgFile::EntryReply &DlgFile::getEntry(int index) const {
-    assert(index >= 0 && index < _entries.size());
     return _entries[index];
 }
 
 const DlgFile::EntryReply &DlgFile::getReply(int index) const {
-    assert(index >= 0 && index < _replies.size());
     return _replies[index];
 }
 

@@ -37,7 +37,6 @@ DebugOverlay::DebugOverlay(const GraphicsOptions &opts) : _opts(opts) {
 
 void DebugOverlay::load() {
     _font = Resources.findFont(kFontResRef);
-    assert(_font);
 }
 
 void DebugOverlay::setContext(const DebugContext &ctx) {

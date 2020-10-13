@@ -77,8 +77,6 @@ void info(const boost::format &s) {
 }
 
 void debug(const string &s, uint32_t level) {
-    assert(level > 0);
-
     if (level <= getDebugLevel()) {
         log(cout, LogLevel::Debug, s);
     }

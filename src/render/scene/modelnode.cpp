@@ -383,7 +383,6 @@ const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
 
 void ModelSceneNode::setModel(const shared_ptr<Model> &model) {
     _model = model;
-    assert(_model);
 
     _meshes.clear();
     _lights.clear();

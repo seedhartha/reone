@@ -26,7 +26,6 @@ namespace reone {
 namespace render {
 
 LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, const ModelNode *modelNode) : SceneNode(sceneGraph), _modelNode(modelNode) {
-    assert(_modelNode);
 }
 
 void LightSceneNode::fillSceneGraph() {

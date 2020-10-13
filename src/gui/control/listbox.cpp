@@ -182,7 +182,6 @@ void ListBox::setProtoItemType(ControlType type) {
 }
 
 const ListBox::Item &ListBox::getItemAt(int index) const {
-    assert(index >= 0 && index < _items.size());
     return _items[index];
 }
 

@@ -57,7 +57,6 @@ static string g_headHookNode("headhook");
 Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
 
-    assert(_objectFactory);
     _drawDistance = 2048.0f;
     _fadeDistance = 0.25f * _drawDistance;
     _selectable = true;

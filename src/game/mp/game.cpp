@@ -69,7 +69,6 @@ void MultiplayerGame::configure() {
 }
 
 void MultiplayerGame::onClientConnected(const string tag) {
-    assert(_module && _module->loaded());
     synchronizeClient(tag);
 }
 
@@ -119,12 +118,10 @@ void MultiplayerGame::sendLoadModule(const string &client, const string &module)
 }
 
 shared_ptr<net::Command> MultiplayerGame::makeCommand(net::CommandType type) {
-    assert(_cmdCounter <= UINT_MAX);
     return shared_ptr<net::Command>(new Command(_cmdCounter++, type));
 }
 
 void MultiplayerGame::sendCommand(const string &client, const shared_ptr<net::Command> &command) {
-    assert(_mode == MultiplayerMode::Server);
     _server->send(client, command);
 }
 

@@ -40,8 +40,6 @@ void TwoDaRow::add(const string &column, const string &value) {
 
 const string &TwoDaRow::getString(const string &column) const {
     auto val = _values.find(column);
-    assert(val != _values.end());
-
     return val->second;
 }
 

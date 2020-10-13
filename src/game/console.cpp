@@ -43,7 +43,6 @@ Console::Console(const GraphicsOptions &opts) : _opts(opts), _input(kTextInputCo
 
 void Console::load() {
     _font = Resources.findFont("fnt_d16x16");
-    assert(_font);
 }
 
 bool Console::handle(const SDL_Event &event) {

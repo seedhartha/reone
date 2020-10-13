@@ -123,7 +123,6 @@ void EquipmentGui::onItemClicked(const string &control, const string &item) {
 }
 
 void EquipmentGui::open(SpatialObject *owner) {
-    assert(owner);
     _owner = owner;
 
     updateEquipment();

@@ -17,8 +17,6 @@
 
 #include "mesh.h"
 
-#include <cassert>
-
 #include "GL/glew.h"
 
 #include "SDL2/SDL_opengl.h"
@@ -44,8 +42,6 @@ void Mesh::computeAABB() {
 
 void Mesh::initGL() {
     if (_glInited) return;
-
-    assert(!_vertices.empty() && !_indices.empty());
 
     glGenBuffers(1, &_vertexBufferId);
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
@@ -109,8 +105,6 @@ void Mesh::render(uint32_t mode) const {
 }
 
 void Mesh::render(uint32_t mode, int count, int offset) const {
-    assert(_glInited);
-
     glBindVertexArray(_vertexArrayId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
 

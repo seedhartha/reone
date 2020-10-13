@@ -66,7 +66,6 @@ MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), 
 }
 
 void MdlFile::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
-    assert(mdx);
     _mdx = mdx;
 
     BinaryFile::load(mdl);
@@ -124,8 +123,6 @@ void MdlFile::doLoad() {
 }
 
 void MdlFile::openMDX() {
-    assert(!_path.empty());
-
     fs::path mdxPath(_path);
     mdxPath.replace_extension(".mdx");
 
@@ -219,7 +216,6 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
         node->_mesh = readMesh();
     }
     if (flags & kNodeHasSkin) {
-        assert(node->_mesh);
         readSkin(*node);
     }
 

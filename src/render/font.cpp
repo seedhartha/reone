@@ -78,8 +78,6 @@ void Font::load(const shared_ptr<Texture> &texture) {
 void Font::initGL() {
     if (_glInited) return;
 
-    assert(!_vertices.empty() && !_indices.empty());
-
     glGenBuffers(1, &_vertexBufferId);
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
@@ -112,7 +110,6 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
 
     ShaderManager &shaders = Shaders;
 
-    assert(_texture);
     glActiveTexture(GL_TEXTURE0);
     _texture->bind();
 

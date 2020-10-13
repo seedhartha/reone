@@ -50,8 +50,6 @@ void GUI::load() {
     info("GUI: load " + _resRef);
 
     shared_ptr<GffStruct> gui(Resources.findGFF(_resRef, ResourceType::Gui));
-    assert(gui);
-
     loadBackground(_backgroundType);
 
     ControlType type = Control::getType(*gui);

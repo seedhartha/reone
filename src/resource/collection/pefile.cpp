@@ -53,7 +53,6 @@ void PEFile::doLoad() {
     seek(offPeHeader);
 
     uint32_t imageType = readUint32();
-    assert(imageType == 0x00004550);
 
     loadHeader();
     loadOptionalHeader();
@@ -63,8 +62,6 @@ void PEFile::doLoad() {
     }
 
     auto resSection = find_if(_sections.begin(), _sections.end(), [](const Section &s) { return s.name == ".rsrc"; });
-    assert(resSection != _sections.end());
-
     seek(resSection->offset);
     loadResourceDir(*resSection, 0);
 }
@@ -101,8 +98,6 @@ void PEFile::loadSection() {
 }
 
 void PEFile::loadResourceDir(const Section &section, int level) {
-    assert(level >= 0 && level <= 2);
-
     ignore(12);
 
     uint16_t namedEntryCount = readUint16();
@@ -116,7 +111,6 @@ void PEFile::loadResourceDir(const Section &section, int level) {
 
 void PEFile::loadResourceDirEntry(const Section &section, int level) {
     uint32_t name = readUint32();
-    assert((name & kNameMaskString) == 0);
 
     switch (level) {
         case 0:
@@ -142,7 +136,6 @@ void PEFile::loadResourceDirEntry(const Section &section, int level) {
     if (siblingDir) {
         loadResourceDir(section, level + 1);
     } else {
-        assert(level == 2);
         loadResourceDataEntry(section);
     }
 

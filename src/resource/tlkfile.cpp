@@ -32,7 +32,6 @@ enum {
 };
 
 const TalkTableString &TalkTable::getString(int32_t ref) const {
-    assert(ref >= 0 && ref < _strings.size());
     return _strings[ref];
 }
 

@@ -134,8 +134,6 @@ void ClassSelection::setButtonColors(Control &control) {
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
-    assert(index >= 0 && index < _classButtons.size());
-
     ClassButton &button = _classButtons[index];
     Control &control(*button.control);
     Control::Extent extent(control.extent());

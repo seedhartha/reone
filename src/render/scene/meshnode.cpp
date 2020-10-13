@@ -33,8 +33,6 @@ namespace render {
 
 MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *model, const ModelNode *modelNode) :
     SceneNode(sceneGraph), _model(model), _modelNode(modelNode) {
-
-    assert(_model && _modelNode);
 }
 
 void MeshSceneNode::fillSceneGraph() {

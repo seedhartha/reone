@@ -37,19 +37,15 @@ void CurFile::loadHeader() {
     ignore(4);
 
     uint32_t size = readUint32();
-    assert(size == 40);
 
     _width = readInt32();
     _height = readInt32();
 
     uint16_t planes = readUint16();
-    assert(planes == 1);
 
     _bitCount = readUint16();
-    assert(_bitCount == 8);
 
     uint32_t compression = readUint32();
-    assert(compression == 0);
 }
 
 void CurFile::loadData() {
