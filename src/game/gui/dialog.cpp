@@ -171,8 +171,6 @@ bool DialogGui::checkCondition(const string &script) {
 void DialogGui::loadCurrentEntry() {
     if (_currentVoice) _currentVoice->stop();
 
-    assert(_currentEntry);
-
     uint32_t speaker = _currentSpeaker;
     if (!_currentEntry->speaker.empty() && _getObjectIdByTag) {
         speaker = _getObjectIdByTag(_currentEntry->speaker);

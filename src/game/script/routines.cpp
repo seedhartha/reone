@@ -17,8 +17,6 @@
 
 #include "routines.h"
 
-#include <cassert>
-
 #include "../../core/log.h"
 
 #include "../game.h"

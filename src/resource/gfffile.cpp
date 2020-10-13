@@ -109,12 +109,10 @@ vector<float> GffField::asFloatArray() const {
 }
 
 const GffStruct &GffField::asStruct() const {
-    assert(!_children.empty());
     return _children[0];
 }
 
 glm::vec3 GffField::asVector() const {
-    assert(_data.size() == 12);
     return glm::make_vec3(reinterpret_cast<const float *>(&_data[0]));
 }
 
@@ -144,8 +142,6 @@ const GffField *GffStruct::find(const string &name) const {
 
 int GffStruct::getInt(const string &name) const {
     const GffField *field = find(name);
-    assert(field);
-
     return static_cast<int>(field->asInt());
 }
 
@@ -156,8 +152,6 @@ int GffStruct::getInt(const string &name, int defaultValue) const {
 
 float GffStruct::getFloat(const string &name) const {
     const GffField *field = find(name);
-    assert(field);
-
     return field->asFloat();
 }
 
@@ -168,15 +162,11 @@ string GffStruct::getString(const string &name) const {
 
 const GffStruct &GffStruct::getStruct(const string &name) const {
     const GffField *field = find(name);
-    assert(field);
-
     return field->children()[0];
 }
 
 const vector<GffStruct> &GffStruct::getList(const string &name) const {
     const GffField *field = find(name);
-    assert(field);
-
     return field->children();
 }
 
@@ -354,7 +344,6 @@ GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
     uint32_t size = readUint32();
     int32_t ref = readInt32();
     uint32_t count = readUint32();
-    assert(count < 2);
 
     LocString loc;
     loc.strRef = ref;

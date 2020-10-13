@@ -66,7 +66,6 @@ int Routine::argumentCount() const {
 }
 
 VariableType Routine::argumentType(int index) const {
-    assert(index >= 0 && index < _argumentTypes.size());
     return _argumentTypes[index];
 }
 

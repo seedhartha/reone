@@ -18,7 +18,6 @@
 #include "scenegraph.h"
 
 #include <algorithm>
-#include <cassert>
 
 #include "GL/glew.h"
 
@@ -45,22 +44,18 @@ void SceneGraph::clear() {
 }
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
-    assert(node);
     _rootNodes.push_back(node);
 }
 
 void SceneGraph::addOpaqueMesh(MeshSceneNode *node) {
-    assert(node);
     _opaqueMeshes.push_back(node);
 }
 
 void SceneGraph::addTransparentMesh(MeshSceneNode *node) {
-    assert(node);
     _transparentMeshes.push_back(node);
 }
 
 void SceneGraph::addLight(LightSceneNode *node) {
-    assert(node);
     _lights.push_back(node);
 }
 

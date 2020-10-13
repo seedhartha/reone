@@ -125,8 +125,6 @@ int ScriptExecution::run() {
 
 void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
     int count = ins.size / 4;
-    assert(count == 1);
-
     int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
@@ -279,15 +277,11 @@ void ScriptExecution::executeLogicalAnd(const Instruction &ins) {
 }
 
 void ScriptExecution::getTwoIntegersFromStack(Variable &left, Variable &right) {
-    assert(_stack.size() >= 2);
-
     right = _stack.back();
     _stack.pop_back();
 
     left = _stack.back();
     _stack.pop_back();
-
-    assert(left.type == VariableType::Int && right.type == VariableType::Int);
 }
 
 void ScriptExecution::executeLogicalOr(const Instruction &ins) {
@@ -452,8 +446,6 @@ void ScriptExecution::executeNegate(const Instruction &ins) {
 
 void ScriptExecution::executeAdjustSP(const Instruction &ins) {
     int count = -ins.stackOffset / 4;
-    assert(count > 0);
-
     for (int i = 0; i < count; ++i) {
         _stack.pop_back();
     }
@@ -514,8 +506,6 @@ void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
 
 void ScriptExecution::executeCopyDownBP(const Instruction &ins) {
     int count = ins.size / 4;
-    assert(count == 1);
-
     int srcIdx = _globalCount - count;
     int dstIdx = _globalCount + ins.stackOffset / 4;
 
@@ -526,8 +516,6 @@ void ScriptExecution::executeCopyDownBP(const Instruction &ins) {
 
 void ScriptExecution::executeCopyTopBP(const Instruction &ins) {
     int count = ins.size / 4;
-    assert(count == 1);
-
     int srcIdx = _globalCount + ins.stackOffset / 4;
 
     for (int i = 0; i < count; ++i) {
@@ -551,7 +539,6 @@ void ScriptExecution::executeSaveBP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeRestoreBP(const Instruction &ins) {
-    assert(!_stack.empty() && _stack.back().type == VariableType::Int);
     _globalCount = _stack.back().intValue;
     _stack.pop_back();
 }

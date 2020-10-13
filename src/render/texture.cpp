@@ -57,8 +57,6 @@ void Texture::initGL() {
         glBindTexture(GL_TEXTURE_2D, _textureId);
         const Layer &layer = _layers.front();
         int mipMapCount = static_cast<int>(layer.mipMaps.size());
-        assert(mipMapCount > 0);
-
         if (mipMapCount > 1) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);
@@ -157,12 +155,10 @@ void Texture::deinitGL() {
 }
 
 void Texture::bind() {
-    assert(_glInited);
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
 void Texture::unbind() {
-    assert(_glInited);
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
 }
 

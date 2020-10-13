@@ -32,10 +32,7 @@ NcsFile::NcsFile(const string &resRef) : BinaryFile(8, "NCS V1.0"), _resRef(resR
 
 void NcsFile::doLoad() {
     uint8_t byteCode = readByte();
-    assert(byteCode == 0x42);
-
     uint32_t length = readUint32BE();
-    assert(_size >= length);
 
     _program = make_unique<ScriptProgram>(_resRef);
     _program->_length = length;
@@ -62,22 +59,11 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::CopyTopSP:
         case ByteCode::CopyDownBP:
         case ByteCode::CopyTopBP:
-            assert(ins.type == InstructionType::One);
             ins.stackOffset = readInt32BE();
             ins.size = readUint16BE();
             break;
 
         case ByteCode::Reserve:
-            assert(
-                ins.type == InstructionType::Int ||
-                ins.type == InstructionType::Float ||
-                ins.type == InstructionType::String ||
-                ins.type == InstructionType::Object ||
-                ins.type == InstructionType::Effect ||
-                ins.type == InstructionType::Event ||
-                ins.type == InstructionType::Location ||
-                ins.type == InstructionType::Talent);
-
             break;
 
         case ByteCode::PushConstant:
@@ -102,7 +88,6 @@ void NcsFile::readInstruction(uint32_t &offset) {
             break;
 
         case ByteCode::CallRoutine:
-            assert(ins.type == InstructionType::None);
             ins.routine = readUint16BE();
             ins.argCount = readByte();
             break;
@@ -112,92 +97,45 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::InclusiveBitwiseOr:
         case ByteCode::ExclusiveBitwiseOr:
         case ByteCode::BitwiseAnd:
-            assert(ins.type == InstructionType::IntInt);
             break;
 
         case ByteCode::Equal:
         case ByteCode::NotEqual:
-            assert(
-                ins.type == InstructionType::IntInt ||
-                ins.type == InstructionType::FloatFloat ||
-                ins.type == InstructionType::ObjectObject ||
-                ins.type == InstructionType::StringString ||
-                ins.type == InstructionType::EffectEffect ||
-                ins.type == InstructionType::EventEvent ||
-                ins.type == InstructionType::LocationLocation ||
-                ins.type == InstructionType::TalentTalent);
-
             break;
 
         case ByteCode::GreaterThanOrEqual:
         case ByteCode::GreaterThan:
         case ByteCode::LessThan:
         case ByteCode::LessThanOrEqual:
-            assert(ins.type == InstructionType::IntInt || ins.type == InstructionType::FloatFloat);
             break;
 
         case ByteCode::ShiftLeft:
         case ByteCode::ShiftRight:
         case ByteCode::UnsignedShiftRight:
-            assert(ins.type == InstructionType::IntInt);
             break;
 
         case ByteCode::Add:
-            assert(
-                ins.type == InstructionType::IntInt ||
-                ins.type == InstructionType::FloatFloat ||
-                ins.type == InstructionType::StringString ||
-                ins.type == InstructionType::IntFloat ||
-                ins.type == InstructionType::FloatInt ||
-                ins.type == InstructionType::VectorVector);
-
             break;
 
         case ByteCode::Subtract:
-            assert(
-                ins.type == InstructionType::IntInt ||
-                ins.type == InstructionType::FloatFloat ||
-                ins.type == InstructionType::IntFloat ||
-                ins.type == InstructionType::FloatInt ||
-                ins.type == InstructionType::VectorVector);
-
             break;
 
         case ByteCode::Multiply:
-            assert(
-                ins.type == InstructionType::IntInt ||
-                ins.type == InstructionType::FloatFloat ||
-                ins.type == InstructionType::IntFloat ||
-                ins.type == InstructionType::FloatInt ||
-                ins.type == InstructionType::VectorFloat ||
-                ins.type == InstructionType::FloatVector);
-
             break;
 
         case ByteCode::Divide:
-            assert(
-                ins.type == InstructionType::IntInt ||
-                ins.type == InstructionType::FloatFloat ||
-                ins.type == InstructionType::IntFloat ||
-                ins.type == InstructionType::FloatInt ||
-                ins.type == InstructionType::VectorFloat);
-
             break;
 
         case ByteCode::Mod:
-            assert(ins.type == InstructionType::IntInt);
             break;
 
         case ByteCode::Negate:
-            assert(ins.type == InstructionType::Int || ins.type == InstructionType::Float);
             break;
 
         case ByteCode::OnesComplement:
-            assert(ins.type == InstructionType::Int);
             break;
 
         case ByteCode::AdjustSP:
-            assert(ins.type == InstructionType::None);
             ins.stackOffset = readInt32BE();
             break;
 
@@ -205,7 +143,6 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::JumpToSubroutine:
         case ByteCode::JumpIfZero:
         case ByteCode::JumpIfNonZero:
-            assert(ins.type == InstructionType::None);
             ins.jumpOffset = offset + readInt32BE();
             break;
 
@@ -213,30 +150,25 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::SaveBP:
         case ByteCode::RestoreBP:
         case ByteCode::Noop:
-            assert(ins.type == InstructionType::None);
             break;
 
         case ByteCode::Destruct:
-            assert(ins.type == InstructionType::One);
             ins.size = readUint16BE();
             ins.stackOffset = readInt16BE();
             ins.sizeNoDestroy = readUint16BE();
             break;
 
         case ByteCode::LogicalNot:
-            assert(ins.type == InstructionType::Int);
             break;
 
         case ByteCode::DecRelToSP:
         case ByteCode::IncRelToSP:
         case ByteCode::DecRelToBP:
         case ByteCode::IncRelToBP:
-            assert(ins.type == InstructionType::Int);
             ins.stackOffset = readInt32BE();
             break;
 
         case ByteCode::StoreState:
-            assert(type == 0x10);
             ins.size = readUint32BE();
             ins.sizeLocals = readUint32BE();
             break;

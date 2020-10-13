@@ -17,7 +17,6 @@
 
 #include "variable.h"
 
-#include <cassert>
 #include <stdexcept>
 
 #include <boost/format.hpp>
@@ -146,9 +145,6 @@ bool Variable::operator!=(const Variable &other) const {
 }
 
 bool Variable::operator<(const Variable &other) const {
-    assert(type == other.type);
-    assert(type == VariableType::Int || type == VariableType::Float);
-
     switch (type) {
         case VariableType::Int:
             return intValue < other.intValue;
@@ -160,9 +156,6 @@ bool Variable::operator<(const Variable &other) const {
 }
 
 bool Variable::operator<=(const Variable &other) const {
-    assert(type == other.type);
-    assert(type == VariableType::Int || type == VariableType::Float);
-
     switch (type) {
         case VariableType::Int:
             return intValue <= other.intValue;
@@ -174,9 +167,6 @@ bool Variable::operator<=(const Variable &other) const {
 }
 
 bool Variable::operator>(const Variable &other) const {
-    assert(type == other.type);
-    assert(type == VariableType::Int || type == VariableType::Float);
-
     switch (type) {
         case VariableType::Int:
             return intValue > other.intValue;
@@ -188,8 +178,6 @@ bool Variable::operator>(const Variable &other) const {
 }
 
 bool Variable::operator>=(const Variable &other) const {
-    assert(type == other.type);
-
     switch (type) {
         case VariableType::Int:
             return intValue >= other.intValue;

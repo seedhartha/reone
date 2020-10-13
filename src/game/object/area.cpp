@@ -18,7 +18,6 @@
 #include "area.h"
 
 #include <algorithm>
-#include <cassert>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>

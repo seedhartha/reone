@@ -77,7 +77,6 @@ void ContainerGui::configureItemsListBox() {
 }
 
 void ContainerGui::open(SpatialObject *container) {
-    assert(container);
     _container = container;
 
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));

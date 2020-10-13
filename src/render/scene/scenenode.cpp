@@ -33,14 +33,11 @@ SceneNode::SceneNode(SceneGraph *sceneGraph) : _sceneGraph(sceneGraph) {
 }
 
 void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
-    assert(node);
     node->setParent(this);
     _children.push_back(node);
 }
 
 void SceneNode::removeChild(const shared_ptr<SceneNode> &node) {
-    assert(node);
-
     auto child = find(_children.begin(), _children.end(), node);
     if (child != _children.end()) {
         _children.erase(child);

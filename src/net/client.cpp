@@ -78,7 +78,6 @@ void Client::stop() {
 }
 
 void Client::send(const shared_ptr<Command> &command) {
-    assert(_connection);
     _connection->send(command);
 }
 
