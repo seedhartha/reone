@@ -69,6 +69,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
     _handlers.insert(make_pair(ByteCode::JumpToSubroutine, bind(&ScriptExecution::executeJumpToSubroutine, this, _1)));
     _handlers.insert(make_pair(ByteCode::JumpIfZero, bind(&ScriptExecution::executeJumpIfZero, this, _1)));
     _handlers.insert(make_pair(ByteCode::Return, bind(&ScriptExecution::executeReturn, this, _1)));
+    _handlers.insert(make_pair(ByteCode::Destruct, bind(&ScriptExecution::executeDestruct, this, _1)));
     _handlers.insert(make_pair(ByteCode::LogicalNot, bind(&ScriptExecution::executeLogicalNot, this, _1)));
     _handlers.insert(make_pair(ByteCode::DecRelToSP, bind(&ScriptExecution::executeDecRelToSP, this, _1)));
     _handlers.insert(make_pair(ByteCode::IncRelToSP, bind(&ScriptExecution::executeIncRelToSP, this, _1)));
@@ -478,6 +479,17 @@ void ScriptExecution::executeReturn(const Instruction &ins) {
     }
 }
 
+void ScriptExecution::executeDestruct(const Instruction &ins) {
+    int startIdx = static_cast<int>(_stack.size()) - ins.size / 4;
+    int startIdxNoDestroy = startIdx + ins.stackOffset / 4;
+    int countNoDestroy = ins.sizeNoDestroy / 4;
+
+    for (int i = 0; i < countNoDestroy; ++i) {
+        _stack[startIdx + i] = _stack[startIdxNoDestroy + i];
+    }
+    _stack.resize(startIdx + countNoDestroy);
+}
+
 void ScriptExecution::executeDecRelToSP(const Instruction &ins) {
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
@@ -562,6 +574,14 @@ void ScriptExecution::executeStoreState(const Instruction &ins) {
 
     _savedState.program = _program;
     _savedState.insOffset = ins.offset + static_cast<int>(ins.type);
+}
+
+int ScriptExecution::stackSize() const {
+    return static_cast<int>(_stack.size());
+}
+
+const Variable &ScriptExecution::getStackVariable(int index) const {
+    return _stack[index];
 }
 
 } // namespace script

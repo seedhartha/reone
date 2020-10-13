@@ -30,6 +30,10 @@ namespace script {
 ScriptProgram::ScriptProgram(const string &name) : _name(name) {
 }
 
+void ScriptProgram::add(Instruction instr) {
+    _instructions.insert(make_pair(instr.offset, instr));
+}
+
 const string &ScriptProgram::name() const {
     return _name;
 }
@@ -40,6 +44,10 @@ uint32_t ScriptProgram::length() const {
 
 const Instruction &ScriptProgram::getInstruction(uint32_t offset) const {
     return _instructions.find(offset)->second;
+}
+
+void ScriptProgram::setLength(uint32_t length) {
+    _length = length;
 }
 
 } // namespace script
