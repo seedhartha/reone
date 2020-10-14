@@ -46,8 +46,8 @@ namespace game {
 
 static const int kDefaultEntryDuration = 1000;
 
-enum AutoPickReplyFlags {
-    kPickReplyOnAudioStop = 1
+enum EndEntryFlags {
+    kEndEntryOnAudioStop = 1
 };
 
 DialogGui::DialogGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
@@ -184,9 +184,49 @@ void DialogGui::loadCurrentEntry() {
     Control &message = getControl("LBL_MESSAGE");
     message.setTextMessage(_currentEntry->text);
 
-    playVoiceOver();
     loadReplies();
     loadCurrentSpeaker();
+    playVoiceOver();
+    scheduleEndOfEntry();
+}
+
+void DialogGui::loadReplies() {
+    ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
+    replies.clear();
+
+    static vector<int> activeReplies;
+
+    activeReplies.clear();
+    for (auto &link : _currentEntry->replies) {
+        if (link.active.empty() || checkCondition(link.active)) {
+            activeReplies.push_back(link.index);
+        }
+    }
+
+    bool singleEmptyReply = false;
+    int replyNumber = 0;
+    for (auto &replyIdx : activeReplies) {
+        const DlgFile::EntryReply &reply = _dialog->getReply(replyIdx);
+        string text(reply.text);
+        if (text.empty()) {
+            if (activeReplies.size() == 1) {
+                singleEmptyReply = true;
+                break;
+            } else {
+            text = "[empty]";
+            }
+        }
+        replies.add({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
+    }
+    if (singleEmptyReply) {
+        _autoPickReplyIdx = activeReplies.front();
+    }
+
+    if (activeReplies.empty()) {
+        finish();
+    } else {
+        hideControl("LB_REPLIES");
+    }
 }
 
 void DialogGui::loadCurrentSpeaker() {
@@ -221,55 +261,19 @@ void DialogGui::playVoiceOver() {
     }
 }
 
-void DialogGui::loadReplies() {
-    ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-    replies.clear();
-
-    static vector<int> activeReplies;
-
-    activeReplies.clear();
-    for (auto &link : _currentEntry->replies) {
-        if (link.active.empty() || checkCondition(link.active)) {
-            activeReplies.push_back(link.index);
-        }
-    }
-
-    bool singleEmptyReply = false;
-    int replyNumber = 0;
-    for (auto &replyIdx : activeReplies) {
-        const DlgFile::EntryReply &reply = _dialog->getReply(replyIdx);
-        string text(reply.text);
-        if (text.empty()) {
-            if (activeReplies.size() == 1) {
-                singleEmptyReply = true;
-                break;
-            } else {
-                text = "[empty]";
-            }
-        }
-        replies.add({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
-    }
-    if (singleEmptyReply) {
-        scheduleReplyPick(activeReplies.front());
-    }
-    if (activeReplies.empty()) {
-        finish();
-    }
-}
-
-void DialogGui::scheduleReplyPick(int replyIdx) {
-    _autoPickReplyIdx = replyIdx;
-    _autoPickReplyFlags = 0;
+void DialogGui::scheduleEndOfEntry() {
+    _entryEnded = false;
+    _endEntryFlags = 0;
 
     uint32_t now = SDL_GetTicks();
     if (_currentEntry->delay != -1) {
-        _autoPickReplyTimestamp = now + 1000 * _currentEntry->delay;
+        _endEntryTimestamp = now + 1000 * _currentEntry->delay;
     } else {
         if (_currentVoice) {
-            _autoPickReplyFlags = kPickReplyOnAudioStop;
-            _autoPickReplyTimestamp = now + _currentVoice->duration();
+            _endEntryFlags = kEndEntryOnAudioStop;
+            _endEntryTimestamp = now + _currentVoice->duration();
         } else {
-            _autoPickReplyTimestamp = now + kDefaultEntryDuration;
+            _endEntryTimestamp = now + kDefaultEntryDuration;
         }
     }
 }
@@ -308,6 +312,8 @@ bool DialogGui::handleKeyDown(SDL_Scancode key) {
 }
 
 bool DialogGui::handleKeyUp(SDL_Scancode key) {
+    if (!_entryEnded) return false;
+
     if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
         ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
         int itemIdx = key - SDL_SCANCODE_1;
@@ -324,17 +330,22 @@ bool DialogGui::handleKeyUp(SDL_Scancode key) {
 void DialogGui::update(float dt) {
     GUI::update(dt);
 
-    if (_autoPickReplyIdx != -1) {
-        bool pickOnStop = (_autoPickReplyFlags & kPickReplyOnAudioStop) != 0;
-        bool stopped = _currentVoice && _currentVoice->stopped();
+    if (!_entryEnded) {
+        bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
+        bool audioStopped = _currentVoice && _currentVoice->stopped();
         uint32_t now = SDL_GetTicks();
-        if ((pickOnStop && stopped) ||
-            (!pickOnStop && now >= _autoPickReplyTimestamp)) {
 
-            int replyIdx = _autoPickReplyIdx;
-            _autoPickReplyIdx = -1;
-            pickReply(replyIdx);
-        }        
+        if ((endOnAudioStop && audioStopped) || (!endOnAudioStop && now >= _endEntryTimestamp)) {
+            _entryEnded =  true;
+
+            if (_autoPickReplyIdx != -1) {
+                int replyIdx = _autoPickReplyIdx;
+                _autoPickReplyIdx = -1;
+                pickReply(replyIdx);
+            } else {
+                showControl("LB_REPLIES");
+            }
+        }
     }
 }
 

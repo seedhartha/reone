@@ -51,8 +51,9 @@ private:
     uint32_t _currentSpeaker { 0 };
     bool _pickReplyEnabled { true };
     int _autoPickReplyIdx { -1 };
-    int _autoPickReplyFlags { 0 };
-    uint32_t _autoPickReplyTimestamp { 0 };
+    int _endEntryFlags { 0 };
+    uint32_t _endEntryTimestamp { 0 };
+    bool _entryEnded { false };
 
     // Callbacks
 
@@ -75,10 +76,10 @@ private:
     void loadStartEntry();
     bool checkCondition(const std::string &script);
     void loadCurrentEntry();
+    void loadReplies();
     void loadCurrentSpeaker();
     void playVoiceOver();
-    void loadReplies();
-    void scheduleReplyPick(int replyIdx);
+    void scheduleEndOfEntry();
     void finish();
 };
 
