@@ -22,11 +22,13 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../../audio/player.h"
+#include "../../core/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
 #include "../../resource/resources.h"
 #include "../../script/execution.h"
 
+#include "../game.h"
 #include "../script/routines.h"
 #include "../script/util.h"
 
@@ -50,7 +52,9 @@ enum EndEntryFlags {
     kEndEntryOnAudioStop = 1
 };
 
-DialogGui::DialogGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+DialogGui::DialogGui(GameVersion version, Game *game, const GraphicsOptions &opts) :
+    GUI(version, opts), _game(game) {
+
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -60,19 +64,12 @@ void DialogGui::load() {
 
     configureMessage();
     configureReplies();
-    addTopFrame();
-    addBottomFrame();
+    loadTopFrame();
+    loadBottomFrame();
 }
 
-void DialogGui::addTopFrame() {
+void DialogGui::loadTopFrame() {
     addFrame(-_rootControl->extent().top, getControl("LBL_MESSAGE").extent().height);
-}
-
-void DialogGui::addBottomFrame() {
-    int rootTop = _rootControl->extent().top;
-    int height = _gfxOpts.height - rootTop;
-
-    addFrame(_gfxOpts.height - rootTop - height, height);
 }
 
 void DialogGui::addFrame(int top, int height) {
@@ -88,6 +85,13 @@ void DialogGui::addFrame(int top, int height) {
     frame->setBorderFill("blackfill");
 
     _controls.insert(_controls.begin(), move(frame));
+}
+
+void DialogGui::loadBottomFrame() {
+    int rootTop = _rootControl->extent().top;
+    int height = _gfxOpts.height - rootTop;
+
+    addFrame(_gfxOpts.height - rootTop - height, height);
 }
 
 void DialogGui::configureMessage() {
@@ -122,32 +126,17 @@ void DialogGui::onReplyClicked(int index) {
     pickReply(index);
 }
 
-void DialogGui::finish() {
-    if (!_dialog->endScript().empty()) {
-        runScript(_dialog->endScript(), _ownerId, kObjectInvalid, -1);
-    }
-    if (_onSpeakerChanged && _currentSpeaker != 0) {
-        _onSpeakerChanged(_currentSpeaker, 0);
-    }
-    if (_onDialogFinished) {
-        _onDialogFinished();
-    }
-}
-
-void DialogGui::startDialog(uint32_t ownerId, const string &resRef) {
+void DialogGui::startDialog(SpatialObject &owner, const string &resRef) {
     shared_ptr<GffStruct> dlg(Resources.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         if (_onDialogFinished) _onDialogFinished();
         return;
     }
-    _ownerId = ownerId;
+    _owner = &owner;
+    _currentSpeaker = _owner;
+
     _dialog.reset(new DlgFile());
     _dialog->load(resRef, *dlg);
-
-    _currentSpeaker = _ownerId;
-    if (_onSpeakerChanged) {
-        _onSpeakerChanged(0, _currentSpeaker);
-    }
 
     loadStartEntry();
 }
@@ -173,13 +162,13 @@ void DialogGui::loadStartEntry() {
 }
 
 bool DialogGui::checkCondition(const string &script) {
-    int result = runScript(script, _ownerId, kObjectInvalid, -1);
+    int result = runScript(script, _owner->id(), kObjectInvalid, -1);
     return result == -1 || result == 1;
 }
 
 void DialogGui::loadCurrentEntry() {
     if (!_currentEntry->script.empty()) {
-        runScript(_currentEntry->script, _ownerId, kObjectInvalid, -1);
+        runScript(_currentEntry->script, _owner->id(), kObjectInvalid, -1);
     }
     Control &message = getControl("LBL_MESSAGE");
     message.setTextMessage(_currentEntry->text);
@@ -188,6 +177,7 @@ void DialogGui::loadCurrentEntry() {
     loadCurrentSpeaker();
     playVoiceOver();
     scheduleEndOfEntry();
+    updateCamera();
 }
 
 void DialogGui::loadReplies() {
@@ -229,17 +219,70 @@ void DialogGui::loadReplies() {
     }
 }
 
-void DialogGui::loadCurrentSpeaker() {
-    uint32_t speaker = _currentSpeaker;
-    if (!_currentEntry->speaker.empty() && _getObjectIdByTag) {
-        speaker = _getObjectIdByTag(_currentEntry->speaker);
+void DialogGui::finish() {
+    if (!_dialog->endScript().empty()) {
+        runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
     }
-    if (_currentSpeaker != speaker) {
-        uint32_t prevSpeaker = _currentSpeaker;
-        _currentSpeaker = speaker;
-        if (_onSpeakerChanged) {
-            _onSpeakerChanged(prevSpeaker, _currentSpeaker);
-        }
+    if (_currentSpeaker) {
+        static_cast<Creature &>(*_currentSpeaker).setTalking(false);
+    }
+    if (_onDialogFinished) {
+        _onDialogFinished();
+    }
+}
+
+void DialogGui::loadCurrentSpeaker() {
+    shared_ptr<Area> area(_game->module()->area());
+    SpatialObject *speaker = nullptr;
+
+    if (!_currentEntry->speaker.empty()) {
+        shared_ptr<SpatialObject> speakerPtr(area->find(_currentEntry->speaker));
+        speaker = speakerPtr.get();
+    }
+    if (!speaker) {
+        speaker = _owner;
+    }
+    if (_currentSpeaker && _currentSpeaker != speaker) {
+        Creature &prevSpeakerCreature = static_cast<Creature &>(*_currentSpeaker);
+        prevSpeakerCreature.setTalking(false);
+    }
+    _currentSpeaker = speaker;
+
+    Creature &speakerCreature = static_cast<Creature &>(*_currentSpeaker);
+    speakerCreature.setTalking(true);
+
+    shared_ptr<SpatialObject> partyLeader(area->partyLeader());
+    partyLeader->face(speakerCreature);
+
+    speakerCreature.face(*partyLeader);
+}
+
+void DialogGui::updateCamera() {
+    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<SpatialObject> partyLeader(area->partyLeader());
+    glm::vec3 listenerPosition(partyLeader->position());
+    glm::vec3 speakerPosition(_currentSpeaker->position());
+    glm::vec3 hookPosition(0.0f);
+
+    if (partyLeader->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
+        listenerPosition += hookPosition;
+    }
+    if (_currentSpeaker->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
+        speakerPosition += hookPosition;
+    }
+    DialogCamera &camera = area->dialogCamera();
+    camera.setListenerPosition(listenerPosition);
+    camera.setSpeakerPosition(speakerPosition);
+    camera.setVariant(getRandomCameraVariant());
+}
+
+DialogCamera::Variant DialogGui::getRandomCameraVariant() const {
+    int r = random(0, 1);
+    switch (r) {
+        case 0:
+            return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
+        default:
+            return DialogCamera::Variant::Both;
     }
 }
 
@@ -282,7 +325,7 @@ void DialogGui::pickReply(uint32_t index) {
     const DlgFile::EntryReply &reply = _dialog->getReply(index);
 
     if (!reply.script.empty()) {
-        runScript(reply.script, _ownerId, kObjectInvalid, -1);
+        runScript(reply.script, _owner->id(), kObjectInvalid, -1);
     }
     if (reply.entries.empty()) {
         finish();
@@ -332,6 +375,7 @@ void DialogGui::endCurrentEntry() {
         pickReply(replyIdx);
     } else {
         showControl("LB_REPLIES");
+        updateCamera();
     }
 }
 
@@ -373,16 +417,8 @@ void DialogGui::setPickReplyEnabled(bool enabled) {
     _pickReplyEnabled = enabled;
 }
 
-void DialogGui::setGetObjectIdByTagFunc(const function<uint32_t(const string &)> &fn) {
-    _getObjectIdByTag = fn;
-}
-
 void DialogGui::setOnReplyPicked(const function<void(uint32_t)> &fn) {
     _onReplyPicked = fn;
-}
-
-void DialogGui::setOnSpeakerChanged(const function<void(uint32_t, uint32_t)> &fn) {
-    _onSpeakerChanged = fn;
 }
 
 void DialogGui::setOnDialogFinished(const function<void()> &fn) {

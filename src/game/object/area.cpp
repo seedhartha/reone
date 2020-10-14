@@ -45,6 +45,7 @@
 #include "objectfactory.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::net;
@@ -252,38 +253,41 @@ void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    unique_ptr<FirstPersonCamera> firstPersonCamera(new FirstPersonCamera(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView)));
-    firstPersonCamera->setPosition(position);
-    firstPersonCamera->setHeading(entryHeading);
-    _firstPersonCamera = move(firstPersonCamera);
+    _firstPersonCamera = make_unique<FirstPersonCamera>(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView));
+    _firstPersonCamera->setPosition(position);
+    _firstPersonCamera->setHeading(entryHeading);
 
-    unique_ptr<ThirdPersonCamera> thirdPersonCamera(new ThirdPersonCamera(_sceneGraph, _cameraAspect, _cameraStyle));
-    thirdPersonCamera->setFindObstacleFunc([this](const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) {
-        glm::vec3 originToDest(dest - origin);
-        glm::vec3 dir(glm::normalize(originToDest));
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_sceneGraph, _cameraAspect, _cameraStyle);
+    _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
+    _thirdPersonCamera->setTargetPosition(position);
+    _thirdPersonCamera->setHeading(entryHeading);
 
-        RaycastProperties props;
-        props.flags = kRaycastRooms | kRaycastObjects;
-        props.origin = origin;
-        props.direction = dir;
-
-        RaycastResult result;
-
-        if (_collisionDetector.raycast(props, result)) {
-            float dist = glm::min(glm::length(originToDest), result.distance);
-            intersection = origin + dist * dir;
-            return true;
-        }
-
-        return false;
-    });
-    thirdPersonCamera->setTargetPosition(position);
-    thirdPersonCamera->setHeading(entryHeading);
-    _thirdPersonCamera = move(thirdPersonCamera);
+    _dialogCamera = make_unique<DialogCamera>(_sceneGraph, _cameraStyle, _cameraAspect);
+    _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
     if (_onCameraChanged) {
         _onCameraChanged(_cameraType);
     }
+}
+
+bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
+    glm::vec3 originToDest(dest - origin);
+    glm::vec3 dir(glm::normalize(originToDest));
+
+    RaycastProperties props;
+    props.flags = kRaycastRooms | kRaycastObjects;
+    props.origin = origin;
+    props.direction = dir;
+
+    RaycastResult result;
+
+    if (_collisionDetector.raycast(props, result)) {
+        float dist = glm::min(glm::length(originToDest), result.distance);
+        intersection = origin + dist * dir;
+        return true;
+    }
+
+    return false;
 }
 
 void Area::add(const shared_ptr<SpatialObject> &object) {
@@ -668,6 +672,9 @@ void Area::toggleCameraType() {
             _firstPersonCamera->setHeading(_thirdPersonCamera->heading());
             changed = true;
             break;
+
+        default:
+            break;
     }
 
     if (changed && _onCameraChanged) {
@@ -717,6 +724,10 @@ ThirdPersonCamera *Area::thirdPersonCamera() {
     return _thirdPersonCamera.get();
 }
 
+DialogCamera &Area::dialogCamera() {
+    return *_dialogCamera;
+}
+
 ObjectSelector &Area::objectSelector() {
     return _objectSelector;
 }
@@ -749,7 +760,7 @@ void Area::setOnPlayerChanged(const function<void()> &fn) {
     _onPlayerChanged = fn;
 }
 
-void Area::setOnStartDialog(const function<void(const Object &, const string &)> &fn) {
+void Area::setOnStartDialog(const function<void(SpatialObject &, const string &)> &fn) {
     _onStartDialog = fn;
 }
 

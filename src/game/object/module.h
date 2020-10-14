@@ -59,7 +59,7 @@ public:
 
     // Callbacks
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
-    void setStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
+    void setStartDialog(const std::function<void(SpatialObject &, const std::string &)> &fn);
     void setOpenContainer(const std::function<void(SpatialObject *)> &fn);
 
 protected:
@@ -78,7 +78,7 @@ private:
 
     // Callbacks
     std::function<void(const std::string &, const std::string &)> _onModuleTransition;
-    std::function<void(const Object &, const std::string &)> _startDialog;
+    std::function<void(SpatialObject &, const std::string &)> _startDialog;
     std::function<void(SpatialObject *)> _openContainer;
 
     void cycleDebugMode(bool forward);

@@ -97,7 +97,7 @@ protected:
     virtual void configureModule();
     virtual void update();
     virtual void loadNextModule();
-    virtual void startDialog(uint32_t ownerId, const std::string &resRef);
+    virtual void startDialog(SpatialObject &owner, const std::string &resRef);
 
     // Event handlers
 
@@ -138,6 +138,7 @@ private:
 
     void openMainMenu();
     void runMainLoop();
+
     float getDeltaTime();
     gui::GUI *getScreenGUI() const;
 
@@ -179,7 +180,6 @@ private:
     void onPlay(const CreatureConfiguration &config);
     void onEquipmentClick();
     void onGetItems();
-    void onDialogSpeakerChanged(uint32_t from, uint32_t to);
 
     // END Event handlers
 

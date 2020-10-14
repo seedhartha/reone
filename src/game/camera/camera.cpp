@@ -25,6 +25,16 @@ namespace reone {
 
 namespace game {
 
+bool Camera::handle(const SDL_Event &event) {
+    return false;
+}
+
+void Camera::update(float dt) {
+}
+
+void Camera::stopMovement() {
+}
+
 float Camera::heading() const {
     return _heading;
 }

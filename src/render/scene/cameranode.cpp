@@ -44,6 +44,10 @@ const glm::mat4 &CameraSceneNode::view() const {
     return _view;
 }
 
+void CameraSceneNode::setProjection(const glm::mat4 &projection) {
+    _projection = projection;
+}
+
 } // namespace render
 
 } // namespace reone

@@ -106,9 +106,9 @@ void ThirdPersonCamera::updateSceneNode() {
     position.y -= _style.distance * glm::cos(_heading);
     position.z += _style.height;
 
-    if (_findObstacleFunc) {
+    if (_findObstacle) {
         glm::vec3 intersection { 0.0f };
-        if (_findObstacleFunc(_targetPosition, position, intersection)) {
+        if (_findObstacle(_targetPosition, position, intersection)) {
             position = intersection;
         }
     }
@@ -137,8 +137,8 @@ void ThirdPersonCamera::setHeading(float heading) {
     updateSceneNode();
 }
 
-void ThirdPersonCamera::setFindObstacleFunc(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
-    _findObstacleFunc = fn;
+void ThirdPersonCamera::setFindObstacle(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
+    _findObstacle = fn;
 }
 
 } // namespace game

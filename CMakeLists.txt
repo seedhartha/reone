@@ -255,6 +255,7 @@ set(GAME_HEADERS
     src/game/actionexecutor.h
     src/game/actionqueue.h
     src/game/camera/camera.h
+    src/game/camera/dialogcamera.h
     src/game/camera/firstperson.h
     src/game/camera/thirdperson.h
     src/game/characters.h
@@ -316,6 +317,7 @@ set(GAME_SOURCES
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
     src/game/camera/camera.cpp
+    src/game/camera/dialogcamera.cpp
     src/game/camera/firstperson.cpp
     src/game/camera/thirdperson.cpp
     src/game/characters.cpp

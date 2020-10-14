@@ -244,18 +244,24 @@ void Game::drawAll() {
 }
 
 void Game::drawWorld() {
+    shared_ptr<CameraSceneNode> cameraNode;
+
     switch (_screen) {
         case GameScreen::InGame:
+        case GameScreen::Container: {
+            Camera *camera = _module ? _module->area()->getCamera() : nullptr;
+            cameraNode = camera ? camera->sceneNode() : nullptr;
+            break;
+        }
         case GameScreen::Dialog:
-        case GameScreen::Container:
+            cameraNode = _module->area()->dialogCamera().sceneNode();
             break;
         default:
-            return;
+            break;
     }
-    Camera *camera = _module ? _module->area()->getCamera() : nullptr;
-    if (!camera) return;
+    if (!cameraNode) return;
 
-    _sceneGraph.setActiveCamera(camera->sceneNode());
+    _sceneGraph.setActiveCamera(cameraNode);
     _worldPipeline.render();
 }
 
@@ -310,8 +316,8 @@ void Game::configureModule() {
         _nextModule = name;
         _nextEntry = entry;
     });
-    _module->setStartDialog([this](const Object &owner, const string &resRef) {
-        startDialog(owner.id(), resRef);
+    _module->setStartDialog([this](SpatialObject &owner, const string &resRef) {
+        startDialog(owner, resRef);
     });
     _module->setOpenContainer([this](SpatialObject *object) {
         _containerGui->open(object);
@@ -319,9 +325,9 @@ void Game::configureModule() {
     });
 }
 
-void Game::startDialog(uint32_t ownerId, const string &resRef) {
+void Game::startDialog(SpatialObject &owner, const string &resRef) {
     _screen = GameScreen::Dialog;
-    _dialogGui->startDialog(ownerId, resRef);
+    _dialogGui->startDialog(owner, resRef);
 }
 
 void Game::loadHUD() {
@@ -340,44 +346,14 @@ void Game::onEquipmentClick() {
 }
 
 void Game::loadDialogGui() {
-    _dialogGui.reset(new DialogGui(_version, _options.graphics));
+    _dialogGui.reset(new DialogGui(_version, this, _options.graphics));
     _dialogGui->load();
     _dialogGui->setPickReplyEnabled(_pickDialogReplyEnabled);
-    _dialogGui->setGetObjectIdByTagFunc([this](const string &tag) {
-        shared_ptr<Object> object(_module->area()->find(tag));
-        return object ? object->id() : 0;
-    });
     _dialogGui->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
-    _dialogGui->setOnSpeakerChanged(bind(&Game::onDialogSpeakerChanged, this, _1, _2));
     _dialogGui->setOnDialogFinished(bind(&Game::onDialogFinished, this));
 }
 
 void Game::onDialogReplyPicked(uint32_t index) {
-}
-
-void Game::onDialogSpeakerChanged(uint32_t from, uint32_t to) {
-    shared_ptr<SpatialObject> player(_module->area()->player());
-    shared_ptr<SpatialObject> partyLeader(_module->area()->partyLeader());
-    shared_ptr<SpatialObject> prevSpeaker = from != 0 ? _module->area()->find(from) : nullptr;
-    shared_ptr<SpatialObject> speaker = to != 0 ? _module->area()->find(to) : nullptr;
-    if (speaker == partyLeader) return;
-
-    debug(boost::format("Game: dialog speaker: \"%s\"") % (speaker ? speaker->tag() : ""));
-
-    if (prevSpeaker) {
-        static_cast<Creature &>(*prevSpeaker).setTalking(false);
-    }
-    if (speaker) {
-        if (player) {
-            player->face(*speaker);
-            _module->area()->update3rdPersonCameraHeading();
-        }
-        if (partyLeader) {
-            partyLeader->face(*speaker);
-            speaker->face(*partyLeader);
-            static_cast<Creature &>(*speaker).setTalking(true);
-        }
-    }
 }
 
 void Game::onDialogFinished() {
