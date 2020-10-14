@@ -518,7 +518,7 @@ void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
 
 void ScriptExecution::executeCopyDownBP(const Instruction &ins) {
     int count = ins.size / 4;
-    int srcIdx = _globalCount - count;
+    int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = _globalCount + ins.stackOffset / 4;
 
     for (int i = 0; i < count; ++i) {
