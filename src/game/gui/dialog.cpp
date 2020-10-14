@@ -323,6 +323,9 @@ bool DialogGui::handle(const SDL_Event &event) {
 void DialogGui::endCurrentEntry() {
     _entryEnded =  true;
 
+    if (_currentVoice) {
+        _currentVoice->stop();
+    }
     if (_autoPickReplyIdx != -1) {
         int replyIdx = _autoPickReplyIdx;
         _autoPickReplyIdx = -1;
