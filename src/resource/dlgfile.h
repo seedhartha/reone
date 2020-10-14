@@ -40,6 +40,8 @@ public:
         std::string script;
         std::string sound;
         std::string listener;
+        int delay { 0 };
+        int waitFlags { 0 };
         int cameraAngle { 0 };
         std::vector<EntryReplyLink> replies;
         std::vector<EntryReplyLink> entries;
@@ -50,12 +52,14 @@ public:
     void reset();
     void load(const std::string &resRef, const GffStruct &dlg);
 
+    bool isSkippable() const;
     const std::vector<EntryReplyLink> &startEntries() const;
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
     const std::string &endScript() const;
 
 private:
+    bool _skippable { false };
     std::vector<EntryReplyLink> _startEntries;
     std::vector<EntryReply> _entries;
     std::vector<EntryReply> _replies;

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include "stream.h"
@@ -37,6 +38,7 @@ public:
     void stop();
 
     bool stopped() const;
+    int duration() const;
 
 private:
     enum class State {
@@ -49,7 +51,7 @@ private:
     bool _loop { false };
     float _gain { 0.0f };
     bool _multiframe { false };
-    State _state { State::NotInited };
+    std::atomic<State> _state { State::NotInited };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
     uint32_t _source { 0 };
