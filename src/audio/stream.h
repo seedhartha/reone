@@ -40,10 +40,12 @@ public:
     void add(Frame &&frame);
     void fill(int frameIdx, uint32_t buffer);
 
+    int duration() const;
     int frameCount() const;
     const Frame &getFrame(int index) const;
 
 private:
+    float _duration { 0 };
     std::vector<Frame> _frames;
 
     AudioStream(const AudioStream &) = delete;

@@ -29,7 +29,8 @@ namespace reone {
 namespace audio {
 
 void AudioStream::add(Frame &&frame) {
-    _frames.push_back(frame);
+    _duration += 1000.0f * (frame.samples.size() / static_cast<float>(frame.sampleRate));
+    _frames.push_back(move(frame));
 }
 
 void AudioStream::fill(int frameIdx, uint32_t buffer) {
@@ -53,6 +54,10 @@ int AudioStream::getALAudioFormat(AudioFormat format) const {
         default:
             throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
     }
+}
+
+int AudioStream::duration() const {
+    return static_cast<int>(_duration);
 }
 
 int AudioStream::frameCount() const {

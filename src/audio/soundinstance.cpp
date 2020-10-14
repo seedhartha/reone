@@ -109,6 +109,10 @@ bool SoundInstance::stopped() const {
     return _state == State::Stopped;
 }
 
+int SoundInstance::duration() const {
+    return _stream->duration();
+}
+
 } // namespace audio
 
 } // namespace reone

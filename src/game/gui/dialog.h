@@ -35,9 +35,9 @@ public:
     void load() override;
     void startDialog(uint32_t ownerId, const std::string &resRef);
     void pickReply(uint32_t index);
+    void update(float dt) override;
 
     void setPickReplyEnabled(bool enabled);
-
     void setGetObjectIdByTagFunc(const std::function<uint32_t(const std::string &)> &fn);
     void setOnReplyPicked(const std::function<void(uint32_t)> &fn);
     void setOnSpeakerChanged(const std::function<void(uint32_t, uint32_t)> &fn);
@@ -50,10 +50,18 @@ private:
     std::shared_ptr<audio::SoundInstance> _currentVoice;
     uint32_t _currentSpeaker { 0 };
     bool _pickReplyEnabled { true };
+    int _autoPickReplyIdx { -1 };
+    int _autoPickReplyFlags { 0 };
+    uint32_t _autoPickReplyTimestamp { 0 };
+
+    // Callbacks
+
     std::function<uint32_t(const std::string &)> _getObjectIdByTag;
     std::function<void(uint32_t)> _onReplyPicked;
     std::function<void(uint32_t, uint32_t)> _onSpeakerChanged;
     std::function<void()> _onDialogFinished;
+
+    // END Callbacks
 
     bool handleKeyDown(SDL_Scancode key) override;
     bool handleKeyUp(SDL_Scancode key) override;
@@ -67,6 +75,10 @@ private:
     void loadStartEntry();
     bool checkCondition(const std::string &script);
     void loadCurrentEntry();
+    void loadCurrentSpeaker();
+    void playVoiceOver();
+    void loadReplies();
+    void scheduleReplyPick(int replyIdx);
     void finish();
 };
 

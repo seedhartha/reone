@@ -35,6 +35,7 @@ void DlgFile::reset() {
 }
 
 void DlgFile::load(const string &resRef, const GffStruct &dlg) {
+    _skippable = dlg.getInt("Skippable") != 0;
     _endScript = dlg.getString("EndConversation");
 
     for (auto &entry : dlg.getList("EntryList")) {
@@ -66,6 +67,8 @@ DlgFile::EntryReply DlgFile::getEntryReply(const GffStruct &gffs) const {
     entry.script = gffs.getString("Script");
     entry.sound = gffs.getString("Sound");
     entry.listener = gffs.getString("Listener");
+    entry.delay = gffs.getInt("Delay");
+    entry.waitFlags = gffs.getInt("WaitFlags");
     entry.cameraAngle = gffs.getInt("CameraAngle");
 
     boost::to_lower(entry.speaker);
@@ -85,6 +88,10 @@ DlgFile::EntryReply DlgFile::getEntryReply(const GffStruct &gffs) const {
     }
 
     return move(entry);
+}
+
+bool DlgFile::isSkippable() const {
+    return _skippable;
 }
 
 const vector<DlgFile::EntryReplyLink> &DlgFile::startEntries() const {
