@@ -31,10 +31,10 @@ namespace game {
 
 class Camera {
 public:
-    virtual bool handle(const SDL_Event &event) = 0;
-    virtual void update(float dt) = 0;
+    virtual bool handle(const SDL_Event &event);
+    virtual void update(float dt);
 
-    virtual void stopMovement() = 0;
+    virtual void stopMovement();
 
     float heading() const;
     std::shared_ptr<render::CameraSceneNode> sceneNode() const;
@@ -42,6 +42,8 @@ public:
 protected:
     float _heading { 0.0f };
     std::shared_ptr<render::CameraSceneNode> _sceneNode;
+
+    Camera() = default;
 };
 
 } // namespace game

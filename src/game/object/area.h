@@ -27,6 +27,7 @@
 #include "../../script/variable.h"
 
 #include "../actionexecutor.h"
+#include "../camera/dialogcamera.h"
 #include "../camera/firstperson.h"
 #include "../camera/thirdperson.h"
 #include "../collisiondetect.h"
@@ -90,6 +91,7 @@ public:
     const CollisionDetector &collisionDetector() const;
     const Pathfinder &pathfinder() const;
     ThirdPersonCamera *thirdPersonCamera();
+    DialogCamera &dialogCamera();
     ObjectSelector &objectSelector();
 
     // Load/save
@@ -113,7 +115,7 @@ public:
     void setOnCameraChanged(const std::function<void(CameraType)> &fn);
     void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
     void setOnPlayerChanged(const std::function<void()> &fn);
-    void setOnStartDialog(const std::function<void(const Object &, const std::string &)> &fn);
+    void setOnStartDialog(const std::function<void(SpatialObject &, const std::string &)> &fn);
 
     // END Callbacks
 
@@ -125,6 +127,7 @@ protected:
     CameraType _cameraType { CameraType::FirstPerson };
     std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
+    std::unique_ptr<DialogCamera> _dialogCamera;
     std::function<void()> _onPlayerChanged;
 
     ObjectList _objects;
@@ -158,19 +161,20 @@ private:
     CameraStyle _cameraStyle;
     std::string _music;
 
+    // Callbacks
+
+    std::function<void(const std::string &, const std::string &)> _onModuleTransition;
+    std::function<void(SpatialObject &, const std::string &)> _onStartDialog;
+    std::function<void(CameraType)> _onCameraChanged;
+
+    // END Callbacks
+
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
     glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
-
-    // Callbacks
-
-    std::function<void(const std::string &, const std::string &)> _onModuleTransition;
-    std::function<void(const Object &, const std::string &)> _onStartDialog;
-    std::function<void(CameraType)> _onCameraChanged;
-
-    // END Callbacks
+    bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
 
     // Loading
 

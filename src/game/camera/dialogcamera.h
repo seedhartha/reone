@@ -19,6 +19,8 @@
 
 #include <functional>
 
+#include "../../render/scene/scenegraph.h"
+
 #include "../types.h"
 
 #include "camera.h"
@@ -27,29 +29,30 @@ namespace reone {
 
 namespace game {
 
-class ThirdPersonCamera : public Camera {
+class DialogCamera : public Camera {
 public:
-    ThirdPersonCamera(render::SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear = 0.1f, float zFar = 10000.0f);
+    enum class Variant {
+        Both,
+        SpeakerClose,
+        SpeakerFar,
+        ListenerClose,
+        ListenerFar
+    };
 
-    bool handle(const SDL_Event &event) override;
-    void update(float dt) override;
-    void stopMovement() override;
+    DialogCamera(render::SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear = 0.1f, float zFar = 10000.0f);
 
-    void setTargetPosition(const glm::vec3 &position);
-    void setHeading(float heading);
+    void setSpeakerPosition(const glm::vec3 &position);
+    void setListenerPosition(const glm::vec3 &position);
+    void setVariant(Variant variant);
     void setFindObstacle(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn);
 
 private:
-    CameraStyle _style;
-    glm::vec3 _targetPosition { 0.0f };
-    bool _rotateCCW { false };
-    bool _rotateCW { false };
-    float _rotationSpeed { 0.0f };
+    glm::vec3 _speakerPosition { 0.0f };
+    glm::vec3 _listenerPosition { 0.0f };
+    Variant _variant { Variant::Both };
     std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> _findObstacle;
 
     void updateSceneNode();
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
 };
 
 } // namespace game

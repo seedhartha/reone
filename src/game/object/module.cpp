@@ -88,10 +88,10 @@ void Module::loadArea(const GffStruct &ifo) {
         _area->update3rdPersonCameraTarget();
         _area->switchTo3rdPersonCamera();
     });
-    area->setOnStartDialog([this](const Object &object, const string &resRef) {
+    area->setOnStartDialog([this](SpatialObject &object, const string &resRef) {
         if (!_startDialog) return;
 
-        const Creature &creature = static_cast<const Creature &>(object);
+        Creature &creature = static_cast<Creature &>(object);
 
         string finalResRef(resRef);
         if (resRef.empty()) finalResRef = creature.conversation();
@@ -285,7 +285,7 @@ void Module::setOnModuleTransition(const function<void(const string &, const str
     _onModuleTransition = fn;
 }
 
-void Module::setStartDialog(const function<void(const Object &, const string &)> &fn) {
+void Module::setStartDialog(const function<void(SpatialObject &, const string &)> &fn) {
     _startDialog = fn;
 }
 

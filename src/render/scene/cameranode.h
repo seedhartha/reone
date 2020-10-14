@@ -30,6 +30,8 @@ public:
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
 
+    void setProjection(const glm::mat4 &projection);
+
 private:
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };

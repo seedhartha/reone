@@ -60,7 +60,7 @@ private:
     void configure() override;
     void update() override;
     void loadNextModule() override;
-    void startDialog(uint32_t ownerId, const std::string &resRef) override;
+    void startDialog(SpatialObject &owner, const std::string &resRef) override;
     void onDialogReplyPicked(uint32_t index) override;
     void onDialogFinished() override;
 

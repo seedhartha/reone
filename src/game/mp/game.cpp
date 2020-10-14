@@ -188,9 +188,11 @@ void MultiplayerGame::update() {
             default:
                 if (_module && _nextModule.empty()) {
                     switch (cmd.type()) {
-                        case CommandType::StartDialog:
-                            startDialog(cmd.objectId(), cmd.resRef());
+                        case CommandType::StartDialog: {
+                            shared_ptr<SpatialObject> object(_module->area()->find(cmd.objectId()));
+                            startDialog(*object, cmd.resRef());
                             break;
+                        }
                         case CommandType::PickDialogReply:
                             _dialogGui->pickReply(cmd.replyIndex());
                             break;
@@ -297,11 +299,11 @@ void MultiplayerGame::onCreatureTalkingChanged(const MultiplayerCreature &creatu
     }
 }
 
-void MultiplayerGame::startDialog(uint32_t ownerId, const string &resRef) {
-    Game::startDialog(ownerId, resRef);
+void MultiplayerGame::startDialog(SpatialObject &owner, const string &resRef) {
+    Game::startDialog(owner, resRef);
 
     if (_mode == MultiplayerMode::Server) {
-        sendStartDialog(ownerId, resRef);
+        sendStartDialog(owner.id(), resRef);
     }
 }
 
