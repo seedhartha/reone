@@ -35,6 +35,8 @@ public:
     void load() override;
     void startDialog(uint32_t ownerId, const std::string &resRef);
     void pickReply(uint32_t index);
+
+    bool handle(const SDL_Event &event) override;
     void update(float dt) override;
 
     void setPickReplyEnabled(bool enabled);
@@ -81,6 +83,7 @@ private:
     void playVoiceOver();
     void scheduleEndOfEntry();
     void finish();
+    void endCurrentEntry();
 };
 
 } // namespace game

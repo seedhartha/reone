@@ -307,6 +307,31 @@ void DialogGui::pickReply(uint32_t index) {
     }
 }
 
+bool DialogGui::handle(const SDL_Event &event) {
+    if (!_entryEnded &&
+        _dialog->isSkippable() &&
+        event.type == SDL_MOUSEBUTTONUP &&
+        event.button.button == SDL_BUTTON_LEFT) {
+
+        endCurrentEntry();
+        return true;
+    }
+
+    return GUI::handle(event);
+}
+
+void DialogGui::endCurrentEntry() {
+    _entryEnded =  true;
+
+    if (_autoPickReplyIdx != -1) {
+        int replyIdx = _autoPickReplyIdx;
+        _autoPickReplyIdx = -1;
+        pickReply(replyIdx);
+    } else {
+        showControl("LB_REPLIES");
+    }
+}
+
 bool DialogGui::handleKeyDown(SDL_Scancode key) {
     return false;
 }
@@ -336,15 +361,7 @@ void DialogGui::update(float dt) {
         uint32_t now = SDL_GetTicks();
 
         if ((endOnAudioStop && audioStopped) || (!endOnAudioStop && now >= _endEntryTimestamp)) {
-            _entryEnded =  true;
-
-            if (_autoPickReplyIdx != -1) {
-                int replyIdx = _autoPickReplyIdx;
-                _autoPickReplyIdx = -1;
-                pickReply(replyIdx);
-            } else {
-                showControl("LB_REPLIES");
-            }
+            endCurrentEntry();
         }
     }
 }
