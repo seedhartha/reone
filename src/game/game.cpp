@@ -254,7 +254,7 @@ void Game::drawWorld() {
             break;
         }
         case GameScreen::Dialog:
-            cameraNode = _module->area()->dialogCamera().sceneNode();
+            cameraNode = _dialogGui->camera().sceneNode();
             break;
         default:
             break;

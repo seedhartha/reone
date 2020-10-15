@@ -265,6 +265,8 @@ void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
     _dialogCamera = make_unique<DialogCamera>(_sceneGraph, _cameraStyle, _cameraAspect);
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
+    _animatedCamera = make_unique<AnimatedCamera>(_sceneGraph, _cameraStyle, _cameraAspect);
+
     if (_onCameraChanged) {
         _onCameraChanged(_cameraType);
     }
@@ -726,6 +728,10 @@ ThirdPersonCamera *Area::thirdPersonCamera() {
 
 DialogCamera &Area::dialogCamera() {
     return *_dialogCamera;
+}
+
+AnimatedCamera &Area::animatedCamera() {
+    return *_animatedCamera;
 }
 
 ObjectSelector &Area::objectSelector() {

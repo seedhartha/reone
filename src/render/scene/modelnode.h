@@ -52,6 +52,7 @@ public:
     ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<Model> &model);
 
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
+    void attach(const std::string &parentNode, const std::shared_ptr<SceneNode> &node);
     void update(float dt);
     void fillSceneGraph() override;
 
@@ -75,7 +76,7 @@ public:
     // Animation
 
     void playDefaultAnimation();
-    void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    void animate(const std::string &parentName, const std::string &anim, int flags = 0, float speed = 1.0f);
     void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
 
     const AnimationState &animationState() const;
@@ -104,6 +105,7 @@ private:
     std::unordered_map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
     std::unordered_map<uint16_t, std::shared_ptr<LightSceneNode>> _lights;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
+    std::unordered_map<uint16_t, std::shared_ptr<SceneNode>> _attachedNodes;
     std::shared_ptr<Texture> _textureOverride;
     std::string _defaultAnimation;
     bool _visible { true };
