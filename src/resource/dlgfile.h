@@ -43,6 +43,7 @@ public:
         int delay { 0 };
         int waitFlags { 0 };
         int cameraAngle { 0 };
+        int cameraAnimation { 0 };
         std::vector<EntryReplyLink> replies;
         std::vector<EntryReplyLink> entries;
     };
@@ -53,6 +54,7 @@ public:
     void load(const std::string &resRef, const GffStruct &dlg);
 
     bool isSkippable() const;
+    const std::string &cameraModel() const;
     const std::vector<EntryReplyLink> &startEntries() const;
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
@@ -60,6 +62,7 @@ public:
 
 private:
     bool _skippable { false };
+    std::string _cameraModel;
     std::vector<EntryReplyLink> _startEntries;
     std::vector<EntryReply> _entries;
     std::vector<EntryReply> _replies;

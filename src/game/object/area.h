@@ -27,6 +27,7 @@
 #include "../../script/variable.h"
 
 #include "../actionexecutor.h"
+#include "../camera/animatedcamera.h"
 #include "../camera/dialogcamera.h"
 #include "../camera/firstperson.h"
 #include "../camera/thirdperson.h"
@@ -92,6 +93,7 @@ public:
     const Pathfinder &pathfinder() const;
     ThirdPersonCamera *thirdPersonCamera();
     DialogCamera &dialogCamera();
+    AnimatedCamera &animatedCamera();
     ObjectSelector &objectSelector();
 
     // Load/save
@@ -128,6 +130,7 @@ protected:
     std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<DialogCamera> _dialogCamera;
+    std::unique_ptr<AnimatedCamera> _animatedCamera;
     std::function<void()> _onPlayerChanged;
 
     ObjectList _objects;

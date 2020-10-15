@@ -42,6 +42,8 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
 
+    Camera &camera() const;
+
     void setPickReplyEnabled(bool enabled);
     void setOnReplyPicked(const std::function<void(uint32_t)> &fn);
     void setOnDialogFinished(const std::function<void()> &fn);
@@ -79,6 +81,7 @@ private:
     void addFrame(int top, int height);
     void configureMessage();
     void configureReplies();
+    void loadAnimatedCamera();
     void loadStartEntry();
     bool checkCondition(const std::string &script);
     void loadCurrentEntry();

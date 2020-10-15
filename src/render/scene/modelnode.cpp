@@ -121,26 +121,45 @@ void ModelSceneNode::animate(const string &anim, int flags, float speed) {
     }
 }
 
-void ModelSceneNode::attach(const string &parentNode, const shared_ptr<Model> &model) {
-    shared_ptr<ModelNode> parent(_model->findNodeByName(parentNode));
+void ModelSceneNode::attach(const string &parentName, const shared_ptr<Model> &model) {
+    shared_ptr<ModelNode> parent(_model->findNodeByName(parentName));
     if (!parent) {
-        warn("Parent node not found: " + parentNode);
+        warn("Parent node not found: " + parentName);
         return;
     }
     uint16_t parentNumber = parent->nodeNumber();
-    auto maybeAttached = _attachedModels.find(parentNumber);
 
+    auto maybeAttached = _attachedModels.find(parentNumber);
     if (maybeAttached != _attachedModels.end()) {
         removeChild(maybeAttached->second);
         _attachedModels.erase(maybeAttached);
     }
     if (model) {
-        shared_ptr<ModelSceneNode> child(new ModelSceneNode(_sceneGraph, model));
-        child->setLocalTransform(parent->absoluteTransform());
-        child->setLightingEnabled(_lightingEnabled);
-        addChild(child);
+        shared_ptr<ModelSceneNode> modelNode(new ModelSceneNode(_sceneGraph, model));
+        modelNode->setLightingEnabled(_lightingEnabled);
+        modelNode->setLocalTransform(parent->absoluteTransform());
+        addChild(modelNode);
+        _attachedModels.insert(make_pair(parentNumber, modelNode));
+    }
+}
 
-        _attachedModels.insert(make_pair(parentNumber, child));
+void ModelSceneNode::attach(const string &parentName, const shared_ptr<SceneNode> &node) {
+    shared_ptr<ModelNode> parent(_model->findNodeByName(parentName));
+    if (!parent) {
+        warn("Parent node not found: " + parentName);
+        return;
+    }
+    uint16_t parentNumber = parent->nodeNumber();
+
+    auto maybeAttached = _attachedNodes.find(parentNumber);
+    if (maybeAttached != _attachedNodes.end()) {
+        removeChild(maybeAttached->second);
+        _attachedNodes.erase(maybeAttached);
+    }
+    if (node) {
+        node->setLocalTransform(parent->absoluteTransform());
+        addChild(node);
+        _attachedNodes.insert(make_pair(parentNumber, node));
     }
 }
 
@@ -269,9 +288,13 @@ void ModelSceneNode::updateNodeTansforms(const ModelNode &node, const glm::mat4 
     if (lightNode != _lights.end()) {
         lightNode->second->setLocalTransform(nodeTransform);
     }
-    auto attached = _attachedModels.find(node.nodeNumber());
-    if (attached != _attachedModels.end()) {
-        attached->second->setLocalTransform(nodeTransform);
+    auto attachedModel = _attachedModels.find(node.nodeNumber());
+    if (attachedModel != _attachedModels.end()) {
+        attachedModel->second->setLocalTransform(nodeTransform);
+    }
+    auto attachedNode = _attachedNodes.find(node.nodeNumber());
+    if (attachedNode != _attachedNodes.end()) {
+        attachedNode->second->setLocalTransform(nodeTransform);
     }
 
     for (auto &child : node.children()) {

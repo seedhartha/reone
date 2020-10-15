@@ -138,7 +138,16 @@ void DialogGui::startDialog(SpatialObject &owner, const string &resRef) {
     _dialog.reset(new DlgFile());
     _dialog->load(resRef, *dlg);
 
+    loadAnimatedCamera();
     loadStartEntry();
+}
+
+void DialogGui::loadAnimatedCamera() {
+    string modelResRef(_dialog->cameraModel());
+    if (modelResRef.empty()) return;
+
+    AnimatedCamera &camera = _game->module()->area()->animatedCamera();
+    camera.setModel(modelResRef);
 }
 
 void DialogGui::loadStartEntry() {
@@ -270,10 +279,15 @@ void DialogGui::updateCamera() {
     if (_currentSpeaker->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
         speakerPosition += hookPosition;
     }
-    DialogCamera &camera = area->dialogCamera();
-    camera.setListenerPosition(listenerPosition);
-    camera.setSpeakerPosition(speakerPosition);
-    camera.setVariant(getRandomCameraVariant());
+    if (_dialog->cameraModel().empty()) {
+        DialogCamera &camera = area->dialogCamera();
+        camera.setListenerPosition(listenerPosition);
+        camera.setSpeakerPosition(speakerPosition);
+        camera.setVariant(getRandomCameraVariant());
+    } else {
+        AnimatedCamera &camera = area->animatedCamera();
+        camera.animate(_currentEntry->cameraAnimation);
+    }
 }
 
 DialogCamera::Variant DialogGui::getRandomCameraVariant() const {
@@ -410,7 +424,18 @@ void DialogGui::update(float dt) {
         if ((endOnAudioStop && audioStopped) || (!endOnAudioStop && now >= _endEntryTimestamp)) {
             endCurrentEntry();
         }
+        shared_ptr<Area> area(_game->module()->area());
+
+        AnimatedCamera &camera = area->animatedCamera();
+        camera.update(dt);
     }
+}
+
+Camera &DialogGui::camera() const {
+    string cameraModel(_dialog->cameraModel());
+    shared_ptr<Area> area(_game->module()->area());
+
+    return cameraModel.empty() ? area->dialogCamera() : static_cast<Camera &>(area->animatedCamera());
 }
 
 void DialogGui::setPickReplyEnabled(bool enabled) {
