@@ -42,6 +42,7 @@ public:
 
     void setCreature(Creature *creature);
 
+private:
     Module *_module { nullptr };
     Area *_area { nullptr };
     Camera *_camera { nullptr };
