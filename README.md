@@ -45,6 +45,6 @@ reone is not the only project aiming to reimplement the Odyssey engine – there
 
 In contrast, this is what reone offers:
 
-* Written in C++ – potentially faster than Unity (C#) and JavaScript implementations.
-* Modern codebase – C++14, OpenGL 3.3, no legacy code (e.g., multiple rendering paths in xoreos).
-* KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora Engine games.
+* Written in C++ – faster than JavaScript and potentially Unity (C#) implementations.
+* Custom game engine based on SDL 2 and OpenGL 3.3 – no Unity knowledge required.
+* KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora Engine games – faster development.
