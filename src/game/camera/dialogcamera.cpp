@@ -70,29 +70,47 @@ void DialogCamera::updateSceneNode() {
     glm::vec3 target(0.0f);
     switch (_variant) {
         case Variant::SpeakerClose:
-            eye = center - 0.25f * distance * dir;
-            eye += glm::min(0.25f * glm::length(listenerToSpeaker), 1.0f) * glm::cross(dir, down);
-            eye += glm::vec3(0.0f, 0.0f, 0.1f);
+            eye = center;
+            eye -= glm::min(0.25f * distance, 1.0f) * dir;
+            eye += glm::min(0.25f * distance, 1.0f) * glm::cross(dir, down);
+            eye += 0.1f * up;
 
             target = _speakerPosition;
-            target += glm::vec3(0.0f, 0.0f, 0.1f);
+            target -= 0.1f * distance * glm::cross(dir, down);
+            target += 0.1f * up;
+            break;
+        case Variant::SpeakerFar:
+            eye = _listenerPosition;
+            eye -= 0.5f * distance * dir;
+            eye += 0.5f * distance * glm::cross(dir, down);
+
+            target = center;
             break;
         case Variant::ListenerClose:
-            eye = center + 0.25f * distance * dir;
-            eye += glm::min(0.25f * glm::length(listenerToSpeaker), 1.0f) * glm::cross(dir, down);
-            eye += glm::vec3(0.0f, 0.0f, 0.1f);
+            eye = center;
+            eye += glm::min(0.25f * distance, 1.0f) * dir;
+            eye += glm::min(0.25f * distance, 1.0f) * glm::cross(dir, down);
+            eye += 0.1f * up;
 
             target = _listenerPosition;
-            target += glm::vec3(0.0f, 0.0f, 0.1f);
+            target -= 0.1f * distance * glm::cross(dir, down);
+            target += 0.1f * up;
+            break;
+        case Variant::ListenerFar:
+            eye = _speakerPosition;
+            eye += 0.5f * distance * dir;
+            eye += 0.5f * distance * glm::cross(dir, down);
+
+            target = center;
             break;
         case Variant::Both:
         default:
             eye = center;
-            eye += glm::min(2.25f * glm::length(listenerToSpeaker), 4.0f) * glm::cross(dir, down);
-            eye += glm::vec3(0.0f, 0.0f, 0.25f);
+            eye += glm::min(2.25f * distance, 4.0f) * glm::cross(dir, down);
+            eye += 0.25f * up;
 
             target = center;
-            target -= glm::vec3(0.0f, 0.0f, 0.25f);
+            target += 0.25f * down;
             break;
     }
     if (_findObstacle) {
