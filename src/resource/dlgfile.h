@@ -26,6 +26,10 @@ namespace reone {
 
 namespace resource {
 
+enum DialogWaitFlags {
+    kDialogWaitAnimFinish = 1
+};
+
 class DlgFile {
 public:
     struct EntryReplyLink {
@@ -44,6 +48,7 @@ public:
         int waitFlags { 0 };
         int cameraAngle { 0 };
         int cameraAnimation { 0 };
+        float camFieldOfView { 0.0f };
         std::vector<EntryReplyLink> replies;
         std::vector<EntryReplyLink> entries;
     };

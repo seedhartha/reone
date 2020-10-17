@@ -155,6 +155,11 @@ float GffStruct::getFloat(const string &name) const {
     return field->asFloat();
 }
 
+float GffStruct::getFloat(const string &name, float defaultValue) const {
+    const GffField *field = find(name);
+    return field ? field->asFloat() : defaultValue;
+}
+
 string GffStruct::getString(const string &name) const {
     const GffField *field = find(name);
     return field ? field->asString() : "";

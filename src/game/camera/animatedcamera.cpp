@@ -31,11 +31,15 @@ namespace reone {
 
 namespace game {
 
-AnimatedCamera::AnimatedCamera(SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear, float zFar) {
+AnimatedCamera::AnimatedCamera(SceneGraph *sceneGraph, float aspect) : _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
+    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f));
+    updateProjection();
+}
 
-    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
-    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, projection);
+void AnimatedCamera::updateProjection() {
+    glm::mat4 projection(glm::perspective(glm::radians(_fovy), _aspect, _zNear, _zFar));
+    _sceneNode->setProjection(projection);
 }
 
 void AnimatedCamera::update(float dt) {
@@ -44,14 +48,14 @@ void AnimatedCamera::update(float dt) {
     }
 }
 
-static const std::string &getAnimationName(int animNumber) {
+static const string &getAnimationName(int animNumber) {
     static map<int, string> nameByNumber;
 
     auto maybeName = nameByNumber.find(animNumber);
     if (maybeName != nameByNumber.end()) {
         return maybeName->second;
     }
-    string name(str(boost::format("CUT%03dW") % (animNumber - 1200 + 1)));
+    string name(str(boost::format("cut%03dw") % (animNumber - 1200 + 1)));
 
     return nameByNumber.insert(make_pair(animNumber, move(name))).first->second;
 }
@@ -62,12 +66,21 @@ void AnimatedCamera::playAnimation(int animNumber) {
     }
 }
 
+bool AnimatedCamera::isAnimationFinished() const {
+    return _model ? _model->isAnimationFinished() : false;
+}
+
 void AnimatedCamera::setModel(const string &resRef) {
     if (_modelResRef == resRef) return;
 
     _modelResRef = resRef;
     _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(resRef));
     _model->attach("camerahook", _sceneNode);
+}
+
+void AnimatedCamera::setFieldOfView(float fovy) {
+    _fovy = fovy;
+    updateProjection();
 }
 
 } // namespace game

@@ -104,6 +104,7 @@ public:
     int getInt(const std::string &name) const;
     int getInt(const std::string &name, int defaultValue) const;
     float getFloat(const std::string &name) const;
+    float getFloat(const std::string &name, float defaultValue) const;
     std::string getString(const std::string &name) const;
     const GffStruct &getStruct(const std::string &name) const;
     const std::vector<GffStruct> &getList(const std::string &name) const;
