@@ -25,7 +25,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/scene/modelnode.h"
+#include "../../render/scene/modelscenenode.h"
 #include "../../render/walkmesh.h"
 
 namespace reone {
@@ -68,8 +68,8 @@ public:
 
     // Animation
 
-    virtual void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
-    virtual void animate(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
+    virtual void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    virtual void playAnimation(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
 
     // END Animation
 

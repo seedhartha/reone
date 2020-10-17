@@ -105,7 +105,7 @@ void Area::loadLYT() {
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, resources.findModel(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
-        model->animate("animloop1", kAnimationLoop);
+        model->playAnimation("animloop1", kAnimationLoop);
 
         _sceneGraph->addRoot(model);
 

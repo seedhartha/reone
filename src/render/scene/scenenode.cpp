@@ -37,11 +37,15 @@ void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
     _children.push_back(node);
 }
 
-void SceneNode::removeChild(const shared_ptr<SceneNode> &node) {
-    auto child = find(_children.begin(), _children.end(), node);
-    if (child != _children.end()) {
-        _children.erase(child);
-        node->setParent(nullptr);
+void SceneNode::removeChild(SceneNode &node) {
+    auto maybeChild = find_if(
+        _children.begin(),
+        _children.end(),
+        [&node](const std::shared_ptr<SceneNode> &n) { return n.get() == &node; });
+
+    if (maybeChild != _children.end()) {
+        _children.erase(maybeChild);
+        node.setParent(nullptr);
     }
 }
 
@@ -73,6 +77,10 @@ const glm::mat4 &SceneNode::absoluteTransform() const {
     return _absoluteTransform;
 }
 
+const glm::mat4 &SceneNode::absoluteTransformInverse() const {
+    return _absoluteTransformInv;
+}
+
 const vector<shared_ptr<SceneNode>> &SceneNode::children() const {
     return _children;
 }
@@ -85,6 +93,7 @@ void SceneNode::setParent(const SceneNode *parent) {
 void SceneNode::updateAbsoluteTransform() {
     _absoluteTransform = _parent ? _parent->_absoluteTransform : glm::mat4(1.0f);
     _absoluteTransform *= _localTransform;
+    _absoluteTransformInv = glm::inverse(_absoluteTransform);
 
     for (auto &child : _children) {
         child->updateAbsoluteTransform();

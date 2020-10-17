@@ -84,16 +84,16 @@ void SpatialObject::update(const UpdateContext &ctx) {
     _model->update(ctx.deltaTime);
 }
 
-void SpatialObject::animate(const string &anim, int flags, float speed) {
-    if (!_model) return;
-
-    _model->animate(anim, flags, speed);
+void SpatialObject::playAnimation(const string &name, int flags, float speed) {
+    if (_model) {
+        _model->playAnimation(name, flags, speed);
+    }
 }
 
-void SpatialObject::animate(const string &parent, const string &anim, int flags, float speed) {
-    if (!_model) return;
-
-    _model->animate(parent, anim, flags, speed);
+void SpatialObject::playAnimation(const string &parent, const string &anim, int flags, float speed) {
+    if (_model) {
+        _model->playAnimation(parent, anim, flags, speed);
+    }
 }
 
 bool SpatialObject::isSelectable() const {

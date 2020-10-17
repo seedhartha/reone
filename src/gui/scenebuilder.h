@@ -24,7 +24,7 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#include "../render/scene/modelnode.h"
+#include "../render/scene/modelscenenode.h"
 #include "../render/scene/scenegraph.h"
 
 #include "control/control.h"

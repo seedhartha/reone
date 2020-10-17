@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "../../render/scene/modelnode.h"
+#include "../../render/scene/modelscenenode.h"
 #include "../../render/scene/scenegraph.h"
 
 #include "../types.h"
@@ -36,7 +36,7 @@ public:
 
     void update(float dt) override;
 
-    void animate(int animNumber);
+    void playAnimation(int animNumber);
 
     void setModel(const std::string &resRef);
 

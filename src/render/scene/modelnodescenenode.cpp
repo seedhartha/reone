@@ -15,14 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "meshnode.h"
+#include "modelnodescenenode.h"
 
 #include <stdexcept>
-#include <unordered_map>
 
-#include <boost/format.hpp>
-
-#include "modelnode.h"
+#include "modelscenenode.h"
 #include "scenegraph.h"
 
 using namespace std;
@@ -31,37 +28,54 @@ namespace reone {
 
 namespace render {
 
-MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *model, const ModelNode *modelNode) :
-    SceneNode(sceneGraph), _model(model), _modelNode(modelNode) {
+ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
+    SceneNode(sceneGraph),
+    _modelSceneNode(modelSceneNode),
+    _modelNode(modelNode) {
+
+    if (!modelSceneNode) {
+        throw invalid_argument("modelSceneNode must not be null");
+    }
+    if (!modelNode) {
+        throw invalid_argument("modelNode must not be null");
+    }
 }
 
-void MeshSceneNode::fillSceneGraph() {
-    if (isTransparent()) {
-        _sceneGraph->addTransparentMesh(this);
-    } else {
-        _sceneGraph->addOpaqueMesh(this);
+void ModelNodeSceneNode::fillSceneGraph() {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    if (mesh) {
+        bool render = mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
+        if (render) {
+            bool transparent = mesh->isTransparent() || _modelNode->alpha() < 1.0f;
+            if (transparent) {
+                _sceneGraph->addTransparentMesh(this);
+            } else {
+                _sceneGraph->addOpaqueMesh(this);
+            }
+        }
     }
+
+    shared_ptr<ModelNode::Light> light(_modelNode->light());
+    if (light) {
+        _sceneGraph->addLight(this);
+    }
+
     SceneNode::fillSceneGraph();
 }
 
-bool MeshSceneNode::isTransparent() const {
+void ModelNodeSceneNode::renderSingle() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return (mesh && mesh->isTransparent()) || _modelNode->alpha() < 1.0f;
-}
+    if (!mesh) return;
 
-void MeshSceneNode::updateDistanceToCamera(const glm::vec3 &cameraPosition) {
-    _distanceToCamera = glm::distance2(_center, cameraPosition);
-}
+    bool render = mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
+    if (!render) return;
 
-void MeshSceneNode::render() const {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
-    const ModelSceneNode::AnimationState &animState = _model->animationState();
-    bool skeletal = skin && !animState.name.empty();
+    bool skeletal = static_cast<bool>(skin);
 
     LocalUniforms locals;
     locals.model = _absoluteTransform;
-    locals.alpha = _model->alpha() * _modelNode->alpha();
+    locals.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
     if (mesh->hasEnvmapTexture()) {
         locals.features.envmapEnabled = true;
@@ -91,10 +105,10 @@ void MeshSceneNode::render() const {
             uint16_t boneIdx = pair.first;
             uint16_t nodeIdx = pair.second;
 
-            auto bone = animState.boneTransforms.find(nodeIdx);
-            if (bone == animState.boneTransforms.end()) continue;
-
-            bones[boneIdx] = bone->second;
+            ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
+            if (bone) {
+                bones[boneIdx] = bone->boneTransform();
+            }
         }
 
         locals.skeletal.bones = move(bones);
@@ -105,8 +119,8 @@ void MeshSceneNode::render() const {
     }
     int lightCount = 0;
 
-    if (_model->isLightingEnabled()) {
-        const vector<LightSceneNode *> &lights = _model->lightsAffectedBy();
+    if (_modelSceneNode->isLightingEnabled()) {
+        const vector<ModelNodeSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
         locals.features.lightingEnabled = true;
         locals.lighting.ambientColor = _sceneGraph->ambientLightColor();
@@ -115,38 +129,32 @@ void MeshSceneNode::render() const {
         for (auto &light : lights) {
             ShaderLight shaderLight;
             shaderLight.position = light->absoluteTransform()[3];
-            shaderLight.radius = light->modelNode().radius();
-            shaderLight.color = light->modelNode().color();
+            shaderLight.radius = light->modelNode()->radius();
+            shaderLight.color = light->modelNode()->color();
 
             locals.lighting.lights.push_back(move(shaderLight));
         }
     }
     Shaders.activate(ShaderProgram::ModelModel, locals);
 
-    mesh->render(_model->textureOverride());
-
-    SceneNode::render();
+    mesh->render(_modelSceneNode->textureOverride());
 }
 
-const ModelSceneNode *MeshSceneNode::model() const {
-    return _model;
+float ModelNodeSceneNode::getDistanceFromCenter(const glm::vec3 &point) const {
+    glm::vec3 center(_absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f));
+    return glm::distance2(center, point);
 }
 
-const ModelNode *MeshSceneNode::modelNode() const {
+ModelNode *ModelNodeSceneNode::modelNode() const {
     return _modelNode;
 }
 
-float MeshSceneNode::distanceToCamera() const {
-    return _distanceToCamera;
+const glm::mat4 &ModelNodeSceneNode::boneTransform() const {
+    return _boneTransform;
 }
 
-void MeshSceneNode::updateAbsoluteTransform() {
-    SceneNode::updateAbsoluteTransform();
-    updateCenter();
-}
-
-void MeshSceneNode::updateCenter() {
-    _center = _absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f);
+void ModelNodeSceneNode::setBoneTransform(const glm::mat4 &transform) {
+    _boneTransform = transform;
 }
 
 } // namespace render

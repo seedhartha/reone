@@ -39,17 +39,17 @@ public:
     Model(
         const std::string &name,
         const std::shared_ptr<ModelNode> &rootNode,
-        const std::vector<std::shared_ptr<Animation>> &anims,
+        std::vector<std::unique_ptr<Animation>> &anims,
         const std::shared_ptr<Model> &superModel = nullptr);
 
     void initGL();
 
-    std::shared_ptr<Animation> findAnimation(const std::string &name, const Model **model) const;
+    Animation *getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
     const std::string &name() const;
-    const ModelNode &rootNode() const;
+    ModelNode &rootNode() const;
     float animationScale() const;
     std::shared_ptr<Model> superModel() const;
     const AABB &aabb() const;
@@ -60,7 +60,7 @@ public:
 private:
     std::string _name;
     std::shared_ptr<ModelNode> _rootNode;
-    std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
+    std::unordered_map<std::string, std::unique_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;

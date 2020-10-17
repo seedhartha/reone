@@ -88,10 +88,11 @@ set(SYSTEM_HEADERS
     src/render/scene/cameranode.h
     src/render/scene/cubenode.h
     src/render/scene/lightnode.h
-    src/render/scene/meshnode.h
-    src/render/scene/modelnode.h
+    src/render/scene/modelnodescenenode.h
+    src/render/scene/modelscenenode.h
     src/render/scene/scenegraph.h
     src/render/scene/scenenode.h
+    src/render/scene/scenenodeanimator.h
     src/render/shaders.h
     src/render/texture.h
     src/render/types.h
@@ -179,10 +180,11 @@ set(SYSTEM_SOURCES
     src/render/scene/cameranode.cpp
     src/render/scene/cubenode.cpp
     src/render/scene/lightnode.cpp
-    src/render/scene/meshnode.cpp
-    src/render/scene/modelnode.cpp
+    src/render/scene/modelnodescenenode.cpp
+    src/render/scene/modelscenenode.cpp
     src/render/scene/scenegraph.cpp
     src/render/scene/scenenode.cpp
+    src/render/scene/scenenodeanimator.cpp
     src/render/shaders.cpp
     src/render/texture.cpp
     src/render/walkmesh.cpp

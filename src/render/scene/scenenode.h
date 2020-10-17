@@ -31,7 +31,7 @@ class SceneGraph;
 class SceneNode {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
-    void removeChild(const std::shared_ptr<SceneNode> &node);
+    void removeChild(SceneNode &node);
     virtual void fillSceneGraph();
     virtual void render() const;
 
@@ -40,6 +40,7 @@ public:
     const SceneNode *parent() const;
     const glm::mat4 &localTransform() const;
     const glm::mat4 &absoluteTransform() const;
+    const glm::mat4 &absoluteTransformInverse() const;
     const std::vector<std::shared_ptr<SceneNode>> &children() const;
 
     void setParent(const SceneNode *parent);
@@ -50,6 +51,7 @@ protected:
     const SceneNode *_parent { nullptr };
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
+    glm::mat4 _absoluteTransformInv { 1.0f };
     std::vector<std::shared_ptr<SceneNode>> _children;
 
     SceneNode(SceneGraph *sceneGraph);

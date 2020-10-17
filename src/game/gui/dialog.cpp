@@ -286,7 +286,7 @@ void DialogGui::updateCamera() {
         camera.setVariant(getRandomCameraVariant());
     } else {
         AnimatedCamera &camera = area->animatedCamera();
-        camera.animate(_currentEntry->cameraAnimation);
+        camera.playAnimation(_currentEntry->cameraAnimation);
     }
 }
 

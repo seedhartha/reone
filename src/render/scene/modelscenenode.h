@@ -25,42 +25,33 @@
 #include "../shaders.h"
 
 #include "scenenode.h"
+#include "scenenodeanimator.h"
 
 namespace reone {
 
 namespace render {
 
-class LightSceneNode;
-class MeshSceneNode;
+class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
-    struct AnimationState {
-        std::string nextAnimation;
-        int nextFlags { 0 };
-        float nextSpeed { 1.0f };
-        std::string name;
-        int flags { 0 };
-        float speed { 1.0f };
-        std::shared_ptr<Animation> animation;
-        const Model *model { nullptr };
-        float time { 0.0f };
-        std::unordered_map<std::string, glm::mat4> localTransforms;
-        std::unordered_map<uint16_t, glm::mat4> boneTransforms;
-    };
+    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
 
-    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<Model> &model);
+    void update(float dt);
+    void render() const override;
 
     void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
     void attach(const std::string &parentNode, const std::shared_ptr<SceneNode> &node);
-    void update(float dt);
     void fillSceneGraph() override;
 
+    ModelNodeSceneNode *getModelNode(const std::string &name) const;
+    ModelNodeSceneNode *getModelNodeByIndex(int index) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
 
     const std::string &name() const;
     std::shared_ptr<Model> model() const;
+    bool hasTextureOverride() const;
     std::shared_ptr<Texture> textureOverride() const;
     bool isVisible() const;
     bool isOnScreen() const;
@@ -76,10 +67,8 @@ public:
     // Animation
 
     void playDefaultAnimation();
-    void animate(const std::string &parentName, const std::string &anim, int flags = 0, float speed = 1.0f);
-    void animate(const std::string &anim, int flags = 0, float speed = 1.0f);
-
-    const AnimationState &animationState() const;
+    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
 
     void setDefaultAnimation(const std::string &name);
 
@@ -91,39 +80,30 @@ public:
     void setLightingIsDirty();
 
     bool isLightingEnabled() const;
-    const std::vector<LightSceneNode *> &lightsAffectedBy() const;
+    const std::vector<ModelNodeSceneNode *> &lightsAffectedBy() const;
 
     void setLightingEnabled(bool affected);
-    void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
+    void setLightsAffectedBy(const std::vector<ModelNodeSceneNode *> &lights);
 
     // END Dynamic lighting
 
 private:
     std::shared_ptr<Model> _model;
-    std::unordered_map<uint16_t, glm::mat4> _nodeTransforms;
-    AnimationState _animState;
-    std::unordered_map<uint16_t, std::shared_ptr<MeshSceneNode>> _meshes;
-    std::unordered_map<uint16_t, std::shared_ptr<LightSceneNode>> _lights;
+    SceneNodeAnimator _animator;
+    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
+    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
-    std::unordered_map<uint16_t, std::shared_ptr<SceneNode>> _attachedNodes;
     std::shared_ptr<Texture> _textureOverride;
-    std::string _defaultAnimation;
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };
     bool _drawAABB { false };
     bool _lightingEnabled { false };
-    std::vector<LightSceneNode *> _lightsAffectedBy;
+    std::vector<ModelNodeSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
 
-    void initChildren();
-    void doUpdate(float dt, const std::set<std::string> &skipNodes);
-    void startNextAnimation();
-    void advanceAnimation(float dt, const std::set<std::string> &skipNodes);
-    void updateAnimTransforms(const ModelNode &animNode, const glm::mat4 &transform, float time, const std::set<std::string> &skipNodes);
-    void updateNodeTansforms(const ModelNode &node, const glm::mat4 &transform);
-    bool shouldRender(const ModelNode &node) const;
-    glm::mat4 getNodeTransform(const ModelNode &node) const;
+    void initModelNodes();
+    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(ModelNode &node) const;
     void updateAbsoluteTransform() override;
 };
 
