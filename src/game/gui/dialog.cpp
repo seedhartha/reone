@@ -293,10 +293,12 @@ void DialogGui::updateCamera() {
 }
 
 DialogCamera::Variant DialogGui::getRandomCameraVariant() const {
-    int r = random(0, 1);
+    int r = random(0, 2);
     switch (r) {
         case 0:
             return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
+        case 1:
+            return _entryEnded ? DialogCamera::Variant::ListenerFar : DialogCamera::Variant::SpeakerFar;
         default:
             return DialogCamera::Variant::Both;
     }
