@@ -56,11 +56,10 @@ static const std::string &getAnimationName(int animNumber) {
     return nameByNumber.insert(make_pair(animNumber, move(name))).first->second;
 }
 
-void AnimatedCamera::animate(int animNumber) {
-    if (!_model) return;
-
-    string animName(getAnimationName(animNumber));
-    _model->animate(animName);
+void AnimatedCamera::playAnimation(int animNumber) {
+    if (_model) {
+        _model->playAnimation(getAnimationName(animNumber));
+    }
 }
 
 void AnimatedCamera::setModel(const string &resRef) {

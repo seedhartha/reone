@@ -23,7 +23,8 @@
 
 #include "../mesh/quad.h"
 
-#include "modelnode.h"
+#include "modelnodescenenode.h"
+#include "modelscenenode.h"
 
 using namespace std;
 
@@ -47,15 +48,15 @@ void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
     _rootNodes.push_back(node);
 }
 
-void SceneGraph::addOpaqueMesh(MeshSceneNode *node) {
+void SceneGraph::addOpaqueMesh(ModelNodeSceneNode *node) {
     _opaqueMeshes.push_back(node);
 }
 
-void SceneGraph::addTransparentMesh(MeshSceneNode *node) {
+void SceneGraph::addTransparentMesh(ModelNodeSceneNode *node) {
     _transparentMeshes.push_back(node);
 }
 
-void SceneGraph::addLight(LightSceneNode *node) {
+void SceneGraph::addLight(ModelNodeSceneNode *node) {
     _lights.push_back(node);
 }
 
@@ -75,13 +76,17 @@ void SceneGraph::prepare() {
             modelNode->updateLighting();
         }
     }
+
+    unordered_map<ModelNodeSceneNode *, float> cameraDistances;
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
 
     for (auto &mesh : _transparentMeshes) {
-        mesh->updateDistanceToCamera(cameraPosition);
+        cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
     }
-    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [](const MeshSceneNode *left, const MeshSceneNode *right) {
-        return left->distanceToCamera() > right->distanceToCamera();
+    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](ModelNodeSceneNode *left, ModelNodeSceneNode *right) {
+        float leftDistance = cameraDistances.find(left)->second;
+        float rightDistance = cameraDistances.find(right)->second;
+        return leftDistance > rightDistance;
     });
 }
 
@@ -99,37 +104,41 @@ void SceneGraph::render() const {
         node->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        mesh->render();
+        mesh->renderSingle();
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->render();
+        mesh->renderSingle();
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<ModelNodeSceneNode *> &lights) const {
+    unordered_map<ModelNodeSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
-        if (light->modelNode().light()->ambientOnly) continue;
+        if (light->modelNode()->light()->ambientOnly) continue;
 
         float distance = light->distanceTo(position);
-        const ModelNode &modelNode = light->modelNode();
-        float radius = modelNode.radius();
+        const ModelNode *modelNode = light->modelNode();
+        float radius = modelNode->radius();
 
         if (distance > radius * radius) continue;
 
-        light->setDistanceToObject(distance);
+        distances.insert(make_pair(light, distance));
         lights.push_back(light);
     }
 
-    sort(lights.begin(), lights.end(), [](const LightSceneNode *left, const LightSceneNode *right) {
-        int leftPriority = left->modelNode().light()->priority;
-        int rightPriority = right->modelNode().light()->priority;
+    sort(lights.begin(), lights.end(), [&distances](ModelNodeSceneNode *left, ModelNodeSceneNode *right) {
+        int leftPriority = left->modelNode()->light()->priority;
+        int rightPriority = right->modelNode()->light()->priority;
 
         if (leftPriority < rightPriority) return true;
         if (leftPriority > rightPriority) return false;
 
-        return left->distanceToObject() < right->distanceToObject();
+        float leftDistance = distances.find(left)->second;
+        float rightDistance = distances.find(right)->second;
+
+        return leftDistance < rightDistance;
     });
 
     if (lights.size() > kMaxLightCount) {

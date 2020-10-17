@@ -17,41 +17,35 @@
 
 #pragma once
 
-#include "glm/vec3.hpp"
-
-#include "../model/modelnode.h"
-#include "../shaders.h"
-
 #include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
+class ModelNode;
 class ModelSceneNode;
 
-class MeshSceneNode : public SceneNode {
+class ModelNodeSceneNode : public SceneNode {
 public:
-    MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *model, const ModelNode *modelNode);
+    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode);
 
     void fillSceneGraph() override;
-    void updateDistanceToCamera(const glm::vec3 &cameraPosition);
-    void render() const override;
 
-    const ModelSceneNode *model() const;
-    const ModelNode *modelNode() const;
-    float distanceToCamera() const;
+    void renderSingle() const;
+
+    float getDistanceFromCenter(const glm::vec3 &point) const;
+
+    ModelNode *modelNode() const;
+    const glm::mat4 &boneTransform() const;
+
+    void setBoneTransform(const glm::mat4 &transform);
 
 private:
-    const ModelSceneNode *_model { nullptr };
-    const ModelNode *_modelNode { nullptr };
-    glm::vec3 _center { 0.0f };
-    float _distanceToCamera { 0.0f };
-
-    bool isTransparent() const;
-
-    void updateAbsoluteTransform() override;
-    void updateCenter();
+    const ModelSceneNode *_modelSceneNode { nullptr };
+    ModelNode *_modelNode { nullptr };
+    glm::mat4 _animTransform { 1.0f };
+    glm::mat4 _boneTransform { 1.0f };
 };
 
 } // namespace render

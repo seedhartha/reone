@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Vsevolod Kremianskii
+ * Copyright Â© 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,11 @@
 
 #include "lightnode.h"
 
-#include "../model/modelnode.h"
-
-#include "scenegraph.h"
-
 namespace reone {
 
 namespace render {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, const ModelNode *modelNode) : SceneNode(sceneGraph), _modelNode(modelNode) {
-}
-
-void LightSceneNode::fillSceneGraph() {
-    _sceneGraph->addLight(this);
-}
-
-const ModelNode &LightSceneNode::modelNode() const {
-    return *_modelNode;
-}
-
-float LightSceneNode::distanceToObject() const {
-    return _distanceToObject;
-}
-
-void LightSceneNode::setDistanceToObject(float distance) {
-    _distanceToObject = distance;
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph) : SceneNode(sceneGraph) {
 }
 
 } // namespace render

@@ -22,9 +22,10 @@
 
 #include "glm/vec3.hpp"
 
+#include "../types.h"
+
 #include "cameranode.h"
-#include "lightnode.h"
-#include "meshnode.h"
+#include "modelnodescenenode.h"
 
 namespace reone {
 
@@ -36,13 +37,13 @@ public:
 
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
-    void addOpaqueMesh(MeshSceneNode *node);
-    void addTransparentMesh(MeshSceneNode *node);
-    void addLight(LightSceneNode *node);
+    void addOpaqueMesh(ModelNodeSceneNode *node);
+    void addTransparentMesh(ModelNodeSceneNode *node);
+    void addLight(ModelNodeSceneNode *node);
     void prepare();
     void render() const;
 
-    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
+    void getLightsAt(const glm::vec3 &position, std::vector<ModelNodeSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
 
@@ -52,9 +53,9 @@ public:
 private:
     GraphicsOptions _opts;
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;
-    std::vector<MeshSceneNode *> _opaqueMeshes;
-    std::vector<MeshSceneNode *> _transparentMeshes;
-    std::vector<LightSceneNode *> _lights;
+    std::vector<ModelNodeSceneNode *> _opaqueMeshes;
+    std::vector<ModelNodeSceneNode *> _transparentMeshes;
+    std::vector<ModelNodeSceneNode *> _lights;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

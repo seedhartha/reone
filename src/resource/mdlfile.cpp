@@ -111,7 +111,7 @@ void MdlFile::doLoad() {
     readNodeNames(nameOffsets);
 
     unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
-    vector<shared_ptr<Animation>> anims(readAnimations(animOffsets));
+    vector<unique_ptr<Animation>> anims(readAnimations(animOffsets));
     shared_ptr<Model> superModel;
 
     if (!superModelName.empty() && superModelName != "null") {
@@ -177,9 +177,12 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     vector<float> orientationValues(readArray<float>(4));
     glm::quat orientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, position);
+    transform *= glm::mat4_cast(orientation);
+
     glm::mat4 absTransform(parent ? parent->_absTransform : glm::mat4(1.0f));
-    absTransform = glm::translate(absTransform, position);
-    absTransform *= glm::mat4_cast(orientation);
+    absTransform *= transform;
 
     uint32_t childOffOffset, childCount;
     readArrayDefinition(childOffOffset, childCount);
@@ -198,6 +201,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     node->_name = name;
     node->_position = position;
     node->_orientation = orientation;
+    node->_localTransform = transform;
     node->_absTransform = absTransform;
     node->_absTransformInv = glm::inverse(absTransform);
 
@@ -537,13 +541,12 @@ void MdlFile::readSkin(ModelNode &node) {
     node._skin->nodeIdxByBoneIdx = move(nodeIdxByBoneIdx);
 }
 
-vector<shared_ptr<Animation>> MdlFile::readAnimations(const vector<uint32_t> &offsets) {
-    vector<shared_ptr<Animation>> anims;
+vector<unique_ptr<Animation>> MdlFile::readAnimations(const vector<uint32_t> &offsets) {
+    vector<unique_ptr<Animation>> anims;
     anims.reserve(offsets.size());
 
     for (uint32_t offset : offsets) {
-        unique_ptr<Animation> anim(readAnimation(offset));
-        anims.push_back(move(anim));
+        anims.push_back(readAnimation(offset));
     }
 
     return move(anims);

@@ -26,7 +26,7 @@ namespace render {
 Model::Model(
     const string &name,
     const shared_ptr<ModelNode> &rootNode,
-    const vector<shared_ptr<Animation>> &anims,
+    vector<unique_ptr<Animation>> &anims,
     const shared_ptr<Model> &superModel
 ) :
     _name(name),
@@ -34,7 +34,7 @@ Model::Model(
     _superModel(superModel) {
 
     for (auto &anim : anims) {
-        _animations.insert(make_pair(anim->name(), anim));
+        _animations.insert(make_pair(anim->name(), move(anim)));
     }
 
     init(_rootNode);
@@ -61,14 +61,13 @@ void Model::initGL() {
     _rootNode->initGL();
 }
 
-shared_ptr<Animation> Model::findAnimation(const string &name, const Model **model) const {
-    auto it = _animations.find(name);
-    if (it != _animations.end()) {
-        *model = this;
-        return it->second;
+Animation *Model::getAnimation(const string &name) const {
+    auto maybeAnim = _animations.find(name);
+    if (maybeAnim != _animations.end()) {
+        return maybeAnim->second.get();
     }
     if (_superModel) {
-        return _superModel->findAnimation(name, model);
+        return _superModel->getAnimation(name);
     }
 
     return nullptr;
@@ -88,7 +87,7 @@ const string &Model::name() const {
     return _name;
 }
 
-const ModelNode &Model::rootNode() const {
+ModelNode &Model::rootNode() const {
     return *_rootNode;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Vsevolod Kremianskii
+ * Copyright Â© 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,9 @@ namespace reone {
 
 namespace render {
 
-class ModelNode;
-
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(SceneGraph *sceneGraph, const ModelNode *modelNode);
-
-    void fillSceneGraph() override;
-
-    const ModelNode &modelNode() const;
-    float distanceToObject() const;
-
-    void setDistanceToObject(float distance);
-
-private:
-    const ModelNode *_modelNode { nullptr };
-    float _distanceToObject { 0.0f };
+    LightSceneNode(SceneGraph *sceneGraph);
 };
 
 } // namespace render

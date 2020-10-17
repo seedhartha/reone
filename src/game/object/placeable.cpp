@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../core/streamutil.h"
-#include "../../render/scene/modelnode.h"
+#include "../../render/scene/modelscenenode.h"
 #include "../../resource/resources.h"
 
 #include "objectfactory.h"

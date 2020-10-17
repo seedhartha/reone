@@ -63,6 +63,7 @@ public:
     const std::string &name() const;
     const glm::vec3 &position() const;
     const glm::quat &orientation() const;
+    const glm::mat4 &localTransform() const;
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
     const glm::vec3 &color() const;
@@ -94,6 +95,7 @@ private:
     std::string _name;
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absTransform { 1.0f };
     glm::mat4 _absTransformInv { 1.0f };
     std::vector<PositionKeyframe> _positionFrames;

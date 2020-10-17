@@ -288,12 +288,12 @@ void Creature::playDefaultAnimation() {
 void Creature::playGreetingAnimation() {
     if (_movementType != MovementType::None) return;
 
-    animate(g_animGreeting, kAnimationPropagate);
+    playAnimation(g_animGreeting, kAnimationPropagate);
 }
 
 void Creature::playTalkAnimation() {
-    animate(g_animTalkBody, kAnimationLoop);
-    animate(g_headHookNode, g_animTalkHead, kAnimationLoop, 0.25f);
+    playAnimation(g_animTalkBody, kAnimationLoop);
+    playAnimation(g_headHookNode, g_animTalkHead, kAnimationLoop, 0.25f);
 }
 
 void Creature::equip(const string &resRef) {
@@ -372,10 +372,10 @@ void Creature::setMovementType(MovementType type) {
 
     switch (type) {
         case MovementType::Walk:
-            _model->animate(getWalkAnimation(), kAnimationLoop | kAnimationPropagate);
+            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate);
             break;
         case MovementType::Run:
-            _model->animate(getRunAnimation(), kAnimationLoop | kAnimationPropagate);
+            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate);
             break;
         default:
             if (_talking) {

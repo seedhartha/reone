@@ -42,11 +42,6 @@ enum class TextureBlending {
     Additive
 };
 
-enum AnimationFlags {
-    kAnimationLoop = 1,
-    kAnimationPropagate = 2
-};
-
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };

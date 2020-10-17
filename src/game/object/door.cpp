@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../core/streamutil.h"
-#include "../../render/scene/modelnode.h"
+#include "../../render/scene/modelscenenode.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -81,7 +81,7 @@ void Door::loadBlueprint(const string &resRef) {
 void Door::open(const shared_ptr<Object> &triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("opened1");
-        _model->animate("opening1");
+        _model->playAnimation("opening1");
     }
     _open = true;
     _selectable = false;
@@ -90,7 +90,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
 void Door::close(const shared_ptr<Object> &triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("closed1");
-        _model->animate("closing1");
+        _model->playAnimation("closing1");
     }
     _open = false;
     _selectable = true;

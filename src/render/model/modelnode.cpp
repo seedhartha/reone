@@ -115,6 +115,10 @@ const glm::quat &ModelNode::orientation() const {
     return _orientation;
 }
 
+const glm::mat4 &ModelNode::localTransform() const {
+    return _localTransform;
+}
+
 const glm::mat4 &ModelNode::absoluteTransform() const {
     return _absTransform;
 }

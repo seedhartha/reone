@@ -137,7 +137,7 @@ void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
     shared_ptr<SpatialObject> object(find(cmd.objectId()));
     if (object) {
         object->setSynchronize(false);
-        object->animate(cmd.animation(), cmd.animationFlags());
+        object->playAnimation(cmd.animation(), cmd.animationFlags());
         object->setSynchronize(true);
     }
 }
