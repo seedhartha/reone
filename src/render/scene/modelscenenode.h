@@ -70,6 +70,8 @@ public:
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
     void playAnimation(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
 
+    bool isAnimationFinished() const;
+
     void setDefaultAnimation(const std::string &name);
 
     // END Animation

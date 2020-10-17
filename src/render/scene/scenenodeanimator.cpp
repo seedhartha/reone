@@ -129,6 +129,10 @@ void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed
     _animFinished = false;
 }
 
+bool SceneNodeAnimator::isAnimationFinished() const {
+    return _animFinished;
+}
+
 void SceneNodeAnimator::setDefaultAnimation(const string &name) {
     _defaultAnim = name;
 }

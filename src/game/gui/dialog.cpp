@@ -49,7 +49,8 @@ namespace game {
 static const int kDefaultEntryDuration = 1000;
 
 enum EndEntryFlags {
-    kEndEntryOnAudioStop = 1
+    kEndEntryOnAnimFinish = 1,
+    kEndEntryOnAudioStop = 2
 };
 
 DialogGui::DialogGui(GameVersion version, Game *game, const GraphicsOptions &opts) :
@@ -286,6 +287,7 @@ void DialogGui::updateCamera() {
         camera.setVariant(getRandomCameraVariant());
     } else {
         AnimatedCamera &camera = area->animatedCamera();
+        camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
         camera.playAnimation(_currentEntry->cameraAnimation);
     }
 }
@@ -323,16 +325,21 @@ void DialogGui::scheduleEndOfEntry() {
     _endEntryFlags = 0;
 
     uint32_t now = SDL_GetTicks();
+
+    if (!_dialog->cameraModel().empty() && _currentEntry->waitFlags & kDialogWaitAnimFinish) {
+        _endEntryFlags = kEndEntryOnAnimFinish;
+        return;
+    }
     if (_currentEntry->delay != -1) {
         _endEntryTimestamp = now + 1000 * _currentEntry->delay;
-    } else {
-        if (_currentVoice) {
-            _endEntryFlags = kEndEntryOnAudioStop;
-            _endEntryTimestamp = now + _currentVoice->duration();
-        } else {
-            _endEntryTimestamp = now + kDefaultEntryDuration;
-        }
+        return;
     }
+    if (_currentVoice) {
+        _endEntryFlags = kEndEntryOnAudioStop;
+        _endEntryTimestamp = now + _currentVoice->duration();
+        return;
+    }
+    _endEntryTimestamp = now + kDefaultEntryDuration;
 }
 
 void DialogGui::pickReply(uint32_t index) {
@@ -417,17 +424,27 @@ void DialogGui::update(float dt) {
     GUI::update(dt);
 
     if (!_entryEnded) {
+        bool endOnAnimFinish = (_endEntryFlags & kEndEntryOnAnimFinish) != 0;
         bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
-        bool audioStopped = _currentVoice && _currentVoice->stopped();
-        uint32_t now = SDL_GetTicks();
 
-        if ((endOnAudioStop && audioStopped) || (!endOnAudioStop && now >= _endEntryTimestamp)) {
-            endCurrentEntry();
+        if (endOnAnimFinish) {
+            shared_ptr<Area> area(_game->module()->area());
+            AnimatedCamera &camera = area->animatedCamera();
+            camera.update(dt);
+            if (camera.isAnimationFinished()) {
+                endCurrentEntry();
+            }
+        } else if (endOnAudioStop) {
+            bool stopped = _currentVoice && _currentVoice->stopped();
+            if (stopped) {
+                endCurrentEntry();
+            }
+        } else {
+            uint32_t now = SDL_GetTicks();
+            if (now >= _endEntryTimestamp) {
+                endCurrentEntry();
+            }
         }
-        shared_ptr<Area> area(_game->module()->area());
-
-        AnimatedCamera &camera = area->animatedCamera();
-        camera.update(dt);
     }
 }
 

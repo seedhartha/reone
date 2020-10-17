@@ -317,6 +317,10 @@ void ModelSceneNode::setAlpha(float alpha) {
     }
 }
 
+bool ModelSceneNode::isAnimationFinished() const {
+    return _model ? _animator.isAnimationFinished() : false;
+}
+
 void ModelSceneNode::setDefaultAnimation(const string &name) {
     _animator.setDefaultAnimation(name);
 

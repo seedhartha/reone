@@ -30,20 +30,31 @@ namespace reone {
 
 namespace game {
 
+const float kDefaultAnimCamFOV = 55.0f;
+
 class AnimatedCamera : public Camera {
 public:
-    AnimatedCamera(render::SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear = 0.1f, float zFar = 10000.0f);
+    AnimatedCamera(render::SceneGraph *sceneGraph, float aspect);
 
     void update(float dt) override;
 
     void playAnimation(int animNumber);
 
+    bool isAnimationFinished() const;
+
     void setModel(const std::string &resRef);
+    void setFieldOfView(float fovy);
 
 private:
     render::SceneGraph *_sceneGraph { nullptr };
+    float _aspect { 1.0f };
     std::string _modelResRef;
     std::unique_ptr<render::ModelSceneNode> _model;
+    float _fovy { kDefaultAnimCamFOV };
+    float _zNear { 0.1f };
+    float _zFar { 10000.0f };
+
+    void updateProjection();
 };
 
 } // namespace game

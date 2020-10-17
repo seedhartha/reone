@@ -72,6 +72,7 @@ DlgFile::EntryReply DlgFile::getEntryReply(const GffStruct &gffs) const {
     entry.waitFlags = gffs.getInt("WaitFlags");
     entry.cameraAngle = gffs.getInt("CameraAngle");
     entry.cameraAnimation = gffs.getInt("CameraAnimation", 0);
+    entry.camFieldOfView = gffs.getFloat("CamFieldOfView", 0.0f);
 
     boost::to_lower(entry.speaker);
     boost::to_lower(entry.listener);
