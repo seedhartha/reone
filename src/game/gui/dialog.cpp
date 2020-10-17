@@ -270,15 +270,19 @@ void DialogGui::loadCurrentSpeaker() {
 void DialogGui::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
     shared_ptr<SpatialObject> partyLeader(area->partyLeader());
-    glm::vec3 listenerPosition(partyLeader->position());
-    glm::vec3 speakerPosition(_currentSpeaker->position());
+    glm::vec3 listenerPosition;
+    glm::vec3 speakerPosition;
     glm::vec3 hookPosition(0.0f);
 
     if (partyLeader->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
-        listenerPosition += hookPosition;
+        listenerPosition = partyLeader->position() + hookPosition;
+    } else {
+        listenerPosition = partyLeader->model()->getCenterOfAABB();
     }
     if (_currentSpeaker->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
-        speakerPosition += hookPosition;
+        speakerPosition = _currentSpeaker->position() + hookPosition;
+    } else {
+        speakerPosition = _currentSpeaker->model()->getCenterOfAABB();
     }
     if (_dialog->cameraModel().empty()) {
         DialogCamera &camera = area->dialogCamera();
