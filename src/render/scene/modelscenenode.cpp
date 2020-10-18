@@ -130,26 +130,16 @@ void ModelSceneNode::playAnimation(int channel, const string &name, int flags, f
     }
 }
 
-void ModelSceneNode::playAnimation(const string &parent, int channel, const string &anim, int flags, float speed) {
-    shared_ptr<ModelNode> parentNode(_model->findNodeByName(parent));
-    if (!parentNode) return;
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {
+    ModelNodeSceneNode *parentNode = getModelNode(parent);
+    if (!parentNode) return nullptr;
 
-    auto maybeAttached = _attachedModels.find(parentNode->nodeNumber());
-    if (maybeAttached == _attachedModels.end()) return;
-
-    maybeAttached->second->playAnimation(channel, anim, flags, speed);
-}
-
-void ModelSceneNode::attach(const string &parentName, const shared_ptr<Model> &model) {
-    ModelNodeSceneNode *parent = getModelNode(parentName);
-    if (!parent) return;
-
-    ModelNode *parentModelNode = parent->modelNode();
+    ModelNode *parentModelNode = parentNode->modelNode();
     uint16_t parentNumber = parentModelNode->nodeNumber();
 
     auto maybeAttached = _attachedModels.find(parentNumber);
     if (maybeAttached != _attachedModels.end()) {
-        parent->removeChild(*maybeAttached->second);
+        parentNode->removeChild(*maybeAttached->second);
         _attachedModels.erase(maybeAttached);
     }
     if (model) {
@@ -159,9 +149,13 @@ void ModelSceneNode::attach(const string &parentName, const shared_ptr<Model> &m
         }
         shared_ptr<ModelSceneNode> modelNode(new ModelSceneNode(_sceneGraph, model, skipNodes));
         modelNode->setLightingEnabled(_lightingEnabled);
-        parent->addChild(modelNode);
-        _attachedModels.insert(make_pair(parentNumber, modelNode));
+        parentNode->addChild(modelNode);
+
+        auto inserted = _attachedModels.insert(make_pair(parentNumber, move(modelNode)));
+        return inserted.first->second;
     }
+
+    return nullptr;
 }
 
 ModelNodeSceneNode *ModelSceneNode::getModelNode(const string &name) const {
@@ -181,13 +175,13 @@ ModelNodeSceneNode *ModelSceneNode::getModelNodeByIndex(int index) const {
     return maybeNode->second;
 }
 
-void ModelSceneNode::attach(const string &parentName, const shared_ptr<SceneNode> &node) {
-    shared_ptr<ModelNode> parent(_model->findNodeByName(parentName));
-    if (!parent) {
-        warn("Parent node not found: " + parentName);
+void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &node) {
+    shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
+    if (!parentModelNode) {
+        warn("Parent node not found: " + parent);
         return;
     }
-    uint16_t parentNumber = parent->nodeNumber();
+    uint16_t parentNumber = parentModelNode->nodeNumber();
 
     auto maybeNode = _modelNodeByNumber.find(parentNumber);
     if (maybeNode != _modelNodeByNumber.end()) {
