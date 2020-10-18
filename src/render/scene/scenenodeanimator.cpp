@@ -29,6 +29,10 @@ namespace reone {
 
 namespace render {
 
+bool SceneNodeAnimator::AnimationChannel::isSameAnimation(const string &name, int flags, float speed) const {
+    return animation && animName == name && animFlags == flags && animSpeed == speed;
+}
+
 SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, const set<string> &skipNodes) :
     _modelSceneNode(modelSceneNode),
     _skipNodes(skipNodes) {
@@ -102,7 +106,7 @@ void SceneNodeAnimator::updateBoneTransforms(ModelNode &modelNode) {
 
 void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
     float length = channel.animation->length();
-    channel.animTime += channel.animSpeed * dt, length;
+    channel.animTime += channel.animSpeed * dt;
 
     bool loop = channel.animFlags & kAnimationLoop;
     if (loop) {
@@ -129,14 +133,12 @@ void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed
 }
 
 void SceneNodeAnimator::stopAnimation(int channel) {
-    AnimationChannel &animChannel = _channels[channel];
-    animChannel.animName.clear();
-    animChannel.animation = nullptr;
+    _channels[channel].animation = nullptr;
 }
 
 void SceneNodeAnimator::playAnimation(int channel, const string &name, int flags, float speed) {
     AnimationChannel &animChannel = _channels[channel];
-    if (animChannel.animName == name && animChannel.animFlags == flags && animChannel.animSpeed == speed) return;
+    if (animChannel.isSameAnimation(name, flags, speed)) return;
 
     animChannel.animName = name;
     animChannel.animFlags = flags;
