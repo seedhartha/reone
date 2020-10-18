@@ -40,8 +40,8 @@ public:
     void update(float dt);
     void render() const override;
 
-    void attach(const std::string &parentNode, const std::shared_ptr<Model> &model);
-    void attach(const std::string &parentNode, const std::shared_ptr<SceneNode> &node);
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<Model> &model);
+    void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
     void fillSceneGraph() override;
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
@@ -69,7 +69,6 @@ public:
     void playDefaultAnimation();
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
     void playAnimation(int channel, const std::string &name, int flags = 0, float speed = 1.0f);
-    void playAnimation(const std::string &parent, int channel, const std::string &anim, int flags = 0, float speed = 1.0f);    void playAnimation(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
 
     bool isAnimationFinished() const;
 

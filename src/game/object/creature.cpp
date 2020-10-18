@@ -142,7 +142,7 @@ void Creature::updateAppearance() {
     if (!headModelName.empty()) {
         headModel = Resources.findModel(headModelName);
     }
-    _model->attach(g_headHookNode, headModel);
+    _headModel = _model->attach(g_headHookNode, headModel);
 
     // Right weapon
 
@@ -297,7 +297,10 @@ void Creature::playTalkAnimation() {
     if (!_model) return;
 
     _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
-    _model->playAnimation(g_headHookNode, 1, g_animTalkHead, kAnimationLoop, 0.25f);
+
+    if (_headModel) {
+        _headModel->playAnimation(1, g_animTalkHead, kAnimationLoop, 0.25f);
+    }
 }
 
 void Creature::equip(const string &resRef) {

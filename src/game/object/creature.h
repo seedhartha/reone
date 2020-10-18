@@ -112,6 +112,7 @@ private:
     CreatureConfiguration _config;
     std::shared_ptr<resource::CreatureBlueprint> _blueprint;
     ModelType _modelType { ModelType::Creature };
+    std::shared_ptr<render::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
     std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
