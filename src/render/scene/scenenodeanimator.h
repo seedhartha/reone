@@ -41,26 +41,34 @@ public:
 
     void playDefaultAnimation();
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(int channel, const std::string &name, int flags = 0, float speed = 1.0f);
 
     bool isAnimationFinished() const;
 
     void setDefaultAnimation(const std::string &name);
 
 private:
+    static const int kChannelCount = 2;
+
+    struct AnimationChannel {
+        std::string animName;
+        int animFlags { 0 };
+        float animSpeed { 1.0f };
+        float animTime { 0.0f };
+        Animation *animation { nullptr };
+        bool animFinished { false };
+    };
+
     ModelSceneNode *_modelSceneNode { nullptr };
     std::set<std::string> _skipNodes;
-    std::string _animName;
-    int _animFlags { 0 };
-    float _animSpeed { 1.0f };
-    float _animTime { 0.0f };
-    Animation *_animation { nullptr };
-    bool _animFinished { false };
+    AnimationChannel _channels[kChannelCount];
     std::string _defaultAnim;
 
-    void advanceTime(float dt);
-    void updateModelNodes();
-    void applyAnimationTransforms(ModelNode &animNode);
+    void updateChannel(int channel, float dt);
+    void advanceTime(AnimationChannel &channel, float dt);
+    void applyAnimationTransforms(const AnimationChannel &channel, ModelNode &animNode);
     void updateBoneTransforms(ModelNode &modelNode);
+    void stopAnimation(int channel);
 };
 
 } // namespace render

@@ -282,7 +282,9 @@ void Creature::loadPortrait(int appearance) {
 }
 
 void Creature::playDefaultAnimation() {
-    if (_model) _model->playDefaultAnimation();
+    if (_model) {
+        _model->playDefaultAnimation();
+    }
 }
 
 void Creature::playGreetingAnimation() {
@@ -292,8 +294,10 @@ void Creature::playGreetingAnimation() {
 }
 
 void Creature::playTalkAnimation() {
-    playAnimation(g_animTalkBody, kAnimationLoop);
-    playAnimation(g_headHookNode, g_animTalkHead, kAnimationLoop, 0.25f);
+    if (!_model) return;
+
+    _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
+    _model->playAnimation(g_headHookNode, 1, g_animTalkHead, kAnimationLoop, 0.25f);
 }
 
 void Creature::equip(const string &resRef) {
