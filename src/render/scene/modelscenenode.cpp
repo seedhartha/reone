@@ -64,14 +64,7 @@ void ModelSceneNode::initModelNodes() {
 
         for (auto &child : modelNode->children()) {
             shared_ptr<ModelNodeSceneNode> childNode(getModelNodeSceneNode(*child));
-
-            // If model node is a skinned mesh, make it child of the root node
-            if (child->mesh() && child->skin()) {
-                childNode->setLocalTransform(child->absoluteTransform());
-                rootNode->addChild(childNode);
-            } else {
-                sceneNode->addChild(childNode);
-            }
+            addChild(childNode);
             nodes.push(childNode.get());
         }
     }
@@ -79,7 +72,7 @@ void ModelSceneNode::initModelNodes() {
 
 unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
     unique_ptr<ModelNodeSceneNode> sceneNode(new ModelNodeSceneNode(_sceneGraph, this, &node));
-    sceneNode->setLocalTransform(node.localTransform());
+    sceneNode->setLocalTransform(node.absoluteTransform());
     return move(sceneNode);
 }
 

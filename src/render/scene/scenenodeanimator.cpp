@@ -50,18 +50,19 @@ void SceneNodeAnimator::update(float dt) {
     for (int i = 0; i < kChannelCount; ++i) {
         updateChannel(i, dt);
     }
-    updateBoneTransforms(_modelSceneNode->model()->rootNode());
+    updateNodeTransforms(_modelSceneNode->model()->rootNode());
 }
 
 void SceneNodeAnimator::updateChannel(int channel, float dt) {
     AnimationChannel &animChannel = _channels[channel];
     if (!animChannel.animation) return;
 
-    applyAnimationTransforms(animChannel, *animChannel.animation->rootNode());
+    animChannel.localTransforms.clear();
+    updateAnimationTransforms(animChannel, *animChannel.animation->rootNode());
     advanceTime(animChannel, dt);
 }
 
-void SceneNodeAnimator::applyAnimationTransforms(const AnimationChannel &channel, ModelNode &animNode) {
+void SceneNodeAnimator::updateAnimationTransforms(AnimationChannel &channel, ModelNode &animNode) {
     ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNode(animNode.name());
     if (sceneNode) {
         ModelNode *modelNode = sceneNode->modelNode();
@@ -83,24 +84,32 @@ void SceneNodeAnimator::applyAnimationTransforms(const AnimationChannel &channel
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, position);
         transform *= glm::mat4_cast(orientation);
-        sceneNode->setLocalTransform(transform);
+        channel.localTransforms.insert(make_pair(modelNode->nodeNumber(), transform));
     }
 
     for (auto &child : animNode.children()) {
-        applyAnimationTransforms(channel, *child);
+        updateAnimationTransforms(channel, *child);
     }
 }
 
-void SceneNodeAnimator::updateBoneTransforms(ModelNode &modelNode) {
-    ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
+void SceneNodeAnimator::updateNodeTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform) {
+    if (modelNode.skin()) return;
 
-    glm::mat4 boneTransform(_modelSceneNode->absoluteTransformInverse());
-    boneTransform *= sceneNode->absoluteTransform();
-    boneTransform *= modelNode.absoluteTransformInverse();
-    sceneNode->setBoneTransform(boneTransform);
+    glm::mat4 transform(parentTransform);
+
+    auto maybeTransform = _channels[0].localTransforms.find(modelNode.nodeNumber());
+    if (maybeTransform != _channels[0].localTransforms.end()) {
+        transform *= maybeTransform->second;
+    } else {
+        transform *= modelNode.localTransform();
+    }
+
+    ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
+    sceneNode->setLocalTransform(transform);
+    sceneNode->setBoneTransform(transform * modelNode.absoluteTransformInverse());
 
     for (auto &child : modelNode.children()) {
-        updateBoneTransforms(*child);
+        updateNodeTransforms(*child, transform);
     }
 }
 
