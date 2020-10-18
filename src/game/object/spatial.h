@@ -42,6 +42,8 @@ class SpatialObject : public Object {
 public:
     void update(const UpdateContext &ctx) override;
 
+    virtual void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
     bool contains(const glm::vec3 &point) const;
@@ -65,13 +67,6 @@ public:
     void setPosition(const glm::vec3 &position);
     void setHeading(float heading);
     void setVisible(bool visible);
-
-    // Animation
-
-    virtual void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
-    virtual void playAnimation(const std::string &parent, const std::string &anim, int flags = 0, float speed = 1.0f);
-
-    // END Animation
 
 protected:
     render::SceneGraph *_sceneGraph { nullptr };

@@ -110,16 +110,6 @@ void ModelSceneNode::playDefaultAnimation() {
     }
 }
 
-void ModelSceneNode::playAnimation(const string &parent, const string &anim, int flags, float speed) {
-    shared_ptr<ModelNode> parentNode(_model->findNodeByName(parent));
-    if (!parentNode) return;
-
-    auto maybeAttached = _attachedModels.find(parentNode->nodeNumber());
-    if (maybeAttached == _attachedModels.end()) return;
-
-    maybeAttached->second->playAnimation(anim, flags, speed);
-}
-
 void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
     _animator.playAnimation(name, flags, speed);
 
@@ -128,6 +118,26 @@ void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
             attached.second->playAnimation(name, flags, speed);
         }
     }
+}
+
+void ModelSceneNode::playAnimation(int channel, const string &name, int flags, float speed) {
+    _animator.playAnimation(channel, name, flags, speed);
+
+    if (flags & kAnimationPropagate) {
+        for (auto &attached : _attachedModels) {
+            attached.second->playAnimation(channel, name, flags, speed);
+        }
+    }
+}
+
+void ModelSceneNode::playAnimation(const string &parent, int channel, const string &anim, int flags, float speed) {
+    shared_ptr<ModelNode> parentNode(_model->findNodeByName(parent));
+    if (!parentNode) return;
+
+    auto maybeAttached = _attachedModels.find(parentNode->nodeNumber());
+    if (maybeAttached == _attachedModels.end()) return;
+
+    maybeAttached->second->playAnimation(channel, anim, flags, speed);
 }
 
 void ModelSceneNode::attach(const string &parentName, const shared_ptr<Model> &model) {

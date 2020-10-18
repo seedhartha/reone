@@ -39,22 +39,25 @@ SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, const set<s
 }
 
 void SceneNodeAnimator::update(float dt) {
-    if (!_animation) return;
-
-    updateModelNodes();
-    advanceTime(dt);
-
-    if (_animFinished) {
+    if (isAnimationFinished()) {
         playDefaultAnimation();
+        return;
     }
-}
-
-void SceneNodeAnimator::updateModelNodes() {
-    applyAnimationTransforms(*_animation->rootNode());
+    for (int i = 0; i < kChannelCount; ++i) {
+        updateChannel(i, dt);
+    }
     updateBoneTransforms(_modelSceneNode->model()->rootNode());
 }
 
-void SceneNodeAnimator::applyAnimationTransforms(ModelNode &animNode) {
+void SceneNodeAnimator::updateChannel(int channel, float dt) {
+    AnimationChannel &animChannel = _channels[channel];
+    if (!animChannel.animation) return;
+
+    applyAnimationTransforms(animChannel, *animChannel.animation->rootNode());
+    advanceTime(animChannel, dt);
+}
+
+void SceneNodeAnimator::applyAnimationTransforms(const AnimationChannel &channel, ModelNode &animNode) {
     ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNode(animNode.name());
     if (sceneNode) {
         ModelNode *modelNode = sceneNode->modelNode();
@@ -64,11 +67,11 @@ void SceneNodeAnimator::applyAnimationTransforms(ModelNode &animNode) {
         bool skip = _skipNodes.count(modelNode->name()) > 0;
         if (!skip) {
             glm::vec3 animPosition(0.0f);
-            if (animNode.getPosition(_animTime, animPosition, _modelSceneNode->model()->animationScale())) {
+            if (animNode.getPosition(channel.animTime, animPosition, _modelSceneNode->model()->animationScale())) {
                 position += animPosition;
             }
             glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);
-            if (animNode.getOrientation(_animTime, animOrientation)) {
+            if (animNode.getOrientation(channel.animTime, animOrientation)) {
                 orientation = animOrientation;
             }
         }
@@ -80,7 +83,7 @@ void SceneNodeAnimator::applyAnimationTransforms(ModelNode &animNode) {
     }
 
     for (auto &child : animNode.children()) {
-        applyAnimationTransforms(*child);
+        applyAnimationTransforms(channel, *child);
     }
 }
 
@@ -97,17 +100,17 @@ void SceneNodeAnimator::updateBoneTransforms(ModelNode &modelNode) {
     }
 }
 
-void SceneNodeAnimator::advanceTime(float dt) {
-    float length = _animation->length();
-    _animTime += _animSpeed * dt, length;
+void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
+    float length = channel.animation->length();
+    channel.animTime += channel.animSpeed * dt, length;
 
-    bool loop = _animFlags & kAnimationLoop;
+    bool loop = channel.animFlags & kAnimationLoop;
     if (loop) {
-        _animTime = glm::mod(_animTime, length);
+        channel.animTime = glm::mod(channel.animTime, length);
     } else {
-        _animTime = glm::min(_animTime, length);
-        if (_animTime == length) {
-            _animFinished = true;
+        channel.animTime = glm::min(channel.animTime, length);
+        if (channel.animTime == length) {
+            channel.animFinished = true;
         }
     }
 }
@@ -119,18 +122,36 @@ void SceneNodeAnimator::playDefaultAnimation() {
 }
 
 void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed) {
-    if (_animName == name && _animFlags == flags && _animSpeed == speed) return;
+    for (int i = 1; i < kChannelCount; ++i) {
+        stopAnimation(i);
+    }
+    playAnimation(0, name, flags, speed);
+}
 
-    _animName = name;
-    _animFlags = flags;
-    _animSpeed = speed;
-    _animTime = 0.0f;
-    _animation = _modelSceneNode->model()->getAnimation(name);
-    _animFinished = false;
+void SceneNodeAnimator::stopAnimation(int channel) {
+    AnimationChannel &animChannel = _channels[channel];
+    animChannel.animName.clear();
+    animChannel.animation = nullptr;
+}
+
+void SceneNodeAnimator::playAnimation(int channel, const string &name, int flags, float speed) {
+    AnimationChannel &animChannel = _channels[channel];
+    if (animChannel.animName == name && animChannel.animFlags == flags && animChannel.animSpeed == speed) return;
+
+    animChannel.animName = name;
+    animChannel.animFlags = flags;
+    animChannel.animSpeed = speed;
+    animChannel.animTime = 0.0f;
+    animChannel.animation = _modelSceneNode->model()->getAnimation(name);
+    animChannel.animFinished = false;
 }
 
 bool SceneNodeAnimator::isAnimationFinished() const {
-    return _animFinished;
+    for (int i = 0; i < kChannelCount; ++i) {
+        const AnimationChannel &channel = _channels[i];
+        if (channel.animation && !channel.animFinished) return false;
+    }
+    return true;
 }
 
 void SceneNodeAnimator::setDefaultAnimation(const string &name) {
