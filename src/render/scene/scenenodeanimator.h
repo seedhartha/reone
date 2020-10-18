@@ -17,8 +17,12 @@
 
 #pragma once
 
+#include <cstdint>
 #include <set>
 #include <string>
+#include <unordered_map>
+
+#include "glm/mat4x4.hpp"
 
 namespace reone {
 
@@ -57,6 +61,7 @@ private:
         float animTime { 0.0f };
         Animation *animation { nullptr };
         bool animFinished { false };
+        std::unordered_map<uint16_t, glm::mat4> localTransforms;
 
         bool isSameAnimation(const std::string &name, int flags, float speed) const;
     };
@@ -68,8 +73,8 @@ private:
 
     void updateChannel(int channel, float dt);
     void advanceTime(AnimationChannel &channel, float dt);
-    void applyAnimationTransforms(const AnimationChannel &channel, ModelNode &animNode);
-    void updateBoneTransforms(ModelNode &modelNode);
+    void updateAnimationTransforms(AnimationChannel &channel, ModelNode &animNode);
+    void updateNodeTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform = glm::mat4(1.0f));
     void stopAnimation(int channel);
 };
 
