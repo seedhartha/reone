@@ -57,6 +57,8 @@ private:
         float animTime { 0.0f };
         Animation *animation { nullptr };
         bool animFinished { false };
+
+        bool isSameAnimation(const std::string &name, int flags, float speed) const;
     };
 
     ModelSceneNode *_modelSceneNode { nullptr };
