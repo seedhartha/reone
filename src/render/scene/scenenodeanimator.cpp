@@ -29,7 +29,7 @@ namespace reone {
 
 namespace render {
 
-static const float kTransitionDuration = 0.5f;
+static const float kTransitionDuration = 0.25f;
 
 bool SceneNodeAnimator::AnimationChannel::isActive() const {
     return animation && !finished;

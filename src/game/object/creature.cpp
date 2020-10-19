@@ -379,10 +379,10 @@ void Creature::setMovementType(MovementType type) {
 
     switch (type) {
         case MovementType::Walk:
-            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate);
+            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             break;
         case MovementType::Run:
-            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate);
+            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             break;
         default:
             if (_talking) {
