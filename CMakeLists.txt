@@ -374,6 +374,7 @@ set(MP_HEADERS
     src/mp/door.h
     src/mp/game.h
     src/mp/objectfactory.h
+    src/mp/types.h
     src/mp/util.h)
 
 set(MP_SOURCES

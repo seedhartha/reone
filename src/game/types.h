@@ -78,12 +78,6 @@ enum class ObjectType {
     Item
 };
 
-enum class MultiplayerMode {
-    None,
-    Server,
-    Client
-};
-
 enum class CreatureRole {
     None,
     PartyLeader,

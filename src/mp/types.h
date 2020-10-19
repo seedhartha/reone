@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Vsevolod Kremianskii
+ * Copyright Â© 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,14 @@
 
 #pragma once
 
-#include "../game/object/objectfactory.h"
-
-#include "callbacks.h"
-#include "types.h"
-
 namespace reone {
 
 namespace mp {
 
-class MultiplayerObjectFactory : public game::ObjectFactory {
-public:
-    MultiplayerObjectFactory(
-        resource::GameVersion version,
-        MultiplayerMode mode,
-        render::SceneGraph *sceneGraph,
-        IMultiplayerCallbacks *callbacks,
-        const render::GraphicsOptions &opts);
-
-    std::unique_ptr<game::Area> newArea();
-    std::unique_ptr<game::Creature> newCreature();
-    std::unique_ptr<game::Door> newDoor();
-
-private:
-    MultiplayerMode _mode { MultiplayerMode::None };
-    IMultiplayerCallbacks *_callbacks { nullptr };
+enum class MultiplayerMode {
+    None,
+    Server,
+    Client
 };
 
 } // namespace mp

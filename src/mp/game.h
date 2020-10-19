@@ -27,6 +27,7 @@
 
 #include "callbacks.h"
 #include "command.h"
+#include "types.h"
 
 namespace reone {
 
@@ -35,13 +36,13 @@ namespace mp {
 class MultiplayerGame : public game::Game, private IMultiplayerCallbacks {
 public:
     MultiplayerGame(
-        game::MultiplayerMode mode,
+        MultiplayerMode mode,
         const boost::filesystem::path &path,
         const game::Options &opts);
 
 private:
     uint32_t _cmdCounter { 0 };
-    game::MultiplayerMode _mode { game::MultiplayerMode::Server };
+    MultiplayerMode _mode { MultiplayerMode::Server };
     std::recursive_mutex _syncMutex;
     std::unique_ptr<net::Client> _client;
     std::unique_ptr<net::Server> _server;
