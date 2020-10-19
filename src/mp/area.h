@@ -21,6 +21,7 @@
 
 #include "command.h"
 #include "creature.h"
+#include "types.h"
 
 namespace reone {
 
@@ -31,7 +32,7 @@ public:
     MultiplayerArea(
         uint32_t id,
         resource::GameVersion version,
-        game::MultiplayerMode mode,
+        MultiplayerMode mode,
         game::ObjectFactory *objectFactory,
         render::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts,

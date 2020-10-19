@@ -21,6 +21,7 @@
 #include <boost/program_options/options_description.hpp>
 
 #include "game/types.h"
+#include "mp/types.h"
 #include "system/net/types.h"
 #include "system/resource/types.h"
 
@@ -42,7 +43,7 @@ private:
     bool _showHelp { false };
     boost::filesystem::path _gamePath;
     game::Options _gameOpts;
-    game::MultiplayerMode _multiplayerMode { game::MultiplayerMode::None };
+    mp::MultiplayerMode _multiplayerMode { mp::MultiplayerMode::None };
 
     // Command line arguments
 
