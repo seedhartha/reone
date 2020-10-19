@@ -17,22 +17,26 @@
 
 #pragma once
 
+#include "../render/aabb.h"
+
 #include "scenenode.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-class CubeSceneNode : public SceneNode {
+class AABBSceneNode : public SceneNode {
 public:
-    CubeSceneNode(SceneGraph *sceneGraph, float size);
+    AABBSceneNode(SceneGraph *sceneGraph, const render::AABB &abbb);
 
     void render() const override;
 
+    const render::AABB &aabb() const;
+
 private:
-    float _size;
+    render::AABB _aabb;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

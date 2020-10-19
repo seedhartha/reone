@@ -21,11 +21,14 @@
 
 #include "GL/glew.h"
 
+#include "../../scene/scenegraph.h"
+
 #include "../mesh/quad.h"
-#include "../scene/scenegraph.h"
 #include "../shaders.h"
 
 using namespace std;
+
+using namespace reone::scene;
 
 namespace reone {
 

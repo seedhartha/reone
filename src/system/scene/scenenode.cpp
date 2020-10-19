@@ -27,7 +27,7 @@ using namespace std;
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 SceneNode::SceneNode(SceneGraph *sceneGraph) : _sceneGraph(sceneGraph) {
 }
@@ -105,6 +105,6 @@ void SceneNode::setLocalTransform(const glm::mat4 &transform) {
     updateAbsoluteTransform();
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

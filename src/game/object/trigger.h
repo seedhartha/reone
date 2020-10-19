@@ -27,7 +27,7 @@ namespace game {
 
 class Trigger : public SpatialObject {
 public:
-    Trigger(uint32_t id, render::SceneGraph *sceneGraph);
+    Trigger(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
 

@@ -25,19 +25,23 @@
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class SceneGraph;
 
+}
+
+namespace render {
+
 class ControlRenderPipeline {
 public:
-    ControlRenderPipeline(SceneGraph *sceneGraph, const glm::ivec4 &extent);
+    ControlRenderPipeline(scene::SceneGraph *sceneGraph, const glm::ivec4 &extent);
 
     void init();
     void render(const glm::ivec2 &offset) const;
 
 private:
-    SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     glm::vec4 _extent { 0.0f };
     Framebuffer _geometry;
 

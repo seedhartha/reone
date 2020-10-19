@@ -24,8 +24,8 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#include "../render/scene/modelscenenode.h"
-#include "../render/scene/scenegraph.h"
+#include "../scene/modelscenenode.h"
+#include "../scene/scenegraph.h"
 
 #include "control/control.h"
 
@@ -44,7 +44,7 @@ public:
 
     SceneBuilder &aspect(float aspect);
     SceneBuilder &depth(float zNear, float zFar);
-    SceneBuilder &modelSupplier(const std::function<std::shared_ptr<render::ModelSceneNode>(render::SceneGraph &)> &supplier);
+    SceneBuilder &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> &supplier);
     SceneBuilder &modelScale(float scale);
     SceneBuilder &modelOffset(const glm::vec2 &offset);
     SceneBuilder &cameraTransform(const glm::mat4 &transform);
@@ -55,7 +55,7 @@ private:
     float _aspect { 1.0f };
     float _zNear { 0.0f };
     float _zFar { 0.0f };
-    std::function<std::shared_ptr<render::ModelSceneNode>(render::SceneGraph &)> _modelSupplier;
+    std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> _modelSupplier;
     float _modelScale { 1.0f };
     glm::vec2 _modelOffset { 0.0f };
     glm::mat4 _cameraTransform { 1.0f };

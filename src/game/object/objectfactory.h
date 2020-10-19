@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "../../system/render/scene/scenegraph.h"
+#include "../../system/scene/scenegraph.h"
 #include "../../system/render/types.h"
 #include "../../system/resource/types.h"
 
@@ -40,7 +40,7 @@ namespace game {
 
 class ObjectFactory {
 public:
-    ObjectFactory(resource::GameVersion version, render::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    ObjectFactory(resource::GameVersion version, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
 
     virtual std::unique_ptr<Module> newModule();
     virtual std::unique_ptr<Area> newArea();
@@ -53,7 +53,7 @@ public:
 
 protected:
     resource::GameVersion _version { resource::GameVersion::KotOR };
-    render::SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     render::GraphicsOptions _options;
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
 

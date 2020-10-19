@@ -27,7 +27,7 @@
 #include "../system/log.h"
 #include "../system/pathutil.h"
 #include "../system/streamutil.h"
-#include "../system/render/scene/scenegraph.h"
+#include "../system/scene/scenegraph.h"
 #include "../system/resource/resources.h"
 
 #include "object/objectfactory.h"
@@ -41,6 +41,7 @@ using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace fs = boost::filesystem;

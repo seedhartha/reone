@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "../../system/render/scene/modelscenenode.h"
-#include "../../system/render/scene/scenegraph.h"
+#include "../../system/scene/modelscenenode.h"
+#include "../../system/scene/scenegraph.h"
 
 #include "../types.h"
 
@@ -34,7 +34,7 @@ const float kDefaultAnimCamFOV = 55.0f;
 
 class AnimatedCamera : public Camera {
 public:
-    AnimatedCamera(render::SceneGraph *sceneGraph, float aspect);
+    AnimatedCamera(scene::SceneGraph *sceneGraph, float aspect);
 
     void update(float dt) override;
 
@@ -46,10 +46,10 @@ public:
     void setFieldOfView(float fovy);
 
 private:
-    render::SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     float _aspect { 1.0f };
     std::string _modelResRef;
-    std::unique_ptr<render::ModelSceneNode> _model;
+    std::unique_ptr<scene::ModelSceneNode> _model;
     float _fovy { kDefaultAnimCamFOV };
     float _zNear { 0.1f };
     float _zFar { 10000.0f };

@@ -25,9 +25,11 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 static const float kTransitionDuration = 0.25f;
 
@@ -252,6 +254,6 @@ void SceneNodeAnimator::setDefaultAnimation(const string &name) {
     _defaultAnim = name;
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

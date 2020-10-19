@@ -17,26 +17,41 @@
 
 #pragma once
 
-#include "../aabb.h"
-
 #include "scenenode.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBSceneNode : public SceneNode {
+class ModelNode;
+
+}
+namespace scene {
+
+class ModelSceneNode;
+
+class ModelNodeSceneNode : public SceneNode {
 public:
-    AABBSceneNode(SceneGraph *sceneGraph, const AABB &abbb);
+    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void render() const override;
+    void fillSceneGraph() override;
 
-    const AABB &aabb() const;
+    void renderSingle() const;
+
+    float getDistanceFromCenter(const glm::vec3 &point) const;
+
+    render::ModelNode *modelNode() const;
+    const glm::mat4 &boneTransform() const;
+
+    void setBoneTransform(const glm::mat4 &transform);
 
 private:
-    AABB _aabb;
+    const ModelSceneNode *_modelSceneNode { nullptr };
+    render::ModelNode *_modelNode { nullptr };
+    glm::mat4 _animTransform { 1.0f };
+    glm::mat4 _boneTransform { 1.0f };
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

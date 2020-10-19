@@ -24,7 +24,7 @@
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class SceneGraph;
 
@@ -63,6 +63,6 @@ private:
     SceneNode &operator=(const SceneNode &) = delete;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

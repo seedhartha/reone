@@ -22,7 +22,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../system/render/scene/modelscenenode.h"
+#include "../system/scene/modelscenenode.h"
 #include "../system/render/walkmesh.h"
 
 namespace reone {
@@ -36,7 +36,7 @@ public:
     Room(
         const std::string &name,
         const glm::vec3 &position,
-        const std::shared_ptr<render::ModelSceneNode> &model,
+        const std::shared_ptr<scene::ModelSceneNode> &model,
         const std::shared_ptr<render::Walkmesh> &walkmesh);
 
     void addTenant(SpatialObject *object);
@@ -45,7 +45,7 @@ public:
 
     const std::string &name() const;
     const glm::vec3 &position() const;
-    const render::ModelSceneNode *model() const;
+    const scene::ModelSceneNode *model() const;
     const render::Walkmesh *walkmesh() const;
     bool visible() const;
 
@@ -54,7 +54,7 @@ public:
 private:
     std::string _name;
     glm::vec3 _position { 0.0f };
-    std::shared_ptr<render::ModelSceneNode> _model;
+    std::shared_ptr<scene::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     std::set<SpatialObject *> _tenants;
     bool _visible { true };

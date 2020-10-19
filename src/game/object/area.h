@@ -21,7 +21,7 @@
 
 #include "../../system/gui/types.h"
 #include "../../system/net/types.h"
-#include "../../system/render/scene/scenegraph.h"
+#include "../../system/scene/scenegraph.h"
 #include "../../system/render/types.h"
 #include "../../system/resource/types.h"
 #include "../../system/script/variable.h"
@@ -57,7 +57,7 @@ public:
         uint32_t id,
         resource::GameVersion version,
         ObjectFactory *objectFactory,
-        render::SceneGraph *sceneGraph,
+        scene::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts);
 
     void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
@@ -123,7 +123,7 @@ public:
 
 protected:
     ObjectFactory *_objectFactory { nullptr };
-    render::SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     bool _scriptsEnabled { true };
     float _cameraAspect { 0.0f };
     CameraType _cameraType { CameraType::FirstPerson };

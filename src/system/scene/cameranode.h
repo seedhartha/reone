@@ -1,5 +1,5 @@
 /*
- * Copyright Â© 2020 Vsevolod Kremianskii
+ * Copyright © 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,26 @@
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-class LightSceneNode : public SceneNode {
+class CameraSceneNode : public SceneNode {
 public:
-    LightSceneNode(SceneGraph *sceneGraph);
+    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
+
+    const glm::mat4 &projection() const;
+    const glm::mat4 &view() const;
+
+    void setProjection(const glm::mat4 &projection);
+
+private:
+    glm::mat4 _projection { 1.0f };
+    glm::mat4 _view { 1.0f };
+
+    void updateAbsoluteTransform() override;
+
+    void updateView();
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

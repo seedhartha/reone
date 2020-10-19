@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Vsevolod Kremianskii
+ * Copyright Â© 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cubenode.h"
-
-#include <glm/ext.hpp>
-
-#include "../../debug.h"
-
-#include "../mesh/cube.h"
+#include "lightnode.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sceneGraph), _size(size) {
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph) : SceneNode(sceneGraph) {
 }
 
-void CubeSceneNode::render() const {
-    if (getDebugMode() != DebugMode::Path) return;
-
-    TheCubeMesh.render(glm::scale(_absoluteTransform, glm::vec3(_size)));
-}
-
-} // namespace render
+} // namespace scene
 
 } // namespace reone

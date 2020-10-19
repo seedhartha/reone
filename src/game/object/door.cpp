@@ -20,13 +20,14 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../system/streamutil.h"
-#include "../../system/render/scene/modelscenenode.h"
+#include "../../system/scene/modelscenenode.h"
 #include "../../system/resource/resources.h"
 
 using namespace std;
 
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 

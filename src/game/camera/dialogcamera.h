@@ -19,7 +19,7 @@
 
 #include <functional>
 
-#include "../../system/render/scene/scenegraph.h"
+#include "../../system/scene/scenegraph.h"
 
 #include "../types.h"
 
@@ -39,7 +39,7 @@ public:
         ListenerFar
     };
 
-    DialogCamera(render::SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear = 0.1f, float zFar = 10000.0f);
+    DialogCamera(scene::SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear = 0.1f, float zFar = 10000.0f);
 
     void setSpeakerPosition(const glm::vec3 &position);
     void setListenerPosition(const glm::vec3 &position);

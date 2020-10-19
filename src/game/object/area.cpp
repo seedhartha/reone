@@ -31,8 +31,8 @@
 #include "../../system/jobs.h"
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
-#include "../../system/render/scene/cubenode.h"
-#include "../../system/render/scene/scenegraph.h"
+#include "../../system/scene/cubenode.h"
+#include "../../system/scene/scenegraph.h"
 #include "../../system/resource/lytfile.h"
 #include "../../system/resource/pthfile.h"
 #include "../../system/resource/resources.h"
@@ -51,6 +51,7 @@ using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {

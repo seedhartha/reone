@@ -28,7 +28,7 @@ namespace game {
 
 class Door : public SpatialObject {
 public:
-    Door(uint32_t id, render::SceneGraph *sceneGraph);
+    Door(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
     virtual void open(const std::shared_ptr<Object> &triggerrer);

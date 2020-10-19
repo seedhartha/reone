@@ -15,32 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "cameranode.h"
 
-#include "scenenode.h"
+#include "glm/ext.hpp"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-class CameraSceneNode : public SceneNode {
-public:
-    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
+CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection) :
+    SceneNode(sceneGraph), _projection(projection) {
+}
 
-    const glm::mat4 &projection() const;
-    const glm::mat4 &view() const;
+void CameraSceneNode::updateAbsoluteTransform() {
+    SceneNode::updateAbsoluteTransform();
+    updateView();
+}
 
-    void setProjection(const glm::mat4 &projection);
+void CameraSceneNode::updateView() {
+    _view = glm::inverse(_absoluteTransform);
+}
 
-private:
-    glm::mat4 _projection { 1.0f };
-    glm::mat4 _view { 1.0f };
+const glm::mat4 &CameraSceneNode::projection() const {
+    return _projection;
+}
 
-    void updateAbsoluteTransform() override;
+const glm::mat4 &CameraSceneNode::view() const {
+    return _view;
+}
 
-    void updateView();
-};
+void CameraSceneNode::setProjection(const glm::mat4 &projection) {
+    _projection = projection;
+}
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

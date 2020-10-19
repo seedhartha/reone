@@ -21,6 +21,7 @@ using namespace std;
 
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 

@@ -24,9 +24,11 @@
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
@@ -157,6 +159,6 @@ void ModelNodeSceneNode::setBoneTransform(const glm::mat4 &transform) {
     _boneTransform = transform;
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

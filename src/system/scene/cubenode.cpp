@@ -15,37 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cameranode.h"
+#include "cubenode.h"
 
-#include "glm/ext.hpp"
+#include <glm/ext.hpp>
+
+#include "../debug.h"
+#include "../render/mesh/cube.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection) :
-    SceneNode(sceneGraph), _projection(projection) {
+CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sceneGraph), _size(size) {
 }
 
-void CameraSceneNode::updateAbsoluteTransform() {
-    SceneNode::updateAbsoluteTransform();
-    updateView();
-}
+void CubeSceneNode::render() const {
+    if (getDebugMode() != DebugMode::Path) return;
 
-void CameraSceneNode::updateView() {
-    _view = glm::inverse(_absoluteTransform);
-}
-
-const glm::mat4 &CameraSceneNode::projection() const {
-    return _projection;
-}
-
-const glm::mat4 &CameraSceneNode::view() const {
-    return _view;
-}
-
-void CameraSceneNode::setProjection(const glm::mat4 &projection) {
-    _projection = projection;
+    TheCubeMesh.render(glm::scale(_absoluteTransform, glm::vec3(_size)));
 }
 
 } // namespace render

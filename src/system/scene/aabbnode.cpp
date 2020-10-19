@@ -17,15 +17,16 @@
 
 #include "aabbnode.h"
 
-#include "../../debug.h"
-
-#include "../mesh/aabb.h"
+#include "../debug.h"
+#include "../render/mesh/aabb.h"
 
 #include "scenegraph.h"
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNode(sceneGraph), _aabb(aabb) {
 }
@@ -40,6 +41,6 @@ const AABB &AABBSceneNode::aabb() const {
     return _aabb;
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone
