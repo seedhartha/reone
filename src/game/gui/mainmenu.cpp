@@ -19,12 +19,12 @@
 
 #include "glm/glm.hpp"
 
-#include "../../audio/player.h"
-#include "../../audio/util.h"
-#include "../../core/debug.h"
-#include "../../gui/control/listbox.h"
-#include "../../gui/scenebuilder.h"
-#include "../../resource/resources.h"
+#include "../../system/audio/player.h"
+#include "../../system/audio/util.h"
+#include "../../system/core/debug.h"
+#include "../../system/gui/control/listbox.h"
+#include "../../system/gui/scenebuilder.h"
+#include "../../system/resource/resources.h"
 
 #include "colors.h"
 

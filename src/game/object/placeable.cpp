@@ -19,9 +19,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../core/streamutil.h"
-#include "../../render/scene/modelscenenode.h"
-#include "../../resource/resources.h"
+#include "../../system/core/streamutil.h"
+#include "../../system/render/scene/modelscenenode.h"
+#include "../../system/resource/resources.h"
 
 #include "objectfactory.h"
 

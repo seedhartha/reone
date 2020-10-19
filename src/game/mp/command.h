@@ -20,9 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "../../core/types.h"
+#include "../../system/core/types.h"
 #include "../../game/types.h"
-#include "../../net/command.h"
+#include "../../system/net/command.h"
 
 namespace reone {
 

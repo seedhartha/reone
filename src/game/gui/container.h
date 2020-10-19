@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include "../../system/gui/gui.h"
 
-#include "../../resource/types.h"
+#include "../../system/resource/types.h"
 
 #include "../object/spatial.h"
 

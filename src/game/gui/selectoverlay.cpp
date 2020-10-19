@@ -19,9 +19,9 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/quad.h"
-#include "../../render/shaders.h"
-#include "../../resource/resources.h"
+#include "../../system/render/mesh/quad.h"
+#include "../../system/render/shaders.h"
+#include "../../system/resource/resources.h"
 
 using namespace std;
 

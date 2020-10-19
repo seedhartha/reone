@@ -17,11 +17,11 @@
 
 #include "module.h"
 
-#include "../../core/debug.h"
-#include "../../core/log.h"
-#include "../../core/streamutil.h"
-#include "../../resource/gfffile.h"
-#include "../../resource/resources.h"
+#include "../../system/core/debug.h"
+#include "../../system/core/log.h"
+#include "../../system/core/streamutil.h"
+#include "../../system/resource/gfffile.h"
+#include "../../system/resource/resources.h"
 
 #include "door.h"
 #include "objectfactory.h"

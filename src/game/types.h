@@ -25,11 +25,11 @@
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 
-#include "../audio/types.h"
-#include "../net/types.h"
-#include "../render/texture.h"
-#include "../render/types.h"
-#include "../resource/types.h"
+#include "../system/audio/types.h"
+#include "../system/net/types.h"
+#include "../system/render/texture.h"
+#include "../system/render/types.h"
+#include "../system/resource/types.h"
 
 namespace reone {
 

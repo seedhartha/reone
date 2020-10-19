@@ -21,12 +21,12 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../../audio/player.h"
-#include "../../core/random.h"
-#include "../../gui/control/listbox.h"
-#include "../../gui/control/panel.h"
-#include "../../resource/resources.h"
-#include "../../script/execution.h"
+#include "../../system/audio/player.h"
+#include "../../system/core/random.h"
+#include "../../system/gui/control/listbox.h"
+#include "../../system/gui/control/panel.h"
+#include "../../system/resource/resources.h"
+#include "../../system/script/execution.h"
 
 #include "../game.h"
 #include "../script/routines.h"

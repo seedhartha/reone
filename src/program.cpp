@@ -21,8 +21,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "core/debug.h"
 #include "game/mp/game.h"
+#include "system/core/debug.h"
 
 using namespace std;
 

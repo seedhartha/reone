@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../gui/textinput.h"
+#include "../../../system/gui/gui.h"
+#include "../../../system/gui/textinput.h"
 
 namespace reone {
 

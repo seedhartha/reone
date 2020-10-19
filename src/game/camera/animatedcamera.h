@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "../../render/scene/modelscenenode.h"
-#include "../../render/scene/scenegraph.h"
+#include "../../system/render/scene/modelscenenode.h"
+#include "../../system/render/scene/scenegraph.h"
 
 #include "../types.h"
 

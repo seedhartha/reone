@@ -17,9 +17,9 @@
 
 #include "container.h"
 
-#include "../../gui/control/imagebutton.h"
-#include "../../gui/control/listbox.h"
-#include "../../resource/resources.h"
+#include "../../system/gui/control/imagebutton.h"
+#include "../../system/gui/control/listbox.h"
+#include "../../system/resource/resources.h"
 
 #include "../object/item.h"
 

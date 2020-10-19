@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../render/scene/modelscenenode.h"
-#include "../../render/scene/scenegraph.h"
-#include "../../resource/types.h"
+#include "../../system/gui/gui.h"
+#include "../../system/render/scene/modelscenenode.h"
+#include "../../system/render/scene/scenegraph.h"
+#include "../../system/resource/types.h"
 
 #include "../types.h"
 

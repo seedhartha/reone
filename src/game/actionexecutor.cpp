@@ -21,8 +21,8 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../core/log.h"
-#include "../script/execution.h"
+#include "../system/core/log.h"
+#include "../system/script/execution.h"
 
 #include "object/area.h"
 #include "object/creature.h"

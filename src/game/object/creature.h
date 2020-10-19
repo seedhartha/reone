@@ -20,10 +20,10 @@
 #include <atomic>
 #include <queue>
 
-#include "../../resource/2dafile.h"
-#include "../../resource/blueprint/creature.h"
-#include "../../resource/gfffile.h"
-#include "../../script/types.h"
+#include "../../system/resource/2dafile.h"
+#include "../../system/resource/blueprint/creature.h"
+#include "../../system/resource/gfffile.h"
+#include "../../system/script/types.h"
 
 #include "item.h"
 #include "spatial.h"

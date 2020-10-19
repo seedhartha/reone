@@ -23,8 +23,8 @@
 
 #include "../game.h"
 
-#include "../../net/client.h"
-#include "../../net/server.h"
+#include "../../system/net/client.h"
+#include "../../system/net/server.h"
 
 #include "callbacks.h"
 #include "command.h"
