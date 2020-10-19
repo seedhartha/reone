@@ -212,7 +212,6 @@ void Area::loadCreatures(const GffStruct &git) {
         shared_ptr<Creature> creature(_objectFactory->newCreature());
         creature->load(gffs);
         landObject(*creature);
-        creature->setSynchronize(true);
         add(creature);
     }
 }
@@ -221,7 +220,6 @@ void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
         shared_ptr<Door> door(_objectFactory->newDoor());
         door->load(gffs);
-        door->setSynchronize(true);
         add(door);
     }
 }
@@ -344,7 +342,6 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
     if (party.memberCount > 0) {
         shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
         landObject(*partyLeader);
-        partyLeader->setSynchronize(true);
         add(partyLeader);
         _player = partyLeader;
         _partyLeader = partyLeader;
@@ -352,7 +349,6 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
     if (party.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
-        partyMember->setSynchronize(true);
         add(partyMember);
         _partyMember1 = partyMember;
 
@@ -362,7 +358,6 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
     if (party.memberCount > 2) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
         landObject(*partyMember);
-        partyMember->setSynchronize(true);
         add(partyMember);
         _partyMember2 = partyMember;
 
