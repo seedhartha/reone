@@ -43,7 +43,7 @@ public:
         int pointIdx { 0 };
     };
 
-    Creature(uint32_t id, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph);
+    Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
     void load(const CreatureConfiguration &config);
@@ -112,7 +112,7 @@ private:
     CreatureConfiguration _config;
     std::shared_ptr<resource::CreatureBlueprint> _blueprint;
     ModelType _modelType { ModelType::Creature };
-    std::shared_ptr<render::ModelSceneNode> _headModel;
+    std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
     std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;

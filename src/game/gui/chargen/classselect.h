@@ -52,7 +52,7 @@ private:
 
     void configureClassButtons();
     void configureClassModels();
-    std::shared_ptr<render::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, render::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, scene::SceneGraph &sceneGraph);
     void configureClassModel(int index, Gender gender, ClassType clazz);
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);

@@ -33,6 +33,7 @@ using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 

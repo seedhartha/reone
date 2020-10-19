@@ -19,11 +19,12 @@
 
 #include <stdexcept>
 
-#include "../render/scene/scenegraph.h"
+#include "../scene/scenegraph.h"
 
 using namespace std;
 
 using namespace reone::render;
+using namespace reone::scene;
 
 namespace reone {
 

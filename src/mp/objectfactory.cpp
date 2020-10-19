@@ -26,6 +26,7 @@ using namespace std;
 using namespace reone::game;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -34,7 +35,7 @@ namespace mp {
 MultiplayerObjectFactory::MultiplayerObjectFactory(
     GameVersion version,
     MultiplayerMode mode,
-    render::SceneGraph *sceneGraph,
+    SceneGraph *sceneGraph,
     IMultiplayerCallbacks *callbacks,
     const GraphicsOptions &opts
 ) :

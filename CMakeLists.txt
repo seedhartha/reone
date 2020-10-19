@@ -82,15 +82,6 @@ set(SYSTEM_HEADERS
     src/system/render/model/modelnode.h
     src/system/render/pipeline/control.h
     src/system/render/pipeline/world.h
-    src/system/render/scene/aabbnode.h
-    src/system/render/scene/cameranode.h
-    src/system/render/scene/cubenode.h
-    src/system/render/scene/lightnode.h
-    src/system/render/scene/modelnodescenenode.h
-    src/system/render/scene/modelscenenode.h
-    src/system/render/scene/scenegraph.h
-    src/system/render/scene/scenenode.h
-    src/system/render/scene/scenenodeanimator.h
     src/system/render/shaders.h
     src/system/render/texture.h
     src/system/render/types.h
@@ -128,6 +119,15 @@ set(SYSTEM_HEADERS
     src/system/resource/types.h
     src/system/resource/util.h
     src/system/resource/visfile.h
+    src/system/scene/aabbnode.h
+    src/system/scene/cameranode.h
+    src/system/scene/cubenode.h
+    src/system/scene/lightnode.h
+    src/system/scene/modelnodescenenode.h
+    src/system/scene/modelscenenode.h
+    src/system/scene/scenegraph.h
+    src/system/scene/scenenode.h
+    src/system/scene/scenenodeanimator.h
     src/system/script/execution.h
     src/system/script/program.h
     src/system/script/routine.h
@@ -175,15 +175,6 @@ set(SYSTEM_SOURCES
     src/system/render/model/modelnode.cpp
     src/system/render/pipeline/control.cpp
     src/system/render/pipeline/world.cpp
-    src/system/render/scene/aabbnode.cpp
-    src/system/render/scene/cameranode.cpp
-    src/system/render/scene/cubenode.cpp
-    src/system/render/scene/lightnode.cpp
-    src/system/render/scene/modelnodescenenode.cpp
-    src/system/render/scene/modelscenenode.cpp
-    src/system/render/scene/scenegraph.cpp
-    src/system/render/scene/scenenode.cpp
-    src/system/render/scene/scenenodeanimator.cpp
     src/system/render/shaders.cpp
     src/system/render/texture.cpp
     src/system/render/walkmesh.cpp
@@ -219,6 +210,15 @@ set(SYSTEM_SOURCES
     src/system/resource/tlkfile.cpp
     src/system/resource/util.cpp
     src/system/resource/visfile.cpp
+    src/system/scene/aabbnode.cpp
+    src/system/scene/cameranode.cpp
+    src/system/scene/cubenode.cpp
+    src/system/scene/lightnode.cpp
+    src/system/scene/modelnodescenenode.cpp
+    src/system/scene/modelscenenode.cpp
+    src/system/scene/scenegraph.cpp
+    src/system/scene/scenenode.cpp
+    src/system/scene/scenenodeanimator.cpp
     src/system/script/execution.cpp
     src/system/script/program.cpp
     src/system/script/routine.cpp

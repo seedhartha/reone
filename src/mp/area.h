@@ -34,7 +34,7 @@ public:
         resource::GameVersion version,
         MultiplayerMode mode,
         game::ObjectFactory *objectFactory,
-        render::SceneGraph *sceneGraph,
+        scene::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts,
         IMultiplayerCallbacks *callbacks);
 

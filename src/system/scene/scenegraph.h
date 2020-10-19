@@ -22,18 +22,18 @@
 
 #include "glm/vec3.hpp"
 
-#include "../types.h"
+#include "../render/types.h"
 
 #include "cameranode.h"
 #include "modelnodescenenode.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class SceneGraph {
 public:
-    SceneGraph(const GraphicsOptions &opts);
+    SceneGraph(const render::GraphicsOptions &opts);
 
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
@@ -51,7 +51,7 @@ public:
     void setAmbientLightColor(const glm::vec3 &color);
 
 private:
-    GraphicsOptions _opts;
+    render::GraphicsOptions _opts;
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
@@ -64,6 +64,6 @@ private:
     SceneGraph &operator=(const SceneGraph &) = delete;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

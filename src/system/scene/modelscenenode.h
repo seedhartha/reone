@@ -20,27 +20,27 @@
 #include <set>
 #include <unordered_map>
 
-#include "../aabb.h"
-#include "../model/model.h"
-#include "../shaders.h"
+#include "../render/aabb.h"
+#include "../render/model/model.h"
+#include "../render/shaders.h"
 
 #include "scenenode.h"
 #include "scenenodeanimator.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
-    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
+    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
 
     void update(float dt);
     void render() const override;
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<Model> &model);
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
     void fillSceneGraph() override;
 
@@ -50,16 +50,16 @@ public:
     glm::vec3 getCenterOfAABB() const;
 
     const std::string &name() const;
-    std::shared_ptr<Model> model() const;
+    std::shared_ptr<render::Model> model() const;
     bool hasTextureOverride() const;
-    std::shared_ptr<Texture> textureOverride() const;
+    std::shared_ptr<render::Texture> textureOverride() const;
     bool isVisible() const;
     bool isOnScreen() const;
     float alpha() const;
-    const AABB &aabb() const;
+    const render::AABB &aabb() const;
 
-    void setModel(const std::shared_ptr<Model> &model);
-    void setTextureOverride(const std::shared_ptr<Texture> &texture);
+    void setModel(const std::shared_ptr<render::Model> &model);
+    void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
@@ -89,12 +89,12 @@ public:
     // END Dynamic lighting
 
 private:
-    std::shared_ptr<Model> _model;
+    std::shared_ptr<render::Model> _model;
     SceneNodeAnimator _animator;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
-    std::shared_ptr<Texture> _textureOverride;
+    std::shared_ptr<render::Texture> _textureOverride;
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };
@@ -104,10 +104,10 @@ private:
     bool _lightingDirty { true };
 
     void initModelNodes();
-    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(ModelNode &node) const;
+    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
     void updateAbsoluteTransform() override;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

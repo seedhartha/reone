@@ -21,7 +21,7 @@
 #include "../system/audio/types.h"
 #include "../system/gui/gui.h"
 #include "../system/render/pipeline/world.h"
-#include "../system/render/scene/scenegraph.h"
+#include "../system/scene/scenegraph.h"
 #include "../system/render/window.h"
 #include "../system/resource/types.h"
 
@@ -84,7 +84,7 @@ protected:
     Options _options;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
-    render::SceneGraph _sceneGraph;
+    scene::SceneGraph _sceneGraph;
     render::WorldRenderPipeline _worldPipeline;
     std::shared_ptr<Module> _module;
     std::string _nextModule;

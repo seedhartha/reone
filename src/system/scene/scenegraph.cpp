@@ -21,16 +21,18 @@
 
 #include "GL/glew.h"
 
-#include "../mesh/quad.h"
+#include "../render/mesh/quad.h"
 
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 static const int kMaxLightCount = 8;
 
@@ -158,6 +160,6 @@ void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

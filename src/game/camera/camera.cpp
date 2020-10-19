@@ -19,7 +19,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::scene;
 
 namespace reone {
 

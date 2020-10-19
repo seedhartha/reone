@@ -27,7 +27,7 @@ namespace game {
 
 class Waypoint : public SpatialObject {
 public:
-    Waypoint(uint32_t id, render::SceneGraph *sceneGraph);
+    Waypoint(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
 };

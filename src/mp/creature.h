@@ -30,7 +30,7 @@ public:
     MultiplayerCreature(
         uint32_t id,
         game::ObjectFactory *objectFactory,
-        render::SceneGraph *sceneGraph,
+        scene::SceneGraph *sceneGraph,
         IMultiplayerCallbacks *callbacks);
 
     void setClientTag(const std::string &clientTag);

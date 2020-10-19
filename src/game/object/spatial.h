@@ -25,7 +25,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../system/render/scene/modelscenenode.h"
+#include "../../system/scene/modelscenenode.h"
 #include "../../system/render/walkmesh.h"
 
 namespace reone {
@@ -58,7 +58,7 @@ public:
     float heading() const;
     const glm::mat4 &transform() const;
     bool visible() const;
-    std::shared_ptr<render::ModelSceneNode> model() const;
+    std::shared_ptr<scene::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
     const std::vector<std::shared_ptr<Item>> &items() const;
     virtual glm::vec3 selectablePosition() const;
@@ -69,12 +69,12 @@ public:
     void setVisible(bool visible);
 
 protected:
-    render::SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     glm::vec3 _position { 0.0f };
     float _heading { 0.0f };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
-    std::shared_ptr<render::ModelSceneNode> _model;
+    std::shared_ptr<scene::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
     float _fadeDistance { kDefaultFadeDistance };
@@ -82,7 +82,7 @@ protected:
     std::vector<std::shared_ptr<Item>> _items;
     bool _selectable { false };
 
-    SpatialObject(uint32_t id, ObjectType type, render::SceneGraph *sceneGraph);
+    SpatialObject(uint32_t id, ObjectType type, scene::SceneGraph *sceneGraph);
 
     virtual void updateTransform();
 };

@@ -22,22 +22,23 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../../log.h"
-#include "../../resource/resources.h"
+#include "../log.h"
+#include "../resource/resources.h"
 
-#include "../mesh/aabb.h"
-#include "../scene/aabbnode.h"
-#include "../scene/scenegraph.h"
+#include "../render/mesh/aabb.h"
 
+#include "aabbnode.h"
 #include "modelscenenode.h"
+#include "scenegraph.h"
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, const set<string> &skipNodes) :
     SceneNode(sceneGraph),
@@ -324,6 +325,6 @@ void ModelSceneNode::setLightsAffectedBy(const vector<ModelNodeSceneNode *> &lig
     _lightsAffectedBy = lights;
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

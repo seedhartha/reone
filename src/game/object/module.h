@@ -41,7 +41,7 @@ class ObjectFactory;
 
 class Module : public Object {
 public:
-    Module(uint32_t id, resource::GameVersion version, ObjectFactory *objectFactory, render::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    Module(uint32_t id, resource::GameVersion version, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
 
     // Loading
     void load(const std::string &name, const resource::GffStruct &ifo);
@@ -68,7 +68,7 @@ protected:
 
 private:
     ObjectFactory *_objectFactory { nullptr };
-    render::SceneGraph *_sceneGraph { nullptr };
+    scene::SceneGraph *_sceneGraph { nullptr };
     std::string _name;
     bool _loaded { false };
     render::GraphicsOptions _opts;

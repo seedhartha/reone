@@ -27,8 +27,8 @@
 #include "../../render/font.h"
 #include "../../render/framebuffer.h"
 #include "../../render/pipeline/control.h"
-#include "../../render/scene/modelscenenode.h"
-#include "../../render/scene/scenegraph.h"
+#include "../../scene/modelscenenode.h"
+#include "../../scene/scenegraph.h"
 #include "../../render/texture.h"
 #include "../../resource/gfffile.h"
 #include "../types.h"
@@ -77,8 +77,8 @@ public:
     };
 
     struct Scene3D {
-        std::shared_ptr<render::ModelSceneNode> model;
-        std::unique_ptr<render::SceneGraph> sceneGraph;
+        std::shared_ptr<scene::ModelSceneNode> model;
+        std::unique_ptr<scene::SceneGraph> sceneGraph;
     };
 
     static ControlType getType(const resource::GffStruct &gffs);

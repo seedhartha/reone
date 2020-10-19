@@ -1,5 +1,5 @@
 /*
- * Copyright Â© 2020 Vsevolod Kremianskii
+ * Copyright © 2020 Vsevolod Kremianskii
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lightnode.h"
+#pragma once
+
+#include "scenenode.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph) : SceneNode(sceneGraph) {
-}
+class CubeSceneNode : public SceneNode {
+public:
+    CubeSceneNode(SceneGraph *sceneGraph, float size);
 
-} // namespace render
+    void render() const override;
+
+private:
+    float _size;
+};
+
+} // namespace scene
 
 } // namespace reone

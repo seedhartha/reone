@@ -23,7 +23,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../../system/render/scene/cameranode.h"
+#include "../../system/scene/cameranode.h"
 
 namespace reone {
 
@@ -37,11 +37,11 @@ public:
     virtual void stopMovement();
 
     float heading() const;
-    std::shared_ptr<render::CameraSceneNode> sceneNode() const;
+    std::shared_ptr<scene::CameraSceneNode> sceneNode() const;
 
 protected:
     float _heading { 0.0f };
-    std::shared_ptr<render::CameraSceneNode> _sceneNode;
+    std::shared_ptr<scene::CameraSceneNode> _sceneNode;
 
     Camera() = default;
 };
