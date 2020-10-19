@@ -16,7 +16,7 @@
  */
 
 #include "program.h"
-#include "system/core/log.h"
+#include "system/log.h"
 
 using namespace std;
 

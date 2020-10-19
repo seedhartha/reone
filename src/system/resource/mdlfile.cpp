@@ -21,7 +21,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../core/log.h"
+#include "../log.h"
 
 #include "resources.h"
 

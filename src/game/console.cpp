@@ -21,7 +21,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../system/core/log.h"
+#include "../system/log.h"
 #include "../system/render/font.h"
 #include "../system/render/mesh/quad.h"
 #include "../system/render/shaders.h"

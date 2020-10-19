@@ -17,7 +17,7 @@
 
 #include "object.h"
 
-#include "../../system/core/log.h"
+#include "../../system/log.h"
 #include "../../system/script/types.h"
 
 #include "../script/util.h"

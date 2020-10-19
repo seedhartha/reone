@@ -19,7 +19,7 @@
 
 #include <boost/asio.hpp>
 
-#include "../core/log.h"
+#include "../log.h"
 
 using namespace std;
 using namespace std::placeholders;

@@ -17,7 +17,7 @@
 
 #include "aabbnode.h"
 
-#include "../../core/debug.h"
+#include "../../debug.h"
 
 #include "../mesh/aabb.h"
 

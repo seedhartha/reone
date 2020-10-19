@@ -25,7 +25,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../../core/log.h"
+#include "../../log.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"

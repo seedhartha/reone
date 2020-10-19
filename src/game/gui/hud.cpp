@@ -17,7 +17,7 @@
 
 #include "hud.h"
 
-#include "../../system/core/log.h"
+#include "../../system/log.h"
 #include "../../system/gui/control/label.h"
 
 using namespace std;

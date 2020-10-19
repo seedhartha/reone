@@ -20,7 +20,7 @@
 #include <istream>
 #include <memory>
 
-#include "../core/types.h"
+#include "types.h"
 
 namespace reone {
 

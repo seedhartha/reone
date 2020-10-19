@@ -21,8 +21,8 @@
 
 #include <boost/format.hpp>
 
-#include "../core/debug.h"
-#include "../core/log.h"
+#include "../debug.h"
+#include "../log.h"
 
 #include "routine.h"
 #include "util.h"

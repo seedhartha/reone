@@ -17,7 +17,7 @@
 
 #include "portraitselect.h"
 
-#include "../../../system/core/random.h"
+#include "../../../system/random.h"
 #include "../../../system/resource/resources.h"
 
 #include "../colors.h"

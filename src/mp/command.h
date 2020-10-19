@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "../game/types.h"
-#include "../system/core/types.h"
+#include "../system/types.h"
 #include "../system/net/command.h"
 
 namespace reone {
