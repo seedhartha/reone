@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -129,29 +128,6 @@ struct UpdateContext {
     glm::vec3 cameraPosition { 0.0f };
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
-};
-
-struct CreatureState {
-    glm::vec3 position { 0.0f };
-    float heading { 0.0f };
-};
-
-struct DoorState {
-    bool open { false };
-};
-
-struct AreaState {
-    std::map<std::string, CreatureState> creatures;
-    std::map<std::string, DoorState> doors;
-};
-
-struct GameState {
-    std::map<std::string, AreaState> areas;
-    PartyConfiguration party;
-    std::map<std::string, bool> globalBooleans;
-    std::map<std::string, int> globalNumbers;
-    std::map<uint32_t, std::map<int, bool>> localBooleans;
-    std::map<uint32_t, std::map<int, int>> localNumbers;
 };
 
 struct HudContext {

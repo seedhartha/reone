@@ -277,11 +277,6 @@ void Module::update(float dt, GuiContext &guiCtx) {
     _area->fill(ctx, guiCtx);
 }
 
-void Module::saveTo(GameState &state) const {
-    state.party = _party;
-    _area->saveTo(state);
-}
-
 void Module::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {
     _onModuleTransition = fn;
 }

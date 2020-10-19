@@ -96,13 +96,6 @@ public:
     AnimatedCamera &animatedCamera();
     ObjectSelector &objectSelector();
 
-    // Load/save
-
-    void saveTo(GameState &state) const;
-    void loadState(const GameState &state);
-
-    // END Load/save
-
     // Party
 
     std::shared_ptr<SpatialObject> player() const;

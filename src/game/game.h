@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <map>
+
 #include "../system/audio/soundinstance.h"
 #include "../system/audio/types.h"
 #include "../system/gui/gui.h"
@@ -117,11 +119,11 @@ private:
     uint32_t _ticks { 0 };
     bool _quit { false };
     std::string _nextEntry;
-    GameState _state;
     std::shared_ptr<audio::SoundInstance> _music;
     Console _console;
     std::map<int, UserDefinedEvent> _events;
     int _eventCounter { 0 };
+    PartyConfiguration _party;
 
     // GUI
 
@@ -133,6 +135,15 @@ private:
     std::unique_ptr<EquipmentGui> _equipmentGui;
 
     // END GUI
+
+    // Globals / locals
+
+    std::map<std::string, bool> _globalBooleans;
+    std::map<std::string, int> _globalNumbers;
+    std::map<uint32_t, std::map<int, bool>> _localBooleans;
+    std::map<uint32_t, std::map<int, int>> _localNumbers;
+
+    // END Globals / locals
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;

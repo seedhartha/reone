@@ -347,30 +347,6 @@ shared_ptr<Item> Creature::getEquippedItem(InventorySlot slot) const {
     return equipped != _equipment.end() ? equipped->second : nullptr;
 }
 
-void Creature::saveTo(AreaState &state) const {
-    if (_tag.empty()) return;
-
-    CreatureState crState;
-    crState.position = _position;
-    crState.heading = _heading;
-
-    state.creatures[_tag] = move(crState);
-}
-
-void Creature::loadState(const AreaState &state) {
-    if (_tag.empty()) return;
-
-    auto it = state.creatures.find(_tag);
-    if (it == state.creatures.end()) return;
-
-    const CreatureState &crState = it->second;
-
-    _position = crState.position;
-    _heading = crState.heading;
-
-    updateTransform();
-}
-
 void Creature::setTag(const string &tag) {
     _tag = tag;
 }
