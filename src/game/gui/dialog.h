@@ -31,9 +31,9 @@ namespace game {
 
 class Game;
 
-class DialogGui : public gui::GUI {
+class Dialog : public gui::GUI {
 public:
-    DialogGui(resource::GameVersion version, Game *game, const render::GraphicsOptions &opts);
+    Dialog(resource::GameVersion version, Game *game, const render::GraphicsOptions &opts);
 
     void load() override;
     void startDialog(SpatialObject &owner, const std::string &resRef);

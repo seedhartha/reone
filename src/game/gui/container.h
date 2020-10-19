@@ -27,9 +27,9 @@ namespace reone {
 
 namespace game {
 
-class ContainerGui : public gui::GUI {
+class Container : public gui::GUI {
 public:
-    ContainerGui(resource::GameVersion version, const render::GraphicsOptions &opts);
+    Container(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     void open(SpatialObject *contanier);

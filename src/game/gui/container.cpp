@@ -37,7 +37,7 @@ static const int kSwitchToResRef = 47884;
 static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
-ContainerGui::ContainerGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+Container::Container(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
     _resRef = getResRef("container");
 
     if (version == GameVersion::TheSithLords) {
@@ -46,7 +46,7 @@ ContainerGui::ContainerGui(GameVersion version, const GraphicsOptions &opts) : G
     }
 }
 
-void ContainerGui::load() {
+void Container::load() {
     GUI::load();
 
     string btnMessage(Resources.getString(kSwitchToResRef).text + " " + Resources.getString(kGiveItemResRef).text);
@@ -58,7 +58,7 @@ void ContainerGui::load() {
     configureItemsListBox();
 }
 
-void ContainerGui::configureItemsListBox() {
+void Container::configureItemsListBox() {
     ListBox &listBox = static_cast<ListBox &>(getControl("LB_ITEMS"));
     ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
 
@@ -76,7 +76,7 @@ void ContainerGui::configureItemsListBox() {
     protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
 }
 
-void ContainerGui::open(SpatialObject *container) {
+void Container::open(SpatialObject *container) {
     _container = container;
 
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
@@ -94,11 +94,11 @@ void ContainerGui::open(SpatialObject *container) {
     }
 }
 
-SpatialObject &ContainerGui::container() const {
+SpatialObject &Container::container() const {
     return *_container;
 }
 
-void ContainerGui::onClick(const string &control) {
+void Container::onClick(const string &control) {
     if (control == "BTN_OK") {
         if (_onGetItems) {
             _onGetItems();
@@ -110,11 +110,11 @@ void ContainerGui::onClick(const string &control) {
     }
 }
 
-void ContainerGui::setOnGetItems(const function<void()> &fn) {
+void Container::setOnGetItems(const function<void()> &fn) {
     _onGetItems = fn;
 }
 
-void ContainerGui::setOnClose(const function<void()> &fn) {
+void Container::setOnClose(const function<void()> &fn) {
     _onClose = fn;
 }
 

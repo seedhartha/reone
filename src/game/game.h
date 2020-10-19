@@ -61,13 +61,6 @@ public:
 
     std::shared_ptr<Module> module() const;
 
-    // Events
-
-    int eventUserDefined(int eventNumber);
-    int getUserDefinedEventNumber(int eventId);
-
-    // END Events
-
     // Globals/locals
 
     bool getGlobalBoolean(const std::string &name) const;
@@ -82,32 +75,18 @@ public:
 
     // END Globals/locals
 
+    // User defined events
+
+    int eventUserDefined(int eventNumber);
+    int getUserDefinedEventNumber(int eventId);
+
+    // END User defined events
+
 protected:
     Options _options;
-    resource::GameVersion _version { resource::GameVersion::KotOR };
-    std::unique_ptr<ObjectFactory> _objectFactory;
-    scene::SceneGraph _sceneGraph;
-    render::WorldRenderPipeline _worldPipeline;
-    std::shared_ptr<Module> _module;
-    std::string _nextModule;
-    GameScreen _screen { GameScreen::MainMenu };
-    std::unique_ptr<DialogGui> _dialogGui;
-    bool _pickDialogReplyEnabled { true };
 
-    virtual void initObjectFactory();
     virtual void init();
-    virtual void configure();
-    virtual void configureModule();
     virtual void update();
-    virtual void loadNextModule();
-    virtual void startDialog(SpatialObject &owner, const std::string &resRef);
-
-    // Event handlers
-
-    virtual void onDialogReplyPicked(uint32_t index);
-    virtual void onDialogFinished();
-
-    // END Event handlers
 
 private:
     struct UserDefinedEvent {
@@ -116,14 +95,19 @@ private:
 
     boost::filesystem::path _path;
     render::RenderWindow _window;
+    scene::SceneGraph _sceneGraph;
+    render::WorldRenderPipeline _worldPipeline;
+    std::unique_ptr<ObjectFactory> _objectFactory;
+    Console _console;
+    resource::GameVersion _version { resource::GameVersion::KotOR };
+    GameScreen _screen { GameScreen::MainMenu };
+    std::string _nextModule;
+    std::string _nextEntry;
+    std::shared_ptr<Module> _module;
+    PartyConfiguration _party;
+    std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };
-    std::string _nextEntry;
-    std::shared_ptr<audio::SoundInstance> _music;
-    Console _console;
-    std::map<int, UserDefinedEvent> _events;
-    int _eventCounter { 0 };
-    PartyConfiguration _party;
 
     // GUI
 
@@ -131,25 +115,35 @@ private:
     std::unique_ptr<LoadingScreen> _loadScreen;
     std::unique_ptr<CharacterGeneration> _charGen;
     std::unique_ptr<HUD> _hud;
-    std::unique_ptr<ContainerGui> _containerGui;
-    std::unique_ptr<EquipmentGui> _equipmentGui;
+    std::unique_ptr<Dialog> _dialog;
+    std::unique_ptr<Container> _container;
+    std::unique_ptr<Equipment> _equipment;
 
     // END GUI
 
-    // Globals / locals
+    // Globals/locals
 
     std::map<std::string, bool> _globalBooleans;
     std::map<std::string, int> _globalNumbers;
     std::map<uint32_t, std::map<int, bool>> _localBooleans;
     std::map<uint32_t, std::map<int, int>> _localNumbers;
 
-    // END Globals / locals
+    // END Globals/locals
+
+    // User defined events
+
+    int _eventCounter { 0 };
+    std::map<int, UserDefinedEvent> _events;
+
+    // END User defined events
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
     void openMainMenu();
     void runMainLoop();
+    void loadNextModule();
+    void startDialog(SpatialObject &owner, const std::string &resRef);
 
     float getDeltaTime();
     gui::GUI *getScreenGUI() const;
@@ -184,6 +178,12 @@ private:
 
     // END Rendering
 
+    // Helper methods
+
+    void withLoadingScreen(const std::function<void()> &block);
+
+    // END Helper methods
+
     // Event handlers
 
     void onNewGame();
@@ -191,14 +191,9 @@ private:
     void onPlay(const CreatureConfiguration &config);
     void onEquipmentClick();
     void onGetItems();
+    void onDialogFinished();
 
     // END Event handlers
-
-    // Helper methods
-
-    void withLoadingScreen(const std::function<void()> &block);
-
-    // END Helper methods
 };
 
 } // namespace game

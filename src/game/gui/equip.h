@@ -26,7 +26,7 @@ namespace reone {
 
 namespace game {
 
-class EquipmentGui : public gui::GUI {
+class Equipment : public gui::GUI {
 public:
     enum class Slot {
         None,
@@ -43,7 +43,7 @@ public:
         WeapR2
     };
 
-    EquipmentGui(resource::GameVersion version, const render::GraphicsOptions &opts);
+    Equipment(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     void open(SpatialObject *owner);
