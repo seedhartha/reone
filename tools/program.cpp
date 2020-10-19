@@ -22,7 +22,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "../src/system/core/pathutil.h"
+#include "../src/system/pathutil.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #include <stdexcept>
 
-#include "../src/system/core/log.h"
+#include "../src/system/log.h"
 
 #include "program.h"
 

@@ -17,9 +17,9 @@
 
 #include "module.h"
 
-#include "../../system/core/debug.h"
-#include "../../system/core/log.h"
-#include "../../system/core/streamutil.h"
+#include "../../system/debug.h"
+#include "../../system/log.h"
+#include "../../system/streamutil.h"
 #include "../../system/resource/gfffile.h"
 #include "../../system/resource/resources.h"
 

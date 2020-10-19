@@ -21,8 +21,8 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../system/core/log.h"
-#include "../../system/core/streamutil.h"
+#include "../../system/log.h"
+#include "../../system/streamutil.h"
 #include "../../system/net/types.h"
 #include "../../system/resource/resources.h"
 #include "../../system/script/types.h"

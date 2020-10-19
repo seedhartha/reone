@@ -21,7 +21,7 @@
 
 #include <boost/format.hpp>
 
-#include "../core/log.h"
+#include "../log.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include "glm/gtx/norm.hpp"
 
-#include "../system/core/log.h"
+#include "../system/log.h"
 
 using namespace std;
 

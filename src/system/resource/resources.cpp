@@ -21,9 +21,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../core/log.h"
-#include "../core/pathutil.h"
-#include "../core/streamutil.h"
+#include "../log.h"
+#include "../pathutil.h"
+#include "../streamutil.h"
 
 #include "audio/mp3file.h"
 #include "audio/wavfile.h"

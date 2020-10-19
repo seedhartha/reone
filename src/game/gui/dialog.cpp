@@ -22,7 +22,7 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../../system/audio/player.h"
-#include "../../system/core/random.h"
+#include "../../system/random.h"
 #include "../../system/gui/control/listbox.h"
 #include "../../system/gui/control/panel.h"
 #include "../../system/resource/resources.h"

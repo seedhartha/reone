@@ -21,7 +21,7 @@
 
 #include "../../system/audio/player.h"
 #include "../../system/audio/util.h"
-#include "../../system/core/debug.h"
+#include "../../system/debug.h"
 #include "../../system/gui/control/listbox.h"
 #include "../../system/gui/scenebuilder.h"
 #include "../../system/resource/resources.h"

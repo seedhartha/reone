@@ -17,7 +17,7 @@
 
 #include "client.h"
 
-#include "../core/log.h"
+#include "../log.h"
 
 using namespace std;
 using namespace std::placeholders;

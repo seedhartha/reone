@@ -19,7 +19,7 @@
 
 #include "glm/glm.hpp"
 
-#include "../../core/streamutil.h"
+#include "../../streamutil.h"
 
 #include "mp3file.h"
 

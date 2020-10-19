@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../system/core/streamutil.h"
+#include "../../system/streamutil.h"
 #include "../../system/render/scene/modelscenenode.h"
 #include "../../system/resource/resources.h"
 

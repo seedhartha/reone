@@ -19,7 +19,7 @@
 
 #include <glm/ext.hpp>
 
-#include "../../core/debug.h"
+#include "../../debug.h"
 
 #include "../mesh/cube.h"
 

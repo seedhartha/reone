@@ -19,7 +19,7 @@
 
 #include <boost/format.hpp>
 
-#include "../src/system/core/log.h"
+#include "../src/system/log.h"
 #include "../src/system/resource/collection/erffile.h"
 #include "../src/system/resource/util.h"
 

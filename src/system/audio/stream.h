@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-#include "../core/types.h"
+#include "../types.h"
 
 #include "types.h"
 

@@ -47,13 +47,7 @@ set(SYSTEM_HEADERS
     src/system/audio/stream.h
     src/system/audio/types.h
     src/system/audio/util.h
-    src/system/core/debug.h
-    src/system/core/jobs.h
-    src/system/core/log.h
-    src/system/core/pathutil.h
-    src/system/core/random.h
-    src/system/core/streamutil.h
-    src/system/core/types.h
+    src/system/debug.h
     src/system/gui/control/button.h
     src/system/gui/control/control.h
     src/system/gui/control/imagebutton.h
@@ -65,11 +59,15 @@ set(SYSTEM_HEADERS
     src/system/gui/scenebuilder.h
     src/system/gui/textinput.h
     src/system/gui/types.h
+    src/system/jobs.h
+    src/system/log.h
     src/system/net/client.h
     src/system/net/connection.h
     src/system/net/command.h
     src/system/net/server.h
     src/system/net/types.h
+    src/system/pathutil.h
+    src/system/random.h
     src/system/render/aabb.h
     src/system/render/font.h
     src/system/render/framebuffer.h
@@ -135,19 +133,16 @@ set(SYSTEM_HEADERS
     src/system/script/routine.h
     src/system/script/types.h
     src/system/script/util.h
-    src/system/script/variable.h)
+    src/system/script/variable.h
+    src/system/streamutil.h
+    src/system/types.h)
 
 set(SYSTEM_SOURCES
     src/system/audio/player.cpp
     src/system/audio/soundinstance.cpp
     src/system/audio/stream.cpp
     src/system/audio/util.cpp
-    src/system/core/debug.cpp
-    src/system/core/jobs.cpp
-    src/system/core/log.cpp
-    src/system/core/pathutil.cpp
-    src/system/core/random.cpp
-    src/system/core/streamutil.cpp
+    src/system/debug.cpp
     src/system/gui/control/button.cpp
     src/system/gui/control/control.cpp
     src/system/gui/control/imagebutton.cpp
@@ -158,10 +153,14 @@ set(SYSTEM_SOURCES
     src/system/gui/gui.cpp
     src/system/gui/scenebuilder.cpp
     src/system/gui/textinput.cpp
+    src/system/jobs.cpp
+    src/system/log.cpp
     src/system/net/client.cpp
     src/system/net/connection.cpp
     src/system/net/command.cpp
     src/system/net/server.cpp
+    src/system/pathutil.cpp
+    src/system/random.cpp
     src/system/render/aabb.cpp
     src/system/render/font.cpp
     src/system/render/framebuffer.cpp
@@ -224,7 +223,8 @@ set(SYSTEM_SOURCES
     src/system/script/program.cpp
     src/system/script/routine.cpp
     src/system/script/util.cpp
-    src/system/script/variable.cpp)
+    src/system/script/variable.cpp
+    src/system/streamutil.cpp)
 
 add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
 set_target_properties(libsystem PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

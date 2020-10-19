@@ -27,10 +27,10 @@
 
 #include "SDL2/SDL.h"
 
-#include "../../system/core/debug.h"
-#include "../../system/core/jobs.h"
-#include "../../system/core/log.h"
-#include "../../system/core/streamutil.h"
+#include "../../system/debug.h"
+#include "../../system/jobs.h"
+#include "../../system/log.h"
+#include "../../system/streamutil.h"
 #include "../../system/render/scene/cubenode.h"
 #include "../../system/render/scene/scenegraph.h"
 #include "../../system/resource/lytfile.h"

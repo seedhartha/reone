@@ -23,10 +23,10 @@
 
 #include "../system/audio/player.h"
 #include "../system/audio/util.h"
-#include "../system/core/jobs.h"
-#include "../system/core/log.h"
-#include "../system/core/pathutil.h"
-#include "../system/core/streamutil.h"
+#include "../system/jobs.h"
+#include "../system/log.h"
+#include "../system/pathutil.h"
+#include "../system/streamutil.h"
 #include "../system/render/scene/scenegraph.h"
 #include "../system/resource/resources.h"
 
