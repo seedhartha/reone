@@ -90,11 +90,11 @@ static float getFloat(const ByteArray &arr, int &offset) {
     return val;
 }
 
-Command::Command(uint32_t id, net::CommandType type) : net::Command(id, type) {
+Command::Command(uint32_t id, CommandType type) : net::Command(id), _type(type) {
 }
 
 void Command::load(const ByteArray &data) {
-    _type = static_cast<net::CommandType>(data[0]);
+    _type = static_cast<CommandType>(data[0]);
 
     int offset = 1;
     int equipmentCount = 0;
@@ -102,11 +102,11 @@ void Command::load(const ByteArray &data) {
     _id = getUint32(data, offset);
 
     switch (_type) {
-        case net::CommandType::LoadModule:
+        case CommandType::LoadModule:
             _module = getString(data, offset);
             break;
 
-        case net::CommandType::LoadCreature:
+        case CommandType::LoadCreature:
             _role = static_cast<CreatureRole>(getUint8(data, offset));
             _objectId = getUint16(data, offset);
             _tag = getString(data, offset);
@@ -121,11 +121,11 @@ void Command::load(const ByteArray &data) {
             }
             break;
 
-        case net::CommandType::SetPlayerRole:
+        case CommandType::SetPlayerRole:
             _role = static_cast<CreatureRole>(getUint8(data, offset));
             break;
 
-        case net::CommandType::SetObjectTransform:
+        case CommandType::SetObjectTransform:
             _objectId = getUint16(data, offset);
             _position.x = getFloat(data, offset);
             _position.y = getFloat(data, offset);
@@ -133,37 +133,37 @@ void Command::load(const ByteArray &data) {
             _heading = getFloat(data, offset);
             break;
 
-        case net::CommandType::SetObjectAnimation:
+        case CommandType::SetObjectAnimation:
             _objectId = getUint16(data, offset);
             _animationFlags = getUint8(data, offset);
             _animation = getString(data, offset);
             break;
 
-        case net::CommandType::SetCreatureMovementType:
+        case CommandType::SetCreatureMovementType:
             _objectId = getUint16(data, offset);
             _movementType = static_cast<MovementType>(getUint8(data, offset));
             break;
 
-        case net::CommandType::SetCreatureTalking:
+        case CommandType::SetCreatureTalking:
             _objectId = getUint16(data, offset);
             _talking = getUint8(data, offset);
             break;
 
-        case net::CommandType::SetDoorOpen:
+        case CommandType::SetDoorOpen:
             _open = getUint8(data, offset);
             _objectId = getUint16(data, offset);
             _triggerrer = getUint16(data, offset);
             break;
 
-        case net::CommandType::StartDialog:
+        case CommandType::StartDialog:
             _resRef = getString(data, offset);
             break;
 
-        case net::CommandType::PickDialogReply:
+        case CommandType::PickDialogReply:
             _replyIndex = getUint8(data, offset);
             break;
 
-        case net::CommandType::FinishDialog:
+        case CommandType::FinishDialog:
             break;
 
         default:
@@ -171,17 +171,17 @@ void Command::load(const ByteArray &data) {
     }
 }
 
-ByteArray Command::bytes() const {
+ByteArray Command::getBytes() const {
     ByteArray data;
     putUint8(static_cast<uint8_t>(_type), data);
     putUint32(_id, data);
 
-    switch (_type) {
-        case net::CommandType::LoadModule:
+    switch (static_cast<CommandType>(_type)) {
+        case CommandType::LoadModule:
             putString(_module, data);
             break;
 
-        case net::CommandType::LoadCreature:
+        case CommandType::LoadCreature:
             putUint8(static_cast<uint8_t>(_role), data);
             putUint16(_objectId, data);
             putString(_tag, data);
@@ -196,11 +196,11 @@ ByteArray Command::bytes() const {
             }
             break;
 
-        case net::CommandType::SetPlayerRole:
+        case CommandType::SetPlayerRole:
             putUint8(static_cast<uint8_t>(_role), data);
             break;
 
-        case net::CommandType::SetObjectTransform:
+        case CommandType::SetObjectTransform:
             putUint16(_objectId, data);
             putFloat(_position.x, data);
             putFloat(_position.y, data);
@@ -208,37 +208,37 @@ ByteArray Command::bytes() const {
             putFloat(_heading, data);
             break;
 
-        case net::CommandType::SetObjectAnimation:
+        case CommandType::SetObjectAnimation:
             putUint16(_objectId, data);
             putUint8(_animationFlags, data);
             putString(_animation, data);
             break;
 
-        case net::CommandType::SetCreatureMovementType:
+        case CommandType::SetCreatureMovementType:
             putUint16(_objectId, data);
             putUint8(static_cast<uint8_t>(_movementType), data);
             break;
 
-        case net::CommandType::SetCreatureTalking:
+        case CommandType::SetCreatureTalking:
             putUint16(_objectId, data);
             putUint8(_talking, data);
             break;
 
-        case net::CommandType::SetDoorOpen:
+        case CommandType::SetDoorOpen:
             putUint8(_open, data);
             putUint16(_objectId, data);
             putUint16(_triggerrer, data);
             break;
 
-        case net::CommandType::StartDialog:
+        case CommandType::StartDialog:
             putString(_resRef, data);
             break;
 
-        case net::CommandType::PickDialogReply:
+        case CommandType::PickDialogReply:
             putUint8(_replyIndex, data);
             break;
 
-        case net::CommandType::FinishDialog:
+        case CommandType::FinishDialog:
             break;
 
         default:
@@ -246,6 +246,14 @@ ByteArray Command::bytes() const {
     }
 
     return move(data);
+}
+
+CommandType Command::type() const {
+    return _type;
+}
+
+uint32_t Command::objectId() const {
+    return _objectId;
 }
 
 const string &Command::module() const {

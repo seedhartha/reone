@@ -56,18 +56,9 @@ static const string &describeCommandType(CommandType type) {
 
 string describeCommand(const Command &command) {
     string desc(describeCommandType(command.type()));
-    switch (command.type()) {
-        case CommandType::SetObjectTransform:
-        case CommandType::SetObjectAnimation:
-        case CommandType::SetCreatureMovementType:
-            desc += str(boost::format(" {id=%d,objectId=%d}") % command.id() % command.objectId());
-            break;
-        default:
-            desc += str(boost::format(" {id=%d}") % command.id());
-            break;
-    }
+    desc += str(boost::format(" {id=%d}") % command.id());
 
-    return desc;
+    return move(desc);
 }
 
 } // namespace mp
