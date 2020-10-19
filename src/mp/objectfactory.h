@@ -17,37 +17,32 @@
 
 #pragma once
 
-#include "../object/creature.h"
+#include "../game/object/objectfactory.h"
+
+#include "callbacks.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
-class IMultiplayerCallbacks;
-
-class MultiplayerCreature : public Creature {
+class MultiplayerObjectFactory : public game::ObjectFactory {
 public:
-    MultiplayerCreature(
-        uint32_t id,
-        ObjectFactory *objectFactory,
+    MultiplayerObjectFactory(
+        resource::GameVersion version,
+        game::MultiplayerMode mode,
         render::SceneGraph *sceneGraph,
-        IMultiplayerCallbacks *callbacks);
+        IMultiplayerCallbacks *callbacks,
+        const render::GraphicsOptions &opts);
 
-    void setClientTag(const std::string &clientTag);
-
-    bool isControlled() const;
-    const std::string &clientTag() const;
+    std::unique_ptr<game::Area> newArea();
+    std::unique_ptr<game::Creature> newCreature();
+    std::unique_ptr<game::Door> newDoor();
 
 private:
+    game::MultiplayerMode _mode { game::MultiplayerMode::None };
     IMultiplayerCallbacks *_callbacks { nullptr };
-    std::string _clientTag;
-
-    void playAnimation(const std::string &name, int flags, float speed) override;
-    void updateTransform() override;
-    void setMovementType(MovementType type) override;
-    void setTalking(bool talking) override;
 };
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

@@ -15,24 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "creature.h"
 #include "door.h"
+
+#include "callbacks.h"
+
+using namespace std;
+
+using namespace reone::game;
+using namespace reone::render;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
-class IMultiplayerCallbacks {
-public:
-    virtual void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) = 0;
-    virtual void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) = 0;
-    virtual void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) = 0;
-    virtual void onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<Object> &trigerrer) = 0;
-    virtual void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) = 0;
-};
+MultiplayerDoor::MultiplayerDoor(uint32_t id, SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks) :
+    Door(id, sceneGraph), _callbacks(callbacks) {
+}
 
-} // namespace game
+void MultiplayerDoor::open(const shared_ptr<Object> &trigerrer) {
+    Door::open(trigerrer);
+    if (_synchronize) {
+        _callbacks->onDoorOpen(*this, trigerrer);
+    }
+}
+
+} // namespace mp
 
 } // namespace reone

@@ -21,11 +21,12 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::render;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 MultiplayerCreature::MultiplayerCreature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks) :
     Creature(id, objectFactory, sceneGraph), _callbacks(callbacks) {
@@ -75,6 +76,6 @@ void MultiplayerCreature::setTalking(bool talking) {
     }
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

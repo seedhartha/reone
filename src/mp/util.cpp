@@ -23,11 +23,12 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::net;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 static map<CommandType, string> g_cmdDesc = {
     { CommandType::LoadModule, "LoadModule" },
@@ -69,6 +70,6 @@ string describeCommand(const Command &command) {
     return desc;
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

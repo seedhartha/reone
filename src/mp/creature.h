@@ -17,24 +17,37 @@
 
 #pragma once
 
-#include "../object/door.h"
+#include "../game/object/creature.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 class IMultiplayerCallbacks;
 
-class MultiplayerDoor : public Door {
+class MultiplayerCreature : public game::Creature {
 public:
-    MultiplayerDoor(uint32_t id, render::SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks);
+    MultiplayerCreature(
+        uint32_t id,
+        game::ObjectFactory *objectFactory,
+        render::SceneGraph *sceneGraph,
+        IMultiplayerCallbacks *callbacks);
 
-    void open(const std::shared_ptr<Object> &trigerrer) override;
+    void setClientTag(const std::string &clientTag);
+
+    bool isControlled() const;
+    const std::string &clientTag() const;
 
 private:
-    IMultiplayerCallbacks *_callbacks { nullptr };;
+    IMultiplayerCallbacks *_callbacks { nullptr };
+    std::string _clientTag;
+
+    void playAnimation(const std::string &name, int flags, float speed) override;
+    void updateTransform() override;
+    void setMovementType(game::MovementType type) override;
+    void setTalking(bool talking) override;
 };
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone
