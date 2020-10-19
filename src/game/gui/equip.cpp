@@ -41,21 +41,21 @@ namespace game {
 
 static const int kStrRefNone = 363;
 
-static unordered_map<EquipmentGui::Slot, string> g_slotNames = {
-    { EquipmentGui::Slot::Implant, "IMPLANT"},
-    { EquipmentGui::Slot::Head, "HEAD"},
-    { EquipmentGui::Slot::Hands, "HANDS"},
-    { EquipmentGui::Slot::ArmL, "ARM_L"},
-    { EquipmentGui::Slot::Body, "BODY"},
-    { EquipmentGui::Slot::ArmR, "ARM_R"},
-    { EquipmentGui::Slot::WeapL, "WEAP_L"},
-    { EquipmentGui::Slot::Belt, "BELT"},
-    { EquipmentGui::Slot::WeapR, "WEAP_R"},
-    { EquipmentGui::Slot::WeapL2, "WEAP_L2"},
-    { EquipmentGui::Slot::WeapR2, "WEAP_R2"}
+static unordered_map<Equipment::Slot, string> g_slotNames = {
+    { Equipment::Slot::Implant, "IMPLANT"},
+    { Equipment::Slot::Head, "HEAD"},
+    { Equipment::Slot::Hands, "HANDS"},
+    { Equipment::Slot::ArmL, "ARM_L"},
+    { Equipment::Slot::Body, "BODY"},
+    { Equipment::Slot::ArmR, "ARM_R"},
+    { Equipment::Slot::WeapL, "WEAP_L"},
+    { Equipment::Slot::Belt, "BELT"},
+    { Equipment::Slot::WeapR, "WEAP_R"},
+    { Equipment::Slot::WeapL2, "WEAP_L2"},
+    { Equipment::Slot::WeapR2, "WEAP_R2"}
 };
 
-EquipmentGui::EquipmentGui(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+Equipment::Equipment(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
 
@@ -65,7 +65,7 @@ EquipmentGui::EquipmentGui(GameVersion version, const GraphicsOptions &opts) : G
     }
 }
 
-void EquipmentGui::load() {
+void Equipment::load() {
     GUI::load();
 
     hideControl("LB_DESC");
@@ -74,10 +74,10 @@ void EquipmentGui::load() {
     configureItemsListBox();
 }
 
-void EquipmentGui::configureItemsListBox() {
+void Equipment::configureItemsListBox() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.setPadding(5);
-    lbItems.setOnItemClicked(bind(&EquipmentGui::onItemClicked, this, _1, _2));
+    lbItems.setOnItemClicked(bind(&Equipment::onItemClicked, this, _1, _2));
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
     protoItem.setBorderColor(getBaseColor(_version));
@@ -92,7 +92,7 @@ void EquipmentGui::configureItemsListBox() {
     protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
 }
 
-void EquipmentGui::onItemClicked(const string &control, const string &item) {
+void Equipment::onItemClicked(const string &control, const string &item) {
     if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
 
     shared_ptr<Item> itemObj;
@@ -122,24 +122,24 @@ void EquipmentGui::onItemClicked(const string &control, const string &item) {
     }
 }
 
-void EquipmentGui::open(SpatialObject *owner) {
+void Equipment::open(SpatialObject *owner) {
     _owner = owner;
 
     updateEquipment();
     selectSlot(Slot::None);
 }
 
-void EquipmentGui::setOnClose(const function<void()> &fn) {
+void Equipment::setOnClose(const function<void()> &fn) {
     _onClose = fn;
 }
 
-void EquipmentGui::preloadControl(Control &control) {
+void Equipment::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
         static_cast<ListBox &>(control).setProtoItemType(ControlType::ImageButton);
     }
 }
 
-void EquipmentGui::onClick(const string &control) {
+void Equipment::onClick(const string &control) {
     if (control == "BTN_EQUIP" || control == "BTN_BACK") {
         if (_selectedSlot == Slot::None) {
             if (_onClose) {
@@ -159,7 +159,7 @@ void EquipmentGui::onClick(const string &control) {
     }
 }
 
-void EquipmentGui::selectSlot(Slot slot) {
+void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
 
     for (auto &name : g_slotNames) {
@@ -180,7 +180,7 @@ void EquipmentGui::selectSlot(Slot slot) {
     updateItems();
 }
 
-void EquipmentGui::updateEquipment() {
+void Equipment::updateEquipment() {
     Creature &owner = static_cast<Creature &>(*_owner);
     const map<InventorySlot, shared_ptr<Item>> &equipment = owner.equipment();
 
@@ -201,7 +201,7 @@ void EquipmentGui::updateEquipment() {
     }
 }
 
-InventorySlot EquipmentGui::getInventorySlot(Slot slot) {
+InventorySlot Equipment::getInventorySlot(Slot slot) {
     switch (slot) {
         case Slot::Implant:
             return InventorySlot::kInventorySlotImplant;
@@ -230,7 +230,7 @@ InventorySlot EquipmentGui::getInventorySlot(Slot slot) {
     }
 }
 
-shared_ptr<Texture> EquipmentGui::getEmptySlotIcon(Slot slot) {
+shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) {
     static unordered_map<Slot, shared_ptr<Texture>> icons;
 
     auto icon = icons.find(slot);
@@ -277,7 +277,7 @@ shared_ptr<Texture> EquipmentGui::getEmptySlotIcon(Slot slot) {
     return pair.first->second;
 }
 
-void EquipmentGui::updateItems() {
+void Equipment::updateItems() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.clear();
 

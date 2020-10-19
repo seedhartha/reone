@@ -62,10 +62,10 @@ Game::Game(const fs::path &path, const Options &opts) :
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
+    _objectFactory(new ObjectFactory(_version, &_sceneGraph, _options.graphics)),
     _console(opts.graphics) {
 
     initGameVersion();
-    initObjectFactory();
 }
 
 void Game::initGameVersion() {
@@ -73,15 +73,10 @@ void Game::initGameVersion() {
     _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
 }
 
-void Game::initObjectFactory() {
-    _objectFactory = make_unique<ObjectFactory>(_version, &_sceneGraph, _options.graphics);
-}
-
 int Game::run() {
     init();
     loadResources();
     openMainMenu();
-    configure();
 
     _window.show();
 
@@ -186,7 +181,6 @@ void Game::onModuleSelected(const string &name) {
     loadModule(name, party);
 }
 
-
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
 
@@ -196,7 +190,17 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 
         shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
-        configureModule();
+        _module->setOnModuleTransition([this](const string &name, const string &entry) {
+            _nextModule = name;
+            _nextEntry = entry;
+        });
+        _module->setStartDialog([this](SpatialObject &owner, const string &resRef) {
+            startDialog(owner, resRef);
+        });
+        _module->setOpenContainer([this](SpatialObject *object) {
+            _container->open(object);
+            _screen = GameScreen::Container;
+        });
         _module->load(name, *ifo);
         _module->area()->setOnCameraChanged([this](CameraType type) {
             _window.setRelativeMouseMode(type == CameraType::FirstPerson);
@@ -213,13 +217,13 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         if (!_hud) {
             loadHUD();
         }
-        if (!_dialogGui) {
+        if (!_dialog) {
             loadDialogGui();
         }
-        if (!_containerGui) {
+        if (!_container) {
             loadContainerGui();
         }
-        if (!_equipmentGui) {
+        if (!_equipment) {
             loadEquipmentGui();
         }
         _ticks = SDL_GetTicks();
@@ -254,7 +258,7 @@ void Game::drawWorld() {
             break;
         }
         case GameScreen::Dialog:
-            cameraNode = _dialogGui->camera().sceneNode();
+            cameraNode = _dialog->camera().sceneNode();
             break;
         default:
             break;
@@ -311,23 +315,9 @@ void Game::drawCursor() {
     _window.drawCursor();
 }
 
-void Game::configureModule() {
-    _module->setOnModuleTransition([this](const string &name, const string &entry) {
-        _nextModule = name;
-        _nextEntry = entry;
-    });
-    _module->setStartDialog([this](SpatialObject &owner, const string &resRef) {
-        startDialog(owner, resRef);
-    });
-    _module->setOpenContainer([this](SpatialObject *object) {
-        _containerGui->open(object);
-        _screen = GameScreen::Container;
-    });
-}
-
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
     _screen = GameScreen::Dialog;
-    _dialogGui->startDialog(owner, resRef);
+    _dialog->startDialog(owner, resRef);
 }
 
 void Game::loadHUD() {
@@ -340,20 +330,15 @@ void Game::onEquipmentClick() {
     _hud->resetFocus();
 
     shared_ptr<SpatialObject> player(_module->area()->player());
-    _equipmentGui->open(player.get());
+    _equipment->open(player.get());
 
     _screen = GameScreen::Equipment;
 }
 
 void Game::loadDialogGui() {
-    _dialogGui.reset(new DialogGui(_version, this, _options.graphics));
-    _dialogGui->load();
-    _dialogGui->setPickReplyEnabled(_pickDialogReplyEnabled);
-    _dialogGui->setOnReplyPicked(bind(&Game::onDialogReplyPicked, this, _1));
-    _dialogGui->setOnDialogFinished(bind(&Game::onDialogFinished, this));
-}
-
-void Game::onDialogReplyPicked(uint32_t index) {
+    _dialog.reset(new Dialog(_version, this, _options.graphics));
+    _dialog->load();
+    _dialog->setOnDialogFinished(bind(&Game::onDialogFinished, this));
 }
 
 void Game::onDialogFinished() {
@@ -361,16 +346,16 @@ void Game::onDialogFinished() {
 }
 
 void Game::loadContainerGui() {
-    _containerGui.reset(new ContainerGui(_version, _options.graphics));
-    _containerGui->load();
-    _containerGui->setOnGetItems(bind(&Game::onGetItems, this));
-    _containerGui->setOnClose([this]() { _screen = GameScreen::InGame; });
+    _container.reset(new Container(_version, _options.graphics));
+    _container->load();
+    _container->setOnGetItems(bind(&Game::onGetItems, this));
+    _container->setOnClose([this]() { _screen = GameScreen::InGame; });
 }
 
 void Game::onGetItems() {
     shared_ptr<SpatialObject> player(_module->area()->player());
 
-    SpatialObject &container = _containerGui->container();
+    SpatialObject &container = _container->container();
     container.moveItemsTo(*player);
 
     Placeable *placeable = dynamic_cast<Placeable *>(&container);
@@ -384,10 +369,10 @@ void Game::onGetItems() {
 }
 
 void Game::loadEquipmentGui() {
-    _equipmentGui.reset(new EquipmentGui(_version, _options.graphics));
-    _equipmentGui->load();
-    _equipmentGui->setOnClose([this]() {
-        _equipmentGui->resetFocus();
+    _equipment.reset(new Equipment(_version, _options.graphics));
+    _equipment->load();
+    _equipment->setOnClose([this]() {
+        _equipment->resetFocus();
         _screen = GameScreen::InGame;
     });
 }
@@ -411,17 +396,14 @@ GUI *Game::getScreenGUI() const {
         case GameScreen::InGame:
             return _hud.get();
         case GameScreen::Dialog:
-            return _dialogGui.get();
+            return _dialog.get();
         case GameScreen::Container:
-            return _containerGui.get();
+            return _container.get();
         case GameScreen::Equipment:
-            return _equipmentGui.get();
+            return _equipment.get();
         default:
             return nullptr;
     }
-}
-
-void Game::configure() {
 }
 
 void Game::runMainLoop() {
@@ -522,25 +504,6 @@ bool Game::handle(const SDL_Event &event) {
     return false;
 }
 
-int Game::eventUserDefined(int eventNumber) {
-    int id = _eventCounter++;
-
-    UserDefinedEvent event { eventNumber };
-    _events.insert(make_pair(id, move(event)));
-
-    return id;
-}
-
-int Game::getUserDefinedEventNumber(int eventId) {
-    auto maybeEvent = _events.find(eventId);
-    if (maybeEvent == _events.end()) {
-        warn("Event not found by id: " + to_string(eventId));
-        return -1;
-    }
-
-    return maybeEvent->second.eventNumber;
-}
-
 shared_ptr<Module> Game::module() const {
     return _module;
 }
@@ -589,6 +552,25 @@ void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
 
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
     _localNumbers[objectId][index] = value;
+}
+
+int Game::eventUserDefined(int eventNumber) {
+    int id = _eventCounter++;
+
+    UserDefinedEvent event { eventNumber };
+    _events.insert(make_pair(id, move(event)));
+
+    return id;
+}
+
+int Game::getUserDefinedEventNumber(int eventId) {
+    auto maybeEvent = _events.find(eventId);
+    if (maybeEvent == _events.end()) {
+        warn("Game: event not found by id: " + to_string(eventId));
+        return -1;
+    }
+
+    return maybeEvent->second.eventNumber;
 }
 
 } // namespace game
