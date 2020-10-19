@@ -45,12 +45,6 @@ void Object::runUserDefinedEvent(int eventNumber) {
     }
 }
 
-void Object::saveTo(AreaState &state) const {
-}
-
-void Object::loadState(const AreaState &state) {
-}
-
 uint32_t Object::id() const {
     return _id;
 }

@@ -49,7 +49,6 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
-    void saveTo(GameState &state) const;
 
     // Getters
     const std::string &name() const;

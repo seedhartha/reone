@@ -69,13 +69,6 @@ public:
 
     // END Animations
 
-    // Load/save
-
-    void saveTo(AreaState &state) const override;
-    void loadState(const AreaState &state) override;
-
-    // END Load/save
-
     // Equipment
 
     void equip(const std::string &resRef);

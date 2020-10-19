@@ -494,35 +494,6 @@ void Area::runOnEnterScript() {
     }
 }
 
-void Area::saveTo(GameState &state) const {
-    AreaState areaState;
-
-    for (auto &list : _objectsByType) {
-        if (list.first != ObjectType::Creature && list.first != ObjectType::Door) continue;
-
-        for (auto &object : list.second) {
-            object->saveTo(areaState);
-        }
-    }
-
-    state.areas[_name] = move(areaState);
-}
-
-void Area::loadState(const GameState &state) {
-    auto it = state.areas.find(_name);
-    if (it == state.areas.end()) return;
-
-    const AreaState &areaState = it->second;
-
-    for (auto &list : _objectsByType) {
-        if (list.first != ObjectType::Creature && list.first != ObjectType::Door) continue;
-
-        for (auto &object : list.second) {
-            object->loadState(areaState);
-        }
-    }
-}
-
 void Area::updateRoomVisibility() {
     Room *playerRoom = _player->room();
     if (!playerRoom) return;

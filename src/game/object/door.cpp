@@ -97,25 +97,6 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
     _selectable = true;
 }
 
-void Door::saveTo(AreaState &state) const {
-    if (_tag.empty()) return;
-
-    DoorState doorState;
-    doorState.open = _open;
-
-    state.doors[_tag] = move(doorState);
-}
-
-void Door::loadState(const AreaState &state) {
-    if (_tag.empty()) return;
-
-    auto it = state.doors.find(_tag);
-    if (it == state.doors.end()) return;
-
-    const DoorState &doorState = it->second;
-    if (doorState.open) open(nullptr);
-}
-
 bool Door::isOpen() const {
     return _open;
 }

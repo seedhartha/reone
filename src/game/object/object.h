@@ -40,13 +40,6 @@ public:
     const std::string &tag() const;
     ActionQueue &actionQueue();
 
-    // Load/save
-
-    virtual void saveTo(AreaState &state) const;
-    virtual void loadState(const AreaState &state);
-
-    // END Load/save
-
 protected:
     enum class ScriptType {
         OnEnter,

@@ -33,8 +33,6 @@ public:
     void load(const resource::GffStruct &gffs);
     virtual void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
-    void saveTo(AreaState &state) const override;
-    void loadState(const AreaState &state) override;
 
     bool isOpen() const;
     bool isStatic() const;

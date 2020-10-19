@@ -202,7 +202,6 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
             _window.setRelativeMouseMode(type == CameraType::FirstPerson);
         });
         _module->loadParty(party, entry);
-        _module->area()->loadState(_state);
 
         if (_music) {
             _music->stop();
@@ -464,11 +463,8 @@ void Game::loadNextModule() {
     jobs.cancel();
     jobs.await();
 
-    if (_module) {
-        _module->saveTo(_state);
-    }
     _sceneGraph.clear();
-    loadModule(_nextModule, _state.party, _nextEntry);
+    loadModule(_nextModule, _party, _nextEntry);
 
     _nextModule.clear();
     _nextEntry.clear();
@@ -550,18 +546,18 @@ shared_ptr<Module> Game::module() const {
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
-    auto maybeValue = _state.globalBooleans.find(name);
-    return maybeValue != _state.globalBooleans.end() ? maybeValue->second : false;
+    auto maybeValue = _globalBooleans.find(name);
+    return maybeValue != _globalBooleans.end() ? maybeValue->second : false;
 }
 
 int Game::getGlobalNumber(const string &name) const {
-    auto maybeValue = _state.globalNumbers.find(name);
-    return maybeValue != _state.globalNumbers.end() ? maybeValue->second : 0;
+    auto maybeValue = _globalNumbers.find(name);
+    return maybeValue != _globalNumbers.end() ? maybeValue->second : 0;
 }
 
 bool Game::getLocalBoolean(uint32_t objectId, int index) const {
-    auto maybeObject = _state.localBooleans.find(objectId);
-    if (maybeObject == _state.localBooleans.end()) return false;
+    auto maybeObject = _localBooleans.find(objectId);
+    if (maybeObject == _localBooleans.end()) return false;
 
     auto maybeValue = maybeObject->second.find(index);
     if (maybeValue == maybeObject->second.end()) return false;
@@ -570,8 +566,8 @@ bool Game::getLocalBoolean(uint32_t objectId, int index) const {
 }
 
 int Game::getLocalNumber(uint32_t objectId, int index) const {
-    auto maybeObject = _state.localNumbers.find(objectId);
-    if (maybeObject == _state.localNumbers.end()) return 0;
+    auto maybeObject = _localNumbers.find(objectId);
+    if (maybeObject == _localNumbers.end()) return 0;
 
     auto maybeValue = maybeObject->second.find(index);
     if (maybeValue == maybeObject->second.end()) return 0;
@@ -580,19 +576,19 @@ int Game::getLocalNumber(uint32_t objectId, int index) const {
 }
 
 void Game::setGlobalBoolean(const string &name, bool value) {
-    _state.globalBooleans[name] = value;
+    _globalBooleans[name] = value;
 }
 
 void Game::setGlobalNumber(const string &name, int value) {
-    _state.globalNumbers[name] = value;
+    _globalNumbers[name] = value;
 }
 
 void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
-    _state.localBooleans[objectId][index] = value;
+    _localBooleans[objectId][index] = value;
 }
 
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
-    _state.localNumbers[objectId][index] = value;
+    _localNumbers[objectId][index] = value;
 }
 
 } // namespace game
