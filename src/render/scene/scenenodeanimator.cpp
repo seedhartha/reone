@@ -29,8 +29,33 @@ namespace reone {
 
 namespace render {
 
+static const float kTransitionDuration = 0.5f;
+
+bool SceneNodeAnimator::AnimationChannel::isActive() const {
+    return animation && !finished;
+}
+
 bool SceneNodeAnimator::AnimationChannel::isSameAnimation(const string &name, int flags, float speed) const {
-    return animation && animName == name && animFlags == flags && animSpeed == speed;
+    return
+        this->animation &&
+        this->name == name &&
+        this->flags == flags &&
+        this->speed == speed;
+}
+
+void SceneNodeAnimator::AnimationChannel::setAnimation(Animation *animation, int flags, float speed) {
+    this->name = animation->name();
+    this->flags = flags;
+    this->speed = speed;
+    this->time = 0.0f;
+    this->animation = animation;
+    this->finished = false;
+    this->transition = false;
+    this->freeze = false;
+}
+
+void SceneNodeAnimator::AnimationChannel::stopAnimation() {
+    animation = nullptr;
 }
 
 SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, const set<string> &skipNodes) :
@@ -43,26 +68,32 @@ SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, const set<s
 }
 
 void SceneNodeAnimator::update(float dt) {
-    if (isAnimationFinished()) {
+    if (!_channels[0].isActive()) {
         playDefaultAnimation();
         return;
+    }
+    if (_channels[0].transition && _channels[0].time >= _channels[0].animation->transitionTime()) {
+        _channels[0].transition = false;
+        _channels[1].stopAnimation();
     }
     for (int i = 0; i < kChannelCount; ++i) {
         updateChannel(i, dt);
     }
+    _absTransforms.clear();
+    updateAbsoluteTransforms(_modelSceneNode->model()->rootNode());
     updateNodeTransforms(_modelSceneNode->model()->rootNode());
 }
 
 void SceneNodeAnimator::updateChannel(int channel, float dt) {
     AnimationChannel &animChannel = _channels[channel];
-    if (!animChannel.animation) return;
+    if (!animChannel.isActive()) return;
 
     animChannel.localTransforms.clear();
-    updateAnimationTransforms(animChannel, *animChannel.animation->rootNode());
+    updateLocalTransforms(animChannel, *animChannel.animation->rootNode());
     advanceTime(animChannel, dt);
 }
 
-void SceneNodeAnimator::updateAnimationTransforms(AnimationChannel &channel, ModelNode &animNode) {
+void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNode &animNode) {
     ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNode(animNode.name());
     if (sceneNode) {
         ModelNode *modelNode = sceneNode->modelNode();
@@ -71,12 +102,13 @@ void SceneNodeAnimator::updateAnimationTransforms(AnimationChannel &channel, Mod
 
         bool skip = _skipNodes.count(modelNode->name()) > 0;
         if (!skip) {
+            float time = channel.transition ? channel.animation->transitionTime() : channel.time;
             glm::vec3 animPosition(0.0f);
-            if (animNode.getPosition(channel.animTime, animPosition, _modelSceneNode->model()->animationScale())) {
+            if (animNode.getPosition(time, animPosition, _modelSceneNode->model()->animationScale())) {
                 position += animPosition;
             }
             glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);
-            if (animNode.getOrientation(channel.animTime, animOrientation)) {
+            if (animNode.getOrientation(time, animOrientation)) {
                 orientation = animOrientation;
             }
         }
@@ -88,42 +120,78 @@ void SceneNodeAnimator::updateAnimationTransforms(AnimationChannel &channel, Mod
     }
 
     for (auto &child : animNode.children()) {
-        updateAnimationTransforms(channel, *child);
+        updateLocalTransforms(channel, *child);
     }
 }
 
-void SceneNodeAnimator::updateNodeTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform) {
+void SceneNodeAnimator::updateAbsoluteTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform) {
     if (modelNode.skin()) return;
 
     glm::mat4 transform(parentTransform);
+    glm::mat4 localTransform;
 
-    auto maybeTransform = _channels[0].localTransforms.find(modelNode.nodeNumber());
-    if (maybeTransform != _channels[0].localTransforms.end()) {
-        transform *= maybeTransform->second;
+    if (_channels[0].transition) {
+        auto maybeTransform0 = _channels[0].localTransforms.find(modelNode.nodeNumber());
+        bool hasTransform0 = maybeTransform0 != _channels[0].localTransforms.end();
+        auto maybeTransform1 = _channels[1].localTransforms.find(modelNode.nodeNumber());
+        bool hasTransform1 = maybeTransform1 != _channels[1].localTransforms.end();
+        if (hasTransform0 && hasTransform1) {
+            float delta = 1.0f - (_channels[0].animation->transitionTime() - _channels[0].time) / _channels[0].animation->transitionTime();
+            glm::quat orientation0(glm::toQuat(maybeTransform0->second));
+            glm::quat orientation1(glm::toQuat(maybeTransform1->second));
+            localTransform = glm::translate(glm::mat4(1.0f), glm::vec3(maybeTransform0->second[3]));
+            localTransform *= glm::mat4_cast(glm::slerp(orientation1, orientation0, delta));
+        } else if (hasTransform0) {
+            localTransform = maybeTransform0->second;
+        } else if (hasTransform1) {
+            localTransform = maybeTransform1->second;
+        } else {
+            localTransform = modelNode.localTransform();
+        }
     } else {
-        transform *= modelNode.localTransform();
+        auto maybeTransform = _channels[0].localTransforms.find(modelNode.nodeNumber());
+        if (maybeTransform != _channels[0].localTransforms.end()) {
+            localTransform = maybeTransform->second;
+        } else {
+            localTransform = modelNode.localTransform();
+        }
     }
+
+    transform *= localTransform;
+    _absTransforms.insert(make_pair(modelNode.nodeNumber(), transform));
+
+    for (auto &child : modelNode.children()) {
+        updateAbsoluteTransforms(*child, transform);
+    }
+}
+
+void SceneNodeAnimator::updateNodeTransforms(ModelNode &modelNode) {
+    if (modelNode.skin()) return;
+
+    glm::mat4 transform(_absTransforms.find(modelNode.nodeNumber())->second);
 
     ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
     sceneNode->setLocalTransform(transform);
     sceneNode->setBoneTransform(transform * modelNode.absoluteTransformInverse());
 
     for (auto &child : modelNode.children()) {
-        updateNodeTransforms(*child, transform);
+        updateNodeTransforms(*child);
     }
 }
 
 void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
-    float length = channel.animation->length();
-    channel.animTime += channel.animSpeed * dt;
+    if (channel.freeze) return;
 
-    bool loop = channel.animFlags & kAnimationLoop;
+    float length = channel.animation->length();
+    channel.time += channel.speed * dt;
+
+    bool loop = channel.flags & kAnimationLoop;
     if (loop) {
-        channel.animTime = glm::mod(channel.animTime, length);
+        channel.time = glm::mod(channel.time, length);
     } else {
-        channel.animTime = glm::min(channel.animTime, length);
-        if (channel.animTime == length) {
-            channel.animFinished = true;
+        channel.time = glm::min(channel.time, length);
+        if (channel.time == length) {
+            channel.finished = true;
         }
     }
 }
@@ -131,38 +199,33 @@ void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
 void SceneNodeAnimator::playDefaultAnimation() {
     if (_defaultAnim.empty()) return;
 
-    playAnimation(_defaultAnim, kAnimationLoop);
+    playAnimation(_defaultAnim, kAnimationLoop | kAnimationBlend);
 }
 
 void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed) {
+    if (_channels[0].isSameAnimation(name, flags, speed)) return;
+
+    Animation *animation = _modelSceneNode->model()->getAnimation(name);
+    if (!animation) return;
+
     for (int i = 1; i < kChannelCount; ++i) {
-        stopAnimation(i);
+        _channels[i].stopAnimation();
     }
-    playAnimation(0, name, flags, speed);
-}
-
-void SceneNodeAnimator::stopAnimation(int channel) {
-    _channels[channel].animation = nullptr;
-}
-
-void SceneNodeAnimator::playAnimation(int channel, const string &name, int flags, float speed) {
-    AnimationChannel &animChannel = _channels[channel];
-    if (animChannel.isSameAnimation(name, flags, speed)) return;
-
-    animChannel.animName = name;
-    animChannel.animFlags = flags;
-    animChannel.animSpeed = speed;
-    animChannel.animTime = 0.0f;
-    animChannel.animation = _modelSceneNode->model()->getAnimation(name);
-    animChannel.animFinished = false;
+    bool blend = flags & kAnimationBlend;
+    if (blend && _channels[0].isActive()) {
+        _channels[1] = _channels[0];
+        _channels[0].setAnimation(animation, flags, speed);
+        _channels[0].time = glm::max(0.0f, animation->transitionTime() - kTransitionDuration);
+        _channels[0].transition = true;
+        _channels[1].transition = false;
+        _channels[1].freeze = true;
+    } else {
+        _channels[0].setAnimation(animation, flags, speed);
+    }
 }
 
 bool SceneNodeAnimator::isAnimationFinished() const {
-    for (int i = 0; i < kChannelCount; ++i) {
-        const AnimationChannel &channel = _channels[i];
-        if (channel.animation && !channel.animFinished) return false;
-    }
-    return true;
+    return !_channels[0].isActive();
 }
 
 void SceneNodeAnimator::setDefaultAnimation(const string &name) {

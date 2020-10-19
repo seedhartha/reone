@@ -113,16 +113,6 @@ void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
     }
 }
 
-void ModelSceneNode::playAnimation(int channel, const string &name, int flags, float speed) {
-    _animator.playAnimation(channel, name, flags, speed);
-
-    if (flags & kAnimationPropagate) {
-        for (auto &attached : _attachedModels) {
-            attached.second->playAnimation(channel, name, flags, speed);
-        }
-    }
-}
-
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
     if (!parentNode) return nullptr;
