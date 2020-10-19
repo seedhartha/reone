@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include "../game/types.h"
-#include "../system/types.h"
 #include "../system/net/command.h"
 
 namespace reone {
@@ -29,17 +24,7 @@ namespace reone {
 namespace mp {
 
 enum class CommandType {
-    LoadModule,
-    LoadCreature,
-    SetPlayerRole,
-    SetObjectTransform,
-    SetObjectAnimation,
-    SetCreatureMovementType,
-    SetCreatureTalking,
-    SetDoorOpen,
-    StartDialog,
-    PickDialogReply,
-    FinishDialog
+    None
 };
 
 class Command : public net::Command {
@@ -52,44 +37,9 @@ public:
     ByteArray getBytes() const override;
 
     CommandType type() const;
-    uint32_t objectId() const;
-    const std::string &module() const;
-    const std::string &tag() const;
-    game::CreatureRole role() const;
-    int appearance() const;
-    const std::vector<std::string> &equipment() const;
-    const glm::vec3 &position() const;
-    float heading() const;
-    const std::string &animation() const;
-    int animationFlags() const;
-    game::MovementType movementType() const;
-    bool talking() const;
-    bool open() const;
-    uint32_t triggerrer() const;
-    const std::string &resRef() const;
-    uint32_t replyIndex() const;
 
 private:
-    CommandType _type { CommandType::LoadModule };
-    uint32_t _objectId { 0 };
-    std::string _module;
-    std::string _tag;
-    game::CreatureRole _role { game::CreatureRole::None };
-    int _appearance { 0 };
-    std::vector<std::string> _equipment;
-    glm::vec3 _position { 0.0f };
-    float _heading { 0.0f };
-    std::string _animation;
-    int _animationFlags { 0 };
-    float _animationSpeed { 1.0f };
-    game::MovementType _movementType { game::MovementType::None };
-    bool _talking { false };
-    bool _open { false };
-    uint32_t _triggerrer { 0 };
-    std::string _resRef;
-    uint32_t _replyIndex { 0 };
-
-    friend class MultiplayerGame;
+    CommandType _type { CommandType::None };
 };
 
 } // namespace mp

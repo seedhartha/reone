@@ -134,7 +134,9 @@ void Connection::handleWrite(uint32_t commandId, shared_ptr<boost::asio::streamb
 
     if (ec) {
         error("Connection: write failed: " + ec.message());
-        if (_onAbort) _onAbort(_tag);
+        if (_onAbort) {
+            _onAbort(_tag);
+        }
     }
     lock_guard<recursive_mutex> lock(_cmdOutMutex);
     auto command = find_if(
@@ -150,12 +152,12 @@ void Connection::handleWrite(uint32_t commandId, shared_ptr<boost::asio::streamb
     }
 }
 
-void Connection::setTag(const string &tag) {
-    _tag = tag;
-}
-
 const string &Connection::tag() const {
     return _tag;
+}
+
+void Connection::setTag(const string &tag) {
+    _tag = tag;
 }
 
 void Connection::setOnAbort(const function<void(const string &)> &fn) {

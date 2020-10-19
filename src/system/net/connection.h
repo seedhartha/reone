@@ -18,8 +18,8 @@
 #pragma once
 
 #include <functional>
-#include <list>
 #include <mutex>
+#include <vector>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
@@ -44,22 +44,31 @@ public:
 
     void send(const std::shared_ptr<Command> &command);
 
+    const std::string &tag() const;
+
     void setTag(const std::string &tag);
 
-    const std::string &tag() const;
+    // Callbacks
 
     void setOnAbort(const std::function<void(const std::string &)> &fn);
     void setOnCommandReceived(const std::function<void(const ByteArray &)> &fn);
+
+    // END Callbacks
 
 private:
     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
     std::string _tag;
     boost::asio::streambuf _readBuffer;
     int _cmdLength { 0 };
-    std::list<std::shared_ptr<Command>> _cmdOut;
+    std::vector<std::shared_ptr<Command>> _cmdOut;
     std::recursive_mutex _cmdOutMutex;
+
+    // Callbacks
+
     std::function<void(const std::string &)> _onAbort;
     std::function<void(const ByteArray &)> _onCommandReceived;
+
+    // END Callbacks
 
     Connection(const Connection &) = delete;
     Connection &operator=(const Connection &) = delete;

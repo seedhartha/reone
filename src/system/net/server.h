@@ -48,9 +48,12 @@ public:
     const ServerClients &clients() const;
 
     // Callbacks
+
     void setOnClientConnected(const std::function<void(const std::string &)> &fn);
     void setOnClientDisconnected(const std::function<void(const std::string &)> &fn);
     void setOnCommandReceived(const std::function<void(const std::string &, const ByteArray &)> &fn);
+
+    // END Callbacks
 
 private:
     boost::asio::io_service _service;
@@ -59,9 +62,12 @@ private:
     ServerClients _clients;
 
     // Callbacks
+
     std::function<void(const std::string &)> _onClientConnected;
     std::function<void(const std::string &)> _onClientDisconnected;
     std::function<void(const std::string &, const ByteArray &)> _onCommandReceived;
+
+    // END Callbacks
 
     Server(const Server &) = delete;
     Server &operator=(const Server &) = delete;
