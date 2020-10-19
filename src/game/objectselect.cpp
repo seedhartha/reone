@@ -56,9 +56,7 @@ void ObjectSelector::update() {
 }
 
 void ObjectSelector::selectNext(bool reverse) {
-    static vector<uint32_t> selectables;
-
-    selectables.clear();
+    vector<uint32_t> selectables;
     getSelectableObjects(selectables);
 
     if (selectables.empty()) {
@@ -86,12 +84,10 @@ void ObjectSelector::selectNext(bool reverse) {
 }
 
 void ObjectSelector::getSelectableObjects(vector<uint32_t> &ids) const {
-    static vector<pair<uint32_t, float>> selectables;
+    vector<pair<uint32_t, float>> selectables;
 
     shared_ptr<SpatialObject> player(_area->player());
-
     glm::vec3 origin(player->position());
-    selectables.clear();
 
     for (auto &object : _area->objects()) {
         if (!object->isSelectable() || object.get() == player.get()) continue;

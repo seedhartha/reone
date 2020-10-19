@@ -194,9 +194,7 @@ void DialogGui::loadReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
     replies.clear();
 
-    static vector<int> activeReplies;
-
-    activeReplies.clear();
+    vector<int> activeReplies;
     for (auto &link : _currentEntry->replies) {
         if (link.active.empty() || checkCondition(link.active)) {
             activeReplies.push_back(link.index);
