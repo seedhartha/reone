@@ -75,7 +75,7 @@ private:
 
     // END IMultiplayerCallbacks overrides
 
-    std::shared_ptr<net::Command> makeCommand(net::CommandType type);
+    std::shared_ptr<net::Command> makeCommand(CommandType type);
     bool shouldSendObjectUpdates(uint32_t objectId) const;
     void synchronizeClient(const std::string &tag);
 

@@ -118,7 +118,7 @@ void MultiplayerGame::sendLoadModule(const string &client, const string &module)
     sendCommand(client, cmd);
 }
 
-shared_ptr<net::Command> MultiplayerGame::makeCommand(net::CommandType type) {
+shared_ptr<net::Command> MultiplayerGame::makeCommand(CommandType type) {
     return shared_ptr<net::Command>(new Command(_cmdCounter++, type));
 }
 

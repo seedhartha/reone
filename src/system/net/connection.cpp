@@ -106,7 +106,6 @@ void Connection::close() {
 
 void Connection::send(const shared_ptr<Command> &command) {
     lock_guard<recursive_mutex> lock(_cmdOutMutex);
-    eraseSameCommands(*command);
     _cmdOut.push_back(command);
 
     if (_cmdOut.size() == 1) {
@@ -114,26 +113,8 @@ void Connection::send(const shared_ptr<Command> &command) {
     }
 }
 
-void Connection::eraseSameCommands(const Command &command) {
-    switch (command.type()) {
-        case net::CommandType::SetObjectTransform:
-        case net::CommandType::SetObjectAnimation:
-        case net::CommandType::SetCreatureMovementType:
-            break;
-        default:
-            return;
-    }
-
-    auto cmdToErase = remove_if(
-        _cmdOut.begin(),
-        _cmdOut.end(),
-        [&command](const shared_ptr<Command> &item) { return item->type() == command.type() && item->objectId() == command.objectId(); });
-
-    _cmdOut.erase(cmdToErase, _cmdOut.end());
-}
-
 void Connection::doSend(const Command &command) {
-    ByteArray data(command.bytes());
+    ByteArray data(command.getBytes());
     int cmdLength = static_cast<int>(data.size());
     data.insert(data.begin(), (cmdLength >> 8) & 0xff);
     data.insert(data.begin(), cmdLength & 0xff);

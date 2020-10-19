@@ -64,7 +64,6 @@ private:
     Connection(const Connection &) = delete;
     Connection &operator=(const Connection &) = delete;
 
-    void eraseSameCommands(const Command &command);
     void doSend(const Command &command);
     void handleRead(size_t bytesRead, const boost::system::error_code &ec);
     void handleWrite(uint32_t commandId, std::shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec);

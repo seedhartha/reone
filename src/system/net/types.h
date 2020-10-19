@@ -23,20 +23,6 @@ namespace reone {
 
 namespace net {
 
-enum class CommandType {
-    LoadModule,
-    LoadCreature,
-    SetPlayerRole,
-    SetObjectTransform,
-    SetObjectAnimation,
-    SetCreatureMovementType,
-    SetCreatureTalking,
-    SetDoorOpen,
-    StartDialog,
-    PickDialogReply,
-    FinishDialog
-};
-
 struct NetworkOptions {
     std::string host;
     int port { 0 };

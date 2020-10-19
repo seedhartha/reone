@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../types.h"
+#include <cstdint>
 
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -28,18 +28,14 @@ namespace net {
 class Command {
 public:
     Command() = default;
-    Command(uint32_t id, CommandType type);
+    Command(uint32_t id);
 
-    virtual ByteArray bytes() const = 0;
+    virtual ByteArray getBytes() const = 0;
 
     uint32_t id() const;
-    CommandType type() const;
-    uint32_t objectId() const;
 
 protected:
     uint32_t _id { 0 };
-    CommandType _type { CommandType::LoadModule };
-    uint32_t _objectId { 0 };
 };
 
 } // namespace net

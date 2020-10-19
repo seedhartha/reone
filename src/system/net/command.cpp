@@ -21,19 +21,11 @@ namespace reone {
 
 namespace net {
 
-Command::Command(uint32_t id, CommandType type) : _id(id), _type(type) {
+Command::Command(uint32_t id) : _id(id) {
 }
 
 uint32_t Command::id() const {
     return _id;
-}
-
-CommandType Command::type() const {
-    return _type;
-}
-
-uint32_t Command::objectId() const {
-    return _objectId;
 }
 
 } // namespace net

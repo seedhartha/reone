@@ -28,16 +28,31 @@ namespace reone {
 
 namespace mp {
 
+enum class CommandType {
+    LoadModule,
+    LoadCreature,
+    SetPlayerRole,
+    SetObjectTransform,
+    SetObjectAnimation,
+    SetCreatureMovementType,
+    SetCreatureTalking,
+    SetDoorOpen,
+    StartDialog,
+    PickDialogReply,
+    FinishDialog
+};
+
 class Command : public net::Command {
 public:
     Command() = default;
-    Command(uint32_t id, net::CommandType type);
+    Command(uint32_t id, CommandType type);
 
     void load(const ByteArray &data);
 
-    ByteArray bytes() const override;
+    ByteArray getBytes() const override;
 
-    // Getters
+    CommandType type() const;
+    uint32_t objectId() const;
     const std::string &module() const;
     const std::string &tag() const;
     game::CreatureRole role() const;
@@ -55,6 +70,8 @@ public:
     uint32_t replyIndex() const;
 
 private:
+    CommandType _type { CommandType::LoadModule };
+    uint32_t _objectId { 0 };
     std::string _module;
     std::string _tag;
     game::CreatureRole _role { game::CreatureRole::None };
