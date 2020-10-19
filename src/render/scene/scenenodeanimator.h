@@ -30,7 +30,8 @@ namespace render {
 
 enum AnimationFlags {
     kAnimationLoop = 1,
-    kAnimationPropagate = 2
+    kAnimationPropagate = 2,
+    kAnimationBlend = 4
 };
 
 class Animation;
@@ -45,7 +46,6 @@ public:
 
     void playDefaultAnimation();
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
-    void playAnimation(int channel, const std::string &name, int flags = 0, float speed = 1.0f);
 
     bool isAnimationFinished() const;
 
@@ -55,27 +55,34 @@ private:
     static const int kChannelCount = 2;
 
     struct AnimationChannel {
-        std::string animName;
-        int animFlags { 0 };
-        float animSpeed { 1.0f };
-        float animTime { 0.0f };
+        std::string name;
+        int flags { 0 };
+        float speed { 1.0f };
+        float time { 0.0f };
         Animation *animation { nullptr };
-        bool animFinished { false };
+        bool finished { false };
+        bool transition { false };
+        bool freeze { false };
         std::unordered_map<uint16_t, glm::mat4> localTransforms;
 
+        bool isActive() const;
         bool isSameAnimation(const std::string &name, int flags, float speed) const;
+
+        void setAnimation(Animation *animation, int flags = 0, float speed = 1.0f);
+        void stopAnimation();
     };
 
     ModelSceneNode *_modelSceneNode { nullptr };
     std::set<std::string> _skipNodes;
     AnimationChannel _channels[kChannelCount];
     std::string _defaultAnim;
+    std::unordered_map<uint16_t, glm::mat4> _absTransforms;
 
     void updateChannel(int channel, float dt);
     void advanceTime(AnimationChannel &channel, float dt);
-    void updateAnimationTransforms(AnimationChannel &channel, ModelNode &animNode);
-    void updateNodeTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform = glm::mat4(1.0f));
-    void stopAnimation(int channel);
+    void updateLocalTransforms(AnimationChannel &channel, ModelNode &animNode);
+    void updateAbsoluteTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform = glm::mat4(1.0f));
+    void updateNodeTransforms(ModelNode &modelNode);
 };
 
 } // namespace render

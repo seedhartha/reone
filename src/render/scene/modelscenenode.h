@@ -68,7 +68,6 @@ public:
 
     void playDefaultAnimation();
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
-    void playAnimation(int channel, const std::string &name, int flags = 0, float speed = 1.0f);
 
     bool isAnimationFinished() const;
 

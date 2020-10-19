@@ -299,7 +299,7 @@ void Creature::playTalkAnimation() {
     _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
 
     if (_headModel) {
-        _headModel->playAnimation(1, g_animTalkHead, kAnimationLoop, 0.25f);
+        //_headModel->playAnimation(1, g_animTalkHead, kAnimationLoop, 0.25f);
     }
 }
 
