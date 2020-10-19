@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "lightnode.h"
 #include "modelscenenode.h"
 #include "scenegraph.h"
 
@@ -56,12 +57,6 @@ void ModelNodeSceneNode::fillSceneGraph() {
             }
         }
     }
-
-    shared_ptr<ModelNode::Light> light(_modelNode->light());
-    if (light) {
-        _sceneGraph->addLight(this);
-    }
-
     SceneNode::fillSceneGraph();
 }
 
@@ -122,7 +117,7 @@ void ModelNodeSceneNode::renderSingle() const {
     int lightCount = 0;
 
     if (_modelSceneNode->isLightingEnabled()) {
-        const vector<ModelNodeSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
+        const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
         locals.features.lightingEnabled = true;
         locals.lighting.ambientColor = _sceneGraph->ambientLightColor();
@@ -131,8 +126,8 @@ void ModelNodeSceneNode::renderSingle() const {
         for (auto &light : lights) {
             ShaderLight shaderLight;
             shaderLight.position = light->absoluteTransform()[3];
-            shaderLight.radius = light->modelNode()->radius();
-            shaderLight.color = light->modelNode()->color();
+            shaderLight.radius = light->radius();
+            shaderLight.color = light->color();
 
             locals.lighting.lights.push_back(move(shaderLight));
         }

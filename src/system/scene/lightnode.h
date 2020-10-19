@@ -25,7 +25,18 @@ namespace scene {
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(SceneGraph *sceneGraph);
+    LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius);
+
+    void fillSceneGraph() override;
+
+    int priority() const;
+    const glm::vec3 &color() const;
+    float radius() const;
+
+private:
+    int _priority { 0 };
+    glm::vec3 _color { 1.0f };
+    float _radius { 1.0f };
 };
 
 } // namespace scene
