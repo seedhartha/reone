@@ -148,6 +148,18 @@ void SceneNodeAnimator::updateAbsoluteTransforms(ModelNode &modelNode, const glm
         } else {
             localTransform = modelNode.localTransform();
         }
+    } else if (_channels[0].flags & kAnimationOverlay) {
+        auto maybeTransform0 = _channels[0].localTransforms.find(modelNode.nodeNumber());
+        bool hasTransform0 = maybeTransform0 != _channels[0].localTransforms.end();
+        auto maybeTransform1 = _channels[1].localTransforms.find(modelNode.nodeNumber());
+        bool hasTransform1 = maybeTransform1 != _channels[1].localTransforms.end();
+        if (hasTransform0) {
+            localTransform = maybeTransform0->second;
+        } else if (hasTransform1) {
+            localTransform = maybeTransform1->second;
+        } else {
+            localTransform = modelNode.localTransform();
+        }
     } else {
         auto maybeTransform = _channels[0].localTransforms.find(modelNode.nodeNumber());
         if (maybeTransform != _channels[0].localTransforms.end()) {
@@ -211,15 +223,23 @@ void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed
     for (int i = 1; i < kChannelCount; ++i) {
         _channels[i].stopAnimation();
     }
-    bool blend = flags & kAnimationBlend;
-    if (blend && _channels[0].isActive()) {
-        _channels[1] = _channels[0];
-        _channels[0].setAnimation(animation, flags, speed);
-        _channels[0].time = glm::max(0.0f, animation->transitionTime() - kTransitionDuration);
-        _channels[0].transition = true;
-        _channels[1].transition = false;
-        _channels[1].freeze = true;
-    } else {
+
+    bool set = false;
+    if (_channels[0].isActive()) {
+        if (flags & kAnimationOverlay) {
+            _channels[1] = _channels[0];
+        } else if (flags & kAnimationBlend) {
+            _channels[1] = _channels[0];
+            _channels[0].setAnimation(animation, flags, speed);
+            _channels[0].time = glm::max(0.0f, animation->transitionTime() - kTransitionDuration);
+            _channels[0].transition = true;
+            _channels[1].transition = false;
+            _channels[1].freeze = true;
+
+            set = true;
+        }
+    }
+    if (!set) {
         _channels[0].setAnimation(animation, flags, speed);
     }
 }

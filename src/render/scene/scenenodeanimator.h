@@ -31,7 +31,8 @@ namespace render {
 enum AnimationFlags {
     kAnimationLoop = 1,
     kAnimationPropagate = 2,
-    kAnimationBlend = 4
+    kAnimationBlend = 4, // blend previous animation into the next one
+    kAnimationOverlay = 8 // overlay next animation on top of the previous one
 };
 
 class Animation;
