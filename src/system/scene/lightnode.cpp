@@ -17,11 +17,34 @@
 
 #include "lightnode.h"
 
+#include "scenegraph.h"
+
 namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph) : SceneNode(sceneGraph) {
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius) :
+    SceneNode(sceneGraph),
+    _priority(priority),
+    _color(color),
+    _radius(radius) {
+}
+
+void LightSceneNode::fillSceneGraph() {
+    _sceneGraph->addLight(this);
+    SceneNode::fillSceneGraph();
+}
+
+int LightSceneNode::priority() const {
+    return _priority;
+}
+
+const glm::vec3 &LightSceneNode::color() const {
+    return _color;
+}
+
+float LightSceneNode::radius() const {
+    return _radius;
 }
 
 } // namespace scene

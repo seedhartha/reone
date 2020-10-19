@@ -28,6 +28,8 @@
 #include "../render/mesh/aabb.h"
 
 #include "aabbnode.h"
+#include "lightnode.h"
+#include "modelnodescenenode.h"
 #include "modelscenenode.h"
 #include "scenegraph.h"
 
@@ -67,6 +69,12 @@ void ModelSceneNode::initModelNodes() {
             shared_ptr<ModelNodeSceneNode> childNode(getModelNodeSceneNode(*child));
             addChild(childNode);
             nodes.push(childNode.get());
+
+            shared_ptr<ModelNode::Light> light(child->light());
+            if (light) {
+                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius()));
+                childNode->addChild(lightNode);
+            }
         }
     }
 }
@@ -251,7 +259,7 @@ bool ModelSceneNode::isLightingEnabled() const {
     return _lightingEnabled;
 }
 
-const vector<ModelNodeSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
+const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
     return _lightsAffectedBy;
 }
 
@@ -321,7 +329,7 @@ void ModelSceneNode::setLightingEnabled(bool enabled) {
     _lightingEnabled = enabled;
 }
 
-void ModelSceneNode::setLightsAffectedBy(const vector<ModelNodeSceneNode *> &lights) {
+void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {
     _lightsAffectedBy = lights;
 }
 

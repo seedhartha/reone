@@ -24,12 +24,14 @@
 
 #include "../render/types.h"
 
-#include "cameranode.h"
-#include "modelnodescenenode.h"
-
 namespace reone {
 
 namespace scene {
+
+class CameraSceneNode;
+class LightSceneNode;
+class ModelNodeSceneNode;
+class SceneNode;
 
 class SceneGraph {
 public:
@@ -39,11 +41,11 @@ public:
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void addOpaqueMesh(ModelNodeSceneNode *node);
     void addTransparentMesh(ModelNodeSceneNode *node);
-    void addLight(ModelNodeSceneNode *node);
+    void addLight(LightSceneNode *node);
     void prepare();
     void render() const;
 
-    void getLightsAt(const glm::vec3 &position, std::vector<ModelNodeSceneNode *> &lights) const;
+    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
 
@@ -55,7 +57,7 @@ private:
     std::vector<std::shared_ptr<SceneNode>> _rootNodes;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
-    std::vector<ModelNodeSceneNode *> _lights;
+    std::vector<LightSceneNode *> _lights;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

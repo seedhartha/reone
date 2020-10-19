@@ -23,6 +23,8 @@
 
 #include "../render/mesh/quad.h"
 
+#include "cameranode.h"
+#include "lightnode.h"
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
 
@@ -58,7 +60,7 @@ void SceneGraph::addTransparentMesh(ModelNodeSceneNode *node) {
     _transparentMeshes.push_back(node);
 }
 
-void SceneGraph::addLight(ModelNodeSceneNode *node) {
+void SceneGraph::addLight(LightSceneNode *node) {
     _lights.push_back(node);
 }
 
@@ -113,26 +115,22 @@ void SceneGraph::render() const {
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, vector<ModelNodeSceneNode *> &lights) const {
-    unordered_map<ModelNodeSceneNode *, float> distances;
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
+    unordered_map<LightSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
-        if (light->modelNode()->light()->ambientOnly) continue;
-
         float distance = light->distanceTo(position);
-        const ModelNode *modelNode = light->modelNode();
-        float radius = modelNode->radius();
-
+        float radius = light->radius();
         if (distance > radius * radius) continue;
 
         distances.insert(make_pair(light, distance));
         lights.push_back(light);
     }
 
-    sort(lights.begin(), lights.end(), [&distances](ModelNodeSceneNode *left, ModelNodeSceneNode *right) {
-        int leftPriority = left->modelNode()->light()->priority;
-        int rightPriority = right->modelNode()->light()->priority;
+    sort(lights.begin(), lights.end(), [&distances](LightSceneNode *left, LightSceneNode *right) {
+        int leftPriority = left->priority();
+        int rightPriority = right->priority();
 
         if (leftPriority < rightPriority) return true;
         if (leftPriority > rightPriority) return false;

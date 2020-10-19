@@ -31,6 +31,7 @@ namespace reone {
 
 namespace scene {
 
+class LightSceneNode;
 class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
@@ -81,10 +82,10 @@ public:
     void setLightingIsDirty();
 
     bool isLightingEnabled() const;
-    const std::vector<ModelNodeSceneNode *> &lightsAffectedBy() const;
+    const std::vector<LightSceneNode *> &lightsAffectedBy() const;
 
     void setLightingEnabled(bool affected);
-    void setLightsAffectedBy(const std::vector<ModelNodeSceneNode *> &lights);
+    void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
 
     // END Dynamic lighting
 
@@ -100,7 +101,7 @@ private:
     float _alpha { 1.0f };
     bool _drawAABB { false };
     bool _lightingEnabled { false };
-    std::vector<ModelNodeSceneNode *> _lightsAffectedBy;
+    std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
 
     void initModelNodes();
