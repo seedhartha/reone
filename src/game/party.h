@@ -17,11 +17,28 @@
 
 #pragma once
 
+#include <vector>
+
 namespace reone {
 
 namespace game {
 
+class Creature;
+
+/**
+ * Encapsulates party management.
+ */
 class Party {
+public:
+    bool addMember(Creature *member);
+    void switchLeader();
+
+    Creature *getMember(int index) const;
+
+    Creature *leader() const;
+
+private:
+    std::vector<Creature *> _members;
 };
 
 } // namespace game
