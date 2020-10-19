@@ -23,35 +23,20 @@
 
 using namespace std;
 
-using namespace reone::game;
-using namespace reone::net;
-
 namespace reone {
 
 namespace mp {
 
-static map<CommandType, string> g_cmdDesc = {
-    { CommandType::LoadModule, "LoadModule" },
-    { CommandType::LoadCreature, "LoadCreature" },
-    { CommandType::SetPlayerRole, "SetPlayerRole" },
-    { CommandType::SetObjectTransform, "SetObjectTransform" },
-    { CommandType::SetObjectAnimation, "SetObjectAnimation" },
-    { CommandType::SetCreatureMovementType, "SetCreatureMovementType" },
-    { CommandType::SetCreatureTalking, "SetCreatureTalking" },
-    { CommandType::SetDoorOpen, "SetDoorOpen" },
-    { CommandType::StartDialog, "StartDialog" },
-    { CommandType::PickDialogReply, "PickDialogReply" },
-    { CommandType::FinishDialog, "FinishDialog" }
-};
-
 static const string &describeCommandType(CommandType type) {
-    auto desc = g_cmdDesc.find(type);
-    if (desc == g_cmdDesc.end()) {
-        auto pair = g_cmdDesc.insert(make_pair(type, to_string(static_cast<int>(type))));
-        return pair.first->second;
+    static map<CommandType, string> descriptions;
+
+    auto maybeDescription = descriptions.find(type);
+    if (maybeDescription != descriptions.end()) {
+        return maybeDescription->second;
     }
 
-    return desc->second;
+    auto inserted = descriptions.insert(make_pair(type, to_string(static_cast<int>(type))));
+    return inserted.first->second;
 }
 
 string describeCommand(const Command &command) {

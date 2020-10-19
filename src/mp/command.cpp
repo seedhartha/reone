@@ -17,11 +17,11 @@
 
 #include "command.h"
 
+#include <cstring>
 #include <stdexcept>
+#include <string>
 
 using namespace std;
-
-using namespace reone::game;
 
 namespace reone {
 
@@ -97,75 +97,10 @@ void Command::load(const ByteArray &data) {
     _type = static_cast<CommandType>(data[0]);
 
     int offset = 1;
-    int equipmentCount = 0;
 
     _id = getUint32(data, offset);
 
     switch (_type) {
-        case CommandType::LoadModule:
-            _module = getString(data, offset);
-            break;
-
-        case CommandType::LoadCreature:
-            _role = static_cast<CreatureRole>(getUint8(data, offset));
-            _objectId = getUint16(data, offset);
-            _tag = getString(data, offset);
-            _appearance = getUint16(data, offset);
-            _position.x = getFloat(data, offset);
-            _position.y = getFloat(data, offset);
-            _position.z = getFloat(data, offset);
-            _heading = getFloat(data, offset);
-            equipmentCount = getUint8(data, offset);
-            for (int i = 0; i < equipmentCount; ++i) {
-                _equipment.push_back(getString(data, offset));
-            }
-            break;
-
-        case CommandType::SetPlayerRole:
-            _role = static_cast<CreatureRole>(getUint8(data, offset));
-            break;
-
-        case CommandType::SetObjectTransform:
-            _objectId = getUint16(data, offset);
-            _position.x = getFloat(data, offset);
-            _position.y = getFloat(data, offset);
-            _position.z = getFloat(data, offset);
-            _heading = getFloat(data, offset);
-            break;
-
-        case CommandType::SetObjectAnimation:
-            _objectId = getUint16(data, offset);
-            _animationFlags = getUint8(data, offset);
-            _animation = getString(data, offset);
-            break;
-
-        case CommandType::SetCreatureMovementType:
-            _objectId = getUint16(data, offset);
-            _movementType = static_cast<MovementType>(getUint8(data, offset));
-            break;
-
-        case CommandType::SetCreatureTalking:
-            _objectId = getUint16(data, offset);
-            _talking = getUint8(data, offset);
-            break;
-
-        case CommandType::SetDoorOpen:
-            _open = getUint8(data, offset);
-            _objectId = getUint16(data, offset);
-            _triggerrer = getUint16(data, offset);
-            break;
-
-        case CommandType::StartDialog:
-            _resRef = getString(data, offset);
-            break;
-
-        case CommandType::PickDialogReply:
-            _replyIndex = getUint8(data, offset);
-            break;
-
-        case CommandType::FinishDialog:
-            break;
-
         default:
             throw runtime_error("Command: unsupported type: " + to_string(static_cast<int>(_type)));
     }
@@ -176,71 +111,7 @@ ByteArray Command::getBytes() const {
     putUint8(static_cast<uint8_t>(_type), data);
     putUint32(_id, data);
 
-    switch (static_cast<CommandType>(_type)) {
-        case CommandType::LoadModule:
-            putString(_module, data);
-            break;
-
-        case CommandType::LoadCreature:
-            putUint8(static_cast<uint8_t>(_role), data);
-            putUint16(_objectId, data);
-            putString(_tag, data);
-            putUint16(_appearance, data);
-            putFloat(_position.x, data);
-            putFloat(_position.y, data);
-            putFloat(_position.z, data);
-            putFloat(_heading, data);
-            putUint8(static_cast<uint8_t>(_equipment.size()), data);
-            for (auto &item : _equipment) {
-                putString(item, data);
-            }
-            break;
-
-        case CommandType::SetPlayerRole:
-            putUint8(static_cast<uint8_t>(_role), data);
-            break;
-
-        case CommandType::SetObjectTransform:
-            putUint16(_objectId, data);
-            putFloat(_position.x, data);
-            putFloat(_position.y, data);
-            putFloat(_position.z, data);
-            putFloat(_heading, data);
-            break;
-
-        case CommandType::SetObjectAnimation:
-            putUint16(_objectId, data);
-            putUint8(_animationFlags, data);
-            putString(_animation, data);
-            break;
-
-        case CommandType::SetCreatureMovementType:
-            putUint16(_objectId, data);
-            putUint8(static_cast<uint8_t>(_movementType), data);
-            break;
-
-        case CommandType::SetCreatureTalking:
-            putUint16(_objectId, data);
-            putUint8(_talking, data);
-            break;
-
-        case CommandType::SetDoorOpen:
-            putUint8(_open, data);
-            putUint16(_objectId, data);
-            putUint16(_triggerrer, data);
-            break;
-
-        case CommandType::StartDialog:
-            putString(_resRef, data);
-            break;
-
-        case CommandType::PickDialogReply:
-            putUint8(_replyIndex, data);
-            break;
-
-        case CommandType::FinishDialog:
-            break;
-
+    switch (_type) {
         default:
             throw runtime_error("Command: unsupported type: " + to_string(static_cast<int>(_type)));
     }
@@ -250,70 +121,6 @@ ByteArray Command::getBytes() const {
 
 CommandType Command::type() const {
     return _type;
-}
-
-uint32_t Command::objectId() const {
-    return _objectId;
-}
-
-const string &Command::module() const {
-    return _module;
-}
-
-const string &Command::tag() const {
-    return _tag;
-}
-
-CreatureRole Command::role() const {
-    return _role;
-}
-
-int Command::appearance() const {
-    return _appearance;
-}
-
-const vector<string> &Command::equipment() const {
-    return _equipment;
-}
-
-const glm::vec3 &Command::position() const {
-    return _position;
-}
-
-float Command::heading() const {
-    return _heading;
-}
-
-const string &Command::animation() const {
-    return _animation;
-}
-
-int Command::animationFlags() const {
-    return _animationFlags;
-}
-
-MovementType Command::movementType() const {
-    return _movementType;
-}
-
-bool Command::talking() const {
-    return _talking;
-}
-
-bool Command::open() const {
-    return _open;
-}
-
-uint32_t Command::triggerrer() const {
-    return _triggerrer;
-}
-
-const string &Command::resRef() const {
-    return _resRef;
-}
-
-uint32_t Command::replyIndex() const {
-    return _replyIndex;
 }
 
 } // namespace mp

@@ -78,7 +78,7 @@ void Game::initObjectFactory() {
 }
 
 int Game::run() {
-    initSubsystems();
+    init();
     loadResources();
     openMainMenu();
     configure();
@@ -86,12 +86,12 @@ int Game::run() {
     _window.show();
 
     runMainLoop();
-    deinitSubsystems();
+    deinit();
 
     return 0;
 }
 
-void Game::initSubsystems() {
+void Game::init() {
     _window.init();
     _worldPipeline.init();
 
@@ -496,7 +496,7 @@ void Game::onPlay(const CreatureConfiguration &config) {
     loadModule(moduleName, party);
 }
 
-void Game::deinitSubsystems() {
+void Game::deinit() {
     Jobs.deinit();
     Routines.deinit();
     TheAudioPlayer.deinit();

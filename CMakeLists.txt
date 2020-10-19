@@ -367,23 +367,14 @@ target_link_libraries(libgame PUBLIC libsystem)
 ## libmp static library
 
 set(MP_HEADERS
-    src/mp/area.h
-    src/mp/callbacks.h
     src/mp/command.h
-    src/mp/creature.h
-    src/mp/door.h
     src/mp/game.h
-    src/mp/objectfactory.h
     src/mp/types.h
     src/mp/util.h)
 
 set(MP_SOURCES
-    src/mp/area.cpp
     src/mp/command.cpp
-    src/mp/creature.cpp
-    src/mp/door.cpp
     src/mp/game.cpp
-    src/mp/objectfactory.cpp
     src/mp/util.cpp)
 
 add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})

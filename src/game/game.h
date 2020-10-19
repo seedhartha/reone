@@ -93,6 +93,7 @@ protected:
     bool _pickDialogReplyEnabled { true };
 
     virtual void initObjectFactory();
+    virtual void init();
     virtual void configure();
     virtual void configureModule();
     virtual void update();
@@ -145,8 +146,7 @@ private:
     // Initialization
 
     void initGameVersion();
-    void initSubsystems();
-    void deinitSubsystems();
+    void deinit();
 
     // END Initialization
 

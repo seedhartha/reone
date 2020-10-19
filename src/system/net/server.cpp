@@ -110,12 +110,12 @@ void Server::stop() {
 }
 
 void Server::send(const string &tag, const shared_ptr<Command> &command) {
-    auto it = _clients.find(tag);
-    if (it == _clients.end()) {
+    auto maybeClient = _clients.find(tag);
+    if (maybeClient == _clients.end()) {
         warn("TCP: invalid client: " + tag);
         return;
     }
-    it->second->send(command);
+    maybeClient->second->send(command);
 }
 
 void Server::sendToAll(const shared_ptr<Command> &command) {

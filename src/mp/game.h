@@ -17,15 +17,12 @@
 
 #pragma once
 
-#include <list>
-#include <map>
 #include <mutex>
 
 #include "../game/game.h"
 #include "../system/net/client.h"
 #include "../system/net/server.h"
 
-#include "callbacks.h"
 #include "command.h"
 #include "types.h"
 
@@ -33,7 +30,7 @@ namespace reone {
 
 namespace mp {
 
-class MultiplayerGame : public game::Game, private IMultiplayerCallbacks {
+class MultiplayerGame : public game::Game {
 public:
     MultiplayerGame(
         MultiplayerMode mode,
@@ -41,11 +38,10 @@ public:
         const game::Options &opts);
 
 private:
-    uint32_t _cmdCounter { 0 };
     MultiplayerMode _mode { MultiplayerMode::Server };
-    std::recursive_mutex _syncMutex;
-    std::unique_ptr<net::Client> _client;
     std::unique_ptr<net::Server> _server;
+    std::unique_ptr<net::Client> _client;
+    uint32_t _cmdCounter { 0 };
 
     // Commands
 
@@ -54,50 +50,21 @@ private:
 
     // END Commands
 
-    // Game overrides
-
-    void initObjectFactory() override;
-    void configure() override;
+    void init() override;
     void update() override;
-    void loadNextModule() override;
-    void startDialog(game::SpatialObject &owner, const std::string &resRef) override;
-    void onDialogReplyPicked(uint32_t index) override;
-    void onDialogFinished() override;
 
-    // END Game overrides
+    void processCommands();
+    std::unique_ptr<net::Command> newCommand(CommandType type);
+    void send(const std::shared_ptr<net::Command> &command);
+    void send(const std::string &client, const std::shared_ptr<net::Command> &command);
 
-    // IMultiplayerCallbacks overrides
-
-    void onObjectTransformChanged(const game::Object &object, const glm::vec3 &position, float heading) override;
-    void onObjectAnimationChanged(const game::Object &object, const std::string &anim, int flags, float speed) override;
-    void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, game::MovementType type) override;
-    void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) override;
-
-    // END IMultiplayerCallbacks overrides
-
-    std::shared_ptr<net::Command> makeCommand(CommandType type);
-    bool shouldSendObjectUpdates(uint32_t objectId) const;
-    void synchronizeClient(const std::string &tag);
-
-    void sendLoadModule(const std::string &client, const std::string &module);
-    void sendLoadCreature(const std::string &client, game::CreatureRole role, const game::Creature &creature);
-    void sendSetPlayerRole(const std::string &client, game::CreatureRole role);
-    void sendSetObjectTransform(uint32_t objectId, const glm::vec3 &position, float heading);
-    void sendSetObjectAnimation(uint32_t objectId, const std::string &animation, int flags, float speed);
-    void sendSetCreatureMovementType(uint32_t objectId, game::MovementType type);
-    void sendSetCreatureTalking(uint32_t objectId, bool talking);
-    void sendSetDoorOpen(uint32_t objectId, uint32_t triggerrer);
-    void sendStartDialog(uint32_t ownerId, const std::string &resRef);
-    void sendPickDialogReply(uint32_t index);
-    void sendFinishDialog();
-
-    void sendCommand(const std::shared_ptr<net::Command> &command);
-    void sendCommand(const std::string &client, const std::shared_ptr<net::Command> &command);
+    // Event handlers
 
     void onClientConnected(const std::string tag);
     void onClientDisconnected(const std::string tag);
     void onCommandReceived(const ByteArray &data);
-    void onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<game::Object> &trigerrer) override;
+
+    // END Event handlers
 };
 
 } // namespace mp
