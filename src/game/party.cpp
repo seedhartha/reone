@@ -17,9 +17,54 @@
 
 #include "party.h"
 
+#include "../system/log.h"
+
+using namespace std;
+
 namespace reone {
 
 namespace game {
+
+static const int kMaxMemberCount = 3;
+
+bool Party::addMember(Creature *member) {
+    if (_members.size() == kMaxMemberCount) {
+        warn("Party: cannot add another member");
+        return false;
+    }
+    _members.push_back(member);
+
+    return true;
+}
+
+void Party::switchLeader() {
+    int count = static_cast<int>(_members.size());
+    if (count < 2) return;
+
+    switch (count) {
+        case 2: {
+            Creature *tmp = _members[0];
+            _members[0] = _members[1];
+            _members[1] = tmp;
+            break;
+        }
+        case 3: {
+            Creature *tmp = _members[0];
+            _members[0] = _members[1];
+            _members[1] = _members[2];
+            _members[2] = tmp;
+            break;
+        }
+    }
+}
+
+Creature *Party::getMember(int index) const {
+    return _members.size() > index ? _members[index] : nullptr;
+}
+
+Creature *Party::leader() const {
+    return !_members.empty() ? _members[0] : nullptr;
+}
 
 } // namespace game
 
