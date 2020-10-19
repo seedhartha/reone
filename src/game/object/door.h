@@ -19,8 +19,8 @@
 
 #include "spatial.h"
 
-#include "../../resource/blueprint/door.h"
-#include "../../resource/gfffile.h"
+#include "../../system/resource/blueprint/door.h"
+#include "../../system/resource/gfffile.h"
 
 namespace reone {
 

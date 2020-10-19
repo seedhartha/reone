@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/blueprint/item.h"
+#include "../../system/resource/blueprint/item.h"
 
 #include "object.h"
 

@@ -19,7 +19,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../../resource/types.h"
+#include "../../system/resource/types.h"
 
 namespace reone {
 

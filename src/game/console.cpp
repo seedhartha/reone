@@ -21,11 +21,11 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../core/log.h"
-#include "../render/font.h"
-#include "../render/mesh/quad.h"
-#include "../render/shaders.h"
-#include "../resource/resources.h"
+#include "../system/core/log.h"
+#include "../system/render/font.h"
+#include "../system/render/mesh/quad.h"
+#include "../system/render/shaders.h"
+#include "../system/resource/resources.h"
 
 using namespace std;
 

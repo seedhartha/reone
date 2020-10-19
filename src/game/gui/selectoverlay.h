@@ -22,8 +22,8 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/texture.h"
-#include "../../render/types.h"
+#include "../../system/render/texture.h"
+#include "../../system/render/types.h"
 
 #include "../types.h"
 

@@ -17,7 +17,7 @@
 
 #include "game.h"
 
-#include "../../core/log.h"
+#include "../../system/core/log.h"
 
 #include "area.h"
 #include "objectfactory.h"

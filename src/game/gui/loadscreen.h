@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include "../../system/gui/gui.h"
 
 namespace reone {
 

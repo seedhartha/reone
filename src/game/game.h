@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../audio/soundinstance.h"
-#include "../audio/types.h"
-#include "../gui/gui.h"
-#include "../render/pipeline/world.h"
-#include "../render/scene/scenegraph.h"
-#include "../render/window.h"
-#include "../resource/types.h"
+#include "../system/audio/soundinstance.h"
+#include "../system/audio/types.h"
+#include "../system/gui/gui.h"
+#include "../system/render/pipeline/world.h"
+#include "../system/render/scene/scenegraph.h"
+#include "../system/render/window.h"
+#include "../system/resource/types.h"
 
 #include "console.h"
 #include "gui/chargen/chargen.h"

@@ -21,11 +21,11 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../core/log.h"
-#include "../../core/streamutil.h"
-#include "../../net/types.h"
-#include "../../resource/resources.h"
-#include "../../script/types.h"
+#include "../../system/core/log.h"
+#include "../../system/core/streamutil.h"
+#include "../../system/net/types.h"
+#include "../../system/resource/resources.h"
+#include "../../system/script/types.h"
 
 #include "../script/util.h"
 

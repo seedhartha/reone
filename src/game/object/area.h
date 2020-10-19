@@ -19,12 +19,12 @@
 
 #include <list>
 
-#include "../../gui/types.h"
-#include "../../net/types.h"
-#include "../../render/scene/scenegraph.h"
-#include "../../render/types.h"
-#include "../../resource/types.h"
-#include "../../script/variable.h"
+#include "../../system/gui/types.h"
+#include "../../system/net/types.h"
+#include "../../system/render/scene/scenegraph.h"
+#include "../../system/render/types.h"
+#include "../../system/resource/types.h"
+#include "../../system/script/variable.h"
 
 #include "../actionexecutor.h"
 #include "../camera/animatedcamera.h"

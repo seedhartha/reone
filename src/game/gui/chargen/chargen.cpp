@@ -19,8 +19,8 @@
 
 #include <stdexcept>
 
-#include "../../../gui/scenebuilder.h"
-#include "../../../resource/resources.h"
+#include "../../../system/gui/scenebuilder.h"
+#include "../../../system/resource/resources.h"
 
 #include "../../portraits.h"
 

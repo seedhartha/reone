@@ -17,7 +17,7 @@
 
 #include "debugoverlay.h"
 
-#include "../../resource/resources.h"
+#include "../../system/resource/resources.h"
 
 #include "../types.h"
 

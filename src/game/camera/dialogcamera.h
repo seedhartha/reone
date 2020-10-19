@@ -19,7 +19,7 @@
 
 #include <functional>
 
-#include "../../render/scene/scenegraph.h"
+#include "../../system/render/scene/scenegraph.h"
 
 #include "../types.h"
 

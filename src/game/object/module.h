@@ -21,7 +21,7 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../../net/types.h"
+#include "../../system/net/types.h"
 
 #include "../player.h"
 

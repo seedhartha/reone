@@ -17,7 +17,7 @@
 
 #include "portraits.h"
 
-#include "../resource/resources.h"
+#include "../system/resource/resources.h"
 
 using namespace std;
 

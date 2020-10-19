@@ -19,8 +19,8 @@
 
 #include <vector>
 
-#include "../../resource/blueprint/placeable.h"
-#include "../../resource/gfffile.h"
+#include "../../system/resource/blueprint/placeable.h"
+#include "../../system/resource/gfffile.h"
 
 #include "spatial.h"
 

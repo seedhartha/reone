@@ -21,8 +21,8 @@
 #include <boost/program_options/options_description.hpp>
 
 #include "game/types.h"
-#include "net/types.h"
-#include "resource/types.h"
+#include "system/net/types.h"
+#include "system/resource/types.h"
 
 namespace reone {
 

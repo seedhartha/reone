@@ -17,9 +17,9 @@
 
 #include "util.h"
 
-#include "../../resource/resources.h"
-#include "../../script/execution.h"
-#include "../../script/types.h"
+#include "../../system/resource/resources.h"
+#include "../../system/script/execution.h"
+#include "../../system/script/types.h"
 
 #include "routines.h"
 

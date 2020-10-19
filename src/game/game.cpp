@@ -21,14 +21,14 @@
 
 #include "SDL2/SDL.h"
 
-#include "../audio/player.h"
-#include "../audio/util.h"
-#include "../core/jobs.h"
-#include "../core/log.h"
-#include "../core/pathutil.h"
-#include "../core/streamutil.h"
-#include "../render/scene/scenegraph.h"
-#include "../resource/resources.h"
+#include "../system/audio/player.h"
+#include "../system/audio/util.h"
+#include "../system/core/jobs.h"
+#include "../system/core/log.h"
+#include "../system/core/pathutil.h"
+#include "../system/core/streamutil.h"
+#include "../system/render/scene/scenegraph.h"
+#include "../system/resource/resources.h"
 
 #include "object/objectfactory.h"
 #include "script/routines.h"
