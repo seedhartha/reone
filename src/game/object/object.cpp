@@ -67,10 +67,6 @@ ActionQueue &Object::actionQueue() {
     return _actionQueue;
 }
 
-void Object::setSynchronize(bool synchronize) {
-    _synchronize = synchronize;
-}
-
 } // namespace game
 
 } // namespace reone

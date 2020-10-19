@@ -86,7 +86,6 @@ void MultiplayerArea::executeLoadCreature(const Command &cmd) {
     creature->load(move(config));
     creature->setPosition(cmd.position());
     creature->setHeading(cmd.heading());
-    creature->setSynchronize(true);
 
     switch (cmd.role()) {
         case CreatureRole::PartyLeader:
@@ -128,37 +127,29 @@ void MultiplayerArea::executeSetPlayerRole(const Command &cmd) {
 void MultiplayerArea::executeSetObjectTransform(const Command &cmd) {
     shared_ptr<SpatialObject> object(find(cmd.objectId()));
     if (object) {
-        object->setSynchronize(false);
         object->setPosition(cmd.position());
         object->setHeading(cmd.heading());
-        object->setSynchronize(true);
     }
 }
 
 void MultiplayerArea::executeSetObjectAnimation(const Command &cmd) {
     shared_ptr<SpatialObject> object(find(cmd.objectId()));
     if (object) {
-        object->setSynchronize(false);
         object->playAnimation(cmd.animation(), cmd.animationFlags());
-        object->setSynchronize(true);
     }
 }
 
 void MultiplayerArea::executeSetCreatureMovementType(const Command &cmd) {
     shared_ptr<SpatialObject> creature(find(cmd.objectId()));
     if (creature) {
-        creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setMovementType(cmd.movementType());
-        creature->setSynchronize(true);
     }
 }
 
 void MultiplayerArea::executeSetCreatureTalking(const Command &cmd) {
     shared_ptr<SpatialObject> creature(find(cmd.objectId()));
     if (creature) {
-        creature->setSynchronize(false);
         static_cast<Creature &>(*creature).setTalking(cmd.talking());
-        creature->setSynchronize(true);
     }
 }
 
@@ -166,9 +157,7 @@ void MultiplayerArea::executeSetDoorOpen(const Command &cmd) {
     shared_ptr<Object> door(find(cmd.objectId()));
     shared_ptr<Object> trigerrer(find(cmd.triggerrer()));
     if (door) {
-        door->setSynchronize(false);
         static_cast<Door &>(*door).open(trigerrer);
-        door->setSynchronize(true);
     }
 }
 

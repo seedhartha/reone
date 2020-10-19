@@ -47,34 +47,26 @@ const string &MultiplayerCreature::clientTag() const {
 
 void MultiplayerCreature::playAnimation(const string &anim, int flags, float speed) {
     SpatialObject::playAnimation(anim, flags);
-    if (_synchronize) {
-        _callbacks->onObjectAnimationChanged(*this, anim, flags, speed);
-    }
+    _callbacks->onObjectAnimationChanged(*this, anim, flags, speed);
 }
 
 void MultiplayerCreature::updateTransform() {
     SpatialObject::updateTransform();
-    if (_synchronize) {
-        _callbacks->onObjectTransformChanged(*this, _position, _heading);
-    }
+    _callbacks->onObjectTransformChanged(*this, _position, _heading);
 }
 
 void MultiplayerCreature::setMovementType(MovementType type) {
     if (type == _movementType) return;
 
     Creature::setMovementType(type);
-    if (_synchronize) {
-        _callbacks->onCreatureMovementTypeChanged(*this, type);
-    }
+    _callbacks->onCreatureMovementTypeChanged(*this, type);
 }
 
 void MultiplayerCreature::setTalking(bool talking) {
     if (talking == _talking) return;
 
     Creature::setTalking(talking);
-    if (_synchronize) {
-        _callbacks->onCreatureTalkingChanged(*this, talking);
-    }
+    _callbacks->onCreatureTalkingChanged(*this, talking);
 }
 
 } // namespace mp

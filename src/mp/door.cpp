@@ -34,9 +34,7 @@ MultiplayerDoor::MultiplayerDoor(uint32_t id, SceneGraph *sceneGraph, IMultiplay
 
 void MultiplayerDoor::open(const shared_ptr<Object> &trigerrer) {
     Door::open(trigerrer);
-    if (_synchronize) {
-        _callbacks->onDoorOpen(*this, trigerrer);
-    }
+    _callbacks->onDoorOpen(*this, trigerrer);
 }
 
 } // namespace mp

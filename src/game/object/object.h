@@ -40,8 +40,6 @@ public:
     const std::string &tag() const;
     ActionQueue &actionQueue();
 
-    void setSynchronize(bool synchronize);
-
     // Load/save
 
     virtual void saveTo(AreaState &state) const;
@@ -61,7 +59,6 @@ protected:
     ObjectType _type { ObjectType::None };
     std::string _tag;
     ActionQueue _actionQueue;
-    bool _synchronize { false };
     std::unordered_map<ScriptType, std::string> _scripts;
 
     Object(uint32_t id, ObjectType type);
