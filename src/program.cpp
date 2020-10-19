@@ -21,13 +21,14 @@
 
 #include <boost/program_options.hpp>
 
-#include "game/mp/game.h"
+#include "mp/game.h"
 #include "system/core/debug.h"
 
 using namespace std;
 
 using namespace reone::game;
 using namespace reone::net;
+using namespace reone::mp;
 using namespace reone::resource;
 
 namespace fs = boost::filesystem;

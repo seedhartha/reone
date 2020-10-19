@@ -17,32 +17,42 @@
 
 #pragma once
 
-#include "../object/objectfactory.h"
+#include "../game/object/area.h"
 
-#include "callbacks.h"
+#include "command.h"
+#include "creature.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
-class MultiplayerObjectFactory : public ObjectFactory {
+class MultiplayerArea : public game::Area {
 public:
-    MultiplayerObjectFactory(
+    MultiplayerArea(
+        uint32_t id,
         resource::GameVersion version,
-        MultiplayerMode mode,
+        game::MultiplayerMode mode,
+        game::ObjectFactory *objectFactory,
         render::SceneGraph *sceneGraph,
-        IMultiplayerCallbacks *callbacks,
-        const render::GraphicsOptions &opts);
+        const render::GraphicsOptions &opts,
+        IMultiplayerCallbacks *callbacks);
 
-    std::unique_ptr<Area> newArea();
-    std::unique_ptr<Creature> newCreature();
-    std::unique_ptr<Door> newDoor();
+    void execute(const Command &cmd);
+
+    const std::shared_ptr<Object> findCreatureByClientTag(const std::string &clientTag) const;
 
 private:
-    MultiplayerMode _mode { MultiplayerMode::None };
     IMultiplayerCallbacks *_callbacks { nullptr };
+
+    void executeLoadCreature(const Command &cmd);
+    void executeSetPlayerRole(const Command &cmd);
+    void executeSetObjectTransform(const Command &cmd);
+    void executeSetObjectAnimation(const Command &cmd);
+    void executeSetCreatureMovementType(const Command &cmd);
+    void executeSetCreatureTalking(const Command &cmd);
+    void executeSetDoorOpen(const Command &cmd);
 };
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

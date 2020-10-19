@@ -21,28 +21,27 @@
 #include <map>
 #include <mutex>
 
-#include "../game.h"
-
-#include "../../system/net/client.h"
-#include "../../system/net/server.h"
+#include "../game/game.h"
+#include "../system/net/client.h"
+#include "../system/net/server.h"
 
 #include "callbacks.h"
 #include "command.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
-class MultiplayerGame : public Game, private IMultiplayerCallbacks {
+class MultiplayerGame : public game::Game, private IMultiplayerCallbacks {
 public:
     MultiplayerGame(
-        MultiplayerMode mode,
+        game::MultiplayerMode mode,
         const boost::filesystem::path &path,
-        const Options &opts);
+        const game::Options &opts);
 
 private:
     uint32_t _cmdCounter { 0 };
-    MultiplayerMode _mode { MultiplayerMode::Server };
+    game::MultiplayerMode _mode { game::MultiplayerMode::Server };
     std::recursive_mutex _syncMutex;
     std::unique_ptr<net::Client> _client;
     std::unique_ptr<net::Server> _server;
@@ -60,7 +59,7 @@ private:
     void configure() override;
     void update() override;
     void loadNextModule() override;
-    void startDialog(SpatialObject &owner, const std::string &resRef) override;
+    void startDialog(game::SpatialObject &owner, const std::string &resRef) override;
     void onDialogReplyPicked(uint32_t index) override;
     void onDialogFinished() override;
 
@@ -68,9 +67,9 @@ private:
 
     // IMultiplayerCallbacks overrides
 
-    void onObjectTransformChanged(const Object &object, const glm::vec3 &position, float heading) override;
-    void onObjectAnimationChanged(const Object &object, const std::string &anim, int flags, float speed) override;
-    void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, MovementType type) override;
+    void onObjectTransformChanged(const game::Object &object, const glm::vec3 &position, float heading) override;
+    void onObjectAnimationChanged(const game::Object &object, const std::string &anim, int flags, float speed) override;
+    void onCreatureMovementTypeChanged(const MultiplayerCreature &creature, game::MovementType type) override;
     void onCreatureTalkingChanged(const MultiplayerCreature &creature, bool talking) override;
 
     // END IMultiplayerCallbacks overrides
@@ -80,11 +79,11 @@ private:
     void synchronizeClient(const std::string &tag);
 
     void sendLoadModule(const std::string &client, const std::string &module);
-    void sendLoadCreature(const std::string &client, CreatureRole role, const Creature &creature);
-    void sendSetPlayerRole(const std::string &client, CreatureRole role);
+    void sendLoadCreature(const std::string &client, game::CreatureRole role, const game::Creature &creature);
+    void sendSetPlayerRole(const std::string &client, game::CreatureRole role);
     void sendSetObjectTransform(uint32_t objectId, const glm::vec3 &position, float heading);
     void sendSetObjectAnimation(uint32_t objectId, const std::string &animation, int flags, float speed);
-    void sendSetCreatureMovementType(uint32_t objectId, MovementType type);
+    void sendSetCreatureMovementType(uint32_t objectId, game::MovementType type);
     void sendSetCreatureTalking(uint32_t objectId, bool talking);
     void sendSetDoorOpen(uint32_t objectId, uint32_t triggerrer);
     void sendStartDialog(uint32_t ownerId, const std::string &resRef);
@@ -97,9 +96,9 @@ private:
     void onClientConnected(const std::string tag);
     void onClientDisconnected(const std::string tag);
     void onCommandReceived(const ByteArray &data);
-    void onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<Object> &trigerrer) override;
+    void onDoorOpen(const MultiplayerDoor &door, const std::shared_ptr<game::Object> &trigerrer) override;
 };
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

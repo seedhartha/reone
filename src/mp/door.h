@@ -15,29 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "door.h"
+#pragma once
 
-#include "callbacks.h"
-
-using namespace std;
-
-using namespace reone::render;
+#include "../game/object/door.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
-MultiplayerDoor::MultiplayerDoor(uint32_t id, SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks) :
-    Door(id, sceneGraph), _callbacks(callbacks) {
-}
+class IMultiplayerCallbacks;
 
-void MultiplayerDoor::open(const shared_ptr<Object> &trigerrer) {
-    Door::open(trigerrer);
-    if (_synchronize) {
-        _callbacks->onDoorOpen(*this, trigerrer);
-    }
-}
+class MultiplayerDoor : public game::Door {
+public:
+    MultiplayerDoor(uint32_t id, render::SceneGraph *sceneGraph, IMultiplayerCallbacks *callbacks);
 
-} // namespace game
+    void open(const std::shared_ptr<game::Object> &trigerrer) override;
+
+private:
+    IMultiplayerCallbacks *_callbacks { nullptr };;
+};
+
+} // namespace mp
 
 } // namespace reone

@@ -20,13 +20,13 @@
 #include <string>
 #include <vector>
 
-#include "../../system/core/types.h"
-#include "../../game/types.h"
-#include "../../system/net/command.h"
+#include "../game/types.h"
+#include "../system/core/types.h"
+#include "../system/net/command.h"
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 class Command : public net::Command {
 public:
@@ -40,14 +40,14 @@ public:
     // Getters
     const std::string &module() const;
     const std::string &tag() const;
-    CreatureRole role() const;
+    game::CreatureRole role() const;
     int appearance() const;
     const std::vector<std::string> &equipment() const;
     const glm::vec3 &position() const;
     float heading() const;
     const std::string &animation() const;
     int animationFlags() const;
-    MovementType movementType() const;
+    game::MovementType movementType() const;
     bool talking() const;
     bool open() const;
     uint32_t triggerrer() const;
@@ -57,7 +57,7 @@ public:
 private:
     std::string _module;
     std::string _tag;
-    CreatureRole _role { CreatureRole::None };
+    game::CreatureRole _role { game::CreatureRole::None };
     int _appearance { 0 };
     std::vector<std::string> _equipment;
     glm::vec3 _position { 0.0f };
@@ -65,7 +65,7 @@ private:
     std::string _animation;
     int _animationFlags { 0 };
     float _animationSpeed { 1.0f };
-    MovementType _movementType { MovementType::None };
+    game::MovementType _movementType { game::MovementType::None };
     bool _talking { false };
     bool _open { false };
     uint32_t _triggerrer { 0 };
@@ -75,6 +75,6 @@ private:
     friend class MultiplayerGame;
 };
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

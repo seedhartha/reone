@@ -17,7 +17,7 @@
 
 #include "game.h"
 
-#include "../../system/core/log.h"
+#include "../system/core/log.h"
 
 #include "area.h"
 #include "objectfactory.h"
@@ -26,6 +26,7 @@
 using namespace std;
 using namespace std::placeholders;
 
+using namespace reone::game;
 using namespace reone::net;
 using namespace reone::resource;
 
@@ -33,7 +34,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 MultiplayerGame::MultiplayerGame(MultiplayerMode mode, const fs::path &path, const Options &opts) :
     Game(path, opts), _mode(mode) {
@@ -378,6 +379,6 @@ void MultiplayerGame::sendFinishDialog() {
     sendCommand(cmd);
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

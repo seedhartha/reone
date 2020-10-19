@@ -280,14 +280,6 @@ set(GAME_HEADERS
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/selectoverlay.h
-    src/game/mp/area.h
-    src/game/mp/callbacks.h
-    src/game/mp/command.h
-    src/game/mp/creature.h
-    src/game/mp/door.h
-    src/game/mp/game.h
-    src/game/mp/objectfactory.h
-    src/game/mp/util.h
     src/game/object/area.h
     src/game/object/creature.h
     src/game/object/door.h
@@ -343,13 +335,6 @@ set(GAME_SOURCES
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/selectoverlay.cpp
-    src/game/mp/area.cpp
-    src/game/mp/command.cpp
-    src/game/mp/creature.cpp
-    src/game/mp/door.cpp
-    src/game/mp/game.cpp
-    src/game/mp/objectfactory.cpp
-    src/game/mp/util.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
@@ -379,6 +364,33 @@ target_link_libraries(libgame PUBLIC libsystem)
 
 ## END libgame static library
 
+## libmp static library
+
+set(MP_HEADERS
+    src/mp/area.h
+    src/mp/callbacks.h
+    src/mp/command.h
+    src/mp/creature.h
+    src/mp/door.h
+    src/mp/game.h
+    src/mp/objectfactory.h
+    src/mp/util.h)
+
+set(MP_SOURCES
+    src/mp/area.cpp
+    src/mp/command.cpp
+    src/mp/creature.cpp
+    src/mp/door.cpp
+    src/mp/game.cpp
+    src/mp/objectfactory.cpp
+    src/mp/util.cpp)
+
+add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})
+set_target_properties(libmp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_link_libraries(libmp PUBLIC libgame)
+
+## END libmp static library
+
 ## reone executable
 
 set(REONE_HEADERS
@@ -390,7 +402,7 @@ set(REONE_SOURCES
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(reone PRIVATE libgame)
+target_link_libraries(reone PRIVATE libmp)
 
 ## END reone executable
 
@@ -415,7 +427,7 @@ if(BUILD_TOOLS)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    target_link_libraries(reone-tools PRIVATE libgame)
+    target_link_libraries(reone-tools PRIVATE libsystem)
 endif()
 
 ## END reone-tools executable

@@ -17,17 +17,18 @@
 
 #include "area.h"
 
-#include "../object/objectfactory.h"
+#include "../game/object/objectfactory.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::net;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 MultiplayerArea::MultiplayerArea(
     uint32_t id,
@@ -180,6 +181,6 @@ const shared_ptr<Object> MultiplayerArea::findCreatureByClientTag(const string &
     return it == creatures.end() ? nullptr : *it;
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

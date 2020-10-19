@@ -23,12 +23,13 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 MultiplayerObjectFactory::MultiplayerObjectFactory(
     GameVersion version,
@@ -52,6 +53,6 @@ unique_ptr<Door> MultiplayerObjectFactory::newDoor() {
     return make_unique<MultiplayerDoor>(_counter++, _sceneGraph, _callbacks);
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

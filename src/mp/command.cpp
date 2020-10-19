@@ -21,9 +21,11 @@
 
 using namespace std;
 
+using namespace reone::game;
+
 namespace reone {
 
-namespace game {
+namespace mp {
 
 static void putString(const string &s, ByteArray &arr) {
     int off = static_cast<int>(arr.size());
@@ -306,6 +308,6 @@ uint32_t Command::replyIndex() const {
     return _replyIndex;
 }
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone

@@ -23,10 +23,10 @@
 
 namespace reone {
 
-namespace game {
+namespace mp {
 
 std::string describeCommand(const Command &cmd);
 
-} // namespace game
+} // namespace mp
 
 } // namespace reone
