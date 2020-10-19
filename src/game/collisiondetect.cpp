@@ -54,14 +54,11 @@ bool CollisionDetector::raycast(const RaycastProperties &props, RaycastResult &r
 }
 
 bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastResult &result) const {
-    static vector<pair<SpatialObject *, float>> collisions;
-
     glm::mat4 invTransform(0.0f);
     glm::vec3 origin(0.0f);
     glm::vec3 dir(0.0f);
     float distance = 0.0f;
-
-    collisions.clear();
+    vector<pair<SpatialObject *, float>> collisions;
 
     for (auto &object : _area->objects()) {
         if (!object->visible() ||
