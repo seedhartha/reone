@@ -592,7 +592,7 @@ void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
 }
 
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
-    _state.localBooleans[objectId][index] = value;
+    _state.localNumbers[objectId][index] = value;
 }
 
 } // namespace game
