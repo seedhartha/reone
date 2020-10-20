@@ -24,7 +24,7 @@
 #include "../../object/creature.h"
 
 #include "classselect.h"
-#include "name.h"
+#include "nameentry.h"
 #include "portraitselect.h"
 #include "quick.h"
 #include "quickorcustom.h"
@@ -41,9 +41,11 @@ enum class CharGenScreen {
     Name
 };
 
+class Game;
+
 class CharacterGeneration : public gui::GUI {
 public:
-    CharacterGeneration(resource::GameVersion, const render::GraphicsOptions &opts);
+    CharacterGeneration(Game *game, resource::GameVersion, const render::GraphicsOptions &opts);
 
     void load() override;
 
@@ -52,10 +54,8 @@ public:
     void render() const override;
     void render3D() const override;
 
-    void setOnPlay(const std::function<void(const CreatureConfiguration &)> &fn);
-    void setOnCancel(const std::function<void()> &fn);
-
 private:
+    Game *_game { nullptr };
     CharGenScreen _screen { CharGenScreen::ClassSelection };
     CreatureConfiguration _character;
     std::unique_ptr<Creature> _creature;
@@ -66,12 +66,9 @@ private:
     std::unique_ptr<QuickOrCustom> _quickOrCustom;
     std::unique_ptr<QuickCharacterGeneration> _quick;
     std::unique_ptr<PortraitSelection> _portraitSelection;
-    std::unique_ptr<NameGui> _nameGui;
+    std::unique_ptr<NameEntry> _nameEntry;
 
     // END Sub GUI
-
-    std::function<void(const CreatureConfiguration &)> _onPlay;
-    std::function<void()> _onCancel;
 
     gui::GUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, scene::SceneGraph &sceneGraph);
@@ -82,11 +79,17 @@ private:
     void loadQuickOrCustom();
     void loadQuickCharacterGeneration();
     void loadPortraitSelection();
-    void loadNameGui();
+    void loadNameEntry();
 
     void loadCharacter(const CreatureConfiguration &config);
 
     // END Loading
+
+    // Event handling
+
+    void finishCharacterGeneration();
+
+    // END Event handling
 };
 
 } // namespace game

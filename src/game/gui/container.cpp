@@ -21,7 +21,9 @@
 #include "../../system/gui/control/listbox.h"
 #include "../../system/resource/resources.h"
 
+#include "../game.h"
 #include "../object/item.h"
+#include "../script/util.h"
 
 using namespace std;
 
@@ -37,7 +39,9 @@ static const int kSwitchToResRef = 47884;
 static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
-Container::Container(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+Container::Container(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts), _game(game) {
+
     _resRef = getResRef("container");
 
     if (version == GameVersion::TheSithLords) {
@@ -100,22 +104,24 @@ SpatialObject &Container::container() const {
 
 void Container::onClick(const string &control) {
     if (control == "BTN_OK") {
-        if (_onGetItems) {
-            _onGetItems();
-        }
+        transferItemsToPlayer();
+        _game->openInGame();
     } else if (control == "BTN_CANCEL") {
-        if (_onClose) {
-            _onClose();
-        }
+        _game->openInGame();
     }
 }
 
-void Container::setOnGetItems(const function<void()> &fn) {
-    _onGetItems = fn;
-}
+void Container::transferItemsToPlayer() {
+    shared_ptr<SpatialObject> player(_game->module()->area()->player());
+    _container->moveItemsTo(*player);
 
-void Container::setOnClose(const function<void()> &fn) {
-    _onClose = fn;
+    Placeable *placeable = dynamic_cast<Placeable *>(_container);
+    if (placeable) {
+        string script;
+        if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
+            runScript(script, placeable->id(), player->id(), -1);
+        }
+    }
 }
 
 } // namespace game

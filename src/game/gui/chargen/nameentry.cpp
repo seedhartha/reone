@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "name.h"
+#include "nameentry.h"
 
 #include "../colors.h"
 
@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) :
+NameEntry::NameEntry(GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
     _input(kTextInputLetters | kTextInputWhitespace) {
 
@@ -41,7 +41,7 @@ NameGui::NameGui(GameVersion version, const GraphicsOptions &opts) :
     }
 }
 
-void NameGui::load() {
+void NameEntry::load() {
     GUI::load();
 
     setControlText("NAME_BOX_EDIT", "");
@@ -52,7 +52,7 @@ void NameGui::load() {
     setControlHilightColor("BTN_BACK", hilightColor);
 }
 
-bool NameGui::handle(const SDL_Event &event) {
+bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
         setControlText("NAME_BOX_EDIT", _input.text());
         return true;
@@ -61,7 +61,7 @@ bool NameGui::handle(const SDL_Event &event) {
     return GUI::handle(event);
 }
 
-void NameGui::onClick(const string &control) {
+void NameEntry::onClick(const string &control) {
     if (control == "END_BTN") {
         if (_onEnd) {
             _onEnd();
@@ -73,11 +73,11 @@ void NameGui::onClick(const string &control) {
     }
 }
 
-void NameGui::setOnEnd(const function<void()> &fn) {
+void NameEntry::setOnEnd(const function<void()> &fn) {
     _onEnd = fn;
 }
 
-void NameGui::setOnBack(const function<void()> &fn) {
+void NameEntry::setOnBack(const function<void()> &fn) {
     _onBack = fn;
 }
 

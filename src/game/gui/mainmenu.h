@@ -28,26 +28,33 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class MainMenu : public gui::GUI {
 public:
-    MainMenu(resource::GameVersion version, const render::GraphicsOptions &opts);
+    MainMenu(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
+
+    // Event handlers
+
     void onClick(const std::string &control) override;
 
-    void setOnNewGame(const std::function<void()> &fn);
-    void setOnExit(const std::function<void()> &fn);
-    void setOnModuleSelected(const std::function<void(const std::string &)> &fn);
+    // END Event handlers
 
 private:
-    std::function<void()> _onNewGame;
-    std::function<void()> _onExit;
-    std::function<void(const std::string &)> _onModuleSelected;
+    Game *_game { nullptr };
 
     void configureButtons();
     void setButtonColors(const std::string &tag);
     std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
     void startModuleSelection();
+
+    // Event handlers
+
+    void onModuleSelected(const std::string &name);
+
+    // END Event handlers
 };
 
 } // namespace game

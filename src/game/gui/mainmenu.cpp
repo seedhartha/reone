@@ -26,6 +26,8 @@
 #include "../../system/gui/scenebuilder.h"
 #include "../../system/resource/resources.h"
 
+#include "../game.h"
+
 #include "colors.h"
 
 using namespace std;
@@ -41,10 +43,16 @@ namespace reone {
 
 namespace game {
 
+static const int kAppearanceBastila = 4;
+static const int kAppearanceCarth = 6;
+static const int kAppearanceDarthRevan = 22;
+static const int kAppearanceAtton = 452;
+static const int kAppearanceKreia = 455;
+
 static const float kKotorModelSize = 1.3f;
 static const float kKotorModelOffsetY = 1.25f;
 
-MainMenu::MainMenu(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+MainMenu::MainMenu(Game *game, GameVersion version, const GraphicsOptions &opts) : GUI(version, opts), _game(game) {
     switch (version) {
         case GameVersion::TheSithLords:
             _resRef = "mainmenu8x6_p";
@@ -134,17 +142,16 @@ shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
 
 void MainMenu::onClick(const string &control) {
     if (control == "BTN_NEWGAME") {
-        if (_onNewGame) {
-            _onNewGame();
-        }
+        _game->startCharacterGeneration();
     } else if (control == "BTN_EXIT") {
-        if (_onExit) _onExit();
+        _game->quit();
     } else if (control == "BTN_WARP") {
         startModuleSelection();
     }
 }
 
 void MainMenu::startModuleSelection() {
+    showControl("LB_MODULES");
     hideControl("BTN_EXIT");
     hideControl("BTN_LOADGAME");
     hideControl("BTN_MOVIES");
@@ -152,32 +159,34 @@ void MainMenu::startModuleSelection() {
     hideControl("BTN_NEWGAME");
     hideControl("BTN_OPTIONS");
     hideControl("BTN_WARP");
-    showControl("LB_MODULES");
     hideControl("LBL_3DVIEW");
     hideControl("LBL_GAMELOGO");
     hideControl("LBL_MENUBG");
 
     ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
-    modules.setOnItemClicked([this](const string &ctrl, const string &item) {
-        if (_onModuleSelected) {
-            _onModuleSelected(item);
-        }
-    });
+    modules.setOnItemClicked(bind(&MainMenu::onModuleSelected, this, _2));
     for (auto &module : Resources.moduleNames()) {
         modules.add({ module, module });
     }
 }
 
-void MainMenu::setOnNewGame(const function<void()> &fn) {
-    _onNewGame = fn;
-}
+void MainMenu::onModuleSelected(const string &name) {
+    PartyConfiguration party;
+    party.memberCount = 2;
+    party.leader.equipment.push_back("g_a_clothes01");
+    party.member1.equipment.push_back("g_a_clothes01");
 
-void MainMenu::setOnExit(const function<void()> &fn) {
-    _onExit = fn;
-}
-
-void MainMenu::setOnModuleSelected(const function<void(const string &)> &fn) {
-    _onModuleSelected = fn;
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            party.leader.appearance = kAppearanceAtton;
+            party.member1.appearance = kAppearanceKreia;
+            break;
+        default:
+            party.leader.appearance = kAppearanceCarth;
+            party.member1.appearance = kAppearanceBastila;
+            break;
+    }
+    _game->loadModule(name, party);
 }
 
 } // namespace game
