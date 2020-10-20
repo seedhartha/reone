@@ -19,17 +19,14 @@
 
 #include "../../system/debug.h"
 #include "../../system/log.h"
-#include "../../system/streamutil.h"
-#include "../../system/resource/gfffile.h"
 #include "../../system/resource/resources.h"
 
-#include "door.h"
+#include "../game.h"
+
 #include "objectfactory.h"
 
 using namespace std;
-using namespace std::placeholders;
 
-using namespace reone::gui;
 using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
@@ -39,9 +36,17 @@ namespace reone {
 
 namespace game {
 
-Module::Module(uint32_t id, GameVersion version, ObjectFactory *objectFactory, SceneGraph *sceneGraph, const GraphicsOptions &opts) :
+Module::Module(
+    uint32_t id,
+    GameVersion version,
+    Game *game,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    const GraphicsOptions &opts
+) :
     Object(id, ObjectType::Module),
     _version(version),
+    _game(game),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph),
     _opts(opts) {
@@ -56,8 +61,6 @@ void Module::load(const string &name, const GffStruct &ifo) {
     _area->loadCameras(_info.entryPosition, _info.entryHeading);
 
     loadPlayer();
-
-    _loaded = true;
 }
 
 void Module::loadInfo(const GffStruct &ifo) {
@@ -75,31 +78,11 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo) {
     reone::info("Module: load area: " + _info.entryArea);
 
-    ResourceManager &resources = ResourceManager::instance();
+    ResourceManager &resources = Resources;
     shared_ptr<GffStruct> are(resources.findGFF(_info.entryArea, ResourceType::Area));
     shared_ptr<GffStruct> git(resources.findGFF(_info.entryArea, ResourceType::GameInstance));
 
     shared_ptr<Area> area(_objectFactory->newArea());
-    area->setOnModuleTransition([this](const string &module, const string &entry) {
-        if (_onModuleTransition) {
-            _onModuleTransition(module, entry);
-        }
-    });
-    area->setOnPlayerChanged([this]() {
-        _area->update3rdPersonCameraTarget();
-        _area->switchTo3rdPersonCamera();
-    });
-    area->setOnStartDialog([this](SpatialObject &object, const string &resRef) {
-        if (!_startDialog) return;
-
-        Creature &creature = static_cast<Creature &>(object);
-
-        string finalResRef(resRef);
-        if (resRef.empty()) finalResRef = creature.conversation();
-        if (resRef.empty()) return;
-
-        _startDialog(object, finalResRef);
-    });
     area->load(_info.entryArea, *are, *git);
     _area = move(area);
 }
@@ -141,8 +124,6 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
 }
 
 bool Module::handle(const SDL_Event &event) {
-    if (!_loaded) return false;
-
     if (_area->getCamera()->handle(event)) return true;
     if (_player->handle(event)) return true;
     if (_area->handle(event)) return true;
@@ -185,9 +166,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     Door *door = dynamic_cast<Door *>(object);
     if (door) {
         if (!door->linkedToModule().empty()) {
-            if (_onModuleTransition) {
-                _onModuleTransition(door->linkedToModule(), door->linkedTo());
-            }
+            _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         } else if (!door->isOpen() && !door->isStatic()) {
             shared_ptr<SpatialObject> player(_area->player());
             door->open(player);
@@ -197,21 +176,16 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 
     Placeable *placeable = dynamic_cast<Placeable *>(object);
     if (placeable && placeable->blueprint().hasInventory()) {
-        if (_openContainer) {
-            _openContainer(placeable);
-        }
+        _game->openContainer(placeable);
         return true;
     }
 
     Creature *creature = dynamic_cast<Creature *>(object);
     if (creature) {
-        if (!creature->conversation().empty() && _startDialog) {
+        if (!creature->conversation().empty()) {
             _player->stopMovement();
             _area->getCamera()->stopMovement();
-
-            if (_startDialog) {
-                _startDialog(*creature, creature->conversation());
-            }
+            _game->startDialog(*creature, creature->conversation());
         }
         return true;
     }
@@ -259,8 +233,6 @@ void Module::cycleDebugMode(bool forward) {
 }
 
 void Module::update(float dt, GuiContext &guiCtx) {
-    if (!_loaded) return;
-
     Camera *camera = _area->getCamera();
     camera->update(dt);
 
@@ -277,24 +249,8 @@ void Module::update(float dt, GuiContext &guiCtx) {
     _area->fill(ctx, guiCtx);
 }
 
-void Module::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {
-    _onModuleTransition = fn;
-}
-
-void Module::setStartDialog(const function<void(SpatialObject &, const string &)> &fn) {
-    _startDialog = fn;
-}
-
-void Module::setOpenContainer(const function<void(SpatialObject *)> &fn) {
-    _openContainer = fn;
-}
-
 const string &Module::name() const {
     return _name;
-}
-
-bool Module::loaded() const {
-    return _loaded;
 }
 
 const ModuleInfo &Module::info() const {

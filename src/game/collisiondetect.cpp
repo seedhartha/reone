@@ -22,6 +22,9 @@
 #include <map>
 
 #include "object/area.h"
+#include "object/door.h"
+
+#include "room.h"
 
 using namespace std;
 

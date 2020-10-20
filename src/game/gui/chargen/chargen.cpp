@@ -76,7 +76,7 @@ void CharacterGeneration::load() {
 }
 
 void CharacterGeneration::loadClassSelection() {
-    _classSelection = make_unique<ClassSelection>(_version, _gfxOpts);
+    _classSelection = make_unique<ClassSelection>(_game, _version, _gfxOpts);
     _classSelection->load();
     _classSelection->setOnClassSelected([this](const CreatureConfiguration &config) {
         _classSelection->resetFocus();
@@ -124,7 +124,7 @@ void CharacterGeneration::loadCharacter(const CreatureConfiguration &config) {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, &sceneGraph, _gfxOpts));
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(config);

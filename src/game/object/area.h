@@ -17,14 +17,16 @@
 
 #pragma once
 
-#include <list>
+#include <memory>
+#include <vector>
 
-#include "../../system/gui/types.h"
-#include "../../system/net/types.h"
-#include "../../system/scene/scenegraph.h"
+#include "glm/vec3.hpp"
+
+#include "SDL2/SDL_events.h"
+
 #include "../../system/render/types.h"
+#include "../../system/resource/gfffile.h"
 #include "../../system/resource/types.h"
-#include "../../system/script/variable.h"
 
 #include "../actionexecutor.h"
 #include "../camera/animatedcamera.h"
@@ -34,13 +36,8 @@
 #include "../collisiondetect.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
-#include "../room.h"
 
-#include "creature.h"
-#include "door.h"
-#include "placeable.h"
-#include "trigger.h"
-#include "waypoint.h"
+#include "object.h"
 
 namespace reone {
 
@@ -49,6 +46,7 @@ namespace game {
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
+class Game;
 class ObjectFactory;
 
 class Area : public Object {
@@ -56,6 +54,7 @@ public:
     Area(
         uint32_t id,
         resource::GameVersion version,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts);
@@ -90,11 +89,11 @@ public:
     const RoomMap &rooms() const;
     const ObjectList &objects() const;
     const CollisionDetector &collisionDetector() const;
+    ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
     ThirdPersonCamera *thirdPersonCamera();
     DialogCamera &dialogCamera();
     AnimatedCamera &animatedCamera();
-    ObjectSelector &objectSelector();
 
     // Party
 
@@ -105,31 +104,41 @@ public:
 
     // END Party
 
-    // Callbacks
-
-    void setOnCameraChanged(const std::function<void(CameraType)> &fn);
-    void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
-    void setOnPlayerChanged(const std::function<void()> &fn);
-    void setOnStartDialog(const std::function<void(SpatialObject &, const std::string &)> &fn);
-
-    // END Callbacks
-
-protected:
+private:
+    Game *_game { nullptr };
+    resource::GameVersion _version { resource::GameVersion::KotOR };
     ObjectFactory *_objectFactory { nullptr };
     scene::SceneGraph *_sceneGraph { nullptr };
-    bool _scriptsEnabled { true };
+    render::GraphicsOptions _opts;
+    CollisionDetector _collisionDetector;
+    ObjectSelector _objectSelector;
+    ActionExecutor _actionExecutor;
+    Pathfinder _pathfinder;
+    std::string _name;
+    RoomMap _rooms;
+    std::unique_ptr<resource::Visibility> _visibility;
+    CameraStyle _cameraStyle;
+    std::string _music;
+
+    // Cameras
+
     float _cameraAspect { 0.0f };
     CameraType _cameraType { CameraType::FirstPerson };
     std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<DialogCamera> _dialogCamera;
     std::unique_ptr<AnimatedCamera> _animatedCamera;
-    std::function<void()> _onPlayerChanged;
+
+    // END Cameras
+
+    // Objects
 
     ObjectList _objects;
     std::unordered_map<ObjectType, ObjectList> _objectsByType;
     std::unordered_map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
     std::unordered_map<std::string, ObjectList> _objectsByTag;
+
+    // END Objects
 
     // Party
 
@@ -143,27 +152,6 @@ protected:
     virtual void add(const std::shared_ptr<SpatialObject> &object);
     void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
-
-private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
-    render::GraphicsOptions _opts;
-    CollisionDetector _collisionDetector;
-    Pathfinder _pathfinder;
-    ObjectSelector _objectSelector;
-    ActionExecutor _actionExecutor;
-    std::string _name;
-    RoomMap _rooms;
-    std::unique_ptr<resource::Visibility> _visibility;
-    CameraStyle _cameraStyle;
-    std::string _music;
-
-    // Callbacks
-
-    std::function<void(const std::string &, const std::string &)> _onModuleTransition;
-    std::function<void(SpatialObject &, const std::string &)> _onStartDialog;
-    std::function<void(CameraType)> _onCameraChanged;
-
-    // END Callbacks
 
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
@@ -191,11 +179,11 @@ private:
 
     // END Loading
 
-    // Events
+    // User input
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
-    // END Events
+    // END User input
 };
 
 } // namespace game

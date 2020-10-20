@@ -38,26 +38,28 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class ObjectFactory {
 public:
-    ObjectFactory(resource::GameVersion version, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    ObjectFactory(resource::GameVersion version, Game *game, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
 
-    virtual std::unique_ptr<Module> newModule();
-    virtual std::unique_ptr<Area> newArea();
-    virtual std::unique_ptr<Creature> newCreature();
-    virtual std::unique_ptr<Placeable> newPlaceable();
-    virtual std::unique_ptr<Door> newDoor();
-    virtual std::unique_ptr<Waypoint> newWaypoint();
-    virtual std::unique_ptr<Trigger> newTrigger();
-    virtual std::unique_ptr<Item> newItem();
+    std::unique_ptr<Module> newModule();
+    std::unique_ptr<Area> newArea();
+    std::unique_ptr<Creature> newCreature();
+    std::unique_ptr<Placeable> newPlaceable();
+    std::unique_ptr<Door> newDoor();
+    std::unique_ptr<Waypoint> newWaypoint();
+    std::unique_ptr<Trigger> newTrigger();
+    std::unique_ptr<Item> newItem();
 
-protected:
+private:
     resource::GameVersion _version { resource::GameVersion::KotOR };
+    Game *_game { nullptr };
     scene::SceneGraph *_sceneGraph { nullptr };
     render::GraphicsOptions _options;
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
 
-private:
     ObjectFactory(const ObjectFactory &) = delete;
     ObjectFactory &operator=(const ObjectFactory &) = delete;
 };
