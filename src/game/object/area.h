@@ -69,8 +69,6 @@ public:
 
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
-    void updateTriggers(const Creature &creature);
-    void updateRoomVisibility();
     SpatialObject *getObjectAt(int x, int y) const;
 
     void update3rdPersonCameraTarget();
@@ -79,6 +77,7 @@ public:
     void toggleCameraType();
     Camera *getCamera() const;
     void startDialog(Creature &creature, const std::string &resRef);
+    void onPlayerMoved();
 
     std::shared_ptr<SpatialObject> find(uint32_t id) const;
     std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
@@ -149,16 +148,18 @@ private:
 
     // END Party
 
-    virtual void add(const std::shared_ptr<SpatialObject> &object);
+    void add(const std::shared_ptr<SpatialObject> &object);
+    void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
+    void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void determineObjectRoom(SpatialObject &object);
     void landObject(SpatialObject &object);
-
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
-    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
-    void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
-    void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
+    void updateRoomVisibility();
+    void updateTriggers(const Creature &creature);
+
     bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
+    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
+    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
 
     // Loading
 

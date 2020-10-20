@@ -451,52 +451,9 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
     return false;
 }
 
-void Area::updateTriggers(const Creature &creature) {
-    glm::vec2 position2d(creature.position());
-    glm::vec3 liftedPosition(position2d, kElevationTestZ);
-    glm::vec3 down(0.0f, 0.0f, -1.0f);
-    glm::vec2 intersection;
-    float distance;
-
-    for (auto &object : _objectsByType[ObjectType::Trigger]) {
-        Trigger &trigger = static_cast<Trigger &>(*object);
-        if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
-
-        const vector<glm::vec3> &geometry = trigger.geometry();
-        bool triggered =
-            (geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, geometry[0], geometry[1], geometry[2], intersection, distance)) ||
-            (geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance));
-
-        if (triggered) {
-            if (!trigger.linkedToModule().empty()) {
-                _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
-            }
-            break;
-        }
-    }
-}
-
 void Area::runOnEnterScript() {
     if (!_scripts[ScriptType::OnEnter].empty()) {
         runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
-    }
-}
-
-void Area::updateRoomVisibility() {
-    Room *playerRoom = _player->room();
-    if (!playerRoom) return;
-
-    for (auto &room : _rooms) {
-        room.second->setVisible(false);
-    }
-    playerRoom->setVisible(true);
-
-    auto adjRooms = _visibility->equal_range(playerRoom->name());
-    for (auto adjRoom = adjRooms.first; adjRoom != adjRooms.second; adjRoom++) {
-        auto room = _rooms.find(adjRoom->second);
-        if (room != _rooms.end()) {
-            room->second->setVisible(true);
-        }
     }
 }
 
@@ -581,20 +538,6 @@ void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {
     }
 }
 
-void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> player(_player);
-    if (!player) return;
-
-    glm::vec3 position;
-
-    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
-        position += player->position();
-    } else {
-        position = player->position();
-    }
-    _thirdPersonCamera->setTargetPosition(position);
-}
-
 void Area::update3rdPersonCameraHeading() {
     shared_ptr<SpatialObject> player(_player);
     if (!player) return;
@@ -646,6 +589,70 @@ void Area::startDialog(Creature &creature, const string &resRef) {
     if (resRef.empty()) return;
 
     _game->startDialog(creature, finalResRef);
+}
+
+void Area::onPlayerMoved() {
+    update3rdPersonCameraTarget();
+    updateRoomVisibility();
+    _objectSelector.selectNearest();
+    updateTriggers(*static_pointer_cast<Creature>(_player));
+}
+
+void Area::update3rdPersonCameraTarget() {
+    shared_ptr<SpatialObject> player(_player);
+    if (!player) return;
+
+    glm::vec3 position;
+
+    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
+        position += player->position();
+    } else {
+        position = player->position();
+    }
+    _thirdPersonCamera->setTargetPosition(position);
+}
+
+void Area::updateRoomVisibility() {
+    Room *playerRoom = _player->room();
+    if (!playerRoom) return;
+
+    for (auto &room : _rooms) {
+        room.second->setVisible(false);
+    }
+    playerRoom->setVisible(true);
+
+    auto adjRooms = _visibility->equal_range(playerRoom->name());
+    for (auto adjRoom = adjRooms.first; adjRoom != adjRooms.second; adjRoom++) {
+        auto room = _rooms.find(adjRoom->second);
+        if (room != _rooms.end()) {
+            room->second->setVisible(true);
+        }
+    }
+}
+
+void Area::updateTriggers(const Creature &creature) {
+    glm::vec2 position2d(creature.position());
+    glm::vec3 liftedPosition(position2d, kElevationTestZ);
+    glm::vec3 down(0.0f, 0.0f, -1.0f);
+    glm::vec2 intersection;
+    float distance;
+
+    for (auto &object : _objectsByType[ObjectType::Trigger]) {
+        Trigger &trigger = static_cast<Trigger &>(*object);
+        if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
+
+        const vector<glm::vec3> &geometry = trigger.geometry();
+        bool triggered =
+            (geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, geometry[0], geometry[1], geometry[2], intersection, distance)) ||
+            (geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance));
+
+        if (triggered) {
+            if (!trigger.linkedToModule().empty()) {
+                _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
+            }
+            break;
+        }
+    }
 }
 
 const CameraStyle &Area::cameraStyle() const {

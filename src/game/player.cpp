@@ -129,9 +129,7 @@ void Player::update(float dt) {
 
         if (_area->moveCreatureTowards(*_creature, dest, true, dt)) {
             _creature->setMovementType(MovementType::Run);
-            _module->area()->update3rdPersonCameraTarget();
-            _area->updateRoomVisibility();
-            _area->objectSelector().selectNearest();
+            _area->onPlayerMoved();
         }
     } else {
         _creature->setMovementType(MovementType::None);
