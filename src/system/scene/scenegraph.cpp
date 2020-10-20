@@ -64,6 +64,13 @@ void SceneGraph::addLight(LightSceneNode *node) {
     _lights.push_back(node);
 }
 
+void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
+    auto maybeRoot = find_if(_rootNodes.begin(), _rootNodes.end(), [&node](const shared_ptr<SceneNode> &n) { return n.get() == node.get(); });
+    if (maybeRoot != _rootNodes.end()) {
+        _rootNodes.erase(maybeRoot);
+    }
+}
+
 void SceneGraph::prepare() {
     if (!_activeCamera) return;
 

@@ -42,6 +42,8 @@ public:
     void addOpaqueMesh(ModelNodeSceneNode *node);
     void addTransparentMesh(ModelNodeSceneNode *node);
     void addLight(LightSceneNode *node);
+    void removeRoot(const std::shared_ptr<SceneNode> &node);
+
     void prepare();
     void render() const;
 

@@ -72,6 +72,7 @@ private:
 
     // Objects
 
+    script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);

@@ -131,7 +131,7 @@ void Game::loadMainMenu() {
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
-    _party = party;
+    _partyConfig = party;
 
     withLoadingScreen([this, &name, &party, &entry]() {
         ResourceManager &resources = Resources;
@@ -140,7 +140,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
         _module->load(name, *ifo);
-        _module->loadParty(_party, entry);
+        _module->loadParty(_partyConfig, entry);
 
         string musicName(_module->area()->music());
         playMusic(musicName);
@@ -349,7 +349,7 @@ void Game::loadNextModule() {
     jobs.await();
 
     _sceneGraph.clear();
-    loadModule(_nextModule, _party, _nextEntry);
+    loadModule(_nextModule, _partyConfig, _nextEntry);
 
     _nextModule.clear();
     _nextEntry.clear();
@@ -453,6 +453,10 @@ bool Game::handle(const SDL_Event &event) {
 
 shared_ptr<Module> Game::module() const {
     return _module;
+}
+
+Party &Game::party() {
+    return _party;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

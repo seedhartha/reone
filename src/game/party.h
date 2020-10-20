@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <map>
+#include <string>
 #include <vector>
 
 namespace reone {
@@ -30,14 +32,17 @@ class Creature;
  */
 class Party {
 public:
+    bool addAvailableMember(int npc, const std::string &blueprint);
     bool addMember(Creature *member);
     void switchLeader();
 
     Creature *getMember(int index) const;
 
+    bool isMemberAvailable(int npc) const;
     Creature *leader() const;
 
 private:
+    std::map<int, std::string> _availableMembers;
     std::vector<Creature *> _members;
 };
 

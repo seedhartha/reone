@@ -17,6 +17,8 @@
 
 #include "area.h"
 
+#include <algorithm>
+
 #include <boost/format.hpp>
 
 #include "glm/gtx/intersect.hpp"
@@ -330,6 +332,55 @@ void Area::determineObjectRoom(SpatialObject &object) {
     }
 }
 
+void Area::doDestroyObjects() {
+    for (auto &object : _objectsToDestroy) {
+        doDestroyObject(object);
+    }
+    _objectsToDestroy.clear();
+}
+
+void Area::doDestroyObject(uint32_t objectId) {
+    auto &object = find(objectId);
+    if (!object) return;
+    {
+        Room *room = object->room();
+        if (room) {
+            room->removeTenant(object.get());
+        }
+    }
+    {
+        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        if (sceneNode) {
+            _sceneGraph->removeRoot(sceneNode);
+        }
+    }
+    {
+        auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+        if (maybeObject != _objects.end()) {
+            _objects.erase(maybeObject);
+        }
+    }
+    _objectById.erase(objectId);
+    {
+        auto maybeTagObjects = _objectsByTag.find(object->tag());
+        if (maybeTagObjects != _objectsByTag.end()) {
+            ObjectList &tagObjects = maybeTagObjects->second;
+            auto maybeObject = find_if(tagObjects.begin(), tagObjects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+            if (maybeObject != tagObjects.end()) {
+                tagObjects.erase(maybeObject);
+            }
+            _objectsByTag.erase(maybeTagObjects);
+        }
+    }
+    {
+        ObjectList &typeObjects = _objectsByType.find(object->type())->second;
+        auto maybeObject = find_if(typeObjects.begin(), typeObjects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+        if (maybeObject != typeObjects.end()) {
+            typeObjects.erase(maybeObject);
+        }
+    }
+}
+
 shared_ptr<SpatialObject> Area::find(uint32_t id) const {
     auto object = _objectById.find(id);
     if (object == _objectById.end()) return nullptr;
@@ -449,6 +500,8 @@ void Area::update(const UpdateContext &updateCtx) {
         object->update(updateCtx);
         _actionExecutor.executeActions(*object, updateCtx.deltaTime);
     }
+    doDestroyObjects();
+
     _objectSelector.update();
     _sceneGraph->prepare();
 }
@@ -507,6 +560,10 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     }
 
     return nullptr;
+}
+
+void Area::destroyObject(const shared_ptr<SpatialObject> &object) {
+    _objectsToDestroy.insert(object->id());
 }
 
 void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {

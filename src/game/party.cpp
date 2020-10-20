@@ -27,6 +27,17 @@ namespace game {
 
 static const int kMaxMemberCount = 3;
 
+bool Party::addAvailableMember(int npc, const string &blueprint) {
+    auto maybeMember = _availableMembers.find(npc);
+    if (maybeMember != _availableMembers.end()) {
+        warn("Party: NPC already exists");
+        return false;
+    }
+    _availableMembers.insert(make_pair(npc, blueprint));
+
+    return true;
+}
+
 bool Party::addMember(Creature *member) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");
@@ -60,6 +71,10 @@ void Party::switchLeader() {
 
 Creature *Party::getMember(int index) const {
     return _members.size() > index ? _members[index] : nullptr;
+}
+
+bool Party::isMemberAvailable(int npc) const {
+    return _availableMembers.count(npc) != 0;
 }
 
 Creature *Party::leader() const {

@@ -280,7 +280,7 @@ void RoutineManager::addTslRoutines() {
     add("GetPCSpeaker", Object, { });
     add("GetStringByStrRef", String, { Int });
     add("ActionSpeakStringByStrRef", Void, { Int, Int });
-    add("DestroyObject", Void, { Object, Float, Int, Float, Int });
+    add("DestroyObject", Void, { Object, Float, Int, Float, Int }, bind(&RoutineManager::destroyObject, this, _1, _2));
     add("GetModule", Object, { });
     add("CreateObject", Object, { Int, String, Location, Int });
     add("EventSpellCastAt", Event, { Object, Int, Int });

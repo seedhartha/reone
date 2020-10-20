@@ -48,6 +48,21 @@ Variable RoutineManager::intToFloat(const vector<Variable> & args, ExecutionCont
     return static_cast<float>(args[0].intValue);
 }
 
+Variable RoutineManager::destroyObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
+        if (spatial) {
+            _game->module()->area()->destroyObject(spatial);
+        }
+    } else {
+        warn("Routine: object not found by id: " + to_string(objectId));
+    }
+
+    return Variable();
+}
+
 Variable RoutineManager::getEnteringObject(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Object);
     result.objectId = ctx.triggererId;
@@ -339,17 +354,21 @@ Variable RoutineManager::actionCloseDoor(const vector<Variable> &args, Execution
 }
 
 Variable RoutineManager::isAvailableCreature(const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: implement routine
-    return Variable(0);
+    int npc = args[0].intValue;
+    bool available = _game->party().isMemberAvailable(npc);
+
+    return Variable(available);
 }
 
 Variable RoutineManager::addAvailableNPCByTemplate(const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: implement routine
-    return Variable(0);
+    int npc = args[0].intValue;
+    string blueprint(args[1].strValue);
+    bool added = _game->party().addAvailableMember(npc, blueprint);
+
+    return Variable(added);
 }
 
 Variable RoutineManager::showPartySelectionGUI(const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: implement routine
     return Variable();
 }
 
