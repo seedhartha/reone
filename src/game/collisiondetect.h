@@ -38,7 +38,7 @@ struct RaycastProperties {
     int flags { 0 };
     glm::vec3 origin { 0.0f };
     glm::vec3 direction { 0.0f };
-    SpatialObject *except { nullptr };
+    const SpatialObject *except { nullptr };
 };
 
 struct RaycastResult {
