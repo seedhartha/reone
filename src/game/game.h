@@ -42,6 +42,7 @@
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
+#include "party.h"
 #include "types.h"
 
 namespace reone {
@@ -75,6 +76,7 @@ public:
     bool handle(const SDL_Event &event) override;
 
     std::shared_ptr<Module> module() const;
+    Party &party();
 
     // Globals/locals
 
@@ -119,7 +121,8 @@ private:
     std::string _nextModule;
     std::string _nextEntry;
     std::shared_ptr<Module> _module;
-    PartyConfiguration _party;
+    Party _party;
+    PartyConfiguration _partyConfig;
     std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };

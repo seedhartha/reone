@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <vector>
 
 #include "glm/vec3.hpp"
@@ -62,25 +63,24 @@ public:
     void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
     void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
     void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
-    void runOnEnterScript();
 
     bool handle(const SDL_Event &event);
     void update(const UpdateContext &updateCtx);
 
+    void destroyObject(const std::shared_ptr<SpatialObject> &object);
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
-    SpatialObject *getObjectAt(int x, int y) const;
-
-    void update3rdPersonCameraTarget();
-    void update3rdPersonCameraHeading();
+    void runOnEnterScript();
+    void startDialog(Creature &creature, const std::string &resRef);
     void switchTo3rdPersonCamera();
     void toggleCameraType();
-    Camera *getCamera() const;
-    void startDialog(Creature &creature, const std::string &resRef);
+    void update3rdPersonCameraTarget();
+    void update3rdPersonCameraHeading();
+
     void onPlayerMoved();
 
-    std::shared_ptr<SpatialObject> find(uint32_t id) const;
-    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
+    Camera *getCamera() const;
+    SpatialObject *getObjectAt(int x, int y) const;
 
     const CameraStyle &cameraStyle() const;
     CameraType cameraType() const;
@@ -93,6 +93,13 @@ public:
     ThirdPersonCamera *thirdPersonCamera();
     DialogCamera &dialogCamera();
     AnimatedCamera &animatedCamera();
+
+    // Objects
+
+    std::shared_ptr<SpatialObject> find(uint32_t id) const;
+    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
+
+    // END Objects
 
     // Party
 
@@ -136,6 +143,7 @@ private:
     std::unordered_map<ObjectType, ObjectList> _objectsByType;
     std::unordered_map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
     std::unordered_map<std::string, ObjectList> _objectsByTag;
+    std::set<uint32_t> _objectsToDestroy;
 
     // END Objects
 
@@ -152,6 +160,8 @@ private:
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void determineObjectRoom(SpatialObject &object);
+    void doDestroyObject(uint32_t objectId);
+    void doDestroyObjects();
     void landObject(SpatialObject &object);
     std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
     void updateRoomVisibility();
