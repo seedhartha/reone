@@ -56,7 +56,10 @@ public:
     virtual ~Game() = default;
 
     int run();
+
+    void playMusic(const std::string &resRef);
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
+
     bool handle(const SDL_Event &event) override;
 
     std::shared_ptr<Module> module() const;
@@ -145,6 +148,8 @@ private:
     void loadNextModule();
     void startDialog(SpatialObject &owner, const std::string &resRef);
 
+    std::string getMainMenuMusic() const;
+    std::string getCharacterGenerationMusic() const;
     float getDeltaTime();
     gui::GUI *getScreenGUI() const;
 

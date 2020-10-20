@@ -114,18 +114,25 @@ void Game::openMainMenu() {
     if (!_mainMenu) {
         loadMainMenu();
     }
+    playMusic(getMainMenuMusic());
     _screen = GameScreen::MainMenu;
+}
 
+string Game::getMainMenuMusic() const {
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            return "mus_sion";
+        default:
+            return "mus_theme_cult";
+    }
+}
+
+void Game::playMusic(const string &resRef) {
     if (_music) {
         _music->stop();
     }
-    switch (_version) {
-        case GameVersion::TheSithLords:
-            _music = playMusic("mus_sion");
-            break;
-        default:
-            _music = playMusic("mus_theme_cult");
-            break;
+    if (!resRef.empty()) {
+        _music = ::playMusic(resRef);
     }
 }
 
@@ -144,22 +151,21 @@ void Game::onNewGame() {
         loadLoadingScreen();
     }
     withLoadingScreen([this]() {
-        if (_music) {
-            _music->stop();
-        }
-        switch (_version) {
-            case GameVersion::TheSithLords:
-                _music = playMusic("mus_main");
-                break;
-            default:
-                _music = playMusic("mus_theme_rep");
-                break;
-        }
         if (!_charGen) {
             loadCharacterGeneration();
         }
+        playMusic(getCharacterGenerationMusic());
         _screen = GameScreen::CharacterGeneration;
     });
+}
+
+string Game::getCharacterGenerationMusic() const {
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            return "mus_main";
+        default:
+            return "mus_theme_rep";
+    }
 }
 
 void Game::onModuleSelected(const string &name) {
@@ -207,13 +213,9 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         });
         _module->loadParty(party, entry);
 
-        if (_music) {
-            _music->stop();
-        }
         string musicName(_module->area()->music());
-        if (!musicName.empty()) {
-            _music = playMusic(musicName);
-        }
+        playMusic(musicName);
+
         if (!_hud) {
             loadHUD();
         }
