@@ -131,6 +131,7 @@ void Game::loadMainMenu() {
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
+    _party = party;
 
     withLoadingScreen([this, &name, &party, &entry]() {
         ResourceManager &resources = Resources;
@@ -139,7 +140,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
         _module->load(name, *ifo);
-        _module->loadParty(party, entry);
+        _module->loadParty(_party, entry);
 
         string musicName(_module->area()->music());
         playMusic(musicName);
