@@ -29,6 +29,7 @@ class Command {
 public:
     Command() = default;
     Command(uint32_t id);
+    virtual ~Command() = default;
 
     virtual ByteArray getBytes() const = 0;
 
