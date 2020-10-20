@@ -17,29 +17,20 @@
 
 #include "area.h"
 
-#include <algorithm>
-
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "glm/gtx/intersect.hpp"
-#include "glm/gtx/norm.hpp"
-
-#include "SDL2/SDL.h"
 
 #include "../../system/debug.h"
-#include "../../system/jobs.h"
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
-#include "../../system/scene/cubenode.h"
-#include "../../system/scene/scenegraph.h"
 #include "../../system/resource/lytfile.h"
-#include "../../system/resource/pthfile.h"
-#include "../../system/resource/resources.h"
 #include "../../system/resource/visfile.h"
-#include "../../system/script/execution.h"
+#include "../../system/resource/resources.h"
+#include "../../system/scene/cubenode.h"
 
-#include "../script/routines.h"
+#include "../game.h"
+#include "../room.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"
@@ -71,12 +62,14 @@ static const char kPartyMember2Tag[] = "party-member-2";
 Area::Area(
     uint32_t id,
     GameVersion version,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph,
     const GraphicsOptions &opts
 ) :
     Object(id, ObjectType::Area),
     _version(version),
+    _game(game),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph),
     _opts(opts),
@@ -265,10 +258,7 @@ void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
     _animatedCamera = make_unique<AnimatedCamera>(_sceneGraph, _cameraAspect);
-
-    if (_onCameraChanged) {
-        _onCameraChanged(_cameraType);
-    }
+    _game->onCameraChanged(_cameraType);
 }
 
 bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
@@ -478,8 +468,8 @@ void Area::updateTriggers(const Creature &creature) {
             (geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance));
 
         if (triggered) {
-            if (!trigger.linkedToModule().empty() && _onModuleTransition) {
-                _onModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
+            if (!trigger.linkedToModule().empty()) {
+                _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
             }
             break;
         }
@@ -487,10 +477,8 @@ void Area::updateTriggers(const Creature &creature) {
 }
 
 void Area::runOnEnterScript() {
-    if (_scriptsEnabled) {
-        if (!_scripts[ScriptType::OnEnter].empty()) {
-            runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
-        }
+    if (!_scripts[ScriptType::OnEnter].empty()) {
+        runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
     }
 }
 
@@ -618,10 +606,7 @@ void Area::switchTo3rdPersonCamera() {
     if (_cameraType == CameraType::ThirdPerson) return;
 
     _cameraType = CameraType::ThirdPerson;
-
-    if (_onCameraChanged) {
-        _onCameraChanged(_cameraType);
-    }
+    _game->onCameraChanged(_cameraType);
 }
 
 void Area::toggleCameraType() {
@@ -646,8 +631,8 @@ void Area::toggleCameraType() {
             break;
     }
 
-    if (changed && _onCameraChanged) {
-        _onCameraChanged(_cameraType);
+    if (changed) {
+        _game->onCameraChanged(_cameraType);
     }
 }
 
@@ -656,9 +641,11 @@ Camera *Area::getCamera() const {
 }
 
 void Area::startDialog(Creature &creature, const string &resRef) {
-    if (_onStartDialog) {
-        _onStartDialog(creature, resRef);
-    }
+    string finalResRef(resRef);
+    if (resRef.empty()) finalResRef = creature.conversation();
+    if (resRef.empty()) return;
+
+    _game->startDialog(creature, finalResRef);
 }
 
 const CameraStyle &Area::cameraStyle() const {
@@ -685,6 +672,10 @@ const CollisionDetector &Area::collisionDetector() const {
     return _collisionDetector;
 }
 
+ObjectSelector &Area::objectSelector() {
+    return _objectSelector;
+}
+
 const Pathfinder &Area::pathfinder() const {
     return _pathfinder;
 }
@@ -701,10 +692,6 @@ AnimatedCamera &Area::animatedCamera() {
     return *_animatedCamera;
 }
 
-ObjectSelector &Area::objectSelector() {
-    return _objectSelector;
-}
-
 shared_ptr<SpatialObject> Area::player() const {
     return _player;
 }
@@ -719,22 +706,6 @@ shared_ptr<SpatialObject> Area::partyMember1() const {
 
 shared_ptr<SpatialObject> Area::partyMember2() const {
     return _partyMember2;
-}
-
-void Area::setOnCameraChanged(const function<void(CameraType)> &fn) {
-    _onCameraChanged = fn;
-}
-
-void Area::setOnModuleTransition(const function<void(const string &, const string &)> &fn) {
-    _onModuleTransition = fn;
-}
-
-void Area::setOnPlayerChanged(const function<void()> &fn) {
-    _onPlayerChanged = fn;
-}
-
-void Area::setOnStartDialog(const function<void(SpatialObject &, const string &)> &fn) {
-    _onStartDialog = fn;
 }
 
 } // namespace game

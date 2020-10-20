@@ -17,17 +17,28 @@
 
 #pragma once
 
-#include <functional>
+#include <memory>
+
+#include "glm/vec3.hpp"
 
 #include "SDL2/SDL_events.h"
 
-#include "../../system/net/types.h"
+#include "../../system/render/types.h"
+#include "../../system/resource/gfffile.h"
+#include "../../system/resource/types.h"
 
 #include "../player.h"
 
 #include "area.h"
+#include "object.h"
 
 namespace reone {
+
+namespace scene {
+
+class SceneGraph;
+
+}
 
 namespace game {
 
@@ -37,48 +48,40 @@ struct ModuleInfo {
     float entryHeading { 0.0f };
 };
 
+class Game;
 class ObjectFactory;
 
 class Module : public Object {
 public:
-    Module(uint32_t id, resource::GameVersion version, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    Module(
+        uint32_t id,
+        resource::GameVersion version,
+        Game *game,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        const render::GraphicsOptions &opts);
 
-    // Loading
     void load(const std::string &name, const resource::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
 
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
 
-    // Getters
     const std::string &name() const;
-    bool loaded() const;
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
 
-    // Callbacks
-    void setOnModuleTransition(const std::function<void(const std::string &, const std::string &)> &fn);
-    void setStartDialog(const std::function<void(SpatialObject &, const std::string &)> &fn);
-    void setOpenContainer(const std::function<void(SpatialObject *)> &fn);
-
-protected:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
-    ModuleInfo _info;
-
 private:
+    resource::GameVersion _version { resource::GameVersion::KotOR };
+    Game *_game { nullptr };
     ObjectFactory *_objectFactory { nullptr };
     scene::SceneGraph *_sceneGraph { nullptr };
-    std::string _name;
-    bool _loaded { false };
     render::GraphicsOptions _opts;
-    std::shared_ptr<Area> _area;
+    std::string _name;
+    ModuleInfo _info;
     PartyConfiguration _party;
+    std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
-
-    // Callbacks
-    std::function<void(const std::string &, const std::string &)> _onModuleTransition;
-    std::function<void(SpatialObject &, const std::string &)> _startDialog;
-    std::function<void(SpatialObject *)> _openContainer;
 
     void cycleDebugMode(bool forward);
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
@@ -91,13 +94,13 @@ private:
 
     // END Loading
 
-    // Events
+    // User input
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
 
-    // END Events
+    // END User input
 };
 
 } // namespace game

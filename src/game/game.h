@@ -17,15 +17,19 @@
 
 #pragma once
 
+#include <cstdint>
+#include <functional>
 #include <map>
 
+#include <boost/filesystem/path.hpp>
+
+#include "SDL2/SDL_events.h"
+
 #include "../system/audio/soundinstance.h"
-#include "../system/audio/types.h"
-#include "../system/gui/gui.h"
 #include "../system/render/pipeline/world.h"
-#include "../system/scene/scenegraph.h"
 #include "../system/render/window.h"
 #include "../system/resource/types.h"
+#include "../system/scene/scenegraph.h"
 
 #include "console.h"
 #include "gui/chargen/chargen.h"
@@ -35,8 +39,9 @@
 #include "gui/hud.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
-#include "object/area.h"
 #include "object/module.h"
+#include "object/objectfactory.h"
+#include "object/spatial.h"
 #include "types.h"
 
 namespace reone {
@@ -44,8 +49,8 @@ namespace reone {
 namespace game {
 
 /**
- * Entry point for the game logic. Delegates work to instances of `Module` and
- * `GUI`. Contains the main game loop.
+ * Facade for the game logic. Contains the main game loop. Delegates work to the
+ * instances of `Module` and `GUI`.
  *
  * @see game::Module
  * @see gui::GUI
@@ -62,6 +67,10 @@ public:
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
     void quit();
     void openInGame();
+    void startDialog(SpatialObject &owner, const std::string &resRef);
+    void openContainer(SpatialObject *container);
+    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
+    void onCameraChanged(CameraType camera);
 
     bool handle(const SDL_Event &event) override;
 
@@ -150,7 +159,6 @@ private:
     void runMainLoop();
     void loadNextModule();
     float measureFrameTime();
-    void startDialog(SpatialObject &owner, const std::string &resRef);
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;

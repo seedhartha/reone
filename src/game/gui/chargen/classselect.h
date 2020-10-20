@@ -19,6 +19,7 @@
 
 #include "../../../system/gui/gui.h"
 #include "../../../system/resource/types.h"
+#include "../../../system/scene/scenegraph.h"
 
 #include "../../object/objectfactory.h"
 #include "../../types.h"
@@ -27,9 +28,11 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class ClassSelection : public gui::GUI {
 public:
-    ClassSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
+    ClassSelection(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 
@@ -43,6 +46,7 @@ private:
         CreatureConfiguration config;
     };
 
+    Game *_game { nullptr };
     resource::GameVersion _version { resource::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };

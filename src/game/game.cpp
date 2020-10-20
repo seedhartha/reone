@@ -17,25 +17,19 @@
 
 #include "game.h"
 
-#include "GL/glew.h"
-
-#include "SDL2/SDL.h"
+#include "SDL2/SDL_opengl.h"
+#include "SDL2/SDL_timer.h"
 
 #include "../system/audio/player.h"
 #include "../system/audio/util.h"
 #include "../system/jobs.h"
 #include "../system/log.h"
 #include "../system/pathutil.h"
-#include "../system/streamutil.h"
-#include "../system/scene/scenegraph.h"
 #include "../system/resource/resources.h"
 
-#include "object/objectfactory.h"
 #include "script/routines.h"
-#include "script/util.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
@@ -56,7 +50,7 @@ Game::Game(const fs::path &path, const Options &opts) :
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
-    _objectFactory(new ObjectFactory(_version, &_sceneGraph, _options.graphics)),
+    _objectFactory(new ObjectFactory(_version, this, &_sceneGraph, _options.graphics)),
     _console(opts.graphics) {
 
     initGameVersion();
@@ -144,21 +138,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 
         shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
-        _module->setOnModuleTransition([this](const string &name, const string &entry) {
-            _nextModule = name;
-            _nextEntry = entry;
-        });
-        _module->setStartDialog([this](SpatialObject &owner, const string &resRef) {
-            startDialog(owner, resRef);
-        });
-        _module->setOpenContainer([this](SpatialObject *object) {
-            _container->open(object);
-            _screen = GameScreen::Container;
-        });
         _module->load(name, *ifo);
-        _module->area()->setOnCameraChanged([this](CameraType type) {
-            _window.setRelativeMouseMode(type == CameraType::FirstPerson);
-        });
         _module->loadParty(party, entry);
 
         string musicName(_module->area()->music());
@@ -266,11 +246,6 @@ void Game::drawCursor() {
     Shaders.setGlobalUniforms(globals);
 
     _window.drawCursor();
-}
-
-void Game::startDialog(SpatialObject &owner, const string &resRef) {
-    _screen = GameScreen::Dialog;
-    _dialog->startDialog(owner, resRef);
 }
 
 void Game::loadHUD() {
@@ -433,6 +408,25 @@ void Game::quit() {
 
 void Game::openInGame() {
     _screen = GameScreen::InGame;
+}
+
+void Game::startDialog(SpatialObject &owner, const string &resRef) {
+    _screen = GameScreen::Dialog;
+    _dialog->startDialog(owner, resRef);
+}
+
+void Game::openContainer(SpatialObject *container) {
+    _container->open(container);
+    _screen = GameScreen::Container;
+}
+
+void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
+    _nextModule = moduleName;
+    _nextEntry = entry;
+}
+
+void Game::onCameraChanged(CameraType camera) {
+    _window.setRelativeMouseMode(camera == CameraType::FirstPerson);
 }
 
 bool Game::handle(const SDL_Event &event) {

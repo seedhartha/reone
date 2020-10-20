@@ -62,7 +62,9 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelection::ClassSelection(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+ClassSelection::ClassSelection(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts), _game(game) {
+
     _resRef = getResRef("classsel");
 
     switch (version) {
@@ -198,7 +200,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, &sceneGraph, _gfxOpts));
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(config);

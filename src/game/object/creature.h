@@ -90,10 +90,6 @@ public:
 
     // END Pathfinding
 
-protected:
-    MovementType _movementType { MovementType::None };
-    bool _talking { false };
-
 private:
     enum class ModelType {
         Creature,
@@ -111,6 +107,8 @@ private:
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
+    MovementType _movementType { MovementType::None };
+    bool _talking { false };
 
     // Loading
 
