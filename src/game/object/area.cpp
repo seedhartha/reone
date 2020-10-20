@@ -54,6 +54,7 @@ static const float kDrawDebugDistance = 64.0f;
 static const float kPartyMemberFollowDistance = 4.0f;
 static const float kMaxDistanceToTestCollision = 64.0f;
 static const float kElevationTestZ = 1024.0f;
+static const float kCreatureObstacleTestZ = 0.1f;
 
 static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
@@ -281,6 +282,31 @@ bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, gl
     return false;
 }
 
+bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
+    glm::vec3 origin(creature.position());
+    origin.z += kCreatureObstacleTestZ;
+
+    glm::vec3 adjustedDest(dest);
+    adjustedDest.z += kCreatureObstacleTestZ;
+
+    glm::vec3 originToDest(adjustedDest - origin);
+    glm::vec3 dir(glm::normalize(originToDest));
+
+    RaycastProperties props;
+    props.flags = kRaycastObjects | kRaycastAABB;
+    props.origin = origin;
+    props.direction = dir;
+    props.except = &creature;
+
+    RaycastResult result;
+
+    if (_collisionDetector.raycast(props, result)) {
+        return result.distance <= glm::length(originToDest);
+    }
+
+    return false;
+}
+
 void Area::add(const shared_ptr<SpatialObject> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
@@ -442,6 +468,9 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
 
     Room *room = nullptr;
 
+    if (findCreatureObstacle(creature, position)) {
+        return false;
+    }
     if (getElevationAt(position, room, position.z)) {
         creature.setRoom(room);
         creature.setPosition(position);
