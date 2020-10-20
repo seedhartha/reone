@@ -50,12 +50,6 @@ namespace reone {
 
 namespace game {
 
-static const int kAppearanceBastila = 4;
-static const int kAppearanceCarth = 6;
-static const int kAppearanceDarthRevan = 22;
-static const int kAppearanceAtton = 452;
-static const int kAppearanceKreia = 455;
-
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _options(opts),
@@ -137,54 +131,8 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::loadMainMenu() {
-    _mainMenu.reset(new MainMenu(_version, _options.graphics));
+    _mainMenu.reset(new MainMenu(this, _version, _options.graphics));
     _mainMenu->load();
-    _mainMenu->setOnNewGame(bind(&Game::onNewGame, this));
-    _mainMenu->setOnExit([this]() { _quit = true; });
-    _mainMenu->setOnModuleSelected(bind(&Game::onModuleSelected, this, _1));
-}
-
-void Game::onNewGame() {
-    _mainMenu->resetFocus();
-
-    if (!_loadScreen) {
-        loadLoadingScreen();
-    }
-    withLoadingScreen([this]() {
-        if (!_charGen) {
-            loadCharacterGeneration();
-        }
-        playMusic(getCharacterGenerationMusic());
-        _screen = GameScreen::CharacterGeneration;
-    });
-}
-
-string Game::getCharacterGenerationMusic() const {
-    switch (_version) {
-        case GameVersion::TheSithLords:
-            return "mus_main";
-        default:
-            return "mus_theme_rep";
-    }
-}
-
-void Game::onModuleSelected(const string &name) {
-    PartyConfiguration party;
-    party.memberCount = 2;
-    party.leader.equipment.push_back("g_a_clothes01");
-    party.member1.equipment.push_back("g_a_clothes01");
-
-    switch (_version) {
-        case GameVersion::TheSithLords:
-            party.leader.appearance = kAppearanceAtton;
-            party.member1.appearance = kAppearanceKreia;
-            break;
-        default:
-            party.leader.appearance = kAppearanceCarth;
-            party.member1.appearance = kAppearanceBastila;
-            break;
-    }
-    loadModule(name, party);
 }
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
@@ -234,6 +182,9 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
 }
 
 void Game::withLoadingScreen(const function<void()> &block) {
+    if (!_loadScreen) {
+        loadLoadingScreen();
+    }
     _screen = GameScreen::Loading;
     drawAll();
     block();
@@ -348,26 +299,8 @@ void Game::onDialogFinished() {
 }
 
 void Game::loadContainerGui() {
-    _container.reset(new Container(_version, _options.graphics));
+    _container.reset(new Container(this, _version, _options.graphics));
     _container->load();
-    _container->setOnGetItems(bind(&Game::onGetItems, this));
-    _container->setOnClose([this]() { _screen = GameScreen::InGame; });
-}
-
-void Game::onGetItems() {
-    shared_ptr<SpatialObject> player(_module->area()->player());
-
-    SpatialObject &container = _container->container();
-    container.moveItemsTo(*player);
-
-    Placeable *placeable = dynamic_cast<Placeable *>(&container);
-    if (placeable) {
-        string script;
-        if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
-            runScript(script, placeable->id(), player->id(), -1);
-        }
-    }
-    _screen = GameScreen::InGame;
 }
 
 void Game::loadEquipmentGui() {
@@ -377,14 +310,6 @@ void Game::loadEquipmentGui() {
         _equipment->resetFocus();
         _screen = GameScreen::InGame;
     });
-}
-
-float Game::getDeltaTime() {
-    uint32_t ticks = SDL_GetTicks();
-    float dt = (ticks - _ticks) / 1000.0f;
-    _ticks = ticks;
-
-    return dt;
 }
 
 GUI *Game::getScreenGUI() const {
@@ -423,7 +348,7 @@ void Game::update() {
     if (!_nextModule.empty()) {
         loadNextModule();
     }
-    float dt = getDeltaTime();
+    float dt = measureFrameTime();
     _window.update(dt);
 
     GUI *gui = getScreenGUI();
@@ -454,26 +379,22 @@ void Game::loadNextModule() {
     _nextEntry.clear();
 }
 
+float Game::measureFrameTime() {
+    uint32_t ticks = SDL_GetTicks();
+    float dt = (ticks - _ticks) / 1000.0f;
+    _ticks = ticks;
+
+    return dt;
+}
+
 void Game::loadLoadingScreen() {
     _loadScreen.reset(new LoadingScreen(_version, _options.graphics));
     _loadScreen->load();
 }
 
 void Game::loadCharacterGeneration() {
-    _charGen.reset(new CharacterGeneration(_version, _options.graphics));
+    _charGen.reset(new CharacterGeneration(this, _version, _options.graphics));
     _charGen->load();
-    _charGen->setOnPlay(bind(&Game::onPlay, this, _1));
-    _charGen->setOnCancel(bind(&Game::openMainMenu, this));
-}
-
-void Game::onPlay(const CreatureConfiguration &config) {
-    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
-
-    PartyConfiguration party;
-    party.memberCount = 1;
-    party.leader = config;
-
-    loadModule(moduleName, party);
 }
 
 void Game::deinit() {
@@ -483,6 +404,35 @@ void Game::deinit() {
     Resources.deinit();
 
     _window.deinit();
+}
+
+void Game::startCharacterGeneration() {
+    _mainMenu->resetFocus();
+
+    withLoadingScreen([this]() {
+        if (!_charGen) {
+            loadCharacterGeneration();
+        }
+        playMusic(getCharacterGenerationMusic());
+        _screen = GameScreen::CharacterGeneration;
+    });
+}
+
+string Game::getCharacterGenerationMusic() const {
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            return "mus_main";
+        default:
+            return "mus_theme_rep";
+    }
+}
+
+void Game::quit() {
+    _quit = true;
+}
+
+void Game::openInGame() {
+    _screen = GameScreen::InGame;
 }
 
 bool Game::handle(const SDL_Event &event) {

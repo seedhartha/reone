@@ -27,26 +27,29 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Container : public gui::GUI {
 public:
-    Container(resource::GameVersion version, const render::GraphicsOptions &opts);
+    Container(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     void open(SpatialObject *contanier);
 
     SpatialObject &container() const;
 
-    void setOnGetItems(const std::function<void()> &fn);
-    void setOnClose(const std::function<void()> &fn);
-
 private:
+    Game *_game { nullptr };
     SpatialObject *_container { nullptr };
 
-    std::function<void()> _onGetItems;
-    std::function<void()> _onClose;
-
     void configureItemsListBox();
+    void transferItemsToPlayer();
+
+    // Event handlers
+
     void onClick(const std::string &control) override;
+
+    // END Event handlers
 };
 
 } // namespace game

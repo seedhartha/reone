@@ -57,8 +57,11 @@ public:
 
     int run();
 
-    void playMusic(const std::string &resRef);
+    void openMainMenu();
+    void startCharacterGeneration();
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
+    void quit();
+    void openInGame();
 
     bool handle(const SDL_Event &event) override;
 
@@ -143,14 +146,14 @@ private:
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
-    void openMainMenu();
+    void playMusic(const std::string &resRef);
     void runMainLoop();
     void loadNextModule();
+    float measureFrameTime();
     void startDialog(SpatialObject &owner, const std::string &resRef);
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
-    float getDeltaTime();
     gui::GUI *getScreenGUI() const;
 
     // Initialization
@@ -191,12 +194,8 @@ private:
 
     // Event handlers
 
-    void onNewGame();
-    void onModuleSelected(const std::string &name);
-    void onPlay(const CreatureConfiguration &config);
-    void onEquipmentClick();
-    void onGetItems();
     void onDialogFinished();
+    void onEquipmentClick();
 
     // END Event handlers
 };

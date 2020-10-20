@@ -24,9 +24,9 @@ namespace reone {
 
 namespace game {
 
-class NameGui : public gui::GUI {
+class NameEntry : public gui::GUI {
 public:
-    NameGui(resource::GameVersion version, const render::GraphicsOptions &opts);
+    NameEntry(resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

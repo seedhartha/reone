@@ -267,7 +267,7 @@ set(GAME_HEADERS
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
-    src/game/gui/chargen/name.h
+    src/game/gui/chargen/nameentry.h
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
     src/game/gui/chargen/quickorcustom.h
@@ -322,7 +322,7 @@ set(GAME_SOURCES
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
-    src/game/gui/chargen/name.cpp
+    src/game/gui/chargen/nameentry.cpp
     src/game/gui/chargen/portraitselect.cpp
     src/game/gui/chargen/quick.cpp
     src/game/gui/chargen/quickorcustom.cpp

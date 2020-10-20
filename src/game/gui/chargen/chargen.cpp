@@ -22,6 +22,7 @@
 #include "../../../system/gui/scenebuilder.h"
 #include "../../../system/resource/resources.h"
 
+#include "../../game.h"
 #include "../../portraits.h"
 
 using namespace std;
@@ -39,7 +40,9 @@ namespace game {
 static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
-CharacterGeneration::CharacterGeneration(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+CharacterGeneration::CharacterGeneration(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts), _game(game) {
+
     _resRef = getResRef("maincg");
     _backgroundType = BackgroundType::Menu;
 
@@ -69,7 +72,7 @@ void CharacterGeneration::load() {
     loadQuickOrCustom();
     loadQuickCharacterGeneration();
     loadPortraitSelection();
-    loadNameGui();
+    loadNameEntry();
 }
 
 void CharacterGeneration::loadClassSelection() {
@@ -84,10 +87,7 @@ void CharacterGeneration::loadClassSelection() {
     });
     _classSelection->setOnCancel([this]() {
         _classSelection->resetFocus();
-
-        if (_onCancel) {
-            _onCancel();
-        }
+        _game->openMainMenu();
     });
 }
 
@@ -167,11 +167,7 @@ void CharacterGeneration::loadQuickCharacterGeneration() {
                 _screen = CharGenScreen::Name;
                 break;
             default:
-                if (_onPlay) {
-                    CreatureConfiguration config(_character);
-                    config.equipment.clear();
-                    _onPlay(config);
-                }
+                finishCharacterGeneration();
                 break;
         }
     });
@@ -179,6 +175,19 @@ void CharacterGeneration::loadQuickCharacterGeneration() {
         _quick->resetFocus();
         _screen = CharGenScreen::QuickOrCustom;
     });
+}
+
+void CharacterGeneration::finishCharacterGeneration() {
+    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+
+    CreatureConfiguration config(_character);
+    config.equipment.clear();
+
+    PartyConfiguration party;
+    party.memberCount = 1;
+    party.leader = config;
+
+    _game->loadModule(moduleName, party);
 }
 
 void CharacterGeneration::loadPortraitSelection() {
@@ -198,17 +207,17 @@ void CharacterGeneration::loadPortraitSelection() {
     });
 }
 
-void CharacterGeneration::loadNameGui() {
-    _nameGui = make_unique<NameGui>(_version, _gfxOpts);
-    _nameGui->load();
-    _nameGui->setOnEnd([this]() {
-        _nameGui->resetFocus();
+void CharacterGeneration::loadNameEntry() {
+    _nameEntry = make_unique<NameEntry>(_version, _gfxOpts);
+    _nameEntry->load();
+    _nameEntry->setOnEnd([this]() {
+        _nameEntry->resetFocus();
         showControl("MODEL_LBL");
         _screen = CharGenScreen::Quick;
         _quick->setStep(2);
     });
-    _nameGui->setOnBack([this]() {
-        _nameGui->resetFocus();
+    _nameEntry->setOnBack([this]() {
+        _nameEntry->resetFocus();
         showControl("MODEL_LBL");
         _screen = CharGenScreen::Quick;
     });
@@ -232,7 +241,7 @@ GUI *CharacterGeneration::getSubGUI() const {
         case CharGenScreen::PortraitSelection:
             return _portraitSelection.get();
         case CharGenScreen::Name:
-            return _nameGui.get();
+            return _nameEntry.get();
         default:
             throw logic_error("CharGen: invalid screen: " + to_string(static_cast<int>(_screen)));
     }
@@ -251,14 +260,6 @@ void CharacterGeneration::render() const {
 void CharacterGeneration::render3D() const {
     GUI::render3D();
     getSubGUI()->render3D();
-}
-
-void CharacterGeneration::setOnPlay(const function<void(const CreatureConfiguration &)> &fn) {
-    _onPlay = fn;
-}
-
-void CharacterGeneration::setOnCancel(const function<void()> &fn) {
-    _onCancel = fn;
 }
 
 } // namespace game
