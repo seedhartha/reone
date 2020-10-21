@@ -340,7 +340,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    auto &object = find(objectId);
+    shared_ptr<SpatialObject> object(find(objectId));
     if (!object) return;
     {
         Room *room = object->room();

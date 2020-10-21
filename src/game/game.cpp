@@ -50,10 +50,10 @@ Game::Game(const fs::path &path, const Options &opts) :
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
-    _objectFactory(new ObjectFactory(_version, this, &_sceneGraph, _options.graphics)),
     _console(opts.graphics) {
 
     initGameVersion();
+    _objectFactory = make_unique<ObjectFactory>(_version, this, &_sceneGraph, _options.graphics);
 }
 
 void Game::initGameVersion() {
