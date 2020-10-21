@@ -114,9 +114,9 @@ private:
     render::RenderWindow _window;
     scene::SceneGraph _sceneGraph;
     render::WorldRenderPipeline _worldPipeline;
-    std::unique_ptr<ObjectFactory> _objectFactory;
     Console _console;
     resource::GameVersion _version { resource::GameVersion::KotOR };
+    std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     std::string _nextModule;
     std::string _nextEntry;
