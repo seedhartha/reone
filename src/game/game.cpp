@@ -364,8 +364,6 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    _mainMenu->resetFocus();
-
     withLoadingScreen([this]() {
         if (!_charGen) {
             loadCharacterGeneration();

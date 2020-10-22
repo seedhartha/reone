@@ -65,8 +65,6 @@ bool NameEntry::handle(const SDL_Event &event) {
 }
 
 void NameEntry::onClick(const string &control) {
-    resetFocus();
-
     if (control == "END_BTN") {
         _charGen->setQuickStep(2);
         _charGen->openQuick();

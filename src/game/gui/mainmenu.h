@@ -36,12 +36,6 @@ public:
 
     void load() override;
 
-    // Event handlers
-
-    void onClick(const std::string &control) override;
-
-    // END Event handlers
-
 private:
     Game *_game { nullptr };
 
@@ -52,7 +46,8 @@ private:
 
     // Event handlers
 
-    void onModuleSelected(const std::string &name);
+    void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     // END Event handlers
 };

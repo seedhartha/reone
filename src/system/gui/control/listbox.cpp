@@ -26,6 +26,8 @@
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"
 
+#include "../gui.h"
+
 #include "button.h"
 #include "imagebutton.h"
 #include "scrollbar.h"
@@ -41,7 +43,7 @@ namespace gui {
 
 static const int kItemPadding = 3;
 
-ListBox::ListBox() : Control(ControlType::ListBox) {
+ListBox::ListBox(GUI *gui) : Control(gui, ControlType::ListBox) {
     _clickable = true;
 }
 
@@ -73,7 +75,7 @@ void ListBox::load(const GffStruct &gffs) {
     if (protoItem) {
         const GffStruct &protoGffs = protoItem->asStruct();
         ControlType type = _protoItemType == ControlType::Invalid ? getType(protoGffs) : _protoItemType;
-        _protoItem = of(type, getTag(protoGffs));
+        _protoItem = of(_gui, type, getTag(protoGffs));
         _protoItem->load(protoGffs);
         updateItems();
     }
@@ -81,7 +83,7 @@ void ListBox::load(const GffStruct &gffs) {
     const GffField *scrollBar = gffs.find("SCROLLBAR");
     if (scrollBar) {
         const GffStruct &scrollGffs = scrollBar->asStruct();
-        _scrollBar = of(getType(scrollGffs), getTag(scrollGffs));
+        _scrollBar = of(_gui, getType(scrollGffs), getTag(scrollGffs));
         _scrollBar->load(scrollGffs);
     }
 }
@@ -116,12 +118,9 @@ bool ListBox::handleClick(int x, int y) {
     int itemIdx = getItemIndex(y);
     if (itemIdx == -1) return false;
 
-    if (_onItemClicked) {
-        _onItemClicked(_tag, _items[itemIdx].tag);
-        return true;
-    }
+    _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
 
-    return false;
+    return true;
 }
 
 void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const {

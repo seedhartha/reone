@@ -35,8 +35,7 @@ public:
         std::shared_ptr<render::Texture> icon;
     };
 
-    ListBox();
-    ListBox(const std::string &tag);
+    ListBox(GUI *gui);
 
     void clear();
     void add(Item item);

@@ -99,8 +99,6 @@ void QuickCharacterGeneration::doSetStep(int step) {
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {
-    resetFocus();
-
     if (control == "BTN_CANCEL") {
         setStep(0);
         _charGen->openQuickOrCustom();

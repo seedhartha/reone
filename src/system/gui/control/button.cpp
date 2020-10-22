@@ -21,7 +21,7 @@ namespace reone {
 
 namespace gui {
 
-Button::Button() : Control(ControlType::Button) {
+Button::Button(GUI *gui) : Control(gui, ControlType::Button) {
     _clickable = true;
 }
 

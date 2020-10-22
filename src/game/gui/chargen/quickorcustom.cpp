@@ -54,8 +54,6 @@ void QuickOrCustom::load() {
 }
 
 void QuickOrCustom::onClick(const string &control) {
-    resetFocus();
-
     if (control == "QUICK_CHAR_BTN") {
         _charGen->setQuickStep(0);
         _charGen->openQuick();

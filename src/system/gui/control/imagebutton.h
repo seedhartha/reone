@@ -25,7 +25,7 @@ namespace gui {
 
 class ImageButton : public Control {
 public:
-    ImageButton();
+    ImageButton(GUI *gui);
 
     void render(const glm::ivec2 &offset, const std::string &textOverride, const std::shared_ptr<render::Texture> &icon) const;
 

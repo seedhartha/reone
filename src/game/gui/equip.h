@@ -60,13 +60,13 @@ private:
     static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);
 
     void configureItemsListBox();
-    void onItemClicked(const std::string &control, const std::string &item);
     void selectSlot(Slot slot);
     void updateEquipment();
     void updateItems();
 
-    void preloadControl(gui::Control &control) override;
     void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+    void preloadControl(gui::Control &control) override;
 };
 
 } // namespace game

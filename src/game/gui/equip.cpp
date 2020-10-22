@@ -81,7 +81,6 @@ void Equipment::load() {
 void Equipment::configureItemsListBox() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.setPadding(5);
-    lbItems.setOnItemClicked(bind(&Equipment::onItemClicked, this, _1, _2));
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
     protoItem.setBorderColor(getBaseColor(_version));
@@ -96,7 +95,7 @@ void Equipment::configureItemsListBox() {
     protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
 }
 
-void Equipment::onItemClicked(const string &control, const string &item) {
+void Equipment::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
 
     shared_ptr<Item> itemObj;

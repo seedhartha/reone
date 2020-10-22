@@ -21,7 +21,7 @@ namespace reone {
 
 namespace gui {
 
-Panel::Panel() : Control(ControlType::Panel) {
+Panel::Panel(GUI *gui) : Control(gui, ControlType::Panel) {
 }
 
 } // namespace gui

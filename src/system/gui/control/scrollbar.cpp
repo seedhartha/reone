@@ -34,7 +34,7 @@ namespace reone {
 
 namespace gui {
 
-ScrollBar::ScrollBar() : Control(ControlType::ScrollBar) {
+ScrollBar::ScrollBar(GUI *gui) : Control(gui, ControlType::ScrollBar) {
 }
 
 void ScrollBar::load(const GffStruct &gffs) {

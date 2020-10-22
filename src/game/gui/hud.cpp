@@ -149,7 +149,6 @@ void HUD::render() const {
 
 void HUD::onClick(const string &control) {
     if (control == "BTN_EQU") {
-        resetFocus();
         _game->openEquipment();
     }
 }

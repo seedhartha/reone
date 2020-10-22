@@ -164,13 +164,14 @@ void MainMenu::startModuleSelection() {
     hideControl("LBL_MENUBG");
 
     ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
-    modules.setOnItemClicked(bind(&MainMenu::onModuleSelected, this, _2));
     for (auto &module : Resources.moduleNames()) {
         modules.add({ module, module });
     }
 }
 
-void MainMenu::onModuleSelected(const string &name) {
+void MainMenu::onListBoxItemClick(const string &control, const string &item) {
+    if (control != "LB_MODULES") return;
+
     PartyConfiguration party;
     party.memberCount = 2;
     party.leader.equipment.push_back("g_a_clothes01");
@@ -186,7 +187,7 @@ void MainMenu::onModuleSelected(const string &name) {
             party.member1.appearance = kAppearanceBastila;
             break;
     }
-    _game->loadModule(name, party);
+    _game->loadModule(item, party);
 }
 
 } // namespace game
