@@ -42,7 +42,8 @@ enum class GameScreen {
     InGame,
     Dialog,
     Container,
-    Equipment
+    Equipment,
+    PartySelection
 };
 
 enum class Gender {

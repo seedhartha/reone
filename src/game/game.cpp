@@ -149,13 +149,16 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
             loadHUD();
         }
         if (!_dialog) {
-            loadDialogGui();
+            loadDialog();
         }
         if (!_container) {
-            loadContainerGui();
+            loadContainer();
         }
         if (!_equipment) {
-            loadEquipmentGui();
+            loadEquipment();
+        }
+        if (!_partySelection) {
+            loadPartySelection();
         }
         _ticks = SDL_GetTicks();
         _screen = GameScreen::InGame;
@@ -254,19 +257,24 @@ void Game::loadHUD() {
     _hud->load();
 }
 
-void Game::loadDialogGui() {
+void Game::loadDialog() {
     _dialog.reset(new Dialog(this, _version, _options.graphics));
     _dialog->load();
 }
 
-void Game::loadContainerGui() {
+void Game::loadContainer() {
     _container.reset(new Container(this, _version, _options.graphics));
     _container->load();
 }
 
-void Game::loadEquipmentGui() {
+void Game::loadEquipment() {
     _equipment.reset(new Equipment(this, _version, _options.graphics));
     _equipment->load();
+}
+
+void Game::loadPartySelection() {
+    _partySelection.reset(new PartySelection(_version, _options.graphics));
+    _partySelection->load();
 }
 
 GUI *Game::getScreenGUI() const {
@@ -285,6 +293,8 @@ GUI *Game::getScreenGUI() const {
             return _container.get();
         case GameScreen::Equipment:
             return _equipment.get();
+        case GameScreen::PartySelection:
+            return _partySelection.get();
         default:
             return nullptr;
     }
@@ -398,6 +408,10 @@ void Game::startDialog(SpatialObject &owner, const string &resRef) {
 void Game::openContainer(SpatialObject *container) {
     _container->open(container);
     _screen = GameScreen::Container;
+}
+
+void Game::openPartySelection() {
+    _screen = GameScreen::PartySelection;
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
