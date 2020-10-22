@@ -39,6 +39,7 @@
 #include "gui/hud.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
+#include "gui/partyselect.h"
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
@@ -63,16 +64,17 @@ public:
 
     int run();
 
-    void openMainMenu();
-    void startCharacterGeneration();
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
-    void quit();
-    void openInGame();
-    void startDialog(SpatialObject &owner, const std::string &resRef);
-    void openContainer(SpatialObject *container);
-    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
     void onCameraChanged(CameraType camera);
+    void openContainer(SpatialObject *container);
     void openEquipment();
+    void openInGame();
+    void openMainMenu();
+    void openPartySelection();
+    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
+    void startCharacterGeneration();
+    void startDialog(SpatialObject &owner, const std::string &resRef);
+    void quit();
 
     bool handle(const SDL_Event &event) override;
 
@@ -137,6 +139,7 @@ private:
     std::unique_ptr<Dialog> _dialog;
     std::unique_ptr<Container> _container;
     std::unique_ptr<Equipment> _equipment;
+    std::unique_ptr<PartySelection> _partySelection;
 
     // END GUI
 
@@ -183,9 +186,10 @@ private:
     void loadLoadingScreen();
     void loadCharacterGeneration();
     void loadHUD();
-    void loadDialogGui();
-    void loadContainerGui();
-    void loadEquipmentGui();
+    void loadDialog();
+    void loadContainer();
+    void loadEquipment();
+    void loadPartySelection();
 
     // END Loading
 
@@ -203,12 +207,6 @@ private:
     void withLoadingScreen(const std::function<void()> &block);
 
     // END Helper methods
-
-    // Event handlers
-
-    void onDialogFinished();
-
-    // END Event handlers
 };
 
 } // namespace game

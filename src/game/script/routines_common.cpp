@@ -369,6 +369,7 @@ Variable RoutineManager::addAvailableNPCByTemplate(const vector<Variable> &args,
 }
 
 Variable RoutineManager::showPartySelectionGUI(const vector<Variable> &args, ExecutionContext &ctx) {
+    _game->openPartySelection();
     return Variable();
 }
 
