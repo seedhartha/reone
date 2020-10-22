@@ -19,6 +19,8 @@
 
 #include "../colors.h"
 
+#include "chargen.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -29,7 +31,10 @@ namespace reone {
 
 namespace game {
 
-QuickOrCustom::QuickOrCustom(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _charGen(charGen) {
+
     _resRef = getResRef("qorcpnl");
 
     if (version == GameVersion::TheSithLords) {
@@ -49,23 +54,14 @@ void QuickOrCustom::load() {
 }
 
 void QuickOrCustom::onClick(const string &control) {
+    resetFocus();
+
     if (control == "QUICK_CHAR_BTN") {
-        if (_onQuickChar) {
-            _onQuickChar();
-        }
+        _charGen->setQuickStep(0);
+        _charGen->openQuick();
     } else if (control == "BTN_BACK") {
-        if (_onBack) {
-            _onBack();
-        }
+        _charGen->openClassSelection();
     }
-}
-
-void QuickOrCustom::setOnQuickCharacter(const function<void()> &fn) {
-    _onQuickChar = fn;
-}
-
-void QuickOrCustom::setOnBack(const function<void()> &fn) {
-    _onBack = fn;
 }
 
 } // namespace game

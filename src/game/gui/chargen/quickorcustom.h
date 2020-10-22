@@ -23,18 +23,16 @@ namespace reone {
 
 namespace game {
 
+class CharacterGeneration;
+
 class QuickOrCustom : public gui::GUI {
 public:
-    QuickOrCustom(resource::GameVersion version, const render::GraphicsOptions &opts);
+    QuickOrCustom(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 
-    void setOnQuickCharacter(const std::function<void()> &fn);
-    void setOnBack(const std::function<void()> &fn);
-
 private:
-    std::function<void()> _onQuickChar;
-    std::function<void()> _onBack;
+    CharacterGeneration *_charGen { nullptr };
 
     void onClick(const std::string &control) override;
 };

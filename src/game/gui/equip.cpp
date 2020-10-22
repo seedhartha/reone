@@ -23,6 +23,7 @@
 #include "../../system/gui/control/listbox.h"
 #include "../../system/resource/resources.h"
 
+#include "../game.h"
 #include "../object/creature.h"
 #include "../object/item.h"
 
@@ -55,7 +56,10 @@ static unordered_map<Equipment::Slot, string> g_slotNames = {
     { Equipment::Slot::WeapR2, "WEAP_R2"}
 };
 
-Equipment::Equipment(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+Equipment::Equipment(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _game(game) {
+
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
 
@@ -129,10 +133,6 @@ void Equipment::open(SpatialObject *owner) {
     selectSlot(Slot::None);
 }
 
-void Equipment::setOnClose(const function<void()> &fn) {
-    _onClose = fn;
-}
-
 void Equipment::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
         static_cast<ListBox &>(control).setProtoItemType(ControlType::ImageButton);
@@ -142,9 +142,7 @@ void Equipment::preloadControl(Control &control) {
 void Equipment::onClick(const string &control) {
     if (control == "BTN_EQUIP" || control == "BTN_BACK") {
         if (_selectedSlot == Slot::None) {
-            if (_onClose) {
-                _onClose();
-            }
+            _game->openInGame();
         } else {
             selectSlot(Slot::None);
         }

@@ -25,6 +25,8 @@
 
 #include "../colors.h"
 
+#include "chargen.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -62,8 +64,10 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelection::ClassSelection(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts), _game(game) {
+ClassSelection::ClassSelection(Game *game, CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _game(game),
+    _charGen(charGen) {
 
     _resRef = getResRef("classsel");
 
@@ -240,25 +244,17 @@ int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
 }
 
 void ClassSelection::onClick(const string &control) {
+    resetFocus();
+
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
-        ClassButton &button = _classButtons[idx];
-        if (_onClassSelected) {
-            _onClassSelected(button.config);
-        }
+        _charGen->setCharacter(_classButtons[idx].config);
+        _charGen->openQuickOrCustom();
         return;
     }
     if (control == "BTN_BACK") {
-        if (_onCancel) _onCancel();
+        _charGen->cancel();
     }
-}
-
-void ClassSelection::setOnClassSelected(const function<void(const CreatureConfiguration &)> &fn) {
-    _onClassSelected = fn;
-}
-
-void ClassSelection::setOnCancel(const function<void()> &fn) {
-    _onCancel = fn;
 }
 
 } // namespace game

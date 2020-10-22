@@ -53,8 +53,9 @@ enum EndEntryFlags {
     kEndEntryOnAudioStop = 2
 };
 
-Dialog::Dialog(GameVersion version, Game *game, const GraphicsOptions &opts) :
-    GUI(version, opts), _game(game) {
+Dialog::Dialog(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _game(game) {
 
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
@@ -119,18 +120,13 @@ void Dialog::configureReplies() {
 }
 
 void Dialog::onReplyClicked(int index) {
-    if (!_pickReplyEnabled) return;
-
-    if (_onReplyPicked) {
-        _onReplyPicked(index);
-    }
     pickReply(index);
 }
 
 void Dialog::startDialog(SpatialObject &owner, const string &resRef) {
     shared_ptr<GffStruct> dlg(Resources.findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
-        if (_onDialogFinished) _onDialogFinished();
+        _game->openInGame();
         return;
     }
     _owner = &owner;
@@ -164,7 +160,7 @@ void Dialog::loadStartEntry() {
         }
     }
     if (entryIdx == -1) {
-        if (_onDialogFinished) _onDialogFinished();
+        _game->openInGame();
         return;
     }
     _currentEntry.reset(new DlgFile::EntryReply(_dialog->getEntry(entryIdx)));
@@ -234,9 +230,7 @@ void Dialog::finish() {
     if (_currentSpeaker) {
         static_cast<Creature &>(*_currentSpeaker).setTalking(false);
     }
-    if (_onDialogFinished) {
-        _onDialogFinished();
-    }
+    _game->openInGame();
 }
 
 void Dialog::loadCurrentSpeaker() {
@@ -457,18 +451,6 @@ Camera &Dialog::camera() const {
     shared_ptr<Area> area(_game->module()->area());
 
     return cameraModel.empty() ? area->dialogCamera() : static_cast<Camera &>(area->animatedCamera());
-}
-
-void Dialog::setPickReplyEnabled(bool enabled) {
-    _pickReplyEnabled = enabled;
-}
-
-void Dialog::setOnReplyPicked(const function<void(uint32_t)> &fn) {
-    _onReplyPicked = fn;
-}
-
-void Dialog::setOnDialogFinished(const function<void()> &fn) {
-    _onDialogFinished = fn;
 }
 
 } // namespace game

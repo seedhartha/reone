@@ -48,11 +48,23 @@ public:
     CharacterGeneration(Game *game, resource::GameVersion, const render::GraphicsOptions &opts);
 
     void load() override;
-
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
     void render() const override;
     void render3D() const override;
+
+    void finish();
+    void cancel();
+    void openClassSelection();
+    void openNameEntry();
+    void openPortraitSelection();
+    void openQuick();
+    void openQuickOrCustom();
+
+    const CreatureConfiguration &character() const;
+
+    void setCharacter(const CreatureConfiguration &config);
+    void setQuickStep(int step);
 
 private:
     Game *_game { nullptr };
@@ -70,26 +82,20 @@ private:
 
     // END Sub GUI
 
+    void loadCharacterModel();
+
     gui::GUI *getSubGUI() const;
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
 
     // Loading
 
     void loadClassSelection();
     void loadQuickOrCustom();
-    void loadQuickCharacterGeneration();
+    void loadQuick();
     void loadPortraitSelection();
     void loadNameEntry();
 
-    void loadCharacter(const CreatureConfiguration &config);
-
     // END Loading
-
-    // Event handling
-
-    void finishCharacterGeneration();
-
-    // END Event handling
 };
 
 } // namespace game

@@ -250,28 +250,13 @@ void Game::drawCursor() {
 }
 
 void Game::loadHUD() {
-    _hud.reset(new HUD(_version, _options.graphics));
+    _hud.reset(new HUD(this, _version, _options.graphics));
     _hud->load();
-    _hud->setOnEquipmentClick(bind(&Game::onEquipmentClick, this));
-}
-
-void Game::onEquipmentClick() {
-    _hud->resetFocus();
-
-    shared_ptr<SpatialObject> player(_module->area()->player());
-    _equipment->open(player.get());
-
-    _screen = GameScreen::Equipment;
 }
 
 void Game::loadDialogGui() {
-    _dialog.reset(new Dialog(_version, this, _options.graphics));
+    _dialog.reset(new Dialog(this, _version, _options.graphics));
     _dialog->load();
-    _dialog->setOnDialogFinished(bind(&Game::onDialogFinished, this));
-}
-
-void Game::onDialogFinished() {
-    _screen = GameScreen::InGame;
 }
 
 void Game::loadContainerGui() {
@@ -280,12 +265,8 @@ void Game::loadContainerGui() {
 }
 
 void Game::loadEquipmentGui() {
-    _equipment.reset(new Equipment(_version, _options.graphics));
+    _equipment.reset(new Equipment(this, _version, _options.graphics));
     _equipment->load();
-    _equipment->setOnClose([this]() {
-        _equipment->resetFocus();
-        _screen = GameScreen::InGame;
-    });
 }
 
 GUI *Game::getScreenGUI() const {
@@ -428,6 +409,12 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::onCameraChanged(CameraType camera) {
     _window.setRelativeMouseMode(camera == CameraType::FirstPerson);
+}
+
+void Game::openEquipment() {
+    shared_ptr<SpatialObject> player(_module->area()->player());
+    _equipment->open(player.get());
+    _screen = GameScreen::Equipment;
 }
 
 bool Game::handle(const SDL_Event &event) {

@@ -26,6 +26,8 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Equipment : public gui::GUI {
 public:
     enum class Slot {
@@ -43,18 +45,16 @@ public:
         WeapR2
     };
 
-    Equipment(resource::GameVersion version, const render::GraphicsOptions &opts);
+    Equipment(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     void open(SpatialObject *owner);
 
-    void setOnClose(const std::function<void()> &fn);
-
 private:
+    Game *_game { nullptr };
     SpatialObject *_owner { nullptr };
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
-    std::function<void()> _onClose;
 
     static resource::InventorySlot getInventorySlot(Slot slot);
     static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);

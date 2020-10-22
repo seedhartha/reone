@@ -26,26 +26,26 @@ namespace reone {
 
 namespace game {
 
+class CharacterGeneration;
+
 class PortraitSelection : public gui::GUI {
 public:
-    PortraitSelection(resource::GameVersion version, const render::GraphicsOptions &opts);
+    PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
-    void loadPortraits(const CreatureConfiguration &config);
 
-    void setOnPortraitSelected(const std::function<void(const CreatureConfiguration &)> &fn);
-    void setOnCancel(const std::function<void()> &fn);
+    void updatePortraits();
+    void resetCurrentPortrait();
 
 private:
-    CreatureConfiguration _character;
+    CharacterGeneration *_charGen { nullptr };
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };
-    std::function<void(const CreatureConfiguration &)> _onPortraitSelected;
-    std::function<void()> _onCancel;
 
-    void setButtonColors(const std::string &tag);
-    void loadCurrentPortrait();
     void onClick(const std::string &control) override;
+
+    void loadCurrentPortrait();
+    void setButtonColors(const std::string &tag);
 };
 
 } // namespace game

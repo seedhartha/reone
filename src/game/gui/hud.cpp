@@ -20,6 +20,8 @@
 #include "../../system/log.h"
 #include "../../system/gui/control/label.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -30,8 +32,11 @@ namespace reone {
 
 namespace game {
 
-HUD::HUD(GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts), _debug(opts), _select(opts) {
+HUD::HUD(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _game(game),
+    _debug(opts),
+    _select(opts) {
 
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
@@ -144,9 +149,8 @@ void HUD::render() const {
 
 void HUD::onClick(const string &control) {
     if (control == "BTN_EQU") {
-        if (_onEquipmentClick) {
-            _onEquipmentClick();
-        }
+        resetFocus();
+        _game->openEquipment();
     }
 }
 
@@ -185,10 +189,6 @@ void HUD::setContext(const GuiContext &ctx) {
     }
     _select.setContext(ctx.selection);
     _debug.setContext(ctx.debug);
-}
-
-void HUD::setOnEquipmentClick(const function<void()> &fn) {
-    _onEquipmentClick = fn;
 }
 
 } // namespace game
