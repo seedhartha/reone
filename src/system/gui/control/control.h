@@ -37,6 +37,8 @@ namespace reone {
 
 namespace gui {
 
+class GUI;
+
 /**
  * GUI control. Can render itself and handle events.
  */
@@ -84,7 +86,7 @@ public:
     static ControlType getType(const resource::GffStruct &gffs);
     static std::string getTag(const resource::GffStruct &gffs);
     static std::string getParent(const resource::GffStruct &gffs);
-    static std::unique_ptr<Control> of(ControlType type, const std::string &tag);
+    static std::unique_ptr<Control> of(GUI *gui, ControlType type, const std::string &tag);
 
     virtual ~Control() = default;
 
@@ -129,10 +131,8 @@ public:
     void setPadding(int padding);
     void setDiscardColor(const glm::vec3 &color);
 
-    void setOnClick(const std::function<void(const std::string &)> &fn);
-    void setOnItemClicked(const std::function<void(const std::string &, const std::string &)> &fn);
-
 protected:
+    GUI *_gui { nullptr };
     ControlType _type { ControlType::Invalid };
     int _id { -1 };
     std::string _tag;
@@ -151,10 +151,7 @@ protected:
     bool _discardEnabled { false };
     glm::vec3 _discardColor { false };
 
-    std::function<void(const std::string &)> _onClick;
-    std::function<void(const std::string &, const std::string &)> _onItemClicked;
-
-    Control(ControlType type);
+    Control(GUI *, ControlType type);
 
     void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
     void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;

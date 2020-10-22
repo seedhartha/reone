@@ -25,7 +25,7 @@ namespace gui {
 
 class ScrollBar : public Control {
 public:
-    ScrollBar();
+    ScrollBar(GUI *gui);
 
     void load(const resource::GffStruct &gffs) override;
     void render(const glm::ivec2 &offset, const std::string &textOverride) const override;

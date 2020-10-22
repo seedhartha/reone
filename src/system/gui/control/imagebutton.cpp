@@ -29,7 +29,7 @@ namespace reone {
 
 namespace gui {
 
-ImageButton::ImageButton() : Control(ControlType::ImageButton) {
+ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
     _clickable = true;
 }
 

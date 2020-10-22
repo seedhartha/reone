@@ -25,7 +25,7 @@ namespace gui {
 
 class Panel : public Control {
 public:
-    Panel();
+    Panel(GUI *gui);
 };
 
 } // namespace gui

@@ -25,7 +25,7 @@ namespace gui {
 
 class Label : public Control {
 public:
-    Label();
+    Label(GUI *gui);
 };
 
 } // namespace gui

@@ -45,22 +45,24 @@ public:
     virtual void render() const;
     virtual void render3D() const;
 
-    void resetFocus();
-
     void configureRootContol(const std::function<void(Control &)> &fn);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
-    void showControl(const std::string &tag);
-    void hideControl(const std::string &tag);
-    void enableControl(const std::string &tag);
     void disableControl(const std::string &tag);
+    void enableControl(const std::string &tag);
+    void hideControl(const std::string &tag);
+    void resetFocus();
+    void showControl(const std::string &tag);
 
-    void setControlFocusable(const std::string &tag, bool focusable);
-    void setControlDisabled(const std::string &tag, bool disabled);
-    void setControlText(const std::string &tag, const std::string &text);
-    void setControlFocus(const std::string &tag, bool focus);
-    void setControlHilightColor(const std::string &tag, const glm::vec3 &color);
+    virtual void onClick(const std::string &control);
+    virtual void onListBoxItemClick(const std::string &control, const std::string &item);
 
     Control &getControl(const std::string &tag) const;
+
+    void setControlDisabled(const std::string &tag, bool disabled);
+    void setControlFocus(const std::string &tag, bool focus);
+    void setControlFocusable(const std::string &tag, bool focusable);
+    void setControlHilightColor(const std::string &tag, const glm::vec3 &color);
+    void setControlText(const std::string &tag, const std::string &text);
 
 protected:
     enum class ScalingMode {
@@ -88,7 +90,6 @@ protected:
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    std::string getResRef(const std::string &base) const;
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
@@ -97,17 +98,19 @@ protected:
     virtual bool handleKeyUp(SDL_Scancode key);
 
     virtual void onFocusChanged(const std::string &control, bool focus);
-    virtual void onClick(const std::string &control);
+
+    std::string getResRef(const std::string &base) const;
 
 private:
     GUI(const GUI &) = delete;
     GUI &operator=(const GUI &) = delete;
 
+    void drawBackground() const;
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
+
     Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
-    void drawBackground() const;
 };
 
 } // namespace gui

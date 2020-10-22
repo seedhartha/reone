@@ -25,7 +25,7 @@ namespace gui {
 
 class Button : public Control {
 public:
-    Button();
+    Button(GUI *gui);
 };
 
 } // namespace gui

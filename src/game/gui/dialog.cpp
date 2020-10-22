@@ -75,7 +75,7 @@ void Dialog::loadTopFrame() {
 }
 
 void Dialog::addFrame(int top, int height) {
-    unique_ptr<Panel> frame(new Panel());
+    unique_ptr<Panel> frame(new Panel(this));
 
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
@@ -112,15 +112,17 @@ void Dialog::configureReplies() {
     Control &protoItem = replies.protoItem();
     protoItem.setHilightColor(getHilightColor(_version));
     protoItem.setTextColor(getBaseColor(_version));
-
-    replies.setOnItemClicked([this](const string &ctrl, const string &item) {
-        int replyIdx = stoi(item);
-        onReplyClicked(replyIdx);
-    });
 }
 
 void Dialog::onReplyClicked(int index) {
     pickReply(index);
+}
+
+void Dialog::onListBoxItemClick(const string &control, const string &item) {
+    if (control != "LB_REPLIES") return;
+
+    int replyIdx = stoi(item);
+    onReplyClicked(replyIdx);
 }
 
 void Dialog::startDialog(SpatialObject &owner, const string &resRef) {

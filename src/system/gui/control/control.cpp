@@ -30,6 +30,8 @@
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"
 
+#include "../gui.h"
+
 #include "button.h"
 #include "imagebutton.h"
 #include "label.h"
@@ -58,26 +60,26 @@ string Control::getParent(const GffStruct &gffs) {
     return gffs.getString("Obj_Parent");
 }
 
-unique_ptr<Control> Control::of(ControlType type, const string &tag) {
+unique_ptr<Control> Control::of(GUI *gui, ControlType type, const string &tag) {
     unique_ptr<Control> control;
     switch (type) {
         case ControlType::Panel:
-            control = make_unique<Panel>();
+            control = make_unique<Panel>(gui);
             break;
         case ControlType::Label:
-            control = make_unique<Label>();
+            control = make_unique<Label>(gui);
             break;
         case ControlType::ImageButton:
-            control = make_unique<ImageButton>();
+            control = make_unique<ImageButton>(gui);
             break;
         case ControlType::Button:
-            control = make_unique<Button>();
+            control = make_unique<Button>(gui);
             break;
         case ControlType::ListBox:
-            control = make_unique<ListBox>();
+            control = make_unique<ListBox>(gui);
             break;
         case ControlType::ScrollBar:
-            control = make_unique<ScrollBar>();
+            control = make_unique<ScrollBar>(gui);
             break;
         default:
             warn("GUI: unsupported control type: " + to_string(static_cast<int>(type)));
@@ -101,7 +103,7 @@ void Control::Extent::getCenter(int &x, int &y) const {
     y = top + height / 2;
 }
 
-Control::Control(ControlType type) : _type(type) {
+Control::Control(GUI *gui, ControlType type) : _gui(gui), _type(type) {
 }
 
 void Control::load(const GffStruct &gffs) {
@@ -199,12 +201,9 @@ bool Control::handleMouseWheel(int x, int y) {
 }
 
 bool Control::handleClick(int x, int y) {
-    if (_onClick) {
-        _onClick(_tag);
-        return true;
-    }
-
-    return false;
+    _gui->resetFocus();
+    _gui->onClick(_tag);
+    return true;
 }
 
 void Control::update(float dt) {
@@ -628,14 +627,6 @@ void Control::setPadding(int padding) {
 void Control::setDiscardColor(const glm::vec3 &color) {
     _discardEnabled = true;
     _discardColor = color;
-}
-
-void Control::setOnClick(const function<void(const string &)> &fn) {
-    _onClick = fn;
-}
-
-void Control::setOnItemClicked(const function<void(const string &, const string &)> &fn) {
-    _onItemClicked = fn;
 }
 
 } // namespace gui

@@ -56,16 +56,6 @@ private:
     uint32_t _endEntryTimestamp { 0 };
     bool _entryEnded { false };
 
-    bool handleKeyDown(SDL_Scancode key) override;
-    bool handleKeyUp(SDL_Scancode key) override;
-
-    // Loading
-
-    void loadTopFrame();
-    void loadBottomFrame();
-
-    // END Loading
-
     void addFrame(int top, int height);
     void configureMessage();
     void configureReplies();
@@ -83,6 +73,18 @@ private:
     void endCurrentEntry();
 
     void onReplyClicked(int index);
+
+    bool handleKeyDown(SDL_Scancode key) override;
+    bool handleKeyUp(SDL_Scancode key) override;
+
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+
+    // Loading
+
+    void loadTopFrame();
+    void loadBottomFrame();
+
+    // END Loading
 };
 
 } // namespace game

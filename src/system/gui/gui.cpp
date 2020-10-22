@@ -55,7 +55,7 @@ void GUI::load() {
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
-    _rootControl = Control::of(type, tag);
+    _rootControl = Control::of(this, type, tag);
     _rootControl->load(*gui);
     _controlByTag[tag] = _rootControl.get();
 
@@ -115,12 +115,11 @@ void GUI::loadControl(const GffStruct &gffs) {
     string tag(Control::getTag(gffs));
     string parent(Control::getParent(gffs));
 
-    unique_ptr<Control> control(Control::of(type, tag));
+    unique_ptr<Control> control(Control::of(this, type, tag));
     if (!control) return;
 
     preloadControl(*control);
     control->load(gffs);
-    control->setOnClick(bind(&GUI::onClick, this, _1));
 
     switch (_scaling) {
         case ScalingMode::PositionRelativeToCenter:
@@ -229,6 +228,9 @@ Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &
 }
 
 void GUI::onFocusChanged(const string &control, bool focus) {
+}
+
+void GUI::onListBoxItemClick(const string &control, const std::string &item) {
 }
 
 void GUI::update(float dt) {

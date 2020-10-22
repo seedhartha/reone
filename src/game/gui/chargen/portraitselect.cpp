@@ -121,8 +121,6 @@ void PortraitSelection::loadCurrentPortrait() {
 }
 
 void PortraitSelection::onClick(const string &control) {
-    resetFocus();
-
     int portraitCount = static_cast<int>(_portraits.size());
 
     if (control == "BTN_ARRL") {

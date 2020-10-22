@@ -21,7 +21,7 @@ namespace reone {
 
 namespace gui {
 
-Label::Label() : Control(ControlType::Label) {
+Label::Label(GUI *gui) : Control(gui, ControlType::Label) {
     _focusable = false;
 }
 

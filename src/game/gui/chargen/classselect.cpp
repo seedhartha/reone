@@ -244,8 +244,6 @@ int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
 }
 
 void ClassSelection::onClick(const string &control) {
-    resetFocus();
-
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
         _charGen->setCharacter(_classButtons[idx].config);
