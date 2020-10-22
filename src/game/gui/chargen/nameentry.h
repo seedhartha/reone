@@ -24,20 +24,18 @@ namespace reone {
 
 namespace game {
 
+class CharacterGeneration;
+
 class NameEntry : public gui::GUI {
 public:
-    NameEntry(resource::GameVersion version, const render::GraphicsOptions &opts);
+    NameEntry(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
 
-    void setOnEnd(const std::function<void()> &fn);
-    void setOnBack(const std::function<void()> &fn);
-
 private:
+    CharacterGeneration *_charGen { nullptr };
     gui::TextInput _input;
-    std::function<void()> _onEnd;
-    std::function<void()> _onBack;
 
     void onClick(const std::string &control) override;
 };

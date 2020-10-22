@@ -23,24 +23,23 @@ namespace reone {
 
 namespace game {
 
+class CharacterGeneration;
+
 class QuickCharacterGeneration : public gui::GUI {
 public:
-    QuickCharacterGeneration(resource::GameVersion version, const render::GraphicsOptions &opts);
+    QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 
     void setStep(int step);
 
-    void setOnStepSelected(const std::function<void(int)> &fn);
-    void setOnCancel(const std::function<void()> &fn);
-
 private:
+    CharacterGeneration *_charGen { nullptr };
     int _step { 0 };
 
-    std::function<void(int)> _onStepSelected;
-    std::function<void()> _onCancel;
-
     void onClick(const std::string &control) override;
+
+    void doSetStep(int step);
 };
 
 } // namespace game

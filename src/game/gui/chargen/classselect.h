@@ -28,16 +28,14 @@ namespace reone {
 
 namespace game {
 
+class CharacterGeneration;
 class Game;
 
 class ClassSelection : public gui::GUI {
 public:
-    ClassSelection(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    ClassSelection(Game *game, CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
-
-    void setOnClassSelected(const std::function<void(const CreatureConfiguration &)> &fn);
-    void setOnCancel(const std::function<void()> &fn);
 
 private:
     struct ClassButton {
@@ -47,12 +45,11 @@ private:
     };
 
     Game *_game { nullptr };
+    CharacterGeneration *_charGen { nullptr };
     resource::GameVersion _version { resource::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;
-    std::function<void(const CreatureConfiguration &)> _onClassSelected;
-    std::function<void()> _onCancel;
 
     void configureClassButtons();
     void configureClassModels();

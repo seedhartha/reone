@@ -22,6 +22,8 @@
 
 #include "../colors.h"
 
+#include "chargen.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -32,7 +34,10 @@ namespace reone {
 
 namespace game {
 
-PortraitSelection::PortraitSelection(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _charGen(charGen) {
+
     _resRef = getResRef("portcust");
 
     switch (version) {
@@ -65,15 +70,12 @@ void PortraitSelection::setButtonColors(const string &tag) {
     control.setHilight(move(hilight));
 }
 
-void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
-    if (!_portraits.empty() && _character == config) return;
-
-    _character = config;
+void PortraitSelection::updatePortraits() {
+    _portraits.clear();
 
     shared_ptr<TwoDaTable> portraits(Resources.find2DA("portraits"));
-    int sex = _character.gender == Gender::Female ? 1 : 0;
-
-    _portraits.clear();
+    const CreatureConfiguration &character = _charGen->character();
+    int sex = character.gender == Gender::Female ? 1 : 0;
 
     for (auto &row : portraits->rows()) {
         if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
@@ -94,14 +96,18 @@ void PortraitSelection::loadPortraits(const CreatureConfiguration &config) {
             _portraits.push_back(move(portrait));
         }
     }
-    auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&config](const Portrait &portrait) {
+    resetCurrentPortrait();
+}
+
+void PortraitSelection::resetCurrentPortrait() {
+    const CreatureConfiguration &character = _charGen->character();
+    auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&character](const Portrait &portrait) {
         return
-            portrait.appearanceNumber == config.appearance ||
-            portrait.appearanceS == config.appearance ||
-            portrait.appearanceL == config.appearance;
+            portrait.appearanceNumber == character.appearance ||
+            portrait.appearanceS == character.appearance ||
+            portrait.appearanceL == character.appearance;
     });
     _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
-
     loadCurrentPortrait();
 }
 
@@ -115,6 +121,8 @@ void PortraitSelection::loadCurrentPortrait() {
 }
 
 void PortraitSelection::onClick(const string &control) {
+    resetFocus();
+
     int portraitCount = static_cast<int>(_portraits.size());
 
     if (control == "BTN_ARRL") {
@@ -129,35 +137,28 @@ void PortraitSelection::onClick(const string &control) {
         loadCurrentPortrait();
 
     } else if (control == "BTN_ACCEPT") {
-        if (_onPortraitSelected) {
-            int appearance;
-            switch (_character.clazz) {
-                case ClassType::Scoundrel:
-                    appearance = _portraits[_currentPortrait].appearanceS;
-                    break;
-                case ClassType::Soldier:
-                    appearance = _portraits[_currentPortrait].appearanceL;
-                    break;
-                default:
-                    appearance = _portraits[_currentPortrait].appearanceNumber;
-                    break;
-            }
-            CreatureConfiguration charGenInfo(_character);
-            charGenInfo.appearance = appearance;
-            _onPortraitSelected(charGenInfo);
+        CreatureConfiguration character(_charGen->character());
+        int appearance;
+        switch (character.clazz) {
+            case ClassType::Scoundrel:
+                appearance = _portraits[_currentPortrait].appearanceS;
+                break;
+            case ClassType::Soldier:
+                appearance = _portraits[_currentPortrait].appearanceL;
+                break;
+            default:
+                appearance = _portraits[_currentPortrait].appearanceNumber;
+                break;
         }
+        character.appearance = appearance;
+        _charGen->setQuickStep(1);
+        _charGen->setCharacter(character);
+        _charGen->openQuick();
 
     } else if (control == "BTN_BACK") {
-        if (_onCancel) _onCancel();
+        resetCurrentPortrait();
+        _charGen->openQuick();
     }
-}
-
-void PortraitSelection::setOnPortraitSelected(const function<void(const CreatureConfiguration &)> &fn) {
-    _onPortraitSelected = fn;
-}
-
-void PortraitSelection::setOnCancel(const function<void()> &fn) {
-    _onCancel = fn;
 }
 
 } // namespace game

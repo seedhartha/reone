@@ -29,22 +29,22 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class HUD : public gui::GUI {
 public:
-    HUD(resource::GameVersion version, const render::GraphicsOptions &opts);
+    HUD(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 
     void render() const override;
 
     void setContext(const GuiContext &ctx);
-    void setOnEquipmentClick(const std::function<void()> &fn);
 
 private:
+    Game *_game { nullptr };
     DebugOverlay _debug;
     SelectionOverlay _select;
-
-    std::function<void()> _onEquipmentClick;
 
     void onClick(const std::string &control) override;
 };

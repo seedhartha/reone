@@ -21,6 +21,8 @@
 
 #include "../colors.h"
 
+#include "chargen.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -31,7 +33,10 @@ namespace reone {
 
 namespace game {
 
-QuickCharacterGeneration::QuickCharacterGeneration(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _charGen(charGen) {
+
     _resRef = getResRef("quickpnl");
 
     if (_version == GameVersion::TheSithLords) {
@@ -42,10 +47,20 @@ QuickCharacterGeneration::QuickCharacterGeneration(GameVersion version, const Gr
 
 void QuickCharacterGeneration::load() {
     GUI::load();
-    setStep(0);
+    doSetStep(0);
+
+    if (_version == GameVersion::KotOR) {
+        configureControl("LBL_DECORATION", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+    }
 }
 
 void QuickCharacterGeneration::setStep(int step) {
+    if (_step != step) {
+        doSetStep(step);
+    }
+}
+
+void QuickCharacterGeneration::doSetStep(int step) {
     _step = step;
 
     setControlFocusable("LBL_1", false);
@@ -84,34 +99,32 @@ void QuickCharacterGeneration::setStep(int step) {
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {
+    resetFocus();
+
     if (control == "BTN_CANCEL") {
         setStep(0);
+        _charGen->openQuickOrCustom();
 
-        if (_onCancel) {
-            _onCancel();
-        }
     } else if (control == "BTN_BACK") {
         if (_step == 0) {
-            if (_onCancel) {
-                _onCancel();
-            }
+            _charGen->openQuickOrCustom();
         } else {
             setStep(_step - 1);
         }
     } else if (boost::starts_with(control, "BTN_STEPNAME")) {
         int step = control[12] - '0';
-        if (_onStepSelected) {
-            _onStepSelected(step);
+        switch (step) {
+            case 1:
+                _charGen->openPortraitSelection();
+                break;
+            case 2:
+                _charGen->openNameEntry();
+                break;
+            default:
+                _charGen->finish();
+                break;
         }
     }
-}
-
-void QuickCharacterGeneration::setOnStepSelected(const function<void(int)> &fn) {
-    _onStepSelected = fn;
-}
-
-void QuickCharacterGeneration::setOnCancel(const function<void()> &fn) {
-    _onCancel = fn;
 }
 
 } // namespace game

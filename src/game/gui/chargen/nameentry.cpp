@@ -19,6 +19,8 @@
 
 #include "../colors.h"
 
+#include "chargen.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -29,8 +31,9 @@ namespace reone {
 
 namespace game {
 
-NameEntry::NameEntry(GameVersion version, const GraphicsOptions &opts) :
+NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
+    _charGen(charGen),
     _input(kTextInputLetters | kTextInputWhitespace) {
 
     _resRef = getResRef("name");
@@ -62,23 +65,15 @@ bool NameEntry::handle(const SDL_Event &event) {
 }
 
 void NameEntry::onClick(const string &control) {
+    resetFocus();
+
     if (control == "END_BTN") {
-        if (_onEnd) {
-            _onEnd();
-        }
+        _charGen->setQuickStep(2);
+        _charGen->openQuick();
+
     } else if (control == "BTN_BACK") {
-        if (_onBack) {
-            _onBack();
-        }
+        _charGen->openQuick();
     }
-}
-
-void NameEntry::setOnEnd(const function<void()> &fn) {
-    _onEnd = fn;
-}
-
-void NameEntry::setOnBack(const function<void()> &fn) {
-    _onBack = fn;
 }
 
 } // namespace game

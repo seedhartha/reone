@@ -70,157 +70,34 @@ void CharacterGeneration::load() {
 
     loadClassSelection();
     loadQuickOrCustom();
-    loadQuickCharacterGeneration();
+    loadQuick();
     loadPortraitSelection();
     loadNameEntry();
 }
 
 void CharacterGeneration::loadClassSelection() {
-    _classSelection = make_unique<ClassSelection>(_game, _version, _gfxOpts);
+    _classSelection = make_unique<ClassSelection>(_game, this, _version, _gfxOpts);
     _classSelection->load();
-    _classSelection->setOnClassSelected([this](const CreatureConfiguration &config) {
-        _classSelection->resetFocus();
-        _portraitSelection->loadPortraits(config);
-        loadCharacter(config);
-        showControl("MODEL_LBL");
-        _screen = CharGenScreen::QuickOrCustom;
-    });
-    _classSelection->setOnCancel([this]() {
-        _classSelection->resetFocus();
-        _game->openMainMenu();
-    });
-}
-
-void CharacterGeneration::loadCharacter(const CreatureConfiguration &config) {
-    _character = config;
-
-    Control &lblModel = getControl("MODEL_LBL");
-    const Control::Extent &extent = lblModel.extent();
-    float aspect = extent.width / static_cast<float>(extent.height);
-
-    glm::mat4 cameraTransform(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, config, _1))
-        .modelScale(kModelScale)
-        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
-        .cameraTransform(cameraTransform)
-        .ambientLightColor(glm::vec3(1.0f))
-        .build());
-
-    lblModel.setScene3D(move(scene));
-
-    string portrait(findPortrait(config.appearance));
-    Control &lblPortrait = getControl("PORTRAIT_LBL");
-
-    if (!portrait.empty()) {
-        lblPortrait.setBorderFill(portrait);
-    }
-}
-
-shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
-
-    unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(config);
-
-    return creature->model();
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(_version, _gfxOpts);
+    _quickOrCustom = make_unique<QuickOrCustom>(this, _version, _gfxOpts);
     _quickOrCustom->load();
-    _quickOrCustom->setOnQuickCharacter([this]() {
-        _quickOrCustom->resetFocus();
-        _screen = CharGenScreen::Quick;
-    });
-    _quickOrCustom->setOnBack([this]() {
-        _quickOrCustom->resetFocus();
-        hideControl("MODEL_LBL");
-        _screen = CharGenScreen::ClassSelection;
-    });
 }
 
-void CharacterGeneration::loadQuickCharacterGeneration() {
-    _quick = make_unique<QuickCharacterGeneration>(_version, _gfxOpts);
+void CharacterGeneration::loadQuick() {
+    _quick = make_unique<QuickCharacterGeneration>(this, _version, _gfxOpts);
     _quick->load();
-
-    if (_version == GameVersion::KotOR) {
-        _quick->configureControl("LBL_DECORATION", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
-    }
-    _quick->setOnStepSelected([this](int step) {
-        _quick->resetFocus();
-
-        switch (step) {
-            case 1:
-                hideControl("MODEL_LBL");
-                _portraitSelection->loadPortraits(_character);
-                _screen = CharGenScreen::PortraitSelection;
-                break;
-            case 2:
-                hideControl("MODEL_LBL");
-                _screen = CharGenScreen::Name;
-                break;
-            default:
-                finishCharacterGeneration();
-                break;
-        }
-    });
-    _quick->setOnCancel([this]() {
-        _quick->resetFocus();
-        _screen = CharGenScreen::QuickOrCustom;
-    });
-}
-
-void CharacterGeneration::finishCharacterGeneration() {
-    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
-
-    CreatureConfiguration config(_character);
-    config.equipment.clear();
-
-    PartyConfiguration party;
-    party.memberCount = 1;
-    party.leader = config;
-
-    _game->loadModule(moduleName, party);
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(_version, _gfxOpts);
+    _portraitSelection = make_unique<PortraitSelection>(this, _version, _gfxOpts);
     _portraitSelection->load();
-    _portraitSelection->setOnPortraitSelected([this](const CreatureConfiguration &config) {
-        _portraitSelection->resetFocus();
-        loadCharacter(config);
-        showControl("MODEL_LBL");
-        _screen = CharGenScreen::Quick;
-        _quick->setStep(1);
-    });
-    _portraitSelection->setOnCancel([this]() {
-        _portraitSelection->resetFocus();
-        showControl("MODEL_LBL");
-        _screen = CharGenScreen::Quick;
-    });
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(_version, _gfxOpts);
+    _nameEntry = make_unique<NameEntry>(this, _version, _gfxOpts);
     _nameEntry->load();
-    _nameEntry->setOnEnd([this]() {
-        _nameEntry->resetFocus();
-        showControl("MODEL_LBL");
-        _screen = CharGenScreen::Quick;
-        _quick->setStep(2);
-    });
-    _nameEntry->setOnBack([this]() {
-        _nameEntry->resetFocus();
-        showControl("MODEL_LBL");
-        _screen = CharGenScreen::Quick;
-    });
 }
 
 bool CharacterGeneration::handle(const SDL_Event &event) {
@@ -260,6 +137,100 @@ void CharacterGeneration::render() const {
 void CharacterGeneration::render3D() const {
     GUI::render3D();
     getSubGUI()->render3D();
+}
+
+void CharacterGeneration::finish() {
+    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+
+    CreatureConfiguration config(_character);
+    config.equipment.clear();
+
+    PartyConfiguration party;
+    party.memberCount = 1;
+    party.leader = config;
+
+    _game->loadModule(moduleName, party);
+}
+
+void CharacterGeneration::cancel() {
+    _game->openMainMenu();
+}
+
+void CharacterGeneration::openClassSelection() {
+    hideControl("MODEL_LBL");
+    _screen = CharGenScreen::ClassSelection;
+}
+
+void CharacterGeneration::openNameEntry() {
+    hideControl("MODEL_LBL");
+    _screen = CharGenScreen::Name;
+}
+
+void CharacterGeneration::openPortraitSelection() {
+    hideControl("MODEL_LBL");
+    _screen = CharGenScreen::PortraitSelection;
+}
+
+void CharacterGeneration::openQuick() {
+    showControl("MODEL_LBL");
+    _screen = CharGenScreen::Quick;
+}
+
+void CharacterGeneration::openQuickOrCustom() {
+    showControl("MODEL_LBL");
+    _screen = CharGenScreen::QuickOrCustom;
+}
+
+void CharacterGeneration::loadCharacterModel() {
+    Control &lblModel = getControl("MODEL_LBL");
+    const Control::Extent &extent = lblModel.extent();
+    float aspect = extent.width / static_cast<float>(extent.height);
+
+    glm::mat4 cameraTransform(1.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
+        .modelScale(kModelScale)
+        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
+        .cameraTransform(cameraTransform)
+        .ambientLightColor(glm::vec3(1.0f))
+        .build());
+
+    lblModel.setScene3D(move(scene));
+
+    string portrait(findPortrait(_character.appearance));
+    if (!portrait.empty()) {
+        Control &lblPortrait = getControl("PORTRAIT_LBL");
+        lblPortrait.setBorderFill(portrait);
+    }
+}
+
+shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
+
+    unique_ptr<Creature> creature(objectFactory->newCreature());
+    creature->load(_character);
+
+    return creature->model();
+}
+
+const CreatureConfiguration &CharacterGeneration::character() const {
+    return _character;
+}
+
+void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
+    _character = config;
+    loadCharacterModel();
+    _portraitSelection->updatePortraits();
+}
+
+void CharacterGeneration::setQuickStep(int step) {
+    _quick->setStep(step);
 }
 
 } // namespace game

@@ -33,7 +33,7 @@ class Game;
 
 class Dialog : public gui::GUI {
 public:
-    Dialog(resource::GameVersion version, Game *game, const render::GraphicsOptions &opts);
+    Dialog(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     void startDialog(SpatialObject &owner, const std::string &resRef);
@@ -44,10 +44,6 @@ public:
 
     Camera &camera() const;
 
-    void setPickReplyEnabled(bool enabled);
-    void setOnReplyPicked(const std::function<void(uint32_t)> &fn);
-    void setOnDialogFinished(const std::function<void()> &fn);
-
 private:
     Game *_game { nullptr };
     SpatialObject *_owner { nullptr };
@@ -55,18 +51,10 @@ private:
     std::shared_ptr<resource::DlgFile::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
     SpatialObject *_currentSpeaker { nullptr };
-    bool _pickReplyEnabled { true };
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
     uint32_t _endEntryTimestamp { 0 };
     bool _entryEnded { false };
-
-    // Callbacks
-
-    std::function<void(uint32_t)> _onReplyPicked;
-    std::function<void()> _onDialogFinished;
-
-    // END Callbacks
 
     bool handleKeyDown(SDL_Scancode key) override;
     bool handleKeyUp(SDL_Scancode key) override;

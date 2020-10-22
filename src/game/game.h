@@ -72,6 +72,7 @@ public:
     void openContainer(SpatialObject *container);
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
     void onCameraChanged(CameraType camera);
+    void openEquipment();
 
     bool handle(const SDL_Event &event) override;
 
@@ -206,7 +207,6 @@ private:
     // Event handlers
 
     void onDialogFinished();
-    void onEquipmentClick();
 
     // END Event handlers
 };
