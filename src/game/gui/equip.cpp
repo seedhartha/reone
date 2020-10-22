@@ -73,7 +73,13 @@ void Equipment::load() {
     GUI::load();
 
     hideControl("LB_DESC");
+    hideControl("LBL_ATKL");
+    hideControl("LBL_ATKR");
     hideControl("LBL_CANTEQUIP");
+    hideControl("LBL_DEF");
+    hideControl("LBL_TOHITL");
+    hideControl("LBL_TOHITR");
+    hideControl("LBL_VITALITY");
 
     configureItemsListBox();
 }
@@ -95,41 +101,83 @@ void Equipment::configureItemsListBox() {
     protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
 }
 
+static InventorySlot getInventorySlot(Equipment::Slot slot) {
+    switch (slot) {
+        case Equipment::Slot::Implant:
+            return InventorySlot::kInventorySlotImplant;
+        case Equipment::Slot::Head:
+            return InventorySlot::kInventorySlotHead;
+        case Equipment::Slot::Hands:
+            return InventorySlot::kInventorySlotHands;
+        case Equipment::Slot::ArmL:
+            return InventorySlot::kInventorySlotLeftArm;
+        case Equipment::Slot::Body:
+            return InventorySlot::kInventorySlotBody;
+        case Equipment::Slot::ArmR:
+            return InventorySlot::kInventorySlotRightArm;
+        case Equipment::Slot::WeapL:
+            return InventorySlot::kInventorySlotLeftWeapon;
+        case Equipment::Slot::Belt:
+            return InventorySlot::kInventorySlotBelt;
+        case Equipment::Slot::WeapR:
+            return InventorySlot::kInventorySlotRightWeapon;
+        case Equipment::Slot::WeapL2:
+            return InventorySlot::kInventorySlotLeftWeapon2;
+        case Equipment::Slot::WeapR2:
+            return InventorySlot::kInventorySlotRightWeapon2;
+        default:
+            throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
+    }
+}
+
 void Equipment::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
 
+    Creature *partyLeader = _game->party().leader();
     shared_ptr<Item> itemObj;
-
     if (item != "[none]") {
-        for (auto &ownerItem : _owner->items()) {
+        for (auto &ownerItem : partyLeader->items()) {
             if (ownerItem->tag() == item) {
                 itemObj = ownerItem;
                 break;
             }
         }
     }
-
-    Creature &owner = static_cast<Creature &>(*_owner);
     InventorySlot slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Item> equipped = owner.getEquippedItem(slot);
+    shared_ptr<Item> equipped = partyLeader->getEquippedItem(slot);
 
     if (equipped != itemObj) {
         if (equipped) {
-            owner.unequip(equipped);
+            partyLeader->unequip(equipped);
         }
         if (itemObj) {
-            owner.equip(slot, itemObj);
+            partyLeader->equip(slot, itemObj);
         }
         updateEquipment();
         selectSlot(Slot::None);
     }
 }
 
-void Equipment::open(SpatialObject *owner) {
-    _owner = owner;
-
+void Equipment::update() {
+    updatePortraits();
     updateEquipment();
     selectSlot(Slot::None);
+}
+
+void Equipment::updatePortraits() {
+    Party &party = _game->party();
+    Creature *partyLeader = party.leader();
+    Creature *partyMember1 = party.getMember(1);
+    Creature *partyMember2 = party.getMember(2);
+
+    Control &lblPortrait = getControl("LBL_PORTRAIT");
+    lblPortrait.setBorderFill(partyLeader->portrait());
+
+    Control &btnChange1 = getControl("BTN_CHANGE1");
+    btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+
+    Control &btnChange2 = getControl("BTN_CHANGE2");
+    btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void Equipment::preloadControl(Control &control) {
@@ -177,9 +225,56 @@ void Equipment::selectSlot(Slot slot) {
     updateItems();
 }
 
+static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
+    static unordered_map<Equipment::Slot, shared_ptr<Texture>> icons;
+
+    auto icon = icons.find(slot);
+    if (icon != icons.end()) return icon->second;
+
+    string resRef;
+    switch (slot) {
+        case Equipment::Slot::Implant:
+            resRef = "iimplant";
+            break;
+        case Equipment::Slot::Head:
+            resRef = "ihead";
+            break;
+        case Equipment::Slot::Hands:
+            resRef = "ihands";
+            break;
+        case Equipment::Slot::ArmL:
+            resRef = "iforearm_l";
+            break;
+        case Equipment::Slot::Body:
+            resRef = "iarmor";
+            break;
+        case Equipment::Slot::ArmR:
+            resRef = "iforearm_r";
+            break;
+        case Equipment::Slot::WeapL:
+        case Equipment::Slot::WeapL2:
+            resRef = "iweap_l";
+            break;
+        case Equipment::Slot::Belt:
+            resRef = "ibelt";
+            break;
+        case Equipment::Slot::WeapR:
+        case Equipment::Slot::WeapR2:
+            resRef = "iweap_r";
+            break;
+        default:
+            return nullptr;
+    }
+
+    shared_ptr<Texture> texture(Resources.findTexture(resRef, TextureType::GUI));
+    auto pair = icons.insert(make_pair(slot, texture));
+
+    return pair.first->second;
+}
+
 void Equipment::updateEquipment() {
-    Creature &owner = static_cast<Creature &>(*_owner);
-    const map<InventorySlot, shared_ptr<Item>> &equipment = owner.equipment();
+    Creature *partyLeader = _game->party().leader();
+    const map<InventorySlot, shared_ptr<Item>> &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
         string tag("LBL_INV_" + name.second);
@@ -198,82 +293,6 @@ void Equipment::updateEquipment() {
     }
 }
 
-InventorySlot Equipment::getInventorySlot(Slot slot) {
-    switch (slot) {
-        case Slot::Implant:
-            return InventorySlot::kInventorySlotImplant;
-        case Slot::Head:
-            return InventorySlot::kInventorySlotHead;
-        case Slot::Hands:
-            return InventorySlot::kInventorySlotHands;
-        case Slot::ArmL:
-            return InventorySlot::kInventorySlotLeftArm;
-        case Slot::Body:
-            return InventorySlot::kInventorySlotBody;
-        case Slot::ArmR:
-            return InventorySlot::kInventorySlotRightArm;
-        case Slot::WeapL:
-            return InventorySlot::kInventorySlotLeftWeapon;
-        case Slot::Belt:
-            return InventorySlot::kInventorySlotBelt;
-        case Slot::WeapR:
-            return InventorySlot::kInventorySlotRightWeapon;
-        case Slot::WeapL2:
-            return InventorySlot::kInventorySlotLeftWeapon2;
-        case Slot::WeapR2:
-            return InventorySlot::kInventorySlotRightWeapon2;
-        default:
-            throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
-    }
-}
-
-shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) {
-    static unordered_map<Slot, shared_ptr<Texture>> icons;
-
-    auto icon = icons.find(slot);
-    if (icon != icons.end()) return icon->second;
-
-    string resRef;
-    switch (slot) {
-        case Slot::Implant:
-            resRef = "iimplant";
-            break;
-        case Slot::Head:
-            resRef = "ihead";
-            break;
-        case Slot::Hands:
-            resRef = "ihands";
-            break;
-        case Slot::ArmL:
-            resRef = "iforearm_l";
-            break;
-        case Slot::Body:
-            resRef = "iarmor";
-            break;
-        case Slot::ArmR:
-            resRef = "iforearm_r";
-            break;
-        case Slot::WeapL:
-        case Slot::WeapL2:
-            resRef = "iweap_l";
-            break;
-        case Slot::Belt:
-            resRef = "ibelt";
-            break;
-        case Slot::WeapR:
-        case Slot::WeapR2:
-            resRef = "iweap_r";
-            break;
-        default:
-            return nullptr;
-    }
-
-    shared_ptr<Texture> texture(Resources.findTexture(resRef, TextureType::GUI));
-    auto pair = icons.insert(make_pair(slot, texture));
-
-    return pair.first->second;
-}
-
 void Equipment::updateItems() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.clear();
@@ -286,7 +305,9 @@ void Equipment::updateItems() {
 
         lbItems.add(move(lbItem));
     }
-    for (auto &item : _owner->items()) {
+    Creature *partyLeader = _game->party().leader();
+
+    for (auto &item : partyLeader->items()) {
         const ItemBlueprint &blueprint = item->blueprint();
 
         if (_selectedSlot == Slot::None) {

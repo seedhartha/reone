@@ -424,8 +424,7 @@ void Game::onCameraChanged(CameraType camera) {
 }
 
 void Game::openEquipment() {
-    shared_ptr<SpatialObject> player(_module->area()->player());
-    _equipment->open(player.get());
+    _equipment->update();
     _screen = GameScreen::Equipment;
 }
 

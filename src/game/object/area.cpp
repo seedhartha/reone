@@ -406,18 +406,22 @@ void Area::landObject(SpatialObject &object) {
 }
 
 void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading) {
+    _game->party().clear();
+
     if (party.memberCount > 0) {
         shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
         landObject(*partyLeader);
         add(partyLeader);
         _player = partyLeader;
         _partyLeader = partyLeader;
+        _game->party().addMember(partyLeader.get());
     }
     if (party.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember1 = partyMember;
+        _game->party().addMember(partyMember.get());
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));
@@ -427,6 +431,7 @@ void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position,
         landObject(*partyMember);
         add(partyMember);
         _partyMember2 = partyMember;
+        _game->party().addMember(partyMember.get());
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));

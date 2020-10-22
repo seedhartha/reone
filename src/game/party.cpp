@@ -48,6 +48,10 @@ bool Party::addMember(Creature *member) {
     return true;
 }
 
+void Party::clear() {
+    _members.clear();
+}
+
 void Party::switchLeader() {
     int count = static_cast<int>(_members.size());
     if (count < 2) return;

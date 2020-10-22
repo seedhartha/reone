@@ -20,12 +20,11 @@
 #include "../../system/gui/gui.h"
 #include "../../system/resource/types.h"
 
-#include "../object/spatial.h"
-
 namespace reone {
 
 namespace game {
 
+class Creature;
 class Game;
 
 class Equipment : public gui::GUI {
@@ -48,25 +47,23 @@ public:
     Equipment(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
-    void open(SpatialObject *owner);
+
+    void update();
 
 private:
     Game *_game { nullptr };
-    SpatialObject *_owner { nullptr };
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
-
-    static resource::InventorySlot getInventorySlot(Slot slot);
-    static std::shared_ptr<render::Texture> getEmptySlotIcon(Slot slot);
-
-    void configureItemsListBox();
-    void selectSlot(Slot slot);
-    void updateEquipment();
-    void updateItems();
 
     void onClick(const std::string &control) override;
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
     void preloadControl(gui::Control &control) override;
+
+    void configureItemsListBox();
+    void updateEquipment();
+    void updateItems();
+    void updatePortraits();
+    void selectSlot(Slot slot);
 };
 
 } // namespace game
