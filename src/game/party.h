@@ -34,6 +34,7 @@ class Party {
 public:
     bool addAvailableMember(int npc, const std::string &blueprint);
     bool addMember(Creature *member);
+    void clear();
     void switchLeader();
 
     Creature *getMember(int index) const;

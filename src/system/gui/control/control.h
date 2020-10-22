@@ -121,6 +121,7 @@ public:
     virtual void setExtent(const Extent &extent);
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
+    void setBorderFill(const std::shared_ptr<render::Texture> &texture);
     void setBorderColor(const glm::vec3 &color);
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);

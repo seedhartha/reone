@@ -573,13 +573,23 @@ void Control::setBorder(const Border &border) {
 }
 
 void Control::setBorderFill(const string &resRef) {
-    if (!_border) {
-        _border = make_shared<Border>();
-    }
+    shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        _border->fill = Resources.findTexture(resRef, TextureType::GUI);
-    } else {
+        texture = Resources.findTexture(resRef, TextureType::GUI);
+    }
+    setBorderFill(texture);
+}
+
+void Control::setBorderFill(const shared_ptr<Texture> &texture) {
+    if (!texture && _border) {
         _border->fill.reset();
+        return;
+    }
+    if (texture) {
+        if (!_border) {
+            _border = make_shared<Border>();
+        }
+        _border->fill = texture;
     }
 }
 
