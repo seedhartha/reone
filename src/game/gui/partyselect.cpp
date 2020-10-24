@@ -17,6 +17,14 @@
 
 #include "partyselect.h"
 
+#include "../../system/gui/control/label.h"
+#include "../../system/resource/resources.h"
+
+#include "../game.h"
+#include "../portraits.h"
+
+using namespace std;
+
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
@@ -25,13 +33,61 @@ namespace reone {
 
 namespace game {
 
-PartySelection::PartySelection(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
+static map<int, string> g_portraitByAppearance = {
+    { 378, "po_ptrask"}
+};
+
+PartySelection::PartySelection(Game *game, GameVersion version, const GraphicsOptions &opts) :
+    GUI(version, opts),
+    _game(game) {
+
     _resRef = getResRef("partyselection");
     _backgroundType = BackgroundType::Menu;
 }
 
 void PartySelection::load() {
     GUI::load();
+}
+
+void PartySelection::update() {
+    Party &party = _game->party();
+
+    for (int i = 0; i < kNpcCount; ++i) {
+        Label &lblChar = static_cast<Label &>(getControl("LBL_CHAR" + to_string(i)));
+        Label &lblNa = static_cast<Label &>(getControl("LBL_NA" + to_string(i)));
+
+        if (party.isMemberAvailable(i)) {
+            string blueprintResRef(party.getAvailableMember(i));
+
+            shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(blueprintResRef));
+            int appearance = blueprint->appearance();
+
+            string portrait;
+
+            auto maybePortrait = g_portraitByAppearance.find(appearance);
+            if (maybePortrait != g_portraitByAppearance.end()) {
+                portrait = maybePortrait->second;
+            } else {
+                portrait = findPortrait(blueprint->appearance());
+            }
+
+            lblChar.setBorderFill(Resources.findTexture(portrait, TextureType::GUI));
+            lblNa.setVisible(false);
+
+        } else {
+            lblChar.setBorderFill(shared_ptr<Texture>(nullptr));
+            lblNa.setVisible(true);
+        }
+    }
+}
+
+void PartySelection::onClick(const string &control) {
+    if (control == "BTN_ACCEPT") {
+    } else if (control == "BTN_DONE") {
+        _game->openInGame();
+    } else if (control == "BTN_BACK") {
+        _game->openInGame();
+    }
 }
 
 } // namespace game

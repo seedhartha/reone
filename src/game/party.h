@@ -37,6 +37,7 @@ public:
     void clear();
     void switchLeader();
 
+    const std::string &getAvailableMember(int npc) const;
     Creature *getMember(int index) const;
 
     bool isMemberAvailable(int npc) const;

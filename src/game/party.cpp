@@ -73,6 +73,10 @@ void Party::switchLeader() {
     }
 }
 
+const string &Party::getAvailableMember(int npc) const {
+    return _availableMembers.find(npc)->second;
+}
+
 Creature *Party::getMember(int index) const {
     return _members.size() > index ? _members[index] : nullptr;
 }
