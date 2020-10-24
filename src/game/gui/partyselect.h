@@ -23,11 +23,24 @@ namespace reone {
 
 namespace game {
 
+static const int kNpcCount = 9;
+
+class Game;
+
 class PartySelection : public gui::GUI {
 public:
-    PartySelection(resource::GameVersion version, const render::GraphicsOptions &opts);
+    PartySelection(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
+
+    void update();
+
+private:
+    Game *_game { nullptr };
+    bool _added[kNpcCount];
+    int _selectedNpc { -1 };
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

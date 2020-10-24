@@ -90,14 +90,13 @@ protected:
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void loadBackground(BackgroundType type);
-    void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
-
     virtual bool handleKeyDown(SDL_Scancode key);
     virtual bool handleKeyUp(SDL_Scancode key);
-
     virtual void onFocusChanged(const std::string &control, bool focus);
+
+    void loadBackground(BackgroundType type);
+    void loadControl(const resource::GffStruct &gffs);
 
     std::string getResRef(const std::string &base) const;
 
