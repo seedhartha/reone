@@ -49,7 +49,7 @@ unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
         return make_unique<KeyTool>();
     } else if (ext == ".bif") {
         return make_unique<BifTool>();
-    } else if (ext == ".erf") {
+    } else if (ext == ".erf" || ext == ".mod" || ext == ".sav") {
         return make_unique<ErfTool>();
     } else if (ext == ".rim") {
         return make_unique<RimTool>();

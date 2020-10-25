@@ -34,6 +34,7 @@ enum class GameVersion {
 
 enum class ResourceType : uint16_t {
     Invalid = 0xffff,
+    Inventory = 0,
     Bmp = 1,
     Tga = 3,
     Wav = 4,
@@ -73,6 +74,7 @@ enum class ResourceType : uint16_t {
     DoorWalkmesh = 2052,
     PlaceableWalkmesh = 2053,
     Journal = 2056,
+    Mod = 2057,
     WaypointBlueprint = 2058,
     SoundSet = 2060,
     ScriptDebugger = 2064,

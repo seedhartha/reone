@@ -28,12 +28,14 @@ namespace reone {
 namespace resource {
 
 static const int kSignatureSize = 8;
-static const char kSignature[] = "ERF V1.0";
+static const char kSignatureErf[] = "ERF V1.0";
+static const char kSignatureMod[] = "MOD V1.0";
 
-ErfFile::ErfFile() : BinaryFile(kSignatureSize, kSignature) {
+ErfFile::ErfFile() : BinaryFile(0, nullptr) {
 }
 
 void ErfFile::doLoad() {
+    checkSignature();
     ignore(8);
 
     _entryCount = readUint32();
@@ -45,6 +47,22 @@ void ErfFile::doLoad() {
 
     loadKeys();
     loadResources();
+}
+
+void ErfFile::checkSignature() {
+    if (_size < kSignatureSize) {
+        throw runtime_error("Invalid binary file size");
+    }
+    char buf[kSignatureSize];
+    _in->read(buf, kSignatureSize);
+
+    bool erf = strncmp(buf, kSignatureErf, kSignatureSize) == 0;
+    if (!erf) {
+        bool mod = strncmp(buf, kSignatureMod, kSignatureSize) == 0;
+        if (!mod) {
+            throw runtime_error("Invalid ERF file signature");
+        }
+    }
 }
 
 void ErfFile::loadKeys() {
