@@ -118,6 +118,6 @@ public:
     virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

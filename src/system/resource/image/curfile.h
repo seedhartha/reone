@@ -43,6 +43,6 @@ private:
     void loadData();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

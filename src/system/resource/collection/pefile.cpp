@@ -158,6 +158,6 @@ void PEFile::loadResourceDataEntry(const Section &section) {
     _resources.push_back(move(res));
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

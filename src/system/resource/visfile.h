@@ -42,6 +42,6 @@ private:
     void processLine(const std::string &line);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

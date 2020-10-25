@@ -117,6 +117,6 @@ const TextureFeatures &TxiFile::features() const {
     return _features;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

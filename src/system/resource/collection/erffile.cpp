@@ -147,6 +147,6 @@ const vector<ErfFile::Key> &ErfFile::keys() const {
     return _keys;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

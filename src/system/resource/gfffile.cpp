@@ -402,6 +402,6 @@ vector<uint32_t> GffFile::readList(uint32_t off) {
     return move(arr);
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

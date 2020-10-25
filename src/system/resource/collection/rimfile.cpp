@@ -99,6 +99,6 @@ const vector<RimFile::Resource> &RimFile::resources() const {
     return _resources;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

@@ -55,6 +55,6 @@ private:
     render::PixelFormat pixelFormat() const;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

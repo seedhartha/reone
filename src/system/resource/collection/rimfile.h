@@ -52,6 +52,6 @@ private:
     ByteArray getResourceData(const Resource &res);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

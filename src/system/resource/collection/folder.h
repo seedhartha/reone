@@ -52,6 +52,6 @@ private:
     void loadDirectory(const boost::filesystem::path &path);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

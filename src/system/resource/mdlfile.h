@@ -61,6 +61,6 @@ private:
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

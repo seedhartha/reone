@@ -580,6 +580,6 @@ const vector<string> &ResourceManager::moduleNames() const {
     return _moduleNames;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

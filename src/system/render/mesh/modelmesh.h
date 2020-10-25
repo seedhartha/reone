@@ -66,6 +66,6 @@ private:
     friend class resource::MdlFile;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

@@ -28,6 +28,6 @@ namespace resource {
 const std::string &getExtByResType(ResourceType type);
 ResourceType getResTypeByExt(const std::string &ext);
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

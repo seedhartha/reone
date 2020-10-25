@@ -120,6 +120,6 @@ private:
     void checkSignature();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

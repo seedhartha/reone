@@ -86,6 +86,6 @@ shared_ptr<ByteArray> Folder::find(const string &resRef, ResourceType type) {
     return make_shared<ByteArray>(move(data));
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

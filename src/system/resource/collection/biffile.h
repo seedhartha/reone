@@ -41,6 +41,6 @@ private:
     ResourceEntry readResourceEntry(int idx);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

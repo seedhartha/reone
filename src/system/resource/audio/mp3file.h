@@ -50,6 +50,6 @@ private:
     static mad_flow outputFunc(void *playbuf, mad_header const *header, mad_pcm *pcm);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

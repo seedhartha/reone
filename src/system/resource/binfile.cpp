@@ -258,6 +258,6 @@ string BinaryFile::readString(uint32_t off, int size) {
     return move(s);
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

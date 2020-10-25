@@ -118,6 +118,6 @@ shared_ptr<AudioStream> Mp3File::stream() const {
     return _stream;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

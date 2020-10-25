@@ -71,6 +71,6 @@ private:
     DoorHook getDoorHook(const std::vector<std::string> &tokens) const;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

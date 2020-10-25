@@ -189,6 +189,6 @@ shared_ptr<ScriptProgram> NcsFile::program() const {
     return _program;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

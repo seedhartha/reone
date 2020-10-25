@@ -131,6 +131,6 @@ const vector<LytFile::DoorHook> &LytFile::doorHooks() const {
     return _doorHooks;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone
