@@ -55,8 +55,14 @@ PartySelection::PartySelection(Game *game, ObjectFactory *objectFactory, GameVer
     _game(game),
     _objectFactory(objectFactory) {
 
-    _resRef = getResRef("partyselection");
-    _backgroundType = BackgroundType::Menu;
+    if (_version == GameVersion::TheSithLords) {
+        _resRef = "partyselect_p";
+        _resolutionX = 800;
+        _resolutionY = 600;
+    } else {
+        _resRef = "partyselection";
+        _backgroundType = BackgroundType::Menu;
+    }
 }
 
 void PartySelection::load() {
