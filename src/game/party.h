@@ -40,6 +40,7 @@ public:
     const std::string &getAvailableMember(int npc) const;
     Creature *getMember(int index) const;
 
+    bool empty() const;
     bool isMemberAvailable(int npc) const;
     Creature *leader() const;
 

@@ -110,35 +110,38 @@ void HUD::load() {
     hideControl("LBL_PLOTXP");
     hideControl("LBL_STEALTHXP");
 
-    hideControl("LBL_MAPBORDER");
-    hideControl("LBL_MAPVIEW");
-    hideControl("LBL_ARROW");
-    hideControl("LBL_TARGET0");
+    hideControl("BTN_ACTION0");
+    hideControl("BTN_ACTION1");
+    hideControl("BTN_ACTION2");
+    hideControl("BTN_ACTION3");
+    hideControl("BTN_ACTION4");
+    hideControl("BTN_ACTION5");
+    hideControl("BTN_ACTIONDOWN0");
+    hideControl("BTN_ACTIONDOWN1");
+    hideControl("BTN_ACTIONDOWN2");
+    hideControl("BTN_ACTIONDOWN3");
+    hideControl("BTN_ACTIONDOWN4");
+    hideControl("BTN_ACTIONDOWN5");
+    hideControl("BTN_ACTIONUP0");
+    hideControl("BTN_ACTIONUP1");
+    hideControl("BTN_ACTIONUP2");
+    hideControl("BTN_ACTIONUP3");
+    hideControl("BTN_ACTIONUP4");
+    hideControl("BTN_ACTIONUP5");
     hideControl("BTN_MINIMAP");
     hideControl("LBL_ACTION0");
-    hideControl("BTN_ACTION0");
-    hideControl("BTN_ACTIONUP0");
-    hideControl("BTN_ACTIONDOWN0");
     hideControl("LBL_ACTION1");
-    hideControl("BTN_ACTION1");
-    hideControl("BTN_ACTIONUP1");
-    hideControl("BTN_ACTIONDOWN1");
     hideControl("LBL_ACTION2");
-    hideControl("BTN_ACTION2");
-    hideControl("BTN_ACTIONUP2");
-    hideControl("BTN_ACTIONDOWN2");
     hideControl("LBL_ACTION3");
-    hideControl("BTN_ACTION3");
-    hideControl("BTN_ACTIONUP3");
-    hideControl("BTN_ACTIONDOWN3");
     hideControl("LBL_ACTION4");
-    hideControl("BTN_ACTION4");
-    hideControl("BTN_ACTIONUP4");
-    hideControl("BTN_ACTIONDOWN4");
     hideControl("LBL_ACTION5");
-    hideControl("BTN_ACTION5");
-    hideControl("BTN_ACTIONUP5");
-    hideControl("BTN_ACTIONDOWN5");
+    hideControl("LBL_ARROW");
+    hideControl("LBL_MAPBORDER");
+    hideControl("LBL_MAPVIEW");
+    hideControl("LBL_TARGET0");
+    hideControl("TB_PAUSE");
+    hideControl("TB_SOLO");
+    hideControl("TB_STEALTH");
 }
 
 void HUD::render() const {
@@ -150,6 +153,8 @@ void HUD::render() const {
 void HUD::onClick(const string &control) {
     if (control == "BTN_EQU") {
         _game->openEquipment();
+    } else if (control == "BTN_MAP") {
+        _game->openPartySelection(PartySelection::Context());
     }
 }
 

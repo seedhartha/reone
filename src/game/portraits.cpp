@@ -31,8 +31,6 @@ string findPortrait(int appearance) {
     shared_ptr<TwoDaTable> table(Resources.find2DA("portraits"));
 
     const TwoDaRow *row = table->findRow([&appearance](const TwoDaRow &row) {
-        if (row.getInt("forpc") == 0) return false;
-
         int appearanceNumber = row.getInt("appearancenumber");
         int appearanceS = row.getInt("appearance_s");
         int appearanceL = row.getInt("appearance_l");

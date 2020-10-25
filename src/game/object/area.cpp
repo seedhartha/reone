@@ -405,33 +405,49 @@ void Area::landObject(SpatialObject &object) {
     }
 }
 
-void Area::loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading) {
-    _game->party().clear();
+void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position, float heading) {
+    _partyConfig = config;
 
-    if (party.memberCount > 0) {
-        shared_ptr<Creature> partyLeader(makeCharacter(party.leader, kPartyLeaderTag, position, heading));
+    Party &party = _game->party();
+    bool firstLoad = party.empty();
+
+    if (!firstLoad) {
+        if (_partyMember1) {
+            destroyObject(*_partyMember1);
+        }
+        if (_partyMember2) {
+            destroyObject(*_partyMember2);
+        }
+        _partyMember1.reset();
+        _partyMember2.reset();
+        party.clear();
+        party.addMember(static_cast<Creature *>(_partyLeader.get()));
+    }
+    if (firstLoad && config.memberCount > 0) {
+        shared_ptr<Creature> partyLeader(makeCharacter(config.leader, kPartyLeaderTag, position, heading));
         landObject(*partyLeader);
         add(partyLeader);
         _player = partyLeader;
         _partyLeader = partyLeader;
-        _game->party().addMember(partyLeader.get());
+        party.addMember(partyLeader.get());
+        _game->module()->player().setCreature(static_cast<Creature *>(_player.get()));
     }
-    if (party.memberCount > 1) {
-        shared_ptr<Creature> partyMember(makeCharacter(party.member1, kPartyMember1Tag, position, heading));
+    if (config.memberCount > 1) {
+        shared_ptr<Creature> partyMember(makeCharacter(config.member1, kPartyMember1Tag, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember1 = partyMember;
-        _game->party().addMember(partyMember.get());
+        party.addMember(partyMember.get());
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));
     }
-    if (party.memberCount > 2) {
-        shared_ptr<Creature> partyMember(makeCharacter(party.member2, kPartyMember2Tag, position, heading));
+    if (config.memberCount > 2) {
+        shared_ptr<Creature> partyMember(makeCharacter(config.member2, kPartyMember2Tag, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember2 = partyMember;
-        _game->party().addMember(partyMember.get());
+        party.addMember(partyMember.get());
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));
@@ -567,8 +583,8 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     return nullptr;
 }
 
-void Area::destroyObject(const shared_ptr<SpatialObject> &object) {
-    _objectsToDestroy.insert(object->id());
+void Area::destroyObject(const SpatialObject &object) {
+    _objectsToDestroy.insert(object.id());
 }
 
 void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
@@ -776,6 +792,10 @@ ObjectSelector &Area::objectSelector() {
 
 const Pathfinder &Area::pathfinder() const {
     return _pathfinder;
+}
+
+const PartyConfiguration &Area::partyConfiguration() const {
+    return _partyConfig;
 }
 
 ThirdPersonCamera *Area::thirdPersonCamera() {

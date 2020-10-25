@@ -15,18 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "button.h"
 
 namespace reone {
 
 namespace gui {
 
-Button::Button(GUI *gui) : Button(gui, ControlType::Button) {
-}
+class ToggleButton : public Button {
+public:
+    ToggleButton(GUI *gui);
 
-Button::Button(GUI *gui, ControlType type) : Control(gui, type) {
-    _clickable = true;
-}
+    const glm::vec3 &getBorderColor() const override;
+
+    void toggle();
+
+    bool isOn() const;
+
+    void setOnColor(const glm::vec3 &color);
+
+private:
+    bool _on { false };
+    glm::vec3 _onColor { 1.0f };
+};
 
 } // namespace gui
 

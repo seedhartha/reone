@@ -17,11 +17,16 @@
 
 #include "partyselect.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../../system/gui/control/label.h"
+#include "../../system/gui/control/togglebutton.h"
 #include "../../system/resource/resources.h"
+#include "../../system/script/types.h"
 
 #include "../game.h"
 #include "../portraits.h"
+#include "../script/util.h"
 
 using namespace std;
 
@@ -33,13 +38,22 @@ namespace reone {
 
 namespace game {
 
+static const int kMaxFollowerCount = 2;
+
+static int g_strRefAdd = 38455;
+static int g_strRefRemove = 38456;
+
+static glm::vec3 g_kotorColorOn = { 0.984314f, 1.0f, 0 };
+static glm::vec3 g_kotorColorAdded = { 0, 0.831373f, 0.090196f };
+
 static map<int, string> g_portraitByAppearance = {
     { 378, "po_ptrask"}
 };
 
-PartySelection::PartySelection(Game *game, GameVersion version, const GraphicsOptions &opts) :
+PartySelection::PartySelection(Game *game, ObjectFactory *objectFactory, GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
-    _game(game) {
+    _game(game),
+    _objectFactory(objectFactory) {
 
     _resRef = getResRef("partyselection");
     _backgroundType = BackgroundType::Menu;
@@ -47,21 +61,40 @@ PartySelection::PartySelection(Game *game, GameVersion version, const GraphicsOp
 
 void PartySelection::load() {
     GUI::load();
+
+    for (int i = 0; i < kNpcCount; ++i) {
+        ToggleButton &button = getNpcButton(i);
+        button.setOnColor(g_kotorColorOn);
+        button.setBorderColorOverride(g_kotorColorAdded);
+        button.setUseBorderColorOverride(false);
+    }
 }
 
-void PartySelection::update() {
+void PartySelection::prepare(const Context &ctx) {
+    _context = ctx;
+    _availableCount = kMaxFollowerCount;
+
+    for (int i = 0; i < kNpcCount; ++i) {
+        _added[i] = false;
+        getNpcButton(i).setUseBorderColorOverride(false);
+    }
+    if (ctx.forceNpc1 >= 0) {
+        addNpc(ctx.forceNpc1);
+    }
+    if (ctx.forceNpc2 >= 0) {
+        addNpc(ctx.forceNpc2);
+    }
     Party &party = _game->party();
 
     for (int i = 0; i < kNpcCount; ++i) {
-        Label &lblChar = static_cast<Label &>(getControl("LBL_CHAR" + to_string(i)));
-        Label &lblNa = static_cast<Label &>(getControl("LBL_NA" + to_string(i)));
+        ToggleButton &btnNpc = getNpcButton(i);
+        Label &lblChar = getControl<Label>("LBL_CHAR" + to_string(i));
+        Label &lblNa = getControl<Label>("LBL_NA" + to_string(i));
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-
             shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(blueprintResRef));
             int appearance = blueprint->appearance();
-
             string portrait;
 
             auto maybePortrait = g_portraitByAppearance.find(appearance);
@@ -70,24 +103,131 @@ void PartySelection::update() {
             } else {
                 portrait = findPortrait(blueprint->appearance());
             }
-
+            btnNpc.setDisabled(false);
             lblChar.setBorderFill(Resources.findTexture(portrait, TextureType::GUI));
             lblNa.setVisible(false);
 
         } else {
+            btnNpc.setDisabled(true);
             lblChar.setBorderFill(shared_ptr<Texture>(nullptr));
             lblNa.setVisible(true);
         }
     }
+    refreshAvailableCount();
+}
+
+void PartySelection::addNpc(int npc) {
+    --_availableCount;
+    _added[npc] = true;
+    getNpcButton(npc).setUseBorderColorOverride(true);
+    refreshAvailableCount();
+}
+
+ToggleButton &PartySelection::getNpcButton(int npc) {
+    string tag("BTN_NPC" + to_string(npc));
+    return getControl<ToggleButton>(tag);
 }
 
 void PartySelection::onClick(const string &control) {
     if (control == "BTN_ACCEPT") {
-    } else if (control == "BTN_DONE") {
+        onAcceptButtonClick();
+
+    } else if (control == "BTN_DONE" || control == "BTN_BACK") {
+        changeParty();
         _game->openInGame();
-    } else if (control == "BTN_BACK") {
-        _game->openInGame();
+
+        if (!_context.exitScript.empty()) {
+            runScript(_context.exitScript, script::kObjectInvalid, script::kObjectInvalid, -1);
+        }
+    } else if (boost::starts_with(control, "BTN_NPC")) {
+        onNpcButtonClick(control);
     }
+}
+
+void PartySelection::onAcceptButtonClick() {
+    if (_selectedNpc == -1) return;
+
+    bool added = _added[_selectedNpc];
+    if (added && _context.forceNpc1 != _selectedNpc && _context.forceNpc2 != _selectedNpc) {
+        removeNpc(_selectedNpc);
+        refreshAcceptButton();
+
+    } else if (!added && _availableCount > 0) {
+        addNpc(_selectedNpc);
+        refreshAcceptButton();
+    }
+}
+
+void PartySelection::refreshAvailableCount() {
+    Label &label = getControl<Label>("LBL_COUNT");
+    label.setTextMessage(to_string(_availableCount));
+}
+
+void PartySelection::refreshAcceptButton() {
+    string text(Resources.getString(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd).text);
+    Button &btnAccept = getControl<Button>("BTN_ACCEPT");
+    btnAccept.setTextMessage(text);
+}
+
+void PartySelection::removeNpc(int npc) {
+    ++_availableCount;
+    _added[npc] = false;
+    getNpcButton(npc).setUseBorderColorOverride(false);
+    refreshAvailableCount();
+}
+
+void PartySelection::onNpcButtonClick(const string &control) {
+    int npc = control.substr(7, 1)[0] - '0';
+    _selectedNpc = npc;
+    refreshNpcButtons();
+    refreshAcceptButton();
+}
+
+void PartySelection::refreshNpcButtons() {
+    for (int i = 0; i < kNpcCount; ++i) {
+        ToggleButton &button = getNpcButton(i);
+
+        if ((i == _selectedNpc && !button.isOn() ||
+            (i != _selectedNpc && button.isOn()))) {
+
+            button.toggle();
+        }
+    }
+}
+
+void PartySelection::changeParty() {
+    shared_ptr<Area> area(_game->module()->area());
+
+    PartyConfiguration partyConfig(area->partyConfiguration());
+    partyConfig.memberCount = 1;
+
+    vector<CreatureConfiguration> added;
+    Party &party = _game->party();
+
+    for (int i = 0; i < kNpcCount; ++i) {
+        if (!_added[i]) continue;
+
+        string blueprintResRef(party.getAvailableMember(i));
+        shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(blueprintResRef));
+
+        CreatureConfiguration creature;
+        creature.appearance = blueprint->appearance();
+        for (auto &item : blueprint->equipment()) {
+            creature.equipment.push_back(item);
+        }
+        added.push_back(move(creature));
+    }
+    if (added.size() > 0) {
+        partyConfig.member1 = added[0];
+        ++partyConfig.memberCount;
+    }
+    if (added.size() > 1) {
+        partyConfig.member2 = added[1];
+        ++partyConfig.memberCount;
+    }
+
+    shared_ptr<SpatialObject> player(area->player());
+    area->loadParty(partyConfig, player->position(), player->heading());
 }
 
 } // namespace game

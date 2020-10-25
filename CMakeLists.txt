@@ -55,6 +55,7 @@ set(SYSTEM_HEADERS
     src/system/gui/control/listbox.h
     src/system/gui/control/panel.h
     src/system/gui/control/scrollbar.h
+    src/system/gui/control/togglebutton.h
     src/system/gui/gui.h
     src/system/gui/scenebuilder.h
     src/system/gui/textinput.h
@@ -150,6 +151,7 @@ set(SYSTEM_SOURCES
     src/system/gui/control/listbox.cpp
     src/system/gui/control/panel.cpp
     src/system/gui/control/scrollbar.cpp
+    src/system/gui/control/togglebutton.cpp
     src/system/gui/gui.cpp
     src/system/gui/scenebuilder.cpp
     src/system/gui/textinput.cpp
