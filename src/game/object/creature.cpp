@@ -75,20 +75,20 @@ void Creature::load(const GffStruct &gffs) {
     string templResRef(gffs.getString("TemplateResRef"));
     boost::to_lower(templResRef);
 
-    loadBlueprint(templResRef);
+    shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(templResRef));
+    load(blueprint);
+
     updateTransform();
 }
 
-void Creature::loadBlueprint(const string &resRef) {
-    ResourceManager &resources = Resources;
-
-    _blueprint = resources.findCreatureBlueprint(resRef);
+void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
+    _blueprint = blueprint;
     _tag = _blueprint->tag();
 
     for (auto &item : _blueprint->equipment()) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(resources.find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(Resources.find2DA("appearance"));
     loadAppearance(*appearanceTable, _blueprint->appearance());
 }
 
@@ -386,7 +386,7 @@ void Creature::setTalking(bool talking) {
     _talking = talking;
 }
 
-const string &Creature::getPauseAnimation() {
+const string &Creature::getPauseAnimation() const {
     switch (_modelType) {
         case ModelType::Creature:
             return g_animPauseCreature;
@@ -395,7 +395,7 @@ const string &Creature::getPauseAnimation() {
     }
 }
 
-const string &Creature::getWalkAnimation() {
+const string &Creature::getWalkAnimation() const {
     switch (_modelType) {
         case ModelType::Creature:
             return g_animWalkCreature;
@@ -404,7 +404,7 @@ const string &Creature::getWalkAnimation() {
     }
 }
 
-const string &Creature::getRunAnimation() {
+const string &Creature::getRunAnimation() const {
     switch (_modelType) {
         case ModelType::Creature:
             return g_animRunCreature;

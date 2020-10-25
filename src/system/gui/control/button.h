@@ -26,6 +26,9 @@ namespace gui {
 class Button : public Control {
 public:
     Button(GUI *gui);
+
+protected:
+    Button(GUI *gui, ControlType type);
 };
 
 } // namespace gui

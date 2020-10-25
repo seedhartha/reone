@@ -99,8 +99,6 @@ void Module::loadParty(const PartyConfiguration &party, const string &entry) {
     getEntryPoint(entry, position, heading);
 
     _area->loadParty(_party, position, heading);
-    _player->setCreature(static_cast<Creature *>(_area->player().get()));
-
     _area->onPlayerMoved();
     _area->update3rdPersonCameraHeading();
     _area->switchTo3rdPersonCamera();
@@ -256,6 +254,10 @@ const ModuleInfo &Module::info() const {
 
 shared_ptr<Area> Module::area() const {
     return _area;
+}
+
+Player &Module::player() {
+    return *_player;
 }
 
 } // namespace game

@@ -38,6 +38,7 @@
 #include "listbox.h"
 #include "panel.h"
 #include "scrollbar.h"
+#include "togglebutton.h"
 
 using namespace std;
 
@@ -74,6 +75,9 @@ unique_ptr<Control> Control::of(GUI *gui, ControlType type, const string &tag) {
             break;
         case ControlType::Button:
             control = make_unique<Button>(gui);
+            break;
+        case ControlType::ToggleButton:
+            control = make_unique<ToggleButton>(gui);
             break;
         case ControlType::ListBox:
             control = make_unique<ListBox>(gui);
@@ -218,7 +222,7 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
 
     glm::ivec2 size(_extent.width, _extent.height);
 
-    if (_hilight && _focus) {
+    if (_focus && _hilight) {
         drawBorder(*_hilight, offset, size);
     } else if (_border) {
         drawBorder(*_border, offset, size);
@@ -238,6 +242,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     Quad &xyFlippedQuad = XYFlippedQuad;
 
     glActiveTexture(GL_TEXTURE0);
+
+    glm::vec3 color(getBorderColor());
 
     if (border.fill) {
         {
@@ -296,7 +302,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 LocalUniforms locals;
                 locals.model = move(transform);
-                locals.color = border.color;
+                locals.color = color;
 
                 shaders.activate(ShaderProgram::GUIGUI, locals);
             }
@@ -311,7 +317,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 LocalUniforms locals;
                 locals.model = move(transform);
-                locals.color = border.color;
+                locals.color = color;
 
                 shaders.activate(ShaderProgram::GUIGUI, locals);
             }
@@ -330,7 +336,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 LocalUniforms locals;
                 locals.model = move(transform);
-                locals.color = border.color;
+                locals.color = color;
 
                 shaders.activate(ShaderProgram::GUIGUI, locals);
             }
@@ -344,7 +350,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 LocalUniforms locals;
                 locals.model = move(transform);
-                locals.color = border.color;
+                locals.color = color;
 
                 shaders.activate(ShaderProgram::GUIGUI, locals);
             }
@@ -367,7 +373,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             LocalUniforms locals;
             locals.model = move(transform);
-            locals.color = border.color;
+            locals.color = color;
 
             shaders.activate(ShaderProgram::GUIGUI, locals);
         }
@@ -381,7 +387,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             LocalUniforms locals;
             locals.model = move(transform);
-            locals.color = border.color;
+            locals.color = color;
 
             shaders.activate(ShaderProgram::GUIGUI, locals);
         }
@@ -395,7 +401,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             LocalUniforms locals;
             locals.model = move(transform);
-            locals.color = border.color;
+            locals.color = color;
 
             shaders.activate(ShaderProgram::GUIGUI, locals);
         }
@@ -409,7 +415,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             LocalUniforms locals;
             locals.model = move(transform);
-            locals.color = border.color;
+            locals.color = color;
 
             shaders.activate(ShaderProgram::GUIGUI, locals);
         }
@@ -417,6 +423,13 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
         border.corner->unbind();
     }
+}
+
+const glm::vec3 &Control::getBorderColor() const {
+    if (_useBorderColorOverride) {
+        return _borderColorOverride;
+    }
+    return (_focus && _hilight) ? _hilight->color : _border->color;
 }
 
 void Control::drawText(const string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const {
@@ -595,6 +608,14 @@ void Control::setBorderFill(const shared_ptr<Texture> &texture) {
 
 void Control::setBorderColor(const glm::vec3 &color) {
     _border->color = color;
+}
+
+void Control::setBorderColorOverride(const glm::vec3 &color) {
+    _borderColorOverride = color;
+}
+
+void Control::setUseBorderColorOverride(bool use) {
+    _useBorderColorOverride = use;
 }
 
 void Control::setHilight(const Border &hilight) {

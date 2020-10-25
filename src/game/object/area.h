@@ -60,39 +60,37 @@ public:
         scene::SceneGraph *sceneGraph,
         const render::GraphicsOptions &opts);
 
-    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
-    void loadParty(const PartyConfiguration &party, const glm::vec3 &position, float heading);
-    void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
-
-    bool handle(const SDL_Event &event);
-    void update(const UpdateContext &updateCtx);
-
-    void destroyObject(const std::shared_ptr<SpatialObject> &object);
+    void destroyObject(const SpatialObject &object);
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
+    bool handle(const SDL_Event &event);
+    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
+    void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
+    void loadParty(const PartyConfiguration &config, const glm::vec3 &position, float heading);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
+    void onPlayerMoved();
     void runOnEnterScript();
     void startDialog(Creature &creature, const std::string &resRef);
     void switchTo3rdPersonCamera();
     void toggleCameraType();
-    void update3rdPersonCameraTarget();
+    void update(const UpdateContext &updateCtx);
     void update3rdPersonCameraHeading();
-
-    void onPlayerMoved();
+    void update3rdPersonCameraTarget();
 
     Camera *getCamera() const;
     SpatialObject *getObjectAt(int x, int y) const;
 
+    AnimatedCamera &animatedCamera();
     const CameraStyle &cameraStyle() const;
     CameraType cameraType() const;
-    const std::string &music() const;
-    const RoomMap &rooms() const;
-    const ObjectList &objects() const;
     const CollisionDetector &collisionDetector() const;
+    DialogCamera &dialogCamera();
+    const std::string &music() const;
+    const ObjectList &objects() const;
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
+    const PartyConfiguration &partyConfiguration() const;
+    const RoomMap &rooms() const;
     ThirdPersonCamera *thirdPersonCamera();
-    DialogCamera &dialogCamera();
-    AnimatedCamera &animatedCamera();
 
     // Objects
 
@@ -103,10 +101,10 @@ public:
 
     // Party
 
-    std::shared_ptr<SpatialObject> player() const;
     std::shared_ptr<SpatialObject> partyLeader() const;
     std::shared_ptr<SpatialObject> partyMember1() const;
     std::shared_ptr<SpatialObject> partyMember2() const;
+    std::shared_ptr<SpatialObject> player() const;
 
     // END Party
 
@@ -120,6 +118,7 @@ private:
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
+    PartyConfiguration _partyConfig;
     std::string _name;
     RoomMap _rooms;
     std::unique_ptr<resource::Visibility> _visibility;

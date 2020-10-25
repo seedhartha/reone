@@ -70,6 +70,7 @@ public:
     const std::string &name() const;
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
+    Player &player();
 
 private:
     resource::GameVersion _version { resource::GameVersion::KotOR };

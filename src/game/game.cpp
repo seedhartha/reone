@@ -273,7 +273,7 @@ void Game::loadEquipment() {
 }
 
 void Game::loadPartySelection() {
-    _partySelection.reset(new PartySelection(this, _version, _options.graphics));
+    _partySelection.reset(new PartySelection(this, _objectFactory.get(), _version, _options.graphics));
     _partySelection->load();
 }
 
@@ -410,8 +410,8 @@ void Game::openContainer(SpatialObject *container) {
     _screen = GameScreen::Container;
 }
 
-void Game::openPartySelection() {
-    _partySelection->update();
+void Game::openPartySelection(const PartySelection::Context &ctx) {
+    _partySelection->prepare(ctx);
     _screen = GameScreen::PartySelection;
 }
 

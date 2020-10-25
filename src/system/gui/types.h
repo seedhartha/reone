@@ -27,6 +27,7 @@ enum class ControlType {
     Label = 4,
     ImageButton = 5,
     Button = 6,
+    ToggleButton = 7,
     ScrollBar = 9,
     ListBox = 11
 };

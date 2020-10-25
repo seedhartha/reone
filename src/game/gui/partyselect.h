@@ -21,26 +21,57 @@
 
 namespace reone {
 
+namespace gui {
+
+class ToggleButton;
+
+}
+
 namespace game {
 
 static const int kNpcCount = 9;
 
 class Game;
+class ObjectFactory;
 
 class PartySelection : public gui::GUI {
 public:
-    PartySelection(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    struct Context {
+        std::string exitScript;
+        int forceNpc1 { -1 };
+        int forceNpc2 { -2 };
+    };
+
+    PartySelection(
+        Game *game,
+        ObjectFactory *objectFactory,
+        resource::GameVersion version,
+        const render::GraphicsOptions &opts);
 
     void load() override;
 
-    void update();
+    void prepare(const Context &ctx);
 
 private:
     Game *_game { nullptr };
-    bool _added[kNpcCount];
+    ObjectFactory *_objectFactory { nullptr };
+    Context _context;
     int _selectedNpc { -1 };
+    bool _added[kNpcCount] { false };
+    int _availableCount { 0 };
 
     void onClick(const std::string &control) override;
+
+    void addNpc(int npc);
+    void changeParty();
+    void onAcceptButtonClick();
+    void onNpcButtonClick(const std::string &control);
+    void refreshAcceptButton();
+    void refreshAvailableCount();
+    void refreshNpcButtons();
+    void removeNpc(int npc);
+
+    gui::ToggleButton &getNpcButton(int npc);
 };
 
 } // namespace game

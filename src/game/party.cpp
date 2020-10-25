@@ -81,6 +81,10 @@ Creature *Party::getMember(int index) const {
     return _members.size() > index ? _members[index] : nullptr;
 }
 
+bool Party::empty() const {
+    return _members.empty();
+}
+
 bool Party::isMemberAvailable(int npc) const {
     return _availableMembers.count(npc) != 0;
 }

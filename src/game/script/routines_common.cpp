@@ -54,7 +54,7 @@ Variable RoutineManager::destroyObject(const vector<Variable> &args, ExecutionCo
     if (object) {
         shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
         if (spatial) {
-            _game->module()->area()->destroyObject(spatial);
+            _game->module()->area()->destroyObject(*spatial);
         }
     } else {
         warn("Routine: object not found by id: " + to_string(objectId));
@@ -204,7 +204,9 @@ Variable RoutineManager::assignCommand(const vector<Variable> &args, ExecutionCo
     unique_ptr<CommandAction> action(new CommandAction(args[1].context));
 
     shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
-    object->actionQueue().add(move(action));
+    if (object) {
+        object->actionQueue().add(move(action));
+    }
 
     return Variable();
 }
@@ -369,7 +371,17 @@ Variable RoutineManager::addAvailableNPCByTemplate(const vector<Variable> &args,
 }
 
 Variable RoutineManager::showPartySelectionGUI(const vector<Variable> &args, ExecutionContext &ctx) {
-    _game->openPartySelection();
+    string exitScript(args.size() >= 1 ? args[0].strValue : "");
+    int forceNpc1 = args.size() >= 2 ? args[1].intValue : -1;
+    int forceNpc2 = args.size() >= 3 ? args[1].intValue : -1;
+
+    PartySelection::Context partyCtx;
+    partyCtx.exitScript = move(exitScript);
+    partyCtx.forceNpc1 = forceNpc1;
+    partyCtx.forceNpc2 = forceNpc2;
+
+    _game->openPartySelection(partyCtx);
+
     return Variable();
 }
 

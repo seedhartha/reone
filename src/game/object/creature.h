@@ -30,6 +30,12 @@
 
 namespace reone {
 
+namespace resource {
+
+class CreatureBlueprint;
+
+}
+
 namespace game {
 
 class ObjectFactory;
@@ -46,6 +52,7 @@ public:
     Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
+    void load(const std::shared_ptr<resource::CreatureBlueprint> &blueprint);
     void load(const CreatureConfiguration &config);
 
     Gender gender() const;
@@ -112,22 +119,21 @@ private:
 
     // Loading
 
-    void loadBlueprint(const std::string &resRef);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
 
     // END Loading
 
-    ModelType parseModelType(const std::string &s) const;
-    void updateAppearance();
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
     std::string getWeaponModelName(resource::InventorySlot slot) const;
+    ModelType parseModelType(const std::string &s) const;
+    void updateAppearance();
 
-    const std::string &getPauseAnimation();
-    const std::string &getWalkAnimation();
-    const std::string &getRunAnimation();
+    const std::string &getPauseAnimation() const;
+    const std::string &getRunAnimation() const;
+    const std::string &getWalkAnimation() const;
 };
 
 } // namespace game

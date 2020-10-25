@@ -70,7 +70,7 @@ public:
     void openEquipment();
     void openInGame();
     void openMainMenu();
-    void openPartySelection();
+    void openPartySelection(const PartySelection::Context &ctx);
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
     void startCharacterGeneration();
     void startDialog(SpatialObject &owner, const std::string &resRef);

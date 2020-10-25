@@ -44,7 +44,8 @@ const string &TwoDaRow::getString(const string &column) const {
 }
 
 int TwoDaRow::getInt(const string &column) const {
-    return stoi(getString(column));
+    string value(getString(column));
+    return !value.empty() ? stoi(value) : -1;
 }
 
 float TwoDaRow::getFloat(const string &column) const {

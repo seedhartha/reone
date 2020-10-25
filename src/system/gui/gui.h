@@ -56,8 +56,6 @@ public:
     virtual void onClick(const std::string &control);
     virtual void onListBoxItemClick(const std::string &control, const std::string &item);
 
-    Control &getControl(const std::string &tag) const;
-
     void setControlDisabled(const std::string &tag, bool disabled);
     void setControlFocus(const std::string &tag, bool focus);
     void setControlFocusable(const std::string &tag, bool focusable);
@@ -90,15 +88,26 @@ protected:
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    virtual void preloadControl(Control &control);
-    virtual bool handleKeyDown(SDL_Scancode key);
-    virtual bool handleKeyUp(SDL_Scancode key);
-    virtual void onFocusChanged(const std::string &control, bool focus);
-
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
+    virtual void onFocusChanged(const std::string &control, bool focus);
+    virtual void preloadControl(Control &control);
 
+    Control &getControl(const std::string &tag) const;
     std::string getResRef(const std::string &base) const;
+
+    template <class T>
+    T &getControl(const std::string &tag) const {
+        Control &ctrl = getControl(tag);
+        return static_cast<T &>(ctrl);
+    }
+
+    // User input
+
+    virtual bool handleKeyDown(SDL_Scancode key);
+    virtual bool handleKeyUp(SDL_Scancode key);
+
+    // END User input
 
 private:
     GUI(const GUI &) = delete;
