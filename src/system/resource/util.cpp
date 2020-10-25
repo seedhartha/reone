@@ -30,6 +30,7 @@ namespace reone {
 namespace resource {
 
 static map<ResourceType, string> g_extByType = {
+    { ResourceType::Inventory, "inv" },
     { ResourceType::Bmp, "bmp" },
     { ResourceType::Tga, "tga" },
     { ResourceType::Wav, "wav" },
@@ -69,6 +70,7 @@ static map<ResourceType, string> g_extByType = {
     { ResourceType::DoorWalkmesh, "dwk" },
     { ResourceType::PlaceableWalkmesh, "pwk" },
     { ResourceType::Journal, "jrl" },
+    { ResourceType::Mod, "mod" },
     { ResourceType::WaypointBlueprint, "utw" },
     { ResourceType::SoundSet, "ssf" },
     { ResourceType::ScriptDebugger, "ndb" },

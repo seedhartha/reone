@@ -54,6 +54,8 @@ private:
     std::vector<Resource> _resources;
 
     void doLoad() override;
+
+    void checkSignature();
     void loadKeys();
     Key readKey();
     void loadResources();
