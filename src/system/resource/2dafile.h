@@ -80,6 +80,6 @@ private:
     void loadRows();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

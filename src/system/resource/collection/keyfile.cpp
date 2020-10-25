@@ -118,6 +118,6 @@ const vector<KeyFile::KeyEntry> &KeyFile::keys() const {
     return _keys;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

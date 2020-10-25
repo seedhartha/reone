@@ -48,6 +48,6 @@ private:
     void readInstruction(uint32_t &offset);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

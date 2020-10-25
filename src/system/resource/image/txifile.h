@@ -48,6 +48,6 @@ private:
     render::TextureBlending parseBlending(const std::string &s) const;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

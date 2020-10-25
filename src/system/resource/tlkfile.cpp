@@ -82,6 +82,6 @@ shared_ptr<TalkTable> TlkFile::table() const {
     return _table;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

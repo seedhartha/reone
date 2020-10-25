@@ -60,6 +60,6 @@ private:
     void loadStrings();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

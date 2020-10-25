@@ -47,6 +47,6 @@ private:
     void loadTexture();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

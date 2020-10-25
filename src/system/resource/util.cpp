@@ -112,6 +112,6 @@ ResourceType getResTypeByExt(const string &ext) {
     return it->second;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

@@ -95,6 +95,6 @@ shared_ptr<Texture> CurFile::texture() {
     return _texture;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

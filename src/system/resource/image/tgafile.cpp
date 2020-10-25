@@ -103,6 +103,6 @@ shared_ptr<Texture> TgaFile::texture() const {
     return _texture;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

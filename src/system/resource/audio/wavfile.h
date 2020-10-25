@@ -65,6 +65,6 @@ private:
     audio::AudioFormat getAudioFormat() const;
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

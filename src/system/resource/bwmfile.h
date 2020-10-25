@@ -49,6 +49,6 @@ private:
     void makeWalkmesh();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

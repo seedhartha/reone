@@ -61,6 +61,6 @@ private:
     KeyEntry readKeyEntry();
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

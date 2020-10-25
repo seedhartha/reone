@@ -61,6 +61,6 @@ const Visibility &VisFile::visibility() const {
     return _visibility;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

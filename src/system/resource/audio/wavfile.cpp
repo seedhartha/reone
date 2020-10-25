@@ -232,6 +232,6 @@ shared_ptr<audio::AudioStream> WavFile::stream() const {
     return _stream;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

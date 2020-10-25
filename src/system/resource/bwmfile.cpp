@@ -115,7 +115,7 @@ shared_ptr<render::Walkmesh> BwmFile::walkmesh() const {
     return _walkmesh;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone
 

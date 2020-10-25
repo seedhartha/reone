@@ -160,6 +160,6 @@ private:
     std::vector<uint32_t> readList(uint32_t off);
 };
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

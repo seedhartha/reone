@@ -159,6 +159,6 @@ shared_ptr<Texture> TpcFile::texture() const {
     return _texture;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

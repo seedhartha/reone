@@ -578,6 +578,6 @@ shared_ptr<Model> MdlFile::model() const {
     return _model;
 }
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone

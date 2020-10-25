@@ -112,6 +112,6 @@ private:
 
 #define Resources resource::ResourceManager::instance()
 
-} // namespace resources
+} // namespace resource
 
 } // namespace reone
