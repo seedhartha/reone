@@ -33,19 +33,19 @@ class LightSceneNode;
 class ModelNodeSceneNode;
 class SceneNode;
 
-class SceneGraph {
+class SceneGraph : public render::IRenderable {
 public:
     SceneGraph(const render::GraphicsOptions &opts);
 
-    void clear();
-    void addRoot(const std::shared_ptr<SceneNode> &node);
-    void addOpaqueMesh(ModelNodeSceneNode *node);
-    void addTransparentMesh(ModelNodeSceneNode *node);
-    void addLight(LightSceneNode *node);
-    void removeRoot(const std::shared_ptr<SceneNode> &node);
+    void render() const override;
 
+    void clear();
+    void addLight(LightSceneNode *node);
+    void addOpaqueMesh(ModelNodeSceneNode *node);
+    void addRoot(const std::shared_ptr<SceneNode> &node);
+    void addTransparentMesh(ModelNodeSceneNode *node);
     void prepare();
-    void render() const;
+    void removeRoot(const std::shared_ptr<SceneNode> &node);
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 

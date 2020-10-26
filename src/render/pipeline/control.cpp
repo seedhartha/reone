@@ -21,21 +21,17 @@
 
 #include "GL/glew.h"
 
-#include "../../scene/scenegraph.h"
-
 #include "../mesh/quad.h"
 #include "../shaders.h"
 
 using namespace std;
 
-using namespace reone::scene;
-
 namespace reone {
 
 namespace render {
 
-ControlRenderPipeline::ControlRenderPipeline(SceneGraph *sceneGraph, const glm::ivec4 &extent) :
-    _sceneGraph(sceneGraph),
+ControlRenderPipeline::ControlRenderPipeline(IRenderable *scene, const glm::ivec4 &extent) :
+    _scene(scene),
     _extent(extent),
     _geometry(_extent[2], _extent[3]) {
 }
@@ -57,7 +53,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        _sceneGraph->render();
+        _scene->render();
         _geometry.unbind();
 
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);

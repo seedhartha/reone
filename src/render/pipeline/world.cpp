@@ -21,14 +21,10 @@
 
 #include "GL/glew.h"
 
-#include "../../scene/scenegraph.h"
-
 #include "../mesh/quad.h"
 #include "../shaders.h"
 
 using namespace std;
-
-using namespace reone::scene;
 
 namespace reone {
 
@@ -36,8 +32,8 @@ namespace render {
 
 static const int kBlurPassCount = 1;
 
-WorldRenderPipeline::WorldRenderPipeline(SceneGraph *sceneGraph, const GraphicsOptions &opts) :
-    _sceneGraph(sceneGraph),
+WorldRenderPipeline::WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts) :
+    _scene(scene),
     _opts(opts),
     _geometry(opts.width, opts.height, 2),
     _verticalBlur(opts.width, opts.height),
@@ -61,7 +57,7 @@ void WorldRenderPipeline::render() const {
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        _sceneGraph->render();
+        _scene->render();
         _geometry.unbind();
     }
     float w = static_cast<float>(_opts.width);
