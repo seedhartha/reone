@@ -39,7 +39,7 @@ void ItemBlueprint::load(const GffStruct &uti) {
     _tag = uti.getString("Tag");
     boost::to_lower(_tag);
 
-    _localizedName = Resources::instance().getString(uti.getInt("LocalizedName")).text;
+    _localizedName = Resources::instance().getString(uti.getInt("LocalizedName"));
 
     shared_ptr<TwoDaTable> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = uti.getInt("BaseItem");

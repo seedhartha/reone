@@ -46,7 +46,7 @@ void Trigger::load(const GffStruct &gffs) {
 
     int transDestIdx = gffs.getInt("TransitionDestin", -1);
     if (transDestIdx != -1) {
-        _transitionDestin = Resources::instance().getString(transDestIdx).text;
+        _transitionDestin = Resources::instance().getString(transDestIdx);
     }
 
     _linkedToModule = gffs.getString("LinkedToModule");
