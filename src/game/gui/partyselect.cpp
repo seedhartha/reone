@@ -52,12 +52,14 @@ static map<int, string> g_portraitByAppearance = {
     { 378, "po_ptrask"}
 };
 
-PartySelection::PartySelection(Game *game, ObjectFactory *objectFactory, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
-    _game(game),
-    _objectFactory(objectFactory) {
+PartySelection::PartySelection(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
 
-    if (_version == GameVersion::TheSithLords) {
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
+    if (game->version() == GameVersion::TheSithLords) {
         _resRef = "partyselect_p";
         _resolutionX = 800;
         _resolutionY = 600;

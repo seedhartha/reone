@@ -36,20 +36,13 @@ namespace reone {
 
 namespace game {
 
-Module::Module(
-    uint32_t id,
-    GameVersion version,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    const GraphicsOptions &opts
-) :
+Module::Module(uint32_t id, Game *game) :
     Object(id, ObjectType::Module),
-    _version(version),
-    _game(game),
-    _objectFactory(objectFactory),
-    _sceneGraph(sceneGraph),
-    _opts(opts) {
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
 }
 
 void Module::load(const string &name, const GffStruct &ifo) {
@@ -81,7 +74,7 @@ void Module::loadArea(const GffStruct &ifo) {
     shared_ptr<GffStruct> are(Resources::instance().findGFF(_info.entryArea, ResourceType::Area));
     shared_ptr<GffStruct> git(Resources::instance().findGFF(_info.entryArea, ResourceType::GameInstance));
 
-    shared_ptr<Area> area(_objectFactory->newArea());
+    shared_ptr<Area> area(_game->objectFactory().newArea());
     area->load(_info.entryArea, *are, *git);
     _area = move(area);
 }

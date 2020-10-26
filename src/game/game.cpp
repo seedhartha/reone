@@ -58,7 +58,7 @@ Game::Game(const fs::path &path, const Options &opts) :
     _console(opts.graphics) {
 
     initGameVersion();
-    _objectFactory = make_unique<ObjectFactory>(_version, this, &_sceneGraph, _options.graphics);
+    _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
 }
 
 void Game::initGameVersion() {
@@ -130,7 +130,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::loadMainMenu() {
-    _mainMenu.reset(new MainMenu(this, _version, _options.graphics));
+    _mainMenu.reset(new MainMenu(this));
     _mainMenu->load();
 }
 
@@ -260,27 +260,27 @@ void Game::drawCursor() {
 }
 
 void Game::loadHUD() {
-    _hud.reset(new HUD(this, _version, _options.graphics));
+    _hud.reset(new HUD(this));
     _hud->load();
 }
 
 void Game::loadDialog() {
-    _dialog.reset(new Dialog(this, _version, _options.graphics));
+    _dialog.reset(new Dialog(this));
     _dialog->load();
 }
 
 void Game::loadContainer() {
-    _container.reset(new Container(this, _version, _options.graphics));
+    _container.reset(new Container(this));
     _container->load();
 }
 
 void Game::loadEquipment() {
-    _equipment.reset(new Equipment(this, _version, _options.graphics));
+    _equipment.reset(new Equipment(this));
     _equipment->load();
 }
 
 void Game::loadPartySelection() {
-    _partySelection.reset(new PartySelection(this, _objectFactory.get(), _version, _options.graphics));
+    _partySelection.reset(new PartySelection(this));
     _partySelection->load();
 }
 
@@ -366,7 +366,7 @@ void Game::loadLoadingScreen() {
 }
 
 void Game::loadCharacterGeneration() {
-    _charGen.reset(new CharacterGeneration(this, _version, _options.graphics));
+    _charGen.reset(new CharacterGeneration(this));
     _charGen->load();
 }
 
@@ -456,12 +456,32 @@ bool Game::handle(const SDL_Event &event) {
     return false;
 }
 
+GameVersion Game::version() const {
+    return _version;
+}
+
+const Options &Game::options() const {
+    return _options;
+}
+
+SceneGraph &Game::sceneGraph() {
+    return _sceneGraph;
+}
+
+ObjectFactory &Game::objectFactory() {
+    return *_objectFactory;
+}
+
 shared_ptr<Module> Game::module() const {
     return _module;
 }
 
 Party &Game::party() {
     return _party;
+}
+
+CharacterGeneration &Game::characterGeneration() {
+    return *_charGen;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

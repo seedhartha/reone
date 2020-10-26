@@ -33,7 +33,7 @@ class Game;
 
 class Dialog : public gui::GUI {
 public:
-    Dialog(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    Dialog(Game *game);
 
     void load() override;
     void startDialog(SpatialObject &owner, const std::string &resRef);

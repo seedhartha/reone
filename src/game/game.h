@@ -78,8 +78,13 @@ public:
 
     bool handle(const SDL_Event &event) override;
 
+    resource::GameVersion version() const;
+    const Options &options() const;
+    scene::SceneGraph &sceneGraph();
+    ObjectFactory &objectFactory();
     std::shared_ptr<Module> module() const;
     Party &party();
+    CharacterGeneration &characterGeneration();
 
     // Globals/locals
 

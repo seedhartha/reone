@@ -17,6 +17,8 @@
 
 #include "objectfactory.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -27,16 +29,23 @@ namespace reone {
 
 namespace game {
 
-ObjectFactory::ObjectFactory(GameVersion version, Game *game, SceneGraph *sceneGraph, const GraphicsOptions &opts) :
-    _version(version), _game(game), _sceneGraph(sceneGraph), _options(opts) {
+ObjectFactory::ObjectFactory(Game *game, SceneGraph *sceneGraph) :
+    _game(game), _sceneGraph(sceneGraph) {
+
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
+    if (!sceneGraph) {
+        throw invalid_argument("Scene graph must not be null");
+    }
 }
 
 unique_ptr<Module> ObjectFactory::newModule() {
-    return make_unique<Module>(_counter++, _version, _game, this, _sceneGraph, _options);
+    return make_unique<Module>(_counter++, _game);
 }
 
 unique_ptr<Area> ObjectFactory::newArea() {
-    return make_unique<Area>(_counter++, _version, _game, this, _sceneGraph, _options);
+    return make_unique<Area>(_counter++, _game);
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {

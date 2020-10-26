@@ -48,17 +48,10 @@ typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
 class Game;
-class ObjectFactory;
 
 class Area : public Object {
 public:
-    Area(
-        uint32_t id,
-        resource::GameVersion version,
-        Game *game,
-        ObjectFactory *objectFactory,
-        scene::SceneGraph *sceneGraph,
-        const render::GraphicsOptions &opts);
+    Area(uint32_t id, Game *game);
 
     void destroyObject(const SpatialObject &object);
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
@@ -110,10 +103,6 @@ public:
 
 private:
     Game *_game { nullptr };
-    resource::GameVersion _version { resource::GameVersion::KotOR };
-    ObjectFactory *_objectFactory { nullptr };
-    scene::SceneGraph *_sceneGraph { nullptr };
-    render::GraphicsOptions _opts;
     CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;

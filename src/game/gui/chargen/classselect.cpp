@@ -21,6 +21,7 @@
 #include "../../../resource/resources.h"
 
 #include "../../characters.h"
+#include "../../game.h"
 #include "../../object/creature.h"
 
 #include "../colors.h"
@@ -64,14 +65,16 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelection::ClassSelection(Game *game, CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
-    _game(game),
-    _charGen(charGen) {
+ClassSelection::ClassSelection(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("classsel");
 
-    switch (version) {
+    switch (game->version()) {
         case GameVersion::TheSithLords:
             _resolutionX = 800;
             _resolutionY = 600;
@@ -204,7 +207,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(config);
@@ -244,14 +247,15 @@ int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
 }
 
 void ClassSelection::onClick(const string &control) {
+    CharacterGeneration &charGen = _game->characterGeneration();
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
-        _charGen->setCharacter(_classButtons[idx].config);
-        _charGen->openQuickOrCustom();
+        charGen.setCharacter(_classButtons[idx].config);
+        charGen.openQuickOrCustom();
         return;
     }
     if (control == "BTN_BACK") {
-        _charGen->cancel();
+        charGen.cancel();
     }
 }
 

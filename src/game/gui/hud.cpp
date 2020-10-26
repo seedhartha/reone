@@ -32,12 +32,15 @@ namespace reone {
 
 namespace game {
 
-HUD::HUD(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+HUD::HUD(Game *game) :
+    GUI(game->version(), game->options().graphics),
     _game(game),
-    _debug(opts),
-    _select(opts) {
+    _debug(game->options().graphics),
+    _select(game->options().graphics) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
