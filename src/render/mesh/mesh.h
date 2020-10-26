@@ -50,7 +50,8 @@ public:
 
     void initGL();
     void deinitGL();
-    void render(uint32_t mode) const;
+    void renderLines() const;
+    void renderTriangles() const;
 
     const AABB &aabb() const;
 

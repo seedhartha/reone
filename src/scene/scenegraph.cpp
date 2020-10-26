@@ -19,8 +19,6 @@
 
 #include <algorithm>
 
-#include "GL/glew.h"
-
 #include "../render/mesh/quad.h"
 
 #include "cameranode.h"

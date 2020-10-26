@@ -171,12 +171,11 @@ void RenderWindow::drawCursor() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    glActiveTexture(0);
-    texture->bind();
+    texture->bind(0);
 
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 
-    texture->unbind();
+    texture->unbind(0);
 }
 
 void RenderWindow::swapBuffers() const {

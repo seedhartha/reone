@@ -17,8 +17,6 @@
 
 #include "selectoverlay.h"
 
-#include "GL/glew.h"
-
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/textures.h"
@@ -63,12 +61,11 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    glActiveTexture(GL_TEXTURE0);
-    texture.bind();
+    texture.bind(0);
 
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 
-    texture.unbind();
+    texture.unbind(0);
 }
 
 void SelectionOverlay::setContext(const SelectionContext &ctx) {

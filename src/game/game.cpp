@@ -17,7 +17,6 @@
 
 #include "game.h"
 
-#include "SDL2/SDL_opengl.h"
 #include "SDL2/SDL_timer.h"
 
 #include "../audio/files.h"
@@ -219,8 +218,6 @@ void Game::drawWorld() {
 }
 
 void Game::drawGUI() {
-    glDisable(GL_DEPTH_TEST);
-
     GlobalUniforms globals;
     globals.projection = glm::ortho(
         0.0f,
@@ -253,8 +250,6 @@ void Game::drawGUI() {
 }
 
 void Game::drawCursor() {
-    glDisable(GL_DEPTH_TEST);
-
     GlobalUniforms globals;
     globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
     globals.view = glm::mat4(1.0f);

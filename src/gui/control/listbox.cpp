@@ -17,10 +17,6 @@
 
 #include "listbox.h"
 
-#include "GL/glew.h"
-
-#include "SDL2/SDL_opengl.h"
-
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"

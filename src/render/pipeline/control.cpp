@@ -23,6 +23,7 @@
 
 #include "../mesh/quad.h"
 #include "../shaders.h"
+#include "../util.h"
 
 using namespace std;
 
@@ -50,10 +51,10 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
 
         _geometry.bind();
 
-        glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        _scene->render();
+        withDepthTest([this]() { _scene->render(); });
+
         _geometry.unbind();
 
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -82,7 +83,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
         glActiveTexture(GL_TEXTURE0);
         _geometry.bindColorBuffer(0);
 
-        Quad::getDefault().render(GL_TRIANGLES);
+        Quad::getDefault().renderTriangles();
 
         _geometry.unbindColorBuffer();
     }

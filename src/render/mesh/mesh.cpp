@@ -100,8 +100,12 @@ void Mesh::deinitGL() {
     _glInited = false;
 }
 
-void Mesh::render(uint32_t mode) const {
-    render(mode, static_cast<int>(_indices.size()), 0);
+void Mesh::renderLines() const {
+    render(GL_LINES, static_cast<int>(_indices.size()), 0);
+}
+
+void Mesh::renderTriangles() const {
+    render(GL_TRIANGLES, static_cast<int>(_indices.size()), 0);
 }
 
 void Mesh::render(uint32_t mode, int count, int offset) const {

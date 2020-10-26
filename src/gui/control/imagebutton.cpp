@@ -17,8 +17,6 @@
 
 #include "imagebutton.h"
 
-#include "GL/glew.h"
-
 #include "../../render/mesh/quad.h"
 
 using namespace std;
@@ -75,12 +73,11 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
-    glActiveTexture(0);
 
     if (_iconFrame) {
-        _iconFrame->bind();
-        Quad::getDefault().render(GL_TRIANGLES);
-        _iconFrame->unbind();
+        _iconFrame->bind(0);
+        Quad::getDefault().renderTriangles();
+        _iconFrame->unbind(0);
     }
     {
         LocalUniforms locals;
@@ -89,9 +86,9 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
     if (icon) {
-        icon->bind();
-        Quad::getDefault().render(GL_TRIANGLES);
-        icon->unbind();
+        icon->bind(0);
+        Quad::getDefault().renderTriangles();
+        icon->unbind(0);
     }
 }
 

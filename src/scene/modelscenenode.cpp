@@ -18,10 +18,6 @@
 #include <stack>
 #include <stdexcept>
 
-#include "GL/glew.h"
-
-#include "SDL2/SDL_opengl.h"
-
 #include "../render/mesh/aabb.h"
 #include "../resource/resources.h"
 #include "../system/log.h"

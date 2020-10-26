@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "../system/types.h"
 
 #include "types.h"
@@ -46,8 +48,8 @@ public:
 
     void initGL();
     void deinitGL();
-    void bind();
-    void unbind();
+    void bind(int unit);
+    void unbind(int unit);
 
     bool isAdditive() const;
 
