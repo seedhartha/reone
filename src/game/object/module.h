@@ -23,9 +23,9 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../../system/render/types.h"
-#include "../../system/resource/gfffile.h"
-#include "../../system/resource/types.h"
+#include "../../render/types.h"
+#include "../../resource/gfffile.h"
+#include "../../resource/types.h"
 
 #include "../player.h"
 

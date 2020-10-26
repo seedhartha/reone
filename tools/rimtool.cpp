@@ -19,9 +19,9 @@
 
 #include <boost/format.hpp>
 
+#include "../src/resource/rimfile.h"
+#include "../src/resource/util.h"
 #include "../src/system/log.h"
-#include "../src/system/resource/collection/rimfile.h"
-#include "../src/system/resource/util.h"
 
 using namespace std;
 

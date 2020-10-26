@@ -17,9 +17,10 @@
 
 #include "util.h"
 
-#include "../../system/resource/resources.h"
-#include "../../system/script/execution.h"
-#include "../../system/script/types.h"
+#include "../../resource/resources.h"
+#include "../../script/execution.h"
+#include "../../script/scripts.h"
+#include "../../script/types.h"
 
 #include "routines.h"
 
@@ -33,7 +34,7 @@ namespace reone {
 namespace game {
 
 int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
-    shared_ptr<ScriptProgram> program(Resources.findScript(resRef));
+    shared_ptr<ScriptProgram> program(Scripts::instance().get(resRef));
     return runScript(move(program), callerId, triggererId, userDefinedEventNumber);
 }
 

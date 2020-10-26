@@ -19,9 +19,10 @@
 
 #include "GL/glew.h"
 
-#include "../../system/render/mesh/quad.h"
-#include "../../system/render/shaders.h"
-#include "../../system/resource/resources.h"
+#include "../../render/mesh/quad.h"
+#include "../../render/shaders.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
@@ -36,8 +37,8 @@ SelectionOverlay::SelectionOverlay(const GraphicsOptions &opts) : _opts(opts) {
 }
 
 void SelectionOverlay::load() {
-    _friendlyReticle = Resources.findTexture("friendlyreticle", TextureType::GUI);
-    _friendlyReticle2 = Resources.findTexture("friendlyreticle2", TextureType::GUI);
+    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureType::GUI);
+    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
 }
 
 void SelectionOverlay::render() const {

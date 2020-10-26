@@ -22,8 +22,8 @@
 
 #include "game/types.h"
 #include "mp/types.h"
-#include "system/net/types.h"
-#include "system/resource/types.h"
+#include "net/types.h"
+#include "resource/types.h"
 
 namespace reone {
 

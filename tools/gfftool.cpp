@@ -22,7 +22,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/system/resource/gfffile.h"
+#include "../src/resource/gfffile.h"
 
 using namespace std;
 

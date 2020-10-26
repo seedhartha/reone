@@ -24,7 +24,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "../src/game/pathfinder.h"
-#include "../src/system/resource/pthfile.h"
+#include "../src/resource/pthfile.h"
 
 using namespace std;
 

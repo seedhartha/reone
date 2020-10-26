@@ -19,9 +19,10 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../system/gui/control/imagebutton.h"
-#include "../../system/gui/control/listbox.h"
-#include "../../system/resource/resources.h"
+#include "../../gui/control/imagebutton.h"
+#include "../../gui/control/listbox.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
 
 #include "../game.h"
 #include "../object/creature.h"
@@ -98,7 +99,7 @@ void Equipment::configureItemsListBox() {
     } else {
         frameTex = "lbl_hex_3";
     }
-    protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
+    protoItem.setIconFrame(Textures::instance().get(frameTex, TextureType::GUI));
 }
 
 static InventorySlot getInventorySlot(Equipment::Slot slot) {
@@ -266,7 +267,7 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
             return nullptr;
     }
 
-    shared_ptr<Texture> texture(Resources.findTexture(resRef, TextureType::GUI));
+    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureType::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -301,7 +302,7 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
         lbItem.text = Resources.getString(kStrRefNone).text;
-        lbItem.icon = Resources.findTexture("inone", TextureType::GUI);
+        lbItem.icon = Textures::instance().get("inone", TextureType::GUI);
 
         lbItems.add(move(lbItem));
     }

@@ -20,24 +20,18 @@
 #include <atomic>
 #include <queue>
 
-#include "../../system/resource/2dafile.h"
-#include "../../system/resource/blueprint/creature.h"
-#include "../../system/resource/gfffile.h"
-#include "../../system/script/types.h"
+#include "../../resource/2dafile.h"
+#include "../../resource/gfffile.h"
+#include "../../script/types.h"
 
 #include "item.h"
 #include "spatial.h"
 
 namespace reone {
 
-namespace resource {
-
-class CreatureBlueprint;
-
-}
-
 namespace game {
 
+class CreatureBlueprint;
 class ObjectFactory;
 
 class Creature : public SpatialObject {
@@ -52,7 +46,7 @@ public:
     Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
-    void load(const std::shared_ptr<resource::CreatureBlueprint> &blueprint);
+    void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
     void load(const CreatureConfiguration &config);
 
     Gender gender() const;
@@ -79,12 +73,12 @@ public:
     // Equipment
 
     void equip(const std::string &resRef);
-    void equip(resource::InventorySlot slot, const std::shared_ptr<Item> &item);
+    void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
-    std::shared_ptr<Item> getEquippedItem(resource::InventorySlot slot) const;
+    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
 
-    const std::map<resource::InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
 
     // END Equipment
 
@@ -106,11 +100,11 @@ private:
 
     ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
-    std::shared_ptr<resource::CreatureBlueprint> _blueprint;
+    std::shared_ptr<CreatureBlueprint> _blueprint;
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
-    std::map<resource::InventorySlot, std::shared_ptr<Item>> _equipment;
+    std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
@@ -127,7 +121,7 @@ private:
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
-    std::string getWeaponModelName(resource::InventorySlot slot) const;
+    std::string getWeaponModelName(InventorySlot slot) const;
     ModelType parseModelType(const std::string &s) const;
     void updateAppearance();
 

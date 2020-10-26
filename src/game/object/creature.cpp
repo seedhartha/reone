@@ -21,12 +21,15 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../net/types.h"
+#include "../../render/models.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
+#include "../../script/types.h"
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
-#include "../../system/net/types.h"
-#include "../../system/resource/resources.h"
-#include "../../system/script/types.h"
 
+#include "../blueprints.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"
@@ -75,7 +78,7 @@ void Creature::load(const GffStruct &gffs) {
     string templResRef(gffs.getString("TemplateResRef"));
     boost::to_lower(templResRef);
 
-    shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(templResRef));
+    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(templResRef));
     load(blueprint);
 
     updateTransform();
@@ -123,17 +126,17 @@ void Creature::updateAppearance() {
     // Body
 
     if (!_model) {
-        _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(bodyModelName));
+        _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(bodyModelName));
         _model->setLightingEnabled(true);
     } else {
-        _model->setModel(Resources.findModel(bodyModelName));
+        _model->setModel(Models::instance().get(bodyModelName));
     }
 
     // Body texture
 
     shared_ptr<Texture> texture;
     if (!bodyTextureName.empty()) {
-        texture = Resources.findTexture(bodyTextureName, TextureType::Diffuse);
+        texture = Textures::instance().get(bodyTextureName, TextureType::Diffuse);
     }
     _model->setTextureOverride(texture);
 
@@ -141,7 +144,7 @@ void Creature::updateAppearance() {
 
     shared_ptr<Model> headModel;
     if (!headModelName.empty()) {
-        headModel = Resources.findModel(headModelName);
+        headModel = Models::instance().get(headModelName);
     }
     _headModel = _model->attach(g_headHookNode, headModel);
 
@@ -149,7 +152,7 @@ void Creature::updateAppearance() {
 
     shared_ptr<Model> leftWeaponModel;
     if (!leftWeaponModelName.empty()) {
-        leftWeaponModel = Resources.findModel(leftWeaponModelName);
+        leftWeaponModel = Models::instance().get(leftWeaponModelName);
     }
     _model->attach("lhand", leftWeaponModel);
 
@@ -157,7 +160,7 @@ void Creature::updateAppearance() {
 
     shared_ptr<Model> rightWeaponModel;
     if (!rightWeaponModelName.empty()) {
-        rightWeaponModel = Resources.findModel(rightWeaponModelName);
+        rightWeaponModel = Models::instance().get(rightWeaponModelName);
     }
     _model->attach("rhand", rightWeaponModel);
 
@@ -279,7 +282,7 @@ void Creature::loadPortrait(int appearance) {
     string resRef(row->getString("baseresref"));
     boost::to_lower(resRef);
 
-    _portrait = Resources.findTexture(resRef, TextureType::GUI);
+    _portrait = Textures::instance().get(resRef, TextureType::GUI);
 }
 
 void Creature::playDefaultAnimation() {
@@ -305,7 +308,7 @@ void Creature::playTalkAnimation() {
 }
 
 void Creature::equip(const string &resRef) {
-    shared_ptr<ItemBlueprint> blueprint(Resources.findItemBlueprint(resRef));
+    shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint.get());

@@ -20,13 +20,19 @@
 #include "SDL2/SDL_opengl.h"
 #include "SDL2/SDL_timer.h"
 
-#include "../system/audio/player.h"
-#include "../system/audio/util.h"
+#include "../audio/files.h"
+#include "../audio/player.h"
+#include "../audio/util.h"
+#include "../render/models.h"
+#include "../render/textures.h"
+#include "../render/walkmeshes.h"
+#include "../resource/resources.h"
+#include "../script/scripts.h"
 #include "../system/jobs.h"
 #include "../system/log.h"
 #include "../system/pathutil.h"
-#include "../system/resource/resources.h"
 
+#include "blueprints.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -79,6 +85,8 @@ void Game::init() {
     _worldPipeline.init();
 
     Resources.init(_version, _path);
+    Models::instance().init(_version);
+    Textures::instance().init(_version);
     TheAudioPlayer.init(_options.audio);
     Routines.init(_version, this);
 }
@@ -89,11 +97,9 @@ void Game::loadResources() {
 }
 
 void Game::loadCursor() {
-    ResourceManager &resources = Resources;
-
     Cursor cursor;
-    cursor.pressed = resources.findTexture("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = resources.findTexture("gui_mp_defaultu", TextureType::Cursor);
+    cursor.pressed = Textures::instance().get("gui_mp_defaultd", TextureType::Cursor);
+    cursor.unpressed = Textures::instance().get("gui_mp_defaultu", TextureType::Cursor);
 
     _window.setCursor(cursor);
 }
@@ -136,6 +142,13 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     withLoadingScreen([this, &name, &party, &entry]() {
         ResourceManager &resources = Resources;
         resources.loadModule(name);
+
+        Models::instance().invalidateCache();
+        Walkmeshes::instance().invalidateCache();
+        Textures::instance().invalidateCache();
+        AudioFiles::instance().invalidateCache();
+        Scripts::instance().invalidateCache();
+        Blueprints::instance().invalidateCache();
 
         shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();

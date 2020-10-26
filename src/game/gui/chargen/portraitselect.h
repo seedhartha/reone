@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../system/gui/gui.h"
-#include "../../../system/resource/types.h"
+#include "../../../gui/gui.h"
+#include "../../../resource/types.h"
 
 #include "../../types.h"
 

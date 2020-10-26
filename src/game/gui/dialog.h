@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "../../system/audio/soundinstance.h"
-#include "../../system/gui/gui.h"
-#include "../../system/resource/dlgfile.h"
-#include "../../system/resource/types.h"
+#include "../../audio/soundinstance.h"
+#include "../../gui/gui.h"
+#include "../../resource/dlgfile.h"
+#include "../../resource/types.h"
 
 #include "../camera/dialogcamera.h"
 #include "../object/spatial.h"

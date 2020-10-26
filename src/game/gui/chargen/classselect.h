@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../../system/gui/gui.h"
-#include "../../../system/resource/types.h"
-#include "../../../system/scene/scenegraph.h"
+#include "../../../gui/gui.h"
+#include "../../../resource/types.h"
+#include "../../../scene/scenegraph.h"
 
 #include "../../object/objectfactory.h"
 #include "../../types.h"

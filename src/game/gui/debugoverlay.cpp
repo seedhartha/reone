@@ -17,7 +17,8 @@
 
 #include "debugoverlay.h"
 
-#include "../../system/resource/resources.h"
+#include "../../resource/resources.h"
+#include "../../render/fonts.h"
 
 #include "../types.h"
 
@@ -36,7 +37,7 @@ DebugOverlay::DebugOverlay(const GraphicsOptions &opts) : _opts(opts) {
 }
 
 void DebugOverlay::load() {
-    _font = Resources.findFont(kFontResRef);
+    _font = Fonts::instance().get(kFontResRef);
 }
 
 void DebugOverlay::setContext(const DebugContext &ctx) {

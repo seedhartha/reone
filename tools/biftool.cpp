@@ -20,9 +20,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include "../src/resource/biffile.h"
+#include "../src/resource/util.h"
 #include "../src/system/log.h"
-#include "../src/system/resource/collection/biffile.h"
-#include "../src/system/resource/util.h"
 
 using namespace std;
 

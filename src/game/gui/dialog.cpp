@@ -21,12 +21,13 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../../system/audio/player.h"
+#include "../../audio/files.h"
+#include "../../audio/player.h"
+#include "../../gui/control/listbox.h"
+#include "../../gui/control/panel.h"
+#include "../../resource/resources.h"
+#include "../../script/execution.h"
 #include "../../system/random.h"
-#include "../../system/gui/control/listbox.h"
-#include "../../system/gui/control/panel.h"
-#include "../../system/resource/resources.h"
-#include "../../system/script/execution.h"
 
 #include "../game.h"
 #include "../script/routines.h"
@@ -310,10 +311,10 @@ void Dialog::playVoiceOver() {
     shared_ptr<AudioStream> voice;
 
     if (!_currentEntry->sound.empty()) {
-        voice = Resources.findAudio(_currentEntry->sound);
+        voice = AudioFiles::instance().get(_currentEntry->sound);
     }
     if (!voice && !_currentEntry->voResRef.empty()) {
-        voice = Resources.findAudio(_currentEntry->voResRef);
+        voice = AudioFiles::instance().get(_currentEntry->voResRef);
     }
     if (voice) {
         _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);

@@ -19,12 +19,13 @@
 
 #include "glm/glm.hpp"
 
-#include "../../system/audio/player.h"
-#include "../../system/audio/util.h"
+#include "../../audio/player.h"
+#include "../../audio/util.h"
+#include "../../gui/control/listbox.h"
+#include "../../gui/scenebuilder.h"
+#include "../../render/models.h"
+#include "../../resource/resources.h"
 #include "../../system/debug.h"
-#include "../../system/gui/control/listbox.h"
-#include "../../system/gui/scenebuilder.h"
-#include "../../system/resource/resources.h"
 
 #include "../game.h"
 
@@ -132,7 +133,7 @@ void MainMenu::setButtonColors(const string &tag) {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    shared_ptr<ModelSceneNode> model(new ModelSceneNode(&sceneGraph, Resources.findModel("mainmenu")));
+    shared_ptr<ModelSceneNode> model(new ModelSceneNode(&sceneGraph, Models::instance().get("mainmenu")));
     model->setDefaultAnimation("default");
     model->playDefaultAnimation();
     model->setLightingEnabled(true);

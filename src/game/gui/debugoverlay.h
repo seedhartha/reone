@@ -20,8 +20,8 @@
 #include <memory>
 #include <vector>
 
-#include "../../system/render/font.h"
-#include "../../system/render/types.h"
+#include "../../render/font.h"
+#include "../../render/types.h"
 
 #include "../types.h"
 

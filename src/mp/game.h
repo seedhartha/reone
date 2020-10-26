@@ -20,8 +20,8 @@
 #include <mutex>
 
 #include "../game/game.h"
-#include "../system/net/client.h"
-#include "../system/net/server.h"
+#include "../net/client.h"
+#include "../net/server.h"
 
 #include "command.h"
 #include "types.h"

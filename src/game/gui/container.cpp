@@ -17,9 +17,10 @@
 
 #include "container.h"
 
-#include "../../system/gui/control/imagebutton.h"
-#include "../../system/gui/control/listbox.h"
-#include "../../system/resource/resources.h"
+#include "../../gui/control/imagebutton.h"
+#include "../../gui/control/listbox.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
 
 #include "../game.h"
 #include "../object/item.h"
@@ -77,7 +78,7 @@ void Container::configureItemsListBox() {
     } else {
         frameTex = "lbl_hex_3";
     }
-    protoItem.setIconFrame(Resources.findTexture(frameTex, TextureType::GUI));
+    protoItem.setIconFrame(Textures::instance().get(frameTex, TextureType::GUI));
 }
 
 void Container::open(SpatialObject *container) {

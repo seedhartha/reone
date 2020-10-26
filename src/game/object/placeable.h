@@ -19,8 +19,9 @@
 
 #include <vector>
 
-#include "../../system/resource/blueprint/placeable.h"
-#include "../../system/resource/gfffile.h"
+#include "../../resource/gfffile.h"
+
+#include "../blueprint/placeable.h"
 
 #include "spatial.h"
 
@@ -36,11 +37,11 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
-    const resource::PlaceableBlueprint &blueprint() const;
+    const PlaceableBlueprint &blueprint() const;
 
 private:
     ObjectFactory *_objectFactory { nullptr };
-    std::shared_ptr<resource::PlaceableBlueprint> _blueprint;
+    std::shared_ptr<PlaceableBlueprint> _blueprint;
 
     void loadBlueprint(const std::string &resRef);
 };

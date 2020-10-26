@@ -17,8 +17,9 @@
 
 #include "portraitselect.h"
 
+#include "../../../render/textures.h"
+#include "../../../resource/resources.h"
 #include "../../../system/random.h"
-#include "../../../system/resource/resources.h"
 
 #include "../colors.h"
 
@@ -84,7 +85,7 @@ void PortraitSelection::updatePortraits() {
             int appearanceS = row.getInt("appearance_s");
             int appearanceL = row.getInt("appearance_l");
 
-            shared_ptr<Texture> image(Resources.findTexture(resRef, TextureType::GUI));
+            shared_ptr<Texture> image(Textures::instance().get(resRef, TextureType::GUI));
 
             Portrait portrait;
             portrait.resRef = move(resRef);

@@ -25,11 +25,11 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../system/audio/soundinstance.h"
-#include "../system/render/pipeline/world.h"
-#include "../system/render/window.h"
-#include "../system/resource/types.h"
-#include "../system/scene/scenegraph.h"
+#include "../audio/soundinstance.h"
+#include "../render/pipeline/world.h"
+#include "../render/window.h"
+#include "../resource/types.h"
+#include "../scene/scenegraph.h"
 
 #include "console.h"
 #include "gui/chargen/chargen.h"

@@ -21,10 +21,10 @@
 #include <string>
 #include <vector>
 
-#include "../../system/resource/types.h"
-#include "../../system/script/routine.h"
-#include "../../system/script/types.h"
-#include "../../system/script/variable.h"
+#include "../../resource/types.h"
+#include "../../script/routine.h"
+#include "../../script/types.h"
+#include "../../script/variable.h"
 
 #include "../object/object.h"
 
