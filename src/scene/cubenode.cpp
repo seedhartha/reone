@@ -22,6 +22,8 @@
 #include "../render/mesh/cube.h"
 #include "../system/debug.h"
 
+using namespace reone::render;
+
 namespace reone {
 
 namespace scene {
@@ -32,7 +34,7 @@ CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sce
 void CubeSceneNode::render() const {
     if (getDebugMode() != DebugMode::Path) return;
 
-    TheCubeMesh.render(glm::scale(_absoluteTransform, glm::vec3(_size)));
+    CubeMesh::instance().render(glm::scale(_absoluteTransform, glm::vec3(_size)));
 }
 
 } // namespace render

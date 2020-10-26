@@ -30,12 +30,12 @@ namespace reone {
 
 namespace game {
 
-RoutineManager &RoutineManager::instance() {
-    static RoutineManager instance;
+Routines &Routines::instance() {
+    static Routines instance;
     return instance;
 }
 
-void RoutineManager::init(GameVersion version, Game *game) {
+void Routines::init(GameVersion version, Game *game) {
     _game = game;
 
     switch (version) {
@@ -48,19 +48,19 @@ void RoutineManager::init(GameVersion version, Game *game) {
     }
 }
 
-RoutineManager::~RoutineManager() {
+Routines::~Routines() {
     deinit();
 }
 
-void RoutineManager::deinit() {
+void Routines::deinit() {
     _routines.clear();
 }
 
-void RoutineManager::add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes) {
+void Routines::add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes) {
     _routines.emplace_back(name, retType, argTypes);
 }
 
-void RoutineManager::add(
+void Routines::add(
     const std::string &name,
     VariableType retType,
     const std::vector<VariableType> &argTypes,
@@ -69,11 +69,11 @@ void RoutineManager::add(
     _routines.emplace_back(name, retType, argTypes, fn);
 }
 
-const Routine &RoutineManager::get(int index) {
+const Routine &Routines::get(int index) {
     return _routines[index];
 }
 
-shared_ptr<Object> RoutineManager::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
+shared_ptr<Object> Routines::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
     uint32_t objectId = 0;
     switch (id) {
         case kObjectSelf:

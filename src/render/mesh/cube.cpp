@@ -64,7 +64,7 @@ void CubeMesh::render(const glm::mat4 &transform) const {
     LocalUniforms locals;
     locals.model = transform;
 
-    Shaders.activate(ShaderProgram::ModelWhite, locals);
+    Shaders::instance().activate(ShaderProgram::ModelWhite, locals);
 
     Mesh::render(GL_TRIANGLES);
 }

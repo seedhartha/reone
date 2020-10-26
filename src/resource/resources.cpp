@@ -61,16 +61,12 @@ static map<string, shared_ptr<GffStruct>> g_gffCache;
 static map<string, shared_ptr<ByteArray>> g_resCache;
 static map<string, shared_ptr<TalkTable>> g_talkTableCache;
 
-static map<string, string> g_fontOverride = {
-    { "fnt_d16x16", "fnt_d16x16b" }
-};
-
-ResourceManager &ResourceManager::instance() {
-    static ResourceManager instance;
+Resources &Resources::instance() {
+    static Resources instance;
     return instance;
 }
 
-void ResourceManager::init(GameVersion version, const fs::path &gamePath) {
+void Resources::init(GameVersion version, const fs::path &gamePath) {
     _version = version;
     _gamePath = gamePath;
 
@@ -83,7 +79,7 @@ void ResourceManager::init(GameVersion version, const fs::path &gamePath) {
     loadModuleNames();
 }
 
-void ResourceManager::indexKeyFile() {
+void Resources::indexKeyFile() {
     fs::path path(getPathIgnoreCase(_gamePath, kKeyFileName));
 
     if (path.empty()) {
@@ -94,7 +90,7 @@ void ResourceManager::indexKeyFile() {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexTexturePacks() {
+void Resources::indexTexturePacks() {
     if (_version == GameVersion::KotOR) {
         fs::path patchPath(getPathIgnoreCase(_gamePath, kPatchFileName));
         indexErfFile(patchPath);
@@ -107,7 +103,7 @@ void ResourceManager::indexTexturePacks() {
     indexErfFile(texPackPath);
 }
 
-void ResourceManager::indexErfFile(const fs::path &path) {
+void Resources::indexErfFile(const fs::path &path) {
     unique_ptr<ErfFile> erf(new ErfFile());
     erf->load(path);
 
@@ -116,7 +112,7 @@ void ResourceManager::indexErfFile(const fs::path &path) {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexAudioFiles() {
+void Resources::indexAudioFiles() {
     fs::path musicPath(getPathIgnoreCase(_gamePath, kMusicDirectoryName));
     fs::path soundsPath(getPathIgnoreCase(_gamePath, kSoundsDirectoryName));
 
@@ -137,7 +133,7 @@ void ResourceManager::indexAudioFiles() {
     }
 }
 
-void ResourceManager::indexDirectory(const fs::path &path) {
+void Resources::indexDirectory(const fs::path &path) {
     unique_ptr<Folder> folder(new Folder());
     folder->load(path);
 
@@ -146,19 +142,19 @@ void ResourceManager::indexDirectory(const fs::path &path) {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexOverrideDirectory() {
+void Resources::indexOverrideDirectory() {
     fs::path path(getPathIgnoreCase(_gamePath, kOverrideDirectoryName));
     indexDirectory(path);
 }
 
-void ResourceManager::indexTalkTable() {
+void Resources::indexTalkTable() {
     fs::path path(getPathIgnoreCase(_gamePath, kTalkTableFileName));
     _tlkFile.load(path);
 
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexExeFile() {
+void Resources::indexExeFile() {
     string filename(_version == GameVersion::TheSithLords ? kExeFileNameTsl : kExeFileNameKotor);
     fs::path path(getPathIgnoreCase(_gamePath, filename));
 
@@ -167,7 +163,7 @@ void ResourceManager::indexExeFile() {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::loadModuleNames() {
+void Resources::loadModuleNames() {
     fs::path modules(getPathIgnoreCase(_gamePath, kModulesDirectoryName));
 
     for (auto &entry : fs::directory_iterator(modules)) {
@@ -185,25 +181,25 @@ void ResourceManager::loadModuleNames() {
     sort(_moduleNames.begin(), _moduleNames.end());
 }
 
-ResourceManager::~ResourceManager() {
+Resources::~Resources() {
     deinit();
 }
 
-void ResourceManager::deinit() {
+void Resources::deinit() {
     clearCaches();
 
     _transientProviders.clear();
     _providers.clear();
 }
 
-void ResourceManager::clearCaches() {
+void Resources::clearCaches() {
     g_2daCache.clear();
     g_gffCache.clear();
     g_resCache.clear();
     g_talkTableCache.clear();
 }
 
-void ResourceManager::loadModule(const string &name) {
+void Resources::loadModule(const string &name) {
     _transientProviders.clear();
     clearCaches();
 
@@ -220,7 +216,7 @@ void ResourceManager::loadModule(const string &name) {
     }
 }
 
-void ResourceManager::indexTransientRimFile(const fs::path &path) {
+void Resources::indexTransientRimFile(const fs::path &path) {
     unique_ptr<RimFile> rim(new RimFile());
     rim->load(path);
 
@@ -229,7 +225,7 @@ void ResourceManager::indexTransientRimFile(const fs::path &path) {
     debug(boost::format("Resources: indexed: %s") % path);
 }
 
-void ResourceManager::indexTransientErfFile(const fs::path &path) {
+void Resources::indexTransientErfFile(const fs::path &path) {
     unique_ptr<ErfFile> erf(new ErfFile());
     erf->load(path);
 
@@ -249,7 +245,7 @@ static shared_ptr<T> findResource(const string &key, map<string, shared_ptr<T>> 
     return pair.first->second;
 }
 
-shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
+shared_ptr<TwoDaTable> Resources::find2DA(const string &resRef) {
     return findResource<TwoDaTable>(resRef, g_2daCache, [this, &resRef]() {
         shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::TwoDa));
         shared_ptr<TwoDaTable> table;
@@ -264,7 +260,7 @@ shared_ptr<TwoDaTable> ResourceManager::find2DA(const string &resRef) {
     });
 }
 
-shared_ptr<ByteArray> ResourceManager::findRaw(const string &resRef, ResourceType type, bool logNotFound) {
+shared_ptr<ByteArray> Resources::findRaw(const string &resRef, ResourceType type, bool logNotFound) {
     string cacheKey(getCacheKey(resRef, type));
     auto res = g_resCache.find(cacheKey);
 
@@ -299,11 +295,11 @@ shared_ptr<ByteArray> ResourceManager::findRaw(const string &resRef, ResourceTyp
     return pair.first->second;
 }
 
-string ResourceManager::getCacheKey(const string &resRef, resource::ResourceType type) const {
+string Resources::getCacheKey(const string &resRef, resource::ResourceType type) const {
     return str(boost::format("%s.%s") % resRef % getExtByResType(type));
 }
 
-shared_ptr<ByteArray> ResourceManager::findRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
+shared_ptr<ByteArray> Resources::findRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
         if (!(*provider)->supports(type)) continue;
 
@@ -316,7 +312,7 @@ shared_ptr<ByteArray> ResourceManager::findRaw(const vector<unique_ptr<IResource
     return nullptr;
 }
 
-shared_ptr<GffStruct> ResourceManager::findGFF(const string &resRef, ResourceType type) {
+shared_ptr<GffStruct> Resources::findGFF(const string &resRef, ResourceType type) {
     string cacheKey(getCacheKey(resRef, type));
 
     return findResource<GffStruct>(cacheKey, g_gffCache, [this, &resRef, &type]() {
@@ -333,7 +329,7 @@ shared_ptr<GffStruct> ResourceManager::findGFF(const string &resRef, ResourceTyp
     });
 }
 
-shared_ptr<TalkTable> ResourceManager::findTalkTable(const string &resRef) {
+shared_ptr<TalkTable> Resources::findTalkTable(const string &resRef) {
     return findResource<TalkTable>(resRef, g_talkTableCache, [this, &resRef]() {
         shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::Conversation));
         shared_ptr<TalkTable> table;
@@ -348,15 +344,15 @@ shared_ptr<TalkTable> ResourceManager::findTalkTable(const string &resRef) {
     });
 }
 
-shared_ptr<ByteArray> ResourceManager::findPeResource(uint32_t name, PEResourceType type) {
+shared_ptr<ByteArray> Resources::findPeResource(uint32_t name, PEResourceType type) {
     return _exeFile.find(name, type);
 }
 
-const TalkTableString &ResourceManager::getString(int32_t ref) const {
+const TalkTableString &Resources::getString(int32_t ref) const {
     return _tlkFile.table()->getString(ref);
 }
 
-const vector<string> &ResourceManager::moduleNames() const {
+const vector<string> &Resources::moduleNames() const {
     return _moduleNames;
 }
 

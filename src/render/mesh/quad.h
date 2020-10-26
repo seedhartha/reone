@@ -34,11 +34,6 @@ private:
     Quad(std::vector<float> &&vertices);
 };
 
-#define DefaultQuad render::Quad::getDefault()
-#define XFlippedQuad render::Quad::getXFlipped()
-#define YFlippedQuad render::Quad::getYFlipped()
-#define XYFlippedQuad render::Quad::getXYFlipped()
-
 } // namespace render
 
 } // namespace reone

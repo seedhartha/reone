@@ -132,7 +132,7 @@ void ModelNodeSceneNode::renderSingle() const {
             locals.lighting.lights.push_back(move(shaderLight));
         }
     }
-    Shaders.activate(ShaderProgram::ModelModel, locals);
+    Shaders::instance().activate(ShaderProgram::ModelModel, locals);
 
     mesh->render(_modelSceneNode->textureOverride());
 }

@@ -44,8 +44,6 @@ Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::
 }
 
 void Door::load(const GffStruct &gffs) {
-    ResourceManager &resources = Resources;
-
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
@@ -58,7 +56,7 @@ void Door::load(const GffStruct &gffs) {
 
     int transDestStrRef = gffs.getInt("TransitionDestin");
     if (transDestStrRef != -1) {
-        _transitionDestin = resources.getString(transDestStrRef).text;
+        _transitionDestin = Resources::instance().getString(transDestStrRef).text;
     }
 
     string templResRef(gffs.getString("TemplateResRef"));
@@ -72,7 +70,7 @@ void Door::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getDoor(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table = Resources.find2DA("genericdoors");
+    shared_ptr<TwoDaTable> table = Resources::instance().find2DA("genericdoors");
 
     string model(table->getString(_blueprint->genericType(), "modelname"));
     boost::to_lower(model);

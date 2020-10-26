@@ -70,26 +70,26 @@ void RenderWindow::init() {
     SDL_GL_SetSwapInterval(0);
     glewInit();
 
-    Shaders.initGL();
-    TheCubeMesh.initGL();
-    TheAABBMesh.initGL();
-    DefaultQuad.initGL();
-    XFlippedQuad.initGL();
-    YFlippedQuad.initGL();
-    XYFlippedQuad.initGL();
+    Shaders::instance().initGL();
+    CubeMesh::instance().initGL();
+    AABBMesh::instance().initGL();
+    Quad::getDefault().initGL();
+    Quad::getXFlipped().initGL();
+    Quad::getYFlipped().initGL();
+    Quad::getXYFlipped().initGL();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderWindow::deinit() {
-    DefaultQuad.deinitGL();
-    XFlippedQuad.deinitGL();
-    YFlippedQuad.deinitGL();
-    XYFlippedQuad.deinitGL();
-    TheAABBMesh.deinitGL();
-    TheCubeMesh.deinitGL();
-    Shaders.deinitGL();
+    Quad::getDefault().deinitGL();
+    Quad::getXFlipped().deinitGL();
+    Quad::getYFlipped().deinitGL();
+    Quad::getXYFlipped().deinitGL();
+    AABBMesh::instance().deinitGL();
+    CubeMesh::instance().deinitGL();
+    Shaders::instance().deinitGL();
 
     SDL_GL_DeleteContext(_context);
     SDL_DestroyWindow(_window);
@@ -169,12 +169,12 @@ void RenderWindow::drawCursor() const {
     LocalUniforms locals;
     locals.model = move(transform);
 
-    Shaders.activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     glActiveTexture(0);
     texture->bind();
 
-    DefaultQuad.render(GL_TRIANGLES);
+    Quad::getDefault().render(GL_TRIANGLES);
 
     texture->unbind();
 }

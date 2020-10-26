@@ -58,8 +58,6 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
 void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &icon) const {
     if (!_iconFrame && !icon) return;
 
-    ShaderManager &shaders = Shaders;
-
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
@@ -75,24 +73,24 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
         locals.model = transform;
         locals.color = move(frameColor);
 
-        shaders.activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
     glActiveTexture(0);
 
     if (_iconFrame) {
         _iconFrame->bind();
-        DefaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
         _iconFrame->unbind();
     }
     {
         LocalUniforms locals;
         locals.model = transform;
 
-        shaders.activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
     if (icon) {
         icon->bind();
-        DefaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
         icon->unbind();
     }
 }

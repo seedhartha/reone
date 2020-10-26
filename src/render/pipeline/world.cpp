@@ -51,7 +51,6 @@ void WorldRenderPipeline::init() {
 }
 
 void WorldRenderPipeline::render() const {
-    ShaderManager &shaders = Shaders;
     {
         // Render geometry
         _geometry.bind();
@@ -71,7 +70,7 @@ void WorldRenderPipeline::render() const {
     GlobalUniforms globals;
     globals.projection = glm::ortho(0.0f, w, h, 0.0f);
 
-    shaders.setGlobalUniforms(globals);
+    Shaders::instance().setGlobalUniforms(globals);
 
     for (int i = 0; i < kBlurPassCount; ++i) {
         {
@@ -90,7 +89,7 @@ void WorldRenderPipeline::render() const {
             locals.blur.resolution = glm::vec2(w, h);
             locals.blur.direction = glm::vec2(1.0f, 0.0f);
 
-            shaders.activate(ShaderProgram::GUIBlur, locals);
+            Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
             glActiveTexture(GL_TEXTURE0);
             if (i == 0) {
@@ -99,7 +98,7 @@ void WorldRenderPipeline::render() const {
                 _verticalBlur.bindColorBuffer(0);
             }
 
-            DefaultQuad.render(GL_TRIANGLES);
+            Quad::getDefault().render(GL_TRIANGLES);
 
             _geometry.unbindColorBuffer();
             _horizontalBlur.unbind();
@@ -120,12 +119,12 @@ void WorldRenderPipeline::render() const {
             locals.blur.resolution = glm::vec2(_opts.width, _opts.height);
             locals.blur.direction = glm::vec2(0.0f, 1.0f);
 
-            shaders.activate(ShaderProgram::GUIBlur, locals);
+            Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
             glActiveTexture(GL_TEXTURE0);
             _horizontalBlur.bindColorBuffer(0);
 
-            DefaultQuad.render(GL_TRIANGLES);
+            Quad::getDefault().render(GL_TRIANGLES);
 
             _horizontalBlur.unbindColorBuffer();
             _verticalBlur.unbind();
@@ -140,7 +139,7 @@ void WorldRenderPipeline::render() const {
         locals.features.bloomEnabled = true;
         locals.textures.bloom = 1;
 
-        shaders.activate(ShaderProgram::GUIBloom, locals);
+        Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
 
         glActiveTexture(GL_TEXTURE0);
         _geometry.bindColorBuffer(0);
@@ -148,7 +147,7 @@ void WorldRenderPipeline::render() const {
         glActiveTexture(GL_TEXTURE1);
         _verticalBlur.bindColorBuffer(0);
 
-        DefaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
 
         glActiveTexture(GL_TEXTURE1);
         _verticalBlur.unbindColorBuffer();

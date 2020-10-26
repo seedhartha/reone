@@ -54,9 +54,8 @@ shared_ptr<Model> Models::get(const string &resRef) {
 }
 
 shared_ptr<Model> Models::doGet(const string &resRef) {
-    ResourceManager &resources = Resources;
-    shared_ptr<ByteArray> mdlData(resources.findRaw(resRef, ResourceType::Model));
-    shared_ptr<ByteArray> mdxData(resources.findRaw(resRef, ResourceType::Mdx));
+    shared_ptr<ByteArray> mdlData(Resources::instance().findRaw(resRef, ResourceType::Model));
+    shared_ptr<ByteArray> mdxData(Resources::instance().findRaw(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {

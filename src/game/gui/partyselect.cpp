@@ -172,7 +172,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(Resources.getString(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd).text);
+    string text(Resources::instance().getString(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd).text);
     Button &btnAccept = getControl<Button>("BTN_ACCEPT");
     btnAccept.setTextMessage(text);
 }

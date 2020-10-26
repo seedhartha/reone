@@ -84,11 +84,11 @@ void Game::init() {
     _window.init();
     _worldPipeline.init();
 
-    Resources.init(_version, _path);
+    Resources::instance().init(_version, _path);
     Models::instance().init(_version);
     Textures::instance().init(_version);
-    TheAudioPlayer.init(_options.audio);
-    Routines.init(_version, this);
+    AudioPlayer::instance().init(_options.audio);
+    Routines::instance().init(_version, this);
 }
 
 void Game::loadResources() {
@@ -140,8 +140,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
     _partyConfig = party;
 
     withLoadingScreen([this, &name, &party, &entry]() {
-        ResourceManager &resources = Resources;
-        resources.loadModule(name);
+        Resources::instance().loadModule(name);
 
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
@@ -150,7 +149,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         Scripts::instance().invalidateCache();
         Blueprints::instance().invalidateCache();
 
-        shared_ptr<GffStruct> ifo(resources.findGFF("module", ResourceType::ModuleInfo));
+        shared_ptr<GffStruct> ifo(Resources::instance().findGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
         _module->load(name, *ifo);
         _module->loadParty(_partyConfig, entry);
@@ -230,7 +229,7 @@ void Game::drawGUI() {
         0.0f,
         -100.0f, 100.0f);
 
-    Shaders.setGlobalUniforms(globals);
+    Shaders::instance().setGlobalUniforms(globals);
 
     switch (_screen) {
         case GameScreen::InGame:
@@ -260,7 +259,7 @@ void Game::drawCursor() {
     globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
     globals.view = glm::mat4(1.0f);
 
-    Shaders.setGlobalUniforms(globals);
+    Shaders::instance().setGlobalUniforms(globals);
 
     _window.drawCursor();
 }
@@ -348,9 +347,8 @@ void Game::update() {
 }
 
 void Game::loadNextModule() {
-    JobExecutor &jobs = Jobs;
-    jobs.cancel();
-    jobs.await();
+    JobExecutor::instance().cancel();
+    JobExecutor::instance().await();
 
     _sceneGraph.clear();
     loadModule(_nextModule, _partyConfig, _nextEntry);
@@ -378,10 +376,10 @@ void Game::loadCharacterGeneration() {
 }
 
 void Game::deinit() {
-    Jobs.deinit();
-    Routines.deinit();
-    TheAudioPlayer.deinit();
-    Resources.deinit();
+    JobExecutor::instance().deinit();
+    Routines::instance().deinit();
+    AudioPlayer::instance().deinit();
+    Resources::instance().deinit();
 
     _window.deinit();
 }

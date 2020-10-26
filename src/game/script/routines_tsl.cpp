@@ -38,15 +38,15 @@ namespace game {
 #define Vector VariableType::Vector
 #define Action VariableType::Action
 
-void RoutineManager::addTslRoutines() {
-    add("Random", Int, { Int }, bind(&RoutineManager::random, this, _1, _2));
+void Routines::addTslRoutines() {
+    add("Random", Int, { Int }, bind(&Routines::random, this, _1, _2));
     add("PrintString", Void, { String });
     add("PrintFloat", Void, { Float, Int, Int });
     add("FloatToString", String, { Float, Int, Int });
     add("PrintInteger", Void, { Int });
     add("PrintObject", Void, { Object });
-    add("AssignCommand", Void, { Object, Action }, bind(&RoutineManager::assignCommand, this, _1, _2));
-    add("DelayCommand", Void, { Float, Action }, bind(&RoutineManager::delayCommand, this, _1, _2));
+    add("AssignCommand", Void, { Object, Action }, bind(&Routines::assignCommand, this, _1, _2));
+    add("DelayCommand", Void, { Float, Action }, bind(&Routines::delayCommand, this, _1, _2));
     add("ExecuteScript", Void, { String, Object, Int });
     add("ClearAllActions", Void, { });
     add("SetFacing", Void, { Float });
@@ -61,10 +61,10 @@ void RoutineManager::addTslRoutines() {
     add("GetTimeMillisecond", Int, { });
     add("ActionRandomWalk", Void, { });
     add("ActionMoveToLocation", Void, { Location, Int });
-    add("ActionMoveToObject", Void, { Object, Int, Float }, bind(&RoutineManager::actionMoveToObject, this, _1, _2));
+    add("ActionMoveToObject", Void, { Object, Int, Float }, bind(&Routines::actionMoveToObject, this, _1, _2));
     add("ActionMoveAwayFromObject", Void, { Object, Int, Float });
-    add("GetArea", Object, { Object }, bind(&RoutineManager::getArea, this, _1, _2));
-    add("GetEnteringObject", Object, { }, bind(&RoutineManager::getEnteringObject, this, _1, _2));
+    add("GetArea", Object, { Object }, bind(&Routines::getArea, this, _1, _2));
+    add("GetEnteringObject", Object, { }, bind(&Routines::getEnteringObject, this, _1, _2));
     add("GetExitingObject", Object, { });
     add("GetPosition", Vector, { Object });
     add("GetFacing", Float, { Object });
@@ -81,9 +81,9 @@ void RoutineManager::addTslRoutines() {
     add("ActionSpeakString", Void, { String, Int });
     add("ActionPlayAnimation", Void, { Int, Float, Float });
     add("GetDistanceToObject", Float, { Object });
-    add("GetIsObjectValid", Int, { Object }, bind(&RoutineManager::getIsObjectValid, this, _1, _2));
-    add("ActionOpenDoor", Void, { Object }, bind(&RoutineManager::actionOpenDoor, this, _1, _2));
-    add("ActionCloseDoor", Void, { Object }, bind(&RoutineManager::actionCloseDoor, this, _1, _2));
+    add("GetIsObjectValid", Int, { Object }, bind(&Routines::getIsObjectValid, this, _1, _2));
+    add("ActionOpenDoor", Void, { Object }, bind(&Routines::actionOpenDoor, this, _1, _2));
+    add("ActionCloseDoor", Void, { Object }, bind(&Routines::actionCloseDoor, this, _1, _2));
     add("SetCameraFacing", Void, { Float });
     add("PlaySound", Void, { String });
     add("GetSpellTargetObject", Object, { });
@@ -170,8 +170,8 @@ void RoutineManager::addTslRoutines() {
     add("GetFirstObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
     add("GetNextObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
     add("EffectEntangle", Effect, { });
-    add("SignalEvent", Void, { Object, Event }, bind(&RoutineManager::signalEvent, this, _1, _2));
-    add("EventUserDefined", Event, { Int }, bind(&RoutineManager::eventUserDefined, this, _1, _2));
+    add("SignalEvent", Void, { Object, Event }, bind(&Routines::signalEvent, this, _1, _2));
+    add("EventUserDefined", Event, { Int }, bind(&Routines::eventUserDefined, this, _1, _2));
     add("EffectDeath", Effect, { Int, Int, Int });
     add("EffectKnockdown", Effect, { });
     add("ActionGiveItem", Void, { Object, Object });
@@ -194,7 +194,7 @@ void RoutineManager::addTslRoutines() {
     add("SetReturnStrref", Void, { Int, Int, Int });
     add("EffectForceJump", Effect, { Object, Int });
     add("EffectSleep", Effect, { });
-    add("GetItemInSlot", Object, { Int, Object }, bind(&RoutineManager::getItemInSlot, this, _1, _2));
+    add("GetItemInSlot", Object, { Int, Object }, bind(&Routines::getItemInSlot, this, _1, _2));
     add("EffectTemporaryForcePoints", Effect, { Int });
     add("EffectConfused", Effect, { });
     add("EffectFrightened", Effect, { });
@@ -236,14 +236,14 @@ void RoutineManager::addTslRoutines() {
     add("GetGlobalString", String, { String });
     add("GetListenPatternNumber", Int, { });
     add("ActionJumpToObject", Void, { Object, Int });
-    add("GetWaypointByTag", Object, { String }, bind(&RoutineManager::getWaypointByTag, this, _1, _2));
+    add("GetWaypointByTag", Object, { String }, bind(&Routines::getWaypointByTag, this, _1, _2));
     add("GetTransitionTarget", Object, { Object });
     add("EffectLinkEffects", Effect, { Effect, Effect });
-    add("GetObjectByTag", Object, { String, Int }, bind(&RoutineManager::getObjectByTag, this, _1, _2));
+    add("GetObjectByTag", Object, { String, Int }, bind(&Routines::getObjectByTag, this, _1, _2));
     add("AdjustAlignment", Void, { Object, Int, Int, Int });
     add("ActionWait", Void, { Float });
     add("SetAreaTransitionBMP", Void, { Int, String });
-    add("ActionStartConversation", Void, { Object, String, Int, Int, Int, String, String, String, String, String, String, Int, Int, Int, Int }, bind(&RoutineManager::actionStartConversation, this, _1, _2));
+    add("ActionStartConversation", Void, { Object, String, Int, Int, Int, String, String, String, String, String, String, Int, Int, Int, Int }, bind(&Routines::actionStartConversation, this, _1, _2));
     add("ActionPauseConversation", Void, { });
     add("ActionResumeConversation", Void, { });
     add("EffectBeam", Effect, { Int, Object, Int, Int });
@@ -256,7 +256,7 @@ void RoutineManager::addTslRoutines() {
     add("ActionJumpToLocation", Void, { Location });
     add("Location", Location, { Vector, Float });
     add("ApplyEffectAtLocation", Void, { Int, Effect, Location, Float });
-    add("GetIsPC", Int, { Object }, bind(&RoutineManager::getIsPC, this, _1, _2));
+    add("GetIsPC", Int, { Object }, bind(&Routines::getIsPC, this, _1, _2));
     add("FeetToMeters", Float, { Float });
     add("YardsToMeters", Float, { Float });
     add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
@@ -269,7 +269,7 @@ void RoutineManager::addTslRoutines() {
     add("GetNearestObject", Object, { Int, Object, Int });
     add("GetNearestObjectToLocation", Object, { Int, Location, Int });
     add("GetNearestObjectByTag", Object, { String, Object, Int });
-    add("IntToFloat", Float, { Int }, bind(&RoutineManager::intToFloat, this, _1, _2));
+    add("IntToFloat", Float, { Int }, bind(&Routines::intToFloat, this, _1, _2));
     add("FloatToInt", Int, { Float });
     add("StringToInt", Int, { String });
     add("StringToFloat", Float, { String });
@@ -280,13 +280,13 @@ void RoutineManager::addTslRoutines() {
     add("GetPCSpeaker", Object, { });
     add("GetStringByStrRef", String, { Int });
     add("ActionSpeakStringByStrRef", Void, { Int, Int });
-    add("DestroyObject", Void, { Object, Float, Int, Float, Int }, bind(&RoutineManager::destroyObject, this, _1, _2));
+    add("DestroyObject", Void, { Object, Float, Int, Float, Int }, bind(&Routines::destroyObject, this, _1, _2));
     add("GetModule", Object, { });
     add("CreateObject", Object, { Int, String, Location, Int });
     add("EventSpellCastAt", Event, { Object, Int, Int });
     add("GetLastSpellCaster", Object, { });
     add("GetLastSpell", Int, { });
-    add("GetUserDefinedEventNumber", Int, { }, bind(&RoutineManager::getUserDefinedEventNumber, this, _1, _2));
+    add("GetUserDefinedEventNumber", Int, { }, bind(&Routines::getUserDefinedEventNumber, this, _1, _2));
     add("GetSpellId", Int, { });
     add("RandomName", String, { });
     add("EffectPoison", Effect, { Int });
@@ -333,7 +333,7 @@ void RoutineManager::addTslRoutines() {
     add("GetLastPlayerDied", Object, { });
     add("GetModuleItemLost", Object, { });
     add("GetModuleItemLostBy", Object, { });
-    add("ActionDoCommand", Void, { Action }, bind(&RoutineManager::actionDoCommand, this, _1, _2));
+    add("ActionDoCommand", Void, { Action }, bind(&Routines::actionDoCommand, this, _1, _2));
     add("EventConversation", Event, { });
     add("SetEncounterDifficulty", Void, { Int, Object });
     add("GetEncounterDifficulty", Int, { Object });
@@ -382,7 +382,7 @@ void RoutineManager::addTslRoutines() {
     add("GetNextItemInInventory", Object, { Object });
     add("GetClassByPosition", Int, { Int, Object });
     add("GetLevelByPosition", Int, { Int, Object });
-    add("GetLevelByClass", Int, { Int, Object }, bind(&RoutineManager::getLevelByClass, this, _1, _2));
+    add("GetLevelByClass", Int, { Int, Object }, bind(&Routines::getLevelByClass, this, _1, _2));
     add("GetDamageDealtByType", Int, { Int });
     add("GetTotalDamageDealt", Int, { });
     add("GetLastDamager", Object, { });
@@ -397,7 +397,7 @@ void RoutineManager::addTslRoutines() {
     add("VersusAlignmentEffect", Effect, { Effect, Int, Int });
     add("VersusRacialTypeEffect", Effect, { Effect, Int });
     add("VersusTrapEffect", Effect, { Effect });
-    add("GetGender", Int, { Object }, bind(&RoutineManager::getGender, this, _1, _2));
+    add("GetGender", Int, { Object }, bind(&Routines::getGender, this, _1, _2));
     add("GetIsTalentValid", Int, { Talent });
     add("ActionMoveAwayFromLocation", Void, { Location, Int, Float });
     add("GetAttemptedAttackTarget", Object, { });
@@ -587,8 +587,8 @@ void RoutineManager::addTslRoutines() {
     add("GetPlaceableIllumination", Int, { Object });
     add("GetIsPlaceableObjectActionPossible", Int, { Object, Int });
     add("DoPlaceableObjectAction", Void, { Object, Int });
-    add("GetFirstPC", Object, { }, bind(&RoutineManager::getFirstPC, this, _1, _2));
-    add("GetNextPC", Object, { }, bind(&RoutineManager::getFirstPC, this, _1, _2));
+    add("GetFirstPC", Object, { }, bind(&Routines::getFirstPC, this, _1, _2));
+    add("GetNextPC", Object, { }, bind(&Routines::getFirstPC, this, _1, _2));
     add("SetTrapDetectedBy", Int, { Object, Object });
     add("GetIsTrapped", Int, { Object });
     add("SetEffectIcon", Effect, { Effect, Int });
@@ -735,8 +735,8 @@ void RoutineManager::addTslRoutines() {
     add("SetGlobalLocation", Void, { String, Location });
     add("AddAvailableNPCByObject", Int, { Int, Object });
     add("RemoveAvailableNPC", Int, { Int });
-    add("IsAvailableCreature", Int, { Int }, bind(&RoutineManager::isAvailableCreature, this, _1, _2));
-    add("AddAvailableNPCByTemplate", Int, { Int, String }, bind(&RoutineManager::addAvailableNPCByTemplate, this, _1, _2));
+    add("IsAvailableCreature", Int, { Int }, bind(&Routines::isAvailableCreature, this, _1, _2));
+    add("AddAvailableNPCByTemplate", Int, { Int, String }, bind(&Routines::addAvailableNPCByTemplate, this, _1, _2));
     add("SpawnAvailableNPC", Object, { Int, Location });
     add("IsNPCPartyMember", Int, { Int });
     add("ActionBarkString", Void, { Int });
@@ -751,7 +751,7 @@ void RoutineManager::addTslRoutines() {
     add("GetNPCSelectability", Int, { Int });
     add("ClearAllEffects", Void, { });
     add("GetLastConversation", String, { });
-    add("ShowPartySelectionGUI", Void, { String, Int, Int, Int }, bind(&RoutineManager::showPartySelectionGUI, this, _1, _2));
+    add("ShowPartySelectionGUI", Void, { String, Int, Int, Int }, bind(&Routines::showPartySelectionGUI, this, _1, _2));
     add("GetStandardFaction", Int, { Object });
     add("GivePlotXP", Void, { String, Int });
     add("GetMinOneHP", Int, { Object });

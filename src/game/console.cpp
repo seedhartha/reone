@@ -102,9 +102,9 @@ void Console::render() const {
         locals.color = glm::vec3(0.0f);
         locals.alpha = 0.5f;
 
-        Shaders.activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
-    DefaultQuad.render(GL_TRIANGLES);
+    Quad::getDefault().render(GL_TRIANGLES);
 
     string text("> " + _input.text());
     {

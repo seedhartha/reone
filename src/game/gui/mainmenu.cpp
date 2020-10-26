@@ -165,7 +165,7 @@ void MainMenu::startModuleSelection() {
     hideControl("LBL_MENUBG");
 
     ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
-    for (auto &module : Resources.moduleNames()) {
+    for (auto &module : Resources::instance().moduleNames()) {
         modules.add({ module, module });
     }
 }

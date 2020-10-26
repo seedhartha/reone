@@ -51,8 +51,7 @@ shared_ptr<AudioStream> AudioFiles::get(const string &resRef) {
 }
 
 shared_ptr<AudioStream> AudioFiles::doGet(const string &resRef) {
-    ResourceManager &resources = Resources;
-    shared_ptr<ByteArray> mp3Data(resources.findRaw(resRef, ResourceType::Mp3, false));
+    shared_ptr<ByteArray> mp3Data(Resources::instance().findRaw(resRef, ResourceType::Mp3, false));
     shared_ptr<AudioStream> stream;
 
     if (mp3Data) {
@@ -61,7 +60,7 @@ shared_ptr<AudioStream> AudioFiles::doGet(const string &resRef) {
         stream = mp3.stream();
 
     } else {
-        shared_ptr<ByteArray> wavData(resources.findRaw(resRef, ResourceType::Wav));
+        shared_ptr<ByteArray> wavData(Resources::instance().findRaw(resRef, ResourceType::Wav));
         if (wavData) {
             WavFile wav;
             wav.load(wrap(wavData));

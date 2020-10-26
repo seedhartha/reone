@@ -32,8 +32,6 @@ private:
     AABBMesh();
 };
 
-#define TheAABBMesh AABBMesh::instance()
-
 } // namespace render
 
 } // namespace reone

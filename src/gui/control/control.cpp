@@ -163,7 +163,7 @@ void Control::loadText(const GffStruct &gffs) {
     _text.font = Fonts::instance().get(gffs.getString("FONT"));
 
     int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? gffs.getString("TEXT") : Resources.getString(strRef).text;
+    _text.text = strRef == -1 ? gffs.getString("TEXT") : Resources::instance().getString(strRef).text;
 
     _text.color = gffs.getVector("COLOR");
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
@@ -233,13 +233,6 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
 }
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const {
-    ShaderManager &shaders = Shaders;
-
-    Quad &defaultQuad = DefaultQuad;
-    Quad &xFlippedQuad = XFlippedQuad;
-    Quad &yFlippedQuad = YFlippedQuad;
-    Quad &xyFlippedQuad = XYFlippedQuad;
-
     glActiveTexture(GL_TEXTURE0);
 
     glm::vec3 color(getBorderColor());
@@ -260,7 +253,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.features.discardEnabled = _discardEnabled;
             locals.discardColor = _discardColor;
 
-            shaders.activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
 
         border.fill->bind();
@@ -274,7 +267,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
             glBlendFunc(GL_ONE, GL_ONE);
         }
-        defaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
 
         if (additive) {
             glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
@@ -303,9 +296,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.model = move(transform);
                 locals.color = color;
 
-                shaders.activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
-            defaultQuad.render(GL_TRIANGLES);
+            Quad::getDefault().render(GL_TRIANGLES);
 
             // Right edge
             {
@@ -318,9 +311,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.model = move(transform);
                 locals.color = color;
 
-                shaders.activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
-            xFlippedQuad.render(GL_TRIANGLES);
+            Quad::getXFlipped().render(GL_TRIANGLES);
         }
 
         if (width > 0.0f) {
@@ -337,9 +330,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.model = move(transform);
                 locals.color = color;
 
-                shaders.activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
-            defaultQuad.render(GL_TRIANGLES);
+            Quad::getDefault().render(GL_TRIANGLES);
 
             // Bottom edge
             {
@@ -351,9 +344,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.model = move(transform);
                 locals.color = color;
 
-                shaders.activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
-            yFlippedQuad.render(GL_TRIANGLES);
+            Quad::getYFlipped().render(GL_TRIANGLES);
         }
 
         border.edge->unbind();
@@ -374,9 +367,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.model = move(transform);
             locals.color = color;
 
-            shaders.activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
-        defaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
 
         // Bottom left corner
         {
@@ -388,9 +381,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.model = move(transform);
             locals.color = color;
 
-            shaders.activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
-        yFlippedQuad.render(GL_TRIANGLES);
+        Quad::getYFlipped().render(GL_TRIANGLES);
 
         // Top right corner
         {
@@ -402,9 +395,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.model = move(transform);
             locals.color = color;
 
-            shaders.activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
-        xFlippedQuad.render(GL_TRIANGLES);
+        Quad::getXFlipped().render(GL_TRIANGLES);
 
         // Bottom right corner
         {
@@ -416,9 +409,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.model = move(transform);
             locals.color = color;
 
-            shaders.activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
-        xyFlippedQuad.render(GL_TRIANGLES);
+        Quad::getXYFlipped().render(GL_TRIANGLES);
 
         border.corner->unbind();
     }
