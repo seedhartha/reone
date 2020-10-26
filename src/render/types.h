@@ -64,6 +64,11 @@ public:
     virtual bool handle(const SDL_Event &event) = 0;
 };
 
+class IRenderable {
+public:
+    virtual void render() const = 0;
+};
+
 } // namespace render
 
 } // namespace reone

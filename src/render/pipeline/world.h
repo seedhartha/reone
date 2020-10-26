@@ -22,23 +22,17 @@
 
 namespace reone {
 
-namespace scene {
-
-class SceneGraph;
-
-}
-
 namespace render {
 
 class WorldRenderPipeline {
 public:
-    WorldRenderPipeline(scene::SceneGraph *sceneGraph, const GraphicsOptions &opts);
+    WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts);
 
     void init();
     void render() const;
 
 private:
-    scene::SceneGraph *_sceneGraph { nullptr };
+    IRenderable *_scene { nullptr };
     GraphicsOptions _opts;
     Framebuffer _geometry;
     Framebuffer _verticalBlur;
