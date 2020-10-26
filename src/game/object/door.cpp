@@ -70,7 +70,7 @@ void Door::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getDoor(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table = Resources::instance().find2DA("genericdoors");
+    shared_ptr<TwoDaTable> table = Resources::instance().get2DA("genericdoors");
 
     string model(table->getString(_blueprint->genericType(), "modelname"));
     boost::to_lower(model);

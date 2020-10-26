@@ -28,7 +28,7 @@ namespace reone {
 namespace game {
 
 string findPortrait(int appearance) {
-    shared_ptr<TwoDaTable> table(Resources::instance().find2DA("portraits"));
+    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
 
     const TwoDaRow *row = table->findRow([&appearance](const TwoDaRow &row) {
         int appearanceNumber = row.getInt("appearancenumber");

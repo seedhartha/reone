@@ -59,7 +59,7 @@ shared_ptr<T> Blueprints::get(const string &resRef, ResourceType type, unordered
 
 template <class T>
 shared_ptr<T> Blueprints::doGet(const string &resRef, ResourceType type) {
-    shared_ptr<GffStruct> data(Resources::instance().findGFF(resRef, type));
+    shared_ptr<GffStruct> data(Resources::instance().getGFF(resRef, type));
     shared_ptr<T> blueprint;
 
     if (data) {

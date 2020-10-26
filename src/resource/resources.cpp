@@ -186,13 +186,13 @@ Resources::~Resources() {
 }
 
 void Resources::deinit() {
-    clearCaches();
+    invalidateCache();
 
     _transientProviders.clear();
     _providers.clear();
 }
 
-void Resources::clearCaches() {
+void Resources::invalidateCache() {
     g_2daCache.clear();
     g_gffCache.clear();
     g_resCache.clear();
@@ -200,8 +200,8 @@ void Resources::clearCaches() {
 }
 
 void Resources::loadModule(const string &name) {
+    invalidateCache();
     _transientProviders.clear();
-    clearCaches();
 
     fs::path modulesPath(getPathIgnoreCase(_gamePath, kModulesDirectoryName));
     fs::path rimPath(getPathIgnoreCase(modulesPath, name + ".rim"));
@@ -236,18 +236,18 @@ void Resources::indexTransientErfFile(const fs::path &path) {
 
 template <class T>
 static shared_ptr<T> findResource(const string &key, map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
-    auto res = cache.find(key);
-    if (res != cache.end()) {
-        return res->second;
+    auto maybeResource = cache.find(key);
+    if (maybeResource != cache.end()) {
+        return maybeResource->second;
     };
-    auto pair = cache.insert(make_pair(key, getter()));
+    auto inserted = cache.insert(make_pair(key, getter()));
 
-    return pair.first->second;
+    return inserted.first->second;
 }
 
-shared_ptr<TwoDaTable> Resources::find2DA(const string &resRef) {
+shared_ptr<TwoDaTable> Resources::get2DA(const string &resRef) {
     return findResource<TwoDaTable>(resRef, g_2daCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::TwoDa));
+        shared_ptr<ByteArray> data(get(resRef, ResourceType::TwoDa));
         shared_ptr<TwoDaTable> table;
 
         if (data) {
@@ -260,7 +260,7 @@ shared_ptr<TwoDaTable> Resources::find2DA(const string &resRef) {
     });
 }
 
-shared_ptr<ByteArray> Resources::findRaw(const string &resRef, ResourceType type, bool logNotFound) {
+shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bool logNotFound) {
     string cacheKey(getCacheKey(resRef, type));
     auto res = g_resCache.find(cacheKey);
 
@@ -269,9 +269,9 @@ shared_ptr<ByteArray> Resources::findRaw(const string &resRef, ResourceType type
     }
     debug("Resources: load " + cacheKey, 2);
 
-    shared_ptr<ByteArray> data = findRaw(_transientProviders, resRef, type);
+    shared_ptr<ByteArray> data = get(_transientProviders, resRef, type);
     if (!data) {
-        data = findRaw(_providers, resRef, type);
+        data = get(_providers, resRef, type);
     }
     if (!data) {
         KeyFile::KeyEntry key;
@@ -299,7 +299,7 @@ string Resources::getCacheKey(const string &resRef, resource::ResourceType type)
     return str(boost::format("%s.%s") % resRef % getExtByResType(type));
 }
 
-shared_ptr<ByteArray> Resources::findRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
+shared_ptr<ByteArray> Resources::get(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
         if (!(*provider)->supports(type)) continue;
 
@@ -312,11 +312,11 @@ shared_ptr<ByteArray> Resources::findRaw(const vector<unique_ptr<IResourceProvid
     return nullptr;
 }
 
-shared_ptr<GffStruct> Resources::findGFF(const string &resRef, ResourceType type) {
+shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {
     string cacheKey(getCacheKey(resRef, type));
 
     return findResource<GffStruct>(cacheKey, g_gffCache, [this, &resRef, &type]() {
-        shared_ptr<ByteArray> data(findRaw(resRef, type));
+        shared_ptr<ByteArray> data(get(resRef, type));
         shared_ptr<GffStruct> gffs;
 
         if (data) {
@@ -329,9 +329,9 @@ shared_ptr<GffStruct> Resources::findGFF(const string &resRef, ResourceType type
     });
 }
 
-shared_ptr<TalkTable> Resources::findTalkTable(const string &resRef) {
+shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
     return findResource<TalkTable>(resRef, g_talkTableCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(findRaw(resRef, ResourceType::Conversation));
+        shared_ptr<ByteArray> data(get(resRef, ResourceType::Conversation));
         shared_ptr<TalkTable> table;
 
         if (data) {
@@ -344,7 +344,7 @@ shared_ptr<TalkTable> Resources::findTalkTable(const string &resRef) {
     });
 }
 
-shared_ptr<ByteArray> Resources::findPeResource(uint32_t name, PEResourceType type) {
+shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
     return _exeFile.find(name, type);
 }
 

@@ -74,7 +74,7 @@ void PortraitSelection::setButtonColors(const string &tag) {
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
 
-    shared_ptr<TwoDaTable> portraits(Resources::instance().find2DA("portraits"));
+    shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
     const CreatureConfiguration &character = _charGen->character();
     int sex = character.gender == Gender::Female ? 1 : 0;
 

@@ -80,7 +80,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
                 name = g_cursorNameByResRefKotor.find(resRef)->second;
                 break;
         }
-        shared_ptr<ByteArray> curData(Resources::instance().findPeResource(name, PEResourceType::Cursor));
+        shared_ptr<ByteArray> curData(Resources::instance().getFromExe(name, PEResourceType::Cursor));
         if (curData) {
             CurFile cur(resRef);
             cur.load(wrap(curData));
@@ -88,7 +88,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         }
     }
     if (!texture && tryTpc) {
-        shared_ptr<ByteArray> tpcData(Resources::instance().findRaw(resRef, ResourceType::Texture));
+        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture));
         if (tpcData) {
             TpcFile tpc(resRef, type);
             tpc.load(wrap(tpcData));
@@ -96,7 +96,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         }
     }
     if (!texture) {
-        shared_ptr<ByteArray> tgaData(Resources::instance().findRaw(resRef, ResourceType::Tga));
+        shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga));
         if (tgaData) {
             TgaFile tga(resRef, type);
             tga.load(wrap(tgaData));
