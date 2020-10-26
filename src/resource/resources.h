@@ -56,7 +56,7 @@ public:
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
 
-    const TalkTableString &getString(int32_t ref) const;
+    const std::string &getString(int32_t ref) const;
 
     const std::vector<std::string> &moduleNames() const;
 

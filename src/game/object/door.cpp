@@ -56,7 +56,7 @@ void Door::load(const GffStruct &gffs) {
 
     int transDestStrRef = gffs.getInt("TransitionDestin");
     if (transDestStrRef != -1) {
-        _transitionDestin = Resources::instance().getString(transDestStrRef).text;
+        _transitionDestin = Resources::instance().getString(transDestStrRef);
     }
 
     string templResRef(gffs.getString("TemplateResRef"));

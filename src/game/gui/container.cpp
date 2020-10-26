@@ -58,10 +58,10 @@ Container::Container(Game *game) :
 void Container::load() {
     GUI::load();
 
-    string btnMessage(Resources::instance().getString(kSwitchToResRef).text + " " + Resources::instance().getString(kGiveItemResRef).text);
+    string btnMessage(Resources::instance().getString(kSwitchToResRef) + " " + Resources::instance().getString(kGiveItemResRef));
     getControl("BTN_GIVEITEMS").setTextMessage(btnMessage);
 
-    string lblMessage(Resources::instance().getString(kInventoryResRef).text);
+    string lblMessage(Resources::instance().getString(kInventoryResRef));
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
     configureItemsListBox();

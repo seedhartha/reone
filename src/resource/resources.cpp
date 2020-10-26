@@ -348,8 +348,15 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
     return _exeFile.find(name, type);
 }
 
-const TalkTableString &Resources::getString(int32_t ref) const {
-    return _tlkFile.table()->getString(ref);
+const string &Resources::getString(int32_t ref) const {
+    static string empty;
+
+    shared_ptr<TalkTable> table(_tlkFile.table());
+    if (ref == -1 || ref >= table->stringCount()) {
+        return empty;
+    }
+
+    return table->getString(ref).text;
 }
 
 const vector<string> &Resources::moduleNames() const {

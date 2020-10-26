@@ -227,10 +227,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
 
     ClassButton &button = _classButtons[idx];
 
-    string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]).text);
-    classText += " " + Resources::instance().getString(g_classStrRefs[button.config.clazz]).text;
+    string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]));
+    classText += " " + Resources::instance().getString(g_classStrRefs[button.config.clazz]);
 
-    string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]).text);
+    string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]));
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);
