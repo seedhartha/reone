@@ -91,7 +91,7 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     for (auto &item : _blueprint->equipment()) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearanceTable, _blueprint->appearance());
 }
 
@@ -188,7 +188,7 @@ string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
 
     string modelName(appearance->getString(_config.appearance, column));
     boost::to_lower(modelName);
@@ -213,7 +213,7 @@ string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
 
     string texName(appearance->getString(_config.appearance, column));
     boost::to_lower(texName);
@@ -230,12 +230,12 @@ string Creature::getBodyTextureName() const {
 string Creature::getHeadModelName() const {
     if (_modelType != ModelType::Character) return "";
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_config.appearance, "normalhead", -1);
     if (headIdx == -1) return "";
 
-    shared_ptr<TwoDaTable> heads(Resources::instance().find2DA("heads"));
+    shared_ptr<TwoDaTable> heads(Resources::instance().get2DA("heads"));
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
@@ -259,13 +259,13 @@ void Creature::load(const CreatureConfiguration &config) {
     for (auto &item : config.equipment) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().find2DA("appearance"));
+    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearanceTable, config.appearance);
     loadPortrait(config.appearance);
 }
 
 void Creature::loadPortrait(int appearance) {
-    shared_ptr<TwoDaTable> portraits(Resources::instance().find2DA("portraits"));
+    shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
     string appearanceString(to_string(appearance));
 
     const TwoDaRow *row = portraits->findRow([&appearanceString](const TwoDaRow &r) {

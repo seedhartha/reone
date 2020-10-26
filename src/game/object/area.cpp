@@ -90,7 +90,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytFile lyt;
-    lyt.load(wrap(Resources::instance().findRaw(_name, ResourceType::AreaLayout)));
+    lyt.load(wrap(Resources::instance().get(_name, ResourceType::AreaLayout)));
 
     SceneGraph *sceneGraph = &_game->sceneGraph();
 
@@ -110,13 +110,13 @@ void Area::loadLYT() {
 
 void Area::loadVIS() {
     VisFile vis;
-    vis.load(wrap(Resources::instance().findRaw(_name, ResourceType::Vis)));
+    vis.load(wrap(Resources::instance().get(_name, ResourceType::Vis)));
 
     _visibility = make_unique<Visibility>(vis.visibility());
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(Resources::instance().findGFF(_name, ResourceType::Path));
+    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Path));
 
     PthFile path;
     path.load(*pth);
@@ -154,7 +154,7 @@ void Area::loadARE(const GffStruct &are) {
 
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
-    shared_ptr<TwoDaTable> styleTable(Resources::instance().find2DA("camerastyle"));
+    shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
 
     _cameraStyle.distance = styleTable->getFloat(styleIdx, "distance", 0.0f);
     _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);
@@ -192,7 +192,7 @@ void Area::loadGIT(const GffStruct &git) {
 
 void Area::loadProperties(const GffStruct &git) {
     const GffStruct &gffs = git.getStruct("AreaProperties");
-    shared_ptr<TwoDaTable> musicTable(Resources::instance().find2DA("ambientmusic"));
+    shared_ptr<TwoDaTable> musicTable(Resources::instance().get2DA("ambientmusic"));
 
     int musicIdx = gffs.getInt("MusicDay");
     if (musicIdx) {

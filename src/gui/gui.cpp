@@ -46,7 +46,7 @@ string GUI::getResRef(const string &base) const {
 void GUI::load() {
     info("GUI: load " + _resRef);
 
-    shared_ptr<GffStruct> gui(Resources::instance().findGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));
     loadBackground(_backgroundType);
 
     ControlType type = Control::getType(*gui);

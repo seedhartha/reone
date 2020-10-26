@@ -41,7 +41,7 @@ void ItemBlueprint::load(const GffStruct &uti) {
 
     _localizedName = Resources::instance().getString(uti.getInt("LocalizedName")).text;
 
-    shared_ptr<TwoDaTable> baseItems(Resources::instance().find2DA("baseitems"));
+    shared_ptr<TwoDaTable> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = uti.getInt("BaseItem");
     _equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
 

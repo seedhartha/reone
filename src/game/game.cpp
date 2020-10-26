@@ -148,7 +148,7 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         Scripts::instance().invalidateCache();
         Blueprints::instance().invalidateCache();
 
-        shared_ptr<GffStruct> ifo(Resources::instance().findGFF("module", ResourceType::ModuleInfo));
+        shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::ModuleInfo));
         _module = _objectFactory->newModule();
         _module->load(name, *ifo);
         _module->loadParty(_partyConfig, entry);

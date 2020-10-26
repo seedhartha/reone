@@ -50,7 +50,7 @@ shared_ptr<Walkmesh> Walkmeshes::get(const string &resRef, ResourceType type) {
 }
 
 shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) {
-    shared_ptr<ByteArray> data(Resources::instance().findRaw(resRef, type));
+    shared_ptr<ByteArray> data(Resources::instance().get(resRef, type));
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {

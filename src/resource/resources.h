@@ -46,14 +46,15 @@ public:
 
     void init(GameVersion version, const boost::filesystem::path &gamePath);
     void deinit();
-    void clearCaches();
+
+    void invalidateCache();
     void loadModule(const std::string &name);
 
-    std::shared_ptr<ByteArray> findRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
-    std::shared_ptr<TwoDaTable> find2DA(const std::string &resRef);
-    std::shared_ptr<GffStruct> findGFF(const std::string &resRef, ResourceType type);
-    std::shared_ptr<TalkTable> findTalkTable(const std::string &resRef);
-    std::shared_ptr<ByteArray> findPeResource(uint32_t name, PEResourceType type);
+    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
+    std::shared_ptr<TwoDaTable> get2DA(const std::string &resRef);
+    std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
+    std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
+    std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
 
     const TalkTableString &getString(int32_t ref) const;
 
@@ -75,19 +76,20 @@ private:
 
     Resources &operator=(const Resources &) = delete;
 
-    void indexKeyFile();
-    void indexTexturePacks();
-    void indexErfFile(const boost::filesystem::path &path);
     void indexAudioFiles();
     void indexDirectory(const boost::filesystem::path &path);
+    void indexErfFile(const boost::filesystem::path &path);
+    void indexExeFile();
+    void indexKeyFile();
     void indexOverrideDirectory();
     void indexTalkTable();
-    void indexExeFile();
-    void indexTransientRimFile(const boost::filesystem::path &path);
+    void indexTexturePacks();
     void indexTransientErfFile(const boost::filesystem::path &path);
+    void indexTransientRimFile(const boost::filesystem::path &path);
     void loadModuleNames();
+
+    std::shared_ptr<ByteArray> get(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;
-    std::shared_ptr<ByteArray> findRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
 };
 
 } // namespace resource
