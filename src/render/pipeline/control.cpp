@@ -45,8 +45,6 @@ void ControlRenderPipeline::init() {
 }
 
 void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
-    ShaderManager &shaders = Shaders;
-
     int viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -78,17 +76,17 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
             0.0f,
             -100.0f, 100.0f);
 
-        shaders.setGlobalUniforms(globals);
+        Shaders::instance().setGlobalUniforms(globals);
 
         LocalUniforms locals;
         locals.model = move(transform);
 
-        shaders.activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
         glActiveTexture(GL_TEXTURE0);
         _geometry.bindColorBuffer(0);
 
-        DefaultQuad.render(GL_TRIANGLES);
+        Quad::getDefault().render(GL_TRIANGLES);
 
         _geometry.unbindColorBuffer();
     }

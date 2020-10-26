@@ -32,7 +32,7 @@ namespace audio {
 
 shared_ptr<SoundInstance> playMusic(const string &resRef) {
     shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
-    return TheAudioPlayer.play(stream, AudioType::Music);
+    return AudioPlayer::instance().play(stream, AudioType::Music);
 }
 
 } // namespace audio

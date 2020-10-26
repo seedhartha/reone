@@ -50,7 +50,7 @@ shared_ptr<ScriptProgram> Scripts::get(const string &resRef) {
 }
 
 shared_ptr<ScriptProgram> Scripts::doGet(const string &resRef) {
-    shared_ptr<ByteArray> data(Resources.findRaw(resRef, ResourceType::CompiledScript));
+    shared_ptr<ByteArray> data(Resources::instance().findRaw(resRef, ResourceType::CompiledScript));
     shared_ptr<ScriptProgram> program;
 
     if (data) {

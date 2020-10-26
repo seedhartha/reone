@@ -109,7 +109,7 @@ void SceneGraph::render() const {
     globals.view = _activeCamera->view();
     globals.cameraPosition = _activeCamera->absoluteTransform()[3];
 
-    Shaders.setGlobalUniforms(globals);
+    Shaders::instance().setGlobalUniforms(globals);
 
     for (auto &node : _rootNodes) {
         node->render();

@@ -40,9 +40,9 @@ namespace reone {
 
 namespace resource {
 
-class ResourceManager {
+class Resources {
 public:
-    static ResourceManager &instance();
+    static Resources &instance();
 
     void init(GameVersion version, const boost::filesystem::path &gamePath);
     void deinit();
@@ -69,11 +69,11 @@ private:
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders;
 
-    ResourceManager() = default;
-    ResourceManager(const ResourceManager &) = delete;
-    ~ResourceManager();
+    Resources() = default;
+    Resources(const Resources &) = delete;
+    ~Resources();
 
-    ResourceManager &operator=(const ResourceManager &) = delete;
+    Resources &operator=(const Resources &) = delete;
 
     void indexKeyFile();
     void indexTexturePacks();
@@ -89,8 +89,6 @@ private:
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;
     std::shared_ptr<ByteArray> findRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
 };
-
-#define Resources resource::ResourceManager::instance()
 
 } // namespace resource
 

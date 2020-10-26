@@ -65,7 +65,7 @@ void Placeable::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getPlaceable(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table(Resources.find2DA("placeables"));
+    shared_ptr<TwoDaTable> table(Resources::instance().find2DA("placeables"));
 
     string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);

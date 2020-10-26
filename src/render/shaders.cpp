@@ -309,12 +309,12 @@ void main() {
 }
 )END";
 
-ShaderManager &ShaderManager::instance() {
-    static ShaderManager instance;
+Shaders &Shaders::instance() {
+    static Shaders instance;
     return instance;
 }
 
-void ShaderManager::initGL() {
+void Shaders::initGL() {
     initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kGUIVertexShader);
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
     initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kWhiteFragmentShader);
@@ -330,7 +330,7 @@ void ShaderManager::initGL() {
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 }
 
-void ShaderManager::initShader(ShaderName name, unsigned int type, const char *source) {
+void Shaders::initShader(ShaderName name, unsigned int type, const char *source) {
     GLuint shader = glCreateShader(type);
     GLint success;
     char log[512];
@@ -348,7 +348,7 @@ void ShaderManager::initShader(ShaderName name, unsigned int type, const char *s
     _shaders.insert(make_pair(name, shader));
 }
 
-void ShaderManager::initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader) {
+void Shaders::initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader) {
     unsigned int vsOrdinal = _shaders.find(vertexShader)->second;
     unsigned int fsOrdinal = _shaders.find(fragmentShader)->second;
 
@@ -370,11 +370,11 @@ void ShaderManager::initProgram(ShaderProgram program, ShaderName vertexShader, 
     _programs.insert(make_pair(program, ordinal));
 }
 
-ShaderManager::~ShaderManager() {
+Shaders::~Shaders() {
     deinitGL();
 }
 
-void ShaderManager::deinitGL() {
+void Shaders::deinitGL() {
     for (auto &pair :_programs) {
         glDeleteProgram(pair.second);
     }
@@ -386,7 +386,7 @@ void ShaderManager::deinitGL() {
     _shaders.clear();
 }
 
-void ShaderManager::activate(ShaderProgram program, const LocalUniforms &locals) {
+void Shaders::activate(ShaderProgram program, const LocalUniforms &locals) {
     if (_activeProgram != program) {
         unsigned int ordinal = getOrdinal(program);
         glUseProgram(ordinal);
@@ -397,7 +397,7 @@ void ShaderManager::activate(ShaderProgram program, const LocalUniforms &locals)
     setLocalUniforms(locals);
 }
 
-unsigned int ShaderManager::getOrdinal(ShaderProgram program) const {
+unsigned int Shaders::getOrdinal(ShaderProgram program) const {
     auto it = _programs.find(program);
     if (it == _programs.end()) {
         throw invalid_argument("Shaders: program not found: " + to_string(static_cast<int>(program)));
@@ -419,7 +419,7 @@ static const string &getLightUniformName(int index, const char *propName) {
     return pair.first->second;
 }
 
-void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
+void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     setUniform("uModel", locals.model);
     setUniform("uColor", locals.color);
     setUniform("uAlpha", locals.alpha);
@@ -477,13 +477,13 @@ void ShaderManager::setLocalUniforms(const LocalUniforms &locals) {
     }
 }
 
-void ShaderManager::setUniform(const string &name, const glm::mat4 &m) {
+void Shaders::setUniform(const string &name, const glm::mat4 &m) {
     setUniform(name, [this, &m](int loc) {
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
     });
 }
 
-void ShaderManager::setUniform(const string &name, const function<void(int)> &setter) {
+void Shaders::setUniform(const string &name, const function<void(int)> &setter) {
     static unordered_map<uint32_t, unordered_map<string, GLint>> locsByProgram;
 
     unordered_map<string, GLint> &locs = locsByProgram[_activeOrdinal];
@@ -501,37 +501,37 @@ void ShaderManager::setUniform(const string &name, const function<void(int)> &se
     }
 }
 
-void ShaderManager::setUniform(const string &name, int value) {
+void Shaders::setUniform(const string &name, int value) {
     setUniform(name, [this, &value](int loc) {
         glUniform1i(loc, value);
     });
 }
 
-void ShaderManager::setUniform(const string &name, float value) {
+void Shaders::setUniform(const string &name, float value) {
     setUniform(name, [this, &value](int loc) {
         glUniform1f(loc, value);
     });
 }
 
-void ShaderManager::setUniform(const string &name, const glm::vec2 &v) {
+void Shaders::setUniform(const string &name, const glm::vec2 &v) {
     setUniform(name, [this, &v](int loc) {
         glUniform2f(loc, v.x, v.y);
     });
 }
 
-void ShaderManager::setUniform(const string &name, const glm::vec3 &v) {
+void Shaders::setUniform(const string &name, const glm::vec3 &v) {
     setUniform(name, [this, &v](int loc) {
         glUniform3f(loc, v.x, v.y, v.z);
     });
 }
 
-void ShaderManager::setUniform(const string &name, const vector<glm::mat4> &arr) {
+void Shaders::setUniform(const string &name, const vector<glm::mat4> &arr) {
     setUniform(name, [this, &arr](int loc) {
         glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
     });
 }
 
-void ShaderManager::deactivate() {
+void Shaders::deactivate() {
     if (_activeProgram == ShaderProgram::None) return;
 
     glUseProgram(0);
@@ -539,7 +539,7 @@ void ShaderManager::deactivate() {
     _activeOrdinal = 0;
 }
 
-void ShaderManager::setGlobalUniforms(const GlobalUniforms &globals) {
+void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
     uint32_t ordinal = _activeOrdinal;
 
     for (auto &program : _programs) {

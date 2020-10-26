@@ -31,7 +31,7 @@ namespace game {
 
 CreatureConfiguration randomCharacter(Gender gender, ClassType clazz) {
     vector<Portrait> portraits;
-    shared_ptr<TwoDaTable> table(Resources.find2DA("portraits"));
+    shared_ptr<TwoDaTable> table(Resources::instance().find2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
 
     for (auto &row : table->rows()) {

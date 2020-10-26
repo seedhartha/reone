@@ -50,7 +50,7 @@ string GUI::getResRef(const string &base) const {
 void GUI::load() {
     info("GUI: load " + _resRef);
 
-    shared_ptr<GffStruct> gui(Resources.findGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(Resources::instance().findGFF(_resRef, ResourceType::Gui));
     loadBackground(_backgroundType);
 
     ControlType type = Control::getType(*gui);
@@ -263,12 +263,12 @@ void GUI::drawBackground() const {
     LocalUniforms locals;
     locals.model = move(transform);
 
-    Shaders.activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     glActiveTexture(0);
     _background->bind();
 
-    DefaultQuad.render(GL_TRIANGLES);
+    Quad::getDefault().render(GL_TRIANGLES);
 
     _background->unbind();
 }

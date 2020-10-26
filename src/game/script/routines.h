@@ -34,9 +34,9 @@ namespace game {
 
 class Game;
 
-class RoutineManager : public script::IRoutineProvider {
+class Routines : public script::IRoutineProvider {
 public:
-    static RoutineManager &instance();
+    static Routines &instance();
 
     void init(resource::GameVersion version, Game *game);
     void deinit();
@@ -47,11 +47,11 @@ private:
     Game *_game { nullptr };
     std::vector<script::Routine> _routines;
 
-    RoutineManager() = default;
-    RoutineManager(const RoutineManager &) = delete;
-    ~RoutineManager();
+    Routines() = default;
+    Routines(const Routines &) = delete;
+    ~Routines();
 
-    RoutineManager &operator=(const RoutineManager &) = delete;
+    Routines &operator=(const Routines &) = delete;
 
     void add(const std::string &name, script::VariableType retType, const std::vector<script::VariableType> &argTypes);
 
@@ -127,8 +127,6 @@ private:
 
     // END Party
 };
-
-#define Routines RoutineManager::instance()
 
 } // namespace game
 

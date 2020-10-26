@@ -61,12 +61,12 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     LocalUniforms locals;
     locals.model = move(transform);
 
-    Shaders.activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     glActiveTexture(GL_TEXTURE0);
     texture.bind();
 
-    DefaultQuad.render(GL_TRIANGLES);
+    Quad::getDefault().render(GL_TRIANGLES);
 
     texture.unbind();
 }

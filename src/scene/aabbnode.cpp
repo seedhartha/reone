@@ -34,7 +34,7 @@ AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNo
 void AABBSceneNode::render() const {
     if (getDebugMode() != DebugMode::ModelNodes) return;
 
-    TheAABBMesh.render(_aabb, _absoluteTransform);
+    AABBMesh::instance().render(_aabb, _absoluteTransform);
 }
 
 const AABB &AABBSceneNode::aabb() const {

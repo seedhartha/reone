@@ -67,7 +67,6 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
 
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
     bool tryCur = type == TextureType::Cursor;
-    ResourceManager &resources = Resources;
     shared_ptr<Texture> texture;
     bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
 
@@ -81,7 +80,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
                 name = g_cursorNameByResRefKotor.find(resRef)->second;
                 break;
         }
-        shared_ptr<ByteArray> curData(resources.findPeResource(name, PEResourceType::Cursor));
+        shared_ptr<ByteArray> curData(Resources::instance().findPeResource(name, PEResourceType::Cursor));
         if (curData) {
             CurFile cur(resRef);
             cur.load(wrap(curData));
@@ -89,7 +88,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         }
     }
     if (!texture && tryTpc) {
-        shared_ptr<ByteArray> tpcData(resources.findRaw(resRef, ResourceType::Texture));
+        shared_ptr<ByteArray> tpcData(Resources::instance().findRaw(resRef, ResourceType::Texture));
         if (tpcData) {
             TpcFile tpc(resRef, type);
             tpc.load(wrap(tpcData));
@@ -97,7 +96,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         }
     }
     if (!texture) {
-        shared_ptr<ByteArray> tgaData(resources.findRaw(resRef, ResourceType::Tga));
+        shared_ptr<ByteArray> tgaData(Resources::instance().findRaw(resRef, ResourceType::Tga));
         if (tgaData) {
             TgaFile tga(resRef, type);
             tga.load(wrap(tgaData));

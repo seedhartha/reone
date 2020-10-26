@@ -101,9 +101,9 @@ struct LocalUniforms {
     glm::vec3 discardColor { 0.0f };
 };
 
-class ShaderManager {
+class Shaders {
 public:
-    static ShaderManager &instance();
+    static Shaders &instance();
 
     void initGL();
     void deinitGL();
@@ -128,11 +128,11 @@ private:
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
 
-    ShaderManager() = default;
-    ShaderManager(const ShaderManager &) = delete;
-    ~ShaderManager();
+    Shaders() = default;
+    Shaders(const Shaders &) = delete;
+    ~Shaders();
 
-    ShaderManager &operator=(const ShaderManager &) = delete;
+    Shaders &operator=(const Shaders &) = delete;
 
     void initShader(ShaderName name, unsigned int type, const char *source);
     void initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader);
@@ -146,8 +146,6 @@ private:
     void setUniform(const std::string &name, const glm::mat4 &m);
     void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
 };
-
-#define Shaders render::ShaderManager::instance()
 
 } // namespace render
 

@@ -301,7 +301,7 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = Resources.getString(kStrRefNone).text;
+        lbItem.text = Resources::instance().getString(kStrRefNone).text;
         lbItem.icon = Textures::instance().get("inone", TextureType::GUI);
 
         lbItems.add(move(lbItem));

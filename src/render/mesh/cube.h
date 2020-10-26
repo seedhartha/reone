@@ -33,8 +33,6 @@ private:
     CubeMesh();
 };
 
-#define TheCubeMesh render::CubeMesh::instance()
-
 } // namespace render
 
 } // namespace reone

@@ -127,7 +127,7 @@ void Dialog::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void Dialog::startDialog(SpatialObject &owner, const string &resRef) {
-    shared_ptr<GffStruct> dlg(Resources.findGFF(resRef, ResourceType::Conversation));
+    shared_ptr<GffStruct> dlg(Resources::instance().findGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         _game->openInGame();
         return;
@@ -317,7 +317,7 @@ void Dialog::playVoiceOver() {
         voice = AudioFiles::instance().get(_currentEntry->voResRef);
     }
     if (voice) {
-        _currentVoice = TheAudioPlayer.play(voice, AudioType::Sound);
+        _currentVoice = AudioPlayer::instance().play(voice, AudioType::Sound);
     }
 }
 

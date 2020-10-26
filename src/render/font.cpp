@@ -108,8 +108,6 @@ void Font::initGL() {
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
-    ShaderManager &shaders = Shaders;
-
     glActiveTexture(GL_TEXTURE0);
     _texture->bind();
 
@@ -138,7 +136,7 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
         locals.model = textTransform;
         locals.color = color;
 
-        shaders.activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
         int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
         glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));
