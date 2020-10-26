@@ -23,6 +23,7 @@
 
 #include "../mesh/quad.h"
 #include "../shaders.h"
+#include "../util.h"
 
 using namespace std;
 
@@ -54,10 +55,9 @@ void WorldRenderPipeline::render() const {
         static const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glDrawBuffers(2, buffers);
 
-        glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        withDepthTest([this]() { _scene->render(); });
 
-        _scene->render();
         _geometry.unbind();
     }
     float w = static_cast<float>(_opts.width);
@@ -73,7 +73,6 @@ void WorldRenderPipeline::render() const {
             // Apply horizontal blur
             _horizontalBlur.bind();
 
-            glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glm::mat4 transform(1.0f);
@@ -94,7 +93,9 @@ void WorldRenderPipeline::render() const {
                 _verticalBlur.bindColorBuffer(0);
             }
 
-            Quad::getDefault().render(GL_TRIANGLES);
+            withDepthTest([]() {
+                Quad::getDefault().renderTriangles();
+            });
 
             _geometry.unbindColorBuffer();
             _horizontalBlur.unbind();
@@ -103,7 +104,6 @@ void WorldRenderPipeline::render() const {
             // Apply vertical blur
             _verticalBlur.bind();
 
-            glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glm::mat4 transform(1.0f);
@@ -120,7 +120,9 @@ void WorldRenderPipeline::render() const {
             glActiveTexture(GL_TEXTURE0);
             _horizontalBlur.bindColorBuffer(0);
 
-            Quad::getDefault().render(GL_TRIANGLES);
+            withDepthTest([]() {
+                Quad::getDefault().renderTriangles();
+            });
 
             _horizontalBlur.unbindColorBuffer();
             _verticalBlur.unbind();
@@ -143,7 +145,7 @@ void WorldRenderPipeline::render() const {
         glActiveTexture(GL_TEXTURE1);
         _verticalBlur.bindColorBuffer(0);
 
-        Quad::getDefault().render(GL_TRIANGLES);
+        Quad::getDefault().renderTriangles();
 
         glActiveTexture(GL_TEXTURE1);
         _verticalBlur.unbindColorBuffer();

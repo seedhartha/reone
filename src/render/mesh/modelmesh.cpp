@@ -35,25 +35,20 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     bool additive = false;
 
     if (diffuse) {
-        glActiveTexture(GL_TEXTURE0);
-        diffuse->bind();
+        diffuse->bind(0);
         additive = diffuse->isAdditive();
     }
     if (_envmap) {
-        glActiveTexture(GL_TEXTURE1);
-        _envmap->bind();
+        _envmap->bind(1);
     }
     if (_lightmap) {
-        glActiveTexture(GL_TEXTURE2);
-        _lightmap->bind();
+        _lightmap->bind(2);
     }
     if (_bumpyShiny) {
-        glActiveTexture(GL_TEXTURE3);
-        _bumpyShiny->bind();
+        _bumpyShiny->bind(3);
     }
     if (_bumpmap) {
-        glActiveTexture(GL_TEXTURE4);
-        _bumpmap->bind();
+        _bumpmap->bind(4);
     }
 
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
@@ -65,31 +60,26 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
         glBlendFunc(GL_ONE, GL_ONE);
     }
 
-    Mesh::render(GL_TRIANGLES);
+    Mesh::renderTriangles();
 
     if (additive) {
         glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
     }
 
     if (_bumpmap) {
-        glActiveTexture(GL_TEXTURE4);
-        _bumpmap->unbind();
+        _bumpmap->unbind(4);
     }
     if (_bumpyShiny) {
-        glActiveTexture(GL_TEXTURE3);
-        _bumpyShiny->unbind();
+        _bumpyShiny->unbind(3);
     }
     if (_lightmap) {
-        glActiveTexture(GL_TEXTURE2);
-        _lightmap->unbind();
+        _lightmap->unbind(2);
     }
     if (_envmap) {
-        glActiveTexture(GL_TEXTURE1);
-        _envmap->unbind();
+        _envmap->unbind(1);
     }
     if (diffuse) {
-        glActiveTexture(GL_TEXTURE0);
-        diffuse->unbind();
+        diffuse->unbind(0);
     }
 }
 

@@ -17,10 +17,6 @@
 
 #include "gui.h"
 
-#include "GL/glew.h"
-
-#include "SDL2/SDL_opengl.h"
-
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../render/textures.h"
@@ -265,12 +261,11 @@ void GUI::drawBackground() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    glActiveTexture(0);
-    _background->bind();
+    _background->bind(0);
 
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 
-    _background->unbind();
+    _background->unbind(0);
 }
 
 void GUI::resetFocus() {

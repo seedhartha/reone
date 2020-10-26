@@ -154,11 +154,13 @@ void Texture::deinitGL() {
     _glInited = false;
 }
 
-void Texture::bind() {
+void Texture::bind(int unit) {
+    glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
-void Texture::unbind() {
+void Texture::unbind(int unit) {
+    glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
 }
 

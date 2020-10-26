@@ -17,10 +17,6 @@
 
 #include "scrollbar.h"
 
-#include "GL/glew.h"
-
-#include "SDL2/SDL_opengl.h"
-
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/textures.h"
@@ -51,13 +47,12 @@ void ScrollBar::load(const GffStruct &gffs) {
 void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
-    glActiveTexture(0);
-    _dir.image->bind();
+    _dir.image->bind(0);
 
     if (_canScrollUp) drawUpArrow(offset);
     if (_canScrollDown) drawDownArrow(offset);
 
-    _dir.image->unbind();
+    _dir.image->unbind(0);
 }
 
 void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
@@ -69,7 +64,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
     locals.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
@@ -82,7 +77,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
     locals.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 }
 
 void ScrollBar::setCanScrollUp(bool scroll) {

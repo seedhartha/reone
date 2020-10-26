@@ -19,8 +19,6 @@
 
 #include "glm/ext.hpp"
 
-#include "SDL2/SDL_opengl.h"
-
 #include "../render/font.h"
 #include "../render/fonts.h"
 #include "../render/mesh/quad.h"
@@ -104,7 +102,7 @@ void Console::render() const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
-    Quad::getDefault().render(GL_TRIANGLES);
+    Quad::getDefault().renderTriangles();
 
     string text("> " + _input.text());
     {

@@ -108,8 +108,7 @@ void Font::initGL() {
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
-    glActiveTexture(GL_TEXTURE0);
-    _texture->bind();
+    _texture->bind(0);
 
     glBindVertexArray(_vertexArrayId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
@@ -148,7 +147,7 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    _texture->unbind();
+    _texture->unbind(0);
 }
 
 float Font::measure(const string &text) const {

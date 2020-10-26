@@ -66,7 +66,7 @@ void CubeMesh::render(const glm::mat4 &transform) const {
 
     Shaders::instance().activate(ShaderProgram::ModelWhite, locals);
 
-    Mesh::render(GL_TRIANGLES);
+    Mesh::renderTriangles();
 }
 
 } // namespace render
