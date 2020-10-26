@@ -19,7 +19,7 @@
 
 #include "spatial.h"
 
-#include "../../system/resource/gfffile.h"
+#include "../../resource/gfffile.h"
 
 namespace reone {
 

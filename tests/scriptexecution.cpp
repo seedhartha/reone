@@ -19,7 +19,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "../src/system/script/execution.h"
+#include "../src/script/execution.h"
 
 using namespace std;
 

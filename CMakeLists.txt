@@ -35,216 +35,266 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-if(NOT USE_EXTERNAL_GLM)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+
+if(USE_EXTERNAL_GLM)
+    include_directories(${CMAKE_SOURCE_DIR}/external/glm)
+else()
     find_package(glm REQUIRED)
 endif()
+
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 ## libsystem static library
 
 set(SYSTEM_HEADERS
-    src/system/audio/player.h
-    src/system/audio/soundinstance.h
-    src/system/audio/stream.h
-    src/system/audio/types.h
-    src/system/audio/util.h
     src/system/debug.h
-    src/system/gui/control/button.h
-    src/system/gui/control/control.h
-    src/system/gui/control/imagebutton.h
-    src/system/gui/control/label.h
-    src/system/gui/control/listbox.h
-    src/system/gui/control/panel.h
-    src/system/gui/control/scrollbar.h
-    src/system/gui/control/togglebutton.h
-    src/system/gui/gui.h
-    src/system/gui/scenebuilder.h
-    src/system/gui/textinput.h
-    src/system/gui/types.h
     src/system/jobs.h
     src/system/log.h
-    src/system/net/client.h
-    src/system/net/connection.h
-    src/system/net/command.h
-    src/system/net/server.h
-    src/system/net/types.h
     src/system/pathutil.h
     src/system/random.h
-    src/system/render/aabb.h
-    src/system/render/font.h
-    src/system/render/framebuffer.h
-    src/system/render/fps.h
-    src/system/render/mesh/aabb.h
-    src/system/render/mesh/cube.h
-    src/system/render/mesh/quad.h
-    src/system/render/mesh/mesh.h
-    src/system/render/mesh/modelmesh.h
-    src/system/render/model/model.h
-    src/system/render/model/animation.h
-    src/system/render/model/modelnode.h
-    src/system/render/pipeline/control.h
-    src/system/render/pipeline/world.h
-    src/system/render/shaders.h
-    src/system/render/texture.h
-    src/system/render/types.h
-    src/system/render/walkmesh.h
-    src/system/render/window.h
-    src/system/resource/2dafile.h
-    src/system/resource/audio/mp3file.h
-    src/system/resource/audio/wavfile.h
-    src/system/resource/binfile.h
-    src/system/resource/blueprint/creature.h
-    src/system/resource/blueprint/door.h
-    src/system/resource/blueprint/item.h
-    src/system/resource/blueprint/placeable.h
-    src/system/resource/blueprint/trigger.h
-    src/system/resource/blueprint/waypoint.h
-    src/system/resource/bwmfile.h
-    src/system/resource/collection/biffile.h
-    src/system/resource/collection/erffile.h
-    src/system/resource/collection/folder.h
-    src/system/resource/collection/keyfile.h
-    src/system/resource/collection/pefile.h
-    src/system/resource/collection/rimfile.h
-    src/system/resource/dlgfile.h
-    src/system/resource/gfffile.h
-    src/system/resource/image/curfile.h
-    src/system/resource/image/tgafile.h
-    src/system/resource/image/tpcfile.h
-    src/system/resource/image/txifile.h
-    src/system/resource/lytfile.h
-    src/system/resource/mdlfile.h
-    src/system/resource/ncsfile.h
-    src/system/resource/pthfile.h
-    src/system/resource/resources.h
-    src/system/resource/tlkfile.h
-    src/system/resource/types.h
-    src/system/resource/util.h
-    src/system/resource/visfile.h
-    src/system/scene/aabbnode.h
-    src/system/scene/cameranode.h
-    src/system/scene/cubenode.h
-    src/system/scene/lightnode.h
-    src/system/scene/modelnodescenenode.h
-    src/system/scene/modelscenenode.h
-    src/system/scene/scenegraph.h
-    src/system/scene/scenenode.h
-    src/system/scene/scenenodeanimator.h
-    src/system/script/execution.h
-    src/system/script/program.h
-    src/system/script/routine.h
-    src/system/script/types.h
-    src/system/script/util.h
-    src/system/script/variable.h
     src/system/streamutil.h
     src/system/types.h)
 
 set(SYSTEM_SOURCES
-    src/system/audio/player.cpp
-    src/system/audio/soundinstance.cpp
-    src/system/audio/stream.cpp
-    src/system/audio/util.cpp
     src/system/debug.cpp
-    src/system/gui/control/button.cpp
-    src/system/gui/control/control.cpp
-    src/system/gui/control/imagebutton.cpp
-    src/system/gui/control/label.cpp
-    src/system/gui/control/listbox.cpp
-    src/system/gui/control/panel.cpp
-    src/system/gui/control/scrollbar.cpp
-    src/system/gui/control/togglebutton.cpp
-    src/system/gui/gui.cpp
-    src/system/gui/scenebuilder.cpp
-    src/system/gui/textinput.cpp
     src/system/jobs.cpp
     src/system/log.cpp
-    src/system/net/client.cpp
-    src/system/net/connection.cpp
-    src/system/net/command.cpp
-    src/system/net/server.cpp
     src/system/pathutil.cpp
     src/system/random.cpp
-    src/system/render/aabb.cpp
-    src/system/render/font.cpp
-    src/system/render/framebuffer.cpp
-    src/system/render/fps.cpp
-    src/system/render/mesh/aabb.cpp
-    src/system/render/mesh/cube.cpp
-    src/system/render/mesh/quad.cpp
-    src/system/render/mesh/mesh.cpp
-    src/system/render/mesh/modelmesh.cpp
-    src/system/render/model/model.cpp
-    src/system/render/model/animation.cpp
-    src/system/render/model/modelnode.cpp
-    src/system/render/pipeline/control.cpp
-    src/system/render/pipeline/world.cpp
-    src/system/render/shaders.cpp
-    src/system/render/texture.cpp
-    src/system/render/walkmesh.cpp
-    src/system/render/window.cpp
-    src/system/resource/2dafile.cpp
-    src/system/resource/audio/mp3file.cpp
-    src/system/resource/audio/wavfile.cpp
-    src/system/resource/binfile.cpp
-    src/system/resource/blueprint/creature.cpp
-    src/system/resource/blueprint/door.cpp
-    src/system/resource/blueprint/item.cpp
-    src/system/resource/blueprint/placeable.cpp
-    src/system/resource/blueprint/trigger.cpp
-    src/system/resource/blueprint/waypoint.cpp
-    src/system/resource/bwmfile.cpp
-    src/system/resource/collection/biffile.cpp
-    src/system/resource/collection/erffile.cpp
-    src/system/resource/collection/folder.cpp
-    src/system/resource/collection/keyfile.cpp
-    src/system/resource/collection/pefile.cpp
-    src/system/resource/collection/rimfile.cpp
-    src/system/resource/dlgfile.cpp
-    src/system/resource/gfffile.cpp
-    src/system/resource/image/curfile.cpp
-    src/system/resource/image/tgafile.cpp
-    src/system/resource/image/tpcfile.cpp
-    src/system/resource/image/txifile.cpp
-    src/system/resource/lytfile.cpp
-    src/system/resource/mdlfile.cpp
-    src/system/resource/ncsfile.cpp
-    src/system/resource/pthfile.cpp
-    src/system/resource/resources.cpp
-    src/system/resource/tlkfile.cpp
-    src/system/resource/util.cpp
-    src/system/resource/visfile.cpp
-    src/system/scene/aabbnode.cpp
-    src/system/scene/cameranode.cpp
-    src/system/scene/cubenode.cpp
-    src/system/scene/lightnode.cpp
-    src/system/scene/modelnodescenenode.cpp
-    src/system/scene/modelscenenode.cpp
-    src/system/scene/scenegraph.cpp
-    src/system/scene/scenenode.cpp
-    src/system/scene/scenenodeanimator.cpp
-    src/system/script/execution.cpp
-    src/system/script/program.cpp
-    src/system/script/routine.cpp
-    src/system/script/util.cpp
-    src/system/script/variable.cpp
     src/system/streamutil.cpp)
 
 add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
 set_target_properties(libsystem PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_compile_definitions(libsystem PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
-target_include_directories(libsystem SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
-target_link_libraries(libsystem PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY} GLEW::GLEW ${OPENGL_LIBRARIES} ${MAD_LIBRARY})
-
-if(WIN32)
-    target_link_libraries(libsystem PUBLIC SDL2::SDL2 OpenAL::OpenAL)
-else()
-    target_link_libraries(libsystem PUBLIC ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
-endif()
-
-if(USE_EXTERNAL_GLM)
-    target_include_directories(libsystem PUBLIC ${CMAKE_SOURCE_DIR}/external/glm)
-endif()
 
 ## END libsystem static library
+
+## libresource static library
+
+set(RESOURCE_HEADERS
+    src/resource/2dafile.h
+    src/resource/biffile.h
+    src/resource/binfile.h
+    src/resource/dlgfile.h
+    src/resource/erffile.h
+    src/resource/folder.h
+    src/resource/gfffile.h
+    src/resource/keyfile.h
+    src/resource/lytfile.h
+    src/resource/pefile.h
+    src/resource/pthfile.h
+    src/resource/resources.h
+    src/resource/rimfile.h
+    src/resource/tlkfile.h
+    src/resource/types.h
+    src/resource/util.h
+    src/resource/visfile.h)
+
+set(RESOURCE_SOURCES
+    src/resource/2dafile.cpp
+    src/resource/biffile.cpp
+    src/resource/binfile.cpp
+    src/resource/dlgfile.cpp
+    src/resource/erffile.cpp
+    src/resource/folder.cpp
+    src/resource/gfffile.cpp
+    src/resource/keyfile.cpp
+    src/resource/lytfile.cpp
+    src/resource/pefile.cpp
+    src/resource/pthfile.cpp
+    src/resource/rimfile.cpp
+    src/resource/resources.cpp
+    src/resource/tlkfile.cpp
+    src/resource/util.cpp
+    src/resource/visfile.cpp)
+
+add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
+set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libresource static library
+
+## librender static library
+
+set(RENDER_HEADERS
+    src/render/aabb.h
+    src/render/bwmfile.h
+    src/render/font.h
+    src/render/fonts.h
+    src/render/fps.h
+    src/render/framebuffer.h
+    src/render/image/curfile.h
+    src/render/image/tgafile.h
+    src/render/image/tpcfile.h
+    src/render/image/txifile.h
+    src/render/mesh/aabb.h
+    src/render/mesh/cube.h
+    src/render/mesh/quad.h
+    src/render/mesh/mesh.h
+    src/render/mesh/modelmesh.h
+    src/render/mdlfile.h
+    src/render/model/animation.h
+    src/render/model/model.h
+    src/render/model/modelnode.h
+    src/render/models.h
+    src/render/pipeline/control.h
+    src/render/pipeline/world.h
+    src/render/shaders.h
+    src/render/texture.h
+    src/render/textures.h
+    src/render/types.h
+    src/render/walkmesh.h
+    src/render/walkmeshes.h
+    src/render/window.h)
+
+set(RENDER_SOURCES
+    src/render/aabb.cpp
+    src/render/bwmfile.cpp
+    src/render/font.cpp
+    src/render/fonts.cpp
+    src/render/fps.cpp
+    src/render/framebuffer.cpp
+    src/render/image/curfile.cpp
+    src/render/image/tgafile.cpp
+    src/render/image/tpcfile.cpp
+    src/render/image/txifile.cpp
+    src/render/mesh/aabb.cpp
+    src/render/mesh/cube.cpp
+    src/render/mesh/quad.cpp
+    src/render/mesh/mesh.cpp
+    src/render/mesh/modelmesh.cpp
+    src/render/mdlfile.cpp
+    src/render/model/animation.cpp
+    src/render/model/model.cpp
+    src/render/model/modelnode.cpp
+    src/render/models.cpp
+    src/render/pipeline/control.cpp
+    src/render/pipeline/world.cpp
+    src/render/shaders.cpp
+    src/render/texture.cpp
+    src/render/textures.cpp
+    src/render/walkmesh.cpp
+    src/render/walkmeshes.cpp
+    src/render/window.cpp)
+
+add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})
+set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END librender static library
+
+## libaudio static library
+
+set(AUDIO_HEADERS
+    src/audio/files.h
+    src/audio/player.h
+    src/audio/mp3file.h
+    src/audio/soundinstance.h
+    src/audio/stream.h
+    src/audio/types.h
+    src/audio/util.h
+    src/audio/wavfile.h)
+
+set(AUDIO_SOURCES
+    src/audio/files.cpp
+    src/audio/player.cpp
+    src/audio/mp3file.cpp
+    src/audio/soundinstance.cpp
+    src/audio/stream.cpp
+    src/audio/util.cpp
+    src/audio/wavfile.cpp)
+
+add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
+set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libaudio static library
+
+## libscene static library
+
+set(SCENE_HEADERS
+    src/scene/aabbnode.h
+    src/scene/cameranode.h
+    src/scene/cubenode.h
+    src/scene/lightnode.h
+    src/scene/modelnodescenenode.h
+    src/scene/modelscenenode.h
+    src/scene/scenegraph.h
+    src/scene/scenenode.h
+    src/scene/scenenodeanimator.h)
+
+set(SCENE_SOURCES
+    src/scene/aabbnode.cpp
+    src/scene/cameranode.cpp
+    src/scene/cubenode.cpp
+    src/scene/lightnode.cpp
+    src/scene/modelnodescenenode.cpp
+    src/scene/modelscenenode.cpp
+    src/scene/scenegraph.cpp
+    src/scene/scenenode.cpp
+    src/scene/scenenodeanimator.cpp)
+
+add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
+set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libscene static library
+
+## libgui static library
+
+set(GUI_HEADERS
+    src/gui/control/button.h
+    src/gui/control/control.h
+    src/gui/control/imagebutton.h
+    src/gui/control/label.h
+    src/gui/control/listbox.h
+    src/gui/control/panel.h
+    src/gui/control/scrollbar.h
+    src/gui/control/togglebutton.h
+    src/gui/gui.h
+    src/gui/scenebuilder.h
+    src/gui/textinput.h
+    src/gui/types.h)
+
+set(GUI_SOURCES
+    src/gui/control/button.cpp
+    src/gui/control/control.cpp
+    src/gui/control/imagebutton.cpp
+    src/gui/control/label.cpp
+    src/gui/control/listbox.cpp
+    src/gui/control/panel.cpp
+    src/gui/control/scrollbar.cpp
+    src/gui/control/togglebutton.cpp
+    src/gui/gui.cpp
+    src/gui/scenebuilder.cpp
+    src/gui/textinput.cpp)
+
+add_library(libgui STATIC ${GUI_HEADERS} ${GUI_SOURCES})
+set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libgui static library
+
+## libscript static library
+
+set(SCRIPT_HEADERS
+    src/script/execution.h
+    src/script/ncsfile.h
+    src/script/program.h
+    src/script/routine.h
+    src/script/scripts.h
+    src/script/types.h
+    src/script/util.h
+    src/script/variable.h)
+
+set(SCRIPT_SOURCES
+    src/script/execution.cpp
+    src/script/ncsfile.cpp
+    src/script/program.cpp
+    src/script/routine.cpp
+    src/script/scripts.cpp
+    src/script/util.cpp
+    src/script/variable.cpp)
+
+add_library(libscript STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
+set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libscript static library
 
 ## libgame static library
 
@@ -258,6 +308,13 @@ set(GAME_HEADERS
     src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
+    src/game/blueprint/creature.h
+    src/game/blueprint/door.h
+    src/game/blueprint/item.h
+    src/game/blueprint/placeable.h
+    src/game/blueprint/trigger.h
+    src/game/blueprint/waypoint.h
+    src/game/blueprints.h
     src/game/camera/animatedcamera.h
     src/game/camera/camera.h
     src/game/camera/dialogcamera.h
@@ -314,6 +371,13 @@ set(GAME_SOURCES
     src/game/action/startconversation.cpp
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
+    src/game/blueprint/creature.cpp
+    src/game/blueprint/door.cpp
+    src/game/blueprint/item.cpp
+    src/game/blueprint/placeable.cpp
+    src/game/blueprint/trigger.cpp
+    src/game/blueprint/waypoint.cpp
+    src/game/blueprints.cpp
     src/game/camera/animatedcamera.cpp
     src/game/camera/camera.cpp
     src/game/camera/dialogcamera.cpp
@@ -364,9 +428,28 @@ set(GAME_SOURCES
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_link_libraries(libgame PUBLIC libsystem)
 
 ## END libgame static library
+
+## libnet static library
+
+set(NET_HEADERS
+    src/net/client.h
+    src/net/connection.h
+    src/net/command.h
+    src/net/server.h
+    src/net/types.h)
+
+set(NET_SOURCES
+    src/net/client.cpp
+    src/net/connection.cpp
+    src/net/command.cpp
+    src/net/server.cpp)
+
+add_library(libnet STATIC ${NET_HEADERS} ${NET_SOURCES})
+set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libnet static library
 
 ## libmp static library
 
@@ -383,7 +466,6 @@ set(MP_SOURCES
 
 add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})
 set_target_properties(libmp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_link_libraries(libmp PUBLIC libgame)
 
 ## END libmp static library
 
@@ -398,7 +480,19 @@ set(REONE_SOURCES
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(reone PRIVATE libmp)
+
+target_link_libraries(reone PRIVATE
+    libmp libnet libgame libscript libgui libscene librender libaudio libresource libsystem
+    ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
+    GLEW::GLEW
+    ${OPENGL_LIBRARIES}
+    ${MAD_LIBRARY})
+
+if(WIN32)
+    target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
+else()
+    target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
+endif()
 
 ## END reone executable
 
@@ -423,7 +517,7 @@ if(BUILD_TOOLS)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    target_link_libraries(reone-tools PRIVATE libsystem)
+    target_link_libraries(reone-tools PRIVATE libresource libsystem ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 endif()
 
 ## END reone-tools executable
@@ -436,7 +530,14 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame)
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libsystem)
+
+        if(WIN32)
+            target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)
+        else()
+            target_link_libraries(test_${TEST_NAME} PRIVATE ${SDL2_LIBRARIES})
+        endif()
+
         add_test(${TEST_NAME} test_${TEST_NAME})
     endforeach()
 endif()

@@ -20,9 +20,9 @@
 #include <cstdint>
 #include <memory>
 
-#include "../../system/scene/scenegraph.h"
-#include "../../system/render/types.h"
-#include "../../system/resource/types.h"
+#include "../../scene/scenegraph.h"
+#include "../../render/types.h"
+#include "../../resource/types.h"
 
 #include "../types.h"
 

@@ -23,9 +23,9 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../system/gui/textinput.h"
-#include "../system/render/font.h"
-#include "../system/render/types.h"
+#include "../gui/textinput.h"
+#include "../render/font.h"
+#include "../render/types.h"
 
 namespace reone {
 

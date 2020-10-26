@@ -25,8 +25,8 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../system/scene/modelscenenode.h"
-#include "../../system/render/walkmesh.h"
+#include "../../scene/modelscenenode.h"
+#include "../../render/walkmesh.h"
 
 namespace reone {
 

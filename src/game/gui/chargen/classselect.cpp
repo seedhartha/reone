@@ -17,8 +17,8 @@
 
 #include "classselect.h"
 
-#include "../../../system/gui/scenebuilder.h"
-#include "../../../system/resource/resources.h"
+#include "../../../gui/scenebuilder.h"
+#include "../../../resource/resources.h"
 
 #include "../../characters.h"
 #include "../../object/creature.h"

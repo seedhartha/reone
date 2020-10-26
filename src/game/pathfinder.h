@@ -26,7 +26,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../system/resource/pthfile.h"
+#include "../resource/pthfile.h"
 
 namespace reone {
 

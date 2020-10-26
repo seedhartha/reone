@@ -21,7 +21,8 @@
 
 #include <boost/format.hpp>
 
-#include "../../system/resource/resources.h"
+#include "../../render/models.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
@@ -75,7 +76,7 @@ void AnimatedCamera::setModel(const string &resRef) {
     if (_modelResRef == resRef) return;
 
     _modelResRef = resRef;
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Resources.findModel(resRef));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(resRef));
     _model->attach("camerahook", _sceneNode);
 }
 

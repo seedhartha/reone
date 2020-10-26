@@ -19,11 +19,13 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../system/gui/control/label.h"
-#include "../../system/gui/control/togglebutton.h"
-#include "../../system/resource/resources.h"
-#include "../../system/script/types.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/togglebutton.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
+#include "../../script/types.h"
 
+#include "../blueprints.h"
 #include "../game.h"
 #include "../portraits.h"
 #include "../script/util.h"
@@ -99,7 +101,7 @@ void PartySelection::prepare(const Context &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(blueprintResRef));
+            shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
             int appearance = blueprint->appearance();
             string portrait;
 
@@ -110,7 +112,7 @@ void PartySelection::prepare(const Context &ctx) {
                 portrait = findPortrait(blueprint->appearance());
             }
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(Resources.findTexture(portrait, TextureType::GUI));
+            lblChar.setBorderFill(Textures::instance().get(portrait, TextureType::GUI));
             lblNa.setVisible(false);
 
         } else {
@@ -214,7 +216,7 @@ void PartySelection::changeParty() {
         if (!_added[i]) continue;
 
         string blueprintResRef(party.getAvailableMember(i));
-        shared_ptr<CreatureBlueprint> blueprint(Resources.findCreatureBlueprint(blueprintResRef));
+        shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
 
         CreatureConfiguration creature;
         creature.appearance = blueprint->appearance();

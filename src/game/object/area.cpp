@@ -23,13 +23,15 @@
 
 #include "glm/gtx/intersect.hpp"
 
+#include "../../render/models.h"
+#include "../../render/walkmeshes.h"
+#include "../../resource/lytfile.h"
+#include "../../resource/visfile.h"
+#include "../../resource/resources.h"
+#include "../../scene/cubenode.h"
 #include "../../system/debug.h"
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
-#include "../../system/resource/lytfile.h"
-#include "../../system/resource/visfile.h"
-#include "../../system/resource/resources.h"
-#include "../../system/scene/cubenode.h"
 
 #include "../game.h"
 #include "../room.h"
@@ -94,19 +96,17 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 }
 
 void Area::loadLYT() {
-    ResourceManager &resources = Resources;
-
     LytFile lyt;
-    lyt.load(wrap(resources.findRaw(_name, ResourceType::AreaLayout)));
+    lyt.load(wrap(Resources.findRaw(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, resources.findModel(lytRoom.name)));
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, Models::instance().get(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->playAnimation("animloop1", kAnimationLoop);
 
         _sceneGraph->addRoot(model);
 
-        shared_ptr<Walkmesh> walkmesh(resources.findWalkmesh(lytRoom.name, ResourceType::Walkmesh));
+        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
 
         _rooms.insert(make_pair(room->name(), move(room)));

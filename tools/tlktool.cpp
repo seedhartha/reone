@@ -19,7 +19,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/system/resource/tlkfile.h"
+#include "../src/resource/tlkfile.h"
 
 using namespace std;
 

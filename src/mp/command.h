@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../system/net/command.h"
+#include "../net/command.h"
 
 namespace reone {
 

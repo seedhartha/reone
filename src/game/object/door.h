@@ -19,8 +19,9 @@
 
 #include "spatial.h"
 
-#include "../../system/resource/blueprint/door.h"
-#include "../../system/resource/gfffile.h"
+#include "../../resource/gfffile.h"
+
+#include "../blueprint/door.h"
 
 namespace reone {
 
@@ -41,7 +42,7 @@ public:
     const std::string &transitionDestin() const;
 
 private:
-    std::shared_ptr<resource::DoorBlueprint> _blueprint;
+    std::shared_ptr<DoorBlueprint> _blueprint;
     bool _open { false };
     std::string _linkedToModule;
     std::string _linkedTo;

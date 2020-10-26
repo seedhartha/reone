@@ -17,8 +17,8 @@
 
 #include "hud.h"
 
+#include "../../gui/control/label.h"
 #include "../../system/log.h"
-#include "../../system/gui/control/label.h"
 
 #include "../game.h"
 

@@ -23,7 +23,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../../system/scene/cameranode.h"
+#include "../../scene/cameranode.h"
 
 namespace reone {
 

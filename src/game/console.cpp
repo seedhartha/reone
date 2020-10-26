@@ -21,11 +21,12 @@
 
 #include "SDL2/SDL_opengl.h"
 
+#include "../render/font.h"
+#include "../render/fonts.h"
+#include "../render/mesh/quad.h"
+#include "../render/shaders.h"
+#include "../resource/resources.h"
 #include "../system/log.h"
-#include "../system/render/font.h"
-#include "../system/render/mesh/quad.h"
-#include "../system/render/shaders.h"
-#include "../system/resource/resources.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ Console::Console(const GraphicsOptions &opts) : _opts(opts), _input(kTextInputCo
 }
 
 void Console::load() {
-    _font = Resources.findFont("fnt_d16x16");
+    _font = Fonts::instance().get("fnt_d16x16");
 }
 
 bool Console::handle(const SDL_Event &event) {

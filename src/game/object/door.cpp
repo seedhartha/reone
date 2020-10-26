@@ -19,9 +19,13 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../render/models.h"
+#include "../../render/walkmeshes.h"
+#include "../../resource/resources.h"
+#include "../../scene/modelscenenode.h"
 #include "../../system/streamutil.h"
-#include "../../system/scene/modelscenenode.h"
-#include "../../system/resource/resources.h"
+
+#include "../blueprints.h"
 
 using namespace std;
 
@@ -65,18 +69,16 @@ void Door::load(const GffStruct &gffs) {
 }
 
 void Door::loadBlueprint(const string &resRef) {
-    ResourceManager &resources = Resources;
-
-    _blueprint = resources.findDoorBlueprint(resRef);
+    _blueprint = Blueprints::instance().getDoor(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table = resources.find2DA("genericdoors");
+    shared_ptr<TwoDaTable> table = Resources.find2DA("genericdoors");
 
     string model(table->getString(_blueprint->genericType(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, resources.findModel(model));
-    _walkmesh = resources.findWalkmesh(model + "0", ResourceType::DoorWalkmesh);
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(model));
+    _walkmesh = Walkmeshes::instance().get(model + "0", ResourceType::DoorWalkmesh);
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {

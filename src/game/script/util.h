@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "../../system/script/program.h"
+#include "../../script/program.h"
 
 namespace reone {
 

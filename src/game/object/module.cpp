@@ -17,9 +17,9 @@
 
 #include "module.h"
 
+#include "../../resource/resources.h"
 #include "../../system/debug.h"
 #include "../../system/log.h"
-#include "../../system/resource/resources.h"
 
 #include "../game.h"
 

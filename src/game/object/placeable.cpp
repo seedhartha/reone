@@ -19,9 +19,13 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../render/models.h"
+#include "../../render/walkmeshes.h"
+#include "../../resource/resources.h"
+#include "../../scene/modelscenenode.h"
 #include "../../system/streamutil.h"
-#include "../../system/scene/modelscenenode.h"
-#include "../../system/resource/resources.h"
+
+#include "../blueprints.h"
 
 #include "objectfactory.h"
 
@@ -58,23 +62,21 @@ void Placeable::load(const GffStruct &gffs) {
 }
 
 void Placeable::loadBlueprint(const string &resRef) {
-    ResourceManager &resources = Resources;
-
-    _blueprint = resources.findPlaceableBlueprint(resRef);
+    _blueprint = Blueprints::instance().getPlaceable(resRef);
     _tag = _blueprint->tag();
 
-    shared_ptr<TwoDaTable> table(resources.find2DA("placeables"));
+    shared_ptr<TwoDaTable> table(Resources.find2DA("placeables"));
 
     string model(table->getString(_blueprint->appearance(), "modelname"));
     boost::to_lower(model);
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, resources.findModel(model));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(model));
     _model->setLightingEnabled(true);
 
-    _walkmesh = resources.findWalkmesh(model, ResourceType::PlaceableWalkmesh);
+    _walkmesh = Walkmeshes::instance().get(model, ResourceType::PlaceableWalkmesh);
 
     for (auto &itemResRef : _blueprint->items()) {
-        shared_ptr<ItemBlueprint> itemBlueprint(resources.findItemBlueprint(itemResRef));
+        shared_ptr<ItemBlueprint> itemBlueprint(Blueprints::instance().getItem(itemResRef));
 
         shared_ptr<Item> item(_objectFactory->newItem());
         item->load(itemBlueprint.get());
