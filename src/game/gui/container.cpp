@@ -40,12 +40,16 @@ static const int kSwitchToResRef = 47884;
 static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
-Container::Container(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts), _game(game) {
+Container::Container(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("container");
 
-    if (version == GameVersion::TheSithLords) {
+    if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 305;
         _resolutionY = 327;
     }

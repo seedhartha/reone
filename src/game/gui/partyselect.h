@@ -32,7 +32,6 @@ namespace game {
 static const int kNpcCount = 9;
 
 class Game;
-class ObjectFactory;
 
 class PartySelection : public gui::GUI {
 public:
@@ -42,11 +41,7 @@ public:
         int forceNpc2 { -2 };
     };
 
-    PartySelection(
-        Game *game,
-        ObjectFactory *objectFactory,
-        resource::GameVersion version,
-        const render::GraphicsOptions &opts);
+    PartySelection(Game *game);
 
     void load() override;
 
@@ -54,7 +49,6 @@ public:
 
 private:
     Game *_game { nullptr };
-    ObjectFactory *_objectFactory { nullptr };
     Context _context;
     int _selectedNpc { -1 };
     bool _added[kNpcCount] { false };

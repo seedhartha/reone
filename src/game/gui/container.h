@@ -31,7 +31,7 @@ class Game;
 
 class Container : public gui::GUI {
 public:
-    Container(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    Container(Game *game);
 
     void load() override;
     void open(SpatialObject *contanier);

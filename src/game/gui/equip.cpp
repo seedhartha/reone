@@ -57,14 +57,17 @@ static unordered_map<Equipment::Slot, string> g_slotNames = {
     { Equipment::Slot::WeapR2, "WEAP_R2"}
 };
 
-Equipment::Equipment(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+Equipment::Equipment(Game *game) :
+    GUI(game->version(), game->options().graphics),
     _game(game) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
 
-    if (_version == GameVersion::TheSithLords) {
+    if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
     }

@@ -40,13 +40,17 @@ namespace game {
 static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
-CharacterGeneration::CharacterGeneration(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts), _game(game) {
+CharacterGeneration::CharacterGeneration(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("maincg");
     _backgroundType = BackgroundType::Menu;
 
-    if (version == GameVersion::TheSithLords) {
+    if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -76,7 +80,7 @@ void CharacterGeneration::load() {
 }
 
 void CharacterGeneration::loadClassSelection() {
-    _classSelection = make_unique<ClassSelection>(_game, this, _version, _gfxOpts);
+    _classSelection = make_unique<ClassSelection>(_game);
     _classSelection->load();
 }
 
@@ -211,7 +215,7 @@ void CharacterGeneration::loadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_version, _game, &sceneGraph, _gfxOpts));
+    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(_character);

@@ -33,10 +33,9 @@ class Game;
 
 class HUD : public gui::GUI {
 public:
-    HUD(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    HUD(Game *game);
 
     void load() override;
-
     void render() const override;
 
     void setContext(const GuiContext &ctx);

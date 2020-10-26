@@ -45,7 +45,7 @@ class Game;
 
 class CharacterGeneration : public gui::GUI {
 public:
-    CharacterGeneration(Game *game, resource::GameVersion, const render::GraphicsOptions &opts);
+    CharacterGeneration(Game *game);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

@@ -32,7 +32,7 @@ class Game;
 
 class MainMenu : public gui::GUI {
 public:
-    MainMenu(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    MainMenu(Game *game);
 
     void load() override;
 

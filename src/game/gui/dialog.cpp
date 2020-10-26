@@ -54,10 +54,13 @@ enum EndEntryFlags {
     kEndEntryOnAudioStop = 2
 };
 
-Dialog::Dialog(Game *game, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+Dialog::Dialog(Game *game) :
+    GUI(game->version(), game->options().graphics),
     _game(game) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }

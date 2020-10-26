@@ -19,21 +19,18 @@
 
 #include "../../../gui/gui.h"
 #include "../../../resource/types.h"
-#include "../../../scene/scenegraph.h"
 
-#include "../../object/objectfactory.h"
 #include "../../types.h"
 
 namespace reone {
 
 namespace game {
 
-class CharacterGeneration;
 class Game;
 
 class ClassSelection : public gui::GUI {
 public:
-    ClassSelection(Game *game, CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    ClassSelection(Game *game);
 
     void load() override;
 
@@ -45,8 +42,6 @@ private:
     };
 
     Game *_game { nullptr };
-    CharacterGeneration *_charGen { nullptr };
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;

@@ -44,7 +44,7 @@ public:
         WeapR2
     };
 
-    Equipment(Game *game, resource::GameVersion version, const render::GraphicsOptions &opts);
+    Equipment(Game *game);
 
     void load() override;
 

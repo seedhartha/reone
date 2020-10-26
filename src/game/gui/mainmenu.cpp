@@ -53,8 +53,14 @@ static const int kAppearanceKreia = 455;
 static const float kKotorModelSize = 1.3f;
 static const float kKotorModelOffsetY = 1.25f;
 
-MainMenu::MainMenu(Game *game, GameVersion version, const GraphicsOptions &opts) : GUI(version, opts), _game(game) {
-    switch (version) {
+MainMenu::MainMenu(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
+    switch (game->version()) {
         case GameVersion::TheSithLords:
             _resRef = "mainmenu8x6_p";
             break;

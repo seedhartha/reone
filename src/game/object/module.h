@@ -53,13 +53,7 @@ class ObjectFactory;
 
 class Module : public Object {
 public:
-    Module(
-        uint32_t id,
-        resource::GameVersion version,
-        Game *game,
-        ObjectFactory *objectFactory,
-        scene::SceneGraph *sceneGraph,
-        const render::GraphicsOptions &opts);
+    Module(uint32_t id, Game *game);
 
     void load(const std::string &name, const resource::GffStruct &ifo);
     void loadParty(const PartyConfiguration &party, const std::string &entry = "");
@@ -73,11 +67,7 @@ public:
     Player &player();
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     Game *_game { nullptr };
-    ObjectFactory *_objectFactory { nullptr };
-    scene::SceneGraph *_sceneGraph { nullptr };
-    render::GraphicsOptions _opts;
     std::string _name;
     ModuleInfo _info;
     PartyConfiguration _party;

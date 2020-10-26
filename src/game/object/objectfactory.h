@@ -42,7 +42,7 @@ class Game;
 
 class ObjectFactory {
 public:
-    ObjectFactory(resource::GameVersion version, Game *game, scene::SceneGraph *sceneGraph, const render::GraphicsOptions &opts);
+    ObjectFactory(Game *game, scene::SceneGraph *sceneGraph);
 
     std::unique_ptr<Module> newModule();
     std::unique_ptr<Area> newArea();
@@ -54,10 +54,8 @@ public:
     std::unique_ptr<Item> newItem();
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
     Game *_game { nullptr };
     scene::SceneGraph *_sceneGraph { nullptr };
-    render::GraphicsOptions _options;
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
 
     ObjectFactory(const ObjectFactory &) = delete;

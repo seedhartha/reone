@@ -64,24 +64,17 @@ static const char kPartyLeaderTag[] = "party-leader";
 static const char kPartyMember1Tag[] = "party-member-1";
 static const char kPartyMember2Tag[] = "party-member-2";
 
-Area::Area(
-    uint32_t id,
-    GameVersion version,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    const GraphicsOptions &opts
-) :
+Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
-    _version(version),
     _game(game),
-    _objectFactory(objectFactory),
-    _sceneGraph(sceneGraph),
-    _opts(opts),
     _collisionDetector(this),
     _objectSelector(this),
     _actionExecutor(this) {
 
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
+    const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 }
 
@@ -99,12 +92,14 @@ void Area::loadLYT() {
     LytFile lyt;
     lyt.load(wrap(Resources::instance().findRaw(_name, ResourceType::AreaLayout)));
 
+    SceneGraph *sceneGraph = &_game->sceneGraph();
+
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(_sceneGraph, Models::instance().get(lytRoom.name)));
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(sceneGraph, Models::instance().get(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->playAnimation("animloop1", kAnimationLoop);
 
-        _sceneGraph->addRoot(model);
+        sceneGraph->addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
@@ -129,6 +124,8 @@ void Area::loadPTH() {
     const vector<PthFile::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
+    SceneGraph *sceneGraph = &_game->sceneGraph();
+
     for (int i = 0; i < points.size(); ++i) {
         const PthFile::Point &point = points[i];
         Room *room = nullptr;
@@ -140,10 +137,10 @@ void Area::loadPTH() {
         }
         pointZ.insert(make_pair(i, z));
 
-        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(_sceneGraph, 0.5f));
+        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(sceneGraph, 0.5f));
         aabb->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(point.x, point.y, z + 0.25f)));
 
-        _sceneGraph->addRoot(aabb);
+        sceneGraph->addRoot(aabb);
     }
 
     _pathfinder.load(points, pointZ);
@@ -174,7 +171,7 @@ void Area::loadAmbientColor(const GffStruct &are) {
 
     ambientColor /= 255.0f;
 
-    _sceneGraph->setAmbientLightColor(ambientColor);
+    _game->sceneGraph().setAmbientLightColor(ambientColor);
 }
 
 void Area::loadScripts(const GffStruct &are) {
@@ -205,7 +202,7 @@ void Area::loadProperties(const GffStruct &git) {
 
 void Area::loadCreatures(const GffStruct &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_objectFactory->newCreature());
+        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
         creature->load(gffs);
         landObject(*creature);
         add(creature);
@@ -214,7 +211,7 @@ void Area::loadCreatures(const GffStruct &git) {
 
 void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_objectFactory->newDoor());
+        shared_ptr<Door> door(_game->objectFactory().newDoor());
         door->load(gffs);
         add(door);
     }
@@ -222,7 +219,7 @@ void Area::loadDoors(const GffStruct &git) {
 
 void Area::loadPlaceables(const GffStruct &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_objectFactory->newPlaceable());
+        shared_ptr<Placeable> placeable(_game->objectFactory().newPlaceable());
         placeable->load(gffs);
         add(placeable);
     }
@@ -230,7 +227,7 @@ void Area::loadPlaceables(const GffStruct &git) {
 
 void Area::loadWaypoints(const GffStruct &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_objectFactory->newWaypoint());
+        shared_ptr<Waypoint> waypoint(_game->objectFactory().newWaypoint());
         waypoint->load(gffs);
         add(waypoint);
     }
@@ -238,7 +235,7 @@ void Area::loadWaypoints(const GffStruct &git) {
 
 void Area::loadTriggers(const GffStruct &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_objectFactory->newTrigger());
+        shared_ptr<Trigger> trigger(_game->objectFactory().newTrigger());
         trigger->load(gffs);
         add(trigger);
     }
@@ -248,19 +245,21 @@ void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    _firstPersonCamera = make_unique<FirstPersonCamera>(_sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView));
+    SceneGraph *sceneGraph = &_game->sceneGraph();
+
+    _firstPersonCamera = make_unique<FirstPersonCamera>(sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView));
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setHeading(entryHeading);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_sceneGraph, _cameraAspect, _cameraStyle);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _cameraStyle);
     _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setHeading(entryHeading);
 
-    _dialogCamera = make_unique<DialogCamera>(_sceneGraph, _cameraStyle, _cameraAspect);
+    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _cameraStyle, _cameraAspect);
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
-    _animatedCamera = make_unique<AnimatedCamera>(_sceneGraph, _cameraAspect);
+    _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
     _game->onCameraChanged(_cameraType);
 }
 
@@ -318,7 +317,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     shared_ptr<ModelSceneNode> sceneNode(object->model());
 
     if (sceneNode) {
-        _sceneGraph->addRoot(sceneNode);
+        _game->sceneGraph().addRoot(sceneNode);
     }
     determineObjectRoom(*object);
 }
@@ -351,7 +350,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     {
         shared_ptr<ModelSceneNode> sceneNode(object->model());
         if (sceneNode) {
-            _sceneGraph->removeRoot(sceneNode);
+            _game->sceneGraph().removeRoot(sceneNode);
         }
     }
     {
@@ -455,7 +454,7 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
 }
 
 shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
-    shared_ptr<Creature> creature(_objectFactory->newCreature());
+    shared_ptr<Creature> creature(_game->objectFactory().newCreature());
     creature->setTag(tag);
     creature->load(character);
     creature->setPosition(position);
@@ -524,7 +523,7 @@ void Area::update(const UpdateContext &updateCtx) {
     doDestroyObjects();
 
     _objectSelector.update();
-    _sceneGraph->prepare();
+    _game->sceneGraph().prepare();
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -564,9 +563,10 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     Camera *camera = getCamera();
     shared_ptr<CameraSceneNode> sceneNode(camera->sceneNode());
 
-    glm::vec4 viewport(0.0f, 0.0f, _opts.width, _opts.height);
-    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, _opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
-    glm::vec3 toWorld(glm::unProject(glm::vec3(x, _opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
+    const GraphicsOptions &opts = _game->options().graphics;
+    glm::vec4 viewport(0.0f, 0.0f, opts.width, opts.height);
+    glm::vec3 fromWorld(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
+    glm::vec3 toWorld(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
 
     RaycastProperties props;
     props.flags = kRaycastObjects | kRaycastAABB;
