@@ -513,13 +513,13 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     glm::vec3 fromWorld(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
 
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> partyLeader(_game->party().leader());
 
     RaycastProperties props;
     props.flags = kRaycastObjects | kRaycastAABB;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
-    props.except = player.get();
+    props.except = partyLeader.get();
 
     RaycastResult result;
 

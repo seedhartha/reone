@@ -17,7 +17,13 @@
 
 #include "party.h"
 
+#include <stdexcept>
+
 #include "../system/log.h"
+
+#include "action/follow.h"
+#include "game.h"
+#include "object/creature.h"
 
 using namespace std;
 
@@ -26,6 +32,32 @@ namespace reone {
 namespace game {
 
 static const int kMaxMemberCount = 3;
+
+Party::Party(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
+}
+
+bool Party::handle(const SDL_Event &event) {
+    if (event.type == SDL_KEYDOWN) {
+        return handleKeyDown(event.key);
+    }
+
+    return false;
+}
+
+bool Party::handleKeyDown(const SDL_KeyboardEvent &event) {
+    if (event.repeat) return false;
+
+    switch (event.keysym.sym) {
+        case SDLK_TAB:
+            switchLeader();
+            return true;
+    }
+
+    return false;
+}
 
 bool Party::addAvailableMember(int npc, const string &blueprint) {
     auto maybeMember = _availableMembers.find(npc);
@@ -71,6 +103,13 @@ void Party::switchLeader() {
             break;
         }
     }
+    _members[0]->actionQueue().clear();
+
+    for (int i = 1; i < count; ++i) {
+        _members[i]->actionQueue().clear();
+        _members[i]->actionQueue().add(make_unique<FollowAction>(_members[0], 1.0f));
+    }
+    _game->module()->area()->onPartyLeaderMoved();
 }
 
 const string &Party::getAvailableMember(int npc) const {

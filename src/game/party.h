@@ -22,17 +22,24 @@
 #include <string>
 #include <vector>
 
+#include "SDL2/SDL_events.h"
+
 namespace reone {
 
 namespace game {
 
 class Creature;
+class Game;
 
 /**
  * Encapsulates party management.
  */
 class Party {
 public:
+    Party(Game *game);
+
+    bool handle(const SDL_Event &event);
+
     bool addAvailableMember(int npc, const std::string &blueprint);
     bool addMember(const std::shared_ptr<Creature> &member);
     void clear();
@@ -50,9 +57,12 @@ public:
     void setPlayer(const std::shared_ptr<Creature> &player);
 
 private:
+    Game *_game { nullptr };
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<std::shared_ptr<Creature>> _members;
+
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
 };
 
 } // namespace game
