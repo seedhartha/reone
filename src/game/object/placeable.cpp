@@ -79,7 +79,7 @@ void Placeable::loadBlueprint(const string &resRef) {
         shared_ptr<ItemBlueprint> itemBlueprint(Blueprints::instance().getItem(itemResRef));
 
         shared_ptr<Item> item(_objectFactory->newItem());
-        item->load(itemBlueprint.get());
+        item->load(itemBlueprint);
 
         _items.push_back(move(item));
     }

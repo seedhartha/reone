@@ -17,6 +17,8 @@
 
 #include "item.h"
 
+using namespace std;
+
 using namespace reone::resource;
 
 namespace reone {
@@ -26,7 +28,7 @@ namespace game {
 Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
-void Item::load(const ItemBlueprint *blueprint) {
+void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
     _blueprint = blueprint;
     _tag = _blueprint->tag();
 }
