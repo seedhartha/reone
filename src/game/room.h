@@ -45,7 +45,7 @@ public:
 
     const std::string &name() const;
     const glm::vec3 &position() const;
-    const scene::ModelSceneNode *model() const;
+    std::shared_ptr<scene::ModelSceneNode> model() const;
     const render::Walkmesh *walkmesh() const;
     bool visible() const;
 

@@ -92,14 +92,10 @@ void Area::loadLYT() {
     LytFile lyt;
     lyt.load(wrap(Resources::instance().get(_name, ResourceType::AreaLayout)));
 
-    SceneGraph *sceneGraph = &_game->sceneGraph();
-
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(sceneGraph, Models::instance().get(lytRoom.name)));
+        shared_ptr<ModelSceneNode> model(new ModelSceneNode(&_game->sceneGraph(), Models::instance().get(lytRoom.name)));
         model->setLocalTransform(glm::translate(glm::mat4(1.0f), lytRoom.position));
         model->playAnimation("animloop1", kAnimationLoop);
-
-        sceneGraph->addRoot(model);
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
         unique_ptr<Room> room(new Room(lytRoom.name, lytRoom.position, model, walkmesh));
@@ -124,8 +120,6 @@ void Area::loadPTH() {
     const vector<PthFile::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
-    SceneGraph *sceneGraph = &_game->sceneGraph();
-
     for (int i = 0; i < points.size(); ++i) {
         const PthFile::Point &point = points[i];
         Room *room = nullptr;
@@ -136,11 +130,6 @@ void Area::loadPTH() {
             continue;
         }
         pointZ.insert(make_pair(i, z));
-
-        shared_ptr<CubeSceneNode> aabb(new CubeSceneNode(sceneGraph, 0.5f));
-        aabb->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(point.x, point.y, z + 0.25f)));
-
-        sceneGraph->addRoot(aabb);
     }
 
     _pathfinder.load(points, pointZ);
@@ -314,11 +303,6 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     _objectById.insert(make_pair(object->id(), object));
     _objectsByTag[object->tag()].push_back(object);
 
-    shared_ptr<ModelSceneNode> sceneNode(object->model());
-
-    if (sceneNode) {
-        _game->sceneGraph().addRoot(sceneNode);
-    }
     determineObjectRoom(*object);
 }
 
@@ -410,7 +394,17 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
     Party &party = _game->party();
     bool firstLoad = party.empty();
 
-    if (!firstLoad) {
+    if (firstLoad) {
+        if (config.memberCount > 0) {
+            shared_ptr<Creature> partyLeader(makeCharacter(config.leader, kPartyLeaderTag, position, heading));
+            landObject(*partyLeader);
+            add(partyLeader);
+            _player = partyLeader;
+            _partyLeader = partyLeader;
+            party.addMember(partyLeader.get());
+            _game->module()->player().setCreature(static_cast<Creature *>(_player.get()));
+        }
+    } else {
         if (_partyMember1) {
             destroyObject(*_partyMember1);
         }
@@ -421,15 +415,6 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
         _partyMember2.reset();
         party.clear();
         party.addMember(static_cast<Creature *>(_partyLeader.get()));
-    }
-    if (firstLoad && config.memberCount > 0) {
-        shared_ptr<Creature> partyLeader(makeCharacter(config.leader, kPartyLeaderTag, position, heading));
-        landObject(*partyLeader);
-        add(partyLeader);
-        _player = partyLeader;
-        _partyLeader = partyLeader;
-        party.addMember(partyLeader.get());
-        _game->module()->player().setCreature(static_cast<Creature *>(_player.get()));
     }
     if (config.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(config.member1, kPartyMember1Tag, position, heading));
@@ -585,6 +570,23 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
 
 void Area::destroyObject(const SpatialObject &object) {
     _objectsToDestroy.insert(object.id());
+}
+
+void Area::fill(SceneGraph &sceneGraph) {
+    sceneGraph.clear();
+
+    for (auto &room : _rooms) {
+        shared_ptr<ModelSceneNode> sceneNode(room.second->model());
+        if (sceneNode) {
+            sceneGraph.addRoot(sceneNode);
+        }
+    }
+    for (auto &object : _objects) {
+        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        if (sceneNode) {
+            sceneGraph.addRoot(sceneNode);
+        }
+    }
 }
 
 void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {

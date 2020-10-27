@@ -59,8 +59,8 @@ const glm::vec3 &Room::position() const {
     return _position;
 }
 
-const ModelSceneNode *Room::model() const {
-    return _model.get();
+shared_ptr<ModelSceneNode> Room::model() const {
+    return _model;
 }
 
 const Walkmesh *Room::walkmesh() const {
