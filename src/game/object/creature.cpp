@@ -314,7 +314,7 @@ void Creature::equip(const string &resRef) {
     shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
-    item->load(blueprint.get());
+    item->load(blueprint);
 
     if (blueprint->isEquippable(kInventorySlotBody)) {
         equip(kInventorySlotBody, item);
