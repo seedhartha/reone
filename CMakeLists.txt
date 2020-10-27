@@ -143,6 +143,8 @@ set(RENDER_HEADERS
     src/render/textures.h
     src/render/types.h
     src/render/util.h
+    src/render/video/bikfile.h
+    src/render/video/video.h
     src/render/walkmesh.h
     src/render/walkmeshes.h
     src/render/window.h)
@@ -174,6 +176,8 @@ set(RENDER_SOURCES
     src/render/texture.cpp
     src/render/textures.cpp
     src/render/util.cpp
+    src/render/video/bikfile.cpp
+    src/render/video/video.cpp
     src/render/walkmesh.cpp
     src/render/walkmeshes.cpp
     src/render/window.cpp)

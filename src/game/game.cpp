@@ -24,6 +24,8 @@
 #include "../audio/util.h"
 #include "../render/models.h"
 #include "../render/textures.h"
+#include "../render/video/bikfile.h"
+#include "../render/video/video.h"
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
@@ -70,6 +72,10 @@ void Game::initGameVersion() {
 int Game::run() {
     init();
     loadResources();
+
+    if (_version == GameVersion::KotOR) {
+        playVideo("legal");
+    }
     openMainMenu();
 
     _window.show();
@@ -102,6 +108,15 @@ void Game::loadCursor() {
     cursor.unpressed = Textures::instance().get("gui_mp_defaultu", TextureType::Cursor);
 
     _window.setCursor(cursor);
+}
+
+void Game::playVideo(const string &name) {
+    fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
+
+    BikFile bik(path);
+    bik.load();
+
+    _video = bik.video();
 }
 
 void Game::openMainMenu() {
@@ -202,9 +217,13 @@ void Game::withLoadingScreen(const function<void()> &block) {
 void Game::drawAll() {
     _window.clear();
 
-    drawWorld();
-    drawGUI();
-    drawCursor();
+    if (_video) {
+        _video->render();
+    } else {
+        drawWorld();
+        drawGUI();
+        drawCursor();
+    }
 
     _window.swapBuffers();
 }
@@ -333,10 +352,16 @@ void Game::runMainLoop() {
 }
 
 void Game::update() {
+    float dt = measureFrameTime();
+    if (_video) {
+        _video->update(dt);
+        if (_video->isFinished()) {
+            _video.reset();
+        }
+    }
     if (!_nextModule.empty()) {
         loadNextModule();
     }
-    float dt = measureFrameTime();
     _window.update(dt);
 
     GUI *gui = getScreenGUI();
