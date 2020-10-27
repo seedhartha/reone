@@ -55,7 +55,8 @@ Game::Game(const fs::path &path, const Options &opts) :
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
-    _console(opts.graphics) {
+    _console(opts.graphics),
+    _party(this) {
 
     initGameVersion();
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
@@ -455,6 +456,9 @@ bool Game::handle(const SDL_Event &event) {
     switch (_screen) {
         case GameScreen::InGame:
             if (_console.handle(event)) {
+                return true;
+            }
+            if (_party.handle(event)) {
                 return true;
             }
             if (_module->handle(event)) {

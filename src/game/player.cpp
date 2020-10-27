@@ -49,8 +49,8 @@ Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
 }
 
 bool Player::handle(const SDL_Event &event) {
-    shared_ptr<Creature> player(_party->player());
-    if (!player) return false;
+    shared_ptr<Creature> partyLeader(_party->leader());
+    if (!partyLeader) return false;
 
     switch (event.type) {
         case SDL_KEYDOWN:
@@ -104,7 +104,7 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDL_SCANCODE_X:
-            _party->player()->playGreetingAnimation();
+            _party->leader()->playGreetingAnimation();
             return true;
 
         default:
@@ -113,8 +113,8 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Player::update(float dt) {
-    shared_ptr<Creature> player(_party->player());
-    if (!player) return;
+    shared_ptr<Creature> partyLeader(_party->leader());
+    if (!partyLeader) return;
 
     float heading = 0.0f;
     bool movement = true;
@@ -131,16 +131,16 @@ void Player::update(float dt) {
         movement = false;
     }
     if (movement) {
-        glm::vec2 dest(player->position());
+        glm::vec2 dest(partyLeader->position());
         dest.x -= 100.0f * glm::sin(heading);
         dest.y += 100.0f * glm::cos(heading);
 
-        if (_area->moveCreatureTowards(*player, dest, true, dt)) {
-            player->setMovementType(MovementType::Run);
+        if (_area->moveCreatureTowards(*partyLeader, dest, true, dt)) {
+            partyLeader->setMovementType(MovementType::Run);
             _area->onPartyLeaderMoved();
         }
     } else {
-        player->setMovementType(MovementType::None);
+        partyLeader->setMovementType(MovementType::None);
     }
 }
 
