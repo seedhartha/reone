@@ -136,26 +136,8 @@ void Game::loadMainMenu() {
 
 void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
     info("Game: load module: " + name);
-    _partyConfig = party;
 
     withLoadingScreen([this, &name, &party, &entry]() {
-        Resources::instance().loadModule(name);
-
-        Models::instance().invalidateCache();
-        Walkmeshes::instance().invalidateCache();
-        Textures::instance().invalidateCache();
-        AudioFiles::instance().invalidateCache();
-        Scripts::instance().invalidateCache();
-        Blueprints::instance().invalidateCache();
-
-        shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::ModuleInfo));
-        _module = _objectFactory->newModule();
-        _module->load(name, *ifo);
-        _module->loadParty(_partyConfig, entry);
-
-        string musicName(_module->area()->music());
-        playMusic(musicName);
-
         if (!_hud) {
             loadHUD();
         }
@@ -171,6 +153,37 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         if (!_partySelection) {
             loadPartySelection();
         }
+
+        Models::instance().invalidateCache();
+        Walkmeshes::instance().invalidateCache();
+        Textures::instance().invalidateCache();
+        AudioFiles::instance().invalidateCache();
+        Scripts::instance().invalidateCache();
+        Blueprints::instance().invalidateCache();
+        Resources::instance().loadModule(name);
+
+        _party.clear();
+
+        auto maybeModule = _loadedModules.find(name);
+        if (maybeModule != _loadedModules.end()) {
+            _module = maybeModule->second;
+        } else {
+            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::ModuleInfo));
+
+            _module = _objectFactory->newModule();
+            _module->load(name, *ifo);
+
+            _loadedModules.insert(make_pair(name, _module));
+        }
+
+        _module->loadParty(party, entry);
+        _module->area()->fill(_sceneGraph);
+
+        _partyConfig = party;
+
+        string musicName(_module->area()->music());
+        playMusic(musicName);
+
         _ticks = SDL_GetTicks();
         _screen = GameScreen::InGame;
     });
@@ -345,7 +358,6 @@ void Game::loadNextModule() {
     JobExecutor::instance().cancel();
     JobExecutor::instance().await();
 
-    _sceneGraph.clear();
     loadModule(_nextModule, _partyConfig, _nextEntry);
 
     _nextModule.clear();

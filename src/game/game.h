@@ -62,6 +62,8 @@ public:
     Game(const boost::filesystem::path &path, const Options &opts);
     virtual ~Game() = default;
 
+    bool handle(const SDL_Event &event) override;
+
     int run();
 
     void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
@@ -75,8 +77,6 @@ public:
     void startCharacterGeneration();
     void startDialog(SpatialObject &owner, const std::string &resRef);
     void quit();
-
-    bool handle(const SDL_Event &event) override;
 
     resource::GameVersion version() const;
     const Options &options() const;
@@ -126,14 +126,20 @@ private:
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
-    std::string _nextModule;
-    std::string _nextEntry;
-    std::shared_ptr<Module> _module;
     Party _party;
     PartyConfiguration _partyConfig;
     std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };
+
+    // Modules
+
+    std::string _nextModule;
+    std::string _nextEntry;
+    std::shared_ptr<Module> _module;
+    std::map<std::string, std::shared_ptr<Module>> _loadedModules;
+
+    // END Modules
 
     // GUI
 

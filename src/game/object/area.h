@@ -42,6 +42,12 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace game {
 
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
@@ -54,6 +60,7 @@ public:
     Area(uint32_t id, Game *game);
 
     void destroyObject(const SpatialObject &object);
+    void fill(scene::SceneGraph &sceneGraph);
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
     bool handle(const SDL_Event &event);
     void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
