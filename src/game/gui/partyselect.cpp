@@ -221,10 +221,7 @@ void PartySelection::changeParty() {
         shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
 
         CreatureConfiguration creature;
-        creature.appearance = blueprint->appearance();
-        for (auto &item : blueprint->equipment()) {
-            creature.equipment.push_back(item);
-        }
+        creature.blueprint = blueprint;
         added.push_back(move(creature));
     }
     if (added.size() > 0) {
@@ -238,6 +235,7 @@ void PartySelection::changeParty() {
 
     shared_ptr<SpatialObject> player(area->player());
     area->loadParty(partyConfig, player->position(), player->heading());
+    area->fill(_game->sceneGraph());
 }
 
 } // namespace game

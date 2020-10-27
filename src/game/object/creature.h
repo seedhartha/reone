@@ -123,7 +123,7 @@ private:
     std::string getHeadModelName() const;
     std::string getWeaponModelName(InventorySlot slot) const;
     ModelType parseModelType(const std::string &s) const;
-    void updateAppearance();
+    void updateModel();
 
     const std::string &getPauseAnimation() const;
     const std::string &getRunAnimation() const;

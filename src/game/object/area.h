@@ -158,7 +158,7 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const std::string &tag, const glm::vec3 &position, float heading);
+    std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const glm::vec3 &position, float heading);
     void updateRoomVisibility();
     void updateTriggers(const Creature &creature);
 
