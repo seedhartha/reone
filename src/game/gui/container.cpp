@@ -117,7 +117,7 @@ void Container::onClick(const string &control) {
 }
 
 void Container::transferItemsToPlayer() {
-    shared_ptr<SpatialObject> player(_game->module()->area()->player());
+    shared_ptr<Creature> player(_game->party().player());
     _container->moveItemsTo(*player);
 
     Placeable *placeable = dynamic_cast<Placeable *>(_container);

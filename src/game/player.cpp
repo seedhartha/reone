@@ -23,6 +23,7 @@
 #include "object/area.h"
 #include "object/creature.h"
 #include "object/module.h"
+#include "party.h"
 
 using namespace std;
 
@@ -30,7 +31,9 @@ namespace reone {
 
 namespace game {
 
-Player::Player(Module *module, Area *area, Camera *camera) : _module(module), _area(area), _camera(camera) {
+Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
+    _module(module), _area(area), _camera(camera), _party(party) {
+
     if (!module) {
         throw invalid_argument("Module must not be null");
     }
@@ -40,10 +43,14 @@ Player::Player(Module *module, Area *area, Camera *camera) : _module(module), _a
     if (!camera) {
         throw invalid_argument("Camera must not be null");
     }
+    if (!party) {
+        throw invalid_argument("Party must not be null");
+    }
 }
 
 bool Player::handle(const SDL_Event &event) {
-    if (!_creature) return false;
+    shared_ptr<Creature> player(_party->player());
+    if (!player) return false;
 
     switch (event.type) {
         case SDL_KEYDOWN:
@@ -97,7 +104,7 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDL_SCANCODE_X:
-            _creature->playGreetingAnimation();
+            _party->player()->playGreetingAnimation();
             return true;
 
         default:
@@ -106,7 +113,8 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Player::update(float dt) {
-    if (!_creature) return;
+    shared_ptr<Creature> player(_party->player());
+    if (!player) return;
 
     float heading = 0.0f;
     bool movement = true;
@@ -123,16 +131,16 @@ void Player::update(float dt) {
         movement = false;
     }
     if (movement) {
-        glm::vec2 dest(_creature->position());
+        glm::vec2 dest(player->position());
         dest.x -= 100.0f * glm::sin(heading);
         dest.y += 100.0f * glm::cos(heading);
 
-        if (_area->moveCreatureTowards(*_creature, dest, true, dt)) {
-            _creature->setMovementType(MovementType::Run);
-            _area->onPlayerMoved();
+        if (_area->moveCreatureTowards(*player, dest, true, dt)) {
+            player->setMovementType(MovementType::Run);
+            _area->onPartyLeaderMoved();
         }
     } else {
-        _creature->setMovementType(MovementType::None);
+        player->setMovementType(MovementType::None);
     }
 }
 
@@ -141,10 +149,6 @@ void Player::stopMovement() {
     _moveLeft = false;
     _moveBackward = false;
     _moveRight = false;
-}
-
-void Player::setCreature(Creature *creature) {
-    _creature = creature;
 }
 
 } // namespace game

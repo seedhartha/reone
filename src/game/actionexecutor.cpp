@@ -84,6 +84,8 @@ void ActionExecutor::executeMoveToPoint(Creature &creature, MoveToPointAction &a
 
 void ActionExecutor::executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt) {
     const SpatialObject *object = dynamic_cast<const SpatialObject *>(action.object());
+    if (!object) return;
+
     glm::vec3 dest(object->position());
     float distance = action.distance();
 

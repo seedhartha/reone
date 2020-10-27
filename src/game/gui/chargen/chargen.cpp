@@ -149,11 +149,16 @@ void CharacterGeneration::finish() {
     CreatureConfiguration config(_character);
     config.equipment.clear();
 
-    PartyConfiguration party;
-    party.memberCount = 1;
-    party.leader = config;
+    shared_ptr<Creature> player(_game->objectFactory().newCreature());
+    player->load(config);
+    player->setTag("PLAYER");
 
-    _game->loadModule(moduleName, party);
+    Party &party = _game->party();
+    party.clear();
+    party.addMember(player);
+    party.setPlayer(player);
+
+    _game->loadModule(moduleName);
 }
 
 void CharacterGeneration::cancel() {

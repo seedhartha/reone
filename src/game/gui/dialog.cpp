@@ -259,7 +259,7 @@ void Dialog::loadCurrentSpeaker() {
     Creature &speakerCreature = static_cast<Creature &>(*_currentSpeaker);
     speakerCreature.setTalking(true);
 
-    shared_ptr<SpatialObject> partyLeader(area->partyLeader());
+    shared_ptr<Creature> partyLeader(_game->party().leader());
     partyLeader->face(speakerCreature);
 
     speakerCreature.face(*partyLeader);
@@ -267,7 +267,7 @@ void Dialog::loadCurrentSpeaker() {
 
 void Dialog::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
-    shared_ptr<SpatialObject> partyLeader(area->partyLeader());
+    shared_ptr<Creature> partyLeader(_game->party().leader());
     glm::vec3 listenerPosition;
     glm::vec3 speakerPosition;
     glm::vec3 hookPosition(0.0f);

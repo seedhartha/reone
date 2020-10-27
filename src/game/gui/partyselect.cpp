@@ -207,12 +207,13 @@ void PartySelection::refreshNpcButtons() {
 
 void PartySelection::changeParty() {
     shared_ptr<Area> area(_game->module()->area());
+    area->unloadParty();
 
-    PartyConfiguration partyConfig(area->partyConfiguration());
-    partyConfig.memberCount = 1;
-
-    vector<CreatureConfiguration> added;
     Party &party = _game->party();
+    party.clear();
+    party.addMember(party.player());
+
+    shared_ptr<Creature> player(_game->party().player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i]) continue;
@@ -220,21 +221,13 @@ void PartySelection::changeParty() {
         string blueprintResRef(party.getAvailableMember(i));
         shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
 
-        CreatureConfiguration creature;
-        creature.blueprint = blueprint;
-        added.push_back(move(creature));
-    }
-    if (added.size() > 0) {
-        partyConfig.member1 = added[0];
-        ++partyConfig.memberCount;
-    }
-    if (added.size() > 1) {
-        partyConfig.member2 = added[1];
-        ++partyConfig.memberCount;
+        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
+        creature->load(blueprint);
+        creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+        party.addMember(creature);
     }
 
-    shared_ptr<SpatialObject> player(area->player());
-    area->loadParty(partyConfig, player->position(), player->heading());
+    area->loadParty(player->position(), player->heading());
     area->fill(_game->sceneGraph());
 }
 

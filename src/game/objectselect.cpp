@@ -22,6 +22,7 @@
 #include "glm/vec3.hpp"
 
 #include "object/area.h"
+#include "party.h"
 
 using namespace std;
 
@@ -34,9 +35,14 @@ namespace game {
 
 static const float kSelectionDistance = 64.0f;
 
-ObjectSelector::ObjectSelector(Area *area) : _area(area) {
+ObjectSelector::ObjectSelector(const Area *area, const Party *party) :
+    _area(area), _party(party) {
+
     if (!area) {
         throw invalid_argument("Area must not be null");
+    }
+    if (!party) {
+        throw invalid_argument("Party must not be null");
     }
 }
 
@@ -86,7 +92,7 @@ void ObjectSelector::selectNext(bool reverse) {
 void ObjectSelector::getSelectableObjects(vector<uint32_t> &ids) const {
     vector<pair<uint32_t, float>> selectables;
 
-    shared_ptr<SpatialObject> player(_area->player());
+    shared_ptr<SpatialObject> player(_party->player());
     glm::vec3 origin(player->position());
 
     for (auto &object : _area->objects()) {
