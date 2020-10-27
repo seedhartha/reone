@@ -38,14 +38,19 @@ public:
     void clear();
     void switchLeader();
 
-    const std::string &getAvailableMember(int npc) const;
-    Creature *getMember(int index) const;
-
     bool empty() const;
+    const std::string &getAvailableMember(int npc) const;
+    std::shared_ptr<Creature> getMember(int index) const;
     bool isMemberAvailable(int npc) const;
-    Creature *leader() const;
+    int size() const;
+
+    std::shared_ptr<Creature> player() const;
+    std::shared_ptr<Creature> leader() const;
+
+    void setPlayer(const std::shared_ptr<Creature> &player);
 
 private:
+    std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<std::shared_ptr<Creature>> _members;
 };

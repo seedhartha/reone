@@ -179,22 +179,37 @@ void MainMenu::startModuleSelection() {
 void MainMenu::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_MODULES") return;
 
-    PartyConfiguration party;
-    party.memberCount = 2;
-    party.leader.equipment.push_back("g_a_clothes01");
-    party.member1.equipment.push_back("g_a_clothes01");
+    CreatureConfiguration playerCfg;
+    CreatureConfiguration companionCfg;
 
     switch (_version) {
         case GameVersion::TheSithLords:
-            party.leader.appearance = kAppearanceAtton;
-            party.member1.appearance = kAppearanceKreia;
+            playerCfg.appearance = kAppearanceAtton;
+            companionCfg.appearance = kAppearanceKreia;
             break;
         default:
-            party.leader.appearance = kAppearanceCarth;
-            party.member1.appearance = kAppearanceBastila;
+            playerCfg.appearance = kAppearanceCarth;
+            companionCfg.appearance = kAppearanceBastila;
             break;
     }
-    _game->loadModule(item, party);
+
+    playerCfg.equipment.push_back("g_a_clothes01");
+    companionCfg.equipment.push_back("g_a_clothes01");
+
+    Party &party = _game->party();
+
+    shared_ptr<Creature> player(_game->objectFactory().newCreature());
+    player->load(playerCfg);
+    player->setTag("PLAYER");
+    party.addMember(player);
+    party.setPlayer(player);
+
+    shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+    companion->load(companionCfg);
+    companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+    party.addMember(companion);
+
+    _game->loadModule(item);
 }
 
 } // namespace game

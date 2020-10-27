@@ -137,10 +137,10 @@ static InventorySlot getInventorySlot(Equipment::Slot slot) {
 void Equipment::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
 
-    Creature *partyLeader = _game->party().leader();
+    shared_ptr<Creature> player(_game->party().player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
-        for (auto &ownerItem : partyLeader->items()) {
+        for (auto &ownerItem : player->items()) {
             if (ownerItem->tag() == item) {
                 itemObj = ownerItem;
                 break;
@@ -148,14 +148,14 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
         }
     }
     InventorySlot slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Item> equipped = partyLeader->getEquippedItem(slot);
+    shared_ptr<Item> equipped = player->getEquippedItem(slot);
 
     if (equipped != itemObj) {
         if (equipped) {
-            partyLeader->unequip(equipped);
+            player->unequip(equipped);
         }
         if (itemObj) {
-            partyLeader->equip(slot, itemObj);
+            player->equip(slot, itemObj);
         }
         updateEquipment();
         selectSlot(Slot::None);
@@ -170,9 +170,9 @@ void Equipment::update() {
 
 void Equipment::updatePortraits() {
     Party &party = _game->party();
-    Creature *partyLeader = party.leader();
-    Creature *partyMember1 = party.getMember(1);
-    Creature *partyMember2 = party.getMember(2);
+    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyMember1(party.getMember(1));
+    shared_ptr<Creature> partyMember2(party.getMember(2));
 
     Control &lblPortrait = getControl("LBL_PORTRAIT");
     lblPortrait.setBorderFill(partyLeader->portrait());
@@ -277,7 +277,7 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    Creature *partyLeader = _game->party().leader();
+    shared_ptr<Creature> partyLeader(_game->party().leader());
     const map<InventorySlot, shared_ptr<Item>> &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
@@ -309,7 +309,7 @@ void Equipment::updateItems() {
 
         lbItems.add(move(lbItem));
     }
-    Creature *partyLeader = _game->party().leader();
+    shared_ptr<Creature> partyLeader(_game->party().leader());
 
     for (auto &item : partyLeader->items()) {
         const ItemBlueprint &blueprint = item->blueprint();

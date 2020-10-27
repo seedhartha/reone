@@ -59,20 +59,20 @@ class Area : public Object {
 public:
     Area(uint32_t id, Game *game);
 
+    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
+    bool handle(const SDL_Event &event);
+    void update(const UpdateContext &updateCtx);
+
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
     void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    bool handle(const SDL_Event &event);
-    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
     void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
-    void loadParty(const PartyConfiguration &config, const glm::vec3 &position, float heading);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
-    void onPlayerMoved();
+    void onPartyLeaderMoved();
     void runOnEnterScript();
     void startDialog(Creature &creature, const std::string &resRef);
     void switchTo3rdPersonCamera();
     void toggleCameraType();
-    void update(const UpdateContext &updateCtx);
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
@@ -88,7 +88,6 @@ public:
     const ObjectList &objects() const;
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
-    const PartyConfiguration &partyConfiguration() const;
     const RoomMap &rooms() const;
     ThirdPersonCamera *thirdPersonCamera();
 
@@ -101,10 +100,8 @@ public:
 
     // Party
 
-    std::shared_ptr<SpatialObject> partyLeader() const;
-    std::shared_ptr<SpatialObject> partyMember1() const;
-    std::shared_ptr<SpatialObject> partyMember2() const;
-    std::shared_ptr<SpatialObject> player() const;
+    void loadParty(const glm::vec3 &position, float heading);
+    void unloadParty();
 
     // END Party
 
@@ -114,7 +111,6 @@ private:
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
-    PartyConfiguration _partyConfig;
     std::string _name;
     RoomMap _rooms;
     std::unique_ptr<resource::Visibility> _visibility;
@@ -142,15 +138,6 @@ private:
 
     // END Objects
 
-    // Party
-
-    std::shared_ptr<SpatialObject> _player;
-    std::shared_ptr<SpatialObject> _partyLeader;
-    std::shared_ptr<SpatialObject> _partyMember1;
-    std::shared_ptr<SpatialObject> _partyMember2;
-
-    // END Party
-
     void add(const std::shared_ptr<SpatialObject> &object);
     void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
     void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
@@ -158,7 +145,6 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    std::shared_ptr<Creature> makeCharacter(const CreatureConfiguration &character, const glm::vec3 &position, float heading);
     void updateRoomVisibility();
     void updateTriggers(const Creature &creature);
 

@@ -27,26 +27,25 @@ class Area;
 class Camera;
 class Creature;
 class Module;
+class Party;
 
 /**
  * Encapsulates third-person player controls.
  */
 class Player {
 public:
-    Player(Module *module, Area *area, Camera *camera);
+    Player(Module *module, Area *area, Camera *camera, const Party *party);
 
     bool handle(const SDL_Event &event);
     void update(float dt);
 
     void stopMovement();
 
-    void setCreature(Creature *creature);
-
 private:
     Module *_module { nullptr };
     Area *_area { nullptr };
     Camera *_camera { nullptr };
-    Creature *_creature { nullptr };
+    const Party *_party { nullptr };
     bool _moveForward { false };
     bool _moveLeft { false };
     bool _moveBackward { false };

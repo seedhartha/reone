@@ -56,7 +56,7 @@ public:
     Module(uint32_t id, Game *game);
 
     void load(const std::string &name, const resource::GffStruct &ifo);
-    void loadParty(const PartyConfiguration &party, const std::string &entry = "");
+    void loadParty(const std::string &entry = "");
 
     bool handle(const SDL_Event &event);
     void update(float dt, GuiContext &guiCtx);
@@ -70,7 +70,6 @@ private:
     Game *_game { nullptr };
     std::string _name;
     ModuleInfo _info;
-    PartyConfiguration _party;
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
 

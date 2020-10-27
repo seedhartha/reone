@@ -77,20 +77,32 @@ const string &Party::getAvailableMember(int npc) const {
     return _availableMembers.find(npc)->second;
 }
 
-Creature *Party::getMember(int index) const {
-    return _members.size() > index ? _members[index].get() : nullptr;
+shared_ptr<Creature> Party::getMember(int index) const {
+    return _members.size() > index ? _members[index] : nullptr;
 }
 
 bool Party::empty() const {
     return _members.empty();
 }
 
+int Party::size() const {
+    return static_cast<int>(_members.size());
+}
+
 bool Party::isMemberAvailable(int npc) const {
     return _availableMembers.count(npc) != 0;
 }
 
-Creature *Party::leader() const {
-    return !_members.empty() ? _members[0].get() : nullptr;
+shared_ptr<Creature> Party::player() const {
+    return _player;
+}
+
+shared_ptr<Creature> Party::leader() const {
+    return !_members.empty() ? _members[0] : nullptr;
+}
+
+void Party::setPlayer(const shared_ptr<Creature> &player) {
+    _player = player;
 }
 
 } // namespace game

@@ -25,10 +25,11 @@ namespace reone {
 namespace game {
 
 class Area;
+class Party;
 
 class ObjectSelector {
 public:
-    ObjectSelector(Area *area);
+    ObjectSelector(const Area *area, const Party *party);
 
     void update();
     void selectNext(bool reverse = false);
@@ -41,7 +42,8 @@ public:
     int selectedObjectId() const;
 
 private:
-    Area *_area { nullptr };
+    const Area *_area { nullptr };
+    const Party *_party { nullptr };
     int _hilightedObjectId { -1 };
     int _selectedObjectId { -1 };
 

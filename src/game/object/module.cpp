@@ -80,18 +80,16 @@ void Module::loadArea(const GffStruct &ifo) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), _area->thirdPersonCamera());
+    _player = make_unique<Player>(this, _area.get(), _area->thirdPersonCamera(), &_game->party());
 }
 
-void Module::loadParty(const PartyConfiguration &party, const string &entry) {
-    _party = party;
-
+void Module::loadParty(const string &entry) {
     glm::vec3 position(0.0f);
     float heading = 0.0f;
     getEntryPoint(entry, position, heading);
 
-    _area->loadParty(_party, position, heading);
-    _area->onPlayerMoved();
+    _area->loadParty(position, heading);
+    _area->onPartyLeaderMoved();
     _area->update3rdPersonCameraHeading();
     _area->switchTo3rdPersonCamera();
     _area->runOnEnterScript();
@@ -155,8 +153,8 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         if (!door->linkedToModule().empty()) {
             _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         } else if (!door->isOpen() && !door->isStatic()) {
-            shared_ptr<SpatialObject> player(_area->player());
-            door->open(player);
+            shared_ptr<Creature> partyLeader(_game->party().leader());
+            door->open(partyLeader);
         }
         return true;
     }

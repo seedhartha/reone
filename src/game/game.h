@@ -66,7 +66,7 @@ public:
 
     int run();
 
-    void loadModule(const std::string &name, const PartyConfiguration &party, std::string entry = "");
+    void loadModule(const std::string &name, const std::string &entry = "");
     void onCameraChanged(CameraType camera);
     void openContainer(SpatialObject *container);
     void openEquipment();
@@ -127,7 +127,6 @@ private:
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
-    PartyConfiguration _partyConfig;
     std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };

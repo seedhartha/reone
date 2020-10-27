@@ -70,7 +70,7 @@ Variable Routines::getEnteringObject(const vector<Variable> &args, ExecutionCont
 }
 
 Variable Routines::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> player(_game->module()->area()->player());
+    shared_ptr<Object> player(_game->party().player());
     return Variable(args[0].objectId == player->id());
 }
 
@@ -79,7 +79,7 @@ Variable Routines::getIsObjectValid(const vector<Variable> &args, ExecutionConte
 }
 
 Variable Routines::getFirstPC(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> player(_game->module()->area()->player());
+    shared_ptr<Object> player(_game->party().player());
 
     Variable result(VariableType::Object);
     result.objectId = player->id();
@@ -90,7 +90,7 @@ Variable Routines::getFirstPC(const vector<Variable> &args, ExecutionContext &ct
 Variable Routines::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
     string tag(args[0].strValue);
     if (tag.empty()) {
-        tag = "party-leader";
+        tag = "PLAYER";
     }
     int nth = args.size() >= 2 ? args[1].intValue : 0;
     shared_ptr<Object> object(_game->module()->area()->find(tag, nth));

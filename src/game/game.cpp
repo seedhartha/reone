@@ -134,10 +134,10 @@ void Game::loadMainMenu() {
     _mainMenu->load();
 }
 
-void Game::loadModule(const string &name, const PartyConfiguration &party, string entry) {
+void Game::loadModule(const string &name, const string &entry) {
     info("Game: load module: " + name);
 
-    withLoadingScreen([this, &name, &party, &entry]() {
+    withLoadingScreen([this, &name, &entry]() {
         if (!_hud) {
             loadHUD();
         }
@@ -162,7 +162,9 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
         Blueprints::instance().invalidateCache();
         Resources::instance().loadModule(name);
 
-        _party.clear();
+        if (_module) {
+            _module->area()->unloadParty();
+        }
 
         auto maybeModule = _loadedModules.find(name);
         if (maybeModule != _loadedModules.end()) {
@@ -176,10 +178,8 @@ void Game::loadModule(const string &name, const PartyConfiguration &party, strin
             _loadedModules.insert(make_pair(name, _module));
         }
 
-        _module->loadParty(party, entry);
+        _module->loadParty(entry);
         _module->area()->fill(_sceneGraph);
-
-        _partyConfig = party;
 
         string musicName(_module->area()->music());
         playMusic(musicName);
@@ -358,7 +358,7 @@ void Game::loadNextModule() {
     JobExecutor::instance().cancel();
     JobExecutor::instance().await();
 
-    loadModule(_nextModule, _partyConfig, _nextEntry);
+    loadModule(_nextModule, _nextEntry);
 
     _nextModule.clear();
     _nextEntry.clear();

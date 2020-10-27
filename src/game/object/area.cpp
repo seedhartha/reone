@@ -60,13 +60,11 @@ static const float kMaxDistanceToTestCollision = 64.0f;
 static const float kElevationTestZ = 1024.0f;
 static const float kCreatureObstacleTestZ = 0.1f;
 
-static const char kPartyLeaderTag[] = "party-leader";
-
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
     _game(game),
     _collisionDetector(this),
-    _objectSelector(this),
+    _objectSelector(this, &game->party()),
     _actionExecutor(this) {
 
     if (!game) {
@@ -386,64 +384,25 @@ void Area::landObject(SpatialObject &object) {
     }
 }
 
-void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position, float heading) {
-    _partyConfig = config;
-
+void Area::loadParty(const glm::vec3 &position, float heading) {
     Party &party = _game->party();
-    bool firstLoad = party.empty();
 
-    if (firstLoad) {
-        if (config.memberCount > 0) {
-            shared_ptr<Creature> partyLeader(makeCharacter(config.leader, position, heading));
-            partyLeader->setTag(kPartyLeaderTag);
-            landObject(*partyLeader);
-            add(partyLeader);
-            _player = partyLeader;
-            _partyLeader = partyLeader;
-            party.addMember(partyLeader);
-            _game->module()->player().setCreature(static_cast<Creature *>(_player.get()));
-        }
-    } else {
-        if (_partyMember1) {
-            destroyObject(*_partyMember1);
-        }
-        if (_partyMember2) {
-            destroyObject(*_partyMember2);
-        }
-        _partyMember1.reset();
-        _partyMember2.reset();
-        party.clear();
-        party.addMember(static_pointer_cast<Creature>(_partyLeader));
-    }
-    if (config.memberCount > 1) {
-        shared_ptr<Creature> partyMember(makeCharacter(config.member1, position, heading));
-        landObject(*partyMember);
-        add(partyMember);
-        _partyMember1 = partyMember;
-        party.addMember(partyMember);
+    for (int i = 0; i < party.size(); ++i) {
+        shared_ptr<Creature> member(party.getMember(i));
+        member->setPosition(position);
+        member->setHeading(heading);
 
-        unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
-        partyMember->actionQueue().add(move(action));
-    }
-    if (config.memberCount > 2) {
-        shared_ptr<Creature> partyMember(makeCharacter(config.member2, position, heading));
-        landObject(*partyMember);
-        add(partyMember);
-        _partyMember2 = partyMember;
-        party.addMember(partyMember);
-
-        unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
-        partyMember->actionQueue().add(move(action));
+        landObject(*member);
+        add(member);
     }
 }
 
-shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const glm::vec3 &position, float heading) {
-    shared_ptr<Creature> creature(_game->objectFactory().newCreature());
-    creature->load(character);
-    creature->setPosition(position);
-    creature->setHeading(heading);
+void Area::unloadParty() {
+    Party &party = _game->party();
 
-    return move(creature);
+    for (int i = 0; i < party.size(); ++i) {
+        doDestroyObject(party.getMember(i)->id());
+    }
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -537,8 +496,11 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
 }
 
 void Area::runOnEnterScript() {
+    shared_ptr<Creature> player(_game->party().player());
+    if (!player) return;
+
     if (!_scripts[ScriptType::OnEnter].empty()) {
-        runScript(_scripts[ScriptType::OnEnter], _id, _player->id(), -1);
+        runScript(_scripts[ScriptType::OnEnter], _id, player->id(), -1);
     }
 }
 
@@ -551,11 +513,13 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     glm::vec3 fromWorld(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
 
+    shared_ptr<Creature> player(_game->party().player());
+
     RaycastProperties props;
     props.flags = kRaycastObjects | kRaycastAABB;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
-    props.except = _player.get();
+    props.except = player.get();
 
     RaycastResult result;
 
@@ -588,9 +552,9 @@ void Area::fill(SceneGraph &sceneGraph) {
 }
 
 void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
-    addPartyMemberPortrait(_partyLeader, guiCtx);
-    addPartyMemberPortrait(_partyMember1, guiCtx);
-    addPartyMemberPortrait(_partyMember2, guiCtx);
+    addPartyMemberPortrait(_game->party().getMember(0), guiCtx);
+    addPartyMemberPortrait(_game->party().getMember(1), guiCtx);
+    addPartyMemberPortrait(_game->party().getMember(2), guiCtx);
 
     int hilightedObjectId = _objectSelector.hilightedObjectId();
     if (hilightedObjectId != -1) {
@@ -646,10 +610,10 @@ void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {
 }
 
 void Area::update3rdPersonCameraHeading() {
-    shared_ptr<SpatialObject> player(_player);
-    if (!player) return;
+    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    if (!partyLeader) return;
 
-    _thirdPersonCamera->setHeading(player->heading());
+    _thirdPersonCamera->setHeading(partyLeader->heading());
 }
 
 void Area::switchTo3rdPersonCamera() {
@@ -664,7 +628,7 @@ void Area::toggleCameraType() {
 
     switch (_cameraType) {
         case CameraType::FirstPerson:
-            if (_partyLeader) {
+            if (_game->party().leader()) {
                 _cameraType = CameraType::ThirdPerson;
                 changed = true;
             }
@@ -698,37 +662,43 @@ void Area::startDialog(Creature &creature, const string &resRef) {
     _game->startDialog(creature, finalResRef);
 }
 
-void Area::onPlayerMoved() {
+void Area::onPartyLeaderMoved() {
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    if (!partyLeader) return;
+
     update3rdPersonCameraTarget();
     updateRoomVisibility();
     _objectSelector.selectNearest();
-    updateTriggers(*static_pointer_cast<Creature>(_player));
+    updateTriggers(*partyLeader);
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> player(_player);
-    if (!player) return;
+    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    if (!partyLeader) return;
 
     glm::vec3 position;
 
-    if (player->model()->getNodeAbsolutePosition("camerahook", position)) {
-        position += player->position();
+    if (partyLeader->model()->getNodeAbsolutePosition("camerahook", position)) {
+        position += partyLeader->position();
     } else {
-        position = player->position();
+        position = partyLeader->position();
     }
     _thirdPersonCamera->setTargetPosition(position);
 }
 
 void Area::updateRoomVisibility() {
-    Room *playerRoom = _player->room();
-    if (!playerRoom) return;
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    if (!partyLeader) return;
+
+    Room *leaderRoom = partyLeader->room();
+    if (!leaderRoom) return;
 
     for (auto &room : _rooms) {
         room.second->setVisible(false);
     }
-    playerRoom->setVisible(true);
+    leaderRoom->setVisible(true);
 
-    auto adjRooms = _visibility->equal_range(playerRoom->name());
+    auto adjRooms = _visibility->equal_range(leaderRoom->name());
     for (auto adjRoom = adjRooms.first; adjRoom != adjRooms.second; adjRoom++) {
         auto room = _rooms.find(adjRoom->second);
         if (room != _rooms.end()) {
@@ -794,10 +764,6 @@ const Pathfinder &Area::pathfinder() const {
     return _pathfinder;
 }
 
-const PartyConfiguration &Area::partyConfiguration() const {
-    return _partyConfig;
-}
-
 ThirdPersonCamera *Area::thirdPersonCamera() {
     return _thirdPersonCamera.get();
 }
@@ -808,22 +774,6 @@ DialogCamera &Area::dialogCamera() {
 
 AnimatedCamera &Area::animatedCamera() {
     return *_animatedCamera;
-}
-
-shared_ptr<SpatialObject> Area::player() const {
-    return _player;
-}
-
-shared_ptr<SpatialObject> Area::partyLeader() const {
-    return _partyLeader;
-}
-
-shared_ptr<SpatialObject> Area::partyMember1() const {
-    return _partyMember1;
-}
-
-shared_ptr<SpatialObject> Area::partyMember2() const {
-    return _partyMember2;
 }
 
 } // namespace game

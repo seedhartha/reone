@@ -139,13 +139,6 @@ struct CreatureConfiguration {
     }
 };
 
-struct PartyConfiguration {
-    int memberCount { 0 };
-    CreatureConfiguration leader;
-    CreatureConfiguration member1;
-    CreatureConfiguration member2;
-};
-
 struct UpdateContext {
     float deltaTime { 0.0f };
     glm::vec3 cameraPosition { 0.0f };
