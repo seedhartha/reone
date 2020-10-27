@@ -91,8 +91,8 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     for (auto &item : _blueprint->equipment()) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().get2DA("appearance"));
-    loadAppearance(*appearanceTable, _blueprint->appearance());
+    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    loadAppearance(*appearance, _blueprint->appearance());
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
@@ -101,7 +101,7 @@ void Creature::loadAppearance(const TwoDaTable &table, int row) {
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
     _runSpeed = table.getFloat(row, "rundist", 0.0f);
 
-    updateAppearance();
+    updateModel();
 }
 
 Creature::ModelType Creature::parseModelType(const string &s) const {
@@ -116,7 +116,7 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
     throw logic_error("Unsupported model type: " + s);
 }
 
-void Creature::updateAppearance() {
+void Creature::updateModel() {
     string bodyModelName(getBodyModelName());
     string bodyTextureName(getBodyTextureName());
     string headModelName(getHeadModelName());
@@ -256,12 +256,16 @@ string Creature::getWeaponModelName(InventorySlot slot) const {
 }
 
 void Creature::load(const CreatureConfiguration &config) {
+    if (config.blueprint) {
+        load(config.blueprint);
+    } else {
+        shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+        loadAppearance(*appearance, config.appearance);
+        loadPortrait(config.appearance);
+    }
     for (auto &item : config.equipment) {
         equip(item);
     }
-    shared_ptr<TwoDaTable> appearanceTable(Resources::instance().get2DA("appearance"));
-    loadAppearance(*appearanceTable, config.appearance);
-    loadPortrait(config.appearance);
 }
 
 void Creature::loadPortrait(int appearance) {
@@ -328,7 +332,7 @@ void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
         _equipment[slot] = item;
     }
     if (_model) {
-        updateAppearance();
+        updateModel();
     }
 }
 
@@ -340,7 +344,7 @@ void Creature::unequip(const shared_ptr<Item> &item) {
         }
     }
     if (_model) {
-        updateAppearance();
+        updateModel();
     }
 }
 

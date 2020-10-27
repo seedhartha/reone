@@ -61,8 +61,6 @@ static const float kElevationTestZ = 1024.0f;
 static const float kCreatureObstacleTestZ = 0.1f;
 
 static const char kPartyLeaderTag[] = "party-leader";
-static const char kPartyMember1Tag[] = "party-member-1";
-static const char kPartyMember2Tag[] = "party-member-2";
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
@@ -396,7 +394,8 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
 
     if (firstLoad) {
         if (config.memberCount > 0) {
-            shared_ptr<Creature> partyLeader(makeCharacter(config.leader, kPartyLeaderTag, position, heading));
+            shared_ptr<Creature> partyLeader(makeCharacter(config.leader, position, heading));
+            partyLeader->setTag(kPartyLeaderTag);
             landObject(*partyLeader);
             add(partyLeader);
             _player = partyLeader;
@@ -417,7 +416,7 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
         party.addMember(static_cast<Creature *>(_partyLeader.get()));
     }
     if (config.memberCount > 1) {
-        shared_ptr<Creature> partyMember(makeCharacter(config.member1, kPartyMember1Tag, position, heading));
+        shared_ptr<Creature> partyMember(makeCharacter(config.member1, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember1 = partyMember;
@@ -427,7 +426,7 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
         partyMember->actionQueue().add(move(action));
     }
     if (config.memberCount > 2) {
-        shared_ptr<Creature> partyMember(makeCharacter(config.member2, kPartyMember2Tag, position, heading));
+        shared_ptr<Creature> partyMember(makeCharacter(config.member2, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember2 = partyMember;
@@ -438,9 +437,8 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
     }
 }
 
-shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const string &tag, const glm::vec3 &position, float heading) {
+shared_ptr<Creature> Area::makeCharacter(const CreatureConfiguration &character, const glm::vec3 &position, float heading) {
     shared_ptr<Creature> creature(_game->objectFactory().newCreature());
-    creature->setTag(tag);
     creature->load(character);
     creature->setPosition(position);
     creature->setHeading(heading);

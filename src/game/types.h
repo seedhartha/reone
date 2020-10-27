@@ -114,6 +114,8 @@ enum class CameraType {
     ThirdPerson
 };
 
+class CreatureBlueprint;
+
 struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
@@ -121,6 +123,7 @@ struct Options {
 };
 
 struct CreatureConfiguration {
+    std::shared_ptr<CreatureBlueprint> blueprint;
     Gender gender { Gender::Male };
     ClassType clazz { ClassType::Soldier };
     int appearance { 0 };
@@ -128,6 +131,7 @@ struct CreatureConfiguration {
 
     bool operator==(const CreatureConfiguration &other) {
         return
+            blueprint == other.blueprint &&
             gender == other.gender &&
             clazz == other.clazz &&
             appearance == other.appearance &&
