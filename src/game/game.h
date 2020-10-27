@@ -48,6 +48,12 @@
 
 namespace reone {
 
+namespace render {
+
+class Video;
+
+}
+
 namespace game {
 
 /**
@@ -130,6 +136,7 @@ private:
     std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };
+    std::shared_ptr<render::Video> _video;
 
     // Modules
 
@@ -172,10 +179,11 @@ private:
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
-    void playMusic(const std::string &resRef);
-    void runMainLoop();
     void loadNextModule();
     float measureFrameTime();
+    void playMusic(const std::string &resRef);
+    void playVideo(const std::string &name);
+    void runMainLoop();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
