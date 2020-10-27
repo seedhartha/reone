@@ -38,7 +38,7 @@ bool Party::addAvailableMember(int npc, const string &blueprint) {
     return true;
 }
 
-bool Party::addMember(Creature *member) {
+bool Party::addMember(const shared_ptr<Creature> &member) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");
         return false;
@@ -58,13 +58,13 @@ void Party::switchLeader() {
 
     switch (count) {
         case 2: {
-            Creature *tmp = _members[0];
+            shared_ptr<Creature> tmp(_members[0]);
             _members[0] = _members[1];
             _members[1] = tmp;
             break;
         }
         case 3: {
-            Creature *tmp = _members[0];
+            shared_ptr<Creature> tmp(_members[0]);
             _members[0] = _members[1];
             _members[1] = _members[2];
             _members[2] = tmp;
@@ -78,7 +78,7 @@ const string &Party::getAvailableMember(int npc) const {
 }
 
 Creature *Party::getMember(int index) const {
-    return _members.size() > index ? _members[index] : nullptr;
+    return _members.size() > index ? _members[index].get() : nullptr;
 }
 
 bool Party::empty() const {
@@ -90,7 +90,7 @@ bool Party::isMemberAvailable(int npc) const {
 }
 
 Creature *Party::leader() const {
-    return !_members.empty() ? _members[0] : nullptr;
+    return !_members.empty() ? _members[0].get() : nullptr;
 }
 
 } // namespace game

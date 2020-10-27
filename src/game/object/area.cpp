@@ -400,7 +400,7 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
             add(partyLeader);
             _player = partyLeader;
             _partyLeader = partyLeader;
-            party.addMember(partyLeader.get());
+            party.addMember(partyLeader);
             _game->module()->player().setCreature(static_cast<Creature *>(_player.get()));
         }
     } else {
@@ -413,14 +413,14 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
         _partyMember1.reset();
         _partyMember2.reset();
         party.clear();
-        party.addMember(static_cast<Creature *>(_partyLeader.get()));
+        party.addMember(static_pointer_cast<Creature>(_partyLeader));
     }
     if (config.memberCount > 1) {
         shared_ptr<Creature> partyMember(makeCharacter(config.member1, position, heading));
         landObject(*partyMember);
         add(partyMember);
         _partyMember1 = partyMember;
-        party.addMember(partyMember.get());
+        party.addMember(partyMember);
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));
@@ -430,7 +430,7 @@ void Area::loadParty(const PartyConfiguration &config, const glm::vec3 &position
         landObject(*partyMember);
         add(partyMember);
         _partyMember2 = partyMember;
-        party.addMember(partyMember.get());
+        party.addMember(partyMember);
 
         unique_ptr<FollowAction> action(new FollowAction(_partyLeader, kPartyMemberFollowDistance));
         partyMember->actionQueue().add(move(action));
