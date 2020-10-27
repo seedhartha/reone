@@ -18,6 +18,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,7 @@ class Creature;
 class Party {
 public:
     bool addAvailableMember(int npc, const std::string &blueprint);
-    bool addMember(Creature *member);
+    bool addMember(const std::shared_ptr<Creature> &member);
     void clear();
     void switchLeader();
 
@@ -46,7 +47,7 @@ public:
 
 private:
     std::map<int, std::string> _availableMembers;
-    std::vector<Creature *> _members;
+    std::vector<std::shared_ptr<Creature>> _members;
 };
 
 } // namespace game
