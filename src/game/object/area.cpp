@@ -22,6 +22,7 @@
 #include <boost/format.hpp>
 
 #include "glm/gtx/intersect.hpp"
+#include "glm/gtx/norm.hpp"
 
 #include "../../render/models.h"
 #include "../../render/walkmeshes.h"
@@ -451,18 +452,21 @@ bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) cons
 }
 
 void Area::update(const UpdateContext &updateCtx) {
-    Object::update(updateCtx);
-    _actionExecutor.executeActions(*this, updateCtx.deltaTime);
-
-    for (auto &room : _rooms) {
-        room.second->update(updateCtx.deltaTime);
-    }
-    for (auto &object : _objects) {
-        object->update(updateCtx);
-        _actionExecutor.executeActions(*object, updateCtx.deltaTime);
-    }
     doDestroyObjects();
 
+    float dt = updateCtx.deltaTime;
+    Object::update(dt);
+    _actionExecutor.executeActions(*this, dt);
+
+    for (auto &room : _rooms) {
+        room.second->update(dt);
+    }
+    updateVisibility(updateCtx);
+
+    for (auto &object : _objects) {
+        object->update(dt);
+        _actionExecutor.executeActions(*object, dt);
+    }
     _objectSelector.update();
     _game->sceneGraph().prepare();
 }
@@ -617,7 +621,6 @@ void Area::onPartyLeaderMoved() {
     if (!partyLeader) return;
 
     update3rdPersonCameraTarget();
-    updateRoomVisibility();
     _objectSelector.selectNearest();
     updateTriggers(*partyLeader);
 }
@@ -636,24 +639,52 @@ void Area::update3rdPersonCameraTarget() {
     _thirdPersonCamera->setTargetPosition(position);
 }
 
-void Area::updateRoomVisibility() {
+void Area::updateVisibility(const UpdateContext &ctx) {
     shared_ptr<Creature> partyLeader(_game->party().leader());
-    if (!partyLeader) return;
+    Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
+    bool allVisible = !leaderRoom || _cameraType == CameraType::FirstPerson;
 
-    Room *leaderRoom = partyLeader->room();
-    if (!leaderRoom) return;
-
-    for (auto &room : _rooms) {
-        room.second->setVisible(false);
-    }
-    leaderRoom->setVisible(true);
-
-    auto adjRooms = _visibility->equal_range(leaderRoom->name());
-    for (auto adjRoom = adjRooms.first; adjRoom != adjRooms.second; adjRoom++) {
-        auto room = _rooms.find(adjRoom->second);
-        if (room != _rooms.end()) {
-            room->second->setVisible(true);
+    if (allVisible) {
+        for (auto &room : _rooms) {
+            room.second->setVisible(true);
         }
+    } else {
+        auto adjRoomNames = _visibility->equal_range(leaderRoom->name());
+        for (auto &room : _rooms) {
+            bool visible = !leaderRoom || room.second.get() == leaderRoom;
+            if (!visible) {
+                for (auto adjRoom = adjRoomNames.first; adjRoom != adjRoomNames.second; adjRoom++) {
+                    if (adjRoom->second == room.first) {
+                        visible = true;
+                        break;
+                    }
+                }
+            }
+            room.second->setVisible(visible);
+        }
+    }
+
+    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+    for (auto &object : _objects) {
+        if (!object->visible()) continue;
+
+        shared_ptr<ModelSceneNode> model(object->model());
+        if (!model) continue;
+
+        glm::vec3 position(object->position());
+        float drawDistance = object->drawDistance();
+        float fadeDistance = object->fadeDistance();
+
+        glm::vec3 screenCoords = glm::project(position, ctx.view, ctx.projection, viewport);
+        float distanceToCamera = glm::distance2(position, ctx.cameraPosition);
+        bool onScreen = distanceToCamera < drawDistance && screenCoords.z < 1.0f;
+        float alpha = 1.0f;
+
+        if (drawDistance != fadeDistance && distanceToCamera > fadeDistance) {
+            alpha = 1.0f - (distanceToCamera - fadeDistance) / (drawDistance - fadeDistance);
+        }
+        model->setOnScreen(onScreen);
+        model->setAlpha(alpha);
     }
 }
 

@@ -40,7 +40,7 @@ class Room;
 
 class SpatialObject : public Object {
 public:
-    void update(const UpdateContext &ctx) override;
+    void update(float dt) override;
 
     virtual void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
 
@@ -62,6 +62,8 @@ public:
     std::shared_ptr<render::Walkmesh> walkmesh() const;
     const std::vector<std::shared_ptr<Item>> &items() const;
     virtual glm::vec3 selectablePosition() const;
+    float drawDistance() const;
+    float fadeDistance() const;
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
