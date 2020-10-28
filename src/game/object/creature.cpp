@@ -29,7 +29,7 @@
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
 
-#include "../blueprints.h"
+#include "../blueprint/blueprints.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"

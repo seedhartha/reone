@@ -33,7 +33,7 @@
 #include "../video/bikfile.h"
 #include "../video/video.h"
 
-#include "blueprints.h"
+#include "blueprint/blueprints.h"
 #include "script/routines.h"
 
 using namespace std;

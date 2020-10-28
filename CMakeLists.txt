@@ -325,13 +325,13 @@ set(GAME_HEADERS
     src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
+    src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
     src/game/blueprint/door.h
     src/game/blueprint/item.h
     src/game/blueprint/placeable.h
     src/game/blueprint/trigger.h
     src/game/blueprint/waypoint.h
-    src/game/blueprints.h
     src/game/camera/animatedcamera.h
     src/game/camera/camera.h
     src/game/camera/dialogcamera.h
@@ -388,13 +388,13 @@ set(GAME_SOURCES
     src/game/action/startconversation.cpp
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
+    src/game/blueprint/blueprints.cpp
     src/game/blueprint/creature.cpp
     src/game/blueprint/door.cpp
     src/game/blueprint/item.cpp
     src/game/blueprint/placeable.cpp
     src/game/blueprint/trigger.cpp
     src/game/blueprint/waypoint.cpp
-    src/game/blueprints.cpp
     src/game/camera/animatedcamera.cpp
     src/game/camera/camera.cpp
     src/game/camera/dialogcamera.cpp
