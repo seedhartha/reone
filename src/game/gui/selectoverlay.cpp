@@ -55,7 +55,7 @@ void SelectionOverlay::update() {
     int hilightedObjectId = selector.hilightedObjectId();
     if (hilightedObjectId != -1) {
         _hilightedScreenCoords = area->getSelectableScreenCoords(hilightedObjectId, projection, view);
-        _hasHilighted = true;
+        _hasHilighted = _hilightedScreenCoords.z < 1.0f;
     } else {
         _hasHilighted = false;
     }
@@ -63,7 +63,7 @@ void SelectionOverlay::update() {
     int selectedObjectId = selector.selectedObjectId();
     if (selectedObjectId != -1) {
         _selectedScreenCoords = area->getSelectableScreenCoords(selectedObjectId, projection, view);
-        _hasSelected = true;
+        _hasSelected = _selectedScreenCoords.z < 1.0f;
     } else {
         _hasSelected = false;
     }
