@@ -20,7 +20,6 @@
 #include <glm/ext.hpp>
 
 #include "../render/mesh/cube.h"
-#include "../system/debug.h"
 
 using namespace reone::render;
 
@@ -32,8 +31,6 @@ CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sce
 }
 
 void CubeSceneNode::render() const {
-    if (getDebugMode() != DebugMode::Path) return;
-
     CubeMesh::instance().render(glm::scale(_absoluteTransform, glm::vec3(_size)));
 }
 

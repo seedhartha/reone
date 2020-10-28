@@ -23,8 +23,6 @@
 #include "../../render/font.h"
 #include "../../render/types.h"
 
-#include "../types.h"
-
 namespace reone {
 
 namespace game {
@@ -37,9 +35,13 @@ public:
 
     void render() const;
 
-    void setContext(const DebugContext &ctx);
-
 private:
+    struct DebugObject {
+        std::string tag;
+        std::string text;
+        glm::vec3 screenCoords { 0.0f };
+    };
+
     render::GraphicsOptions _opts;
     std::shared_ptr<render::Font> _font;
     std::vector<DebugObject> _objects;

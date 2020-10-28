@@ -31,20 +31,25 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class SelectionOverlay {
 public:
-    SelectionOverlay(const render::GraphicsOptions &opts);
+    SelectionOverlay(Game *game);
 
     void load();
+    void prepare(const glm::mat4 &projection, const glm::mat4 &view);
+
     void render() const;
 
-    void setContext(const SelectionContext &ctx);
-
 private:
-    render::GraphicsOptions _opts;
+    Game *_game { nullptr };
     std::shared_ptr<render::Texture> _friendlyReticle;
     std::shared_ptr<render::Texture> _friendlyReticle2;
-    SelectionContext _context;
+    bool _hasHilighted { false };
+    bool _hasSelected { false };
+    glm::vec3 _hilightedScreenCoords { 0.0f };
+    glm::vec3 _selectedScreenCoords { 0.0f };
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
 };

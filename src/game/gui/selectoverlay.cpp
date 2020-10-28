@@ -22,6 +22,8 @@
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -31,7 +33,10 @@ namespace reone {
 
 namespace game {
 
-SelectionOverlay::SelectionOverlay(const GraphicsOptions &opts) : _opts(opts) {
+SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("Game must not be null");
+    }
 }
 
 void SelectionOverlay::load() {
@@ -39,21 +44,44 @@ void SelectionOverlay::load() {
     _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
 }
 
-void SelectionOverlay::render() const {
-    if (_context.hasHilighted) {
-        drawReticle(*_friendlyReticle, _context.hilightedScreenCoords);
+void SelectionOverlay::prepare(const glm::mat4 &projection, const glm::mat4 &view) {
+    shared_ptr<Area> area(_game->module()->area());
+    ObjectSelector &selector = area->objectSelector();
+
+    int hilightedObjectId = selector.hilightedObjectId();
+    if (hilightedObjectId != -1) {
+        _hilightedScreenCoords = area->getSelectableScreenCoords(hilightedObjectId, projection, view);
+        _hasHilighted = true;
+    } else {
+        _hasHilighted = false;
     }
-    if (_context.hasSelected) {
-        drawReticle(*_friendlyReticle2, _context.selectedScreenCoords);
+
+    int selectedObjectId = selector.selectedObjectId();
+    if (selectedObjectId != -1) {
+        _selectedScreenCoords = area->getSelectableScreenCoords(selectedObjectId, projection, view);
+        _hasSelected = true;
+    } else {
+        _hasSelected = false;
+    }
+}
+
+void SelectionOverlay::render() const {
+    if (_hasHilighted) {
+        drawReticle(*_friendlyReticle, _hilightedScreenCoords);
+    }
+    if (_hasSelected) {
+        drawReticle(*_friendlyReticle2, _selectedScreenCoords);
     }
 }
 
 void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) const {
+    const GraphicsOptions &opts = _game->options().graphics;
+
     int width = texture.width();
     int height = texture.height();
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3((_opts.width * screenCoords.x) - width / 2, (_opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
+    transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     LocalUniforms locals;
@@ -66,10 +94,6 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     Quad::getDefault().renderTriangles();
 
     texture.unbind(0);
-}
-
-void SelectionOverlay::setContext(const SelectionContext &ctx) {
-    _context = ctx;
 }
 
 } // namespace game

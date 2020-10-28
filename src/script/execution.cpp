@@ -21,7 +21,6 @@
 
 #include <boost/format.hpp>
 
-#include "../system/debug.h"
 #include "../system/log.h"
 
 #include "routine.h"
@@ -107,7 +106,7 @@ int ScriptExecution::run() {
         }
         _nextInstruction = ins.nextOffset;
 
-        if (getDebugLevel() >= 2) {
+        if (getDebugLogLevel() >= 2) {
             debug("Script: " + describeInstruction(ins), 3);
         }
         handler->second(ins);
@@ -232,7 +231,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     }
     Variable retValue = routine.invoke(args, _context);
 
-    if (getDebugLevel() >= 2) {
+    if (getDebugLogLevel() >= 2) {
         debug(boost::format("Script: %s -> %s") % routine.name() % retValue.toString(), 2);
     }
     switch (routine.returnType()) {

@@ -65,7 +65,6 @@ public:
 
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
-    void fill(const UpdateContext &updateCtx, GuiContext &guiCtx);
     void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
@@ -78,6 +77,7 @@ public:
 
     Camera *getCamera() const;
     SpatialObject *getObjectAt(int x, int y) const;
+    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     AnimatedCamera &animatedCamera();
     const CameraStyle &cameraStyle() const;
@@ -139,8 +139,6 @@ private:
     // END Objects
 
     void add(const std::shared_ptr<SpatialObject> &object);
-    void addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx);
-    void addPartyMemberPortrait(const std::shared_ptr<SpatialObject> &object, GuiContext &ctx);
     void determineObjectRoom(SpatialObject &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
@@ -151,7 +149,6 @@ private:
     bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
     bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
     bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
-    glm::vec3 getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const;
 
     // Loading
 
