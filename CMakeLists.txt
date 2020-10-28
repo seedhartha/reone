@@ -374,6 +374,7 @@ set(GAME_HEADERS
     src/game/player.h
     src/game/portraits.h
     src/game/room.h
+    src/game/rp/types.h
     src/game/script/routines.h
     src/game/script/util.h
     src/game/types.h)
