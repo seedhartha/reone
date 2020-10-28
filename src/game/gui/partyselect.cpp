@@ -25,7 +25,7 @@
 #include "../../resource/resources.h"
 #include "../../script/types.h"
 
-#include "../blueprints.h"
+#include "../blueprint/blueprints.h"
 #include "../game.h"
 #include "../portraits.h"
 #include "../script/util.h"

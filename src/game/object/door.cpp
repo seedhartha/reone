@@ -25,7 +25,7 @@
 #include "../../scene/modelscenenode.h"
 #include "../../system/streamutil.h"
 
-#include "../blueprints.h"
+#include "../blueprint/blueprints.h"
 
 using namespace std;
 

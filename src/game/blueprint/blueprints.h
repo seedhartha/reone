@@ -21,14 +21,14 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../resource/types.h"
+#include "../../resource/types.h"
 
-#include "blueprint/creature.h"
-#include "blueprint/door.h"
-#include "blueprint/item.h"
-#include "blueprint/placeable.h"
-#include "blueprint/trigger.h"
-#include "blueprint/waypoint.h"
+#include "creature.h"
+#include "door.h"
+#include "item.h"
+#include "placeable.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 
