@@ -29,7 +29,7 @@ using namespace std;
 
 namespace reone {
 
-namespace render {
+namespace video {
 
 BikFile::BikFile(const fs::path &path) : _path(path) {
 }
@@ -46,6 +46,6 @@ shared_ptr<Video> BikFile::video() const {
     return _video;
 }
 
-} // namespace render
+} // namespace video
 
 } // namespace reone

@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace render {
+namespace video {
 
 class Video;
 
@@ -38,6 +38,6 @@ private:
     std::shared_ptr<Video> _video;
 };
 
-} // namespace render
+} // namespace video
 
 } // namespace reone

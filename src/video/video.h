@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace render {
+namespace video {
 
 class Video {
 public:
@@ -39,6 +39,6 @@ private:
     uint32_t _textureId { 0 };
 };
 
-} // namespace render
+} // namespace video
 
 } // namespace reone
