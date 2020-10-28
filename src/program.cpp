@@ -22,7 +22,7 @@
 #include <boost/program_options.hpp>
 
 #include "mp/game.h"
-#include "system/debug.h"
+#include "system/log.h"
 
 using namespace std;
 
@@ -96,7 +96,7 @@ void Program::loadOptions() {
     _gameOpts.network.host = vars.count("join") > 0 ? vars["join"].as<string>() : "";
     _gameOpts.network.port = vars["port"].as<int>();
 
-    setDebugLevel(vars["debug"].as<int>());
+    setDebugLogLevel(vars["debug"].as<int>());
 
     if (vars.count("serve") > 0) {
         _multiplayerMode = MultiplayerMode::Server;

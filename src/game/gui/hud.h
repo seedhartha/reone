@@ -20,8 +20,6 @@
 #include "../../gui/gui.h"
 #include "../../resource/types.h"
 
-#include "../types.h"
-
 #include "debugoverlay.h"
 #include "selectoverlay.h"
 
@@ -38,12 +36,12 @@ public:
     void load() override;
     void render() const override;
 
-    void setContext(const GuiContext &ctx);
+    void prepare(const glm::mat4 &projection, const glm::mat4 &view);
 
 private:
     Game *_game { nullptr };
-    DebugOverlay _debug;
     SelectionOverlay _select;
+    DebugOverlay _debug;
 
     void onClick(const std::string &control) override;
 };

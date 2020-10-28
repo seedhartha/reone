@@ -40,10 +40,6 @@ void DebugOverlay::load() {
     _font = Fonts::instance().get(kFontResRef);
 }
 
-void DebugOverlay::setContext(const DebugContext &ctx) {
-    _objects = ctx.objects;
-}
-
 void DebugOverlay::render() const {
     glm::mat4 transform;
     glm::vec3 red(1.0f, 0.0f, 0.0f);

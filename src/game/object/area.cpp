@@ -29,7 +29,6 @@
 #include "../../resource/visfile.h"
 #include "../../resource/resources.h"
 #include "../../scene/cubenode.h"
-#include "../../system/debug.h"
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
 
@@ -551,62 +550,13 @@ void Area::fill(SceneGraph &sceneGraph) {
     }
 }
 
-void Area::fill(const UpdateContext &updateCtx, GuiContext &guiCtx) {
-    addPartyMemberPortrait(_game->party().getMember(0), guiCtx);
-    addPartyMemberPortrait(_game->party().getMember(1), guiCtx);
-    addPartyMemberPortrait(_game->party().getMember(2), guiCtx);
-
-    int hilightedObjectId = _objectSelector.hilightedObjectId();
-    if (hilightedObjectId != -1) {
-        glm::vec3 coords(getSelectableScreenCoords(hilightedObjectId, updateCtx));
-        if (coords.z < 1.0f) {
-            guiCtx.selection.hasHilighted = true;
-            guiCtx.selection.hilightedScreenCoords = coords;
-        }
-    }
-    int selectedObjectId = _objectSelector.selectedObjectId();
-    if (selectedObjectId != -1) {
-        glm::vec3 coords(getSelectableScreenCoords(selectedObjectId, updateCtx));
-        if (coords.z < 1.0f) {
-            guiCtx.selection.hasSelected = true;
-            guiCtx.selection.selectedScreenCoords = coords;
-        }
-    }
-    addDebugInfo(updateCtx, guiCtx);
-}
-
-glm::vec3 Area::getSelectableScreenCoords(uint32_t objectId, const UpdateContext &ctx) const {
+glm::vec3 Area::getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const {
     static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
     shared_ptr<SpatialObject> object(find(objectId));
     glm::vec3 position(object->selectablePosition());
 
-    return glm::project(position, ctx.view, ctx.projection, viewport);
-}
-
-void Area::addPartyMemberPortrait(const shared_ptr<SpatialObject> &object, GuiContext &ctx) {
-    if (object) {
-        ctx.hud.partyPortraits.push_back(static_cast<Creature &>(*object).portrait());
-    }
-}
-
-void Area::addDebugInfo(const UpdateContext &updateCtx, GuiContext &guiCtx) {
-    if (getDebugMode() == DebugMode::GameObjects) {
-        guiCtx.debug.objects.clear();
-        glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
-
-        for (auto &object : _objects) {
-            glm::vec3 position(object->position());
-            if (glm::distance2(position, updateCtx.cameraPosition) > kDrawDebugDistance) continue;
-
-            DebugObject debugObj;
-            debugObj.tag = object->tag();
-            debugObj.text = object->tag();
-            debugObj.screenCoords = glm::project(position, updateCtx.view, updateCtx.projection, viewport);
-
-            guiCtx.debug.objects.push_back(move(debugObj));
-        }
-    }
+    return glm::project(position, view, projection, viewport);
 }
 
 void Area::update3rdPersonCameraHeading() {

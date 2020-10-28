@@ -36,7 +36,7 @@ HUD::HUD(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game),
     _debug(game->options().graphics),
-    _select(game->options().graphics) {
+    _select(game) {
 
     if (!game) {
         throw invalid_argument("Game must not be null");
@@ -147,6 +147,27 @@ void HUD::load() {
     hideControl("TB_STEALTH");
 }
 
+void HUD::prepare(const glm::mat4 &projection, const glm::mat4 &view) {
+    Party &party = _game->party();
+
+    for (int i = 0; i < 3; ++i) {
+        Control &lblChar = getControl("LBL_CHAR" + to_string(i + 1));
+        Control &lblBack = getControl("LBL_BACK" + to_string(i + 1));
+
+        shared_ptr<Creature> member(party.getMember(i));
+        if (member) {
+            lblChar.setVisible(true);
+            lblChar.setBorderFill(member->portrait());
+            lblBack.setVisible(true);
+        } else {
+            lblChar.setVisible(false);
+            lblBack.setVisible(false);
+        }
+    }
+
+    _select.prepare(projection, view);
+}
+
 void HUD::render() const {
     GUI::render();
     _select.render();
@@ -159,43 +180,6 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_MAP") {
         _game->openPartySelection(PartySelection::Context());
     }
-}
-
-void HUD::setContext(const GuiContext &ctx) {
-    size_t partySize = ctx.hud.partyPortraits.size();
-    if (partySize > 0) {
-        Control &label = getControl("LBL_CHAR1");
-        label.border().fill = ctx.hud.partyPortraits[0];
-        label.setVisible(true);
-
-        showControl("LBL_BACK1");
-    } else {
-        hideControl("LBL_CHAR1");
-        hideControl("LBL_BACK1");
-    }
-    if (partySize > 1) {
-        Control &label = getControl("LBL_CHAR3");
-        label.border().fill = ctx.hud.partyPortraits[1];
-        label.setVisible(true);
-
-        showControl("LBL_BACK3");
-    } else {
-        hideControl("LBL_CHAR3");
-        hideControl("LBL_BACK3");
-    }
-    if (partySize > 2) {
-        Control &label = getControl("LBL_CHAR2");
-        label.border().fill = ctx.hud.partyPortraits[2];
-        label.setVisible(true);
-
-        showControl("LBL_CHAR2");
-        showControl("LBL_BACK2");
-    } else {
-        hideControl("LBL_CHAR2");
-        hideControl("LBL_BACK2");
-    }
-    _select.setContext(ctx.selection);
-    _debug.setContext(ctx.debug);
 }
 
 } // namespace game

@@ -25,7 +25,7 @@
 #include "../../gui/scenebuilder.h"
 #include "../../render/models.h"
 #include "../../resource/resources.h"
-#include "../../system/debug.h"
+#include "../../system/log.h"
 
 #include "../game.h"
 
@@ -43,6 +43,8 @@ using namespace reone::scene;
 namespace reone {
 
 namespace game {
+
+static const bool kWarpEnabled = true;
 
 static const int kAppearanceBastila = 4;
 static const int kAppearanceCarth = 6;
@@ -87,7 +89,7 @@ void MainMenu::load() {
     setControlDisabled("BTN_MOVIES", true);
     setControlDisabled("BTN_OPTIONS", true);
 
-    if (getDebugLevel() == 0) {
+    if (!kWarpEnabled) {
         hideControl("BTN_WARP");
     }
     configureButtons();

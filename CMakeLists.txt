@@ -48,7 +48,6 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 ## libsystem static library
 
 set(SYSTEM_HEADERS
-    src/system/debug.h
     src/system/jobs.h
     src/system/log.h
     src/system/pathutil.h
@@ -57,7 +56,6 @@ set(SYSTEM_HEADERS
     src/system/types.h)
 
 set(SYSTEM_SOURCES
-    src/system/debug.cpp
     src/system/jobs.cpp
     src/system/log.cpp
     src/system/pathutil.cpp

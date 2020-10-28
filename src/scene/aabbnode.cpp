@@ -18,7 +18,6 @@
 #include "aabbnode.h"
 
 #include "../render/mesh/aabb.h"
-#include "../system/debug.h"
 
 #include "scenegraph.h"
 
@@ -32,8 +31,6 @@ AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNo
 }
 
 void AABBSceneNode::render() const {
-    if (getDebugMode() != DebugMode::ModelNodes) return;
-
     AABBMesh::instance().render(_aabb, _absoluteTransform);
 }
 

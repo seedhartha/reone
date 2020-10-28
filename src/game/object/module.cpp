@@ -18,7 +18,6 @@
 #include "module.h"
 
 #include "../../resource/resources.h"
-#include "../../system/debug.h"
 #include "../../system/log.h"
 
 #include "../game.h"
@@ -184,40 +183,12 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
             _area->toggleCameraType();
             return true;
 
-        case SDL_SCANCODE_LEFTBRACKET:
-            cycleDebugMode(false);
-            return true;
-
-        case SDL_SCANCODE_RIGHTBRACKET:
-            cycleDebugMode(true);
-            return true;
-
         default:
             return false;
     }
 }
 
-void Module::cycleDebugMode(bool forward) {
-    DebugMode mode = getDebugMode();
-    switch (mode) {
-        case DebugMode::None:
-            mode = forward ? DebugMode::GameObjects : DebugMode::Path;
-            break;
-        case DebugMode::GameObjects:
-            mode = forward ? DebugMode::ModelNodes : DebugMode::None;
-            break;
-        case DebugMode::ModelNodes:
-            mode = forward ? DebugMode::Path : DebugMode::GameObjects;
-            break;
-        case DebugMode::Path:
-        default:
-            mode = forward ? DebugMode::None : DebugMode::ModelNodes;
-            break;
-    }
-    setDebugMode(mode);
-}
-
-void Module::update(float dt, GuiContext &guiCtx) {
+void Module::update(float dt) {
     Camera *camera = _area->getCamera();
     camera->update(dt);
 
@@ -231,7 +202,6 @@ void Module::update(float dt, GuiContext &guiCtx) {
     ctx.view = camera->sceneNode()->view();
 
     _area->update(ctx);
-    _area->fill(ctx, guiCtx);
 }
 
 const string &Module::name() const {

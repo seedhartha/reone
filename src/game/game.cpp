@@ -354,31 +354,34 @@ void Game::runMainLoop() {
 
 void Game::update() {
     float dt = measureFrameTime();
+
     if (_video) {
         _video->update(dt);
         if (_video->isFinished()) {
             _video.reset();
         }
     }
+
     if (!_nextModule.empty()) {
         loadNextModule();
     }
-    _window.update(dt);
 
     GUI *gui = getScreenGUI();
     if (gui) {
         gui->update(dt);
     }
-    bool updModule = _screen == GameScreen::InGame || _screen == GameScreen::Dialog;
 
-    if (updModule && _module) {
-        GuiContext guiCtx;
-        _module->update(dt, guiCtx);
-
-        if (_module->area()->cameraType() == CameraType::ThirdPerson) {
-            _hud->setContext(guiCtx);
-        }
+    bool updModule = _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
+    if (updModule) {
+        _module->update(dt);
     }
+
+    if (_screen == GameScreen::InGame) {
+        Camera *camera = _module->area()->getCamera();
+        _hud->prepare(camera->sceneNode()->projection(), camera->sceneNode()->view());
+    }
+
+    _window.update(dt);
 }
 
 void Game::loadNextModule() {

@@ -78,15 +78,15 @@ enum class ObjectType {
     Item
 };
 
+enum class CameraType {
+    FirstPerson,
+    ThirdPerson
+};
+
 enum class MovementType {
     None,
     Walk,
     Run
-};
-
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson
 };
 
 class CreatureBlueprint;
@@ -95,6 +95,13 @@ struct Options {
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
     net::NetworkOptions network;
+};
+
+struct UpdateContext {
+    float deltaTime { 0.0f };
+    glm::vec3 cameraPosition { 0.0f };
+    glm::mat4 projection { 1.0f };
+    glm::mat4 view { 1.0f };
 };
 
 struct CreatureConfiguration {
@@ -112,40 +119,6 @@ struct CreatureConfiguration {
             appearance == other.appearance &&
             equipment == other.equipment;
     }
-};
-
-struct UpdateContext {
-    float deltaTime { 0.0f };
-    glm::vec3 cameraPosition { 0.0f };
-    glm::mat4 projection { 1.0f };
-    glm::mat4 view { 1.0f };
-};
-
-struct HudContext {
-    std::vector<std::shared_ptr<render::Texture>> partyPortraits;
-};
-
-struct SelectionContext {
-    bool hasHilighted { false };
-    bool hasSelected { false };
-    glm::vec3 hilightedScreenCoords { 0.0f };
-    glm::vec3 selectedScreenCoords { 0.0f };
-};
-
-struct DebugObject {
-    std::string tag;
-    std::string text;
-    glm::vec3 screenCoords { 0.0f };
-};
-
-struct DebugContext {
-    std::vector<DebugObject> objects;
-};
-
-struct GuiContext {
-    HudContext hud;
-    SelectionContext selection;
-    DebugContext debug;
 };
 
 struct Portrait {

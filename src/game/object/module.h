@@ -59,7 +59,7 @@ public:
     void loadParty(const std::string &entry = "");
 
     bool handle(const SDL_Event &event);
-    void update(float dt, GuiContext &guiCtx);
+    void update(float dt);
 
     const std::string &name() const;
     const ModuleInfo &info() const;
@@ -73,7 +73,6 @@ private:
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
 
-    void cycleDebugMode(bool forward);
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
 
     // Loading
