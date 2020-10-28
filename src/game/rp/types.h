@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 namespace reone {
@@ -72,7 +73,7 @@ enum class Skill {
 };
 
 struct CreatureAttributes {
-    std::map<ClassType, int> classLevels;
+    std::vector<std::pair<ClassType, int>> classLevels;
     std::vector<int> abilities;
     std::vector<int> skills;
 };
