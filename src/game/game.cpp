@@ -376,11 +376,6 @@ void Game::update() {
         _module->update(dt);
     }
 
-    if (_screen == GameScreen::InGame) {
-        Camera *camera = _module->area()->getCamera();
-        _hud->prepare(camera->sceneNode()->projection(), camera->sceneNode()->view());
-    }
-
     _window.update(dt);
 }
 

@@ -34,9 +34,9 @@ public:
     HUD(Game *game);
 
     void load() override;
-    void render() const override;
 
-    void prepare(const glm::mat4 &projection, const glm::mat4 &view);
+    void update(float dt) override;
+    void render() const override;
 
 private:
     Game *_game { nullptr };

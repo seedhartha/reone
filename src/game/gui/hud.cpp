@@ -147,7 +147,9 @@ void HUD::load() {
     hideControl("TB_STEALTH");
 }
 
-void HUD::prepare(const glm::mat4 &projection, const glm::mat4 &view) {
+void HUD::update(float dt) {
+    GUI::update(dt);
+
     Party &party = _game->party();
 
     for (int i = 0; i < 3; ++i) {
@@ -165,7 +167,7 @@ void HUD::prepare(const glm::mat4 &projection, const glm::mat4 &view) {
         }
     }
 
-    _select.prepare(projection, view);
+    _select.update();
 }
 
 void HUD::render() const {

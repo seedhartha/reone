@@ -38,8 +38,8 @@ public:
     SelectionOverlay(Game *game);
 
     void load();
-    void prepare(const glm::mat4 &projection, const glm::mat4 &view);
 
+    void update();
     void render() const;
 
 private:

@@ -44,9 +44,13 @@ void SelectionOverlay::load() {
     _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
 }
 
-void SelectionOverlay::prepare(const glm::mat4 &projection, const glm::mat4 &view) {
+void SelectionOverlay::update() {
     shared_ptr<Area> area(_game->module()->area());
     ObjectSelector &selector = area->objectSelector();
+
+    Camera *camera = area->getCamera();
+    glm::mat4 projection(camera->sceneNode()->projection());
+    glm::mat4 view(camera->sceneNode()->view());
 
     int hilightedObjectId = selector.hilightedObjectId();
     if (hilightedObjectId != -1) {
