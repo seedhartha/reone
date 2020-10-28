@@ -36,6 +36,12 @@ class ObjectFactory;
 
 class Creature : public SpatialObject {
 public:
+    enum class MovementType {
+        None,
+        Walk,
+        Run
+    };
+
     struct Path {
         glm::vec3 destination { 0.0f };
         std::vector<glm::vec3> points;

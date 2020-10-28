@@ -24,6 +24,8 @@
 #include "../actionqueue.h"
 #include "../types.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
@@ -33,6 +35,7 @@ public:
     virtual ~Object() = default;
 
     virtual void update(const UpdateContext &ctx);
+
     void runUserDefinedEvent(int eventNumber);
 
     uint32_t id() const;

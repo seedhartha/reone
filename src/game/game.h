@@ -120,6 +120,18 @@ protected:
     virtual void update();
 
 private:
+    enum class GameScreen {
+        None,
+        MainMenu,
+        Loading,
+        CharacterGeneration,
+        InGame,
+        Dialog,
+        Container,
+        Equipment,
+        PartySelection
+    };
+
     struct UserDefinedEvent {
         int eventNumber { 0 };
     };

@@ -34,6 +34,7 @@
 #include "../camera/dialogcamera.h"
 #include "../camera/firstperson.h"
 #include "../camera/thirdperson.h"
+#include "../camera/types.h"
 #include "../collisiondetect.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"

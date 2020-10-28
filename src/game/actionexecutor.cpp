@@ -121,7 +121,7 @@ bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest,
     float distToDest = glm::distance2(origin, dest);
 
     if (distToDest <= distance) {
-        creature.setMovementType(MovementType::None);
+        creature.setMovementType(Creature::MovementType::None);
         creature.clearPath();
         return true;
     }
@@ -173,10 +173,10 @@ void ActionExecutor::advanceCreatureOnPath(Creature &creature, float dt) {
         selectNextPathPoint(*path);
 
     } else if (_area->moveCreatureTowards(creature, dest, true, dt)) {
-        creature.setMovementType(MovementType::Run);
+        creature.setMovementType(Creature::MovementType::Run);
 
     } else {
-        creature.setMovementType(MovementType::None);
+        creature.setMovementType(Creature::MovementType::None);
     }
 }
 
