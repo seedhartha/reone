@@ -30,6 +30,8 @@
 #include "../render/types.h"
 #include "../resource/types.h"
 
+#include "rp/types.h"
+
 namespace reone {
 
 namespace game {
@@ -64,26 +66,6 @@ enum class GameScreen {
     PartySelection
 };
 
-enum class Gender {
-    Male = 0,
-    Female = 1,
-    Both = 2,
-    Other = 3,
-    None = 4
-};
-
-enum class ClassType {
-    Soldier = 0,
-    Scout = 1,
-    Scoundrel = 2,
-    JediGuardian = 3,
-    JediConsular = 4,
-    JediSentinel = 5,
-    CombatDroid = 6,
-    ExpertDroid = 7,
-    Minion = 8
-};
-
 enum class ObjectType {
     None,
     Module,
@@ -94,13 +76,6 @@ enum class ObjectType {
     Waypoint,
     Trigger,
     Item
-};
-
-enum class CreatureRole {
-    None,
-    PartyLeader,
-    PartyMember1,
-    PartyMember2
 };
 
 enum class MovementType {
