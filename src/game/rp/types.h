@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace reone {
 
 namespace game {
@@ -47,6 +49,32 @@ enum class ClassType {
     SithMarauder = 14,
     SithLord = 15,
     SithAssassin = 16
+};
+
+enum class Ability {
+    Strength = 0,
+    Dexterity = 1,
+    Constitution = 2,
+    Intelligence = 3,
+    Wisdom = 4,
+    Charisma = 5
+};
+
+enum class Skill {
+    ComputerUse = 0,
+    Demolitions = 1,
+    Stealth = 2,
+    Awareness = 3,
+    Persuade = 4,
+    Repair = 5,
+    Security = 6,
+    TreatInjury = 7
+};
+
+struct CreatureAttributes {
+    std::map<ClassType, int> classLevels;
+    std::vector<int> abilities;
+    std::vector<int> skills;
 };
 
 } // namespace game
