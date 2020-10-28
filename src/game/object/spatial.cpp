@@ -18,7 +18,6 @@
 #include "spatial.h"
 
 #include "glm/gtx/euler_angles.hpp"
-#include "glm/gtx/norm.hpp"
 
 #include "../room.h"
 
@@ -66,23 +65,11 @@ void SpatialObject::moveItemsTo(SpatialObject &other) {
     _items.clear();
 }
 
-void SpatialObject::update(const UpdateContext &ctx) {
-    Object::update(ctx);
-
-    if (!_model) return;
-
-    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
-    glm::vec3 screenCoords = glm::project(_position, ctx.view, ctx.projection, viewport);
-    float distanceToCamera = glm::distance2(_position, ctx.cameraPosition);
-    bool onScreen = distanceToCamera < _drawDistance && screenCoords.z < 1.0f;
-    float alpha = 1.0f;
-
-    if (_drawDistance != _fadeDistance && distanceToCamera > _fadeDistance) {
-        alpha = 1.0f - (distanceToCamera - _fadeDistance) / (_drawDistance - _fadeDistance);
+void SpatialObject::update(float dt) {
+    Object::update(dt);
+    if (_model) {
+        _model->update(dt);
     }
-    _model->setOnScreen(onScreen);
-    _model->setAlpha(alpha);
-    _model->update(ctx.deltaTime);
 }
 
 void SpatialObject::playAnimation(const string &name, int flags, float speed) {
@@ -129,6 +116,14 @@ const vector<shared_ptr<Item>> &SpatialObject::items() const {
 
 glm::vec3 SpatialObject::selectablePosition() const {
     return _model->getCenterOfAABB();
+}
+
+float SpatialObject::drawDistance() const {
+    return _drawDistance;
+}
+
+float SpatialObject::fadeDistance() const {
+    return _fadeDistance;
 }
 
 void SpatialObject::setRoom(Room *room) {

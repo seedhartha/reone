@@ -22,7 +22,6 @@
 #include <unordered_map>
 
 #include "../actionqueue.h"
-#include "../types.h"
 
 #include "types.h"
 
@@ -34,7 +33,7 @@ class Object {
 public:
     virtual ~Object() = default;
 
-    virtual void update(const UpdateContext &ctx);
+    virtual void update(float dt);
 
     void runUserDefinedEvent(int eventNumber);
 

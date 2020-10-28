@@ -23,8 +23,6 @@
 
 using namespace std;
 
-using namespace reone::render;
-using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
@@ -34,7 +32,7 @@ namespace game {
 Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
 }
 
-void Object::update(const UpdateContext &ctx) {
+void Object::update(float dt) {
     _actionQueue.update();
 }
 
