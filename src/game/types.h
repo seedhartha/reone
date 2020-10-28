@@ -54,41 +54,6 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
-enum class GameScreen {
-    None,
-    MainMenu,
-    Loading,
-    CharacterGeneration,
-    InGame,
-    Dialog,
-    Container,
-    Equipment,
-    PartySelection
-};
-
-enum class ObjectType {
-    None,
-    Module,
-    Area,
-    Creature,
-    Door,
-    Placeable,
-    Waypoint,
-    Trigger,
-    Item
-};
-
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson
-};
-
-enum class MovementType {
-    None,
-    Walk,
-    Run
-};
-
 class CreatureBlueprint;
 
 struct Options {
@@ -127,13 +92,6 @@ struct Portrait {
     int appearanceNumber { 0 };
     int appearanceS { 0 };
     int appearanceL { 0 };
-};
-
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
 };
 
 } // namespace game

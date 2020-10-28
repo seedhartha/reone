@@ -335,6 +335,7 @@ set(GAME_HEADERS
     src/game/camera/dialogcamera.h
     src/game/camera/firstperson.h
     src/game/camera/thirdperson.h
+    src/game/camera/types.h
     src/game/characters.h
     src/game/collisiondetect.h
     src/game/console.h
@@ -365,6 +366,7 @@ set(GAME_HEADERS
     src/game/object/placeable.h
     src/game/object/spatial.h
     src/game/object/trigger.h
+    src/game/object/types.h
     src/game/object/waypoint.h
     src/game/objectselect.h
     src/game/party.h

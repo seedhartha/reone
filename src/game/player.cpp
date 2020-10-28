@@ -136,11 +136,11 @@ void Player::update(float dt) {
         dest.y += 100.0f * glm::cos(heading);
 
         if (_area->moveCreatureTowards(*partyLeader, dest, true, dt)) {
-            partyLeader->setMovementType(MovementType::Run);
+            partyLeader->setMovementType(Creature::MovementType::Run);
             _area->onPartyLeaderMoved();
         }
     } else {
-        partyLeader->setMovementType(MovementType::None);
+        partyLeader->setMovementType(Creature::MovementType::None);
     }
 }
 
