@@ -143,8 +143,6 @@ set(RENDER_HEADERS
     src/render/textures.h
     src/render/types.h
     src/render/util.h
-    src/render/video/bikfile.h
-    src/render/video/video.h
     src/render/walkmesh.h
     src/render/walkmeshes.h
     src/render/window.h)
@@ -176,8 +174,6 @@ set(RENDER_SOURCES
     src/render/texture.cpp
     src/render/textures.cpp
     src/render/util.cpp
-    src/render/video/bikfile.cpp
-    src/render/video/video.cpp
     src/render/walkmesh.cpp
     src/render/walkmeshes.cpp
     src/render/window.cpp)
@@ -212,6 +208,21 @@ add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 ## END libaudio static library
+
+## libvideo static library
+
+set(VIDEO_HEADERS
+    src/video/bikfile.h
+    src/video/video.h)
+
+set(VIDEO_SOURCES
+    src/video/bikfile.cpp
+    src/video/video.cpp)
+
+add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
+set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libvideo static library
 
 ## libscene static library
 
@@ -488,7 +499,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libmp libnet libgame libscript libgui libscene librender libaudio libresource libsystem
+    libmp libnet libgame libscript libgui libscene libvideo librender libaudio libresource libsystem
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
     ${OPENGL_LIBRARIES}

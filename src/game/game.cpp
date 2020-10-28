@@ -24,14 +24,14 @@
 #include "../audio/util.h"
 #include "../render/models.h"
 #include "../render/textures.h"
-#include "../render/video/bikfile.h"
-#include "../render/video/video.h"
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
 #include "../system/jobs.h"
 #include "../system/log.h"
 #include "../system/pathutil.h"
+#include "../video/bikfile.h"
+#include "../video/video.h"
 
 #include "blueprints.h"
 #include "script/routines.h"
@@ -44,6 +44,7 @@ using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+using namespace reone::video;
 
 namespace fs = boost::filesystem;
 

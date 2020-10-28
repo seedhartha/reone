@@ -48,7 +48,7 @@
 
 namespace reone {
 
-namespace render {
+namespace video {
 
 class Video;
 
@@ -136,7 +136,7 @@ private:
     std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };
-    std::shared_ptr<render::Video> _video;
+    std::shared_ptr<video::Video> _video;
 
     // Modules
 

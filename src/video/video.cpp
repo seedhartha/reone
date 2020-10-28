@@ -21,12 +21,14 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../mesh/quad.h"
-#include "../shaders.h"
+#include "../render/mesh/quad.h"
+#include "../render/shaders.h"
+
+using namespace reone::render;
 
 namespace reone {
 
-namespace render {
+namespace video {
 
 void Video::init() {
     if (_inited) return;
@@ -74,6 +76,6 @@ bool Video::isFinished() const {
     return _finished;
 }
 
-} // namespace render
+} // namespace video
 
 } // namespace reone
