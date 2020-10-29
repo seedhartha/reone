@@ -451,17 +451,16 @@ bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) cons
     return false;
 }
 
-void Area::update(const UpdateContext &updateCtx) {
+void Area::update(float dt) {
     doDestroyObjects();
 
-    float dt = updateCtx.deltaTime;
     Object::update(dt);
     _actionExecutor.executeActions(*this, dt);
 
     for (auto &room : _rooms) {
         room.second->update(dt);
     }
-    updateVisibility(updateCtx);
+    updateVisibility();
 
     for (auto &object : _objects) {
         object->update(dt);
@@ -635,7 +634,7 @@ void Area::update3rdPersonCameraTarget() {
     _thirdPersonCamera->setTargetPosition(position);
 }
 
-void Area::updateVisibility(const UpdateContext &ctx) {
+void Area::updateVisibility() {
     shared_ptr<Creature> partyLeader(_game->party().leader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = !leaderRoom || _cameraType == CameraType::FirstPerson;
@@ -660,7 +659,10 @@ void Area::updateVisibility(const UpdateContext &ctx) {
         }
     }
 
+    Camera *camera = _game->getActiveCamera();
+    shared_ptr<CameraSceneNode> cameraNode(camera->sceneNode());
     glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+
     for (auto &object : _objects) {
         if (!object->visible()) continue;
 
@@ -671,8 +673,9 @@ void Area::updateVisibility(const UpdateContext &ctx) {
         float drawDistance = object->drawDistance();
         float fadeDistance = object->fadeDistance();
 
-        glm::vec3 screenCoords = glm::project(position, ctx.view, ctx.projection, viewport);
-        float distanceToCamera = glm::distance2(position, ctx.cameraPosition);
+        glm::vec3 screenCoords(glm::project(position, cameraNode->view(), cameraNode->projection(), viewport));
+        glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
+        float distanceToCamera = glm::distance2(position, cameraPosition);
         bool onScreen = distanceToCamera < drawDistance && screenCoords.z < 1.0f;
         float alpha = 1.0f;
 

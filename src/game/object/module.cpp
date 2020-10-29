@@ -188,19 +188,10 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Module::update(float dt) {
-    Camera *camera = _game->getActiveCamera();
-    camera->update(dt);
-
     if (_area->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
-    UpdateContext ctx;
-    ctx.deltaTime = dt;
-    ctx.cameraPosition = camera->sceneNode()->absoluteTransform()[3];
-    ctx.projection = camera->sceneNode()->projection();
-    ctx.view = camera->sceneNode()->view();
-
-    _area->update(ctx);
+    _area->update(dt);
 }
 
 const string &Module::name() const {
