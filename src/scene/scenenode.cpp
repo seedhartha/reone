@@ -41,11 +41,11 @@ void SceneNode::removeChild(SceneNode &node) {
     auto maybeChild = find_if(
         _children.begin(),
         _children.end(),
-        [&node](const std::shared_ptr<SceneNode> &n) { return n.get() == &node; });
+        [&node](const shared_ptr<SceneNode> &n) { return n.get() == &node; });
 
     if (maybeChild != _children.end()) {
-        _children.erase(maybeChild);
         node.setParent(nullptr);
+        _children.erase(maybeChild);
     }
 }
 
