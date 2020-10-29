@@ -62,13 +62,6 @@ struct Options {
     net::NetworkOptions network;
 };
 
-struct UpdateContext {
-    float deltaTime { 0.0f };
-    glm::vec3 cameraPosition { 0.0f };
-    glm::mat4 projection { 1.0f };
-    glm::mat4 view { 1.0f };
-};
-
 struct CreatureConfiguration {
     std::shared_ptr<CreatureBlueprint> blueprint;
     Gender gender { Gender::Male };

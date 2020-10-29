@@ -63,7 +63,7 @@ public:
     void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
 
     bool handle(const SDL_Event &event);
-    void update(const UpdateContext &updateCtx);
+    void update(float dt);
 
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
@@ -151,7 +151,7 @@ private:
     void doDestroyObjects();
     void landObject(SpatialObject &object);
     void updateTriggers(const Creature &creature);
-    void updateVisibility(const UpdateContext &ctx);
+    void updateVisibility();
 
     bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
     bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
