@@ -48,7 +48,7 @@ void SelectionOverlay::update() {
     shared_ptr<Area> area(_game->module()->area());
     ObjectSelector &selector = area->objectSelector();
 
-    Camera *camera = area->getCamera();
+    Camera *camera = _game->getActiveCamera();
     glm::mat4 projection(camera->sceneNode()->projection());
     glm::mat4 view(camera->sceneNode()->view());
 

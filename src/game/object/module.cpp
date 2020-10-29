@@ -79,7 +79,7 @@ void Module::loadArea(const GffStruct &ifo) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), _area->thirdPersonCamera(), &_game->party());
+    _player = make_unique<Player>(this, _area.get(), &_area->thirdPersonCamera(), &_game->party());
 }
 
 void Module::loadParty(const string &entry) {
@@ -108,7 +108,6 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &h
 }
 
 bool Module::handle(const SDL_Event &event) {
-    if (_area->getCamera()->handle(event)) return true;
     if (_player->handle(event)) return true;
     if (_area->handle(event)) return true;
 
@@ -168,7 +167,7 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     if (creature) {
         if (!creature->conversation().empty()) {
             _player->stopMovement();
-            _area->getCamera()->stopMovement();
+            _game->getActiveCamera()->stopMovement();
             _game->startDialog(*creature, creature->conversation());
         }
         return true;
@@ -189,7 +188,7 @@ bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Module::update(float dt) {
-    Camera *camera = _area->getCamera();
+    Camera *camera = _game->getActiveCamera();
     camera->update(dt);
 
     if (_area->cameraType() == CameraType::ThirdPerson) {

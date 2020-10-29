@@ -508,7 +508,7 @@ void Area::runOnEnterScript() {
 }
 
 SpatialObject *Area::getObjectAt(int x, int y) const {
-    Camera *camera = getCamera();
+    Camera *camera = _game->getActiveCamera();
     shared_ptr<CameraSceneNode> sceneNode(camera->sceneNode());
 
     const GraphicsOptions &opts = _game->options().graphics;
@@ -602,10 +602,6 @@ void Area::toggleCameraType() {
     if (changed) {
         _game->onCameraChanged(_cameraType);
     }
-}
-
-Camera *Area::getCamera() const {
-    return _cameraType == CameraType::ThirdPerson ? _thirdPersonCamera.get() : static_cast<Camera *>(_firstPersonCamera.get());
 }
 
 void Area::startDialog(Creature &creature, const string &resRef) {
@@ -745,8 +741,12 @@ const Pathfinder &Area::pathfinder() const {
     return _pathfinder;
 }
 
-ThirdPersonCamera *Area::thirdPersonCamera() {
-    return _thirdPersonCamera.get();
+FirstPersonCamera &Area::firstPersonCamera() {
+    return *_firstPersonCamera;
+}
+
+ThirdPersonCamera &Area::thirdPersonCamera() {
+    return *_thirdPersonCamera;
 }
 
 DialogCamera &Area::dialogCamera() {
