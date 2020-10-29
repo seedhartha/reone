@@ -467,7 +467,6 @@ void Area::update(float dt) {
         _actionExecutor.executeActions(*object, dt);
     }
     _objectSelector.update();
-    _game->sceneGraph().prepare();
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {

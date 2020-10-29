@@ -234,6 +234,8 @@ void Game::drawWorld() {
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
+    _sceneGraph.prepare();
+
     _worldPipeline.render();
 }
 
