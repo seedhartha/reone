@@ -230,25 +230,27 @@ void Game::drawAll() {
 }
 
 void Game::drawWorld() {
-    shared_ptr<CameraSceneNode> cameraNode;
+    const Camera *camera = getActiveCamera();
+    if (!camera) return;
 
+    _sceneGraph.setActiveCamera(camera->sceneNode());
+    _worldPipeline.render();
+}
+
+Camera *Game::getActiveCamera() const {
     switch (_screen) {
         case GameScreen::InGame:
         case GameScreen::Container: {
-            Camera *camera = _module ? _module->area()->getCamera() : nullptr;
-            cameraNode = camera ? camera->sceneNode() : nullptr;
-            break;
+            shared_ptr<Area> area(_module->area());
+            CameraType type = area->cameraType();
+            Camera *camera = type == CameraType::ThirdPerson ? (Camera *) &area->thirdPersonCamera() : &area->firstPersonCamera();
+            return camera;
         }
         case GameScreen::Dialog:
-            cameraNode = _dialog->camera().sceneNode();
-            break;
+            return &_dialog->camera();
         default:
-            break;
+            return nullptr;
     }
-    if (!cameraNode) return;
-
-    _sceneGraph.setActiveCamera(cameraNode);
-    _worldPipeline.render();
 }
 
 void Game::drawGUI() {
@@ -478,17 +480,22 @@ bool Game::handle(const SDL_Event &event) {
         return true;
     }
     switch (_screen) {
-        case GameScreen::InGame:
+        case GameScreen::InGame: {
             if (_console.handle(event)) {
                 return true;
             }
             if (_party.handle(event)) {
                 return true;
             }
+            Camera *camera = getActiveCamera();
+            if (camera && camera->handle(event)) {
+                return true;
+            }
             if (_module->handle(event)) {
                 return true;
             }
             break;
+        }
         default:
             break;
     }

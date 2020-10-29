@@ -77,21 +77,17 @@ public:
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
-    Camera *getCamera() const;
     SpatialObject *getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const;
 
-    AnimatedCamera &animatedCamera();
     const CameraStyle &cameraStyle() const;
     CameraType cameraType() const;
     const CollisionDetector &collisionDetector() const;
-    DialogCamera &dialogCamera();
     const std::string &music() const;
     const ObjectList &objects() const;
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
     const RoomMap &rooms() const;
-    ThirdPersonCamera *thirdPersonCamera();
 
     // Objects
 
@@ -99,6 +95,15 @@ public:
     std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
 
     // END Objects
+
+    // Cameras
+
+    FirstPersonCamera &firstPersonCamera();
+    ThirdPersonCamera &thirdPersonCamera();
+    DialogCamera &dialogCamera();
+    AnimatedCamera &animatedCamera();
+
+    // END Cameras
 
     // Party
 

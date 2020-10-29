@@ -84,6 +84,8 @@ public:
     void startDialog(SpatialObject &owner, const std::string &resRef);
     void quit();
 
+    Camera *getActiveCamera() const;
+
     resource::GameVersion version() const;
     const Options &options() const;
     scene::SceneGraph &sceneGraph();
