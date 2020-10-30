@@ -27,12 +27,15 @@ namespace game {
 
 class StartConversationAction : public ObjectAction {
 public:
-    StartConversationAction(const std::shared_ptr<Object> &object, const std::string &dialogResRef);
+    StartConversationAction(Object *object, const std::string &dialogResRef, bool ignoreStartRange = false);
+
+    bool isStartRangeIgnored() const;
 
     const std::string &dialogResRef() const;
 
 private:
     std::string _dialogResRef;
+    bool _ignoreStartRange { false };
 };
 
 } // namespace game

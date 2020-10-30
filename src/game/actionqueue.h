@@ -33,6 +33,8 @@ public:
     void delay(std::unique_ptr<Action> action, float seconds);
     void update();
 
+    bool empty() const;
+
     Action *currentAction();
 
 private:

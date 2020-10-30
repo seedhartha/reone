@@ -130,16 +130,20 @@ void Player::update(float dt) {
     } else {
         movement = false;
     }
+
+    ActionQueue &actions = partyLeader->actionQueue();
+
     if (movement) {
+        actions.clear();
+
         glm::vec2 dest(partyLeader->position());
         dest.x -= 100.0f * glm::sin(heading);
         dest.y += 100.0f * glm::cos(heading);
 
         if (_area->moveCreatureTowards(*partyLeader, dest, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
-            _area->onPartyLeaderMoved();
         }
-    } else {
+    } else if (actions.empty()) {
         partyLeader->setMovementType(Creature::MovementType::None);
     }
 }

@@ -24,8 +24,11 @@
 #include "../script/execution.h"
 #include "../system/log.h"
 
+#include "game.h"
 #include "object/area.h"
 #include "object/creature.h"
+#include "object/door.h"
+#include "object/placeable.h"
 
 using namespace std;
 
@@ -37,9 +40,9 @@ namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
 
-ActionExecutor::ActionExecutor(Area *area) : _area(area) {
-    if (!area) {
-        throw invalid_argument("area must not be null");
+ActionExecutor::ActionExecutor(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("game must not be null");
     }
 }
 
@@ -66,6 +69,12 @@ void ActionExecutor::executeActions(Object &object, float dt) {
         case ActionType::StartConversation:
             executeStartConversation(static_cast<Creature &>(object), *dynamic_cast<StartConversationAction *>(action), dt);
             break;
+        case ActionType::OpenDoor:
+            executeOpenDoor(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
+            break;
+        case ActionType::OpenContainer:
+            executeOpenContainer(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
+            break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
             action->isCompleted();
@@ -83,10 +92,8 @@ void ActionExecutor::executeMoveToPoint(Creature &creature, MoveToPointAction &a
 }
 
 void ActionExecutor::executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt) {
-    const SpatialObject *object = dynamic_cast<const SpatialObject *>(action.object());
-    if (!object) return;
-
-    glm::vec3 dest(object->position());
+    SpatialObject &object = *static_cast<SpatialObject *>(action.object());
+    glm::vec3 dest(object.position());
     float distance = action.distance();
 
     bool reached = navigateCreature(creature, dest, distance, dt);
@@ -96,8 +103,8 @@ void ActionExecutor::executeMoveToObject(Creature &creature, MoveToObjectAction 
 }
 
 void ActionExecutor::executeFollow(Creature &creature, FollowAction &action, float dt) {
-    const SpatialObject *object = dynamic_cast<const SpatialObject *>(action.object());
-    glm::vec3 dest(object->position());
+    SpatialObject &object = *static_cast<SpatialObject *>(action.object());
+    glm::vec3 dest(object.position());
     float distance = action.distance();
 
     navigateCreature(creature, dest, distance, dt);
@@ -112,8 +119,12 @@ void ActionExecutor::executeDoCommand(Object &object, CommandAction &action, flo
 }
 
 void ActionExecutor::executeStartConversation(Creature &creature, StartConversationAction &action, float dt) {
-    _area->startDialog(creature, action.dialogResRef());
-    action.complete();
+    Creature &target = static_cast<Creature &>(*action.object());
+    bool reached = action.isStartRangeIgnored() || navigateCreature(creature, target.position(), 1.0f, dt);
+    if (reached) {
+        _game->module()->area()->startDialog(target, action.dialogResRef());
+        action.complete();
+    }
 }
 
 bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt) {
@@ -172,7 +183,7 @@ void ActionExecutor::advanceCreatureOnPath(Creature &creature, float dt) {
     if (distToDest <= 1.0f) {
         selectNextPathPoint(*path);
 
-    } else if (_area->moveCreatureTowards(creature, dest, true, dt)) {
+    } else if (_game->module()->area()->moveCreatureTowards(creature, dest, true, dt)) {
         creature.setMovementType(Creature::MovementType::Run);
 
     } else {
@@ -189,10 +200,28 @@ void ActionExecutor::selectNextPathPoint(Creature::Path &path) {
 
 void ActionExecutor::updateCreaturePath(Creature &creature, const glm::vec3 &dest) {
     const glm::vec3 &origin = creature.position();
-    vector<glm::vec3> points(_area->pathfinder().findPath(origin, dest));
+    vector<glm::vec3> points(_game->module()->area()->pathfinder().findPath(origin, dest));
     uint32_t now = SDL_GetTicks();
 
     creature.setPath(dest, move(points), now);
+}
+
+void ActionExecutor::executeOpenDoor(Creature &creature, ObjectAction &action, float dt) {
+    Door &door = *static_cast<Door *>(action.object());
+    bool reached = navigateCreature(creature, door.position(), 1.0f, dt);
+    if (reached) {
+        door.open(&creature);
+        action.complete();
+    }
+}
+
+void ActionExecutor::executeOpenContainer(Creature &creature, ObjectAction &action, float dt) {
+    Placeable &placeable = *static_cast<Placeable *>(action.object());
+    bool reached = navigateCreature(creature, placeable.position(), 1.0f, dt);
+    if (reached) {
+        _game->openContainer(&placeable);
+        action.complete();
+    }
 }
 
 } // namespace game

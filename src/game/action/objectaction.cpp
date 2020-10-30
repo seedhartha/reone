@@ -17,17 +17,22 @@
 
 #include "objectaction.h"
 
+#include <stdexcept>
+
 using namespace std;
 
 namespace reone {
 
 namespace game {
 
-ObjectAction::ObjectAction(ActionType type, const shared_ptr<Object> &object) : Action(type), _object(object) {
+ObjectAction::ObjectAction(ActionType type, Object *object) : Action(type), _object(object) {
+    if (!object) {
+        throw invalid_argument("Object must not be null");
+    }
 }
 
-const Object *ObjectAction::object() const {
-    return _object.get();
+Object *ObjectAction::object() const {
+    return _object;
 }
 
 } // namespace game

@@ -208,7 +208,7 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
 
     shared_ptr<Creature> companion(_game->objectFactory().newCreature());
     companion->load(companionCfg);
-    companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+    companion->actionQueue().add(make_unique<FollowAction>(player.get(), 1.0f));
     party.addMember(companion);
 
     _game->loadModule(item);

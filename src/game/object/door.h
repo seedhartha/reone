@@ -32,8 +32,8 @@ public:
     Door(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
-    virtual void open(const std::shared_ptr<Object> &triggerrer);
-    void close(const std::shared_ptr<Object> &triggerrer);
+    void open(Object *triggerrer);
+    void close(Object *triggerrer);
 
     bool isOpen() const;
     bool isStatic() const;

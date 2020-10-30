@@ -30,16 +30,16 @@ namespace reone {
 
 namespace game {
 
-class Area;
+class Game;
 
 class ActionExecutor {
 public:
-    ActionExecutor(Area *area);
+    ActionExecutor(Game *game);
 
     void executeActions(Object &object, float dt);
 
 private:
-    Area *_area { nullptr };
+    Game *_game { nullptr };
 
     ActionExecutor(const ActionExecutor &) = delete;
     ActionExecutor &operator=(const ActionExecutor &) = delete;
@@ -56,6 +56,8 @@ private:
     void executeFollow(Creature &creature, FollowAction &action, float dt);
     void executeDoCommand(Object &object, CommandAction &command, float dt);
     void executeStartConversation(Creature &creature, StartConversationAction &action, float dt);
+    void executeOpenDoor(Creature &creature, ObjectAction &action, float dt);
+    void executeOpenContainer(Creature &creature, ObjectAction &action, float dt);
 
     // END Actions
 };

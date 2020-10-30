@@ -169,27 +169,34 @@ void Module::onObjectClick(SpatialObject &object) {
 }
 
 void Module::onCreatureClick(Creature &creature) {
-    if (!creature.conversation().empty()) {
-        _player->stopMovement();
-        _game->getActiveCamera()->stopMovement();
-        _game->startDialog(creature, creature.conversation());
-    }
+    if (creature.conversation().empty()) return;
+
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    ActionQueue &actions = partyLeader->actionQueue();
+    actions.clear();
+    actions.add(make_unique<StartConversationAction>(&creature, creature.conversation()));
 }
 
 void Module::onDoorClick(Door &door) {
     if (!door.linkedToModule().empty()) {
         _game->scheduleModuleTransition(door.linkedToModule(), door.linkedTo());
-    } else if (!door.isOpen() && !door.isStatic()) {
+        return;
+    }
+    if (!door.isOpen() && !door.isStatic()) {
         shared_ptr<Creature> partyLeader(_game->party().leader());
-        door.open(partyLeader);
+        ActionQueue &actions = partyLeader->actionQueue();
+        actions.clear();
+        actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, &door));
     }
 }
 
 void Module::onPlaceableClick(Placeable &placeable) {
-    if (placeable.blueprint().hasInventory()) {
-        _game->openContainer(&placeable);
-        return;
-    }
+    if (!placeable.blueprint().hasInventory()) return;
+
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    ActionQueue &actions = partyLeader->actionQueue();
+    actions.clear();
+    actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, &placeable));
 }
 
 bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {

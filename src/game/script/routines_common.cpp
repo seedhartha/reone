@@ -256,7 +256,7 @@ Variable Routines::actionMoveToObject(const vector<Variable> &args, ExecutionCon
 
     if (subject) {
         Creature &creature = static_cast<Creature &>(*subject);
-        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object, distance));
+        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object.get(), distance));
         creature.actionQueue().add(move(action));
     } else {
         warn("Routine: object not found: " + to_string(objectId));
@@ -274,7 +274,8 @@ Variable Routines::actionStartConversation(const vector<Variable> &args, Executi
 
     if (creature) {
         string dialogResRef((args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : creature->conversation());
-        unique_ptr<StartConversationAction> action(new StartConversationAction(object, dialogResRef));
+        bool ignoreStartRange = args.size() >= 4 ? (args[4].intValue != 0) : false;
+        unique_ptr<StartConversationAction> action(new StartConversationAction(subject.get(), dialogResRef, ignoreStartRange));
         creature->actionQueue().add(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
@@ -319,7 +320,7 @@ Variable Routines::actionOpenDoor(const vector<Variable> &args, ExecutionContext
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::OpenDoor, object));
+            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::OpenDoor, object.get()));
             creature->actionQueue().add(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());
@@ -341,7 +342,7 @@ Variable Routines::actionCloseDoor(const vector<Variable> &args, ExecutionContex
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::CloseDoor, object));
+            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::CloseDoor, object.get()));
             creature->actionQueue().add(move(action));
         }
         Door *door = dynamic_cast<Door *>(subject.get());

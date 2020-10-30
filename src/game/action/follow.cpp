@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-FollowAction::FollowAction(const shared_ptr<Object> &object, float distance) :
+FollowAction::FollowAction(Object *object, float distance) :
     ObjectAction(ActionType::Follow, object),
     _distance(distance) {
 }
