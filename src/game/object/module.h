@@ -48,8 +48,10 @@ struct ModuleInfo {
     float entryHeading { 0.0f };
 };
 
+class Door;
 class Game;
 class ObjectFactory;
+class Placeable;
 
 class Module : public Object {
 public:
@@ -72,6 +74,11 @@ private:
     ModuleInfo _info;
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
+
+    void onCreatureClick(Creature &creature);
+    void onDoorClick(Door &door);
+    void onObjectClick(SpatialObject &object);
+    void onPlaceableClick(Placeable &placeable);
 
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
 
