@@ -433,9 +433,7 @@ void Dialog::update(float dt) {
 
         if (endOnAnimFinish) {
             shared_ptr<Area> area(_game->module()->area());
-            AnimatedCamera &camera = area->animatedCamera();
-            camera.update(dt);
-            if (camera.isAnimationFinished()) {
+            if (area->animatedCamera().isAnimationFinished()) {
                 endCurrentEntry();
             }
         } else if (endOnAudioStop) {
