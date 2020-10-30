@@ -29,12 +29,12 @@ class Object;
 
 class ObjectAction : public Action {
 public:
-    ObjectAction(ActionType type, const std::shared_ptr<Object> &object);
+    ObjectAction(ActionType type, Object *object);
 
-    const Object *object() const;
+    Object *object() const;
 
 protected:
-    std::shared_ptr<Object> _object;
+    Object *_object { nullptr };
 };
 
 } // namespace game

@@ -79,7 +79,7 @@ void Door::loadBlueprint(const string &resRef) {
     _walkmesh = Walkmeshes::instance().get(model + "0", ResourceType::DoorWalkmesh);
 }
 
-void Door::open(const shared_ptr<Object> &triggerrer) {
+void Door::open(Object *triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("opened1");
         _model->playAnimation("opening1");
@@ -88,7 +88,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
     _selectable = false;
 }
 
-void Door::close(const shared_ptr<Object> &triggerrer) {
+void Door::close(Object *triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("closed1");
         _model->playAnimation("closing1");

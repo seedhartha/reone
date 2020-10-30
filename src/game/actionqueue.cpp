@@ -74,6 +74,10 @@ void ActionQueue::updateDelayedActions() {
     _delayed.erase(delayedToRemove, _delayed.end());
 }
 
+bool ActionQueue::empty() const {
+    return _actions.empty();
+}
+
 Action *ActionQueue::currentAction() {
    return _actions.empty() ? nullptr : _actions.front().get();
 }

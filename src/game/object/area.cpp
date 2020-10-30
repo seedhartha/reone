@@ -65,7 +65,7 @@ Area::Area(uint32_t id, Game *game) :
     _game(game),
     _collisionDetector(this),
     _objectSelector(this, &game->party()),
-    _actionExecutor(this) {
+    _actionExecutor(game) {
 
     if (!game) {
         throw invalid_argument("Game must not be null");
@@ -490,6 +490,9 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
     if (getElevationAt(position, room, position.z)) {
         creature.setRoom(room);
         creature.setPosition(position);
+        if (&creature == _game->party().leader().get()) {
+            onPartyLeaderMoved();
+        }
         return true;
     }
 

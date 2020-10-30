@@ -33,7 +33,8 @@ enum class ActionType {
     StartConversation = 0x1001,
     PauseConversation = 0x1002,
     ResumeConversation = 0x1003,
-    MoveToObject = 0x1004
+    MoveToObject = 0x1004,
+    OpenContainer = 0x1005
 };
 
 class Action {

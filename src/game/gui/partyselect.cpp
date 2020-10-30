@@ -223,7 +223,7 @@ void PartySelection::changeParty() {
 
         shared_ptr<Creature> creature(_game->objectFactory().newCreature());
         creature->load(blueprint);
-        creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+        creature->actionQueue().add(make_unique<FollowAction>(player.get(), 1.0f));
         party.addMember(creature);
     }
 
