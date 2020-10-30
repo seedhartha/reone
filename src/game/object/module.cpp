@@ -145,35 +145,51 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         _area->objectSelector().select(object->id());
         return true;
     }
-
-    Door *door = dynamic_cast<Door *>(object);
-    if (door) {
-        if (!door->linkedToModule().empty()) {
-            _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
-        } else if (!door->isOpen() && !door->isStatic()) {
-            shared_ptr<Creature> partyLeader(_game->party().leader());
-            door->open(partyLeader);
-        }
-        return true;
-    }
-
-    Placeable *placeable = dynamic_cast<Placeable *>(object);
-    if (placeable && placeable->blueprint().hasInventory()) {
-        _game->openContainer(placeable);
-        return true;
-    }
-
-    Creature *creature = dynamic_cast<Creature *>(object);
-    if (creature) {
-        if (!creature->conversation().empty()) {
-            _player->stopMovement();
-            _game->getActiveCamera()->stopMovement();
-            _game->startDialog(*creature, creature->conversation());
-        }
-        return true;
-    }
+    onObjectClick(*object);
 
     return true;
+}
+
+void Module::onObjectClick(SpatialObject &object) {
+    Creature *creature = dynamic_cast<Creature *>(&object);
+    if (creature) {
+        onCreatureClick(*creature);
+        return;
+    }
+    Door *door = dynamic_cast<Door *>(&object);
+    if (door) {
+        onDoorClick(*door);
+        return;
+    }
+    Placeable *placeable = dynamic_cast<Placeable *>(&object);
+    if (placeable) {
+        onPlaceableClick(*placeable);
+        return;
+    }
+}
+
+void Module::onCreatureClick(Creature &creature) {
+    if (!creature.conversation().empty()) {
+        _player->stopMovement();
+        _game->getActiveCamera()->stopMovement();
+        _game->startDialog(creature, creature.conversation());
+    }
+}
+
+void Module::onDoorClick(Door &door) {
+    if (!door.linkedToModule().empty()) {
+        _game->scheduleModuleTransition(door.linkedToModule(), door.linkedTo());
+    } else if (!door.isOpen() && !door.isStatic()) {
+        shared_ptr<Creature> partyLeader(_game->party().leader());
+        door.open(partyLeader);
+    }
+}
+
+void Module::onPlaceableClick(Placeable &placeable) {
+    if (placeable.blueprint().hasInventory()) {
+        _game->openContainer(&placeable);
+        return;
+    }
 }
 
 bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
