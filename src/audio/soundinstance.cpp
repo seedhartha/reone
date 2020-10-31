@@ -17,6 +17,8 @@
 
 #include "soundinstance.h"
 
+#include "glm/glm.hpp"
+
 #include "AL/al.h"
 
 using namespace std;
@@ -25,23 +27,29 @@ namespace reone {
 
 namespace audio {
 
+static const int kMaxBufferCount = 8;
+
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain) :
     _stream(stream), _loop(loop), _gain(gain) {
-
-    _multiframe = _stream->frameCount() > 1;
 }
 
 void SoundInstance::init() {
-    int bufferCount = _multiframe ? 2 : 1;
+    int frameCount = _stream->frameCount();
+    int bufferCount = glm::clamp(frameCount, 1, kMaxBufferCount);
+
     _buffers.resize(bufferCount);
+    _buffered = bufferCount > 1;
+
     alGenBuffers(bufferCount, &_buffers[0]);
     alGenSources(1, &_source);
     alSourcef(_source, AL_GAIN, _gain);
 
-    if (_multiframe) {
-        _stream->fill(_nextFrame++, _buffers[0]);
-        _stream->fill(_nextFrame++, _buffers[1]);
-        alSourceQueueBuffers(_source, 2, &_buffers[0]);
+    if (_buffered) {
+        for (int i = 0; i < bufferCount; ++i) {
+            _stream->fill(_nextFrame, _buffers[i]);
+            ++_nextFrame;
+        }
+        alSourceQueueBuffers(_source, bufferCount, &_buffers[0]);
     } else {
         _stream->fill(0, _buffers[0]);
         alSourcei(_source, AL_BUFFER, _buffers[0]);
@@ -72,7 +80,7 @@ void SoundInstance::update() {
     if (_state == State::NotInited) {
         init();
     }
-    if (!_multiframe) {
+    if (!_buffered) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);
         if (state == AL_STOPPED) {
@@ -84,19 +92,23 @@ void SoundInstance::update() {
     ALint processed = 0;
     alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
 
-    while (processed--) {
+    while (processed-- > 0) {
         alSourceUnqueueBuffers(_source, 1, &_buffers[_nextBuffer]);
-        if (_nextFrame >= _stream->frameCount()) {
-            if (_loop) {
-                _nextFrame = 0;
-            } else {
-                _state = State::Stopped;
-                break;
-            }
+        if (_nextFrame < _stream->frameCount()) {
+            _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
+            alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
         }
-        _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
-        alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
-        _nextBuffer = (_nextBuffer + 1) % 2;
+        _nextBuffer = (_nextBuffer + 1) % static_cast<int>(_buffers.size());
+    }
+
+    ALint queued = 0;
+    alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
+    if (queued == 0) {
+        if (_loop) {
+            _nextFrame = 0;
+        } else {
+            _state = State::Stopped;
+        }
     }
 }
 
