@@ -50,7 +50,7 @@ private:
     std::shared_ptr<AudioStream> _stream;
     bool _loop { false };
     float _gain { 0.0f };
-    bool _multiframe { false };
+    bool _buffered { false };
     std::atomic<State> _state { State::NotInited };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
