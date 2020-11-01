@@ -27,10 +27,10 @@
 
 #include "glm/ext.hpp"
 
+#include "cursor.h"
 #include "mesh/aabb.h"
 #include "mesh/cube.h"
 #include "mesh/quad.h"
-
 #include "shaders.h"
 
 using namespace std;
@@ -154,28 +154,13 @@ void RenderWindow::clear() const {
 void RenderWindow::drawCursor() const {
     if (_relativeMouseMode) return;
 
-    shared_ptr<Texture> texture;
-
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
-    texture = state & SDL_BUTTON(1) ? _cursor.pressed : _cursor.unpressed;
+    bool pressed = state & SDL_BUTTON(1);
 
-    if (!texture) return;
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
-
-    LocalUniforms locals;
-    locals.model = move(transform);
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    texture->bind(0);
-
-    Quad::getDefault().renderTriangles();
-
-    texture->unbind(0);
+    _cursor->setPosition({ x, y });
+    _cursor->setPressed(pressed);
+    _cursor->render();
 }
 
 void RenderWindow::swapBuffers() const {
@@ -187,10 +172,9 @@ void RenderWindow::setRelativeMouseMode(bool enabled) {
     _relativeMouseMode = enabled;
 }
 
-void RenderWindow::setCursor(const Cursor &cursor) {
-    bool hasTexture = cursor.pressed && cursor.unpressed;
-    SDL_ShowCursor(hasTexture ? 0 : 1);
+void RenderWindow::setCursor(const shared_ptr<Cursor> &cursor) {
     _cursor = cursor;
+    SDL_ShowCursor(!static_cast<bool>(cursor));
 }
 
 } // namespace render

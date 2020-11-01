@@ -34,6 +34,7 @@
 #include "../video/video.h"
 
 #include "blueprint/blueprints.h"
+#include "cursors.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -72,7 +73,6 @@ void Game::initGameVersion() {
 
 int Game::run() {
     init();
-    loadResources();
 
     if (_version == GameVersion::KotOR) {
         playVideo("legal");
@@ -92,22 +92,27 @@ void Game::init() {
     _worldPipeline.init();
 
     Resources::instance().init(_version, _path);
+    Cursors::instance().init(_version);
     Models::instance().init(_version);
     Textures::instance().init(_version);
     AudioPlayer::instance().init(_options.audio);
     Routines::instance().init(_version, this);
-}
 
-void Game::loadResources() {
-    loadCursor();
+    setCursorType(CursorType::Default);
+
     _console.load();
 }
 
-void Game::loadCursor() {
-    Cursor cursor;
-    cursor.pressed = Textures::instance().get("gui_mp_defaultd", TextureType::Cursor);
-    cursor.unpressed = Textures::instance().get("gui_mp_defaultu", TextureType::Cursor);
+void Game::setCursorType(CursorType type) {
+    if (_cursorType == type) return;
 
+    _cursorType = type;
+
+    if (type == CursorType::None) {
+        _window.setCursor(nullptr);
+        return;
+    }
+    shared_ptr<Cursor> cursor(Cursors::instance().get(type));
     _window.setCursor(cursor);
 }
 
@@ -420,6 +425,7 @@ void Game::deinit() {
     JobExecutor::instance().deinit();
     Routines::instance().deinit();
     AudioPlayer::instance().deinit();
+    Cursors::instance().deinit();
     Resources::instance().deinit();
 
     _window.deinit();

@@ -116,6 +116,7 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 set(RENDER_HEADERS
     src/render/aabb.h
     src/render/bwmfile.h
+    src/render/cursor.h
     src/render/font.h
     src/render/fonts.h
     src/render/fps.h
@@ -148,6 +149,7 @@ set(RENDER_HEADERS
 set(RENDER_SOURCES
     src/render/aabb.cpp
     src/render/bwmfile.cpp
+    src/render/cursor.cpp
     src/render/font.cpp
     src/render/fonts.cpp
     src/render/fps.cpp
@@ -339,6 +341,7 @@ set(GAME_HEADERS
     src/game/characters.h
     src/game/collisiondetect.h
     src/game/console.h
+    src/game/cursors.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -404,6 +407,7 @@ set(GAME_SOURCES
     src/game/characters.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
+    src/game/cursors.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp

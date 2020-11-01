@@ -32,16 +32,6 @@ namespace reone {
 
 namespace render {
 
-static unordered_map<string, uint32_t> g_cursorNameByResRefKotor = {
-    { "gui_mp_defaultu", 4 },
-    { "gui_mp_defaultd", 5 }
-};
-
-static unordered_map<string, uint32_t> g_cursorNameByResRefTsl = {
-    { "gui_mp_defaultu", 3 },
-    { "gui_mp_defaultd", 4 }
-};
-
 Textures &Textures::instance() {
     static Textures instance;
     return instance;
@@ -66,28 +56,10 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
 }
 
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
-    bool tryCur = type == TextureType::Cursor;
     shared_ptr<Texture> texture;
-    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
 
-    if (tryCur) {
-        uint32_t name;
-        switch (_version) {
-            case GameVersion::TheSithLords:
-                name = g_cursorNameByResRefTsl.find(resRef)->second;
-                break;
-            default:
-                name = g_cursorNameByResRefKotor.find(resRef)->second;
-                break;
-        }
-        shared_ptr<ByteArray> curData(Resources::instance().getFromExe(name, PEResourceType::Cursor));
-        if (curData) {
-            CurFile cur(resRef);
-            cur.load(wrap(curData));
-            texture = cur.texture();
-        }
-    }
-    if (!texture && tryTpc) {
+    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
+    if (tryTpc) {
         shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture));
         if (tpcData) {
             TpcFile tpc(resRef, type);
@@ -95,6 +67,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
             texture = tpc.texture();
         }
     }
+
     if (!texture) {
         shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga));
         if (tgaData) {
