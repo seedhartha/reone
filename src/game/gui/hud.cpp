@@ -153,8 +153,9 @@ void HUD::update(float dt) {
     Party &party = _game->party();
 
     for (int i = 0; i < 3; ++i) {
-        Control &lblChar = getControl("LBL_CHAR" + to_string(i + 1));
-        Control &lblBack = getControl("LBL_BACK" + to_string(i + 1));
+        int charIdx = (i == 0) ? 1 : (4 - i);
+        Control &lblChar = getControl("LBL_CHAR" + to_string(charIdx));
+        Control &lblBack = getControl("LBL_BACK" + to_string(charIdx));
 
         shared_ptr<Creature> member(party.getMember(i));
         if (member) {

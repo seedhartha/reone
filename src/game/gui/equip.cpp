@@ -44,17 +44,31 @@ namespace game {
 static const int kStrRefNone = 363;
 
 static unordered_map<Equipment::Slot, string> g_slotNames = {
-    { Equipment::Slot::Implant, "IMPLANT"},
-    { Equipment::Slot::Head, "HEAD"},
-    { Equipment::Slot::Hands, "HANDS"},
-    { Equipment::Slot::ArmL, "ARM_L"},
-    { Equipment::Slot::Body, "BODY"},
-    { Equipment::Slot::ArmR, "ARM_R"},
-    { Equipment::Slot::WeapL, "WEAP_L"},
-    { Equipment::Slot::Belt, "BELT"},
-    { Equipment::Slot::WeapR, "WEAP_R"},
-    { Equipment::Slot::WeapL2, "WEAP_L2"},
-    { Equipment::Slot::WeapR2, "WEAP_R2"}
+    { Equipment::Slot::Implant, "IMPLANT" },
+    { Equipment::Slot::Head, "HEAD" },
+    { Equipment::Slot::Hands, "HANDS" },
+    { Equipment::Slot::ArmL, "ARM_L" },
+    { Equipment::Slot::Body, "BODY" },
+    { Equipment::Slot::ArmR, "ARM_R" },
+    { Equipment::Slot::WeapL, "WEAP_L" },
+    { Equipment::Slot::Belt, "BELT" },
+    { Equipment::Slot::WeapR, "WEAP_R" },
+    { Equipment::Slot::WeapL2, "WEAP_L2" },
+    { Equipment::Slot::WeapR2, "WEAP_R2" }
+};
+
+static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
+    { Equipment::Slot::Implant, 31388 },
+    { Equipment::Slot::Head, 31375 },
+    { Equipment::Slot::Hands, 31383 },
+    { Equipment::Slot::ArmL, 31376 },
+    { Equipment::Slot::Body, 31380 },
+    { Equipment::Slot::ArmR, 31377 },
+    { Equipment::Slot::WeapL, 31378 },
+    { Equipment::Slot::Belt, 31382 },
+    { Equipment::Slot::WeapR, 31379 },
+    { Equipment::Slot::WeapL2, 31378 },
+    { Equipment::Slot::WeapR2, 31379 }
 };
 
 Equipment::Equipment(Game *game) :
@@ -84,6 +98,14 @@ void Equipment::load() {
     hideControl("LBL_TOHITL");
     hideControl("LBL_TOHITR");
     hideControl("LBL_VITALITY");
+
+    glm::vec3 hilightColor(getHilightColor(_version));
+
+    Control &btnEquip = getControl("BTN_EQUIP");
+    btnEquip.setHilightColor(hilightColor);
+
+    Control &btnBack = getControl("BTN_BACK");
+    btnBack.setHilightColor(hilightColor);
 
     configureItemsListBox();
 }
@@ -162,6 +184,27 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
     }
 }
 
+void Equipment::onFocusChanged(const string &control, bool focus) {
+    GUI::onFocusChanged(control, focus);
+
+    if (!focus || !boost::starts_with(control, "BTN_INV_")) return;
+
+    string slotDesc;
+
+    string slotName(control.substr(8));
+    for (auto &name : g_slotNames) {
+        if (name.second != slotName)  continue;
+
+        auto maybeStrRef = g_slotStrRefs.find(name.first);
+        if (maybeStrRef != g_slotStrRefs.end()) {
+            slotDesc = Resources::instance().getString(maybeStrRef->second);
+        }
+        break;
+    }
+
+    getControl("LBL_SLOTNAME").setTextMessage(slotDesc);
+}
+
 void Equipment::update() {
     updatePortraits();
     updateEquipment();
@@ -169,6 +212,8 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
+    if (_version != GameVersion::KotOR) return;
+
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.leader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
@@ -198,8 +243,8 @@ void Equipment::onClick(const string &control) {
             selectSlot(Slot::None);
         }
     } else if (boost::starts_with(control, "BTN_INV_")) {
+        string slotName(control.substr(8));
         for (auto &name : g_slotNames) {
-            string slotName(control.substr(8));
             if (name.second == slotName) {
                 selectSlot(name.first);
                 break;
