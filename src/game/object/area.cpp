@@ -121,7 +121,7 @@ void Area::loadPTH() {
         Room *room = nullptr;
         float z = 0.0f;
 
-        if (!getElevationAt(glm::vec2(point.x, point.y), room, z)) {
+        if (!getElevationAt(glm::vec2(point.x, point.y), nullptr, room, z)) {
             warn(boost::format("Area: point %d elevation not found") % i);
             continue;
         }
@@ -256,6 +256,7 @@ bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, gl
     props.flags = kRaycastRooms | kRaycastObjects;
     props.origin = origin;
     props.direction = dir;
+    props.objectTypes = { ObjectType::Door };
 
     RaycastResult result;
 
@@ -282,6 +283,7 @@ bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest)
     props.flags = kRaycastObjects | kRaycastAABB;
     props.origin = origin;
     props.direction = dir;
+    props.objectTypes = { ObjectType::Creature };
     props.except = &creature;
 
     RaycastResult result;
@@ -306,7 +308,7 @@ void Area::determineObjectRoom(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
 
-    if (getElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, &object, room, position.z)) {
         object.setRoom(room);
     }
 }
@@ -377,10 +379,21 @@ shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
 
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
+    float heading = object.heading();
     Room *room = nullptr;
 
-    if (getElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, &object, room, position.z)) {
         object.setPosition(position);
+        return;
+    }
+    for (int i = 0; i < 4; ++i) {
+        float angle = i * glm::half_pi<float>();
+        position = object.position() + glm::vec3(glm::sin(angle), glm::cos(angle), 0.0f);
+
+        if (getElevationAt(position, &object, room, position.z)) {
+            object.setPosition(position);
+            return;
+        }
     }
 }
 
@@ -429,7 +442,7 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
 }
 
-bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) const {
+bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const {
     RaycastProperties props;
     props.origin = glm::vec3(position, kElevationTestZ);
     props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -437,10 +450,20 @@ bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z) cons
     RaycastResult result;
 
     props.flags = kRaycastObjects;
+    props.objectTypes = { ObjectType::Placeable };
+    props.except = nullptr;
+
+    if (_collisionDetector.raycast(props, result)) return false;
+
+    props.flags = kRaycastObjects | kRaycastAABB;
+    props.objectTypes = { ObjectType::Creature };
+    props.except = except;
 
     if (_collisionDetector.raycast(props, result)) return false;
 
     props.flags = kRaycastRooms | kRaycastWalkable;
+    props.objectTypes.clear();
+    props.except = nullptr;
 
     if (_collisionDetector.raycast(props, result)) {
         room = result.room;
@@ -487,7 +510,7 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
     if (findCreatureObstacle(creature, position)) {
         return false;
     }
-    if (getElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, &creature, room, position.z)) {
         creature.setRoom(room);
         creature.setPosition(position);
         if (&creature == _game->party().leader().get()) {
@@ -523,7 +546,9 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     props.flags = kRaycastObjects | kRaycastAABB;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
+    props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };
     props.except = partyLeader.get();
+    props.maxDistance = 1000.0f;
 
     RaycastResult result;
 

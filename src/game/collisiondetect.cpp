@@ -37,7 +37,7 @@ namespace game {
 
 CollisionDetector::CollisionDetector(Area *area) : _area(area) {
     if (!area) {
-        throw invalid_argument("Area must not be null");
+        throw invalid_argument("area must not be null");
     }
 }
 
@@ -64,12 +64,16 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
     vector<pair<SpatialObject *, float>> collisions;
 
     for (auto &object : _area->objects()) {
-        if (!object->visible() ||
-            object.get() == props.except ||
-            (object->type() == ObjectType::Door && static_cast<Door &>(*object).isOpen())) {
+        if (object.get() == props.except) continue;
 
-            continue;
-        }
+        ObjectType type = object->type();
+        if (props.objectTypes.count(type) == 0) continue;
+
+        if (type == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
+
+        float dist = object->distanceTo(glm::vec2(props.origin));
+        if (dist > props.maxDistance * props.maxDistance) continue;
+
         invTransform = glm::inverse(object->transform());
         origin = invTransform * glm::vec4(props.origin, 1.0f);
         dir = invTransform * glm::vec4(props.direction, 0.0f);

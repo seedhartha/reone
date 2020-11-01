@@ -17,13 +17,19 @@
 
 #pragma once
 
+#include <set>
+
 #include "glm/vec3.hpp"
+
+#include "object/types.h"
 
 namespace reone {
 
 namespace game {
 
-enum RaycastFlag {
+static const float kDefaultRaycastDistance = 8.0f;
+
+enum RaycastFlags {
     kRaycastRooms = 1,
     kRaycastObjects = 2,
     kRaycastWalkable = 4,
@@ -38,7 +44,9 @@ struct RaycastProperties {
     int flags { 0 };
     glm::vec3 origin { 0.0f };
     glm::vec3 direction { 0.0f };
+    std::set<ObjectType> objectTypes;
     const SpatialObject *except { nullptr };
+    float maxDistance { kDefaultRaycastDistance };
 };
 
 struct RaycastResult {
