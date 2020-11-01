@@ -459,16 +459,19 @@ void Game::openInGame() {
 }
 
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
+    setCursorType(CursorType::Default);
     _screen = GameScreen::Dialog;
     _dialog->startDialog(owner, resRef);
 }
 
 void Game::openContainer(SpatialObject *container) {
+    setCursorType(CursorType::Default);
     _container->open(container);
     _screen = GameScreen::Container;
 }
 
 void Game::openPartySelection(const PartySelection::Context &ctx) {
+    setCursorType(CursorType::Default);
     _partySelection->prepare(ctx);
     _screen = GameScreen::PartySelection;
 }
@@ -483,6 +486,7 @@ void Game::onCameraChanged(CameraType camera) {
 }
 
 void Game::openEquipment() {
+    setCursorType(CursorType::Default);
     _equipment->update();
     _screen = GameScreen::Equipment;
 }
