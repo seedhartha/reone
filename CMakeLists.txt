@@ -500,6 +500,10 @@ set(REONE_SOURCES
     src/main.cpp
     src/program.cpp)
 
+if(WIN32)
+    list(APPEND REONE_SOURCES res/reone.rc)
+endif()
+
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
