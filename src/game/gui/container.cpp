@@ -26,6 +26,8 @@
 #include "../object/item.h"
 #include "../script/util.h"
 
+#include "colors.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -59,7 +61,18 @@ void Container::load() {
     GUI::load();
 
     string btnMessage(Resources::instance().getString(kSwitchToResRef) + " " + Resources::instance().getString(kGiveItemResRef));
-    getControl("BTN_GIVEITEMS").setTextMessage(btnMessage);
+
+    glm::vec3 hilightColor(getHilightColor(_version));
+
+    Control &btnOk = getControl("BTN_OK");
+    btnOk.setHilightColor(hilightColor);
+
+    Control &btnCancel = getControl("BTN_CANCEL");
+    btnCancel.setHilightColor(hilightColor);
+
+    Control &btnGiveItems = getControl("BTN_GIVEITEMS");
+    btnGiveItems.setTextMessage(btnMessage);
+    btnGiveItems.setHilightColor(hilightColor);
 
     string lblMessage(Resources::instance().getString(kInventoryResRef));
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);

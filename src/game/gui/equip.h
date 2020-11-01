@@ -56,6 +56,7 @@ private:
     int _selectedItemIdx { -1 };
 
     void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus);
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
     void preloadControl(gui::Control &control) override;
 
