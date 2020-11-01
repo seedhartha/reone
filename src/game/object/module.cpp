@@ -127,11 +127,12 @@ bool Module::handle(const SDL_Event &event) {
 }
 
 bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
-    const SpatialObject *object = _area->getObjectAt(event.x, event.y);
-    _area->objectSelector().hilight(object ? object->id() : -1);
-
     CursorType cursor = CursorType::Default;
-    if (object) {
+
+    const SpatialObject *object = _area->getObjectAt(event.x, event.y);
+    if (object && object->isSelectable()) {
+        _area->objectSelector().hilight(object->id());
+
         switch (object->type()) {
             case ObjectType::Creature:
                 cursor = CursorType::Talk;
@@ -145,7 +146,10 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
             default:
                 break;
         }
+    } else {
+        _area->objectSelector().hilight(-1);
     }
+
     _game->setCursorType(cursor);
 
     return true;
@@ -153,7 +157,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
 bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     SpatialObject *object = _area->getObjectAt(event.x, event.y);
-    if (!object) {
+    if (!object || !object->isSelectable()) {
         return false;
     }
     debug(boost::format("Object '%s' clicked on") % object->tag());

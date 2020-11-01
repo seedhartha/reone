@@ -92,11 +92,11 @@ void ObjectSelector::selectNext(bool reverse) {
 void ObjectSelector::getSelectableObjects(vector<uint32_t> &ids) const {
     vector<pair<uint32_t, float>> selectables;
 
-    shared_ptr<SpatialObject> player(_party->player());
-    glm::vec3 origin(player->position());
+    shared_ptr<SpatialObject> partyLeader(_party->leader());
+    glm::vec3 origin(partyLeader->position());
 
     for (auto &object : _area->objects()) {
-        if (!object->isSelectable() || object.get() == player.get()) continue;
+        if (!object->isSelectable() || object.get() == partyLeader.get()) continue;
 
         shared_ptr<ModelSceneNode> model(object->model());
         if (!model || !model->isVisible()) continue;
