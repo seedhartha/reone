@@ -155,7 +155,7 @@ private:
 
     bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
     bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
-    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z) const;
+    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
 
     // Loading
 
