@@ -94,6 +94,8 @@ public:
     Party &party();
     CharacterGeneration &characterGeneration();
 
+    void setCursorType(CursorType type);
+
     // Globals/locals
 
     bool getGlobalBoolean(const std::string &name) const;
@@ -151,6 +153,7 @@ private:
     uint32_t _ticks { 0 };
     bool _quit { false };
     std::shared_ptr<video::Video> _video;
+    CursorType _cursorType { CursorType::None };
 
     // Modules
 
@@ -212,8 +215,6 @@ private:
 
     // Loading
 
-    void loadResources();
-    void loadCursor();
     void loadMainMenu();
     void loadLoadingScreen();
     void loadCharacterGeneration();

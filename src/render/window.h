@@ -28,10 +28,7 @@ namespace reone {
 
 namespace render {
 
-struct Cursor {
-    std::shared_ptr<Texture> pressed;
-    std::shared_ptr<Texture> unpressed;
-};
+class Cursor;
 
 class RenderWindow {
 public:
@@ -44,13 +41,16 @@ public:
     void processEvents(bool &quit);
     void update(float dt);
 
+    void setRelativeMouseMode(bool enabled);
+    void setCursor(const std::shared_ptr<Cursor> &cursor);
+
     // Rendering
+
     void clear() const;
     void drawCursor() const;
     void swapBuffers() const;
 
-    void setRelativeMouseMode(bool enabled);
-    void setCursor(const Cursor &cursor);
+    // END Rendering
 
 private:
     GraphicsOptions _opts;
@@ -58,7 +58,7 @@ private:
     SDL_Window *_window { nullptr };
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };
-    Cursor _cursor;
+    std::shared_ptr<Cursor> _cursor;
     FpsCounter _fps;
     std::function<void()> _onRenderWorld;
     std::function<void()> _onRenderGUI;

@@ -17,29 +17,33 @@
 
 #pragma once
 
-#include "../../resource/binfile.h"
+#include <memory>
 
-#include "../texture.h"
+#include "glm/vec2.hpp"
 
 namespace reone {
 
 namespace render {
 
-class CurFile : public resource::BinaryFile {
-public:
-    CurFile();
+class Texture;
 
-    std::shared_ptr<Texture> texture();
+class Cursor {
+public:
+    Cursor(const std::shared_ptr<Texture> &up, const std::shared_ptr<Texture> &down);
+
+    void render() const;
+
+    void setPosition(const glm::ivec2 &position);
+    void setPressed(bool pressed);
 
 private:
-    uint16_t _bitCount { 0 };
-    int _width { 0 };
-    int _height { 0 };
-    std::shared_ptr<Texture> _texture;
+    Cursor(const Cursor &) = delete;
+    Cursor &operator=(const Cursor &) = delete;
 
-    void doLoad() override;
-    void loadHeader();
-    void loadData();
+    glm::ivec2 _position { 0 };
+    bool _pressed { false };
+    std::shared_ptr<Texture> _up;
+    std::shared_ptr<Texture> _down;
 };
 
 } // namespace render

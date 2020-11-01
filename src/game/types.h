@@ -36,6 +36,14 @@ namespace reone {
 
 namespace game {
 
+enum class CursorType {
+    None,
+    Default,
+    Door,
+    Talk,
+    Pickup
+};
+
 enum InventorySlot {
     kInventorySlotHead = 0,
     kInventorySlotBody = 1,

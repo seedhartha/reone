@@ -23,7 +23,7 @@ namespace reone {
 
 namespace render {
 
-CurFile::CurFile(const string &resRef) : BinaryFile(0), _resRef(resRef) {
+CurFile::CurFile() : BinaryFile(0) {
 }
 
 void CurFile::doLoad() {
@@ -82,7 +82,7 @@ void CurFile::loadData() {
     Texture::Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    _texture = make_shared<Texture>(_resRef, TextureType::Cursor);
+    _texture = make_shared<Texture>("", TextureType::Cursor);
     _texture->_width = mipMap.width;
     _texture->_height = mipMap.height;
     _texture->_pixelFormat = PixelFormat::BGRA;

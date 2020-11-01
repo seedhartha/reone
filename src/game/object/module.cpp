@@ -130,6 +130,24 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     const SpatialObject *object = _area->getObjectAt(event.x, event.y);
     _area->objectSelector().hilight(object ? object->id() : -1);
 
+    CursorType cursor = CursorType::Default;
+    if (object) {
+        switch (object->type()) {
+            case ObjectType::Creature:
+                cursor = CursorType::Talk;
+                break;
+            case ObjectType::Door:
+                cursor = CursorType::Door;
+                break;
+            case ObjectType::Placeable:
+                cursor = CursorType::Pickup;
+                break;
+            default:
+                break;
+        }
+    }
+    _game->setCursorType(cursor);
+
     return true;
 }
 
