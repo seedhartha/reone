@@ -375,11 +375,6 @@ void Game::update() {
         loadNextModule();
     }
 
-    GUI *gui = getScreenGUI();
-    if (gui) {
-        gui->update(dt);
-    }
-
     Camera *camera = getActiveCamera();
     if (camera) {
         camera->update(dt);
@@ -388,6 +383,11 @@ void Game::update() {
     bool updModule = _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
     if (updModule) {
         _module->update(dt);
+    }
+
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->update(dt);
     }
 
     _window.update(dt);
