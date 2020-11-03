@@ -17,54 +17,24 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../resource/types.h"
+#include "../../../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-class Creature;
 class Game;
 
-class Equipment : public gui::GUI {
+class CharacterMenu : public gui::GUI {
 public:
-    enum class Slot {
-        None,
-        Implant,
-        Head,
-        Hands,
-        ArmL,
-        Body,
-        ArmR,
-        WeapL,
-        Belt,
-        WeapR,
-        WeapL2,
-        WeapR2
-    };
-
-    Equipment(Game *game);
+    CharacterMenu(Game *game);
 
     void load() override;
 
-    void update();
-
 private:
     Game *_game { nullptr };
-    Slot _selectedSlot { Slot::None };
-    int _selectedItemIdx { -1 };
 
     void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus);
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
-    void preloadControl(gui::Control &control) override;
-
-    void configureItemsListBox();
-    void updateEquipment();
-    void updateItems();
-    void updatePortraits();
-    void selectSlot(Slot slot);
 };
 
 } // namespace game
