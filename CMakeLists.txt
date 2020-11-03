@@ -353,11 +353,14 @@ set(GAME_HEADERS
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
-    src/game/gui/equip.h
     src/game/gui/hud.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
-    src/game/gui/partyselect.h
+    src/game/gui/menu/character.h
+    src/game/gui/menu/equip.h
+    src/game/gui/menu/ingame.h
+    src/game/gui/menu/inventory.h
+    src/game/gui/menu/partyselect.h
     src/game/gui/selectoverlay.h
     src/game/object/area.h
     src/game/object/creature.h
@@ -419,11 +422,14 @@ set(GAME_SOURCES
     src/game/gui/container.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
-    src/game/gui/equip.cpp
     src/game/gui/hud.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
-    src/game/gui/partyselect.cpp
+    src/game/gui/menu/character.cpp
+    src/game/gui/menu/equip.cpp
+    src/game/gui/menu/ingame.cpp
+    src/game/gui/menu/inventory.cpp
+    src/game/gui/menu/partyselect.cpp
     src/game/gui/selectoverlay.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp

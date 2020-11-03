@@ -19,16 +19,16 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../gui/control/imagebutton.h"
-#include "../../gui/control/listbox.h"
-#include "../../render/textures.h"
-#include "../../resource/resources.h"
+#include "../../../gui/control/imagebutton.h"
+#include "../../../gui/control/listbox.h"
+#include "../../../render/textures.h"
+#include "../../../resource/resources.h"
 
-#include "../game.h"
-#include "../object/creature.h"
-#include "../object/item.h"
+#include "../../game.h"
+#include "../../object/creature.h"
+#include "../../object/item.h"
 
-#include "colors.h"
+#include "../colors.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -75,9 +75,6 @@ Equipment::Equipment(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
 

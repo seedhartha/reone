@@ -35,11 +35,10 @@
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/dialog.h"
-#include "gui/equip.h"
 #include "gui/hud.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
-#include "gui/partyselect.h"
+#include "gui/menu/ingame.h"
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
@@ -74,8 +73,10 @@ public:
 
     void loadModule(const std::string &name, const std::string &entry = "");
     void onCameraChanged(CameraType camera);
+    void openCharacter();
     void openContainer(SpatialObject *container);
     void openEquipment();
+    void openInventory();
     void openInGame();
     void openMainMenu();
     void openPartySelection(const PartySelection::Context &ctx);
@@ -130,10 +131,9 @@ private:
         Loading,
         CharacterGeneration,
         InGame,
+        InGameMenu,
         Dialog,
-        Container,
-        Equipment,
-        PartySelection
+        Container
     };
 
     struct UserDefinedEvent {
@@ -170,10 +170,9 @@ private:
     std::unique_ptr<LoadingScreen> _loadScreen;
     std::unique_ptr<CharacterGeneration> _charGen;
     std::unique_ptr<HUD> _hud;
+    std::unique_ptr<InGameMenu> _inGame;
     std::unique_ptr<Dialog> _dialog;
     std::unique_ptr<Container> _container;
-    std::unique_ptr<Equipment> _equipment;
-    std::unique_ptr<PartySelection> _partySelection;
 
     // END GUI
 
@@ -219,10 +218,9 @@ private:
     void loadLoadingScreen();
     void loadCharacterGeneration();
     void loadHUD();
+    void loadInGame();
     void loadDialog();
     void loadContainer();
-    void loadEquipment();
-    void loadPartySelection();
 
     // END Loading
 

@@ -180,6 +180,10 @@ void HUD::render() const {
 void HUD::onClick(const string &control) {
     if (control == "BTN_EQU") {
         _game->openEquipment();
+    } else if (control == "BTN_INV") {
+        _game->openInventory();
+    } else if (control == "BTN_CHAR") {
+        _game->openCharacter();
     } else if (control == "BTN_MAP") {
         _game->openPartySelection(PartySelection::Context());
     }

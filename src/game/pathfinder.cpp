@@ -19,8 +19,6 @@
 
 #include "glm/gtx/norm.hpp"
 
-#include "../system/log.h"
-
 using namespace std;
 
 using namespace reone::resource;
