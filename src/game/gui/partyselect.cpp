@@ -19,16 +19,16 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../../gui/control/label.h"
-#include "../../../gui/control/togglebutton.h"
-#include "../../../render/textures.h"
-#include "../../../resource/resources.h"
-#include "../../../script/types.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/togglebutton.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
+#include "../../script/types.h"
 
-#include "../../blueprint/blueprints.h"
-#include "../../game.h"
-#include "../../portraits.h"
-#include "../../script/util.h"
+#include "../blueprint/blueprints.h"
+#include "../game.h"
+#include "../portraits.h"
+#include "../script/util.h"
 
 using namespace std;
 

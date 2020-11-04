@@ -21,51 +21,20 @@
 
 namespace reone {
 
-namespace gui {
-
-class ToggleButton;
-
-}
-
 namespace game {
-
-static const int kNpcCount = 9;
 
 class Game;
 
-class PartySelection : public gui::GUI {
+class JournalMenu : public gui::GUI {
 public:
-    struct Context {
-        std::string exitScript;
-        int forceNpc1 { -1 };
-        int forceNpc2 { -2 };
-    };
-
-    PartySelection(Game *game);
+    JournalMenu(Game *game);
 
     void load() override;
 
-    void prepare(const Context &ctx);
-
 private:
     Game *_game { nullptr };
-    Context _context;
-    int _selectedNpc { -1 };
-    bool _added[kNpcCount] { false };
-    int _availableCount { 0 };
 
     void onClick(const std::string &control) override;
-
-    void addNpc(int npc);
-    void changeParty();
-    void onAcceptButtonClick();
-    void onNpcButtonClick(const std::string &control);
-    void refreshAcceptButton();
-    void refreshAvailableCount();
-    void refreshNpcButtons();
-    void removeNpc(int npc);
-
-    gui::ToggleButton &getNpcButton(int npc);
 };
 
 } // namespace game

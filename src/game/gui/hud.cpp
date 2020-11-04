@@ -179,13 +179,19 @@ void HUD::render() const {
 
 void HUD::onClick(const string &control) {
     if (control == "BTN_EQU") {
-        _game->openEquipment();
+        _game->openInGameMenu(InGameMenu::Tab::Equipment);
     } else if (control == "BTN_INV") {
-        _game->openInventory();
+        _game->openInGameMenu(InGameMenu::Tab::Inventory);
     } else if (control == "BTN_CHAR") {
-        _game->openCharacter();
+        _game->openInGameMenu(InGameMenu::Tab::Character);
+    } else if (control == "BTN_ABI") {
+        _game->openInGameMenu(InGameMenu::Tab::Abilities);
+    } else if (control == "BTN_MSG") {
+        _game->openInGameMenu(InGameMenu::Tab::Messages);
+    } else if (control == "BTN_JOU") {
+        _game->openInGameMenu(InGameMenu::Tab::Journal);
     } else if (control == "BTN_MAP") {
-        _game->openPartySelection(PartySelection::Context());
+        _game->openInGameMenu(InGameMenu::Tab::Map);
     }
 }
 
