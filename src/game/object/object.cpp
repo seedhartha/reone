@@ -37,8 +37,8 @@ void Object::update(float dt) {
 }
 
 void Object::runUserDefinedEvent(int eventNumber) {
-    if (!_scripts[ScriptType::OnUserDefined].empty()) {
-        runScript(_scripts[ScriptType::OnUserDefined], _id, kObjectInvalid, eventNumber);
+    if (!_onUserDefined.empty()) {
+        runScript(_onUserDefined, _id, kObjectInvalid, eventNumber);
     }
 }
 

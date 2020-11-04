@@ -124,6 +124,14 @@ private:
     CameraStyle _cameraStyle;
     std::string _music;
 
+    // Scripts
+
+    std::string _onEnter;
+    std::string _onExit;
+    std::string _onHeartbeat;
+
+    // END Scripts
+
     // Cameras
 
     float _cameraAspect { 0.0f };

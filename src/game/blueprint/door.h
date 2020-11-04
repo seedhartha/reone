@@ -31,14 +31,23 @@ public:
 
     void load(const resource::GffStruct &utd);
 
-    const std::string &tag() const;
+    bool isLockable() const;
+    bool isLocked() const;
     bool isStatic() const;
+
+    const std::string &tag() const;
     int genericType() const;
+    const std::string &onOpen() const;
+    const std::string &onFailToOpen() const;
 
 private:
     std::string _tag;
-    bool _static { false };
+    bool _lockable { false };
+    bool _locked { false };
     int _genericType { 0 };
+    bool _static { false };
+    std::string _onOpen;
+    std::string _onFailToOpen;
 
     DoorBlueprint(const DoorBlueprint &) = delete;
     DoorBlueprint &operator=(const DoorBlueprint &) = delete;
