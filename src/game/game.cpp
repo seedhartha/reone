@@ -172,6 +172,9 @@ void Game::loadModule(const string &name, const string &entry) {
         if (!_container) {
             loadContainer();
         }
+        if (!_partySelect) {
+            loadPartySelection();
+        }
 
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
@@ -314,6 +317,11 @@ void Game::loadContainer() {
     _container->load();
 }
 
+void Game::loadPartySelection() {
+    _partySelect.reset(new PartySelection(this));
+    _partySelect->load();
+}
+
 void Game::loadInGame() {
     _inGame.reset(new InGameMenu(this));
     _inGame->load();
@@ -335,6 +343,8 @@ GUI *Game::getScreenGUI() const {
             return _dialog.get();
         case GameScreen::Container:
             return _container.get();
+        case GameScreen::PartySelection:
+            return _partySelect.get();
         default:
             return nullptr;
     }
@@ -448,16 +458,40 @@ void Game::openInGame() {
     _screen = GameScreen::InGame;
 }
 
+void Game::openInGameMenu(InGameMenu::Tab tab) {
+    setCursorType(CursorType::Default);
+    switch (tab) {
+        case InGameMenu::Tab::Equipment:
+            _inGame->openEquipment();
+            break;
+        case InGameMenu::Tab::Inventory:
+            _inGame->openInventory();
+            break;
+        case InGameMenu::Tab::Character:
+            _inGame->openCharacter();
+            break;
+        case InGameMenu::Tab::Abilities:
+            _inGame->openAbilities();
+            break;
+        case InGameMenu::Tab::Messages:
+            _inGame->openMessages();
+            break;
+        case InGameMenu::Tab::Journal:
+            _inGame->openJournal();
+            break;
+        case InGameMenu::Tab::Map:
+            _inGame->openMap();
+            break;
+        default:
+            break;
+    }
+    _screen = GameScreen::InGameMenu;
+}
+
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
     setCursorType(CursorType::Default);
     _screen = GameScreen::Dialog;
     _dialog->startDialog(owner, resRef);
-}
-
-void Game::openCharacter() {
-    setCursorType(CursorType::Default);
-    _inGame->openCharacter();
-    _screen = GameScreen::InGameMenu;
 }
 
 void Game::openContainer(SpatialObject *container) {
@@ -466,16 +500,10 @@ void Game::openContainer(SpatialObject *container) {
     _screen = GameScreen::Container;
 }
 
-void Game::openInventory() {
-    setCursorType(CursorType::Default);
-    _inGame->openInventory();
-    _screen = GameScreen::InGameMenu;
-}
-
 void Game::openPartySelection(const PartySelection::Context &ctx) {
     setCursorType(CursorType::Default);
-    _inGame->openPartySelection(ctx);
-    _screen = GameScreen::InGameMenu;
+    _partySelect->prepare(ctx);
+    _screen = GameScreen::PartySelection;
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
@@ -485,12 +513,6 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::onCameraChanged(CameraType camera) {
     _window.setRelativeMouseMode(camera == CameraType::FirstPerson);
-}
-
-void Game::openEquipment() {
-    setCursorType(CursorType::Default);
-    _inGame->openEquipment();
-    _screen = GameScreen::InGameMenu;
 }
 
 bool Game::handle(const SDL_Event &event) {

@@ -39,6 +39,7 @@
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/menu/ingame.h"
+#include "gui/partyselect.h"
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
@@ -73,11 +74,9 @@ public:
 
     void loadModule(const std::string &name, const std::string &entry = "");
     void onCameraChanged(CameraType camera);
-    void openCharacter();
     void openContainer(SpatialObject *container);
-    void openEquipment();
-    void openInventory();
     void openInGame();
+    void openInGameMenu(InGameMenu::Tab tab);
     void openMainMenu();
     void openPartySelection(const PartySelection::Context &ctx);
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
@@ -133,7 +132,8 @@ private:
         InGame,
         InGameMenu,
         Dialog,
-        Container
+        Container,
+        PartySelection
     };
 
     struct UserDefinedEvent {
@@ -173,6 +173,7 @@ private:
     std::unique_ptr<InGameMenu> _inGame;
     std::unique_ptr<Dialog> _dialog;
     std::unique_ptr<Container> _container;
+    std::unique_ptr<PartySelection> _partySelect;
 
     // END GUI
 
@@ -214,13 +215,14 @@ private:
 
     // Loading
 
-    void loadMainMenu();
-    void loadLoadingScreen();
     void loadCharacterGeneration();
+    void loadContainer();
+    void loadDialog();
     void loadHUD();
     void loadInGame();
-    void loadDialog();
-    void loadContainer();
+    void loadLoadingScreen();
+    void loadMainMenu();
+    void loadPartySelection();
 
     // END Loading
 

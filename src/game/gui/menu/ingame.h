@@ -19,10 +19,13 @@
 
 #include "../../../gui/gui.h"
 
+#include "abilities.h"
 #include "character.h"
 #include "equip.h"
 #include "inventory.h"
-#include "partyselect.h"
+#include "journal.h"
+#include "map.h"
+#include "messages.h"
 
 namespace reone {
 
@@ -32,6 +35,17 @@ class Game;
 
 class InGameMenu : public gui::GUI {
 public:
+    enum class Tab {
+        None,
+        Equipment,
+        Inventory,
+        Character,
+        Abilities,
+        Messages,
+        Journal,
+        Map
+    };
+
     InGameMenu(Game *game);
 
     void load() override;
@@ -39,34 +53,35 @@ public:
     void update(float dt) override;
     void render() const override;
 
-    void openCharacter();
     void openEquipment();
     void openInventory();
-    void openPartySelection(const PartySelection::Context &ctx);
+    void openCharacter();
+    void openAbilities();
+    void openMessages();
+    void openJournal();
+    void openMap();
 
 private:
-    enum class Tab {
-        None,
-        Character,
-        Equipment,
-        Inventory,
-        PartySelection
-    };
-
     Game *_game { nullptr };
     Tab _tab { Tab::None };
 
     std::unique_ptr<CharacterMenu> _character;
     std::unique_ptr<Equipment> _equip;
     std::unique_ptr<InventoryMenu> _inventory;
-    std::unique_ptr<PartySelection> _party;
+    std::unique_ptr<AbilitiesMenu> _abilities;
+    std::unique_ptr<MessagesMenu> _messages;
+    std::unique_ptr<JournalMenu> _journal;
+    std::unique_ptr<MapMenu> _map;
 
     void onClick(const std::string &control) override;
 
     void loadCharacterMenu();
     void loadEquipmentMenu();
     void loadInventoryMenu();
-    void loadPartySelection();
+    void loadAbilitiesMenu();
+    void loadMessagesMenu();
+    void loadJournalMenu();
+    void loadMapMenu();
 
     GUI *getActiveTabGUI() const;
 };

@@ -57,15 +57,13 @@ void InGameMenu::load() {
     setControlFocusable("LBLH_MAP", false);
     setControlFocusable("LBLH_OPT", false);
 
-    loadCharacterMenu();
     loadEquipmentMenu();
     loadInventoryMenu();
-    loadPartySelection();
-}
-
-void InGameMenu::loadCharacterMenu() {
-    _character = make_unique<CharacterMenu>(_game);
-    _character->load();
+    loadCharacterMenu();
+    loadAbilitiesMenu();
+    loadMessagesMenu();
+    loadJournalMenu();
+    loadMapMenu();
 }
 
 void InGameMenu::loadEquipmentMenu() {
@@ -78,30 +76,56 @@ void InGameMenu::loadInventoryMenu() {
     _inventory->load();
 }
 
-void InGameMenu::loadPartySelection() {
-    _party = make_unique<PartySelection>(_game);
-    _party->load();
+void InGameMenu::loadCharacterMenu() {
+    _character = make_unique<CharacterMenu>(_game);
+    _character->load();
+}
+
+void InGameMenu::loadAbilitiesMenu() {
+    _abilities = make_unique<AbilitiesMenu>(_game);
+    _abilities->load();
+}
+
+void InGameMenu::loadMessagesMenu() {
+    _messages = make_unique<MessagesMenu>(_game);
+    _messages->load();
+}
+
+void InGameMenu::loadJournalMenu() {
+    _journal = make_unique<JournalMenu>(_game);
+    _journal->load();
+}
+
+void InGameMenu::loadMapMenu() {
+    _map = make_unique<MapMenu>(_game);
+    _map->load();
 }
 
 bool InGameMenu::handle(const SDL_Event &event) {
     GUI *tabGui = getActiveTabGUI();
     if (tabGui && tabGui->handle(event)) return true;
 
-    if (_tab != Tab::PartySelection && GUI::handle(event)) return true;
+    if (_tab != Tab::Map && GUI::handle(event)) return true;
 
     return false;
 }
 
 GUI *InGameMenu::getActiveTabGUI() const {
     switch (_tab) {
-        case Tab::Character:
-            return _character.get();
         case Tab::Equipment:
             return _equip.get();
         case Tab::Inventory:
             return _inventory.get();
-        case Tab::PartySelection:
-            return _party.get();
+        case Tab::Character:
+            return _character.get();
+        case Tab::Abilities:
+            return _abilities.get();
+        case Tab::Messages:
+            return _messages.get();
+        case Tab::Journal:
+            return _journal.get();
+        case Tab::Map:
+            return _map.get();
         default:
             return nullptr;
     }
@@ -121,22 +145,7 @@ void InGameMenu::render() const {
     if (tabGui) {
         tabGui->render();
     }
-    if (_tab != Tab::PartySelection) {
-        GUI::render();
-    }
-}
-
-void InGameMenu::openCharacter() {
-    setControlFocus("LBLH_EQU", false);
-    setControlFocus("LBLH_INV", false);
-    setControlFocus("LBLH_CHA", true);
-    setControlFocus("LBLH_ABI", false);
-    setControlFocus("LBLH_MSG", false);
-    setControlFocus("LBLH_JOU", false);
-    setControlFocus("LBLH_MAP", false);
-    setControlFocus("LBLH_OPT", false);
-
-    _tab = Tab::Character;
+    GUI::render();
 }
 
 void InGameMenu::openEquipment() {
@@ -166,7 +175,59 @@ void InGameMenu::openInventory() {
     _tab = Tab::Inventory;
 }
 
-void InGameMenu::openPartySelection(const PartySelection::Context &ctx) {
+void InGameMenu::openCharacter() {
+    setControlFocus("LBLH_EQU", false);
+    setControlFocus("LBLH_INV", false);
+    setControlFocus("LBLH_CHA", true);
+    setControlFocus("LBLH_ABI", false);
+    setControlFocus("LBLH_MSG", false);
+    setControlFocus("LBLH_JOU", false);
+    setControlFocus("LBLH_MAP", false);
+    setControlFocus("LBLH_OPT", false);
+
+    _tab = Tab::Character;
+}
+
+void InGameMenu::openAbilities() {
+    setControlFocus("LBLH_EQU", false);
+    setControlFocus("LBLH_INV", false);
+    setControlFocus("LBLH_CHA", false);
+    setControlFocus("LBLH_ABI", true);
+    setControlFocus("LBLH_MSG", false);
+    setControlFocus("LBLH_JOU", false);
+    setControlFocus("LBLH_MAP", false);
+    setControlFocus("LBLH_OPT", false);
+
+    _tab = Tab::Abilities;
+}
+
+void InGameMenu::openMessages() {
+    setControlFocus("LBLH_EQU", false);
+    setControlFocus("LBLH_INV", false);
+    setControlFocus("LBLH_CHA", false);
+    setControlFocus("LBLH_ABI", false);
+    setControlFocus("LBLH_MSG", true);
+    setControlFocus("LBLH_JOU", false);
+    setControlFocus("LBLH_MAP", false);
+    setControlFocus("LBLH_OPT", false);
+
+    _tab = Tab::Messages;
+}
+
+void InGameMenu::openJournal() {
+    setControlFocus("LBLH_EQU", false);
+    setControlFocus("LBLH_INV", false);
+    setControlFocus("LBLH_CHA", false);
+    setControlFocus("LBLH_ABI", false);
+    setControlFocus("LBLH_MSG", false);
+    setControlFocus("LBLH_JOU", true);
+    setControlFocus("LBLH_MAP", false);
+    setControlFocus("LBLH_OPT", false);
+
+    _tab = Tab::Journal;
+}
+
+void InGameMenu::openMap() {
     setControlFocus("LBLH_EQU", false);
     setControlFocus("LBLH_INV", false);
     setControlFocus("LBLH_CHA", false);
@@ -176,8 +237,7 @@ void InGameMenu::openPartySelection(const PartySelection::Context &ctx) {
     setControlFocus("LBLH_MAP", true);
     setControlFocus("LBLH_OPT", false);
 
-    _party->prepare(ctx);
-    _tab = Tab::PartySelection;
+    _tab = Tab::Map;
 }
 
 void InGameMenu::onClick(const string &control) {
@@ -187,8 +247,14 @@ void InGameMenu::onClick(const string &control) {
         openInventory();
     } else if (control == "LBLH_CHA") {
         openCharacter();
+    } else if (control == "LBLH_ABI") {
+        openAbilities();
+    } else if (control == "LBLH_MSG") {
+        openMessages();
+    } else if (control == "LBLH_JOU") {
+        openJournal();
     } else if (control == "LBLH_MAP") {
-        openPartySelection(PartySelection::Context());
+        openMap();
     }
 }
 
