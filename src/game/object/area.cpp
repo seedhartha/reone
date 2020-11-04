@@ -160,10 +160,10 @@ void Area::loadAmbientColor(const GffStruct &are) {
 }
 
 void Area::loadScripts(const GffStruct &are) {
-    _scripts[ScriptType::OnEnter] = are.getString("OnEnter");
-    _scripts[ScriptType::OnExit] = are.getString("OnExit");
-    _scripts[ScriptType::OnHeartbeat] = are.getString("OnHeartbeat");
-    _scripts[ScriptType::OnUserDefined] = are.getString("OnUserDefined");
+    _onEnter = are.getString("OnEnter");
+    _onExit = are.getString("OnExit");
+    _onHeartbeat = are.getString("OnHeartbeat");
+    _onUserDefined = are.getString("OnUserDefined");
 }
 
 void Area::loadGIT(const GffStruct &git) {
@@ -526,8 +526,8 @@ void Area::runOnEnterScript() {
     shared_ptr<Creature> player(_game->party().player());
     if (!player) return;
 
-    if (!_scripts[ScriptType::OnEnter].empty()) {
-        runScript(_scripts[ScriptType::OnEnter], _id, player->id(), -1);
+    if (!_onEnter.empty()) {
+        runScript(_onEnter, _id, player->id(), -1);
     }
 }
 

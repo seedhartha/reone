@@ -43,18 +43,16 @@ public:
     ActionQueue &actionQueue();
 
 protected:
-    enum class ScriptType {
-        OnEnter,
-        OnExit,
-        OnHeartbeat,
-        OnUserDefined
-    };
-
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
     std::string _tag;
     ActionQueue _actionQueue;
-    std::unordered_map<ScriptType, std::string> _scripts;
+
+    // Scripts
+
+    std::string _onUserDefined;
+
+    // END Scripts
 
     Object(uint32_t id, ObjectType type);
 

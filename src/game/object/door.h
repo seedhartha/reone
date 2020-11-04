@@ -36,7 +36,9 @@ public:
     void close(Object *triggerrer);
 
     bool isOpen() const;
-    bool isStatic() const;
+    bool isLocked() const;
+
+    const DoorBlueprint &blueprint() const;
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;
     const std::string &transitionDestin() const;
@@ -44,6 +46,7 @@ public:
 private:
     std::shared_ptr<DoorBlueprint> _blueprint;
     bool _open { false };
+    bool _locked { false };
     std::string _linkedToModule;
     std::string _linkedTo;
     std::string _transitionDestin;

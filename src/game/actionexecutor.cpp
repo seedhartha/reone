@@ -29,6 +29,7 @@
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/placeable.h"
+#include "script/util.h"
 
 using namespace std;
 
@@ -210,7 +211,16 @@ void ActionExecutor::executeOpenDoor(Creature &creature, ObjectAction &action, f
     Door &door = *static_cast<Door *>(action.object());
     bool reached = navigateCreature(creature, door.position(), 1.0f, dt);
     if (reached) {
-        door.open(&creature);
+        if (door.isLocked()) {
+            if (!door.blueprint().onFailToOpen().empty()) {
+                runScript(door.blueprint().onFailToOpen(), door.id(), creature.id(), -1);
+            }
+        } else {
+            door.open(&creature);
+            if (!door.blueprint().onOpen().empty()) {
+                runScript(door.blueprint().onOpen(), door.id(), creature.id(), -1);
+            }
+        }
         action.complete();
     }
 }

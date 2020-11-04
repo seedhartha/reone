@@ -204,7 +204,7 @@ void Module::onDoorClick(Door &door) {
         _game->scheduleModuleTransition(door.linkedToModule(), door.linkedTo());
         return;
     }
-    if (!door.isOpen() && !door.isStatic()) {
+    if (!door.isOpen() && !door.blueprint().isStatic()) {
         shared_ptr<Creature> partyLeader(_game->party().leader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();

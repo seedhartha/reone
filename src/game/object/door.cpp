@@ -23,6 +23,7 @@
 #include "../../render/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/modelscenenode.h"
+#include "../../script/scripts.h"
 #include "../../system/streamutil.h"
 
 #include "../blueprint/blueprints.h"
@@ -32,6 +33,7 @@ using namespace std;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
@@ -69,6 +71,7 @@ void Door::load(const GffStruct &gffs) {
 void Door::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getDoor(resRef);
     _tag = _blueprint->tag();
+    _locked = _blueprint->isLocked();
 
     shared_ptr<TwoDaTable> table = Resources::instance().get2DA("genericdoors");
 
@@ -101,8 +104,12 @@ bool Door::isOpen() const {
     return _open;
 }
 
-bool Door::isStatic() const {
-    return _blueprint->isStatic();
+bool Door::isLocked() const {
+    return _locked;
+}
+
+const DoorBlueprint &Door::blueprint() const {
+    return *_blueprint;
 }
 
 const string &Door::linkedToModule() const {
