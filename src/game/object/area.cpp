@@ -687,6 +687,8 @@ void Area::updateVisibility() {
     }
 
     Camera *camera = _game->getActiveCamera();
+    if (!camera) return;
+
     shared_ptr<CameraSceneNode> cameraNode(camera->sceneNode());
     glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
