@@ -40,7 +40,28 @@ void CreatureBlueprint::load(const GffStruct &utc) {
 
     _appearance = utc.getInt("Appearance_Type");
     _conversation = utc.getString("Conversation");
-    _scripts[ScriptType::Spawn] = utc.getString("ScriptSpawn");
+
+    loadAttributes(utc);
+    loadScripts(utc);
+}
+
+void CreatureBlueprint::loadAttributes(const GffStruct &utc) {
+    for (auto &classGff : utc.getList("ClassList")) {
+        int clazz = classGff.getInt("Class");
+        int level = classGff.getInt("ClassLevel");
+        _attributes.classLevels.push_back(make_pair(static_cast<ClassType>(clazz), level));
+    }
+    _attributes.abilities[Ability::Strength] = utc.getInt("Str");
+    _attributes.abilities[Ability::Dexterity] = utc.getInt("Dex");
+    _attributes.abilities[Ability::Constitution] = utc.getInt("Con");
+    _attributes.abilities[Ability::Intelligence] = utc.getInt("Int");
+    _attributes.abilities[Ability::Wisdom] = utc.getInt("Wis");
+    _attributes.abilities[Ability::Charisma] = utc.getInt("Cha");
+}
+
+void CreatureBlueprint::loadScripts(const GffStruct &utc) {
+    _onSpawn = utc.getString("ScriptSpawn");
+    _onUserDefined = utc.getString("ScriptUserDefine");
 }
 
 const string &CreatureBlueprint::tag() const {
@@ -57,6 +78,18 @@ int CreatureBlueprint::appearance() const {
 
 const string &CreatureBlueprint::conversation() const {
     return _conversation;
+}
+
+const CreatureAttributes &CreatureBlueprint::attributes() const {
+    return _attributes;
+}
+
+const string &CreatureBlueprint::onSpawn() const {
+    return _onSpawn;
+}
+
+const string &CreatureBlueprint::onUserDefined() const {
+    return _onUserDefined;
 }
 
 } // namespace game

@@ -83,6 +83,7 @@ private:
     // END Sub GUI
 
     void loadCharacterModel();
+    void updateAttributes();
 
     gui::GUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);

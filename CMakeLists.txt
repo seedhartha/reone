@@ -384,6 +384,7 @@ set(GAME_HEADERS
     src/game/player.h
     src/game/portraits.h
     src/game/room.h
+    src/game/rp/classes.h
     src/game/rp/types.h
     src/game/script/routines.h
     src/game/script/util.h
@@ -456,6 +457,7 @@ set(GAME_SOURCES
     src/game/player.cpp
     src/game/portraits.cpp
     src/game/room.cpp
+    src/game/rp/classes.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp
     src/game/script/routines_kotor.cpp

@@ -23,6 +23,7 @@
 #include "../../characters.h"
 #include "../../game.h"
 #include "../../object/creature.h"
+#include "../../rp/classes.h"
 
 #include "../colors.h"
 
@@ -45,15 +46,6 @@ static const float kModelOffsetY = 0.9f;
 static map<Gender, int> g_genderStrRefs {
     { Gender::Male, 646 },
     { Gender::Female, 647 }
-};
-
-static map<ClassType, int> g_classStrRefs {
-    { ClassType::Scout, 133 },
-    { ClassType::Soldier, 134 },
-    { ClassType::Scoundrel, 135 },
-    { ClassType::JediGuardian, 353 },
-    { ClassType::JediConsular, 354 },
-    { ClassType::JediSentinel, 355 }
 };
 
 static map<ClassType, int> g_classDescStrRefs {
@@ -228,7 +220,7 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
     ClassButton &button = _classButtons[idx];
 
     string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]));
-    classText += " " + Resources::instance().getString(g_classStrRefs[button.config.clazz]);
+    classText += " " + getClassTitle(button.config.clazz);
 
     string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]));
 
