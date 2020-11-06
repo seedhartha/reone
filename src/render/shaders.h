@@ -34,6 +34,7 @@ enum class ShaderProgram {
     GUIGUI,
     GUIBlur,
     GUIBloom,
+    GUIWhite,
     ModelWhite,
     ModelModel
 };

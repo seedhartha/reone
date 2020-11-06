@@ -114,13 +114,14 @@ void main() {
 static const GLchar kWhiteFragmentShader[] = R"END(
 #version 330
 
+uniform vec3 uColor;
 uniform float uAlpha;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    fragColor = vec4(1.0, 1.0, 1.0, uAlpha);
+    fragColor = vec4(uColor, uAlpha);
     fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
 }
 )END";
@@ -326,6 +327,7 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::GUIGUI, ShaderName::VertexGUI, ShaderName::FragmentGUI);
     initProgram(ShaderProgram::GUIBlur, ShaderName::VertexGUI, ShaderName::FragmentBlur);
     initProgram(ShaderProgram::GUIBloom, ShaderName::VertexGUI, ShaderName::FragmentBloom);
+    initProgram(ShaderProgram::GUIWhite, ShaderName::VertexGUI, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 }

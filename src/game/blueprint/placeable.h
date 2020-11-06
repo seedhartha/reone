@@ -40,6 +40,7 @@ public:
     bool getScript(ScriptType type, std::string &resRef) const;
 
     const std::string &tag() const;
+    const std::string &localizedName() const;
     int appearance() const;
     bool hasInventory() const;
     bool isUsable() const;
@@ -47,6 +48,7 @@ public:
 
 private:
     std::string _tag;
+    std::string _localizedName;
     int _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };

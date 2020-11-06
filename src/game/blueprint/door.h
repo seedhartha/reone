@@ -36,12 +36,14 @@ public:
     bool isStatic() const;
 
     const std::string &tag() const;
+    const std::string &localizedName() const;
     int genericType() const;
     const std::string &onOpen() const;
     const std::string &onFailToOpen() const;
 
 private:
     std::string _tag;
+    std::string _localizedName;
     bool _lockable { false };
     bool _locked { false };
     int _genericType { 0 };

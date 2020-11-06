@@ -54,6 +54,10 @@ const string &Object::tag() const {
     return _tag;
 }
 
+const string &Object::title() const {
+    return _title;
+}
+
 ActionQueue &Object::actionQueue() {
     return _actionQueue;
 }

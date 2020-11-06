@@ -40,12 +40,14 @@ public:
     uint32_t id() const;
     ObjectType type() const;
     const std::string &tag() const;
+    const std::string &title() const;
     ActionQueue &actionQueue();
 
 protected:
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
     std::string _tag;
+    std::string _title;
     ActionQueue _actionQueue;
 
     // Scripts

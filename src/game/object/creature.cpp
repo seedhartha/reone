@@ -98,6 +98,14 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     string portrait(getPortrait(_blueprint->portraitId()));
     _portrait = Textures::instance().get(portrait, TextureType::GUI);
 
+    string firstName(_blueprint->firstName());
+    string lastName(_blueprint->lastName());
+    if (!firstName.empty() && !lastName.empty()) {
+        _title = firstName + " " + lastName;
+    } else if (!firstName.empty()) {
+        _title = firstName;
+    }
+
     _attributes = blueprint->attributes();
     _onSpawn = blueprint->onSpawn();
     _onUserDefined = blueprint->onUserDefined();
