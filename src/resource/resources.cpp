@@ -348,7 +348,7 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
     return _exeFile.find(name, type);
 }
 
-const string &Resources::getString(int32_t ref) const {
+string Resources::getString(int32_t ref) const {
     static string empty;
 
     shared_ptr<TalkTable> table(_tlkFile.table());
@@ -356,7 +356,32 @@ const string &Resources::getString(int32_t ref) const {
         return empty;
     }
 
-    return table->getString(ref).text;
+    string text(table->getString(ref).text);
+    if (_version == GameVersion::TheSithLords) {
+        stripDeveloperNotes(text);
+    }
+
+    return move(text);
+}
+
+void Resources::stripDeveloperNotes(string &text) const {
+    do {
+        int openBracketIdx = text.find_first_of('{', 0);
+        if (openBracketIdx == -1) break;
+
+        int closeBracketIdx = text.find_first_of('}', openBracketIdx + 1);
+        if (closeBracketIdx == -1) break;
+
+        int textLen = static_cast<int>(text.size());
+        int noteLen = closeBracketIdx - openBracketIdx + 1;
+
+        for (int i = openBracketIdx; i + noteLen < textLen; ++i) {
+            text[i] = text[i + noteLen];
+        }
+
+        text.resize(textLen - noteLen);
+
+    } while (true);
 }
 
 const vector<string> &Resources::moduleNames() const {
