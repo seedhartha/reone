@@ -61,10 +61,9 @@ ClassSelection::ClassSelection(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     _resRef = getResRef("classsel");
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     switch (game->version()) {
         case GameVersion::TheSithLords:

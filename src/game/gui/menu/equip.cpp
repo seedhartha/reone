@@ -77,6 +77,8 @@ Equipment::Equipment(Game *game) :
 
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -100,14 +102,6 @@ void Equipment::load() {
 
     setControlFocusable("BTN_CHANGE1", false);
     setControlFocusable("BTN_CHANGE2", false);
-
-    glm::vec3 hilightColor(getHilightColor(_version));
-
-    Control &btnEquip = getControl("BTN_EQUIP");
-    btnEquip.setHilightColor(hilightColor);
-
-    Control &btnBack = getControl("BTN_BACK");
-    btnBack.setHilightColor(hilightColor);
 
     configureItemsListBox();
 }

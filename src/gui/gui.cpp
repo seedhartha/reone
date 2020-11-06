@@ -117,6 +117,9 @@ void GUI::loadControl(const GffStruct &gffs) {
 
     preloadControl(*control);
     control->load(gffs);
+    if (_hasDefaultHilightColor) {
+        control->setHilightColor(_defaultHilightColor);
+    }
 
     switch (_scaling) {
         case ScalingMode::PositionRelativeToCenter:
@@ -308,10 +311,6 @@ void GUI::setControlText(const string &tag, const string &text) {
 
 void GUI::setControlFocus(const string &tag, bool focus) {
     configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
-}
-
-void GUI::setControlHilightColor(const string &tag, const glm::vec3 &color) {
-    configureControl(tag, [&color](Control &ctrl) { ctrl.setHilightColor(color); });
 }
 
 Control &GUI::getControl(const string &tag) const {

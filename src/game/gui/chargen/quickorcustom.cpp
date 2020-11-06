@@ -36,6 +36,8 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -47,10 +49,6 @@ void QuickOrCustom::load() {
     GUI::load();
 
     disableControl("CUST_CHAR_BTN");
-
-    glm::vec3 hilightColor(getHilightColor(_version));
-    setControlHilightColor("QUICK_CHAR_BTN", hilightColor);
-    setControlHilightColor("BTN_BACK", hilightColor);
 
     if (_version == GameVersion::KotOR) {
         configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });

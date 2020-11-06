@@ -59,7 +59,6 @@ public:
     void setControlDisabled(const std::string &tag, bool disabled);
     void setControlFocus(const std::string &tag, bool focus);
     void setControlFocusable(const std::string &tag, bool focusable);
-    void setControlHilightColor(const std::string &tag, const glm::vec3 &color);
     void setControlText(const std::string &tag, const std::string &text);
 
 protected:
@@ -85,6 +84,8 @@ protected:
     std::vector<std::unique_ptr<Control>> _controls;
     std::unordered_map<std::string, Control *> _controlByTag;
     Control *_focus { nullptr };
+    bool _hasDefaultHilightColor { false };
+    glm::vec3 _defaultHilightColor { 0.0f };
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 

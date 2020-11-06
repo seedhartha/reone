@@ -38,6 +38,8 @@ QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen,
     _charGen(charGen) {
 
     _resRef = getResRef("quickpnl");
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     if (_version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -86,16 +88,6 @@ void QuickCharacterGeneration::doSetStep(int step) {
     setControlFocus("BTN_STEPNAME1", _step == 0);
     setControlFocus("BTN_STEPNAME2", _step == 1);
     setControlFocus("BTN_STEPNAME3", _step == 2);
-
-    glm::vec3 hilightColor(getHilightColor(_version));
-    setControlHilightColor("LBL_NUM1", hilightColor);
-    setControlHilightColor("LBL_NUM2", hilightColor);
-    setControlHilightColor("LBL_NUM3", hilightColor);
-    setControlHilightColor("BTN_STEPNAME1", hilightColor);
-    setControlHilightColor("BTN_STEPNAME2", hilightColor);
-    setControlHilightColor("BTN_STEPNAME3", hilightColor);
-    setControlHilightColor("BTN_BACK", hilightColor);
-    setControlHilightColor("BTN_CANCEL", hilightColor);
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {

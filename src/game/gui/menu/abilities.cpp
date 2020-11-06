@@ -19,6 +19,8 @@
 
 #include "../../game.h"
 
+#include "../colors.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -34,6 +36,8 @@ AbilitiesMenu::AbilitiesMenu(Game *game) :
 
     _resRef = getResRef("abilities");
     _backgroundType = BackgroundType::Menu;
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 800;
