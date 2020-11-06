@@ -154,6 +154,7 @@ private:
     bool _quit { false };
     std::shared_ptr<video::Video> _video;
     CursorType _cursorType { CursorType::None };
+    float _gameSpeed { 1.0f };
 
     // Modules
 
@@ -196,6 +197,7 @@ private:
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
     void loadNextModule();
     float measureFrameTime();
     void playMusic(const std::string &resRef);
