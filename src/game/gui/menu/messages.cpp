@@ -43,6 +43,8 @@ MessagesMenu::MessagesMenu(Game *game) :
 
 void MessagesMenu::load() {
     GUI::load();
+
+    disableControl("BTN_SHOW");
 }
 
 void MessagesMenu::onClick(const string &control) {

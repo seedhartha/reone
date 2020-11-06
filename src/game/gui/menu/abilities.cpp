@@ -43,6 +43,32 @@ AbilitiesMenu::AbilitiesMenu(Game *game) :
 
 void AbilitiesMenu::load() {
     GUI::load();
+
+    hideControl("BTN_CHARLEFT");
+    hideControl("BTN_CHARRIGHT");
+    hideControl("LBL_RANKVAL");
+    hideControl("LBL_BONUSVAL");
+    hideControl("LBL_TOTALVAL");
+    hideControl("LBL_NAME");
+
+    disableControl("BTN_SKILLS");
+    disableControl("BTN_POWERS");
+    disableControl("BTN_FEATS");
+}
+
+void AbilitiesMenu::updatePortraits() {
+    if (_version != GameVersion::KotOR) return;
+
+    Party &party = _game->party();
+    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyMember1(party.getMember(1));
+    shared_ptr<Creature> partyMember2(party.getMember(2));
+
+    Control &btnChange1 = getControl("BTN_CHANGE1");
+    btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+
+    Control &btnChange2 = getControl("BTN_CHANGE2");
+    btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void AbilitiesMenu::onClick(const string &control) {

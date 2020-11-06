@@ -87,6 +87,8 @@ Equipment::Equipment(Game *game) :
 void Equipment::load() {
     GUI::load();
 
+    hideControl("BTN_CHARLEFT");
+    hideControl("BTN_CHARRIGHT");
     hideControl("LB_DESC");
     hideControl("LBL_ATKL");
     hideControl("LBL_ATKR");
@@ -95,6 +97,9 @@ void Equipment::load() {
     hideControl("LBL_TOHITL");
     hideControl("LBL_TOHITR");
     hideControl("LBL_VITALITY");
+
+    setControlFocusable("BTN_CHANGE1", false);
+    setControlFocusable("BTN_CHANGE2", false);
 
     glm::vec3 hilightColor(getHilightColor(_version));
 
