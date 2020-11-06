@@ -40,6 +40,7 @@ namespace reone {
 namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
+static const float kMaxConversationDistance = 4.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
     if (!game) {
@@ -121,7 +122,7 @@ void ActionExecutor::executeDoCommand(Object &object, CommandAction &action, flo
 
 void ActionExecutor::executeStartConversation(Creature &creature, StartConversationAction &action, float dt) {
     Creature &target = static_cast<Creature &>(*action.object());
-    bool reached = action.isStartRangeIgnored() || navigateCreature(creature, target.position(), 1.0f, dt);
+    bool reached = action.isStartRangeIgnored() || navigateCreature(creature, target.position(), kMaxConversationDistance, dt);
     if (reached) {
         _game->module()->area()->startDialog(target, action.dialogResRef());
         action.complete();
