@@ -30,6 +30,7 @@
 #include "../../system/streamutil.h"
 
 #include "../blueprint/blueprints.h"
+#include "../portraits.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"
@@ -93,6 +94,9 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     }
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _blueprint->appearance());
+
+    string portrait(getPortrait(_blueprint->portraitId()));
+    _portrait = Textures::instance().get(portrait, TextureType::GUI);
 
     _attributes = blueprint->attributes();
     _onSpawn = blueprint->onSpawn();

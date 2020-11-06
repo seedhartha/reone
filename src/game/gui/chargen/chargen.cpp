@@ -208,7 +208,7 @@ void CharacterGeneration::loadCharacterModel() {
 
     lblModel.setScene3D(move(scene));
 
-    string portrait(findPortrait(_character.appearance));
+    string portrait(getPortraitByAppearance(_character.appearance));
     if (!portrait.empty()) {
         Control &lblPortrait = getControl("PORTRAIT_LBL");
         lblPortrait.setBorderFill(portrait);

@@ -23,7 +23,8 @@ namespace reone {
 
 namespace game {
 
-std::string findPortrait(int appearance);
+std::string getPortrait(int id);
+std::string getPortraitByAppearance(int appearance);
 
 } // namespace game
 

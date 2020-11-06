@@ -39,6 +39,7 @@ void CreatureBlueprint::load(const GffStruct &utc) {
     }
 
     _appearance = utc.getInt("Appearance_Type");
+    _portraitId = utc.getInt("PortraitId", -1);
     _conversation = utc.getString("Conversation");
 
     loadAttributes(utc);
@@ -87,6 +88,10 @@ const vector<string> &CreatureBlueprint::equipment() const {
 
 int CreatureBlueprint::appearance() const {
     return _appearance;
+}
+
+int CreatureBlueprint::portraitId() const {
+    return _portraitId;
 }
 
 const string &CreatureBlueprint::conversation() const {

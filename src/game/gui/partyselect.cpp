@@ -111,7 +111,7 @@ void PartySelection::prepare(const Context &ctx) {
             if (maybePortrait != g_portraitByAppearance.end()) {
                 portrait = maybePortrait->second;
             } else {
-                portrait = findPortrait(blueprint->appearance());
+                portrait = getPortraitByAppearance(blueprint->appearance());
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(Textures::instance().get(portrait, TextureType::GUI));
