@@ -112,6 +112,8 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 }
 
 void SelectionOverlay::drawTitleBar() const {
+    if (_selectedTitle.empty()) return;
+
     const GraphicsOptions &opts = _game->options().graphics;
     float barHeight = _font->height() + kTitleBarPadding;
     {
