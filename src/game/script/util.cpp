@@ -35,6 +35,9 @@ namespace game {
 
 int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
     shared_ptr<ScriptProgram> program(Scripts::instance().get(resRef));
+    if (!program) {
+        return -1;
+    }
     return runScript(move(program), callerId, triggererId, userDefinedEventNumber);
 }
 
