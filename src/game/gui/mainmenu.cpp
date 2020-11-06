@@ -59,9 +59,9 @@ MainMenu::MainMenu(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
+
     switch (game->version()) {
         case GameVersion::TheSithLords:
             _resRef = "mainmenu8x6_p";

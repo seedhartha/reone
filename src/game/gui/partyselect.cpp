@@ -30,6 +30,8 @@
 #include "../portraits.h"
 #include "../script/util.h"
 
+#include "colors.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -56,9 +58,6 @@ PartySelection::PartySelection(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     if (game->version() == GameVersion::TheSithLords) {
         _resRef = "partyselect_p";
         _resolutionX = 800;
@@ -67,6 +66,8 @@ PartySelection::PartySelection(Game *game) :
         _resRef = "partyselection";
         _backgroundType = BackgroundType::Menu;
     }
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 }
 
 void PartySelection::load() {

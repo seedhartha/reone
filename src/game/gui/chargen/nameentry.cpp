@@ -37,6 +37,8 @@ NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const Gr
     _input(kTextInputLetters | kTextInputWhitespace) {
 
     _resRef = getResRef("name");
+    _hasDefaultHilightColor = true;
+    _defaultHilightColor = getHilightColor(_version);
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -49,10 +51,6 @@ void NameEntry::load() {
 
     setControlText("NAME_BOX_EDIT", "");
     disableControl("BTN_RANDOM");
-
-    glm::vec3 hilightColor(getHilightColor(_version));
-    setControlHilightColor("END_BTN", hilightColor);
-    setControlHilightColor("BTN_BACK", hilightColor);
 }
 
 bool NameEntry::handle(const SDL_Event &event) {
