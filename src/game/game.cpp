@@ -408,7 +408,7 @@ float Game::measureFrameTime() {
     float dt = (ticks - _ticks) / 1000.0f;
     _ticks = ticks;
 
-    return dt;
+    return dt * _gameSpeed;
 }
 
 void Game::loadLoadingScreen() {
@@ -539,6 +539,29 @@ bool Game::handle(const SDL_Event &event) {
         }
         default:
             break;
+    }
+    if (event.type == SDL_KEYDOWN) {
+        return handleKeyDown(event.key);
+    }
+
+    return false;
+}
+
+bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
+    if (event.repeat) return false;
+
+    switch (event.keysym.sym) {
+        case SDLK_MINUS:
+            if (_gameSpeed > 1.0f) {
+                _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+            }
+            return true;
+
+        case SDLK_EQUALS:
+            if (_gameSpeed < 4.0f) {
+                _gameSpeed = glm::min(4.0f, _gameSpeed + 1.0f);
+            }
+            return true;
     }
 
     return false;
