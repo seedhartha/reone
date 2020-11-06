@@ -44,6 +44,36 @@ InventoryMenu::InventoryMenu(Game *game) :
 
 void InventoryMenu::load() {
     GUI::load();
+
+    hideControl("BTN_CHARLEFT");
+    hideControl("BTN_CHARRIGHT");
+    hideControl("LBL_CREDITS_VALUE");
+    hideControl("LBL_VIT");
+    hideControl("LBL_DEF");
+
+    disableControl("BTN_USEITEM");
+    disableControl("BTN_QUESTITEMS");
+
+    setControlFocusable("BTN_CHANGE1", false);
+    setControlFocusable("BTN_CHANGE2", false);
+}
+
+void InventoryMenu::updatePortraits() {
+    if (_version != GameVersion::KotOR) return;
+
+    Party &party = _game->party();
+    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyMember1(party.getMember(1));
+    shared_ptr<Creature> partyMember2(party.getMember(2));
+
+    Control &lblPortrait = getControl("LBL_PORT");
+    lblPortrait.setBorderFill(partyLeader->portrait());
+
+    Control &btnChange1 = getControl("BTN_CHANGE1");
+    btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+
+    Control &btnChange2 = getControl("BTN_CHANGE2");
+    btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void InventoryMenu::onClick(const string &control) {

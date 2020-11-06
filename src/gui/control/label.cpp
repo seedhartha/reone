@@ -23,6 +23,7 @@ namespace gui {
 
 Label::Label(GUI *gui) : Control(gui, ControlType::Label) {
     _focusable = false;
+    _clickable = true;
 }
 
 } // namespace gui

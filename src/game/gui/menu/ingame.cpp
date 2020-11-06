@@ -172,6 +172,7 @@ void InGameMenu::openInventory() {
     setControlFocus("LBLH_MAP", false);
     setControlFocus("LBLH_OPT", false);
 
+    _inventory->updatePortraits();
     _tab = Tab::Inventory;
 }
 
@@ -185,6 +186,7 @@ void InGameMenu::openCharacter() {
     setControlFocus("LBLH_MAP", false);
     setControlFocus("LBLH_OPT", false);
 
+    _character->updatePortraits();
     _tab = Tab::Character;
 }
 
@@ -198,6 +200,7 @@ void InGameMenu::openAbilities() {
     setControlFocus("LBLH_MAP", false);
     setControlFocus("LBLH_OPT", false);
 
+    _abilities->updatePortraits();
     _tab = Tab::Abilities;
 }
 

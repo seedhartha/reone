@@ -43,6 +43,9 @@ MapMenu::MapMenu(Game *game) :
 
 void MapMenu::load() {
     GUI::load();
+
+    disableControl("BTN_PRTYSLCT");
+    disableControl("BTN_RETURN");
 }
 
 void MapMenu::onClick(const string &control) {

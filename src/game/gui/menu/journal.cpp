@@ -43,6 +43,10 @@ JournalMenu::JournalMenu(Game *game) :
 
 void JournalMenu::load() {
     GUI::load();
+
+    disableControl("BTN_QUESTITEMS");
+    disableControl("BTN_SORT");
+    disableControl("BTN_SWAPTEXT");
 }
 
 void JournalMenu::onClick(const string &control) {
