@@ -53,6 +53,7 @@ void HUD::load() {
     _select.load();
 
     hideControl("BTN_CLEARALL");
+    hideControl("BTN_SWAPWEAPONS");
     hideControl("BTN_TARGET0");
     hideControl("BTN_TARGET1");
     hideControl("BTN_TARGET2");
