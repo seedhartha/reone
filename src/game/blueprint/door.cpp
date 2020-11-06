@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../resource/resources.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -30,6 +32,11 @@ namespace game {
 void DoorBlueprint::load(const GffStruct &utd) {
     _tag = utd.getString("Tag");
     boost::to_lower(_tag);
+
+    int locNameStrRef = utd.getInt("LocName", -1);
+    if (locNameStrRef != -1) {
+        _localizedName = Resources::instance().getString(locNameStrRef);
+    }
 
     _lockable = utd.getInt("Lockable", 0) != 0;
     _locked = utd.getInt("Locked", 0) != 0;
@@ -54,6 +61,10 @@ bool DoorBlueprint::isStatic() const {
 
 const string &DoorBlueprint::tag() const {
     return _tag;
+}
+
+const string &DoorBlueprint::localizedName() const {
+    return _localizedName;
 }
 
 int DoorBlueprint::genericType() const {

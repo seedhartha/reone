@@ -64,6 +64,7 @@ void Placeable::load(const GffStruct &gffs) {
 void Placeable::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getPlaceable(resRef);
     _tag = _blueprint->tag();
+    _title = _blueprint->localizedName();
 
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("placeables"));
 

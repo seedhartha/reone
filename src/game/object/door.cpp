@@ -71,6 +71,7 @@ void Door::load(const GffStruct &gffs) {
 void Door::loadBlueprint(const string &resRef) {
     _blueprint = Blueprints::instance().getDoor(resRef);
     _tag = _blueprint->tag();
+    _title = _blueprint->localizedName();
     _locked = _blueprint->isLocked();
 
     shared_ptr<TwoDaTable> table = Resources::instance().get2DA("genericdoors");

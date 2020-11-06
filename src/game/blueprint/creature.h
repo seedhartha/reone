@@ -36,6 +36,8 @@ public:
     void load(const resource::GffStruct &utc);
 
     const std::string &tag() const;
+    const std::string &firstName() const;
+    const std::string &lastName() const;
     const std::vector<std::string> &equipment() const;
     int appearance() const;
     int portraitId() const;
@@ -46,6 +48,8 @@ public:
 
 private:
     std::string _tag;
+    std::string _firstName;
+    std::string _lastName;
     std::vector<std::string> _equipment;
     int _appearance { 0 };
     int _portraitId { -1 };

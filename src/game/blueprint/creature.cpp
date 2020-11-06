@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../resource/resources.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -41,6 +43,16 @@ void CreatureBlueprint::load(const GffStruct &utc) {
     _appearance = utc.getInt("Appearance_Type");
     _portraitId = utc.getInt("PortraitId", -1);
     _conversation = utc.getString("Conversation");
+
+    int firstNameStrRef = utc.getInt("FirstName", -1);
+    if (firstNameStrRef != -1) {
+        _firstName = Resources::instance().getString(firstNameStrRef);
+    }
+
+    int lastNameStrRef = utc.getInt("LastName", -1);
+    if (lastNameStrRef != -1) {
+        _lastName = Resources::instance().getString(lastNameStrRef);
+    }
 
     loadAttributes(utc);
     loadScripts(utc);
@@ -80,6 +92,14 @@ void CreatureBlueprint::loadScripts(const GffStruct &utc) {
 
 const string &CreatureBlueprint::tag() const {
     return _tag;
+}
+
+const string &CreatureBlueprint::firstName() const {
+    return _firstName;
+}
+
+const string &CreatureBlueprint::lastName() const {
+    return _lastName;
 }
 
 const vector<string> &CreatureBlueprint::equipment() const {

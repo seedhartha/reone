@@ -22,12 +22,16 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/texture.h"
-#include "../../render/types.h"
-
 #include "../types.h"
 
 namespace reone {
+
+namespace render {
+
+class Font;
+class Texture;
+
+}
 
 namespace game {
 
@@ -44,14 +48,18 @@ public:
 
 private:
     Game *_game { nullptr };
+    std::shared_ptr<render::Font> _font;
     std::shared_ptr<render::Texture> _friendlyReticle;
     std::shared_ptr<render::Texture> _friendlyReticle2;
     bool _hasHilighted { false };
     bool _hasSelected { false };
     glm::vec3 _hilightedScreenCoords { 0.0f };
     glm::vec3 _selectedScreenCoords { 0.0f };
+    std::string _selectedTitle;
+    int _reticleHeight { 0 };
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
+    void drawTitleBar() const;
 };
 
 } // namespace game

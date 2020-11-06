@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../resource/resources.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -30,6 +32,11 @@ namespace game {
 void PlaceableBlueprint::load(const GffStruct &utp) {
     _tag = utp.getString("Tag");
     boost::to_lower(_tag);
+
+    int locNameStrRef = utp.getInt("LocName", -1);
+    if (locNameStrRef != -1) {
+        _localizedName = Resources::instance().getString(locNameStrRef);
+    }
 
     _appearance = utp.getInt("Appearance");
     _hasInventory = utp.getInt("HasInventory") != 0;
@@ -66,6 +73,10 @@ bool PlaceableBlueprint::getScript(ScriptType type, string &resRef) const {
 
 const string &PlaceableBlueprint::tag() const {
     return _tag;
+}
+
+const string &PlaceableBlueprint::localizedName() const {
+    return _localizedName;
 }
 
 int PlaceableBlueprint::appearance() const {
