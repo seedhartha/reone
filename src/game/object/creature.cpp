@@ -93,6 +93,10 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     }
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _blueprint->appearance());
+
+    _attributes = blueprint->attributes();
+    _onSpawn = blueprint->onSpawn();
+    _onUserDefined = blueprint->onUserDefined();
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {

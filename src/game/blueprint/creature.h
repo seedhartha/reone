@@ -23,6 +23,8 @@
 
 #include "../../resource/gfffile.h"
 
+#include "../rp/types.h"
+
 namespace reone {
 
 namespace game {
@@ -37,32 +39,29 @@ public:
     const std::vector<std::string> &equipment() const;
     int appearance() const;
     const std::string &conversation() const;
+    const CreatureAttributes &attributes() const;
+    const std::string &onSpawn() const;
+    const std::string &onUserDefined() const;
 
 private:
-    enum class ScriptType {
-        OnNotice,
-        SpellAt,
-        Attacked,
-        Damaged,
-        Disturbed,
-        EndRound,
-        EndDialogu,
-        Dialogue,
-        Spawn,
-        Rested,
-        Death,
-        UserDefine,
-        OnBlocked
-    };
-
     std::string _tag;
     std::vector<std::string> _equipment;
     int _appearance { 0 };
     std::string _conversation;
-    std::unordered_map<ScriptType, std::string> _scripts;
+    CreatureAttributes _attributes;
+
+    // Scripts
+
+    std::string _onSpawn;
+    std::string _onUserDefined;
+
+    // END Scripts
 
     CreatureBlueprint(const CreatureBlueprint &) = delete;
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
+
+    void loadAttributes(const resource::GffStruct &utc);
+    void loadScripts(const resource::GffStruct &utc);
 };
 
 } // namespace game

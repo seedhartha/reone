@@ -116,6 +116,13 @@ private:
     float _runSpeed { 0.0f };
     MovementType _movementType { MovementType::None };
     bool _talking { false };
+    CreatureAttributes _attributes;
+
+    // Scripts
+
+    std::string _onSpawn;
+
+    // END Scripts
 
     // Loading
 

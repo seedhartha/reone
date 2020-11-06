@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <map>
 #include <utility>
 #include <vector>
 
@@ -74,8 +75,15 @@ enum class Skill {
 
 struct CreatureAttributes {
     std::vector<std::pair<ClassType, int>> classLevels;
-    std::vector<int> abilities;
-    std::vector<int> skills;
+    std::map<Ability, int> abilities;
+    std::map<Skill, int> skills;
+
+    int strength() const { return abilities.find(Ability::Strength)->second; }
+    int dexterity() const { return abilities.find(Ability::Dexterity)->second; }
+    int constitution() const { return abilities.find(Ability::Constitution)->second; }
+    int intelligence() const { return abilities.find(Ability::Intelligence)->second; }
+    int wisdom() const { return abilities.find(Ability::Wisdom)->second; }
+    int charisma() const { return abilities.find(Ability::Charisma)->second; }
 };
 
 } // namespace game

@@ -24,6 +24,7 @@
 
 #include "../../game.h"
 #include "../../portraits.h"
+#include "../../rp/classes.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -65,9 +66,7 @@ void CharacterGeneration::load() {
     hideControl("NEW_LBL");
 
     setControlText("LBL_NAME", "");
-    setControlText("LBL_CLASS", "");
-    setControlText("LBL_LEVEL", "");
-    setControlText("LBL_LEVEL_VAL", "");
+    setControlText("LBL_LEVEL_VAL", "1");
 
     loadClassSelection();
     loadQuickOrCustom();
@@ -232,7 +231,26 @@ const CreatureConfiguration &CharacterGeneration::character() const {
 void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
     _character = config;
     loadCharacterModel();
+    updateAttributes();
     _portraitSelection->updatePortraits();
+}
+
+void CharacterGeneration::updateAttributes() {
+    setControlText("LBL_CLASS", getClassTitle(_character.clazz));
+
+    CreatureAttributes attrs(getClassAttributes(_character.clazz));
+    int vitality = getClassHitPoints(_character.clazz, 1) + (attrs.constitution() - 10) / 2;
+    int defense = 10 + getClassDefenseBonus(_character.clazz, 1) + (attrs.dexterity() - 10) / 2;
+
+    setControlText("LBL_VIT", to_string(vitality));
+    setControlText("LBL_DEF", to_string(defense));
+
+    setControlText("STR_AB_LBL", to_string(attrs.strength()));
+    setControlText("DEX_AB_LBL", to_string(attrs.dexterity()));
+    setControlText("CON_AB_LBL", to_string(attrs.constitution()));
+    setControlText("INT_AB_LBL", to_string(attrs.intelligence()));
+    setControlText("WIS_AB_LBL", to_string(attrs.wisdom()));
+    setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
 }
 
 void CharacterGeneration::setQuickStep(int step) {
