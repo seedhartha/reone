@@ -56,7 +56,7 @@ public:
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
 
-    const std::string &getString(int32_t ref) const;
+    std::string getString(int32_t ref) const;
 
     const std::vector<std::string> &moduleNames() const;
 
@@ -87,6 +87,7 @@ private:
     void indexTransientErfFile(const boost::filesystem::path &path);
     void indexTransientRimFile(const boost::filesystem::path &path);
     void loadModuleNames();
+    void stripDeveloperNotes(std::string &text) const;
 
     std::shared_ptr<ByteArray> get(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
     inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;

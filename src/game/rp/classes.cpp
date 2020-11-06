@@ -38,7 +38,7 @@ static map<ClassType, int> g_classStrRefs {
     { ClassType::JediSentinel, 355 }
 };
 
-const string &getClassTitle(ClassType clazz) {
+string getClassTitle(ClassType clazz) {
     int strRef = g_classStrRefs.find(clazz)->second;
     return Resources::instance().getString(strRef);
 }

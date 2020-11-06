@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-const std::string &getClassTitle(ClassType clazz);
+std::string getClassTitle(ClassType clazz);
 CreatureAttributes getClassAttributes(ClassType clazz);
 int getClassHitPoints(ClassType clazz, int level);
 int getClassDefenseBonus(ClassType clazz, int level);
