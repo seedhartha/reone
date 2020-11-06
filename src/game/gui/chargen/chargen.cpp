@@ -44,9 +44,6 @@ CharacterGeneration::CharacterGeneration(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     _resRef = getResRef("maincg");
     _backgroundType = BackgroundType::Menu;
 

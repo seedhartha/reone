@@ -51,6 +51,10 @@ void QuickOrCustom::load() {
     glm::vec3 hilightColor(getHilightColor(_version));
     setControlHilightColor("QUICK_CHAR_BTN", hilightColor);
     setControlHilightColor("BTN_BACK", hilightColor);
+
+    if (_version == GameVersion::KotOR) {
+        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+    }
 }
 
 void QuickOrCustom::onClick(const string &control) {
