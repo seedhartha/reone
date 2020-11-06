@@ -27,7 +27,7 @@ namespace game {
 
 ObjectAction::ObjectAction(ActionType type, Object *object) : Action(type), _object(object) {
     if (!object) {
-        throw invalid_argument("Object must not be null");
+        throw invalid_argument("object must not be null");
     }
 }
 
