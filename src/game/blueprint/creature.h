@@ -61,6 +61,8 @@ private:
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 
     void loadAttributes(const resource::GffStruct &utc);
+    void loadAbilities(const resource::GffStruct &utc);
+    void loadSkills(const resource::GffStruct &utc);
     void loadScripts(const resource::GffStruct &utc);
 };
 

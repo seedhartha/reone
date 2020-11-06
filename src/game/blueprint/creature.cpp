@@ -51,12 +51,25 @@ void CreatureBlueprint::loadAttributes(const GffStruct &utc) {
         int level = classGff.getInt("ClassLevel");
         _attributes.classLevels.push_back(make_pair(static_cast<ClassType>(clazz), level));
     }
+    loadAbilities(utc);
+    loadSkills(utc);
+}
+
+void CreatureBlueprint::loadAbilities(const GffStruct &utc) {
     _attributes.abilities[Ability::Strength] = utc.getInt("Str");
     _attributes.abilities[Ability::Dexterity] = utc.getInt("Dex");
     _attributes.abilities[Ability::Constitution] = utc.getInt("Con");
     _attributes.abilities[Ability::Intelligence] = utc.getInt("Int");
     _attributes.abilities[Ability::Wisdom] = utc.getInt("Wis");
     _attributes.abilities[Ability::Charisma] = utc.getInt("Cha");
+}
+
+void CreatureBlueprint::loadSkills(const GffStruct &utc) {
+    const vector<GffStruct> &skills = utc.getList("SkillList");
+    for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
+        Skill skill = static_cast<Skill>(i);
+        _attributes.skills[skill] = skills[i].getInt("Rank");
+    }
 }
 
 void CreatureBlueprint::loadScripts(const GffStruct &utc) {
