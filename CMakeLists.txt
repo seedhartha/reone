@@ -48,19 +48,25 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 ## libsystem static library
 
 set(SYSTEM_HEADERS
+    src/system/endianutil.h
     src/system/jobs.h
     src/system/log.h
     src/system/pathutil.h
     src/system/random.h
+    src/system/streamreader.h
     src/system/streamutil.h
+    src/system/streamwriter.h
     src/system/types.h)
 
 set(SYSTEM_SOURCES
+    src/system/endianutil.cpp
     src/system/jobs.cpp
     src/system/log.cpp
     src/system/pathutil.cpp
     src/system/random.cpp
-    src/system/streamutil.cpp)
+    src/system/streamreader.cpp
+    src/system/streamutil.cpp
+    src/system/streamwriter.cpp)
 
 add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
 set_target_properties(libsystem PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -388,6 +394,7 @@ set(GAME_HEADERS
     src/game/room.h
     src/game/rp/classes.h
     src/game/rp/types.h
+    src/game/savfile.h
     src/game/script/routines.h
     src/game/script/util.h
     src/game/types.h)
@@ -462,6 +469,7 @@ set(GAME_SOURCES
     src/game/portraits.cpp
     src/game/room.cpp
     src/game/rp/classes.cpp
+    src/game/savfile.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp
     src/game/script/routines_kotor.cpp

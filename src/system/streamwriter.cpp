@@ -15,17 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "streamwriter.h"
 
-#include <vector>
+#include <stdexcept>
+
+using namespace std;
 
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
-};
+StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, Endianess endianess) :
+    _stream(stream),
+    _endianess(endianess) {
 
-typedef std::vector<char> ByteArray;
+    if (!stream) {
+        throw invalid_argument("stream must not be null");
+    }
+}
+
+void StreamWriter::putByte(uint8_t val) {
+}
 
 } // namespace reone

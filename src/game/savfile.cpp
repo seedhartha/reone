@@ -15,17 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <vector>
+#include "savfile.h"
 
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
-};
+namespace game {
 
-typedef std::vector<char> ByteArray;
+} // namespace game
 
 } // namespace reone
