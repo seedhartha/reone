@@ -354,16 +354,16 @@ set(GAME_HEADERS
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
     src/game/gui/hud.h
+    src/game/gui/ingame/abilities.h
+    src/game/gui/ingame/character.h
+    src/game/gui/ingame/equip.h
+    src/game/gui/ingame/ingame.h
+    src/game/gui/ingame/inventory.h
+    src/game/gui/ingame/journal.h
+    src/game/gui/ingame/map.h
+    src/game/gui/ingame/messages.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
-    src/game/gui/menu/abilities.h
-    src/game/gui/menu/character.h
-    src/game/gui/menu/equip.h
-    src/game/gui/menu/ingame.h
-    src/game/gui/menu/inventory.h
-    src/game/gui/menu/journal.h
-    src/game/gui/menu/map.h
-    src/game/gui/menu/messages.h
     src/game/gui/partyselect.h
     src/game/gui/selectoverlay.h
     src/game/object/area.h
@@ -428,16 +428,16 @@ set(GAME_SOURCES
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
     src/game/gui/hud.cpp
+    src/game/gui/ingame/abilities.cpp
+    src/game/gui/ingame/character.cpp
+    src/game/gui/ingame/equip.cpp
+    src/game/gui/ingame/ingame.cpp
+    src/game/gui/ingame/inventory.cpp
+    src/game/gui/ingame/journal.cpp
+    src/game/gui/ingame/map.cpp
+    src/game/gui/ingame/messages.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
-    src/game/gui/menu/abilities.cpp
-    src/game/gui/menu/character.cpp
-    src/game/gui/menu/equip.cpp
-    src/game/gui/menu/ingame.cpp
-    src/game/gui/menu/inventory.cpp
-    src/game/gui/menu/journal.cpp
-    src/game/gui/menu/map.cpp
-    src/game/gui/menu/messages.cpp
     src/game/gui/partyselect.cpp
     src/game/gui/selectoverlay.cpp
     src/game/object/area.cpp
