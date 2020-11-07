@@ -26,6 +26,7 @@
 #include "journal.h"
 #include "map.h"
 #include "messages.h"
+#include "options.h"
 
 namespace reone {
 
@@ -43,7 +44,8 @@ public:
         Abilities,
         Messages,
         Journal,
-        Map
+        Map,
+        Options
     };
 
     InGameMenu(Game *game);
@@ -60,6 +62,7 @@ public:
     void openMessages();
     void openJournal();
     void openMap();
+    void openOptions();
 
 private:
     Game *_game { nullptr };
@@ -72,16 +75,20 @@ private:
     std::unique_ptr<MessagesMenu> _messages;
     std::unique_ptr<JournalMenu> _journal;
     std::unique_ptr<MapMenu> _map;
+    std::unique_ptr<OptionsMenu> _options;
 
     void onClick(const std::string &control) override;
 
-    void loadCharacterMenu();
-    void loadEquipmentMenu();
-    void loadInventoryMenu();
-    void loadAbilitiesMenu();
-    void loadMessagesMenu();
-    void loadJournalMenu();
-    void loadMapMenu();
+    void loadCharacter();
+    void loadEquipment();
+    void loadInventory();
+    void loadAbilities();
+    void loadMessages();
+    void loadJournal();
+    void loadMap();
+    void loadOptions();
+
+    void updateTabButtons();
 
     GUI *getActiveTabGUI() const;
 };

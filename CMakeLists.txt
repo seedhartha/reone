@@ -362,9 +362,11 @@ set(GAME_HEADERS
     src/game/gui/ingame/journal.h
     src/game/gui/ingame/map.h
     src/game/gui/ingame/messages.h
+    src/game/gui/ingame/options.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/partyselect.h
+    src/game/gui/saveload.h
     src/game/gui/selectoverlay.h
     src/game/object/area.h
     src/game/object/creature.h
@@ -436,9 +438,11 @@ set(GAME_SOURCES
     src/game/gui/ingame/journal.cpp
     src/game/gui/ingame/map.cpp
     src/game/gui/ingame/messages.cpp
+    src/game/gui/ingame/options.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/partyselect.cpp
+    src/game/gui/saveload.cpp
     src/game/gui/selectoverlay.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp
