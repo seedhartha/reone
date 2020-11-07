@@ -61,7 +61,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
     glm::vec3 origin(0.0f);
     glm::vec3 dir(0.0f);
     float distance = 0.0f;
-    vector<pair<SpatialObject *, float>> collisions;
+    vector<pair<shared_ptr<SpatialObject>, float>> collisions;
 
     for (auto &object : _area->objects()) {
         if (object.get() == props.except) continue;
@@ -83,7 +83,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
             if (!model) continue;
 
             if (model->aabb().intersectLine(origin, dir, distance)) {
-                collisions.push_back(make_pair(object.get(), distance));
+                collisions.push_back(make_pair(object, distance));
             }
             continue;
         }
@@ -91,13 +91,13 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         if (!walkmesh) continue;
 
         if (walkmesh->raycast(origin, dir, false, distance)) {
-            collisions.push_back(make_pair(object.get(), distance));
+            collisions.push_back(make_pair(object, distance));
             continue;
         }
     }
     if (collisions.empty()) return false;
 
-    sort(collisions.begin(), collisions.end(), [](const pair<SpatialObject *, float> &left, const pair<SpatialObject *, float> &right) {
+    sort(collisions.begin(), collisions.end(), [](const pair<const shared_ptr<SpatialObject> &, float> &left, const pair<const shared_ptr<SpatialObject> &, float> &right) {
         return left.second < right.second;
     });
     result.object = collisions[0].first;

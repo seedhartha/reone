@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <memory>
 #include <set>
 
 #include "glm/vec3.hpp"
@@ -51,7 +52,7 @@ struct RaycastProperties {
 
 struct RaycastResult {
     Room *room { nullptr };
-    SpatialObject *object { nullptr };
+    std::shared_ptr<SpatialObject> object;
     glm::vec3 intersection { 0.0f };
     float distance { 0.0f };
 };
