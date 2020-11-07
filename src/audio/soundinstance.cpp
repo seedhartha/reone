@@ -91,9 +91,11 @@ void SoundInstance::update() {
 
     ALint processed = 0;
     alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
-
     while (processed-- > 0) {
         alSourceUnqueueBuffers(_source, 1, &_buffers[_nextBuffer]);
+        if (_loop && _nextFrame == _stream->frameCount()) {
+            _nextFrame = 0;
+        }
         if (_nextFrame < _stream->frameCount()) {
             _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
             alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
@@ -104,11 +106,7 @@ void SoundInstance::update() {
     ALint queued = 0;
     alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
     if (queued == 0) {
-        if (_loop) {
-            _nextFrame = 0;
-        } else {
-            _state = State::Stopped;
-        }
+        _state = State::Stopped;
     }
 }
 
