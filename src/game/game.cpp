@@ -129,6 +129,9 @@ void Game::openMainMenu() {
     if (!_mainMenu) {
         loadMainMenu();
     }
+    if (!_saveLoad) {
+        loadSaveLoad();
+    }
     playMusic(getMainMenuMusic());
     _screen = GameScreen::MainMenu;
 }
@@ -322,6 +325,11 @@ void Game::loadPartySelection() {
     _partySelect->load();
 }
 
+void Game::loadSaveLoad() {
+    _saveLoad.reset(new SaveLoad(this));
+    _saveLoad->load();
+}
+
 void Game::loadInGame() {
     _inGame.reset(new InGameMenu(this));
     _inGame->load();
@@ -345,6 +353,8 @@ GUI *Game::getScreenGUI() const {
             return _container.get();
         case GameScreen::PartySelection:
             return _partySelect.get();
+        case GameScreen::SaveLoad:
+            return _saveLoad.get();
         default:
             return nullptr;
     }
@@ -482,6 +492,9 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
         case InGameMenu::Tab::Map:
             _inGame->openMap();
             break;
+        case InGameMenu::Tab::Options:
+            _inGame->openOptions();
+            break;
         default:
             break;
     }
@@ -504,6 +517,12 @@ void Game::openPartySelection(const PartySelection::Context &ctx) {
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
     _screen = GameScreen::PartySelection;
+}
+
+void Game::openSaveLoad(SaveLoad::Mode mode) {
+    setCursorType(CursorType::Default);
+    _saveLoad->setMode(mode);
+    _screen = GameScreen::SaveLoad;
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {

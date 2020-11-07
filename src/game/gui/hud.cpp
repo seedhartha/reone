@@ -193,6 +193,8 @@ void HUD::onClick(const string &control) {
         _game->openInGameMenu(InGameMenu::Tab::Journal);
     } else if (control == "BTN_MAP") {
         _game->openInGameMenu(InGameMenu::Tab::Map);
+    } else if (control == "BTN_OPT") {
+        _game->openInGameMenu(InGameMenu::Tab::Options);
     }
 }
 

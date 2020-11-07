@@ -85,7 +85,6 @@ void MainMenu::load() {
     hideControl("LBL_BW");
     hideControl("LBL_LUCAS");
 
-    setControlDisabled("BTN_LOADGAME", true);
     setControlDisabled("BTN_MOVIES", true);
     setControlDisabled("BTN_OPTIONS", true);
 
@@ -152,6 +151,8 @@ shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
 void MainMenu::onClick(const string &control) {
     if (control == "BTN_NEWGAME") {
         _game->startCharacterGeneration();
+    } else if (control == "BTN_LOADGAME") {
+        _game->openSaveLoad(SaveLoad::Mode::LoadFromMainMenu);
     } else if (control == "BTN_EXIT") {
         _game->quit();
     } else if (control == "BTN_WARP") {
