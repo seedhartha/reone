@@ -156,7 +156,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 }
 
 bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    SpatialObject *object = _area->getObjectAt(event.x, event.y);
+    shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
     if (!object || !object->isSelectable()) {
         return false;
     }
@@ -167,58 +167,58 @@ bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
         _area->objectSelector().select(object->id());
         return true;
     }
-    onObjectClick(*object);
+    onObjectClick(object);
 
     return true;
 }
 
-void Module::onObjectClick(SpatialObject &object) {
-    Creature *creature = dynamic_cast<Creature *>(&object);
+void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
+    shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
     if (creature) {
-        onCreatureClick(*creature);
+        onCreatureClick(creature);
         return;
     }
-    Door *door = dynamic_cast<Door *>(&object);
+    shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
     if (door) {
-        onDoorClick(*door);
+        onDoorClick(door);
         return;
     }
-    Placeable *placeable = dynamic_cast<Placeable *>(&object);
+    shared_ptr<Placeable> placeable(dynamic_pointer_cast<Placeable>(object));
     if (placeable) {
-        onPlaceableClick(*placeable);
+        onPlaceableClick(placeable);
         return;
     }
 }
 
-void Module::onCreatureClick(Creature &creature) {
-    if (creature.conversation().empty()) return;
+void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
+    if (creature->conversation().empty()) return;
 
     shared_ptr<Creature> partyLeader(_game->party().leader());
     ActionQueue &actions = partyLeader->actionQueue();
     actions.clear();
-    actions.add(make_unique<StartConversationAction>(&creature, creature.conversation()));
+    actions.add(make_unique<StartConversationAction>(creature, creature->conversation()));
 }
 
-void Module::onDoorClick(Door &door) {
-    if (!door.linkedToModule().empty()) {
-        _game->scheduleModuleTransition(door.linkedToModule(), door.linkedTo());
+void Module::onDoorClick(const shared_ptr<Door> &door) {
+    if (!door->linkedToModule().empty()) {
+        _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         return;
     }
-    if (!door.isOpen() && !door.blueprint().isStatic()) {
+    if (!door->isOpen() && !door->blueprint().isStatic()) {
         shared_ptr<Creature> partyLeader(_game->party().leader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();
-        actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, &door));
+        actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, door));
     }
 }
 
-void Module::onPlaceableClick(Placeable &placeable) {
-    if (!placeable.blueprint().hasInventory()) return;
+void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
+    if (!placeable->blueprint().hasInventory()) return;
 
     shared_ptr<Creature> partyLeader(_game->party().leader());
     ActionQueue &actions = partyLeader->actionQueue();
     actions.clear();
-    actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, &placeable));
+    actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
 }
 
 bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {

@@ -256,7 +256,7 @@ Variable Routines::actionMoveToObject(const vector<Variable> &args, ExecutionCon
 
     if (subject) {
         Creature &creature = static_cast<Creature &>(*subject);
-        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object.get(), distance));
+        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object, distance));
         creature.actionQueue().add(move(action));
     } else {
         warn("Routine: object not found: " + to_string(objectId));
@@ -275,7 +275,7 @@ Variable Routines::actionStartConversation(const vector<Variable> &args, Executi
     if (creature) {
         string dialogResRef((args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : creature->conversation());
         bool ignoreStartRange = args.size() >= 4 ? (args[4].intValue != 0) : false;
-        unique_ptr<StartConversationAction> action(new StartConversationAction(subject.get(), dialogResRef, ignoreStartRange));
+        unique_ptr<StartConversationAction> action(new StartConversationAction(subject, dialogResRef, ignoreStartRange));
         creature->actionQueue().add(move(action));
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
@@ -320,12 +320,13 @@ Variable Routines::actionOpenDoor(const vector<Variable> &args, ExecutionContext
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::OpenDoor, object.get()));
+            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::OpenDoor, object));
             creature->actionQueue().add(move(action));
-        }
-        Door *door = dynamic_cast<Door *>(subject.get());
-        if (door) {
-            door->open(nullptr);
+        } else {
+            Door *door = dynamic_cast<Door *>(subject.get());
+            if (door) {
+                door->open(nullptr);
+            }
         }
     } else {
         warn("Routine: object not found: " + to_string(objectId));
@@ -342,12 +343,13 @@ Variable Routines::actionCloseDoor(const vector<Variable> &args, ExecutionContex
     if (subject) {
         Creature *creature = dynamic_cast<Creature *>(subject.get());
         if (creature) {
-            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::CloseDoor, object.get()));
+            unique_ptr<ObjectAction> action(new ObjectAction(ActionType::CloseDoor, object));
             creature->actionQueue().add(move(action));
-        }
-        Door *door = dynamic_cast<Door *>(subject.get());
-        if (door) {
-            door->close(nullptr);
+        } else {
+            Door *door = dynamic_cast<Door *>(subject.get());
+            if (door) {
+                door->close(nullptr);
+            }
         }
     } else {
         warn("Routine: object not found: " + to_string(objectId));

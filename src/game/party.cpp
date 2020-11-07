@@ -107,7 +107,7 @@ void Party::switchLeader() {
 
     for (int i = 1; i < count; ++i) {
         _members[i]->actionQueue().clear();
-        _members[i]->actionQueue().add(make_unique<FollowAction>(_members[0].get(), 1.0f));
+        _members[i]->actionQueue().add(make_unique<FollowAction>(_members[0], 1.0f));
     }
     _game->module()->area()->onPartyLeaderMoved();
 }
