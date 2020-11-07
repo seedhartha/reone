@@ -17,15 +17,19 @@
 
 #pragma once
 
-#include <vector>
-
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
+namespace game {
+
+class SavFile {
+public:
+    SavFile() = default;
+
+private:
+    SavFile(const SavFile &) = delete;
+    SavFile &operator=(const SavFile &) = delete;
 };
 
-typedef std::vector<char> ByteArray;
+} // namespace game
 
 } // namespace reone

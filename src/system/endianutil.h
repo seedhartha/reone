@@ -17,15 +17,9 @@
 
 #pragma once
 
-#include <vector>
-
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
-};
-
-typedef std::vector<char> ByteArray;
+template <class T>
+void swapBytes(T &val);
 
 } // namespace reone

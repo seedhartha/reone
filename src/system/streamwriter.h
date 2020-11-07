@@ -17,15 +17,26 @@
 
 #pragma once
 
-#include <vector>
+#include <cstdint>
+#include <memory>
+#include <ostream>
+
+#include "types.h"
 
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
-};
+class StreamWriter {
+public:
+    StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
 
-typedef std::vector<char> ByteArray;
+    void putByte(uint8_t val);
+
+private:
+    std::shared_ptr<std::ostream> _stream;
+    Endianess _endianess;
+
+    StreamWriter(const StreamWriter &) = delete;
+    StreamWriter &operator=(const StreamWriter &) = delete;
+};
 
 } // namespace reone
