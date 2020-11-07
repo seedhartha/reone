@@ -19,6 +19,7 @@
 
 #include <boost/filesystem.hpp>
 
+#include "../system/streamreader.h"
 #include "../system/types.h"
 
 namespace reone {
@@ -34,8 +35,10 @@ public:
     void load(const boost::filesystem::path &path);
 
 protected:
+    Endianess _endianess { Endianess::Little };
     boost::filesystem::path _path;
     std::shared_ptr<std::istream> _in;
+    std::unique_ptr<StreamReader> _reader;
     size_t _size { 0 };
 
     template <typename T>
@@ -75,21 +78,15 @@ protected:
     void ignore(int size);
     uint8_t readByte();
     int16_t readInt16();
-    int16_t readInt16BE();
     uint16_t readUint16();
-    uint16_t readUint16BE();
     int32_t readInt32();
-    int32_t readInt32BE();
     uint32_t readUint32();
-    uint32_t readUint32BE();
     int64_t readInt64();
     uint64_t readUint64();
     float readFloat();
-    float readFloatBE();
     double readDouble();
     std::string readFixedString(int size);
     std::string readFixedString(uint32_t off, int size);
-    std::string readFixedStringWide(int len);
     std::string readString(uint32_t off);
     std::string readString(uint32_t off, int size);
 

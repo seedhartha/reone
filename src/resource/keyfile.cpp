@@ -60,7 +60,7 @@ KeyFile::FileEntry KeyFile::readFileEntry() {
 
     FileEntry entry;
     entry.fileSize = fileSize;
-    entry.filename = readString(filenameOffset, filenameSize);
+    entry.filename = readFixedString(filenameOffset, filenameSize);
 
     return move(entry);
 }

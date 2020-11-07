@@ -17,8 +17,6 @@
 
 #include "binfile.h"
 
-#include <codecvt>
-
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -59,6 +57,7 @@ void BinaryFile::load(const shared_ptr<istream> &in) {
         throw invalid_argument("Invalid input stream");
     }
     _in = in;
+    _reader = make_unique<StreamReader>(in, _endianess);
 
     load();
 }
@@ -90,172 +89,91 @@ void BinaryFile::load(const fs::path &path) {
     if (!fs::exists(path)) {
         throw runtime_error("File not found: " + path.string());
     }
-    _in.reset(new fs::ifstream(path, ios::binary));
+    _in = make_shared<fs::ifstream>(path, ios::binary);
+    _reader = make_unique<StreamReader>(_in, _endianess);
     _path = path;
 
     load();
 }
 
 uint32_t BinaryFile::tell() const {
-    return static_cast<uint32_t>(_in->tellg());
+    return _reader->tell();
 }
 
 void BinaryFile::ignore(int size) {
-    _in->ignore(size);
+    _reader->ignore(size);
 }
 
 uint8_t BinaryFile::readByte() {
-    uint8_t val;
-    _in->read(reinterpret_cast<char *>(&val), 1);
-    return val;
+    return _reader->getByte();
 }
 
 int16_t BinaryFile::readInt16() {
-    int16_t val;
-    _in->read(reinterpret_cast<char *>(&val), 2);
-    return val;
-}
-
-int16_t BinaryFile::readInt16BE() {
-    int16_t val;
-    _in->read(reinterpret_cast<char *>(&val), 2);
-    return ((val << 8) & 0xff00) | ((val >> 8) & 0x00ff);
+    return _reader->getInt16();
 }
 
 uint16_t BinaryFile::readUint16() {
-    uint16_t val;
-    _in->read(reinterpret_cast<char *>(&val), 2);
-    return val;
-}
-
-uint16_t BinaryFile::readUint16BE() {
-    uint16_t val;
-    _in->read(reinterpret_cast<char *>(&val), 2);
-    return ((val << 8) & 0xff00) | ((val >> 8) & 0x00ff);
+    return _reader->getUint16();
 }
 
 int32_t BinaryFile::readInt32() {
-    int32_t val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-    return val;
-}
-
-int32_t BinaryFile::readInt32BE() {
-    int32_t val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-
-    return
-        ((val << 24) & 0xff000000) |
-        ((val << 8) & 0x00ff0000) |
-        ((val >> 8) & 0x0000ff00) |
-        ((val >> 24) & 0x000000ff);
+    return _reader->getInt32();
 }
 
 uint32_t BinaryFile::readUint32() {
-    uint32_t val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-    return val;
-}
-
-uint32_t BinaryFile::readUint32BE() {
-    uint32_t val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-
-    return
-        ((val << 24) & 0xff000000) |
-        ((val << 8) & 0x00ff0000) |
-        ((val >> 8) & 0x0000ff00) |
-        ((val >> 24) & 0x000000ff);
+    return _reader->getUint32();
 }
 
 int64_t BinaryFile::readInt64() {
-    int64_t val;
-    _in->read(reinterpret_cast<char *>(&val), 8);
-    return val;
+    return _reader->getInt64();
 }
 
 uint64_t BinaryFile::readUint64() {
-    uint64_t val;
-    _in->read(reinterpret_cast<char *>(&val), 8);
-    return val;
+    return _reader->getUint64();
 }
 
 float BinaryFile::readFloat() {
-    float val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-    return val;
-}
-
-float BinaryFile::readFloatBE() {
-    uint32_t val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-    val =
-        ((val << 24) & 0xff000000) |
-        ((val << 8) & 0x00ff0000) |
-        ((val >> 8) & 0x0000ff00) |
-        ((val >> 24) & 0x000000ff);
-
-    return *reinterpret_cast<float *>(&val);
+    return _reader->getFloat();
 }
 
 double BinaryFile::readDouble() {
-    double val;
-    _in->read(reinterpret_cast<char *>(&val), 4);
-    return val;
+    return _reader->getDouble();
 }
 
 string BinaryFile::readFixedString(int size) {
-    string s;
-    s.resize(size);
-    _in->read(&s[0], size);
-
-    return s.c_str();
+    string result(_reader->getString(size));
+    result.erase(find(result.begin(), result.end(), '\0'), result.end());
+    return move(result);
 }
 
 string BinaryFile::readFixedString(uint32_t off, int size) {
-    streampos pos = _in->tellg();
-    _in->seekg(off);
+    size_t pos = _reader->tell();
+    _reader->seek(off);
 
-    string s(readFixedString(size));
-    _in->seekg(pos);
+    string result(readFixedString(size));
+    _reader->seek(pos);
 
-    return move(s);
-}
-
-string BinaryFile::readFixedStringWide(int len) {
-    u16string ws;
-    ws.resize(len);
-    _in->read(reinterpret_cast<char *>(&ws[0]), 2 * len);
-
-    wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> conv;
-    string s(conv.to_bytes(ws));
-
-    return move(s);
+    return move(result);
 }
 
 string BinaryFile::readString(uint32_t off) {
-    streampos pos = _in->tellg();
-    _in->seekg(off);
+    size_t pos = _reader->tell();
+    _reader->seek(off);
 
-    char buf[256];
-    streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
+    string result(_reader->getCString());
+    _reader->seek(pos);
 
-    _in->seekg(pos);
-
-    return string(buf, strnlen(buf, chRead));
+    return move(result);
 }
 
 string BinaryFile::readString(uint32_t off, int size) {
-    streampos pos = _in->tellg();
-    _in->seekg(off);
+    size_t pos = _reader->tell();
+    _reader->seek(off);
 
-    string s;
-    s.resize(size);
+    string result(_reader->getString(size));
+    _reader->seek(pos);
 
-    _in->read(&s[0], size);
-    _in->seekg(pos);
-
-    return move(s);
+    return move(result);
 }
 
 } // namespace resource
