@@ -30,6 +30,10 @@ class StreamReader {
 public:
     StreamReader(const std::shared_ptr<std::istream> &stream, Endianess endianess = Endianess::Little);
 
+    size_t tell();
+    void seek(size_t pos);
+    void ignore(int count);
+
     uint8_t getByte();
     uint16_t getUint16();
     uint32_t getUint32();

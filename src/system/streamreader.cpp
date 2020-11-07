@@ -35,6 +35,19 @@ StreamReader::StreamReader(const shared_ptr<istream> &stream, Endianess endianes
     }
 }
 
+size_t StreamReader::tell() {
+    return _stream->tellg();
+}
+
+void StreamReader::seek(size_t pos) {
+    _stream->clear();
+    _stream->seekg(pos);
+}
+
+void StreamReader::ignore(int count) {
+    _stream->ignore(count);
+}
+
 uint8_t StreamReader::getByte() {
     uint8_t val;
     _stream->read(reinterpret_cast<char *>(&val), 1);

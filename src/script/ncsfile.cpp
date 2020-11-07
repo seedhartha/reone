@@ -26,11 +26,12 @@ namespace reone {
 namespace script {
 
 NcsFile::NcsFile(const string &resRef) : BinaryFile(8, "NCS V1.0"), _resRef(resRef) {
+    _endianess = Endianess::Big;
 }
 
 void NcsFile::doLoad() {
     uint8_t byteCode = readByte();
-    uint32_t length = readUint32BE();
+    uint32_t length = readUint32();
 
     _program = make_unique<ScriptProgram>(_resRef);
     _program->_length = length;
@@ -57,28 +58,25 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::CopyTopSP:
         case ByteCode::CopyDownBP:
         case ByteCode::CopyTopBP:
-            ins.stackOffset = readInt32BE();
-            ins.size = readUint16BE();
-            break;
-
-        case ByteCode::Reserve:
+            ins.stackOffset = readInt32();
+            ins.size = readUint16();
             break;
 
         case ByteCode::PushConstant:
             switch (ins.type) {
                 case InstructionType::Int:
-                    ins.intValue = readInt32BE();
+                    ins.intValue = readInt32();
                     break;
                 case InstructionType::Float:
-                    ins.floatValue = readFloatBE();
+                    ins.floatValue = readFloat();
                     break;
                 case InstructionType::String: {
-                    uint16_t len = readUint16BE();
+                    uint16_t len = readUint16();
                     ins.strValue = readFixedString(len);
                     break;
                 }
                 case InstructionType::Object:
-                    ins.objectId = readInt32BE();
+                    ins.objectId = readInt32();
                     break;
                 default:
                     throw runtime_error(str(boost::format("NCS: unsupported instruction type: %02x %02x") % static_cast<int>(ins.byteCode) % static_cast<int>(ins.type)));
@@ -86,89 +84,66 @@ void NcsFile::readInstruction(uint32_t &offset) {
             break;
 
         case ByteCode::CallRoutine:
-            ins.routine = readUint16BE();
+            ins.routine = readUint16();
             ins.argCount = readByte();
             break;
 
-        case ByteCode::LogicalAnd:
-        case ByteCode::LogicalOr:
-        case ByteCode::InclusiveBitwiseOr:
-        case ByteCode::ExclusiveBitwiseOr:
-        case ByteCode::BitwiseAnd:
-            break;
-
-        case ByteCode::Equal:
-        case ByteCode::NotEqual:
-            break;
-
-        case ByteCode::GreaterThanOrEqual:
-        case ByteCode::GreaterThan:
-        case ByteCode::LessThan:
-        case ByteCode::LessThanOrEqual:
-            break;
-
-        case ByteCode::ShiftLeft:
-        case ByteCode::ShiftRight:
-        case ByteCode::UnsignedShiftRight:
-            break;
-
-        case ByteCode::Add:
-            break;
-
-        case ByteCode::Subtract:
-            break;
-
-        case ByteCode::Multiply:
-            break;
-
-        case ByteCode::Divide:
-            break;
-
-        case ByteCode::Mod:
-            break;
-
-        case ByteCode::Negate:
-            break;
-
-        case ByteCode::OnesComplement:
-            break;
-
         case ByteCode::AdjustSP:
-            ins.stackOffset = readInt32BE();
+            ins.stackOffset = readInt32();
             break;
 
         case ByteCode::Jump:
         case ByteCode::JumpToSubroutine:
         case ByteCode::JumpIfZero:
         case ByteCode::JumpIfNonZero:
-            ins.jumpOffset = offset + readInt32BE();
-            break;
-
-        case ByteCode::Return:
-        case ByteCode::SaveBP:
-        case ByteCode::RestoreBP:
-        case ByteCode::Noop:
+            ins.jumpOffset = offset + readInt32();
             break;
 
         case ByteCode::Destruct:
-            ins.size = readUint16BE();
-            ins.stackOffset = readInt16BE();
-            ins.sizeNoDestroy = readUint16BE();
-            break;
-
-        case ByteCode::LogicalNot:
+            ins.size = readUint16();
+            ins.stackOffset = readInt16();
+            ins.sizeNoDestroy = readUint16();
             break;
 
         case ByteCode::DecRelToSP:
         case ByteCode::IncRelToSP:
         case ByteCode::DecRelToBP:
         case ByteCode::IncRelToBP:
-            ins.stackOffset = readInt32BE();
+            ins.stackOffset = readInt32();
             break;
 
         case ByteCode::StoreState:
-            ins.size = readUint32BE();
-            ins.sizeLocals = readUint32BE();
+            ins.size = readUint32();
+            ins.sizeLocals = readUint32();
+            break;
+
+        case ByteCode::Reserve:
+        case ByteCode::LogicalAnd:
+        case ByteCode::LogicalOr:
+        case ByteCode::InclusiveBitwiseOr:
+        case ByteCode::ExclusiveBitwiseOr:
+        case ByteCode::BitwiseAnd:
+        case ByteCode::Equal:
+        case ByteCode::NotEqual:
+        case ByteCode::GreaterThanOrEqual:
+        case ByteCode::GreaterThan:
+        case ByteCode::LessThan:
+        case ByteCode::LessThanOrEqual:
+        case ByteCode::ShiftLeft:
+        case ByteCode::ShiftRight:
+        case ByteCode::UnsignedShiftRight:
+        case ByteCode::Add:
+        case ByteCode::Subtract:
+        case ByteCode::Multiply:
+        case ByteCode::Divide:
+        case ByteCode::Mod:
+        case ByteCode::Negate:
+        case ByteCode::OnesComplement:
+        case ByteCode::Return:
+        case ByteCode::SaveBP:
+        case ByteCode::RestoreBP:
+        case ByteCode::Noop:
+        case ByteCode::LogicalNot:
             break;
 
         default:
