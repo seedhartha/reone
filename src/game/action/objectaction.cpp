@@ -25,14 +25,14 @@ namespace reone {
 
 namespace game {
 
-ObjectAction::ObjectAction(ActionType type, Object *object) : Action(type), _object(object) {
+ObjectAction::ObjectAction(ActionType type, const shared_ptr<Object> &object) : Action(type), _object(object) {
     if (!object) {
         throw invalid_argument("object must not be null");
     }
 }
 
 Object *ObjectAction::object() const {
-    return _object;
+    return _object.get();
 }
 
 } // namespace game

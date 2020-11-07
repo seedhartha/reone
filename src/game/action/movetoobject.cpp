@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-MoveToObjectAction::MoveToObjectAction(Object *object, float distance) :
+MoveToObjectAction::MoveToObjectAction(const shared_ptr<Object> &object, float distance) :
     ObjectAction(ActionType::MoveToObject, object),
     _distance(distance) {
 }

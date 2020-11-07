@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-StartConversationAction::StartConversationAction(Object *object, const string &dialogResRef, bool ignoreStartRange) :
+StartConversationAction::StartConversationAction(const shared_ptr<Object> &object, const string &dialogResRef, bool ignoreStartRange) :
     ObjectAction(ActionType::StartConversation, object),
     _dialogResRef(dialogResRef),
     _ignoreStartRange(ignoreStartRange) {

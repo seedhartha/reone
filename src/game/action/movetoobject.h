@@ -25,7 +25,7 @@ namespace game {
 
 class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(Object *object, float distance);
+    MoveToObjectAction(const std::shared_ptr<Object> &object, float distance);
 
     float distance() const;
 

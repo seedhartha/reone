@@ -75,10 +75,10 @@ private:
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
 
-    void onCreatureClick(Creature &creature);
-    void onDoorClick(Door &door);
-    void onObjectClick(SpatialObject &object);
-    void onPlaceableClick(Placeable &placeable);
+    void onCreatureClick(const std::shared_ptr<Creature> &creature);
+    void onDoorClick(const std::shared_ptr<Door> &door);
+    void onObjectClick(const std::shared_ptr<SpatialObject> &object);
+    void onPlaceableClick(const std::shared_ptr<Placeable> &placeable);
 
     void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
 
