@@ -23,16 +23,22 @@ Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.
 Specify a game path to run the game, e.g. `reone --game C:\swkotor`
 
 Controls:
-* Use WASD keys to move around
-* Click on doors to open them
+* Use WASD and ZC keys to move around
+* Left click to interact with an object
+* Use V key to switch the camera type
+* Use "-" and "+" keys to adjust the game speed
+
+## Multiplayer
+
+reone supports multiplayer. See [this](https://github.com/seedhartha/reone/wiki/Multiplayer) page for an overview of the multiplayer mode.
 
 ## Configuration
 
-reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).
+reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).
 
 ## Contribution
 
-reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap). For an overview of the project architecture, take a look at the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki.
+reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap). For an overview of the project architecture and other developer resources, visit the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki.
 
 ## Similar Projects
 
@@ -45,6 +51,6 @@ reone is not the only project aiming to reimplement the Odyssey engine – there
 
 In contrast, this is what reone offers:
 
-* Written in C++ – faster than JavaScript and potentially Unity (C#) implementations.
+* Written in C++ – industry standard, statically typed language; faster than the JavaScript implementation.
 * Custom game engine based on SDL 2 and OpenGL 3.3 – no Unity knowledge required.
 * KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora Engine games – faster development.
