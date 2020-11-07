@@ -129,7 +129,7 @@ bool Module::handle(const SDL_Event &event) {
 bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     CursorType cursor = CursorType::Default;
 
-    const SpatialObject *object = _area->getObjectAt(event.x, event.y);
+    shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
     if (object && object->isSelectable()) {
         _area->objectSelector().hilight(object->id());
 

@@ -531,7 +531,7 @@ void Area::runOnEnterScript() {
     }
 }
 
-SpatialObject *Area::getObjectAt(int x, int y) const {
+shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     Camera *camera = _game->getActiveCamera();
     shared_ptr<CameraSceneNode> sceneNode(camera->sceneNode());
 

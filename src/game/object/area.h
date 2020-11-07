@@ -77,7 +77,7 @@ public:
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
-    SpatialObject *getObjectAt(int x, int y) const;
+    std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     const CameraStyle &cameraStyle() const;
