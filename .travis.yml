@@ -35,6 +35,10 @@ addons:
       - libglew-dev
       - libopenal-dev
       - libmad0-dev
+      - libavcodec-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libswscale-dev
   coverity_scan:
     project:
       name: "seedhartha/reone"
