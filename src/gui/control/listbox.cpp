@@ -56,12 +56,17 @@ void ListBox::updateItems() {
 void ListBox::clear() {
     _items.clear();
     _itemOffset = 0;
+    _hilightedIndex = -1;
     updateItems();
 }
 
 void ListBox::add(Item item) {
     _items.push_back(move(item));
     updateItems();
+}
+
+void ListBox::clearSelection() {
+    _hilightedIndex = -1;
 }
 
 void ListBox::load(const GffStruct &gffs) {
@@ -85,7 +90,9 @@ void ListBox::load(const GffStruct &gffs) {
 }
 
 bool ListBox::handleMouseMotion(int x, int y) {
-    _hilightedIndex = getItemIndex(y);
+    if (_mode == SelectionMode::Propagate) {
+        _hilightedIndex = getItemIndex(y);
+    }
     return false;
 }
 
@@ -114,7 +121,14 @@ bool ListBox::handleClick(int x, int y) {
     int itemIdx = getItemIndex(y);
     if (itemIdx == -1) return false;
 
-    _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
+    switch (_mode) {
+        case SelectionMode::Hilight:
+            _hilightedIndex = itemIdx;
+            break;
+        case SelectionMode::Propagate:
+            _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
+            break;
+    }
 
     return true;
 }
@@ -162,7 +176,7 @@ void ListBox::stretch(float x, float y) {
 
 void ListBox::setFocus(bool focus) {
     Control::setFocus(focus);
-    if (!focus) {
+    if (!focus && _mode == SelectionMode::Propagate) {
         _hilightedIndex = -1;
     }
 }
@@ -174,6 +188,10 @@ void ListBox::setExtent(const Extent &extent) {
 
 void ListBox::setProtoItemType(ControlType type) {
     _protoItemType = type;
+}
+
+void ListBox::setSelectionMode(SelectionMode mode) {
+    _mode = mode;
 }
 
 const ListBox::Item &ListBox::getItemAt(int index) const {
@@ -190,6 +208,10 @@ Control &ListBox::scrollBar() const {
 
 int ListBox::itemCount() const {
     return static_cast<int>(_items.size());
+}
+
+int ListBox::hilightedIndex() const {
+    return _hilightedIndex;
 }
 
 } // namespace gui

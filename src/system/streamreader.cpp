@@ -57,15 +57,15 @@ uint8_t StreamReader::getByte() {
 uint16_t StreamReader::getUint16() {
     uint16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 template <class T>
-T StreamReader::fixEndianess(T val) {
+void StreamReader::fixEndianess(T &val) {
     if (!isSameEndianess()) {
         swapBytes(val);
     }
-    return val;
 }
 
 bool StreamReader::isSameEndianess() const {
@@ -75,43 +75,50 @@ bool StreamReader::isSameEndianess() const {
 uint32_t StreamReader::getUint32() {
     uint32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 uint64_t StreamReader::getUint64() {
     uint64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 int16_t StreamReader::getInt16() {
     int16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 int32_t StreamReader::getInt32() {
     int32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 int64_t StreamReader::getInt64() {
     int64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 float StreamReader::getFloat() {
     float val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 double StreamReader::getDouble() {
     double val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    return fixEndianess(val);
+    fixEndianess(val);
+    return val;
 }
 
 string StreamReader::getCString() {

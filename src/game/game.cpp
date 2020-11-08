@@ -211,6 +211,7 @@ void Game::loadModule(const string &name, const string &entry) {
 
         _ticks = SDL_GetTicks();
         _screen = GameScreen::InGame;
+        _loadFromSaveGame = false;
     });
 }
 
@@ -358,6 +359,14 @@ GUI *Game::getScreenGUI() const {
         default:
             return nullptr;
     }
+}
+
+bool Game::isLoadFromSaveGame() const {
+    return _loadFromSaveGame;
+}
+
+void Game::setLoadFromSaveGame(bool load) {
+    _loadFromSaveGame = load;
 }
 
 void Game::runMainLoop() {
@@ -522,6 +531,7 @@ void Game::openPartySelection(const PartySelection::Context &ctx) {
 void Game::openSaveLoad(SaveLoad::Mode mode) {
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
+    _saveLoad->update();
     _screen = GameScreen::SaveLoad;
 }
 

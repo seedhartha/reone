@@ -17,15 +17,31 @@
 
 #pragma once
 
+#include <string>
+
+#include <boost/filesystem/path.hpp>
+
 namespace reone {
 
 namespace game {
 
+class Game;
+
 class SavFile {
 public:
-    SavFile() = default;
+    SavFile(const boost::filesystem::path &path);
+
+    void save(const Game *game, const std::string &name);
+    void peek();
+    void load(Game *game);
+
+    const std::string &name() const;
 
 private:
+    boost::filesystem::path _path;
+    uint64_t _timestamp { 0 };
+    std::string _name;
+
     SavFile(const SavFile &) = delete;
     SavFile &operator=(const SavFile &) = delete;
 };

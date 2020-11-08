@@ -88,6 +88,8 @@ public:
 
     Camera *getActiveCamera() const;
 
+    bool isLoadFromSaveGame() const;
+
     resource::GameVersion version() const;
     const Options &options() const;
     scene::SceneGraph &sceneGraph();
@@ -97,6 +99,7 @@ public:
     CharacterGeneration &characterGeneration();
 
     void setCursorType(CursorType type);
+    void setLoadFromSaveGame(bool load);
 
     // Globals/locals
 
@@ -158,6 +161,7 @@ private:
     std::shared_ptr<video::Video> _video;
     CursorType _cursorType { CursorType::None };
     float _gameSpeed { 1.0f };
+    bool _loadFromSaveGame { false };
 
     // Modules
 

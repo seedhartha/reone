@@ -17,7 +17,10 @@
 
 #include "streamwriter.h"
 
+#include <cstring>
 #include <stdexcept>
+
+#include "endianutil.h"
 
 using namespace std;
 
@@ -33,6 +36,36 @@ StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, Endianess endianes
 }
 
 void StreamWriter::putByte(uint8_t val) {
+    _stream->put(val);
+}
+
+void StreamWriter::putInt64(int64_t val) {
+    put(val);
+}
+
+void StreamWriter::putCString(const string &str) {
+    int len = strnlen(&str[0], str.length());
+    _stream->write(&str[0], len);
+    _stream->put('\0');
+}
+
+template <class T>
+void StreamWriter::put(T val) {
+    fixEndianess(val);
+    char buf[sizeof(T)];
+    memcpy(buf, &val, sizeof(T));
+    _stream->write(buf, sizeof(T));
+}
+
+template <class T>
+void StreamWriter::fixEndianess(T &val) {
+    if (!isSameEndianess()) {
+        swapBytes(val);
+    }
+}
+
+bool StreamWriter::isSameEndianess() const {
+    return _endianess == Endianess::Little;
 }
 
 } // namespace reone

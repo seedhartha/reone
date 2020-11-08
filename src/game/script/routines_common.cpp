@@ -211,6 +211,10 @@ Variable Routines::assignCommand(const vector<Variable> &args, ExecutionContext 
     return Variable();
 }
 
+Variable Routines::getLoadFromSaveGame(const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable(_game->isLoadFromSaveGame() ? 1 : 0);
+}
+
 Variable Routines::eventUserDefined(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Event);
     result.engineTypeId = _game->eventUserDefined(args[0].intValue);

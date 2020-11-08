@@ -62,7 +62,7 @@ private:
     bool isSameEndianess() const;
 
     template <class T>
-    T fixEndianess(T val);
+    void fixEndianess(T &val);
 };
 
 } // namespace reone
