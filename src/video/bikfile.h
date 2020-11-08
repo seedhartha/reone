@@ -34,12 +34,6 @@ public:
     std::shared_ptr<Video> video() const;
 
 private:
-    struct FrameDescriptor {
-        uint32_t offset { 0 };
-        bool keyframe { false };
-        size_t size { 0 };
-    };
-
     boost::filesystem::path _path;
     std::shared_ptr<Video> _video;
 };

@@ -18,6 +18,7 @@ project(reone)
 
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_TESTS "build unit tests" OFF)
+option(ENABLE_VIDEO "enable video playback" OFF)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -36,6 +37,11 @@ else()
 endif()
 
 include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+
+if(ENABLE_VIDEO)
+    find_package(FFMPEG REQUIRED)
+    include_directories(${FFMPEG_INCLUDE_DIRS})
+endif()
 
 if(USE_EXTERNAL_GLM)
     include_directories(${CMAKE_SOURCE_DIR}/external/glm)
@@ -227,6 +233,10 @@ set(VIDEO_SOURCES
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
 set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+if(ENABLE_VIDEO)
+    target_compile_definitions(libvideo PRIVATE -DREONE_ENABLE_VIDEO)
+endif()
 
 ## END libvideo static library
 
@@ -541,6 +551,10 @@ target_link_libraries(reone PRIVATE
     GLEW::GLEW
     ${OPENGL_LIBRARIES}
     ${MAD_LIBRARY})
+
+if(ENABLE_VIDEO)
+    target_link_libraries(reone PRIVATE ${FFMPEG_LIBRARIES})
+endif()
 
 if(WIN32)
     target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
