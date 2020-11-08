@@ -57,7 +57,7 @@ void TlkFile::loadStrings() {
     for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
 
-        string soundResRef(readFixedString(16));
+        string soundResRef(readCString(16));
         boost::to_lower(soundResRef);
 
         ignore(8);

@@ -78,9 +78,7 @@ void TgaFile::loadTexture() {
 
     if (_imageType == ImageType::Grayscale) {
         int size = _width * _height;
-        ByteArray buf(size);
-        _in->read(&buf[0], size);
-
+        ByteArray buf(_reader->getArray<char>(size));
         char *pi = &mipMap.data[0];
 
         for (int i = 0; i < size; ++i) {
@@ -90,9 +88,9 @@ void TgaFile::loadTexture() {
             pi[3] = static_cast<char>(0xff);
             pi += 4;
         }
-
     } else {
-        _in->read(&mipMap.data[0], finalSize);
+        ByteArray data(_reader->getArray<char>(finalSize));
+        mipMap.data = move(data);
     }
 
 }

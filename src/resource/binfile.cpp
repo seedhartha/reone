@@ -25,26 +25,6 @@ namespace reone {
 
 namespace resource {
 
-vector<char> BinaryFile::readArray(istream &in, int n) {
-    if (n == 0) {
-        return ByteArray();
-    }
-    ByteArray arr(n);
-    in.read(&arr[0], n);
-
-    return move(arr);
-}
-
-vector<char> BinaryFile::readArray(istream &in, uint32_t off, int n) {
-    streampos pos = in.tellg();
-    in.seekg(off);
-
-    ByteArray arr(readArray<char>(in, n));
-    in.seekg(pos);
-
-    return move(arr);
-}
-
 BinaryFile::BinaryFile(int signSize, const char *sign) : _signSize(signSize) {
     if (!sign) return;
 
@@ -96,67 +76,63 @@ void BinaryFile::load(const fs::path &path) {
     load();
 }
 
-uint32_t BinaryFile::tell() const {
+size_t BinaryFile::tell() const {
     return _reader->tell();
 }
 
-void BinaryFile::ignore(int size) {
-    _reader->ignore(size);
+void BinaryFile::seek(size_t pos) {
+    _reader->seek(pos);
+}
+
+void BinaryFile::ignore(int count) {
+    _reader->ignore(count);
 }
 
 uint8_t BinaryFile::readByte() {
     return _reader->getByte();
 }
 
-int16_t BinaryFile::readInt16() {
-    return _reader->getInt16();
-}
-
 uint16_t BinaryFile::readUint16() {
     return _reader->getUint16();
-}
-
-int32_t BinaryFile::readInt32() {
-    return _reader->getInt32();
 }
 
 uint32_t BinaryFile::readUint32() {
     return _reader->getUint32();
 }
 
-int64_t BinaryFile::readInt64() {
-    return _reader->getInt64();
-}
-
 uint64_t BinaryFile::readUint64() {
     return _reader->getUint64();
+}
+
+int16_t BinaryFile::readInt16() {
+    return _reader->getInt16();
+}
+
+int32_t BinaryFile::readInt32() {
+    return _reader->getInt32();
 }
 
 float BinaryFile::readFloat() {
     return _reader->getFloat();
 }
 
-double BinaryFile::readDouble() {
-    return _reader->getDouble();
-}
-
-string BinaryFile::readFixedString(int size) {
-    string result(_reader->getString(size));
+string BinaryFile::readCString(int len) {
+    string result(_reader->getString(len));
     result.erase(find(result.begin(), result.end(), '\0'), result.end());
     return move(result);
 }
 
-string BinaryFile::readFixedString(uint32_t off, int size) {
+string BinaryFile::readCString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(readFixedString(size));
+    string result(readCString(len));
     _reader->seek(pos);
 
     return move(result);
 }
 
-string BinaryFile::readString(uint32_t off) {
+string BinaryFile::readCStringAt(size_t off) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
@@ -166,11 +142,15 @@ string BinaryFile::readString(uint32_t off) {
     return move(result);
 }
 
-string BinaryFile::readString(uint32_t off, int size) {
+string BinaryFile::readString(int len) {
+    return _reader->getString(len);
+}
+
+string BinaryFile::readString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(_reader->getString(size));
+    string result(_reader->getString(len));
     _reader->seek(pos);
 
     return move(result);

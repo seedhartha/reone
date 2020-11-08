@@ -52,14 +52,9 @@ void CurFile::loadData() {
     int pixelCount = _width * _width;
     int colorCount = _bitCount == 8 ? 256 : 16;
 
-    ByteArray palette(4 * colorCount);
-    _in->read(&palette[0], palette.size());
-
-    ByteArray xorData(pixelCount);
-    _in->read(&xorData[0], xorData.size());
-
-    ByteArray andData(pixelCount / 8);
-    _in->read(&andData[0], andData.size());
+    ByteArray palette(_reader->getArray<char>(4 * colorCount));
+    ByteArray xorData(_reader->getArray<char>(pixelCount));
+    ByteArray andData(_reader->getArray<char>(pixelCount / 8));
 
     Texture::MipMap mipMap;
     mipMap.width = _width;

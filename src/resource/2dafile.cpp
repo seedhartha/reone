@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "../system/log.h"
@@ -136,7 +137,7 @@ void TwoDaFile::loadHeaders() {
 }
 
 bool TwoDaFile::readToken(string &token) {
-    uint32_t pos = tell();
+    size_t pos = tell();
 
     char buf[256];
     streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
@@ -155,7 +156,7 @@ bool TwoDaFile::readToken(string &token) {
         }
     }
 
-    throw runtime_error("2DA: token not terminated");
+    throw runtime_error("2DA token not terminated");
 }
 
 void TwoDaFile::loadLabels() {
@@ -177,7 +178,7 @@ void TwoDaFile::loadRows() {
     }
 
     uint16_t dataSize = readUint16();
-    uint32_t pos = tell();
+    size_t pos = tell();
 
     for (int i = 0; i < _rowCount; ++i) {
         TwoDaRow row;
@@ -185,9 +186,9 @@ void TwoDaFile::loadRows() {
         for (int j = 0; j < columnCount; ++j) {
             const string &name = _table->_headers[j];
             int cellIdx = i * columnCount + j;
-            uint32_t off = pos + offsets[cellIdx];
+            size_t off = pos + offsets[cellIdx];
 
-            row.add(name, readString(off));
+            row.add(name, readCStringAt(off));
         }
 
         _table->_rows.push_back(row);

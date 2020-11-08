@@ -33,7 +33,7 @@ WavFile::WavFile() : BinaryFile(0) {
 }
 
 void WavFile::doLoad() {
-    string sign(readFixedString(4));
+    string sign(readString(4));
     if (sign == "\xff\xf3\x60\xc4") {
         seek(0x1da);
     } else if (sign != "RIFF") {
@@ -41,7 +41,7 @@ void WavFile::doLoad() {
     }
 
     uint32_t chunkSize = readUint32();
-    string format(readFixedString(4));
+    string format(readString(4));
     if (format != "WAVE") {
         throw runtime_error("WAV: invalid chunk format: " + format);
     }
@@ -59,9 +59,9 @@ void WavFile::doLoad() {
 }
 
 bool WavFile::readChunkHeader(ChunkHeader &chunk) {
-    if (_in->eof()) return false;
+    if (_reader->eof()) return false;
 
-    string id(readFixedString(4));
+    string id(readString(4));
     uint32_t size = readUint32();
 
     chunk.id = move(id);
@@ -95,9 +95,8 @@ void WavFile::loadFormat(ChunkHeader chunk) {
 
 void WavFile::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
-        uint32_t pos = tell();
-        ByteArray data(_size - pos);
-        _in->read(&data[0], data.size());
+        size_t pos = tell();
+        ByteArray data(_reader->getArray<char>(_size - pos));
 
         Mp3File mp3;
         mp3.load(move(data));
@@ -117,11 +116,13 @@ void WavFile::loadData(ChunkHeader chunk) {
 }
 
 void WavFile::loadPCM(uint32_t chunkSize) {
+    ByteArray data(_reader->getArray<char>(chunkSize));
+
     AudioStream::Frame frame;
     frame.format = getAudioFormat();
     frame.sampleRate = _sampleRate;
     frame.samples.resize(chunkSize);
-    _in->read(&frame.samples[0], chunkSize);
+    frame.samples = move(data);
 
     _stream = make_shared<AudioStream>();
     _stream->add(move(frame));
@@ -142,8 +143,7 @@ static const int kIMAStepTable[] = {
 };
 
 void WavFile::loadIMAADPCM(uint32_t chunkSize) {
-    ByteArray chunk(chunkSize);
-    _in->read(&chunk[0], chunkSize);
+    ByteArray chunk(_reader->getArray<char>(chunkSize));
 
     AudioStream::Frame frame;
     frame.format = getAudioFormat();

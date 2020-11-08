@@ -53,12 +53,11 @@ void ErfFile::checkSignature() {
     if (_size < kSignatureSize) {
         throw runtime_error("Invalid binary file size");
     }
-    char buf[kSignatureSize];
-    _in->read(buf, kSignatureSize);
+    string sign(_reader->getString(kSignatureSize));
 
-    bool erf = strncmp(buf, kSignatureErf, kSignatureSize) == 0;
+    bool erf = strncmp(&sign[0], kSignatureErf, kSignatureSize) == 0;
     if (!erf) {
-        bool mod = strncmp(buf, kSignatureMod, kSignatureSize) == 0;
+        bool mod = strncmp(&sign[0], kSignatureMod, kSignatureSize) == 0;
         if (!mod) {
             throw runtime_error("Invalid ERF file signature");
         }
@@ -75,7 +74,7 @@ void ErfFile::loadKeys() {
 }
 
 ErfFile::Key ErfFile::readKey() {
-    string resRef(readFixedString(16));
+    string resRef(readCString(16));
     uint32_t resId = readUint32();
     uint16_t resType = readUint16();
     ignore(2);

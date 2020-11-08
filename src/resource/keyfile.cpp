@@ -60,7 +60,7 @@ KeyFile::FileEntry KeyFile::readFileEntry() {
 
     FileEntry entry;
     entry.fileSize = fileSize;
-    entry.filename = readFixedString(filenameOffset, filenameSize);
+    entry.filename = readCString(filenameOffset, filenameSize);
 
     return move(entry);
 }
@@ -75,7 +75,7 @@ void KeyFile::loadKeys() {
 }
 
 KeyFile::KeyEntry KeyFile::readKeyEntry() {
-    string resRef(readFixedString(16));
+    string resRef(readCString(16));
     uint16_t resType = readUint16();
     uint32_t resId = readUint32();
 

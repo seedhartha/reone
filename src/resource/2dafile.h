@@ -66,6 +66,7 @@ private:
 class TwoDaFile : public BinaryFile {
 public:
     TwoDaFile();
+
     const std::shared_ptr<TwoDaTable> &table() const;
 
 private:
