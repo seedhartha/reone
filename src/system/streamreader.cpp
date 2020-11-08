@@ -142,7 +142,9 @@ bool StreamReader::eof() const {
 template <>
 vector<char> StreamReader::getArray(int count) {
     vector<char> result(count);
-    _stream->read(&result[0], count);
+    if (count > 0) {
+        _stream->read(&result[0], count);
+    }
     return move(result);
 }
 
