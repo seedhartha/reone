@@ -39,7 +39,11 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
 
 if(ENABLE_VIDEO)
-    find_package(FFMPEG REQUIRED)
+    if(WIN32)
+        find_package(FFMPEG REQUIRED)
+    else()
+        pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libavutil libswscale)
+    endif()
     include_directories(${FFMPEG_INCLUDE_DIRS})
 endif()
 
