@@ -26,6 +26,17 @@
 
 #include "video.h"
 
+#if REONE_ENABLE_VIDEO
+
+extern "C" {
+
+#include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
+
+}
+
+#endif
+
 namespace fs = boost::filesystem;
 
 using namespace std;
@@ -40,61 +51,80 @@ BikFile::BikFile(const fs::path &path) : _path(path) {
 }
 
 void BikFile::load() {
+#if REONE_ENABLE_VIDEO
     if (!fs::exists(_path)) {
-        throw runtime_error("File not found: " + _path.string());
+        throw runtime_error("BIK: file not found: " + _path.string());
     }
-    shared_ptr<ifstream> stream(new fs::ifstream(_path, ios::binary));
-    StreamReader reader(stream);
-
-    string sign(reader.getString(4));
-    if (sign != kSignature) {
-        throw runtime_error("Invalid BIK file signature");
+    AVFormatContext *formatCtx = nullptr;
+    if (avformat_open_input(&formatCtx, _path.string().c_str(), nullptr, nullptr) != 0) {
+        throw runtime_error("BIK: failed to open");
     }
-
-    uint32_t fileSize = reader.getUint32();
-    uint32_t frameCount = reader.getUint32();
-    uint32_t largestFrameSize = reader.getUint32();
-
-    reader.ignore(4);
-
-    uint32_t width = reader.getUint32();
-    uint32_t height = reader.getUint32();
-    uint32_t fpsNumerator = reader.getUint32();
-    uint32_t fpsDenominator = reader.getUint32();
-    uint32_t videoFlags = reader.getUint32();
-
-    uint32_t audioTrackCount = reader.getUint32();
-    if (audioTrackCount > 0) {
-        reader.ignore(12 * audioTrackCount);
+    if (avformat_find_stream_info(formatCtx, nullptr) != 0) {
+        throw runtime_error("BIK: failed to find stream info");
     }
-
-    vector<FrameDescriptor> descriptors;
-    for (uint32_t i = 0; i <= frameCount; ++i) {
-        uint32_t value = reader.getUint32();
-        uint32_t offset = value & ~1;
-
-        FrameDescriptor desc;
-        desc.offset = offset;
-        desc.keyframe = (value & 1) != 0;
-        if (i > 0) {
-            descriptors[i - 1].size = offset - descriptors[i - 1].offset;
-        }
-        if (i < frameCount) {
-            descriptors.push_back(move(desc));
+    int videoStream = -1;
+    for (uint32_t i = 0; i < formatCtx->nb_streams; ++i) {
+        if (formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoStream = i;
+            break;
         }
     }
+    if (videoStream == -1) {
+        throw runtime_error("BIK: video stream not found");
+    }
+    AVCodecContext *codecCtx = formatCtx->streams[videoStream]->codec;
+    AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
+    if (!codec) {
+        throw runtime_error("BIK: codec not found");
+    }
+    AVCodecContext *codecCtxOrig = codecCtx;
+    codecCtx = avcodec_alloc_context3(codec);
+    if (avcodec_copy_context(codecCtx, codecCtxOrig) != 0) {
+        throw runtime_error("BIK: failed to copy codec context");
+    }
+    if (avcodec_open2(codecCtx, codec, nullptr) != 0) {
+        throw runtime_error("BIK: failed to open codec");
+    }
+    AVFrame *frame = av_frame_alloc();
+    AVFrame *frameRGB = av_frame_alloc();
+    int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, codecCtx->width, codecCtx->height);
+    uint8_t *buffer = static_cast<uint8_t *>(av_malloc(numBytes));
+    avpicture_fill(reinterpret_cast<AVPicture *>(frameRGB), buffer, AV_PIX_FMT_RGB24, codecCtx->width, codecCtx->height);
+    AVPacket packet;
+    SwsContext *swsCtx = sws_getContext(
+        codecCtx->width, codecCtx->height,
+        codecCtx->pix_fmt,
+        codecCtx->width, codecCtx->height,
+        AV_PIX_FMT_RGB24,
+        SWS_BILINEAR,
+        nullptr, nullptr, nullptr);
+
+    AVRational &fps = formatCtx->streams[videoStream]->r_frame_rate;
 
     _video = make_shared<Video>();
-    _video->_width = width;
-    _video->_height = height;
-    _video->_fps = fpsNumerator / static_cast<float>(fpsDenominator);
+    _video->_width = codecCtx->width;
+    _video->_height = codecCtx->height;
+    _video->_fps = fps.num / static_cast<float>(fps.den);
 
-    for (auto &desc : descriptors) {
-        reader.seek(desc.offset);
+    while (av_read_frame(formatCtx, &packet) >= 0) {
+        if (packet.stream_index != videoStream) continue;
 
-        ByteArray data(reader.getArray<char>(static_cast<int>(desc.size)));
-        data.resize(3 * static_cast<size_t>(width) * height);
-        memset(&data[0], 0, data.size());
+        int frameFinished = 0;
+        avcodec_decode_video2(codecCtx, frame, &frameFinished, &packet);
+
+        if (frameFinished == 0) continue;
+
+        sws_scale(
+            swsCtx,
+            frame->data, frame->linesize, 0, codecCtx->height,
+            frameRGB->data, frameRGB->linesize);
+
+        ByteArray data(3ll * codecCtx->width * codecCtx->height);
+        for (int y = 0; y < codecCtx->height; ++y) {
+            int dstIdx = 3 * codecCtx->width * y;
+            uint8_t *src = frameRGB->data[0] + static_cast<long long>(y) * frameRGB->linesize[0];
+            memcpy(&data[dstIdx], src, 3ll * codecCtx->width);
+        }
 
         Video::Frame frame;
         frame.data = move(data);
@@ -102,6 +132,15 @@ void BikFile::load() {
     }
 
     _video->init();
+
+    av_free_packet(&packet);
+    av_free(buffer);
+    av_free(frameRGB);
+    av_free(frame);
+    avcodec_close(codecCtx);
+    avcodec_close(codecCtxOrig);
+    avformat_close_input(&formatCtx);
+#endif
 }
 
 shared_ptr<Video> BikFile::video() const {
