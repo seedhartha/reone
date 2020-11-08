@@ -290,7 +290,7 @@ void Routines::addTslRoutines() {
     add("GetSpellId", Int, { });
     add("RandomName", String, { });
     add("EffectPoison", Effect, { Int });
-    add("GetLoadFromSaveGame", Int, { });
+    add("GetLoadFromSaveGame", Int, { }, bind(&Routines::getLoadFromSaveGame, this, _1, _2));
     add("EffectAssuredDeflection", Effect, { Int });
     add("GetName", String, { Object });
     add("GetLastSpeaker", Object, { });

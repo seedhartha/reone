@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "types.h"
 
@@ -30,6 +31,8 @@ public:
     StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
 
     void putByte(uint8_t val);
+    void putInt64(int64_t val);
+    void putCString(const std::string &str);
 
 private:
     std::shared_ptr<std::ostream> _stream;
@@ -37,6 +40,14 @@ private:
 
     StreamWriter(const StreamWriter &) = delete;
     StreamWriter &operator=(const StreamWriter &) = delete;
+
+    bool isSameEndianess() const;
+
+    template <class T>
+    void put(T val);
+
+    template <class T>
+    void fixEndianess(T &val);
 };
 
 } // namespace reone

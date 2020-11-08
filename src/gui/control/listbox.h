@@ -29,6 +29,11 @@ static const int kDefaultSlotCount = 6;
 
 class ListBox : public Control {
 public:
+    enum class SelectionMode {
+        Hilight,
+        Propagate
+    };
+
     struct Item {
         std::string tag;
         std::string text;
@@ -40,6 +45,8 @@ public:
     void clear();
     void add(Item item);
 
+    void clearSelection();
+
     void load(const resource::GffStruct &gffs) override;
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
@@ -50,14 +57,17 @@ public:
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
     void setProtoItemType(ControlType type);
+    void setSelectionMode(SelectionMode mode);
 
     const Item &getItemAt(int index) const;
 
     Control &protoItem() const;
     Control &scrollBar() const;
     int itemCount() const;
+    int hilightedIndex() const;
 
 private:
+    SelectionMode _mode { SelectionMode::Propagate };
     ControlType _protoItemType { ControlType::Invalid };
     std::shared_ptr<Control> _protoItem;
     std::shared_ptr<Control> _scrollBar;

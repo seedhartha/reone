@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <boost/filesystem/path.hpp>
+
 #include "../../gui/gui.h"
 
 namespace reone {
@@ -37,13 +39,36 @@ public:
 
     void load() override;
 
+    void update();
+
     void setMode(Mode mode);
 
 private:
+    struct SavedGame {
+        int index { 0 };
+        std::string name;
+        boost::filesystem::path path;
+    };
+
     Game *_game { nullptr };
     Mode _mode { Mode::Save };
+    std::vector<SavedGame> _saves;
+    int _selectedSaveIdx { -1 };
 
     void onClick(const std::string &control) override;
+
+    void indexSavedGames();
+    void indexSavedGame(int index, const boost::filesystem::path &path);
+
+    void saveGame(int index);
+    void loadGame(int index);
+    void deleteGame(int index);
+
+    boost::filesystem::path getSavesPath() const;
+    boost::filesystem::path getSaveDirPath(int index) const;
+    std::string getSaveName(int index) const;
+    int getSelectedSaveIndex() const;
+    int getNewSaveIndex() const;
 };
 
 } // namespace game

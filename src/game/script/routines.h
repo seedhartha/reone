@@ -69,6 +69,7 @@ private:
     script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // Objects
 
