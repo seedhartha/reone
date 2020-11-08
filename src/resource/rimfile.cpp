@@ -52,7 +52,7 @@ void RimFile::loadResources() {
 }
 
 RimFile::Resource RimFile::readResource() {
-    string resRef(readFixedString(16));
+    string resRef(readCString(16));
     uint16_t type = readUint16();
     ignore(4 + 2);
     uint32_t offset = readUint32();

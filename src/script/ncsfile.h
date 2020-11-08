@@ -45,7 +45,7 @@ private:
     std::string _resRef;
     std::shared_ptr<ScriptProgram> _program;
 
-    void readInstruction(uint32_t &offset);
+    void readInstruction(size_t &offset);
 };
 
 } // namespace script

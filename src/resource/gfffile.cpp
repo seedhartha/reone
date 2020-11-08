@@ -304,7 +304,7 @@ GffField GffFile::readField(int idx) {
 
 string GffFile::readLabel(int idx) {
     uint32_t off = _labelOffset + 16 * idx;
-    return readFixedString(off, 16);
+    return readCString(off, 16);
 }
 
 vector<uint32_t> GffFile::readFieldIndices(uint32_t off, int count) {
@@ -312,7 +312,7 @@ vector<uint32_t> GffFile::readFieldIndices(uint32_t off, int count) {
 }
 
 uint64_t GffFile::readQWordFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
     uint64_t val = readUint64();
     seek(pos);
@@ -321,29 +321,29 @@ uint64_t GffFile::readQWordFieldData(uint32_t off) {
 }
 
 string GffFile::readStringFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
-    string s(readFixedString(size));
+    string s(readCString(size));
     seek(pos);
 
     return move(s);
 }
 
 string GffFile::readResRefFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint8_t size = readByte();
-    string s(readFixedString(size));
+    string s(readCString(size));
     seek(pos);
 
     return move(s);
 }
 
 GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
@@ -356,7 +356,7 @@ GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
     if (count > 0) {
         int32_t type = readInt32();
         uint32_t ssSize = readUint32();
-        loc.subString = readFixedString(ssSize);
+        loc.subString = readCString(ssSize);
     }
 
     seek(pos);
@@ -365,7 +365,7 @@ GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
 }
 
 int32_t GffFile::readStrRefFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
@@ -377,7 +377,7 @@ int32_t GffFile::readStrRefFieldData(uint32_t off) {
 }
 
 ByteArray GffFile::readByteArrayFieldData(uint32_t off) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
@@ -392,8 +392,8 @@ ByteArray GffFile::readByteArrayFieldData(uint32_t off, int size) {
 }
 
 vector<uint32_t> GffFile::readList(uint32_t off) {
-    streampos pos = _in->tellg();
-    seek(_listIndicesOffset + off);
+    size_t pos = tell();
+    seek(static_cast<size_t>(_listIndicesOffset) + off);
 
     uint32_t count = readUint32();
     vector<uint32_t> arr(readArray<uint32_t>(count));

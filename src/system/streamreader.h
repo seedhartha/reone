@@ -21,6 +21,7 @@
 #include <istream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "types.h"
 
@@ -45,6 +46,11 @@ public:
     double getDouble();
     std::string getCString();
     std::string getString(int len);
+
+    bool eof() const;
+
+    template <class T>
+    std::vector<T> getArray(int count);
 
 private:
     std::shared_ptr<std::istream> _stream;

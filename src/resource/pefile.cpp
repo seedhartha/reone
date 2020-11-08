@@ -84,7 +84,7 @@ void PEFile::loadOptionalHeader() {
 }
 
 void PEFile::loadSection() {
-    string name(readFixedString(8));
+    string name(readCString(8));
 
     ignore(4);
 
@@ -129,7 +129,7 @@ void PEFile::loadResourceDirEntry(const Section &section, int level) {
     uint32_t sibling = readUint32();
     bool siblingDir = (sibling & kSiblingMaskDir) != 0;
 
-    uint32_t pos = tell();
+    size_t pos = tell();
     uint32_t offSibling = section.offset + (sibling & 0x7fffffff);
     seek(offSibling);
 

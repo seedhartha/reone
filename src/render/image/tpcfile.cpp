@@ -111,18 +111,15 @@ void TpcFile::loadTexture() {
                 getMipMapSize(j, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
-            ByteArray &data = mipMap.data;
-            data.resize(dataSize);
-
-            _in->read(&data[0], dataSize);
+            ByteArray data(_reader->getArray<char>(dataSize));
+            mipMap.data = move(data);
         }
     }
 
-    uint32_t pos = tell();
+    size_t pos = tell();
 
     if (pos < _size) {
-        ByteArray data(_size - pos);
-        _in->read(&data[0], data.size());
+        ByteArray data(_reader->getArray<char>(_size - pos));
 
         TxiFile txi;
         txi.load(wrap(data));

@@ -36,20 +36,20 @@ void NcsFile::doLoad() {
     _program = make_unique<ScriptProgram>(_resRef);
     _program->_length = length;
 
-    uint32_t off = tell();
+    size_t off = tell();
     while (off < length) {
         readInstruction(off);
     }
 }
 
-void NcsFile::readInstruction(uint32_t &offset) {
+void NcsFile::readInstruction(size_t &offset) {
     seek(offset);
 
     uint8_t byteCode = readByte();
     uint8_t type = readByte();
 
     Instruction ins;
-    ins.offset = offset;
+    ins.offset = static_cast<uint32_t>(offset);
     ins.byteCode = static_cast<ByteCode>(byteCode);
     ins.type = static_cast<InstructionType>(type);
 
@@ -72,7 +72,7 @@ void NcsFile::readInstruction(uint32_t &offset) {
                     break;
                 case InstructionType::String: {
                     uint16_t len = readUint16();
-                    ins.strValue = readFixedString(len);
+                    ins.strValue = readCString(len);
                     break;
                 }
                 case InstructionType::Object:
@@ -96,7 +96,7 @@ void NcsFile::readInstruction(uint32_t &offset) {
         case ByteCode::JumpToSubroutine:
         case ByteCode::JumpIfZero:
         case ByteCode::JumpIfNonZero:
-            ins.jumpOffset = offset + readInt32();
+            ins.jumpOffset = static_cast<uint32_t>(offset + readInt32());
             break;
 
         case ByteCode::Destruct:
@@ -150,10 +150,10 @@ void NcsFile::readInstruction(uint32_t &offset) {
             throw runtime_error(str(boost::format("NCS: unsupported byte code: %02x") % static_cast<int>(ins.byteCode)));
     }
 
-    uint32_t pos = tell();
-    ins.nextOffset = pos;
+    size_t pos = tell();
+    ins.nextOffset = static_cast<uint32_t>(pos);
 
-    _program->_instructions.insert(make_pair(offset, move(ins)));
+    _program->_instructions.insert(make_pair(static_cast<uint32_t>(offset), move(ins)));
 
     offset = pos;
 }

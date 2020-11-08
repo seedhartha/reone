@@ -69,6 +69,7 @@ MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), 
 
 void MdlFile::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
     _mdx = mdx;
+    _mdxReader = make_unique<StreamReader>(mdx);
 
     BinaryFile::load(mdl);
 }
@@ -81,7 +82,7 @@ void MdlFile::doLoad() {
 
     ignore(8);
 
-    _name = readFixedString(32);
+    _name = readCString(32);
     boost::to_lower(_name);
 
     uint32_t rootNodeOffset = readUint32();
@@ -102,7 +103,7 @@ void MdlFile::doLoad() {
     float radius = readFloat();
     float scale = readFloat();
 
-    string superModelName(readFixedString(32));
+    string superModelName(readCString(32));
     boost::to_lower(superModelName);
 
     ignore(16);
@@ -132,7 +133,7 @@ void MdlFile::openMDX() {
         throw runtime_error("MDL: MDX file not found: " + mdxPath.string());
     }
     _mdx.reset(new fs::ifstream(mdxPath, ios::binary));
-
+    _mdxReader = make_unique<StreamReader>(_mdx);
 }
 
 void MdlFile::readArrayDefinition(uint32_t &offset, uint32_t &count) {
@@ -145,7 +146,7 @@ void MdlFile::readNodeNames(const vector<uint32_t> &offsets) {
     map<string, int> nameHits;
 
     for (uint32_t offset : offsets) {
-        string name(readString(kMdlDataOffset + offset));
+        string name(readCStringAt(kMdlDataOffset + offset));
         boost::to_lower(name);
 
         int hitCount = nameHits[name]++;
@@ -158,7 +159,7 @@ void MdlFile::readNodeNames(const vector<uint32_t> &offsets) {
 }
 
 unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(offset);
 
     uint16_t flags = readUint16();
@@ -236,7 +237,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
 }
 
 void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vector<float> &data, ModelNode &node) {
-    uint32_t pos = tell();
+    size_t pos = tell();
     seek(kMdlDataOffset + keyOffset);
 
     for (uint32_t i = 0; i < keyCount; ++i) {
@@ -416,10 +417,10 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
 
     uint32_t transparency = readUint32();
 
-    string diffuse(readFixedString(32));
+    string diffuse(readCString(32));
     boost::to_lower(diffuse);
 
-    string lightmap(readFixedString(32));
+    string lightmap(readCString(32));
     boost::to_lower(lightmap);
 
     ignore(36);
@@ -458,7 +459,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
 
     ignore(4);
 
-    uint32_t endPos = tell();
+    size_t endPos = tell();
 
     if (faceCount == 0) {
         warn(boost::format("MDL: invalid face count: %d, model %s") % to_string(faceCount) % _name);
@@ -478,8 +479,8 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
 
     int valPerVert = mdxVertexSize / sizeof(float);
     int vertValCount = valPerVert * vertexCount;
-    seek(*_mdx, mdxDataOffset);
-    vector<float> vertices(readArray<float>(*_mdx, vertValCount));
+    _mdxReader->seek(mdxDataOffset);
+    vector<float> vertices(_mdxReader->getArray<float>(vertValCount));
 
     Mesh::VertexOffsets offsets;
     offsets.vertexCoords = mdxVerticesOffset;
@@ -557,7 +558,7 @@ unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
     seek(kMdlDataOffset + offset);
     ignore(8);
 
-    string name(readFixedString(32));
+    string name(readCString(32));
     boost::to_lower(name);
 
     uint32_t rootNodeOffset = readUint32();

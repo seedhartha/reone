@@ -36,6 +36,7 @@ public:
 private:
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::shared_ptr<std::istream> _mdx;
+    std::unique_ptr<StreamReader> _mdxReader;
     std::string _name;
     int _nodeIndex { 0 };
     std::vector<std::string> _nodeNames;
