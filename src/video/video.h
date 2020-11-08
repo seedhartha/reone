@@ -18,10 +18,15 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+
+#include "../system/types.h"
 
 namespace reone {
 
 namespace video {
+
+class BikFile;
 
 class Video {
 public:
@@ -34,9 +39,20 @@ public:
     bool isFinished() const;
 
 private:
+    struct Frame {
+        ByteArray data;
+    };
+
+    int _width { 0 };
+    int _height { 0 };
+    float _fps { 0.0f };
+    std::vector<Frame> _frames;
     bool _inited { false };
-    bool _finished { false };
     uint32_t _textureId { 0 };
+    float _time { 0.0f };
+    bool _finished { false };
+
+    friend class BikFile;
 };
 
 } // namespace video
