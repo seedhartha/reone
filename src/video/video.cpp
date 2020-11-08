@@ -17,12 +17,18 @@
 
 #include "video.h"
 
+#include <utility>
+
 #include "GL/glew.h"
 
 #include "SDL2/SDL_opengl.h"
 
+#include "glm/ext.hpp"
+
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
+
+using namespace std;
 
 using namespace reone::render;
 
@@ -34,6 +40,10 @@ void Video::init() {
     if (_inited) return;
 
     glGenTextures(1, &_textureId);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -52,13 +62,26 @@ void Video::deinit() {
 void Video::update(float dt) {
     if (_finished) return;
 
-    _finished = true;
+    _time += dt;
+
+    int frameCount = static_cast<int>(_frames.size());
+    int frameIdx = min(static_cast<int>(_fps * _time), frameCount - 1);
+    if (frameIdx == frameCount - 1) {
+        _finished = true;
+        return;
+    }
+    Frame &frame = _frames[frameIdx];
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, &frame.data[0]);
 }
 
 void Video::render() {
     if (!_inited) return;
 
     GlobalUniforms globals;
+    globals.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
     Shaders::instance().setGlobalUniforms(globals);
 
     LocalUniforms locals;
