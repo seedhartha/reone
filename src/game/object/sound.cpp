@@ -65,11 +65,16 @@ void Sound::update(float dt) {
     if (!_active || !_audible) return;
 
     if (!_sound || _sound->isStopped()) {
+        if (_timeout > 0.0f) {
+            _timeout = glm::max(0.0f, _timeout - dt);
+            return;
+        }
         const vector<string> &sounds = _blueprint->sounds();
+        int soundCount = static_cast<int>(sounds.size());
         if (sounds.empty()) {
             _active = false;
             return;
-        } else if (++_soundIdx == static_cast<int>(sounds.size())) {
+        } else if (++_soundIdx == soundCount) {
             if (_blueprint->looping()) {
                 _soundIdx = 0;
             } else {
@@ -77,13 +82,14 @@ void Sound::update(float dt) {
                 return;
             }
         }
-        playSound(sounds[_soundIdx]);
+        playSound(sounds[_soundIdx], soundCount == 1 && _blueprint->continuous());
+        _timeout = _blueprint->interval() / 1000.0f;
     }
 }
 
-void Sound::playSound(const string &resRef) {
+void Sound::playSound(const string &resRef, bool loop) {
     shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
-    _sound = AudioPlayer::instance().play(stream, AudioType::Sound, _blueprint->continuous(), _blueprint->volume() / 255.0f);
+    _sound = AudioPlayer::instance().play(stream, AudioType::Sound, loop, _blueprint->volume() / 255.0f);
 }
 
 shared_ptr<SoundBlueprint> Sound::blueprint() const {
