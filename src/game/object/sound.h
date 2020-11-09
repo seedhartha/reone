@@ -55,9 +55,10 @@ private:
     bool _audible { false };
     int _priority { 0 };
     int _soundIdx { -1 };
+    float _timeout { 0.0f };
     std::shared_ptr<audio::SoundInstance> _sound;
 
-    void playSound(const std::string &resRef);
+    void playSound(const std::string &resRef, bool loop);
 };
 
 } // namespace game
