@@ -67,7 +67,7 @@ void Program::initOptions() {
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
-        ("debug", po::value<int>()->default_value(0), "debug level (0-3)");
+        ("debug", po::value<int>()->default_value(0), "debug log level (0-3)");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")

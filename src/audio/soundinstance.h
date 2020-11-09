@@ -37,7 +37,7 @@ public:
     void update();
     void stop();
 
-    bool stopped() const;
+    bool isStopped() const;
     int duration() const;
 
 private:

@@ -437,7 +437,7 @@ void Dialog::update(float dt) {
                 endCurrentEntry();
             }
         } else if (endOnAudioStop) {
-            bool stopped = _currentVoice && _currentVoice->stopped();
+            bool stopped = _currentVoice && _currentVoice->isStopped();
             if (stopped) {
                 endCurrentEntry();
             }

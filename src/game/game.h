@@ -155,7 +155,6 @@ private:
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
-    std::shared_ptr<audio::SoundInstance> _music;
     uint32_t _ticks { 0 };
     bool _quit { false };
     std::shared_ptr<video::Video> _video;
@@ -185,6 +184,14 @@ private:
     std::unique_ptr<SaveLoad> _saveLoad;
 
     // END GUI
+
+    // Audio
+
+    std::string _musicResRef;
+    std::shared_ptr<audio::SoundInstance> _music;
+    std::shared_ptr<audio::SoundInstance> _movieAudio;
+
+    // END Audio
 
     // Globals/locals
 
