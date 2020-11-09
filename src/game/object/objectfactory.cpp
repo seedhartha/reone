@@ -72,6 +72,10 @@ unique_ptr<Item> ObjectFactory::newItem() {
     return make_unique<Item>(_counter++);
 }
 
+unique_ptr<Sound> ObjectFactory::newSound() {
+    return make_unique<Sound>(_counter++, _sceneGraph);
+}
+
 } // namespace game
 
 } // namespace reone

@@ -27,6 +27,7 @@
 #include "door.h"
 #include "item.h"
 #include "placeable.h"
+#include "sound.h"
 #include "trigger.h"
 #include "waypoint.h"
 
@@ -44,6 +45,7 @@ public:
     std::shared_ptr<DoorBlueprint> getDoor(const std::string &resRef);
     std::shared_ptr<ItemBlueprint> getItem(const std::string &resRef);
     std::shared_ptr<PlaceableBlueprint> getPlaceable(const std::string &resRef);
+    std::shared_ptr<SoundBlueprint> getSound(const std::string &resRef);
     std::shared_ptr<TriggerBlueprint> getTrigger(const std::string &resRef);
     std::shared_ptr<WaypointBlueprint> getWaypoint(const std::string &resRef);
 
@@ -52,6 +54,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<DoorBlueprint>> _doorCache;
     std::unordered_map<std::string, std::shared_ptr<ItemBlueprint>> _itemCache;
     std::unordered_map<std::string, std::shared_ptr<PlaceableBlueprint>> _placeableCache;
+    std::unordered_map<std::string, std::shared_ptr<SoundBlueprint>> _soundCache;
     std::unordered_map<std::string, std::shared_ptr<TriggerBlueprint>> _triggerCache;
     std::unordered_map<std::string, std::shared_ptr<WaypointBlueprint>> _waypointCache;
 

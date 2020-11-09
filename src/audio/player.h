@@ -18,9 +18,9 @@
 #pragma once
 
 #include <atomic>
-#include <list>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 #include "AL/alc.h"
 
@@ -38,7 +38,7 @@ public:
     void deinit();
 
     void reset();
-    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, AudioType type);
+    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
 
 private:
     AudioOptions _opts;
@@ -46,7 +46,7 @@ private:
     ALCcontext *_context { nullptr };
     std::thread _thread;
     std::atomic_bool _run { true };
-    std::list<std::shared_ptr<SoundInstance>> _sounds;
+    std::vector<std::shared_ptr<SoundInstance>> _sounds;
     std::recursive_mutex _soundsMutex;
 
     AudioPlayer() = default;

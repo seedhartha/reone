@@ -160,6 +160,7 @@ private:
     void landObject(SpatialObject &object);
     void updateTriggers(const Creature &creature);
     void updateVisibility();
+    void updateSounds();
 
     bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
     bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
@@ -181,6 +182,7 @@ private:
     void loadPlaceables(const resource::GffStruct &git);
     void loadWaypoints(const resource::GffStruct &git);
     void loadTriggers(const resource::GffStruct &git);
+    void loadSounds(const resource::GffStruct &git);
 
     // END Loading
 

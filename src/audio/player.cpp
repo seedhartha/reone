@@ -58,16 +58,19 @@ void AudioPlayer::init(const AudioOptions &opts) {
 }
 
 void AudioPlayer::threadStart() {
+    vector<shared_ptr<SoundInstance>> sounds;
     while (_run) {
-        lock_guard<recursive_mutex> lock(_soundsMutex);
-        auto it = remove_if(
-            _sounds.begin(),
-            _sounds.end(),
-            [](const shared_ptr<SoundInstance> &sound) { return sound->isStopped(); });
+        {
+            lock_guard<recursive_mutex> lock(_soundsMutex);
+            auto it = remove_if(
+                _sounds.begin(),
+                _sounds.end(),
+                [](const shared_ptr<SoundInstance> &sound) { return sound->isStopped(); });
 
-        _sounds.erase(it, _sounds.end());
-
-        for (auto &sound : _sounds) {
+            _sounds.erase(it, _sounds.end());
+            sounds = _sounds;
+        }
+        for (auto &sound : sounds) {
             sound->update();
         }
     }
@@ -101,13 +104,12 @@ void AudioPlayer::reset() {
     _sounds.clear();
 }
 
-shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type) {
+shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain) {
     if (!stream) {
         throw invalid_argument("Audio stream is empty");
     }
-    float gain = getVolume(type) / 100.0f;
-
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, false, gain));
+    float finalGain = gain * getVolume(type) / 100.0f;
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, finalGain));
 
     lock_guard<recursive_mutex> lock(_soundsMutex);
     _sounds.push_back(sound);

@@ -33,6 +33,7 @@
 #include "../../system/log.h"
 #include "../../system/streamutil.h"
 
+#include "../blueprint/sound.h"
 #include "../game.h"
 #include "../room.h"
 #include "../script/util.h"
@@ -59,6 +60,7 @@ static const float kPartyMemberFollowDistance = 4.0f;
 static const float kMaxDistanceToTestCollision = 64.0f;
 static const float kElevationTestZ = 1024.0f;
 static const float kCreatureObstacleTestZ = 0.1f;
+static const int kMaxSoundCount = 4;
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
@@ -173,6 +175,7 @@ void Area::loadGIT(const GffStruct &git) {
     loadPlaceables(git);
     loadWaypoints(git);
     loadTriggers(git);
+    loadSounds(git);
 }
 
 void Area::loadProperties(const GffStruct &git) {
@@ -223,6 +226,14 @@ void Area::loadTriggers(const GffStruct &git) {
         shared_ptr<Trigger> trigger(_game->objectFactory().newTrigger());
         trigger->load(gffs);
         add(trigger);
+    }
+}
+
+void Area::loadSounds(const GffStruct &git) {
+    for (auto &gffs : git.getList("SoundList")) {
+        shared_ptr<Sound> sound(_game->objectFactory().newSound());
+        sound->load(gffs);
+        add(sound);
     }
 }
 
@@ -484,6 +495,7 @@ void Area::update(float dt) {
         room.second->update(dt);
     }
     updateVisibility();
+    updateSounds();
 
     for (auto &object : _objects) {
         object->update(dt);
@@ -713,6 +725,40 @@ void Area::updateVisibility() {
         }
         model->setOnScreen(onScreen);
         model->setAlpha(alpha);
+    }
+}
+
+void Area::updateSounds() {
+    Camera *camera = _game->getActiveCamera();
+    if (!camera) return;
+
+    vector<pair<Sound *, float>> soundDistances;
+    glm::vec3 cameraPosition(camera->sceneNode()->absoluteTransform()[3]);
+
+    for (auto &sound : _objectsByType[ObjectType::Sound]) {
+        Sound *soundPtr = static_cast<Sound *>(sound.get());
+        soundPtr->setAudible(false);
+
+        if (!soundPtr->isActive()) continue;
+
+        shared_ptr<SoundBlueprint> blueprint(soundPtr->blueprint());
+        float maxDist = blueprint->maxDistance();
+        float minDist = blueprint->minDistance();
+
+        float dist = soundPtr->distanceTo(cameraPosition);
+        if (dist < minDist * minDist || dist > maxDist * maxDist) continue;
+
+        soundDistances.push_back(make_pair(soundPtr, dist));
+    }
+
+    sort(soundDistances.begin(), soundDistances.end(), [](auto &left, auto &right) {
+        return left.first->priority() < right.first->priority() || left.second < right.second;
+    });
+    if (soundDistances.size() > kMaxSoundCount) {
+        soundDistances.erase(soundDistances.begin() + kMaxSoundCount, soundDistances.end());
+    }
+    for (auto &sound : soundDistances) {
+        sound.first->setAudible(true);
     }
 }
 
