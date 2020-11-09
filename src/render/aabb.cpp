@@ -118,6 +118,13 @@ bool AABB::contains(const glm::vec3 &p) const {
         p.z >= _min.z && p.z <= _max.z;
 }
 
+bool AABB::intersect(const AABB &other) const {
+    return
+        (_min.x <= other._max.x && _max.x >= other._min.x) &&
+        (_min.y <= other._max.y && _max.y >= other._min.y) &&
+        (_min.z <= other._max.z && _max.z >= other._min.z);
+}
+
 bool AABB::intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const {
     if (contains(origin)) return true;
 

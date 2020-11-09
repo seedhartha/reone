@@ -253,6 +253,7 @@ set(SCENE_HEADERS
     src/scene/lightnode.h
     src/scene/modelnodescenenode.h
     src/scene/modelscenenode.h
+    src/scene/octree.h
     src/scene/scenegraph.h
     src/scene/scenenode.h
     src/scene/scenenodeanimator.h)
@@ -264,6 +265,7 @@ set(SCENE_SOURCES
     src/scene/lightnode.cpp
     src/scene/modelnodescenenode.cpp
     src/scene/modelscenenode.cpp
+    src/scene/octree.cpp
     src/scene/scenegraph.cpp
     src/scene/scenenode.cpp
     src/scene/scenenodeanimator.cpp)
