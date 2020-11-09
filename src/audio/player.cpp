@@ -38,7 +38,7 @@ AudioPlayer &AudioPlayer::instance() {
 
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
-    if (_opts.musicVolume == 0 && _opts.soundVolume == 0) {
+    if (_opts.musicVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
         info("Audio disabled");
         return;
     }
@@ -106,7 +106,7 @@ shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &strea
         throw invalid_argument("Audio stream is empty");
     }
     bool loop = type == AudioType::Music;
-    float gain = (type == AudioType::Music ? _opts.musicVolume : _opts.soundVolume) / 100.0f;
+    float gain = getVolume(type) / 100.0f;
 
     shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, gain));
 
@@ -114,6 +114,19 @@ shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &strea
     _sounds.push_back(sound);
 
     return move(sound);
+}
+
+int AudioPlayer::getVolume(AudioType type) const {
+    switch (type) {
+        case AudioType::Music:
+            return _opts.musicVolume;
+        case AudioType::Sound:
+            return _opts.soundVolume;
+        case AudioType::Movie:
+            return _opts.movieVolume;
+        default:
+            return 85;
+    }
 }
 
 } // namespace audio
