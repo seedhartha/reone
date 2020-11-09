@@ -73,10 +73,7 @@ void Game::initGameVersion() {
 
 int Game::run() {
     init();
-
-    if (_version == GameVersion::KotOR) {
-        playVideo("legal");
-    }
+    playVideo("legal");
     openMainMenu();
 
     _window.show();
