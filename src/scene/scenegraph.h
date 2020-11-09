@@ -39,20 +39,30 @@ public:
 
     void render() const override;
 
-    void clear();
-    void addLight(LightSceneNode *node);
-    void addOpaqueMesh(ModelNodeSceneNode *node);
     void addRoot(const std::shared_ptr<SceneNode> &node);
-    void addTransparentMesh(ModelNodeSceneNode *node);
-    void prepare();
+    void clear();
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
+    void prepare();
+
+    void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
+
+    // Meshes
+
+    void addOpaqueMesh(ModelNodeSceneNode *node);
+    void addTransparentMesh(ModelNodeSceneNode *node);
+
+    // END Meshes
+
+    // Lights
+
+    void addLight(LightSceneNode *node);
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
-
-    void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setAmbientLightColor(const glm::vec3 &color);
+
+    // END Lights
 
 private:
     render::GraphicsOptions _opts;
