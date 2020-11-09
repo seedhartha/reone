@@ -212,6 +212,7 @@ private:
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     void loadNextModule();
     float measureFrameTime();

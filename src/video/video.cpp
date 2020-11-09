@@ -96,6 +96,10 @@ void Video::render() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Video::finish() {
+    _finished = true;
+}
+
 bool Video::isFinished() const {
     return _finished;
 }
