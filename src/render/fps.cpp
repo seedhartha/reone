@@ -51,7 +51,7 @@ bool FpsCounter::hasAverage() const {
     return _hasAverage;
 }
 
-float FpsCounter::getAverage() const {
+float FpsCounter::average() const {
     return _average;
 }
 
