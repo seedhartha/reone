@@ -552,34 +552,51 @@ void Game::onCameraChanged(CameraType camera) {
 }
 
 bool Game::handle(const SDL_Event &event) {
-    GUI *gui = getScreenGUI();
-    if (gui && gui->handle(event)) {
-        return true;
-    }
-    switch (_screen) {
-        case GameScreen::InGame: {
-            if (_console.handle(event)) {
-                return true;
-            }
-            if (_party.handle(event)) {
-                return true;
-            }
-            Camera *camera = getActiveCamera();
-            if (camera && camera->handle(event)) {
-                return true;
-            }
-            if (_module->handle(event)) {
-                return true;
-            }
-            break;
+    if (!_video) {
+        GUI *gui = getScreenGUI();
+        if (gui && gui->handle(event)) {
+            return true;
         }
+        switch (_screen) {
+            case GameScreen::InGame: {
+                if (_console.handle(event)) {
+                    return true;
+                }
+                if (_party.handle(event)) {
+                    return true;
+                }
+                Camera *camera = getActiveCamera();
+                if (camera && camera->handle(event)) {
+                    return true;
+                }
+                if (_module->handle(event)) {
+                    return true;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    switch (event.type) {
+        case SDL_MOUSEBUTTONDOWN:
+            if (handleMouseButtonDown(event.button)) return true;
+            break;
+        case SDL_KEYDOWN:
+            if (handleKeyDown(event.key)) return true;
+            break;
         default:
             break;
     }
-    if (event.type == SDL_KEYDOWN) {
-        return handleKeyDown(event.key);
-    }
 
+    return false;
+}
+
+bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (_video) {
+        _video->finish();
+        return true;
+    }
     return false;
 }
 

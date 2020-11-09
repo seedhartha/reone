@@ -43,6 +43,8 @@ public:
     void update(float dt);
     void render();
 
+    void finish();
+
     bool isFinished() const;
 
     std::shared_ptr<audio::AudioStream> audio() const;
