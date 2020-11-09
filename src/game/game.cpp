@@ -123,7 +123,7 @@ void Game::playVideo(const string &name) {
 
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
-        AudioPlayer::instance().play(audio, AudioType::Sound);
+        AudioPlayer::instance().play(audio, AudioType::Movie);
     }
 }
 

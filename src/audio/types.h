@@ -30,12 +30,14 @@ enum class AudioFormat {
 
 enum class AudioType {
     Music,
-    Sound
+    Sound,
+    Movie
 };
 
 struct AudioOptions {
     int soundVolume { 85 };
     int musicVolume { 85 };
+    int movieVolume { 85 };
 };
 
 } // namespace audio

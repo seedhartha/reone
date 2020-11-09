@@ -56,6 +56,8 @@ private:
     AudioPlayer &operator=(const AudioPlayer &) = delete;
 
     void threadStart();
+
+    int getVolume(AudioType type) const;
 };
 
 } // namespace audio
