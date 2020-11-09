@@ -115,7 +115,7 @@ void SoundInstance::stop() {
     _state = State::Stopped;
 }
 
-bool SoundInstance::stopped() const {
+bool SoundInstance::isStopped() const {
     return _state == State::Stopped;
 }
 

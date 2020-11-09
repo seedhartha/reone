@@ -121,9 +121,12 @@ void Game::playVideo(const string &name) {
 
     _video = bik.video();
 
+    if (_music && !_music->isStopped()) {
+        _music->stop();
+    }
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
-        AudioPlayer::instance().play(audio, AudioType::Movie);
+        _movieAudio = AudioPlayer::instance().play(audio, AudioType::Movie);
     }
 }
 
@@ -148,12 +151,12 @@ string Game::getMainMenuMusic() const {
 }
 
 void Game::playMusic(const string &resRef) {
-    if (_music) {
+    if (_musicResRef == resRef) return;
+
+    if (_music && !_music->isStopped()) {
         _music->stop();
     }
-    if (!resRef.empty()) {
-        _music = ::playMusic(resRef);
-    }
+    _musicResRef = resRef;
 }
 
 void Game::loadMainMenu() {
@@ -390,6 +393,8 @@ void Game::update() {
         if (_video->isFinished()) {
             _video.reset();
         }
+    } else if (!_musicResRef.empty() && (!_music || _music->isStopped())) {
+        _music = ::playMusic(_musicResRef);
     }
 
     if (!_nextModule.empty()) {

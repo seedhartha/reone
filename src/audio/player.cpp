@@ -63,7 +63,7 @@ void AudioPlayer::threadStart() {
         auto it = remove_if(
             _sounds.begin(),
             _sounds.end(),
-            [](const shared_ptr<SoundInstance> &sound) { return sound->stopped(); });
+            [](const shared_ptr<SoundInstance> &sound) { return sound->isStopped(); });
 
         _sounds.erase(it, _sounds.end());
 
@@ -105,10 +105,9 @@ shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &strea
     if (!stream) {
         throw invalid_argument("Audio stream is empty");
     }
-    bool loop = type == AudioType::Music;
     float gain = getVolume(type) / 100.0f;
 
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, gain));
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, false, gain));
 
     lock_guard<recursive_mutex> lock(_soundsMutex);
     _sounds.push_back(sound);
