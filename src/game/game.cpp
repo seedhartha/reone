@@ -123,6 +123,11 @@ void Game::playVideo(const string &name) {
     bik.load();
 
     _video = bik.video();
+
+    shared_ptr<AudioStream> audio(_video->audio());
+    if (audio) {
+        AudioPlayer::instance().play(audio, AudioType::Sound);
+    }
 }
 
 void Game::openMainMenu() {
