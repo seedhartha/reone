@@ -18,11 +18,18 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "../system/types.h"
 
 namespace reone {
+
+namespace audio {
+
+class AudioStream;
+
+}
 
 namespace video {
 
@@ -38,6 +45,8 @@ public:
 
     bool isFinished() const;
 
+    std::shared_ptr<audio::AudioStream> audio() const;
+
 private:
     struct Frame {
         ByteArray data;
@@ -51,8 +60,9 @@ private:
     uint32_t _textureId { 0 };
     float _time { 0.0f };
     bool _finished { false };
+    std::shared_ptr<audio::AudioStream> _audio;
 
-    friend class BikFile;
+    friend class BinkVideoDecoder;
 };
 
 } // namespace video

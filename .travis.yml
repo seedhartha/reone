@@ -38,6 +38,7 @@ addons:
       - libavcodec-dev
       - libavformat-dev
       - libavutil-dev
+      - libswresample-dev
       - libswscale-dev
   coverity_scan:
     project:

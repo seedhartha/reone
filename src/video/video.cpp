@@ -30,6 +30,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::render;
 
 namespace reone {
@@ -97,6 +98,10 @@ void Video::render() {
 
 bool Video::isFinished() const {
     return _finished;
+}
+
+shared_ptr<AudioStream> Video::audio() const {
+    return _audio;
 }
 
 } // namespace video

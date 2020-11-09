@@ -19,12 +19,19 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include "../audio/types.h"
+
 namespace reone {
 
 namespace video {
 
 class Video;
 
+/**
+ * Represents a Bink Video file. Uses FFmpeg for loading.
+ *
+ * http://dranger.com/ffmpeg/ffmpeg.html
+ */
 class BikFile {
 public:
     BikFile(const boost::filesystem::path &path);
