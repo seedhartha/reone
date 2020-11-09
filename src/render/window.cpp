@@ -27,6 +27,8 @@
 
 #include "glm/ext.hpp"
 
+#include "../system/log.h"
+
 #include "cursor.h"
 #include "mesh/aabb.h"
 #include "mesh/cube.h"
@@ -83,6 +85,9 @@ void RenderWindow::init() {
 }
 
 void RenderWindow::deinit() {
+    if (_fpsGlobal.hasAverage()) {
+        debug("Average FPS: " + to_string(static_cast<int>(_fpsGlobal.average())));
+    }
     Quad::getDefault().deinitGL();
     Quad::getXFlipped().deinitGL();
     Quad::getYFlipped().deinitGL();
@@ -139,11 +144,12 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
 }
 
 void RenderWindow::update(float dt) {
-    _fps.update(dt);
+    _fpsLocal.update(dt);
+    _fpsGlobal.update(dt);
 
-    if (_fps.hasAverage()) {
-        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fps.getAverage())).c_str());
-        _fps.reset();
+    if (_fpsLocal.hasAverage()) {
+        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fpsLocal.average())).c_str());
+        _fpsLocal.reset();
     }
 }
 

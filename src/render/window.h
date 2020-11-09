@@ -59,7 +59,8 @@ private:
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };
     std::shared_ptr<Cursor> _cursor;
-    FpsCounter _fps;
+    FpsCounter _fpsLocal;
+    FpsCounter _fpsGlobal;
     std::function<void()> _onRenderWorld;
     std::function<void()> _onRenderGUI;
 

@@ -29,11 +29,11 @@ public:
     void update(float dt);
 
     bool hasAverage() const;
-    float getAverage() const;
+    float average() const;
 
 private:
     uint32_t _startTicks { 0 };
-    int _frameCount { 0 };
+    uint64_t _frameCount { 0 };
     bool _hasAverage { false };
     float _average { 0.0f };
 };
