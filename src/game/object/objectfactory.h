@@ -31,6 +31,7 @@
 #include "door.h"
 #include "module.h"
 #include "placeable.h"
+#include "sound.h"
 #include "trigger.h"
 #include "waypoint.h"
 
@@ -52,6 +53,7 @@ public:
     std::unique_ptr<Waypoint> newWaypoint();
     std::unique_ptr<Trigger> newTrigger();
     std::unique_ptr<Item> newItem();
+    std::unique_ptr<Sound> newSound();
 
 private:
     Game *_game { nullptr };

@@ -350,6 +350,7 @@ set(GAME_HEADERS
     src/game/blueprint/door.h
     src/game/blueprint/item.h
     src/game/blueprint/placeable.h
+    src/game/blueprint/sound.h
     src/game/blueprint/trigger.h
     src/game/blueprint/waypoint.h
     src/game/camera/animatedcamera.h
@@ -396,6 +397,7 @@ set(GAME_HEADERS
     src/game/object/object.h
     src/game/object/objectfactory.h
     src/game/object/placeable.h
+    src/game/object/sound.h
     src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/types.h
@@ -428,6 +430,7 @@ set(GAME_SOURCES
     src/game/blueprint/door.cpp
     src/game/blueprint/item.cpp
     src/game/blueprint/placeable.cpp
+    src/game/blueprint/sound.cpp
     src/game/blueprint/trigger.cpp
     src/game/blueprint/waypoint.cpp
     src/game/camera/animatedcamera.cpp
@@ -473,6 +476,7 @@ set(GAME_SOURCES
     src/game/object/object.cpp
     src/game/object/objectfactory.cpp
     src/game/object/placeable.cpp
+    src/game/object/sound.cpp
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
     src/game/object/waypoint.cpp

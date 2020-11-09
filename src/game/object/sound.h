@@ -17,21 +17,47 @@
 
 #pragma once
 
+#include "spatial.h"
+
+#include "../../resource/gfffile.h"
+
 namespace reone {
+
+namespace audio {
+
+class SoundInstance;
+
+}
 
 namespace game {
 
-enum class ObjectType {
-    None,
-    Module,
-    Area,
-    Creature,
-    Door,
-    Placeable,
-    Waypoint,
-    Trigger,
-    Item,
-    Sound
+class SoundBlueprint;
+
+class Sound : public SpatialObject {
+public:
+    Sound(uint32_t id, scene::SceneGraph *sceneGraph);
+
+    void load(const resource::GffStruct &gffs);
+
+    void update(float dt) override;
+
+    bool isActive() const;
+    bool isAudible() const;
+
+    std::shared_ptr<SoundBlueprint> blueprint() const;
+    int priority() const;
+
+    void setAudible(bool audible);
+
+private:
+    std::shared_ptr<SoundBlueprint> _blueprint;
+    bool _active { false };
+    bool _audible { false };
+    int _priority { 0 };
+    int _soundIdx { -1 };
+    std::shared_ptr<audio::SoundInstance> _sound;
+
+    void playSound(const std::string &resRef);
 };
 
 } // namespace game

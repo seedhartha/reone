@@ -38,6 +38,7 @@ void Blueprints::invalidateCache() {
     _doorCache.clear();
     _itemCache.clear();
     _placeableCache.clear();
+    _soundCache.clear();
     _triggerCache.clear();
     _waypointCache.clear();
 }
@@ -80,6 +81,10 @@ shared_ptr<ItemBlueprint> Blueprints::getItem(const string &resRef) {
 
 shared_ptr<PlaceableBlueprint> Blueprints::getPlaceable(const string &resRef) {
     return get<PlaceableBlueprint>(resRef, ResourceType::PlaceableBlueprint, _placeableCache);
+}
+
+shared_ptr<SoundBlueprint> Blueprints::getSound(const string &resRef) {
+    return get<SoundBlueprint>(resRef, ResourceType::SoundBlueprint, _soundCache);
 }
 
 shared_ptr<TriggerBlueprint> Blueprints::getTrigger(const string &resRef) {
