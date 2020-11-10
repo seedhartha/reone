@@ -592,6 +592,7 @@ void Area::fill(SceneGraph &sceneGraph) {
             sceneGraph.addRoot(sceneNode);
         }
     }
+    sceneGraph.onLastRootAdded();
 }
 
 glm::vec3 Area::getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const {

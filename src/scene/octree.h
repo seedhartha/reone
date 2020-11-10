@@ -29,10 +29,12 @@ namespace reone {
 
 namespace scene {
 
+class CameraSceneNode;
 class OctreeNode;
+class SceneNode;
 
 struct OctreeObject {
-    std::string tag;
+    SceneNode *sceneNode { nullptr };
     render::AABB aabb;
     std::unordered_set<OctreeNode *> nodes;
 };
@@ -70,6 +72,8 @@ private:
 
     bool isLeaf() const;
     bool isObjectIn(OctreeObject *object, Quadrant quadrant) const;
+
+    friend class Octree;
 };
 
 /**
@@ -81,8 +85,10 @@ public:
     void registerObject(OctreeObject object);
     void build();
 
+    std::vector<SceneNode *> getNodesInFrustum(const CameraSceneNode *camera) const;
+
 private:
-    std::unordered_map<std::string, OctreeObject> _objects;
+    std::unordered_map<SceneNode *, OctreeObject> _objects;
     std::unique_ptr<OctreeNode> _root;
 };
 

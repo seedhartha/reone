@@ -17,7 +17,11 @@
 
 #include "octree.h"
 
+#include <algorithm>
 #include <stdexcept>
+#include <stack>
+
+#include "cameranode.h"
 
 using namespace std;
 
@@ -114,7 +118,7 @@ void Octree::clear() {
 }
 
 void Octree::registerObject(OctreeObject object) {
-    _objects.insert(make_pair(object.tag, move(object)));
+    _objects.insert(make_pair(object.sceneNode, move(object)));
 }
 
 void Octree::build() {
@@ -127,6 +131,59 @@ void Octree::build() {
     for (auto &object : _objects) {
         _root->add(&object.second);
     }
+}
+
+vector<SceneNode *> Octree::getNodesInFrustum(const CameraSceneNode *camera) const {
+    stack<OctreeNode *> nodes;
+    nodes.push(_root.get());
+
+    unordered_map<SceneNode *, float> cameraDistByNode;
+    while (!nodes.empty()) {
+        OctreeNode *node = nodes.top();
+        nodes.pop();
+
+        if (!camera->isInFrustum(node->_aabb)) continue;
+
+        float dist = camera->distanceTo(node->_aabb.center());
+        if (!node->_objects.empty()) {
+            for (auto &object : node->_objects) {
+                auto maybeDistance = cameraDistByNode.find(object->sceneNode);
+                if (maybeDistance != cameraDistByNode.end()) {
+                    if (dist > maybeDistance->second) {
+                        cameraDistByNode[object->sceneNode] = dist;
+                    }
+                    continue;
+                }
+                cameraDistByNode.insert(make_pair(object->sceneNode, dist));
+            }
+        }
+        if (node->_bottomLeft) {
+            nodes.push(node->_bottomLeft.get());
+        }
+        if (node->_bottomRight) {
+            nodes.push(node->_bottomRight.get());
+        }
+        if (node->_topLeft) {
+            nodes.push(node->_topLeft.get());
+        }
+        if (node->_topRight) {
+            nodes.push(node->_topRight.get());
+        }
+    }
+
+    vector<pair<SceneNode *, float>> cameraDistances;
+    for (auto &pair : cameraDistByNode) {
+        cameraDistances.push_back(pair);
+    }
+    sort(cameraDistances.begin(), cameraDistances.end(), [](auto &left, auto &right) {
+        return left.second > right.second;
+    });
+    vector<SceneNode *> result;
+    for (auto &pair : cameraDistances) {
+        result.push_back(pair.first);
+    }
+
+    return move(result);
 }
 
 } // namespace scene

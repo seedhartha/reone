@@ -53,6 +53,7 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
     camera->setLocalTransform(_cameraTransform);
 
     sceneGraph->addRoot(model);
+    sceneGraph->onLastRootAdded();
     sceneGraph->setAmbientLightColor(_ambientLightColor);
     sceneGraph->setActiveCamera(camera);
 
