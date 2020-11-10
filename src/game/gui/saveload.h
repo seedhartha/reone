@@ -44,7 +44,7 @@ public:
     void setMode(Mode mode);
 
 private:
-    struct SavedGame {
+    struct GameDescriptor {
         int index { 0 };
         std::string name;
         boost::filesystem::path path;
@@ -52,7 +52,7 @@ private:
 
     Game *_game { nullptr };
     Mode _mode { Mode::Save };
-    std::vector<SavedGame> _saves;
+    std::vector<GameDescriptor> _saves;
     int _selectedSaveIdx { -1 };
 
     void onClick(const std::string &control) override;

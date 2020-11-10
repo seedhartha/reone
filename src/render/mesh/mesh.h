@@ -24,13 +24,9 @@
 
 namespace reone {
 
-namespace resource {
+namespace render {
 
 class MdlFile;
-
-}
-
-namespace render {
 
 /**
  * Polygonal mesh, containing vertex and index data. Renders itself,
@@ -76,7 +72,7 @@ private:
     Mesh(const Mesh &) = delete;
     Mesh &operator=(const Mesh &) = delete;
 
-    friend class resource::MdlFile;
+    friend class MdlFile;
 };
 
 } // namespace render

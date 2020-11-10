@@ -20,17 +20,17 @@
 #include <string>
 #include <vector>
 
-#include "gfffile.h"
+#include "../resource/gfffile.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 enum DialogWaitFlags {
     kDialogWaitAnimFinish = 1
 };
 
-class DlgFile {
+class Dialog {
 public:
     struct EntryReplyLink {
         int index { 0 };
@@ -53,10 +53,10 @@ public:
         std::vector<EntryReplyLink> entries;
     };
 
-    DlgFile() = default;
+    Dialog() = default;
 
     void reset();
-    void load(const std::string &resRef, const GffStruct &dlg);
+    void load(const std::string &resRef, const resource::GffStruct &dlg);
 
     bool isSkippable() const;
     const std::string &cameraModel() const;
@@ -74,13 +74,13 @@ private:
     std::string _endScript;
     int _entryIndex { -1 };
 
-    DlgFile(const DlgFile &) = delete;
-    DlgFile &operator=(const DlgFile &) = delete;
+    Dialog(const Dialog &) = delete;
+    Dialog &operator=(const Dialog &) = delete;
 
-    EntryReplyLink getEntryReplyLink(const GffStruct &gffs) const;
-    EntryReply getEntryReply(const GffStruct &gffs) const;
+    EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
+    EntryReply getEntryReply(const resource::GffStruct &gffs) const;
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

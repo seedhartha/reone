@@ -23,8 +23,8 @@
 
 #include <boost/test/included/unit_test.hpp>
 
+#include "../src/game/path.h"
 #include "../src/game/pathfinder.h"
-#include "../src/resource/pthfile.h"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ using namespace reone::game;
 using namespace reone::resource;
 
 BOOST_AUTO_TEST_CASE(test_find_path) {
-    vector<PthFile::Point> points = {
+    vector<Path::Point> points = {
         { 1.0f, 1.0f, { 1, 2 } },
         { 1.0f, 2.0f, { 0, 2 } },
         { 2.0f, 2.0f, { 1, 3, 4 } },
