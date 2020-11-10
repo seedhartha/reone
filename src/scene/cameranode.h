@@ -27,18 +27,30 @@ class CameraSceneNode : public SceneNode {
 public:
     CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
 
+    bool isInFrustum(const glm::vec3 &point) const;
+
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
 
     void setProjection(const glm::mat4 &projection);
 
 private:
+    struct {
+        glm::vec4 left { 0.0f };
+        glm::vec4 right { 0.0f };
+        glm::vec4 bottom { 0.0f };
+        glm::vec4 top { 0.0f };
+        glm::vec4 near { 0.0f };
+        glm::vec4 far { 0.0f };
+    } _frustum;
+
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
 
     void updateAbsoluteTransform() override;
 
     void updateView();
+    void updateFrustum();
 };
 
 } // namespace scene
