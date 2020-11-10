@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "../resource/binfile.h"
-#include "../resource/types.h"
+#include "../../resource/binfile.h"
+#include "../../resource/types.h"
 
-#include "model/model.h"
+#include "../model/model.h"
 
 namespace reone {
 
