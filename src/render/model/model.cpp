@@ -83,6 +83,10 @@ shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
     return it != _nodeByName.end() ? it->second : nullptr;
 }
 
+Model::Classification Model::classification() const {
+    return _classification;
+}
+
 const string &Model::name() const {
     return _name;
 }
@@ -105,6 +109,10 @@ const AABB &Model::aabb() const {
 
 float Model::radiusXY() const {
     return _radiusXY;
+}
+
+void Model::setClassification(Classification classification) {
+    _classification = classification;
 }
 
 void Model::setAnimationScale(float scale) {
