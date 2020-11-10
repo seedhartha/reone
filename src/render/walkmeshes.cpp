@@ -17,10 +17,10 @@
 
 #include "walkmeshes.h"
 
-#include "../resource/resources.h"
 #include "../common/streamutil.h"
+#include "../resource/resources.h"
 
-#include "bwmfile.h"
+#include "format/bwmfile.h"
 
 using namespace std;
 

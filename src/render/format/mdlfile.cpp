@@ -21,11 +21,11 @@
 
 #include "glm/ext.hpp"
 
-#include "../resource/resources.h"
-#include "../common/log.h"
+#include "../../common/log.h"
+#include "../../resource/resources.h"
 
-#include "models.h"
-#include "textures.h"
+#include "../models.h"
+#include "../textures.h"
 
 using namespace std;
 
