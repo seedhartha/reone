@@ -712,14 +712,13 @@ void Area::updateVisibility() {
         shared_ptr<ModelSceneNode> model(object->model());
         if (!model) continue;
 
-        glm::vec3 position(object->position());
+        glm::vec3 objectCenter(model->getCenterOfAABB());
         float drawDistance = object->drawDistance();
         float fadeDistance = object->fadeDistance();
 
-        glm::vec3 screenCoords(glm::project(position, cameraNode->view(), cameraNode->projection(), viewport));
         glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
-        float distanceToCamera = glm::distance2(position, cameraPosition);
-        bool onScreen = distanceToCamera < drawDistance && screenCoords.z < 1.0f;
+        float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
+        bool onScreen = distanceToCamera < drawDistance && cameraNode->isInFrustum(objectCenter);
         float alpha = 1.0f;
 
         if (drawDistance != fadeDistance && distanceToCamera > fadeDistance) {
