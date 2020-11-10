@@ -19,15 +19,20 @@
 
 #include "scenenode.h"
 
+#include "../render/aabb.h"
+
 namespace reone {
 
 namespace scene {
+
+const int kFrustumPlaneCount = 6;
 
 class CameraSceneNode : public SceneNode {
 public:
     CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
 
     bool isInFrustum(const glm::vec3 &point) const;
+    bool isInFrustum(const render::AABB &aabb) const;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
@@ -35,17 +40,9 @@ public:
     void setProjection(const glm::mat4 &projection);
 
 private:
-    struct {
-        glm::vec4 left { 0.0f };
-        glm::vec4 right { 0.0f };
-        glm::vec4 bottom { 0.0f };
-        glm::vec4 top { 0.0f };
-        glm::vec4 near { 0.0f };
-        glm::vec4 far { 0.0f };
-    } _frustum;
-
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
+    glm::vec4 _frustum[kFrustumPlaneCount];
 
     void updateAbsoluteTransform() override;
 

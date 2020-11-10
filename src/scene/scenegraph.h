@@ -76,6 +76,8 @@ private:
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
+
+    void renderIfInsideFrustum(const ModelNodeSceneNode &node) const;
 };
 
 } // namespace scene

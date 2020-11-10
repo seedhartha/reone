@@ -113,10 +113,17 @@ void SceneGraph::render() const {
         node->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        mesh->renderSingle();
+        renderIfInsideFrustum(*mesh);
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->renderSingle();
+        renderIfInsideFrustum(*mesh);
+    }
+}
+
+void SceneGraph::renderIfInsideFrustum(const ModelNodeSceneNode &node) const {
+    AABB aabb(node.modelNode()->mesh()->aabb() * node.absoluteTransform());
+    if (_activeCamera->isInFrustum(aabb)) {
+        node.renderSingle();
     }
 }
 
