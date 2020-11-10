@@ -19,7 +19,7 @@
 
 #include <utility>
 
-#include "../common/streamutil.h"
+#include "../../common/streamutil.h"
 
 #include "mp3file.h"
 

@@ -20,8 +20,8 @@
 #include "../resource/resources.h"
 #include "../common/streamutil.h"
 
-#include "mp3file.h"
-#include "wavfile.h"
+#include "format/mp3file.h"
+#include "format/wavfile.h"
 
 using namespace std;
 
