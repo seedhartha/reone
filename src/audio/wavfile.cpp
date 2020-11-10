@@ -17,7 +17,7 @@
 
 #include "wavfile.h"
 
-#include "glm/glm.hpp"
+#include <utility>
 
 #include "../system/streamutil.h"
 
@@ -218,10 +218,10 @@ void WavFile::getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, int1
 int16_t WavFile::getIMASample(int channel, uint8_t nibble) {
     int step = (2 * (nibble & 0x7) + 1) * kIMAStepTable[_ima[channel].stepIndex] / 8;
     int diff = nibble & 0x8 ? -step : step;
-    int sample = glm::clamp(_ima[channel].lastSample + diff, -32768, 32767);
+    int sample = min(max(_ima[channel].lastSample + diff, -32768), 32767);
 
     _ima[channel].lastSample = sample;
-    _ima[channel].stepIndex = glm::clamp(_ima[channel].stepIndex + kIMAIndexTable[nibble & 0x7], 0, 88);
+    _ima[channel].stepIndex = min(max(_ima[channel].stepIndex + kIMAIndexTable[nibble & 0x7], 0), 88);
 
     return sample;
 }

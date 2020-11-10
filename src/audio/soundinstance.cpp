@@ -17,7 +17,7 @@
 
 #include "soundinstance.h"
 
-#include "glm/glm.hpp"
+#include <utility>
 
 #include "AL/al.h"
 
@@ -35,7 +35,7 @@ SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, f
 
 void SoundInstance::init() {
     int frameCount = _stream->frameCount();
-    int bufferCount = glm::clamp(frameCount, 1, kMaxBufferCount);
+    int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 
     _buffers.resize(bufferCount);
     _buffered = bufferCount > 1;
