@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../resource/binfile.h"
+#include "../../resource/binfile.h"
 
-#include "stream.h"
+#include "../stream.h"
 
 namespace reone {
 

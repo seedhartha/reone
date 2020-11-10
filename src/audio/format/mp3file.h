@@ -22,7 +22,7 @@
 
 #include "mad.h"
 
-#include "stream.h"
+#include "../stream.h"
 
 namespace reone {
 

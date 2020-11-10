@@ -204,22 +204,22 @@ set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(AUDIO_HEADERS
     src/audio/files.h
+    src/audio/format/mp3file.h
+    src/audio/format/wavfile.h
     src/audio/player.h
-    src/audio/mp3file.h
     src/audio/soundinstance.h
     src/audio/stream.h
     src/audio/types.h
-    src/audio/util.h
-    src/audio/wavfile.h)
+    src/audio/util.h)
 
 set(AUDIO_SOURCES
     src/audio/files.cpp
+    src/audio/format/mp3file.cpp
+    src/audio/format/wavfile.cpp
     src/audio/player.cpp
-    src/audio/mp3file.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
-    src/audio/util.cpp
-    src/audio/wavfile.cpp)
+    src/audio/util.cpp)
 
 add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
