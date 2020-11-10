@@ -67,7 +67,7 @@ set(COMMON_HEADERS
     src/common/streamutil.h
     src/common/streamwriter.h
     src/common/types.h
-    src/common/vector.h)
+    src/common/vector3.h)
 
 set(COMMON_SOURCES
     src/common/endianutil.cpp

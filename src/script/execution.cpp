@@ -253,7 +253,7 @@ Variable ScriptExecution::getVectorFromStack() {
     float y = getFloatFromStack().floatValue;
     float x = getFloatFromStack().floatValue;
 
-    return glm::vec3(x, y, z);
+    return Vector3(x, y, z);
 }
 
 Variable ScriptExecution::getFloatFromStack() {

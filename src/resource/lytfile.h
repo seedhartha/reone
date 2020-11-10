@@ -19,7 +19,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "glm/glm.hpp"
+#include "../common/vector3.h"
 
 namespace reone {
 
@@ -29,13 +29,13 @@ class LytFile {
 public:
     struct Room {
         std::string name;
-        glm::vec3 position { 0.0f };
+        Vector3 position;
     };
 
     struct DoorHook {
         std::string room;
         std::string name;
-        glm::vec3 position { 0.0f };
+        Vector3 position;
     };
 
     LytFile() = default;
