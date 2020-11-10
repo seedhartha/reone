@@ -24,6 +24,8 @@
 
 #include "../render/types.h"
 
+#include "octree.h"
+
 namespace reone {
 
 namespace scene {
@@ -39,10 +41,12 @@ public:
 
     void render() const override;
 
-    void addRoot(const std::shared_ptr<SceneNode> &node);
     void clear();
+
+    void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
+    void onLastRootAdded();
     void prepare();
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
@@ -73,6 +77,7 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
+    Octree _octree;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

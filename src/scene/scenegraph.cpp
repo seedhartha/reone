@@ -69,6 +69,9 @@ void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
     }
 }
 
+void SceneGraph::onLastRootAdded() {
+}
+
 void SceneGraph::prepare() {
     if (!_activeCamera) return;
 
