@@ -88,12 +88,17 @@ bool ModelMesh::shouldRender() const {
 }
 
 bool ModelMesh::isTransparent() const {
-    if (!_diffuse || _envmap) return false;
+    if (_transparency > 0) return true;
+
+    TextureFeatures features = _diffuse->features();
+    if (features.blending == TextureBlending::Additive) return true;
+
+    if (_envmap || _bumpyShiny || _bumpmap) return false;
 
     PixelFormat format = _diffuse->pixelFormat();
-    TextureFeatures features = _diffuse->features();
+    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
 
-    return features.blending == TextureBlending::Additive || format == PixelFormat::DXT5 || format == PixelFormat::BGRA;
+    return true;
 }
 
 bool ModelMesh::hasDiffuseTexture() const {
