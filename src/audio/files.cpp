@@ -18,7 +18,7 @@
 #include "files.h"
 
 #include "../resource/resources.h"
-#include "../system/streamutil.h"
+#include "../common/streamutil.h"
 
 #include "mp3file.h"
 #include "wavfile.h"

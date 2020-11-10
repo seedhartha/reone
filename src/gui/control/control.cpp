@@ -27,7 +27,7 @@
 #include "../../render/textures.h"
 #include "../../render/util.h"
 #include "../../resource/resources.h"
-#include "../../system/log.h"
+#include "../../common/log.h"
 
 #include "../gui.h"
 

@@ -25,7 +25,7 @@
 #include <boost/asio/streambuf.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "../system/types.h"
+#include "../common/types.h"
 
 #include "command.h"
 #include "types.h"

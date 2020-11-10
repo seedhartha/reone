@@ -27,7 +27,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "cursor.h"
 #include "mesh/aabb.h"

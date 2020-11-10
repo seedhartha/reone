@@ -27,9 +27,9 @@
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
-#include "../system/jobs.h"
-#include "../system/log.h"
-#include "../system/pathutil.h"
+#include "../common/jobs.h"
+#include "../common/log.h"
+#include "../common/pathutil.h"
 #include "../video/bikfile.h"
 #include "../video/video.h"
 

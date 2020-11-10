@@ -19,7 +19,7 @@
 
 #include "glm/glm.hpp"
 
-#include "../../system/streamutil.h"
+#include "../../common/streamutil.h"
 
 #include "txifile.h"
 

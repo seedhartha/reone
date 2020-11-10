@@ -30,8 +30,8 @@
 #include "../../resource/visfile.h"
 #include "../../resource/resources.h"
 #include "../../scene/cubenode.h"
-#include "../../system/log.h"
-#include "../../system/streamutil.h"
+#include "../../common/log.h"
+#include "../../common/streamutil.h"
 
 #include "../blueprint/sound.h"
 #include "../game.h"

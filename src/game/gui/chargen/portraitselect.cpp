@@ -19,7 +19,7 @@
 
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
-#include "../../../system/random.h"
+#include "../../../common/random.h"
 
 #include "../colors.h"
 

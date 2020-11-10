@@ -22,7 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
-#include "../system/log.h"
+#include "../common/log.h"
 
 using namespace std;
 

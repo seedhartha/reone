@@ -20,7 +20,7 @@
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"
-#include "../../system/log.h"
+#include "../../common/log.h"
 
 #include "../gui.h"
 

@@ -27,7 +27,7 @@
 #include "../../gui/control/panel.h"
 #include "../../resource/resources.h"
 #include "../../script/execution.h"
-#include "../../system/random.h"
+#include "../../common/random.h"
 
 #include "../game.h"
 #include "../script/routines.h"

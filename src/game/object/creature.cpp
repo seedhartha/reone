@@ -26,8 +26,8 @@
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../script/types.h"
-#include "../../system/log.h"
-#include "../../system/streamutil.h"
+#include "../../common/log.h"
+#include "../../common/streamutil.h"
 
 #include "../blueprint/blueprints.h"
 #include "../portraits.h"

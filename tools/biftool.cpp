@@ -22,7 +22,7 @@
 
 #include "../src/resource/biffile.h"
 #include "../src/resource/util.h"
-#include "../src/system/log.h"
+#include "../src/common/log.h"
 
 using namespace std;
 

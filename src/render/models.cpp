@@ -18,7 +18,7 @@
 #include "models.h"
 
 #include "../resource/resources.h"
-#include "../system/streamutil.h"
+#include "../common/streamutil.h"
 
 #include "mdlfile.h"
 

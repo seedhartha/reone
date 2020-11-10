@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-#include "../system/types.h"
+#include "../common/types.h"
 
 namespace reone {
 

@@ -24,7 +24,7 @@
 #include "../../resource/resources.h"
 #include "../../scene/modelscenenode.h"
 #include "../../script/scripts.h"
-#include "../../system/streamutil.h"
+#include "../../common/streamutil.h"
 
 #include "../blueprint/blueprints.h"
 

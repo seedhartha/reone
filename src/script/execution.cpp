@@ -21,7 +21,7 @@
 
 #include <boost/format.hpp>
 
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "routine.h"
 #include "util.h"

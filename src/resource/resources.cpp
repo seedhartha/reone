@@ -21,9 +21,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../system/log.h"
-#include "../system/pathutil.h"
-#include "../system/streamutil.h"
+#include "../common/log.h"
+#include "../common/pathutil.h"
+#include "../common/streamutil.h"
 
 #include "biffile.h"
 #include "erffile.h"

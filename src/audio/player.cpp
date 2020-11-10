@@ -23,7 +23,7 @@
 
 #include "AL/al.h"
 
-#include "../system/log.h"
+#include "../common/log.h"
 
 using namespace std;
 

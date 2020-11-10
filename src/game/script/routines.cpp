@@ -17,7 +17,7 @@
 
 #include "routines.h"
 
-#include "../../system/log.h"
+#include "../../common/log.h"
 
 #include "../game.h"
 

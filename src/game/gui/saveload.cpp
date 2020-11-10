@@ -21,7 +21,7 @@
 
 #include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"
-#include "../../system/log.h"
+#include "../../common/log.h"
 
 #include "../game.h"
 #include "../savfile.h"

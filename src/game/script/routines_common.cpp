@@ -19,8 +19,8 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../../system/log.h"
-#include "../../system/random.h"
+#include "../../common/log.h"
+#include "../../common/random.h"
 
 #include "../action/commandaction.h"
 #include "../action/movetoobject.h"
