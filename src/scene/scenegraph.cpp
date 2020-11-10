@@ -121,10 +121,10 @@ void SceneGraph::render() const {
         node->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        renderIfInsideFrustum(*mesh);
+        mesh->renderSingle();
     }
     for (auto &mesh : _transparentMeshes) {
-        renderIfInsideFrustum(*mesh);
+        mesh->renderSingle();
     }
 }
 
