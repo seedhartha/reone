@@ -498,7 +498,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     offsets.texCoords2 = mdxLightmapOffset != 0xffff ? mdxLightmapOffset : -1;
     offsets.stride = mdxVertexSize;
 
-    unique_ptr<ModelMesh> mesh(new ModelMesh(render));
+    unique_ptr<ModelMesh> mesh(new ModelMesh(render, transparency));
     mesh->_vertices = move(vertices);
     mesh->_indices = move(indices);
     mesh->_offsets = move(offsets);

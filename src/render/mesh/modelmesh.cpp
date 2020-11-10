@@ -27,7 +27,7 @@ namespace reone {
 
 namespace render {
 
-ModelMesh::ModelMesh(bool render) : _render(render) {
+ModelMesh::ModelMesh(bool render, int transparency) : _render(render), _transparency(transparency) {
 }
 
 void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
@@ -114,6 +114,10 @@ bool ModelMesh::hasBumpyShinyTexture() const {
 
 bool ModelMesh::hasBumpmapTexture() const {
     return static_cast<bool>(_bumpmap);
+}
+
+int ModelMesh::transparency() const {
+    return _transparency;
 }
 
 const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
