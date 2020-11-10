@@ -19,6 +19,8 @@
 
 #include "glm/ext.hpp"
 
+using namespace reone::render;
+
 namespace reone {
 
 namespace scene {
@@ -42,32 +44,44 @@ void CameraSceneNode::updateView() {
 void CameraSceneNode::updateFrustum() {
     glm::mat4 vp(_projection * _view);
     for (int i = 3; i >= 0; --i) {
-        _frustum.left[i] = vp[i][3] + vp[i][0];
-        _frustum.right[i] = vp[i][3] - vp[i][0];
-        _frustum.bottom[i] = vp[i][3] + vp[i][1];
-        _frustum.top[i] = vp[i][3] - vp[i][1];
-        _frustum.near[i] = vp[i][3] + vp[i][2];
-        _frustum.far[i] = vp[i][3] - vp[i][2];
+        _frustum[0][i] = vp[i][3] + vp[i][0];
+        _frustum[1][i] = vp[i][3] - vp[i][0];
+        _frustum[2][i] = vp[i][3] + vp[i][1];
+        _frustum[3][i] = vp[i][3] - vp[i][1];
+        _frustum[4][i] = vp[i][3] + vp[i][2];
+        _frustum[5][i] = vp[i][3] - vp[i][2];
     }
-    _frustum.left = glm::normalize(_frustum.left);
-    _frustum.right = glm::normalize(_frustum.right);
-    _frustum.bottom = glm::normalize(_frustum.bottom);
-    _frustum.top = glm::normalize(_frustum.top);
-    _frustum.near = glm::normalize(_frustum.near);
-    _frustum.far = glm::normalize(_frustum.far);
+    for (int i = 0; i < kFrustumPlaneCount; ++i) {
+        _frustum[i] = glm::normalize(_frustum[i]);
+    }
 }
 
 bool CameraSceneNode::isInFrustum(const glm::vec3 &point) const {
     glm::vec4 point4(point, 1.0f);
-    bool result =
-        glm::dot(_frustum.left, point4) >= 0.0f &&
-        glm::dot(_frustum.right, point4) >= 0.0f &&
-        glm::dot(_frustum.bottom, point4) >= 0.0f &&
-        glm::dot(_frustum.top, point4) >= 0.0f &&
-        glm::dot(_frustum.near, point4) >= 0.0f &&
-        glm::dot(_frustum.far, point4) >= 0.0f;
+    for (int i = 0; i < kFrustumPlaneCount; ++i) {
+        if (glm::dot(_frustum[i], point4) < 0.0f) return false;
+    }
+    return true;
+}
 
-    return result;
+bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
+    glm::vec3 center(aabb.center());
+    glm::vec3 halfSize(aabb.size() * 0.5f);
+
+    for (int i = 0; i < kFrustumPlaneCount; ++i) {
+        if (glm::dot(_frustum[i], glm::vec4(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x - halfSize.x, center.y + halfSize.y, center.z - halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x - halfSize.x, center.y - halfSize.y, center.z + halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x + halfSize.x, center.y + halfSize.y, center.z - halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x + halfSize.x, center.y - halfSize.y, center.z + halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z, 1.0f)) >= 0.0f) continue;
+        if (glm::dot(_frustum[i], glm::vec4(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z, 1.0f)) >= 0.0f) continue;
+
+        return false;
+    }
+
+    return true;
 }
 
 const glm::mat4 &CameraSceneNode::projection() const {
