@@ -60,6 +60,7 @@ private:
     void readSkin(render::ModelNode &node);
     std::vector<std::unique_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
+    Model::Classification getClassification(int value) const;
 };
 
 } // namespace render

@@ -36,6 +36,17 @@ namespace render {
  */
 class Model {
 public:
+    enum class Classification {
+        Other,
+        Effect,
+        Tile,
+        Character,
+        Door,
+        Lightsaber,
+        Placeable,
+        Flyer
+    };
+
     Model(
         const std::string &name,
         const std::shared_ptr<ModelNode> &rootNode,
@@ -48,6 +59,7 @@ public:
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
+    Classification classification() const;
     const std::string &name() const;
     ModelNode &rootNode() const;
     float animationScale() const;
@@ -55,9 +67,11 @@ public:
     const AABB &aabb() const;
     float radiusXY() const;
 
+    void setClassification(Classification classification);
     void setAnimationScale(float scale);
 
 private:
+    Classification _classification { Classification::Other };
     std::string _name;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::unique_ptr<Animation>> _animations;

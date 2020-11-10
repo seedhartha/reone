@@ -19,6 +19,8 @@
 
 #include "scenenode.h"
 
+#include "../render/model/model.h"
+
 namespace reone {
 
 namespace render {
@@ -50,6 +52,8 @@ private:
     render::ModelNode *_modelNode { nullptr };
     glm::mat4 _animTransform { 1.0f };
     glm::mat4 _boneTransform { 1.0f };
+
+    bool isTransparentByClassification(render::Model::Classification classification) const;
 };
 
 } // namespace scene

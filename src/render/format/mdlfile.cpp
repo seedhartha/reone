@@ -92,7 +92,15 @@ void MdlFile::doLoad() {
 
     uint8_t type = readByte();
 
-    ignore(11);
+    ignore(3);
+
+    uint8_t classification = readByte();
+
+    ignore(2);
+
+    uint8_t fogged = readByte();
+
+    ignore(4);
 
     uint32_t animOffOffset, animCount;
     readArrayDefinition(animOffOffset, animCount);
@@ -122,6 +130,7 @@ void MdlFile::doLoad() {
     }
 
     _model = make_unique<Model>(_name, move(rootNode), anims, superModel);
+    _model->setClassification(getClassification(classification));
     _model->setAnimationScale(scale);
 }
 
@@ -574,6 +583,27 @@ unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
     unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
 
     return make_unique<Animation>(name, length, transitionTime, move(rootNode));
+}
+
+Model::Classification MdlFile::getClassification(int value) const {
+    switch (value) {
+        case 1:
+            return Model::Classification::Effect;
+        case 2:
+            return Model::Classification::Tile;
+        case 4:
+            return Model::Classification::Character;
+        case 8:
+            return Model::Classification::Door;
+        case 0x10:
+            return Model::Classification::Lightsaber;
+        case 0x20:
+            return Model::Classification::Placeable;
+        case 0x40:
+            return Model::Classification::Flyer;
+        default:
+            return Model::Classification::Other;
+    }
 }
 
 shared_ptr<Model> MdlFile::model() const {

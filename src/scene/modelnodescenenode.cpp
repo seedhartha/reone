@@ -49,7 +49,8 @@ void ModelNodeSceneNode::fillSceneGraph() {
     if (mesh) {
         bool render = mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
         if (render) {
-            bool transparent = mesh->isTransparent() || _modelNode->alpha() < 1.0f;
+            bool transparentByClassification = isTransparentByClassification(_modelSceneNode->model()->classification());
+            bool transparent = transparentByClassification && (mesh->isTransparent() || _modelNode->alpha() < 1.0f);
             if (transparent) {
                 _sceneGraph->addTransparentMesh(this);
             } else {
@@ -58,6 +59,10 @@ void ModelNodeSceneNode::fillSceneGraph() {
         }
     }
     SceneNode::fillSceneGraph();
+}
+
+bool ModelNodeSceneNode::isTransparentByClassification(Model::Classification classification) const {
+    return classification != Model::Classification::Character;
 }
 
 void ModelNodeSceneNode::renderSingle() const {
