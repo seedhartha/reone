@@ -37,7 +37,7 @@ class MdlFile;
  */
 class ModelMesh : public Mesh {
 public:
-    ModelMesh(bool render);
+    ModelMesh(bool render, int transparency);
 
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
 
@@ -49,10 +49,12 @@ public:
     bool hasBumpyShinyTexture() const;
     bool hasBumpmapTexture() const;
 
+    int transparency() const;
     const std::shared_ptr<Texture> &diffuseTexture() const;
 
 private:
     bool _render { false };
+    int _transparency { 0 };
     std::shared_ptr<Texture> _diffuse;
     std::shared_ptr<Texture> _envmap;
     std::shared_ptr<Texture> _lightmap;

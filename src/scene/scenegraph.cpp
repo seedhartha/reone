@@ -96,8 +96,13 @@ void SceneGraph::prepare() {
         cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
     }
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](ModelNodeSceneNode *left, ModelNodeSceneNode *right) {
+        int leftTransparency = left->modelNode()->mesh()->transparency();
+        int rightTransparency = right->modelNode()->mesh()->transparency();
+        if (leftTransparency < rightTransparency) return true;
+
         float leftDistance = cameraDistances.find(left)->second;
         float rightDistance = cameraDistances.find(right)->second;
+
         return leftDistance > rightDistance;
     });
 }
