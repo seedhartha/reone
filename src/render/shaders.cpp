@@ -254,7 +254,7 @@ void main() {
     }
     float finalAlpha = uAlpha;
 
-    if (!uEnvmapEnabled && !uBumpyShinyEnabled) {
+    if (!uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
     }
     fragColor = vec4(lightColor * surfaceColor, finalAlpha);
