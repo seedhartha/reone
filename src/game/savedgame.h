@@ -27,9 +27,9 @@ namespace game {
 
 class Game;
 
-class SavFile {
+class SavedGame {
 public:
-    SavFile(const boost::filesystem::path &path);
+    SavedGame(const boost::filesystem::path &path);
 
     void save(const Game *game, const std::string &name);
     void peek();
@@ -42,8 +42,8 @@ private:
     uint64_t _timestamp { 0 };
     std::string _name;
 
-    SavFile(const SavFile &) = delete;
-    SavFile &operator=(const SavFile &) = delete;
+    SavedGame(const SavedGame &) = delete;
+    SavedGame &operator=(const SavedGame &) = delete;
 };
 
 } // namespace game

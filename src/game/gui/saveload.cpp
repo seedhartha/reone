@@ -19,12 +19,12 @@
 
 #include <boost/filesystem.hpp>
 
+#include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../game.h"
-#include "../savfile.h"
+#include "../savedgame.h"
 
 #include "colors.h"
 
@@ -133,10 +133,10 @@ void SaveLoad::indexSavedGame(int index, const fs::path &path) {
         warn("SaveLoad: SAV file not found");
         return;
     }
-    SavFile sav(savPath);
+    SavedGame sav(savPath);
     sav.peek();
 
-    SavedGame save;
+    GameDescriptor save;
     save.index = index;
     save.path = savPath;
     save.name = sav.name();
@@ -216,7 +216,7 @@ void SaveLoad::saveGame(int index) {
     fs::path savPath(saveDirPath);
     savPath.append(kSaveFilename);
 
-    SavFile sav(savPath);
+    SavedGame sav(savPath);
     sav.save(_game, getSaveName(index));
 }
 
@@ -231,15 +231,15 @@ string SaveLoad::getSaveName(int index) const {
 }
 
 void SaveLoad::loadGame(int index) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const SavedGame &save) { return save.index == index; });
+    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const GameDescriptor &save) { return save.index == index; });
     if (maybeSave == _saves.end()) return;
 
-    SavFile sav(maybeSave->path);
+    SavedGame sav(maybeSave->path);
     sav.load(_game);
 }
 
 void SaveLoad::deleteGame(int index) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const SavedGame &save) { return save.index == index; });
+    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const GameDescriptor &save) { return save.index == index; });
     if (maybeSave == _saves.end()) return;
 
     fs::path saveDirPath(getSaveDirPath(index));

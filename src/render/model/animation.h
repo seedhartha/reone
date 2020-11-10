@@ -25,6 +25,8 @@ namespace reone {
 
 namespace render {
 
+class MdlFile;
+
 class Animation {
 public:
     Animation(const std::string &name, float length, float transitionTime, const std::shared_ptr<ModelNode> &rootNode);
@@ -46,7 +48,7 @@ private:
     Animation(const Animation &) = delete;
     Animation &operator=(const Animation &) = delete;
 
-    friend class resource::MdlFile;
+    friend class MdlFile;
 };
 
 } // namespace render

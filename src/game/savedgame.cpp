@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "savfile.h"
+#include "savedgame.h"
 
 #include <chrono>
 #include <memory>
@@ -37,10 +37,10 @@ namespace game {
 
 static const char kSignature[] = "SAV";
 
-SavFile::SavFile(const fs::path &path) : _path(path) {
+SavedGame::SavedGame(const fs::path &path) : _path(path) {
 }
 
-void SavFile::save(const Game *game, const string &name) {
+void SavedGame::save(const Game *game, const string &name) {
     shared_ptr<ofstream> stream(new fs::ofstream(_path, ios::binary));
     StreamWriter writer(stream);
 
@@ -50,7 +50,7 @@ void SavFile::save(const Game *game, const string &name) {
     writer.putCString(game->module()->name());
 }
 
-void SavFile::peek() {
+void SavedGame::peek() {
     shared_ptr<ifstream> stream(new fs::ifstream(_path, ios::binary));
     StreamReader reader(stream);
 
@@ -63,7 +63,7 @@ void SavFile::peek() {
     _name = reader.getCString();
 }
 
-void SavFile::load(Game *game) {
+void SavedGame::load(Game *game) {
     shared_ptr<ifstream> stream(new fs::ifstream(_path, ios::binary));
     StreamReader reader(stream);
 
@@ -80,7 +80,7 @@ void SavFile::load(Game *game) {
     game->scheduleModuleTransition(moduleName, "");
 }
 
-const string &SavFile::name() const {
+const string &SavedGame::name() const {
     return _name;
 }
 

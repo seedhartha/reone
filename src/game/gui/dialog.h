@@ -19,10 +19,10 @@
 
 #include "../../audio/soundinstance.h"
 #include "../../gui/gui.h"
-#include "../../resource/dlgfile.h"
 #include "../../resource/types.h"
 
 #include "../camera/dialogcamera.h"
+#include "../dialog.h"
 #include "../object/spatial.h"
 
 namespace reone {
@@ -31,9 +31,9 @@ namespace game {
 
 class Game;
 
-class Dialog : public gui::GUI {
+class DialogGUI : public gui::GUI {
 public:
-    Dialog(Game *game);
+    DialogGUI(Game *game);
 
     void load() override;
     void startDialog(SpatialObject &owner, const std::string &resRef);
@@ -47,8 +47,8 @@ public:
 private:
     Game *_game { nullptr };
     SpatialObject *_owner { nullptr };
-    std::shared_ptr<resource::DlgFile> _dialog;
-    std::shared_ptr<resource::DlgFile::EntryReply> _currentEntry;
+    std::shared_ptr<Dialog> _dialog;
+    std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundInstance> _currentVoice;
     SpatialObject *_currentSpeaker { nullptr };
     int _autoPickReplyIdx { -1 };

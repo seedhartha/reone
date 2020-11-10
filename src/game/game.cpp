@@ -317,7 +317,7 @@ void Game::loadHUD() {
 }
 
 void Game::loadDialog() {
-    _dialog.reset(new Dialog(this));
+    _dialog.reset(new DialogGUI(this));
     _dialog->load();
 }
 

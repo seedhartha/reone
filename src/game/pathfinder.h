@@ -26,7 +26,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../resource/pthfile.h"
+#include "path.h"
 
 namespace reone {
 
@@ -36,7 +36,7 @@ class Pathfinder {
 public:
     Pathfinder() = default;
 
-    void load(const std::vector<resource::PthFile::Point> &points, const std::unordered_map<int, float> &pointZ);
+    void load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ);
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 

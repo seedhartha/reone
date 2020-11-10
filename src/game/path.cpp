@@ -15,15 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pthfile.h"
+#include "path.h"
 
 using namespace std;
 
+using namespace reone::resource;
+
 namespace reone {
 
-namespace resource {
+namespace game {
 
-void PthFile::load(const GffStruct &pth) {
+void Path::load(const GffStruct &pth) {
     vector<int> connections;
 
     for (auto &connection : pth.getList("Path_Conections")) {
@@ -50,7 +52,7 @@ void PthFile::load(const GffStruct &pth) {
     }
 }
 
-const vector<PthFile::Point> &PthFile::points() const {
+const vector<Path::Point> &Path::points() const {
     return _points;
 }
 

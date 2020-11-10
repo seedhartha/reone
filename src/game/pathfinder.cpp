@@ -30,15 +30,15 @@ namespace game {
 Pathfinder::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
 }
 
-void Pathfinder::load(const vector<PthFile::Point> &points, const unordered_map<int, float> &pointZ) {
+void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int, float> &pointZ) {
     for (uint16_t i = 0; i < points.size(); ++i) {
-        const PthFile::Point &point = points[i];
+        const Path::Point &point = points[i];
         glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
         _vertices.push_back(pointVec);
 
         glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
-            const PthFile::Point &adjPoint = points[adjPointIdx];
+            const Path::Point &adjPoint = points[adjPointIdx];
             adjPointVec = glm::vec3(adjPoint.x, adjPoint.y, pointZ.find(adjPointIdx)->second);
 
             float distance = glm::distance2(pointVec, adjPointVec);

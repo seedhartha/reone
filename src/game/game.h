@@ -178,7 +178,7 @@ private:
     std::unique_ptr<CharacterGeneration> _charGen;
     std::unique_ptr<HUD> _hud;
     std::unique_ptr<InGameMenu> _inGame;
-    std::unique_ptr<Dialog> _dialog;
+    std::unique_ptr<DialogGUI> _dialog;
     std::unique_ptr<Container> _container;
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;

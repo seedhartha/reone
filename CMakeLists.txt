@@ -90,14 +90,12 @@ set(RESOURCE_HEADERS
     src/resource/2dafile.h
     src/resource/biffile.h
     src/resource/binfile.h
-    src/resource/dlgfile.h
     src/resource/erffile.h
     src/resource/folder.h
     src/resource/gfffile.h
     src/resource/keyfile.h
     src/resource/lytfile.h
     src/resource/pefile.h
-    src/resource/pthfile.h
     src/resource/resources.h
     src/resource/rimfile.h
     src/resource/tlkfile.h
@@ -109,14 +107,12 @@ set(RESOURCE_SOURCES
     src/resource/2dafile.cpp
     src/resource/biffile.cpp
     src/resource/binfile.cpp
-    src/resource/dlgfile.cpp
     src/resource/erffile.cpp
     src/resource/folder.cpp
     src/resource/gfffile.cpp
     src/resource/keyfile.cpp
     src/resource/lytfile.cpp
     src/resource/pefile.cpp
-    src/resource/pthfile.cpp
     src/resource/rimfile.cpp
     src/resource/resources.cpp
     src/resource/tlkfile.cpp
@@ -366,6 +362,7 @@ set(GAME_HEADERS
     src/game/collisiondetect.h
     src/game/console.h
     src/game/cursors.h
+    src/game/dialog.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -407,13 +404,14 @@ set(GAME_HEADERS
     src/game/object/waypoint.h
     src/game/objectselect.h
     src/game/party.h
+    src/game/path.h
     src/game/pathfinder.h
     src/game/player.h
     src/game/portraits.h
     src/game/room.h
     src/game/rp/classes.h
     src/game/rp/types.h
-    src/game/savfile.h
+    src/game/savedgame.h
     src/game/script/routines.h
     src/game/script/util.h
     src/game/types.h)
@@ -445,6 +443,7 @@ set(GAME_SOURCES
     src/game/collisiondetect.cpp
     src/game/console.cpp
     src/game/cursors.cpp
+    src/game/dialog.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
@@ -485,12 +484,13 @@ set(GAME_SOURCES
     src/game/object/waypoint.cpp
     src/game/objectselect.cpp
     src/game/party.cpp
+    src/game/path.cpp
     src/game/pathfinder.cpp
     src/game/player.cpp
     src/game/portraits.cpp
     src/game/room.cpp
     src/game/rp/classes.cpp
-    src/game/savfile.cpp
+    src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_common.cpp
     src/game/script/routines_kotor.cpp

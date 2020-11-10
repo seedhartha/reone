@@ -23,11 +23,11 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
 #include "../../resource/resources.h"
 #include "../../script/execution.h"
-#include "../../common/random.h"
 
 #include "../game.h"
 #include "../script/routines.h"
@@ -54,7 +54,7 @@ enum EndEntryFlags {
     kEndEntryOnAudioStop = 2
 };
 
-Dialog::Dialog(Game *game) :
+DialogGUI::DialogGUI(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
@@ -65,7 +65,7 @@ Dialog::Dialog(Game *game) :
     _scaling = ScalingMode::Stretch;
 }
 
-void Dialog::load() {
+void DialogGUI::load() {
     GUI::load();
 
     configureMessage();
@@ -74,11 +74,11 @@ void Dialog::load() {
     loadBottomFrame();
 }
 
-void Dialog::loadTopFrame() {
+void DialogGUI::loadTopFrame() {
     addFrame(-_rootControl->extent().top, getControl("LBL_MESSAGE").extent().height);
 }
 
-void Dialog::addFrame(int top, int height) {
+void DialogGUI::addFrame(int top, int height) {
     unique_ptr<Panel> frame(new Panel(this));
 
     Control::Extent extent;
@@ -93,14 +93,14 @@ void Dialog::addFrame(int top, int height) {
     _controls.insert(_controls.begin(), move(frame));
 }
 
-void Dialog::loadBottomFrame() {
+void DialogGUI::loadBottomFrame() {
     int rootTop = _rootControl->extent().top;
     int height = _gfxOpts.height - rootTop;
 
     addFrame(_gfxOpts.height - rootTop - height, height);
 }
 
-void Dialog::configureMessage() {
+void DialogGUI::configureMessage() {
     Control &message = getControl("LBL_MESSAGE");
 
     Control::Extent extent(message.extent());
@@ -110,7 +110,7 @@ void Dialog::configureMessage() {
     message.setTextColor(getBaseColor(_version));
 }
 
-void Dialog::configureReplies() {
+void DialogGUI::configureReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
 
     Control &protoItem = replies.protoItem();
@@ -118,18 +118,18 @@ void Dialog::configureReplies() {
     protoItem.setTextColor(getBaseColor(_version));
 }
 
-void Dialog::onReplyClicked(int index) {
+void DialogGUI::onReplyClicked(int index) {
     pickReply(index);
 }
 
-void Dialog::onListBoxItemClick(const string &control, const string &item) {
+void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_REPLIES") return;
 
     int replyIdx = stoi(item);
     onReplyClicked(replyIdx);
 }
 
-void Dialog::startDialog(SpatialObject &owner, const string &resRef) {
+void DialogGUI::startDialog(SpatialObject &owner, const string &resRef) {
     shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         _game->openInGame();
@@ -138,14 +138,14 @@ void Dialog::startDialog(SpatialObject &owner, const string &resRef) {
     _owner = &owner;
     _currentSpeaker = _owner;
 
-    _dialog.reset(new DlgFile());
+    _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
     loadAnimatedCamera();
     loadStartEntry();
 }
 
-void Dialog::loadAnimatedCamera() {
+void DialogGUI::loadAnimatedCamera() {
     string modelResRef(_dialog->cameraModel());
     if (modelResRef.empty()) return;
 
@@ -153,7 +153,7 @@ void Dialog::loadAnimatedCamera() {
     camera.setModel(modelResRef);
 }
 
-void Dialog::loadStartEntry() {
+void DialogGUI::loadStartEntry() {
     int entryIdx = -1;
     for (auto &link : _dialog->startEntries()) {
         if (link.active.empty()) {
@@ -169,16 +169,16 @@ void Dialog::loadStartEntry() {
         _game->openInGame();
         return;
     }
-    _currentEntry.reset(new DlgFile::EntryReply(_dialog->getEntry(entryIdx)));
+    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
     loadCurrentEntry();
 }
 
-bool Dialog::checkCondition(const string &script) {
+bool DialogGUI::checkCondition(const string &script) {
     int result = runScript(script, _owner->id(), kObjectInvalid, -1);
     return result == -1 || result == 1;
 }
 
-void Dialog::loadCurrentEntry() {
+void DialogGUI::loadCurrentEntry() {
     if (!_currentEntry->script.empty()) {
         runScript(_currentEntry->script, _owner->id(), kObjectInvalid, -1);
     }
@@ -192,7 +192,7 @@ void Dialog::loadCurrentEntry() {
     updateCamera();
 }
 
-void Dialog::loadReplies() {
+void DialogGUI::loadReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
     replies.clear();
 
@@ -206,7 +206,7 @@ void Dialog::loadReplies() {
     bool singleEmptyReply = false;
     int replyNumber = 0;
     for (auto &replyIdx : activeReplies) {
-        const DlgFile::EntryReply &reply = _dialog->getReply(replyIdx);
+        const Dialog::EntryReply &reply = _dialog->getReply(replyIdx);
         string text(reply.text);
         if (text.empty()) {
             if (activeReplies.size() == 1) {
@@ -229,7 +229,7 @@ void Dialog::loadReplies() {
     }
 }
 
-void Dialog::finish() {
+void DialogGUI::finish() {
     if (!_dialog->endScript().empty()) {
         runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
     }
@@ -239,7 +239,7 @@ void Dialog::finish() {
     _game->openInGame();
 }
 
-void Dialog::loadCurrentSpeaker() {
+void DialogGUI::loadCurrentSpeaker() {
     shared_ptr<Area> area(_game->module()->area());
     SpatialObject *speaker = nullptr;
 
@@ -265,7 +265,7 @@ void Dialog::loadCurrentSpeaker() {
     speakerCreature.face(*partyLeader);
 }
 
-void Dialog::updateCamera() {
+void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
     shared_ptr<Creature> partyLeader(_game->party().leader());
     glm::vec3 listenerPosition;
@@ -294,7 +294,7 @@ void Dialog::updateCamera() {
     }
 }
 
-DialogCamera::Variant Dialog::getRandomCameraVariant() const {
+DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
     int r = random(0, 2);
     switch (r) {
         case 0:
@@ -306,7 +306,7 @@ DialogCamera::Variant Dialog::getRandomCameraVariant() const {
     }
 }
 
-void Dialog::playVoiceOver() {
+void DialogGUI::playVoiceOver() {
     if (_currentVoice) {
         _currentVoice->stop();
         _currentVoice.reset();
@@ -324,7 +324,7 @@ void Dialog::playVoiceOver() {
     }
 }
 
-void Dialog::scheduleEndOfEntry() {
+void DialogGUI::scheduleEndOfEntry() {
     _entryEnded = false;
     _endEntryFlags = 0;
 
@@ -346,8 +346,8 @@ void Dialog::scheduleEndOfEntry() {
     _endEntryTimestamp = now + kDefaultEntryDuration;
 }
 
-void Dialog::pickReply(uint32_t index) {
-    const DlgFile::EntryReply &reply = _dialog->getReply(index);
+void DialogGUI::pickReply(uint32_t index) {
+    const Dialog::EntryReply &reply = _dialog->getReply(index);
 
     if (!reply.script.empty()) {
         runScript(reply.script, _owner->id(), kObjectInvalid, -1);
@@ -370,12 +370,12 @@ void Dialog::pickReply(uint32_t index) {
     }
 
     if (entryIdx != -1) {
-        _currentEntry.reset(new DlgFile::EntryReply(_dialog->getEntry(entryIdx)));
+        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
         loadCurrentEntry();
     }
 }
 
-bool Dialog::handle(const SDL_Event &event) {
+bool DialogGUI::handle(const SDL_Event &event) {
     if (!_entryEnded &&
         _dialog->isSkippable() &&
         event.type == SDL_MOUSEBUTTONUP &&
@@ -388,7 +388,7 @@ bool Dialog::handle(const SDL_Event &event) {
     return GUI::handle(event);
 }
 
-void Dialog::endCurrentEntry() {
+void DialogGUI::endCurrentEntry() {
     _entryEnded =  true;
 
     if (_currentVoice) {
@@ -404,11 +404,11 @@ void Dialog::endCurrentEntry() {
     }
 }
 
-bool Dialog::handleKeyDown(SDL_Scancode key) {
+bool DialogGUI::handleKeyDown(SDL_Scancode key) {
     return false;
 }
 
-bool Dialog::handleKeyUp(SDL_Scancode key) {
+bool DialogGUI::handleKeyUp(SDL_Scancode key) {
     if (!_entryEnded) return false;
 
     if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
@@ -424,7 +424,7 @@ bool Dialog::handleKeyUp(SDL_Scancode key) {
     return false;
 }
 
-void Dialog::update(float dt) {
+void DialogGUI::update(float dt) {
     GUI::update(dt);
 
     if (!_entryEnded) {
@@ -450,7 +450,7 @@ void Dialog::update(float dt) {
     }
 }
 
-Camera &Dialog::camera() const {
+Camera &DialogGUI::camera() const {
     string cameraModel(_dialog->cameraModel());
     shared_ptr<Area> area(_game->module()->area());
 

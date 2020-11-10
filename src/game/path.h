@@ -21,13 +21,13 @@
 
 #include <glm/vec2.hpp>
 
-#include "gfffile.h"
+#include "../resource/gfffile.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
-class PthFile {
+class Path {
 public:
     struct Point {
         float x { 0.0f };
@@ -35,19 +35,19 @@ public:
         std::vector<int> adjPoints;
     };
 
-    PthFile() = default;
+    Path() = default;
 
-    void load(const GffStruct &pth);
+    void load(const resource::GffStruct &pth);
 
     const std::vector<Point> &points() const;
 
 private:
     std::vector<Point> _points;
 
-    PthFile(const PthFile &) = delete;
-    PthFile &operator=(const PthFile &) = delete;
+    Path(const Path &) = delete;
+    Path &operator=(const Path &) = delete;
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

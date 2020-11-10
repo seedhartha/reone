@@ -15,26 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dlgfile.h"
+#include "dialog.h"
 
 #include <boost/algorithm/string.hpp>
 
-#include "resources.h"
+#include "../resource/resources.h"
 
 using namespace std;
 
+using namespace reone::resource;
+
 namespace reone {
 
-namespace resource {
+namespace game {
 
-void DlgFile::reset() {
+void Dialog::reset() {
     _entries.clear();
     _replies.clear();
     _startEntries.clear();
     _endScript.clear();
 }
 
-void DlgFile::load(const string &resRef, const GffStruct &dlg) {
+void Dialog::load(const string &resRef, const GffStruct &dlg) {
     _skippable = dlg.getInt("Skippable") != 0;
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
@@ -50,7 +52,7 @@ void DlgFile::load(const string &resRef, const GffStruct &dlg) {
     }
 }
 
-DlgFile::EntryReplyLink DlgFile::getEntryReplyLink(const GffStruct &gffs) const {
+Dialog::EntryReplyLink Dialog::getEntryReplyLink(const GffStruct &gffs) const {
     EntryReplyLink link;
     link.index = gffs.getInt("Index");
     link.active = gffs.getString("Active");
@@ -58,7 +60,7 @@ DlgFile::EntryReplyLink DlgFile::getEntryReplyLink(const GffStruct &gffs) const 
     return move(link);
 }
 
-DlgFile::EntryReply DlgFile::getEntryReply(const GffStruct &gffs) const {
+Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     int strRef = gffs.getInt("Text");
 
     EntryReply entry;
@@ -93,27 +95,27 @@ DlgFile::EntryReply DlgFile::getEntryReply(const GffStruct &gffs) const {
     return move(entry);
 }
 
-bool DlgFile::isSkippable() const {
+bool Dialog::isSkippable() const {
     return _skippable;
 }
 
-const string &DlgFile::cameraModel() const {
+const string &Dialog::cameraModel() const {
     return _cameraModel;
 }
 
-const vector<DlgFile::EntryReplyLink> &DlgFile::startEntries() const {
+const vector<Dialog::EntryReplyLink> &Dialog::startEntries() const {
     return _startEntries;
 }
 
-const DlgFile::EntryReply &DlgFile::getEntry(int index) const {
+const Dialog::EntryReply &Dialog::getEntry(int index) const {
     return _entries[index];
 }
 
-const DlgFile::EntryReply &DlgFile::getReply(int index) const {
+const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
 }
 
-const string &DlgFile::endScript() const {
+const string &Dialog::endScript() const {
     return _endScript;
 }
 

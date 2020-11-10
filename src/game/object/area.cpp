@@ -114,14 +114,14 @@ void Area::loadVIS() {
 void Area::loadPTH() {
     shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Path));
 
-    PthFile path;
+    Path path;
     path.load(*pth);
 
-    const vector<PthFile::Point> &points = path.points();
+    const vector<Path::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
     for (int i = 0; i < points.size(); ++i) {
-        const PthFile::Point &point = points[i];
+        const Path::Point &point = points[i];
         Room *room = nullptr;
         float z = 0.0f;
 
