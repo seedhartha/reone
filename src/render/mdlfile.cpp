@@ -22,7 +22,7 @@
 #include "glm/ext.hpp"
 
 #include "../resource/resources.h"
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "models.h"
 #include "textures.h"

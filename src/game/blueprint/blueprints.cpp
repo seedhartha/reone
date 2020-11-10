@@ -18,7 +18,7 @@
 #include "blueprints.h"
 
 #include "../../resource/resources.h"
-#include "../../system/streamutil.h"
+#include "../../common/streamutil.h"
 
 using namespace std;
 

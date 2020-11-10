@@ -18,7 +18,7 @@
 #include "characters.h"
 
 #include "../resource/resources.h"
-#include "../system/random.h"
+#include "../common/random.h"
 
 using namespace std;
 

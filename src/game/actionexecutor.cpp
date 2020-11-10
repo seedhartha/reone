@@ -22,7 +22,7 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../script/execution.h"
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "game.h"
 #include "object/area.h"

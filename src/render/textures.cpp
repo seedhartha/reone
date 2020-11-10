@@ -18,7 +18,7 @@
 #include "textures.h"
 
 #include "../resource/resources.h"
-#include "../system/streamutil.h"
+#include "../common/streamutil.h"
 
 #include "image/curfile.h"
 #include "image/tgafile.h"

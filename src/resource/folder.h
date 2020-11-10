@@ -21,7 +21,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../system/types.h"
+#include "../common/types.h"
 
 #include "types.h"
 

@@ -23,7 +23,7 @@
 #include "../../render/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/modelscenenode.h"
-#include "../../system/streamutil.h"
+#include "../../common/streamutil.h"
 
 #include "../blueprint/blueprints.h"
 

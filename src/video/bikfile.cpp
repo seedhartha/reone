@@ -22,8 +22,8 @@
 #include <boost/filesystem.hpp>
 
 #include "../audio/stream.h"
-#include "../system/log.h"
-#include "../system/streamreader.h"
+#include "../common/log.h"
+#include "../common/streamreader.h"
 
 #include "video.h"
 

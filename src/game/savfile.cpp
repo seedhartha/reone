@@ -22,8 +22,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../system/streamreader.h"
-#include "../system/streamwriter.h"
+#include "../common/streamreader.h"
+#include "../common/streamwriter.h"
 
 #include "game.h"
 

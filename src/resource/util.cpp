@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "types.h"
 

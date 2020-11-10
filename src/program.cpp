@@ -22,7 +22,7 @@
 #include <boost/program_options.hpp>
 
 #include "mp/game.h"
-#include "system/log.h"
+#include "common/log.h"
 
 using namespace std;
 

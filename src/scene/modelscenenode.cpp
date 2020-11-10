@@ -20,7 +20,7 @@
 
 #include "../render/mesh/aabb.h"
 #include "../resource/resources.h"
-#include "../system/log.h"
+#include "../common/log.h"
 
 #include "aabbnode.h"
 #include "lightnode.h"

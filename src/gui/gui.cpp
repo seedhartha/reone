@@ -21,7 +21,7 @@
 #include "../render/shaders.h"
 #include "../render/textures.h"
 #include "../resource/resources.h"
-#include "../system/log.h"
+#include "../common/log.h"
 
 using namespace std;
 using namespace std::placeholders;

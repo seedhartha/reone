@@ -55,33 +55,34 @@ endif()
 
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
-## libsystem static library
+## libcommon static library
 
-set(SYSTEM_HEADERS
-    src/system/endianutil.h
-    src/system/jobs.h
-    src/system/log.h
-    src/system/pathutil.h
-    src/system/random.h
-    src/system/streamreader.h
-    src/system/streamutil.h
-    src/system/streamwriter.h
-    src/system/types.h)
+set(COMMON_HEADERS
+    src/common/endianutil.h
+    src/common/jobs.h
+    src/common/log.h
+    src/common/pathutil.h
+    src/common/random.h
+    src/common/streamreader.h
+    src/common/streamutil.h
+    src/common/streamwriter.h
+    src/common/types.h
+    src/common/vector.h)
 
-set(SYSTEM_SOURCES
-    src/system/endianutil.cpp
-    src/system/jobs.cpp
-    src/system/log.cpp
-    src/system/pathutil.cpp
-    src/system/random.cpp
-    src/system/streamreader.cpp
-    src/system/streamutil.cpp
-    src/system/streamwriter.cpp)
+set(COMMON_SOURCES
+    src/common/endianutil.cpp
+    src/common/jobs.cpp
+    src/common/log.cpp
+    src/common/pathutil.cpp
+    src/common/random.cpp
+    src/common/streamreader.cpp
+    src/common/streamutil.cpp
+    src/common/streamwriter.cpp)
 
-add_library(libsystem STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES})
-set_target_properties(libsystem PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
+set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-## END libsystem static library
+## END libcommon static library
 
 ## libresource static library
 
@@ -556,7 +557,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libmp libnet libgame libscript libgui libscene libvideo librender libaudio libresource libsystem
+    libmp libnet libgame libscript libgui libscene libvideo librender libaudio libresource libcommon
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
     ${OPENGL_LIBRARIES}
@@ -595,7 +596,7 @@ if(BUILD_TOOLS)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    target_link_libraries(reone-tools PRIVATE libresource libsystem ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_link_libraries(reone-tools PRIVATE libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 endif()
 
 ## END reone-tools executable
@@ -608,7 +609,7 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libsystem)
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libcommon)
 
         if(WIN32)
             target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)

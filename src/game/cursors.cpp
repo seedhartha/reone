@@ -22,7 +22,7 @@
 #include "../render/cursor.h"
 #include "../render/image/curfile.h"
 #include "../resource/resources.h"
-#include "../system/streamutil.h"
+#include "../common/streamutil.h"
 
 using namespace std;
 
