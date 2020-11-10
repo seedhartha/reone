@@ -135,7 +135,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
             skipNodes.insert(node->name());
         }
         shared_ptr<ModelSceneNode> modelNode(new ModelSceneNode(_sceneGraph, model, skipNodes));
-        modelNode->setLightingEnabled(_lightingEnabled);
+        modelNode->setLightingEnabled(_lightingEnabled && model->classification() != Model::Classification::Lightsaber);
         parentNode->addChild(modelNode);
 
         auto inserted = _attachedModels.insert(make_pair(parentNumber, move(modelNode)));
