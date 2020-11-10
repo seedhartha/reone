@@ -112,8 +112,9 @@ const GffStruct &GffField::asStruct() const {
     return _children[0];
 }
 
-glm::vec3 GffField::asVector() const {
-    return glm::make_vec3(reinterpret_cast<const float *>(&_data[0]));
+Vector3 GffField::asVector() const {
+    const float *values = reinterpret_cast<const float *>(&_data[0]);
+    return Vector3(values[0], values[1], values[2]);
 }
 
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
@@ -175,9 +176,9 @@ const vector<GffStruct> &GffStruct::getList(const string &name) const {
     return field->children();
 }
 
-glm::vec3 GffStruct::getVector(const string &name) const {
+Vector3 GffStruct::getVector(const string &name) const {
     const GffField *field = find(name);
-    return field ? field->asVector() : glm::vec3(0.0f);
+    return field ? field->asVector() : Vector3();
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {

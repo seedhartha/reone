@@ -103,7 +103,7 @@ void LytFile::processLine(const string &line) {
 LytFile::Room LytFile::getRoom(const vector<string> &tokens) const {
     Room room;
     room.name = boost::to_lower_copy(tokens[0]);
-    room.position = glm::vec3(
+    room.position = Vector3(
         stof(tokens[1]),
         stof(tokens[2]),
         stof(tokens[3]));
@@ -115,7 +115,7 @@ LytFile::DoorHook LytFile::getDoorHook(const vector<string> &tokens) const {
     DoorHook door;
     door.room = boost::to_lower_copy(tokens[0]);
     door.name = boost::to_lower_copy(tokens[1]);
-    door.position = glm::vec3(
+    door.position = Vector3(
         stof(tokens[2]),
         stof(tokens[3]),
         stof(tokens[4]));

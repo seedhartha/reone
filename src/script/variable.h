@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "glm/vec3.hpp"
+#include "../common/vector3.h"
 
 #include "types.h"
 
@@ -44,7 +44,7 @@ enum class VariableType {
 struct Variable {
     VariableType type { VariableType::Void };
     std::string strValue;
-    glm::vec3 vecValue { 0.0f };
+    Vector3 vecValue;
     ExecutionContext context;
 
     union {
@@ -59,7 +59,7 @@ struct Variable {
     Variable(int value);
     Variable(float value);
     Variable(const std::string &value);
-    Variable(const glm::vec3 &value);
+    Variable(const Vector3 &value);
     Variable(const ExecutionContext &context);
 
     Variable operator+(const Variable &other) const;

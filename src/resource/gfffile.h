@@ -19,7 +19,7 @@
 
 #include "binfile.h"
 
-#include "glm/vec3.hpp"
+#include "../common/vector3.h"
 
 namespace reone {
 
@@ -67,7 +67,7 @@ public:
     const ByteArray &asByteArray() const;
     std::vector<float> asFloatArray() const;
     const GffStruct &asStruct() const;
-    glm::vec3 asVector() const;
+    Vector3 asVector() const;
 
 private:
     GffFieldType _type { GffFieldType::Byte };
@@ -108,7 +108,7 @@ public:
     std::string getString(const std::string &name) const;
     const GffStruct &getStruct(const std::string &name) const;
     const std::vector<GffStruct> &getList(const std::string &name) const;
-    glm::vec3 getVector(const std::string &name) const;
+    Vector3 getVector(const std::string &name) const;
 
     const std::vector<GffField> &fields() const;
 

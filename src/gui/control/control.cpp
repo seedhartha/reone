@@ -153,7 +153,9 @@ void Control::loadBorder(const GffStruct &gffs) {
     }
 
     _border->dimension = gffs.getInt("DIMENSION", 0);
-    _border->color = gffs.getVector("COLOR");
+
+    Vector3 color(gffs.getVector("COLOR"));
+    _border->color = glm::vec3(color.x, color.y, color.z);
 }
 
 void Control::loadText(const GffStruct &gffs) {
@@ -162,7 +164,8 @@ void Control::loadText(const GffStruct &gffs) {
     int strRef = gffs.getInt("STRREF");
     _text.text = strRef == -1 ? gffs.getString("TEXT") : Resources::instance().getString(strRef);
 
-    _text.color = gffs.getVector("COLOR");
+    Vector3 color(gffs.getVector("COLOR"));
+    _text.color = glm::vec3(color.x, color.y, color.z);
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
 }
 
@@ -184,7 +187,9 @@ void Control::loadHilight(const GffStruct &gffs) {
     }
 
     _hilight->dimension = gffs.getInt("DIMENSION", 0);
-    _hilight->color = gffs.getVector("COLOR");
+
+    Vector3 color(gffs.getVector("COLOR"));
+    _hilight->color = glm::vec3(color.x, color.y, color.z);
 }
 
 void Control::updateTransform() {
