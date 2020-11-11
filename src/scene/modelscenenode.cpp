@@ -93,12 +93,6 @@ void ModelSceneNode::update(float dt) {
 void ModelSceneNode::render() const {
 }
 
-void ModelSceneNode::fillSceneGraph() {
-    if (!_visible || !_onScreen) return;
-
-    SceneNode::fillSceneGraph();
-}
-
 void ModelSceneNode::playDefaultAnimation() {
     _animator.playDefaultAnimation();
 

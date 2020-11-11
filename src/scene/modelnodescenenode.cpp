@@ -44,25 +44,17 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
     }
 }
 
-void ModelNodeSceneNode::fillSceneGraph() {
+bool ModelNodeSceneNode::shouldRender() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (mesh) {
-        bool render = mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
-        if (render) {
-            bool transparentByClassification = isTransparentByClassification(_modelSceneNode->model()->classification());
-            bool transparent = transparentByClassification && (mesh->isTransparent() || _modelNode->alpha() < 1.0f);
-            if (transparent) {
-                _sceneGraph->addTransparentMesh(this);
-            } else {
-                _sceneGraph->addOpaqueMesh(this);
-            }
-        }
-    }
-    SceneNode::fillSceneGraph();
+    return mesh && mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
 }
 
-bool ModelNodeSceneNode::isTransparentByClassification(Model::Classification classification) const {
-    return classification != Model::Classification::Character;
+bool ModelNodeSceneNode::isTransparent() const {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    if (!mesh || _modelSceneNode->model()->classification() == Model::Classification::Character) {
+        return false;
+    }
+    return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 
 void ModelNodeSceneNode::renderSingle() const {
@@ -145,6 +137,10 @@ void ModelNodeSceneNode::renderSingle() const {
 float ModelNodeSceneNode::getDistanceFromCenter(const glm::vec3 &point) const {
     glm::vec3 center(_absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f));
     return glm::distance2(center, point);
+}
+
+const ModelSceneNode *ModelNodeSceneNode::modelSceneNode() const {
+    return _modelSceneNode;
 }
 
 ModelNode *ModelNodeSceneNode::modelNode() const {

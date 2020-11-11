@@ -27,8 +27,6 @@ class LightSceneNode : public SceneNode {
 public:
     LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius);
 
-    void fillSceneGraph() override;
-
     int priority() const;
     const glm::vec3 &color() const;
     float radius() const;

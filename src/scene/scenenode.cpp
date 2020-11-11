@@ -49,12 +49,6 @@ void SceneNode::removeChild(SceneNode &node) {
     }
 }
 
-void SceneNode::fillSceneGraph() {
-    for (auto &child : _children) {
-        child->fillSceneGraph();
-    }
-}
-
 void SceneNode::render() const {
     for (auto &child : _children) {
         child->render();

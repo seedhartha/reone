@@ -252,7 +252,7 @@ void Game::drawWorld() {
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.prepare();
+    _sceneGraph.prepareFrame();
 
     _worldPipeline.render();
 }

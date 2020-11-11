@@ -18,6 +18,7 @@
 #include "scenegraph.h"
 
 #include <algorithm>
+#include <stack>
 
 #include "../render/mesh/quad.h"
 
@@ -40,62 +41,41 @@ SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
 
 void SceneGraph::clear() {
-    _opaqueMeshes.clear();
-    _transparentMeshes.clear();
-    _lights.clear();
-    _rootNodes.clear();
+    _roots.clear();
 }
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
-    _rootNodes.push_back(node);
-}
-
-void SceneGraph::addOpaqueMesh(ModelNodeSceneNode *node) {
-    _opaqueMeshes.push_back(node);
-}
-
-void SceneGraph::addTransparentMesh(ModelNodeSceneNode *node) {
-    _transparentMeshes.push_back(node);
-}
-
-void SceneGraph::addLight(LightSceneNode *node) {
-    _lights.push_back(node);
+    _roots.push_back(node);
 }
 
 void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
-    auto maybeRoot = find_if(_rootNodes.begin(), _rootNodes.end(), [&node](const shared_ptr<SceneNode> &n) { return n.get() == node.get(); });
-    if (maybeRoot != _rootNodes.end()) {
-        _rootNodes.erase(maybeRoot);
+    auto maybeRoot = find_if(_roots.begin(), _roots.end(), [&node](auto &n) { return n.get() == node.get(); });
+    if (maybeRoot != _roots.end()) {
+        _roots.erase(maybeRoot);
     }
 }
 
-void SceneGraph::onLastRootAdded() {
+void SceneGraph::build() {
 }
 
-void SceneGraph::prepare() {
+void SceneGraph::prepareFrame() {
     if (!_activeCamera) return;
 
-    _opaqueMeshes.clear();
-    _transparentMeshes.clear();
-    _lights.clear();
+    refreshMeshesAndLights();
 
-    for (auto &node : _rootNodes) {
-        node->fillSceneGraph();
-    }
-    for (auto &node : _rootNodes) {
-        ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(node.get());
+    for (auto &root : _roots) {
+        ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(root.get());
         if (modelNode) {
             modelNode->updateLighting();
         }
     }
-
     unordered_map<ModelNodeSceneNode *, float> cameraDistances;
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
 
     for (auto &mesh : _transparentMeshes) {
         cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
     }
-    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](ModelNodeSceneNode *left, ModelNodeSceneNode *right) {
+    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](auto &left, auto &right) {
         int leftTransparency = left->modelNode()->mesh()->transparency();
         int rightTransparency = right->modelNode()->mesh()->transparency();
         if (leftTransparency < rightTransparency) return true;
@@ -105,6 +85,42 @@ void SceneGraph::prepare() {
 
         return leftDistance > rightDistance;
     });
+}
+
+void SceneGraph::refreshMeshesAndLights() {
+    _opaqueMeshes.clear();
+    _transparentMeshes.clear();
+    _lights.clear();
+
+    for (auto &root : _roots) {
+        stack<SceneNode *> nodes;
+        nodes.push(root.get());
+
+        while (!nodes.empty()) {
+            SceneNode *node = nodes.top();
+            nodes.pop();
+
+            ModelNodeSceneNode *modelNode = dynamic_cast<ModelNodeSceneNode *>(node);
+            if (modelNode) {
+                if (modelNode->shouldRender()) {
+                    if (modelNode->isTransparent()) {
+                        _transparentMeshes.push_back(modelNode);
+                    } else {
+                        _opaqueMeshes.push_back(modelNode);
+                    }
+                }
+            } else {
+                LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
+                if (light) {
+                    _lights.push_back(light);
+                }
+            }
+
+            for (auto &child : node->children()) {
+                nodes.push(child.get());
+            }
+        }
+    }
 }
 
 void SceneGraph::render() const {
@@ -117,22 +133,22 @@ void SceneGraph::render() const {
 
     Shaders::instance().setGlobalUniforms(globals);
 
-    for (auto &node : _rootNodes) {
-        node->render();
+    for (auto &root : _roots) {
+        root->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        mesh->renderSingle();
+        renderIfVisibleAndOnScreen(*mesh);
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->renderSingle();
+        renderIfVisibleAndOnScreen(*mesh);
     }
 }
 
-void SceneGraph::renderIfInsideFrustum(const ModelNodeSceneNode &node) const {
-    AABB aabb(node.modelNode()->mesh()->aabb() * node.absoluteTransform());
-    if (_activeCamera->isInFrustum(aabb)) {
-        node.renderSingle();
-    }
+void SceneGraph::renderIfVisibleAndOnScreen(const ModelNodeSceneNode &node) const {
+    const ModelSceneNode *model = node.modelSceneNode();
+    if (!model->isVisible() || !model->isOnScreen()) return;
+
+    node.renderSingle();
 }
 
 void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {

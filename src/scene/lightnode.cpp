@@ -30,11 +30,6 @@ LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::
     _radius(radius) {
 }
 
-void LightSceneNode::fillSceneGraph() {
-    _sceneGraph->addLight(this);
-    SceneNode::fillSceneGraph();
-}
-
 int LightSceneNode::priority() const {
     return _priority;
 }

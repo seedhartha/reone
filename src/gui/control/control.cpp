@@ -214,7 +214,7 @@ bool Control::handleClick(int x, int y) {
 void Control::update(float dt) {
     if (_scene3d) {
         _scene3d->model->update(dt);
-        _scene3d->sceneGraph->prepare();
+        _scene3d->sceneGraph->prepareFrame();
     }
 }
 
