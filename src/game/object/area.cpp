@@ -297,7 +297,7 @@ bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest)
     props.flags = kRaycastObjects | kRaycastAABB;
     props.origin = origin;
     props.direction = dir;
-    props.objectTypes = { ObjectType::Creature };
+    props.objectTypes = { ObjectType::Creature, ObjectType::Door };
     props.except = &creature;
 
     RaycastResult result;
