@@ -76,7 +76,6 @@ private:
     SceneGraph &operator=(const SceneGraph &) = delete;
 
     void refreshMeshesAndLights();
-    void renderIfVisibleAndOnScreen(const ModelNodeSceneNode &node) const;
 };
 
 } // namespace scene

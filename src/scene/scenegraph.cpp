@@ -100,22 +100,27 @@ void SceneGraph::refreshMeshesAndLights() {
             SceneNode *node = nodes.top();
             nodes.pop();
 
-            ModelNodeSceneNode *modelNode = dynamic_cast<ModelNodeSceneNode *>(node);
-            if (modelNode) {
-                if (modelNode->shouldRender()) {
-                    if (modelNode->isTransparent()) {
-                        _transparentMeshes.push_back(modelNode);
-                    } else {
-                        _opaqueMeshes.push_back(modelNode);
+            ModelSceneNode *model = dynamic_cast<ModelSceneNode *>(node);
+            if (model) {
+                if (!model->isVisible() || !model->isOnScreen()) continue;
+
+            } else {
+                ModelNodeSceneNode *modelNode = dynamic_cast<ModelNodeSceneNode *>(node);
+                if (modelNode) {
+                    if (modelNode->shouldRender()) {
+                        if (modelNode->isTransparent()) {
+                            _transparentMeshes.push_back(modelNode);
+                        } else {
+                            _opaqueMeshes.push_back(modelNode);
+                        }
+                    }
+                } else {
+                    LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
+                    if (light) {
+                        _lights.push_back(light);
                     }
                 }
-            } else {
-                LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
-                if (light) {
-                    _lights.push_back(light);
-                }
             }
-
             for (auto &child : node->children()) {
                 nodes.push(child.get());
             }
@@ -137,18 +142,11 @@ void SceneGraph::render() const {
         root->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        renderIfVisibleAndOnScreen(*mesh);
+        mesh->renderSingle();
     }
     for (auto &mesh : _transparentMeshes) {
-        renderIfVisibleAndOnScreen(*mesh);
+        mesh->renderSingle();
     }
-}
-
-void SceneGraph::renderIfVisibleAndOnScreen(const ModelNodeSceneNode &node) const {
-    const ModelSceneNode *model = node.modelSceneNode();
-    if (!model->isVisible() || !model->isOnScreen()) return;
-
-    node.renderSingle();
 }
 
 void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
