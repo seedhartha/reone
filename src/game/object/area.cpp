@@ -459,6 +459,7 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
     RaycastProperties props;
     props.origin = glm::vec3(position, kElevationTestZ);
     props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
+    props.maxDistance = 2.0f * kElevationTestZ;
 
     RaycastResult result;
 

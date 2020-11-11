@@ -34,7 +34,7 @@ void Walkmesh::computeAABB() {
     }
 }
 
-bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const {
+bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const {
     const vector<Face> &faces = walkable ? _walkableFaces : _nonWalkableFaces;
     glm::vec2 baryPosition(0.0f);
 
@@ -43,7 +43,7 @@ bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walka
         const glm::vec3 &p1 = _vertices[face.indices[1]];
         const glm::vec3 &p2 = _vertices[face.indices[2]];
 
-        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, distance) && distance >= 0.0f) {
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, distance) && distance >= 0.0f && distance <= maxDistance) {
             return true;
         }
     }

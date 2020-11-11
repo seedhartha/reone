@@ -31,7 +31,7 @@ class Walkmesh {
 public:
     Walkmesh() = default;
 
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const;
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
 
     const AABB &aabb() const;
 
