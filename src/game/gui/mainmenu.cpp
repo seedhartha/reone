@@ -182,6 +182,10 @@ void MainMenu::startModuleSelection() {
 void MainMenu::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_MODULES") return;
 
+    onModuleSelected(item);
+}
+
+void MainMenu::onModuleSelected(const string &name) {
     CreatureConfiguration playerCfg;
     CreatureConfiguration companionCfg;
 
@@ -212,7 +216,7 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
     companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
     party.addMember(companion);
 
-    _game->loadModule(item);
+    _game->loadModule(name);
 }
 
 } // namespace game

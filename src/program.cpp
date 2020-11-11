@@ -60,6 +60,7 @@ int Program::run() {
 void Program::initOptions() {
     _commonOpts.add_options()
         ("game", po::value<string>(), "path to game directory")
+        ("module", po::value<string>(), "name of a module to load")
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
@@ -90,6 +91,7 @@ void Program::loadOptions() {
 
     _showHelp = vars.count("help") > 0;
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    _gameOpts.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
     _gameOpts.graphics.width = vars["width"].as<int>();
     _gameOpts.graphics.height = vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();

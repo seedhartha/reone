@@ -65,6 +65,7 @@ enum InventorySlot {
 class CreatureBlueprint;
 
 struct Options {
+    std::string module;
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
     net::NetworkOptions network;

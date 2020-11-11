@@ -36,6 +36,8 @@ public:
 
     void load() override;
 
+    void onModuleSelected(const std::string &name);
+
 private:
     Game *_game { nullptr };
 
