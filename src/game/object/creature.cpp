@@ -58,6 +58,7 @@ static string g_animTalkBody("tlknorm");
 static string g_animGreeting("greeting");
 
 static string g_headHookNode("headhook");
+static string g_talkDummyNode("talkdummy");
 
 Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
@@ -510,7 +511,7 @@ float Creature::runSpeed() const {
 glm::vec3 Creature::selectablePosition() const {
     glm::vec3 position;
 
-    if (_model->getNodeAbsolutePosition(g_headHookNode, position)) {
+    if (_model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
         return _model->absoluteTransform() * glm::vec4(position, 1.0f);
     }
 
