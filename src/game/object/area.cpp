@@ -18,6 +18,7 @@
 #include "area.h"
 
 #include <algorithm>
+#include <sstream>
 
 #include <boost/format.hpp>
 
@@ -450,9 +451,27 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
             _objectSelector.selectNext();
             return true;
 
+        case SDL_SCANCODE_SLASH: {
+            int objectId = _objectSelector.selectedObjectId();
+            if (objectId != -1) {
+                shared_ptr<SpatialObject> object(find(objectId));
+                printDebugInfo(*object);
+            }
+            return true;
+        }
+
         default:
             return false;
     }
+}
+
+void Area::printDebugInfo(const SpatialObject &object) {
+    ostringstream ss;
+    ss << boost::format("tag='%s'") % object.tag();
+    ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
+    ss << boost::format(",model='%s'") % object.model()->name();
+
+    debug("Selected object: " + ss.str());
 }
 
 bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const {
