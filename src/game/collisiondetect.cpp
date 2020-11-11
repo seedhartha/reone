@@ -90,7 +90,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         shared_ptr<Walkmesh> walkmesh(object->walkmesh());
         if (!walkmesh) continue;
 
-        if (walkmesh->raycast(origin, dir, false, distance)) {
+        if (walkmesh->raycast(origin, dir, false, props.maxDistance, distance)) {
             collisions.push_back(make_pair(object, distance));
             continue;
         }
@@ -116,7 +116,7 @@ bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResu
         const Walkmesh *walkmesh = room.walkmesh();
         if (!walkmesh) continue;
 
-        if (walkmesh->raycast(props.origin, props.direction, props.flags & kRaycastWalkable, distance)) {
+        if (walkmesh->raycast(props.origin, props.direction, props.flags & kRaycastWalkable, props.maxDistance, distance)) {
             result.room = &room;
             result.intersection = props.origin + distance * props.direction;
             result.distance = distance;
