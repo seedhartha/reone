@@ -40,7 +40,7 @@ namespace reone {
 namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
-static const float kMaxConversationDistance = 4.0f;
+static const float kMaxConversationDistance = 8.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
     if (!game) {
