@@ -349,7 +349,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
     {
-        auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+        auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
         if (maybeObject != _objects.end()) {
             _objects.erase(maybeObject);
         }
@@ -359,7 +359,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         auto maybeTagObjects = _objectsByTag.find(object->tag());
         if (maybeTagObjects != _objectsByTag.end()) {
             ObjectList &tagObjects = maybeTagObjects->second;
-            auto maybeObject = find_if(tagObjects.begin(), tagObjects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+            auto maybeObject = find_if(tagObjects.begin(), tagObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
             if (maybeObject != tagObjects.end()) {
                 tagObjects.erase(maybeObject);
             }
@@ -368,7 +368,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     }
     {
         ObjectList &typeObjects = _objectsByType.find(object->type())->second;
-        auto maybeObject = find_if(typeObjects.begin(), typeObjects.end(), [&object](const shared_ptr<SpatialObject> &o) { return o.get() == object.get(); });
+        auto maybeObject = find_if(typeObjects.begin(), typeObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
         if (maybeObject != typeObjects.end()) {
             typeObjects.erase(maybeObject);
         }
@@ -593,7 +593,7 @@ void Area::fill(SceneGraph &sceneGraph) {
             sceneGraph.addRoot(sceneNode);
         }
     }
-    sceneGraph.onLastRootAdded();
+    sceneGraph.build();
 }
 
 glm::vec3 Area::getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const {

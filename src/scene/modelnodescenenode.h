@@ -36,12 +36,14 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void fillSceneGraph() override;
-
     void renderSingle() const;
 
     float getDistanceFromCenter(const glm::vec3 &point) const;
 
+    bool shouldRender() const;
+    bool isTransparent() const;
+
+    const ModelSceneNode *modelSceneNode() const;
     render::ModelNode *modelNode() const;
     const glm::mat4 &boneTransform() const;
 
@@ -52,8 +54,6 @@ private:
     render::ModelNode *_modelNode { nullptr };
     glm::mat4 _animTransform { 1.0f };
     glm::mat4 _boneTransform { 1.0f };
-
-    bool isTransparentByClassification(render::Model::Classification classification) const;
 };
 
 } // namespace scene

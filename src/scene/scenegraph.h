@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -46,21 +47,13 @@ public:
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
-    void onLastRootAdded();
-    void prepare();
+    void build();
+    void prepareFrame();
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
 
-    // Meshes
-
-    void addOpaqueMesh(ModelNodeSceneNode *node);
-    void addTransparentMesh(ModelNodeSceneNode *node);
-
-    // END Meshes
-
     // Lights
 
-    void addLight(LightSceneNode *node);
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
@@ -70,7 +63,7 @@ public:
 
 private:
     render::GraphicsOptions _opts;
-    std::vector<std::shared_ptr<SceneNode>> _rootNodes;
+    std::vector<std::shared_ptr<SceneNode>> _roots;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<LightSceneNode *> _lights;
@@ -82,7 +75,8 @@ private:
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
-    void renderIfInsideFrustum(const ModelNodeSceneNode &node) const;
+    void refreshMeshesAndLights();
+    void renderIfVisibleAndOnScreen(const ModelNodeSceneNode &node) const;
 };
 
 } // namespace scene

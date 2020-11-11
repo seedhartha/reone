@@ -43,7 +43,6 @@ public:
 
     std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
-    void fillSceneGraph() override;
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
