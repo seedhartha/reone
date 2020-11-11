@@ -235,10 +235,14 @@ string Creature::getBodyTextureName() const {
     string texName(appearance->getString(_config.appearance, column));
     boost::to_lower(texName);
 
-    if (bodyItem) {
-        texName += str(boost::format("%02d") % bodyItem->blueprint().textureVariation());
-    } else {
-        texName += "01";
+    if (texName.empty()) return "";
+
+    if (_modelType == ModelType::Character) {
+        if (bodyItem) {
+            texName += str(boost::format("%02d") % bodyItem->blueprint().textureVariation());
+        } else {
+            texName += "01";
+        }
     }
 
     return move(texName);
