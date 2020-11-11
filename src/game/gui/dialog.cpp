@@ -272,12 +272,12 @@ void DialogGUI::updateCamera() {
     glm::vec3 speakerPosition;
     glm::vec3 hookPosition(0.0f);
 
-    if (partyLeader->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
+    if (partyLeader->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
         listenerPosition = partyLeader->position() + hookPosition;
     } else {
         listenerPosition = partyLeader->model()->getCenterOfAABB();
     }
-    if (_currentSpeaker->model()->getNodeAbsolutePosition("headhook", hookPosition)) {
+    if (_currentSpeaker->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
         speakerPosition = _currentSpeaker->position() + hookPosition;
     } else {
         speakerPosition = _currentSpeaker->model()->getCenterOfAABB();
