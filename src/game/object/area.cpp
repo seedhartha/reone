@@ -577,7 +577,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<Creature> partyLeader(_game->party().leader());
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB;
+    props.flags = kRaycastObjects | kRaycastAABB | kRaycastSelectable;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
     props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };
