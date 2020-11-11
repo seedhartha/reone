@@ -73,9 +73,13 @@ void Game::initGameVersion() {
 
 int Game::run() {
     init();
-    playVideo("legal");
     openMainMenu();
 
+    if (!_options.module.empty()) {
+        _mainMenu->onModuleSelected(_options.module);
+    } else {
+        playVideo("legal");
+    }
     _window.show();
 
     runMainLoop();
