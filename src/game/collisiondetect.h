@@ -34,7 +34,8 @@ enum RaycastFlags {
     kRaycastRooms = 1,
     kRaycastObjects = 2,
     kRaycastWalkable = 4,
-    kRaycastAABB = 8
+    kRaycastAABB = 8,
+    kRaycastSelectable = 0x10
 };
 
 class Area;
