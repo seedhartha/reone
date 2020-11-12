@@ -363,8 +363,8 @@ void Routines::addKotorRoutines() {
     add("GetLastAssociateCommand", Int, { Object });
     add("GiveGoldToCreature", Void, { Object, Int });
     add("SetIsDestroyable", Void, { Int, Int, Int });
-    add("SetLocked", Void, { Object, Int });
-    add("GetLocked", Int, { Object });
+    add("SetLocked", Void, { Object, Int }, bind(&Routines::setLocked, this, _1, _2));
+    add("GetLocked", Int, { Object }, bind(&Routines::getLocked, this, _1, _2));
     add("GetClickingObject", Object, { });
     add("SetAssociateListenPatterns", Void, { Object });
     add("GetLastWeaponUsed", Object, { Object });
