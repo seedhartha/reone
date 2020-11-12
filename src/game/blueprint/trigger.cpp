@@ -17,6 +17,10 @@
 
 #include "trigger.h"
 
+#include <boost/algorithm/string.hpp>
+
+using namespace std;
+
 using namespace reone::resource;
 
 namespace reone {
@@ -24,6 +28,18 @@ namespace reone {
 namespace game {
 
 void TriggerBlueprint::load(const GffStruct &utt) {
+    _tag = utt.getString("Tag");
+    boost::to_lower(_tag);
+
+    _onEnter = utt.getString("ScriptOnEnter");
+}
+
+const string &TriggerBlueprint::tag() const {
+    return _tag;
+}
+
+const string &TriggerBlueprint::onEnter() const {
+    return _onEnter;
 }
 
 } // namespace resource

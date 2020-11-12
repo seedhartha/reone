@@ -25,17 +25,22 @@ namespace reone {
 
 namespace game {
 
+class TriggerBlueprint;
+
 class Trigger : public SpatialObject {
 public:
     Trigger(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
 
+    const TriggerBlueprint &blueprint() const;
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;
     const std::vector<glm::vec3> &geometry() const;
 
 private:
+    std::shared_ptr<TriggerBlueprint> _blueprint;
+    std::string _tag;
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;

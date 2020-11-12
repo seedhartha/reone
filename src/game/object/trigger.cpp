@@ -21,6 +21,8 @@
 
 #include "../../resource/resources.h"
 
+#include "../blueprint/blueprints.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -35,8 +37,9 @@ Trigger::Trigger(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, Object
 }
 
 void Trigger::load(const GffStruct &gffs) {
-    _tag = gffs.getString("Tag");
-    boost::to_lower(_tag);
+    string blueprintResRef(gffs.getString("TemplateResRef"));
+    _blueprint = Blueprints::instance().getTrigger(blueprintResRef);
+    _tag = _blueprint->tag();
 
     _position.x = gffs.getFloat("XPosition");
     _position.y = gffs.getFloat("YPosition");
@@ -62,6 +65,10 @@ void Trigger::load(const GffStruct &gffs) {
 
         _geometry.push_back(_transform * glm::vec4(x, y, z, 1.0f));
     }
+}
+
+const TriggerBlueprint &Trigger::blueprint() const {
+    return *_blueprint;
 }
 
 const string &Trigger::linkedToModule() const {

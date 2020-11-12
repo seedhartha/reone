@@ -34,6 +34,7 @@
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 
+#include "../blueprint/trigger.h"
 #include "../blueprint/sound.h"
 #include "../game.h"
 #include "../room.h"
@@ -759,8 +760,8 @@ void Area::updateSounds() {
     }
 }
 
-void Area::updateTriggers(const Creature &creature) {
-    glm::vec2 position2d(creature.position());
+void Area::updateTriggers(const Creature &triggerrer) {
+    glm::vec2 position2d(triggerrer.position());
     glm::vec3 liftedPosition(position2d, kElevationTestZ);
     glm::vec3 down(0.0f, 0.0f, -1.0f);
     glm::vec2 intersection;
@@ -778,6 +779,10 @@ void Area::updateTriggers(const Creature &creature) {
         if (triggered) {
             if (!trigger.linkedToModule().empty()) {
                 _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
+                return;
+            }
+            if (!trigger.blueprint().onEnter().empty()) {
+                runScript(trigger.blueprint().onEnter(), trigger.id(), triggerrer.id(), -1);
             }
             break;
         }
