@@ -41,6 +41,7 @@ using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {
@@ -261,32 +262,38 @@ void DialogGUI::loadCurrentSpeaker() {
     }
     _currentSpeaker = speaker;
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
-    partyLeader->face(*_currentSpeaker);
+    shared_ptr<Creature> player(_game->party().player());
 
-    Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
-    if (speakerCreature) {
-        speakerCreature->setTalking(true);
-        speakerCreature->face(*partyLeader);
+    if (_currentSpeaker) {
+        player->face(*_currentSpeaker);
+
+        Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        if (speakerCreature) {
+            speakerCreature->setTalking(true);
+            speakerCreature->face(*player);
+        }
     }
 }
 
 void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> player(_game->party().player());
     glm::vec3 listenerPosition;
     glm::vec3 speakerPosition;
     glm::vec3 hookPosition(0.0f);
 
-    if (partyLeader->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-        listenerPosition = partyLeader->position() + hookPosition;
+    if (player->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
+        listenerPosition = player->position() + hookPosition;
     } else {
-        listenerPosition = partyLeader->model()->getCenterOfAABB();
+        listenerPosition = player->model()->getCenterOfAABB();
     }
-    if (_currentSpeaker->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-        speakerPosition = _currentSpeaker->position() + hookPosition;
-    } else {
-        speakerPosition = _currentSpeaker->model()->getCenterOfAABB();
+    if (_currentSpeaker) {
+        shared_ptr<ModelSceneNode> speakerModel(_currentSpeaker->model());
+        if (speakerModel->getNodeAbsolutePosition("talkdummy", hookPosition)) {
+            speakerPosition = _currentSpeaker->position() + hookPosition;
+        } else {
+            speakerPosition = speakerModel->getCenterOfAABB();
+        }
     }
     if (_dialog->cameraModel().empty()) {
         DialogCamera &camera = static_cast<DialogCamera &>(area->getCamera(CameraType::Dialog));

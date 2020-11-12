@@ -206,10 +206,6 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         shared_ptr<Creature> partyLeader(_game->party().leader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();
-
-        if (!door->conversation().empty()) {
-            actions.add(make_unique<StartConversationAction>(door, door->conversation()));
-        }
         actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, door));
     }
 }

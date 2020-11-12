@@ -373,7 +373,9 @@ void Area::doDestroyObject(uint32_t objectId) {
             if (maybeObject != tagObjects.end()) {
                 tagObjects.erase(maybeObject);
             }
-            _objectsByTag.erase(maybeTagObjects);
+            if (tagObjects.empty()) {
+                _objectsByTag.erase(maybeTagObjects);
+            }
         }
     }
     {
