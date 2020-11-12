@@ -46,6 +46,7 @@ public:
         std::string listener;
         int delay { 0 };
         int waitFlags { 0 };
+        int cameraId { -1 };
         int cameraAngle { 0 };
         int cameraAnimation { 0 };
         float camFieldOfView { 0.0f };

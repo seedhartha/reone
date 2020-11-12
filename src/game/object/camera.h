@@ -17,23 +17,28 @@
 
 #pragma once
 
+#include "spatial.h"
+
+#include "../../resource/gfffile.h"
+
+#include "../camera/camera.h"
+
 namespace reone {
 
 namespace game {
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
-};
+class CameraObject : public SpatialObject, public Camera {
+public:
+    CameraObject(uint32_t id, scene::SceneGraph *sceneGraph);
 
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
+    void load(const resource::GffStruct &gffs);
+
+    int cameraId() const;
+    float fieldOfView() const;
+
+private:
+    int _cameraId { 0 };
+    float _fieldOfView { 0.0f };
 };
 
 } // namespace game

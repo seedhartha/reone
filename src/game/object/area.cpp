@@ -179,6 +179,7 @@ void Area::loadGIT(const GffStruct &git) {
     loadWaypoints(git);
     loadTriggers(git);
     loadSounds(git);
+    loadCameras(git);
 }
 
 void Area::loadProperties(const GffStruct &git) {
@@ -240,7 +241,15 @@ void Area::loadSounds(const GffStruct &git) {
     }
 }
 
-void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
+void Area::loadCameras(const GffStruct &git) {
+    for (auto &gffs : git.getList("CameraList")) {
+        shared_ptr<CameraObject> camera(_game->objectFactory().newCamera());
+        camera->load(gffs);
+        add(camera);
+    }
+}
+
+void Area::initCameras(const glm::vec3 &entryPosition, float entryHeading) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
@@ -259,7 +268,7 @@ void Area::loadCameras(const glm::vec3 &entryPosition, float entryHeading) {
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
     _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
-    _game->onCameraChanged(_cameraType);
+    _staticCamera = make_unique<StaticCamera>(sceneGraph, _cameraAspect);
 }
 
 bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
@@ -631,40 +640,6 @@ void Area::update3rdPersonCameraHeading() {
     _thirdPersonCamera->setHeading(partyLeader->heading());
 }
 
-void Area::switchTo3rdPersonCamera() {
-    if (_cameraType == CameraType::ThirdPerson) return;
-
-    _cameraType = CameraType::ThirdPerson;
-    _game->onCameraChanged(_cameraType);
-}
-
-void Area::toggleCameraType() {
-    bool changed = false;
-
-    switch (_cameraType) {
-        case CameraType::FirstPerson:
-            if (_game->party().leader()) {
-                _cameraType = CameraType::ThirdPerson;
-                changed = true;
-            }
-            break;
-
-        case CameraType::ThirdPerson:
-            _cameraType = CameraType::FirstPerson;
-            _firstPersonCamera->setPosition(_thirdPersonCamera->sceneNode()->absoluteTransform()[3]);
-            _firstPersonCamera->setHeading(_thirdPersonCamera->heading());
-            changed = true;
-            break;
-
-        default:
-            break;
-    }
-
-    if (changed) {
-        _game->onCameraChanged(_cameraType);
-    }
-}
-
 void Area::startDialog(Creature &creature, const string &resRef) {
     string finalResRef(resRef);
     if (resRef.empty()) finalResRef = creature.conversation();
@@ -699,7 +674,7 @@ void Area::update3rdPersonCameraTarget() {
 void Area::updateVisibility() {
     shared_ptr<Creature> partyLeader(_game->party().leader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
-    bool allVisible = !leaderRoom || _cameraType == CameraType::FirstPerson;
+    bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
     if (allVisible) {
         for (auto &room : _rooms) {
@@ -813,10 +788,6 @@ const CameraStyle &Area::cameraStyle() const {
     return _cameraStyle;
 }
 
-CameraType Area::cameraType() const {
-    return _cameraType;
-}
-
 const string &Area::music() const {
     return _music;
 }
@@ -841,20 +812,31 @@ const Pathfinder &Area::pathfinder() const {
     return _pathfinder;
 }
 
-FirstPersonCamera &Area::firstPersonCamera() {
-    return *_firstPersonCamera;
+Camera &Area::getCamera(CameraType type) {
+    switch (type) {
+        case CameraType::FirstPerson:
+            return *_firstPersonCamera;
+        case CameraType::ThirdPerson:
+            return *_thirdPersonCamera;
+        case CameraType::Static:
+            return *_staticCamera;
+        case CameraType::Animated:
+            return *_animatedCamera;
+        case CameraType::Dialog:
+            return *_dialogCamera;
+        default:
+            throw invalid_argument("Unsupported camera type: " + to_string(static_cast<int>(type)));
+    }
 }
 
-ThirdPersonCamera &Area::thirdPersonCamera() {
-    return *_thirdPersonCamera;
-}
-
-DialogCamera &Area::dialogCamera() {
-    return *_dialogCamera;
-}
-
-AnimatedCamera &Area::animatedCamera() {
-    return *_animatedCamera;
+void Area::setStaticCamera(int cameraId) {
+    for (auto &object : _objectsByType[ObjectType::Camera]) {
+        CameraObject &camera = static_cast<CameraObject &>(*object);
+        if (camera.cameraId() == cameraId) {
+            _staticCamera->setObject(camera);
+            break;
+        }
+    }
 }
 
 } // namespace game

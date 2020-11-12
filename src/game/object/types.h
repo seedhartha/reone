@@ -31,7 +31,8 @@ enum class ObjectType {
     Waypoint,
     Trigger,
     Item,
-    Sound
+    Sound,
+    Camera
 };
 
 } // namespace game

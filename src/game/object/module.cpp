@@ -50,7 +50,7 @@ void Module::load(const string &name, const GffStruct &ifo) {
     loadInfo(ifo);
     loadArea(ifo);
 
-    _area->loadCameras(_info.entryPosition, _info.entryHeading);
+    _area->initCameras(_info.entryPosition, _info.entryHeading);
 
     loadPlayer();
 }
@@ -79,7 +79,7 @@ void Module::loadArea(const GffStruct &ifo) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), &_area->thirdPersonCamera(), &_game->party());
+    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_game->party());
 }
 
 void Module::loadParty(const string &entry) {
@@ -90,7 +90,6 @@ void Module::loadParty(const string &entry) {
     _area->loadParty(position, heading);
     _area->onPartyLeaderMoved();
     _area->update3rdPersonCameraHeading();
-    _area->switchTo3rdPersonCamera();
     _area->runOnEnterScript();
 }
 
@@ -118,8 +117,7 @@ bool Module::handle(const SDL_Event &event) {
         case SDL_MOUSEBUTTONUP:
             if (handleMouseButtonUp(event.button)) return true;
             break;
-        case SDL_KEYUP:
-            if (handleKeyUp(event.key)) return true;
+        default:
             break;
     }
 
@@ -221,19 +219,8 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
     actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
 }
 
-bool Module::handleKeyUp(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-        case SDL_SCANCODE_V:
-            _area->toggleCameraType();
-            return true;
-
-        default:
-            return false;
-    }
-}
-
 void Module::update(float dt) {
-    if (_area->cameraType() == CameraType::ThirdPerson) {
+    if (_game->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     _area->update(dt);
