@@ -33,10 +33,11 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
+    bool isIn(const glm::vec2 &point) const;
+
     const TriggerBlueprint &blueprint() const;
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;
-    const std::vector<glm::vec3> &geometry() const;
 
 private:
     std::shared_ptr<TriggerBlueprint> _blueprint;

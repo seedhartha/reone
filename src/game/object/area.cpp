@@ -22,7 +22,6 @@
 
 #include <boost/format.hpp>
 
-#include "glm/gtx/intersect.hpp"
 #include "glm/gtx/norm.hpp"
 
 #include "../../render/models.h"
@@ -762,29 +761,18 @@ void Area::updateSounds() {
 
 void Area::updateTriggers(const Creature &triggerrer) {
     glm::vec2 position2d(triggerrer.position());
-    glm::vec3 liftedPosition(position2d, kElevationTestZ);
-    glm::vec3 down(0.0f, 0.0f, -1.0f);
-    glm::vec2 intersection;
-    float distance;
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         Trigger &trigger = static_cast<Trigger &>(*object);
         if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
+        if (!trigger.isIn(position2d)) continue;
 
-        const vector<glm::vec3> &geometry = trigger.geometry();
-        bool triggered =
-            (geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, geometry[0], geometry[1], geometry[2], intersection, distance)) ||
-            (geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, geometry[2], geometry[3], geometry[0], intersection, distance));
-
-        if (triggered) {
-            if (!trigger.linkedToModule().empty()) {
-                _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
-                return;
-            }
-            if (!trigger.blueprint().onEnter().empty()) {
-                runScript(trigger.blueprint().onEnter(), trigger.id(), triggerrer.id(), -1);
-            }
-            break;
+        if (!trigger.linkedToModule().empty()) {
+            _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
+            return;
+        }
+        if (!trigger.blueprint().onEnter().empty()) {
+            runScript(trigger.blueprint().onEnter(), trigger.id(), triggerrer.id(), -1);
         }
     }
 }
