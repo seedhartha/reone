@@ -527,6 +527,7 @@ void Area::update(float dt) {
     }
     updateVisibility();
     updateSounds();
+    updateTriggers();
 
     for (auto &object : _objects) {
         object->update(dt);
@@ -556,9 +557,11 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
     if (getElevationAt(position, &creature, room, position.z)) {
         creature.setRoom(room);
         creature.setPosition(position);
-        if (&creature == _game->party().leader().get()) {
+
+        if (creature.id() == _game->party().leader()->id()) {
             onPartyLeaderMoved();
         }
+        checkTriggersIntersection(creature);
         return true;
     }
 
@@ -654,7 +657,6 @@ void Area::onPartyLeaderMoved() {
 
     update3rdPersonCameraTarget();
     _objectSelector.selectNearest();
-    updateTriggers(*partyLeader);
 }
 
 void Area::update3rdPersonCameraTarget() {
@@ -759,13 +761,23 @@ void Area::updateSounds() {
     }
 }
 
-void Area::updateTriggers(const Creature &triggerrer) {
+void Area::updateTriggers() {
+    for (auto &object : _objectsByType[ObjectType::Trigger]) {
+        Trigger &trigger = static_cast<Trigger &>(*object);
+        trigger.update();
+    }
+}
+
+void Area::checkTriggersIntersection(SpatialObject &triggerrer) {
     glm::vec2 position2d(triggerrer.position());
+    shared_ptr<SpatialObject> triggererPtr(find(triggerrer.id()));
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         Trigger &trigger = static_cast<Trigger &>(*object);
         if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
-        if (!trigger.isIn(position2d)) continue;
+        if (trigger.isTenant(triggererPtr) || !trigger.isIn(position2d)) continue;
+
+        trigger.addTenant(triggererPtr);
 
         if (!trigger.linkedToModule().empty()) {
             _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());

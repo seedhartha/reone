@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "spatial.h"
+#include <set>
 
 #include "../../resource/gfffile.h"
+
+#include "spatial.h"
 
 namespace reone {
 
@@ -33,7 +35,12 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
+    void update();
+
+    void addTenant(const std::shared_ptr<SpatialObject> &object);
+
     bool isIn(const glm::vec2 &point) const;
+    bool isTenant(const std::shared_ptr<SpatialObject> &object) const;
 
     const TriggerBlueprint &blueprint() const;
     const std::string &linkedToModule() const;
@@ -46,6 +53,7 @@ private:
     std::string _linkedToModule;
     std::string _linkedTo;
     std::vector<glm::vec3> _geometry;
+    std::set<std::shared_ptr<SpatialObject>> _tenants;
 };
 
 } // namespace game

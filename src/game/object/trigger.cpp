@@ -69,6 +69,20 @@ void Trigger::load(const GffStruct &gffs) {
     }
 }
 
+void Trigger::update() {
+    set<shared_ptr<SpatialObject>> tenantsToRemove;
+
+    for (auto &tenant : _tenants) {
+        glm::vec2 position2d(tenant->position());
+        if (isIn(position2d)) continue;
+
+        tenantsToRemove.insert(tenant);
+    }
+    for (auto &tenant : tenantsToRemove) {
+        _tenants.erase(tenant);
+    }
+}
+
 bool Trigger::isIn(const glm::vec2 &point) const {
     glm::vec3 liftedPosition(point, 1000.0f);
     glm::vec3 down(0.0f, 0.0f, -1.0f);
@@ -78,6 +92,11 @@ bool Trigger::isIn(const glm::vec2 &point) const {
     return
         (_geometry.size() >= 3 && glm::intersectRayTriangle(liftedPosition, down, _geometry[0], _geometry[1], _geometry[2], intersection, distance)) ||
         (_geometry.size() >= 4 && glm::intersectRayTriangle(liftedPosition, down, _geometry[2], _geometry[3], _geometry[0], intersection, distance));
+}
+
+bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
+    auto maybeTenant = find(_tenants.begin(), _tenants.end(), object);
+    return maybeTenant != _tenants.end();
 }
 
 const TriggerBlueprint &Trigger::blueprint() const {
@@ -90,6 +109,10 @@ const string &Trigger::linkedToModule() const {
 
 const string &Trigger::linkedTo() const {
     return _linkedTo;
+}
+
+void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {
+    _tenants.insert(object);
 }
 
 } // namespace game

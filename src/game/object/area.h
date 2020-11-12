@@ -73,7 +73,6 @@ public:
     void onPartyLeaderMoved();
     void runOnEnterScript();
     void startDialog(Creature &creature, const std::string &resRef);
-    void switchTo3rdPersonCamera();
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
@@ -156,7 +155,8 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    void updateTriggers(const Creature &triggerrer);
+    void updateTriggers();
+    void checkTriggersIntersection(SpatialObject &triggerrer);
     void updateVisibility();
     void updateSounds();
 
