@@ -152,7 +152,13 @@ Variable Routines::getItemInSlot(const vector<Variable> &args, ExecutionContext 
     Variable result(VariableType::Object);
     result.objectId = item ? item->id() : kObjectInvalid;
 
-   return move(result);
+    return move(result);
+}
+
+Variable Routines::isObjectPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
+    int objectId = args[0].intValue;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    return _game->party().isMember(*object);
 }
 
 Variable Routines::getGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {

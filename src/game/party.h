@@ -30,6 +30,7 @@ namespace game {
 
 class Creature;
 class Game;
+class Object;
 
 /**
  * Encapsulates party management.
@@ -49,6 +50,7 @@ public:
     const std::string &getAvailableMember(int npc) const;
     std::shared_ptr<Creature> getMember(int index) const;
     bool isMemberAvailable(int npc) const;
+    bool isMember(const Object &object) const;
     int size() const;
 
     std::shared_ptr<Creature> player() const;
