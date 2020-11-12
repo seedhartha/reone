@@ -257,20 +257,34 @@ void Game::drawWorld() {
     _worldPipeline.render();
 }
 
-Camera *Game::getActiveCamera() const {
-    switch (_screen) {
-        case GameScreen::InGame:
-        case GameScreen::Container: {
+void Game::toggleInGameCameraType() {
+    switch (_cameraType) {
+        case CameraType::FirstPerson:
+            if (_party.leader()) {
+                _cameraType = CameraType::ThirdPerson;
+            }
+            break;
+        case CameraType::ThirdPerson: {
             shared_ptr<Area> area(_module->area());
-            CameraType type = area->cameraType();
-            Camera *camera = type == CameraType::ThirdPerson ? (Camera *) &area->thirdPersonCamera() : &area->firstPersonCamera();
-            return camera;
+            FirstPersonCamera &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
+            ThirdPersonCamera &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
+            firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
+            firstPerson.setHeading(thirdPerson.heading());
+            _cameraType = CameraType::FirstPerson;
+            break;
         }
-        case GameScreen::Dialog:
-            return &_dialog->camera();
         default:
-            return nullptr;
+            break;
     }
+    _window.setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
+}
+
+Camera *Game::getActiveCamera() const {
+    if (!_module) return nullptr;
+
+    shared_ptr<Area> area(_module->area());
+
+    return &area->getCamera(_cameraType);
 }
 
 void Game::drawGUI() {
@@ -286,7 +300,7 @@ void Game::drawGUI() {
 
     switch (_screen) {
         case GameScreen::InGame:
-            if (_module->area()->cameraType() == CameraType::ThirdPerson) {
+            if (_cameraType == CameraType::ThirdPerson) {
                 _hud->render();
             }
             if (_console.isOpen()) {
@@ -404,11 +418,7 @@ void Game::update() {
     if (!_nextModule.empty()) {
         loadNextModule();
     }
-
-    Camera *camera = getActiveCamera();
-    if (camera) {
-        camera->update(dt);
-    }
+    updateCamera(dt);
 
     bool updModule = _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
     if (updModule) {
@@ -551,8 +561,29 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
     _nextEntry = entry;
 }
 
-void Game::onCameraChanged(CameraType camera) {
-    _window.setRelativeMouseMode(camera == CameraType::FirstPerson);
+void Game::updateCamera(float dt) {
+    switch (_screen) {
+        case GameScreen::Dialog: {
+            int cameraId;
+            CameraType cameraType = _dialog->getCamera(cameraId);
+            if (cameraType == CameraType::Static) {
+                _module->area()->setStaticCamera(cameraId);
+            }
+            _cameraType = cameraType;
+            break;
+        }
+        case GameScreen::InGame:
+            if (_cameraType != CameraType::FirstPerson && _cameraType != CameraType::ThirdPerson) {
+                _cameraType = CameraType::ThirdPerson;
+            }
+            break;
+        default:
+            break;
+    }
+    Camera *camera = getActiveCamera();
+    if (camera) {
+        camera->update(dt);
+    }
 }
 
 bool Game::handle(const SDL_Event &event) {
@@ -619,6 +650,12 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
                 _gameSpeed = glm::min(4.0f, _gameSpeed + 1.0f);
             }
             return true;
+
+        case SDLK_v:
+            if (_screen == GameScreen::InGame) {
+                toggleInGameCameraType();
+            }
+            return true;
     }
 
     return false;
@@ -650,6 +687,10 @@ Party &Game::party() {
 
 CharacterGeneration &Game::characterGeneration() {
     return *_charGen;
+}
+
+CameraType Game::cameraType() const {
+    return _cameraType;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

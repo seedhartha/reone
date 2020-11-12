@@ -76,6 +76,10 @@ unique_ptr<Sound> ObjectFactory::newSound() {
     return make_unique<Sound>(_counter++, _sceneGraph);
 }
 
+unique_ptr<CameraObject> ObjectFactory::newCamera() {
+    return make_unique<CameraObject>(_counter++, _sceneGraph);
+}
+
 } // namespace game
 
 } // namespace reone

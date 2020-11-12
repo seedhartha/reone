@@ -73,6 +73,7 @@ public:
 protected:
     scene::SceneGraph *_sceneGraph { nullptr };
     glm::vec3 _position { 0.0f };
+    glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
     float _heading { 0.0f };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };

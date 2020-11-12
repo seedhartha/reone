@@ -117,6 +117,11 @@ Vector3 GffField::asVector() const {
     return Vector3(values[0], values[1], values[2]);
 }
 
+Quaternion GffField::asOrientation() const {
+    const float *values = reinterpret_cast<const float *>(&_data[0]);
+    return Quaternion(values[0], values[1], values[2], values[3]);
+}
+
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
 }
 
@@ -179,6 +184,11 @@ const vector<GffStruct> &GffStruct::getList(const string &name) const {
 Vector3 GffStruct::getVector(const string &name) const {
     const GffField *field = find(name);
     return field ? field->asVector() : Vector3();
+}
+
+Quaternion GffStruct::getOrientation(const string &name) const {
+    const GffField *field = find(name);
+    return field ? field->asOrientation() : Quaternion();
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {

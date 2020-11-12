@@ -42,7 +42,7 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
 
-    Camera &camera() const;
+    CameraType getCamera(int &cameraId) const;
 
 private:
     Game *_game { nullptr };

@@ -149,7 +149,7 @@ void DialogGUI::loadAnimatedCamera() {
     string modelResRef(_dialog->cameraModel());
     if (modelResRef.empty()) return;
 
-    AnimatedCamera &camera = _game->module()->area()->animatedCamera();
+    AnimatedCamera &camera = static_cast<AnimatedCamera &>(_game->module()->area()->getCamera(CameraType::Animated));
     camera.setModel(modelResRef);
 }
 
@@ -283,12 +283,12 @@ void DialogGUI::updateCamera() {
         speakerPosition = _currentSpeaker->model()->getCenterOfAABB();
     }
     if (_dialog->cameraModel().empty()) {
-        DialogCamera &camera = area->dialogCamera();
+        DialogCamera &camera = static_cast<DialogCamera &>(area->getCamera(CameraType::Dialog));
         camera.setListenerPosition(listenerPosition);
         camera.setSpeakerPosition(speakerPosition);
         camera.setVariant(getRandomCameraVariant());
     } else {
-        AnimatedCamera &camera = area->animatedCamera();
+        AnimatedCamera &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
         camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
         camera.playAnimation(_currentEntry->cameraAnimation);
     }
@@ -433,7 +433,8 @@ void DialogGUI::update(float dt) {
 
         if (endOnAnimFinish) {
             shared_ptr<Area> area(_game->module()->area());
-            if (area->animatedCamera().isAnimationFinished()) {
+            AnimatedCamera &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
+            if (camera.isAnimationFinished()) {
                 endCurrentEntry();
             }
         } else if (endOnAudioStop) {
@@ -450,11 +451,17 @@ void DialogGUI::update(float dt) {
     }
 }
 
-Camera &DialogGUI::camera() const {
+CameraType DialogGUI::getCamera(int &cameraId) const {
     string cameraModel(_dialog->cameraModel());
-    shared_ptr<Area> area(_game->module()->area());
+    if (!cameraModel.empty()) {
+        return CameraType::Animated;
+    }
+    if (_currentEntry->cameraId != -1) {
+        cameraId = _currentEntry->cameraId;
+        return CameraType::Static;
+    }
 
-    return cameraModel.empty() ? area->dialogCamera() : static_cast<Camera &>(area->animatedCamera());
+    return CameraType::Dialog;
 }
 
 } // namespace game

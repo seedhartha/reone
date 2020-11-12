@@ -74,7 +74,6 @@ public:
     int run();
 
     void loadModule(const std::string &name, const std::string &entry = "");
-    void onCameraChanged(CameraType camera);
     void openSaveLoad(SaveLoad::Mode mode);
     void openPartySelection(const PartySelection::Context &ctx);
     void openMainMenu();
@@ -97,6 +96,7 @@ public:
     std::shared_ptr<Module> module() const;
     Party &party();
     CharacterGeneration &characterGeneration();
+    CameraType cameraType() const;
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -161,6 +161,7 @@ private:
     CursorType _cursorType { CursorType::None };
     float _gameSpeed { 1.0f };
     bool _loadFromSaveGame { false };
+    CameraType _cameraType { CameraType::ThirdPerson };
 
     // Modules
 
@@ -219,6 +220,8 @@ private:
     void playMusic(const std::string &resRef);
     void playVideo(const std::string &name);
     void runMainLoop();
+    void toggleInGameCameraType();
+    void updateCamera(float dt);
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;

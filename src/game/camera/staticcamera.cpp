@@ -15,26 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "staticcamera.h"
+
+#include "glm/ext.hpp"
+
+#include "../object/camera.h"
+
+using namespace std;
+
+using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
-};
+StaticCamera::StaticCamera(SceneGraph *sceneGraph, float aspect) : _aspect(aspect) {
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f));
+}
 
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
-};
+void StaticCamera::setObject(const CameraObject &object) {
+    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, 0.1f, 10000.0f));
+
+    _sceneNode->setLocalTransform(object.transform());
+    _sceneNode->setProjection(projection);
+}
 
 } // namespace game
 

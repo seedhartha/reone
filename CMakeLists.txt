@@ -61,6 +61,7 @@ set(COMMON_HEADERS
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
+    src/common/quaternion.h
     src/common/pathutil.h
     src/common/random.h
     src/common/streamreader.h
@@ -356,6 +357,7 @@ set(GAME_HEADERS
     src/game/camera/camera.h
     src/game/camera/dialogcamera.h
     src/game/camera/firstperson.h
+    src/game/camera/staticcamera.h
     src/game/camera/thirdperson.h
     src/game/camera/types.h
     src/game/characters.h
@@ -390,6 +392,7 @@ set(GAME_HEADERS
     src/game/gui/saveload.h
     src/game/gui/selectoverlay.h
     src/game/object/area.h
+    src/game/object/camera.h
     src/game/object/creature.h
     src/game/object/door.h
     src/game/object/item.h
@@ -438,6 +441,7 @@ set(GAME_SOURCES
     src/game/camera/camera.cpp
     src/game/camera/dialogcamera.cpp
     src/game/camera/firstperson.cpp
+    src/game/camera/staticcamera.cpp
     src/game/camera/thirdperson.cpp
     src/game/characters.cpp
     src/game/collisiondetect.cpp
@@ -471,6 +475,7 @@ set(GAME_SOURCES
     src/game/gui/saveload.cpp
     src/game/gui/selectoverlay.cpp
     src/game/object/area.cpp
+    src/game/object/camera.cpp
     src/game/object/creature.cpp
     src/game/object/door.cpp
     src/game/object/item.cpp

@@ -17,23 +17,22 @@
 
 #pragma once
 
+#include "camera.h"
+
 namespace reone {
 
 namespace game {
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
-};
+class CameraObject;
 
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
+class StaticCamera : public Camera {
+public:
+    StaticCamera(scene::SceneGraph *sceneGraph, float aspect);
+
+    void setObject(const CameraObject &object);
+
+private:
+    float _aspect { 1.0f };
 };
 
 } // namespace game

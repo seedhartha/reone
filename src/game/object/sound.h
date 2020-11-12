@@ -42,7 +42,6 @@ public:
     void update(float dt) override;
 
     bool isActive() const;
-    bool isAudible() const;
 
     std::shared_ptr<SoundBlueprint> blueprint() const;
     int priority() const;

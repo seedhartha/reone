@@ -72,6 +72,7 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     entry.listener = gffs.getString("Listener");
     entry.delay = gffs.getInt("Delay");
     entry.waitFlags = gffs.getInt("WaitFlags");
+    entry.cameraId = gffs.getInt("CameraID", -1);
     entry.cameraAngle = gffs.getInt("CameraAngle");
     entry.cameraAnimation = gffs.getInt("CameraAnimation", 0);
     entry.camFieldOfView = gffs.getFloat("CamFieldOfView", 0.0f);

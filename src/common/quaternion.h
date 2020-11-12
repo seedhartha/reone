@@ -19,23 +19,16 @@
 
 namespace reone {
 
-namespace game {
+struct Quaternion {
+    float x { 0.0f };
+    float y { 0.0f };
+    float z { 0.0f };
+    float w { 0.0f };
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
+    Quaternion() = default;
+
+    Quaternion(float w, float x, float y, float z) : x(x), y(y), z(z), w(w) {
+    }
 };
-
-struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
-};
-
-} // namespace game
 
 } // namespace reone

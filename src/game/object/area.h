@@ -33,6 +33,7 @@
 #include "../camera/animatedcamera.h"
 #include "../camera/dialogcamera.h"
 #include "../camera/firstperson.h"
+#include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
 #include "../camera/types.h"
 #include "../collisiondetect.h"
@@ -67,13 +68,12 @@ public:
 
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
-    void loadCameras(const glm::vec3 &entryPosition, float entryHeading);
+    void initCameras(const glm::vec3 &entryPosition, float entryHeading);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
     void runOnEnterScript();
     void startDialog(Creature &creature, const std::string &resRef);
     void switchTo3rdPersonCamera();
-    void toggleCameraType();
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
@@ -81,7 +81,6 @@ public:
     glm::vec3 getSelectableScreenCoords(uint32_t objectId, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     const CameraStyle &cameraStyle() const;
-    CameraType cameraType() const;
     const CollisionDetector &collisionDetector() const;
     const std::string &music() const;
     const ObjectList &objects() const;
@@ -98,10 +97,9 @@ public:
 
     // Cameras
 
-    FirstPersonCamera &firstPersonCamera();
-    ThirdPersonCamera &thirdPersonCamera();
-    DialogCamera &dialogCamera();
-    AnimatedCamera &animatedCamera();
+    Camera &getCamera(CameraType type);
+
+    void setStaticCamera(int cameraId);
 
     // END Cameras
 
@@ -135,11 +133,11 @@ private:
     // Cameras
 
     float _cameraAspect { 0.0f };
-    CameraType _cameraType { CameraType::FirstPerson };
     std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<DialogCamera> _dialogCamera;
     std::unique_ptr<AnimatedCamera> _animatedCamera;
+    std::unique_ptr<StaticCamera> _staticCamera;
 
     // END Cameras
 
@@ -185,6 +183,7 @@ private:
     void loadWaypoints(const resource::GffStruct &git);
     void loadTriggers(const resource::GffStruct &git);
     void loadSounds(const resource::GffStruct &git);
+    void loadCameras(const resource::GffStruct &git);
 
     // END Loading
 
