@@ -214,11 +214,13 @@ Variable Routines::getGlobalNumber(const vector<Variable> &args, ExecutionContex
 }
 
 Variable Routines::getLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    return _game->getLocalBoolean(args[0].objectId, args[1].intValue);
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    return object ? _game->getLocalBoolean(object->id(), args[1].intValue) : false;
 }
 
 Variable Routines::getLocalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    return _game->getLocalNumber(args[0].objectId, args[1].intValue);
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    return object ? _game->getLocalNumber(object->id(), args[1].intValue) : false;
 }
 
 Variable Routines::setGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -232,12 +234,18 @@ Variable Routines::setGlobalNumber(const vector<Variable> &args, ExecutionContex
 }
 
 Variable Routines::setLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
-    _game->setLocalBoolean(args[0].objectId, args[1].intValue, args[2].intValue);
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        _game->setLocalBoolean(object->id(), args[1].intValue, args[2].intValue);
+    }
     return Variable();
 }
 
 Variable Routines::setLocalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
-    _game->setLocalNumber(args[0].objectId, args[1].intValue, args[2].intValue);
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        _game->setLocalNumber(object->id(), args[1].intValue, args[2].intValue);
+    }
     return Variable();
 }
 
