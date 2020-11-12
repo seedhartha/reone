@@ -643,12 +643,12 @@ void Area::update3rdPersonCameraHeading() {
     _thirdPersonCamera->setHeading(partyLeader->heading());
 }
 
-void Area::startDialog(Creature &creature, const string &resRef) {
+void Area::startDialog(SpatialObject &object, const string &resRef) {
     string finalResRef(resRef);
-    if (resRef.empty()) finalResRef = creature.conversation();
+    if (resRef.empty()) finalResRef = object.conversation();
     if (resRef.empty()) return;
 
-    _game->startDialog(creature, finalResRef);
+    _game->startDialog(object, finalResRef);
 }
 
 void Area::onPartyLeaderMoved() {

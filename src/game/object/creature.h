@@ -51,6 +51,8 @@ public:
 
     Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
+    std::string conversation() const override;
+
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
     void load(const CreatureConfiguration &config);
@@ -59,7 +61,6 @@ public:
     int getClassLevel(ClassType clazz) const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
-    std::string conversation() const;
     float walkSpeed() const;
     float runSpeed() const;
     glm::vec3 selectablePosition() const override;

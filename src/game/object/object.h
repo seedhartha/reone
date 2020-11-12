@@ -41,6 +41,7 @@ public:
     ObjectType type() const;
     const std::string &tag() const;
     const std::string &title() const;
+    virtual std::string conversation() const;
     ActionQueue &actionQueue();
 
 protected:
@@ -49,12 +50,7 @@ protected:
     std::string _tag;
     std::string _title;
     ActionQueue _actionQueue;
-
-    // Scripts
-
     std::string _onUserDefined;
-
-    // END Scripts
 
     Object(uint32_t id, ObjectType type);
 
