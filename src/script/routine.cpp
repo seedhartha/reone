@@ -17,6 +17,8 @@
 
 #include "routine.h"
 
+#include "../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -40,6 +42,7 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     if (_func) {
         return _func(args, ctx);
     }
+    warn("Routine: not implemented: " + _name);
     Variable result(_returnType);
 
     switch (_returnType) {
