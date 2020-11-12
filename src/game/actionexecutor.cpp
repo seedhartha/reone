@@ -69,10 +69,13 @@ void ActionExecutor::executeActions(Object &object, float dt) {
             executeDoCommand(object, *dynamic_cast<CommandAction *>(action), dt);
             break;
         case ActionType::StartConversation:
-            executeStartConversation(static_cast<Creature &>(object), *dynamic_cast<StartConversationAction *>(action), dt);
+            executeStartConversation(object, *dynamic_cast<StartConversationAction *>(action), dt);
             break;
         case ActionType::OpenDoor:
-            executeOpenDoor(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
+            executeOpenDoor(object, *dynamic_cast<ObjectAction *>(action), dt);
+            break;
+        case ActionType::CloseDoor:
+            executeCloseDoor(object, *dynamic_cast<ObjectAction *>(action), dt);
             break;
         case ActionType::OpenContainer:
             executeOpenContainer(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
@@ -84,47 +87,50 @@ void ActionExecutor::executeActions(Object &object, float dt) {
     }
 }
 
-void ActionExecutor::executeMoveToPoint(Creature &creature, MoveToPointAction &action, float dt) {
+void ActionExecutor::executeMoveToPoint(Creature &actor, MoveToPointAction &action, float dt) {
     glm::vec3 dest(action.point());
 
-    bool reached = navigateCreature(creature, dest, 1.0f, dt);
+    bool reached = navigateCreature(actor, dest, 1.0f, dt);
     if (reached) {
         action.complete();
     }
 }
 
-void ActionExecutor::executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt) {
+void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &action, float dt) {
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
     float distance = action.distance();
 
-    bool reached = navigateCreature(creature, dest, distance, dt);
+    bool reached = navigateCreature(actor, dest, distance, dt);
     if (reached) {
         action.complete();
     }
 }
 
-void ActionExecutor::executeFollow(Creature &creature, FollowAction &action, float dt) {
+void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
     float distance = action.distance();
 
-    navigateCreature(creature, dest, distance, dt);
+    navigateCreature(actor, dest, distance, dt);
 }
 
-void ActionExecutor::executeDoCommand(Object &object, CommandAction &action, float dt) {
+void ActionExecutor::executeDoCommand(Object &actor, CommandAction &action, float dt) {
     ExecutionContext ctx(action.context());
-    ctx.callerId = object.id();
+    ctx.callerId = actor.id();
 
     ScriptExecution(ctx.savedState->program, move(ctx)).run();
     action.complete();
 }
 
-void ActionExecutor::executeStartConversation(Creature &creature, StartConversationAction &action, float dt) {
-    SpatialObject &target = static_cast<SpatialObject &>(*action.object());
-    bool reached = action.isStartRangeIgnored() || navigateCreature(creature, target.position(), kMaxConversationDistance, dt);
+void ActionExecutor::executeStartConversation(Object &actor, StartConversationAction &action, float dt) {
+    Creature *creatureActor = dynamic_cast<Creature *>(&actor);
+    SpatialObject &object = static_cast<SpatialObject &>(*action.object());
+
+    bool reached = !creatureActor || action.isStartRangeIgnored() || navigateCreature(*creatureActor, object.position(), kMaxConversationDistance, dt);
     if (reached) {
-        _game->module()->area()->startDialog(target, action.dialogResRef());
+        bool isActorLeader = _game->party().leader()->id() == actor.id();
+        _game->module()->area()->startDialog(isActorLeader ? object : static_cast<SpatialObject &>(actor), action.dialogResRef());
         action.complete();
     }
 }
@@ -208,27 +214,41 @@ void ActionExecutor::updateCreaturePath(Creature &creature, const glm::vec3 &des
     creature.setPath(dest, move(points), now);
 }
 
-void ActionExecutor::executeOpenDoor(Creature &creature, ObjectAction &action, float dt) {
+void ActionExecutor::executeOpenDoor(Object &actor, ObjectAction &action, float dt) {
+    Creature *creatureActor = dynamic_cast<Creature *>(&actor);
     Door &door = *static_cast<Door *>(action.object());
-    bool reached = navigateCreature(creature, door.position(), 1.0f, dt);
+
+    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), 1.0f, dt);
     if (reached) {
-        if (door.isLocked()) {
+        bool isObjectSelf = actor.id() == door.id();
+        if (!isObjectSelf && door.isLocked()) {
             if (!door.blueprint().onFailToOpen().empty()) {
-                runScript(door.blueprint().onFailToOpen(), door.id(), creature.id(), -1);
+                runScript(door.blueprint().onFailToOpen(), door.id(), actor.id(), -1);
             }
         } else {
-            door.open(&creature);
-            if (!door.blueprint().onOpen().empty()) {
-                runScript(door.blueprint().onOpen(), door.id(), creature.id(), -1);
+            door.open(&actor);
+            if (!isObjectSelf && !door.blueprint().onOpen().empty()) {
+                runScript(door.blueprint().onOpen(), door.id(), actor.id(), -1);
             }
         }
         action.complete();
     }
 }
 
-void ActionExecutor::executeOpenContainer(Creature &creature, ObjectAction &action, float dt) {
+void ActionExecutor::executeCloseDoor(Object &actor, ObjectAction &action, float dt) {
+    Creature *creatureActor = dynamic_cast<Creature *>(&actor);
+    Door &door = *static_cast<Door *>(action.object());
+
+    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), 1.0f, dt);
+    if (reached) {
+        door.close(&actor);
+        action.complete();
+    }
+}
+
+void ActionExecutor::executeOpenContainer(Creature &actor, ObjectAction &action, float dt) {
     Placeable &placeable = *static_cast<Placeable *>(action.object());
-    bool reached = navigateCreature(creature, placeable.position(), 1.0f, dt);
+    bool reached = navigateCreature(actor, placeable.position(), 1.0f, dt);
     if (reached) {
         _game->openContainer(&placeable);
         action.complete();

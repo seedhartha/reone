@@ -51,13 +51,14 @@ private:
 
     // Actions
 
-    void executeMoveToPoint(Creature &creature, MoveToPointAction &action, float dt);
-    void executeMoveToObject(Creature &creature, MoveToObjectAction &action, float dt);
-    void executeFollow(Creature &creature, FollowAction &action, float dt);
-    void executeDoCommand(Object &object, CommandAction &command, float dt);
-    void executeStartConversation(Creature &creature, StartConversationAction &action, float dt);
-    void executeOpenDoor(Creature &creature, ObjectAction &action, float dt);
-    void executeOpenContainer(Creature &creature, ObjectAction &action, float dt);
+    void executeMoveToPoint(Creature &actor, MoveToPointAction &action, float dt);
+    void executeMoveToObject(Creature &actor, MoveToObjectAction &action, float dt);
+    void executeFollow(Creature &actor, FollowAction &action, float dt);
+    void executeDoCommand(Object &actor, CommandAction &command, float dt);
+    void executeStartConversation(Object &actor, StartConversationAction &action, float dt);
+    void executeOpenDoor(Object &actor, ObjectAction &action, float dt);
+    void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
+    void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);
 
     // END Actions
 };
