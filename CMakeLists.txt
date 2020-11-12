@@ -29,6 +29,7 @@ find_package(MAD REQUIRED)
 
 if(WIN32)
     find_package(OpenAL CONFIG REQUIRED)
+    find_package(SDL2 CONFIG REQUIRED)
 else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(OpenAL REQUIRED openal)
