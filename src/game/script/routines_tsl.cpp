@@ -616,7 +616,7 @@ void Routines::addTslRoutines() {
     add("AddPartyMember", Int, { Int, Object });
     add("RemovePartyMember", Int, { Int });
     add("IsObjectPartyMember", Int, { Object }, bind(&Routines::isObjectPartyMember, this, _1, _2));
-    add("GetPartyMemberByIndex", Object, { Int });
+    add("GetPartyMemberByIndex", Object, { Int }, bind(&Routines::getPartyMemberByIndex, this, _1, _2));
     add("GetGlobalBoolean", Int, { String });
     add("SetGlobalBoolean", Void, { String, Int });
     add("GetGlobalNumber", Int, { String });

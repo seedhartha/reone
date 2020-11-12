@@ -140,6 +140,16 @@ Variable Routines::getArea(const vector<Variable> &args, ExecutionContext &ctx) 
     return move(result);
 }
 
+Variable Routines::getPartyMemberByIndex(const vector<Variable> &args, ExecutionContext &ctx) {
+    int index = args[0].intValue;
+    shared_ptr<Creature> member(_game->party().getMember(index));
+
+    Variable result(VariableType::Object);
+    result.objectId = member ? member->id() : kObjectInvalid;
+
+    return move(result);
+}
+
 Variable Routines::getItemInSlot(const vector<Variable> &args, ExecutionContext &ctx) {
     uint32_t objectId(args.size() > 1 ? args[1].objectId : kObjectSelf);
     shared_ptr<Object> object(getObjectById(objectId, ctx));

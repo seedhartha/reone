@@ -616,7 +616,7 @@ void Routines::addKotorRoutines() {
     add("AddPartyMember", Int, { Int, Object });
     add("RemovePartyMember", Int, { Int });
     add("IsObjectPartyMember", Int, { Object }, bind(&Routines::isObjectPartyMember, this, _1, _2));
-    add("GetPartyMemberByIndex", Object, { Int });
+    add("GetPartyMemberByIndex", Object, { Int }, bind(&Routines::getPartyMemberByIndex, this, _1, _2));
     add("GetGlobalBoolean", Int, { String }, bind(&Routines::getGlobalBoolean, this, _1, _2));
     add("SetGlobalBoolean", Void, { String, Int }, bind(&Routines::setGlobalBoolean, this, _1, _2));
     add("GetGlobalNumber", Int, { String }, bind(&Routines::getGlobalNumber, this, _1, _2));
