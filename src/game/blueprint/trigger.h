@@ -31,7 +31,13 @@ public:
 
     void load(const resource::GffStruct &utt);
 
+    const std::string &tag() const;
+    const std::string &onEnter() const;
+
 private:
+    std::string _tag;
+    std::string _onEnter;
+
     TriggerBlueprint(const TriggerBlueprint &) = delete;
     TriggerBlueprint &operator=(const TriggerBlueprint &) = delete;
 };

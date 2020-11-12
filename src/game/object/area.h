@@ -156,7 +156,7 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    void updateTriggers(const Creature &creature);
+    void updateTriggers(const Creature &triggerrer);
     void updateVisibility();
     void updateSounds();
 
