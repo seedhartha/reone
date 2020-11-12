@@ -84,7 +84,9 @@ private:
     script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
 
     // END Objects
 
