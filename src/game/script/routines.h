@@ -86,6 +86,8 @@ private:
     script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
 
     // END Objects

@@ -45,6 +45,8 @@ public:
     const std::string &linkedTo() const;
     const std::string &transitionDestin() const;
 
+    void setLocked(bool locked);
+
 private:
     std::shared_ptr<DoorBlueprint> _blueprint;
     bool _open { false };

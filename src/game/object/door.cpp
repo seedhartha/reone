@@ -129,6 +129,10 @@ const string &Door::transitionDestin() const {
     return _transitionDestin;
 }
 
+void Door::setLocked(bool locked) {
+    _locked = locked;
+}
+
 } // namespace game
 
 } // namespace reone

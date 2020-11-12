@@ -166,9 +166,43 @@ Variable Routines::getItemInSlot(const vector<Variable> &args, ExecutionContext 
 }
 
 Variable Routines::isObjectPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
-    int objectId = args[0].intValue;
+    int objectId = args[0].objectId;
     shared_ptr<Object> object(getObjectById(objectId, ctx));
     return _game->party().isMember(*object);
+}
+
+Variable Routines::setLocked(const vector<Variable> &args, ExecutionContext &ctx) {
+    int objectId = args[0].objectId;
+    bool locked = args[1].intValue != 0;
+
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        Door *door = dynamic_cast<Door *>(object.get());
+        if (door) {
+            door->setLocked(locked);
+        } else {
+            warn("Routine: object is not a door: " + to_string(objectId));
+        }
+    }
+
+    return Variable();
+}
+
+Variable Routines::getLocked(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+
+    int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        Door *door = dynamic_cast<Door *>(object.get());
+        if (door) {
+            result.intValue = door->isLocked() ? 1 : 0;
+        } else {
+            warn("Routine: object is not a door: " + to_string(objectId));
+        }
+    }
+
+    return move(result);
 }
 
 Variable Routines::getGlobalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
