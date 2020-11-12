@@ -132,6 +132,13 @@ bool Party::isMemberAvailable(int npc) const {
     return _availableMembers.count(npc) != 0;
 }
 
+bool Party::isMember(const Object &object) const {
+    for (auto &member : _members) {
+        if (member->id() == object.id()) return true;
+    }
+    return false;
+}
+
 shared_ptr<Creature> Party::player() const {
     return _player;
 }
