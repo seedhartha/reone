@@ -234,7 +234,10 @@ void DialogGUI::finish() {
         runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
     }
     if (_currentSpeaker) {
-        static_cast<Creature &>(*_currentSpeaker).setTalking(false);
+        Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        if (speakerCreature) {
+            speakerCreature->setTalking(false);
+        }
     }
     _game->openInGame();
 }
@@ -251,18 +254,21 @@ void DialogGUI::loadCurrentSpeaker() {
         speaker = _owner;
     }
     if (_currentSpeaker && _currentSpeaker != speaker) {
-        Creature &prevSpeakerCreature = static_cast<Creature &>(*_currentSpeaker);
-        prevSpeakerCreature.setTalking(false);
+        Creature *prevSpeakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        if (prevSpeakerCreature) {
+            prevSpeakerCreature->setTalking(false);
+        }
     }
     _currentSpeaker = speaker;
 
-    Creature &speakerCreature = static_cast<Creature &>(*_currentSpeaker);
-    speakerCreature.setTalking(true);
-
     shared_ptr<Creature> partyLeader(_game->party().leader());
-    partyLeader->face(speakerCreature);
+    partyLeader->face(*_currentSpeaker);
 
-    speakerCreature.face(*partyLeader);
+    Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+    if (speakerCreature) {
+        speakerCreature->setTalking(true);
+        speakerCreature->face(*partyLeader);
+    }
 }
 
 void DialogGUI::updateCamera() {

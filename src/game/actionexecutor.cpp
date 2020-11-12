@@ -121,7 +121,7 @@ void ActionExecutor::executeDoCommand(Object &object, CommandAction &action, flo
 }
 
 void ActionExecutor::executeStartConversation(Creature &creature, StartConversationAction &action, float dt) {
-    Creature &target = static_cast<Creature &>(*action.object());
+    SpatialObject &target = static_cast<SpatialObject &>(*action.object());
     bool reached = action.isStartRangeIgnored() || navigateCreature(creature, target.position(), kMaxConversationDistance, dt);
     if (reached) {
         _game->module()->area()->startDialog(target, action.dialogResRef());

@@ -58,6 +58,10 @@ const string &Object::title() const {
     return _title;
 }
 
+string Object::conversation() const {
+    return "";
+}
+
 ActionQueue &Object::actionQueue() {
     return _actionQueue;
 }

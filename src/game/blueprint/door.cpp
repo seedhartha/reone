@@ -38,6 +38,9 @@ void DoorBlueprint::load(const GffStruct &utd) {
         _localizedName = Resources::instance().getString(locNameStrRef);
     }
 
+    _conversation = utd.getString("Conversation");
+    boost::to_lower(_conversation);
+
     _lockable = utd.getInt("Lockable", 0) != 0;
     _locked = utd.getInt("Locked", 0) != 0;
     _genericType = utd.getInt("GenericType");
@@ -65,6 +68,10 @@ const string &DoorBlueprint::tag() const {
 
 const string &DoorBlueprint::localizedName() const {
     return _localizedName;
+}
+
+const string &DoorBlueprint::conversation() const {
+    return _conversation;
 }
 
 int DoorBlueprint::genericType() const {

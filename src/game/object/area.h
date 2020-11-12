@@ -72,7 +72,7 @@ public:
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
     void runOnEnterScript();
-    void startDialog(Creature &creature, const std::string &resRef);
+    void startDialog(SpatialObject &object, const std::string &resRef);
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 

@@ -37,6 +37,7 @@ public:
 
     const std::string &tag() const;
     const std::string &localizedName() const;
+    const std::string &conversation() const;
     int genericType() const;
     const std::string &onOpen() const;
     const std::string &onFailToOpen() const;
@@ -44,6 +45,7 @@ public:
 private:
     std::string _tag;
     std::string _localizedName;
+    std::string _conversation;
     bool _lockable { false };
     bool _locked { false };
     int _genericType { 0 };
