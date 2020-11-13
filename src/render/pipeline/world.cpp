@@ -135,19 +135,18 @@ void WorldRenderPipeline::render() const {
         LocalUniforms locals;
         locals.model = move(transform);
         locals.features.bloomEnabled = true;
-        locals.textures.bloom = 1;
 
         Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
 
         glActiveTexture(GL_TEXTURE0);
         _geometry.bindColorBuffer(0);
 
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE0 + locals.textures.bloom);
         _verticalBlur.bindColorBuffer(0);
 
         Quad::getDefault().renderTriangles();
 
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE + locals.textures.bloom);
         _verticalBlur.unbindColorBuffer();
 
         glActiveTexture(GL_TEXTURE0);

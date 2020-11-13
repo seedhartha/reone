@@ -73,19 +73,15 @@ void ModelNodeSceneNode::renderSingle() const {
 
     if (mesh->hasEnvmapTexture()) {
         locals.features.envmapEnabled = true;
-        locals.textures.envmap = 1;
     }
     if (mesh->hasLightmapTexture()) {
         locals.features.lightmapEnabled = true;
-        locals.textures.lightmap = 2;
     }
     if (mesh->hasBumpyShinyTexture()) {
         locals.features.bumpyShinyEnabled = true;
-        locals.textures.bumpyShiny = 3;
     }
     if (mesh->hasBumpmapTexture()) {
         locals.features.bumpmapEnabled = true;
-        locals.textures.bumpmap = 4;
     }
     if (skeletal) {
         locals.features.skeletalEnabled = true;

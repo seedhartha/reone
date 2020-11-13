@@ -59,11 +59,11 @@ struct FeatureUniforms {
 };
 
 struct TextureUniforms {
-    int lightmap { 0 };
-    int envmap { 0 };
-    int bumpyShiny { 0 };
-    int bumpmap { 0 };
-    int bloom { 0 };
+    static constexpr int envmap { 1 };
+    static constexpr int lightmap { 2 };
+    static constexpr int bumpyShiny { 3 };
+    static constexpr int bumpmap { 4 };
+    static constexpr int bloom { 5 };
 };
 
 struct SkeletalUniforms {
