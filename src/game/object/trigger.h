@@ -33,9 +33,9 @@ class Trigger : public SpatialObject {
 public:
     Trigger(uint32_t id, scene::SceneGraph *sceneGraph);
 
-    void load(const resource::GffStruct &gffs);
+    void update(float dt) override;
 
-    void update();
+    void load(const resource::GffStruct &gffs);
 
     void addTenant(const std::shared_ptr<SpatialObject> &object);
 

@@ -69,7 +69,7 @@ void Trigger::load(const GffStruct &gffs) {
     }
 }
 
-void Trigger::update() {
+void Trigger::update(float dt) {
     set<shared_ptr<SpatialObject>> tenantsToRemove;
 
     for (auto &tenant : _tenants) {
