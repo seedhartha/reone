@@ -529,7 +529,6 @@ void Area::update(float dt) {
     }
     updateVisibility();
     updateSounds();
-    updateTriggers();
 
     for (auto &object : _objects) {
         object->update(dt);
@@ -760,13 +759,6 @@ void Area::updateSounds() {
     }
     for (auto &sound : soundDistances) {
         sound.first->setAudible(true);
-    }
-}
-
-void Area::updateTriggers() {
-    for (auto &object : _objectsByType[ObjectType::Trigger]) {
-        Trigger &trigger = static_cast<Trigger &>(*object);
-        trigger.update();
     }
 }
 

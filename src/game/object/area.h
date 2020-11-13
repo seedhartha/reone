@@ -155,7 +155,6 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    void updateTriggers();
     void checkTriggersIntersection(SpatialObject &triggerrer);
     void updateVisibility();
     void updateSounds();
