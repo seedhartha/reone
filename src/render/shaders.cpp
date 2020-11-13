@@ -434,19 +434,12 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     setUniform("uLightingEnabled", locals.features.lightingEnabled);
     setUniform("uSelfIllumEnabled", locals.features.selfIllumEnabled);
     setUniform("uDiscardEnabled", locals.features.discardEnabled);
+    setUniform("uLightmap", locals.textures.lightmap);
+    setUniform("uEnvmap", locals.textures.envmap);
+    setUniform("uBumpyShiny", locals.textures.bumpyShiny);
+    setUniform("uBumpmap", locals.textures.bumpmap);
+    setUniform("uBloom", locals.textures.bloom);
 
-    if (locals.features.lightmapEnabled) {
-        setUniform("uLightmap", locals.textures.lightmap);
-    }
-    if (locals.features.envmapEnabled) {
-        setUniform("uEnvmap", locals.textures.envmap);
-    }
-    if (locals.features.bumpyShinyEnabled) {
-        setUniform("uBumpyShiny", locals.textures.bumpyShiny);
-    }
-    if (locals.features.bumpmapEnabled) {
-        setUniform("uBumpmap", locals.textures.bumpmap);
-    }
     if (locals.features.skeletalEnabled) {
         setUniform("uAbsTransform", locals.skeletal.absTransform);
         setUniform("uAbsTransformInv", locals.skeletal.absTransformInv);
@@ -470,9 +463,6 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     if (locals.features.blurEnabled) {
         setUniform("uResolution", locals.blur.resolution);
         setUniform("uDirection", locals.blur.direction);
-    }
-    if (locals.features.bloomEnabled) {
-        setUniform("uBloom", locals.textures.bloom);
     }
     if (locals.features.discardEnabled) {
         setUniform("uDiscardColor", locals.discardColor);
