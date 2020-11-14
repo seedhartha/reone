@@ -33,8 +33,19 @@ namespace reone {
 
 namespace render {
 
+static const int kFeaturesBindingPointIndex = 1;
+static const int kLightingBindingPointIndex = 2;
+
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
+
+const int MAX_LIGHTS = 8;
+
+struct Light {
+    vec4 position;
+    vec4 color;
+    float radius;
+};
 
 layout(std140) uniform Features {
     bool uLightmapEnabled;
@@ -47,6 +58,12 @@ layout(std140) uniform Features {
     bool uBlurEnabled;
     bool uBloomEnabled;
     bool uDiscardEnabled;
+};
+
+layout(std140) uniform Lighting {
+    vec4 uAmbientLightColor;
+    int uLightCount;
+    Light uLights[MAX_LIGHTS];
 };
 )END";
 
@@ -160,14 +177,7 @@ void main() {
 )END";
 
 static const GLchar kModelFragmentShader[] = R"END(
-const int MAX_LIGHTS = 8;
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
-
-struct Light {
-    vec3 position;
-    vec3 color;
-    float radius;
-};
 
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
@@ -178,10 +188,7 @@ uniform samplerCube uBumpyShiny;
 uniform vec3 uCameraPosition;
 uniform float uAlpha;
 
-uniform int uLightCount;
-uniform vec3 uAmbientLightColor;
 uniform vec3 uSelfIllumColor;
-uniform Light uLights[MAX_LIGHTS];
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -205,12 +212,12 @@ void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
 }
 
 void applyLighting(vec3 normal, inout vec3 color) {
-    color += uAmbientLightColor;
+    color += uAmbientLightColor.rgb;
 
     if (uLightCount == 0) return;
 
     for (int i = 0; i < uLightCount; ++i) {
-        vec3 surfaceToLight = uLights[i].position - fragPosition;
+        vec3 surfaceToLight = uLights[i].position.xyz - fragPosition;
         vec3 lightDir = normalize(surfaceToLight);
 
         vec3 surfaceToCamera = normalize(uCameraPosition - fragPosition);
@@ -225,7 +232,7 @@ void applyLighting(vec3 normal, inout vec3 color) {
         float attenuation = clamp(1.0 - distToLight / uLights[i].radius, 0.0, 1.0);
         attenuation *= attenuation;
 
-        color += attenuation * (diffuseCoeff + specularCoeff) * uLights[i].color;
+        color += attenuation * (diffuseCoeff + specularCoeff) * uLights[i].color.rgb;
     }
 }
 
@@ -325,15 +332,21 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 
     glGenBuffers(1, &_featuresUbo);
+    glGenBuffers(1, &_lightingUbo);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
 
-        uint32_t blockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
-        if (blockIdx != GL_INVALID_INDEX) {
-            glBindBufferBase(GL_UNIFORM_BUFFER, 0, _featuresUbo);
-            glUniformBlockBinding(_activeOrdinal, blockIdx, 0);
+        uint32_t featuresBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
+        if (featuresBlockIdx != GL_INVALID_INDEX) {
+            glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
+            glUniformBlockBinding(_activeOrdinal, featuresBlockIdx, kFeaturesBindingPointIndex);
+        }
+        uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
+        if (lightingBlockIdx != GL_INVALID_INDEX) {
+            glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _featuresUbo);
+            glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
         }
 
         setUniform("uEnvmap", TextureUniforms::envmap);
@@ -393,6 +406,10 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinitGL() {
+    if (_lightingUbo) {
+        glDeleteBuffers(1, &_lightingUbo);
+        _lightingUbo = 0;
+    }
     if (_featuresUbo) {
         glDeleteBuffers(1, &_featuresUbo);
         _featuresUbo = 0;
@@ -427,21 +444,8 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
     return it->second;
 }
 
-static const string &getLightUniformName(int index, const char *propName) {
-    static unordered_map<int, unordered_map<const char *, string>> cache;
-    auto &cacheByIndex = cache[index];
-    auto maybeName = cacheByIndex.find(propName);
-
-    if (maybeName != cacheByIndex.end()) {
-        return maybeName->second;
-    }
-    string name(str(boost::format("uLights[%d].%s") % index % propName));
-    auto pair = cacheByIndex.insert(make_pair(propName, name));
-
-    return pair.first->second;
-}
-
 void Shaders::setLocalUniforms(const LocalUniforms &locals) {
+    glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.features), &locals.features, GL_STATIC_DRAW);
 
     setUniform("uModel", locals.model);
@@ -454,16 +458,8 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
         setUniform("uBones", locals.skeletal.bones);
     }
     if (locals.features.lightingEnabled) {
-        int lightCount = static_cast<int>(locals.lighting.lights.size());
-        setUniform("uLightCount", lightCount);
-        setUniform("uAmbientLightColor", locals.lighting.ambientColor);
-
-        for (int i = 0; i < lightCount; ++i) {
-            const ShaderLight &light = locals.lighting.lights[i];
-            setUniform(getLightUniformName(i, "position"), light.position);
-            setUniform(getLightUniformName(i, "color"), light.color);
-            setUniform(getLightUniformName(i, "radius"), light.radius);
-        }
+        glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.lighting), &locals.lighting, GL_STATIC_DRAW);
     }
     if (locals.features.selfIllumEnabled) {
         setUniform("uSelfIllumColor", locals.selfIllumColor);
