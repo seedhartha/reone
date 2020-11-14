@@ -30,6 +30,7 @@ namespace reone {
 namespace render {
 
 const int kMaxLightCount = 8;
+const int kMaxBoneCount = 128;
 
 enum class ShaderProgram {
     None,
@@ -89,7 +90,7 @@ struct TextureUniforms {
 struct SkeletalUniforms {
     glm::mat4 absTransform { 1.0f };
     glm::mat4 absTransformInv { 1.0f };
-    std::vector<glm::mat4> bones;
+    glm::mat4 bones[kMaxBoneCount];
 };
 
 struct ShaderLight {
@@ -152,6 +153,7 @@ private:
     uint32_t _activeOrdinal { 0 };
     uint32_t _featuresUbo { 0 };
     uint32_t _lightingUbo { 0 };
+    uint32_t _skeletalUbo { 0 };
 
     Shaders() = default;
     Shaders(const Shaders &) = delete;
