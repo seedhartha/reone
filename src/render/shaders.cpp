@@ -317,6 +317,11 @@ Shaders &Shaders::instance() {
     return instance;
 }
 
+Shaders::Shaders() {
+    _lightingUniforms = make_shared<LightingUniforms>();
+    _skeletalUniforms = make_shared<SkeletalUniforms>();
+}
+
 void Shaders::initGL() {
     initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kGUIVertexShader);
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
@@ -459,7 +464,7 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     auto maybeFeatures = features.find(_activeProgram);
     if (maybeFeatures == features.end() || maybeFeatures->second != locals.features) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.features), &locals.features, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(FeatureUniforms), &locals.features, GL_STATIC_DRAW);
         features[_activeProgram] = locals.features;
     }
     setUniform("uModel", locals.model);
@@ -468,11 +473,11 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
 
     if (locals.features.skeletalEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.skeletal), &locals.skeletal, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), locals.skeletal.get(), GL_STATIC_DRAW);
     }
     if (locals.features.lightingEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.lighting), &locals.lighting, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
     }
     if (locals.features.selfIllumEnabled) {
         setUniform("uSelfIllumColor", locals.selfIllumColor);
@@ -546,6 +551,14 @@ void Shaders::deactivate() {
     glUseProgram(0);
     _activeProgram = ShaderProgram::None;
     _activeOrdinal = 0;
+}
+
+shared_ptr<LightingUniforms> Shaders::lightingUniforms() const {
+    return _lightingUniforms;
+}
+
+shared_ptr<SkeletalUniforms> Shaders::skeletalUniforms() const {
+    return _skeletalUniforms;
 }
 
 void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
