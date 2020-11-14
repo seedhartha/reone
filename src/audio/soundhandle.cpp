@@ -17,6 +17,8 @@
 
 #include "soundhandle.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace audio {
@@ -37,12 +39,31 @@ int SoundHandle::duration() const {
     return _duration;
 }
 
+Vector3 SoundHandle::position() const {
+    return _position;
+}
+
+bool SoundHandle::isPositionDirty() const {
+    return _positionDirty;
+}
+
 void SoundHandle::setState(State state) {
     _state = state;
 }
 
 void SoundHandle::setDuration(int duration) {
     _duration = duration;
+}
+
+void SoundHandle::setPosition(Vector3 position) {
+    if (_position.load() != position) {
+        _position = move(position);
+        _positionDirty = true;
+    }
+}
+
+void SoundHandle::setPositionDirty(bool dirty) {
+    _positionDirty = dirty;
 }
 
 } // namespace audio

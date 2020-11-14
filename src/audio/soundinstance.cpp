@@ -111,6 +111,11 @@ void SoundInstance::deinit() {
 }
 
 void SoundInstance::update() {
+    if (_handle->isPositionDirty()) {
+        Vector3 position(_handle->position());
+        alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
+        _handle->setPositionDirty(false);
+    }
     if (!_buffered) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);
@@ -119,7 +124,6 @@ void SoundInstance::update() {
         }
         return;
     }
-
     ALint processed = 0;
     alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
     while (processed-- > 0) {
@@ -133,7 +137,6 @@ void SoundInstance::update() {
         }
         _nextBuffer = (_nextBuffer + 1) % static_cast<int>(_buffers.size());
     }
-
     ALint queued = 0;
     alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
     if (queued == 0) {
