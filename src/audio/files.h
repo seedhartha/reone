@@ -19,6 +19,7 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 #include "../resource/types.h"
@@ -39,6 +40,7 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<AudioStream>> _cache;
+    std::recursive_mutex _mutex;
 
     AudioFiles() = default;
     AudioFiles(const AudioFiles &) = delete;

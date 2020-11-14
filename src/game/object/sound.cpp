@@ -88,8 +88,7 @@ void Sound::update(float dt) {
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
-    _sound = AudioPlayer::instance().play(stream, AudioType::Sound, loop, _blueprint->volume() / 255.0f);
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, _blueprint->volume() / 255.0f);
 }
 
 shared_ptr<SoundBlueprint> Sound::blueprint() const {

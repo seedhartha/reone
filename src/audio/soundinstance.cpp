@@ -17,9 +17,14 @@
 
 #include "soundinstance.h"
 
+#include <stdexcept>
 #include <utility>
 
 #include "AL/al.h"
+
+#include "../common/log.h"
+
+#include "files.h"
 
 using namespace std;
 
@@ -29,11 +34,35 @@ namespace audio {
 
 static const int kMaxBufferCount = 8;
 
+SoundInstance::SoundInstance(const string &resRef, bool loop, float gain) :
+    _resRef(resRef),
+    _loop(loop),
+    _gain(gain) {
+
+    if (resRef.empty()) {
+        throw invalid_argument("resRef must not be empty");
+    }
+}
+
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain) :
-    _stream(stream), _loop(loop), _gain(gain) {
+    _stream(stream),
+    _loop(loop),
+    _gain(gain) {
+
+    if (!stream) {
+        throw invalid_argument("stream must not be null");
+    }
 }
 
 void SoundInstance::init() {
+    if (!_stream) {
+        _stream = AudioFiles::instance().get(_resRef);
+        if (!_stream) {
+            warn("Audio file not found: " + _resRef);
+            _state = State::Stopped;
+            return;
+        }
+    }
     int frameCount = _stream->frameCount();
     int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 

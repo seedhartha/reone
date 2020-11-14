@@ -17,15 +17,9 @@
 
 #pragma once
 
-#include <string>
-
-#include "soundinstance.h"
-
 namespace reone {
 
 namespace audio {
-
-std::shared_ptr<SoundInstance> playMusic(const std::string &resRef);
 
 } // namespace audio
 
