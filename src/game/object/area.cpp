@@ -68,7 +68,8 @@ Area::Area(uint32_t id, Game *game) :
     _game(game),
     _collisionDetector(this),
     _objectSelector(this, &game->party()),
-    _actionExecutor(game) {
+    _actionExecutor(game),
+    _combat(this, &game->party()) {
 
     if (!game) {
         throw invalid_argument("Game must not be null");
@@ -535,6 +536,7 @@ void Area::update(float dt) {
         _actionExecutor.executeActions(*object, dt);
     }
     _objectSelector.update();
+    _combat.update();
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {

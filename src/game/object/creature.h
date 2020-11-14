@@ -23,6 +23,7 @@
 #include "../../resource/2dafile.h"
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
+#include "../effect.h"
 
 #include "item.h"
 #include "spatial.h"
@@ -33,6 +34,14 @@ namespace game {
 
 class CreatureBlueprint;
 class ObjectFactory;
+
+enum class CombatState {
+    Idle,
+    Attack,
+    Defense,
+    Cooldown,
+    Staggered
+};
 
 class Creature : public SpatialObject {
 public:
@@ -98,6 +107,22 @@ public:
 
     // END Pathfinding
 
+    // Combat
+
+    /* combat animation interruption */
+    bool isInterrupted() { return _cbtState != CombatState::Idle; }
+
+    CombatState getCombatState() { return _cbtState; }
+    void setCombatState(CombatState state) { _cbtState = state;  }
+
+    // const std::deque<std::unique_ptr<Effect>> &getActiveEffects() { return _activeEffects; }
+
+    void applyEffect(std::unique_ptr<Effect> &&eff) {
+        _activeEffects.push_back(std::move(eff)); 
+    }
+
+    // END Combat
+
 private:
     enum class ModelType {
         Creature,
@@ -124,6 +149,13 @@ private:
     std::string _onSpawn;
 
     // END Scripts
+
+    // combat
+
+    CombatState _cbtState = CombatState::Idle;
+    std::deque<std::unique_ptr<Effect>> _activeEffects;
+
+    // END combat
 
     // Loading
 
