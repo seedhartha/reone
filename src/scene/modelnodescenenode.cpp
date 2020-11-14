@@ -72,19 +72,19 @@ void ModelNodeSceneNode::renderSingle() const {
     locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
     if (mesh->hasEnvmapTexture()) {
-        locals.features.envmapEnabled = true;
+        locals.general.envmapEnabled = true;
     }
     if (mesh->hasLightmapTexture()) {
-        locals.features.lightmapEnabled = true;
+        locals.general.lightmapEnabled = true;
     }
     if (mesh->hasBumpyShinyTexture()) {
-        locals.features.bumpyShinyEnabled = true;
+        locals.general.bumpyShinyEnabled = true;
     }
     if (mesh->hasBumpmapTexture()) {
-        locals.features.bumpmapEnabled = true;
+        locals.general.bumpmapEnabled = true;
     }
     if (skeletal) {
-        locals.features.skeletalEnabled = true;
+        locals.general.skeletalEnabled = true;
         locals.skeletal = Shaders::instance().skeletalUniforms();
         locals.skeletal->absTransform = _modelNode->absoluteTransform();
         locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
@@ -103,7 +103,7 @@ void ModelNodeSceneNode::renderSingle() const {
         }
     }
     if (_modelNode->isSelfIllumEnabled()) {
-        locals.features.selfIllumEnabled = true;
+        locals.general.selfIllumEnabled = true;
         locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
     }
     int lightCount = 0;
@@ -111,7 +111,7 @@ void ModelNodeSceneNode::renderSingle() const {
     if (_modelSceneNode->isLightingEnabled()) {
         const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
-        locals.features.lightingEnabled = true;
+        locals.general.lightingEnabled = true;
         locals.lighting = Shaders::instance().lightingUniforms();
         locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
         locals.lighting->lightCount = static_cast<int>(lights.size());

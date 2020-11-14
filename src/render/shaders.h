@@ -57,7 +57,7 @@ struct GlobalUniforms {
     glm::vec3 cameraPosition { 0.0f };
 };
 
-struct FeatureUniforms {
+struct GeneralUniforms {
     int lightmapEnabled { false };
     int envmapEnabled { false };
     int bumpyShinyEnabled { false };
@@ -68,31 +68,12 @@ struct FeatureUniforms {
     int blurEnabled { false };
     int bloomEnabled { false };
     int discardEnabled { false };
+    char padding1[8];
 
-    bool operator==(const FeatureUniforms &other) {
-        return
-            lightmapEnabled == other.lightmapEnabled &&
-            envmapEnabled == other.envmapEnabled &&
-            bumpyShinyEnabled == other.bumpyShinyEnabled &&
-            bumpmapEnabled == other.bumpmapEnabled &&
-            skeletalEnabled == other.skeletalEnabled &&
-            lightingEnabled == other.lightingEnabled &&
-            selfIllumEnabled == other.selfIllumEnabled &&
-            blurEnabled == other.blurEnabled &&
-            bloomEnabled == other.bloomEnabled &&
-            discardEnabled == other.discardEnabled;
-    }
-
-    bool operator!=(const FeatureUniforms &other) {
-        return !operator==(other);
-    }
-};
-
-struct GeneralUniforms {
     glm::mat4 model { 1.0f };
     glm::vec4 color { 1.0f };
     float alpha { 1.0f };
-    char padding[12];
+    char padding2[12];
     glm::vec4 selfIllumColor { 1.0f };
     glm::vec4 discardColor { 0.0f };
     glm::vec2 blurResolution { 0.0f };
@@ -120,7 +101,6 @@ struct LightingUniforms {
 };
 
 struct LocalUniforms {
-    FeatureUniforms features;
     GeneralUniforms general;
     std::shared_ptr<SkeletalUniforms> skeletal;
     std::shared_ptr<LightingUniforms> lighting;
@@ -160,7 +140,6 @@ private:
 
     // Uniform buffer objects
 
-    uint32_t _featuresUbo { 0 };
     uint32_t _generalUbo { 0 };
     uint32_t _lightingUbo { 0 };
     uint32_t _skeletalUbo { 0 };
