@@ -50,7 +50,7 @@ struct Light {
     float radius;
 };
 
-layout(std140) uniform Features {
+layout(std140) uniform General {
     bool uLightmapEnabled;
     bool uEnvmapEnabled;
     bool uBumpyShinyEnabled;
@@ -61,9 +61,7 @@ layout(std140) uniform Features {
     bool uBlurEnabled;
     bool uBloomEnabled;
     bool uDiscardEnabled;
-};
 
-layout(std140) uniform General {
     uniform mat4 uModel;
     uniform vec4 uColor;
     uniform float uAlpha;
@@ -336,7 +334,6 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 
-    glGenBuffers(1, &_featuresUbo);
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
     glGenBuffers(1, &_skeletalUbo);
@@ -345,13 +342,11 @@ void Shaders::initGL() {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
 
-        uint32_t featuresBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
-        if (featuresBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, featuresBlockIdx, kFeaturesBindingPointIndex);
-        }
         uint32_t generalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "General");
         if (generalBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, generalBlockIdx, kGeneralBindingPointIndex);
+            //GLint blockSize;
+            //glGetActiveUniformBlockiv(_activeOrdinal, generalBlockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
         }
         uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
         if (lightingBlockIdx != GL_INVALID_INDEX) {
@@ -431,10 +426,6 @@ void Shaders::deinitGL() {
         glDeleteBuffers(1, &_generalUbo);
         _generalUbo = 0;
     }
-    if (_featuresUbo) {
-        glDeleteBuffers(1, &_featuresUbo);
-        _featuresUbo = 0;
-    }
     for (auto &pair :_programs) {
         glDeleteProgram(pair.second);
     }
@@ -466,22 +457,14 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 }
 
 void Shaders::setLocalUniforms(const LocalUniforms &locals) {
-    static unordered_map<ShaderProgram, FeatureUniforms> features;
-
-    auto maybeFeatures = features.find(_activeProgram);
-    if (maybeFeatures == features.end() || maybeFeatures->second != locals.features) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(FeatureUniforms), &locals.features, GL_STATIC_DRAW);
-        features[_activeProgram] = locals.features;
-    }
     glBindBufferBase(GL_UNIFORM_BUFFER, kGeneralBindingPointIndex, _generalUbo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &locals.general, GL_STATIC_DRAW);
 
-    if (locals.features.skeletalEnabled) {
+    if (locals.general.skeletalEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), locals.skeletal.get(), GL_STATIC_DRAW);
     }
-    if (locals.features.lightingEnabled) {
+    if (locals.general.lightingEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
     }

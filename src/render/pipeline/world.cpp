@@ -79,7 +79,7 @@ void WorldRenderPipeline::render() const {
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.features.blurEnabled = true;
+            locals.general.blurEnabled = true;
             locals.general.model = move(transform);
             locals.general.blurResolution = glm::vec2(w, h);
             locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
@@ -110,7 +110,7 @@ void WorldRenderPipeline::render() const {
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.features.blurEnabled = true;
+            locals.general.blurEnabled = true;
             locals.general.model = move(transform);
             locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
             locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
@@ -133,7 +133,7 @@ void WorldRenderPipeline::render() const {
         transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
         LocalUniforms locals;
-        locals.features.bloomEnabled = true;
+        locals.general.bloomEnabled = true;
         locals.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
