@@ -23,6 +23,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../audio/soundhandle.h"
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
@@ -406,6 +407,7 @@ void DialogGUI::endCurrentEntry() {
 
     if (_currentVoice) {
         _currentVoice->stop();
+        _currentVoice.reset();
     }
     if (_autoPickReplyIdx != -1) {
         int replyIdx = _autoPickReplyIdx;

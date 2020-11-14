@@ -17,49 +17,40 @@
 
 #pragma once
 
-#include "spatial.h"
-
-#include "../../resource/gfffile.h"
+#include <atomic>
 
 namespace reone {
 
 namespace audio {
 
-class SoundHandle;
-
-}
-
-namespace game {
-
-class SoundBlueprint;
-
-class Sound : public SpatialObject {
+class SoundHandle {
 public:
-    Sound(uint32_t id, scene::SceneGraph *sceneGraph);
+    enum class State {
+        NotInited,
+        Playing,
+        Stopped
+    };
 
-    void load(const resource::GffStruct &gffs);
+    SoundHandle() = default;
 
-    void update(float dt) override;
+    void stop();
 
-    bool isActive() const;
+    bool isNotInited() const;
+    bool isStopped() const;
 
-    std::shared_ptr<SoundBlueprint> blueprint() const;
-    int priority() const;
+    int duration() const;
 
-    void setAudible(bool audible);
+    void setState(State state);
+    void setDuration(int duration);
 
 private:
-    std::shared_ptr<SoundBlueprint> _blueprint;
-    bool _active { false };
-    bool _audible { false };
-    int _priority { 0 };
-    int _soundIdx { -1 };
-    float _timeout { 0.0f };
-    std::shared_ptr<audio::SoundHandle> _sound;
+    std::atomic<State> _state { State::NotInited };
+    int _duration { 0 };
 
-    void playSound(const std::string &resRef, bool loop);
+    SoundHandle(const SoundHandle &) = delete;
+    SoundHandle &operator=(const SoundHandle &) = delete;
 };
 
-} // namespace game
+} // namespace audio
 
 } // namespace reone

@@ -18,6 +18,8 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
+#include <map>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -31,6 +33,8 @@ namespace reone {
 
 namespace audio {
 
+class SoundHandle;
+
 class AudioPlayer {
 public:
     static AudioPlayer &instance();
@@ -38,9 +42,8 @@ public:
     void init(const AudioOptions &opts);
     void deinit();
 
-    void reset();
-    std::shared_ptr<SoundInstance> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f);
-    std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
+    std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f);
+    std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
 
 private:
     AudioOptions _opts;
@@ -58,6 +61,10 @@ private:
     AudioPlayer &operator=(const AudioPlayer &) = delete;
 
     void threadStart();
+
+    void initAL();
+    void deinitAL();
+
     void enqueue(const std::shared_ptr<SoundInstance> &sound);
 
     float getGain(AudioType type, float gain) const;

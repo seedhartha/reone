@@ -25,6 +25,7 @@
 #include "../common/log.h"
 
 #include "files.h"
+#include "soundhandle.h"
 
 using namespace std;
 
@@ -37,7 +38,8 @@ static const int kMaxBufferCount = 8;
 SoundInstance::SoundInstance(const string &resRef, bool loop, float gain) :
     _resRef(resRef),
     _loop(loop),
-    _gain(gain) {
+    _gain(gain),
+    _handle(new SoundHandle()) {
 
     if (resRef.empty()) {
         throw invalid_argument("resRef must not be empty");
@@ -47,7 +49,8 @@ SoundInstance::SoundInstance(const string &resRef, bool loop, float gain) :
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain) :
     _stream(stream),
     _loop(loop),
-    _gain(gain) {
+    _gain(gain),
+    _handle(new SoundHandle()) {
 
     if (!stream) {
         throw invalid_argument("stream must not be null");
@@ -58,11 +61,13 @@ void SoundInstance::init() {
     if (!_stream) {
         _stream = AudioFiles::instance().get(_resRef);
         if (!_stream) {
-            warn("Audio file not found: " + _resRef);
-            _state = State::Stopped;
+            warn("SoundInstance: file not found: " + _resRef);
+            _handle->setState(SoundHandle::State::Stopped);
             return;
         }
     }
+    _handle->setDuration(_stream->duration());
+
     int frameCount = _stream->frameCount();
     int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 
@@ -86,7 +91,7 @@ void SoundInstance::init() {
     }
 
     alSourcePlay(_source);
-    _state = State::Playing;
+    _handle->setState(SoundHandle::State::Playing);
 }
 
 SoundInstance::~SoundInstance() {
@@ -106,14 +111,11 @@ void SoundInstance::deinit() {
 }
 
 void SoundInstance::update() {
-    if (_state == State::NotInited) {
-        init();
-    }
     if (!_buffered) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);
         if (state == AL_STOPPED) {
-            _state = State::Stopped;
+            _handle->setState(SoundHandle::State::Stopped);
         }
         return;
     }
@@ -135,21 +137,12 @@ void SoundInstance::update() {
     ALint queued = 0;
     alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
     if (queued == 0) {
-        _state = State::Stopped;
+        _handle->setState(SoundHandle::State::Stopped);
     }
 }
 
-void SoundInstance::stop() {
-    alSourceStop(_source);
-    _state = State::Stopped;
-}
-
-bool SoundInstance::isStopped() const {
-    return _state == State::Stopped;
-}
-
-int SoundInstance::duration() const {
-    return _stream->duration();
+shared_ptr<SoundHandle> SoundInstance::handle() const {
+    return _handle;
 }
 
 } // namespace audio

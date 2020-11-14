@@ -205,6 +205,7 @@ set(AUDIO_HEADERS
     src/audio/format/mp3file.h
     src/audio/format/wavfile.h
     src/audio/player.h
+    src/audio/soundhandle.h
     src/audio/soundinstance.h
     src/audio/stream.h
     src/audio/types.h
@@ -215,6 +216,7 @@ set(AUDIO_SOURCES
     src/audio/format/mp3file.cpp
     src/audio/format/wavfile.cpp
     src/audio/player.cpp
+    src/audio/soundhandle.cpp
     src/audio/soundinstance.cpp
     src/audio/stream.cpp
     src/audio/util.cpp)
