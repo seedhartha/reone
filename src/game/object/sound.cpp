@@ -21,7 +21,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../audio/soundinstance.h"
+#include "../../audio/soundhandle.h"
 #include "../../resource/resources.h"
 
 #include "../blueprint/blueprints.h"
@@ -59,8 +59,9 @@ void Sound::load(const GffStruct &gffs) {
 void Sound::update(float dt) {
     SpatialObject::update(dt);
 
-    if (_sound && !_sound->isStopped() && !_audible) {
+    if (_sound && !_audible) {
         _sound->stop();
+        _sound.reset();
     }
     if (!_active || !_audible) return;
 

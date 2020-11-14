@@ -21,6 +21,7 @@
 
 #include "../audio/files.h"
 #include "../audio/player.h"
+#include "../audio/soundhandle.h"
 #include "../audio/util.h"
 #include "../render/models.h"
 #include "../render/textures.h"
@@ -125,8 +126,9 @@ void Game::playVideo(const string &name) {
 
     _video = bik.video();
 
-    if (_music && !_music->isStopped()) {
+    if (_music) {
         _music->stop();
+        _music.reset();
     }
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
@@ -157,8 +159,9 @@ string Game::getMainMenuMusic() const {
 void Game::playMusic(const string &resRef) {
     if (_musicResRef == resRef) return;
 
-    if (_music && !_music->isStopped()) {
+    if (_music) {
         _music->stop();
+        _music.reset();
     }
     _musicResRef = resRef;
 }
@@ -413,8 +416,10 @@ void Game::update() {
         if (_video->isFinished()) {
             _video.reset();
         }
-    } else if (!_musicResRef.empty() && (!_music || _music->isStopped())) {
-        _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
+    } else if (!_musicResRef.empty()) {
+        if (!_music || _music->isStopped()) {
+            _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
+        }
     }
 
     if (!_nextModule.empty()) {

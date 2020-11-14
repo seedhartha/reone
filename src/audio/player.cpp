@@ -25,6 +25,8 @@
 
 #include "../common/log.h"
 
+#include "soundhandle.h"
+
 using namespace std;
 
 namespace reone {
@@ -38,42 +40,61 @@ AudioPlayer &AudioPlayer::instance() {
 
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
+
     if (_opts.musicVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
-        info("Audio disabled");
+        info("AudioPlayer: audio is disabled");
         return;
     }
-
-    _device = alcOpenDevice(nullptr);
-    if (!_device) {
-        throw runtime_error("Failed to open audio device");
-    }
-
-    _context = alcCreateContext(_device, nullptr);
-    if (!_context) {
-        throw runtime_error("Failed to create audio context");
-    }
-    alcMakeContextCurrent(_context);
-
     _thread = thread(bind(&AudioPlayer::threadStart, this));
 }
 
 void AudioPlayer::threadStart() {
+    initAL();
+
     vector<shared_ptr<SoundInstance>> sounds;
     while (_run) {
         {
             lock_guard<recursive_mutex> lock(_soundsMutex);
-            auto it = remove_if(
-                _sounds.begin(),
-                _sounds.end(),
-                [](const shared_ptr<SoundInstance> &sound) { return sound->isStopped(); });
+            auto maybeSounds = remove_if(
+                _sounds.begin(), _sounds.end(),
+                [](auto &sound) { return sound->handle()->isStopped(); });
 
-            _sounds.erase(it, _sounds.end());
+            _sounds.erase(maybeSounds, _sounds.end());
             sounds = _sounds;
         }
         for (auto &sound : sounds) {
+            if (sound->handle()->isNotInited()) {
+                sound->init();
+            }
             sound->update();
         }
         this_thread::yield();
+    }
+
+    deinitAL();
+}
+
+void AudioPlayer::initAL() {
+    _device = alcOpenDevice(nullptr);
+    if (!_device) {
+        throw runtime_error("Failed to open an OpenAL device");
+    }
+    _context = alcCreateContext(_device, nullptr);
+    if (!_context) {
+        throw runtime_error("Failed to create an OpenAL context");
+    }
+    alcMakeContextCurrent(_context);
+}
+
+void AudioPlayer::deinitAL() {
+    if (_context) {
+        alcMakeContextCurrent(nullptr);
+        alcDestroyContext(_context);
+        _context = nullptr;
+    }
+    if (_device) {
+        alcCloseDevice(_device);
+        _device = nullptr;
     }
 }
 
@@ -87,39 +108,12 @@ void AudioPlayer::deinit() {
     if (_thread.joinable()) {
         _thread.join();
     }
-    _sounds.clear();
-
-    if (_context) {
-        alcMakeContextCurrent(nullptr);
-        alcDestroyContext(_context);
-        _context = nullptr;
-    }
-    if (_device) {
-        alcCloseDevice(_device);
-        _device = nullptr;
-    }
 }
 
-void AudioPlayer::reset() {
-    lock_guard<recursive_mutex> lock(_soundsMutex);
-    _sounds.clear();
-}
-
-shared_ptr<SoundInstance> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain) {
+shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain) {
     shared_ptr<SoundInstance> sound(new SoundInstance(resRef, loop, getGain(type, gain)));
     enqueue(sound);
-    return move(sound);
-}
-
-void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
-    lock_guard<recursive_mutex> lock(_soundsMutex);
-    _sounds.push_back(sound);
-}
-
-shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain)));
-    enqueue(sound);
-    return move(sound);
+    return sound->handle();
 }
 
 float AudioPlayer::getGain(AudioType type, float gain) const {
@@ -139,6 +133,17 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     }
 
     return gain * (volume / 100.0f);
+}
+
+void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
+    lock_guard<recursive_mutex> lock(_soundsMutex);
+    _sounds.push_back(sound);
+}
+
+shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain) {
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain)));
+    enqueue(sound);
+    return sound->handle();
 }
 
 } // namespace audio

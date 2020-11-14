@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <string>
 #include <memory>
 
@@ -26,6 +25,8 @@
 namespace reone {
 
 namespace audio {
+
+class SoundHandle;
 
 class SoundInstance {
 public:
@@ -36,34 +37,26 @@ public:
 
     SoundInstance &operator=(SoundInstance &&) = default;
 
+    void init();
     void update();
-    void stop();
 
-    bool isStopped() const;
-    int duration() const;
+    std::shared_ptr<SoundHandle> handle() const;
 
 private:
-    enum class State {
-        NotInited,
-        Playing,
-        Stopped
-    };
-
     std::string _resRef;
     std::shared_ptr<AudioStream> _stream;
     bool _loop { false };
     float _gain { 0.0f };
+    std::shared_ptr<SoundHandle> _handle;
+    std::vector<uint32_t> _buffers;
     bool _buffered { false };
-    std::atomic<State> _state { State::NotInited };
+    uint32_t _source { 0 };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
-    uint32_t _source { 0 };
-    std::vector<uint32_t> _buffers;
 
     SoundInstance(SoundInstance &) = delete;
     SoundInstance &operator=(SoundInstance &) = delete;
 
-    void init();
     void deinit();
 };
 

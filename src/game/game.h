@@ -25,7 +25,6 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../audio/soundinstance.h"
 #include "../render/pipeline/world.h"
 #include "../render/window.h"
 #include "../resource/types.h"
@@ -48,6 +47,12 @@
 #include "types.h"
 
 namespace reone {
+
+namespace audio {
+
+class SoundHandle;
+
+}
 
 namespace video {
 
@@ -189,8 +194,8 @@ private:
     // Audio
 
     std::string _musicResRef;
-    std::shared_ptr<audio::SoundInstance> _music;
-    std::shared_ptr<audio::SoundInstance> _movieAudio;
+    std::shared_ptr<audio::SoundHandle> _music;
+    std::shared_ptr<audio::SoundHandle> _movieAudio;
 
     // END Audio
 
