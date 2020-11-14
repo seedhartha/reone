@@ -73,6 +73,7 @@ void AudioPlayer::threadStart() {
         for (auto &sound : sounds) {
             sound->update();
         }
+        this_thread::yield();
     }
 }
 

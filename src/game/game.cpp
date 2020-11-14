@@ -400,6 +400,8 @@ void Game::runMainLoop() {
 
         update();
         drawAll();
+
+        this_thread::yield();
     }
 }
 
