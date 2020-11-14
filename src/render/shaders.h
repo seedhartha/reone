@@ -58,6 +58,24 @@ struct FeatureUniforms {
     int blurEnabled { false };
     int bloomEnabled { false };
     int discardEnabled { false };
+
+    bool operator==(const FeatureUniforms &other) {
+        return
+            lightmapEnabled == other.lightmapEnabled &&
+            envmapEnabled == other.envmapEnabled &&
+            bumpyShinyEnabled == other.bumpyShinyEnabled &&
+            bumpmapEnabled == other.bumpmapEnabled &&
+            skeletalEnabled == other.skeletalEnabled &&
+            lightingEnabled == other.lightingEnabled &&
+            selfIllumEnabled == other.selfIllumEnabled &&
+            blurEnabled == other.blurEnabled &&
+            bloomEnabled == other.bloomEnabled &&
+            discardEnabled == other.discardEnabled;
+    }
+
+    bool operator!=(const FeatureUniforms &other) {
+        return !operator==(other);
+    }
 };
 
 struct TextureUniforms {

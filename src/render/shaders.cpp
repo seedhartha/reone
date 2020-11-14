@@ -445,9 +445,14 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 }
 
 void Shaders::setLocalUniforms(const LocalUniforms &locals) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.features), &locals.features, GL_STATIC_DRAW);
+    static unordered_map<ShaderProgram, FeatureUniforms> features;
 
+    auto maybeFeatures = features.find(_activeProgram);
+    if (maybeFeatures == features.end() || maybeFeatures->second != locals.features) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.features), &locals.features, GL_STATIC_DRAW);
+        features[_activeProgram] = locals.features;
+    }
     setUniform("uModel", locals.model);
     setUniform("uColor", locals.color);
     setUniform("uAlpha", locals.alpha);
