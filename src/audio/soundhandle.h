@@ -19,6 +19,8 @@
 
 #include <atomic>
 
+#include "../common/vector3.h"
+
 namespace reone {
 
 namespace audio {
@@ -39,13 +41,19 @@ public:
     bool isStopped() const;
 
     int duration() const;
+    Vector3 position() const;
+    bool isPositionDirty() const;
 
     void setState(State state);
     void setDuration(int duration);
+    void setPosition(Vector3 position);
+    void setPositionDirty(bool dirty);
 
 private:
     std::atomic<State> _state { State::NotInited };
     int _duration { 0 };
+    std::atomic<Vector3> _position;
+    std::atomic_bool _positionDirty { false };
 
     SoundHandle(const SoundHandle &) = delete;
     SoundHandle &operator=(const SoundHandle &) = delete;

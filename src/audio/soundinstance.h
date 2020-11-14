@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 
+#include "../common/vector3.h"
+
 #include "stream.h"
 
 namespace reone {

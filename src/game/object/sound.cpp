@@ -59,9 +59,13 @@ void Sound::load(const GffStruct &gffs) {
 void Sound::update(float dt) {
     SpatialObject::update(dt);
 
-    if (_sound && !_audible) {
-        _sound->stop();
-        _sound.reset();
+    if (_sound) {
+        if (_audible) {
+            _sound->setPosition(glm::vec3(_transform[3]));
+        } else {
+            _sound->stop();
+            _sound.reset();
+        }
     }
     if (!_active || !_audible) return;
 
@@ -89,7 +93,7 @@ void Sound::update(float dt) {
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, _blueprint->volume() / 255.0f);
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop);
 }
 
 shared_ptr<SoundBlueprint> Sound::blueprint() const {

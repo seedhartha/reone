@@ -62,6 +62,11 @@ void AudioPlayer::threadStart() {
             _sounds.erase(maybeSounds, _sounds.end());
             sounds = _sounds;
         }
+        if (_listenerPositionDirty) {
+            Vector3 position(_listenerPosition.load());
+            alListener3f(AL_POSITION, position.x, position.y, position.z);
+            _listenerPositionDirty = false;
+        }
         for (auto &sound : sounds) {
             if (sound->handle()->isNotInited()) {
                 sound->init();
@@ -144,6 +149,13 @@ shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream,
     shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain)));
     enqueue(sound);
     return sound->handle();
+}
+
+void AudioPlayer::setListenerPosition(Vector3 position) {
+    if (_listenerPosition.load() != position) {
+        _listenerPosition = position;
+        _listenerPositionDirty = true;
+    }
 }
 
 } // namespace audio

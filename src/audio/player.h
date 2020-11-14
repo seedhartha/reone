@@ -27,6 +27,8 @@
 
 #include "AL/alc.h"
 
+#include "../common/vector3.h"
+
 #include "soundinstance.h"
 
 namespace reone {
@@ -45,6 +47,8 @@ public:
     std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f);
     std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
 
+    void setListenerPosition(Vector3 position);
+
 private:
     AudioOptions _opts;
     ALCdevice *_device { nullptr };
@@ -53,6 +57,8 @@ private:
     std::atomic_bool _run { true };
     std::vector<std::shared_ptr<SoundInstance>> _sounds;
     std::recursive_mutex _soundsMutex;
+    std::atomic<Vector3> _listenerPosition;
+    std::atomic_bool _listenerPositionDirty { false };
 
     AudioPlayer() = default;
     AudioPlayer(const AudioPlayer &) = delete;
