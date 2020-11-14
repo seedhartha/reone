@@ -96,9 +96,9 @@ void Console::render() const {
         transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
         LocalUniforms locals;
-        locals.model = move(transform);
-        locals.color = glm::vec3(0.0f);
-        locals.alpha = 0.5f;
+        locals.general.model = move(transform);
+        locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        locals.general.alpha = 0.5f;
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }

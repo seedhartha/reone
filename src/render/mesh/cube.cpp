@@ -62,7 +62,7 @@ CubeMesh::CubeMesh() {
 
 void CubeMesh::render(const glm::mat4 &transform) const {
     LocalUniforms locals;
-    locals.model = transform;
+    locals.general.model = transform;
 
     Shaders::instance().activate(ShaderProgram::ModelWhite, locals);
 

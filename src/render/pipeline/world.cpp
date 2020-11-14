@@ -79,10 +79,10 @@ void WorldRenderPipeline::render() const {
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
             locals.features.blurEnabled = true;
-            locals.blur.resolution = glm::vec2(w, h);
-            locals.blur.direction = glm::vec2(1.0f, 0.0f);
+            locals.general.model = move(transform);
+            locals.general.blurResolution = glm::vec2(w, h);
+            locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
@@ -110,10 +110,10 @@ void WorldRenderPipeline::render() const {
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
             locals.features.blurEnabled = true;
-            locals.blur.resolution = glm::vec2(_opts.width, _opts.height);
-            locals.blur.direction = glm::vec2(0.0f, 1.0f);
+            locals.general.model = move(transform);
+            locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
+            locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
@@ -133,8 +133,8 @@ void WorldRenderPipeline::render() const {
         transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
         LocalUniforms locals;
-        locals.model = move(transform);
         locals.features.bloomEnabled = true;
+        locals.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
 

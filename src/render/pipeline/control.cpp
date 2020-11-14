@@ -76,7 +76,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
         Shaders::instance().setGlobalUniforms(globals);
 
         LocalUniforms locals;
-        locals.model = move(transform);
+        locals.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
