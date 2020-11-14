@@ -113,16 +113,14 @@ void ModelNodeSceneNode::renderSingle() const {
         const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
         locals.features.lightingEnabled = true;
-        locals.lighting.ambientColor = _sceneGraph->ambientLightColor();
-        locals.lighting.lights.clear();
+        locals.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+        locals.lighting.lightCount = static_cast<int>(lights.size());
 
-        for (auto &light : lights) {
-            ShaderLight shaderLight;
-            shaderLight.position = light->absoluteTransform()[3];
-            shaderLight.radius = light->radius();
-            shaderLight.color = light->color();
-
-            locals.lighting.lights.push_back(move(shaderLight));
+        for (int i = 0; i < locals.lighting.lightCount; ++i) {
+            ShaderLight &shaderLight = locals.lighting.lights[i];
+            shaderLight.position = lights[i]->absoluteTransform()[3];
+            shaderLight.radius = lights[i]->radius();
+            shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
         }
     }
     Shaders::instance().activate(ShaderProgram::ModelModel, locals);

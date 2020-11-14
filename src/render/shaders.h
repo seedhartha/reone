@@ -29,6 +29,8 @@ namespace reone {
 
 namespace render {
 
+const int kMaxLightCount = 8;
+
 enum class ShaderProgram {
     None,
     GUIGUI,
@@ -73,14 +75,17 @@ struct SkeletalUniforms {
 };
 
 struct ShaderLight {
-    glm::vec3 position { 0.0f };
-    glm::vec3 color { 1.0f };
+    glm::vec4 position { 0.0f };
+    glm::vec4 color { 1.0f };
     float radius { 1.0f };
+    char padding[12];
 };
 
 struct LightingUniforms {
-    glm::vec3 ambientColor { 1.0f };
-    std::vector<ShaderLight> lights;
+    glm::vec4 ambientLightColor { 1.0f };
+    int lightCount { 0 };
+    char padding[12];
+    ShaderLight lights[kMaxLightCount];
 };
 
 struct GaussianBlurUniforms {
@@ -128,6 +133,7 @@ private:
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
     uint32_t _featuresUbo { 0 };
+    uint32_t _lightingUbo { 0 };
 
     Shaders() = default;
     Shaders(const Shaders &) = delete;

@@ -35,8 +35,6 @@ namespace reone {
 
 namespace scene {
 
-static const int kMaxLightCount = 8;
-
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
 
