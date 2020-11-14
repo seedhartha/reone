@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -38,6 +39,7 @@ public:
     void deinit();
 
     void reset();
+    std::shared_ptr<SoundInstance> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f);
     std::shared_ptr<SoundInstance> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
 
 private:
@@ -56,8 +58,9 @@ private:
     AudioPlayer &operator=(const AudioPlayer &) = delete;
 
     void threadStart();
+    void enqueue(const std::shared_ptr<SoundInstance> &sound);
 
-    int getVolume(AudioType type) const;
+    float getGain(AudioType type, float gain) const;
 };
 
 } // namespace audio

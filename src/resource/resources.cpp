@@ -261,9 +261,10 @@ shared_ptr<TwoDaTable> Resources::get2DA(const string &resRef) {
 }
 
 shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bool logNotFound) {
+    lock_guard<recursive_mutex> lock(_mutex);
+
     string cacheKey(getCacheKey(resRef, type));
     auto res = g_resCache.find(cacheKey);
-
     if (res != g_resCache.end()) {
         return res->second;
     }

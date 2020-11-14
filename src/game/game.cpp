@@ -414,7 +414,7 @@ void Game::update() {
             _video.reset();
         }
     } else if (!_musicResRef.empty() && (!_music || _music->isStopped())) {
-        _music = ::playMusic(_musicResRef);
+        _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
     }
 
     if (!_nextModule.empty()) {

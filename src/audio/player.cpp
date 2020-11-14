@@ -105,30 +105,40 @@ void AudioPlayer::reset() {
     _sounds.clear();
 }
 
-shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain) {
-    if (!stream) {
-        throw invalid_argument("Audio stream is empty");
-    }
-    float finalGain = gain * getVolume(type) / 100.0f;
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, finalGain));
-
-    lock_guard<recursive_mutex> lock(_soundsMutex);
-    _sounds.push_back(sound);
-
+shared_ptr<SoundInstance> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain) {
+    shared_ptr<SoundInstance> sound(new SoundInstance(resRef, loop, getGain(type, gain)));
+    enqueue(sound);
     return move(sound);
 }
 
-int AudioPlayer::getVolume(AudioType type) const {
+void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
+    lock_guard<recursive_mutex> lock(_soundsMutex);
+    _sounds.push_back(sound);
+}
+
+shared_ptr<SoundInstance> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain) {
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain)));
+    enqueue(sound);
+    return move(sound);
+}
+
+float AudioPlayer::getGain(AudioType type, float gain) const {
+    int volume;
     switch (type) {
         case AudioType::Music:
-            return _opts.musicVolume;
+            volume = _opts.musicVolume;
+            break;
         case AudioType::Sound:
-            return _opts.soundVolume;
+            volume = _opts.soundVolume;
+            break;
         case AudioType::Movie:
-            return _opts.movieVolume;
+            volume = _opts.movieVolume;
+            break;
         default:
             return 85;
     }
+
+    return gain * (volume / 100.0f);
 }
 
 } // namespace audio

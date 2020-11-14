@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -69,6 +70,7 @@ private:
     std::vector<std::string> _moduleNames;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders;
+    std::recursive_mutex _mutex;
 
     Resources() = default;
     Resources(const Resources &) = delete;

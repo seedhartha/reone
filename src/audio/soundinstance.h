@@ -18,6 +18,7 @@
 #pragma once
 
 #include <atomic>
+#include <string>
 #include <memory>
 
 #include "stream.h"
@@ -28,6 +29,7 @@ namespace audio {
 
 class SoundInstance {
 public:
+    SoundInstance(const std::string &resRef, bool loop, float gain);
     SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain);
     SoundInstance(SoundInstance &&) = default;
     ~SoundInstance();
@@ -47,6 +49,7 @@ private:
         Stopped
     };
 
+    std::string _resRef;
     std::shared_ptr<AudioStream> _stream;
     bool _loop { false };
     float _gain { 0.0f };

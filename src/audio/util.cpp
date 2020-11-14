@@ -17,23 +17,9 @@
 
 #include "util.h"
 
-#include "../resource/resources.h"
-
-#include "files.h"
-#include "player.h"
-
-using namespace std;
-
-using namespace reone::resource;
-
 namespace reone {
 
 namespace audio {
-
-shared_ptr<SoundInstance> playMusic(const string &resRef) {
-    shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
-    return AudioPlayer::instance().play(stream, AudioType::Music);
-}
 
 } // namespace audio
 
