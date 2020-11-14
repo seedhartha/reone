@@ -78,7 +78,9 @@ void SceneGraph::prepareFrame() {
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](auto &left, auto &right) {
         int leftTransparency = left->modelNode()->mesh()->transparency();
         int rightTransparency = right->modelNode()->mesh()->transparency();
+
         if (leftTransparency < rightTransparency) return true;
+        if (leftTransparency > rightTransparency) return false;
 
         float leftDistance = cameraDistances.find(left)->second;
         float rightDistance = cameraDistances.find(right)->second;
