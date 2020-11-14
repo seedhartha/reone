@@ -90,7 +90,6 @@ struct GaussianBlurUniforms {
 
 struct LocalUniforms {
     FeatureUniforms features;
-    TextureUniforms textures;
     SkeletalUniforms skeletal;
     LightingUniforms lighting;
     GaussianBlurUniforms blur;
