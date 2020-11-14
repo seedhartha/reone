@@ -46,16 +46,16 @@ struct GlobalUniforms {
 };
 
 struct FeatureUniforms {
-    bool lightmapEnabled { false };
-    bool envmapEnabled { false };
-    bool bumpyShinyEnabled { false };
-    bool bumpmapEnabled { false };
-    bool skeletalEnabled { false };
-    bool lightingEnabled { false };
-    bool selfIllumEnabled { false };
-    bool blurEnabled { false };
-    bool bloomEnabled { false };
-    bool discardEnabled { false };
+    int lightmapEnabled { false };
+    int envmapEnabled { false };
+    int bumpyShinyEnabled { false };
+    int bumpmapEnabled { false };
+    int skeletalEnabled { false };
+    int lightingEnabled { false };
+    int selfIllumEnabled { false };
+    int blurEnabled { false };
+    int bloomEnabled { false };
+    int discardEnabled { false };
 };
 
 struct TextureUniforms {
@@ -127,6 +127,7 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
+    uint32_t _featuresUbo { 0 };
 
     Shaders() = default;
     Shaders(const Shaders &) = delete;
