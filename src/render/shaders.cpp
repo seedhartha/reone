@@ -330,6 +330,20 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::GUIWhite, ShaderName::VertexGUI, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
+
+    for (auto &program : _programs) {
+        glUseProgram(program.second);
+        _activeOrdinal = program.second;
+
+        setUniform("uEnvmap", TextureUniforms::envmap);
+        setUniform("uLightmap", TextureUniforms::lightmap);
+        setUniform("uBumpyShiny", TextureUniforms::bumpyShiny);
+        setUniform("uBumpmap", TextureUniforms::bumpmap);
+        setUniform("uBloom", TextureUniforms::bloom);
+
+        _activeOrdinal = 0;
+        glUseProgram(0);
+    }
 }
 
 void Shaders::initShader(ShaderName name, unsigned int type, const char *source) {
@@ -434,11 +448,6 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     setUniform("uLightingEnabled", locals.features.lightingEnabled);
     setUniform("uSelfIllumEnabled", locals.features.selfIllumEnabled);
     setUniform("uDiscardEnabled", locals.features.discardEnabled);
-    setUniform("uLightmap", locals.textures.lightmap);
-    setUniform("uEnvmap", locals.textures.envmap);
-    setUniform("uBumpyShiny", locals.textures.bumpyShiny);
-    setUniform("uBumpmap", locals.textures.bumpmap);
-    setUniform("uBloom", locals.textures.bloom);
 
     if (locals.features.skeletalEnabled) {
         setUniform("uAbsTransform", locals.skeletal.absTransform);

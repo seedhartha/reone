@@ -141,12 +141,12 @@ void WorldRenderPipeline::render() const {
         glActiveTexture(GL_TEXTURE0);
         _geometry.bindColorBuffer(0);
 
-        glActiveTexture(GL_TEXTURE0 + locals.textures.bloom);
+        glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
         _verticalBlur.bindColorBuffer(0);
 
         Quad::getDefault().renderTriangles();
 
-        glActiveTexture(GL_TEXTURE + locals.textures.bloom);
+        glActiveTexture(GL_TEXTURE + TextureUniforms::bloom);
         _verticalBlur.unbindColorBuffer();
 
         glActiveTexture(GL_TEXTURE0);
