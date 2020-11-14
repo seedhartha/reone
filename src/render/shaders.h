@@ -43,6 +43,14 @@ enum class ShaderProgram {
     ModelModel
 };
 
+struct TextureUniforms {
+    static constexpr int envmap { 1 };
+    static constexpr int lightmap { 2 };
+    static constexpr int bumpyShiny { 3 };
+    static constexpr int bumpmap { 4 };
+    static constexpr int bloom { 5 };
+};
+
 struct GlobalUniforms {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
@@ -80,12 +88,15 @@ struct FeatureUniforms {
     }
 };
 
-struct TextureUniforms {
-    static constexpr int envmap { 1 };
-    static constexpr int lightmap { 2 };
-    static constexpr int bumpyShiny { 3 };
-    static constexpr int bumpmap { 4 };
-    static constexpr int bloom { 5 };
+struct GeneralUniforms {
+    glm::mat4 model { 1.0f };
+    glm::vec4 color { 1.0f };
+    float alpha { 1.0f };
+    char padding[12];
+    glm::vec4 selfIllumColor { 1.0f };
+    glm::vec4 discardColor { 0.0f };
+    glm::vec2 blurResolution { 0.0f };
+    glm::vec2 blurDirection { 0.0f };
 };
 
 struct SkeletalUniforms {
@@ -108,22 +119,11 @@ struct LightingUniforms {
     ShaderLight lights[kMaxLightCount];
 };
 
-struct GaussianBlurUniforms {
-    glm::vec2 resolution { 0.0f };
-    glm::vec2 direction { 0.0f };
-};
-
 struct LocalUniforms {
     FeatureUniforms features;
+    GeneralUniforms general;
     std::shared_ptr<SkeletalUniforms> skeletal;
     std::shared_ptr<LightingUniforms> lighting;
-    GaussianBlurUniforms blur;
-
-    glm::mat4 model { 1.0f };
-    glm::vec3 color { 1.0f };
-    float alpha { 1.0f };
-    glm::vec3 selfIllumColor { 1.0f };
-    glm::vec3 discardColor { 0.0f };
 };
 
 class Shaders {
@@ -161,6 +161,7 @@ private:
     // Uniform buffer objects
 
     uint32_t _featuresUbo { 0 };
+    uint32_t _generalUbo { 0 };
     uint32_t _lightingUbo { 0 };
     uint32_t _skeletalUbo { 0 };
 

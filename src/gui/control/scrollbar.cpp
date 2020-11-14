@@ -61,7 +61,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
     LocalUniforms locals;
-    locals.model = move(transform);
+    locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     Quad::getDefault().renderTriangles();
@@ -74,7 +74,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
     LocalUniforms locals;
-    locals.model = move(transform);
+    locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     Quad::getDefault().renderTriangles();

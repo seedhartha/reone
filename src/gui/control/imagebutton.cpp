@@ -68,8 +68,8 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
         }
 
         LocalUniforms locals;
-        locals.model = transform;
-        locals.color = move(frameColor);
+        locals.general.model = transform;
+        locals.general.color = glm::vec4(frameColor, 1.0f);
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }
@@ -81,7 +81,7 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
     }
     {
         LocalUniforms locals;
-        locals.model = transform;
+        locals.general.model = transform;
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
     }

@@ -68,8 +68,8 @@ void ModelNodeSceneNode::renderSingle() const {
     bool skeletal = static_cast<bool>(skin);
 
     LocalUniforms locals;
-    locals.model = _absoluteTransform;
-    locals.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
+    locals.general.model = _absoluteTransform;
+    locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
     if (mesh->hasEnvmapTexture()) {
         locals.features.envmapEnabled = true;
@@ -104,7 +104,7 @@ void ModelNodeSceneNode::renderSingle() const {
     }
     if (_modelNode->isSelfIllumEnabled()) {
         locals.features.selfIllumEnabled = true;
-        locals.selfIllumColor = _modelNode->selfIllumColor();
+        locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
     }
     int lightCount = 0;
 

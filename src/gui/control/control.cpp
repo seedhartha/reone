@@ -249,9 +249,9 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
             locals.features.discardEnabled = _discardEnabled;
-            locals.discardColor = _discardColor;
+            locals.general.model = move(transform);
+            locals.general.discardColor = glm::vec4(_discardColor, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
@@ -288,8 +288,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
                 LocalUniforms locals;
-                locals.model = move(transform);
-                locals.color = color;
+                locals.general.model = move(transform);
+                locals.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
@@ -303,8 +303,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
 
                 LocalUniforms locals;
-                locals.model = move(transform);
-                locals.color = color;
+                locals.general.model = move(transform);
+                locals.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
@@ -322,8 +322,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 LocalUniforms locals;
-                locals.model = move(transform);
-                locals.color = color;
+                locals.general.model = move(transform);
+                locals.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
@@ -336,8 +336,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 LocalUniforms locals;
-                locals.model = move(transform);
-                locals.color = color;
+                locals.general.model = move(transform);
+                locals.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
             }
@@ -359,8 +359,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
-            locals.color = color;
+            locals.general.model = move(transform);
+            locals.general.color = glm::vec4(color, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
@@ -373,8 +373,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
-            locals.color = color;
+            locals.general.model = move(transform);
+            locals.general.color = glm::vec4(color, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
@@ -387,8 +387,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
-            locals.color = color;
+            locals.general.model = move(transform);
+            locals.general.color = glm::vec4(color, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
@@ -401,8 +401,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             LocalUniforms locals;
-            locals.model = move(transform);
-            locals.color = color;
+            locals.general.model = move(transform);
+            locals.general.color = glm::vec4(color, 1.0f);
 
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }

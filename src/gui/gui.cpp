@@ -260,7 +260,7 @@ void GUI::drawBackground() const {
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     LocalUniforms locals;
-    locals.model = move(transform);
+    locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 

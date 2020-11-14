@@ -49,7 +49,7 @@ void Cursor::render() const {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     LocalUniforms locals;
-    locals.model = move(transform);
+    locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 

@@ -34,8 +34,9 @@ namespace reone {
 namespace render {
 
 static const int kFeaturesBindingPointIndex = 1;
-static const int kLightingBindingPointIndex = 2;
-static const int kSkeletalBindingPointIndex = 3;
+static const int kGeneralBindingPointIndex = 2;
+static const int kLightingBindingPointIndex = 3;
+static const int kSkeletalBindingPointIndex = 4;
 
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
@@ -62,6 +63,16 @@ layout(std140) uniform Features {
     bool uDiscardEnabled;
 };
 
+layout(std140) uniform General {
+    uniform mat4 uModel;
+    uniform vec4 uColor;
+    uniform float uAlpha;
+    uniform vec4 uSelfIllumColor;
+    uniform vec4 uDiscardColor;
+    uniform vec2 uBlurResolution;
+    uniform vec2 uBlurDirection;
+};
+
 layout(std140) uniform Lighting {
     vec4 uAmbientLightColor;
     int uLightCount;
@@ -78,7 +89,6 @@ layout(std140) uniform Skeletal {
 static const GLchar kGUIVertexShader[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
-uniform mat4 uModel;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
@@ -94,7 +104,6 @@ void main() {
 static const GLchar kModelVertexShader[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
-uniform mat4 uModel;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -143,23 +152,17 @@ void main() {
 )END";
 
 static const GLchar kWhiteFragmentShader[] = R"END(
-uniform vec3 uColor;
-uniform float uAlpha;
-
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    fragColor = vec4(uColor, uAlpha);
+    fragColor = vec4(uColor.rgb, uAlpha);
     fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
 }
 )END";
 
 static const GLchar kGUIFragmentShader[] = R"END(
 uniform sampler2D uTexture;
-uniform vec3 uColor;
-uniform float uAlpha;
-uniform vec3 uDiscardColor;
 
 in vec2 fragTexCoords;
 
@@ -168,9 +171,9 @@ layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     vec4 textureSample = texture(uTexture, fragTexCoords);
-    vec3 finalColor = uColor * textureSample.rgb;
+    vec3 finalColor = uColor.rgb * textureSample.rgb;
 
-    if (uDiscardEnabled && length(uDiscardColor - finalColor) < 0.01) {
+    if (uDiscardEnabled && length(uDiscardColor.rgb - finalColor) < 0.01) {
         discard;
     }
     fragColor = vec4(finalColor, uAlpha * textureSample.a);
@@ -188,9 +191,6 @@ uniform samplerCube uEnvmap;
 uniform samplerCube uBumpyShiny;
 
 uniform vec3 uCameraPosition;
-uniform float uAlpha;
-
-uniform vec3 uSelfIllumColor;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -266,7 +266,7 @@ void main() {
     fragColor = vec4(lightColor * surfaceColor, finalAlpha);
 
     if (uSelfIllumEnabled) {
-        vec3 color = uSelfIllumColor * diffuseSample.rgb;
+        vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb;
         fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
     } else {
         fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
@@ -276,21 +276,19 @@ void main() {
 
 static const GLchar kGaussianBlurFragmentShader[] = R"END(
 uniform sampler2D uTexture;
-uniform vec2 uResolution;
-uniform vec2 uDirection;
 
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uResolution);
+    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
     vec4 color = vec4(0.0);
-    vec2 off1 = vec2(1.3846153846) * uDirection;
-    vec2 off2 = vec2(3.2307692308) * uDirection;
+    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
+    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
     color += texture2D(uTexture, uv) * 0.2270270270;
-    color += texture2D(uTexture, uv + (off1 / uResolution)) * 0.3162162162;
-    color += texture2D(uTexture, uv - (off1 / uResolution)) * 0.3162162162;
-    color += texture2D(uTexture, uv + (off2 / uResolution)) * 0.0702702703;
-    color += texture2D(uTexture, uv - (off2 / uResolution)) * 0.0702702703;
+    color += texture2D(uTexture, uv + (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture2D(uTexture, uv - (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture2D(uTexture, uv + (off2 / uBlurResolution)) * 0.0702702703;
+    color += texture2D(uTexture, uv - (off2 / uBlurResolution)) * 0.0702702703;
 
     fragColor = color;
 }
@@ -339,6 +337,7 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 
     glGenBuffers(1, &_featuresUbo);
+    glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
     glGenBuffers(1, &_skeletalUbo);
 
@@ -349,6 +348,10 @@ void Shaders::initGL() {
         uint32_t featuresBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
         if (featuresBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, featuresBlockIdx, kFeaturesBindingPointIndex);
+        }
+        uint32_t generalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "General");
+        if (generalBlockIdx != GL_INVALID_INDEX) {
+            glUniformBlockBinding(_activeOrdinal, generalBlockIdx, kGeneralBindingPointIndex);
         }
         uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
         if (lightingBlockIdx != GL_INVALID_INDEX) {
@@ -424,6 +427,10 @@ void Shaders::deinitGL() {
         glDeleteBuffers(1, &_lightingUbo);
         _lightingUbo = 0;
     }
+    if (_generalUbo) {
+        glDeleteBuffers(1, &_generalUbo);
+        _generalUbo = 0;
+    }
     if (_featuresUbo) {
         glDeleteBuffers(1, &_featuresUbo);
         _featuresUbo = 0;
@@ -467,9 +474,8 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
         glBufferData(GL_UNIFORM_BUFFER, sizeof(FeatureUniforms), &locals.features, GL_STATIC_DRAW);
         features[_activeProgram] = locals.features;
     }
-    setUniform("uModel", locals.model);
-    setUniform("uColor", locals.color);
-    setUniform("uAlpha", locals.alpha);
+    glBindBufferBase(GL_UNIFORM_BUFFER, kGeneralBindingPointIndex, _generalUbo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &locals.general, GL_STATIC_DRAW);
 
     if (locals.features.skeletalEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
@@ -478,16 +484,6 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     if (locals.features.lightingEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
-    }
-    if (locals.features.selfIllumEnabled) {
-        setUniform("uSelfIllumColor", locals.selfIllumColor);
-    }
-    if (locals.features.blurEnabled) {
-        setUniform("uResolution", locals.blur.resolution);
-        setUniform("uDirection", locals.blur.direction);
-    }
-    if (locals.features.discardEnabled) {
-        setUniform("uDiscardColor", locals.discardColor);
     }
 }
 

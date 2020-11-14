@@ -132,8 +132,8 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
 
     for (auto &glyph : text) {
         LocalUniforms locals;
-        locals.model = textTransform;
-        locals.color = color;
+        locals.general.model = textTransform;
+        locals.general.color = glm::vec4(color, 1.0f);
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
