@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -114,8 +115,8 @@ struct GaussianBlurUniforms {
 
 struct LocalUniforms {
     FeatureUniforms features;
-    SkeletalUniforms skeletal;
-    LightingUniforms lighting;
+    std::shared_ptr<SkeletalUniforms> skeletal;
+    std::shared_ptr<LightingUniforms> lighting;
     GaussianBlurUniforms blur;
 
     glm::mat4 model { 1.0f };
@@ -134,6 +135,9 @@ public:
     void activate(ShaderProgram program, const LocalUniforms &uniforms);
     void deactivate();
 
+    std::shared_ptr<LightingUniforms> lightingUniforms() const;
+    std::shared_ptr<SkeletalUniforms> skeletalUniforms() const;
+
     void setGlobalUniforms(const GlobalUniforms &globals);
 
 private:
@@ -151,11 +155,18 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
+    std::shared_ptr<LightingUniforms> _lightingUniforms;
+    std::shared_ptr<SkeletalUniforms> _skeletalUniforms;
+
+    // Uniform buffer objects
+
     uint32_t _featuresUbo { 0 };
     uint32_t _lightingUbo { 0 };
     uint32_t _skeletalUbo { 0 };
 
-    Shaders() = default;
+    // END Uniform buffer objects
+
+    Shaders();
     Shaders(const Shaders &) = delete;
     ~Shaders();
 

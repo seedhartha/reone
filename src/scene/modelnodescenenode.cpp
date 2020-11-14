@@ -85,11 +85,12 @@ void ModelNodeSceneNode::renderSingle() const {
     }
     if (skeletal) {
         locals.features.skeletalEnabled = true;
-        locals.skeletal.absTransform = _modelNode->absoluteTransform();
-        locals.skeletal.absTransformInv = _modelNode->absoluteTransformInverse();
+        locals.skeletal = Shaders::instance().skeletalUniforms();
+        locals.skeletal->absTransform = _modelNode->absoluteTransform();
+        locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
 
         for (int i = 0; i < kMaxBoneCount; ++i) {
-            locals.skeletal.bones[i] = glm::mat4(1.0f);
+            locals.skeletal->bones[i] = glm::mat4(1.0f);
         }
         for (auto &pair : skin->nodeIdxByBoneIdx) {
             uint16_t boneIdx = pair.first;
@@ -97,7 +98,7 @@ void ModelNodeSceneNode::renderSingle() const {
 
             ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
             if (bone) {
-                locals.skeletal.bones[boneIdx] = bone->boneTransform();
+                locals.skeletal->bones[boneIdx] = bone->boneTransform();
             }
         }
     }
@@ -111,11 +112,12 @@ void ModelNodeSceneNode::renderSingle() const {
         const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
         locals.features.lightingEnabled = true;
-        locals.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-        locals.lighting.lightCount = static_cast<int>(lights.size());
+        locals.lighting = Shaders::instance().lightingUniforms();
+        locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+        locals.lighting->lightCount = static_cast<int>(lights.size());
 
-        for (int i = 0; i < locals.lighting.lightCount; ++i) {
-            ShaderLight &shaderLight = locals.lighting.lights[i];
+        for (int i = 0; i < locals.lighting->lightCount; ++i) {
+            ShaderLight &shaderLight = locals.lighting->lights[i];
             shaderLight.position = lights[i]->absoluteTransform()[3];
             shaderLight.radius = lights[i]->radius();
             shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
