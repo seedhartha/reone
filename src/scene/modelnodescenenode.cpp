@@ -88,20 +88,18 @@ void ModelNodeSceneNode::renderSingle() const {
         locals.skeletal.absTransform = _modelNode->absoluteTransform();
         locals.skeletal.absTransformInv = _modelNode->absoluteTransformInverse();
 
-        const unordered_map<uint16_t, uint16_t> &nodeIdxByBoneIdx = skin->nodeIdxByBoneIdx;
-        vector<glm::mat4> bones(nodeIdxByBoneIdx.size(), glm::mat4(1.0f));
-
-        for (auto &pair : nodeIdxByBoneIdx) {
+        for (int i = 0; i < kMaxBoneCount; ++i) {
+            locals.skeletal.bones[i] = glm::mat4(1.0f);
+        }
+        for (auto &pair : skin->nodeIdxByBoneIdx) {
             uint16_t boneIdx = pair.first;
             uint16_t nodeIdx = pair.second;
 
             ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
             if (bone) {
-                bones[boneIdx] = bone->boneTransform();
+                locals.skeletal.bones[boneIdx] = bone->boneTransform();
             }
         }
-
-        locals.skeletal.bones = move(bones);
     }
     if (_modelNode->isSelfIllumEnabled()) {
         locals.features.selfIllumEnabled = true;

@@ -35,11 +35,13 @@ namespace render {
 
 static const int kFeaturesBindingPointIndex = 1;
 static const int kLightingBindingPointIndex = 2;
+static const int kSkeletalBindingPointIndex = 3;
 
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
+const int MAX_BONES = 128;
 
 struct Light {
     vec4 position;
@@ -65,6 +67,12 @@ layout(std140) uniform Lighting {
     int uLightCount;
     Light uLights[MAX_LIGHTS];
 };
+
+layout(std140) uniform Skeletal {
+    uniform mat4 uAbsTransform;
+    uniform mat4 uAbsTransformInv;
+    uniform mat4 uBones[MAX_BONES];
+};
 )END";
 
 static const GLchar kGUIVertexShader[] = R"END(
@@ -84,15 +92,9 @@ void main() {
 )END";
 
 static const GLchar kModelVertexShader[] = R"END(
-const int MAX_BONES = 128;
-
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
-
-uniform mat4 uAbsTransform;
-uniform mat4 uAbsTransformInv;
-uniform mat4 uBones[MAX_BONES];
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -333,6 +335,7 @@ void Shaders::initGL() {
 
     glGenBuffers(1, &_featuresUbo);
     glGenBuffers(1, &_lightingUbo);
+    glGenBuffers(1, &_skeletalUbo);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -340,13 +343,15 @@ void Shaders::initGL() {
 
         uint32_t featuresBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
         if (featuresBlockIdx != GL_INVALID_INDEX) {
-            glBindBufferBase(GL_UNIFORM_BUFFER, kFeaturesBindingPointIndex, _featuresUbo);
             glUniformBlockBinding(_activeOrdinal, featuresBlockIdx, kFeaturesBindingPointIndex);
         }
         uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
         if (lightingBlockIdx != GL_INVALID_INDEX) {
-            glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _featuresUbo);
             glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
+        }
+        uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
+        if (skeletalBlockIdx != GL_INVALID_INDEX) {
+            glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
         }
 
         setUniform("uEnvmap", TextureUniforms::envmap);
@@ -406,6 +411,10 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinitGL() {
+    if (_skeletalUbo) {
+        glDeleteBuffers(1, &_skeletalUbo);
+        _skeletalUbo = 0;
+    }
     if (_lightingUbo) {
         glDeleteBuffers(1, &_lightingUbo);
         _lightingUbo = 0;
@@ -458,9 +467,8 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     setUniform("uAlpha", locals.alpha);
 
     if (locals.features.skeletalEnabled) {
-        setUniform("uAbsTransform", locals.skeletal.absTransform);
-        setUniform("uAbsTransformInv", locals.skeletal.absTransformInv);
-        setUniform("uBones", locals.skeletal.bones);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.skeletal), &locals.skeletal, GL_STATIC_DRAW);
     }
     if (locals.features.lightingEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
