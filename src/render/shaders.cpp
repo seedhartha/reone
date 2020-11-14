@@ -33,9 +33,24 @@ namespace reone {
 
 namespace render {
 
-static const GLchar kGUIVertexShader[] = R"END(
+static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
+layout(std140) uniform Features {
+    bool uLightmapEnabled;
+    bool uEnvmapEnabled;
+    bool uBumpyShinyEnabled;
+    bool uBumpmapEnabled;
+    bool uSkeletalEnabled;
+    bool uLightingEnabled;
+    bool uSelfIllumEnabled;
+    bool uBlurEnabled;
+    bool uBloomEnabled;
+    bool uDiscardEnabled;
+};
+)END";
+
+static const GLchar kGUIVertexShader[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
@@ -52,15 +67,12 @@ void main() {
 )END";
 
 static const GLchar kModelVertexShader[] = R"END(
-#version 330
-
 const int MAX_BONES = 128;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
 
-uniform bool uSkeletalEnabled;
 uniform mat4 uAbsTransform;
 uniform mat4 uAbsTransformInv;
 uniform mat4 uBones[MAX_BONES];
@@ -112,8 +124,6 @@ void main() {
 )END";
 
 static const GLchar kWhiteFragmentShader[] = R"END(
-#version 330
-
 uniform vec3 uColor;
 uniform float uAlpha;
 
@@ -127,12 +137,9 @@ void main() {
 )END";
 
 static const GLchar kGUIFragmentShader[] = R"END(
-#version 330
-
 uniform sampler2D uTexture;
 uniform vec3 uColor;
 uniform float uAlpha;
-uniform bool uDiscardEnabled;
 uniform vec3 uDiscardColor;
 
 in vec2 fragTexCoords;
@@ -153,8 +160,6 @@ void main() {
 )END";
 
 static const GLchar kModelFragmentShader[] = R"END(
-#version 330
-
 const int MAX_LIGHTS = 8;
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
 
@@ -163,14 +168,6 @@ struct Light {
     vec3 color;
     float radius;
 };
-
-uniform bool uLightmapEnabled;
-uniform bool uEnvmapEnabled;
-uniform bool uBumpyShinyEnabled;
-uniform bool uBumpmapEnabled;
-uniform bool uSkeletalEnabled;
-uniform bool uLightingEnabled;
-uniform bool uSelfIllumEnabled;
 
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
@@ -269,8 +266,6 @@ void main() {
 )END";
 
 static const GLchar kGaussianBlurFragmentShader[] = R"END(
-#version 330
-
 uniform sampler2D uTexture;
 uniform vec2 uResolution;
 uniform vec2 uDirection;
@@ -293,8 +288,6 @@ void main() {
 )END";
 
 static const GLchar kBloomFragmentShader[] = R"END(
-#version 330
-
 uniform sampler2D uGeometry;
 uniform sampler2D uBloom;
 
@@ -331,9 +324,17 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
 
+    glGenBuffers(1, &_featuresUbo);
+
     for (auto &program : _programs) {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
+
+        uint32_t blockIdx = glGetUniformBlockIndex(_activeOrdinal, "Features");
+        if (blockIdx != GL_INVALID_INDEX) {
+            glBindBufferBase(GL_UNIFORM_BUFFER, 0, _featuresUbo);
+            glUniformBlockBinding(_activeOrdinal, blockIdx, 0);
+        }
 
         setUniform("uEnvmap", TextureUniforms::envmap);
         setUniform("uLightmap", TextureUniforms::lightmap);
@@ -352,7 +353,8 @@ void Shaders::initShader(ShaderName name, unsigned int type, const char *source)
     char log[512];
     GLsizei logSize;
 
-    glShaderSource(shader, 1, &source, nullptr);
+    const GLchar *sources[] = { kCommonShaderHeader, source };
+    glShaderSource(shader, 2, sources, nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
@@ -391,6 +393,10 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinitGL() {
+    if (_featuresUbo) {
+        glDeleteBuffers(1, &_featuresUbo);
+        _featuresUbo = 0;
+    }
     for (auto &pair :_programs) {
         glDeleteProgram(pair.second);
     }
@@ -436,18 +442,11 @@ static const string &getLightUniformName(int index, const char *propName) {
 }
 
 void Shaders::setLocalUniforms(const LocalUniforms &locals) {
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(locals.features), &locals.features, GL_STATIC_DRAW);
+
     setUniform("uModel", locals.model);
     setUniform("uColor", locals.color);
     setUniform("uAlpha", locals.alpha);
-    setUniform("uLightmapEnabled", locals.features.lightmapEnabled);
-    setUniform("uEnvmapEnabled", locals.features.envmapEnabled);
-    setUniform("uLightmapEnabled", locals.features.lightmapEnabled);
-    setUniform("uBumpyShinyEnabled", locals.features.bumpyShinyEnabled);
-    setUniform("uBumpmapEnabled", locals.features.bumpmapEnabled);
-    setUniform("uSkeletalEnabled", locals.features.skeletalEnabled);
-    setUniform("uLightingEnabled", locals.features.lightingEnabled);
-    setUniform("uSelfIllumEnabled", locals.features.selfIllumEnabled);
-    setUniform("uDiscardEnabled", locals.features.discardEnabled);
 
     if (locals.features.skeletalEnabled) {
         setUniform("uAbsTransform", locals.skeletal.absTransform);
