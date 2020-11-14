@@ -752,7 +752,13 @@ void Area::updateSounds() {
     }
 
     sort(soundDistances.begin(), soundDistances.end(), [](auto &left, auto &right) {
-        return left.first->priority() < right.first->priority() || left.second < right.second;
+        int leftPriority = left.first->priority();
+        int rightPriority = right.first->priority();
+
+        if (leftPriority < rightPriority) return true;
+        if (leftPriority > rightPriority) return false;
+
+        return left.second < right.second;
     });
     if (soundDistances.size() > kMaxSoundCount) {
         soundDistances.erase(soundDistances.begin() + kMaxSoundCount, soundDistances.end());
