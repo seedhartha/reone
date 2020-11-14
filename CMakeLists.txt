@@ -364,6 +364,7 @@ set(GAME_HEADERS
     src/game/characters.h
     src/game/collisiondetect.h
     src/game/console.h
+    src/game/combat.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/game.h
@@ -447,6 +448,7 @@ set(GAME_SOURCES
     src/game/characters.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
+    src/game/combat.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp

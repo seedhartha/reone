@@ -28,6 +28,7 @@
 #include "../../script/types.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../action/attack.h"
 
 #include "../blueprint/blueprints.h"
 #include "../portraits.h"

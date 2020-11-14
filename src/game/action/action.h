@@ -23,6 +23,7 @@ namespace game {
 
 enum class ActionType {
     MoveToPoint = 0,
+    AttackObject = 3,
     OpenDoor = 5,
     CloseDoor = 6,
     Follow = 35,
