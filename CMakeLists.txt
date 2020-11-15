@@ -415,6 +415,7 @@ set(GAME_HEADERS
     src/game/player.h
     src/game/portraits.h
     src/game/room.h
+    src/game/rp/attributes.h
     src/game/rp/classes.h
     src/game/rp/types.h
     src/game/savedgame.h
@@ -497,6 +498,7 @@ set(GAME_SOURCES
     src/game/player.cpp
     src/game/portraits.cpp
     src/game/room.cpp
+    src/game/rp/attributes.cpp
     src/game/rp/classes.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp

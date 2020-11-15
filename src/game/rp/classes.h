@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "attributes.h"
 #include "types.h"
 
 namespace reone {

@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <map>
-#include <utility>
-#include <vector>
-
 namespace reone {
 
 namespace game {
@@ -73,56 +69,6 @@ enum class Skill {
     Repair = 5,
     Security = 6,
     TreatInjury = 7
-};
-
-struct CreatureAttributes {
-    std::vector<std::pair<ClassType, int>> classLevels;
-    int hitDice { 0 };
-    std::map<Ability, int> abilities;
-    std::map<Skill, int> skills;
-
-    void computeHitDice() {
-        hitDice = 0;
-        for (auto &classLevel : classLevels) {
-            hitDice += classLevel.second;
-        }
-    }
-
-    ClassType getClassByPosition(int position) const {
-        return (position - 1) < static_cast<int>(classLevels.size()) ?
-            classLevels[static_cast<size_t>(position) - 1].first :
-            ClassType::Invalid;
-    }
-
-    int getClassLevel(ClassType clazz) const {
-        auto maybeClassLevel = find_if(
-            classLevels.begin(), classLevels.end(),
-            [&clazz](auto &classLevel) { return classLevel.first == clazz; });
-
-        return maybeClassLevel != classLevels.end() ? maybeClassLevel->second : 0;
-    }
-
-    int getHitDice() const { return hitDice; }
-
-    int strength() const { return abilities.find(Ability::Strength)->second; }
-    int dexterity() const { return abilities.find(Ability::Dexterity)->second; }
-    int constitution() const { return abilities.find(Ability::Constitution)->second; }
-    int intelligence() const { return abilities.find(Ability::Intelligence)->second; }
-    int wisdom() const { return abilities.find(Ability::Wisdom)->second; }
-    int charisma() const { return abilities.find(Ability::Charisma)->second; }
-
-    bool hasSkill(Skill skill) const {
-        return skills.find(skill)->second > 0;
-    }
-
-    int computerUse() const { return skills.find(Skill::ComputerUse)->second; }
-    int demolitions() const { return skills.find(Skill::Demolitions)->second; }
-    int stealth() const { return skills.find(Skill::Stealth)->second; }
-    int awareness() const { return skills.find(Skill::Awareness)->second; }
-    int persuade() const { return skills.find(Skill::Persuade)->second; }
-    int repair() const { return skills.find(Skill::Repair)->second; }
-    int security() const { return skills.find(Skill::Security)->second; }
-    int treatInjury() const { return skills.find(Skill::TreatInjury)->second; }
 };
 
 } // namespace game

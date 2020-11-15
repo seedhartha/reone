@@ -24,6 +24,8 @@
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
+#include "../rp/attributes.h"
+
 #include "item.h"
 #include "spatial.h"
 

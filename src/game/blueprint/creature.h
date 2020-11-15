@@ -23,7 +23,7 @@
 
 #include "../../resource/gfffile.h"
 
-#include "../rp/types.h"
+#include "../rp/attributes.h"
 
 namespace reone {
 
