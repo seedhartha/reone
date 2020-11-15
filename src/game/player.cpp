@@ -153,6 +153,9 @@ void Player::stopMovement() {
     _moveLeft = false;
     _moveBackward = false;
     _moveRight = false;
+
+    shared_ptr<Creature> partyLeader(_party->leader());
+    partyLeader->setMovementType(Creature::MovementType::None);
 }
 
 } // namespace game

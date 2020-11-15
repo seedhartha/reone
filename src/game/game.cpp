@@ -539,6 +539,7 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 }
 
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
+    _module->player().stopMovement();
     setCursorType(CursorType::Default);
     _screen = GameScreen::Dialog;
     _dialog->startDialog(owner, resRef);
