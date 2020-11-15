@@ -35,6 +35,7 @@ void TriggerBlueprint::load(const GffStruct &utt) {
     boost::to_lower(_tag);
 
     _onEnter = utt.getString("ScriptOnEnter");
+    _onExit = utt.getString("ScriptOnExit");
 }
 
 const string &TriggerBlueprint::tag() const {
@@ -43,6 +44,10 @@ const string &TriggerBlueprint::tag() const {
 
 const string &TriggerBlueprint::onEnter() const {
     return _onEnter;
+}
+
+const string &TriggerBlueprint::onExit() const {
+    return _onExit;
 }
 
 } // namespace resource
