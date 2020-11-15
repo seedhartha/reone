@@ -24,7 +24,6 @@
 
 #include "../common/log.h"
 
-#include "files.h"
 #include "soundhandle.h"
 
 using namespace std;
@@ -35,41 +34,15 @@ namespace audio {
 
 static const int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(const string &resRef, bool loop, float gain, bool positional, Vector3 position) :
-    _resRef(resRef),
-    _loop(loop),
-    _gain(gain),
-    _positional(positional),
-    _handle(new SoundHandle(position)) {
-
-    if (resRef.empty()) {
-        throw invalid_argument("resRef must not be empty");
-    }
-}
-
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, Vector3 position) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
     _positional(positional),
-    _handle(new SoundHandle(position)) {
-
-    if (!stream) {
-        throw invalid_argument("stream must not be null");
-    }
+    _handle(new SoundHandle(stream->duration(), position)) {
 }
 
 void SoundInstance::init() {
-    if (!_stream) {
-        _stream = AudioFiles::instance().get(_resRef);
-        if (!_stream) {
-            warn("SoundInstance: file not found: " + _resRef);
-            _handle->setState(SoundHandle::State::Stopped);
-            return;
-        }
-    }
-    _handle->setDuration(_stream->duration());
-
     int frameCount = _stream->frameCount();
     int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 

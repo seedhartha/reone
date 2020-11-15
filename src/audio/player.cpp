@@ -25,6 +25,7 @@
 
 #include "../common/log.h"
 
+#include "files.h"
 #include "soundhandle.h"
 
 using namespace std;
@@ -116,7 +117,12 @@ void AudioPlayer::deinit() {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, Vector3 position) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(resRef, loop, getGain(type, gain), positional, move(position)));
+    shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
+    if (!stream) {
+        warn("AudioPlayer: file not found: " + resRef);
+        return nullptr;
+    }
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
     enqueue(sound);
     return sound->handle();
 }
