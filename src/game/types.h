@@ -62,6 +62,12 @@ enum InventorySlot {
     kInventorySlotLeftWeapon2 = 19
 };
 
+enum class ContextualAction {
+    None,
+    Unlock,
+    Attack
+};
+
 class CreatureBlueprint;
 
 struct Options {

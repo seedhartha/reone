@@ -63,6 +63,8 @@ public:
     bool handle(const SDL_Event &event);
     void update(float dt);
 
+    std::vector<ContextualAction> getContextualActions(const std::shared_ptr<Object> &object) const;
+
     const std::string &name() const;
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
