@@ -30,6 +30,10 @@ void SoundHandle::stop() {
     _state = State::Stopped;
 }
 
+void SoundHandle::resetPositionDirty() {
+    _positionDirty = false;
+}
+
 bool SoundHandle::isNotInited() const {
     return _state == State::NotInited;
 }
@@ -63,10 +67,6 @@ void SoundHandle::setPosition(Vector3 position) {
         _position = move(position);
         _positionDirty = true;
     }
-}
-
-void SoundHandle::setPositionDirty(bool dirty) {
-    _positionDirty = dirty;
 }
 
 } // namespace audio

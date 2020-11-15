@@ -35,10 +35,11 @@ namespace audio {
 
 static const int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(const string &resRef, Vector3 position, bool loop, float gain) :
+SoundInstance::SoundInstance(const string &resRef, bool loop, float gain, bool positional, Vector3 position) :
     _resRef(resRef),
     _loop(loop),
     _gain(gain),
+    _positional(positional),
     _handle(new SoundHandle(position)) {
 
     if (resRef.empty()) {
@@ -46,10 +47,11 @@ SoundInstance::SoundInstance(const string &resRef, Vector3 position, bool loop, 
     }
 }
 
-SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, Vector3 position, bool loop, float gain) :
+SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, Vector3 position) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
+    _positional(positional),
     _handle(new SoundHandle(position)) {
 
     if (!stream) {
@@ -78,9 +80,12 @@ void SoundInstance::init() {
     alGenSources(1, &_source);
     alSourcef(_source, AL_GAIN, _gain);
 
-    Vector3 position(_handle->position());
-    alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
-
+    if (_positional) {
+        Vector3 position(_handle->position());
+        alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
+    } else {
+        alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
+    }
     if (_buffered) {
         for (int i = 0; i < bufferCount; ++i) {
             _stream->fill(_nextFrame, _buffers[i]);
@@ -114,10 +119,10 @@ void SoundInstance::deinit() {
 }
 
 void SoundInstance::update() {
-    if (_handle->isPositionDirty()) {
+    if (_positional && _handle->isPositionDirty()) {
         Vector3 position(_handle->position());
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
-        _handle->setPositionDirty(false);
+        _handle->resetPositionDirty();
     }
     if (!_buffered) {
         ALint state = 0;

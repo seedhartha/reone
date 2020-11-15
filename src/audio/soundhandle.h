@@ -36,6 +36,7 @@ public:
     SoundHandle(Vector3 position);
 
     void stop();
+    void resetPositionDirty();
 
     bool isNotInited() const;
     bool isStopped() const;
@@ -47,7 +48,6 @@ public:
     void setState(State state);
     void setDuration(int duration);
     void setPosition(Vector3 position);
-    void setPositionDirty(bool dirty);
 
 private:
     std::atomic<State> _state { State::NotInited };
