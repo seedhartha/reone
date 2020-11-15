@@ -90,9 +90,10 @@ public:
     void startDialog(SpatialObject &owner, const std::string &resRef);
     void quit();
 
-    Camera *getActiveCamera() const;
-
     bool isLoadFromSaveGame() const;
+
+    Camera *getActiveCamera() const;
+    int getRunScriptVar() const;
 
     resource::GameVersion version() const;
     const Options &options() const;
@@ -105,6 +106,7 @@ public:
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
+    void setRunScriptVar(int var);
 
     // Globals/locals
 
@@ -167,6 +169,7 @@ private:
     float _gameSpeed { 1.0f };
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
+    int _runScriptVar { -1 };
 
     // Modules
 

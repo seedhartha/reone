@@ -31,6 +31,8 @@
 #include "../object/creature.h"
 #include "../object/door.h"
 
+#include "util.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -153,6 +155,24 @@ Variable Routines::d100(const vector<Variable> &args, ExecutionContext &ctx) {
 
 Variable Routines::shipBuild(const vector<Variable> &args, ExecutionContext &ctx) {
     return 1;
+}
+
+Variable Routines::executeScript(const vector<Variable> &args, ExecutionContext &ctx) {
+    string script(args[0].strValue);
+    int targetId = args[1].objectId;
+    int scriptVar = args.size() >= 3 ? args[2].intValue : -1;
+
+    shared_ptr<Object> target(getObjectById(targetId, ctx));
+    if (target) {
+        _game->setRunScriptVar(scriptVar);
+        runScript(script, targetId, kObjectInvalid, -1);
+    }
+
+    return Variable();
+}
+
+Variable Routines::getRunScriptVar(const vector<Variable> &args, ExecutionContext &ctx) {
+    return _game->getRunScriptVar();
 }
 
 } // namespace game

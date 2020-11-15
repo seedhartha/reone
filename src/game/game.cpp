@@ -291,6 +291,10 @@ Camera *Game::getActiveCamera() const {
     return &area->getCamera(_cameraType);
 }
 
+int Game::getRunScriptVar() const {
+    return _runScriptVar;
+}
+
 void Game::drawGUI() {
     GlobalUniforms globals;
     globals.projection = glm::ortho(
@@ -773,6 +777,10 @@ int Game::getUserDefinedEventNumber(int eventId) {
     }
 
     return maybeEvent->second.eventNumber;
+}
+
+void Game::setRunScriptVar(int var) {
+    _runScriptVar = var;
 }
 
 } // namespace game

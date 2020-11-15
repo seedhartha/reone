@@ -47,7 +47,7 @@ void Routines::addTslRoutines() {
     add("PrintObject", Void, { Object });
     add("AssignCommand", Void, { Object, Action }, bind(&Routines::assignCommand, this, _1, _2));
     add("DelayCommand", Void, { Float, Action }, bind(&Routines::delayCommand, this, _1, _2));
-    add("ExecuteScript", Void, { String, Object, Int });
+    add("ExecuteScript", Void, { String, Object, Int }, bind(&Routines::executeScript, this, _1, _2));
     add("ClearAllActions", Void, { }, bind(&Routines::clearAllActions, this, _1, _2));
     add("SetFacing", Void, { Float });
     add("SwitchPlayerCharacter", Int, { Int });
@@ -604,7 +604,7 @@ void Routines::addTslRoutines() {
     add("GetFactionLeader", Object, { Object });
     add("SWMG_SetSpeedBlurEffect", Void, { Int, Float });
     add("EndGame", Void, { Int });
-    add("GetRunScriptVar", Int, { });
+    add("GetRunScriptVar", Int, { }, bind(&Routines::getRunScriptVar, this, _1, _2));
     add("GetCreatureMovmentType", Int, { Object });
     add("AmbientSoundSetDayVolume", Void, { Object, Int });
     add("AmbientSoundSetNightVolume", Void, { Object, Int });
