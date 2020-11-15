@@ -74,16 +74,16 @@ void Trigger::update(float dt) {
     set<shared_ptr<SpatialObject>> tenantsToRemove;
 
     for (auto &tenant : _tenants) {
-        glm::vec2 position2d(tenant->position());
-        if (isIn(position2d)) continue;
-
+        if (tenant) {
+            glm::vec2 position2d(tenant->position());
+            if (isIn(position2d)) continue;
+        }
         tenantsToRemove.insert(tenant);
-
+    }
+    for (auto &tenant : tenantsToRemove) {
         if (!_blueprint->onExit().empty()) {
             runScript(_blueprint->onExit(), id(), tenant->id(), -1);
         }
-    }
-    for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
     }
 }
