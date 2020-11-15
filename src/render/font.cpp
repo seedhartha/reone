@@ -146,8 +146,6 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    _texture->unbind(0);
 }
 
 float Font::measure(const string &text) const {

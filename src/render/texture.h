@@ -49,7 +49,6 @@ public:
     void initGL();
     void deinitGL();
     void bind(int unit);
-    void unbind(int unit);
 
     bool isAdditive() const;
 
