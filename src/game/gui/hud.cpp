@@ -148,6 +148,12 @@ void HUD::load() {
     hideControl("TB_STEALTH");
 }
 
+bool HUD::handle(const SDL_Event &event) {
+    if (_select.handle(event)) return true;
+
+    return GUI::handle(event);
+}
+
 void HUD::update(float dt) {
     GUI::update(dt);
 

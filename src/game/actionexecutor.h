@@ -59,6 +59,7 @@ private:
     void executeOpenDoor(Object &actor, ObjectAction &action, float dt);
     void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
     void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);
+    void executeOpenLock(Creature &actor, ObjectAction &action, float dt);
 
     // END Actions
 };
