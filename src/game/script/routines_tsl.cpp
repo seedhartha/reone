@@ -199,7 +199,7 @@ void Routines::addTslRoutines() {
     add("EffectConfused", Effect, { });
     add("EffectFrightened", Effect, { });
     add("EffectChoke", Effect, { });
-    add("SetGlobalString", Void, { String, String });
+    add("SetGlobalString", Void, { String, String }, bind(&Routines::setGlobalString, this, _1, _2));
     add("EffectStunned", Effect, { });
     add("SetCommandable", Void, { Int, Object });
     add("GetCommandable", Int, { Object });
@@ -233,7 +233,7 @@ void Routines::addTslRoutines() {
     add("GetFactionMostFrequentClass", Int, { Object });
     add("GetFactionWorstAC", Object, { Object, Int });
     add("GetFactionBestAC", Object, { Object, Int });
-    add("GetGlobalString", String, { String });
+    add("GetGlobalString", String, { String }, bind(&Routines::getGlobalString, this, _1, _2));
     add("GetListenPatternNumber", Int, { });
     add("ActionJumpToObject", Void, { Object, Int });
     add("GetWaypointByTag", Object, { String }, bind(&Routines::getWaypointByTag, this, _1, _2));

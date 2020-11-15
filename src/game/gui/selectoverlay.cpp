@@ -101,7 +101,7 @@ bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
 bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (event.clicks > 1 ||
-        _selectedActionIdx == -1 |
+        _selectedActionIdx == -1 ||
         _selectedActionIdx >= _actions.size()) return false;
 
     shared_ptr<Area> area(_game->module()->area());

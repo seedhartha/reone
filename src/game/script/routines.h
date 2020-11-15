@@ -125,14 +125,16 @@ private:
 
     // Globals/locals
 
-    script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Globals/locals
 

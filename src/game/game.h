@@ -112,11 +112,13 @@ public:
 
     bool getGlobalBoolean(const std::string &name) const;
     int getGlobalNumber(const std::string &name) const;
+    std::string getGlobalString(const std::string &name) const;
     bool getLocalBoolean(uint32_t objectId, int idx) const;
     int getLocalNumber(uint32_t objectId, int idx) const;
 
     void setGlobalBoolean(const std::string &name, bool value);
     void setGlobalNumber(const std::string &name, int value);
+    void setGlobalString(const std::string &name, const std::string &value);
     void setLocalBoolean(uint32_t objectId, int idx, bool value);
     void setLocalNumber(uint32_t objectId, int idx, int value);
 
@@ -204,6 +206,7 @@ private:
 
     // Globals/locals
 
+    std::map<std::string, std::string> _globalStrings;
     std::map<std::string, bool> _globalBooleans;
     std::map<std::string, int> _globalNumbers;
     std::map<uint32_t, std::map<int, bool>> _localBooleans;
