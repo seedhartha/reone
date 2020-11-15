@@ -44,6 +44,7 @@ public:
 
     void load();
 
+    bool handle(const SDL_Event &event);
     void update();
     void render() const;
 
@@ -63,12 +64,18 @@ private:
     glm::vec3 _selectedScreenCoords { 0.0f };
     std::string _selectedTitle;
     int _reticleHeight { 0 };
+    int _selectedActionIdx { -1 };
 
     void addTextureByAction(ContextualAction action, const std::string &resRef);
+
+    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
     void drawTitleBar() const;
     void drawActionBar() const;
+
+    bool getActionScreenCoords(int index, float &x, float &y) const;
 };
 
 } // namespace game

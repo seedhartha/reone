@@ -25,6 +25,7 @@ enum class ActionType {
     MoveToPoint = 0,
     OpenDoor = 5,
     CloseDoor = 6,
+    OpenLock = 13,
     Follow = 35,
     FollowLeader = 38,
     QueueEmpty = 65534,

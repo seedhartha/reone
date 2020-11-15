@@ -43,6 +43,7 @@ namespace game {
 static const int kOffsetToReticle = 8;
 static const int kTitleBarWidth = 250;
 static const int kTitleBarPadding = 6;
+static const int kActionCount = 3;
 static const int kActionBarMargin = 3;
 static const int kActionBarPadding = 3;
 static const int kActionWidth = 35;
@@ -68,6 +69,52 @@ void SelectionOverlay::load() {
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
     _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureType::GUI)));
+}
+
+bool SelectionOverlay::handle(const SDL_Event &event) {
+    switch (event.type) {
+        case SDL_MOUSEMOTION:
+            return handleMouseMotion(event.motion);
+        case SDL_MOUSEBUTTONDOWN:
+            return handleMouseButtonDown(event.button);
+        default:
+            return false;
+    }
+}
+
+bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+    _selectedActionIdx = -1;
+
+    if (!_hasSelected) return false;
+
+    for (int i = 0; i < kActionCount; ++i) {
+        float x, y;
+        getActionScreenCoords(i, x, y);
+        if (event.x >= x && event.y >= y && event.x < x + kActionWidth && event.y < y + kActionHeight) {
+            _selectedActionIdx = i;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (event.clicks > 1 || _selectedActionIdx == -1) return false;
+
+    shared_ptr<Area> area(_game->module()->area());
+    ObjectSelector &selector = area->objectSelector();
+    shared_ptr<SpatialObject> object(area->find(selector.selectedObjectId()));
+
+    switch (_actions[_selectedActionIdx]) {
+        case ContextualAction::Unlock: {
+            ActionQueue &actions = _game->party().leader()->actionQueue();
+            actions.add(make_unique<ObjectAction>(ActionType::OpenLock, object));
+            break;
+        }
+    }
+
+    return true;
 }
 
 void SelectionOverlay::update() {
@@ -177,10 +224,10 @@ void SelectionOverlay::drawTitleBar() const {
 
 void SelectionOverlay::drawActionBar() const {
     const GraphicsOptions &opts = _game->options().graphics;
-    float frameY = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kActionHeight - kOffsetToReticle - kActionBarMargin;
 
-    for (int i = -1; i < 2; ++i) {
-        float frameX = opts.width * _selectedScreenCoords.x + (static_cast<float>(i) - 0.5f) * kActionWidth + i * kActionBarMargin;
+    for (int i = 0; i < kActionCount; ++i) {
+        float frameX, frameY;
+        getActionScreenCoords(i, frameX, frameY);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
@@ -191,19 +238,24 @@ void SelectionOverlay::drawActionBar() const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        _friendlyScroll->bind(0);
+        shared_ptr<Texture> frameTexture;
+        if (i == _selectedActionIdx) {
+            frameTexture = _hilightedScroll;
+        } else {
+            frameTexture = _friendlyScroll;
+        }
+        frameTexture->bind(0);
 
         Quad::getDefault().renderTriangles();
 
-        _friendlyScroll->unbind(0);
+        frameTexture->unbind(0);
 
-        int actionIdx = i + 1;
-        if (actionIdx < static_cast<int>(_actions.size())) {
-            ContextualAction action = _actions[actionIdx];
+        if (i < static_cast<int>(_actions.size())) {
+            ContextualAction action = _actions[i];
 
             shared_ptr<Texture> texture(_textureByAction.find(action)->second);
             if (texture) {
-                float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2 - kOffsetToReticle - kActionBarMargin;
+                float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2.0f - kOffsetToReticle - kActionBarMargin;
 
                 transform = glm::mat4(1.0f);
                 transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
@@ -222,6 +274,16 @@ void SelectionOverlay::drawActionBar() const {
             }
         }
     }
+}
+
+bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
+    if (!_hasSelected) return false;
+
+    const GraphicsOptions &opts = _game->options().graphics;
+    x = opts.width * _selectedScreenCoords.x + (static_cast<float>(index - 1) - 0.5f) * kActionWidth + (index - 1) * kActionBarMargin;
+    y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kActionHeight - kOffsetToReticle - kActionBarMargin;
+
+    return true;
 }
 
 } // namespace game

@@ -80,6 +80,9 @@ void ActionExecutor::executeActions(Object &object, float dt) {
         case ActionType::OpenContainer:
             executeOpenContainer(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
             break;
+        case ActionType::OpenLock:
+            executeOpenLock(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
+            break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
             action->isCompleted();
@@ -251,6 +254,24 @@ void ActionExecutor::executeOpenContainer(Creature &actor, ObjectAction &action,
     bool reached = navigateCreature(actor, placeable.position(), 1.0f, dt);
     if (reached) {
         _game->openContainer(&placeable);
+        action.complete();
+    }
+}
+
+void ActionExecutor::executeOpenLock(Creature &actor, ObjectAction &action, float dt) {
+    Door *door = dynamic_cast<Door *>(action.object());
+    if (door) {
+        bool reached = navigateCreature(actor, door->position(), 1.0f, dt);
+        if (reached) {
+            door->setLocked(false);
+            door->open(&actor);
+            if (!door->blueprint().onOpen().empty()) {
+                runScript(door->blueprint().onOpen(), door->id(), actor.id(), -1);
+            }
+            action.complete();
+        }
+    } else {
+        warn("ActionExecutor: unsupported OpenLock object: " + to_string(action.object()->id()));
         action.complete();
     }
 }
