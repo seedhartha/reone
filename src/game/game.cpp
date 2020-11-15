@@ -540,10 +540,15 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 }
 
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
-    _module->player().stopMovement();
+    stopMovement();
     setCursorType(CursorType::Default);
     _screen = GameScreen::Dialog;
     _dialog->startDialog(owner, resRef);
+}
+
+void Game::stopMovement() {
+    getActiveCamera()->stopMovement();
+    _module->player().stopMovement();
 }
 
 void Game::openContainer(SpatialObject *container) {
@@ -553,6 +558,7 @@ void Game::openContainer(SpatialObject *container) {
 }
 
 void Game::openPartySelection(const PartySelection::Context &ctx) {
+    stopMovement();
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
     _screen = GameScreen::PartySelection;

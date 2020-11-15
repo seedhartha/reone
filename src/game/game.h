@@ -227,6 +227,7 @@ private:
     void runMainLoop();
     void toggleInGameCameraType();
     void updateCamera(float dt);
+    void stopMovement();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
