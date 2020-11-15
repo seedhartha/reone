@@ -24,7 +24,6 @@
 
 #include "glm/gtx/norm.hpp"
 
-#include "../../audio/player.h"
 #include "../../render/models.h"
 #include "../../render/walkmeshes.h"
 #include "../../resource/lytfile.h"
@@ -736,7 +735,6 @@ void Area::updateSounds() {
 
     vector<pair<Sound *, float>> soundDistances;
     glm::vec3 cameraPosition(camera->sceneNode()->absoluteTransform()[3]);
-    AudioPlayer::instance().setListenerPosition(cameraPosition);
 
     for (auto &sound : _objectsByType[ObjectType::Sound]) {
         Sound *soundPtr = static_cast<Sound *>(sound.get());
