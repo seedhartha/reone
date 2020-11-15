@@ -35,13 +35,9 @@ public:
 
     bool isInRange() { return _inRange; }
 
-    void advance(float dt) {
-        _timeout = glm::max(0.0f, _timeout - dt);
-    }
+    void advance(float dt) { _timeout = glm::max(0.0f, _timeout - dt); }
 
-    bool isTimedOut() const {
-        return _timeout < 1E-6;
-    }
+    bool isTimedOut() const { return _timeout < 1E-6; }
 
     float distance() const { return _distance; }
 

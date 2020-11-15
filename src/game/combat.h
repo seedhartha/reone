@@ -20,7 +20,7 @@
 #include <unordered_set>
 #include <map>
 
-
+#include "faction.h"
 #include "effect.h"
 #include "types.h"
 #include "object/creature.h"
@@ -71,20 +71,46 @@ private:
     uint32_t _timestamp;
 };
 
+constexpr float MAX_DETECT_RANGE = 20; // TODO: adjust detection distance
+
 class Combat {
 
 public:
     Combat(Area *area, Party *party);
 
     /*
-    * AIMaster -> CombatStateMachine -> effectSync -> animationSync
+    * Always:
+    * 0. Update Timers
+    * 1. Activity Scanner
+    * 2. Sync Effect
+
+    * If Combat Mode Activated:
+    * 3. AIMaster
+    * 4. Update CombatStateMachine
+    * 5. Sync Animation
     */
     void update();
 
     /*
     * Roles:
-    * 1. Scan surroundings for hostiles
-    * 2. Queue Commands (e.g. go to, item consumption, equipment swapping etc.)
+    * 1. Scan the surrounding of one combatant per frame, remove the combatant if
+    *    no enemies are in visible range & no action in actionQueue
+    * 2. Add creatures to _activeCombatants, if applicable
+    * 3. Activate/Deactivate global combat mode for party->player
+    */
+    void activityScanner();
+
+    /*
+    * Roles:
+    * 1. Evaluate damage/effects
+    * 2. Animate damage statistics
+    * 3. Feedback Text
+    */
+    void effectSync();
+
+    /*
+    * Roles:
+    * 1. Queue Commands (e.g. go to, item consumption, equipment swapping etc.)
     */
     void AIMaster(std::shared_ptr<Creature> &combatant);
 
@@ -94,13 +120,6 @@ public:
     * 2. Combat signal exchange and synchronization
     */
     void combatStateMachine(std::shared_ptr<Creature> &combatant);
-
-    /*
-    * 1. Evaluate damage/effects
-    * 2. Animate damage statistics
-    * 3. Feedback Text
-    */
-    void effectSync();
 
     /*
     * Roles:
@@ -115,8 +134,21 @@ private:
     Area *_area;
     Party *_party;
 
-    std::list<std::shared_ptr<Creature>> _activeCombatants;
-    
+    /* combat mode */
+    bool _activated = false;
+
+    /* register to _activeCombatants */
+    bool registerCombatant(const std::shared_ptr<Creature> &combatant) {
+        auto res = _activeCombatantIds.insert(combatant->id());
+        if (res.second) { // combatant not already in _activeCombatantIds
+            _activeCombatants.push_back(combatant);
+        }
+        return res.second;
+    }
+
+    std::deque<std::shared_ptr<Creature>> _activeCombatants;
+    std::unordered_set<uint32_t> _activeCombatantIds;
+
     /* queue[ pair( attacker, victim ) ] */
     std::deque<std::pair<std::shared_ptr<Creature>,
         std::shared_ptr<Creature>>> _duelQueue;
