@@ -17,21 +17,12 @@
 
 #include "routines.h"
 
-#include "SDL2/SDL_timer.h"
+#include <boost/format.hpp>
 
-#include "../../common/log.h"
 #include "../../common/random.h"
 
-#include "../action/commandaction.h"
-#include "../action/movetoobject.h"
-#include "../action/movetopoint.h"
-#include "../action/startconversation.h"
 #include "../game.h"
-#include "../object/area.h"
-#include "../object/creature.h"
-#include "../object/door.h"
-
-#include "util.h"
+#include "../script/util.h"
 
 using namespace std;
 
@@ -41,18 +32,6 @@ using namespace reone::script;
 namespace reone {
 
 namespace game {
-
-Variable Routines::random(const vector<Variable> &args, ExecutionContext &ctx) {
-    return reone::random(0, args[0].intValue - 1);
-}
-
-Variable Routines::intToFloat(const vector<Variable> & args, ExecutionContext & ctx) {
-    return static_cast<float>(args[0].intValue);
-}
-
-Variable Routines::getLoadFromSaveGame(const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable(_game->isLoadFromSaveGame() ? 1 : 0);
-}
 
 Variable Routines::d2(const vector<Variable> &args, ExecutionContext &ctx) {
     int numDice = args.size() > 0 ? args[0].intValue : 1;
@@ -153,6 +132,54 @@ Variable Routines::d100(const vector<Variable> &args, ExecutionContext &ctx) {
     return result;
 }
 
+Variable Routines::feetToMeters(const vector<Variable> &args, ExecutionContext &ctx) {
+    return args[0].floatValue * 0.3048f;
+}
+
+Variable Routines::floatToInt(const vector<Variable> &args, ExecutionContext &ctx) {
+    return static_cast<int>(args[0].floatValue);
+}
+
+Variable Routines::floatToString(const vector<Variable> &args, ExecutionContext &ctx) {
+    return to_string(args[0].floatValue);
+}
+
+Variable Routines::hoursToSeconds(const vector<Variable> &args, ExecutionContext &ctx) {
+    return args[0].intValue * 3600;
+}
+
+Variable Routines::intToFloat(const vector<Variable> &args, ExecutionContext &ctx) {
+    return static_cast<float>(args[0].intValue);
+}
+
+Variable Routines::intToHexString(const vector<Variable> &args, ExecutionContext &ctx) {
+    return str(boost::format("%08x") % args[0].intValue);
+}
+
+Variable Routines::intToString(const vector<Variable> &args, ExecutionContext &ctx) {
+    return to_string(args[0].intValue);
+}
+
+Variable Routines::roundsToSeconds(const vector<Variable> &args, ExecutionContext &ctx) {
+    return args[0].intValue / 6.0f;
+}
+
+Variable Routines::stringToFloat(const vector<Variable> &args, ExecutionContext &ctx) {
+    return stof(args[0].strValue);
+}
+
+Variable Routines::stringToInt(const vector<Variable> &args, ExecutionContext &ctx) {
+    return stoi(args[0].strValue);
+}
+
+Variable Routines::turnsToSeconds(const vector<Variable> &args, ExecutionContext &ctx) {
+    return args[0].intValue / 60.0f;
+}
+
+Variable Routines::yardsToMeters(const vector<Variable> &args, ExecutionContext &ctx) {
+    return args[0].floatValue * 0.9144f;
+}
+
 Variable Routines::shipBuild(const vector<Variable> &args, ExecutionContext &ctx) {
     return 1;
 }
@@ -173,6 +200,14 @@ Variable Routines::executeScript(const vector<Variable> &args, ExecutionContext 
 
 Variable Routines::getRunScriptVar(const vector<Variable> &args, ExecutionContext &ctx) {
     return _game->getRunScriptVar();
+}
+
+Variable Routines::random(const vector<Variable> &args, ExecutionContext &ctx) {
+    return reone::random(0, args[0].intValue - 1);
+}
+
+Variable Routines::getLoadFromSaveGame(const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable(_game->isLoadFromSaveGame() ? 1 : 0);
 }
 
 } // namespace game
