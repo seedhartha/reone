@@ -65,94 +65,8 @@ private:
     void addTslRoutines();
 
     std::shared_ptr<Object> getObjectById(uint32_t id, const script::ExecutionContext &ctx) const;
-    script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
-    // Objects
-
-    script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getFirstPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getHitDice(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getClassByPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getHasSkill(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getPCSpeaker(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Objects
-
-    // Globals/locals
-
-    script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Globals/locals
-
-    // Events
-
-    script::Variable eventUserDefined(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable signalEvent(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable getUserDefinedEventNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Events
-
-    // Actions
-
-    script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionPauseConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionResumeConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Actions
-
-    // Party
-
-    script::Variable isAvailableCreature(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable addAvailableNPCByTemplate(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Party
-
-    // Math
-
-    script::Variable fabs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable cos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable sin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable tan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable acos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable asin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable atan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable log(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable pow(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable sqrt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable abs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
-    // END Math
-
-    // Dice
+    // Common
 
     script::Variable d2(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable d3(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -164,7 +78,99 @@ private:
     script::Variable d20(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable d100(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
-    // END Dice
+    script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Common
+
+    // Objects
+
+    script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Objects
+
+    // Globals/locals
+
+    script::Variable setLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Globals/locals
+
+    // Events
+
+    script::Variable eventUserDefined(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable signalEvent(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getUserDefinedEventNumber(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Events
+
+    // Party
+
+    script::Variable addAvailableNPCByTemplate(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getFirstPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPCSpeaker(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable isAvailableCreature(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Party
+
+    // Actions
+
+    script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionPauseConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionResumeConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Actions
+
+    // Role-playing
+
+    script::Variable getClassByPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getHasSkill(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getHitDice(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Role-playing
+
+    // Math
+
+    script::Variable abs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable acos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable asin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable atan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable cos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable fabs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable log(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable pow(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable sin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable sqrt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable tan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Math
 };
 
 } // namespace game
