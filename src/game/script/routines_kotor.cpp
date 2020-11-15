@@ -205,7 +205,7 @@ void Routines::addKotorRoutines() {
     add("GetCommandable", Int, { Object });
     add("EffectRegenerate", Effect, { Int, Float });
     add("EffectMovementSpeedIncrease", Effect, { Int });
-    add("GetHitDice", Int, { Object });
+    add("GetHitDice", Int, { Object }, bind(&Routines::getHitDice, this, _1, _2));
     add("ActionForceFollowObject", Void, { Object, Float });
     add("GetTag", String, { Object });
     add("ResistForce", Int, { Object, Object });
@@ -277,7 +277,7 @@ void Routines::addKotorRoutines() {
     add("GetIsEnemy", Int, { Object, Object });
     add("GetIsFriend", Int, { Object, Object });
     add("GetIsNeutral", Int, { Object, Object });
-    add("GetPCSpeaker", Object, { });
+    add("GetPCSpeaker", Object, { }, bind(&Routines::getPCSpeaker, this, _1, _2));
     add("GetStringByStrRef", String, { Int });
     add("ActionSpeakStringByStrRef", Void, { Int, Int });
     add("DestroyObject", Void, { Object, Float, Int, Float }, bind(&Routines::destroyObject, this, _1, _2));
@@ -325,7 +325,7 @@ void Routines::addKotorRoutines() {
     add("GetModuleItemAcquiredFrom", Object, { });
     add("SetCustomToken", Void, { Int, String });
     add("GetHasFeat", Int, { Int, Object });
-    add("GetHasSkill", Int, { Int, Object });
+    add("GetHasSkill", Int, { Int, Object }, bind(&Routines::getHasSkill, this, _1, _2));
     add("ActionUseFeat", Void, { Int, Object });
     add("ActionUseSkill", Void, { Int, Object, Int, Object });
     add("GetObjectSeen", Int, { Object, Object });
@@ -380,7 +380,7 @@ void Routines::addKotorRoutines() {
     add("DoDoorAction", Void, { Object, Int });
     add("GetFirstItemInInventory", Object, { Object });
     add("GetNextItemInInventory", Object, { Object });
-    add("GetClassByPosition", Int, { Int, Object });
+    add("GetClassByPosition", Int, { Int, Object }, bind(&Routines::getClassByPosition, this, _1, _2));
     add("GetLevelByPosition", Int, { Int, Object });
     add("GetLevelByClass", Int, { Int, Object }, bind(&Routines::getLevelByClass, this, _1, _2));
     add("GetDamageDealtByType", Int, { Int });

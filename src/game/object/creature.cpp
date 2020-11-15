@@ -284,6 +284,9 @@ void Creature::load(const CreatureConfiguration &config) {
         shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
         loadAppearance(*appearance, config.appearance);
         loadPortrait(config.appearance);
+
+        _attributes.classLevels.push_back(make_pair(config.clazz, 1));
+        _attributes.computeHitDice();
     }
     for (auto &item : config.equipment) {
         equip(item);
@@ -487,10 +490,6 @@ Gender Creature::gender() const {
     return _config.gender;
 }
 
-int Creature::getClassLevel(ClassType clazz) const {
-    return _config.clazz == clazz ? 1 : 0;
-}
-
 int Creature::appearance() const {
     return _config.appearance;
 }
@@ -517,6 +516,10 @@ float Creature::walkSpeed() const {
 
 float Creature::runSpeed() const {
     return _runSpeed;
+}
+
+const CreatureAttributes &Creature::attributes() const {
+    return _attributes;
 }
 
 glm::vec3 Creature::selectablePosition() const {

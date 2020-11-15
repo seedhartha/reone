@@ -66,6 +66,7 @@ void CreatureBlueprint::loadAttributes(const GffStruct &utc) {
     }
     loadAbilities(utc);
     loadSkills(utc);
+    _attributes.computeHitDice();
 }
 
 void CreatureBlueprint::loadAbilities(const GffStruct &utc) {

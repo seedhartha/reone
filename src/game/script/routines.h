@@ -88,7 +88,10 @@ private:
     script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-
+    script::Variable getHitDice(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getClassByPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getHasSkill(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPCSpeaker(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Objects
 
