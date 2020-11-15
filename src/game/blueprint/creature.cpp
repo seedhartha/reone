@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/log.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -42,6 +43,7 @@ void CreatureBlueprint::load(const GffStruct &utc) {
 
     _appearance = utc.getInt("Appearance_Type");
     _portraitId = utc.getInt("PortraitId", -1);
+    _factionId = utc.getInt("FactionID", -1);
     _conversation = utc.getString("Conversation");
 
     int firstNameStrRef = utc.getInt("FirstName", -1);

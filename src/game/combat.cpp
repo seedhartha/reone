@@ -28,22 +28,34 @@ namespace reone {
 
 namespace game {
 
-// void Combat::load(const shared_ptr<Area> &area)
-// {
-//     _area = area;
+// helper functions
 
-//     _activeCombatants.clear();
+AttackAction* getAttackAction(shared_ptr<Creature>& combatant) {
+    return dynamic_cast<AttackAction*>(combatant->actionQueue().currentAction());
+}
 
-//     // for testing purpose:
-//     for (auto &creature : area->objectsByType()[ObjectType::Creature]) {
-//         if (creature->tag().compare("kas22_kinrath_05") == 0 || creature->tag().compare("kas22_czguard_01") == 0
-//             || creature->tag().compare("kas22_czguard_02") == 0 || creature->tag().compare("kas22_dehno_01") == 0) {
+bool isActiveTargetInRange(shared_ptr<Creature>& combatant) {
+    auto* action = getAttackAction(combatant);
+    return action && action->isInRange();
+}
 
-//             _activeCombatants.push_back(move(static_pointer_cast<Creature>(creature)));
-//             debug(boost::format("creature '%s' with id '%d' added to combatant list!!") % creature->tag() % creature->id());
-//         }
-//     }
-// }
+void duel(shared_ptr<Creature>& attacker, shared_ptr<Creature>& target) {
+    target->face(*attacker);
+    attacker->face(*target);
+    attacker->playAnimation("g8a1");
+    target->playAnimation("g8g1");
+}
+
+void bash(shared_ptr<Creature>& attacker, shared_ptr<Creature>& target) {
+    attacker->face(*target);
+    attacker->playAnimation("g8a2");
+}
+
+void flinch(shared_ptr<Creature>& target) {
+    target->playAnimation("g1y1");
+}
+
+// END helper functions
 
 Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
     if (!area) {
@@ -56,20 +68,66 @@ void Combat::update() {
 
     std::shared_ptr<Creature> pc = _party->player();
     if (pc) {
-        for (auto &cbt : _activeCombatants) AIMaster(cbt); // TODO: use blind cycle
+        activityScanner();
 
-        combatStateMachine(pc);
-        for (auto &cbt : _activeCombatants) {
-            combatStateMachine(cbt);
+        
+
+        if (_activated) {
+            for (auto& cbt : _activeCombatants) AIMaster(cbt);
+            for (auto &cbt : _activeCombatants) combatStateMachine(cbt);
+
+            animationSync();
         }
-        animationSync();
     }
     else {
         debug("no pc yet ...");
     }
 }
 
+void Combat::activityScanner()
+{
+    _activated = !_activeCombatants.empty();
+    auto &actor = _activated ? _activeCombatants.front() : _party->player();
+
+    // TODO: need a better mechanism to query creatures in range
+    bool stillActive = false;
+    for (auto &creature : _area->objectsByType()[ObjectType::Creature]) {
+        if (glm::length(creature->position() - actor->position()) > MAX_DETECT_RANGE) {
+            continue;
+        }
+
+        // TODO: add line-of-sight requirement
+
+        const auto &target = static_pointer_cast<Creature>(creature);
+        if (getIsEnemy(actor, target)) {
+            stillActive = true;
+            if (registerCombatant(target)) { // will fail if already registered
+                debug(boost::format("combat: registered '%s', faction '%d'")
+                      % target->tag() % static_cast<int>(target->getFaction()));
+            }
+        }
+    }
+
+    if (!_activated) return;
+
+    // remove actor from _activeCombatants if !active
+    if (!stillActive) {
+        actor->setCombatState(CombatState::Idle);
+
+        _activeCombatants.pop_front();
+        _activeCombatantIds.erase(actor->id());
+
+        debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % _activated);
+    }
+    else { // rotate _activeCombatants
+        _activeCombatants.pop_front();
+        _activeCombatants.push_back(actor);
+    }
+}
+
 void Combat::AIMaster(shared_ptr<Creature> &combatant) {
+    if (combatant->id() == _party->player()->id()) return;
+
     ActionQueue &cbt_queue = combatant->actionQueue();
 
     // no additional instructions if current queue is empty
@@ -78,23 +136,20 @@ void Combat::AIMaster(shared_ptr<Creature> &combatant) {
     // otherwise, go to nearest hostile, set meleecommand, unset meleecommand
 
     auto hostile = findNearestHostile(combatant);
-    if (hostile) cbt_queue.add(make_unique<AttackAction>(hostile, true));
-}
-
-AttackAction* getAttackAction(shared_ptr<Creature>& combatant) {
-    return dynamic_cast<AttackAction*>(combatant->actionQueue().currentAction());
-}
-
-bool isActiveTargetInRange(shared_ptr<Creature>& combatant) {
-    auto* action = getAttackAction(combatant);
-    return action && action->isInRange();
+    if (hostile) {
+        cbt_queue.add(make_unique<AttackAction>(hostile, true));
+        debug(boost::format("AIMaster: '%s' Queued to attack '%s'") % combatant->tag()
+            % hostile->tag());
+    }
 }
 
 void Combat::onEnterAttackState(shared_ptr<Creature> &combatant) {
     if (!combatant) return;
 
     setStateTimeout(combatant, 1500);
-    debug(boost::format("'%s' enters Attack state, set_timer") % combatant->tag());
+    debug(boost::format("'%s' enters Attack state, actionQueueLen[%d], attackAction[%d]") 
+        % combatant->tag() % combatant->actionQueue().size()
+        % (getAttackAction(combatant) != nullptr)); // TODO: disable redundant info
 
     auto *action = getAttackAction(combatant);
     auto &target = action->target();
@@ -180,22 +235,6 @@ void Combat::combatStateMachine(shared_ptr<Creature> &combatant) {
     }
 }
 
-void duel(shared_ptr<Creature>& attacker, shared_ptr<Creature>& target) {
-    target->face(*attacker);
-    attacker->face(*target);
-    attacker->playAnimation("g8a1");
-    target->playAnimation("g8g1");
-}
-
-void bash(shared_ptr<Creature>& attacker, shared_ptr<Creature>& target) {
-    attacker->face(*target);
-    attacker->playAnimation("g8a2");
-}
-
-void flinch(shared_ptr<Creature>& target) {
-    target->playAnimation("g1y1");
-}
-
 void Combat::animationSync() {
     while (!_duelQueue.empty()) {
         auto &pr = _duelQueue.front();
@@ -214,10 +253,11 @@ shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant)
     shared_ptr<Creature> closest_target = nullptr;
     float min_dist = 1000000;
 
-    for (auto &creature : _area->objectsByType()[ObjectType::Creature]) {
+    for (auto &creature : _activeCombatants) {
         if (creature->id() == combatant->id()) continue;
 
-        // TODO: if (nonhostile) continue;
+        if (!getIsEnemy(static_pointer_cast<Creature>(creature), combatant))
+            continue;
 
         float distance = glm::length(creature->position() - combatant->position()); // TODO: fine tune the distance
         if (distance < min_dist) {
