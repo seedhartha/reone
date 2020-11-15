@@ -590,6 +590,8 @@ void Game::updateCamera(float dt) {
     Camera *camera = getActiveCamera();
     if (camera) {
         camera->update(dt);
+        glm::vec3 position(camera->sceneNode()->absoluteTransform()[3]);
+        AudioPlayer::instance().setListenerPosition(position);
     }
 }
 
