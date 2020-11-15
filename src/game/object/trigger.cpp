@@ -24,6 +24,7 @@
 #include "../../resource/resources.h"
 
 #include "../blueprint/blueprints.h"
+#include "../script/util.h"
 
 using namespace std;
 
@@ -77,6 +78,10 @@ void Trigger::update(float dt) {
         if (isIn(position2d)) continue;
 
         tenantsToRemove.insert(tenant);
+
+        if (!_blueprint->onExit().empty()) {
+            runScript(_blueprint->onExit(), id(), tenant->id(), -1);
+        }
     }
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);

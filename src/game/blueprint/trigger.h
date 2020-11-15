@@ -33,11 +33,13 @@ public:
 
     const std::string &tag() const;
     const std::string &onEnter() const;
+    const std::string &onExit() const;
 
 private:
     std::string _resRef;
     std::string _tag;
     std::string _onEnter;
+    std::string _onExit;
 
     TriggerBlueprint(const TriggerBlueprint &) = delete;
     TriggerBlueprint &operator=(const TriggerBlueprint &) = delete;
