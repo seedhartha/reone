@@ -478,6 +478,171 @@ Variable Routines::showPartySelectionGUI(const vector<Variable> &args, Execution
     return Variable();
 }
 
+Variable Routines::fabs(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    return glm::abs(value);
+}
+
+Variable Routines::cos(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    return glm::cos(value);
+}
+
+Variable Routines::sin(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    return glm::sin(value);
+}
+
+Variable Routines::tan(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    return glm::tan(value);
+}
+
+Variable Routines::acos(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    if (value > 1 || value < -1) return 0.0f;
+
+    return glm::acos(value);
+}
+
+Variable Routines::asin(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    if (value > 1 || value < -1) return 0.0f;
+
+    return glm::asin(value);
+}
+
+Variable Routines::atan(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    return glm::atan(value);
+}
+
+Variable Routines::log(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    if (value <= 0.0f) return 0.0f;
+
+    return glm::log(value);
+}
+
+Variable Routines::pow(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    float exponent = args[1].floatValue;
+    if (value == 0.0f && exponent < 0.0f) return 0.0f;
+
+    return glm::pow(value, exponent);
+}
+
+Variable Routines::sqrt(const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = args[0].floatValue;
+    if (value < 0.0f) return 0.0f;
+
+    return glm::sqrt(value);
+}
+
+Variable Routines::abs(const vector<Variable> &args, ExecutionContext &ctx) {
+    int value = args[0].intValue;
+    return glm::abs(value);
+}
+
+Variable Routines::d2(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 2);
+    }
+
+    return result;
+}
+
+Variable Routines::d3(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 3);
+    }
+
+    return result;
+}
+
+Variable Routines::d4(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 4);
+    }
+
+    return result;
+}
+
+Variable Routines::d6(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 6);
+    }
+
+    return result;
+}
+
+Variable Routines::d8(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 8);
+    }
+
+    return result;
+}
+
+Variable Routines::d10(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 10);
+    }
+
+    return result;
+}
+
+Variable Routines::d12(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 12);
+    }
+
+    return result;
+}
+
+Variable Routines::d20(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 20);
+    }
+
+    return result;
+}
+
+Variable Routines::d100(const vector<Variable> &args, ExecutionContext &ctx) {
+    int numDice = args.size() > 0 ? args[0].intValue : 1;
+    int result = 0;
+
+    for (int i = 0; i < numDice; ++i) {
+        result += reone::random(1, 100);
+    }
+
+    return result;
+}
+
 } // namespace game
 
 } // namespace reone
