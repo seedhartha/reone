@@ -502,9 +502,16 @@ set(GAME_SOURCES
     src/game/rp/classes.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
+    src/game/script/routines_actions.cpp
     src/game/script/routines_common.cpp
+    src/game/script/routines_events.cpp
     src/game/script/routines_kotor.cpp
+    src/game/script/routines_objects.cpp
+    src/game/script/routines_math.cpp
+    src/game/script/routines_rp.cpp
+    src/game/script/routines_party.cpp
     src/game/script/routines_tsl.cpp
+    src/game/script/routines_vars.cpp
     src/game/script/util.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
