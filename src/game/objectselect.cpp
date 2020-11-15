@@ -33,8 +33,6 @@ namespace reone {
 
 namespace game {
 
-static const float kSelectionDistance = 64.0f;
-
 ObjectSelector::ObjectSelector(const Area *area, const Party *party) :
     _area(area), _party(party) {
 

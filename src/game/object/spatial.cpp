@@ -41,11 +41,11 @@ void SpatialObject::addItem(const shared_ptr<Item> &item) {
 }
 
 float SpatialObject::distanceTo(const glm::vec2 &point) const {
-    return glm::distance2(glm::vec2(_position), point);
+    return glm::distance(glm::vec2(_position), point);
 }
 
 float SpatialObject::distanceTo(const glm::vec3 &point) const {
-    return glm::distance2(_position, point);
+    return glm::distance(_position, point);
 }
 
 bool SpatialObject::contains(const glm::vec3 &point) const {

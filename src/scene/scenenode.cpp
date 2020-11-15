@@ -56,7 +56,7 @@ void SceneNode::render() const {
 }
 
 float SceneNode::distanceTo(const glm::vec3 &point) const {
-    return glm::distance2(glm::vec3(_absoluteTransform[3]), point);
+    return glm::distance(glm::vec3(_absoluteTransform[3]), point);
 }
 
 const SceneNode *SceneNode::parent() const {

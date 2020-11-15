@@ -128,11 +128,6 @@ void ModelNodeSceneNode::renderSingle() const {
     mesh->render(_modelSceneNode->textureOverride());
 }
 
-float ModelNodeSceneNode::getDistanceFromCenter(const glm::vec3 &point) const {
-    glm::vec3 center(_absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f));
-    return glm::distance2(center, point);
-}
-
 const ModelSceneNode *ModelNodeSceneNode::modelSceneNode() const {
     return _modelSceneNode;
 }

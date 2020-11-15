@@ -38,8 +38,6 @@ public:
 
     void renderSingle() const;
 
-    float getDistanceFromCenter(const glm::vec3 &point) const;
-
     bool shouldRender() const;
     bool isTransparent() const;
 
