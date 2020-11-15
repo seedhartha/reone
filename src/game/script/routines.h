@@ -81,6 +81,7 @@ private:
     script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable shipBuild(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Common
 
@@ -127,7 +128,9 @@ private:
     script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getPCSpeaker(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isAvailableCreature(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable isNPCPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setPartyLeader(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Party
@@ -142,6 +145,7 @@ private:
     script::Variable actionResumeConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionStartConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable clearAllActions(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Actions

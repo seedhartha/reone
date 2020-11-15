@@ -147,6 +147,12 @@ Variable Routines::actionCloseDoor(const vector<Variable> &args, ExecutionContex
     return Variable();
 }
 
+Variable Routines::clearAllActions(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> actor(getObjectById(ctx.callerId, ctx));
+    actor->actionQueue().clear();
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

@@ -29,6 +29,9 @@ namespace reone {
 
 namespace game {
 
+DoorBlueprint::DoorBlueprint(const string &resRef) : _resRef(resRef) {
+}
+
 void DoorBlueprint::load(const GffStruct &utd) {
     _tag = utd.getString("Tag");
     boost::to_lower(_tag);

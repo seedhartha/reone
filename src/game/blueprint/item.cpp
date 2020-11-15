@@ -32,10 +32,10 @@ namespace reone {
 
 namespace game {
 
-void ItemBlueprint::load(const GffStruct &uti) {
-    _resRef = uti.getString("TemplateResRef");
-    boost::to_lower(_resRef);
+ItemBlueprint::ItemBlueprint(const string &resRef) : _resRef(resRef) {
+}
 
+void ItemBlueprint::load(const GffStruct &uti) {
     _tag = uti.getString("Tag");
     boost::to_lower(_tag);
 

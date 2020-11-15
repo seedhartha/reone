@@ -48,11 +48,11 @@ void Routines::addKotorRoutines() {
     add("AssignCommand", Void, { Object, Action }, bind(&Routines::assignCommand, this, _1, _2));
     add("DelayCommand", Void, { Float, Action }, bind(&Routines::delayCommand, this, _1, _2));
     add("ExecuteScript", Void, { String, Object, Int });
-    add("ClearAllActions", Void, { });
+    add("ClearAllActions", Void, { }, bind(&Routines::clearAllActions, this, _1, _2));
     add("SetFacing", Void, { Float });
     add("SwitchPlayerCharacter", Int, { Int });
     add("SetTime", Void, { Int, Int, Int, Int });
-    add("SetPartyLeader", Int, { Int });
+    add("SetPartyLeader", Int, { Int }, bind(&Routines::setPartyLeader, this, _1, _2));
     add("SetAreaUnescapable", Void, { Int });
     add("GetAreaUnescapable", Int, { });
     add("GetTimeHour", Int, { });
@@ -738,7 +738,7 @@ void Routines::addKotorRoutines() {
     add("IsAvailableCreature", Int, { Int }, bind(&Routines::isAvailableCreature, this, _1, _2));
     add("AddAvailableNPCByTemplate", Int, { Int, String }, bind(&Routines::addAvailableNPCByTemplate, this, _1, _2));
     add("SpawnAvailableNPC", Object, { Int, Location });
-    add("IsNPCPartyMember", Int, { Int });
+    add("IsNPCPartyMember", Int, { Int }, bind(&Routines::isNPCPartyMember, this, _1, _2));
     add("ActionBarkString", Void, { Int });
     add("GetIsConversationActive", Int, { });
     add("EffectLightsaberThrow", Effect, { Object, Object, Object, Int });
@@ -800,7 +800,7 @@ void Routines::addKotorRoutines() {
     add("SetMaxHitPoints", Void, { Object, Int });
     add("NoClicksFor", Void, { Float });
     add("HoldWorldFadeInForDialog", Void, { });
-    add("ShipBuild", Int, { });
+    add("ShipBuild", Int, { }, bind(&Routines::shipBuild, this, _1, _2));
     add("SurrenderRetainBuffs", Void, { });
     add("SuppressStatusSummaryEntry", Void, { Int });
     add("GetCheatCode", Int, { Int });

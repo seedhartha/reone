@@ -78,10 +78,10 @@ void Creature::load(const GffStruct &gffs) {
     float dirY = gffs.getFloat("YOrientation");
     _heading = -glm::atan(dirX, dirY);
 
-    string templResRef(gffs.getString("TemplateResRef"));
-    boost::to_lower(templResRef);
+    string blueprintResRef(gffs.getString("TemplateResRef"));
+    boost::to_lower(blueprintResRef);
 
-    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(templResRef));
+    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
     load(blueprint);
 
     updateTransform();
@@ -518,6 +518,10 @@ float Creature::runSpeed() const {
 
 const CreatureAttributes &Creature::attributes() const {
     return _attributes;
+}
+
+shared_ptr<CreatureBlueprint> Creature::blueprint() const {
+    return _blueprint;
 }
 
 glm::vec3 Creature::selectablePosition() const {

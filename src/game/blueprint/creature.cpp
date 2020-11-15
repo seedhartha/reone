@@ -29,6 +29,9 @@ namespace reone {
 
 namespace game {
 
+CreatureBlueprint::CreatureBlueprint(const string &resRef) : _resRef(resRef) {
+}
+
 void CreatureBlueprint::load(const GffStruct &utc) {
     _tag = utc.getString("Tag");
     boost::to_lower(_tag);
@@ -88,6 +91,10 @@ void CreatureBlueprint::loadSkills(const GffStruct &utc) {
 void CreatureBlueprint::loadScripts(const GffStruct &utc) {
     _onSpawn = utc.getString("ScriptSpawn");
     _onUserDefined = utc.getString("ScriptUserDefine");
+}
+
+const string &CreatureBlueprint::resRef() const {
+    return _resRef;
 }
 
 const string &CreatureBlueprint::tag() const {

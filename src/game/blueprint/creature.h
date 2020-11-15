@@ -31,10 +31,11 @@ namespace game {
 
 class CreatureBlueprint {
 public:
-    CreatureBlueprint() = default;
+    CreatureBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &utc);
 
+    const std::string &resRef() const;
     const std::string &tag() const;
     const std::string &firstName() const;
     const std::string &lastName() const;
@@ -47,6 +48,7 @@ public:
     const std::string &onUserDefined() const;
 
 private:
+    std::string _resRef;
     std::string _tag;
     std::string _firstName;
     std::string _lastName;

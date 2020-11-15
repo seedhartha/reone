@@ -33,7 +33,7 @@ public:
         OnInvDisturbed
     };
 
-    PlaceableBlueprint() = default;
+    PlaceableBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &utp);
 
@@ -47,6 +47,7 @@ public:
     const std::vector<std::string> &items() const;
 
 private:
+    std::string _resRef;
     std::string _tag;
     std::string _localizedName;
     int _appearance { 0 };

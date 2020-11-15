@@ -27,6 +27,9 @@ namespace reone {
 
 namespace game {
 
+TriggerBlueprint::TriggerBlueprint(const string &resRef) : _resRef(resRef) {
+}
+
 void TriggerBlueprint::load(const GffStruct &utt) {
     _tag = utt.getString("Tag");
     boost::to_lower(_tag);

@@ -29,6 +29,9 @@ namespace reone {
 
 namespace game {
 
+PlaceableBlueprint::PlaceableBlueprint(const string &resRef) : _resRef(resRef) {
+}
+
 void PlaceableBlueprint::load(const GffStruct &utp) {
     _tag = utp.getString("Tag");
     boost::to_lower(_tag);

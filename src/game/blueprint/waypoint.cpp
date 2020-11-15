@@ -17,11 +17,16 @@
 
 #include "waypoint.h"
 
+using namespace std;
+
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
+
+WaypointBlueprint::WaypointBlueprint(const string &resRef) : _resRef(resRef) {
+}
 
 void WaypointBlueprint::load(const GffStruct &utw) {
 }

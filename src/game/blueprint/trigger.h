@@ -27,7 +27,7 @@ namespace game {
 
 class TriggerBlueprint {
 public:
-    TriggerBlueprint() = default;
+    TriggerBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &utt);
 
@@ -35,6 +35,7 @@ public:
     const std::string &onEnter() const;
 
 private:
+    std::string _resRef;
     std::string _tag;
     std::string _onEnter;
 

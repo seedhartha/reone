@@ -46,16 +46,18 @@ public:
     void clear();
     void switchLeader();
 
-    bool empty() const;
     const std::string &getAvailableMember(int npc) const;
     std::shared_ptr<Creature> getMember(int index) const;
-    bool isMemberAvailable(int npc) const;
+    bool isNPCMember(int npc) const;
     bool isMember(const Object &object) const;
-    int size() const;
+    bool isMemberAvailable(int npc) const;
 
+    bool empty() const;
+    int size() const;
     std::shared_ptr<Creature> player() const;
     std::shared_ptr<Creature> leader() const;
 
+    void setPartyLeader(int npc);
     void setPlayer(const std::shared_ptr<Creature> &player);
 
 private:
@@ -65,6 +67,8 @@ private:
     std::vector<std::shared_ptr<Creature>> _members;
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
+
+    void onLeaderChanged();
 };
 
 } // namespace game
