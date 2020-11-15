@@ -36,6 +36,10 @@ SpatialObject::SpatialObject(uint32_t id, ObjectType type, SceneGraph *sceneGrap
     Object(id, type), _sceneGraph(sceneGraph) {
 }
 
+void SpatialObject::addItem(const shared_ptr<Item> &item) {
+    _items.push_back(item);
+}
+
 float SpatialObject::distanceTo(const glm::vec2 &point) const {
     return glm::distance2(glm::vec2(_position), point);
 }

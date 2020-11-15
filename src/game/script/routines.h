@@ -87,6 +87,7 @@ private:
 
     // Objects
 
+    script::Variable createItemOnObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);

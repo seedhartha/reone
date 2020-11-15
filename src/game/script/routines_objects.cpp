@@ -17,8 +17,11 @@
 
 #include "routines.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../../common/log.h"
 
+#include "../blueprint/blueprints.h"
 #include "../game.h"
 
 using namespace std;
@@ -128,6 +131,36 @@ Variable Routines::getLocked(const vector<Variable> &args, ExecutionContext &ctx
             result.intValue = door->isLocked() ? 1 : 0;
         } else {
             warn("Routine: object is not a door: " + to_string(objectId));
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::createItemOnObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = kObjectInvalid;
+
+    string itemBlueprint(args[0].strValue);
+    if (!itemBlueprint.empty()) {
+        boost::to_lower(itemBlueprint);
+
+        int targetId = args.size() >= 2 ? args[1].objectId : kObjectSelf;
+        int count = args.size() >= 3 ? args[2].intValue : 1;
+
+        shared_ptr<Object> target(getObjectById(targetId, ctx));
+        if (target) {
+            shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(itemBlueprint));
+            shared_ptr<Item> item(_game->objectFactory().newItem());
+            item->load(blueprint);
+
+            shared_ptr<SpatialObject> spatialTarget(dynamic_pointer_cast<SpatialObject>(target));
+            spatialTarget->addItem(item);
+
+            result.objectId = item->id();
+
+        } else {
+            warn("Routine: object not found: " + to_string(targetId));
         }
     }
 

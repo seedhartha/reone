@@ -44,6 +44,8 @@ public:
 
     virtual void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
 
+    void addItem(const std::shared_ptr<Item> &item);
+
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
     bool contains(const glm::vec3 &point) const;
