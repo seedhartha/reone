@@ -261,6 +261,14 @@ Variable Routines::getLoadFromSaveGame(const vector<Variable> &args, ExecutionCo
     return Variable(_game->isLoadFromSaveGame() ? 1 : 0);
 }
 
+Variable Routines::playMovie(const vector<Variable> &args, ExecutionContext &ctx) {
+    string movie(args[0].strValue);
+    boost::to_lower(movie);
+    _game->playVideo(movie);
+
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

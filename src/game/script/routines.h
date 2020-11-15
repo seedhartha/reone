@@ -105,6 +105,7 @@ private:
     script::Variable getRunScriptVar(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable shipBuild(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable playMovie(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Common
 

@@ -90,6 +90,8 @@ public:
     void startDialog(SpatialObject &owner, const std::string &resRef);
     void quit();
 
+    void playVideo(const std::string &name);
+
     bool isLoadFromSaveGame() const;
 
     Camera *getActiveCamera() const;
@@ -229,7 +231,6 @@ private:
     void loadNextModule();
     float measureFrameTime();
     void playMusic(const std::string &resRef);
-    void playVideo(const std::string &name);
     void runMainLoop();
     void toggleInGameCameraType();
     void updateCamera(float dt);
