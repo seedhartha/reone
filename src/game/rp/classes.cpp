@@ -48,12 +48,12 @@ CreatureAttributes getClassAttributes(ClassType clazz) {
     int row = static_cast<int>(clazz);
 
     CreatureAttributes attrs;
-    attrs.abilities.insert(make_pair(Ability::Strength, classes->getInt(row, "str")));
-    attrs.abilities.insert(make_pair(Ability::Dexterity, classes->getInt(row, "dex")));
-    attrs.abilities.insert(make_pair(Ability::Constitution, classes->getInt(row, "con")));
-    attrs.abilities.insert(make_pair(Ability::Intelligence, classes->getInt(row, "int")));
-    attrs.abilities.insert(make_pair(Ability::Wisdom, classes->getInt(row, "wis")));
-    attrs.abilities.insert(make_pair(Ability::Charisma, classes->getInt(row, "cha")));
+    attrs.setAbilityScore(Ability::Strength, classes->getInt(row, "str"));
+    attrs.setAbilityScore(Ability::Dexterity, classes->getInt(row, "dex"));
+    attrs.setAbilityScore(Ability::Constitution, classes->getInt(row, "con"));
+    attrs.setAbilityScore(Ability::Intelligence, classes->getInt(row, "int"));
+    attrs.setAbilityScore(Ability::Wisdom, classes->getInt(row, "wis"));
+    attrs.setAbilityScore(Ability::Charisma, classes->getInt(row, "cha"));
 
     return move(attrs);
 }

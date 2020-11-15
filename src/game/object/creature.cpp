@@ -284,9 +284,7 @@ void Creature::load(const CreatureConfiguration &config) {
         shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
         loadAppearance(*appearance, config.appearance);
         loadPortrait(config.appearance);
-
-        _attributes.classLevels.push_back(make_pair(config.clazz, 1));
-        _attributes.computeHitDice();
+        _attributes.addClassLevels(config.clazz, 1);
     }
     for (auto &item : config.equipment) {
         equip(item);

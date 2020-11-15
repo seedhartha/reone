@@ -62,27 +62,26 @@ void CreatureBlueprint::loadAttributes(const GffStruct &utc) {
     for (auto &classGff : utc.getList("ClassList")) {
         int clazz = classGff.getInt("Class");
         int level = classGff.getInt("ClassLevel");
-        _attributes.classLevels.push_back(make_pair(static_cast<ClassType>(clazz), level));
+        _attributes.addClassLevels(static_cast<ClassType>(clazz), level);
     }
     loadAbilities(utc);
     loadSkills(utc);
-    _attributes.computeHitDice();
 }
 
 void CreatureBlueprint::loadAbilities(const GffStruct &utc) {
-    _attributes.abilities[Ability::Strength] = utc.getInt("Str");
-    _attributes.abilities[Ability::Dexterity] = utc.getInt("Dex");
-    _attributes.abilities[Ability::Constitution] = utc.getInt("Con");
-    _attributes.abilities[Ability::Intelligence] = utc.getInt("Int");
-    _attributes.abilities[Ability::Wisdom] = utc.getInt("Wis");
-    _attributes.abilities[Ability::Charisma] = utc.getInt("Cha");
+    _attributes.setAbilityScore(Ability::Strength, utc.getInt("Str"));
+    _attributes.setAbilityScore(Ability::Dexterity, utc.getInt("Dex"));
+    _attributes.setAbilityScore(Ability::Constitution, utc.getInt("Con"));
+    _attributes.setAbilityScore(Ability::Intelligence, utc.getInt("Int"));
+    _attributes.setAbilityScore(Ability::Wisdom, utc.getInt("Wis"));
+    _attributes.setAbilityScore(Ability::Charisma, utc.getInt("Cha"));
 }
 
 void CreatureBlueprint::loadSkills(const GffStruct &utc) {
     const vector<GffStruct> &skills = utc.getList("SkillList");
     for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        _attributes.skills[skill] = skills[i].getInt("Rank");
+        _attributes.setSkillRank(skill, skills[i].getInt("Rank"));
     }
 }
 
