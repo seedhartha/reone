@@ -135,6 +135,36 @@ private:
     script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Party
+
+    // Math
+
+    script::Variable fabs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable cos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable sin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable tan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable acos(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable asin(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable atan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable log(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable pow(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable sqrt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable abs(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Math
+
+    // Dice
+
+    script::Variable d2(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d3(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d4(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d6(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d8(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d10(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d12(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d20(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable d100(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Dice
 };
 
 } // namespace game
