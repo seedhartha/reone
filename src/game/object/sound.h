@@ -46,6 +46,9 @@ public:
     std::shared_ptr<SoundBlueprint> blueprint() const;
     int priority() const;
 
+    void play();
+    void stop();
+
     void setAudible(bool audible);
 
 private:

@@ -127,6 +127,8 @@ private:
     script::Variable getTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable soundObjectPlay(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable soundObjectStop(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Objects
 

@@ -452,8 +452,8 @@ void Routines::addTslRoutines() {
     add("GetLastPlayerDying", Object, { });
     add("GetStartingLocation", Location, { });
     add("ChangeToStandardFaction", Void, { Object, Int });
-    add("SoundObjectPlay", Void, { Object });
-    add("SoundObjectStop", Void, { Object });
+    add("SoundObjectPlay", Void, { Object }, bind(&Routines::soundObjectPlay, this, _1, _2));
+    add("SoundObjectStop", Void, { Object }, bind(&Routines::soundObjectStop, this, _1, _2));
     add("SoundObjectSetVolume", Void, { Object, Int });
     add("SoundObjectSetPosition", Void, { Object, Vector });
     add("SpeakOneLinerConversation", Void, { String, Object });

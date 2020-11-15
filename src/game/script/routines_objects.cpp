@@ -209,6 +209,18 @@ Variable Routines::getPosition(const vector<Variable> &args, ExecutionContext &c
     return Vector3(target ? target->position() : glm::vec3(0.0f));
 }
 
+Variable Routines::soundObjectPlay(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
+    target->play();
+    return Variable();
+}
+
+Variable Routines::soundObjectStop(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
+    target->stop();
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
