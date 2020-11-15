@@ -122,7 +122,7 @@ Variable Routines::getLevelByClass(const vector<Variable> &args, ExecutionContex
 
     Creature &creature = static_cast<Creature &>(*object);
 
-    return Variable(creature.getClassLevel(clazz));
+    return Variable(creature.attributes().getClassLevel(clazz));
 }
 
 Variable Routines::getGender(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -202,6 +202,59 @@ Variable Routines::getLocked(const vector<Variable> &args, ExecutionContext &ctx
         }
     }
 
+    return move(result);
+}
+
+Variable Routines::getHitDice(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+
+    int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
+        if (creature) {
+            result.intValue = creature->attributes().getHitDice();
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::getClassByPosition(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(static_cast<int>(ClassType::Invalid));
+    int position = args[0].intValue;
+    int objectId = args.size() > 1 ? args[1].objectId : kObjectSelf;
+
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
+        if (creature) {
+            result.intValue = static_cast<int>(creature->attributes().getClassByPosition(position));
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::getHasSkill(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+    Skill skill = static_cast<Skill>(args[0].intValue);
+    int objectId = args.size() > 1 ? args[1].objectId : kObjectSelf;
+
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    if (object) {
+        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
+        if (creature) {
+            result.intValue = creature->attributes().hasSkill(skill) ? 1 : 0;
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::getPCSpeaker(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = _game->party().player()->id();
     return move(result);
 }
 
