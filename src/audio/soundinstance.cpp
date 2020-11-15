@@ -35,22 +35,22 @@ namespace audio {
 
 static const int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(const string &resRef, bool loop, float gain) :
+SoundInstance::SoundInstance(const string &resRef, Vector3 position, bool loop, float gain) :
     _resRef(resRef),
     _loop(loop),
     _gain(gain),
-    _handle(new SoundHandle()) {
+    _handle(new SoundHandle(position)) {
 
     if (resRef.empty()) {
         throw invalid_argument("resRef must not be empty");
     }
 }
 
-SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain) :
+SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, Vector3 position, bool loop, float gain) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
-    _handle(new SoundHandle()) {
+    _handle(new SoundHandle(position)) {
 
     if (!stream) {
         throw invalid_argument("stream must not be null");
@@ -77,6 +77,9 @@ void SoundInstance::init() {
     alGenBuffers(bufferCount, &_buffers[0]);
     alGenSources(1, &_source);
     alSourcef(_source, AL_GAIN, _gain);
+
+    Vector3 position(_handle->position());
+    alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
 
     if (_buffered) {
         for (int i = 0; i < bufferCount; ++i) {

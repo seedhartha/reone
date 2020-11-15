@@ -23,6 +23,9 @@ namespace reone {
 
 namespace audio {
 
+SoundHandle::SoundHandle(Vector3 position) : _position(position) {
+}
+
 void SoundHandle::stop() {
     _state = State::Stopped;
 }

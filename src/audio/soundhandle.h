@@ -33,7 +33,7 @@ public:
         Stopped
     };
 
-    SoundHandle() = default;
+    SoundHandle(Vector3 position);
 
     void stop();
 
