@@ -65,22 +65,6 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     if (additive) {
         glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
     }
-
-    if (_bumpmap) {
-        _bumpmap->unbind(4);
-    }
-    if (_bumpyShiny) {
-        _bumpyShiny->unbind(3);
-    }
-    if (_lightmap) {
-        _lightmap->unbind(2);
-    }
-    if (_envmap) {
-        _envmap->unbind(1);
-    }
-    if (diffuse) {
-        diffuse->unbind(0);
-    }
 }
 
 bool ModelMesh::shouldRender() const {

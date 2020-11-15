@@ -51,8 +51,6 @@ void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) con
 
     if (_canScrollUp) drawUpArrow(offset);
     if (_canScrollDown) drawDownArrow(offset);
-
-    _dir.image->unbind(0);
 }
 
 void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {

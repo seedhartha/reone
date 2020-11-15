@@ -177,8 +177,6 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     texture.bind(0);
 
     Quad::getDefault().renderTriangles();
-
-    texture.unbind(0);
 }
 
 void SelectionOverlay::drawTitleBar() const {
@@ -248,8 +246,6 @@ void SelectionOverlay::drawActionBar() const {
 
         Quad::getDefault().renderTriangles();
 
-        frameTexture->unbind(0);
-
         if (i < static_cast<int>(_actions.size())) {
             ContextualAction action = _actions[i];
 
@@ -269,8 +265,6 @@ void SelectionOverlay::drawActionBar() const {
                 texture->bind(0);
 
                 Quad::getDefault().renderTriangles();
-
-                texture->unbind(0);
             }
         }
     }

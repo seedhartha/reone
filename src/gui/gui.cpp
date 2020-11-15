@@ -267,8 +267,6 @@ void GUI::drawBackground() const {
     _background->bind(0);
 
     Quad::getDefault().renderTriangles();
-
-    _background->unbind(0);
 }
 
 void GUI::resetFocus() {

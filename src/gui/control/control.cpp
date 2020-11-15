@@ -266,8 +266,6 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         } else {
             Quad::getDefault().renderTriangles();
         }
-
-        border.fill->unbind(0);
     }
     if (border.edge) {
         int width = size.x - 2 * border.dimension;
@@ -343,8 +341,6 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             }
             Quad::getYFlipped().renderTriangles();
         }
-
-        border.edge->unbind(0);
     }
     if (border.corner) {
         int x = _extent.left + offset.x;
@@ -407,8 +403,6 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
         Quad::getXYFlipped().renderTriangles();
-
-        border.corner->unbind(0);
     }
 }
 

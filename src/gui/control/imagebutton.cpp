@@ -77,7 +77,6 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
     if (_iconFrame) {
         _iconFrame->bind(0);
         Quad::getDefault().renderTriangles();
-        _iconFrame->unbind(0);
     }
     {
         LocalUniforms locals;
@@ -88,7 +87,6 @@ void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &
     if (icon) {
         icon->bind(0);
         Quad::getDefault().renderTriangles();
-        icon->unbind(0);
     }
 }
 

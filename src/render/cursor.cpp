@@ -56,8 +56,6 @@ void Cursor::render() const {
     texture->bind(0);
 
     Quad::getDefault().renderTriangles();
-
-    texture->unbind(0);
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {
