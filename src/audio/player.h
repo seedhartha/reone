@@ -44,8 +44,8 @@ public:
     void init(const AudioOptions &opts);
     void deinit();
 
-    std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f);
-    std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f);
+    std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, Vector3 position = Vector3(), bool loop = false, float gain = 1.0f);
+    std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, Vector3 position = Vector3(), bool loop = false, float gain = 1.0f);
 
     void setListenerPosition(Vector3 position);
 
