@@ -93,7 +93,7 @@ void Sound::update(float dt) {
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, true, Vector3(_transform[3]));
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), Vector3(_transform[3]));
 }
 
 shared_ptr<SoundBlueprint> Sound::blueprint() const {

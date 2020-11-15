@@ -39,6 +39,7 @@ public:
     float minDistance() const;
     bool continuous() const;
     bool looping() const;
+    bool positional() const;
     int interval() const;
     int volume() const;
     const std::vector<std::string> &sounds() const;
@@ -51,6 +52,7 @@ private:
     float _minDistance { 0.0f };
     bool _continuous { false };
     bool _looping { false };
+    bool _positional { false };
     int _interval { 0 };
     int _volume { 0 };
     std::vector<std::string> _sounds;
