@@ -202,7 +202,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         return;
     }
-    if (!door->isOpen() && !door->blueprint().isStatic()) {
+    if (!door->isOpen()) {
         shared_ptr<Creature> partyLeader(_game->party().leader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();
@@ -224,6 +224,17 @@ void Module::update(float dt) {
         _player->update(dt);
     }
     _area->update(dt);
+}
+
+vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
+    vector<ContextualAction> actions;
+
+    shared_ptr<Door> door = dynamic_pointer_cast<Door>(object);
+    if (door && door->isLocked()) {
+        actions.push_back(ContextualAction::Unlock);
+    }
+
+    return move(actions);
 }
 
 const string &Module::name() const {

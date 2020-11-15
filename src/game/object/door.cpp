@@ -77,6 +77,7 @@ void Door::loadBlueprint(const string &resRef) {
     _tag = _blueprint->tag();
     _title = _blueprint->localizedName();
     _locked = _blueprint->isLocked();
+    _selectable = !_blueprint->isStatic();
 
     shared_ptr<TwoDaTable> table = Resources::instance().get2DA("genericdoors");
 

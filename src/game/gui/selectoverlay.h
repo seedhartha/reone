@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
@@ -54,13 +55,16 @@ private:
     std::shared_ptr<render::Texture> _friendlyScroll;
     std::shared_ptr<render::Texture> _hostileScroll;
     std::shared_ptr<render::Texture> _hilightedScroll;
+    std::unordered_map<ContextualAction, std::shared_ptr<render::Texture>> _textureByAction;
     bool _hasHilighted { false };
     bool _hasSelected { false };
-    bool _hasActions { false };
+    std::vector<ContextualAction> _actions;
     glm::vec3 _hilightedScreenCoords { 0.0f };
     glm::vec3 _selectedScreenCoords { 0.0f };
     std::string _selectedTitle;
     int _reticleHeight { 0 };
+
+    void addTextureByAction(ContextualAction action, const std::string &resRef);
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
     void drawTitleBar() const;
