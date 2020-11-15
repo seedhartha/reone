@@ -55,15 +55,16 @@ Variable Routines::getIsObjectValid(const vector<Variable> &args, ExecutionConte
 }
 
 Variable Routines::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+
     string tag(args[0].strValue);
     if (tag.empty()) {
-        tag = "PLAYER";
+        result.objectId = _game->party().player()->id();
+    } else {
+        int nth = args.size() >= 2 ? args[1].intValue : 0;
+        shared_ptr<Object> object(_game->module()->area()->find(tag, nth));
+        result.objectId = object ? object->id() : kObjectInvalid;
     }
-    int nth = args.size() >= 2 ? args[1].intValue : 0;
-    shared_ptr<Object> object(_game->module()->area()->find(tag, nth));
-
-    Variable result(VariableType::Object);
-    result.objectId = object ? object->id() : kObjectInvalid;
 
     return move(result);
 }
