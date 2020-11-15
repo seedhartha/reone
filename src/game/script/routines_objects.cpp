@@ -167,6 +167,18 @@ Variable Routines::createItemOnObject(const vector<Variable> &args, ExecutionCon
     return move(result);
 }
 
+Variable Routines::getModule(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = _game->module()->id();
+    return move(result);
+}
+
+Variable Routines::getTag(const vector<Variable> &args, ExecutionContext &ctx) {
+    int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    return object ? object->tag() : "";
+}
+
 } // namespace game
 
 } // namespace reone
