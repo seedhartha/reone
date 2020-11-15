@@ -65,9 +65,9 @@ void Routines::addKotorRoutines() {
     add("ActionMoveAwayFromObject", Void, { Object, Int, Float });
     add("GetArea", Object, { Object }, bind(&Routines::getArea, this, _1, _2));
     add("GetEnteringObject", Object, { }, bind(&Routines::getEnteringObject, this, _1, _2));
-    add("GetExitingObject", Object, { });
-    add("GetPosition", Vector, { Object });
-    add("GetFacing", Float, { Object });
+    add("GetExitingObject", Object, { }, bind(&Routines::getExitingObject, this, _1, _2));
+    add("GetPosition", Vector, { Object }, bind(&Routines::getPosition, this, _1, _2));
+    add("GetFacing", Float, { Object }, bind(&Routines::getFacing, this, _1, _2));
     add("GetItemPossessor", Object, { Object });
     add("GetItemPossessedBy", Object, { Object, String });
     add("CreateItemOnObject", Object, { String, Object, Int }, bind(&Routines::createItemOnObject, this, _1, _2));
@@ -80,7 +80,7 @@ void Routines::addKotorRoutines() {
     add("GetNearestCreature", Object, { Int, Int, Object, Int, Int, Int, Int, Int });
     add("ActionSpeakString", Void, { String, Int });
     add("ActionPlayAnimation", Void, { Int, Float, Float });
-    add("GetDistanceToObject", Float, { Object });
+    add("GetDistanceToObject", Float, { Object }, bind(&Routines::getDistanceToObject, this, _1, _2));
     add("GetIsObjectValid", Int, { Object }, bind(&Routines::getIsObjectValid, this, _1, _2));
     add("ActionOpenDoor", Void, { Object }, bind(&Routines::actionOpenDoor, this, _1, _2));
     add("ActionCloseDoor", Void, { Object }, bind(&Routines::actionCloseDoor, this, _1, _2));
@@ -374,7 +374,7 @@ void Routines::addKotorRoutines() {
     add("GetIdentified", Int, { Object });
     add("SetIdentified", Void, { Object, Int });
     add("GetDistanceBetweenLocations2D", Float, { Location, Location });
-    add("GetDistanceToObject2D", Float, { Object });
+    add("GetDistanceToObject2D", Float, { Object }, bind(&Routines::getDistanceToObject2D, this, _1, _2));
     add("GetBlockingDoor", Object, { });
     add("GetIsDoorActionPossible", Int, { Object, Int });
     add("DoDoorAction", Void, { Object, Int });

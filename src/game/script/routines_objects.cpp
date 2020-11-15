@@ -179,6 +179,36 @@ Variable Routines::getTag(const vector<Variable> &args, ExecutionContext &ctx) {
     return object ? object->tag() : "";
 }
 
+Variable Routines::getDistanceToObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<SpatialObject> caller(_game->module()->area()->find(ctx.callerId));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
+    return caller->distanceTo(object->position());
+}
+
+Variable Routines::getDistanceToObject2D(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<SpatialObject> caller(_game->module()->area()->find(ctx.callerId));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
+    if (!caller || !object) return -1.0f;
+
+    return caller->distanceTo(glm::vec2(object->position()));
+}
+
+Variable Routines::getExitingObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = ctx.triggererId;
+    return move(result);
+}
+
+Variable Routines::getFacing(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<SpatialObject> target(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
+    return target ? target->heading() : -1.0f;
+}
+
+Variable Routines::getPosition(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<SpatialObject> target(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
+    return Vector3(target ? target->position() : glm::vec3(0.0f));
+}
+
 } // namespace game
 
 } // namespace reone

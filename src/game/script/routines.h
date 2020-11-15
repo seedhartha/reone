@@ -113,12 +113,17 @@ private:
     script::Variable createItemOnObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getDistanceToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getDistanceToObject2D(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getExitingObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getFacing(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getModule(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
