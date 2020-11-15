@@ -432,7 +432,7 @@ void Game::update() {
     }
     updateCamera(dt);
 
-    bool updModule = _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
+    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
     if (updModule) {
         _module->update(dt);
     }
@@ -650,6 +650,9 @@ bool Game::handle(const SDL_Event &event) {
 
 bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (_video) {
+        if (_movieAudio) {
+            _movieAudio->stop();
+        }
         _video->finish();
         return true;
     }
