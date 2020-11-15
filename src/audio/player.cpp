@@ -115,8 +115,8 @@ void AudioPlayer::deinit() {
     }
 }
 
-shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, Vector3 position, bool loop, float gain) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(resRef, move(position), loop, getGain(type, gain)));
+shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, Vector3 position) {
+    shared_ptr<SoundInstance> sound(new SoundInstance(resRef, loop, getGain(type, gain), positional, move(position)));
     enqueue(sound);
     return sound->handle();
 }
@@ -145,8 +145,8 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
     _sounds.push_back(sound);
 }
 
-shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, Vector3 position, bool loop, float gain) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, move(position), loop, getGain(type, gain)));
+shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, Vector3 position) {
+    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
     enqueue(sound);
     return sound->handle();
 }

@@ -443,10 +443,6 @@ void DialogGUI::update(float dt) {
     GUI::update(dt);
 
     if (!_entryEnded) {
-        if (_currentVoice && !_currentVoice->isStopped()) {
-            glm::vec3 position(_game->getActiveCamera()->sceneNode()->absoluteTransform()[3]);
-            _currentVoice->setPosition(position);
-        }
         bool endOnAnimFinish = (_endEntryFlags & kEndEntryOnAnimFinish) != 0;
         bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
 
