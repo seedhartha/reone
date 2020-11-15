@@ -17,6 +17,7 @@
 
 #include "routines.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "../../common/random.h"
@@ -141,6 +142,7 @@ Variable Routines::floatToInt(const vector<Variable> &args, ExecutionContext &ct
 }
 
 Variable Routines::floatToString(const vector<Variable> &args, ExecutionContext &ctx) {
+    // TODO: handle optional arguments
     return to_string(args[0].floatValue);
 }
 
@@ -178,6 +180,55 @@ Variable Routines::turnsToSeconds(const vector<Variable> &args, ExecutionContext
 
 Variable Routines::yardsToMeters(const vector<Variable> &args, ExecutionContext &ctx) {
     return args[0].floatValue * 0.9144f;
+}
+
+Variable Routines::getStringLength(const vector<Variable> &args, ExecutionContext &ctx) {
+    return static_cast<int>(args[0].strValue.length());
+}
+
+Variable Routines::getStringUpperCase(const vector<Variable> &args, ExecutionContext &ctx) {
+    string result(args[0].strValue);
+    boost::to_upper(result);
+    return move(result);
+}
+
+Variable Routines::getStringLowerCase(const vector<Variable> &args, ExecutionContext &ctx) {
+    string result(args[0].strValue);
+    boost::to_lower(result);
+    return move(result);
+}
+
+Variable Routines::getStringRight(const vector<Variable> &args, ExecutionContext &ctx) {
+    string str(args[0].strValue);
+    int count = args[1].intValue;
+    return str.substr(str.length() - count, count);
+}
+
+Variable Routines::getStringLeft(const vector<Variable> &args, ExecutionContext &ctx) {
+    string str(args[0].strValue);
+    int count = args[1].intValue;
+    return str.substr(0, count);
+}
+
+Variable Routines::insertString(const vector<Variable> &args, ExecutionContext &ctx) {
+    string dest(args[0].strValue);
+    string str(args[1].strValue);
+    int pos = args[2].intValue;
+    return dest.insert(pos, str);
+}
+
+Variable Routines::getSubString(const vector<Variable> &args, ExecutionContext &ctx) {
+    string str(args[0].strValue);
+    int start = args[1].intValue;
+    int count = args[2].intValue;
+    return str.substr(start, count);
+}
+
+Variable Routines::findSubString(const vector<Variable> &args, ExecutionContext &ctx) {
+    string str(args[0].strValue);
+    string substr(args[1].strValue);
+    size_t pos = str.find(substr);
+    return pos != string::npos ? static_cast<int>(pos) : -1;
 }
 
 Variable Routines::shipBuild(const vector<Variable> &args, ExecutionContext &ctx) {
