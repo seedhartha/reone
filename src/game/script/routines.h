@@ -117,7 +117,9 @@ private:
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getModule(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 

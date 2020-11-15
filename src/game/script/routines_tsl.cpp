@@ -207,7 +207,7 @@ void Routines::addTslRoutines() {
     add("EffectMovementSpeedIncrease", Effect, { Int });
     add("GetHitDice", Int, { Object }, bind(&Routines::getHitDice, this, _1, _2));
     add("ActionForceFollowObject", Void, { Object, Float });
-    add("GetTag", String, { Object });
+    add("GetTag", String, { Object }, bind(&Routines::getTag, this, _1, _2));
     add("ResistForce", Int, { Object, Object });
     add("GetEffectType", Int, { Effect });
     add("EffectAreaOfEffect", Effect, { Int, String, String, String });
@@ -281,7 +281,7 @@ void Routines::addTslRoutines() {
     add("GetStringByStrRef", String, { Int });
     add("ActionSpeakStringByStrRef", Void, { Int, Int });
     add("DestroyObject", Void, { Object, Float, Int, Float, Int }, bind(&Routines::destroyObject, this, _1, _2));
-    add("GetModule", Object, { });
+    add("GetModule", Object, { }, bind(&Routines::getModule, this, _1, _2));
     add("CreateObject", Object, { Int, String, Location, Int });
     add("EventSpellCastAt", Event, { Object, Int, Int });
     add("GetLastSpellCaster", Object, { });
