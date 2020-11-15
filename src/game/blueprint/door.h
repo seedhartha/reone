@@ -27,7 +27,7 @@ namespace game {
 
 class DoorBlueprint {
 public:
-    DoorBlueprint() = default;
+    DoorBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &utd);
 
@@ -43,6 +43,7 @@ public:
     const std::string &onFailToOpen() const;
 
 private:
+    std::string _resRef;
     std::string _tag;
     std::string _localizedName;
     std::string _conversation;

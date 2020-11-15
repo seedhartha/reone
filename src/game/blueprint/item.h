@@ -28,7 +28,7 @@ namespace game {
 
 class ItemBlueprint {
 public:
-    ItemBlueprint() = default;
+    ItemBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &uti);
 

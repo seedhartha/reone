@@ -27,11 +27,13 @@ namespace game {
 
 class WaypointBlueprint {
 public:
-    WaypointBlueprint() = default;
+    WaypointBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &utw);
 
 private:
+    std::string _resRef;
+
     WaypointBlueprint(const WaypointBlueprint &) = delete;
     WaypointBlueprint &operator=(const WaypointBlueprint &) = delete;
 };

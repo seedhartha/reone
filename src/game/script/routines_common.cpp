@@ -151,6 +151,10 @@ Variable Routines::d100(const vector<Variable> &args, ExecutionContext &ctx) {
     return result;
 }
 
+Variable Routines::shipBuild(const vector<Variable> &args, ExecutionContext &ctx) {
+    return 1;
+}
+
 } // namespace game
 
 } // namespace reone

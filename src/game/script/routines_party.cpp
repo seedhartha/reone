@@ -84,6 +84,18 @@ Variable Routines::getPCSpeaker(const vector<Variable> &args, ExecutionContext &
     return move(result);
 }
 
+Variable Routines::isNPCPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
+    int npc = args[0].intValue;
+    bool result = _game->party().isNPCMember(npc);
+    return Variable(result ? 1 : 0);
+}
+
+Variable Routines::setPartyLeader(const vector<Variable> &args, ExecutionContext &ctx) {
+    int npc = args[0].intValue;
+    _game->party().setPartyLeader(npc);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

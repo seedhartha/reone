@@ -66,6 +66,7 @@ public:
     float walkSpeed() const;
     float runSpeed() const;
     const CreatureAttributes &attributes() const;
+    std::shared_ptr<CreatureBlueprint> blueprint() const;
 
     void setTag(const std::string &tag);
     virtual void setMovementType(MovementType type);

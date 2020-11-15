@@ -27,6 +27,9 @@ namespace reone {
 
 namespace game {
 
+SoundBlueprint::SoundBlueprint(const string &resRef) : _resRef(resRef) {
+}
+
 void SoundBlueprint::load(const GffStruct &uts) {
     _tag = uts.getString("Tag");
     boost::to_lower(_tag);

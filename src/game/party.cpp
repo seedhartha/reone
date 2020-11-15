@@ -22,6 +22,7 @@
 #include "../common/log.h"
 
 #include "action/follow.h"
+#include "blueprint/creature.h"
 #include "game.h"
 #include "object/creature.h"
 
@@ -103,9 +104,14 @@ void Party::switchLeader() {
             break;
         }
     }
+
+    onLeaderChanged();
+}
+
+void Party::onLeaderChanged() {
     _members[0]->actionQueue().clear();
 
-    for (int i = 1; i < count; ++i) {
+    for (int i = 1; i < static_cast<int>(_members.size()); ++i) {
         _members[i]->actionQueue().clear();
         _members[i]->actionQueue().add(make_unique<FollowAction>(_members[0], 1.0f));
     }
@@ -128,6 +134,19 @@ int Party::size() const {
     return static_cast<int>(_members.size());
 }
 
+bool Party::isNPCMember(int npc) const {
+    auto maybeMember = _availableMembers.find(npc);
+    if (maybeMember == _availableMembers.end()) return false;
+
+    for (auto &member : _members) {
+        if (member->blueprint()->resRef() == maybeMember->second) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Party::isMemberAvailable(int npc) const {
     return _availableMembers.count(npc) != 0;
 }
@@ -145,6 +164,42 @@ shared_ptr<Creature> Party::player() const {
 
 shared_ptr<Creature> Party::leader() const {
     return !_members.empty() ? _members[0] : nullptr;
+}
+
+void Party::setPartyLeader(int npc) {
+    int memberIdx = -1;
+
+    if (npc != kNpcPlayer) {
+        auto maybeMember = _availableMembers.find(npc);
+        if (maybeMember == _availableMembers.end()) {
+            warn("Party: NPC is not available: " + to_string(npc));
+            return;
+        }
+        for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
+            if (_members[i]->blueprint()->resRef() == maybeMember->second) {
+                memberIdx = -1;
+                break;
+            }
+        }
+    } else {
+        for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
+            if (_members[i]->id() == _player->id()) {
+                memberIdx = i;
+                break;
+            }
+        }
+    }
+    if (memberIdx == -1) {
+        warn("Party: NPC not found: " + to_string(npc));
+        return;
+    }
+    if (memberIdx == 0) return;
+
+    shared_ptr<Creature> tmp(_members[0]);
+    _members[0] = _members[memberIdx];
+    _members[memberIdx] = tmp;
+
+    onLeaderChanged();
 }
 
 void Party::setPlayer(const shared_ptr<Creature> &player) {

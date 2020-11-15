@@ -28,7 +28,7 @@ namespace game {
 
 class SoundBlueprint {
 public:
-    SoundBlueprint() = default;
+    SoundBlueprint(const std::string &resRef);
 
     void load(const resource::GffStruct &uts);
 
@@ -45,6 +45,7 @@ public:
     const std::vector<std::string> &sounds() const;
 
 private:
+    std::string _resRef;
     std::string _tag;
     bool _active { false };
     int _priority { 0 };
