@@ -78,10 +78,22 @@ private:
     script::Variable d20(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable d100(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
+    script::Variable feetToMeters(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable floatToInt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable floatToString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable hoursToSeconds(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable intToHexString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable intToString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable roundsToSeconds(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable stringToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable stringToInt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable turnsToSeconds(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable yardsToMeters(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
     script::Variable executeScript(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getRunScriptVar(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
-    script::Variable intToFloat(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable shipBuild(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 

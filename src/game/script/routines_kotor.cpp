@@ -42,7 +42,7 @@ void Routines::addKotorRoutines() {
     add("Random", Int, { Int }, bind(&Routines::random, this, _1, _2));
     add("PrintString", Void, { String });
     add("PrintFloat", Void, { Float, Int, Int });
-    add("FloatToString", String, { Float, Int, Int });
+    add("FloatToString", String, { Float, Int, Int }, bind(&Routines::floatToString, this, _1, _2));
     add("PrintInteger", Void, { Int });
     add("PrintObject", Void, { Object });
     add("AssignCommand", Void, { Object, Action }, bind(&Routines::assignCommand, this, _1, _2));
@@ -131,7 +131,7 @@ void Routines::addKotorRoutines() {
     add("GetEffectDurationType", Int, { Effect });
     add("GetEffectSubType", Int, { Effect });
     add("GetEffectCreator", Object, { Effect });
-    add("IntToString", String, { Int });
+    add("IntToString", String, { Int }, bind(&Routines::intToString, this, _1, _2));
     add("GetFirstObjectInArea", Object, { Object, Int });
     add("GetNextObjectInArea", Object, { Object, Int });
     add("d2", Int, { Int }, bind(&Routines::d2, this, _1, _2));
@@ -160,9 +160,9 @@ void Routines::addKotorRoutines() {
     add("EffectAttackIncrease", Effect, { Int, Int });
     add("EffectDamageReduction", Effect, { Int, Int, Int });
     add("EffectDamageIncrease", Effect, { Int, Int });
-    add("RoundsToSeconds", Float, { Int });
-    add("HoursToSeconds", Float, { Int });
-    add("TurnsToSeconds", Float, { Int });
+    add("RoundsToSeconds", Float, { Int }, bind(&Routines::roundsToSeconds, this, _1, _2));
+    add("HoursToSeconds", Float, { Int }, bind(&Routines::hoursToSeconds, this, _1, _2));
+    add("TurnsToSeconds", Float, { Int }, bind(&Routines::turnsToSeconds, this, _1, _2));
     add("SoundObjectSetFixedVariance", Void, { Object, Float });
     add("GetGoodEvilValue", Int, { Object });
     add("GetPartyMemberCount", Int, { });
@@ -257,8 +257,8 @@ void Routines::addKotorRoutines() {
     add("Location", Location, { Vector, Float });
     add("ApplyEffectAtLocation", Void, { Int, Effect, Location, Float });
     add("GetIsPC", Int, { Object }, bind(&Routines::getIsPC, this, _1, _2));
-    add("FeetToMeters", Float, { Float });
-    add("YardsToMeters", Float, { Float });
+    add("FeetToMeters", Float, { Float }, bind(&Routines::feetToMeters, this, _1, _2));
+    add("YardsToMeters", Float, { Float }, bind(&Routines::yardsToMeters, this, _1, _2));
     add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
     add("SpeakString", Void, { String, Int });
     add("GetSpellTargetLocation", Location, { });
@@ -270,9 +270,9 @@ void Routines::addKotorRoutines() {
     add("GetNearestObjectToLocation", Object, { Int, Location, Int });
     add("GetNearestObjectByTag", Object, { String, Object, Int });
     add("IntToFloat", Float, { Int }, bind(&Routines::intToFloat, this, _1, _2));
-    add("FloatToInt", Int, { Float });
-    add("StringToInt", Int, { String });
-    add("StringToFloat", Float, { String });
+    add("FloatToInt", Int, { Float }, bind(&Routines::floatToInt, this, _1, _2));
+    add("StringToInt", Int, { String }, bind(&Routines::stringToInt, this, _1, _2));
+    add("StringToFloat", Float, { String }, bind(&Routines::stringToFloat, this, _1, _2));
     add("ActionCastSpellAtLocation", Void, { Int, Location, Int, Int, Int, Int });
     add("GetIsEnemy", Int, { Object, Object });
     add("GetIsFriend", Int, { Object, Object });
@@ -435,7 +435,7 @@ void Routines::addKotorRoutines() {
     add("GiveXPToCreature", Void, { Object, Int });
     add("SetXP", Void, { Object, Int });
     add("GetXP", Int, { Object });
-    add("IntToHexString", String, { Int });
+    add("IntToHexString", String, { Int }, bind(&Routines::intToHexString, this, _1, _2));
     add("GetBaseItemType", Int, { Object });
     add("GetItemHasItemProperty", Int, { Object, Int });
     add("ActionEquipMostDamagingMelee", Void, { Object, Int });
