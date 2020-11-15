@@ -268,6 +268,7 @@ void Game::toggleInGameCameraType() {
             }
             break;
         case CameraType::ThirdPerson: {
+            _module->player().stopMovement();
             shared_ptr<Area> area(_module->area());
             FirstPersonCamera &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
             ThirdPersonCamera &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
