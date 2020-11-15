@@ -74,6 +74,7 @@ public:
     void playDefaultAnimation();
     void playGreetingAnimation();
     void playTalkAnimation();
+    void playUnlockDoorAnimation();
 
     // END Animations
 

@@ -56,6 +56,7 @@ static string g_animRunCharacter("run");
 static string g_animTalkHead("talk");
 static string g_animTalkBody("tlknorm");
 static string g_animGreeting("greeting");
+static string g_animUnlockDoor("unlockdr");
 
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
@@ -329,6 +330,12 @@ void Creature::playTalkAnimation() {
     if (_headModel) {
         _headModel->playAnimation(g_animTalkHead, kAnimationLoop | kAnimationOverlay, 0.25f);
     }
+}
+
+void Creature::playUnlockDoorAnimation() {
+    if (!_model) return;
+
+    _model->playAnimation(g_animUnlockDoor, kAnimationBlend);
 }
 
 void Creature::equip(const string &resRef) {
