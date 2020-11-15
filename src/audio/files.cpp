@@ -41,7 +41,6 @@ void AudioFiles::invalidateCache() {
 }
 
 shared_ptr<AudioStream> AudioFiles::get(const string &resRef) {
-    lock_guard<recursive_mutex> lock(_mutex);
     auto maybeAudio = _cache.find(resRef);
     if (maybeAudio != _cache.end()) {
         return maybeAudio->second;

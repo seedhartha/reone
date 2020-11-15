@@ -32,7 +32,6 @@ class SoundHandle;
 
 class SoundInstance {
 public:
-    SoundInstance(const std::string &resRef, bool loop, float gain, bool positional, Vector3 position);
     SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, Vector3 position);
     SoundInstance(SoundInstance &&) = default;
     ~SoundInstance();
@@ -45,7 +44,6 @@ public:
     std::shared_ptr<SoundHandle> handle() const;
 
 private:
-    std::string _resRef;
     std::shared_ptr<AudioStream> _stream;
     bool _loop { false };
     float _gain { 0.0f };

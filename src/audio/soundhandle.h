@@ -33,7 +33,7 @@ public:
         Stopped
     };
 
-    SoundHandle(Vector3 position);
+    SoundHandle(float duration, Vector3 position);
 
     void stop();
     void resetPositionDirty();
@@ -46,7 +46,6 @@ public:
     bool isPositionDirty() const;
 
     void setState(State state);
-    void setDuration(int duration);
     void setPosition(Vector3 position);
 
 private:
