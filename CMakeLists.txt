@@ -587,7 +587,7 @@ endif()
 if(WIN32)
     target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
 else()
-    target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads)
+    target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
 endif()
 
 ## END reone executable
