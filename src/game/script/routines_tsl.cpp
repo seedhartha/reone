@@ -70,7 +70,7 @@ void Routines::addTslRoutines() {
     add("GetFacing", Float, { Object });
     add("GetItemPossessor", Object, { Object });
     add("GetItemPossessedBy", Object, { Object, String });
-    add("CreateItemOnObject", Object, { String, Object, Int, Int });
+    add("CreateItemOnObject", Object, { String, Object, Int, Int }, bind(&Routines::createItemOnObject, this, _1, _2));
     add("ActionEquipItem", Void, { Object, Int, Int });
     add("ActionUnequipItem", Void, { Object, Int });
     add("ActionPickUpItem", Void, { Object });
