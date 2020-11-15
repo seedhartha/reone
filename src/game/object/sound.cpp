@@ -96,6 +96,25 @@ void Sound::playSound(const string &resRef, bool loop) {
     _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), Vector3(_transform[3]));
 }
 
+
+void Sound::play() {
+    if (_sound) {
+        _sound->stop();
+    }
+
+    _timeout = 0.0f;
+    _active = true;
+}
+
+void Sound::stop() {
+    if (_sound) {
+        _sound->stop();
+        _sound.reset();
+    }
+
+    _active = false;
+}
+
 shared_ptr<SoundBlueprint> Sound::blueprint() const {
     return _blueprint;
 }
