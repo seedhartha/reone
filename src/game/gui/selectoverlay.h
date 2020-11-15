@@ -51,8 +51,12 @@ private:
     std::shared_ptr<render::Font> _font;
     std::shared_ptr<render::Texture> _friendlyReticle;
     std::shared_ptr<render::Texture> _friendlyReticle2;
+    std::shared_ptr<render::Texture> _friendlyScroll;
+    std::shared_ptr<render::Texture> _hostileScroll;
+    std::shared_ptr<render::Texture> _hilightedScroll;
     bool _hasHilighted { false };
     bool _hasSelected { false };
+    bool _hasActions { false };
     glm::vec3 _hilightedScreenCoords { 0.0f };
     glm::vec3 _selectedScreenCoords { 0.0f };
     std::string _selectedTitle;
@@ -60,6 +64,7 @@ private:
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
     void drawTitleBar() const;
+    void drawActionBar() const;
 };
 
 } // namespace game
