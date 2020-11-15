@@ -73,7 +73,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         if (props.flags & kRaycastSelectable && !object->isSelectable()) continue;
 
         float dist = object->distanceTo(glm::vec2(props.origin));
-        if (dist > props.maxDistance * props.maxDistance) continue;
+        if (dist > props.maxDistance) continue;
 
         invTransform = glm::inverse(object->transform());
         origin = invTransform * glm::vec4(props.origin, 1.0f);

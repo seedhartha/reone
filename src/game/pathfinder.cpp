@@ -40,9 +40,7 @@ void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int
         for (auto &adjPointIdx : point.adjPoints) {
             const Path::Point &adjPoint = points[adjPointIdx];
             adjPointVec = glm::vec3(adjPoint.x, adjPoint.y, pointZ.find(adjPointIdx)->second);
-
             float distance = glm::distance2(pointVec, adjPointVec);
-
             _edges[i].push_back({ static_cast<uint16_t>(adjPointIdx), distance });
         }
     }

@@ -40,7 +40,7 @@ namespace reone {
 namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
-static const float kMaxConversationDistance = 8.0f;
+static const float kMaxConversationDistance = 3.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
     if (!game) {
@@ -142,7 +142,7 @@ bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest,
     const glm::vec3 &origin = creature.position();
     float distToDest = glm::distance2(origin, dest);
 
-    if (distToDest <= distance) {
+    if (distToDest <= distance * distance) {
         creature.setMovementType(Creature::MovementType::None);
         creature.clearPath();
         return true;

@@ -24,6 +24,8 @@ namespace reone {
 
 namespace game {
 
+const float kSelectionDistance = 8.0f;
+
 class Area;
 class Party;
 

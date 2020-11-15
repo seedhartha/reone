@@ -57,9 +57,7 @@ namespace reone {
 namespace game {
 
 static const float kDefaultFieldOfView = 75.0f;
-static const float kDrawDebugDistance = 64.0f;
-static const float kPartyMemberFollowDistance = 4.0f;
-static const float kMaxDistanceToTestCollision = 64.0f;
+static const float kMaxDistanceToTestCollision = 8.0f;
 static const float kElevationTestZ = 1024.0f;
 static const float kCreatureObstacleTestZ = 0.1f;
 static const int kMaxSoundCount = 4;
@@ -596,7 +594,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     props.direction = glm::normalize(toWorld - fromWorld);
     props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };
     props.except = partyLeader.get();
-    props.maxDistance = 1000.0f;
+    props.maxDistance = 2.0f * kSelectionDistance;
 
     RaycastResult result;
 
@@ -746,7 +744,7 @@ void Area::updateSounds() {
         float minDist = blueprint->minDistance();
 
         float dist = soundPtr->distanceTo(cameraPosition);
-        if (dist < minDist * minDist || dist > maxDist * maxDist) continue;
+        if (dist < minDist || dist > maxDist) continue;
 
         soundDistances.push_back(make_pair(soundPtr, dist));
     }
