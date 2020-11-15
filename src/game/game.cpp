@@ -724,6 +724,11 @@ int Game::getGlobalNumber(const string &name) const {
     return maybeValue != _globalNumbers.end() ? maybeValue->second : 0;
 }
 
+string Game::getGlobalString(const string &name) const {
+    auto maybeValue = _globalStrings.find(name);
+    return maybeValue != _globalStrings.end() ? maybeValue->second : "";
+}
+
 bool Game::getLocalBoolean(uint32_t objectId, int index) const {
     auto maybeObject = _localBooleans.find(objectId);
     if (maybeObject == _localBooleans.end()) return false;
@@ -750,6 +755,10 @@ void Game::setGlobalBoolean(const string &name, bool value) {
 
 void Game::setGlobalNumber(const string &name, int value) {
     _globalNumbers[name] = value;
+}
+
+void Game::setGlobalString(const string &name, const string &value) {
+    _globalStrings[name] = value;
 }
 
 void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {

@@ -35,6 +35,10 @@ Variable Routines::getGlobalNumber(const vector<Variable> &args, ExecutionContex
     return _game->getGlobalNumber(args[0].strValue);
 }
 
+Variable Routines::getGlobalString(const vector<Variable> &args, ExecutionContext &ctx) {
+    return _game->getGlobalString(args[0].strValue);
+}
+
 Variable Routines::getLocalBoolean(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     return object ? _game->getLocalBoolean(object->id(), args[1].intValue) : false;
@@ -52,6 +56,11 @@ Variable Routines::setGlobalBoolean(const vector<Variable> &args, ExecutionConte
 
 Variable Routines::setGlobalNumber(const vector<Variable> &args, ExecutionContext &ctx) {
     _game->setGlobalNumber(args[0].strValue, args[1].intValue);
+    return Variable();
+}
+
+Variable Routines::setGlobalString(const vector<Variable> &args, ExecutionContext &ctx) {
+    _game->setGlobalString(args[0].strValue, args[1].strValue);
     return Variable();
 }
 
