@@ -91,6 +91,15 @@ private:
     script::Variable turnsToSeconds(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable yardsToMeters(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
+    script::Variable getStringLength(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getStringUpperCase(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getStringLowerCase(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getStringRight(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getStringLeft(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable insertString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getSubString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable findSubString(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
     script::Variable executeScript(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getRunScriptVar(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
