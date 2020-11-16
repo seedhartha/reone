@@ -37,8 +37,9 @@ namespace game {
 class Area;
 class Party;
 
-constexpr float MAX_DETECT_RANGE = 20; // TODO: adjust detection distance
-constexpr uint32_t DEACTIVATION_TIMEOUT = 10000; // 10s in ticks
+constexpr float MAX_DETECT_RANGE = 20;              // TODO: adjust detection distance
+constexpr uint32_t DEACTIVATION_TIMEOUT = 10000;    // 10s in ticks
+constexpr uint32_t AI_MASTER_INTERVAL = 3000;       //3s in ticks
 
 class Combat {
 
@@ -98,6 +99,8 @@ public:
     std::shared_ptr<Creature> findNearestHostile(std::shared_ptr<Creature> &combatant,
                                                  float detectionRange = MAX_DETECT_RANGE);
 
+    bool activated() { return _activated; }
+
 private:
     Area *_area;
     Party *_party;
@@ -142,7 +145,12 @@ private:
 
     TimerMap<uint32_t> _deactivationTimer;
 
-    // TODO: TimerQueue<uint32_t> _ai_timer;
+    void setAITimeout(const std::shared_ptr<Creature>& creature);
+
+    bool isAITimerDone(const std::shared_ptr<Creature>& creature);
+
+    std::unordered_set<uint32_t> _pendingAITimer;
+    TimerQueue<uint32_t> _AITimer;
 
     // END timers
 
@@ -163,6 +171,13 @@ private:
     void onEnterCooldownState(std::shared_ptr<Creature>& combatant);
 
     // END state transition
+
+    // activation
+    
+    void onActivation();
+    void onDeactivation();
+
+    // END activation
 
 };
 

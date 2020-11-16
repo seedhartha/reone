@@ -111,6 +111,10 @@ void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &ac
 }
 
 void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
+    // TODO: continuously queue following if combat inactive
+    if (_game->module()->area()->combat().activated()) {
+        action.complete();
+    }
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
     float distance = action.distance();
