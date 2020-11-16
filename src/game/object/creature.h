@@ -44,6 +44,10 @@ public:
         Run
     };
 
+    enum class Animation {
+        UnlockDoor
+    };
+
     struct Path {
         glm::vec3 destination { 0.0f };
         std::vector<glm::vec3> points;
@@ -53,11 +57,17 @@ public:
 
     Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
+    void update(float dt) override;
+    void clearAllActions() override;
+
     glm::vec3 selectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
     void load(const CreatureConfiguration &config);
+
+    void playAnimation(Animation anim);
+    void updateModelAnimation();
 
     Gender gender() const;
     int appearance() const;
@@ -68,17 +78,8 @@ public:
     std::shared_ptr<CreatureBlueprint> blueprint() const;
 
     void setTag(const std::string &tag);
-    virtual void setMovementType(MovementType type);
-    virtual void setTalking(bool talking);
-
-    // Animations
-
-    void playDefaultAnimation();
-    void playGreetingAnimation();
-    void playTalkAnimation();
-    void playUnlockDoorAnimation();
-
-    // END Animations
+    void setMovementType(MovementType type);
+    void setTalking(bool talking);
 
     // Equipment
 
@@ -121,6 +122,8 @@ private:
     MovementType _movementType { MovementType::None };
     bool _talking { false };
     CreatureAttributes _attributes;
+    bool _animDirty { true };
+    bool _animFireForget { false };
 
     // Scripts
 
@@ -135,12 +138,14 @@ private:
 
     // END Loading
 
+    void updateModel();
+
+    ModelType parseModelType(const std::string &s) const;
+
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
     std::string getWeaponModelName(InventorySlot slot) const;
-    ModelType parseModelType(const std::string &s) const;
-    void updateModel();
 
     const std::string &getPauseAnimation() const;
     const std::string &getRunAnimation() const;

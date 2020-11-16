@@ -224,6 +224,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(_character);
+    creature->updateModelAnimation();
 
     return creature->model();
 }

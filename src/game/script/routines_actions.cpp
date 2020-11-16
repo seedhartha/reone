@@ -149,7 +149,7 @@ Variable Routines::actionCloseDoor(const vector<Variable> &args, ExecutionContex
 
 Variable Routines::clearAllActions(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> actor(getObjectById(ctx.callerId, ctx));
-    actor->actionQueue().clear();
+    actor->clearAllActions();
     return Variable();
 }
 

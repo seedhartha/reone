@@ -202,6 +202,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfi
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(config);
+    creature->updateModelAnimation();
 
     return creature->model();
 }

@@ -182,11 +182,6 @@ void Creature::updateModel() {
         rightWeaponModel = Models::instance().get(rightWeaponModelName);
     }
     _model->attach("rhand", rightWeaponModel);
-
-    // Animation
-
-    _model->setDefaultAnimation(getPauseAnimation());
-    _model->playDefaultAnimation();
 }
 
 string Creature::getBodyModelName() const {
@@ -312,32 +307,64 @@ void Creature::loadPortrait(int appearance) {
     _portrait = Textures::instance().get(resRef, TextureType::GUI);
 }
 
-void Creature::playDefaultAnimation() {
-    if (_model) {
-        _model->playDefaultAnimation();
-    }
+void Creature::update(float dt) {
+    SpatialObject::update(dt);
+    updateModelAnimation();
 }
 
-void Creature::playGreetingAnimation() {
-    if (_movementType != MovementType::None) return;
-
-    playAnimation(g_animGreeting, kAnimationPropagate);
-}
-
-void Creature::playTalkAnimation() {
+void Creature::updateModelAnimation() {
     if (!_model) return;
 
-    _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
+    if (_animFireForget) {
+        if (!_model->isAnimationFinished()) return;
 
-    if (_headModel) {
-        _headModel->playAnimation(g_animTalkHead, kAnimationLoop | kAnimationOverlay, 0.25f);
+        _animFireForget = false;
+        _animDirty = true;
     }
+    if (!_animDirty) return;
+
+    switch (_movementType) {
+        case MovementType::Run:
+            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            break;
+        case MovementType::Walk:
+            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            break;
+        default:
+            if (_talking) {
+                _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
+                if (_headModel) {
+                    _headModel->playAnimation(g_animTalkHead, kAnimationLoop | kAnimationOverlay, 0.25f);
+                }
+            } else {
+                _model->playAnimation(getPauseAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            }
+            break;
+    }
+
+    _animDirty = false;
 }
 
-void Creature::playUnlockDoorAnimation() {
-    if (!_model) return;
+void Creature::clearAllActions() {
+    SpatialObject::clearAllActions();
+    setMovementType(MovementType::None);
+}
 
-    _model->playAnimation(g_animUnlockDoor, kAnimationBlend);
+void Creature::playAnimation(Animation anim) {
+    if (!_model || _movementType != MovementType::None) return;
+
+    string animName;
+    switch (anim) {
+        case Animation::UnlockDoor:
+            animName = g_animUnlockDoor;
+            break;
+        default:
+            break;
+    }
+    if (!animName.empty()) {
+        _model->playAnimation(animName, kAnimationPropagate | kAnimationBlend);
+        _animFireForget = true;
+    }
 }
 
 void Creature::equip(const string &resRef) {
@@ -388,38 +415,18 @@ void Creature::setTag(const string &tag) {
 }
 
 void Creature::setMovementType(MovementType type) {
-    if (!_model || _movementType == type) return;
-
-    switch (type) {
-        case MovementType::Walk:
-            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
-            break;
-        case MovementType::Run:
-            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
-            break;
-        default:
-            if (_talking) {
-                playTalkAnimation();
-            } else {
-                _model->playDefaultAnimation();
-            }
-            break;
-    }
+    if (_movementType == type) return;
 
     _movementType = type;
+    _animDirty = true;
+    _animFireForget = false;
 }
 
 void Creature::setTalking(bool talking) {
     if (_talking == talking) return;
 
-    if (_movementType == MovementType::None) {
-        if (talking) {
-            playTalkAnimation();
-        } else {
-            playDefaultAnimation();
-        }
-    }
     _talking = talking;
+    _animDirty = true;
 }
 
 const string &Creature::getPauseAnimation() const {

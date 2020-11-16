@@ -78,12 +78,6 @@ void SpatialObject::update(float dt) {
     }
 }
 
-void SpatialObject::playAnimation(const string &name, int flags, float speed) {
-    if (_model) {
-        _model->playAnimation(name, flags, speed);
-    }
-}
-
 bool SpatialObject::isSelectable() const {
     return _selectable;
 }
