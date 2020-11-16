@@ -17,46 +17,27 @@
 
 #pragma once
 
+#include <memory>
+
+#include "action.h"
+
 namespace reone {
 
 namespace game {
 
-enum class ActionType {
-    MoveToPoint = 0,
-    OpenDoor = 5,
-    CloseDoor = 6,
-    OpenLock = 13,
-    Follow = 35,
-    FollowLeader = 38,
-    QueueEmpty = 65534,
+class Location;
 
-    DoCommand = 0x1000,
-    StartConversation = 0x1001,
-    PauseConversation = 0x1002,
-    ResumeConversation = 0x1003,
-    MoveToObject = 0x1004,
-    OpenContainer = 0x1005,
-    JumpToObject = 0x1006,
-    JumpToLocation = 0x1007
-};
-
-class Action {
+class LocationAction : public Action {
 public:
-    Action(ActionType type);
-    virtual ~Action() = default;
+    LocationAction(ActionType type, const std::shared_ptr<Location> &location) :
+        Action(type),
+        _location(location) {
+    }
 
-    void complete();
-
-    ActionType type() const;
-    bool isCompleted() const;
-
-protected:
-    ActionType _type { ActionType::QueueEmpty };
-    bool _completed { false };
+    std::shared_ptr<Location> location() const { return _location; }
 
 private:
-    Action(const Action &) = delete;
-    Action &operator=(const Action &) = delete;
+    std::shared_ptr<Location> _location;
 };
 
 } // namespace game

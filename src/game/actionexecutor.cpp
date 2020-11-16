@@ -84,6 +84,12 @@ void ActionExecutor::executeActions(Object &object, float dt) {
         case ActionType::OpenLock:
             executeOpenLock(static_cast<Creature &>(object), *dynamic_cast<ObjectAction *>(action), dt);
             break;
+        case ActionType::JumpToObject:
+            executeJumpToObject(object, *dynamic_cast<ObjectAction *>(action), dt);
+            break;
+        case ActionType::JumpToLocation:
+            executeJumpToLocation(object, *dynamic_cast<LocationAction *>(action), dt);
+            break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
             action->isCompleted();
@@ -283,6 +289,24 @@ void ActionExecutor::executeOpenLock(Creature &actor, ObjectAction &action, floa
         warn("ActionExecutor: unsupported OpenLock object: " + to_string(action.object()->id()));
         action.complete();
     }
+}
+
+void ActionExecutor::executeJumpToObject(Object &actor, ObjectAction &action, float dt) {
+    SpatialObject &spatialObject = *static_cast<SpatialObject *>(action.object());
+
+    SpatialObject &spatialActor = static_cast<SpatialObject &>(actor);
+    spatialActor.setPosition(spatialObject.position());
+    spatialActor.setHeading(spatialObject.heading());
+
+    action.complete();
+}
+
+void ActionExecutor::executeJumpToLocation(Object &actor, LocationAction &action, float dt) {
+    SpatialObject &spatialActor = static_cast<SpatialObject &>(actor);
+    spatialActor.setPosition(action.location()->position());
+    spatialActor.setHeading(action.location()->facing());
+
+    action.complete();
 }
 
 } // namespace game
