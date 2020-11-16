@@ -157,6 +157,27 @@ void Combat::AIMaster(shared_ptr<Creature> &combatant) {
     }
 }
 
+void Combat::updateTimers(uint32_t currentTicks) {
+    _stateTimer.update(currentTicks);
+    _effectDelayTimer.update(currentTicks);
+    _deactivationTimer.update(currentTicks);
+
+    for (const auto& e : _stateTimer.completed) {
+        if (--(_pendingStates[e]) == 0)
+            _pendingStates.erase(e);
+    }
+    _stateTimer.completed.clear();
+
+    for (auto& pr : _effectDelayTimer.completed) {
+        if (!pr->first) continue;
+
+        pr->first->applyEffect(std::move(pr->second));
+        pr->second = nullptr; // dangling?
+        _effectDelayIndex.erase(pr);
+    }
+    _effectDelayTimer.completed.clear();
+}
+
 void Combat::setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t delayTicks) {
     if (!creature) return;
     _stateTimer.setTimeout(creature->id(), delayTicks);
@@ -169,6 +190,13 @@ void Combat::setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t
 bool Combat::isStateTimerDone(const std::shared_ptr<Creature>& creature) {
     if (!creature) return false;
     return _pendingStates.count(creature->id()) == 0;
+}
+
+void Combat::setDelayEffectTimeout(std::unique_ptr<Effect>&& eff,
+    std::shared_ptr<Creature>& target, uint32_t delayTicks) {
+    auto index = _effectDelayIndex.insert(
+        _effectDelayIndex.end(), std::make_pair(target, std::move(eff)));
+    _effectDelayTimer.setTimeout(index, delayTicks);
 }
 
 void Combat::onEnterAttackState(shared_ptr<Creature> &combatant) {
@@ -295,6 +323,14 @@ shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant,
     }
 
     return move(closest_target);
+}
+
+bool Combat::registerCombatant(const std::shared_ptr<Creature>& combatant) {
+    auto res = _activeCombatantIds.insert(combatant->id());
+    if (res.second) { // combatant not already in _activeCombatantIds
+        _activeCombatants.push_back(combatant);
+    }
+    return res.second;
 }
 
 } // namespace game
