@@ -201,7 +201,6 @@ bool Control::handleMouseWheel(int x, int y) {
 }
 
 bool Control::handleClick(int x, int y) {
-    _gui->resetFocus();
     _gui->onClick(_tag);
     return true;
 }

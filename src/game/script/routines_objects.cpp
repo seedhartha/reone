@@ -211,13 +211,17 @@ Variable Routines::getPosition(const vector<Variable> &args, ExecutionContext &c
 
 Variable Routines::soundObjectPlay(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
-    target->play();
+    if (target) {
+        target->play();
+    }
     return Variable();
 }
 
 Variable Routines::soundObjectStop(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
-    target->stop();
+    if (target) {
+        target->stop();
+    }
     return Variable();
 }
 

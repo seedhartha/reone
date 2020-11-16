@@ -146,7 +146,15 @@ void Game::openMainMenu() {
         loadSaveLoad();
     }
     playMusic(getMainMenuMusic());
-    _screen = GameScreen::MainMenu;
+    changeScreen(GameScreen::MainMenu);
+}
+
+void Game::changeScreen(GameScreen screen) {
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->resetFocus();
+    }
+    _screen = screen;
 }
 
 string Game::getMainMenuMusic() const {
@@ -224,7 +232,7 @@ void Game::loadModule(const string &name, const string &entry) {
         playMusic(musicName);
 
         _ticks = SDL_GetTicks();
-        _screen = GameScreen::InGame;
+        openInGame();
         _loadFromSaveGame = false;
     });
 }
@@ -233,7 +241,7 @@ void Game::withLoadingScreen(const function<void()> &block) {
     if (!_loadScreen) {
         loadLoadingScreen();
     }
-    _screen = GameScreen::Loading;
+    changeScreen(GameScreen::Loading);
     drawAll();
     block();
 }
@@ -491,7 +499,7 @@ void Game::startCharacterGeneration() {
             loadCharacterGeneration();
         }
         playMusic(getCharacterGenerationMusic());
-        _screen = GameScreen::CharacterGeneration;
+        changeScreen(GameScreen::CharacterGeneration);
     });
 }
 
@@ -509,7 +517,7 @@ void Game::quit() {
 }
 
 void Game::openInGame() {
-    _screen = GameScreen::InGame;
+    changeScreen(GameScreen::InGame);
 }
 
 void Game::openInGameMenu(InGameMenu::Tab tab) {
@@ -542,13 +550,13 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
         default:
             break;
     }
-    _screen = GameScreen::InGameMenu;
+    changeScreen(GameScreen::InGameMenu);
 }
 
 void Game::startDialog(SpatialObject &owner, const string &resRef) {
     stopMovement();
     setCursorType(CursorType::Default);
-    _screen = GameScreen::Dialog;
+    changeScreen(GameScreen::Dialog);
     _dialog->startDialog(owner, resRef);
 }
 
@@ -560,21 +568,21 @@ void Game::stopMovement() {
 void Game::openContainer(SpatialObject *container) {
     setCursorType(CursorType::Default);
     _container->open(container);
-    _screen = GameScreen::Container;
+    changeScreen(GameScreen::Container);
 }
 
 void Game::openPartySelection(const PartySelection::Context &ctx) {
     stopMovement();
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
-    _screen = GameScreen::PartySelection;
+    changeScreen(GameScreen::PartySelection);
 }
 
 void Game::openSaveLoad(SaveLoad::Mode mode) {
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
     _saveLoad->update();
-    _screen = GameScreen::SaveLoad;
+    changeScreen(GameScreen::SaveLoad);
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
@@ -651,10 +659,13 @@ bool Game::handle(const SDL_Event &event) {
 }
 
 bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (event.button != SDL_BUTTON_LEFT) return false;
+
     if (_video) {
         _video->finish();
         return true;
     }
+
     return false;
 }
 
