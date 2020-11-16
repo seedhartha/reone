@@ -548,7 +548,7 @@ void Routines::addKotorRoutines() {
     add("SetLockHeadFollowInDialog", Void, { Object, Int });
     add("CutsceneMove", Void, { Object, Vector, Int });
     add("EnableVideoEffect", Void, { Int });
-    add("StartNewModule", Void, { String, String, String, String, String, String, String, String });
+    add("StartNewModule", Void, { String, String, String, String, String, String, String, String }, bind(&Routines::startNewModule, this, _1, _2));
     add("DisableVideoEffect", Void, { });
     add("GetWeaponRanged", Int, { Object });
     add("DoSinglePlayerAutoSave", Void, { });
