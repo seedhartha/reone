@@ -93,7 +93,8 @@ void Sound::update(float dt) {
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), getPosition());
+    float gain = _blueprint->volume() / 127.0f;
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, gain, _blueprint->positional(), getPosition());
 }
 
 void Sound::play() {
