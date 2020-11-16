@@ -235,7 +235,7 @@ void Routines::addTslRoutines() {
     add("GetFactionBestAC", Object, { Object, Int });
     add("GetGlobalString", String, { String }, bind(&Routines::getGlobalString, this, _1, _2));
     add("GetListenPatternNumber", Int, { });
-    add("ActionJumpToObject", Void, { Object, Int });
+    add("ActionJumpToObject", Void, { Object, Int }, bind(&Routines::actionJumpToObject, this, _1, _2));
     add("GetWaypointByTag", Object, { String }, bind(&Routines::getWaypointByTag, this, _1, _2));
     add("GetTransitionTarget", Object, { Object });
     add("EffectLinkEffects", Effect, { Effect, Effect });
@@ -253,7 +253,7 @@ void Routines::addTslRoutines() {
     add("GetGoingToBeAttackedBy", Object, { Object });
     add("EffectForceResistanceIncrease", Effect, { Int });
     add("GetLocation", Location, { Object }, bind(&Routines::getLocation, this, _1, _2));
-    add("ActionJumpToLocation", Void, { Location });
+    add("ActionJumpToLocation", Void, { Location }, bind(&Routines::actionJumpToLocation, this, _1, _2));
     add("Location", Location, { TVector, Float }, bind(&Routines::location, this, _1, _2));
     add("ApplyEffectAtLocation", Void, { Int, Effect, Location, Float });
     add("GetIsPC", Int, { Object }, bind(&Routines::getIsPC, this, _1, _2));
@@ -352,7 +352,7 @@ void Routines::addTslRoutines() {
     add("ActionUseTalentAtLocation", Void, { Talent, Location });
     add("GetGoldPieceValue", Int, { Object });
     add("GetIsPlayableRacialType", Int, { Object });
-    add("JumpToLocation", Void, { Location });
+    add("JumpToLocation", Void, { Location }, bind(&Routines::jumpToLocation, this, _1, _2));
     add("EffectTemporaryHitpoints", Effect, { Int });
     add("GetSkillRank", Int, { Int, Object });
     add("GetAttackTarget", Object, { Object });
@@ -421,10 +421,10 @@ void Routines::addTslRoutines() {
     add("ActionSurrenderToEnemies", Void, { });
     add("GetFirstFactionMember", Object, { Object, Int });
     add("GetNextFactionMember", Object, { Object, Int });
-    add("ActionForceMoveToLocation", Void, { Location, Int, Float });
-    add("ActionForceMoveToObject", Void, { Object, Int, Float, Float });
+    add("ActionForceMoveToLocation", Void, { Location, Int, Float }, bind(&Routines::actionForceMoveToLocation, this, _1, _2));
+    add("ActionForceMoveToObject", Void, { Object, Int, Float, Float }, bind(&Routines::actionForceMoveToObject, this, _1, _2));
     add("GetJournalQuestExperience", Int, { String });
-    add("JumpToObject", Void, { Object, Int });
+    add("JumpToObject", Void, { Object, Int }, bind(&Routines::jumpToObject, this, _1, _2));
     add("SetMapPinEnabled", Void, { Object, Int });
     add("EffectHitPointChangeWhenDying", Effect, { Float });
     add("PopUpGUIPanel", Void, { Object, Int });

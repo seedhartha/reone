@@ -186,6 +186,10 @@ private:
 
     script::Variable actionCloseDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionDoCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionForceMoveToLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionForceMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionJumpToLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable actionJumpToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionMoveToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionOpenDoor(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable actionPauseConversation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -194,6 +198,8 @@ private:
     script::Variable assignCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable clearAllActions(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable delayCommand(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable jumpToLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable jumpToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Actions
 

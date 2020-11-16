@@ -20,8 +20,10 @@
 #include "../../common/log.h"
 
 #include "../action/commandaction.h"
+#include "../action/locationaction.h"
 #include "../action/movetoobject.h"
 #include "../action/startconversation.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -151,6 +153,90 @@ Variable Routines::actionCloseDoor(const vector<Variable> &args, ExecutionContex
 Variable Routines::clearAllActions(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> actor(getObjectById(ctx.callerId, ctx));
     actor->clearAllActions();
+    return Variable();
+}
+
+Variable Routines::actionJumpToObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+
+    if (subject && object) {
+        subject->actionQueue().add(make_unique<ObjectAction>(ActionType::JumpToObject, object));
+    } else {
+        warn("Routine: actionJumpToObject: subject or object is null");
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionJumpToLocation(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Location> location(_game->getLocation(args[0].engineTypeId));
+
+    if (subject && location) {
+        subject->actionQueue().add(make_unique<LocationAction>(ActionType::JumpToLocation, location));
+    } else {
+        warn("Routine: actionJumpToLocation: subject or location is null");
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionForceMoveToObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    bool run = args.size() >= 2 ? (args[1].intValue != 0) : false;
+    float range = args.size() >= 3 ? args[2].floatValue : 1.0f;
+
+    if (subject && object) {
+        subject->actionQueue().add(make_unique<MoveToObjectAction>(object, run, range));
+    } else {
+        warn("Routine: actionForceMoveToObject: subject or object is null");
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionForceMoveToLocation(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Location> location(_game->getLocation(args[0].engineTypeId));
+
+    if (subject && location) {
+        subject->actionQueue().add(make_unique<MoveToPointAction>(location->position()));
+    } else {
+        warn("Routine: actionForceMoveToLocation: subject or location is null");
+    }
+
+    return Variable();
+}
+
+Variable Routines::jumpToObject(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+
+    if (subject && object) {
+        ActionQueue &actions = subject->actionQueue();
+        actions.clear();
+        actions.add(make_unique<ObjectAction>(ActionType::JumpToObject, object));
+    } else {
+        warn("Routine: jumpToObject: subject or object is null");
+    }
+
+    return Variable();
+}
+
+Variable Routines::jumpToLocation(const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Object> subject(getObjectById(ctx.callerId, ctx));
+    shared_ptr<Location> location(_game->getLocation(args[0].engineTypeId));
+
+    if (subject && location) {
+        ActionQueue &actions = subject->actionQueue();
+        actions.clear();
+        actions.add(make_unique<LocationAction>(ActionType::JumpToLocation, location));
+    } else {
+        warn("Routine: jumpToLocation: subject or location is null");
+    }
+
     return Variable();
 }
 

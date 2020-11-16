@@ -21,6 +21,7 @@
 
 #include "action/commandaction.h"
 #include "action/follow.h"
+#include "action/locationaction.h"
 #include "action/movetoobject.h"
 #include "action/movetopoint.h"
 #include "action/startconversation.h"
@@ -60,6 +61,8 @@ private:
     void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
     void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);
     void executeOpenLock(Creature &actor, ObjectAction &action, float dt);
+    void executeJumpToObject(Object &actor, ObjectAction &action, float dt);
+    void executeJumpToLocation(Object &actor, LocationAction &action, float dt);
 
     // END Actions
 };
