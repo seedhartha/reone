@@ -48,7 +48,6 @@ public:
 
 private:
     std::shared_ptr<TriggerBlueprint> _blueprint;
-    std::string _tag;
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;

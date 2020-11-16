@@ -776,6 +776,7 @@ void Area::checkTriggersIntersection(SpatialObject &triggerrer) {
         if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
         if (trigger.isTenant(triggererPtr) || !trigger.isIn(position2d)) continue;
 
+        debug(boost::format("Trigger %s triggerred by %s") % trigger.tag() % triggerrer.tag());
         trigger.addTenant(triggererPtr);
 
         if (!trigger.linkedToModule().empty()) {
