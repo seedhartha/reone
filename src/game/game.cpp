@@ -429,6 +429,10 @@ void Game::update() {
     if (_video) {
         _video->update(dt);
         if (_video->isFinished()) {
+            if (_movieAudio) {
+                _movieAudio->stop();
+                _movieAudio.reset();
+            }
             _video.reset();
         }
     } else if (!_musicResRef.empty()) {
@@ -662,9 +666,6 @@ bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (event.button != SDL_BUTTON_LEFT) return false;
 
     if (_video) {
-        if (_movieAudio) {
-            _movieAudio->stop();
-        }
         _video->finish();
         return true;
     }
