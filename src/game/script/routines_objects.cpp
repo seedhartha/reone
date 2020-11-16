@@ -61,6 +61,8 @@ Variable Routines::getObjectByTag(const vector<Variable> &args, ExecutionContext
     Variable result(VariableType::Object);
 
     string tag(args[0].strValue);
+    boost::to_lower(tag);
+
     if (tag.empty()) {
         result.objectId = _game->party().player()->id();
     } else {
@@ -73,7 +75,10 @@ Variable Routines::getObjectByTag(const vector<Variable> &args, ExecutionContext
 }
 
 Variable Routines::getWaypointByTag(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> object(_game->module()->area()->find(args[0].strValue));
+    string tag(args[0].strValue);
+    boost::to_lower(tag);
+
+    shared_ptr<Object> object(_game->module()->area()->find(tag));
 
     Variable result(VariableType::Object);
     result.objectId = object ? object->id() : kObjectInvalid;
