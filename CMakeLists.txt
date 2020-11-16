@@ -368,6 +368,8 @@ set(GAME_HEADERS
     src/game/console.h
     src/game/cursors.h
     src/game/dialog.h
+    src/game/enginetype/location.h
+    src/game/enginetype/typefactory.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -452,6 +454,7 @@ set(GAME_SOURCES
     src/game/console.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
+    src/game/enginetype/typefactory.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
@@ -504,6 +507,7 @@ set(GAME_SOURCES
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp
     src/game/script/routines_common.cpp
+    src/game/script/routines_enginetypes.cpp
     src/game/script/routines_events.cpp
     src/game/script/routines_kotor.cpp
     src/game/script/routines_objects.cpp

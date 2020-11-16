@@ -252,9 +252,9 @@ void Routines::addKotorRoutines() {
     add("GetModuleFileName", String, { });
     add("GetGoingToBeAttackedBy", Object, { Object });
     add("EffectForceResistanceIncrease", Effect, { Int });
-    add("GetLocation", Location, { Object });
+    add("GetLocation", Location, { Object }, bind(&Routines::getLocation, this, _1, _2));
     add("ActionJumpToLocation", Void, { Location });
-    add("Location", Location, { TVector, Float });
+    add("Location", Location, { TVector, Float }, bind(&Routines::location, this, _1, _2));
     add("ApplyEffectAtLocation", Void, { Int, Effect, Location, Float });
     add("GetIsPC", Int, { Object }, bind(&Routines::getIsPC, this, _1, _2));
     add("FeetToMeters", Float, { Float }, bind(&Routines::feetToMeters, this, _1, _2));
@@ -262,9 +262,9 @@ void Routines::addKotorRoutines() {
     add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
     add("SpeakString", Void, { String, Int });
     add("GetSpellTargetLocation", Location, { });
-    add("GetPositionFromLocation", TVector, { Location });
+    add("GetPositionFromLocation", TVector, { Location }, bind(&Routines::getPositionFromLocation, this, _1, _2));
     add("EffectBodyFuel", Effect, { });
-    add("GetFacingFromLocation", Float, { Location });
+    add("GetFacingFromLocation", Float, { Location }, bind(&Routines::getFacingFromLocation, this, _1, _2));
     add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int });
     add("GetNearestObject", Object, { Int, Object, Int });
     add("GetNearestObjectToLocation", Object, { Int, Location, Int });

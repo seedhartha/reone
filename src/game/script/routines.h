@@ -134,6 +134,15 @@ private:
 
     // END Objects
 
+    // Engine types
+
+    script::Variable getFacingFromLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getPositionFromLocation(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable location(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
+    // END Engine types
+
     // Globals/locals
 
     script::Variable getGlobalBoolean(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);

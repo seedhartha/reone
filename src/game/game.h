@@ -31,6 +31,7 @@
 #include "../scene/scenegraph.h"
 
 #include "console.h"
+#include "enginetype/typefactory.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/dialog.h"
@@ -131,6 +132,14 @@ public:
 
     // END User defined events
 
+    // Engine types
+
+    std::shared_ptr<Location> newLocation(glm::vec3 position, float facing);
+
+    std::shared_ptr<Location> getLocation(int id) const;
+
+    // END Engine types
+
 protected:
     Options _options;
 
@@ -162,6 +171,7 @@ private:
     Console _console;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
+    std::unique_ptr<EngineTypeFactory> _engineTypeFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
     uint32_t _ticks { 0 };
@@ -172,6 +182,7 @@ private:
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
+    std::map<int, std::shared_ptr<Location>> _locations;
 
     // Modules
 
