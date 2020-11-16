@@ -34,12 +34,12 @@ namespace audio {
 
 static const int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, Vector3 position) :
+SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
     _positional(positional),
-    _handle(new SoundHandle(stream->duration(), position)) {
+    _handle(new SoundHandle(stream->duration(), move(position))) {
 }
 
 void SoundInstance::init() {
@@ -54,7 +54,7 @@ void SoundInstance::init() {
     alSourcef(_source, AL_GAIN, _gain);
 
     if (_positional) {
-        Vector3 position(_handle->position());
+        glm::vec3 position(_handle->position());
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
     } else {
         alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
@@ -93,7 +93,7 @@ void SoundInstance::deinit() {
 
 void SoundInstance::update() {
     if (_positional && _handle->isPositionDirty()) {
-        Vector3 position(_handle->position());
+        glm::vec3 position(_handle->position());
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
         _handle->resetPositionDirty();
     }

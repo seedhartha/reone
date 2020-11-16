@@ -20,7 +20,7 @@
 #include <string>
 #include <memory>
 
-#include "../common/vector3.h"
+#include "glm/vec3.hpp"
 
 #include "stream.h"
 
@@ -32,7 +32,7 @@ class SoundHandle;
 
 class SoundInstance {
 public:
-    SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, Vector3 position);
+    SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position);
     SoundInstance(SoundInstance &&) = default;
     ~SoundInstance();
 

@@ -19,7 +19,7 @@
 
 #include <atomic>
 
-#include "../common/vector3.h"
+#include "glm/vec3.hpp"
 
 namespace reone {
 
@@ -33,7 +33,7 @@ public:
         Stopped
     };
 
-    SoundHandle(float duration, Vector3 position);
+    SoundHandle(float duration, const glm::vec3 &position);
 
     void stop();
     void resetPositionDirty();
@@ -42,16 +42,16 @@ public:
     bool isStopped() const;
 
     int duration() const;
-    Vector3 position() const;
+    glm::vec3 position() const;
     bool isPositionDirty() const;
 
     void setState(State state);
-    void setPosition(Vector3 position);
+    void setPosition(const glm::vec3 &position);
 
 private:
     std::atomic<State> _state { State::NotInited };
     int _duration { 0 };
-    std::atomic<Vector3> _position;
+    std::atomic<glm::vec3> _position;
     std::atomic_bool _positionDirty { false };
 
     SoundHandle(const SoundHandle &) = delete;

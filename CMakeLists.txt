@@ -62,14 +62,12 @@ set(COMMON_HEADERS
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
-    src/common/quaternion.h
     src/common/pathutil.h
     src/common/random.h
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
-    src/common/types.h
-    src/common/vector3.h)
+    src/common/types.h)
 
 set(COMMON_SOURCES
     src/common/endianutil.cpp

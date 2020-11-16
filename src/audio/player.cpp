@@ -64,7 +64,7 @@ void AudioPlayer::threadStart() {
             sounds = _sounds;
         }
         if (_listenerPositionDirty) {
-            Vector3 position(_listenerPosition.load());
+            glm::vec3 position(_listenerPosition.load());
             alListener3f(AL_POSITION, position.x, position.y, position.z);
             _listenerPositionDirty = false;
         }
@@ -116,7 +116,7 @@ void AudioPlayer::deinit() {
     }
 }
 
-shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, Vector3 position) {
+shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
     shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
     if (!stream) {
         warn("AudioPlayer: file not found: " + resRef);
@@ -151,13 +151,13 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
     _sounds.push_back(sound);
 }
 
-shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, Vector3 position) {
+shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
     shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
     enqueue(sound);
     return sound->handle();
 }
 
-void AudioPlayer::setListenerPosition(Vector3 position) {
+void AudioPlayer::setListenerPosition(const glm::vec3 &position) {
     if (_listenerPosition.load() != position) {
         _listenerPosition = position;
         _listenerPositionDirty = true;

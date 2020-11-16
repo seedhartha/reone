@@ -35,15 +35,15 @@ void CameraObject::load(const GffStruct &gffs) {
     _cameraId = gffs.getInt("CameraID");
     _fieldOfView = gffs.getFloat("FieldOfView");
 
-    Vector3 position(gffs.getVector("Position"));
+    glm::vec3 position(gffs.getVector("Position"));
     float height = gffs.getFloat("Height");
 
     _position = glm::vec3(position.x, position.y, position.z + height);
 
-    Quaternion orientation(gffs.getOrientation("Orientation"));
+    glm::quat orientation(gffs.getOrientation("Orientation"));
     float pitch = gffs.getFloat("Pitch");
 
-    _orientation = glm::quat(orientation.w, orientation.x, orientation.y, orientation.z);
+    _orientation = move(orientation);
     _orientation *= glm::quat_cast(glm::eulerAngleX(glm::radians(pitch)));
 
     updateTransform();
