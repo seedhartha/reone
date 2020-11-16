@@ -25,11 +25,13 @@ namespace game {
 
 class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(const std::shared_ptr<Object> &object, float distance);
+    MoveToObjectAction(const std::shared_ptr<Object> &object, bool run, float distance);
 
+    bool getRun() const;
     float distance() const;
 
 private:
+    bool _run { false };
     float _distance { 0.0f };
 };
 

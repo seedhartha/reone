@@ -44,8 +44,8 @@ private:
     ActionExecutor(const ActionExecutor &) = delete;
     ActionExecutor &operator=(const ActionExecutor &) = delete;
 
-    bool navigateCreature(Creature &creature, const glm::vec3 &dest, float distance, float dt);
-    void advanceCreatureOnPath(Creature &creature, float dt);
+    bool navigateCreature(Creature &creature, const glm::vec3 &dest, bool run, float distance, float dt);
+    void advanceCreatureOnPath(Creature &creature, bool run, float dt);
     void selectNextPathPoint(Creature::Path &path);
     void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
 
