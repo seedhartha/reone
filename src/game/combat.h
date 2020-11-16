@@ -106,13 +106,7 @@ private:
     bool _activated = false;
 
     /* register to _activeCombatants */
-    bool registerCombatant(const std::shared_ptr<Creature> &combatant) {
-        auto res = _activeCombatantIds.insert(combatant->id());
-        if (res.second) { // combatant not already in _activeCombatantIds
-            _activeCombatants.push_back(combatant);
-        }
-        return res.second;
-    }
+    bool registerCombatant(const std::shared_ptr<Creature>& combatant);
 
     std::deque<std::shared_ptr<Creature>> _activeCombatants;
     std::unordered_set<uint32_t> _activeCombatantIds;
@@ -126,26 +120,7 @@ private:
     // timers
 
     /* to be called once each frame, as soon as possible */
-    void updateTimers(uint32_t currentTicks) {
-        _stateTimer.update(currentTicks);
-        _effectDelayTimer.update(currentTicks);
-        _deactivationTimer.update(currentTicks);
-
-        for (const auto& e : _stateTimer.completed) {
-            if (--(_pendingStates[e]) == 0)
-                _pendingStates.erase(e);
-        }
-        _stateTimer.completed.clear();
-
-        for (auto& pr : _effectDelayTimer.completed) {
-            if (!pr->first) continue;
-
-            pr->first->applyEffect(std::move(pr->second));
-            pr->second = nullptr; // dangling?
-            _effectDelayIndex.erase(pr);
-        }
-        _effectDelayTimer.completed.clear();
-    }
+    void updateTimers(uint32_t currentTicks);
 
     void setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t delayTicks);
 
@@ -155,10 +130,7 @@ private:
     std::unordered_map<uint32_t, int> _pendingStates;
     TimerQueue<uint32_t> _stateTimer; // use creature_id
 
-    void setDelayEffectTimeout(std::unique_ptr<Effect> && eff, std::shared_ptr<Creature> & target, uint32_t delayTicks) {
-        auto index = _effectDelayIndex.insert(_effectDelayIndex.end(), std::make_pair(target, std::move(eff)));
-        _effectDelayTimer.setTimeout(index, delayTicks);
-    }
+    void setDelayEffectTimeout(std::unique_ptr<Effect>&& eff, std::shared_ptr<Creature>& target, uint32_t delayTicks);
 
     /*
     * delay the effect application on creature,

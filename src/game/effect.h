@@ -26,7 +26,7 @@ namespace game {
 class Creature;
 
 enum class EffectType {
-    EFFECT_TYPE_INVALIDEFFECT = 0,
+    Invalid = 0,
 
 };
 
@@ -58,13 +58,13 @@ private:
 class DamageEffect : public Effect {
 public:
     DamageEffect(const std::shared_ptr<Creature>& applicator)
-        : Effect(EffectType::EFFECT_TYPE_INVALIDEFFECT, 0), _applicator(applicator) {}
+        : Effect(EffectType::Invalid, 0), _damager(applicator) {}
 
     /* for feedback text, mostly */
-    std::shared_ptr<Creature>& getApplicator() { return _applicator; }
+    std::shared_ptr<Creature>& getDamager() { return _damager; }
 
 private:
-    std::shared_ptr<Creature> _applicator;
+    std::shared_ptr<Creature> _damager;
 };
 
 } // namespace game
