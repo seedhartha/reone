@@ -198,8 +198,8 @@ void PartySelection::refreshNpcButtons() {
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &button = getNpcButton(i);
 
-        if ((i == _selectedNpc && !button.isOn() ||
-            (i != _selectedNpc && button.isOn()))) {
+        if ((i == _selectedNpc && !button.isOn()) ||
+            (i != _selectedNpc && button.isOn())) {
 
             button.toggle();
         }
