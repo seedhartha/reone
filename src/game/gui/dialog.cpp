@@ -60,9 +60,6 @@ DialogGUI::DialogGUI(Game *game) :
     GUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -278,25 +275,11 @@ void DialogGUI::loadCurrentSpeaker() {
 
 void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
-    shared_ptr<Creature> player(_game->party().player());
-    glm::vec3 listenerPosition;
-    glm::vec3 speakerPosition;
-    glm::vec3 hookPosition(0.0f);
 
-    if (player->model()->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-        listenerPosition = player->position() + hookPosition;
-    } else {
-        listenerPosition = player->model()->getCenterOfAABB();
-    }
-    if (_currentSpeaker) {
-        shared_ptr<ModelSceneNode> speakerModel(_currentSpeaker->model());
-        if (speakerModel->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-            speakerPosition = _currentSpeaker->position() + hookPosition;
-        } else {
-            speakerPosition = speakerModel->getCenterOfAABB();
-        }
-    }
     if (_dialog->cameraModel().empty()) {
+        shared_ptr<Creature> player(_game->party().player());
+        glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
+        glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         DialogCamera &camera = static_cast<DialogCamera &>(area->getCamera(CameraType::Dialog));
         camera.setListenerPosition(listenerPosition);
         camera.setSpeakerPosition(speakerPosition);
@@ -306,6 +289,19 @@ void DialogGUI::updateCamera() {
         camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
         camera.playAnimation(_currentEntry->cameraAnimation);
     }
+}
+
+glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
+    shared_ptr<ModelSceneNode> model(object.model());
+    if (model) {
+        glm::vec3 hookPosition(0.0f);
+        if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {
+            return object.position() + hookPosition;
+        }
+        return model->getCenterOfAABB();
+    }
+
+    return object.position();
 }
 
 DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
@@ -442,6 +438,10 @@ bool DialogGUI::handleKeyUp(SDL_Scancode key) {
 void DialogGUI::update(float dt) {
     GUI::update(dt);
 
+    if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
+        DialogCamera &camera = static_cast<DialogCamera &>(_game->module()->area()->getCamera(CameraType::Dialog));
+        camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
+    }
     if (!_entryEnded) {
         bool endOnAnimFinish = (_endEntryFlags & kEndEntryOnAnimFinish) != 0;
         bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;

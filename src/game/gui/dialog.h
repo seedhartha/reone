@@ -61,26 +61,28 @@ private:
     uint32_t _endEntryTimestamp { 0 };
     bool _entryEnded { false };
 
+    bool checkCondition(const std::string &script);
     void addFrame(int top, int height);
     void configureMessage();
     void configureReplies();
+    void endCurrentEntry();
+    void finish();
     void loadAnimatedCamera();
-    void loadStartEntry();
-    bool checkCondition(const std::string &script);
     void loadCurrentEntry();
-    void loadReplies();
     void loadCurrentSpeaker();
-    void updateCamera();
-    DialogCamera::Variant getRandomCameraVariant() const;
+    void loadReplies();
+    void loadStartEntry();
     void playVoiceOver();
     void scheduleEndOfEntry();
-    void finish();
-    void endCurrentEntry();
+    void updateCamera();
 
     void onReplyClicked(int index);
 
     bool handleKeyDown(SDL_Scancode key) override;
     bool handleKeyUp(SDL_Scancode key) override;
+
+    glm::vec3 getTalkPosition(const SpatialObject &object) const;
+    DialogCamera::Variant getRandomCameraVariant() const;
 
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
