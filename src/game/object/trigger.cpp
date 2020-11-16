@@ -81,11 +81,12 @@ void Trigger::update(float dt) {
         tenantsToRemove.insert(tenant);
     }
     for (auto &tenant : tenantsToRemove) {
+        _tenants.erase(tenant);
         if (!_blueprint->onExit().empty()) {
             runScript(_blueprint->onExit(), id(), tenant->id(), -1);
         }
-        _tenants.erase(tenant);
     }
+    SpatialObject::update(dt);
 }
 
 bool Trigger::isIn(const glm::vec2 &point) const {
