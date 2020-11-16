@@ -741,10 +741,9 @@ void Area::updateSounds() {
 
         shared_ptr<SoundBlueprint> blueprint(soundPtr->blueprint());
         float maxDist = blueprint->maxDistance();
-        float minDist = blueprint->minDistance();
 
         float dist = soundPtr->distanceTo(cameraPosition);
-        if (dist < minDist || dist > maxDist) continue;
+        if (dist > maxDist) continue;
 
         soundDistances.push_back(make_pair(soundPtr, dist));
     }
