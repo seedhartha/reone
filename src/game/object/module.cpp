@@ -213,12 +213,17 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    if (!placeable->blueprint().hasInventory()) return;
-
     shared_ptr<Creature> partyLeader(_game->party().leader());
     ActionQueue &actions = partyLeader->actionQueue();
-    actions.clear();
-    actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
+
+    if (placeable->blueprint().hasInventory()) {
+        actions.clear();
+        actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
+
+    } else if (!placeable->conversation().empty()) {
+        actions.clear();
+        actions.add(make_unique<StartConversationAction>(placeable, placeable->conversation()));
+    }
 }
 
 void Module::update(float dt) {
