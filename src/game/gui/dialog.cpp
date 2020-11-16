@@ -378,10 +378,12 @@ void DialogGUI::pickReply(uint32_t index) {
         }
     }
 
-    if (entryIdx != -1) {
-        _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
-        loadCurrentEntry();
+    if (entryIdx == -1) {
+        finish();
+        return;
     }
+    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+    loadCurrentEntry();
 }
 
 bool DialogGUI::handle(const SDL_Event &event) {
@@ -397,7 +399,7 @@ bool DialogGUI::handle(const SDL_Event &event) {
 }
 
 void DialogGUI::endCurrentEntry() {
-    _entryEnded =  true;
+    _entryEnded = true;
 
     if (_currentVoice) {
         _currentVoice->stop();
