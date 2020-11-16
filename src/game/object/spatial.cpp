@@ -57,6 +57,8 @@ bool SpatialObject::contains(const glm::vec3 &point) const {
 }
 
 void SpatialObject::face(const SpatialObject &other) {
+    if (_id == other._id) return;
+
     glm::vec2 dir(glm::normalize(other._position - _position));
     _heading = -glm::atan(dir.x, dir.y);
     updateTransform();
