@@ -267,6 +267,13 @@ Variable Routines::getStringByStrRef(const vector<Variable> &args, ExecutionCont
     return Variable(Resources::instance().getString(strRef));
 }
 
+Variable Routines::startNewModule(const vector<Variable> &args, ExecutionContext &ctx) {
+    string moduleName(args[0].strValue);
+    string waypoint(args.size() >= 2 ? args[1].strValue : "");
+    _game->scheduleModuleTransition(moduleName, waypoint);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

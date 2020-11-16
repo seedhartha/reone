@@ -106,6 +106,7 @@ private:
     script::Variable getStringByStrRef(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable shipBuild(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable startNewModule(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Common
 
