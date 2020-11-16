@@ -35,8 +35,6 @@ class Placeable : public SpatialObject {
 public:
     Placeable(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
-    std::string conversation() const override;
-
     void load(const resource::GffStruct &gffs);
 
     const PlaceableBlueprint &blueprint() const;

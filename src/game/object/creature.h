@@ -53,7 +53,6 @@ public:
 
     Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
-    std::string conversation() const override;
     glm::vec3 selectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);
