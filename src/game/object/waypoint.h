@@ -25,11 +25,16 @@ namespace reone {
 
 namespace game {
 
+class WaypointBlueprint;
+
 class Waypoint : public SpatialObject {
 public:
     Waypoint(uint32_t id, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
+
+private:
+    std::shared_ptr<WaypointBlueprint> _blueprint;
 };
 
 } // namespace game

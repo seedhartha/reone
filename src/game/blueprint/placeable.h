@@ -41,6 +41,7 @@ public:
 
     const std::string &tag() const;
     const std::string &localizedName() const;
+    const std::string &conversation() const;
     int appearance() const;
     bool hasInventory() const;
     bool isUsable() const;
@@ -50,6 +51,7 @@ private:
     std::string _resRef;
     std::string _tag;
     std::string _localizedName;
+    std::string _conversation;
     int _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };

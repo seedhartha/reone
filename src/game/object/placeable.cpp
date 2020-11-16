@@ -47,6 +47,10 @@ Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *scen
     _fadeDistance = 0.25f * _drawDistance;
 }
 
+string Placeable::conversation() const {
+    return _blueprint->conversation();
+}
+
 void Placeable::load(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");

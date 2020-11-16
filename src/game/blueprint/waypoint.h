@@ -31,8 +31,11 @@ public:
 
     void load(const resource::GffStruct &utw);
 
+    const std::string &tag() const;
+
 private:
     std::string _resRef;
+    std::string _tag;
 
     WaypointBlueprint(const WaypointBlueprint &) = delete;
     WaypointBlueprint &operator=(const WaypointBlueprint &) = delete;

@@ -41,6 +41,7 @@ void PlaceableBlueprint::load(const GffStruct &utp) {
         _localizedName = Resources::instance().getString(locNameStrRef);
     }
 
+    _conversation = utp.getString("Conversation");
     _appearance = utp.getInt("Appearance");
     _hasInventory = utp.getInt("HasInventory") != 0;
     _usable = utp.getInt("Useable") != 0;
@@ -80,6 +81,10 @@ const string &PlaceableBlueprint::tag() const {
 
 const string &PlaceableBlueprint::localizedName() const {
     return _localizedName;
+}
+
+const string &PlaceableBlueprint::conversation() const {
+    return _conversation;
 }
 
 int PlaceableBlueprint::appearance() const {
