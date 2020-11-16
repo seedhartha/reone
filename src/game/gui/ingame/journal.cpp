@@ -36,12 +36,13 @@ JournalMenu::JournalMenu(Game *game) :
 
     _resRef = getResRef("journal");
     _backgroundType = BackgroundType::Menu;
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 

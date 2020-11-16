@@ -47,6 +47,11 @@ InGameMenu::InGameMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("top");
+
+    if (_version == GameVersion::TheSithLords) {
+        _resolutionX = 800;
+        _resolutionY = 600;
+    }
 }
 
 void InGameMenu::load() {

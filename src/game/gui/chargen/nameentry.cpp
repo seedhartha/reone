@@ -37,12 +37,13 @@ NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const Gr
     _input(kTextInputLetters | kTextInputWhitespace) {
 
     _resRef = getResRef("name");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 

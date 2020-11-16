@@ -47,12 +47,13 @@ Container::Container(Game *game) :
     _game(game) {
 
     _resRef = getResRef("container");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     if (game->version() == GameVersion::TheSithLords) {
         _resolutionX = 305;
         _resolutionY = 327;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 
