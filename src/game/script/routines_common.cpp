@@ -279,6 +279,15 @@ Variable Routines::startNewModule(const vector<Variable> &args, ExecutionContext
     return Variable();
 }
 
+Variable Routines::playMovie(const vector<Variable> &args, ExecutionContext &ctx) {
+    string movie(args[0].strValue);
+    boost::to_lower(movie);
+
+    _game->playVideo(movie);
+
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
