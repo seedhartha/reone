@@ -63,12 +63,13 @@ Variable Routines::actionDoCommand(const vector<Variable> &args, ExecutionContex
 
 Variable Routines::actionMoveToObject(const vector<Variable> &args, ExecutionContext &ctx) {
     int objectId = args[0].objectId;
-    float distance = args.size() >= 2 ? args[2].floatValue : 1.0f;
+    bool run = args.size() >= 2 ? (args[1].intValue != 0) : false;
+    float distance = args.size() >= 3 ? args[2].floatValue : 1.0f;
 
     shared_ptr<Object> actor(getObjectById(ctx.callerId, ctx));
     if (actor) {
         shared_ptr<Object> object(getObjectById(objectId, ctx));
-        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object, distance));
+        unique_ptr<MoveToObjectAction> action(new MoveToObjectAction(object, run, distance));
         actor->actionQueue().add(move(action));
     } else {
         warn("Routine: object not found: " + to_string(objectId));
