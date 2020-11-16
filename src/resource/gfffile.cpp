@@ -112,14 +112,14 @@ const GffStruct &GffField::asStruct() const {
     return _children[0];
 }
 
-Vector3 GffField::asVector() const {
+glm::vec3 GffField::asVector() const {
     const float *values = reinterpret_cast<const float *>(&_data[0]);
-    return Vector3(values[0], values[1], values[2]);
+    return glm::vec3(values[0], values[1], values[2]);
 }
 
-Quaternion GffField::asOrientation() const {
+glm::quat GffField::asOrientation() const {
     const float *values = reinterpret_cast<const float *>(&_data[0]);
-    return Quaternion(values[0], values[1], values[2], values[3]);
+    return glm::quat(values[0], values[1], values[2], values[3]);
 }
 
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
@@ -181,14 +181,14 @@ const vector<GffStruct> &GffStruct::getList(const string &name) const {
     return field->children();
 }
 
-Vector3 GffStruct::getVector(const string &name) const {
+glm::vec3 GffStruct::getVector(const string &name) const {
     const GffField *field = find(name);
-    return field ? field->asVector() : Vector3();
+    return field ? field->asVector() : glm::vec3(0.0f);
 }
 
-Quaternion GffStruct::getOrientation(const string &name) const {
+glm::quat GffStruct::getOrientation(const string &name) const {
     const GffField *field = find(name);
-    return field ? field->asOrientation() : Quaternion();
+    return field ? field->asOrientation() : glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {

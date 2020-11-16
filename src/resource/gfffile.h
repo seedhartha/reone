@@ -19,8 +19,8 @@
 
 #include "binfile.h"
 
-#include "../common/quaternion.h"
-#include "../common/vector3.h"
+#include "glm/gtc/quaternion.hpp"
+#include "glm/vec3.hpp"
 
 namespace reone {
 
@@ -68,8 +68,8 @@ public:
     const ByteArray &asByteArray() const;
     std::vector<float> asFloatArray() const;
     const GffStruct &asStruct() const;
-    Vector3 asVector() const;
-    Quaternion asOrientation() const;
+    glm::vec3 asVector() const;
+    glm::quat asOrientation() const;
 
 private:
     GffFieldType _type { GffFieldType::Byte };
@@ -110,8 +110,8 @@ public:
     std::string getString(const std::string &name) const;
     const GffStruct &getStruct(const std::string &name) const;
     const std::vector<GffStruct> &getList(const std::string &name) const;
-    Vector3 getVector(const std::string &name) const;
-    Quaternion getOrientation(const std::string &name) const;
+    glm::vec3 getVector(const std::string &name) const;
+    glm::quat getOrientation(const std::string &name) const;
 
     const std::vector<GffField> &fields() const;
 

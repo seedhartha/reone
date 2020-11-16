@@ -47,14 +47,12 @@ Variable Routines::getLocation(const vector<Variable> &args, ExecutionContext &c
 Variable Routines::getPositionFromLocation(const vector<Variable> &args, ExecutionContext &ctx) {
     int locationId = args[0].engineTypeId;
     shared_ptr<Location> location(_game->getLocation(locationId));
-    glm::vec3 position(location->position());
-    return Variable(Vector3(position.x, position.y, position.z));
+    return location->position();
 }
 
 Variable Routines::location(const vector<Variable> &args, ExecutionContext &ctx) {
-    Vector3 position(args[0].vecValue);
     float facing = args[1].floatValue;
-    shared_ptr<Location> location(_game->newLocation(glm::vec3(position.x, position.y, position.z), facing));
+    shared_ptr<Location> location(_game->newLocation(args[0].vecValue, facing));
 
     Variable result(VariableType::Location);
     result.engineTypeId = location->id();

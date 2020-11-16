@@ -206,7 +206,7 @@ Variable Routines::getFacing(const vector<Variable> &args, ExecutionContext &ctx
 
 Variable Routines::getPosition(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> target(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    return Vector3(target ? target->position() : glm::vec3(0.0f));
+    return target ? target->position() : glm::vec3(0.0f);
 }
 
 Variable Routines::soundObjectPlay(const vector<Variable> &args, ExecutionContext &ctx) {

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace audio {
 
-SoundHandle::SoundHandle(float duration, Vector3 position) : _duration(duration), _position(position) {
+SoundHandle::SoundHandle(float duration, const glm::vec3 &position) : _duration(duration), _position(position) {
 }
 
 void SoundHandle::stop() {
@@ -46,7 +46,7 @@ int SoundHandle::duration() const {
     return _duration;
 }
 
-Vector3 SoundHandle::position() const {
+glm::vec3 SoundHandle::position() const {
     return _position;
 }
 
@@ -58,9 +58,9 @@ void SoundHandle::setState(State state) {
     _state = state;
 }
 
-void SoundHandle::setPosition(Vector3 position) {
+void SoundHandle::setPosition(const glm::vec3 &position) {
     if (_position.load() != position) {
-        _position = move(position);
+        _position = position;
         _positionDirty = true;
     }
 }

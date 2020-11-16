@@ -123,8 +123,8 @@ bool Sound::isActive() const {
     return _active;
 }
 
-Vector3 Sound::getPosition() const {
-    Vector3 position(_transform[3]);
+glm::vec3 Sound::getPosition() const {
+    glm::vec3 position(_transform[3]);
     position.z += _blueprint->elevation();
     return move(position);
 }
