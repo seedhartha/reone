@@ -105,7 +105,12 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 
     shared_ptr<Area> area(_game->module()->area());
     ObjectSelector &selector = area->objectSelector();
-    shared_ptr<SpatialObject> object(area->find(selector.selectedObjectId()));
+
+    int selectedObjectId = selector.selectedObjectId();
+    if (selectedObjectId == -1) return false;
+
+    shared_ptr<SpatialObject> object(area->find(selectedObjectId));
+    if (!object) return false;
 
     switch (_actions[_selectedActionIdx]) {
         case ContextualAction::Unlock: {
