@@ -34,9 +34,16 @@ Variable Routines::getFacingFromLocation(const vector<Variable> &args, Execution
 }
 
 Variable Routines::getLocation(const vector<Variable> &args, ExecutionContext &ctx) {
+    glm::vec3 position(0.0f);
+    float facing = 0.0f;
+
     shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    glm::vec3 position(object->position());
-    shared_ptr<Location> location(_game->newLocation(move(position), object->heading()));
+    if (object) {
+        position = object->position();
+        facing = object->heading();
+    }
+
+    shared_ptr<Location> location(_game->newLocation(move(position), facing));
 
     Variable result(VariableType::Location);
     result.engineTypeId = location->id();
