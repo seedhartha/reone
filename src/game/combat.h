@@ -61,8 +61,8 @@ public:
 
     /*
     * Roles:
-    * 1. Scan the surrounding of one combatant per frame, remove the combatant if
-    *    no enemies are in visible range & no action in actionQueue
+    * 1. Scan the first of activeCombatants each frame, remove the combatant 
+    *    if no enemies are in visible range & no action in actionQueue
     * 2. Add creatures to _activeCombatants, if applicable
     * 3. Activate/Deactivate global combat mode for party->player
     */
@@ -99,17 +99,17 @@ public:
     std::shared_ptr<Creature> findNearestHostile(std::shared_ptr<Creature> &combatant,
                                                  float detectionRange = MAX_DETECT_RANGE);
 
-    bool activated() { return _activated; }
+    bool activated() { return !_activeCombatants.empty(); }
 
 private:
     Area *_area;
     Party *_party;
 
-    /* combat mode */
-    bool _activated = false;
-
     /* register to _activeCombatants */
     bool registerCombatant(const std::shared_ptr<Creature>& combatant);
+
+    /* register hostiles to activecombatant list, return stillActive*/
+    bool scanHostility(const std::shared_ptr<Creature>& combatant);
 
     std::deque<std::shared_ptr<Creature>> _activeCombatants;
     std::unordered_set<uint32_t> _activeCombatantIds;
