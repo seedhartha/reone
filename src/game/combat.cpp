@@ -66,7 +66,7 @@ Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
 void Combat::update() {
     updateTimers(SDL_GetTicks());
 
-    std::shared_ptr<Creature> pc = _party->player();
+    std::shared_ptr<Creature> pc = _party->leader();
     if (pc) {
         activityScanner();
 
@@ -87,7 +87,7 @@ void Combat::update() {
 void Combat::activityScanner()
 {
     _activated = !_activeCombatants.empty();
-    auto &actor = _activated ? _activeCombatants.front() : _party->player();
+    auto &actor = _activated ? _activeCombatants.front() : _party->leader();
 
     // TODO: need a better mechanism to query creatures in range
     bool stillActive = false;
@@ -110,37 +110,65 @@ void Combat::activityScanner()
 
     if (!_activated) return;
 
-    // remove actor from _activeCombatants if !active
-    if (!stillActive) {
-        actor->setCombatState(CombatState::Idle);
+    // deactivate actor if !active
+    if (!stillActive) { //&& getAttackAction(actor) == nullptr ???
+        if (_deactivationTimer.completed.count(actor->id()) == 1) {
+            _deactivationTimer.completed.erase(actor->id());
 
-        _activeCombatants.pop_front();
-        _activeCombatantIds.erase(actor->id());
+            // deactivation timeout complete
+            actor->setCombatState(CombatState::Idle);
 
-        debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % _activated);
+            _activeCombatants.pop_front();
+            _activeCombatantIds.erase(actor->id());
+
+            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % _activated);
+        }
+        else if (!_deactivationTimer.isRegistered(actor->id())) {
+            _deactivationTimer.setTimeout(actor->id(), DEACTIVATION_TIMEOUT);
+
+            debug(boost::format("combat: registered deactivation timer'%s'") % actor->tag());
+        }
     }
-    else { // rotate _activeCombatants
+    else { 
+        if (_deactivationTimer.isRegistered(actor->id())) {
+            _deactivationTimer.cancel(actor->id());
+
+            debug(boost::format("combat: cancelled deactivation timer'%s'") % actor->tag());
+        }
+
+        // rotate _activeCombatants
         _activeCombatants.pop_front();
         _activeCombatants.push_back(actor);
     }
 }
 
 void Combat::AIMaster(shared_ptr<Creature> &combatant) {
-    if (combatant->id() == _party->player()->id()) return;
+    if (combatant->id() == _party->leader()->id()) return;
 
     ActionQueue &cbt_queue = combatant->actionQueue();
 
-    // no additional instructions if current queue is empty
     if (cbt_queue.currentAction()) return;
 
-    // otherwise, go to nearest hostile, set meleecommand, unset meleecommand
-
-    auto hostile = findNearestHostile(combatant);
+    auto hostile = findNearestHostile(combatant, MAX_DETECT_RANGE);
     if (hostile) {
         cbt_queue.add(make_unique<AttackAction>(hostile, true));
         debug(boost::format("AIMaster: '%s' Queued to attack '%s'") % combatant->tag()
             % hostile->tag());
     }
+}
+
+void Combat::setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t delayTicks) {
+    if (!creature) return;
+    _stateTimer.setTimeout(creature->id(), delayTicks);
+
+    // in case of repetition
+    if (_pendingStates.count(creature->id()) == 0) _pendingStates[creature->id()] = 0;
+    ++(_pendingStates[creature->id()]);
+}
+
+bool Combat::isStateTimerDone(const std::shared_ptr<Creature>& creature) {
+    if (!creature) return false;
+    return _pendingStates.count(creature->id()) == 0;
 }
 
 void Combat::onEnterAttackState(shared_ptr<Creature> &combatant) {
@@ -249,9 +277,9 @@ void Combat::animationSync() {
     }
 }
 
-shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant) {
+shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant, float detectionRange) {
     shared_ptr<Creature> closest_target = nullptr;
-    float min_dist = 1000000;
+    float min_dist = detectionRange;
 
     for (auto &creature : _activeCombatants) {
         if (creature->id() == combatant->id()) continue;
