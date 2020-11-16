@@ -211,6 +211,10 @@ private:
     script::Variable sqrt(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable tan(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
+    script::Variable vectorCreate(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable vectorNormalize(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable vectorMagnitude(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+
     // END Math
 };
 
