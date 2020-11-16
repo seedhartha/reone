@@ -67,33 +67,33 @@ void Combat::update() {
     updateTimers(SDL_GetTicks());
 
     std::shared_ptr<Creature> pc = _party->leader();
-    if (pc) {
-        activityScanner();
-
-        
-
-        if (_activated) {
-            // One AIMaster per frame, rotated by activityScanner
-            if (!_activeCombatants.empty() && isAITimerDone(_activeCombatants.back())) {
-                    AIMaster(_activeCombatants.back());
-                    setAITimeout(_activeCombatants.back());
-            }
-
-            for (auto &cbt : _activeCombatants) combatStateMachine(cbt);
-
-            animationSync();
-        }
-    }
-    else {
+    if (!pc) {
         debug("no pc yet ...");
+        return;
     }
+
+    // TODO: scan all party members??
+    scanHostility(pc);
+    activityScanner();
+
+    if (activated()) {
+        // One AIMaster per frame, rotated by activityScanner
+        if (isAITimerDone(_activeCombatants.front())) {
+            AIMaster(_activeCombatants.front());
+            setAITimeout(_activeCombatants.front());
+        }
+
+        for (auto &cbt : _activeCombatants) combatStateMachine(cbt);
+        animationSync();
+
+        // rotate _activeCombatants
+        _activeCombatants.push_back(_activeCombatants.front());
+        _activeCombatants.pop_front();
+    }
+
 }
 
-void Combat::activityScanner()
-{
-    _activated = !_activeCombatants.empty();
-    auto &actor = _activated ? _activeCombatants.front() : _party->leader();
-
+bool Combat::scanHostility(const std::shared_ptr<Creature>& actor) {
     // TODO: need a better mechanism to query creatures in range
     bool stillActive = false;
     for (auto &creature : _area->objectsByType()[ObjectType::Creature]) {
@@ -113,7 +113,17 @@ void Combat::activityScanner()
         }
     }
 
-    if (!_activated) return;
+    return stillActive;
+}
+
+void Combat::activityScanner() {
+    if (_activeCombatants.empty()) {
+        return;
+    }
+
+    auto &actor = _activeCombatants.front();
+
+    bool stillActive = scanHostility(actor);
 
     // deactivate actor if !active
     if (!stillActive) { //&& getAttackAction(actor) == nullptr ???
@@ -126,7 +136,7 @@ void Combat::activityScanner()
             _activeCombatants.pop_front();
             _activeCombatantIds.erase(actor->id());
 
-            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % _activated);
+            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % activated());
         }
         else if (!_deactivationTimer.isRegistered(actor->id())) {
             _deactivationTimer.setTimeout(actor->id(), DEACTIVATION_TIMEOUT);
@@ -140,10 +150,6 @@ void Combat::activityScanner()
 
             debug(boost::format("combat: cancelled deactivation timer'%s'") % actor->tag());
         }
-
-        // rotate _activeCombatants
-        _activeCombatants.pop_front();
-        _activeCombatants.push_back(actor);
     }
 }
 
