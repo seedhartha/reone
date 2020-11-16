@@ -37,6 +37,7 @@ namespace reone {
 namespace game {
 
 const int kNpcPlayer = -1;
+const int kEngineTypeInvalid = -1;
 
 enum class CursorType {
     None,

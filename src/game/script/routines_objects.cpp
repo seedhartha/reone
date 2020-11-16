@@ -33,17 +33,15 @@ namespace reone {
 namespace game {
 
 Variable Routines::destroyObject(const vector<Variable> &args, ExecutionContext &ctx) {
-    int objectId = args[0].objectId;
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     if (object) {
         shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
         if (spatial) {
             _game->module()->area()->destroyObject(*spatial);
+        } else {
+            warn("Routines: destroyObject: not a spatial object: " + to_string(object->id()));
         }
-    } else {
-        warn("Routine: object not found by id: " + to_string(objectId));
     }
-
     return Variable();
 }
 
@@ -54,7 +52,7 @@ Variable Routines::getEnteringObject(const vector<Variable> &args, ExecutionCont
 }
 
 Variable Routines::getIsObjectValid(const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable(args[0].objectId != kObjectInvalid);
+    return args[0].objectId != kObjectInvalid;
 }
 
 Variable Routines::getObjectByTag(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -89,19 +87,24 @@ Variable Routines::getWaypointByTag(const vector<Variable> &args, ExecutionConte
 Variable Routines::getArea(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Object);
     result.objectId = _game->module()->area()->id();
-
     return move(result);
 }
 
 Variable Routines::getItemInSlot(const vector<Variable> &args, ExecutionContext &ctx) {
-    uint32_t objectId(args.size() > 1 ? args[1].objectId : kObjectSelf);
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
     shared_ptr<Object> item;
 
+    InventorySlot slot = static_cast<InventorySlot>(args[0].intValue);
+    shared_ptr<Object> object(getObjectById(args.size() >= 2 ? args[1].objectId : kObjectSelf, ctx));
+
     if (object) {
-        Creature &creature = static_cast<Creature &>(*object);
-        item = creature.getEquippedItem(static_cast<InventorySlot>(args[0].intValue));
+        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
+        if (creature) {
+            item = creature->getEquippedItem(slot);
+        } else {
+            warn("Routines: getItemInSlot: not a creature: " + to_string(object->id()));
+        }
     }
+
     Variable result(VariableType::Object);
     result.objectId = item ? item->id() : kObjectInvalid;
 
@@ -109,16 +112,15 @@ Variable Routines::getItemInSlot(const vector<Variable> &args, ExecutionContext 
 }
 
 Variable Routines::setLocked(const vector<Variable> &args, ExecutionContext &ctx) {
-    int objectId = args[0].objectId;
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     bool locked = args[1].intValue != 0;
 
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
     if (object) {
-        Door *door = dynamic_cast<Door *>(object.get());
+        shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
         if (door) {
             door->setLocked(locked);
         } else {
-            warn("Routine: object is not a door: " + to_string(objectId));
+            warn("Routines: setLocked: not a door: " + to_string(object->id()));
         }
     }
 
@@ -128,14 +130,13 @@ Variable Routines::setLocked(const vector<Variable> &args, ExecutionContext &ctx
 Variable Routines::getLocked(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(0);
 
-    int objectId = args[0].objectId;
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     if (object) {
-        Door *door = dynamic_cast<Door *>(object.get());
+        shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
         if (door) {
             result.intValue = door->isLocked() ? 1 : 0;
         } else {
-            warn("Routine: object is not a door: " + to_string(objectId));
+            warn("Routines: getLocked: not a door: " + to_string(object->id()));
         }
     }
 
@@ -147,25 +148,31 @@ Variable Routines::createItemOnObject(const vector<Variable> &args, ExecutionCon
     result.objectId = kObjectInvalid;
 
     string itemBlueprint(args[0].strValue);
-    if (!itemBlueprint.empty()) {
-        boost::to_lower(itemBlueprint);
+    boost::to_lower(itemBlueprint);
 
-        int targetId = args.size() >= 2 ? args[1].objectId : kObjectSelf;
-        int count = args.size() >= 3 ? args[2].intValue : 1;
+    shared_ptr<Object> target(getObjectById(args.size() >= 2 ? args[1].objectId : kObjectSelf, ctx));
+    int count = args.size() >= 3 ? args[2].intValue : 1;
 
-        shared_ptr<Object> target(getObjectById(targetId, ctx));
-        if (target) {
+    if (target) {
+        if (!itemBlueprint.empty()) {
             shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(itemBlueprint));
-            shared_ptr<Item> item(_game->objectFactory().newItem());
-            item->load(blueprint);
+            if (blueprint) {
+                shared_ptr<Item> item(_game->objectFactory().newItem());
+                item->load(blueprint);
 
-            shared_ptr<SpatialObject> spatialTarget(dynamic_pointer_cast<SpatialObject>(target));
-            spatialTarget->addItem(item);
+                shared_ptr<SpatialObject> spatialTarget(dynamic_pointer_cast<SpatialObject>(target));
+                if (spatialTarget) {
+                    spatialTarget->addItem(item);
+                } else {
+                    warn("Routines: createItemOnObject: not a spatial object: " + to_string(target->id()));
+                }
+                result.objectId = item->id();
 
-            result.objectId = item->id();
-
+            } else {
+                warn("Routines: createItemOnObject: item blueprint not found: " + itemBlueprint);
+            }
         } else {
-            warn("Routine: object not found: " + to_string(targetId));
+            warn("Routines: createItemOnObject: item blueprint is empty");
         }
     }
 
@@ -179,23 +186,48 @@ Variable Routines::getModule(const vector<Variable> &args, ExecutionContext &ctx
 }
 
 Variable Routines::getTag(const vector<Variable> &args, ExecutionContext &ctx) {
-    int objectId = args[0].objectId;
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     return object ? object->tag() : "";
 }
 
 Variable Routines::getDistanceToObject(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> caller(_game->module()->area()->find(ctx.callerId));
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    return caller->distanceTo(object->position());
+    Variable result(-1.0f);
+
+    shared_ptr<Object> left(getObjectById(kObjectSelf, ctx));
+    shared_ptr<Object> right(getObjectById(args[0].objectId, ctx));
+
+    if (left && right) {
+        shared_ptr<SpatialObject> spatialLeft(dynamic_pointer_cast<SpatialObject>(left));
+        shared_ptr<SpatialObject> spatialRight(dynamic_pointer_cast<SpatialObject>(right));
+
+        if (spatialLeft && spatialRight) {
+            result.floatValue = spatialLeft->distanceTo(spatialRight->position());
+        } else {
+            warn("Routines: getDistanceToObject: objects are not spatial: " + to_string(left->id()) + " " + to_string(right->id()));
+        }
+    }
+
+    return move(result);
 }
 
 Variable Routines::getDistanceToObject2D(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> caller(_game->module()->area()->find(ctx.callerId));
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    if (!caller || !object) return -1.0f;
+    Variable result(-1.0f);
 
-    return caller->distanceTo(glm::vec2(object->position()));
+    shared_ptr<Object> left(getObjectById(kObjectSelf, ctx));
+    shared_ptr<Object> right(getObjectById(args[0].objectId, ctx));
+
+    if (left && right) {
+        shared_ptr<SpatialObject> spatialLeft(dynamic_pointer_cast<SpatialObject>(left));
+        shared_ptr<SpatialObject> spatialRight(dynamic_pointer_cast<SpatialObject>(right));
+
+        if (spatialLeft && spatialRight) {
+            result.floatValue = spatialLeft->distanceTo(glm::vec2(spatialRight->position()));
+        } else {
+            warn("Routines: getDistanceToObject2D: objects are not spatial: " + to_string(left->id()) + " " + to_string(right->id()));
+        }
+    }
+
+    return move(result);
 }
 
 Variable Routines::getExitingObject(const vector<Variable> &args, ExecutionContext &ctx) {
@@ -205,28 +237,62 @@ Variable Routines::getExitingObject(const vector<Variable> &args, ExecutionConte
 }
 
 Variable Routines::getFacing(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    return target ? target->heading() : -1.0f;
+    Variable result(-1.0f);
+
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
+        if (spatial) {
+            result.floatValue = spatial->heading();
+        } else {
+            warn("Routines: getFacing: not a spatial object: " + to_string(object->id()));
+        }
+    }
+
+    return move(result);
 }
 
 Variable Routines::getPosition(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
-    return target ? target->position() : glm::vec3(0.0f);
+    Variable result(glm::vec3(0.0f));
+
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
+        if (spatial) {
+            result.vecValue = spatial->position();
+        } else {
+            warn("Routines: getPosition: not a spatial object: " + to_string(object->id()));
+        }
+    }
+
+    return move(result);
 }
 
 Variable Routines::soundObjectPlay(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
-    if (target) {
-        target->play();
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        shared_ptr<Sound> sound(dynamic_pointer_cast<Sound>(object));
+        if (sound) {
+            sound->play();
+        } else {
+            warn("Routines: soundObjectPlay: not a sound: " + to_string(object->id()));
+        }
     }
+
     return Variable();
 }
 
 Variable Routines::soundObjectStop(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Sound> target(dynamic_pointer_cast<Sound>(getObjectById(args[0].objectId, ctx)));
-    if (target) {
-        target->stop();
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+    if (object) {
+        shared_ptr<Sound> sound(dynamic_pointer_cast<Sound>(object));
+        if (sound) {
+            sound->stop();
+        } else {
+            warn("Routines: soundObjectStop: not a sound: " + to_string(object->id()));
+        }
     }
+
     return Variable();
 }
 

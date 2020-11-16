@@ -92,7 +92,7 @@ void ActionExecutor::executeActions(Object &object, float dt) {
             break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
-            action->isCompleted();
+            action->complete();
             break;
     }
 }

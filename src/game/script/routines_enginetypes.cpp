@@ -28,33 +28,30 @@ namespace reone {
 namespace game {
 
 Variable Routines::getFacingFromLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    int locationId = args[0].engineTypeId;
-    shared_ptr<Location> location(_game->getLocation(locationId));
-    return Variable(location->facing());
+    shared_ptr<Location> location(getLocationById(args[0].engineTypeId));
+    return location ? location->facing() : -1.0f;
 }
 
 Variable Routines::getLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 position(0.0f);
-    float facing = 0.0f;
+    Variable result(VariableType::Location);
+    result.engineTypeId = kEngineTypeInvalid;
 
     shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
     if (object) {
-        position = object->position();
-        facing = object->heading();
+        glm::vec3 position(object->position());
+        float facing = object->heading();
+        shared_ptr<Location> location(_game->newLocation(move(position), facing));
+
+        Variable result(VariableType::Location);
+        result.engineTypeId = location->id();
     }
-
-    shared_ptr<Location> location(_game->newLocation(move(position), facing));
-
-    Variable result(VariableType::Location);
-    result.engineTypeId = location->id();
 
     return move(result);
 }
 
 Variable Routines::getPositionFromLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    int locationId = args[0].engineTypeId;
-    shared_ptr<Location> location(_game->getLocation(locationId));
-    return location->position();
+    shared_ptr<Location> location(getLocationById(args[0].engineTypeId));
+    return location ? location->position() : glm::vec3(0.0f);
 }
 
 Variable Routines::location(const vector<Variable> &args, ExecutionContext &ctx) {

@@ -32,22 +32,17 @@ namespace game {
 Variable Routines::eventUserDefined(const vector<Variable> &args, ExecutionContext &ctx) {
     Variable result(VariableType::Event);
     result.engineTypeId = _game->eventUserDefined(args[0].intValue);
-
     return move(result);
 }
 
 Variable Routines::signalEvent(const vector<Variable> &args, ExecutionContext &ctx) {
-    int objectId = args[0].objectId;
-    shared_ptr<Object> object(getObjectById(objectId, ctx));
+    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
     if (object) {
         int eventNumber = _game->getUserDefinedEventNumber(args[1].engineTypeId);
         if (eventNumber != -1) {
             object->runUserDefinedEvent(eventNumber);
         }
-    } else {
-        warn("Routine: object not found by id: " + to_string(objectId));
     }
-
     return Variable();
 }
 
