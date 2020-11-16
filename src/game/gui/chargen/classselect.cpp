@@ -62,8 +62,6 @@ ClassSelection::ClassSelection(Game *game) :
     _game(game) {
 
     _resRef = getResRef("classsel");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     switch (game->version()) {
         case GameVersion::TheSithLords:
@@ -72,6 +70,8 @@ ClassSelection::ClassSelection(Game *game) :
             break;
         default:
             _backgroundType = BackgroundType::Menu;
+            _hasDefaultHilightColor = true;
+            _defaultHilightColor = getHilightColor(_version);
             break;
     }
 }

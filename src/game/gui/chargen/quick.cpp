@@ -38,12 +38,13 @@ QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen,
     _charGen(charGen) {
 
     _resRef = getResRef("quickpnl");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     if (_version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 

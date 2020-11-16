@@ -40,8 +40,6 @@ PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion v
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     switch (version) {
         case GameVersion::TheSithLords:
@@ -50,6 +48,8 @@ PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion v
             break;
         default:
             _backgroundType = BackgroundType::Menu;
+            _hasDefaultHilightColor = true;
+            _defaultHilightColor = getHilightColor(_version);
             break;
     }
 }

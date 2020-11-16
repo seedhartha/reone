@@ -65,9 +65,9 @@ PartySelection::PartySelection(Game *game) :
     } else {
         _resRef = "partyselection";
         _backgroundType = BackgroundType::Menu;
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 }
 
 void PartySelection::load() {

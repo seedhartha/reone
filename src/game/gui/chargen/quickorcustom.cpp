@@ -36,12 +36,13 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
-    _hasDefaultHilightColor = true;
-    _defaultHilightColor = getHilightColor(_version);
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 
