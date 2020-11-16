@@ -81,14 +81,14 @@ Variable Routines::actionMoveToObject(const vector<Variable> &args, ExecutionCon
 Variable Routines::actionStartConversation(const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> actor(getObjectById(ctx.callerId, ctx));
     if (actor) {
-        int objectId = args[0].objectId == kObjectSelf ? ctx.callerId : args[0].objectId;
-        shared_ptr<Object> object(getObjectById(objectId, ctx));
+        shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+        if (object) {
+            string dialogResRef((args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : actor->conversation());
+            bool ignoreStartRange = args.size() >= 4 ? (args[4].intValue != 0) : false;
 
-        string dialogResRef((args.size() >= 2 && !args[1].strValue.empty()) ? args[1].strValue : actor->conversation());
-        bool ignoreStartRange = args.size() >= 4 ? (args[4].intValue != 0) : false;
-
-        unique_ptr<StartConversationAction> action(new StartConversationAction(object, dialogResRef, ignoreStartRange));
-        actor->actionQueue().add(move(action));
+            unique_ptr<StartConversationAction> action(new StartConversationAction(object, dialogResRef, ignoreStartRange));
+            actor->actionQueue().add(move(action));
+        }
     } else {
         warn("Routine: creature not found: " + to_string(ctx.callerId));
     }
