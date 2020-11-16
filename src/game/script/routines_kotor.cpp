@@ -278,7 +278,7 @@ void Routines::addKotorRoutines() {
     add("GetIsFriend", Int, { Object, Object });
     add("GetIsNeutral", Int, { Object, Object });
     add("GetPCSpeaker", Object, { }, bind(&Routines::getPCSpeaker, this, _1, _2));
-    add("GetStringByStrRef", String, { Int });
+    add("GetStringByStrRef", String, { Int }, bind(&Routines::getStringByStrRef, this, _1, _2));
     add("ActionSpeakStringByStrRef", Void, { Int, Int });
     add("DestroyObject", Void, { Object, Float, Int, Float }, bind(&Routines::destroyObject, this, _1, _2));
     add("GetModule", Object, { }, bind(&Routines::getModule, this, _1, _2));

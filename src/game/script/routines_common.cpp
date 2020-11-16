@@ -21,6 +21,7 @@
 #include <boost/format.hpp>
 
 #include "../../common/random.h"
+#include "../../resource/resources.h"
 
 #include "../game.h"
 #include "../script/util.h"
@@ -259,6 +260,11 @@ Variable Routines::random(const vector<Variable> &args, ExecutionContext &ctx) {
 
 Variable Routines::getLoadFromSaveGame(const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable(_game->isLoadFromSaveGame() ? 1 : 0);
+}
+
+Variable Routines::getStringByStrRef(const vector<Variable> &args, ExecutionContext &ctx) {
+    int strRef = args[0].intValue;
+    return Variable(Resources::instance().getString(strRef));
 }
 
 } // namespace game

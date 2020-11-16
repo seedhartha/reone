@@ -103,6 +103,7 @@ private:
     script::Variable executeScript(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLoadFromSaveGame(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getRunScriptVar(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getStringByStrRef(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable random(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable shipBuild(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
