@@ -96,7 +96,6 @@ void Sound::playSound(const string &resRef, bool loop) {
     _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), Vector3(_transform[3]));
 }
 
-
 void Sound::play() {
     if (_sound) {
         _sound->stop();
