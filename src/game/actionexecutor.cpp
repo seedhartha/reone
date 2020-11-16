@@ -40,7 +40,8 @@ namespace reone {
 namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
-static const float kMaxConversationDistance = 3.0f;
+static const float kMaxConversationDistance = 4.0f;
+static const float kDistanceWalk = 4.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
     if (!game) {
@@ -114,9 +115,10 @@ void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &ac
 void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
-    float distance = action.distance();
+    float distance = actor.distanceTo(glm::vec2(dest));
+    bool run = distance > kDistanceWalk;
 
-    navigateCreature(actor, dest, true, distance, dt);
+    navigateCreature(actor, dest, run, action.distance(), dt);
 }
 
 void ActionExecutor::executeDoCommand(Object &actor, CommandAction &action, float dt) {
