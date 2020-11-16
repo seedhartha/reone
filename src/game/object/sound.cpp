@@ -61,7 +61,7 @@ void Sound::update(float dt) {
 
     if (_sound) {
         if (_audible) {
-            _sound->setPosition(glm::vec3(_transform[3]));
+            _sound->setPosition(getPosition());
         } else {
             _sound->stop();
             _sound.reset();
@@ -93,7 +93,7 @@ void Sound::update(float dt) {
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), Vector3(_transform[3]));
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, 1.0f, _blueprint->positional(), getPosition());
 }
 
 void Sound::play() {
@@ -120,6 +120,12 @@ shared_ptr<SoundBlueprint> Sound::blueprint() const {
 
 bool Sound::isActive() const {
     return _active;
+}
+
+Vector3 Sound::getPosition() const {
+    Vector3 position(_transform[3]);
+    position.z += _blueprint->elevation();
+    return move(position);
 }
 
 int Sound::priority() const {
