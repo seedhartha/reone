@@ -264,7 +264,7 @@ void ActionExecutor::executeOpenLock(Creature &actor, ObjectAction &action, floa
         bool reached = navigateCreature(actor, door->position(), 1.0f, dt);
         if (reached) {
             actor.face(*door);
-            actor.playUnlockDoorAnimation();
+            actor.playAnimation(Creature::Animation::UnlockDoor);
             door->setLocked(false);
             door->open(&actor);
             if (!door->blueprint().onOpen().empty()) {

@@ -34,6 +34,7 @@ public:
     virtual ~Object() = default;
 
     virtual void update(float dt);
+    virtual void clearAllActions();
 
     void runUserDefinedEvent(int eventNumber);
 

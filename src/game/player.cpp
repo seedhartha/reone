@@ -103,10 +103,6 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
             _moveRight = false;
             return true;
 
-        case SDL_SCANCODE_X:
-            _party->leader()->playGreetingAnimation();
-            return true;
-
         default:
             return false;
     }

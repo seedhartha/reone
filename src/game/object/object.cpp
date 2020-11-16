@@ -36,6 +36,10 @@ void Object::update(float dt) {
     _actionQueue.update();
 }
 
+void Object::clearAllActions() {
+    _actionQueue.clear();
+}
+
 void Object::runUserDefinedEvent(int eventNumber) {
     if (!_onUserDefined.empty()) {
         runScript(_onUserDefined, _id, kObjectInvalid, eventNumber);
