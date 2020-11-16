@@ -58,7 +58,7 @@ private:
     SpatialObject *_currentSpeaker { nullptr };
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
-    uint32_t _endEntryTimeout { 0 };
+    float _endEntryTimeout { 0.0f };
     bool _entryEnded { false };
 
     bool checkCondition(const std::string &script);
