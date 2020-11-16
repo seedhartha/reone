@@ -45,10 +45,6 @@ Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::
     _selectable = true;
 }
 
-string Door::conversation() const {
-    return _blueprint ? _blueprint->conversation() : "";
-}
-
 void Door::load(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
@@ -69,6 +65,9 @@ void Door::load(const GffStruct &gffs) {
     boost::to_lower(templResRef);
 
     loadBlueprint(templResRef);
+
+    _conversation = _blueprint->conversation();
+
     updateTransform();
 }
 

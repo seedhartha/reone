@@ -41,7 +41,7 @@ public:
     ObjectType type() const;
     const std::string &tag() const;
     const std::string &title() const;
-    virtual std::string conversation() const;
+    const std::string &conversation() const;
     ActionQueue &actionQueue();
 
 protected:
@@ -49,6 +49,7 @@ protected:
     ObjectType _type { ObjectType::None };
     std::string _tag;
     std::string _title;
+    std::string _conversation;
     ActionQueue _actionQueue;
     std::string _onUserDefined;
 

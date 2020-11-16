@@ -31,8 +31,6 @@ class Door : public SpatialObject {
 public:
     Door(uint32_t id, scene::SceneGraph *sceneGraph);
 
-    std::string conversation() const override;
-
     void load(const resource::GffStruct &gffs);
     void open(Object *triggerrer);
     void close(Object *triggerrer);

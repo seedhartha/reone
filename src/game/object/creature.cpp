@@ -90,6 +90,7 @@ void Creature::load(const GffStruct &gffs) {
 void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     _blueprint = blueprint;
     _tag = _blueprint->tag();
+    _conversation = _blueprint->conversation();
 
     for (auto &item : _blueprint->equipment()) {
         equip(item);
@@ -494,10 +495,6 @@ int Creature::appearance() const {
 
 shared_ptr<Texture> Creature::portrait() const {
     return _portrait;
-}
-
-string Creature::conversation() const {
-    return _blueprint ? _blueprint->conversation() : "";
 }
 
 const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {
