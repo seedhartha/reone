@@ -64,7 +64,9 @@ Game::Game(const fs::path &path, const Options &opts) :
     _party(this) {
 
     initGameVersion();
+
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
+    _engineTypeFactory = make_unique<EngineTypeFactory>();
 }
 
 void Game::initGameVersion() {
@@ -790,6 +792,17 @@ int Game::getUserDefinedEventNumber(int eventId) {
 
 void Game::setRunScriptVar(int var) {
     _runScriptVar = var;
+}
+
+shared_ptr<Location> Game::newLocation(glm::vec3 position, float facing) {
+    shared_ptr<Location> location(_engineTypeFactory->newLocation(position, facing));
+    _locations.insert(make_pair(location->id(), location));
+    return location;
+}
+
+shared_ptr<Location> Game::getLocation(int id) const {
+    auto maybeLocation = _locations.find(id);
+    return maybeLocation != _locations.end() ? maybeLocation->second : nullptr;
 }
 
 } // namespace game
