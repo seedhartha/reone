@@ -56,15 +56,15 @@ void Routines::deinit() {
     _routines.clear();
 }
 
-void Routines::add(const std::string &name, VariableType retType, const std::vector<VariableType> &argTypes) {
+void Routines::add(const string &name, VariableType retType, const vector<VariableType> &argTypes) {
     _routines.emplace_back(name, retType, argTypes);
 }
 
 void Routines::add(
-    const std::string &name,
+    const string &name,
     VariableType retType,
-    const std::vector<VariableType> &argTypes,
-    const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn) {
+    const vector<VariableType> &argTypes,
+    const function<Variable(const vector<Variable> &, ExecutionContext &)> &fn) {
 
     _routines.emplace_back(name, retType, argTypes, fn);
 }
@@ -73,19 +73,12 @@ const Routine &Routines::get(int index) {
     return _routines[index];
 }
 
-shared_ptr<Object> Routines::getObjectById(uint32_t id, const ExecutionContext &ctx) const {
-    uint32_t objectId = 0;
-    switch (id) {
-        case kObjectSelf:
-            objectId = ctx.callerId;
-            break;
-        case kObjectInvalid:
-            warn("Routine: invalid object id: " + to_string(id));
-            return nullptr;
-        default:
-            objectId = id;
-            break;
+shared_ptr<Object> Routines::getObjectById(int id, const ExecutionContext &ctx) const {
+    if (id == kObjectInvalid) {
+        warn("Routines: getObjectById: invalid object");
+        return nullptr;
     }
+    uint32_t objectId = id == kObjectSelf ? ctx.callerId : id;
 
     shared_ptr<Module> module(_game->module());
     if (module->id() == objectId) {
@@ -97,7 +90,26 @@ shared_ptr<Object> Routines::getObjectById(uint32_t id, const ExecutionContext &
         return area;
     }
 
-    return area->find(objectId);
+    shared_ptr<Object> object(area->find(objectId));
+    if (!object) {
+        warn("Routines: getObjectById: object not found: " + to_string(objectId));
+    }
+
+    return move(object);
+}
+
+shared_ptr<Location> Routines::getLocationById(int id) const {
+    if (id == kEngineTypeInvalid) {
+        warn("Routines: getLocationById: invalid location");
+        return nullptr;
+    }
+
+    shared_ptr<Location> location(_game->getLocation(id));
+    if (!location) {
+        warn("Routines: getLocationById: location not found: " + to_string(id));
+    }
+
+    return move(location);
 }
 
 } // namespace game

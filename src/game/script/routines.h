@@ -33,6 +33,7 @@ namespace reone {
 namespace game {
 
 class Game;
+class Location;
 
 class Routines : public script::IRoutineProvider {
 public:
@@ -64,7 +65,8 @@ private:
     void addKotorRoutines();
     void addTslRoutines();
 
-    std::shared_ptr<Object> getObjectById(uint32_t id, const script::ExecutionContext &ctx) const;
+    std::shared_ptr<Object> getObjectById(int id, const script::ExecutionContext &ctx) const;
+    std::shared_ptr<Location> getLocationById(int id) const;
 
     // Common
 
