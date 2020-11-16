@@ -772,7 +772,7 @@ void Routines::addKotorRoutines() {
     add("ActionFollowLeader", Void, { });
     add("SetForcePowerUnsuccessful", Void, { Int, Object });
     add("GetIsDebilitated", Int, { Object });
-    add("PlayMovie", Void, { String });
+    add("PlayMovie", Void, { String }, bind(&Routines::playMovie, this, _1, _2));
     add("SaveNPCState", Void, { Int });
     add("GetCategoryFromTalent", Int, { Talent });
     add("SurrenderByFaction", Void, { Int, Int });
