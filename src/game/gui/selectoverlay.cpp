@@ -118,6 +118,8 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
             actions.add(make_unique<ObjectAction>(ActionType::OpenLock, object));
             break;
         }
+        default:
+            break;
     }
 
     return true;
