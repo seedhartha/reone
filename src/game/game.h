@@ -245,6 +245,7 @@ private:
     void toggleInGameCameraType();
     void updateCamera(float dt);
     void stopMovement();
+    void changeScreen(GameScreen screen);
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;

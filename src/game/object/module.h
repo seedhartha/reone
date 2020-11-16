@@ -95,7 +95,7 @@ private:
     // User input
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
 
     // END User input
 };

@@ -114,8 +114,8 @@ bool Module::handle(const SDL_Event &event) {
         case SDL_MOUSEMOTION:
             if (handleMouseMotion(event.motion)) return true;
             break;
-        case SDL_MOUSEBUTTONUP:
-            if (handleMouseButtonUp(event.button)) return true;
+        case SDL_MOUSEBUTTONDOWN:
+            if (handleMouseButtonDown(event.button)) return true;
             break;
         default:
             break;
@@ -153,7 +153,9 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     return true;
 }
 
-bool Module::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (event.button != SDL_BUTTON_LEFT) return false;
+
     shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
     if (!object || !object->isSelectable()) {
         return false;

@@ -24,6 +24,7 @@
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../audio/soundhandle.h"
+#include "../../common/log.h"
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
@@ -338,22 +339,20 @@ void DialogGUI::scheduleEndOfEntry() {
     _entryEnded = false;
     _endEntryFlags = 0;
 
-    uint32_t now = SDL_GetTicks();
-
     if (!_dialog->cameraModel().empty() && _currentEntry->waitFlags & kDialogWaitAnimFinish) {
         _endEntryFlags = kEndEntryOnAnimFinish;
         return;
     }
     if (_currentEntry->delay != -1) {
-        _endEntryTimestamp = now + 1000 * _currentEntry->delay;
+        _endEntryTimeout = 1000 * _currentEntry->delay;
         return;
     }
     if (_currentVoice) {
         _endEntryFlags = kEndEntryOnAudioStop;
-        _endEntryTimestamp = now + _currentVoice->duration();
+        _endEntryTimeout = _currentVoice->duration();
         return;
     }
-    _endEntryTimestamp = now + kDefaultEntryDuration;
+    _endEntryTimeout = kDefaultEntryDuration;
 }
 
 void DialogGUI::pickReply(uint32_t index) {
@@ -388,8 +387,7 @@ void DialogGUI::pickReply(uint32_t index) {
 bool DialogGUI::handle(const SDL_Event &event) {
     if (!_entryEnded &&
         _dialog->isSkippable() &&
-        event.type == SDL_MOUSEBUTTONUP &&
-        event.button.button == SDL_BUTTON_LEFT) {
+        event.type == SDL_MOUSEBUTTONDOWN) {
 
         endCurrentEntry();
         return true;
@@ -444,23 +442,22 @@ void DialogGUI::update(float dt) {
     }
     if (!_entryEnded) {
         bool endOnAnimFinish = (_endEntryFlags & kEndEntryOnAnimFinish) != 0;
-        bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
-
         if (endOnAnimFinish) {
             shared_ptr<Area> area(_game->module()->area());
             AnimatedCamera &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
             if (camera.isAnimationFinished()) {
                 endCurrentEntry();
             }
-        } else if (endOnAudioStop) {
-            bool stopped = _currentVoice && _currentVoice->isStopped();
-            if (stopped) {
-                endCurrentEntry();
-            }
         } else {
-            uint32_t now = SDL_GetTicks();
-            if (now >= _endEntryTimestamp) {
+            _endEntryTimeout = glm::max(0.0f, _endEntryTimeout - dt);
+            if (_endEntryTimeout == 0.0f) {
                 endCurrentEntry();
+            } else {
+                bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
+                bool stopped = _currentVoice && _currentVoice->isStopped();
+                if (endOnAudioStop && stopped) {
+                    endCurrentEntry();
+                }
             }
         }
     }

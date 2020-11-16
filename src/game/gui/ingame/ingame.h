@@ -79,6 +79,9 @@ private:
 
     void onClick(const std::string &control) override;
 
+    void updateTabButtons();
+    void changeTab(Tab tab);
+
     void loadCharacter();
     void loadEquipment();
     void loadInventory();
@@ -87,8 +90,6 @@ private:
     void loadJournal();
     void loadMap();
     void loadOptions();
-
-    void updateTabButtons();
 
     GUI *getActiveTabGUI() const;
 };

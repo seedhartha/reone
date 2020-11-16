@@ -84,6 +84,7 @@ private:
 
     void loadCharacterModel();
     void updateAttributes();
+    void changeScreen(CharGenScreen screen);
 
     gui::GUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);

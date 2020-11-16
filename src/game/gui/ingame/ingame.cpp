@@ -166,7 +166,15 @@ void InGameMenu::render() const {
 
 void InGameMenu::openEquipment() {
     _equip->update();
-    _tab = Tab::Equipment;
+    changeTab(Tab::Equipment);
+}
+
+void InGameMenu::changeTab(Tab tab) {
+    GUI *gui = getActiveTabGUI();
+    if (gui) {
+        gui->resetFocus();
+    }
+    _tab = tab;
     updateTabButtons();
 }
 
@@ -178,40 +186,33 @@ void InGameMenu::updateTabButtons() {
 
 void InGameMenu::openInventory() {
     _inventory->updatePortraits();
-    _tab = Tab::Inventory;
-    updateTabButtons();
+    changeTab(Tab::Inventory);
 }
 
 void InGameMenu::openCharacter() {
     _character->updatePortraits();
-    _tab = Tab::Character;
-    updateTabButtons();
+    changeTab(Tab::Character);
 }
 
 void InGameMenu::openAbilities() {
     _abilities->updatePortraits();
-    _tab = Tab::Abilities;
-    updateTabButtons();
+    changeTab(Tab::Abilities);
 }
 
 void InGameMenu::openMessages() {
-    _tab = Tab::Messages;
-    updateTabButtons();
+    changeTab(Tab::Messages);
 }
 
 void InGameMenu::openJournal() {
-    _tab = Tab::Journal;
-    updateTabButtons();
+    changeTab(Tab::Journal);
 }
 
 void InGameMenu::openMap() {
-    _tab = Tab::Map;
-    updateTabButtons();
+    changeTab(Tab::Map);
 }
 
 void InGameMenu::openOptions() {
-    _tab = Tab::Options;
-    updateTabButtons();
+    changeTab(Tab::Options);
 }
 
 void InGameMenu::onClick(const string &control) {

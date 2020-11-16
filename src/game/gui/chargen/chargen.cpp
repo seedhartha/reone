@@ -167,27 +167,35 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::openClassSelection() {
     hideControl("MODEL_LBL");
-    _screen = CharGenScreen::ClassSelection;
+    changeScreen(CharGenScreen::ClassSelection);
+}
+
+void CharacterGeneration::changeScreen(CharGenScreen screen) {
+    GUI *gui = getSubGUI();
+    if (gui) {
+        gui->resetFocus();
+    }
+    _screen = screen;
 }
 
 void CharacterGeneration::openNameEntry() {
     hideControl("MODEL_LBL");
-    _screen = CharGenScreen::Name;
+    changeScreen(CharGenScreen::Name);
 }
 
 void CharacterGeneration::openPortraitSelection() {
     hideControl("MODEL_LBL");
-    _screen = CharGenScreen::PortraitSelection;
+    changeScreen(CharGenScreen::PortraitSelection);
 }
 
 void CharacterGeneration::openQuick() {
     showControl("MODEL_LBL");
-    _screen = CharGenScreen::Quick;
+    changeScreen(CharGenScreen::Quick);
 }
 
 void CharacterGeneration::openQuickOrCustom() {
     showControl("MODEL_LBL");
-    _screen = CharGenScreen::QuickOrCustom;
+    changeScreen(CharGenScreen::QuickOrCustom);
 }
 
 void CharacterGeneration::loadCharacterModel() {

@@ -65,7 +65,7 @@ Variable Routines::isAvailableCreature(const vector<Variable> &args, ExecutionCo
 Variable Routines::isObjectPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
     int objectId = args[0].objectId;
     shared_ptr<Object> object(getObjectById(objectId, ctx));
-    return _game->party().isMember(*object);
+    return object ? _game->party().isMember(*object) : false;
 }
 
 Variable Routines::getPartyMemberByIndex(const vector<Variable> &args, ExecutionContext &ctx) {

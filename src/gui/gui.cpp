@@ -177,12 +177,14 @@ bool GUI::handle(const SDL_Event &event) {
             }
             break;
         }
-        case SDL_MOUSEBUTTONUP: {
-            glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
-            Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
-            if (control && event.button.button == SDL_BUTTON_LEFT) {
-                debug("GUI: click: " + control->tag());
-                return control->handleClick(ctrlCoords.x, ctrlCoords.y);
+        case SDL_MOUSEBUTTONDOWN: {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
+                Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
+                if (control) {
+                    debug("GUI: click: " + control->tag());
+                    return control->handleClick(ctrlCoords.x, ctrlCoords.y);
+                }
             }
             break;
         }
