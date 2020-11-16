@@ -35,7 +35,7 @@ namespace game {
 #define Event VariableType::Event
 #define Location VariableType::Location
 #define Talent VariableType::Talent
-#define Vector VariableType::Vector
+#define TVector VariableType::Vector
 #define Action VariableType::Action
 
 void Routines::addKotorRoutines() {
@@ -66,7 +66,7 @@ void Routines::addKotorRoutines() {
     add("GetArea", Object, { Object }, bind(&Routines::getArea, this, _1, _2));
     add("GetEnteringObject", Object, { }, bind(&Routines::getEnteringObject, this, _1, _2));
     add("GetExitingObject", Object, { }, bind(&Routines::getExitingObject, this, _1, _2));
-    add("GetPosition", Vector, { Object }, bind(&Routines::getPosition, this, _1, _2));
+    add("GetPosition", TVector, { Object }, bind(&Routines::getPosition, this, _1, _2));
     add("GetFacing", Float, { Object }, bind(&Routines::getFacing, this, _1, _2));
     add("GetItemPossessor", Object, { Object });
     add("GetItemPossessedBy", Object, { Object, String });
@@ -143,7 +143,7 @@ void Routines::addKotorRoutines() {
     add("d12", Int, { Int }, bind(&Routines::d12, this, _1, _2));
     add("d20", Int, { Int }, bind(&Routines::d20, this, _1, _2));
     add("d100", Int, { Int }, bind(&Routines::d100, this, _1, _2));
-    add("VectorMagnitude", Float, { Vector });
+    add("VectorMagnitude", Float, { TVector }, bind(&Routines::vectorMagnitude, this, _1, _2));
     add("GetMetaMagicFeat", Int, { });
     add("GetObjectType", Int, { Object });
     add("GetRacialType", Int, { Object });
@@ -167,8 +167,8 @@ void Routines::addKotorRoutines() {
     add("GetGoodEvilValue", Int, { Object });
     add("GetPartyMemberCount", Int, { });
     add("GetAlignmentGoodEvil", Int, { Object });
-    add("GetFirstObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
-    add("GetNextObjectInShape", Object, { Int, Float, Location, Int, Int, Vector });
+    add("GetFirstObjectInShape", Object, { Int, Float, Location, Int, Int, TVector });
+    add("GetNextObjectInShape", Object, { Int, Float, Location, Int, Int, TVector });
     add("EffectEntangle", Effect, { });
     add("SignalEvent", Void, { Object, Event }, bind(&Routines::signalEvent, this, _1, _2));
     add("EventUserDefined", Event, { Int }, bind(&Routines::eventUserDefined, this, _1, _2));
@@ -176,15 +176,15 @@ void Routines::addKotorRoutines() {
     add("EffectKnockdown", Effect, { });
     add("ActionGiveItem", Void, { Object, Object });
     add("ActionTakeItem", Void, { Object, Object });
-    add("VectorNormalize", Vector, { Vector });
+    add("VectorNormalize", TVector, { TVector }, bind(&Routines::vectorNormalize, this, _1, _2));
     add("GetItemStackSize", Int, { Object });
     add("GetAbilityScore", Int, { Object, Int });
     add("GetIsDead", Int, { Object });
-    add("PrintVector", Void, { Vector, Int });
-    add("Vector", Vector, { Float, Float, Float });
-    add("SetFacingPoint", Void, { Vector });
-    add("AngleToVector", Vector, { Float });
-    add("VectorToAngle", Float, { Vector });
+    add("PrintVector", Void, { TVector, Int });
+    add("Vector", TVector, { Float, Float, Float }, bind(&Routines::vectorCreate, this, _1, _2));
+    add("SetFacingPoint", Void, { TVector });
+    add("AngleToVector", TVector, { Float });
+    add("VectorToAngle", Float, { TVector });
     add("TouchAttackMelee", Int, { Object, Int });
     add("TouchAttackRanged", Int, { Object, Int });
     add("EffectParalyze", Effect, { });
@@ -254,7 +254,7 @@ void Routines::addKotorRoutines() {
     add("EffectForceResistanceIncrease", Effect, { Int });
     add("GetLocation", Location, { Object });
     add("ActionJumpToLocation", Void, { Location });
-    add("Location", Location, { Vector, Float });
+    add("Location", Location, { TVector, Float });
     add("ApplyEffectAtLocation", Void, { Int, Effect, Location, Float });
     add("GetIsPC", Int, { Object }, bind(&Routines::getIsPC, this, _1, _2));
     add("FeetToMeters", Float, { Float }, bind(&Routines::feetToMeters, this, _1, _2));
@@ -262,7 +262,7 @@ void Routines::addKotorRoutines() {
     add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
     add("SpeakString", Void, { String, Int });
     add("GetSpellTargetLocation", Location, { });
-    add("GetPositionFromLocation", Vector, { Location });
+    add("GetPositionFromLocation", TVector, { Location });
     add("EffectBodyFuel", Effect, { });
     add("GetFacingFromLocation", Float, { Location });
     add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int });
@@ -455,7 +455,7 @@ void Routines::addKotorRoutines() {
     add("SoundObjectPlay", Void, { Object }, bind(&Routines::soundObjectPlay, this, _1, _2));
     add("SoundObjectStop", Void, { Object }, bind(&Routines::soundObjectStop, this, _1, _2));
     add("SoundObjectSetVolume", Void, { Object, Int });
-    add("SoundObjectSetPosition", Void, { Object, Vector });
+    add("SoundObjectSetPosition", Void, { Object, TVector });
     add("SpeakOneLinerConversation", Void, { String, Object });
     add("GetGold", Int, { Object });
     add("GetLastRespawnButtonPresser", Object, { });
@@ -546,7 +546,7 @@ void Routines::addKotorRoutines() {
     add("SetCameraMode", Void, { Object, Int });
     add("SetLockOrientationInDialog", Void, { Object, Int });
     add("SetLockHeadFollowInDialog", Void, { Object, Int });
-    add("CutsceneMove", Void, { Object, Vector, Int });
+    add("CutsceneMove", Void, { Object, TVector, Int });
     add("EnableVideoEffect", Void, { Int });
     add("StartNewModule", Void, { String, String, String, String, String, String, String, String }, bind(&Routines::startNewModule, this, _1, _2));
     add("DisableVideoEffect", Void, { });
@@ -554,7 +554,7 @@ void Routines::addKotorRoutines() {
     add("DoSinglePlayerAutoSave", Void, { });
     add("GetGameDifficulty", Int, { });
     add("GetUserActionsPending", Int, { });
-    add("RevealMap", Void, { Vector, Int });
+    add("RevealMap", Void, { TVector, Int });
     add("SetTutorialWindowsEnabled", Void, { Int });
     add("ShowTutorialWindow", Void, { Int });
     add("StartCreditSequence", Void, { Int });
@@ -662,7 +662,7 @@ void Routines::addKotorRoutines() {
     add("SWMG_SetSphereRadius", Void, { Object, Float });
     add("SWMG_GetNumLoops", Int, { Object });
     add("SWMG_SetNumLoops", Void, { Object, Int });
-    add("SWMG_GetPosition", Vector, { Object });
+    add("SWMG_GetPosition", TVector, { Object });
     add("SWMG_GetGunBankCount", Int, { Object });
     add("SWMG_GetGunBankBulletModel", String, { Object, Int });
     add("SWMG_GetGunBankGunModel", String, { Object, Int });
@@ -680,22 +680,22 @@ void Routines::addKotorRoutines() {
     add("SWMG_SetGunBankTarget", Void, { Object, Int, Int });
     add("SWMG_GetLastBulletHitPart", String, { });
     add("SWMG_IsGunBankTargetting", Int, { Object, Int });
-    add("SWMG_GetPlayerOffset", Vector, { });
+    add("SWMG_GetPlayerOffset", TVector, { });
     add("SWMG_GetPlayerInvincibility", Float, { });
     add("SWMG_GetPlayerSpeed", Float, { });
     add("SWMG_GetPlayerMinSpeed", Float, { });
     add("SWMG_GetPlayerAccelerationPerSecond", Float, { });
-    add("SWMG_GetPlayerTunnelPos", Vector, { });
-    add("SWMG_SetPlayerOffset", Void, { Vector });
+    add("SWMG_GetPlayerTunnelPos", TVector, { });
+    add("SWMG_SetPlayerOffset", Void, { TVector });
     add("SWMG_SetPlayerInvincibility", Void, { Float });
     add("SWMG_SetPlayerSpeed", Void, { Float });
     add("SWMG_SetPlayerMinSpeed", Void, { Float });
     add("SWMG_SetPlayerAccelerationPerSecond", Void, { Float });
-    add("SWMG_SetPlayerTunnelPos", Void, { Vector });
-    add("SWMG_GetPlayerTunnelNeg", Vector, { });
-    add("SWMG_SetPlayerTunnelNeg", Void, { Vector });
-    add("SWMG_GetPlayerOrigin", Vector, { });
-    add("SWMG_SetPlayerOrigin", Void, { Vector });
+    add("SWMG_SetPlayerTunnelPos", Void, { TVector });
+    add("SWMG_GetPlayerTunnelNeg", TVector, { });
+    add("SWMG_SetPlayerTunnelNeg", Void, { TVector });
+    add("SWMG_GetPlayerOrigin", TVector, { });
+    add("SWMG_SetPlayerOrigin", Void, { TVector });
     add("SWMG_GetGunBankHorizontalSpread", Float, { Object, Int });
     add("SWMG_GetGunBankVerticalSpread", Float, { Object, Int });
     add("SWMG_GetGunBankSensingRadius", Float, { Object, Int });
@@ -756,8 +756,8 @@ void Routines::addKotorRoutines() {
     add("GivePlotXP", Void, { String, Int });
     add("GetMinOneHP", Int, { Object });
     add("SetMinOneHP", Void, { Object, Int });
-    add("SWMG_GetPlayerTunnelInfinite", Vector, { });
-    add("SWMG_SetPlayerTunnelInfinite", Void, { Vector });
+    add("SWMG_GetPlayerTunnelInfinite", TVector, { });
+    add("SWMG_SetPlayerTunnelInfinite", Void, { TVector });
     add("SetGlobalFadeIn", Void, { Float, Float, Float, Float, Float });
     add("SetGlobalFadeOut", Void, { Float, Float, Float, Float, Float });
     add("GetLastHostileTarget", Object, { Object });

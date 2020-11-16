@@ -93,6 +93,23 @@ Variable Routines::abs(const vector<Variable> &args, ExecutionContext &ctx) {
     return glm::abs(value);
 }
 
+Variable Routines::vectorCreate(const vector<Variable> &args, ExecutionContext &ctx) {
+    float x = args[0].floatValue;
+    float y = args[1].floatValue;
+    float z = args[2].floatValue;
+    return Variable(Vector3(x, y, z));
+}
+
+Variable Routines::vectorNormalize(const vector<Variable> &args, ExecutionContext &ctx) {
+    Vector3 vec(args[0].vecValue);
+    vec.normalize();
+    return Variable(move(vec));
+}
+
+Variable Routines::vectorMagnitude(const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable(args[0].vecValue.length());
+}
+
 } // namespace game
 
 } // namespace reone

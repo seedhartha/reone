@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "glm/vec3.hpp"
 
 namespace reone {
@@ -40,6 +42,20 @@ struct Vector3 {
 
     bool operator!=(const Vector3 &other) {
         return !operator==(other);
+    }
+
+    void normalize() {
+        float len = length();
+        if (len < 1e-6) return;
+
+        float invLen = 1.0f / len;
+        x *= invLen;
+        y *= invLen;
+        z *= invLen;
+    }
+
+    float length() const {
+        return sqrtf(x * x + y * y + z * z);
     }
 };
 
