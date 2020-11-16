@@ -43,6 +43,8 @@ public:
 
     bool isActive() const;
 
+    Vector3 getPosition() const;
+
     std::shared_ptr<SoundBlueprint> blueprint() const;
     int priority() const;
 

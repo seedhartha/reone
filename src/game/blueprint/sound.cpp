@@ -39,6 +39,7 @@ void SoundBlueprint::load(const GffStruct &uts) {
     _maxDistance = uts.getFloat("MaxDistance");
     _minDistance = uts.getFloat("MinDistance");
     _continuous = uts.getInt("Continuous") != 0;
+    _elevation = uts.getFloat("Elevation");
     _looping = uts.getInt("Looping") != 0;
     _positional = uts.getInt("Positional") != 0;
     _interval = uts.getInt("Interval");
@@ -71,6 +72,10 @@ float SoundBlueprint::minDistance() const {
 
 bool SoundBlueprint::continuous() const {
     return _continuous;
+}
+
+float SoundBlueprint::elevation() const {
+    return _elevation;
 }
 
 bool SoundBlueprint::looping() const {

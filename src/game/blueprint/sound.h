@@ -38,6 +38,7 @@ public:
     float maxDistance() const;
     float minDistance() const;
     bool continuous() const;
+    float elevation() const;
     bool looping() const;
     bool positional() const;
     int interval() const;
@@ -52,6 +53,7 @@ private:
     float _maxDistance { 0.0f };
     float _minDistance { 0.0f };
     bool _continuous { false };
+    float _elevation { 0.0f };
     bool _looping { false };
     bool _positional { false };
     int _interval { 0 };
