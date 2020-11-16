@@ -269,8 +269,13 @@ Variable Routines::getStringByStrRef(const vector<Variable> &args, ExecutionCont
 
 Variable Routines::startNewModule(const vector<Variable> &args, ExecutionContext &ctx) {
     string moduleName(args[0].strValue);
+    boost::to_lower(moduleName);
+
     string waypoint(args.size() >= 2 ? args[1].strValue : "");
+    boost::to_lower(waypoint);
+
     _game->scheduleModuleTransition(moduleName, waypoint);
+
     return Variable();
 }
 

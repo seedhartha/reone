@@ -91,14 +91,17 @@ void Area::loadLYT() {
     lyt.load(wrap(Resources::instance().get(_name, ResourceType::AreaLayout)));
 
     for (auto &lytRoom : lyt.rooms()) {
+        shared_ptr<Model> model(Models::instance().get(lytRoom.name));
+        if (!model) continue;
+
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        shared_ptr<ModelSceneNode> model(new ModelSceneNode(&_game->sceneGraph(), Models::instance().get(lytRoom.name)));
-        model->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-        model->playAnimation("animloop1", kAnimationLoop);
+        shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(&_game->sceneGraph(), model));
+        sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+        sceneNode->playAnimation("animloop1", kAnimationLoop);
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
-        unique_ptr<Room> room(new Room(lytRoom.name, position, model, walkmesh));
+        unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));
 
         _rooms.insert(make_pair(room->name(), move(room)));
     }
