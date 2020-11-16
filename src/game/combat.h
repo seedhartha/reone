@@ -27,6 +27,9 @@
 
 #include "SDL2/SDL_timer.h"
 
+#include "../common/timer.h"
+
+
 namespace reone {
 
 namespace game {
@@ -34,44 +37,8 @@ namespace game {
 class Area;
 class Party;
 
-template <typename T>
-struct TimerPairCompare {
-    constexpr bool operator()(
-        std::pair<uint32_t, T> const& a,
-        std::pair<uint32_t, T> const& b)
-        const noexcept {
-        return a.first > b.first;
-    } // min heap!
-};
-
-template <typename T>
-struct TimerQueue {
-    void setTimeout(const T &obj, uint32_t tick) {
-        _timer.push(std::make_pair(_timestamp + tick, obj));
-    }
-
-    /* call once per frame, as soon as possible */
-    void update(uint32_t currentTicks) {
-        _timestamp = currentTicks;
-
-        while (!_timer.empty() && _timer.top().first < _timestamp) {
-            completed.push_back(_timer.top().second);
-            _timer.pop();
-        }
-    }
-
-    /* users are responsible for managing this */
-    std::list<T> completed;
-
-private:
-    std::priority_queue<std::pair<uint32_t, T>,
-        std::vector<std::pair<uint32_t, T>>,
-        TimerPairCompare<T>> _timer;
-
-    uint32_t _timestamp;
-};
-
 constexpr float MAX_DETECT_RANGE = 20; // TODO: adjust detection distance
+constexpr uint32_t DEACTIVATION_TIMEOUT = 10000; // 10s in ticks
 
 class Combat {
 
@@ -128,7 +95,8 @@ public:
     */
     void animationSync();
 
-    std::shared_ptr<Creature> findNearestHostile(std::shared_ptr<Creature> &combatant);
+    std::shared_ptr<Creature> findNearestHostile(std::shared_ptr<Creature> &combatant,
+                                                 float detectionRange = MAX_DETECT_RANGE);
 
 private:
     Area *_area;
@@ -161,6 +129,7 @@ private:
     void updateTimers(uint32_t currentTicks) {
         _stateTimer.update(currentTicks);
         _effectDelayTimer.update(currentTicks);
+        _deactivationTimer.update(currentTicks);
 
         for (const auto& e : _stateTimer.completed) {
             if (--(_pendingStates[e]) == 0)
@@ -178,19 +147,9 @@ private:
         _effectDelayTimer.completed.clear();
     }
 
-    void setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t delayTicks) {
-        if (!creature) return;
-        _stateTimer.setTimeout(creature->id(), delayTicks);
+    void setStateTimeout(const std::shared_ptr<Creature>& creature, uint32_t delayTicks);
 
-        // in case of repetition
-        if (_pendingStates.count(creature->id()) == 0) _pendingStates[creature->id()] = 0;
-        ++(_pendingStates[creature->id()]);
-    }
-
-    bool isStateTimerDone(const std::shared_ptr<Creature>& creature) {
-        if (!creature) return false;
-        return _pendingStates.count(creature->id()) == 0;
-    }
+    bool isStateTimerDone(const std::shared_ptr<Creature>& creature);
 
     /* structure: { id : #repetition } */
     std::unordered_map<uint32_t, int> _pendingStates;
@@ -208,6 +167,10 @@ private:
     std::list<std::pair<std::shared_ptr<Creature>,
                         std::unique_ptr<Effect>>> _effectDelayIndex;
     TimerQueue<decltype(_effectDelayIndex.begin())> _effectDelayTimer;
+
+    TimerMap<uint32_t> _deactivationTimer;
+
+    // TODO: TimerQueue<uint32_t> _ai_timer;
 
     // END timers
 

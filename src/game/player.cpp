@@ -82,7 +82,11 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDL_SCANCODE_F:
-            _party->player()->actionQueue().add(std::make_unique<AttackAction>(_area->combat().findNearestHostile(_party->player())));
+            if (_area->combat().findNearestHostile(_party->leader())) {
+                _party->leader()->actionQueue().add(std::make_unique<AttackAction>(
+                    _area->combat().findNearestHostile(_party->leader())));
+            }
+
             return true;
 
         default:
