@@ -52,6 +52,8 @@ class SceneGraph;
 
 namespace game {
 
+const float kRoundDuration = 6.0f;
+
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
@@ -120,6 +122,7 @@ private:
     std::unique_ptr<resource::Visibility> _visibility;
     CameraStyle _cameraStyle;
     std::string _music;
+    float _heartbeatTimeout { kRoundDuration };
 
     // Scripts
 
@@ -158,6 +161,7 @@ private:
     void checkTriggersIntersection(SpatialObject &triggerrer);
     void updateVisibility();
     void updateSounds();
+    void updateHeartbeat(float dt);
 
     void printDebugInfo(const SpatialObject &object);
 

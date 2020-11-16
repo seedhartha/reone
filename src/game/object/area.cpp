@@ -534,6 +534,8 @@ void Area::update(float dt) {
         _actionExecutor.executeActions(*object, dt);
     }
     _objectSelector.update();
+
+    updateHeartbeat(dt);
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -783,6 +785,17 @@ void Area::checkTriggersIntersection(SpatialObject &triggerrer) {
         if (!trigger.blueprint().onEnter().empty()) {
             runScript(trigger.blueprint().onEnter(), trigger.id(), triggerrer.id(), -1);
         }
+    }
+}
+
+void Area::updateHeartbeat(float dt) {
+    _heartbeatTimeout = glm::max(0.0f, _heartbeatTimeout - dt);
+
+    if (_heartbeatTimeout == 0.0f) {
+        if (!_onHeartbeat.empty()) {
+            runScript(_onHeartbeat, _id, -1, -1);
+        }
+        _heartbeatTimeout = kRoundDuration;
     }
 }
 
