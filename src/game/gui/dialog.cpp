@@ -344,12 +344,12 @@ void DialogGUI::scheduleEndOfEntry() {
         return;
     }
     if (_currentEntry->delay != -1) {
-        _endEntryTimeout = 1000 * _currentEntry->delay;
+        _endEntryTimeout = 1000.0f * _currentEntry->delay;
         return;
     }
     if (_currentVoice) {
         _endEntryFlags = kEndEntryOnAudioStop;
-        _endEntryTimeout = _currentVoice->duration();
+        _endEntryTimeout = static_cast<float>(_currentVoice->duration());
         return;
     }
     _endEntryTimeout = kDefaultEntryDuration;
