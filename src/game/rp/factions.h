@@ -24,11 +24,9 @@ namespace reone {
 
 namespace game {
 
-constexpr static int kMaxFactionCount = 25;
-
 class Creature;
 
-bool getIsEnemy(const std::shared_ptr<Creature> &target, const std::shared_ptr<Creature> &source);
+bool getIsEnemy(const Creature &left, const Creature &right);
 
 } // namespace game
 

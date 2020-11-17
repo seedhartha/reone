@@ -48,6 +48,10 @@ float SpatialObject::distanceTo(const glm::vec3 &point) const {
     return glm::distance(_position, point);
 }
 
+float SpatialObject::distanceTo(const SpatialObject &other) const {
+    return glm::distance(_position, other._position);
+}
+
 bool SpatialObject::contains(const glm::vec3 &point) const {
     if (!_model) return false;
 
