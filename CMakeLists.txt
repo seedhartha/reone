@@ -67,6 +67,7 @@ set(COMMON_HEADERS
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
+    src/common/timer.h
     src/common/types.h)
 
 set(COMMON_SOURCES
@@ -338,6 +339,7 @@ set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(GAME_HEADERS
     src/game/action/action.h
+    src/game/action/attack.h
     src/game/action/commandaction.h
     src/game/action/follow.h
     src/game/action/locationaction.h
@@ -365,6 +367,9 @@ set(GAME_HEADERS
     src/game/characters.h
     src/game/collisiondetect.h
     src/game/console.h
+    src/game/combat.h
+    src/game/faction.h
+    src/game/effect.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/location.h
@@ -451,6 +456,8 @@ set(GAME_SOURCES
     src/game/characters.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
+    src/game/combat.cpp
+    src/game/faction.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/enginetype/typefactory.cpp

@@ -77,7 +77,16 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDL_SCANCODE_C:
+
             _moveRight = true;
+            return true;
+
+        case SDL_SCANCODE_F:
+            if (_area->combat().findNearestHostile(_party->leader())) {
+                _party->leader()->actionQueue().add(std::make_unique<AttackAction>(
+                    _area->combat().findNearestHostile(_party->leader())));
+            }
+
             return true;
 
         default:
@@ -111,6 +120,8 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 void Player::update(float dt) {
     shared_ptr<Creature> partyLeader(_party->leader());
     if (!partyLeader) return;
+
+    if (_party->player()->isInterrupted()) return;
 
     float heading = 0.0f;
     bool movement = true;

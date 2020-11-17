@@ -28,6 +28,7 @@
 #include "../../script/types.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../action/attack.h"
 
 #include "../blueprint/blueprints.h"
 #include "../portraits.h"
@@ -112,6 +113,16 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     _attributes = blueprint->attributes();
     _onSpawn = blueprint->onSpawn();
     _onUserDefined = blueprint->onUserDefined();
+
+    // TODO: update to match KOTOR 2
+    if (blueprint->factionId() < 1 || blueprint->factionId() > 17) {
+        if (blueprint->factionId() != -1)
+            debug(boost::format("'%s' with id '%d' has strange factionId(): %d") %tag() % id() % blueprint->factionId());
+        
+        _factionId = Faction::INVALID_STANDARD_FACTION;
+    } else {
+        _factionId = static_cast<Faction>(blueprint->factionId());
+    }
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
