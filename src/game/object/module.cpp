@@ -161,14 +161,12 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
         return false;
     }
 
-    const auto &creature = dynamic_pointer_cast<Creature>(object);
+    shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
     if (creature) {
-        debug(boost::format("Creature '%s' with faction '%d' clicked on") % creature->tag() % 
-            static_cast<int>(creature->getFaction()));
+        debug(boost::format("Creature '%s' with faction '%d' clicked on") % creature->tag() % static_cast<int>(creature->faction()));
     } else {
         debug(boost::format("Object '%s' clicked on") % object->tag());
     }
-    
 
     uint32_t selectedObjectId = _area->objectSelector().selectedObjectId();
     if (object->id() != selectedObjectId) {

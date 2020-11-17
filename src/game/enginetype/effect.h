@@ -26,22 +26,21 @@ namespace game {
 class Creature;
 
 enum class EffectType {
-    Invalid = 0,
-
+    Invalid = 0
 };
 
 class Effect {
 public:
-    Effect(EffectType type, float duration)
-        : _type(type), _timeout(duration) {}
+    Effect(EffectType type, float duration) : _type(type), _timeout(duration) {}
 
     virtual ~Effect() = default;
 
-    void update(float dt) { // managed by creature.update
+    // managed by creature.update
+    void update(float dt) {
         _timeout -= dt;
     }
 
-    bool isValid() const { return _timeout > 0 ; }
+    bool isValid() const { return _timeout > 0; }
 
     EffectType type() const { return _type; }
 
@@ -54,11 +53,15 @@ private:
     Effect &operator=(const Effect &) = delete;
 };
 
-/* Calculate damage based on equipment and effects */
+/**
+ * Calculate damage based on equipment and effects.
+ */
 class DamageEffect : public Effect {
 public:
-    DamageEffect(const std::shared_ptr<Creature>& applicator)
-        : Effect(EffectType::Invalid, 0), _damager(applicator) {}
+    DamageEffect(const std::shared_ptr<Creature> &damager) :
+        Effect(EffectType::Invalid, 0),
+        _damager(damager) {
+    }
 
     /* for feedback text, mostly */
     std::shared_ptr<Creature>& getDamager() { return _damager; }

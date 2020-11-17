@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Vsevolod Kremianskii
  * Copyright (c) 2020 uwadmin12
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,18 +18,23 @@
 
 #pragma once
 
-#include <queue>
+#include <cstdint>
 #include <list>
+#include <queue>
 #include <unordered_set>
-#include <unordered_map>
+#include <vector>
 
 namespace reone {
 
-/* Queue-based timer structure */
+/**
+ * Queue-based timer structure.
+ */
 template <typename T>
 struct TimerQueue {
     /* does not override previous obj */
-    void setTimeout(const T& obj, uint32_t tick) { _timer.push(std::make_pair(_timestamp + tick, obj)); }
+    void setTimeout(const T &obj, uint32_t tick) {
+        _timer.push(std::make_pair(_timestamp + tick, obj));
+    }
 
     /* call once per frame, as soon as possible */
     void update(uint32_t currentTicks) {
@@ -43,7 +49,6 @@ struct TimerQueue {
     /* users are responsible for managing this */
     std::list<T> completed;
 
-
 private:
     struct TimerPairCompare {
         constexpr bool operator()(std::pair<uint32_t, T> const& a,
@@ -56,39 +61,7 @@ private:
                         std::vector<std::pair<uint32_t, T>>,
                         TimerPairCompare> _timer;
 
-    uint32_t _timestamp = 0;
-};
-
-/* Map-based timer structure (<T> must be hashable) */
-template <typename T>
-struct TimerMap {
-    /* overrides previous obj timeout */
-    void setTimeout(const T& obj, uint32_t tick) { _timer[obj] = _timestamp + tick; }
-
-    /* call once per frame, as soon as possible */
-    void update(uint32_t currentTicks) {
-        _timestamp = currentTicks;
-
-        for (auto &it = _timer.begin(); it != _timer.end(); ) {
-            if (it->second < _timestamp) {
-                completed.insert(it->first);
-                it = _timer.erase(it);
-            }
-            else ++it;
-        }
-    }
-
-    bool isRegistered(const T& obj) { return _timer.count(obj) == 1; }
-
-    void cancel(const T& obj) { _timer.erase(obj); }
-
-    /* users are responsible for managing this */
-    std::unordered_set<T> completed;
-
-private:
-    std::unordered_map<T, uint32_t> _timer;
-
-    uint32_t _timestamp = 0;
+    uint32_t _timestamp { 0 };
 };
 
 } // namespace reone

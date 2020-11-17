@@ -58,7 +58,7 @@ private:
     void executeFollow(Creature &actor, FollowAction &action, float dt);
     void executeDoCommand(Object &actor, CommandAction &command, float dt);
     void executeStartConversation(Object &actor, StartConversationAction &action, float dt);
-    void executeAttack(Creature &creature, AttackAction &action, float dt);
+    void executeAttack(Creature &actor, AttackAction &action, float dt);
     void executeOpenDoor(Object &actor, ObjectAction &action, float dt);
     void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
     void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);

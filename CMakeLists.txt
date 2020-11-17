@@ -67,7 +67,8 @@ set(COMMON_HEADERS
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
-    src/common/timer.h
+    src/common/timermap.h
+    src/common/timerqueue.h
     src/common/types.h)
 
 set(COMMON_SOURCES
@@ -368,10 +369,9 @@ set(GAME_HEADERS
     src/game/collisiondetect.h
     src/game/console.h
     src/game/combat.h
-    src/game/faction.h
-    src/game/effect.h
     src/game/cursors.h
     src/game/dialog.h
+    src/game/enginetype/effect.h
     src/game/enginetype/location.h
     src/game/enginetype/typefactory.h
     src/game/game.h
@@ -423,6 +423,7 @@ set(GAME_HEADERS
     src/game/room.h
     src/game/rp/attributes.h
     src/game/rp/classes.h
+    src/game/rp/factions.h
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
@@ -457,7 +458,6 @@ set(GAME_SOURCES
     src/game/collisiondetect.cpp
     src/game/console.cpp
     src/game/combat.cpp
-    src/game/faction.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/enginetype/typefactory.cpp
@@ -509,6 +509,7 @@ set(GAME_SOURCES
     src/game/room.cpp
     src/game/rp/attributes.cpp
     src/game/rp/classes.cpp
+    src/game/rp/factions.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

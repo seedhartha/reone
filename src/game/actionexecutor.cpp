@@ -158,7 +158,7 @@ void ActionExecutor::executeStartConversation(Object &actor, StartConversationAc
     }
 }
 
-void ActionExecutor::executeAttack(Creature& creature, AttackAction& action, float dt) {
+void ActionExecutor::executeAttack(Creature &actor, AttackAction &action, float dt) {
     if (!action.isInRange()) {
         if (action.isTimedOut()) {
             action.complete();
@@ -170,10 +170,10 @@ void ActionExecutor::executeAttack(Creature& creature, AttackAction& action, flo
         const SpatialObject* object = dynamic_cast<const SpatialObject*>(action.object());
         glm::vec3 dest(object->position());
 
-        bool reached = navigateCreature(creature, dest, true, action.distance(), dt);
+        bool reached = navigateCreature(actor, dest, true, action.distance(), dt);
         if (reached) {
             action.setAttack();
-            creature.face(*object);
+            actor.face(*object);
         }
     }
 }

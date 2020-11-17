@@ -28,8 +28,8 @@
 #include "../../script/types.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
-#include "../action/attack.h"
 
+#include "../action/attack.h"
 #include "../blueprint/blueprints.h"
 #include "../portraits.h"
 #include "../script/util.h"
@@ -91,6 +91,7 @@ void Creature::load(const GffStruct &gffs) {
 void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     _blueprint = blueprint;
     _tag = _blueprint->tag();
+    _faction = static_cast<Faction>(blueprint->factionId());
     _conversation = _blueprint->conversation();
 
     for (auto &item : _blueprint->equipment()) {
@@ -113,16 +114,6 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
     _attributes = blueprint->attributes();
     _onSpawn = blueprint->onSpawn();
     _onUserDefined = blueprint->onUserDefined();
-
-    // TODO: update to match KOTOR 2
-    if (blueprint->factionId() < 1 || blueprint->factionId() > 17) {
-        if (blueprint->factionId() != -1)
-            debug(boost::format("'%s' with id '%d' has strange factionId(): %d") %tag() % id() % blueprint->factionId());
-        
-        _factionId = Faction::INVALID_STANDARD_FACTION;
-    } else {
-        _factionId = static_cast<Faction>(blueprint->factionId());
-    }
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
@@ -369,6 +360,18 @@ void Creature::playAnimation(Animation anim) {
         case Animation::UnlockDoor:
             animName = g_animUnlockDoor;
             break;
+        case Animation::UnarmedAttack1:
+            animName = "g8a1";
+            break;
+        case Animation::UnarmedAttack2:
+            animName = "g8a2";
+            break;
+        case Animation::UnarmedDodge1:
+            animName = "g8d1";
+            break;
+        case Animation::Flinch:
+            animName = "g1y1";
+            break;
         default:
             break;
     }
@@ -547,6 +550,36 @@ glm::vec3 Creature::selectablePosition() const {
     }
 
     return _model->getCenterOfAABB();
+}
+
+Faction Creature::faction() const {
+    return _faction;
+}
+
+void Creature::setFaction(Faction faction) {
+    _faction = faction;
+}
+
+bool Creature::isInterrupted() const {
+    switch (_combatState) {
+        case CombatState::Idle:
+        case CombatState::Cooldown:
+            return false;
+        default:
+            return true;
+    }
+}
+
+CombatState Creature::combatState() const {
+    return _combatState;
+}
+
+void Creature::setCombatState(CombatState state) {
+    _combatState = state;
+}
+
+void Creature::applyEffect(unique_ptr<Effect> &&eff) {
+    _activeEffects.push_back(move(eff));
 }
 
 } // namespace game
