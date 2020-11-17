@@ -538,9 +538,10 @@ void Area::update(float dt) {
         _actionExecutor.executeActions(*object, dt);
     }
     _objectSelector.update();
-    _combat.update();
-
     updateHeartbeat(dt);
+
+    // TODO: enable when polished enough
+    // _combat.update();
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {

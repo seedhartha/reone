@@ -1,5 +1,6 @@
 /*
- * Copyright © 2020 uwadmin12
+ * Copyright (c) 2020 Vsevolod Kremianskii
+ * Copyright (c) 2020 uwadmin12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +18,10 @@
 
 #include "combat.h"
 
-#include "object/area.h"
-#include "party.h"
 #include "../common/log.h"
 
+#include "object/area.h"
+#include "party.h"
 
 using namespace std;
 
@@ -28,45 +29,45 @@ namespace reone {
 
 namespace game {
 
-// helper functions
+// Helper functions
 
-AttackAction* getAttackAction(shared_ptr<Creature> &combatant) {
-    return dynamic_cast<AttackAction*>(combatant->actionQueue().currentAction());
+static AttackAction *getAttackAction(const shared_ptr<Creature> &combatant) {
+    return dynamic_cast<AttackAction *>(combatant->actionQueue().currentAction());
 }
 
-bool isActiveTargetInRange(shared_ptr<Creature> &combatant) {
+static bool isActiveTargetInRange(const shared_ptr<Creature> &combatant) {
     auto* action = getAttackAction(combatant);
     return action && action->isInRange();
 }
 
-void duel(shared_ptr<Creature> &attacker, shared_ptr<Creature> &target) {
+static void duel(const shared_ptr<Creature> &attacker, const shared_ptr<Creature> &target) {
     target->face(*attacker);
     attacker->face(*target);
-    attacker->playAnimation("g8a1");
-    target->playAnimation("g8g1");
+    attacker->playAnimation(Creature::Animation::UnarmedAttack1);
+    target->playAnimation(Creature::Animation::UnarmedDodge1);
 }
 
-void bash(shared_ptr<Creature> &attacker, shared_ptr<Creature> &target) {
+static void bash(const shared_ptr<Creature> &attacker, const shared_ptr<Creature> &target) {
     attacker->face(*target);
-    attacker->playAnimation("g8a2");
+    attacker->playAnimation(Creature::Animation::UnarmedAttack2);
 }
 
-void flinch(shared_ptr<Creature> &target) {
-    target->playAnimation("g1y1");
+static void flinch(const shared_ptr<Creature> &target) {
+    target->playAnimation(Creature::Animation::Flinch);
 }
 
-// END helper functions
+// END Helper functions
 
 Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
     if (!area) {
-        throw invalid_argument("Area must not be null");
+        throw invalid_argument("area must not be null");
     }
 }
 
 void Combat::update() {
     updateTimers(SDL_GetTicks());
 
-    std::shared_ptr<Creature> pc = _party->leader();
+    shared_ptr<Creature> pc = _party->leader();
     if (!pc) {
         debug("no pc yet ...");
         return;
@@ -83,21 +84,22 @@ void Combat::update() {
             setAITimeout(_activeCombatants.front());
         }
 
-        for (auto &cbt : _activeCombatants) combatStateMachine(cbt);
+        for (auto &cbt : _activeCombatants) {
+            combatStateMachine(cbt);
+        }
         animationSync();
 
         // rotate _activeCombatants
         _activeCombatants.push_back(_activeCombatants.front());
         _activeCombatants.pop_front();
     }
-
 }
 
-bool Combat::scanHostility(const std::shared_ptr<Creature>& actor) {
+bool Combat::scanHostility(const shared_ptr<Creature>& actor) {
     // TODO: need a better mechanism to query creatures in range
     bool stillActive = false;
     for (auto &creature : _area->objectsByType()[ObjectType::Creature]) {
-        if (glm::length(creature->position() - actor->position()) > MAX_DETECT_RANGE) {
+        if (glm::length(creature->position() - actor->position()) > kDetectionRange) {
             continue;
         }
 
@@ -108,7 +110,7 @@ bool Combat::scanHostility(const std::shared_ptr<Creature>& actor) {
             stillActive = true;
             if (registerCombatant(target)) { // will fail if already registered
                 debug(boost::format("combat: registered '%s', faction '%d'")
-                      % target->tag() % static_cast<int>(target->getFaction()));
+                      % target->tag() % static_cast<int>(target->faction()));
             }
         }
     }
@@ -117,18 +119,15 @@ bool Combat::scanHostility(const std::shared_ptr<Creature>& actor) {
 }
 
 void Combat::activityScanner() {
-    if (_activeCombatants.empty()) {
-        return;
-    }
+    if (_activeCombatants.empty()) return;
 
-    auto &actor = _activeCombatants.front();
-
+    shared_ptr<Creature> actor(_activeCombatants.front());
     bool stillActive = scanHostility(actor);
 
     // deactivate actor if !active
     if (!stillActive) { //&& getAttackAction(actor) == nullptr ???
-        if (_deactivationTimer.completed.count(actor->id()) == 1) {
-            _deactivationTimer.completed.erase(actor->id());
+        if (_deactivationTimers.completed.count(actor->id()) == 1) {
+            _deactivationTimers.completed.erase(actor->id());
 
             // deactivation timeout complete
             actor->setCombatState(CombatState::Idle);
@@ -138,29 +137,32 @@ void Combat::activityScanner() {
 
             debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % activated());
         }
-        else if (!_deactivationTimer.isRegistered(actor->id())) {
-            _deactivationTimer.setTimeout(actor->id(), DEACTIVATION_TIMEOUT);
+        else if (!_deactivationTimers.isRegistered(actor->id())) {
+            _deactivationTimers.setTimeout(actor->id(), kDeactivationTimeout);
 
             debug(boost::format("combat: registered deactivation timer'%s'") % actor->tag());
         }
     }
-    else { 
-        if (_deactivationTimer.isRegistered(actor->id())) {
-            _deactivationTimer.cancel(actor->id());
+    else {
+        if (_deactivationTimers.isRegistered(actor->id())) {
+            _deactivationTimers.cancel(actor->id());
 
             debug(boost::format("combat: cancelled deactivation timer'%s'") % actor->tag());
         }
     }
 }
 
-void Combat::AIMaster(shared_ptr<Creature> &combatant) {
+void Combat::effectSync() {
+}
+
+void Combat::AIMaster(const shared_ptr<Creature> &combatant) {
     if (combatant->id() == _party->leader()->id()) return;
 
     ActionQueue &cbt_queue = combatant->actionQueue();
 
     //if (cbt_queue.currentAction()) return;
 
-    auto hostile = findNearestHostile(combatant, MAX_DETECT_RANGE);
+    auto hostile = findNearestHostile(combatant, kDetectionRange);
     if (hostile) {
         cbt_queue.add(make_unique<AttackAction>(hostile));
         debug(boost::format("AIMaster: '%s' Queued to attack '%s'") % combatant->tag()
@@ -169,80 +171,89 @@ void Combat::AIMaster(shared_ptr<Creature> &combatant) {
 }
 
 void Combat::updateTimers(uint32_t currentTicks) {
-    _stateTimer.update(currentTicks);
-    _effectDelayTimer.update(currentTicks);
-    _deactivationTimer.update(currentTicks);
-    _AITimer.update(currentTicks);
+    _stateTimers.update(currentTicks);
+    _effectDelayTimers.update(currentTicks);
+    _deactivationTimers.update(currentTicks);
+    _aiTimers.update(currentTicks);
 
-    for (const auto &id : _stateTimer.completed) {
+    for (const auto &id : _stateTimers.completed) {
         if (--(_pendingStates[id]) == 0)
             _pendingStates.erase(id);
     }
-    _stateTimer.completed.clear();
+    _stateTimers.completed.clear();
 
-    for (auto &pr : _effectDelayTimer.completed) {
+    for (auto &pr : _effectDelayTimers.completed) {
         if (!pr->first) continue;
 
-        pr->first->applyEffect(std::move(pr->second));
+        pr->first->applyEffect(move(pr->second));
         pr->second = nullptr; // dangling?
         _effectDelayIndex.erase(pr);
     }
-    _effectDelayTimer.completed.clear();
+    _effectDelayTimers.completed.clear();
 
-    for (auto &id : _AITimer.completed) {
-        _pendingAITimer.erase(id);
+    for (auto &id : _aiTimers.completed) {
+        _pendingAITimers.erase(id);
     }
-    _AITimer.completed.clear();
+    _aiTimers.completed.clear();
 }
 
-void Combat::setStateTimeout(const std::shared_ptr<Creature> &creature, uint32_t delayTicks) {
+void Combat::setStateTimeout(const shared_ptr<Creature> &creature, uint32_t delayTicks) {
     if (!creature) return;
-    _stateTimer.setTimeout(creature->id(), delayTicks);
+
+    _stateTimers.setTimeout(creature->id(), delayTicks);
 
     // in case of repetition
-    if (_pendingStates.count(creature->id()) == 0) _pendingStates[creature->id()] = 0;
+    if (_pendingStates.count(creature->id()) == 0) {
+        _pendingStates[creature->id()] = 0;
+    }
     ++(_pendingStates[creature->id()]);
 }
 
-bool Combat::isStateTimerDone(const std::shared_ptr<Creature> &creature) {
+bool Combat::isStateTimerDone(const shared_ptr<Creature> &creature) {
     if (!creature) return false;
+
     return _pendingStates.count(creature->id()) == 0;
 }
 
-void Combat::setDelayEffectTimeout(std::unique_ptr<Effect> &&eff,
-    std::shared_ptr<Creature> &target, uint32_t delayTicks) {
+void Combat::setDelayEffectTimeout(
+    unique_ptr<Effect> &&eff,
+    const shared_ptr<Creature> &target,
+    uint32_t delayTicks
+) {
     auto index = _effectDelayIndex.insert(
-        _effectDelayIndex.end(), std::make_pair(target, std::move(eff)));
-    _effectDelayTimer.setTimeout(index, delayTicks);
+        _effectDelayIndex.end(),
+        make_pair(target, move(eff)));
+
+    _effectDelayTimers.setTimeout(index, delayTicks);
 }
 
-void Combat::setAITimeout(const std::shared_ptr<Creature> &creature) {
+void Combat::setAITimeout(const shared_ptr<Creature> &creature) {
     if (!creature) return;
-    _AITimer.setTimeout(creature->id(), AI_MASTER_INTERVAL);
-    
-    _pendingAITimer.insert(creature->id());
+
+    _aiTimers.setTimeout(creature->id(), kAIMasterInterval);
+    _pendingAITimers.insert(creature->id());
 }
 
-bool Combat::isAITimerDone(const std::shared_ptr<Creature> &creature) {
+bool Combat::isAITimerDone(const shared_ptr<Creature> &creature) {
     if (!creature) return false;
-    return _pendingAITimer.count(creature->id()) == 0;
+
+    return _pendingAITimers.count(creature->id()) == 0;
 }
 
-void Combat::onEnterAttackState(shared_ptr<Creature> &combatant) {
+void Combat::onEnterAttackState(const shared_ptr<Creature> &combatant) {
     if (!combatant) return;
 
     setStateTimeout(combatant, 1500);
-    debug(boost::format("'%s' enters Attack state, actionQueueLen[%d], attackAction[%d]") 
+    debug(boost::format("'%s' enters Attack state, actionQueueLen[%d], attackAction[%d]")
         % combatant->tag() % combatant->actionQueue().size()
         % (getAttackAction(combatant) != nullptr)); // TODO: disable redundant info
 
-    auto *action = getAttackAction(combatant);
-    auto &target = action->target();
+    AttackAction *action = getAttackAction(combatant);
+    shared_ptr<Creature> target(action->target());
 
-    if (target && (target->getCombatState() == CombatState::Idle
-        || target->getCombatState() == CombatState::Cooldown)) {
+    if (target && (target->combatState() == CombatState::Idle || target->combatState() == CombatState::Cooldown)) {
         _duelQueue.push_back(make_pair(combatant, target));
-        
+
         // synchronization
         combatStateMachine(target);
     } else {
@@ -250,24 +261,24 @@ void Combat::onEnterAttackState(shared_ptr<Creature> &combatant) {
     }
 
     setDelayEffectTimeout(
-        std::make_unique<DamageEffect>(combatant), target, 500 // dummy delay
+        make_unique<DamageEffect>(combatant), target, 500 // dummy delay
     );
 
     action->complete();
 }
 
-void Combat::onEnterDefenseState(shared_ptr<Creature> &combatant) {
+void Combat::onEnterDefenseState(const shared_ptr<Creature> &combatant) {
     setStateTimeout(combatant, 1500);
     debug(boost::format("'%s' enters Defense state, set_timer") % combatant->tag());
 }
 
-void Combat::onEnterCooldownState(shared_ptr<Creature> &combatant) {
+void Combat::onEnterCooldownState(const shared_ptr<Creature> &combatant) {
     setStateTimeout(combatant, 1500);
     debug(boost::format("'%s' enters Cooldown state, set_timer") % combatant->tag());
 }
 
-void Combat::combatStateMachine(shared_ptr<Creature> &combatant) {
-    switch (combatant->getCombatState()) {
+void Combat::combatStateMachine(const shared_ptr<Creature> &combatant) {
+    switch (combatant->combatState()) {
     case CombatState::Idle:
         for (auto &pr : _duelQueue) { // if combatant is caught in a duel
             if (pr.second && pr.second->id() == combatant->id()) {
@@ -334,7 +345,7 @@ void Combat::animationSync() {
     }
 }
 
-shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant, float detectionRange) {
+shared_ptr<Creature> Combat::findNearestHostile(const shared_ptr<Creature> &combatant, float detectionRange) {
     shared_ptr<Creature> closest_target = nullptr;
     float min_dist = detectionRange;
 
@@ -354,7 +365,7 @@ shared_ptr<Creature> Combat::findNearestHostile(shared_ptr<Creature> &combatant,
     return move(closest_target);
 }
 
-bool Combat::registerCombatant(const std::shared_ptr<Creature> &combatant) {
+bool Combat::registerCombatant(const shared_ptr<Creature> &combatant) {
     auto res = _activeCombatantIds.insert(combatant->id());
     if (res.second) { // combatant not already in _activeCombatantIds
         _activeCombatants.push_back(combatant);

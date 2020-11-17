@@ -71,6 +71,30 @@ enum class Skill {
     TreatInjury = 7
 };
 
+enum class Faction {
+    Invalid = -1,
+    Hostile1 = 1,
+    Friendly1 = 2,
+    Hostile2 = 3,
+    Friendly2 = 4,
+    Neutral = 5,
+    Insane = 6,
+    Tuskan = 7,
+    GlobalXor = 8,
+    Surrender1 = 9,
+    Surrender2 = 10,
+    Predator = 11,
+    Prey = 12,
+    Trap = 13,
+    EndarSpire = 14,
+    Rancor = 15,
+    Gizka1 = 16,
+    Gizka2 = 17,
+    SelfLoathing = 21,
+    OneOnOne = 22,
+    PartyPuppet = 23
+};
+
 } // namespace game
 
 } // namespace reone

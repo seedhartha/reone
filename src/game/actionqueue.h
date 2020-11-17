@@ -34,7 +34,7 @@ public:
     void update();
 
     bool empty() const;
-    size_t size() const { return _actions.size(); }
+    int size() const;
 
     Action *currentAction();
 
