@@ -205,11 +205,13 @@ void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
     player->load(playerCfg);
     player->setTag("PLAYER");
+    player->setFaction(Faction::STANDARD_FACTION_FRIENDLY_1);
     party.addMember(player);
     party.setPlayer(player);
 
     shared_ptr<Creature> companion(_game->objectFactory().newCreature());
     companion->load(companionCfg);
+    companion->setFaction(Faction::STANDARD_FACTION_FRIENDLY_1);
     companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
     party.addMember(companion);
 

@@ -23,6 +23,7 @@
 #include "../../resource/2dafile.h"
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
+#include "../effect.h"
 
 #include "../rp/attributes.h"
 
@@ -35,6 +36,36 @@ namespace game {
 
 class CreatureBlueprint;
 class ObjectFactory;
+
+enum class CombatState {
+    Idle,
+    Attack,
+    Defense,
+    Cooldown,
+    Staggered
+};
+
+// TODO: Factions from KOTOR 2
+enum class Faction {
+    INVALID_STANDARD_FACTION = -1,
+    STANDARD_FACTION_HOSTILE_1 = 1,
+    STANDARD_FACTION_FRIENDLY_1 = 2,
+    STANDARD_FACTION_HOSTILE_2 = 3,
+    STANDARD_FACTION_FRIENDLY_2 = 4,
+    STANDARD_FACTION_NEUTRAL = 5,
+    STANDARD_FACTION_INSANE = 6,
+    STANDARD_FACTION_PTAT_TUSKAN = 7,
+    STANDARD_FACTION_GLB_XOR = 8,
+    STANDARD_FACTION_SURRENDER_1 = 9,
+    STANDARD_FACTION_SURRENDER_2 = 10,
+    STANDARD_FACTION_PREDATOR = 11,
+    STANDARD_FACTION_PREY = 12,
+    STANDARD_FACTION_TRAP = 13,
+    STANDARD_FACTION_ENDAR_SPIRE = 14,
+    STANDARD_FACTION_RANCOR = 15,
+    STANDARD_FACTION_GIZKA_1 = 16,
+    STANDARD_FACTION_GIZKA_2 = 17
+};
 
 class Creature : public SpatialObject {
 public:
@@ -102,6 +133,26 @@ public:
 
     // END Pathfinding
 
+    // Combat
+
+    /* combat animation interruption */
+    bool isInterrupted() { return !(_cbtState == CombatState::Idle || _cbtState == CombatState::Cooldown); }
+
+    CombatState getCombatState() { return _cbtState; }
+    void setCombatState(CombatState state) { _cbtState = state;  }
+
+    Faction getFaction() const { return _factionId; }
+
+    void setFaction(Faction faction) { _factionId = faction; }
+
+    // const std::deque<std::unique_ptr<Effect>> &getActiveEffects() { return _activeEffects; }
+
+    void applyEffect(std::unique_ptr<Effect> &&eff) {
+        _activeEffects.push_back(std::move(eff)); 
+    }
+
+    // END Combat
+
 private:
     enum class ModelType {
         Creature,
@@ -130,6 +181,14 @@ private:
     std::string _onSpawn;
 
     // END Scripts
+
+    // combat
+
+    CombatState _cbtState = CombatState::Idle;
+    std::deque<std::unique_ptr<Effect>> _activeEffects;
+    Faction _factionId = Faction::INVALID_STANDARD_FACTION;
+
+    // END combat
 
     // Loading
 

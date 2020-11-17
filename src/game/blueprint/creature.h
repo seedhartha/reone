@@ -42,6 +42,7 @@ public:
     const std::vector<std::string> &equipment() const;
     int appearance() const;
     int portraitId() const;
+    int factionId() const { return _factionId; }
     const std::string &conversation() const;
     const CreatureAttributes &attributes() const;
     const std::string &onSpawn() const;
@@ -55,6 +56,7 @@ private:
     std::vector<std::string> _equipment;
     int _appearance { 0 };
     int _portraitId { -1 };
+    int _factionId { -1 };
     std::string _conversation;
     CreatureAttributes _attributes;
 

@@ -160,7 +160,15 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (!object || !object->isSelectable()) {
         return false;
     }
-    debug(boost::format("Object '%s' clicked on") % object->tag());
+
+    const auto &creature = dynamic_pointer_cast<Creature>(object);
+    if (creature) {
+        debug(boost::format("Creature '%s' with faction '%d' clicked on") % creature->tag() % 
+            static_cast<int>(creature->getFaction()));
+    } else {
+        debug(boost::format("Object '%s' clicked on") % object->tag());
+    }
+    
 
     uint32_t selectedObjectId = _area->objectSelector().selectedObjectId();
     if (object->id() != selectedObjectId) {

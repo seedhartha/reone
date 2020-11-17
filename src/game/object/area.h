@@ -29,6 +29,7 @@
 #include "../../resource/gfffile.h"
 #include "../../resource/types.h"
 
+#include "../combat.h"
 #include "../actionexecutor.h"
 #include "../camera/animatedcamera.h"
 #include "../camera/dialogcamera.h"
@@ -88,6 +89,8 @@ public:
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
     const RoomMap &rooms() const;
+    Combat& combat() { return _combat;  }
+    std::unordered_map<ObjectType, ObjectList> &objectsByType() { return _objectsByType; }
 
     // Objects
 
@@ -116,6 +119,7 @@ private:
     CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
+    Combat _combat;
     Pathfinder _pathfinder;
     std::string _name;
     RoomMap _rooms;

@@ -25,6 +25,7 @@
 #include "action/movetoobject.h"
 #include "action/movetopoint.h"
 #include "action/startconversation.h"
+#include "action/attack.h"
 #include "object/creature.h"
 
 namespace reone {
@@ -57,6 +58,7 @@ private:
     void executeFollow(Creature &actor, FollowAction &action, float dt);
     void executeDoCommand(Object &actor, CommandAction &command, float dt);
     void executeStartConversation(Object &actor, StartConversationAction &action, float dt);
+    void executeAttack(Creature &creature, AttackAction &action, float dt);
     void executeOpenDoor(Object &actor, ObjectAction &action, float dt);
     void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
     void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);

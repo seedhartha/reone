@@ -72,6 +72,9 @@ void ActionExecutor::executeActions(Object &object, float dt) {
         case ActionType::StartConversation:
             executeStartConversation(object, *dynamic_cast<StartConversationAction *>(action), dt);
             break;
+        case ActionType::AttackObject:
+            executeAttack(static_cast<Creature &>(object), *dynamic_cast<AttackAction *>(action), dt);
+            break;
         case ActionType::OpenDoor:
             executeOpenDoor(object, *dynamic_cast<ObjectAction *>(action), dt);
             break;
@@ -119,6 +122,10 @@ void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &ac
 }
 
 void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
+    // TODO: continuously queue following if combat inactive
+    if (_game->module()->area()->combat().activated()) {
+        action.complete();
+    }
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
     float distance = actor.distanceTo(glm::vec2(dest));
@@ -151,7 +158,29 @@ void ActionExecutor::executeStartConversation(Object &actor, StartConversationAc
     }
 }
 
+void ActionExecutor::executeAttack(Creature& creature, AttackAction& action, float dt) {
+    if (!action.isInRange()) {
+        if (action.isTimedOut()) {
+            action.complete();
+            return;
+        }
+
+        // pursue and face object one reached
+        action.advance(dt);
+        const SpatialObject* object = dynamic_cast<const SpatialObject*>(action.object());
+        glm::vec3 dest(object->position());
+
+        bool reached = navigateCreature(creature, dest, true, action.distance(), dt);
+        if (reached) {
+            action.setAttack();
+            creature.face(*object);
+        }
+    }
+}
+
 bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest, bool run, float distance, float dt) {
+    if (creature.isInterrupted()) return false;
+
     const glm::vec3 &origin = creature.position();
     float distToDest = glm::distance2(origin, dest);
 
