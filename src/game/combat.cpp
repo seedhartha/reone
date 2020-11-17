@@ -67,17 +67,13 @@ Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
 void Combat::update() {
     updateTimers(SDL_GetTicks());
 
-    shared_ptr<Creature> pc = _party->leader();
-    if (!pc) {
-        debug("no pc yet ...");
-        return;
+    shared_ptr<Creature> partyLeader(_party->leader());
+    if (partyLeader) {
+        scanHostility(partyLeader);
     }
-
-    // TODO: scan all party members??
-    scanHostility(pc);
     activityScanner();
 
-    if (activated()) {
+    if (isActivated()) {
         // One AIMaster per frame, rotated by activityScanner
         if (isAITimerDone(_activeCombatants.front())) {
             AIMaster(_activeCombatants.front());
@@ -95,24 +91,50 @@ void Combat::update() {
     }
 }
 
-bool Combat::scanHostility(const shared_ptr<Creature>& actor) {
-    // TODO: need a better mechanism to query creatures in range
+void Combat::updateTimers(uint32_t currentTicks) {
+    _stateTimers.update(currentTicks);
+    _effectDelayTimers.update(currentTicks);
+    _deactivationTimers.update(currentTicks);
+    _aiTimers.update(currentTicks);
+
+    for (const auto &id : _stateTimers.completed) {
+        if (--(_pendingStates[id]) == 0)
+            _pendingStates.erase(id);
+    }
+    _stateTimers.completed.clear();
+
+    for (auto &pr : _effectDelayTimers.completed) {
+        if (!pr->first) continue;
+
+        pr->first->applyEffect(move(pr->second));
+        pr->second = nullptr; // dangling?
+        _effectDelayIndex.erase(pr);
+    }
+    _effectDelayTimers.completed.clear();
+
+    for (auto &id : _aiTimers.completed) {
+        _pendingAITimers.erase(id);
+    }
+    _aiTimers.completed.clear();
+}
+
+bool Combat::scanHostility(const shared_ptr<Creature> &subject) {
     bool stillActive = false;
-    for (auto &creature : _area->objectsByType()[ObjectType::Creature]) {
-        if (glm::length(creature->position() - actor->position()) > kDetectionRange) {
-            continue;
+
+    ObjectList creatures(_area->getObjectsByType(ObjectType::Creature));
+    for (auto &object : creatures) {
+        if (object->distanceTo(*subject) > kDetectionRange) continue;
+
+        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
+        if (!getIsEnemy(*subject, *creature)) continue;
+
+        stillActive = true;
+
+        if (registerCombatant(creature)) { // will fail if already registered
+            debug(boost::format("combat: registered '%s', faction '%d'") % creature->tag() % static_cast<int>(creature->faction()));
         }
 
         // TODO: add line-of-sight requirement
-
-        const auto &target = static_pointer_cast<Creature>(creature);
-        if (getIsEnemy(actor, target)) {
-            stillActive = true;
-            if (registerCombatant(target)) { // will fail if already registered
-                debug(boost::format("combat: registered '%s', faction '%d'")
-                      % target->tag() % static_cast<int>(target->faction()));
-            }
-        }
     }
 
     return stillActive;
@@ -135,7 +157,7 @@ void Combat::activityScanner() {
             _activeCombatants.pop_front();
             _activeCombatantIds.erase(actor->id());
 
-            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % activated());
+            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % isActivated());
         }
         else if (!_deactivationTimers.isRegistered(actor->id())) {
             _deactivationTimers.setTimeout(actor->id(), kDeactivationTimeout);
@@ -168,33 +190,6 @@ void Combat::AIMaster(const shared_ptr<Creature> &combatant) {
         debug(boost::format("AIMaster: '%s' Queued to attack '%s'") % combatant->tag()
             % hostile->tag());
     }
-}
-
-void Combat::updateTimers(uint32_t currentTicks) {
-    _stateTimers.update(currentTicks);
-    _effectDelayTimers.update(currentTicks);
-    _deactivationTimers.update(currentTicks);
-    _aiTimers.update(currentTicks);
-
-    for (const auto &id : _stateTimers.completed) {
-        if (--(_pendingStates[id]) == 0)
-            _pendingStates.erase(id);
-    }
-    _stateTimers.completed.clear();
-
-    for (auto &pr : _effectDelayTimers.completed) {
-        if (!pr->first) continue;
-
-        pr->first->applyEffect(move(pr->second));
-        pr->second = nullptr; // dangling?
-        _effectDelayIndex.erase(pr);
-    }
-    _effectDelayTimers.completed.clear();
-
-    for (auto &id : _aiTimers.completed) {
-        _pendingAITimers.erase(id);
-    }
-    _aiTimers.completed.clear();
 }
 
 void Combat::setStateTimeout(const shared_ptr<Creature> &creature, uint32_t delayTicks) {
@@ -352,7 +347,7 @@ shared_ptr<Creature> Combat::findNearestHostile(const shared_ptr<Creature> &comb
     for (auto &creature : _activeCombatants) {
         if (creature->id() == combatant->id()) continue;
 
-        if (!getIsEnemy(static_pointer_cast<Creature>(creature), combatant))
+        if (!getIsEnemy(static_cast<Creature &>(*creature), *combatant))
             continue;
 
         float distance = glm::length(creature->position() - combatant->position()); // TODO: fine tune the distance
@@ -363,6 +358,10 @@ shared_ptr<Creature> Combat::findNearestHostile(const shared_ptr<Creature> &comb
     }
 
     return move(closest_target);
+}
+
+bool Combat::isActivated() const {
+    return !_activeCombatants.empty();
 }
 
 bool Combat::registerCombatant(const shared_ptr<Creature> &combatant) {

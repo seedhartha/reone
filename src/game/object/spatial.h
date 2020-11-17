@@ -46,6 +46,8 @@ public:
 
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
+    float distanceTo(const SpatialObject &other) const;
+
     bool contains(const glm::vec3 &point) const;
 
     void face(const SpatialObject &other);

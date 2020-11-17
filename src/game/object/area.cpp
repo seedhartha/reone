@@ -405,6 +405,10 @@ shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
     return objects->second[nth];
 }
 
+ObjectList &Area::getObjectsByType(ObjectType type) {
+    return _objectsByType.find(type)->second;
+}
+
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
     float heading = object.heading();
@@ -541,7 +545,7 @@ void Area::update(float dt) {
     updateHeartbeat(dt);
 
     // TODO: enable when polished enough
-    // _combat.update();
+    //_combat.update();
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -816,6 +820,10 @@ const string &Area::music() const {
 
 const RoomMap &Area::rooms() const {
     return _rooms;
+}
+
+Combat &Area::combat() {
+    return _combat;
 }
 
 const ObjectList &Area::objects() const {

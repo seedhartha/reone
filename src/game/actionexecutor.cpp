@@ -123,7 +123,7 @@ void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &ac
 
 void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
     // TODO: continuously queue following if combat inactive
-    if (_game->module()->area()->combat().activated()) {
+    if (_game->module()->area()->combat().isActivated()) {
         action.complete();
     }
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());

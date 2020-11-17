@@ -99,7 +99,7 @@ public:
     std::shared_ptr<Creature> findNearestHostile(const std::shared_ptr<Creature> &combatant,
                                                  float detectionRange = kDetectionRange);
 
-    bool activated() { return !_activeCombatants.empty(); }
+    bool isActivated() const;
 
 private:
     Area *_area;
@@ -109,7 +109,7 @@ private:
     bool registerCombatant(const std::shared_ptr<Creature> &combatant);
 
     /* register hostiles to activecombatant list, return stillActive */
-    bool scanHostility(const std::shared_ptr<Creature> &combatant);
+    bool scanHostility(const std::shared_ptr<Creature> &subject);
 
     std::deque<std::shared_ptr<Creature>> _activeCombatants;
     std::unordered_set<uint32_t> _activeCombatantIds;

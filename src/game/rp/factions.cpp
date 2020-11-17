@@ -29,6 +29,8 @@ namespace reone {
 
 namespace game {
 
+constexpr static int kMaxFactionCount = 25;
+
 const list<Faction> g_hostileFactions { Faction::Hostile1, Faction::Hostile2 };
 const list<Faction> g_friendlyFactions { Faction::Friendly1, Faction::Friendly2 };
 const list<Faction> g_surrenderFactions { Faction::Surrender1, Faction::Surrender2 };
@@ -88,22 +90,18 @@ vector<vector<bool>> initialize() {
 
 const vector<vector<bool>> _hostility = initialize();
 
-bool getIsEnemy(const shared_ptr<Creature> &target, const shared_ptr<Creature> &source) {
-    if (!target || !source) {
-        debug("getIsEnemy, oTarget or OSource is nullptr");
-        return false;
-    }
+bool getIsEnemy(const Creature &left, const Creature &right) {
+    int leftFaction = static_cast<int>(left.faction());
+    int rightFaction = static_cast<int>(right.faction());
 
-    int s = static_cast<int>(source->faction());
-    int t = static_cast<int>(target->faction());
-    if (s < 0 || s >= kMaxFactionCount || t < 0 || t >= kMaxFactionCount) {
-        debug(boost::format("Source %s Faction: %d") % source->tag() % s);
-        debug(boost::format("Target %s Faction: %d") % target->tag() % t);
+    if (leftFaction < 0 || leftFaction >= kMaxFactionCount || rightFaction < 0 || rightFaction >= kMaxFactionCount) {
+        debug(boost::format("Source %s Faction: %d") % left.tag() % leftFaction);
+        debug(boost::format("Target %s Faction: %d") % right.tag() % rightFaction);
 
         return false;
     }
 
-    return _hostility[s][t];
+    return _hostility[leftFaction][rightFaction];
 }
 
 } // namespace game

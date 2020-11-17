@@ -89,13 +89,14 @@ public:
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
     const RoomMap &rooms() const;
-    Combat& combat() { return _combat;  }
-    std::unordered_map<ObjectType, ObjectList> &objectsByType() { return _objectsByType; }
+    Combat& combat();
 
     // Objects
 
     std::shared_ptr<SpatialObject> find(uint32_t id) const;
     std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
+
+    ObjectList &getObjectsByType(ObjectType type);
 
     // END Objects
 
