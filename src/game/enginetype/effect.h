@@ -64,7 +64,7 @@ public:
     }
 
     /* for feedback text, mostly */
-    std::shared_ptr<Creature>& getDamager() { return _damager; }
+    std::shared_ptr<Creature> &getDamager() { return _damager; }
 
 private:
     std::shared_ptr<Creature> _damager;

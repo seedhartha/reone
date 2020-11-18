@@ -110,7 +110,7 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 
 void Player::update(float dt) {
     shared_ptr<Creature> partyLeader(_party->leader());
-    if (!partyLeader || partyLeader->isInterrupted()) return;
+    if (!partyLeader || partyLeader->isMovementRestricted()) return;
 
     float heading = 0.0f;
     bool movement = true;

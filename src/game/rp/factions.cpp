@@ -38,7 +38,7 @@ const list<Faction> g_gizkaFactions { Faction::Gizka1, Faction::Gizka2 };
 
 list<pair<Faction, Faction>> groupPairs(list<Faction> group1, list<Faction> group2) {
     list<pair<Faction, Faction>> aggr;
-    for (auto& f1 : group1) {
+    for (auto &f1 : group1) {
         for (auto &f2 : group2) {
             aggr.push_back(make_pair(f1, f2));
         }
@@ -77,7 +77,7 @@ vector<vector<bool>> initialize() {
     }
 
     // propagate hostile links to map
-    for (auto& pr : propagateHostileLinks()) {
+    for (auto &pr : propagateHostileLinks()) {
         size_t i = static_cast<size_t>(pr.first);
         size_t j = static_cast<size_t>(pr.second);
 

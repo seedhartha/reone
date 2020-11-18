@@ -17,6 +17,11 @@
 
 #include "combat.h"
 
+#include <algorithm>
+#include <climits>
+
+#include "glm/common.hpp"
+
 #include "../common/log.h"
 
 #include "object/area.h"
@@ -28,347 +33,221 @@ namespace reone {
 
 namespace game {
 
-// Helper functions
+constexpr float kRoundDuration = 3.0f;
 
 static AttackAction *getAttackAction(const shared_ptr<Creature> &combatant) {
     return dynamic_cast<AttackAction *>(combatant->actionQueue().currentAction());
 }
 
-static bool isActiveTargetInRange(const shared_ptr<Creature> &combatant) {
-    auto* action = getAttackAction(combatant);
-    return action && action->isInRange();
+void Combat::Round::advance(float dt) {
+    time = glm::min(time + dt, kRoundDuration);
 }
-
-static void duel(const shared_ptr<Creature> &attacker, const shared_ptr<Creature> &target) {
-    target->face(*attacker);
-    attacker->face(*target);
-    attacker->playAnimation(Creature::Animation::UnarmedAttack1);
-    target->playAnimation(Creature::Animation::UnarmedDodge1);
-}
-
-static void bash(const shared_ptr<Creature> &attacker, const shared_ptr<Creature> &target) {
-    attacker->face(*target);
-    attacker->playAnimation(Creature::Animation::UnarmedAttack2);
-}
-
-static void flinch(const shared_ptr<Creature> &target) {
-    target->playAnimation(Creature::Animation::Flinch);
-}
-
-// END Helper functions
 
 Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
     if (!area) {
         throw invalid_argument("area must not be null");
     }
+    if (!party) {
+        throw invalid_argument("party must not be null");
+    }
 }
 
-void Combat::update() {
-    updateTimers(SDL_GetTicks());
+void Combat::update(float dt) {
+    _heartbeatTimer.update(dt);
 
-    shared_ptr<Creature> partyLeader(_party->leader());
-    if (partyLeader) {
-        scanHostility(partyLeader);
+    if (_heartbeatTimer.hasTimedOut()) {
+        _heartbeatTimer.reset(kHeartbeatInterval);
+        updateCombatants();
+        updateAI();
     }
-    activityScanner();
+    updateRounds(dt);
+}
 
-    if (isActivated()) {
-        // One AIMaster per frame, rotated by activityScanner
-        if (isAITimerDone(_activeCombatants.front())) {
-            AIMaster(_activeCombatants.front());
-            setAITimeout(_activeCombatants.front());
+void Combat::updateCombatants() {
+    ObjectList &creatures = _area->getObjectsByType(ObjectType::Creature);
+    for (auto &object : creatures) {
+        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
+
+        vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
+        bool hasEnemies = !enemies.empty();
+
+        auto maybeCombatant = _combatantById.find(creature->id());
+        if (maybeCombatant != _combatantById.end()) {
+            if (hasEnemies) {
+                maybeCombatant->second->enemies = move(enemies);
+            } else {
+                _combatantById.erase(maybeCombatant);
+            }
+            continue;
         }
-
-        for (auto &cbt : _activeCombatants) {
-            combatStateMachine(cbt);
+        if (hasEnemies) {
+            auto combatant = make_shared<Combatant>();
+            combatant->creature = creature;
+            combatant->enemies = move(enemies);
+            _combatantById.insert(make_pair(creature->id(), move(combatant)));
         }
-        animationSync();
-
-        // rotate _activeCombatants
-        _activeCombatants.push_back(_activeCombatants.front());
-        _activeCombatants.pop_front();
     }
 }
 
-void Combat::updateTimers(uint32_t currentTicks) {
-    _stateTimers.update(currentTicks);
-    _effectDelayTimers.update(currentTicks);
-    _deactivationTimers.update(currentTicks);
-    _aiTimers.update(currentTicks);
-
-    for (const auto &id : _stateTimers.completed) {
-        if (--(_pendingStates[id]) == 0)
-            _pendingStates.erase(id);
+void Combat::updateAI() {
+    for (auto &pair : _combatantById) {
+        updateCombatantAI(*pair.second);
     }
-    _stateTimers.completed.clear();
-
-    for (auto &pr : _effectDelayTimers.completed) {
-        if (!pr->first) continue;
-
-        pr->first->applyEffect(move(pr->second));
-        pr->second = nullptr; // dangling?
-        _effectDelayIndex.erase(pr);
-    }
-    _effectDelayTimers.completed.clear();
-
-    for (auto &id : _aiTimers.completed) {
-        _pendingAITimers.erase(id);
-    }
-    _aiTimers.completed.clear();
 }
 
-bool Combat::scanHostility(const shared_ptr<Creature> &subject) {
-    bool stillActive = false;
+void Combat::updateCombatantAI(Combatant &combatant) {
+    shared_ptr<Creature> creature(combatant.creature);
+    ActionQueue &actions = creature->actionQueue();
+
+    Action *action = actions.currentAction();
+    if (action && action->type() == ActionType::AttackObject) return;
+
+    shared_ptr<Creature> enemy(getNearestEnemy(combatant));
+    if (!enemy) return;
+
+    actions.clear();
+    actions.add(make_unique<AttackAction>(enemy));
+
+    debug(boost::format("Combat: attack action added: '%s' -> '%s'") % creature->tag() % enemy->tag(), 2);
+}
+
+shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
+    shared_ptr<Creature> result;
+    float minDist = FLT_MAX;
+
+    for (auto &enemy : combatant.enemies) {
+        float dist = enemy->distanceTo(*combatant.creature);
+        if (dist >= minDist) continue;
+
+        result = enemy;
+        minDist = dist;
+    }
+
+    return move(result);
+}
+
+vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
+    vector<shared_ptr<Creature>> result;
 
     ObjectList creatures(_area->getObjectsByType(ObjectType::Creature));
     for (auto &object : creatures) {
-        if (object->distanceTo(*subject) > kDetectionRange) continue;
+        if (object->distanceTo(combatant) > range) continue;
 
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
-        if (!getIsEnemy(*subject, *creature)) continue;
+        if (!getIsEnemy(combatant, *creature)) continue;
 
-        stillActive = true;
+        // TODO: check line-of-sight
 
-        if (registerCombatant(creature)) { // will fail if already registered
-            debug(boost::format("combat: registered '%s', faction '%d'") % creature->tag() % static_cast<int>(creature->faction()));
+        result.push_back(move(creature));
+    }
+
+    return move(result);
+}
+
+void Combat::updateRounds(float dt) {
+    for (auto &pair : _combatantById) {
+        shared_ptr<Combatant> attacker(pair.second);
+
+        // Check if attacker already participates in a combat round
+
+        auto maybeAttackerRound = _roundByAttackerId.find(attacker->creature->id());
+        if (maybeAttackerRound != _roundByAttackerId.end()) continue;
+
+        // Check if attacker is close enough to attack its target
+
+        AttackAction *action = getAttackAction(attacker->creature);
+        if (!action) continue;
+
+        shared_ptr<Creature> defender(action->target());
+        if (!defender || defender->distanceTo(*attacker->creature) > action->range()) continue;
+
+        // Check if target is valid combatant
+
+        auto maybeDefender = _combatantById.find(defender->id());
+        if (maybeDefender == _combatantById.end()) continue;
+
+        attacker->target = defender;
+
+        // Create a combat round if not a duel
+
+        auto maybeDefenderRound = _roundByAttackerId.find(defender->id());
+        bool isDuel = maybeDefenderRound != _roundByAttackerId.end() && maybeDefenderRound->second->defender == attacker;
+
+        if (!isDuel) {
+            auto round = make_shared<Round>();
+            round->attacker = attacker;
+            round->defender = maybeDefender->second;
+            _roundByAttackerId.insert(make_pair(attacker->creature->id(), round));
         }
-
-        // TODO: add line-of-sight requirement
     }
+    for (auto it = _roundByAttackerId.begin(); it != _roundByAttackerId.end(); ) {
+        shared_ptr<Round> round(it->second);
+        updateRound(*round, dt);
 
-    return stillActive;
-}
-
-void Combat::activityScanner() {
-    if (_activeCombatants.empty()) return;
-
-    shared_ptr<Creature> actor(_activeCombatants.front());
-    bool stillActive = scanHostility(actor);
-
-    // deactivate actor if !active
-    if (!stillActive) { //&& getAttackAction(actor) == nullptr ???
-        if (_deactivationTimers.completed.count(actor->id()) == 1) {
-            _deactivationTimers.completed.erase(actor->id());
-
-            // deactivation timeout complete
-            actor->setCombatState(CombatState::Idle);
-
-            _activeCombatants.pop_front();
-            _activeCombatantIds.erase(actor->id());
-
-            debug(boost::format("combat: deactivated '%s', combat_mode[%d]") % actor->tag() % isActivated());
-        }
-        else if (!_deactivationTimers.isRegistered(actor->id())) {
-            _deactivationTimers.setTimeout(actor->id(), kDeactivationTimeout);
-
-            debug(boost::format("combat: registered deactivation timer'%s'") % actor->tag());
-        }
-    }
-    else {
-        if (_deactivationTimers.isRegistered(actor->id())) {
-            _deactivationTimers.cancel(actor->id());
-
-            debug(boost::format("combat: cancelled deactivation timer'%s'") % actor->tag());
+        if (round->state == RoundState::Finished) {
+            round->attacker->target.reset();
+            it = _roundByAttackerId.erase(it);
+        } else {
+            ++it;
         }
     }
 }
 
-void Combat::effectSync() {
-}
+void Combat::updateRound(Round &round, float dt) {
+    round.advance(dt);
 
-void Combat::AIMaster(const shared_ptr<Creature> &combatant) {
-    if (combatant->id() == _party->leader()->id()) return;
+    shared_ptr<Creature> attacker(round.attacker->creature);
+    shared_ptr<Creature> defender(round.defender->creature);
+    bool isDuel = round.defender->target == attacker;
 
-    ActionQueue &cbt_queue = combatant->actionQueue();
-
-    //if (cbt_queue.currentAction()) return;
-
-    auto hostile = findNearestHostile(combatant, kDetectionRange);
-    if (hostile) {
-        cbt_queue.add(make_unique<AttackAction>(hostile));
-        debug(boost::format("AIMaster: '%s' Queued to attack '%s'") % combatant->tag()
-            % hostile->tag());
-    }
-}
-
-void Combat::setStateTimeout(const shared_ptr<Creature> &creature, uint32_t delayTicks) {
-    if (!creature) return;
-
-    _stateTimers.setTimeout(creature->id(), delayTicks);
-
-    // in case of repetition
-    if (_pendingStates.count(creature->id()) == 0) {
-        _pendingStates[creature->id()] = 0;
-    }
-    ++(_pendingStates[creature->id()]);
-}
-
-bool Combat::isStateTimerDone(const shared_ptr<Creature> &creature) {
-    if (!creature) return false;
-
-    return _pendingStates.count(creature->id()) == 0;
-}
-
-void Combat::setDelayEffectTimeout(
-    unique_ptr<Effect> &&eff,
-    const shared_ptr<Creature> &target,
-    uint32_t delayTicks
-) {
-    auto index = _effectDelayIndex.insert(
-        _effectDelayIndex.end(),
-        make_pair(target, move(eff)));
-
-    _effectDelayTimers.setTimeout(index, delayTicks);
-}
-
-void Combat::setAITimeout(const shared_ptr<Creature> &creature) {
-    if (!creature) return;
-
-    _aiTimers.setTimeout(creature->id(), kAIMasterInterval);
-    _pendingAITimers.insert(creature->id());
-}
-
-bool Combat::isAITimerDone(const shared_ptr<Creature> &creature) {
-    if (!creature) return false;
-
-    return _pendingAITimers.count(creature->id()) == 0;
-}
-
-void Combat::onEnterAttackState(const shared_ptr<Creature> &combatant) {
-    if (!combatant) return;
-
-    setStateTimeout(combatant, 1500);
-    debug(boost::format("'%s' enters Attack state, actionQueueLen[%d], attackAction[%d]")
-        % combatant->tag() % combatant->actionQueue().size()
-        % (getAttackAction(combatant) != nullptr)); // TODO: disable redundant info
-
-    AttackAction *action = getAttackAction(combatant);
-    shared_ptr<Creature> target(action->target());
-
-    if (target && (target->combatState() == CombatState::Idle || target->combatState() == CombatState::Cooldown)) {
-        _duelQueue.push_back(make_pair(combatant, target));
-
-        // synchronization
-        combatStateMachine(target);
-    } else {
-        _bashQueue.push_back(make_pair(combatant, target));
-    }
-
-    setDelayEffectTimeout(
-        make_unique<DamageEffect>(combatant), target, 500 // dummy delay
-    );
-
-    action->complete();
-}
-
-void Combat::onEnterDefenseState(const shared_ptr<Creature> &combatant) {
-    setStateTimeout(combatant, 1500);
-    debug(boost::format("'%s' enters Defense state, set_timer") % combatant->tag());
-}
-
-void Combat::onEnterCooldownState(const shared_ptr<Creature> &combatant) {
-    setStateTimeout(combatant, 1500);
-    debug(boost::format("'%s' enters Cooldown state, set_timer") % combatant->tag());
-}
-
-void Combat::combatStateMachine(const shared_ptr<Creature> &combatant) {
-    switch (combatant->combatState()) {
-    case CombatState::Idle:
-        for (auto &pr : _duelQueue) { // if combatant is caught in a duel
-            if (pr.second && pr.second->id() == combatant->id()) {
-                combatant->setCombatState(CombatState::Defense);
-                onEnterDefenseState(combatant);
-                return;
+    switch (round.state) {
+        case RoundState::Started:
+            attacker->face(*defender);
+            attacker->setMovementType(Creature::MovementType::None);
+            attacker->setMovementRestricted(true);
+            if (isDuel) {
+                attacker->playAnimation(Creature::Animation::UnarmedAttack1);
+                defender->face(*attacker);
+                defender->setMovementType(Creature::MovementType::None);
+                defender->setMovementRestricted(true);
+                defender->playAnimation(Creature::Animation::UnarmedDodge1);
+            } else {
+                attacker->playAnimation(Creature::Animation::UnarmedAttack2);
             }
-        }
+            round.state = RoundState::FirstTurn;
+            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+            break;
 
-        if (isActiveTargetInRange(combatant)) {
-            combatant->setCombatState(CombatState::Attack);
-            onEnterAttackState(combatant);
-        }
-        return;
-
-    case CombatState::Attack:
-        if (isStateTimerDone(combatant)) {
-            combatant->setCombatState(CombatState::Cooldown);
-            onEnterCooldownState(combatant);
-        }
-        return;
-
-    case CombatState::Cooldown:
-        for (auto &pr : _duelQueue) { // if combatant is caught in a duel
-            if (pr.second && pr.second->id() == combatant->id()) {
-                combatant->setCombatState(CombatState::Defense);
-                onEnterDefenseState(combatant);
-                return;
+        case RoundState::FirstTurn:
+            if (round.time >= 0.5f * kRoundDuration) {
+                if (isDuel) {
+                    defender->face(*attacker);
+                    defender->playAnimation(Creature::Animation::UnarmedAttack1);
+                    attacker->face(*defender);
+                    attacker->playAnimation(Creature::Animation::UnarmedDodge1);
+                }
+                round.state = RoundState::SecondTurn;
+                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
             }
-        }
+            break;
 
-        if (isStateTimerDone(combatant)) {
-            combatant->setCombatState(CombatState::Idle);
-            debug(boost::format("'%s' enters Idle state") % combatant->tag());
-        }
-        return;
+        case RoundState::SecondTurn:
+            if (round.time == kRoundDuration) {
+                attacker->setMovementRestricted(false);
+                defender->setMovementRestricted(false);
+                round.state = RoundState::Finished;
+                debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+            }
+            break;
 
-    case CombatState::Defense:
-        if (isStateTimerDone(combatant)) {
-            combatant->setCombatState(CombatState::Idle);
-            debug(boost::format("'%s' enters Idle state") % combatant->tag());
-
-            // synchronization
-            combatStateMachine(combatant);
-        }
-        return;
-
-    default:
-        return;
+        default:
+            break;
     }
 }
 
-void Combat::animationSync() {
-    while (!_duelQueue.empty()) {
-        auto &pr = _duelQueue.front();
-        duel(pr.first, pr.second);
-        _duelQueue.pop_front();
-    }
-
-    while (!_bashQueue.empty()) {
-        auto &pr = _bashQueue.front();
-        duel(pr.first, pr.second);
-        _bashQueue.pop_front();
-    }
-}
-
-shared_ptr<Creature> Combat::findNearestHostile(const shared_ptr<Creature> &combatant, float detectionRange) {
-    shared_ptr<Creature> closest_target = nullptr;
-    float min_dist = detectionRange;
-
-    for (auto &creature : _activeCombatants) {
-        if (creature->id() == combatant->id()) continue;
-
-        if (!getIsEnemy(static_cast<Creature &>(*creature), *combatant))
-            continue;
-
-        float distance = glm::length(creature->position() - combatant->position()); // TODO: fine tune the distance
-        if (distance < min_dist) {
-            min_dist = distance;
-            closest_target = static_pointer_cast<Creature>(creature);
-        }
-    }
-
-    return move(closest_target);
-}
-
-bool Combat::isActivated() const {
-    return !_activeCombatants.empty();
-}
-
-bool Combat::registerCombatant(const shared_ptr<Creature> &combatant) {
-    auto res = _activeCombatantIds.insert(combatant->id());
-    if (res.second) { // combatant not already in _activeCombatantIds
-        _activeCombatants.push_back(combatant);
-    }
-    return res.second;
+bool Combat::isActive() const {
+    shared_ptr<Creature> partyLeader(_party->leader());
+    return partyLeader && _combatantById.count(partyLeader->id()) != 0;
 }
 
 } // namespace game

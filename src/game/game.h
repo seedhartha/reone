@@ -247,6 +247,8 @@ private:
     void updateCamera(float dt);
     void stopMovement();
     void changeScreen(GameScreen screen);
+    void updateVideo(float dt);
+    void updateMusic();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;

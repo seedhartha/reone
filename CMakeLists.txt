@@ -67,8 +67,7 @@ set(COMMON_HEADERS
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
-    src/common/timermap.h
-    src/common/timerqueue.h
+    src/common/timer.h
     src/common/types.h)
 
 set(COMMON_SOURCES
@@ -79,7 +78,8 @@ set(COMMON_SOURCES
     src/common/random.cpp
     src/common/streamreader.cpp
     src/common/streamutil.cpp
-    src/common/streamwriter.cpp)
+    src/common/streamwriter.cpp
+    src/common/timer.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

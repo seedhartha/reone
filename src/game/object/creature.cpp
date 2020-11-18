@@ -21,6 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/timer.h"
 #include "../../net/types.h"
 #include "../../render/models.h"
 #include "../../render/textures.h"
@@ -367,7 +368,7 @@ void Creature::playAnimation(Animation anim) {
             animName = "g8a2";
             break;
         case Animation::UnarmedDodge1:
-            animName = "g8d1";
+            animName = "g8g1";
             break;
         case Animation::Flinch:
             animName = "g1y1";
@@ -506,6 +507,10 @@ void Creature::clearPath() {
     _path.reset();
 }
 
+void Creature::applyEffect(unique_ptr<Effect> &&eff) {
+    _effects.push_back(move(eff));
+}
+
 Gender Creature::gender() const {
     return _config.gender;
 }
@@ -560,26 +565,12 @@ void Creature::setFaction(Faction faction) {
     _faction = faction;
 }
 
-bool Creature::isInterrupted() const {
-    switch (_combatState) {
-        case CombatState::Idle:
-        case CombatState::Cooldown:
-            return false;
-        default:
-            return true;
-    }
+bool Creature::isMovementRestricted() const {
+    return _movementRestricted;
 }
 
-CombatState Creature::combatState() const {
-    return _combatState;
-}
-
-void Creature::setCombatState(CombatState state) {
-    _combatState = state;
-}
-
-void Creature::applyEffect(unique_ptr<Effect> &&eff) {
-    _activeEffects.push_back(move(eff));
+void Creature::setMovementRestricted(bool restricted) {
+    _movementRestricted = restricted;
 }
 
 } // namespace game

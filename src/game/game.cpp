@@ -427,20 +427,10 @@ void Game::update() {
     float dt = measureFrameTime();
 
     if (_video) {
-        _video->update(dt);
-        if (_video->isFinished()) {
-            if (_movieAudio) {
-                _movieAudio->stop();
-                _movieAudio.reset();
-            }
-            _video.reset();
-        }
-    } else if (!_musicResRef.empty()) {
-        if (!_music || _music->isStopped()) {
-            _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
-        }
+        updateVideo(dt);
+    } else {
+        updateMusic();
     }
-
     if (!_nextModule.empty()) {
         loadNextModule();
     }
@@ -457,6 +447,26 @@ void Game::update() {
     }
 
     _window.update(dt);
+}
+
+void Game::updateVideo(float dt) {
+    _video->update(dt);
+
+    if (_video->isFinished()) {
+        if (_movieAudio) {
+            _movieAudio->stop();
+            _movieAudio.reset();
+        }
+        _video.reset();
+    }
+}
+
+void Game::updateMusic() {
+    if (_musicResRef.empty()) return;
+
+    if (!_music || _music->isStopped()) {
+        _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
+    }
 }
 
 void Game::loadNextModule() {

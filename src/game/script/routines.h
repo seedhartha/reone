@@ -60,7 +60,7 @@ private:
         const std::string &name,
         script::VariableType retType,
         const std::vector<script::VariableType> &argTypes,
-        const std::function<script::Variable(const std::vector<script::Variable>&, script::ExecutionContext &ctx)> &fn);
+        const std::function<script::Variable(const std::vector<script::Variable> &, script::ExecutionContext &ctx)> &fn);
 
     void addKotorRoutines();
     void addTslRoutines();
