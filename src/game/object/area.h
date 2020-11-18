@@ -53,7 +53,7 @@ class SceneGraph;
 
 namespace game {
 
-const float kRoundDuration = 6.0f;
+const float kHeartbeatInterval = 6.0f;
 
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
@@ -89,7 +89,7 @@ public:
     ObjectSelector &objectSelector();
     const Pathfinder &pathfinder() const;
     const RoomMap &rooms() const;
-    Combat& combat();
+    Combat &combat();
 
     // Objects
 
@@ -127,7 +127,7 @@ private:
     std::unique_ptr<resource::Visibility> _visibility;
     CameraStyle _cameraStyle;
     std::string _music;
-    float _heartbeatTimeout { kRoundDuration };
+    float _heartbeatTimeout { kHeartbeatInterval };
 
     // Scripts
 

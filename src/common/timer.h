@@ -17,31 +17,20 @@
 
 #pragma once
 
-#include "../object/creature.h"
-
-#include "objectaction.h"
-
 namespace reone {
 
-namespace game {
-
-class AttackAction : public ObjectAction {
+class Timer {
 public:
-    AttackAction(const std::shared_ptr<Creature> &object, float range = 1.6f) :
-        ObjectAction(ActionType::AttackObject, object),
-        _range(range) {
-    }
+    Timer(float timeout);
 
-    std::shared_ptr<Creature> target() const {
-        return std::static_pointer_cast<Creature>(_object);
-    }
+    void update(float dt);
+    void reset(float timeout);
+    void cancel();
 
-    float range() const { return _range; }
+    bool hasTimedOut() const;
 
 private:
-    float _range;
+    float _timeout;
 };
-
-} // namespace game
 
 } // namespace reone

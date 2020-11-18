@@ -32,6 +32,8 @@
 
 namespace reone {
 
+class Timer;
+
 namespace game {
 
 class CreatureBlueprint;
@@ -82,6 +84,10 @@ public:
     void playAnimation(Animation anim);
     void updateModelAnimation();
 
+    void applyEffect(std::unique_ptr<Effect> &&eff);
+
+    bool isMovementRestricted() const;
+
     Gender gender() const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
@@ -95,6 +101,7 @@ public:
     void setMovementType(MovementType type);
     void setTalking(bool talking);
     void setFaction(Faction faction);
+    void setMovementRestricted(bool restricted);
 
     // Equipment
 
@@ -116,18 +123,6 @@ public:
     void clearPath();
 
     // END Pathfinding
-
-    // Combat
-
-    void applyEffect(std::unique_ptr<Effect> &&eff);
-
-    bool isInterrupted() const;
-
-    CombatState combatState() const;
-
-    void setCombatState(CombatState state);
-
-    // END Combat
 
 private:
     enum class ModelType {
@@ -151,6 +146,9 @@ private:
     CreatureAttributes _attributes;
     bool _animDirty { true };
     bool _animFireForget { false };
+    Faction _faction { Faction::Invalid };
+    std::deque<std::unique_ptr<Effect>> _effects;
+    bool _movementRestricted { false };
 
     // Scripts
 
@@ -158,21 +156,8 @@ private:
 
     // END Scripts
 
-    // Combat
-
-    CombatState _combatState { CombatState::Idle };
-    std::deque<std::unique_ptr<Effect>> _activeEffects;
-    Faction _faction { Faction::Invalid };
-
-    // END Combat
-
-    // Loading
-
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
-
-    // END Loading
-
     void updateModel();
 
     ModelType parseModelType(const std::string &s) const;

@@ -122,10 +122,6 @@ void ActionExecutor::executeMoveToObject(Creature &actor, MoveToObjectAction &ac
 }
 
 void ActionExecutor::executeFollow(Creature &actor, FollowAction &action, float dt) {
-    // TODO: continuously queue following if combat inactive
-    if (_game->module()->area()->combat().isActivated()) {
-        action.complete();
-    }
     SpatialObject &object = *static_cast<SpatialObject *>(action.object());
     glm::vec3 dest(object.position());
     float distance = actor.distanceTo(glm::vec2(dest));
@@ -159,27 +155,14 @@ void ActionExecutor::executeStartConversation(Object &actor, StartConversationAc
 }
 
 void ActionExecutor::executeAttack(Creature &actor, AttackAction &action, float dt) {
-    if (!action.isInRange()) {
-        if (action.isTimedOut()) {
-            action.complete();
-            return;
-        }
+    shared_ptr<Creature> target(action.target());
+    glm::vec3 dest(target->position());
 
-        // pursue and face object one reached
-        action.advance(dt);
-        const SpatialObject* object = dynamic_cast<const SpatialObject*>(action.object());
-        glm::vec3 dest(object->position());
-
-        bool reached = navigateCreature(actor, dest, true, action.distance(), dt);
-        if (reached) {
-            action.setAttack();
-            actor.face(*object);
-        }
-    }
+    navigateCreature(actor, dest, true, action.range(), dt);
 }
 
 bool ActionExecutor::navigateCreature(Creature &creature, const glm::vec3 &dest, bool run, float distance, float dt) {
-    if (creature.isInterrupted()) return false;
+    if (creature.isMovementRestricted()) return false;
 
     const glm::vec3 &origin = creature.position();
     float distToDest = glm::distance2(origin, dest);

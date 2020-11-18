@@ -15,33 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "timer.h"
 
-#include "../object/creature.h"
-
-#include "objectaction.h"
+#include "glm/common.hpp"
 
 namespace reone {
 
-namespace game {
+Timer::Timer(float timeout) : _timeout(timeout) {
+}
 
-class AttackAction : public ObjectAction {
-public:
-    AttackAction(const std::shared_ptr<Creature> &object, float range = 1.6f) :
-        ObjectAction(ActionType::AttackObject, object),
-        _range(range) {
-    }
+void Timer::update(float dt) {
+    _timeout = glm::max(0.0f, _timeout - dt);
+}
 
-    std::shared_ptr<Creature> target() const {
-        return std::static_pointer_cast<Creature>(_object);
-    }
+void Timer::reset(float timeout) {
+    _timeout = timeout;
+}
 
-    float range() const { return _range; }
+void Timer::cancel() {
+    _timeout = 0.0f;
+}
 
-private:
-    float _range;
-};
-
-} // namespace game
+bool Timer::hasTimedOut() const {
+    return _timeout == 0.0f;
+}
 
 } // namespace reone

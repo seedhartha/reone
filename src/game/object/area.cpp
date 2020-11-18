@@ -545,7 +545,7 @@ void Area::update(float dt) {
     updateHeartbeat(dt);
 
     // TODO: enable when polished enough
-    //_combat.update();
+    _combat.update(dt);
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
@@ -806,7 +806,7 @@ void Area::updateHeartbeat(float dt) {
         if (!_onHeartbeat.empty()) {
             runScript(_onHeartbeat, _id, -1, -1);
         }
-        _heartbeatTimeout = kRoundDuration;
+        _heartbeatTimeout = kHeartbeatInterval;
     }
 }
 

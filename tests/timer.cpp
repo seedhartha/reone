@@ -15,33 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#define BOOST_TEST_MODULE timer
 
-#include "../object/creature.h"
+#include <boost/test/included/unit_test.hpp>
 
-#include "objectaction.h"
+#include "../src/common/timer.h"
 
-namespace reone {
+using namespace std;
 
-namespace game {
+using namespace reone;
 
-class AttackAction : public ObjectAction {
-public:
-    AttackAction(const std::shared_ptr<Creature> &object, float range = 1.6f) :
-        ObjectAction(ActionType::AttackObject, object),
-        _range(range) {
-    }
+BOOST_AUTO_TEST_CASE(test_timer_times_out) {
+    Timer timer(1.0f);
 
-    std::shared_ptr<Creature> target() const {
-        return std::static_pointer_cast<Creature>(_object);
-    }
+    timer.update(0.5f);
 
-    float range() const { return _range; }
+    BOOST_TEST(!timer.hasTimedOut());
 
-private:
-    float _range;
-};
+    timer.update(0.6f);
 
-} // namespace game
-
-} // namespace reone
+    BOOST_TEST(timer.hasTimedOut());
+}
