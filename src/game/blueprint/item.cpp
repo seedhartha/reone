@@ -68,6 +68,10 @@ void ItemBlueprint::load(const GffStruct &uti) {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
     _icon = Textures::instance().get(iconResRef, TextureType::GUI);
+
+    _attackRange = baseItems->getInt(baseItem, "maxattackrange");
+    _weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
+    _weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
 }
 
 bool ItemBlueprint::isEquippable() const {
@@ -112,6 +116,18 @@ int ItemBlueprint::modelVariation() const {
 
 shared_ptr<Texture> ItemBlueprint::icon() const {
     return _icon;
+}
+
+int ItemBlueprint::attackRange() const {
+    return _attackRange;
+}
+
+WeaponType ItemBlueprint::weaponType() const {
+    return _weaponType;
+}
+
+WeaponWield ItemBlueprint::weaponWield() const {
+    return _weaponWield;
 }
 
 } // namespace game

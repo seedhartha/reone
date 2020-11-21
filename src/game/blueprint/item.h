@@ -44,6 +44,9 @@ public:
     const std::string &itemClass() const;
     int modelVariation() const;
     std::shared_ptr<render::Texture> icon() const;
+    int attackRange() const;
+    WeaponType weaponType() const;
+    WeaponWield weaponWield() const;
 
 private:
     std::string _resRef;
@@ -56,6 +59,9 @@ private:
     int _modelVariation { 0 };
     std::shared_ptr<render::Texture> _icon;
     uint32_t _equipableSlots { 0 };
+    int _attackRange { 0 };
+    WeaponType _weaponType { WeaponType::None };
+    WeaponWield _weaponWield { WeaponWield::None };
 
     ItemBlueprint(const ItemBlueprint &) = delete;
     ItemBlueprint &operator=(const ItemBlueprint &) = delete;

@@ -71,6 +71,22 @@ enum class ContextualAction {
     Attack
 };
 
+enum class WeaponType {
+    None = 0,
+    Melee = 1,
+    Ranged = 4
+};
+
+enum class WeaponWield {
+    None = 0,
+    StunBaton = 1,
+    SingleSaber = 2,
+    TwoHandedSaber = 3,
+    SingleBlaster = 4,
+    Rifle = 5,
+    HeavyCarbine = 6
+};
+
 class CreatureBlueprint;
 
 struct Options {
