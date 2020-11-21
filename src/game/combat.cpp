@@ -106,7 +106,7 @@ void Combat::updateCombatantAI(Combatant &combatant) {
     if (!enemy) return;
 
     actions.clear();
-    actions.add(make_unique<AttackAction>(enemy));
+    actions.add(make_unique<AttackAction>(enemy, creature->attackRange()));
 
     debug(boost::format("Combat: attack action added: '%s' -> '%s'") % creature->tag() % enemy->tag(), 2);
 }

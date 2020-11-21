@@ -36,6 +36,8 @@ class Timer;
 
 namespace game {
 
+constexpr float kDefaultAttackRange = 2.0f;
+
 class CreatureBlueprint;
 class ObjectFactory;
 
@@ -96,6 +98,7 @@ public:
     const CreatureAttributes &attributes() const;
     std::shared_ptr<CreatureBlueprint> blueprint() const;
     Faction faction() const;
+    int attackRange() const;
 
     void setTag(const std::string &tag);
     void setMovementType(MovementType type);

@@ -489,9 +489,9 @@ string Creature::getDuelAttackAnimation() const {
 }
 
 bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    auto maybeWeapon = _equipment.find(kInventorySlotRightWeapon);
-    if (maybeWeapon != _equipment.end()) {
-        const ItemBlueprint &blueprint = maybeWeapon->second->blueprint();
+    shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
+    if (item) {
+        const ItemBlueprint &blueprint = item->blueprint();
         type = blueprint.weaponType();
         wield = blueprint.weaponWield();
         return true;
@@ -638,6 +638,11 @@ glm::vec3 Creature::selectablePosition() const {
 
 Faction Creature::faction() const {
     return _faction;
+}
+
+int Creature::attackRange() const {
+    shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
+    return item ? item->blueprint().attackRange() : kDefaultAttackRange;
 }
 
 void Creature::setFaction(Faction faction) {
