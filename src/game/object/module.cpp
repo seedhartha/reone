@@ -247,6 +247,10 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
         actions.push_back(ContextualAction::Unlock);
     }
 
+    shared_ptr<Creature> hostile = dynamic_pointer_cast<Creature>(object);
+    if (hostile && getIsEnemy(*(_game->party().leader()), *hostile)) {
+        actions.push_back(ContextualAction::Attack);
+    }
     return move(actions);
 }
 
