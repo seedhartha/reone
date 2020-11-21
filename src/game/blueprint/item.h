@@ -44,7 +44,7 @@ public:
     const std::string &itemClass() const;
     int modelVariation() const;
     std::shared_ptr<render::Texture> icon() const;
-    int attackRange() const;
+    float attackRange() const;
     WeaponType weaponType() const;
     WeaponWield weaponWield() const;
 

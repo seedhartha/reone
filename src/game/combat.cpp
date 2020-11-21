@@ -97,14 +97,14 @@ void Combat::updateAI() {
 
 void Combat::updateCombatantAI(Combatant &combatant) {
     shared_ptr<Creature> creature(combatant.creature);
-    ActionQueue &actions = creature->actionQueue();
-
-    Action *action = actions.currentAction();
-    if (action && action->type() == ActionType::AttackObject) return;
 
     shared_ptr<Creature> enemy(getNearestEnemy(combatant));
     if (!enemy) return;
 
+    AttackAction *action = getAttackAction(creature);
+    if (action && action->target() == enemy) return;
+
+    ActionQueue &actions = creature->actionQueue();
     actions.clear();
     actions.add(make_unique<AttackAction>(enemy, creature->attackRange()));
 

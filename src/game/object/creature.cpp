@@ -646,9 +646,15 @@ Faction Creature::faction() const {
     return _faction;
 }
 
-int Creature::attackRange() const {
+float Creature::attackRange() const {
+    float result = kDefaultAttackRange;
+
     shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
-    return item ? item->blueprint().attackRange() : kDefaultAttackRange;
+    if (item && item->blueprint().attackRange() > kDefaultAttackRange) {
+        result = item->blueprint().attackRange();
+    }
+
+    return result;
 }
 
 void Creature::setFaction(Faction faction) {

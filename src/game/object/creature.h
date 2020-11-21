@@ -98,7 +98,7 @@ public:
     const CreatureAttributes &attributes() const;
     std::shared_ptr<CreatureBlueprint> blueprint() const;
     Faction faction() const;
-    int attackRange() const;
+    float attackRange() const;
 
     void setTag(const std::string &tag);
     void setMovementType(MovementType type);
