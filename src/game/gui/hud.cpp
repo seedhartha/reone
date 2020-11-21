@@ -196,6 +196,7 @@ void HUD::showCombatHud() {
     // TODO: make those class members?
     showControl("BTN_CLEARALL");
     showControl("BTN_CLEARONE");
+    showControl("BTN_CLEARONE2");
 
     showControl("LBL_CMBTMODEMSG");
     showControl("LBL_CMBTMSGBG");
@@ -213,6 +214,7 @@ void HUD::showCombatHud() {
 void HUD::hideCombatHud() {
     hideControl("BTN_CLEARALL");
     hideControl("BTN_CLEARONE");
+    showControl("BTN_CLEARONE2");
 
     hideControl("LBL_CMBTMODEMSG");
     hideControl("LBL_CMBTMSGBG");
@@ -233,7 +235,7 @@ void HUD::drawActionQueueItems() const {
 
     // clear the drawn queue items first
     for (int j = 0; j < 4; ++j) {
-        Control& qItem = getControl("LBL_QUEUE" + to_string(j));
+        Control &qItem = getControl("LBL_QUEUE" + to_string(j));
         qItem.setBorderFill("");
     }
 
@@ -241,6 +243,7 @@ void HUD::drawActionQueueItems() const {
     while (i < 4 && it != actionQueue.end()) {
         ActionType actionType = (*it)->type();
 
+        // TODO: if (isDisplayableAction(*it))
         if (actionType == ActionType::AttackObject) {
             Control &qItem = getControl("LBL_QUEUE"+to_string(i));
             qItem.setBorderFill("i_attack");
@@ -268,6 +271,19 @@ void HUD::onClick(const string &control) {
         _game->openInGameMenu(InGameMenu::Tab::Map);
     } else if (control == "BTN_OPT") {
         _game->openInGameMenu(InGameMenu::Tab::Options);
+    } else if (control == "BTN_CLEARALL") {
+        _game->party().leader()->actionQueue().clear();
+    } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
+        auto &actionQueue = _game->party().leader()->actionQueue();
+
+        for (auto& it=actionQueue.begin(); it!=actionQueue.end(); ++it) {
+
+            // TODO: if (isDisplayableAction(*it))
+            if ((*it)->type() == ActionType::AttackObject) {
+                (*it)->complete();
+                break;
+            }
+        }
     }
 }
 
