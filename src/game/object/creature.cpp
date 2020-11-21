@@ -472,6 +472,8 @@ const string &Creature::getRunAnimation() const {
 }
 
 string Creature::getDuelAttackAnimation() const {
+    if (_modelType == ModelType::Creature) return "g0a1";
+
     WeaponType type = WeaponType::None;
     WeaponWield wield = WeaponWield::None;
     getWeaponInfo(type, wield);
@@ -520,6 +522,8 @@ int Creature::getWeaponWieldNumber(WeaponWield wield) const {
 }
 
 string Creature::getBashAttackAnimation() const {
+    if (_modelType == ModelType::Creature) return "g0a2";
+
     WeaponType type = WeaponType::None;
     WeaponWield wield = WeaponWield::None;
     getWeaponInfo(type, wield);
@@ -537,6 +541,8 @@ string Creature::getBashAttackAnimation() const {
 }
 
 string Creature::getDodgeAnimation() const {
+    if (_modelType == ModelType::Creature) return "cdodgeg";
+
     WeaponType type = WeaponType::None;
     WeaponWield wield = WeaponWield::None;
     getWeaponInfo(type, wield);
@@ -547,7 +553,7 @@ string Creature::getDodgeAnimation() const {
 }
 
 string Creature::getKnockdownAnimation() const {
-    return "g1y1";
+    return _modelType == ModelType::Creature ? "ckdbck" : "g1y1";
 }
 
 void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
