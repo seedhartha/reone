@@ -153,6 +153,7 @@ void CharacterGeneration::finish() {
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
     player->load(config);
     player->setTag("PLAYER");
+    player->setFaction(Faction::Friendly1);
 
     Party &party = _game->party();
     party.clear();
