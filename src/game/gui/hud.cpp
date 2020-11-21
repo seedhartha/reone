@@ -231,7 +231,6 @@ void HUD::hideCombatHud() {
 
 void HUD::drawActionQueueItems() const {
     auto &actionQueue = _game->party().leader()->actionQueue();
-    auto &it = actionQueue.begin();
 
     // clear the drawn queue items first
     for (int j = 0; j < 4; ++j) {
@@ -239,6 +238,7 @@ void HUD::drawActionQueueItems() const {
         qItem.setBorderFill("");
     }
 
+    auto it = actionQueue.begin();
     int i = 0;
     while (i < 4 && it != actionQueue.end()) {
         ActionType actionType = (*it)->type();
@@ -276,7 +276,7 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
         auto &actionQueue = _game->party().leader()->actionQueue();
 
-        for (auto& it=actionQueue.begin(); it!=actionQueue.end(); ++it) {
+        for (auto it=actionQueue.begin(); it!=actionQueue.end(); ++it) {
 
             // TODO: if (isDisplayableAction(*it))
             if ((*it)->type() == ActionType::AttackObject) {
