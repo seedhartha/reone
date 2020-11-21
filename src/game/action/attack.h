@@ -27,7 +27,7 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(const std::shared_ptr<Creature> &object, float range = 1.6f) :
+    AttackAction(const std::shared_ptr<Creature> &object, float range = kDefaultAttackRange) :
         ObjectAction(ActionType::AttackObject, object),
         _range(range) {
     }
