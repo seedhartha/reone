@@ -57,10 +57,10 @@ public:
 
     enum class Animation {
         UnlockDoor,
-        UnarmedAttack1,
-        UnarmedAttack2,
-        UnarmedDodge1,
-        Flinch
+        DuelAttack,
+        BashAttack,
+        Dodge,
+        Knockdown
     };
 
     struct Path {
@@ -161,6 +161,8 @@ private:
     void updateModel();
 
     ModelType parseModelType(const std::string &s) const;
+    bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
+    int getWeaponWieldNumber(WeaponWield wield) const;
 
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
@@ -170,6 +172,11 @@ private:
     const std::string &getPauseAnimation() const;
     const std::string &getRunAnimation() const;
     const std::string &getWalkAnimation() const;
+
+    std::string getDuelAttackAnimation() const;
+    std::string getBashAttackAnimation() const;
+    std::string getDodgeAnimation() const;
+    std::string getKnockdownAnimation() const;
 };
 
 } // namespace game

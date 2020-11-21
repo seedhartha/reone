@@ -361,17 +361,17 @@ void Creature::playAnimation(Animation anim) {
         case Animation::UnlockDoor:
             animName = g_animUnlockDoor;
             break;
-        case Animation::UnarmedAttack1:
-            animName = "g8a1";
+        case Animation::DuelAttack:
+            animName = getDuelAttackAnimation();
             break;
-        case Animation::UnarmedAttack2:
-            animName = "g8a2";
+        case Animation::BashAttack:
+            animName = getBashAttackAnimation();
             break;
-        case Animation::UnarmedDodge1:
-            animName = "g8g1";
+        case Animation::Dodge:
+            animName = getDodgeAnimation();
             break;
-        case Animation::Flinch:
-            animName = "g1y1";
+        case Animation::Knockdown:
+            animName = getKnockdownAnimation();
             break;
         default:
             break;
@@ -469,6 +469,85 @@ const string &Creature::getRunAnimation() const {
         default:
             return g_animRunCharacter;
     }
+}
+
+string Creature::getDuelAttackAnimation() const {
+    WeaponType type = WeaponType::None;
+    WeaponWield wield = WeaponWield::None;
+    getWeaponInfo(type, wield);
+
+    int wieldNumber = getWeaponWieldNumber(wield);
+
+    switch (type) {
+        case WeaponType::Melee:
+            return str(boost::format("c%da1") % wieldNumber);
+        case WeaponType::Ranged:
+            return str(boost::format("b%da1") % wieldNumber);
+        default:
+            return str(boost::format("g%da1") % wieldNumber);
+    }
+}
+
+bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
+    auto maybeWeapon = _equipment.find(kInventorySlotRightWeapon);
+    if (maybeWeapon != _equipment.end()) {
+        const ItemBlueprint &blueprint = maybeWeapon->second->blueprint();
+        type = blueprint.weaponType();
+        wield = blueprint.weaponWield();
+        return true;
+    }
+
+    return false;
+}
+
+int Creature::getWeaponWieldNumber(WeaponWield wield) const {
+    switch (wield) {
+        case WeaponWield::StunBaton:
+            return 1;
+        case WeaponWield::SingleSaber:
+            return 2;
+        case WeaponWield::TwoHandedSaber:
+            return 3;
+        case WeaponWield::SingleBlaster:
+            return 5;
+        case WeaponWield::Rifle:
+            return 7;
+        case WeaponWield::HeavyCarbine:
+            return 9;
+        default:
+            return 8;
+    }
+}
+
+string Creature::getBashAttackAnimation() const {
+    WeaponType type = WeaponType::None;
+    WeaponWield wield = WeaponWield::None;
+    getWeaponInfo(type, wield);
+
+    int wieldNumber = getWeaponWieldNumber(wield);
+
+    switch (type) {
+        case WeaponType::Melee:
+            return str(boost::format("c%da2") % wieldNumber);
+        case WeaponType::Ranged:
+            return str(boost::format("b%da2") % wieldNumber);
+        default:
+            return str(boost::format("g%da2") % wieldNumber);
+    }
+}
+
+string Creature::getDodgeAnimation() const {
+    WeaponType type = WeaponType::None;
+    WeaponWield wield = WeaponWield::None;
+    getWeaponInfo(type, wield);
+
+    int wieldNumber = getWeaponWieldNumber(wield);
+
+    return str(boost::format("g%dg1") % wieldNumber);
+}
+
+string Creature::getKnockdownAnimation() const {
+    return "g1y1";
 }
 
 void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
