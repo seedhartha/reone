@@ -53,6 +53,8 @@ private:
     std::shared_ptr<render::Font> _font;
     std::shared_ptr<render::Texture> _friendlyReticle;
     std::shared_ptr<render::Texture> _friendlyReticle2;
+    std::shared_ptr<render::Texture> _hostileReticle;
+    std::shared_ptr<render::Texture> _hostileReticle2;
     std::shared_ptr<render::Texture> _friendlyScroll;
     std::shared_ptr<render::Texture> _hostileScroll;
     std::shared_ptr<render::Texture> _hilightedScroll;
@@ -65,6 +67,8 @@ private:
     std::string _selectedTitle;
     int _reticleHeight { 0 };
     int _selectedActionIdx { -1 };
+    bool _hilightedHostile;
+    bool _selectedHostile;
 
     void addTextureByAction(ContextualAction action, const std::string &resRef);
 
