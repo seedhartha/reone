@@ -44,6 +44,10 @@ private:
     SelectionOverlay _select;
     DebugOverlay _debug;
 
+    void showCombatHud();
+    void hideCombatHud();
+    void drawActionQueueItems() const;
+
     void onClick(const std::string &control) override;
 };
 

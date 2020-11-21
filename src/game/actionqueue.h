@@ -33,6 +33,10 @@ public:
     void delay(std::unique_ptr<Action> action, float seconds);
     void update();
 
+    using iterator = std::deque<std::unique_ptr<Action>>::iterator;
+    iterator begin();
+    iterator end();
+
     bool empty() const;
     int size() const;
 
@@ -44,7 +48,7 @@ private:
         uint32_t timestamp { 0 };
     };
 
-    std::queue<std::unique_ptr<Action>> _actions;
+    std::deque<std::unique_ptr<Action>> _actions;
     std::vector<DelayedAction> _delayed;
 
     void removeCompletedActions();
