@@ -65,6 +65,7 @@ void SelectionOverlay::load() {
     _reticleHeight = _friendlyReticle2->height();
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
+    addTextureByAction(ContextualAction::Attack, "i_attack");
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
@@ -118,6 +119,14 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
             actions.add(make_unique<ObjectAction>(ActionType::OpenLock, object));
             break;
         }
+
+        case ContextualAction::Attack: {
+            ActionQueue &actions = _game->party().leader()->actionQueue();
+            actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(object),
+                        _game->party().leader()->attackRange()));
+            break;
+        }
+
         default:
             break;
     }
