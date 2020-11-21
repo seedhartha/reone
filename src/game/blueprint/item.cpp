@@ -118,8 +118,8 @@ shared_ptr<Texture> ItemBlueprint::icon() const {
     return _icon;
 }
 
-int ItemBlueprint::attackRange() const {
-    return _attackRange;
+float ItemBlueprint::attackRange() const {
+    return static_cast<float>(_attackRange);
 }
 
 WeaponType ItemBlueprint::weaponType() const {
