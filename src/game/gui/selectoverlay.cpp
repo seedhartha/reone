@@ -59,6 +59,8 @@ void SelectionOverlay::load() {
     _font = Fonts::instance().get("dialogfont16x16");
     _friendlyReticle = Textures::instance().get("friendlyreticle", TextureType::GUI);
     _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
+    _hostileReticle = Textures::instance().get("hostilereticle", TextureType::GUI);
+    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureType::GUI);
     _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureType::GUI);
     _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureType::GUI);
     _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureType::GUI);
@@ -148,6 +150,9 @@ void SelectionOverlay::update() {
         shared_ptr<SpatialObject> object(area->find(hilightedObjectId));
         _hilightedScreenCoords = area->getSelectableScreenCoords(object, projection, view);
         _hasHilighted = _hilightedScreenCoords.z < 1.0f;
+
+        shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
+        _hilightedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
     } else {
         _hasHilighted = false;
     }
@@ -159,6 +164,9 @@ void SelectionOverlay::update() {
         _hasSelected = _selectedScreenCoords.z < 1.0f;
         _selectedTitle = object->title();
         _actions = module->getContextualActions(object);
+
+        shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
+        _selectedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
     } else {
         _hasSelected = false;
     }
@@ -166,10 +174,10 @@ void SelectionOverlay::update() {
 
 void SelectionOverlay::render() const {
     if (_hasHilighted) {
-        drawReticle(*_friendlyReticle, _hilightedScreenCoords);
+        drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
     }
     if (_hasSelected) {
-        drawReticle(*_friendlyReticle2, _selectedScreenCoords);
+        drawReticle(_selectedHostile ? *_hostileReticle2 : *_friendlyReticle2, _selectedScreenCoords);
         if (!_actions.empty()) {
             drawActionBar();
         }
@@ -256,6 +264,8 @@ void SelectionOverlay::drawActionBar() const {
         shared_ptr<Texture> frameTexture;
         if (i == _selectedActionIdx) {
             frameTexture = _hilightedScroll;
+        } else if (_selectedHostile) {
+            frameTexture = _hostileScroll;
         } else {
             frameTexture = _friendlyScroll;
         }
