@@ -40,6 +40,7 @@ namespace reone {
 namespace game {
 
 static const float kKeepPathDuration = 1000.0f;
+static const float kDefaultMaxObjectDistance = 2.0f;
 static const float kMaxConversationDistance = 4.0f;
 static const float kDistanceWalk = 4.0f;
 
@@ -246,7 +247,7 @@ void ActionExecutor::executeOpenDoor(Object &actor, ObjectAction &action, float 
     Creature *creatureActor = dynamic_cast<Creature *>(&actor);
     Door &door = *static_cast<Door *>(action.object());
 
-    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), true, 1.0f, dt);
+    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
         bool isObjectSelf = actor.id() == door.id();
         if (!isObjectSelf && door.isLocked()) {
@@ -267,7 +268,7 @@ void ActionExecutor::executeCloseDoor(Object &actor, ObjectAction &action, float
     Creature *creatureActor = dynamic_cast<Creature *>(&actor);
     Door &door = *static_cast<Door *>(action.object());
 
-    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), true, 1.0f, dt);
+    bool reached = !creatureActor || navigateCreature(*creatureActor, door.position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
         door.close(&actor);
         action.complete();
@@ -276,7 +277,7 @@ void ActionExecutor::executeCloseDoor(Object &actor, ObjectAction &action, float
 
 void ActionExecutor::executeOpenContainer(Creature &actor, ObjectAction &action, float dt) {
     Placeable &placeable = *static_cast<Placeable *>(action.object());
-    bool reached = navigateCreature(actor, placeable.position(), true, 1.0f, dt);
+    bool reached = navigateCreature(actor, placeable.position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
         _game->openContainer(&placeable);
         action.complete();
@@ -286,7 +287,7 @@ void ActionExecutor::executeOpenContainer(Creature &actor, ObjectAction &action,
 void ActionExecutor::executeOpenLock(Creature &actor, ObjectAction &action, float dt) {
     Door *door = dynamic_cast<Door *>(action.object());
     if (door) {
-        bool reached = navigateCreature(actor, door->position(), true, 1.0f, dt);
+        bool reached = navigateCreature(actor, door->position(), true, kDefaultMaxObjectDistance, dt);
         if (reached) {
             actor.face(*door);
             actor.playAnimation(Creature::Animation::UnlockDoor);
