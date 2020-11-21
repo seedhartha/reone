@@ -175,6 +175,14 @@ void HUD::update(float dt) {
         }
     }
 
+    if (_game->module()->area()->combat().isActive()) {
+        showCombatHud();
+        drawActionQueueItems();
+    }
+    else {
+        hideCombatHud();
+    }
+
     _select.update();
 }
 
@@ -182,6 +190,65 @@ void HUD::render() const {
     GUI::render();
     _select.render();
     _debug.render();
+}
+
+void HUD::showCombatHud() {
+    // TODO: make those class members?
+    showControl("BTN_CLEARALL");
+    showControl("BTN_CLEARONE");
+
+    showControl("LBL_CMBTMODEMSG");
+    showControl("LBL_CMBTMSGBG");
+
+    showControl("LBL_COMBATBG1");
+    showControl("LBL_COMBATBG2");
+    showControl("LBL_COMBATBG3");
+
+    showControl("LBL_QUEUE0");
+    showControl("LBL_QUEUE1");
+    showControl("LBL_QUEUE2");
+    showControl("LBL_QUEUE3");
+}
+
+void HUD::hideCombatHud() {
+    hideControl("BTN_CLEARALL");
+    hideControl("BTN_CLEARONE");
+
+    hideControl("LBL_CMBTMODEMSG");
+    hideControl("LBL_CMBTMSGBG");
+
+    hideControl("LBL_COMBATBG1");
+    hideControl("LBL_COMBATBG2");
+    hideControl("LBL_COMBATBG3");
+
+    hideControl("LBL_QUEUE0");
+    hideControl("LBL_QUEUE1");
+    hideControl("LBL_QUEUE2");
+    hideControl("LBL_QUEUE3");
+}
+
+void HUD::drawActionQueueItems() const {
+    auto &actionQueue = _game->party().leader()->actionQueue();
+    auto &it = actionQueue.begin();
+
+    // clear the drawn queue items first
+    for (int j = 0; j < 4; ++j) {
+        Control& qItem = getControl("LBL_QUEUE" + to_string(j));
+        qItem.setBorderFill("");
+    }
+
+    int i = 0;
+    while (i < 4 && it != actionQueue.end()) {
+        ActionType actionType = (*it)->type();
+
+        if (actionType == ActionType::AttackObject) {
+            Control &qItem = getControl("LBL_QUEUE"+to_string(i));
+            qItem.setBorderFill("i_attack");
+            ++i;
+        }
+
+        it += 1;
+    }
 }
 
 void HUD::onClick(const string &control) {

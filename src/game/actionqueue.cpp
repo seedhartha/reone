@@ -29,12 +29,12 @@ namespace game {
 
 void ActionQueue::clear() {
     while (!_actions.empty()) {
-        _actions.pop();
+        _actions.pop_front();
     }
 }
 
 void ActionQueue::add(unique_ptr<Action> action) {
-    _actions.push(move(action));
+    _actions.push_back(move(action));
 }
 
 void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
@@ -49,12 +49,20 @@ void ActionQueue::update() {
     updateDelayedActions();
 }
 
+ActionQueue::iterator ActionQueue::begin() {
+    return _actions.begin();
+}
+
+ActionQueue::iterator ActionQueue::end() {
+    return _actions.end();
+}
+
 void ActionQueue::removeCompletedActions() {
     while (true) {
         const Action *action = currentAction();
         if (!action || !action->isCompleted()) return;
 
-        _actions.pop();
+        _actions.pop_front();
     }
 }
 
@@ -63,7 +71,7 @@ void ActionQueue::updateDelayedActions() {
 
     for (auto &delayed : _delayed) {
         if (now >= delayed.timestamp) {
-            _actions.push(move(delayed.action));
+            _actions.push_back(move(delayed.action));
         }
     }
     auto delayedToRemove = remove_if(
