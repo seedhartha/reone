@@ -46,7 +46,7 @@ private:
 
     void showCombatHud();
     void hideCombatHud();
-    void drawActionQueueItems() const;
+    void refreshActionQueueItems() const;
 
     void onClick(const std::string &control) override;
 };
