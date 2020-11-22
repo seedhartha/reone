@@ -123,9 +123,10 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
         }
 
         case ContextualAction::Attack: {
-            ActionQueue &actions = _game->party().leader()->actionQueue();
+            shared_ptr<Creature> &partyLeader =  _game->party().leader();
+            ActionQueue &actions = partyLeader->actionQueue();
             actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(object),
-                        _game->party().leader()->attackRange()));
+                        partyLeader->attackRange()));
             break;
         }
 
