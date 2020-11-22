@@ -177,7 +177,7 @@ void HUD::update(float dt) {
 
     if (_game->module()->area()->combat().isActive()) {
         showCombatHud();
-        drawActionQueueItems();
+        refreshActionQueueItems();
     }
     else {
         hideCombatHud();
@@ -229,28 +229,22 @@ void HUD::hideCombatHud() {
     hideControl("LBL_QUEUE3");
 }
 
-void HUD::drawActionQueueItems() const {
+void HUD::refreshActionQueueItems() const {
     auto &actionQueue = _game->party().leader()->actionQueue();
 
-    // clear the drawn queue items first
-    for (int j = 0; j < 4; ++j) {
-        Control &qItem = getControl("LBL_QUEUE" + to_string(j));
-        qItem.setBorderFill("");
-    }
-
     auto it = actionQueue.begin();
-    int i = 0;
-    while (i < 4 && it != actionQueue.end()) {
-        ActionType actionType = (*it)->type();
+    for (int i = 0; i < 4; ++i) {
+        string fill;
 
         // TODO: if (isDisplayableAction(*it))
-        if (actionType == ActionType::AttackObject) {
-            Control &qItem = getControl("LBL_QUEUE"+to_string(i));
-            qItem.setBorderFill("i_attack");
-            ++i;
+        while (it != actionQueue.end() && (*it)->type() != ActionType::AttackObject)
+            ++it;
+        if (it != actionQueue.end()) {
+            fill = "i_attack";
+            ++it;
         }
-
-        it += 1;
+        Control& item = getControl("LBL_QUEUE" + to_string(i));
+        item.setBorderFill(fill);
     }
 }
 
@@ -276,11 +270,11 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
         auto &actionQueue = _game->party().leader()->actionQueue();
 
-        for (auto it=actionQueue.begin(); it!=actionQueue.end(); ++it) {
+        for (auto &action : actionQueue) {
 
             // TODO: if (isDisplayableAction(*it))
-            if ((*it)->type() == ActionType::AttackObject) {
-                (*it)->complete();
+            if (action->type() == ActionType::AttackObject) {
+                action->complete();
                 break;
             }
         }
