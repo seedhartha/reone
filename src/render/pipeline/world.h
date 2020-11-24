@@ -40,6 +40,11 @@ private:
 
     WorldRenderPipeline(const WorldRenderPipeline &) = delete;
     WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
+
+    void drawGeometry() const;
+    void applyHorizontalBlur() const;
+    void applyVerticalBlur() const;
+    void drawResult() const;
 };
 
 } // namespace render
