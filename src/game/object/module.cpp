@@ -40,7 +40,7 @@ Module::Module(uint32_t id, Game *game) :
     _game(game) {
 
     if (!game) {
-        throw invalid_argument("Game must not be null");
+        throw invalid_argument("game must not be null");
     }
 }
 

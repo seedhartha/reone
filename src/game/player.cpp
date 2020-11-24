@@ -35,16 +35,16 @@ Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
     _module(module), _area(area), _camera(camera), _party(party) {
 
     if (!module) {
-        throw invalid_argument("Module must not be null");
+        throw invalid_argument("module must not be null");
     }
     if (!area) {
-        throw invalid_argument("Area must not be null");
+        throw invalid_argument("area must not be null");
     }
     if (!camera) {
-        throw invalid_argument("Camera must not be null");
+        throw invalid_argument("camera must not be null");
     }
     if (!party) {
-        throw invalid_argument("Party must not be null");
+        throw invalid_argument("party must not be null");
     }
 }
 
@@ -152,6 +152,10 @@ void Player::stopMovement() {
 
     shared_ptr<Creature> partyLeader(_party->leader());
     partyLeader->setMovementType(Creature::MovementType::None);
+}
+
+bool Player::isMovementRequested() const {
+    return _moveForward || _moveLeft || _moveBackward || _moveRight;
 }
 
 } // namespace game

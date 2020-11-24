@@ -36,12 +36,11 @@ namespace game {
 
 constexpr float kDetectionRange = 20.0f;
 
-class Area;
-class Party;
+class Game;
 
 class Combat {
 public:
-    Combat(Area *area, Party *party);
+    Combat(Game *game);
 
     void update(float dt);
 
@@ -72,8 +71,7 @@ private:
         void advance(float dt);
     };
 
-    Area *_area;
-    Party *_party;
+    Game *_game;
 
     Timer _heartbeatTimer { 0.0f };
     std::map<uint32_t, std::shared_ptr<Combatant>> _combatantById;

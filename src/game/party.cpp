@@ -36,7 +36,7 @@ static const int kMaxMemberCount = 3;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {
-        throw invalid_argument("Game must not be null");
+        throw invalid_argument("game must not be null");
     }
 }
 

@@ -68,11 +68,8 @@ Area::Area(uint32_t id, Game *game) :
     _collisionDetector(this),
     _objectSelector(this, &game->party()),
     _actionExecutor(game),
-    _combat(this, &game->party()) {
+    _combat(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 }

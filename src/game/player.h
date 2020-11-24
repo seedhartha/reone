@@ -41,6 +41,8 @@ public:
 
     void stopMovement();
 
+    bool isMovementRequested() const;
+
 private:
     Module *_module { nullptr };
     Area *_area { nullptr };

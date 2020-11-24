@@ -33,10 +33,10 @@ ObjectFactory::ObjectFactory(Game *game, SceneGraph *sceneGraph) :
     _game(game), _sceneGraph(sceneGraph) {
 
     if (!game) {
-        throw invalid_argument("Game must not be null");
+        throw invalid_argument("game must not be null");
     }
     if (!sceneGraph) {
-        throw invalid_argument("Scene graph must not be null");
+        throw invalid_argument("sceneGraph must not be null");
     }
 }
 
