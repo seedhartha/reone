@@ -23,11 +23,12 @@ namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius) :
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, bool shadow) :
     SceneNode(sceneGraph),
     _priority(priority),
     _color(color),
-    _radius(radius) {
+    _radius(radius),
+    _shadow(shadow) {
 }
 
 int LightSceneNode::priority() const {
@@ -40,6 +41,10 @@ const glm::vec3 &LightSceneNode::color() const {
 
 float LightSceneNode::radius() const {
     return _radius;
+}
+
+bool LightSceneNode::shadow() const {
+    return _shadow;
 }
 
 } // namespace scene

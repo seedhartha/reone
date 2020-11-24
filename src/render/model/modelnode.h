@@ -43,6 +43,7 @@ public:
         int priority { 1 };
         bool ambientOnly { false };
         bool affectDynamic { false };
+        bool shadow { false };
     };
 
     struct Skin {

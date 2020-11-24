@@ -406,14 +406,15 @@ void MdlFile::readLight(ModelNode &node) {
 
     ignore(64);
 
-    node._light->priority = readInt32();
-    node._light->ambientOnly = static_cast<bool>(readInt32());
+    node._light->priority = readUint32();
+    node._light->ambientOnly = static_cast<bool>(readUint32());
 
     ignore(4);
 
-    node._light->affectDynamic = static_cast<bool>(readInt32());
+    node._light->affectDynamic = static_cast<bool>(readUint32());
+    node._light->shadow = static_cast<bool>(readUint32());
 
-    ignore(12);
+    ignore(8);
 }
 
 unique_ptr<ModelMesh> MdlFile::readMesh() {

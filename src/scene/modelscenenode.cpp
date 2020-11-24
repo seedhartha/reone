@@ -67,7 +67,7 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius()));
+                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius(), light->shadow));
                 childNode->addChild(lightNode);
             }
         }
