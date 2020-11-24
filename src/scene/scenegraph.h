@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <vector>
@@ -41,6 +42,7 @@ public:
     SceneGraph(const render::GraphicsOptions &opts);
 
     void render() const override;
+    void renderNoGlobalUniforms() const override;
 
     void clear();
 
@@ -54,7 +56,9 @@ public:
 
     // Lights
 
-    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
+    const std::vector<render::ShadowLight> &shadowLights() const override;
+
+    void getLightsAt(const glm::vec3 &position, int count, const std::function<bool(const LightSceneNode &)> &pred, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
     void setAmbientLightColor(const glm::vec3 &color);
@@ -71,11 +75,15 @@ private:
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
     Octree _octree;
+    std::vector<render::ShadowLight> _shadowLights;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
     void refreshMeshesAndLights();
+    void refreshShadowLights();
+
+    void getLightProjectionView(const LightSceneNode &light, glm::mat4 &projection, glm::mat4 &view) const;
 };
 
 } // namespace scene

@@ -34,7 +34,9 @@ public:
     void bind() const;
     void unbind() const;
     void bindColorBuffer(int n) const;
+    void bindDepthBuffer() const;
     void unbindColorBuffer() const;
+    void unbindDepthBuffer() const;
 
     int width() const;
     int height() const;

@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "../framebuffer.h"
 #include "../types.h"
 
@@ -37,10 +40,12 @@ private:
     Framebuffer _geometry;
     Framebuffer _verticalBlur;
     Framebuffer _horizontalBlur;
+    std::vector<std::unique_ptr<Framebuffer>> _shadows;
 
     WorldRenderPipeline(const WorldRenderPipeline &) = delete;
     WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
 
+    void drawShadows() const;
     void drawGeometry() const;
     void applyHorizontalBlur() const;
     void applyVerticalBlur() const;
