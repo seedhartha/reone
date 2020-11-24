@@ -37,10 +37,10 @@ ObjectSelector::ObjectSelector(const Area *area, const Party *party) :
     _area(area), _party(party) {
 
     if (!area) {
-        throw invalid_argument("Area must not be null");
+        throw invalid_argument("area must not be null");
     }
     if (!party) {
-        throw invalid_argument("Party must not be null");
+        throw invalid_argument("party must not be null");
     }
 }
 

@@ -24,8 +24,7 @@
 
 #include "../common/log.h"
 
-#include "object/area.h"
-#include "party.h"
+#include "game.h"
 
 using namespace std;
 
@@ -43,12 +42,9 @@ void Combat::Round::advance(float dt) {
     time = glm::min(time + dt, kRoundDuration);
 }
 
-Combat::Combat(Area *area, Party *party) : _area(area), _party(party) {
-    if (!area) {
-        throw invalid_argument("area must not be null");
-    }
-    if (!party) {
-        throw invalid_argument("party must not be null");
+Combat::Combat(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("game must not be null");
     }
 }
 
@@ -64,7 +60,7 @@ void Combat::update(float dt) {
 }
 
 void Combat::updateCombatants() {
-    ObjectList &creatures = _area->getObjectsByType(ObjectType::Creature);
+    ObjectList &creatures = _game->module()->area()->getObjectsByType(ObjectType::Creature);
     for (auto &object : creatures) {
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
 
@@ -129,7 +125,7 @@ shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
 vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
     vector<shared_ptr<Creature>> result;
 
-    ObjectList creatures(_area->getObjectsByType(ObjectType::Creature));
+    ObjectList creatures(_game->module()->area()->getObjectsByType(ObjectType::Creature));
     for (auto &object : creatures) {
         if (object->distanceTo(combatant) > range) continue;
 
@@ -147,6 +143,10 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
 void Combat::updateRounds(float dt) {
     for (auto &pair : _combatantById) {
         shared_ptr<Combatant> attacker(pair.second);
+
+        // Do not start a combat round, if attacker is a moving party leader
+
+        if (attacker->creature->id() == _game->party().leader()->id() && _game->module()->player().isMovementRequested()) continue;
 
         // Check if attacker already participates in a combat round
 
@@ -246,7 +246,7 @@ void Combat::updateRound(Round &round, float dt) {
 }
 
 bool Combat::isActive() const {
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_game->party().leader());
     return partyLeader && _combatantById.count(partyLeader->id()) != 0;
 }
 
