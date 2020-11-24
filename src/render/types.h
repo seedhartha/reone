@@ -22,11 +22,15 @@
 
 #include "SDL2/SDL_events.h"
 
+#include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 namespace reone {
 
 namespace render {
+
+const int kMaxShadowLightCount = 4;
 
 enum class TextureType {
     Diffuse,
@@ -59,14 +63,24 @@ struct TextureFeatures {
     std::vector<glm::vec3> lowerRightCoords;
 };
 
+struct ShadowLight {
+    glm::vec4 position { 0.0f };
+    glm::mat4 view { 1.0f };
+    glm::mat4 projection { 1.0f };
+};
+
 class IEventHandler {
 public:
     virtual bool handle(const SDL_Event &event) = 0;
 };
 
+// TODO: move render pipelines into libscene
 class IRenderable {
 public:
     virtual void render() const = 0;
+    virtual void renderNoGlobalUniforms() const = 0;
+
+    virtual const std::vector<ShadowLight> &shadowLights() const = 0;
 };
 
 } // namespace render

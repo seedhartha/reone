@@ -83,6 +83,9 @@ void ModelNodeSceneNode::renderSingle() const {
     if (mesh->hasBumpmapTexture()) {
         locals.general.bumpmapEnabled = true;
     }
+    if (_modelSceneNode->model()->classification() == Model::Classification::Other) {
+        locals.general.shadowsEnabled = true;
+    }
     if (skeletal) {
         locals.general.skeletalEnabled = true;
         locals.skeletal = Shaders::instance().skeletalUniforms();

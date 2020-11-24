@@ -67,7 +67,7 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius(), light->shadow));
+                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius(), child->multiplier(), light->shadow));
                 childNode->addChild(lightNode);
             }
         }
@@ -181,7 +181,7 @@ void ModelSceneNode::updateLighting() {
     _lightsAffectedBy.clear();
     glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
 
-    _sceneGraph->getLightsAt(center, _lightsAffectedBy);
+    _sceneGraph->getLightsAt(center, kMaxLightCount, [](auto &) { return true; }, _lightsAffectedBy);
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {

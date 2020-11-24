@@ -36,18 +36,26 @@ namespace render {
 static const int kFeaturesBindingPointIndex = 1;
 static const int kGeneralBindingPointIndex = 2;
 static const int kLightingBindingPointIndex = 3;
-static const int kSkeletalBindingPointIndex = 4;
+static const int kShadowsBindingPointIndex = 4;
+static const int kSkeletalBindingPointIndex = 5;
 
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
+const int MAX_SHADOW_LIGHTS = 4;
 const int MAX_BONES = 128;
 
 struct Light {
     vec4 position;
     vec4 color;
     float radius;
+};
+
+struct ShadowLight {
+    vec4 position;
+    mat4 view;
+    mat4 projection;
 };
 
 layout(std140) uniform General {
@@ -61,6 +69,7 @@ layout(std140) uniform General {
     bool uBlurEnabled;
     bool uBloomEnabled;
     bool uDiscardEnabled;
+    bool uShadowsEnabled;
 
     uniform mat4 uModel;
     uniform vec4 uColor;
@@ -75,6 +84,11 @@ layout(std140) uniform Lighting {
     vec4 uAmbientLightColor;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
+};
+
+layout(std140) uniform Shadows {
+    int uShadowLightCount;
+    ShadowLight uShadowLights[MAX_SHADOW_LIGHTS];
 };
 
 layout(std140) uniform Skeletal {
@@ -102,6 +116,7 @@ void main() {
 static const GLchar kModelVertexShader[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
+uniform mat4 uLightSpaceMatrix;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -187,6 +202,7 @@ uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
 uniform samplerCube uEnvmap;
 uniform samplerCube uBumpyShiny;
+uniform sampler2D uShadowmaps[MAX_SHADOW_LIGHTS];
 
 uniform vec3 uCameraPosition;
 
@@ -221,18 +237,41 @@ void applyLighting(vec3 normal, inout vec3 color) {
         vec3 lightDir = normalize(surfaceToLight);
 
         vec3 surfaceToCamera = normalize(uCameraPosition - fragPosition);
-        float diffuseCoeff = max(dot(normal, lightDir), 0.0);
-        float specularCoeff = 0.0;
+        float diffuse = max(dot(normal, lightDir), 0.0);
+        float specular = 0.0;
 
-        if (diffuseCoeff > 0.0) {
-            specularCoeff = 0.25 * pow(max(0.0, dot(surfaceToCamera, reflect(-lightDir, normal))), 32);
+        if (diffuse > 0.0) {
+            specular = 0.25 * pow(max(0.0, dot(surfaceToCamera, reflect(-lightDir, normal))), 32);
         }
         float distToLight = length(surfaceToLight);
 
         float attenuation = clamp(1.0 - distToLight / uLights[i].radius, 0.0, 1.0);
         attenuation *= attenuation;
 
-        color += attenuation * (diffuseCoeff + specularCoeff) * uLights[i].color.rgb;
+        color += attenuation * (diffuse + specular) * uLights[i].color.rgb;
+    }
+}
+
+void applyShadows(vec3 normal, inout vec3 color) {
+    for (int i = 0; i < uShadowLightCount; ++i) {
+        vec4 lightSpacePos = uShadowLights[i].projection * uShadowLights[i].view * vec4(fragPosition, 1.0);
+        vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+        projCoords = projCoords * 0.5 + 0.5;
+
+        if (projCoords.z > 1.0) continue;
+
+        float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
+        float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
+        float closestDepth = texture(uShadowmaps[i], projCoords.xy).r;
+        float currentDepth = projCoords.z;
+
+        vec3 surfaceToLight = uShadowLights[i].position.xyz - fragPosition;
+        vec3 lightDir = normalize(surfaceToLight);
+        float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+
+        if (currentDepth - bias > closestDepth) {
+            color *= 1.0 - shadow;
+        }
     }
 }
 
@@ -255,6 +294,9 @@ void main() {
         lightColor = min(lightColor, 1.0);
     } else {
         lightColor = vec3(1.0);
+    }
+    if (uShadowsEnabled) {
+        applyShadows(normal, lightColor);
     }
     float finalAlpha = uAlpha;
 
@@ -336,6 +378,7 @@ void Shaders::initGL() {
 
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
+    glGenBuffers(1, &_shadowsUbo);
     glGenBuffers(1, &_skeletalUbo);
 
     for (auto &program : _programs) {
@@ -352,6 +395,10 @@ void Shaders::initGL() {
         if (lightingBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
         }
+        uint32_t shadowsBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Shadows");
+        if (shadowsBlockIdx != GL_INVALID_INDEX) {
+            glUniformBlockBinding(_activeOrdinal, shadowsBlockIdx, kShadowsBindingPointIndex);
+        }
         uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
         if (skeletalBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
@@ -362,6 +409,11 @@ void Shaders::initGL() {
         setUniform("uBumpyShiny", TextureUniforms::bumpyShiny);
         setUniform("uBumpmap", TextureUniforms::bumpmap);
         setUniform("uBloom", TextureUniforms::bloom);
+
+        for (int i = 0; i < kMaxShadowLightCount; ++i) {
+            string name(str(boost::format("uShadowmaps[%d]") % i));
+            setUniform(name, TextureUniforms::shadowmap0 + i);
+        }
 
         _activeOrdinal = 0;
         glUseProgram(0);
@@ -417,6 +469,10 @@ void Shaders::deinitGL() {
     if (_skeletalUbo) {
         glDeleteBuffers(1, &_skeletalUbo);
         _skeletalUbo = 0;
+    }
+    if (_shadowsUbo) {
+        glDeleteBuffers(1, &_shadowsUbo);
+        _shadowsUbo = 0;
     }
     if (_lightingUbo) {
         glDeleteBuffers(1, &_lightingUbo);
@@ -550,6 +606,9 @@ void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
         setUniform("uProjection", globals.projection);
         setUniform("uView", globals.view);
         setUniform("uCameraPosition", globals.cameraPosition);
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, kShadowsBindingPointIndex, _shadowsUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(ShadowsUniforms), &globals.shadows, GL_STATIC_DRAW);
     }
     glUseProgram(ordinal);
     _activeOrdinal = ordinal;

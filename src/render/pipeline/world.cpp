@@ -31,21 +31,32 @@ namespace reone {
 
 namespace render {
 
+static const int kShadowResolution = 2048;
+
 WorldRenderPipeline::WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts) :
     _scene(scene),
     _opts(opts),
     _geometry(opts.width, opts.height, 2),
     _verticalBlur(opts.width, opts.height),
     _horizontalBlur(opts.width, opts.height) {
+
+    for (int i = 0; i < kMaxShadowLightCount; ++i) {
+        _shadows.push_back(make_unique<Framebuffer>(kShadowResolution, kShadowResolution, 0));
+    }
 }
 
 void WorldRenderPipeline::init() {
     _geometry.init();
     _verticalBlur.init();
     _horizontalBlur.init();
+
+    for (auto &shadows : _shadows) {
+        shadows->init();
+    }
 }
 
 void WorldRenderPipeline::render() const {
+    drawShadows();
     drawGeometry();
 
     float w = static_cast<float>(_opts.width);
@@ -61,6 +72,39 @@ void WorldRenderPipeline::render() const {
     drawResult();
 }
 
+void WorldRenderPipeline::drawShadows() const {
+    const vector<ShadowLight> &lights = _scene->shadowLights();
+
+    int lightCount = static_cast<int>(lights.size());
+    if (lightCount == 0) return;
+
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    glViewport(0, 0, kShadowResolution, kShadowResolution);
+
+    GlobalUniforms globals;
+
+    for (int i = 0; i < lightCount; ++i) {
+        _shadows[i]->bind();
+
+        glDrawBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        globals.cameraPosition = lights[i].position;
+        globals.projection = lights[i].projection;
+        globals.view = lights[i].view;
+
+        Shaders::instance().setGlobalUniforms(globals);
+
+        withDepthTest([this]() { _scene->renderNoGlobalUniforms(); });
+
+        _shadows[i]->unbind();
+    }
+
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+}
+
 void WorldRenderPipeline::drawGeometry() const {
     _geometry.bind();
 
@@ -68,6 +112,13 @@ void WorldRenderPipeline::drawGeometry() const {
     glDrawBuffers(2, buffers);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    int lightCount = static_cast<int>(_scene->shadowLights().size());
+
+    for (int i = 0; i < lightCount; ++i) {
+        glActiveTexture(GL_TEXTURE0 + TextureUniforms::shadowmap0 + i);
+        _shadows[i]->bindDepthBuffer();
+    }
     withDepthTest([this]() { _scene->render(); });
 
     _geometry.unbind();

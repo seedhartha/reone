@@ -26,6 +26,8 @@
 
 #include "glm/glm.hpp"
 
+#include "types.h"
+
 namespace reone {
 
 namespace render {
@@ -49,12 +51,20 @@ struct TextureUniforms {
     static constexpr int bumpyShiny { 3 };
     static constexpr int bumpmap { 4 };
     static constexpr int bloom { 5 };
+    static constexpr int shadowmap0 { 6 };
+};
+
+struct ShadowsUniforms {
+    int shadowLightCount { 0 };
+    char padding[12];
+    ShadowLight shadowLights[kMaxShadowLightCount];
 };
 
 struct GlobalUniforms {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
     glm::vec3 cameraPosition { 0.0f };
+    ShadowsUniforms shadows;
 };
 
 struct GeneralUniforms {
@@ -68,7 +78,8 @@ struct GeneralUniforms {
     int blurEnabled { false };
     int bloomEnabled { false };
     int discardEnabled { false };
-    char padding1[8];
+    int shadowsEnabled { false };
+    char padding1[4];
 
     glm::mat4 model { 1.0f };
     glm::vec4 color { 1.0f };
@@ -142,6 +153,7 @@ private:
 
     uint32_t _generalUbo { 0 };
     uint32_t _lightingUbo { 0 };
+    uint32_t _shadowsUbo { 0 };
     uint32_t _skeletalUbo { 0 };
 
     // END Uniform buffer objects
