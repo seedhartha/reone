@@ -121,7 +121,12 @@ void GUI::loadControl(const GffStruct &gffs) {
         control->setHilightColor(_defaultHilightColor);
     }
 
-    switch (_scaling) {
+    ScalingMode scaling = _scaling;
+    auto maybeScaling = _scalingByControlTag.find(tag);
+    if (maybeScaling != _scalingByControlTag.end()) {
+        scaling = maybeScaling->second;
+    }
+    switch (scaling) {
         case ScalingMode::PositionRelativeToCenter:
             positionRelativeToCenter(*control);
             break;

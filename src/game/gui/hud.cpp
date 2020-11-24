@@ -38,13 +38,19 @@ HUD::HUD(Game *game) :
     _debug(game->options().graphics),
     _select(game) {
 
-    if (!game) {
-        throw invalid_argument("Game must not be null");
-    }
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
     _scaling = ScalingMode::PositionRelativeToCenter;
+
+    static string combatControlTags[] = {
+        "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
+        "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
+        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"
+    };
+    for (auto &tag : combatControlTags) {
+        _scalingByControlTag.insert(make_pair(tag, ScalingMode::Stretch));
+    }
 }
 
 void HUD::load() {

@@ -86,6 +86,7 @@ protected:
     Control *_focus { nullptr };
     bool _hasDefaultHilightColor { false };
     glm::vec3 _defaultHilightColor { 0.0f };
+    std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
     GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
 
