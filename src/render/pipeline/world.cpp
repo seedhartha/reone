@@ -31,8 +31,6 @@ namespace reone {
 
 namespace render {
 
-static const int kBlurPassCount = 1;
-
 WorldRenderPipeline::WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts) :
     _scene(scene),
     _opts(opts),
@@ -48,18 +46,8 @@ void WorldRenderPipeline::init() {
 }
 
 void WorldRenderPipeline::render() const {
-    {
-        // Render geometry
-        _geometry.bind();
+    drawGeometry();
 
-        static const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-        glDrawBuffers(2, buffers);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->render(); });
-
-        _geometry.unbind();
-    }
     float w = static_cast<float>(_opts.width);
     float h = static_cast<float>(_opts.height);
 
@@ -68,90 +56,109 @@ void WorldRenderPipeline::render() const {
 
     Shaders::instance().setGlobalUniforms(globals);
 
-    for (int i = 0; i < kBlurPassCount; ++i) {
-        {
-            // Apply horizontal blur
-            _horizontalBlur.bind();
+    applyHorizontalBlur();
+    applyVerticalBlur();
+    drawResult();
+}
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void WorldRenderPipeline::drawGeometry() const {
+    _geometry.bind();
 
-            glm::mat4 transform(1.0f);
-            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+    static const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, buffers);
 
-            LocalUniforms locals;
-            locals.general.blurEnabled = true;
-            locals.general.model = move(transform);
-            locals.general.blurResolution = glm::vec2(w, h);
-            locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    withDepthTest([this]() { _scene->render(); });
 
-            Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
+    _geometry.unbind();
+}
 
-            glActiveTexture(GL_TEXTURE0);
-            if (i == 0) {
-                _geometry.bindColorBuffer(1);
-            } else {
-                _verticalBlur.bindColorBuffer(0);
-            }
+void WorldRenderPipeline::applyHorizontalBlur() const {
+    float w = static_cast<float>(_opts.width);
+    float h = static_cast<float>(_opts.height);
 
-            withDepthTest([]() {
-                Quad::getDefault().renderTriangles();
-            });
+    _horizontalBlur.bind();
 
-            _geometry.unbindColorBuffer();
-            _horizontalBlur.unbind();
-        }
-        {
-            // Apply vertical blur
-            _verticalBlur.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-            glm::mat4 transform(1.0f);
-            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+    LocalUniforms locals;
+    locals.general.blurEnabled = true;
+    locals.general.model = move(transform);
+    locals.general.blurResolution = glm::vec2(w, h);
+    locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
-            LocalUniforms locals;
-            locals.general.blurEnabled = true;
-            locals.general.model = move(transform);
-            locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
-            locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
+    Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
-            Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
+    glActiveTexture(GL_TEXTURE0);
+    _geometry.bindColorBuffer(1);
 
-            glActiveTexture(GL_TEXTURE0);
-            _horizontalBlur.bindColorBuffer(0);
-
-            withDepthTest([]() {
-                Quad::getDefault().renderTriangles();
-            });
-
-            _horizontalBlur.unbindColorBuffer();
-            _verticalBlur.unbind();
-        }
-    }
-    {
-        glm::mat4 transform(1.0f);
-        transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
-
-        LocalUniforms locals;
-        locals.general.bloomEnabled = true;
-        locals.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
-
-        glActiveTexture(GL_TEXTURE0);
-        _geometry.bindColorBuffer(0);
-
-        glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
-        _verticalBlur.bindColorBuffer(0);
-
+    withDepthTest([]() {
         Quad::getDefault().renderTriangles();
+    });
 
-        glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
-        _verticalBlur.unbindColorBuffer();
+    _geometry.unbindColorBuffer();
+    _horizontalBlur.unbind();
+}
 
-        glActiveTexture(GL_TEXTURE0);
-        _geometry.unbindColorBuffer();
-    }
+void WorldRenderPipeline::applyVerticalBlur() const {
+    float w = static_cast<float>(_opts.width);
+    float h = static_cast<float>(_opts.height);
+
+    _verticalBlur.bind();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+    LocalUniforms locals;
+    locals.general.blurEnabled = true;
+    locals.general.model = move(transform);
+    locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
+    locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
+
+    Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
+
+    glActiveTexture(GL_TEXTURE0);
+    _horizontalBlur.bindColorBuffer(0);
+
+    withDepthTest([]() {
+        Quad::getDefault().renderTriangles();
+    });
+
+    _horizontalBlur.unbindColorBuffer();
+    _verticalBlur.unbind();
+}
+
+void WorldRenderPipeline::drawResult() const {
+    float w = static_cast<float>(_opts.width);
+    float h = static_cast<float>(_opts.height);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+    LocalUniforms locals;
+    locals.general.bloomEnabled = true;
+    locals.general.model = move(transform);
+
+    Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
+
+    glActiveTexture(GL_TEXTURE0);
+    _geometry.bindColorBuffer(0);
+
+    glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
+    _verticalBlur.bindColorBuffer(0);
+
+    Quad::getDefault().renderTriangles();
+
+    glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
+    _verticalBlur.unbindColorBuffer();
+
+    glActiveTexture(GL_TEXTURE0);
+    _geometry.unbindColorBuffer();
 }
 
 } // namespace render
