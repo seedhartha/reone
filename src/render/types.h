@@ -30,7 +30,7 @@ namespace reone {
 
 namespace render {
 
-const int kMaxShadowLightCount = 4;
+const int kMaxShadowLightCount = 2;
 
 enum class TextureType {
     Diffuse,
@@ -78,7 +78,7 @@ public:
 class IRenderable {
 public:
     virtual void render() const = 0;
-    virtual void renderNoGlobalUniforms() const = 0;
+    virtual void renderNoGlobalUniforms(bool shadowPass) const = 0;
 
     virtual const std::vector<ShadowLight> &shadowLights() const = 0;
 };

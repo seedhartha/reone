@@ -181,7 +181,7 @@ void ModelSceneNode::updateLighting() {
     _lightsAffectedBy.clear();
     glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
 
-    _sceneGraph->getLightsAt(center, kMaxLightCount, [](auto &) { return true; }, _lightsAffectedBy);
+    _sceneGraph->getLightsAt(center, _lightsAffectedBy);
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {

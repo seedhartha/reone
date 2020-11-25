@@ -27,7 +27,10 @@ namespace reone {
 
 namespace render {
 
-ModelMesh::ModelMesh(bool render, int transparency) : _render(render), _transparency(transparency) {
+ModelMesh::ModelMesh(bool render, int transparency, bool shadow) :
+    _render(render),
+    _transparency(transparency),
+    _shadow(shadow) {
 }
 
 void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
@@ -69,6 +72,10 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
 
 bool ModelMesh::shouldRender() const {
     return _render;
+}
+
+bool ModelMesh::shouldCastShadows() const {
+    return _shadow;
 }
 
 bool ModelMesh::isTransparent() const {

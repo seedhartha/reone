@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <functional>
 #include <map>
 #include <memory>
 #include <vector>
@@ -42,7 +41,7 @@ public:
     SceneGraph(const render::GraphicsOptions &opts);
 
     void render() const override;
-    void renderNoGlobalUniforms() const override;
+    void renderNoGlobalUniforms(bool shadowPass) const override;
 
     void clear();
 
@@ -58,7 +57,8 @@ public:
 
     const std::vector<render::ShadowLight> &shadowLights() const override;
 
-    void getLightsAt(const glm::vec3 &position, int count, const std::function<bool(const LightSceneNode &)> &pred, std::vector<LightSceneNode *> &lights) const;
+    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
+    void getShadowLights(std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
     void setAmbientLightColor(const glm::vec3 &color);
@@ -70,6 +70,7 @@ private:
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
+    std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
@@ -83,7 +84,7 @@ private:
     void refreshMeshesAndLights();
     void refreshShadowLights();
 
-    void getLightProjectionView(const LightSceneNode &light, glm::mat4 &projection, glm::mat4 &view) const;
+    glm::mat4 getLightProjection(const LightSceneNode &light) const;
 };
 
 } // namespace scene

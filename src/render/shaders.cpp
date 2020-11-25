@@ -43,7 +43,7 @@ static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
-const int MAX_SHADOW_LIGHTS = 4;
+const int MAX_SHADOW_LIGHTS = 2;
 const int MAX_BONES = 128;
 
 struct Light {

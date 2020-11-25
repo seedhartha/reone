@@ -457,7 +457,11 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     uint16_t vertexCount = readUint16();
     uint16_t textureCount = readUint16();
 
-    ignore(5);
+    ignore(3);
+
+    uint8_t shadow = readByte();
+
+    ignore(1);
 
     uint8_t render = readByte();
 
@@ -499,7 +503,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     offsets.texCoords2 = mdxLightmapOffset != 0xffff ? mdxLightmapOffset : -1;
     offsets.stride = mdxVertexSize;
 
-    unique_ptr<ModelMesh> mesh(new ModelMesh(render, transparency));
+    unique_ptr<ModelMesh> mesh(new ModelMesh(render, transparency, shadow));
     mesh->_vertices = move(vertices);
     mesh->_indices = move(indices);
     mesh->_offsets = move(offsets);

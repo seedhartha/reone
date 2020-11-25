@@ -91,6 +91,7 @@ void SceneGraph::prepareFrame() {
 void SceneGraph::refreshMeshesAndLights() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
+    _shadowMeshes.clear();
     _lights.clear();
 
     for (auto &root : _roots) {
@@ -115,6 +116,9 @@ void SceneGraph::refreshMeshesAndLights() {
                             _opaqueMeshes.push_back(modelNode);
                         }
                     }
+                    if (modelNode->shouldCastShadows()) {
+                        _shadowMeshes.push_back(modelNode);
+                    }
                 } else {
                     LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
                     if (light) {
@@ -132,16 +136,12 @@ void SceneGraph::refreshMeshesAndLights() {
 void SceneGraph::refreshShadowLights() {
     _shadowLights.clear();
 
-    if (!_activeCamera) return;
-
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
-
     vector<LightSceneNode *> nodes;
-    getLightsAt(cameraPosition, kMaxShadowLightCount, [](auto &light) { return light.shadow(); }, nodes);
+    getShadowLights(nodes);
 
     for (auto &node : nodes) {
-        glm::mat4 projection, view;
-        getLightProjectionView(*node, projection, view);
+        glm::mat4 projection(getLightProjection(*node));
+        glm::mat4 view(node->absoluteTransformInverse());
 
         ShadowLight light;
         light.position = node->absoluteTransform()[3];
@@ -168,18 +168,24 @@ void SceneGraph::render() const {
 
     Shaders::instance().setGlobalUniforms(globals);
 
-    renderNoGlobalUniforms();
+    renderNoGlobalUniforms(false);
 }
 
-void SceneGraph::renderNoGlobalUniforms() const {
+void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
+    if (shadowPass) {
+        for (auto &mesh : _shadowMeshes) {
+            mesh->renderSingle(true);
+        }
+        return;
+    }
     for (auto &root : _roots) {
         root->render();
     }
     for (auto &mesh : _opaqueMeshes) {
-        mesh->renderSingle();
+        mesh->renderSingle(false);
     }
     for (auto &mesh : _transparentMeshes) {
-        mesh->renderSingle();
+        mesh->renderSingle(false);
     }
 }
 
@@ -187,18 +193,11 @@ const vector<ShadowLight> &SceneGraph::shadowLights() const {
     return _shadowLights;
 }
 
-void SceneGraph::getLightProjectionView(const LightSceneNode &light, glm::mat4 &projection, glm::mat4 &view) const {
-    projection = glm::perspective(glm::radians(100.0f), 1.0f, 1.0f, light.radius());
-    view = light.absoluteTransformInverse();
-}
-
-void SceneGraph::getLightsAt(const glm::vec3 &position, int count, const function<bool(const LightSceneNode &)> &pred, vector<LightSceneNode *> &lights) const {
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
     unordered_map<LightSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
-        if (!pred(*light)) continue;
-
         float distance = light->distanceTo(position);
         float radius = light->radius();
         if (distance > radius) continue;
@@ -220,9 +219,33 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, int count, const functio
         return leftDistance < rightDistance;
     });
 
-    if (lights.size() > count) {
-        lights.erase(lights.begin() + count, lights.end());
+    if (lights.size() > kMaxLightCount) {
+        lights.erase(lights.begin() + kMaxLightCount, lights.end());
     }
+}
+
+void SceneGraph::getShadowLights(vector<LightSceneNode *> &lights) const {
+    lights.clear();
+
+    if (!_activeCamera) return;
+
+    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
+
+    for (auto &light : _lights) {
+        if (!light->shadow() || light->distanceTo(cameraPosition) > light->radius()) continue;
+
+        lights.push_back(light);
+    }
+    sort(lights.begin(), lights.end(), [](auto &left, auto &right) {
+        return left->priority() < right->priority();
+    });
+    if (lights.size() > kMaxShadowLightCount) {
+        lights.erase(lights.begin() + kMaxShadowLightCount, lights.end());
+    }
+}
+
+glm::mat4 SceneGraph::getLightProjection(const LightSceneNode &light) const {
+    return glm::perspective(glm::radians(100.0f), 1.0f, 1.0f, light.radius());
 }
 
 const glm::vec3 &SceneGraph::ambientLightColor() const {
