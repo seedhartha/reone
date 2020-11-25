@@ -49,6 +49,11 @@ bool ModelNodeSceneNode::shouldRender() const {
     return mesh && mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
 }
 
+bool ModelNodeSceneNode::shouldCastShadows() const {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    return mesh && !mesh->shouldRender() && mesh->shouldCastShadows();
+}
+
 bool ModelNodeSceneNode::isTransparent() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh || _modelSceneNode->model()->classification() == Model::Classification::Character) {
@@ -57,76 +62,76 @@ bool ModelNodeSceneNode::isTransparent() const {
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 
-void ModelNodeSceneNode::renderSingle() const {
+void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
-
-    bool render = mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
-    if (!render) return;
-
-    shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
-    bool skeletal = static_cast<bool>(skin);
 
     LocalUniforms locals;
     locals.general.model = _absoluteTransform;
     locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
-    if (mesh->hasEnvmapTexture()) {
-        locals.general.envmapEnabled = true;
-    }
-    if (mesh->hasLightmapTexture()) {
-        locals.general.lightmapEnabled = true;
-    }
-    if (mesh->hasBumpyShinyTexture()) {
-        locals.general.bumpyShinyEnabled = true;
-    }
-    if (mesh->hasBumpmapTexture()) {
-        locals.general.bumpmapEnabled = true;
-    }
-    if (_modelSceneNode->model()->classification() == Model::Classification::Other) {
-        locals.general.shadowsEnabled = true;
-    }
-    if (skeletal) {
-        locals.general.skeletalEnabled = true;
-        locals.skeletal = Shaders::instance().skeletalUniforms();
-        locals.skeletal->absTransform = _modelNode->absoluteTransform();
-        locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
-
-        for (int i = 0; i < kMaxBoneCount; ++i) {
-            locals.skeletal->bones[i] = glm::mat4(1.0f);
+    if (!shadowPass) {
+        if (mesh->hasEnvmapTexture()) {
+            locals.general.envmapEnabled = true;
         }
-        for (auto &pair : skin->nodeIdxByBoneIdx) {
-            uint16_t boneIdx = pair.first;
-            uint16_t nodeIdx = pair.second;
+        if (mesh->hasLightmapTexture()) {
+            locals.general.lightmapEnabled = true;
+        }
+        if (mesh->hasBumpyShinyTexture()) {
+            locals.general.bumpyShinyEnabled = true;
+        }
+        if (mesh->hasBumpmapTexture()) {
+            locals.general.bumpmapEnabled = true;
+        }
 
-            ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
-            if (bone) {
-                locals.skeletal->bones[boneIdx] = bone->boneTransform();
+        bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
+        if (receivesShadows) {
+            locals.general.shadowsEnabled = true;
+        }
+
+        shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
+        if (!shadowPass && skin) {
+            locals.general.skeletalEnabled = true;
+            locals.skeletal = Shaders::instance().skeletalUniforms();
+            locals.skeletal->absTransform = _modelNode->absoluteTransform();
+            locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
+
+            for (int i = 0; i < kMaxBoneCount; ++i) {
+                locals.skeletal->bones[i] = glm::mat4(1.0f);
+            }
+            for (auto &pair : skin->nodeIdxByBoneIdx) {
+                uint16_t boneIdx = pair.first;
+                uint16_t nodeIdx = pair.second;
+
+                ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
+                if (bone) {
+                    locals.skeletal->bones[boneIdx] = bone->boneTransform();
+                }
+            }
+        }
+
+        if (!shadowPass && _modelNode->isSelfIllumEnabled()) {
+            locals.general.selfIllumEnabled = true;
+            locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
+        }
+        if (!shadowPass && _modelSceneNode->isLightingEnabled()) {
+            const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
+
+            locals.general.lightingEnabled = true;
+            locals.lighting = Shaders::instance().lightingUniforms();
+            locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+            locals.lighting->lightCount = static_cast<int>(lights.size());
+
+            for (int i = 0; i < locals.lighting->lightCount; ++i) {
+                ShaderLight &shaderLight = locals.lighting->lights[i];
+                shaderLight.position = lights[i]->absoluteTransform()[3];
+                shaderLight.radius = lights[i]->radius();
+                shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
             }
         }
     }
-    if (_modelNode->isSelfIllumEnabled()) {
-        locals.general.selfIllumEnabled = true;
-        locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
-    }
-    int lightCount = 0;
-
-    if (_modelSceneNode->isLightingEnabled()) {
-        const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
-
-        locals.general.lightingEnabled = true;
-        locals.lighting = Shaders::instance().lightingUniforms();
-        locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-        locals.lighting->lightCount = static_cast<int>(lights.size());
-
-        for (int i = 0; i < locals.lighting->lightCount; ++i) {
-            ShaderLight &shaderLight = locals.lighting->lights[i];
-            shaderLight.position = lights[i]->absoluteTransform()[3];
-            shaderLight.radius = lights[i]->radius();
-            shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-        }
-    }
-    Shaders::instance().activate(ShaderProgram::ModelModel, locals);
+    ShaderProgram program = shadowPass ? ShaderProgram::ModelWhite : ShaderProgram::ModelModel;
+    Shaders::instance().activate(program, locals);
 
     mesh->render(_modelSceneNode->textureOverride());
 }

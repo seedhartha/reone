@@ -97,7 +97,7 @@ void WorldRenderPipeline::drawShadows() const {
 
         Shaders::instance().setGlobalUniforms(globals);
 
-        withDepthTest([this]() { _scene->renderNoGlobalUniforms(); });
+        withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
 
         _shadows[i]->unbind();
     }

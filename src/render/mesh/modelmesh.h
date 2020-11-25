@@ -37,12 +37,15 @@ class MdlFile;
  */
 class ModelMesh : public Mesh {
 public:
-    ModelMesh(bool render, int transparency);
+    ModelMesh(bool render, int transparency, bool shadow);
 
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
 
     bool shouldRender() const;
+    bool shouldCastShadows() const;
+
     bool isTransparent() const;
+
     bool hasDiffuseTexture() const;
     bool hasEnvmapTexture() const;
     bool hasLightmapTexture() const;
@@ -55,6 +58,7 @@ public:
 private:
     bool _render { false };
     int _transparency { 0 };
+    bool _shadow { false };
     std::shared_ptr<Texture> _diffuse;
     std::shared_ptr<Texture> _envmap;
     std::shared_ptr<Texture> _lightmap;

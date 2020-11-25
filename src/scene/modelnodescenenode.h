@@ -36,9 +36,11 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void renderSingle() const;
+    void renderSingle(bool shadowPass) const;
 
     bool shouldRender() const;
+    bool shouldCastShadows() const;
+
     bool isTransparent() const;
 
     const ModelSceneNode *modelSceneNode() const;
