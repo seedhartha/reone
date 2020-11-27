@@ -262,7 +262,14 @@ void applyShadows(vec3 normal, inout vec3 color) {
 
         float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
         float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
-        float closestDepth = texture(uShadowmaps[i], projCoords.xy).r;
+
+        float closestDepth;
+        if (i == 1) {
+            closestDepth = texture(uShadowmaps[1], projCoords.xy).r;
+        } else {
+            closestDepth = texture(uShadowmaps[0], projCoords.xy).r;
+        }
+
         float currentDepth = projCoords.z;
 
         vec3 surfaceToLight = uShadowLights[i].position.xyz - fragPosition;
