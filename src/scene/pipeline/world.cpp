@@ -21,15 +21,17 @@
 
 #include "GL/glew.h"
 
-#include "../mesh/quad.h"
-#include "../shaders.h"
-#include "../util.h"
+#include "../../render/mesh/quad.h"
+#include "../../render/shaders.h"
+#include "../../render/util.h"
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 static const int kShadowResolution = 2048;
 
@@ -212,6 +214,6 @@ void WorldRenderPipeline::drawResult() const {
     _geometry.unbindColorBuffer();
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

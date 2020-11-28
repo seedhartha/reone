@@ -20,27 +20,27 @@
 #include <memory>
 #include <vector>
 
-#include "../framebuffer.h"
-#include "../types.h"
+#include "../../render/framebuffer.h"
+#include "../../render/types.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class WorldRenderPipeline {
 public:
-    WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts);
+    WorldRenderPipeline(render::IRenderable *scene, const render::GraphicsOptions &opts);
 
     void init();
     void render() const;
 
 private:
-    IRenderable *_scene { nullptr };
-    GraphicsOptions _opts;
-    Framebuffer _geometry;
-    Framebuffer _verticalBlur;
-    Framebuffer _horizontalBlur;
-    std::vector<std::unique_ptr<Framebuffer>> _shadows;
+    render::IRenderable *_scene { nullptr };
+    render::GraphicsOptions _opts;
+    render::Framebuffer _geometry;
+    render::Framebuffer _verticalBlur;
+    render::Framebuffer _horizontalBlur;
+    std::vector<std::unique_ptr<render::Framebuffer>> _shadows;
 
     WorldRenderPipeline(const WorldRenderPipeline &) = delete;
     WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
@@ -52,6 +52,6 @@ private:
     void drawResult() const;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

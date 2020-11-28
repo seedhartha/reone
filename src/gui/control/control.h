@@ -26,11 +26,11 @@
 
 #include "../../render/font.h"
 #include "../../render/framebuffer.h"
-#include "../../render/pipeline/control.h"
-#include "../../scene/modelscenenode.h"
-#include "../../scene/scenegraph.h"
 #include "../../render/texture.h"
 #include "../../resource/gfffile.h"
+#include "../../scene/modelscenenode.h"
+#include "../../scene/pipeline/control.h"
+#include "../../scene/scenegraph.h"
 #include "../types.h"
 
 namespace reone {
@@ -170,7 +170,7 @@ protected:
     virtual const glm::vec3 &getBorderColor() const;
 
 private:
-    std::unique_ptr<render::ControlRenderPipeline> _pipeline;
+    std::unique_ptr<scene::ControlRenderPipeline> _pipeline;
 
     Control(const Control &) = delete;
     Control &operator=(const Control &) = delete;
