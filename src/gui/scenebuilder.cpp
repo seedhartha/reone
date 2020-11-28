@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "../scene/cameranode.h"
+#include "../scene/node/cameranode.h"
 #include "../scene/scenegraph.h"
 
 using namespace std;

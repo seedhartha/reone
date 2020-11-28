@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "../../scene/modelscenenode.h"
+#include "../../scene/node/modelscenenode.h"
 #include "../../scene/scenegraph.h"
 
 #include "../types.h"

@@ -19,9 +19,10 @@
 
 #include <stdexcept>
 
+#include "../scenegraph.h"
+
 #include "lightnode.h"
 #include "modelscenenode.h"
-#include "scenegraph.h"
 
 using namespace std;
 

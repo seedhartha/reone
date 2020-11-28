@@ -19,41 +19,35 @@
 
 #include "scenenode.h"
 
-#include "../render/model/model.h"
+#include "../../render/aabb.h"
 
 namespace reone {
 
-namespace render {
-
-class ModelNode;
-
-}
 namespace scene {
 
-class ModelSceneNode;
+const int kFrustumPlaneCount = 6;
 
-class ModelNodeSceneNode : public SceneNode {
+class CameraSceneNode : public SceneNode {
 public:
-    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
+    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
 
-    void renderSingle(bool shadowPass) const;
+    bool isInFrustum(const glm::vec3 &point) const;
+    bool isInFrustum(const render::AABB &aabb) const;
 
-    bool shouldRender() const;
-    bool shouldCastShadows() const;
+    const glm::mat4 &projection() const;
+    const glm::mat4 &view() const;
 
-    bool isTransparent() const;
-
-    const ModelSceneNode *modelSceneNode() const;
-    render::ModelNode *modelNode() const;
-    const glm::mat4 &boneTransform() const;
-
-    void setBoneTransform(const glm::mat4 &transform);
+    void setProjection(const glm::mat4 &projection);
 
 private:
-    const ModelSceneNode *_modelSceneNode { nullptr };
-    render::ModelNode *_modelNode { nullptr };
-    glm::mat4 _animTransform { 1.0f };
-    glm::mat4 _boneTransform { 1.0f };
+    glm::mat4 _projection { 1.0f };
+    glm::mat4 _view { 1.0f };
+    glm::vec4 _frustum[kFrustumPlaneCount];
+
+    void updateAbsoluteTransform() override;
+
+    void updateView();
+    void updateFrustum();
 };
 
 } // namespace scene

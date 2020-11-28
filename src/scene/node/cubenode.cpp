@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabbnode.h"
+#include "cubenode.h"
 
-#include "../render/mesh/aabb.h"
+#include <glm/ext.hpp>
 
-#include "scenegraph.h"
+#include "../../render/mesh/cube.h"
 
 using namespace reone::render;
 
@@ -27,17 +27,13 @@ namespace reone {
 
 namespace scene {
 
-AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNode(sceneGraph), _aabb(aabb) {
+CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sceneGraph), _size(size) {
 }
 
-void AABBSceneNode::render() const {
-    AABBMesh::instance().render(_aabb, _absoluteTransform);
+void CubeSceneNode::render() const {
+    CubeMesh::instance().render(glm::scale(_absoluteTransform, glm::vec3(_size)));
 }
 
-const AABB &AABBSceneNode::aabb() const {
-    return _aabb;
-}
-
-} // namespace scene
+} // namespace render
 
 } // namespace reone

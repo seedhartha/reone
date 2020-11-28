@@ -17,24 +17,43 @@
 
 #pragma once
 
-#include "../render/aabb.h"
-
 #include "scenenode.h"
+
+#include "../../render/model/model.h"
 
 namespace reone {
 
+namespace render {
+
+class ModelNode;
+
+}
 namespace scene {
 
-class AABBSceneNode : public SceneNode {
+class ModelSceneNode;
+
+class ModelNodeSceneNode : public SceneNode {
 public:
-    AABBSceneNode(SceneGraph *sceneGraph, const render::AABB &abbb);
+    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void render() const override;
+    void renderSingle(bool shadowPass) const;
 
-    const render::AABB &aabb() const;
+    bool shouldRender() const;
+    bool shouldCastShadows() const;
+
+    bool isTransparent() const;
+
+    const ModelSceneNode *modelSceneNode() const;
+    render::ModelNode *modelNode() const;
+    const glm::mat4 &boneTransform() const;
+
+    void setBoneTransform(const glm::mat4 &transform);
 
 private:
-    render::AABB _aabb;
+    const ModelSceneNode *_modelSceneNode { nullptr };
+    render::ModelNode *_modelNode { nullptr };
+    glm::mat4 _animTransform { 1.0f };
+    glm::mat4 _boneTransform { 1.0f };
 };
 
 } // namespace scene
