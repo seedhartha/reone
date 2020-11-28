@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../resource/binfile.h"
+#include "../resource/binfile.h"
 
-#include "../walkmesh.h"
+#include "walkmesh.h"
 
 namespace reone {
 

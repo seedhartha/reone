@@ -20,7 +20,7 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "format/mdlfile.h"
+#include "model/mdlfile.h"
 
 using namespace std;
 

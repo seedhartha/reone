@@ -20,9 +20,9 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "format/curfile.h"
-#include "format/tgafile.h"
-#include "format/tpcfile.h"
+#include "image/curfile.h"
+#include "image/tgafile.h"
+#include "image/tpcfile.h"
 
 using namespace std;
 

@@ -130,23 +130,23 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 
 set(RENDER_HEADERS
     src/render/aabb.h
+    src/render/bwmfile.h
     src/render/cursor.h
     src/render/font.h
     src/render/fonts.h
-    src/render/format/bwmfile.h
-    src/render/format/curfile.h
-    src/render/format/mdlfile.h
-    src/render/format/tgafile.h
-    src/render/format/tpcfile.h
-    src/render/format/txifile.h
     src/render/fps.h
     src/render/framebuffer.h
+    src/render/image/curfile.h
+    src/render/image/tgafile.h
+    src/render/image/tpcfile.h
+    src/render/image/txifile.h
     src/render/mesh/aabb.h
     src/render/mesh/cube.h
     src/render/mesh/quad.h
     src/render/mesh/mesh.h
     src/render/mesh/modelmesh.h
     src/render/model/animation.h
+    src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelnode.h
     src/render/models.h
@@ -161,23 +161,23 @@ set(RENDER_HEADERS
 
 set(RENDER_SOURCES
     src/render/aabb.cpp
+    src/render/bwmfile.cpp
     src/render/cursor.cpp
     src/render/font.cpp
     src/render/fonts.cpp
-    src/render/format/bwmfile.cpp
-    src/render/format/curfile.cpp
-    src/render/format/mdlfile.cpp
-    src/render/format/tgafile.cpp
-    src/render/format/tpcfile.cpp
-    src/render/format/txifile.cpp
     src/render/fps.cpp
     src/render/framebuffer.cpp
+    src/render/image/curfile.cpp
+    src/render/image/tgafile.cpp
+    src/render/image/tpcfile.cpp
+    src/render/image/txifile.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/cube.cpp
     src/render/mesh/quad.cpp
     src/render/mesh/mesh.cpp
     src/render/mesh/modelmesh.cpp
     src/render/model/animation.cpp
+    src/render/model/mdlfile.cpp
     src/render/model/model.cpp
     src/render/model/modelnode.cpp
     src/render/models.cpp
