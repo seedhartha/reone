@@ -252,24 +252,24 @@ void applyLighting(vec3 normal, inout vec3 color) {
     }
 }
 
+float getShadowmapDepth(int index, vec2 texCoords) {
+    if (index == 1) {
+        return texture(uShadowmaps[1], texCoords).r;
+    } else {
+        return texture(uShadowmaps[0], texCoords).r;
+    }
+}
+
 void applyShadows(vec3 normal, inout vec3 color) {
     for (int i = 0; i < uShadowLightCount; ++i) {
         vec4 lightSpacePos = uShadowLights[i].projection * uShadowLights[i].view * vec4(fragPosition, 1.0);
-        vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-        projCoords = projCoords * 0.5 + 0.5;
 
+        vec3 projCoords = 0.5 * (lightSpacePos.xyz / lightSpacePos.w) + 0.5;
         if (projCoords.z > 1.0) continue;
 
         float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
         float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
-
-        float closestDepth;
-        if (i == 1) {
-            closestDepth = texture(uShadowmaps[1], projCoords.xy).r;
-        } else {
-            closestDepth = texture(uShadowmaps[0], projCoords.xy).r;
-        }
-
+        float closestDepth = getShadowmapDepth(i, projCoords.xy);
         float currentDepth = projCoords.z;
 
         vec3 surfaceToLight = uShadowLights[i].position.xyz - fragPosition;
