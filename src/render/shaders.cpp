@@ -258,6 +258,15 @@ float getShadowmapDepth(int index, vec2 texCoords) {
     } else {
         return texture(uShadowmaps[0], texCoords).r;
     }
+    /*
+    if (index == 2) {
+        return texture(uShadowmaps[2], texCoords).r;
+    else if (index == 1) {
+        return texture(uShadowmaps[1], texCoords).r;
+    } else {
+        return texture(uShadowmaps[0], texCoords).r;
+    }
+    */
 }
 
 void applyShadows(vec3 normal, inout vec3 color) {
@@ -272,11 +281,7 @@ void applyShadows(vec3 normal, inout vec3 color) {
         float closestDepth = getShadowmapDepth(i, projCoords.xy);
         float currentDepth = projCoords.z;
 
-        vec3 surfaceToLight = uShadowLights[i].position.xyz - fragPosition;
-        vec3 lightDir = normalize(surfaceToLight);
-        float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-
-        if (currentDepth - bias > closestDepth) {
+        if (currentDepth > closestDepth) {
             color *= 1.0 - shadow;
         }
     }

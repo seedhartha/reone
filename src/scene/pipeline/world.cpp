@@ -201,6 +201,7 @@ void WorldRenderPipeline::drawResult() const {
 
     glActiveTexture(GL_TEXTURE0);
     _geometry.bindColorBuffer(0);
+    //_shadows[0]->bindDepthBuffer();
 
     glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
     _verticalBlur.bindColorBuffer(0);

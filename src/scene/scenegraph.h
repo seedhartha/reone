@@ -82,7 +82,7 @@ private:
     void refreshMeshesAndLights();
     void refreshShadowLights();
 
-    glm::mat4 getLightProjection(const LightSceneNode &light) const;
+    glm::mat4 getLightProjection() const;
 };
 
 } // namespace scene
