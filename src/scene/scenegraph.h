@@ -25,8 +25,6 @@
 
 #include "../render/types.h"
 
-#include "octree.h"
-
 namespace reone {
 
 namespace scene {
@@ -75,7 +73,6 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    Octree _octree;
     std::vector<render::ShadowLight> _shadowLights;
 
     SceneGraph(const SceneGraph &) = delete;
