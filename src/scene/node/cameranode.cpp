@@ -19,8 +19,6 @@
 
 #include "glm/ext.hpp"
 
-using namespace reone::render;
-
 namespace reone {
 
 namespace scene {

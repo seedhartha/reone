@@ -20,7 +20,7 @@
 #include <set>
 #include <unordered_map>
 
-#include "../../render/aabb.h"
+#include "../../common/aabb.h"
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
 
@@ -57,7 +57,7 @@ public:
     bool isVisible() const;
     bool isOnScreen() const;
     float alpha() const;
-    const render::AABB &aabb() const;
+    const AABB &aabb() const;
 
     void setModel(const std::shared_ptr<render::Model> &model);
     void setTextureOverride(const std::shared_ptr<render::Texture> &texture);

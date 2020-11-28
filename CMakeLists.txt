@@ -59,6 +59,7 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 ## libcommon static library
 
 set(COMMON_HEADERS
+    src/common/aabb.h
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
@@ -71,6 +72,7 @@ set(COMMON_HEADERS
     src/common/types.h)
 
 set(COMMON_SOURCES
+    src/common/aabb.cpp
     src/common/endianutil.cpp
     src/common/jobs.cpp
     src/common/log.cpp
@@ -129,7 +131,6 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 ## librender static library
 
 set(RENDER_HEADERS
-    src/render/aabb.h
     src/render/bwmfile.h
     src/render/cursor.h
     src/render/font.h
@@ -160,7 +161,6 @@ set(RENDER_HEADERS
     src/render/window.h)
 
 set(RENDER_SOURCES
-    src/render/aabb.cpp
     src/render/bwmfile.cpp
     src/render/cursor.cpp
     src/render/font.cpp

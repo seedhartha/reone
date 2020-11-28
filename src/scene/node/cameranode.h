@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../render/aabb.h"
+#include "../../common/aabb.h"
 
 namespace reone {
 
@@ -32,7 +32,7 @@ public:
     CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
 
     bool isInFrustum(const glm::vec3 &point) const;
-    bool isInFrustum(const render::AABB &aabb) const;
+    bool isInFrustum(const AABB &aabb) const;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
