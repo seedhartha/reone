@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../render/aabb.h"
+#include "../../common/aabb.h"
 
 #include "scenenode.h"
 
@@ -27,14 +27,14 @@ namespace scene {
 
 class AABBSceneNode : public SceneNode {
 public:
-    AABBSceneNode(SceneGraph *sceneGraph, const render::AABB &abbb);
+    AABBSceneNode(SceneGraph *sceneGraph, const AABB &abbb);
 
     void render() const override;
 
-    const render::AABB &aabb() const;
+    const AABB &aabb() const;
 
 private:
-    render::AABB _aabb;
+    AABB _aabb;
 };
 
 } // namespace scene

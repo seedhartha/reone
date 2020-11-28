@@ -25,8 +25,6 @@
 
 namespace reone {
 
-namespace render {
-
 AABB::AABB(const glm::vec3 &min, const glm::vec3 &max) : _empty(false), _min(min), _max(max) {
     updateTransform();
 }
@@ -167,7 +165,5 @@ const glm::vec3 &AABB::center() const {
 const glm::mat4 &AABB::transform() const {
     return _transform;
 }
-
-} // namespace render
 
 } // namespace reone

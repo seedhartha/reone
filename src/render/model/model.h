@@ -19,7 +19,7 @@
 
 #include <unordered_map>
 
-#include "../aabb.h"
+#include "../../common/aabb.h"
 
 #include "animation.h"
 

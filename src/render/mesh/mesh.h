@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "../aabb.h"
+#include "../../common/aabb.h"
 
 namespace reone {
 
