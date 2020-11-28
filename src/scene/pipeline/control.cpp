@@ -21,15 +21,17 @@
 
 #include "GL/glew.h"
 
-#include "../mesh/quad.h"
-#include "../shaders.h"
-#include "../util.h"
+#include "../../render/mesh/quad.h"
+#include "../../render/shaders.h"
+#include "../../render/util.h"
 
 using namespace std;
 
+using namespace reone::render;
+
 namespace reone {
 
-namespace render {
+namespace scene {
 
 ControlRenderPipeline::ControlRenderPipeline(IRenderable *scene, const glm::ivec4 &extent) :
     _scene(scene),
@@ -89,6 +91,6 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
     }
 }
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

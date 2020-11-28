@@ -150,8 +150,6 @@ set(RENDER_HEADERS
     src/render/model/model.h
     src/render/model/modelnode.h
     src/render/models.h
-    src/render/pipeline/control.h
-    src/render/pipeline/world.h
     src/render/shaders.h
     src/render/texture.h
     src/render/textures.h
@@ -183,8 +181,6 @@ set(RENDER_SOURCES
     src/render/model/model.cpp
     src/render/model/modelnode.cpp
     src/render/models.cpp
-    src/render/pipeline/control.cpp
-    src/render/pipeline/world.cpp
     src/render/shaders.cpp
     src/render/texture.cpp
     src/render/textures.cpp
@@ -255,6 +251,8 @@ set(SCENE_HEADERS
     src/scene/modelnodescenenode.h
     src/scene/modelscenenode.h
     src/scene/octree.h
+    src/scene/pipeline/control.h
+    src/scene/pipeline/world.h
     src/scene/scenegraph.h
     src/scene/scenenode.h
     src/scene/scenenodeanimator.h)
@@ -267,6 +265,8 @@ set(SCENE_SOURCES
     src/scene/modelnodescenenode.cpp
     src/scene/modelscenenode.cpp
     src/scene/octree.cpp
+    src/scene/pipeline/control.cpp
+    src/scene/pipeline/world.cpp
     src/scene/scenegraph.cpp
     src/scene/scenenode.cpp
     src/scene/scenenodeanimator.cpp)

@@ -25,9 +25,9 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../render/pipeline/world.h"
 #include "../render/window.h"
 #include "../resource/types.h"
+#include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
 
 #include "console.h"
@@ -169,7 +169,7 @@ private:
     boost::filesystem::path _path;
     render::RenderWindow _window;
     scene::SceneGraph _sceneGraph;
-    render::WorldRenderPipeline _worldPipeline;
+    scene::WorldRenderPipeline _worldPipeline;
     Console _console;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;

@@ -20,29 +20,29 @@
 #include "glm/vec2.hpp"
 #include "glm/vec4.hpp"
 
-#include "../framebuffer.h"
-#include "../types.h"
+#include "../../render/framebuffer.h"
+#include "../../render/types.h"
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
 class ControlRenderPipeline {
 public:
-    ControlRenderPipeline(IRenderable *scene, const glm::ivec4 &extent);
+    ControlRenderPipeline(render::IRenderable *scene, const glm::ivec4 &extent);
 
     void init();
     void render(const glm::ivec2 &offset) const;
 
 private:
-    IRenderable *_scene { nullptr };
+    render::IRenderable *_scene { nullptr };
     glm::vec4 _extent { 0.0f };
-    Framebuffer _geometry;
+    render::Framebuffer _geometry;
 
     ControlRenderPipeline(const ControlRenderPipeline &) = delete;
     ControlRenderPipeline &operator=(const ControlRenderPipeline &) = delete;
 };
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone
