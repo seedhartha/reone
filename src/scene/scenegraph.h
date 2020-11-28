@@ -50,13 +50,13 @@ public:
     void prepareFrame();
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
+    void setReferenceNode(const std::shared_ptr<SceneNode> &node);
 
     // Lights
 
     const std::vector<render::ShadowLight> &shadowLights() const;
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
-    void getShadowLights(std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
     void setAmbientLightColor(const glm::vec3 &color);
@@ -74,6 +74,7 @@ private:
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
     std::vector<render::ShadowLight> _shadowLights;
+    std::shared_ptr<SceneNode> _refNode;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
