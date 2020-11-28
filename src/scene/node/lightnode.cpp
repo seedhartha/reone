@@ -15,40 +15,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "lightnode.h"
 
-#include "scenenode.h"
-
-#include "../render/aabb.h"
+#include "../scenegraph.h"
 
 namespace reone {
 
 namespace scene {
 
-const int kFrustumPlaneCount = 6;
+LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, float multiplier, bool shadow) :
+    SceneNode(sceneGraph),
+    _priority(priority),
+    _color(color),
+    _radius(radius),
+    _multiplier(multiplier),
+    _shadow(shadow) {
+}
 
-class CameraSceneNode : public SceneNode {
-public:
-    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
+int LightSceneNode::priority() const {
+    return _priority;
+}
 
-    bool isInFrustum(const glm::vec3 &point) const;
-    bool isInFrustum(const render::AABB &aabb) const;
+const glm::vec3 &LightSceneNode::color() const {
+    return _color;
+}
 
-    const glm::mat4 &projection() const;
-    const glm::mat4 &view() const;
+float LightSceneNode::radius() const {
+    return _radius;
+}
 
-    void setProjection(const glm::mat4 &projection);
+float LightSceneNode::multiplier() const {
+    return _multiplier;
+}
 
-private:
-    glm::mat4 _projection { 1.0f };
-    glm::mat4 _view { 1.0f };
-    glm::vec4 _frustum[kFrustumPlaneCount];
-
-    void updateAbsoluteTransform() override;
-
-    void updateView();
-    void updateFrustum();
-};
+bool LightSceneNode::shadow() const {
+    return _shadow;
+}
 
 } // namespace scene
 

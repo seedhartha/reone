@@ -22,10 +22,10 @@
 
 #include "../render/mesh/quad.h"
 
-#include "cameranode.h"
-#include "lightnode.h"
-#include "modelnodescenenode.h"
-#include "modelscenenode.h"
+#include "node/cameranode.h"
+#include "node/lightnode.h"
+#include "node/modelnodescenenode.h"
+#include "node/modelscenenode.h"
 
 using namespace std;
 

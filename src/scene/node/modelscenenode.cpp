@@ -18,15 +18,16 @@
 #include <stack>
 #include <stdexcept>
 
-#include "../render/mesh/aabb.h"
-#include "../resource/resources.h"
-#include "../common/log.h"
+#include "../../common/log.h"
+#include "../../render/mesh/aabb.h"
+#include "../../resource/resources.h"
+
+#include "../scenegraph.h"
 
 #include "aabbnode.h"
 #include "lightnode.h"
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
-#include "scenegraph.h"
 
 using namespace std;
 

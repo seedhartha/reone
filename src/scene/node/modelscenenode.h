@@ -20,12 +20,13 @@
 #include <set>
 #include <unordered_map>
 
-#include "../render/aabb.h"
-#include "../render/model/model.h"
-#include "../render/shaders.h"
+#include "../../render/aabb.h"
+#include "../../render/model/model.h"
+#include "../../render/shaders.h"
+
+#include "../scenenodeanimator.h"
 
 #include "scenenode.h"
-#include "scenenodeanimator.h"
 
 namespace reone {
 

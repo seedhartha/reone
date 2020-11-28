@@ -244,31 +244,31 @@ endif()
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/scene/aabbnode.h
-    src/scene/cameranode.h
-    src/scene/cubenode.h
-    src/scene/lightnode.h
-    src/scene/modelnodescenenode.h
-    src/scene/modelscenenode.h
+    src/scene/node/aabbnode.h
+    src/scene/node/cameranode.h
+    src/scene/node/cubenode.h
+    src/scene/node/lightnode.h
+    src/scene/node/modelnodescenenode.h
+    src/scene/node/modelscenenode.h
+    src/scene/node/scenenode.h
     src/scene/octree.h
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
     src/scene/scenegraph.h
-    src/scene/scenenode.h
     src/scene/scenenodeanimator.h)
 
 set(SCENE_SOURCES
-    src/scene/aabbnode.cpp
-    src/scene/cameranode.cpp
-    src/scene/cubenode.cpp
-    src/scene/lightnode.cpp
-    src/scene/modelnodescenenode.cpp
-    src/scene/modelscenenode.cpp
+    src/scene/node/aabbnode.cpp
+    src/scene/node/cameranode.cpp
+    src/scene/node/cubenode.cpp
+    src/scene/node/lightnode.cpp
+    src/scene/node/modelnodescenenode.cpp
+    src/scene/node/modelscenenode.cpp
+    src/scene/node/scenenode.cpp
     src/scene/octree.cpp
     src/scene/pipeline/control.cpp
     src/scene/pipeline/world.cpp
     src/scene/scenegraph.cpp
-    src/scene/scenenode.cpp
     src/scene/scenenodeanimator.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})

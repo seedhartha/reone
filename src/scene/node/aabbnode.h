@@ -15,42 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lightnode.h"
+#pragma once
 
-#include "scenegraph.h"
+#include "../../render/aabb.h"
+
+#include "scenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, float multiplier, bool shadow) :
-    SceneNode(sceneGraph),
-    _priority(priority),
-    _color(color),
-    _radius(radius),
-    _multiplier(multiplier),
-    _shadow(shadow) {
-}
+class AABBSceneNode : public SceneNode {
+public:
+    AABBSceneNode(SceneGraph *sceneGraph, const render::AABB &abbb);
 
-int LightSceneNode::priority() const {
-    return _priority;
-}
+    void render() const override;
 
-const glm::vec3 &LightSceneNode::color() const {
-    return _color;
-}
+    const render::AABB &aabb() const;
 
-float LightSceneNode::radius() const {
-    return _radius;
-}
-
-float LightSceneNode::multiplier() const {
-    return _multiplier;
-}
-
-bool LightSceneNode::shadow() const {
-    return _shadow;
-}
+private:
+    render::AABB _aabb;
+};
 
 } // namespace scene
 

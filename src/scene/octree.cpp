@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <stack>
 
-#include "cameranode.h"
+#include "node/cameranode.h"
 
 using namespace std;
 

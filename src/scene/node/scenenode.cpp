@@ -21,7 +21,7 @@
 
 #include "glm/gtx/norm.hpp"
 
-#include "scenegraph.h"
+#include "../scenegraph.h"
 
 using namespace std;
 

@@ -20,8 +20,8 @@
 #include <stack>
 #include <stdexcept>
 
-#include "modelnodescenenode.h"
-#include "modelscenenode.h"
+#include "node/modelnodescenenode.h"
+#include "node/modelscenenode.h"
 
 using namespace std;
 

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../../gui/gui.h"
-#include "../../../scene/modelscenenode.h"
+#include "../../../scene/node/modelscenenode.h"
 #include "../../../scene/scenegraph.h"
 
 #include "../../object/creature.h"
