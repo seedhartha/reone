@@ -21,7 +21,7 @@
 
 #include "../common/streamutil.h"
 #include "../render/cursor.h"
-#include "../render/format/curfile.h"
+#include "../render/image/curfile.h"
 #include "../resource/resources.h"
 
 using namespace std;
