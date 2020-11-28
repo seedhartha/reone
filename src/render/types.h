@@ -74,15 +74,6 @@ public:
     virtual bool handle(const SDL_Event &event) = 0;
 };
 
-// TODO: move render pipelines into libscene
-class IRenderable {
-public:
-    virtual void render() const = 0;
-    virtual void renderNoGlobalUniforms(bool shadowPass) const = 0;
-
-    virtual const std::vector<ShadowLight> &shadowLights() const = 0;
-};
-
 } // namespace render
 
 } // namespace reone

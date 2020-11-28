@@ -35,7 +35,7 @@ namespace scene {
 
 static const int kShadowResolution = 2048;
 
-WorldRenderPipeline::WorldRenderPipeline(IRenderable *scene, const GraphicsOptions &opts) :
+WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
     _scene(scene),
     _opts(opts),
     _geometry(opts.width, opts.height, 2),

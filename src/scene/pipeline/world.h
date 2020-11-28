@@ -22,6 +22,7 @@
 
 #include "../../render/framebuffer.h"
 #include "../../render/types.h"
+#include "../../scene/scenegraph.h"
 
 namespace reone {
 
@@ -29,13 +30,13 @@ namespace scene {
 
 class WorldRenderPipeline {
 public:
-    WorldRenderPipeline(render::IRenderable *scene, const render::GraphicsOptions &opts);
+    WorldRenderPipeline(SceneGraph *scene, const render::GraphicsOptions &opts);
 
     void init();
     void render() const;
 
 private:
-    render::IRenderable *_scene { nullptr };
+    SceneGraph *_scene { nullptr };
     render::GraphicsOptions _opts;
     render::Framebuffer _geometry;
     render::Framebuffer _verticalBlur;

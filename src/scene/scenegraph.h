@@ -36,12 +36,12 @@ class LightSceneNode;
 class ModelNodeSceneNode;
 class SceneNode;
 
-class SceneGraph : public render::IRenderable {
+class SceneGraph {
 public:
     SceneGraph(const render::GraphicsOptions &opts);
 
-    void render() const override;
-    void renderNoGlobalUniforms(bool shadowPass) const override;
+    void render() const;
+    void renderNoGlobalUniforms(bool shadowPass) const;
 
     void clear();
 
@@ -55,7 +55,7 @@ public:
 
     // Lights
 
-    const std::vector<render::ShadowLight> &shadowLights() const override;
+    const std::vector<render::ShadowLight> &shadowLights() const;
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
     void getShadowLights(std::vector<LightSceneNode *> &lights) const;

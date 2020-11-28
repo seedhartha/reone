@@ -21,7 +21,8 @@
 #include "glm/vec4.hpp"
 
 #include "../../render/framebuffer.h"
-#include "../../render/types.h"
+
+#include "../scenegraph.h"
 
 namespace reone {
 
@@ -29,13 +30,13 @@ namespace scene {
 
 class ControlRenderPipeline {
 public:
-    ControlRenderPipeline(render::IRenderable *scene, const glm::ivec4 &extent);
+    ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent);
 
     void init();
     void render(const glm::ivec2 &offset) const;
 
 private:
-    render::IRenderable *_scene { nullptr };
+    SceneGraph *_scene { nullptr };
     glm::vec4 _extent { 0.0f };
     render::Framebuffer _geometry;
 
