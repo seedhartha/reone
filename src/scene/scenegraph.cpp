@@ -35,6 +35,8 @@ namespace reone {
 
 namespace scene {
 
+static const float kMaxLightDistance = 16.0f;
+
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
 
@@ -138,20 +140,27 @@ void SceneGraph::refreshShadowLights() {
 
     if (!_refNode) return;
 
+    glm::vec3 refNodePos(_refNode->absoluteTransform()[3]);
     vector<LightSceneNode *> lights;
-    getLightsAt(_refNode->absoluteTransform()[3], lights);
+    getLightsAt(refNodePos, lights);
 
     for (auto &light : lights) {
         if (!light->shadow()) continue;
         if (_shadowLights.size() >= kMaxShadowLightCount) break;
 
-        glm::mat4 projection(getLightProjection(*light));
-        glm::mat4 view(light->absoluteTransformInverse());
+        glm::vec3 lightPos(light->absoluteTransform()[3]);
+        glm::vec3 lightToRefNode(lightPos - refNodePos);
+        glm::vec3 lightDir(glm::normalize(lightToRefNode));
+
+        float dist = glm::min(glm::length(lightToRefNode), kMaxLightDistance);
+        lightPos = refNodePos + dist * lightDir;
+
+        glm::mat4 view(glm::lookAt(lightPos, refNodePos, glm::vec3(0.0f, 0.0f, 1.0f)));
 
         ShadowLight shadowLight;
-        shadowLight.position = light->absoluteTransform()[3];
+        shadowLight.position = glm::vec4(lightPos, 1.0f);
         shadowLight.view = view;
-        shadowLight.projection = projection;
+        shadowLight.projection = getLightProjection();
         _shadowLights.push_back(move(shadowLight));
     }
 }
@@ -229,8 +238,8 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
     }
 }
 
-glm::mat4 SceneGraph::getLightProjection(const LightSceneNode &light) const {
-    return glm::perspective(glm::radians(100.0f), 1.0f, 1.0f, light.radius());
+glm::mat4 SceneGraph::getLightProjection() const {
+    return glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, 1000.0f);
 }
 
 const glm::vec3 &SceneGraph::ambientLightColor() const {
