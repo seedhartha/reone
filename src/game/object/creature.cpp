@@ -444,13 +444,26 @@ void Creature::setTalking(bool talking) {
     _animDirty = true;
 }
 
-const string &Creature::getPauseAnimation() const {
+string Creature::getPauseAnimation() const {
     switch (_modelType) {
         case ModelType::Creature:
             return g_animPauseCreature;
         default:
-            return g_animPauseCharacter;
+            break;
     }
+
+    // TODO: if (_lowHP) return "pauseinj" 
+
+    if (_inCombat) {
+        WeaponType type = WeaponType::None;
+        WeaponWield wield = WeaponWield::None;
+        getWeaponInfo(type, wield);
+
+        int wieldNumber = getWeaponWieldNumber(wield);
+        return str(boost::format("g%dr1") % wieldNumber);
+    }
+
+    return g_animPauseCharacter;
 }
 
 const string &Creature::getWalkAnimation() const {
@@ -462,13 +475,35 @@ const string &Creature::getWalkAnimation() const {
     }
 }
 
-const string &Creature::getRunAnimation() const {
+string Creature::getRunAnimation() const {
     switch (_modelType) {
         case ModelType::Creature:
             return g_animRunCreature;
         default:
-            return g_animRunCharacter;
+            break;
     }
+
+    // TODO: if (_lowHP) return "runinj" 
+
+    if (_inCombat) {
+        WeaponType type = WeaponType::None;
+        WeaponWield wield = WeaponWield::None;
+        getWeaponInfo(type, wield);
+
+        switch (wield) {
+            case WeaponWield::SingleSaber:
+                return getEquippedItem(kInventorySlotLeftWeapon) ? "runds" : "runss";
+            case WeaponWield::TwoHandedSaber:
+                return "runst";
+            case WeaponWield::Rifle:
+            case WeaponWield::HeavyCarbine:
+                return  "runrf";
+            default:
+                break;
+        }
+    }
+
+    return g_animRunCharacter;
 }
 
 string Creature::getDuelAttackAnimation() const {
@@ -507,11 +542,11 @@ int Creature::getWeaponWieldNumber(WeaponWield wield) const {
         case WeaponWield::StunBaton:
             return 1;
         case WeaponWield::SingleSaber:
-            return 2;
+            return getEquippedItem(kInventorySlotLeftWeapon) ? 4 : 2;
         case WeaponWield::TwoHandedSaber:
             return 3;
         case WeaponWield::SingleBlaster:
-            return 5;
+            return getEquippedItem(kInventorySlotLeftWeapon) ? 6 : 5;
         case WeaponWield::Rifle:
             return 7;
         case WeaponWield::HeavyCarbine:
