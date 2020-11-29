@@ -105,6 +105,7 @@ public:
     void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
+    void setCombat(bool active) { _inCombat = active; }
 
     // Equipment
 
@@ -152,6 +153,7 @@ private:
     Faction _faction { Faction::Invalid };
     std::deque<std::unique_ptr<Effect>> _effects;
     bool _movementRestricted { false };
+    bool _inCombat { false };
 
     // Scripts
 
@@ -172,8 +174,8 @@ private:
     std::string getHeadModelName() const;
     std::string getWeaponModelName(InventorySlot slot) const;
 
-    const std::string &getPauseAnimation() const;
-    const std::string &getRunAnimation() const;
+    std::string getPauseAnimation() const;
+    std::string getRunAnimation() const;
     const std::string &getWalkAnimation() const;
 
     std::string getDuelAttackAnimation() const;
