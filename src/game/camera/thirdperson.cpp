@@ -141,6 +141,11 @@ void ThirdPersonCamera::setFindObstacle(const function<bool(const glm::vec3 &, c
     _findObstacle = fn;
 }
 
+void ThirdPersonCamera::setStyle(const CameraStyle &style) {
+    _style = style;
+    updateSceneNode();
+}
+
 } // namespace game
 
 } // namespace reone
