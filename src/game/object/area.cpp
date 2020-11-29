@@ -152,6 +152,13 @@ void Area::loadCameraStyle(const GffStruct &are) {
     _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);
     _cameraStyle.viewAngle = styleTable->getFloat(styleIdx, "viewangle", 0.0f);
     _cameraStyle.height = styleTable->getFloat(styleIdx, "height", 0.0f);
+
+    auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
+    _combatCamStyle.distance = combatStyleRow->getFloat("distance");
+    _combatCamStyle.pitch = combatStyleRow->getFloat("pitch");
+    _combatCamStyle.viewAngle = combatStyleRow->getFloat("viewangle");
+    _combatCamStyle.height = combatStyleRow->getFloat("height");
+
 }
 
 void Area::loadAmbientColor(const GffStruct &are) {
@@ -867,6 +874,14 @@ void Area::setStaticCamera(int cameraId) {
             break;
         }
     }
+}
+
+void Area::setCombatTPCamera() {
+    _thirdPersonCamera->setStyle(_combatCamStyle);
+}
+
+void Area::setDefaultTPCamera() {
+    _thirdPersonCamera->setStyle(_cameraStyle);
 }
 
 } // namespace game

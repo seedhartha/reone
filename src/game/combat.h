@@ -46,6 +46,10 @@ public:
 
     bool isActive() const;
 
+    void onEnterCombatMode();
+
+    void onExitCombatMode();
+
 private:
     enum class RoundState {
         Started,

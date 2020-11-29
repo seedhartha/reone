@@ -48,6 +48,7 @@ Combat::Combat(Game *game) : _game(game) {
     }
 }
 
+bool wasActive = false;
 void Combat::update(float dt) {
     _heartbeatTimer.update(dt);
 
@@ -57,6 +58,10 @@ void Combat::update(float dt) {
         updateAI();
     }
     updateRounds(dt);
+
+    if (!wasActive && isActive()) onEnterCombatMode();
+    else if (wasActive && !isActive()) onExitCombatMode();
+    wasActive = isActive();
 }
 
 void Combat::updateCombatants() {
@@ -248,6 +253,14 @@ void Combat::updateRound(Round &round, float dt) {
 bool Combat::isActive() const {
     shared_ptr<Creature> partyLeader(_game->party().leader());
     return partyLeader && _combatantById.count(partyLeader->id()) != 0;
+}
+
+void Combat::onEnterCombatMode() {
+    _game->module()->area()->setCombatTPCamera();
+}
+
+void Combat::onExitCombatMode() {
+    _game->module()->area()->setDefaultTPCamera();
 }
 
 } // namespace game
