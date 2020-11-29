@@ -107,6 +107,8 @@ public:
     Camera &getCamera(CameraType type);
 
     void setStaticCamera(int cameraId);
+    void setCombatTPCamera();
+    void setDefaultTPCamera();
 
     // END Cameras
 
@@ -128,6 +130,7 @@ private:
     RoomMap _rooms;
     std::unique_ptr<resource::Visibility> _visibility;
     CameraStyle _cameraStyle;
+    CameraStyle _combatCamStyle;
     std::string _music;
     float _heartbeatTimeout { kHeartbeatInterval };
     Map _map;
