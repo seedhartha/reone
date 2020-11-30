@@ -114,6 +114,7 @@ public:
     void unequip(const std::shared_ptr<Item> &item);
 
     std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    bool isSlotEquipped(InventorySlot slot) const;
 
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
 
