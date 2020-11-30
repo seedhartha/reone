@@ -424,6 +424,10 @@ shared_ptr<Item> Creature::getEquippedItem(InventorySlot slot) const {
     return equipped != _equipment.end() ? equipped->second : nullptr;
 }
 
+bool Creature::isSlotEquipped(InventorySlot slot) const {
+    return _equipment.find(slot) != _equipment.end();
+}
+
 void Creature::setTag(const string &tag) {
     _tag = tag;
 }
@@ -444,11 +448,8 @@ void Creature::setTalking(bool talking) {
 }
 
 string Creature::getPauseAnimation() const {
-    switch (_modelType) {
-        case ModelType::Creature:
-            return g_animPauseCreature;
-        default:
-            break;
+    if (_modelType == ModelType::Creature) {
+        return g_animPauseCreature;
     }
 
     // TODO: if (_lowHP) return "pauseinj" 
@@ -475,11 +476,8 @@ const string &Creature::getWalkAnimation() const {
 }
 
 string Creature::getRunAnimation() const {
-    switch (_modelType) {
-        case ModelType::Creature:
-            return g_animRunCreature;
-        default:
-            break;
+    if (_modelType == ModelType::Creature) {
+        return g_animRunCreature;
     }
 
     // TODO: if (_lowHP) return "runinj" 
@@ -491,7 +489,7 @@ string Creature::getRunAnimation() const {
 
         switch (wield) {
             case WeaponWield::SingleSaber:
-                return getEquippedItem(kInventorySlotLeftWeapon) ? "runds" : "runss";
+                return isSlotEquipped(kInventorySlotLeftWeapon) ? "runds" : "runss";
             case WeaponWield::TwoHandedSaber:
                 return "runst";
             case WeaponWield::Rifle:
@@ -541,11 +539,11 @@ int Creature::getWeaponWieldNumber(WeaponWield wield) const {
         case WeaponWield::StunBaton:
             return 1;
         case WeaponWield::SingleSaber:
-            return getEquippedItem(kInventorySlotLeftWeapon) ? 4 : 2;
+            return isSlotEquipped(kInventorySlotLeftWeapon) ? 4 : 2;
         case WeaponWield::TwoHandedSaber:
             return 3;
         case WeaponWield::SingleBlaster:
-            return getEquippedItem(kInventorySlotLeftWeapon) ? 6 : 5;
+            return isSlotEquipped(kInventorySlotLeftWeapon) ? 6 : 5;
         case WeaponWield::Rifle:
             return 7;
         case WeaponWield::HeavyCarbine:
