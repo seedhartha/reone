@@ -53,7 +53,7 @@ static const char kSignature[] = "BIKi";
 
 #if REONE_ENABLE_VIDEO
 
-class BinkVideoDecoder {
+class BinkVideoDecoder : public MediaStream<Video::Frame> {
 public:
     BinkVideoDecoder(const fs::path &path) : _path(path) {
     }
@@ -95,6 +95,14 @@ public:
         }
     }
 
+    void ignoreFrames(int count) override {
+        readVideoFrames(count, true);
+    }
+
+    void fetchFrames(int count) override {
+        readVideoFrames(count);
+    }
+
     void load() {
         openInput(_path);
         findStreams();
@@ -106,7 +114,7 @@ public:
         initConverters();
         initFrames();
         initVideo();
-        processStream();
+        readAudioFrames();
     }
 
     shared_ptr<Video> video() const {
@@ -231,55 +239,82 @@ private:
         }
     }
 
-    void processStream() {
+    void readVideoFrames(int count, bool ignore = false) {
+        if (count == 0 || _ended) return;
+
         AVPacket packet;
 
-        while (av_read_frame(_formatCtx, &packet) >= 0) {
-            int gotFrame = 0;
-
-            if (packet.stream_index == _videoStreamIdx) {
-                avcodec_decode_video2(_videoCodecCtx, _frame, &gotFrame, &packet);
-                if (gotFrame == 0) continue;
-
-                sws_scale(
-                    _swsContext,
-                    _frame->data, _frame->linesize, 0, _videoCodecCtx->height,
-                    _frameRgb->data, _frameRgb->linesize);
-
-                ByteArray data(3ll * _videoCodecCtx->width * _videoCodecCtx->height);
-                for (int y = 0; y < _videoCodecCtx->height; ++y) {
-                    int dstIdx = 3 * _videoCodecCtx->width * y;
-                    uint8_t *src = _frameRgb->data[0] + static_cast<long long>(y) * _frameRgb->linesize[0];
-                    memcpy(&data[dstIdx], src, 3ll * _videoCodecCtx->width);
-                }
-
-                Video::Frame frame;
-                frame.data = move(data);
-                _video->_frames.push_back(move(frame));
-
-            } else if (_audioStreamIdx != -1 && packet.stream_index == _audioStreamIdx) {
-                avcodec_send_packet(_audioCodecCtx, &packet);
-                avcodec_receive_frame(_audioCodecCtx, _frame);
-
-                int sampleCount = swr_get_out_samples(_swrContext, _frame->nb_samples);
-                int bufSize = av_samples_get_buffer_size(nullptr, 1, sampleCount, AV_SAMPLE_FMT_S16, 1);
-                ByteArray samples(bufSize);
-                uint8_t *samplesPtr = reinterpret_cast<uint8_t *>(&samples[0]);
-
-                swr_convert(
-                    _swrContext,
-                    &samplesPtr, sampleCount,
-                    const_cast<const uint8_t **>(&_frame->extended_data[0]), _frame->nb_samples);
-
-                AudioStream::Frame frame;
-                frame.format = AudioFormat::Mono16;
-                frame.sampleRate = _audioCodecCtx->sample_rate;
-                frame.samples = move(samples);
-                _video->_audio->add(move(frame));
+        while (count > 0) {
+            if (av_read_frame(_formatCtx, &packet) < 0) {
+                _ended = true;
+                break;
             }
+            if (packet.stream_index != _videoStreamIdx) continue;
+
+            int gotFrame = 0;
+            avcodec_decode_video2(_videoCodecCtx, _frame, &gotFrame, &packet);
+            if (gotFrame == 0) continue;
+
+            --count;
+
+            if (ignore) continue;
+
+            sws_scale(
+                _swsContext,
+                _frame->data, _frame->linesize, 0, _videoCodecCtx->height,
+                _frameRgb->data, _frameRgb->linesize);
+
+            ByteArray data(3ll * _videoCodecCtx->width * _videoCodecCtx->height);
+            for (int y = 0; y < _videoCodecCtx->height; ++y) {
+                int dstIdx = 3 * _videoCodecCtx->width * y;
+                uint8_t *src = _frameRgb->data[0] + static_cast<long long>(y) * _frameRgb->linesize[0];
+                memcpy(&data[dstIdx], src, 3ll * _videoCodecCtx->width);
+            }
+
+            auto frame = make_shared<Video::Frame>();
+            frame->data = move(data);
+            _frames.push_back(move(frame));
         }
 
         av_free_packet(&packet);
+    }
+
+    void readAudioFrames() {
+        if (!hasAudio()) return;
+
+        AVPacket packet;
+
+        while (av_read_frame(_formatCtx, &packet) >= 0) {
+            if (packet.stream_index != _audioStreamIdx) continue;
+
+            avcodec_send_packet(_audioCodecCtx, &packet);
+            avcodec_receive_frame(_audioCodecCtx, _frame);
+
+            int sampleCount = swr_get_out_samples(_swrContext, _frame->nb_samples);
+            int bufSize = av_samples_get_buffer_size(nullptr, 1, sampleCount, AV_SAMPLE_FMT_S16, 1);
+            ByteArray samples(bufSize);
+            uint8_t *samplesPtr = reinterpret_cast<uint8_t *>(&samples[0]);
+
+            swr_convert(
+                _swrContext,
+                &samplesPtr, sampleCount,
+                const_cast<const uint8_t **>(&_frame->extended_data[0]), _frame->nb_samples);
+
+            AudioStream::Frame frame;
+            frame.format = AudioFormat::Mono16;
+            frame.sampleRate = _audioCodecCtx->sample_rate;
+            frame.samples = move(samples);
+            _video->_audio->add(move(frame));
+        }
+
+        av_free_packet(&packet);
+
+        seekBeginning();
+    }
+
+    void seekBeginning() {
+        int64_t pos = av_rescale_q(0ll, { 1, AV_TIME_BASE }, _formatCtx->streams[_audioStreamIdx]->time_base);
+        av_seek_frame(_formatCtx, _audioStreamIdx, pos, AVSEEK_FLAG_ANY);
     }
 };
 
@@ -294,10 +329,11 @@ void BikFile::load() {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
 
-    BinkVideoDecoder decoder(_path);
-    decoder.load();
+    auto decoder = make_shared<BinkVideoDecoder>(_path);
+    decoder->load();
 
-    _video = decoder.video();
+    _video = decoder->video();
+    _video->setMediaStream(decoder);
     _video->init();
 #endif // REONE_ENABLE_VIDEO
 }

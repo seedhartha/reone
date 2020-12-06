@@ -283,8 +283,7 @@ Variable Routines::playMovie(const vector<Variable> &args, ExecutionContext &ctx
     string movie(args[0].strValue);
     boost::to_lower(movie);
 
-    // TODO: implement movie streaming
-    //_game->playVideo(movie);
+    _game->playVideo(movie);
 
     return Variable();
 }

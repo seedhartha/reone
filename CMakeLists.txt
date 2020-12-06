@@ -63,6 +63,7 @@ set(COMMON_HEADERS
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
+    src/common/mediastream.h
     src/common/pathutil.h
     src/common/random.h
     src/common/streamreader.h
