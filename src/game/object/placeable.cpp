@@ -44,7 +44,6 @@ Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *scen
     _objectFactory(objectFactory) {
 
     _drawDistance = 4096.0f;
-    _fadeDistance = 0.25f * _drawDistance;
 }
 
 void Placeable::load(const GffStruct &gffs) {

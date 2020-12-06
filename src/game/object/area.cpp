@@ -724,14 +724,7 @@ void Area::updateVisibility() {
         float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
         float drawDistance = object->drawDistance();
         bool onScreen = distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb);
-        float fadeDistance = object->fadeDistance();
-        float alpha = 1.0f;
-
-        if (drawDistance != fadeDistance && distanceToCamera > fadeDistance) {
-            alpha = 1.0f - (distanceToCamera - fadeDistance) / (drawDistance - fadeDistance);
-        }
         model->setOnScreen(onScreen);
-        model->setAlpha(alpha);
     }
 }
 
