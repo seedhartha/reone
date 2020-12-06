@@ -46,6 +46,14 @@ MapMenu::MapMenu(Game *game) :
     }
 }
 
+void MapMenu::update(float dt) {
+    const ModuleInfo &info = _game->module()->info();
+
+    configureControl("LBL_Map", [&info](Control &control) {
+        control.setBorderFill("lbl_map" + info.entryArea);
+    });
+}
+
 void MapMenu::load() {
     GUI::load();
 
