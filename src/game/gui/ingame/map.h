@@ -29,6 +29,8 @@ class MapMenu : public gui::GUI {
 public:
     MapMenu(Game *game);
 
+    void update(float dt) override;
+
     void load() override;
 
 private:
