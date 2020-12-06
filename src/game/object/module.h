@@ -46,6 +46,11 @@ struct ModuleInfo {
     std::string entryArea;
     glm::vec3 entryPosition { 0.0f };
     float entryHeading { 0.0f };
+    int northAxis { 0 };
+    glm::vec2 worldPoint1 { 0.0f };
+    glm::vec2 worldPoint2 { 0.0f };
+    glm::vec2 mapPoint1 { 0.0f };
+    glm::vec2 mapPoint2 { 0.0f };
 };
 
 class Door;
