@@ -33,7 +33,6 @@ namespace reone {
 namespace game {
 
 static const float kDefaultDrawDistance = 1024.0f;
-static const float kDefaultFadeDistance = 256.0f;
 
 class Item;
 class Room;
@@ -65,7 +64,6 @@ public:
     const std::vector<std::shared_ptr<Item>> &items() const;
     virtual glm::vec3 selectablePosition() const;
     float drawDistance() const;
-    float fadeDistance() const;
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
@@ -82,7 +80,6 @@ protected:
     std::shared_ptr<scene::ModelSceneNode> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
-    float _fadeDistance { kDefaultFadeDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
     bool _selectable { false };

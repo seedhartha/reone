@@ -41,7 +41,6 @@ namespace game {
 
 Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Door, sceneGraph) {
     _drawDistance = FLT_MAX;
-    _fadeDistance = 0.25f * _drawDistance;
     _selectable = true;
 }
 

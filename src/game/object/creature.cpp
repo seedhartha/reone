@@ -67,7 +67,6 @@ Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneG
     SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
 
     _drawDistance = 2048.0f;
-    _fadeDistance = 0.25f * _drawDistance;
     _selectable = true;
 }
 
