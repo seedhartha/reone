@@ -19,8 +19,8 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
+#include "../common/mediastream.h"
 #include "../common/types.h"
 
 namespace reone {
@@ -37,6 +37,10 @@ class BikFile;
 
 class Video {
 public:
+    struct Frame {
+        ByteArray data;
+    };
+
     void init();
     void deinit();
 
@@ -49,20 +53,22 @@ public:
 
     std::shared_ptr<audio::AudioStream> audio() const;
 
-private:
-    struct Frame {
-        ByteArray data;
-    };
+    void setMediaStream(const std::shared_ptr<MediaStream<Frame>> &stream);
 
+private:
     int _width { 0 };
     int _height { 0 };
     float _fps { 0.0f };
-    std::vector<Frame> _frames;
+    std::shared_ptr<Frame> _frame;
     bool _inited { false };
     uint32_t _textureId { 0 };
     float _time { 0.0f };
     bool _finished { false };
+    std::shared_ptr<MediaStream<Frame>> _stream;
     std::shared_ptr<audio::AudioStream> _audio;
+
+    void updateFrame(float dt);
+    void updateFrameTexture();
 
     friend class BinkVideoDecoder;
 };

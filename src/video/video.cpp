@@ -63,19 +63,27 @@ void Video::deinit() {
 void Video::update(float dt) {
     if (_finished) return;
 
+    updateFrame(dt);
+    updateFrameTexture();
+}
+
+void Video::updateFrame(float dt) {
     _time += dt;
 
-    int frameCount = static_cast<int>(_frames.size());
-    int frameIdx = min(static_cast<int>(_fps * _time), frameCount - 1);
-    if (frameIdx == frameCount - 1) {
+    int frame = static_cast<int>(_fps * _time);
+    _frame = _stream->get(frame);
+
+    if (!_frame) {
         _finished = true;
-        return;
     }
-    Frame &frame = _frames[frameIdx];
+}
+
+void Video::updateFrameTexture() {
+    if (!_frame) return;
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, &frame.data[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, &_frame->data[0]);
 }
 
 void Video::render() {
@@ -106,6 +114,10 @@ bool Video::isFinished() const {
 
 shared_ptr<AudioStream> Video::audio() const {
     return _audio;
+}
+
+void Video::setMediaStream(const shared_ptr<MediaStream<Frame>> &stream) {
+    _stream = stream;
 }
 
 } // namespace video
