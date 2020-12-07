@@ -154,7 +154,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
         _combatCamStyle.load(*combatStyleRow);
     }
     else {
-        throw out_of_range("Combat camera style failed to load.");
+        throw logic_error("Combat camera style failed to load.");
     }
 }
 
