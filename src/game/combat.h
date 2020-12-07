@@ -76,6 +76,7 @@ private:
     };
 
     Game *_game;
+    bool _active { false };
 
     Timer _heartbeatTimer { 0.0f };
     std::map<uint32_t, std::shared_ptr<Combatant>> _combatantById;
@@ -86,6 +87,7 @@ private:
     void updateCombatantAI(Combatant &combatant);
     void updateRounds(float dt);
     void updateRound(Round &round, float dt);
+    void updateActivation();
 
     std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;
