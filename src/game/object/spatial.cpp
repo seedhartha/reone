@@ -126,10 +126,6 @@ float SpatialObject::drawDistance() const {
     return _drawDistance;
 }
 
-float SpatialObject::fadeDistance() const {
-    return _fadeDistance;
-}
-
 void SpatialObject::setRoom(Room *room) {
     if (_room) {
         _room->removeTenant(this);

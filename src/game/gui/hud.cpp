@@ -146,8 +146,6 @@ void HUD::load() {
     hideControl("LBL_ACTION4");
     hideControl("LBL_ACTION5");
     hideControl("LBL_ARROW");
-    hideControl("LBL_MAPBORDER");
-    hideControl("LBL_MAPVIEW");
     hideControl("LBL_TARGET0");
     hideControl("TB_PAUSE");
     hideControl("TB_SOLO");
@@ -194,8 +192,25 @@ void HUD::update(float dt) {
 
 void HUD::render() const {
     GUI::render();
+
     _select.render();
     _debug.render();
+
+    drawMinimap();
+}
+
+void HUD::drawMinimap() const {
+    Control &label = getControl("LBL_MAPVIEW");
+    const Control::Extent &extent = label.extent();
+
+    glm::vec4 bounds;
+    bounds[0] = _controlOffset.x + extent.left;
+    bounds[1] = _controlOffset.y + extent.top;
+    bounds[2] = extent.width;
+    bounds[3] = extent.height;
+
+    shared_ptr<Area> area(_game->module()->area());
+    area->map().render(Map::Mode::Minimap, bounds);
 }
 
 void HUD::showCombatHud() {

@@ -63,6 +63,7 @@ set(COMMON_HEADERS
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
+    src/common/mediastream.h
     src/common/pathutil.h
     src/common/random.h
     src/common/streamreader.h
@@ -398,6 +399,7 @@ set(GAME_HEADERS
     src/game/gui/partyselect.h
     src/game/gui/saveload.h
     src/game/gui/selectoverlay.h
+    src/game/map.h
     src/game/object/area.h
     src/game/object/camera.h
     src/game/object/creature.h
@@ -485,6 +487,7 @@ set(GAME_SOURCES
     src/game/gui/partyselect.cpp
     src/game/gui/saveload.cpp
     src/game/gui/selectoverlay.cpp
+    src/game/map.cpp
     src/game/object/area.cpp
     src/game/object/camera.cpp
     src/game/object/creature.cpp

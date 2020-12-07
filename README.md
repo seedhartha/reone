@@ -28,10 +28,6 @@ Controls:
 * Use V key to switch the camera type
 * Use "-" and "+" keys to adjust the game speed
 
-## Multiplayer
-
-reone supports multiplayer. See [this](https://github.com/seedhartha/reone/wiki/Multiplayer) page for an overview of the multiplayer mode.
-
 ## Configuration
 
 reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).

@@ -68,7 +68,8 @@ Area::Area(uint32_t id, Game *game) :
     _collisionDetector(this),
     _objectSelector(this, &game->party()),
     _actionExecutor(game),
-    _combat(game) {
+    _combat(game),
+    _map(game) {
 
     const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
@@ -140,6 +141,7 @@ void Area::loadARE(const GffStruct &are) {
     loadCameraStyle(are);
     loadAmbientColor(are);
     loadScripts(are);
+    loadMap(are);
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
@@ -176,6 +178,10 @@ void Area::loadScripts(const GffStruct &are) {
     _onExit = are.getString("OnExit");
     _onHeartbeat = are.getString("OnHeartbeat");
     _onUserDefined = are.getString("OnUserDefined");
+}
+
+void Area::loadMap(const GffStruct &are) {
+    _map.load(_name, are.getStruct("Map"));
 }
 
 void Area::loadGIT(const GffStruct &git) {
@@ -731,14 +737,7 @@ void Area::updateVisibility() {
         float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
         float drawDistance = object->drawDistance();
         bool onScreen = distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb);
-        float fadeDistance = object->fadeDistance();
-        float alpha = 1.0f;
-
-        if (drawDistance != fadeDistance && distanceToCamera > fadeDistance) {
-            alpha = 1.0f - (distanceToCamera - fadeDistance) / (drawDistance - fadeDistance);
-        }
         model->setOnScreen(onScreen);
-        model->setAlpha(alpha);
     }
 }
 
@@ -828,6 +827,10 @@ const RoomMap &Area::rooms() const {
 
 Combat &Area::combat() {
     return _combat;
+}
+
+Map &Area::map() {
+    return _map;
 }
 
 const ObjectList &Area::objects() const {

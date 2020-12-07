@@ -17,7 +17,10 @@
 
 #include "map.h"
 
+#include <stdexcept>
+
 #include "../../game.h"
+#include "../../map.h"
 
 #include "../colors.h"
 
@@ -51,6 +54,22 @@ void MapMenu::load() {
 
     disableControl("BTN_PRTYSLCT");
     disableControl("BTN_RETURN");
+}
+
+void MapMenu::render() const {
+    GUI::render();
+
+    Control &label = getControl("LBL_Map");
+    const Control::Extent &extent = label.extent();
+
+    glm::vec4 bounds(
+        _controlOffset.x + extent.left,
+        _controlOffset.y + extent.top,
+        extent.width,
+        extent.height);
+
+    shared_ptr<Area> area(_game->module()->area());
+    area->map().render(Map::Mode::Default, bounds);
 }
 
 void MapMenu::onClick(const string &control) {
