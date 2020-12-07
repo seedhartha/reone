@@ -44,11 +44,13 @@ private:
     SelectionOverlay _select;
     DebugOverlay _debug;
 
+    void onClick(const std::string &control) override;
+
     void showCombatHud();
     void hideCombatHud();
     void refreshActionQueueItems() const;
 
-    void onClick(const std::string &control) override;
+    void drawMinimap() const;
 };
 
 } // namespace game
