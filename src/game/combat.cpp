@@ -48,7 +48,6 @@ Combat::Combat(Game *game) : _game(game) {
     }
 }
 
-bool wasActive = false;
 void Combat::update(float dt) {
     _heartbeatTimer.update(dt);
 
@@ -58,10 +57,7 @@ void Combat::update(float dt) {
         updateAI();
     }
     updateRounds(dt);
-
-    if (!wasActive && isActive()) onEnterCombatMode();
-    else if (wasActive && !isActive()) onExitCombatMode();
-    wasActive = isActive();
+    updateActivation();
 }
 
 void Combat::updateCombatants() {
@@ -250,9 +246,19 @@ void Combat::updateRound(Round &round, float dt) {
     }
 }
 
-bool Combat::isActive() const {
+void Combat::updateActivation() {
     shared_ptr<Creature> partyLeader(_game->party().leader());
-    return partyLeader && _combatantById.count(partyLeader->id()) != 0;
+    bool active = partyLeader && _combatantById.count(partyLeader->id()) != 0;
+    if (_active == active) return;
+
+    if (active) onEnterCombatMode();
+    else onExitCombatMode();
+
+    _active = active;
+}
+
+bool Combat::isActive() const {
+    return _active;
 }
 
 void Combat::onEnterCombatMode() {

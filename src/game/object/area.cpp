@@ -147,18 +147,15 @@ void Area::loadARE(const GffStruct &are) {
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
     shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
-
-    _cameraStyle.distance = styleTable->getFloat(styleIdx, "distance", 0.0f);
-    _cameraStyle.pitch = styleTable->getFloat(styleIdx, "pitch", 0.0f);
-    _cameraStyle.viewAngle = styleTable->getFloat(styleIdx, "viewangle", 0.0f);
-    _cameraStyle.height = styleTable->getFloat(styleIdx, "height", 0.0f);
+    _cameraStyle.load(styleTable->rows().at(styleIdx));
 
     auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
-    _combatCamStyle.distance = combatStyleRow->getFloat("distance");
-    _combatCamStyle.pitch = combatStyleRow->getFloat("pitch");
-    _combatCamStyle.viewAngle = combatStyleRow->getFloat("viewangle");
-    _combatCamStyle.height = combatStyleRow->getFloat("height");
-
+    if (combatStyleRow) {
+        _combatCamStyle.load(*combatStyleRow);
+    }
+    else {
+        throw out_of_range("Combat camera style failed to load.");
+    }
 }
 
 void Area::loadAmbientColor(const GffStruct &are) {

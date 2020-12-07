@@ -22,6 +22,7 @@
 #include "../../scene/scenegraph.h"
 
 #include "camera.h"
+#include "camerastyle.h"
 #include "types.h"
 
 namespace reone {
