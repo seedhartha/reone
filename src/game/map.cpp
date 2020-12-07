@@ -21,6 +21,10 @@
 
 #include "glm/mat4x4.hpp"
 
+#include "GL/glew.h"
+
+#include "SDL2/SDL_opengl.h"
+
 #include "../common/log.h"
 #include "../render/mesh/quad.h"
 #include "../render/textures.h"
@@ -81,37 +85,99 @@ void Map::render(Mode mode, const glm::vec4 &bounds) const {
 }
 
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
-    transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
+    if (mode == Mode::Minimap) {
+        shared_ptr<Creature> partyLeader(_game->party().leader());
+        if (!partyLeader) return;
 
-    LocalUniforms locals;
-    locals.general.model = transform;
+        glm::vec2 worldPos(partyLeader->position());
+        glm::vec2 mapPos(getMapPosition(worldPos));
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        glm::vec3 topLeft(0.0f);
+        topLeft.x = bounds[0] + 0.5f * bounds[2] - mapPos.x * 440.0f / static_cast<float>(_texture->width()) * _texture->width();
+        topLeft.y = bounds[1] + 0.5f * bounds[3] - mapPos.y * _texture->height();
 
-    _texture->bind(0);
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, topLeft);
+        transform = glm::scale(transform, glm::vec3(_texture->width(), _texture->height(), 1.0f));
 
-    Quad::getDefault().renderTriangles();
+        LocalUniforms locals;
+        locals.general.model = transform;
+
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
+        _texture->bind(0);
+
+        // TODO: use librender abstraction
+
+        glEnable(GL_SCISSOR_TEST);
+
+        float height = _game->options().graphics.height;
+        glScissor(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        Quad::getDefault().renderTriangles();
+
+        glDisable(GL_SCISSOR_TEST);
+
+        // END TODO
+
+    } else {
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
+        transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
+
+        LocalUniforms locals;
+        locals.general.model = transform;
+
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
+        _texture->bind(0);
+
+        Quad::getDefault().renderTriangles();
+    }
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     shared_ptr<Creature> partyLeader(_game->party().leader());
     if (!partyLeader) return;
 
-    glm::vec3 worldPos(partyLeader->position());
+    glm::vec3 arrowPos(0.0f);
 
-    glm::vec2 mapPos(getMapPosition(worldPos));
-    mapPos.x *= bounds[2] / static_cast<float>(_texture->width());
-    mapPos.y *= bounds[3] / static_cast<float>(_texture->height());
+    if (mode == Mode::Default) {
+        glm::vec2 worldPos(partyLeader->position());
+        glm::vec2 mapPos(getMapPosition(worldPos));
 
-    glm::vec3 arrowPos(
-        bounds[0] + mapPos.x * bounds[2] - 0.5f * _arrow->width(),
-        bounds[1] + mapPos.y * bounds[3] - 0.5f * _arrow->height(),
-        0.0f);
+        mapPos.x *= bounds[2] / static_cast<float>(_texture->width());
+        mapPos.y *= bounds[3] / static_cast<float>(_texture->height());
 
+        arrowPos.x = bounds[0] + mapPos.x * bounds[2];
+        arrowPos.y = bounds[1] + mapPos.y * bounds[3];
+
+    } else {
+        arrowPos.x = bounds[0] + 0.5f * bounds[2];
+        arrowPos.y = bounds[1] + 0.5f * bounds[3];
+    }
+
+    float heading;
+    switch (_northAxis) {
+        case 0:
+            heading = -partyLeader->heading();
+            break;
+        case 1:
+            heading = glm::pi<float>() - partyLeader->heading();
+            break;
+        case 2:
+            heading = glm::three_over_two_pi<float>() - partyLeader->heading();
+            break;
+        default:
+            heading = glm::half_pi<float>() - partyLeader->heading();
+            break;
+    }
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, arrowPos);
+    transform = glm::rotate(transform, heading, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::translate(transform, glm::vec3(-0.5f * _arrow->width(), -0.5f * _arrow->height(), 0.0f));
     transform = glm::scale(transform, glm::vec3(_arrow->width(), _arrow->height(), 1.0f));
 
     LocalUniforms locals;
