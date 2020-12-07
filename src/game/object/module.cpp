@@ -76,14 +76,6 @@ void Module::loadArea(const GffStruct &ifo) {
     shared_ptr<Area> area(_game->objectFactory().newArea());
     area->load(_info.entryArea, *are, *git);
     _area = move(area);
-
-    // TODO: move map properties to Area
-    auto &map = are->getStruct("Map");
-    _info.northAxis = map.getInt("NorthAxis");
-    _info.worldPoint1 = glm::vec2(map.getFloat("WorldPt1X"), map.getFloat("WorldPt1Y"));
-    _info.worldPoint2 = glm::vec2(map.getFloat("WorldPt2X"), map.getFloat("WorldPt2Y"));
-    _info.mapPoint1 = glm::vec2(map.getFloat("MapPt1X"), map.getFloat("MapPt1Y"));
-    _info.mapPoint2 = glm::vec2(map.getFloat("MapPt2X"), map.getFloat("MapPt2Y"));
 }
 
 void Module::loadPlayer() {
