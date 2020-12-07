@@ -38,6 +38,7 @@
 #include "../camera/thirdperson.h"
 #include "../camera/types.h"
 #include "../collisiondetect.h"
+#include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
 
@@ -90,6 +91,7 @@ public:
     const Pathfinder &pathfinder() const;
     const RoomMap &rooms() const;
     Combat &combat();
+    Map &map();
 
     // Objects
 
@@ -128,6 +130,7 @@ private:
     CameraStyle _cameraStyle;
     std::string _music;
     float _heartbeatTimeout { kHeartbeatInterval };
+    Map _map;
 
     // Scripts
 
@@ -180,10 +183,13 @@ private:
     void loadVIS();
     void loadPTH();
     void loadARE(const resource::GffStruct &are);
+    void loadGIT(const resource::GffStruct &gffs);
+
     void loadCameraStyle(const resource::GffStruct &are);
     void loadAmbientColor(const resource::GffStruct &are);
     void loadScripts(const resource::GffStruct &are);
-    void loadGIT(const resource::GffStruct &gffs);
+    void loadMap(const resource::GffStruct &are);
+
     void loadProperties(const resource::GffStruct &git);
     void loadCreatures(const resource::GffStruct &git);
     void loadDoors(const resource::GffStruct &git);

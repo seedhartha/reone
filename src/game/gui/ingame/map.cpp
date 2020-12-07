@@ -17,18 +17,16 @@
 
 #include "map.h"
 
-#include "../../../common/log.h"
-#include "../../../render/mesh/quad.h"
-#include "../../../render/textures.h"
+#include <stdexcept>
 
 #include "../../game.h"
+#include "../../map.h"
 
 #include "../colors.h"
 
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
@@ -56,98 +54,22 @@ void MapMenu::load() {
 
     disableControl("BTN_PRTYSLCT");
     disableControl("BTN_RETURN");
-
-    string arrowTex("mm_barrow");
-    if (_version == GameVersion::TheSithLords) {
-        arrowTex += "_p";
-    }
-    _arrow = Textures::instance().get(arrowTex, TextureType::GUI);
-}
-
-void MapMenu::update(float dt) {
-    const ModuleInfo &info = _game->module()->info();
-    string mapResRef("lbl_map" + info.entryArea);
-    _map = Textures::instance().get(mapResRef, TextureType::GUI);
 }
 
 void MapMenu::render() const {
     GUI::render();
 
-    if (!_map) return;
-
-    drawMap();
-    drawPartyLeader();
-}
-
-void MapMenu::drawMap() const {
     Control &label = getControl("LBL_Map");
     const Control::Extent &extent = label.extent();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left, _controlOffset.y + extent.top, 0.0f));
-    transform = glm::scale(transform, glm::vec3(extent.width, extent.height, 1.0f));
+    glm::vec4 bounds(
+        _controlOffset.x + extent.left,
+        _controlOffset.y + extent.top,
+        extent.width,
+        extent.height);
 
-    LocalUniforms locals;
-    locals.general.model = transform;
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    _map->bind(0);
-
-    Quad::getDefault().renderTriangles();
-}
-
-void MapMenu::drawPartyLeader() const {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
-    if (!partyLeader) return;
-
-    const ModuleInfo &info = _game->module()->info();
-    glm::vec3 leaderPos(partyLeader->position());
-    float scaleX, scaleY, relX, relY;
-
-    switch (info.northAxis) {
-        case 0:
-        case 1:
-            scaleX = (info.mapPoint1.x - info.mapPoint2.x) / (info.worldPoint1.x - info.worldPoint2.x);
-            scaleY = (info.mapPoint1.y - info.mapPoint2.y) / (info.worldPoint1.y - info.worldPoint2.y);
-            relX = (leaderPos.x - info.worldPoint1.x) * scaleX + info.mapPoint1.x;
-            relY = (leaderPos.y - info.worldPoint1.y) * scaleY + info.mapPoint1.y;
-            break;
-        case 2:
-        case 3:
-            scaleX = (info.mapPoint1.y - info.mapPoint2.y) / (info.worldPoint1.x - info.worldPoint2.x);
-            scaleY = (info.mapPoint1.x - info.mapPoint2.x) / (info.worldPoint1.y - info.worldPoint2.y);
-            relX = (leaderPos.y - info.worldPoint1.y) * scaleY + info.mapPoint1.x;
-            relY = (leaderPos.x - info.worldPoint1.x) * scaleX + info.mapPoint1.y;
-            break;
-        default:
-            warn("Map: invalid north axis: " + to_string(info.northAxis));
-            return;
-    }
-
-    Control &label = getControl("LBL_Map");
-    const Control::Extent &extent = label.extent();
-
-    relX *= extent.width / static_cast<float>(_map->width());
-    relY *= extent.height / static_cast<float>(_map->height());
-
-    glm::vec3 arrowPos(
-        _controlOffset.x + extent.left + relX * extent.width - 0.5f * _arrow->width(),
-        _controlOffset.y + extent.top + relY * extent.height - 0.5f * _arrow->height(),
-        0.0f);
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, arrowPos);
-    transform = glm::scale(transform, glm::vec3(_arrow->width(), _arrow->height(), 1.0f));
-
-    LocalUniforms locals;
-    locals.general.model = transform;
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    _arrow->bind(0);
-
-    Quad::getDefault().renderTriangles();
+    shared_ptr<Area> area(_game->module()->area());
+    area->map().render(Map::Mode::Default, bounds);
 }
 
 void MapMenu::onClick(const string &control) {

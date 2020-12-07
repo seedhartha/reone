@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../../../gui/gui.h"
 
 namespace reone {
@@ -24,24 +26,19 @@ namespace reone {
 namespace game {
 
 class Game;
+class Map;
 
 class MapMenu : public gui::GUI {
 public:
     MapMenu(Game *game);
 
     void load() override;
-    void update(float dt) override;
     void render() const override;
 
 private:
     Game *_game { nullptr };
-    std::shared_ptr<render::Texture> _map;
-    std::shared_ptr<render::Texture> _arrow;
 
     void onClick(const std::string &control) override;
-
-    void drawMap() const;
-    void drawPartyLeader() const;
 };
 
 } // namespace game
