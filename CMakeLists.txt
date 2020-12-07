@@ -359,6 +359,7 @@ set(GAME_HEADERS
     src/game/blueprint/waypoint.h
     src/game/camera/animatedcamera.h
     src/game/camera/camera.h
+    src/game/camera/camerastyle.h
     src/game/camera/dialogcamera.h
     src/game/camera/firstperson.h
     src/game/camera/staticcamera.h
@@ -450,6 +451,7 @@ set(GAME_SOURCES
     src/game/blueprint/waypoint.cpp
     src/game/camera/animatedcamera.cpp
     src/game/camera/camera.cpp
+    src/game/camera/camerastyle.cpp
     src/game/camera/dialogcamera.cpp
     src/game/camera/firstperson.cpp
     src/game/camera/staticcamera.cpp
