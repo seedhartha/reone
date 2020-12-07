@@ -17,16 +17,22 @@
 
 #pragma once
 
+
 namespace reone {
+
+namespace resource {
+    class TwoDaRow;
+}
 
 namespace game {
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
+struct CameraStyle {
+    float distance{ 0.0f };
+    float pitch{ 0.0f };
+    float height{ 0.0f };
+    float viewAngle{ 0.0f };
+
+    void load(const resource::TwoDaRow &row);
 };
 
 } // namespace game

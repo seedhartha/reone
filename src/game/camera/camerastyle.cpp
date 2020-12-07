@@ -17,17 +17,20 @@
 
 #pragma once
 
+#include "camerastyle.h"
+
+#include "../../resource/resources.h"
+
 namespace reone {
 
 namespace game {
 
-enum class CameraType {
-    FirstPerson,
-    ThirdPerson,
-    Static,
-    Animated,
-    Dialog
-};
+void CameraStyle::load(const resource::TwoDaRow &row) {
+    distance = row.getFloat("distance");
+    pitch = row.getFloat("pitch");
+    viewAngle = row.getFloat("viewangle");
+    height = row.getFloat("height");
+}
 
 } // namespace game
 
