@@ -74,7 +74,7 @@ void Combat::updateCombatants() {
                 maybeCombatant->second->enemies = move(enemies);
             } else {
                 _combatantById.erase(maybeCombatant);
-                creature->setCombat(false);
+                creature->setInCombat(false);
             }
             continue;
         }
@@ -83,7 +83,7 @@ void Combat::updateCombatants() {
             combatant->creature = creature;
             combatant->enemies = move(enemies);
             _combatantById.insert(make_pair(creature->id(), move(combatant)));
-            creature->setCombat(true);
+            creature->setInCombat(true);
         }
     }
 }
