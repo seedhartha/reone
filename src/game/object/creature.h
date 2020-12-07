@@ -105,7 +105,7 @@ public:
     void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
-    void setCombat(bool active) { _inCombat = active; }
+    void setInCombat(bool active) { _inCombat = active; }
 
     // Equipment
 
