@@ -70,6 +70,18 @@ ActionQueue &Object::actionQueue() {
     return _actionQueue;
 }
 
+int Object::hitPoints() const {
+    return _hitPoints;
+}
+
+int Object::maxHitPoints() const {
+    return _maxHitPoints;
+}
+
+int Object::currentHitPoints() const {
+    return _currentHitPoints;
+}
+
 } // namespace game
 
 } // namespace reone
