@@ -45,6 +45,15 @@ public:
     const std::string &conversation() const;
     ActionQueue &actionQueue();
 
+    // Base maximum hit points, not considering any bonuses.
+    int hitPoints() const;
+
+    // Maximum hit points, after considering all bonuses and penalties.
+    int maxHitPoints() const;
+
+    // Current hit points, not counting any bonuses.
+    int currentHitPoints() const;
+
 protected:
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
@@ -52,7 +61,15 @@ protected:
     std::string _title;
     std::string _conversation;
     ActionQueue _actionQueue;
+    int _hitPoints { 0 };
+    int _maxHitPoints { 0 };
+    int _currentHitPoints { 0 };
+
+    // Scripts
+
     std::string _onUserDefined;
+
+    // END Scripts
 
     Object(uint32_t id, ObjectType type);
 
