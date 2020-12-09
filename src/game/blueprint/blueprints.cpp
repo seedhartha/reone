@@ -40,7 +40,6 @@ void Blueprints::invalidateCache() {
     _placeableCache.clear();
     _soundCache.clear();
     _triggerCache.clear();
-    _waypointCache.clear();
 }
 
 shared_ptr<CreatureBlueprint> Blueprints::getCreature(const string &resRef) {
@@ -89,10 +88,6 @@ shared_ptr<SoundBlueprint> Blueprints::getSound(const string &resRef) {
 
 shared_ptr<TriggerBlueprint> Blueprints::getTrigger(const string &resRef) {
     return get<TriggerBlueprint>(resRef, ResourceType::TriggerBlueprint, _triggerCache);
-}
-
-shared_ptr<WaypointBlueprint> Blueprints::getWaypoint(const string &resRef) {
-    return get<WaypointBlueprint>(resRef, ResourceType::WaypointBlueprint, _waypointCache);
 }
 
 } // namespace game
