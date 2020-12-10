@@ -39,6 +39,7 @@ public:
     void runUserDefinedEvent(int eventNumber);
 
     bool isMinOneHP() const;
+    bool isDead() const;
 
     uint32_t id() const;
     ObjectType type() const;
@@ -57,6 +58,7 @@ public:
     int currentHitPoints() const;
 
     void setTag(const std::string &tag);
+    void setMinOneHP(bool minOneHP);
 
 protected:
     uint32_t _id { 0 };
@@ -69,6 +71,7 @@ protected:
     int _hitPoints { 0 };
     int _maxHitPoints { 0 };
     int _currentHitPoints { 0 };
+    bool _dead { false };
 
     // Scripts
 

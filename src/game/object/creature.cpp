@@ -160,6 +160,7 @@ void Creature::loadPortrait(int appearance) {
 void Creature::update(float dt) {
     SpatialObject::update(dt);
     updateModelAnimation();
+    updateHealth();
 }
 
 void Creature::updateModelAnimation() {
@@ -181,7 +182,9 @@ void Creature::updateModelAnimation() {
             _model->playAnimation(_animResolver.getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             break;
         default:
-            if (_talking) {
+            if (_dead) {
+                _model->playAnimation(_animResolver.getDeadAnimation(), kAnimationPropagate | kAnimationBlend);
+            } else if (_talking) {
                 _model->playAnimation(_animResolver.getTalkAnimation(), kAnimationLoop | kAnimationPropagate);
                 if (_headModel) {
                     _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), kAnimationLoop | kAnimationOverlay, 0.25f);
@@ -193,6 +196,14 @@ void Creature::updateModelAnimation() {
     }
 
     _animDirty = false;
+}
+
+void Creature::updateHealth() {
+    if (_dead || _currentHitPoints > 0) return;
+
+    playAnimation(Animation::Die);
+    _dead = true;
+    _selectable = false;
 }
 
 void Creature::clearAllActions() {
@@ -219,6 +230,9 @@ void Creature::playAnimation(Animation anim) {
             break;
         case Animation::Knockdown:
             animName = _animResolver.getKnockdownAnimation();
+            break;
+        case Animation::Die:
+            animName = _animResolver.getDieAnimation();
             break;
         default:
             break;

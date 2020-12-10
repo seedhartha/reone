@@ -154,6 +154,7 @@ void CharacterGeneration::finish() {
     player->load(config);
     player->setTag("PLAYER");
     player->setFaction(Faction::Friendly1);
+    player->setMinOneHP(true);
 
     Party &party = _game->party();
     party.clear();
