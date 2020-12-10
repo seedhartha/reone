@@ -60,6 +60,7 @@ public:
     GffFieldType type() const;
     const std::string &label() const;
     const std::vector<GffStruct> &children() const;
+    bool asBool() const;
     int64_t asInt() const;
     uint64_t asUint() const;
     float asFloat() const;
@@ -103,6 +104,7 @@ public:
 
     void setType(GffFieldType type);
 
+    bool getBool(const std::string &name, bool defaultValue = false) const;
     int getInt(const std::string &name) const;
     int getInt(const std::string &name, int defaultValue) const;
     float getFloat(const std::string &name) const;

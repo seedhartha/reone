@@ -37,7 +37,7 @@ void Dialog::reset() {
 }
 
 void Dialog::load(const string &resRef, const GffStruct &dlg) {
-    _skippable = dlg.getInt("Skippable") != 0;
+    _skippable = dlg.getBool("Skippable");
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
 
