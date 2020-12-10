@@ -36,9 +36,14 @@ public:
     void close(Object *triggerrer);
 
     bool isOpen() const;
+    bool isLockable() const;
     bool isLocked() const;
+    bool isStatic() const;
 
-    const DoorBlueprint &blueprint() const;
+    const std::string &getOnOpen() const;
+    const std::string &getOnFailToOpen() const;
+
+    int genericType() const;
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;
     const std::string &transitionDestin() const;
@@ -46,14 +51,25 @@ public:
     void setLocked(bool locked);
 
 private:
-    std::shared_ptr<DoorBlueprint> _blueprint;
     bool _open { false };
+    bool _lockable { false };
     bool _locked { false };
+    int _genericType { 0 };
+    bool _static { false };
     std::string _linkedToModule;
     std::string _linkedTo;
     std::string _transitionDestin;
 
-    void loadBlueprint(const std::string &resRef);
+    // Scripts
+
+    std::string _onOpen;
+    std::string _onFailToOpen;
+
+    // END Scripts
+
+    void loadBlueprint(const resource::GffStruct &gffs);
+
+    friend class DoorBlueprint;
 };
 
 } // namespace game

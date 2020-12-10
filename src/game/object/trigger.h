@@ -36,23 +36,33 @@ public:
     void update(float dt) override;
 
     void load(const resource::GffStruct &gffs);
-
     void addTenant(const std::shared_ptr<SpatialObject> &object);
 
     bool isIn(const glm::vec2 &point) const;
     bool isTenant(const std::shared_ptr<SpatialObject> &object) const;
 
-    const TriggerBlueprint &blueprint() const;
     const std::string &linkedToModule() const;
     const std::string &linkedTo() const;
+    const std::string &onEnter() const;
+    const std::string &onExit() const;
 
 private:
-    std::shared_ptr<TriggerBlueprint> _blueprint;
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;
     std::vector<glm::vec3> _geometry;
     std::set<std::shared_ptr<SpatialObject>> _tenants;
+
+    // Scripts
+
+    std::string _onEnter;
+    std::string _onExit;
+
+    // END Scripts
+
+    void loadBlueprint(const resource::GffStruct &gffs);
+
+    friend class TriggerBlueprint;
 };
 
 } // namespace game

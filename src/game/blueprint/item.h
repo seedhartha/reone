@@ -17,51 +17,28 @@
 
 #pragma once
 
-#include "../../render/texture.h"
-#include "../../resource/gfffile.h"
+#include <string>
+#include <memory>
 
-#include "../types.h"
+#include "../../resource/gfffile.h"
 
 namespace reone {
 
 namespace game {
 
+class Item;
+
 class ItemBlueprint {
 public:
-    ItemBlueprint(const std::string &resRef);
+    ItemBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &uti);
 
-    void load(const resource::GffStruct &uti);
-
-    bool isEquippable() const;
-    bool isEquippable(InventorySlot slot) const;
+    void load(Item &item);
 
     const std::string &resRef() const;
-    const std::string &tag() const;
-    const std::string &localizedName() const;
-    const std::string &baseBodyVariation() const;
-    int bodyVariation() const;
-    int textureVariation() const;
-    const std::string &itemClass() const;
-    int modelVariation() const;
-    std::shared_ptr<render::Texture> icon() const;
-    float attackRange() const;
-    WeaponType weaponType() const;
-    WeaponWield weaponWield() const;
 
 private:
     std::string _resRef;
-    std::string _tag;
-    std::string _localizedName;
-    std::string _baseBodyVariation;
-    int _bodyVariation { 0 };
-    int _textureVariation { 0 };
-    std::string _itemClass;
-    int _modelVariation { 0 };
-    std::shared_ptr<render::Texture> _icon;
-    uint32_t _equipableSlots { 0 };
-    int _attackRange { 0 };
-    WeaponType _weaponType { WeaponType::None };
-    WeaponWield _weaponWield { WeaponWield::None };
+    std::shared_ptr<resource::GffStruct> _uti;
 
     ItemBlueprint(const ItemBlueprint &) = delete;
     ItemBlueprint &operator=(const ItemBlueprint &) = delete;

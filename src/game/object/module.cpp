@@ -222,7 +222,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
     shared_ptr<Creature> partyLeader(_game->party().leader());
     ActionQueue &actions = partyLeader->actionQueue();
 
-    if (placeable->blueprint().hasInventory()) {
+    if (placeable->hasInventory()) {
         actions.clear();
         actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
 

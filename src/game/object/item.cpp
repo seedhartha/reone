@@ -19,6 +19,7 @@
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
@@ -29,12 +30,55 @@ Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
 void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
-    _blueprint = blueprint;
-    _tag = _blueprint->tag();
+    blueprint->load(*this);
 }
 
-const ItemBlueprint &Item::blueprint() const {
-    return *_blueprint;
+bool Item::isEquippable() const {
+    return _equipableSlots != 0;
+}
+
+bool Item::isEquippable(InventorySlot slot) const {
+    return (_equipableSlots >> slot) & 1;
+}
+
+const string &Item::localizedName() const {
+    return _localizedName;
+}
+
+const string &Item::baseBodyVariation() const {
+    return _baseBodyVariation;
+}
+
+int Item::bodyVariation() const {
+    return _bodyVariation;
+}
+
+int Item::textureVariation() const {
+    return _textureVariation;
+}
+
+const string &Item::itemClass() const {
+    return _itemClass;
+}
+
+int Item::modelVariation() const {
+    return _modelVariation;
+}
+
+shared_ptr<Texture> Item::icon() const {
+    return _icon;
+}
+
+float Item::attackRange() const {
+    return static_cast<float>(_attackRange);
+}
+
+WeaponType Item::weaponType() const {
+    return _weaponType;
+}
+
+WeaponWield Item::weaponWield() const {
+    return _weaponWield;
 }
 
 } // namespace game

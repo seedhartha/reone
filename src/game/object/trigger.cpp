@@ -40,9 +40,7 @@ Trigger::Trigger(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, Object
 }
 
 void Trigger::load(const GffStruct &gffs) {
-    string blueprintResRef(gffs.getString("TemplateResRef"));
-    _blueprint = Blueprints::instance().getTrigger(blueprintResRef);
-    _tag = _blueprint->tag();
+    loadBlueprint(gffs);
 
     _position.x = gffs.getFloat("XPosition");
     _position.y = gffs.getFloat("YPosition");
@@ -55,11 +53,8 @@ void Trigger::load(const GffStruct &gffs) {
         _transitionDestin = Resources::instance().getString(transDestIdx);
     }
 
-    _linkedToModule = gffs.getString("LinkedToModule");
-    boost::to_lower(_linkedToModule);
-
-    _linkedTo = gffs.getString("LinkedTo");
-    boost::to_lower(_linkedTo);
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
 
     for (auto &child : gffs.getList("Geometry")) {
         float x = child.getFloat("PointX");
@@ -68,6 +63,12 @@ void Trigger::load(const GffStruct &gffs) {
 
         _geometry.push_back(_transform * glm::vec4(x, y, z, 1.0f));
     }
+}
+
+void Trigger::loadBlueprint(const GffStruct &gffs) {
+    string resRef(gffs.getString("TemplateResRef"));
+    shared_ptr<TriggerBlueprint> blueprint(Blueprints::instance().getTrigger(resRef));
+    blueprint->load(*this);
 }
 
 void Trigger::update(float dt) {
@@ -82,11 +83,15 @@ void Trigger::update(float dt) {
     }
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
-        if (!_blueprint->onExit().empty()) {
-            runScript(_blueprint->onExit(), id(), tenant->id(), -1);
+        if (!_onExit.empty()) {
+            runScript(_onExit, id(), tenant->id(), -1);
         }
     }
     SpatialObject::update(dt);
+}
+
+void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {
+    _tenants.insert(object);
 }
 
 bool Trigger::isIn(const glm::vec2 &point) const {
@@ -105,10 +110,6 @@ bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
     return maybeTenant != _tenants.end();
 }
 
-const TriggerBlueprint &Trigger::blueprint() const {
-    return *_blueprint;
-}
-
 const string &Trigger::linkedToModule() const {
     return _linkedToModule;
 }
@@ -117,8 +118,12 @@ const string &Trigger::linkedTo() const {
     return _linkedTo;
 }
 
-void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {
-    _tenants.insert(object);
+const string &Trigger::onEnter() const {
+    return _onEnter;
+}
+
+const string &Trigger::onExit() const {
+    return _onExit;
 }
 
 } // namespace game

@@ -17,126 +17,113 @@
 
 #include "creature.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 
 #include "../../common/log.h"
+#include "../../render/textures.h"
 #include "../../resource/resources.h"
+
+#include "../object/creature.h"
+#include "../portraits.h"
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-CreatureBlueprint::CreatureBlueprint(const string &resRef) : _resRef(resRef) {
+CreatureBlueprint::CreatureBlueprint(const string &resRef, const shared_ptr<GffStruct> &utc) :
+    _resRef(resRef),
+    _utc(utc) {
+
+    if (!utc) {
+        throw invalid_argument("utc must not be null");
+    }
 }
 
-void CreatureBlueprint::load(const GffStruct &utc) {
-    _tag = utc.getString("Tag");
-    boost::to_lower(_tag);
+void CreatureBlueprint::load(Creature &creature) {
+    creature._tag = boost::to_lower_copy(_utc->getString("Tag"));
+    creature._appearance = getAppearanceFromUtc();
 
-    for (auto &item : utc.getList("Equip_ItemList")) {
-        string itemResRef(item.getString("EquippedRes"));
-        boost::to_lower(itemResRef);
-
-        _equipment.push_back(move(itemResRef));
+    for (auto &item : _utc->getList("Equip_ItemList")) {
+        creature.equip(boost::to_lower_copy(item.getString("EquippedRes")));
     }
 
-    _appearance = utc.getInt("Appearance_Type");
-    _portraitId = utc.getInt("PortraitId", -1);
-    _factionId = utc.getInt("FactionID", -1);
-    _conversation = utc.getString("Conversation");
+    string portrait(getPortrait(_utc->getInt("PortraitId", -1)));
+    creature._portrait = Textures::instance().get(portrait, TextureType::GUI);
 
-    int firstNameStrRef = utc.getInt("FirstName", -1);
+    creature._faction = static_cast<Faction>(_utc->getInt("FactionID", -1));
+    creature._conversation = boost::to_lower_copy(_utc->getString("Conversation"));
+
+    loadTitle(creature);
+    loadAttributes(creature);
+    loadScripts(creature);
+}
+
+int CreatureBlueprint::getAppearanceFromUtc() const {
+    return _utc->getInt("Appearance_Type");
+}
+
+void CreatureBlueprint::loadTitle(Creature &creature) {
+    string firstName, lastName;
+
+    int firstNameStrRef = _utc->getInt("FirstName", -1);
     if (firstNameStrRef != -1) {
-        _firstName = Resources::instance().getString(firstNameStrRef);
+        firstName = Resources::instance().getString(firstNameStrRef);
     }
-
-    int lastNameStrRef = utc.getInt("LastName", -1);
+    int lastNameStrRef = _utc->getInt("LastName", -1);
     if (lastNameStrRef != -1) {
-        _lastName = Resources::instance().getString(lastNameStrRef);
+        lastName = Resources::instance().getString(lastNameStrRef);
     }
 
-    loadAttributes(utc);
-    loadScripts(utc);
+    if (!firstName.empty() && !lastName.empty()) {
+        creature._title = firstName + " " + lastName;
+    } else if (!firstName.empty()) {
+        creature._title = firstName;
+    }
 }
 
-void CreatureBlueprint::loadAttributes(const GffStruct &utc) {
-    for (auto &classGff : utc.getList("ClassList")) {
+void CreatureBlueprint::loadAttributes(Creature &creature) {
+    CreatureAttributes &attributes = creature.attributes();
+
+    for (auto &classGff : _utc->getList("ClassList")) {
         int clazz = classGff.getInt("Class");
         int level = classGff.getInt("ClassLevel");
-        _attributes.addClassLevels(static_cast<ClassType>(clazz), level);
+        attributes.addClassLevels(static_cast<ClassType>(clazz), level);
     }
-    loadAbilities(utc);
-    loadSkills(utc);
+    loadAbilities(attributes);
+    loadSkills(attributes);
 }
 
-void CreatureBlueprint::loadAbilities(const GffStruct &utc) {
-    _attributes.setAbilityScore(Ability::Strength, utc.getInt("Str"));
-    _attributes.setAbilityScore(Ability::Dexterity, utc.getInt("Dex"));
-    _attributes.setAbilityScore(Ability::Constitution, utc.getInt("Con"));
-    _attributes.setAbilityScore(Ability::Intelligence, utc.getInt("Int"));
-    _attributes.setAbilityScore(Ability::Wisdom, utc.getInt("Wis"));
-    _attributes.setAbilityScore(Ability::Charisma, utc.getInt("Cha"));
+void CreatureBlueprint::loadAbilities(CreatureAttributes &attributes) {
+    attributes.setAbilityScore(Ability::Strength, _utc->getInt("Str"));
+    attributes.setAbilityScore(Ability::Dexterity, _utc->getInt("Dex"));
+    attributes.setAbilityScore(Ability::Constitution, _utc->getInt("Con"));
+    attributes.setAbilityScore(Ability::Intelligence, _utc->getInt("Int"));
+    attributes.setAbilityScore(Ability::Wisdom, _utc->getInt("Wis"));
+    attributes.setAbilityScore(Ability::Charisma, _utc->getInt("Cha"));
 }
 
-void CreatureBlueprint::loadSkills(const GffStruct &utc) {
-    const vector<GffStruct> &skills = utc.getList("SkillList");
+void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
+    const vector<GffStruct> &skills = _utc->getList("SkillList");
     for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        _attributes.setSkillRank(skill, skills[i].getInt("Rank"));
+        attributes.setSkillRank(skill, skills[i].getInt("Rank"));
     }
 }
 
-void CreatureBlueprint::loadScripts(const GffStruct &utc) {
-    _onSpawn = utc.getString("ScriptSpawn");
-    _onUserDefined = utc.getString("ScriptUserDefine");
+void CreatureBlueprint::loadScripts(Creature &creature) {
+    creature.setOnSpawn(boost::to_lower_copy(_utc->getString("ScriptSpawn")));
+    creature.setOnUserDefined(boost::to_lower_copy(_utc->getString("ScriptUserDefine")));
 }
 
 const string &CreatureBlueprint::resRef() const {
     return _resRef;
-}
-
-const string &CreatureBlueprint::tag() const {
-    return _tag;
-}
-
-const string &CreatureBlueprint::firstName() const {
-    return _firstName;
-}
-
-const string &CreatureBlueprint::lastName() const {
-    return _lastName;
-}
-
-const vector<string> &CreatureBlueprint::equipment() const {
-    return _equipment;
-}
-
-int CreatureBlueprint::appearance() const {
-    return _appearance;
-}
-
-int CreatureBlueprint::portraitId() const {
-    return _portraitId;
-}
-
-const string &CreatureBlueprint::conversation() const {
-    return _conversation;
-}
-
-const CreatureAttributes &CreatureBlueprint::attributes() const {
-    return _attributes;
-}
-
-const string &CreatureBlueprint::onSpawn() const {
-    return _onSpawn;
-}
-
-const string &CreatureBlueprint::onUserDefined() const {
-    return _onUserDefined;
 }
 
 } // namespace game

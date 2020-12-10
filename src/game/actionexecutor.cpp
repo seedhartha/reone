@@ -251,13 +251,17 @@ void ActionExecutor::executeOpenDoor(Object &actor, ObjectAction &action, float 
     if (reached) {
         bool isObjectSelf = actor.id() == door.id();
         if (!isObjectSelf && door.isLocked()) {
-            if (!door.blueprint().onFailToOpen().empty()) {
-                runScript(door.blueprint().onFailToOpen(), door.id(), actor.id(), -1);
+            string onFailToOpen(door.getOnFailToOpen());
+            if (!onFailToOpen.empty()) {
+                runScript(onFailToOpen, door.id(), actor.id(), -1);
             }
         } else {
             door.open(&actor);
-            if (!isObjectSelf && !door.blueprint().onOpen().empty()) {
-                runScript(door.blueprint().onOpen(), door.id(), actor.id(), -1);
+            if (!isObjectSelf) {
+                string onOpen(door.getOnOpen());
+                if (!onOpen.empty()) {
+                    runScript(onOpen, door.id(), actor.id(), -1);
+                }
             }
         }
         action.complete();
@@ -293,8 +297,10 @@ void ActionExecutor::executeOpenLock(Creature &actor, ObjectAction &action, floa
             actor.playAnimation(Creature::Animation::UnlockDoor);
             door->setLocked(false);
             door->open(&actor);
-            if (!door->blueprint().onOpen().empty()) {
-                runScript(door->blueprint().onOpen(), door->id(), actor.id(), -1);
+
+            string onOpen(door->getOnOpen());
+            if (!onOpen.empty()) {
+                runScript(onOpen, door->id(), actor.id(), -1);
             }
             action.complete();
         }

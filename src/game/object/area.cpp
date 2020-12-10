@@ -751,8 +751,7 @@ void Area::updateSounds() {
 
         if (!soundPtr->isActive()) continue;
 
-        shared_ptr<SoundBlueprint> blueprint(soundPtr->blueprint());
-        float maxDist = blueprint->maxDistance();
+        float maxDist = soundPtr->maxDistance();
 
         float dist = soundPtr->distanceTo(cameraPosition);
         if (dist > maxDist) continue;
@@ -793,8 +792,8 @@ void Area::checkTriggersIntersection(SpatialObject &triggerrer) {
             _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
             return;
         }
-        if (!trigger.blueprint().onEnter().empty()) {
-            runScript(trigger.blueprint().onEnter(), trigger.id(), triggerrer.id(), -1);
+        if (!trigger.onEnter().empty()) {
+            runScript(trigger.onEnter(), trigger.id(), triggerrer.id(), -1);
         }
     }
 }

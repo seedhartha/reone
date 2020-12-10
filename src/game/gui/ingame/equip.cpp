@@ -330,7 +330,7 @@ void Equipment::updateEquipment() {
 
             auto equipped = equipment.find(slot);
             if (equipped != equipment.end()) {
-                border.fill = equipped->second->blueprint().icon();
+                border.fill = equipped->second->icon();
             } else {
                 border.fill = getEmptySlotIcon(name.first);
             }
@@ -354,18 +354,16 @@ void Equipment::updateItems() {
     shared_ptr<Creature> partyLeader(_game->party().leader());
 
     for (auto &item : partyLeader->items()) {
-        const ItemBlueprint &blueprint = item->blueprint();
-
         if (_selectedSlot == Slot::None) {
-            if (!blueprint.isEquippable()) continue;
+            if (!item->isEquippable()) continue;
         } else {
             InventorySlot slot = getInventorySlot(_selectedSlot);
-            if (!blueprint.isEquippable(slot)) continue;
+            if (!item->isEquippable(slot)) continue;
         }
         ListBox::Item lbItem;
-        lbItem.tag = blueprint.tag();
-        lbItem.text = blueprint.localizedName();
-        lbItem.icon = blueprint.icon();
+        lbItem.tag = item->tag();
+        lbItem.text = item->localizedName();
+        lbItem.icon = item->icon();
 
         lbItems.add(move(lbItem));
     }

@@ -90,22 +90,23 @@ public:
 
     bool isMovementRestricted() const;
 
+    const std::string &blueprintResRef() const;
     Gender gender() const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
     float walkSpeed() const;
     float runSpeed() const;
-    const CreatureAttributes &attributes() const;
-    std::shared_ptr<CreatureBlueprint> blueprint() const;
+    CreatureAttributes &attributes();
     Faction faction() const;
     float attackRange() const;
 
-    void setTag(const std::string &tag);
     void setMovementType(MovementType type);
     void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
     void setInCombat(bool active) { _inCombat = active; }
+    void setOnSpawn(const std::string &onSpawn);
+    void setOnUserDefined(const std::string &onUserDefined);
 
     // Equipment
 
@@ -138,7 +139,8 @@ private:
 
     ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
-    std::shared_ptr<CreatureBlueprint> _blueprint;
+    std::string _blueprintResRef;
+    int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
@@ -155,6 +157,7 @@ private:
     std::deque<std::unique_ptr<Effect>> _effects;
     bool _movementRestricted { false };
     bool _inCombat { false };
+    int _portraitId { 0 };
 
     // Scripts
 
@@ -162,6 +165,7 @@ private:
 
     // END Scripts
 
+    void loadBlueprint(const resource::GffStruct &gffs);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
     void updateModel();
@@ -183,6 +187,8 @@ private:
     std::string getBashAttackAnimation() const;
     std::string getDodgeAnimation() const;
     std::string getKnockdownAnimation() const;
+
+    friend class CreatureBlueprint;
 };
 
 } // namespace game

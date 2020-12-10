@@ -17,9 +17,13 @@
 
 #include "door.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 
 #include "../../resource/resources.h"
+
+#include "../object/door.h"
 
 using namespace std;
 
@@ -29,64 +33,36 @@ namespace reone {
 
 namespace game {
 
-DoorBlueprint::DoorBlueprint(const string &resRef) : _resRef(resRef) {
+DoorBlueprint::DoorBlueprint(const string &resRef, const shared_ptr<GffStruct> &utd) :
+    _resRef(resRef),
+    _utd(utd) {
+
+    if (!utd) {
+        throw invalid_argument("utd must not be null");
+    }
 }
 
-void DoorBlueprint::load(const GffStruct &utd) {
-    _tag = utd.getString("Tag");
-    boost::to_lower(_tag);
+void DoorBlueprint::load(Door &door) {
+    door._tag = boost::to_lower_copy(_utd->getString("Tag"));
 
-    int locNameStrRef = utd.getInt("LocName", -1);
+    int locNameStrRef = _utd->getInt("LocName", -1);
     if (locNameStrRef != -1) {
-        _localizedName = Resources::instance().getString(locNameStrRef);
+        door._title = Resources::instance().getString(locNameStrRef);
     }
 
-    _conversation = utd.getString("Conversation");
-    boost::to_lower(_conversation);
+    door._conversation = boost::to_lower_copy(_utd->getString("Conversation"));
+    door._lockable = _utd->getInt("Lockable", 0) != 0;
+    door._locked = _utd->getInt("Locked", 0) != 0;
+    door._genericType = _utd->getInt("GenericType");
+    door._static = _utd->getInt("Static", 0) != 0;
+    door._selectable = !door._static;
 
-    _lockable = utd.getInt("Lockable", 0) != 0;
-    _locked = utd.getInt("Locked", 0) != 0;
-    _genericType = utd.getInt("GenericType");
-    _static = utd.getInt("Static", 0) != 0;
-
-    _onOpen = utd.getString("OnOpen");
-    _onFailToOpen = utd.getString("OnFailToOpen");
+    door._onOpen = _utd->getString("OnOpen");
+    door._onFailToOpen = _utd->getString("OnFailToOpen");
 }
 
-bool DoorBlueprint::isLockable() const {
-    return _lockable;
-}
-
-bool DoorBlueprint::isLocked() const {
-    return _locked;
-}
-
-bool DoorBlueprint::isStatic() const {
-    return _static;
-}
-
-const string &DoorBlueprint::tag() const {
-    return _tag;
-}
-
-const string &DoorBlueprint::localizedName() const {
-    return _localizedName;
-}
-
-const string &DoorBlueprint::conversation() const {
-    return _conversation;
-}
-
-int DoorBlueprint::genericType() const {
-    return _genericType;
-}
-
-const string &DoorBlueprint::onOpen() const {
-    return _onOpen;
-}
-
-const string &DoorBlueprint::onFailToOpen() const {
-    return _onFailToOpen;
+const string &DoorBlueprint::resRef() const {
+    return _resRef;
 }
 
 } // namespace game

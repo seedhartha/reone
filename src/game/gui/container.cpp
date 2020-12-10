@@ -96,12 +96,10 @@ void Container::open(SpatialObject *container) {
     lbItems.clear();
 
     for (auto &item : container->items()) {
-        const ItemBlueprint &blueprint = item->blueprint();
-
         ListBox::Item lbItem;
-        lbItem.tag = blueprint.tag();
-        lbItem.icon = blueprint.icon();
-        lbItem.text = blueprint.localizedName();
+        lbItem.tag = item->tag();
+        lbItem.icon = item->icon();
+        lbItem.text = item->localizedName();
 
         lbItems.add(move(lbItem));
     }
@@ -126,8 +124,8 @@ void Container::transferItemsToPlayer() {
 
     Placeable *placeable = dynamic_cast<Placeable *>(_container);
     if (placeable) {
-        string script;
-        if (placeable->blueprint().getScript(PlaceableBlueprint::ScriptType::OnInvDisturbed, script)) {
+        string script(placeable->onInvDisturbed());
+        if (!script.empty()) {
             runScript(script, placeable->id(), player->id(), -1);
         }
     }

@@ -71,6 +71,8 @@ Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneG
 }
 
 void Creature::load(const GffStruct &gffs) {
+    loadBlueprint(gffs);
+
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
@@ -79,41 +81,22 @@ void Creature::load(const GffStruct &gffs) {
     float dirY = gffs.getFloat("YOrientation");
     _heading = -glm::atan(dirX, dirY);
 
-    string blueprintResRef(gffs.getString("TemplateResRef"));
-    boost::to_lower(blueprintResRef);
-
-    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
-    load(blueprint);
-
     updateTransform();
 }
 
+void Creature::loadBlueprint(const GffStruct &gffs) {
+    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(resRef));
+    load(blueprint);
+}
+
 void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
-    _blueprint = blueprint;
-    _tag = _blueprint->tag();
-    _faction = static_cast<Faction>(blueprint->factionId());
-    _conversation = _blueprint->conversation();
+    _blueprintResRef = blueprint->resRef();
 
-    for (auto &item : _blueprint->equipment()) {
-        equip(item);
-    }
+    blueprint->load(*this);
+
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
-    loadAppearance(*appearance, _blueprint->appearance());
-
-    string portrait(getPortrait(_blueprint->portraitId()));
-    _portrait = Textures::instance().get(portrait, TextureType::GUI);
-
-    string firstName(_blueprint->firstName());
-    string lastName(_blueprint->lastName());
-    if (!firstName.empty() && !lastName.empty()) {
-        _title = firstName + " " + lastName;
-    } else if (!firstName.empty()) {
-        _title = firstName;
-    }
-
-    _attributes = blueprint->attributes();
-    _onSpawn = blueprint->onSpawn();
-    _onUserDefined = blueprint->onUserDefined();
+    loadAppearance(*appearance, _appearance);
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
@@ -194,7 +177,7 @@ string Creature::getBodyModelName() const {
 
         shared_ptr<Item> bodyItem(getEquippedItem(kInventorySlotBody));
         if (bodyItem) {
-            string baseBodyVar(bodyItem->blueprint().baseBodyVariation());
+            string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
         } else {
             column += "a";
@@ -220,7 +203,7 @@ string Creature::getBodyTextureName() const {
         column = "tex";
 
         if (bodyItem) {
-            string baseBodyVar(bodyItem->blueprint().baseBodyVariation());
+            string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
         } else {
             column += "a";
@@ -238,7 +221,7 @@ string Creature::getBodyTextureName() const {
 
     if (_modelType == ModelType::Character) {
         if (bodyItem) {
-            texName += str(boost::format("%02d") % bodyItem->blueprint().textureVariation());
+            texName += str(boost::format("%02d") % bodyItem->textureVariation());
         } else {
             texName += "01";
         }
@@ -267,10 +250,10 @@ string Creature::getWeaponModelName(InventorySlot slot) const {
     shared_ptr<Item> bodyItem(getEquippedItem(slot));
     if (!bodyItem) return "";
 
-    string modelName(bodyItem->blueprint().itemClass());
+    string modelName(bodyItem->itemClass());
     boost::to_lower(modelName);
 
-    modelName += str(boost::format("_%03d") % bodyItem->blueprint().modelVariation());
+    modelName += str(boost::format("_%03d") % bodyItem->modelVariation());
 
     return move(modelName);
 }
@@ -387,9 +370,9 @@ void Creature::equip(const string &resRef) {
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint);
 
-    if (blueprint->isEquippable(kInventorySlotBody)) {
+    if (item->isEquippable(kInventorySlotBody)) {
         equip(kInventorySlotBody, item);
-    } else if (blueprint->isEquippable(kInventorySlotRightWeapon)) {
+    } else if (item->isEquippable(kInventorySlotRightWeapon)) {
         equip(kInventorySlotRightWeapon, item);
     }
 
@@ -397,9 +380,7 @@ void Creature::equip(const string &resRef) {
 }
 
 void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
-    const ItemBlueprint &blueprint = item->blueprint();
-
-    if (blueprint.isEquippable(slot)) {
+    if (item->isEquippable(slot)) {
         _equipment[slot] = item;
     }
     if (_model) {
@@ -426,10 +407,6 @@ shared_ptr<Item> Creature::getEquippedItem(InventorySlot slot) const {
 
 bool Creature::isSlotEquipped(InventorySlot slot) const {
     return _equipment.find(slot) != _equipment.end();
-}
-
-void Creature::setTag(const string &tag) {
-    _tag = tag;
 }
 
 void Creature::setMovementType(MovementType type) {
@@ -525,9 +502,8 @@ string Creature::getDuelAttackAnimation() const {
 bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
     shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
     if (item) {
-        const ItemBlueprint &blueprint = item->blueprint();
-        type = blueprint.weaponType();
-        wield = blueprint.weaponWield();
+        type = item->weaponType();
+        wield = item->weaponWield();
         return true;
     }
 
@@ -628,6 +604,10 @@ void Creature::applyEffect(unique_ptr<Effect> &&eff) {
     _effects.push_back(move(eff));
 }
 
+const string &Creature::blueprintResRef() const {
+    return _blueprintResRef;
+}
+
 Gender Creature::gender() const {
     return _config.gender;
 }
@@ -656,12 +636,8 @@ float Creature::runSpeed() const {
     return _runSpeed;
 }
 
-const CreatureAttributes &Creature::attributes() const {
+CreatureAttributes &Creature::attributes() {
     return _attributes;
-}
-
-shared_ptr<CreatureBlueprint> Creature::blueprint() const {
-    return _blueprint;
 }
 
 glm::vec3 Creature::selectablePosition() const {
@@ -682,8 +658,8 @@ float Creature::attackRange() const {
     float result = kDefaultAttackRange;
 
     shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
-    if (item && item->blueprint().attackRange() > kDefaultAttackRange) {
-        result = item->blueprint().attackRange();
+    if (item && item->attackRange() > kDefaultAttackRange) {
+        result = item->attackRange();
     }
 
     return result;
@@ -699,6 +675,14 @@ bool Creature::isMovementRestricted() const {
 
 void Creature::setMovementRestricted(bool restricted) {
     _movementRestricted = restricted;
+}
+
+void Creature::setOnSpawn(const string &onSpawn) {
+    _onSpawn = onSpawn;
+}
+
+void Creature::setOnUserDefined(const string &onUserDefined) {
+    _onUserDefined = onUserDefined;
 }
 
 } // namespace game

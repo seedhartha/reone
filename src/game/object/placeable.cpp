@@ -47,51 +47,46 @@ Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *scen
 }
 
 void Placeable::load(const GffStruct &gffs) {
+    loadBlueprint(gffs);
+
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
 
     _heading = gffs.getFloat("Bearing");
 
-    string templResRef(gffs.getString("TemplateResRef"));
-    boost::to_lower(templResRef);
-
-    loadBlueprint(templResRef);
-
-    _conversation = _blueprint->conversation();
-
     updateTransform();
 }
 
-void Placeable::loadBlueprint(const string &resRef) {
-    _blueprint = Blueprints::instance().getPlaceable(resRef);
-    _tag = _blueprint->tag();
-    _title = _blueprint->localizedName();
+void Placeable::loadBlueprint(const GffStruct &gffs) {
+    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+
+    shared_ptr<PlaceableBlueprint> blueprint(Blueprints::instance().getPlaceable(resRef));
+    blueprint->load(*this);
 
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("placeables"));
+    string modelName(boost::to_lower_copy(table->getString(_appearance, "modelname")));
 
-    string model(table->getString(_blueprint->appearance(), "modelname"));
-    boost::to_lower(model);
-
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(model));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
     _model->setLightingEnabled(true);
 
-    _walkmesh = Walkmeshes::instance().get(model, ResourceType::PlaceableWalkmesh);
-
-    for (auto &itemResRef : _blueprint->items()) {
-        shared_ptr<ItemBlueprint> itemBlueprint(Blueprints::instance().getItem(itemResRef));
-
-        shared_ptr<Item> item(_objectFactory->newItem());
-        item->load(itemBlueprint);
-
-        _items.push_back(move(item));
-    }
-
-    _selectable = _blueprint->isUsable();
+    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::PlaceableWalkmesh);
 }
 
-const PlaceableBlueprint &Placeable::blueprint() const {
-    return *_blueprint;
+bool Placeable::hasInventory() const {
+    return _hasInventory;
+}
+
+bool Placeable::isUsable() const {
+    return _usable;
+}
+
+ObjectFactory &Placeable::objectFactory() {
+    return *_objectFactory;
+}
+
+const string &Placeable::onInvDisturbed() const {
+    return _onInvDisturbed;
 }
 
 } // namespace game

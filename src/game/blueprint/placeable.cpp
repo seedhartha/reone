@@ -21,6 +21,11 @@
 
 #include "../../resource/resources.h"
 
+#include "../object/objectfactory.h"
+#include "../object/placeable.h"
+
+#include "blueprints.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -29,78 +34,54 @@ namespace reone {
 
 namespace game {
 
-PlaceableBlueprint::PlaceableBlueprint(const string &resRef) : _resRef(resRef) {
+PlaceableBlueprint::PlaceableBlueprint(const string &resRef, const shared_ptr<GffStruct> &utp) :
+    _resRef(resRef),
+    _utp(utp) {
+
+    if (!utp) {
+        throw invalid_argument("utp must not be null");
+    }
 }
 
-void PlaceableBlueprint::load(const GffStruct &utp) {
-    _tag = utp.getString("Tag");
-    boost::to_lower(_tag);
+void PlaceableBlueprint::load(Placeable &placeable) {
+    placeable._tag = boost::to_lower_copy(_utp->getString("Tag"));
 
-    int locNameStrRef = utp.getInt("LocName", -1);
+    int locNameStrRef = _utp->getInt("LocName", -1);
     if (locNameStrRef != -1) {
-        _localizedName = Resources::instance().getString(locNameStrRef);
+        placeable._title = Resources::instance().getString(locNameStrRef);
     }
 
-    _conversation = utp.getString("Conversation");
-    _appearance = utp.getInt("Appearance");
-    _hasInventory = utp.getInt("HasInventory") != 0;
-    _usable = utp.getInt("Useable") != 0;
+    placeable._appearance = _utp->getInt("Appearance");
+    placeable._conversation = _utp->getString("Conversation");
+    placeable._hasInventory = _utp->getInt("HasInventory") != 0;
+    placeable._usable = _utp->getInt("Useable") != 0;
+    placeable._selectable = placeable._usable;
 
-    loadItems(utp);
-    loadScripts(utp);
+    loadItems(placeable);
+    loadScripts(placeable);
 }
 
-void PlaceableBlueprint::loadItems(const GffStruct &utp) {
-    const GffField *itemList = utp.find("ItemList");
+void PlaceableBlueprint::loadItems(Placeable &placeable) {
+    const GffField *itemList = _utp->find("ItemList");
     if (itemList) {
-        for (auto &item : itemList->children()) {
-            string resRef(item.getString("InventoryRes"));
-            boost::to_lower(resRef);
+        for (auto &itemGffs : itemList->children()) {
+            string resRef(boost::to_lower_copy(itemGffs.getString("InventoryRes")));
+            shared_ptr<ItemBlueprint> itemBlueprint(Blueprints::instance().getItem(resRef));
 
-            _items.push_back(move(resRef));
+            shared_ptr<Item> item(placeable.objectFactory().newItem());
+            item->load(itemBlueprint);
+
+            placeable._items.push_back(move(item));
         }
     }
 }
 
-void PlaceableBlueprint::loadScripts(const GffStruct &utp) {
-    _scripts.insert(make_pair(ScriptType::OnInvDisturbed, utp.getString("OnInvDisturbed")));
+void PlaceableBlueprint::loadScripts(Placeable &placeable) {
+    placeable._onInvDisturbed = _utp->getString("OnInvDisturbed");
 }
 
-bool PlaceableBlueprint::getScript(ScriptType type, string &resRef) const {
-    auto script = _scripts.find(type);
-    if (script == _scripts.end() || script->second.empty()) return false;
-
-    resRef = script->second;
-
-    return true;
-}
-
-const string &PlaceableBlueprint::tag() const {
-    return _tag;
-}
-
-const string &PlaceableBlueprint::localizedName() const {
-    return _localizedName;
-}
-
-const string &PlaceableBlueprint::conversation() const {
-    return _conversation;
-}
-
-int PlaceableBlueprint::appearance() const {
-    return _appearance;
-}
-
-bool PlaceableBlueprint::hasInventory() const {
-    return _hasInventory;
-}
-
-bool PlaceableBlueprint::isUsable() const {
-    return _usable;
-}
-
-const vector<string> &PlaceableBlueprint::items() const {
-    return _items;
+const string &PlaceableBlueprint::resRef() const {
+    return _resRef;
 }
 
 } // namespace game

@@ -17,11 +17,15 @@
 
 #include "item.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+
+#include "../object/item.h"
 
 using namespace std;
 
@@ -32,102 +36,53 @@ namespace reone {
 
 namespace game {
 
-ItemBlueprint::ItemBlueprint(const string &resRef) : _resRef(resRef) {
+ItemBlueprint::ItemBlueprint(const string &resRef, const shared_ptr<GffStruct> &uti) :
+    _resRef(resRef),
+    _uti(uti) {
+
+    if (!uti) {
+        throw invalid_argument("uti must not be null");
+    }
 }
 
-void ItemBlueprint::load(const GffStruct &uti) {
-    _tag = uti.getString("Tag");
-    boost::to_lower(_tag);
-
-    _localizedName = Resources::instance().getString(uti.getInt("LocalizedName"));
+void ItemBlueprint::load(Item &item) {
+    item._tag = boost::to_lower_copy(_uti->getString("Tag"));
+    item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
 
     shared_ptr<TwoDaTable> baseItems(Resources::instance().get2DA("baseitems"));
-    int baseItem = uti.getInt("BaseItem");
-    _equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
+    int baseItem = _uti->getInt("BaseItem");
+
+    item._equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
 
     string itemClass(baseItems->getString(baseItem, "itemclass"));
-    _itemClass = boost::to_lower_copy(itemClass);
+    item._itemClass = boost::to_lower_copy(itemClass);
 
     string iconResRef;
 
-    if (isEquippable(kInventorySlotBody)) {
-        _baseBodyVariation = baseItems->getString(baseItem, "bodyvar");
-        boost::to_lower(_baseBodyVariation);
+    if (item.isEquippable(kInventorySlotBody)) {
+        item._baseBodyVariation = boost::to_lower_copy(baseItems->getString(baseItem, "bodyvar"));
+        item._bodyVariation = _uti->getInt("BodyVariation", 1);
+        item._textureVariation = _uti->getInt("TextureVar", 1);
 
-        _bodyVariation = uti.getInt("BodyVariation", 1);
-        _textureVariation = uti.getInt("TextureVar", 1);
+        iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._textureVariation);
 
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
-
-    } else if (isEquippable(kInventorySlotRightWeapon)) {
-        _modelVariation = uti.getInt("ModelVariation", 1);
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
+    } else if (item.isEquippable(kInventorySlotRightWeapon)) {
+        item._modelVariation = _uti->getInt("ModelVariation", 1);
+        iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
 
     } else {
-        _modelVariation = uti.getInt("ModelVariation", 1);
-        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
+        item._modelVariation = _uti->getInt("ModelVariation", 1);
+        iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
     }
-    _icon = Textures::instance().get(iconResRef, TextureType::GUI);
+    item._icon = Textures::instance().get(iconResRef, TextureType::GUI);
 
-    _attackRange = baseItems->getInt(baseItem, "maxattackrange");
-    _weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
-    _weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
-}
-
-bool ItemBlueprint::isEquippable() const {
-    return _equipableSlots != 0;
-}
-
-bool ItemBlueprint::isEquippable(InventorySlot slot) const {
-    return (_equipableSlots >> slot) & 1;
+    item._attackRange = baseItems->getInt(baseItem, "maxattackrange");
+    item._weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
+    item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
 }
 
 const string &ItemBlueprint::resRef() const {
     return _resRef;
-}
-
-const string &ItemBlueprint::tag() const {
-    return _tag;
-}
-
-const string &ItemBlueprint::localizedName() const {
-    return _localizedName;
-}
-
-const string &ItemBlueprint::baseBodyVariation() const {
-    return _baseBodyVariation;
-}
-
-int ItemBlueprint::bodyVariation() const {
-    return _bodyVariation;
-}
-
-int ItemBlueprint::textureVariation() const {
-    return _textureVariation;
-}
-
-const string &ItemBlueprint::itemClass() const {
-    return _itemClass;
-}
-
-int ItemBlueprint::modelVariation() const {
-    return _modelVariation;
-}
-
-shared_ptr<Texture> ItemBlueprint::icon() const {
-    return _icon;
-}
-
-float ItemBlueprint::attackRange() const {
-    return static_cast<float>(_attackRange);
-}
-
-WeaponType ItemBlueprint::weaponType() const {
-    return _weaponType;
-}
-
-WeaponWield ItemBlueprint::weaponWield() const {
-    return _weaponWield;
 }
 
 } // namespace game

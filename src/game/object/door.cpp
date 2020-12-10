@@ -50,40 +50,30 @@ void Door::load(const GffStruct &gffs) {
     _position[2] = gffs.getFloat("Z");
 
     _heading = gffs.getFloat("Bearing");
-    _linkedToModule = gffs.getString("LinkedToModule");
-
-    _linkedTo = gffs.getString("LinkedTo");
-    boost::to_lower(_linkedTo);
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
 
     int transDestStrRef = gffs.getInt("TransitionDestin");
     if (transDestStrRef != -1) {
         _transitionDestin = Resources::instance().getString(transDestStrRef);
     }
 
-    string templResRef(gffs.getString("TemplateResRef"));
-    boost::to_lower(templResRef);
-
-    loadBlueprint(templResRef);
-
-    _conversation = _blueprint->conversation();
-
+    loadBlueprint(gffs);
     updateTransform();
 }
 
-void Door::loadBlueprint(const string &resRef) {
-    _blueprint = Blueprints::instance().getDoor(resRef);
-    _tag = _blueprint->tag();
-    _title = _blueprint->localizedName();
-    _locked = _blueprint->isLocked();
-    _selectable = !_blueprint->isStatic();
+void Door::loadBlueprint(const GffStruct &gffs) {
+    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
 
-    shared_ptr<TwoDaTable> table = Resources::instance().get2DA("genericdoors");
+    shared_ptr<DoorBlueprint> blueprint(Blueprints::instance().getDoor(resRef));
+    blueprint->load(*this);
 
-    string model(table->getString(_blueprint->genericType(), "modelname"));
-    boost::to_lower(model);
+    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("genericdoors"));
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(model));
-    _walkmesh = Walkmeshes::instance().get(model + "0", ResourceType::DoorWalkmesh);
+    string modelName(boost::to_lower_copy(table->getString(_genericType, "modelname")));
+    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
+
+    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::DoorWalkmesh);
 }
 
 void Door::open(Object *triggerrer) {
@@ -108,12 +98,28 @@ bool Door::isOpen() const {
     return _open;
 }
 
+bool Door::isLockable() const {
+    return _lockable;
+}
+
 bool Door::isLocked() const {
     return _locked;
 }
 
-const DoorBlueprint &Door::blueprint() const {
-    return *_blueprint;
+bool Door::isStatic() const {
+    return _static;
+}
+
+const string &Door::getOnOpen() const {
+    return _onOpen;
+}
+
+const string &Door::getOnFailToOpen() const {
+    return _onFailToOpen;
+}
+
+int Door::genericType() const {
+    return _genericType;
 }
 
 const string &Door::linkedToModule() const {

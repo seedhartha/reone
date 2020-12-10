@@ -40,20 +40,19 @@ Sound::Sound(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType
 }
 
 void Sound::load(const GffStruct &gffs) {
-    string blueprintResRef(gffs.getString("TemplateResRef"));
-    _blueprint = Blueprints::instance().getSound(blueprintResRef);
-
-    _tag = _blueprint->tag();
-    _active = _blueprint->active();
-
-    shared_ptr<TwoDaTable> priorityGroups(Resources::instance().get2DA("prioritygroups"));
-    _priority = priorityGroups->getInt(_blueprint->priority(), "priority");
+    loadBlueprint(gffs);
 
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
     updateTransform();
+}
+
+void Sound::loadBlueprint(const GffStruct &gffs) {
+    string resRef(gffs.getString("TemplateResRef"));
+    shared_ptr<SoundBlueprint> blueprint(Blueprints::instance().getSound(resRef));
+    blueprint->load(*this);
 }
 
 void Sound::update(float dt) {
@@ -74,27 +73,27 @@ void Sound::update(float dt) {
             _timeout = glm::max(0.0f, _timeout - dt);
             return;
         }
-        const vector<string> &sounds = _blueprint->sounds();
+        const vector<string> &sounds = _sounds;
         int soundCount = static_cast<int>(sounds.size());
         if (sounds.empty()) {
             _active = false;
             return;
         } else if (++_soundIdx == soundCount) {
-            if (_blueprint->looping()) {
+            if (_looping) {
                 _soundIdx = 0;
             } else {
                 _active = false;
                 return;
             }
         }
-        playSound(sounds[_soundIdx], soundCount == 1 && _blueprint->continuous());
-        _timeout = _blueprint->interval() / 1000.0f;
+        playSound(sounds[_soundIdx], soundCount == 1 && _continuous);
+        _timeout = _interval / 1000.0f;
     }
 }
 
 void Sound::playSound(const string &resRef, bool loop) {
-    float gain = _blueprint->volume() / 127.0f;
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, gain, _blueprint->positional(), getPosition());
+    float gain = _volume / 127.0f;
+    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
 }
 
 void Sound::play() {
@@ -115,22 +114,42 @@ void Sound::stop() {
     _active = false;
 }
 
-shared_ptr<SoundBlueprint> Sound::blueprint() const {
-    return _blueprint;
-}
-
 bool Sound::isActive() const {
     return _active;
 }
 
 glm::vec3 Sound::getPosition() const {
     glm::vec3 position(_transform[3]);
-    position.z += _blueprint->elevation();
+    position.z += _elevation;
     return move(position);
 }
 
 int Sound::priority() const {
     return _priority;
+}
+
+float Sound::maxDistance() const {
+    return _maxDistance;
+}
+
+float Sound::minDistance() const {
+    return _minDistance;
+}
+
+bool Sound::continuous() const {
+    return _continuous;
+}
+
+float Sound::elevation() const {
+    return _elevation;
+}
+
+bool Sound::looping() const {
+    return _looping;
+}
+
+bool Sound::positional() const {
+    return _positional;
 }
 
 void Sound::setAudible(bool audible) {

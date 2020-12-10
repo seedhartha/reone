@@ -31,38 +31,53 @@ class SoundHandle;
 
 namespace game {
 
-class SoundBlueprint;
-
 class Sound : public SpatialObject {
 public:
     Sound(uint32_t id, scene::SceneGraph *sceneGraph);
 
+    void update(float dt) override;
+
     void load(const resource::GffStruct &gffs);
 
-    void update(float dt) override;
+    void play();
+    void stop();
 
     bool isActive() const;
 
     glm::vec3 getPosition() const;
 
-    std::shared_ptr<SoundBlueprint> blueprint() const;
     int priority() const;
-
-    void play();
-    void stop();
+    float maxDistance() const;
+    float minDistance() const;
+    bool continuous() const;
+    float elevation() const;
+    bool looping() const;
+    bool positional() const;
 
     void setAudible(bool audible);
 
 private:
-    std::shared_ptr<SoundBlueprint> _blueprint;
     bool _active { false };
-    bool _audible { false };
     int _priority { 0 };
     int _soundIdx { -1 };
     float _timeout { 0.0f };
+    float _maxDistance { 0.0f };
+    float _minDistance { 0.0f };
+    bool _continuous { false };
+    float _elevation { 0.0f };
+    bool _looping { false };
+    bool _positional { false };
+    int _interval { 0 };
+    int _volume { 0 };
+    std::vector<std::string> _sounds;
+    bool _audible { false };
     std::shared_ptr<audio::SoundHandle> _sound;
 
+    void loadBlueprint(const resource::GffStruct &gffs);
+
     void playSound(const std::string &resRef, bool loop);
+
+    friend class SoundBlueprint;
 };
 
 } // namespace game

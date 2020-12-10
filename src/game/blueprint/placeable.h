@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -27,42 +28,26 @@ namespace reone {
 
 namespace game {
 
+class ObjectFactory;
+class Placeable;
+
 class PlaceableBlueprint {
 public:
-    enum class ScriptType {
-        OnInvDisturbed
-    };
+    PlaceableBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utp);
 
-    PlaceableBlueprint(const std::string &resRef);
+    void load(Placeable &placeable);
 
-    void load(const resource::GffStruct &utp);
-
-    bool getScript(ScriptType type, std::string &resRef) const;
-
-    const std::string &tag() const;
-    const std::string &localizedName() const;
-    const std::string &conversation() const;
-    int appearance() const;
-    bool hasInventory() const;
-    bool isUsable() const;
-    const std::vector<std::string> &items() const;
+    const std::string &resRef() const;
 
 private:
     std::string _resRef;
-    std::string _tag;
-    std::string _localizedName;
-    std::string _conversation;
-    int _appearance { 0 };
-    bool _hasInventory { false };
-    bool _usable { false };
-    std::vector<std::string> _items;
-    std::unordered_map<ScriptType, std::string> _scripts;
+    std::shared_ptr<resource::GffStruct> _utp;
 
     PlaceableBlueprint(const PlaceableBlueprint &) = delete;
     PlaceableBlueprint &operator=(const PlaceableBlueprint &) = delete;
 
-    void loadItems(const resource::GffStruct &utp);
-    void loadScripts(const resource::GffStruct &utp);
+    void loadItems(Placeable &placeable);
+    void loadScripts(Placeable &placeable);
 };
 
 } // namespace game

@@ -105,14 +105,14 @@ void PartySelection::prepare(const Context &ctx) {
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
             shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
-            int appearance = blueprint->appearance();
+            int appearance = blueprint->getAppearanceFromUtc();
             string portrait;
 
             auto maybePortrait = g_portraitByAppearance.find(appearance);
             if (maybePortrait != g_portraitByAppearance.end()) {
                 portrait = maybePortrait->second;
             } else {
-                portrait = getPortraitByAppearance(blueprint->appearance());
+                portrait = getPortraitByAppearance(blueprint->getAppearanceFromUtc());
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(Textures::instance().get(portrait, TextureType::GUI));
