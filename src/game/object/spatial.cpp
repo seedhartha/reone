@@ -86,6 +86,10 @@ bool SpatialObject::isSelectable() const {
     return _selectable;
 }
 
+SceneGraph &SpatialObject::sceneGraph() {
+    return *_sceneGraph;
+}
+
 Room *SpatialObject::room() const {
     return _room;
 }

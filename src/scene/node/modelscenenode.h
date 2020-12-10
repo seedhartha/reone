@@ -47,6 +47,7 @@ public:
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
+    std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
 

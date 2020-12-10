@@ -56,6 +56,7 @@ public:
 
     virtual glm::vec3 getSelectablePosition() const;
 
+    scene::SceneGraph &sceneGraph();
     Room *room() const;
     const glm::vec3 &position() const;
     float heading() const;

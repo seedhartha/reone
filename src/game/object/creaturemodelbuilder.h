@@ -17,9 +17,36 @@
 
 #pragma once
 
+#include <string>
+
+#include "../types.h"
+
 namespace reone {
 
+namespace scene {
+
+class ModelSceneNode;
+
+}
+
 namespace game {
+
+class Creature;
+
+class CreatureModelBuilder {
+public:
+    CreatureModelBuilder(Creature *creature);
+
+    std::shared_ptr<scene::ModelSceneNode> build();
+
+private:
+    Creature *_creature { nullptr };
+
+    std::string getBodyModelName() const;
+    std::string getBodyTextureName() const;
+    std::string getHeadModelName() const;
+    std::string getWeaponModelName(InventorySlot slot) const;
+};
 
 } // namespace game
 
