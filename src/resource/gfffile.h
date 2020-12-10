@@ -102,20 +102,18 @@ public:
     void add(GffField &&field);
     const GffField *find(const std::string &name) const;
 
-    void setType(GffFieldType type);
-
     bool getBool(const std::string &name, bool defaultValue = false) const;
-    int getInt(const std::string &name) const;
-    int getInt(const std::string &name, int defaultValue) const;
-    float getFloat(const std::string &name) const;
-    float getFloat(const std::string &name, float defaultValue) const;
-    std::string getString(const std::string &name) const;
+    int getInt(const std::string &name, int defaultValue = 0) const;
+    float getFloat(const std::string &name, float defaultValue = 0.0f) const;
+    std::string getString(const std::string &name, const char *defaultValue = "") const;
+    glm::vec3 getVector(const std::string &name, glm::vec3 defaultValue = glm::vec3(0.0f)) const;
+    glm::quat getOrientation(const std::string &name, glm::quat defaultValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) const;
     const GffStruct &getStruct(const std::string &name) const;
     const std::vector<GffStruct> &getList(const std::string &name) const;
-    glm::vec3 getVector(const std::string &name) const;
-    glm::quat getOrientation(const std::string &name) const;
 
     const std::vector<GffField> &fields() const;
+
+    void setType(GffFieldType type);
 
 private:
     GffFieldType _type { GffFieldType::Byte };
