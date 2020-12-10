@@ -19,7 +19,11 @@
 
 #include <memory>
 
+#include "../../render/texture.h"
+#include "../../resource/gfffile.h"
+
 #include "../blueprint/item.h"
+#include "../types.h"
 
 #include "object.h"
 
@@ -33,10 +37,34 @@ public:
 
     void load(const std::shared_ptr<ItemBlueprint> &blueprint);
 
-    const ItemBlueprint &blueprint() const;
+    bool isEquippable() const;
+    bool isEquippable(InventorySlot slot) const;
+
+    const std::string &localizedName() const;
+    const std::string &baseBodyVariation() const;
+    int bodyVariation() const;
+    int textureVariation() const;
+    const std::string &itemClass() const;
+    int modelVariation() const;
+    std::shared_ptr<render::Texture> icon() const;
+    float attackRange() const;
+    WeaponType weaponType() const;
+    WeaponWield weaponWield() const;
 
 private:
-    std::shared_ptr<ItemBlueprint> _blueprint;
+    std::string _localizedName;
+    std::string _baseBodyVariation;
+    int _bodyVariation { 0 };
+    int _textureVariation { 0 };
+    std::string _itemClass;
+    int _modelVariation { 0 };
+    std::shared_ptr<render::Texture> _icon;
+    uint32_t _equipableSlots { 0 };
+    int _attackRange { 0 };
+    WeaponType _weaponType { WeaponType::None };
+    WeaponWield _weaponWield { WeaponWield::None };
+
+    friend class ItemBlueprint;
 };
 
 } // namespace game

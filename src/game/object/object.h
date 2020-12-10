@@ -54,6 +54,8 @@ public:
     // Current hit points, not counting any bonuses.
     int currentHitPoints() const;
 
+    void setTag(const std::string &tag);
+
 protected:
     uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };

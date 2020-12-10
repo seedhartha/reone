@@ -140,8 +140,7 @@ bool Party::isNPCMember(int npc) const {
 
     if (npc != kNpcPlayer) {
         for (auto &member : _members) {
-            shared_ptr<CreatureBlueprint> blueprint(member->blueprint());
-            if (blueprint && blueprint->resRef() == maybeMember->second) {
+            if (member->blueprintResRef() == maybeMember->second) {
                 return true;
             }
         }
@@ -185,8 +184,7 @@ void Party::setPartyLeader(int npc) {
             return;
         }
         for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
-            shared_ptr<CreatureBlueprint> blueprint(_members[i]->blueprint());
-            if (blueprint && blueprint->resRef() == maybeMember->second) {
+            if (_members[i]->blueprintResRef()  == maybeMember->second) {
                 memberIdx = -1;
                 break;
             }

@@ -37,13 +37,27 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
-    const PlaceableBlueprint &blueprint() const;
+    bool hasInventory() const;
+    bool isUsable() const;
+
+    ObjectFactory &objectFactory();
+    const std::string &onInvDisturbed() const;
 
 private:
     ObjectFactory *_objectFactory { nullptr };
-    std::shared_ptr<PlaceableBlueprint> _blueprint;
+    int  _appearance { 0 };
+    bool _hasInventory { false };
+    bool _usable { false };
 
-    void loadBlueprint(const std::string &resRef);
+    // Scripts
+
+    std::string _onInvDisturbed;
+
+    // END Scripts
+
+    void loadBlueprint(const resource::GffStruct &gffs);
+
+    friend class PlaceableBlueprint;
 };
 
 } // namespace game

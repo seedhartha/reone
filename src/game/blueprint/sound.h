@@ -18,7 +18,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <memory>
 
 #include "../../resource/gfffile.h"
 
@@ -26,39 +26,17 @@ namespace reone {
 
 namespace game {
 
+class Sound;
+
 class SoundBlueprint {
 public:
-    SoundBlueprint(const std::string &resRef);
+    SoundBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &uts);
 
-    void load(const resource::GffStruct &uts);
-
-    const std::string &tag() const;
-    bool active() const;
-    int priority() const;
-    float maxDistance() const;
-    float minDistance() const;
-    bool continuous() const;
-    float elevation() const;
-    bool looping() const;
-    bool positional() const;
-    int interval() const;
-    int volume() const;
-    const std::vector<std::string> &sounds() const;
+    void load(Sound &sound);
 
 private:
     std::string _resRef;
-    std::string _tag;
-    bool _active { false };
-    int _priority { 0 };
-    float _maxDistance { 0.0f };
-    float _minDistance { 0.0f };
-    bool _continuous { false };
-    float _elevation { 0.0f };
-    bool _looping { false };
-    bool _positional { false };
-    int _interval { 0 };
-    int _volume { 0 };
-    std::vector<std::string> _sounds;
+    std::shared_ptr<resource::GffStruct> _uts;
 
     SoundBlueprint(const SoundBlueprint &) = delete;
     SoundBlueprint &operator=(const SoundBlueprint &) = delete;

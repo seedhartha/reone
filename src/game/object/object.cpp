@@ -82,6 +82,10 @@ int Object::currentHitPoints() const {
     return _currentHitPoints;
 }
 
+void Object::setTag(const string &tag) {
+    _tag = tag;
+}
+
 } // namespace game
 
 } // namespace reone

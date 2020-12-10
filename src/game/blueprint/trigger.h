@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "../../resource/gfffile.h"
 
@@ -25,21 +26,17 @@ namespace reone {
 
 namespace game {
 
+class Trigger;
+
 class TriggerBlueprint {
 public:
-    TriggerBlueprint(const std::string &resRef);
+    TriggerBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utt);
 
-    void load(const resource::GffStruct &utt);
-
-    const std::string &tag() const;
-    const std::string &onEnter() const;
-    const std::string &onExit() const;
+    void load(Trigger &trigger);
 
 private:
     std::string _resRef;
-    std::string _tag;
-    std::string _onEnter;
-    std::string _onExit;
+    std::shared_ptr<resource::GffStruct> _utt;
 
     TriggerBlueprint(const TriggerBlueprint &) = delete;
     TriggerBlueprint &operator=(const TriggerBlueprint &) = delete;

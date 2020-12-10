@@ -59,15 +59,8 @@ shared_ptr<T> Blueprints::get(const string &resRef, ResourceType type, unordered
 
 template <class T>
 shared_ptr<T> Blueprints::doGet(const string &resRef, ResourceType type) {
-    shared_ptr<GffStruct> data(Resources::instance().getGFF(resRef, type));
-    shared_ptr<T> blueprint;
-
-    if (data) {
-        blueprint.reset(new T(resRef));
-        blueprint->load(*data);
-    }
-
-    return move(blueprint);
+    shared_ptr<GffStruct> gffs(Resources::instance().getGFF(resRef, type));
+    return make_shared<T>(resRef, gffs);
 }
 
 shared_ptr<DoorBlueprint> Blueprints::getDoor(const string &resRef) {

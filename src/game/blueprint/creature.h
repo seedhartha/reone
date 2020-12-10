@@ -18,8 +18,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
-#include <vector>
+#include <memory>
 
 #include "../../resource/gfffile.h"
 
@@ -29,51 +28,29 @@ namespace reone {
 
 namespace game {
 
+class Creature;
+
 class CreatureBlueprint {
 public:
-    CreatureBlueprint(const std::string &resRef);
+    CreatureBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utc);
 
-    void load(const resource::GffStruct &utc);
+    void load(Creature &creature);
 
     const std::string &resRef() const;
-    const std::string &tag() const;
-    const std::string &firstName() const;
-    const std::string &lastName() const;
-    const std::vector<std::string> &equipment() const;
-    int appearance() const;
-    int portraitId() const;
-    int factionId() const { return _factionId; }
-    const std::string &conversation() const;
-    const CreatureAttributes &attributes() const;
-    const std::string &onSpawn() const;
-    const std::string &onUserDefined() const;
+    int getAppearanceFromUtc() const;
 
 private:
     std::string _resRef;
-    std::string _tag;
-    std::string _firstName;
-    std::string _lastName;
-    std::vector<std::string> _equipment;
-    int _appearance { 0 };
-    int _portraitId { -1 };
-    int _factionId { -1 };
-    std::string _conversation;
-    CreatureAttributes _attributes;
-
-    // Scripts
-
-    std::string _onSpawn;
-    std::string _onUserDefined;
-
-    // END Scripts
+    std::shared_ptr<resource::GffStruct> _utc;
 
     CreatureBlueprint(const CreatureBlueprint &) = delete;
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 
-    void loadAttributes(const resource::GffStruct &utc);
-    void loadAbilities(const resource::GffStruct &utc);
-    void loadSkills(const resource::GffStruct &utc);
-    void loadScripts(const resource::GffStruct &utc);
+    void loadTitle(Creature &creature);
+    void loadAttributes(Creature &creature);
+    void loadAbilities(CreatureAttributes &attributes);
+    void loadSkills(CreatureAttributes &attributes);
+    void loadScripts(Creature &creature);
 };
 
 } // namespace game

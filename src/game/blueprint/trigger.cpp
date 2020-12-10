@@ -17,7 +17,11 @@
 
 #include "trigger.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
+
+#include "../object/trigger.h"
 
 using namespace std;
 
@@ -27,27 +31,19 @@ namespace reone {
 
 namespace game {
 
-TriggerBlueprint::TriggerBlueprint(const string &resRef) : _resRef(resRef) {
+TriggerBlueprint::TriggerBlueprint(const string &resRef, const shared_ptr<GffStruct> &utt) :
+    _resRef(resRef),
+    _utt(utt) {
+
+    if (!utt) {
+        throw invalid_argument("utt must not be null");
+    }
 }
 
-void TriggerBlueprint::load(const GffStruct &utt) {
-    _tag = utt.getString("Tag");
-    boost::to_lower(_tag);
-
-    _onEnter = utt.getString("ScriptOnEnter");
-    _onExit = utt.getString("ScriptOnExit");
-}
-
-const string &TriggerBlueprint::tag() const {
-    return _tag;
-}
-
-const string &TriggerBlueprint::onEnter() const {
-    return _onEnter;
-}
-
-const string &TriggerBlueprint::onExit() const {
-    return _onExit;
+void TriggerBlueprint::load(Trigger &trigger) {
+    trigger._tag = boost::to_lower_copy(_utt->getString("Tag"));
+    trigger._onEnter = boost::to_lower_copy(_utt->getString("ScriptOnEnter"));
+    trigger._onExit = boost::to_lower_copy(_utt->getString("ScriptOnExit"));
 }
 
 } // namespace resource

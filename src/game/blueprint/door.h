@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "../../resource/gfffile.h"
 
@@ -25,34 +26,19 @@ namespace reone {
 
 namespace game {
 
+class Door;
+
 class DoorBlueprint {
 public:
-    DoorBlueprint(const std::string &resRef);
+    DoorBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utd);
 
-    void load(const resource::GffStruct &utd);
+    void load(Door &door);
 
-    bool isLockable() const;
-    bool isLocked() const;
-    bool isStatic() const;
-
-    const std::string &tag() const;
-    const std::string &localizedName() const;
-    const std::string &conversation() const;
-    int genericType() const;
-    const std::string &onOpen() const;
-    const std::string &onFailToOpen() const;
+    const std::string &resRef() const;
 
 private:
     std::string _resRef;
-    std::string _tag;
-    std::string _localizedName;
-    std::string _conversation;
-    bool _lockable { false };
-    bool _locked { false };
-    int _genericType { 0 };
-    bool _static { false };
-    std::string _onOpen;
-    std::string _onFailToOpen;
+    std::shared_ptr<resource::GffStruct> _utd;
 
     DoorBlueprint(const DoorBlueprint &) = delete;
     DoorBlueprint &operator=(const DoorBlueprint &) = delete;

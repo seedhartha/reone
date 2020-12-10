@@ -17,7 +17,14 @@
 
 #include "sound.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
+
+#include "../../resource/2dafile.h"
+#include "../../resource/resources.h"
+
+#include "../object/sound.h"
 
 using namespace std;
 
@@ -27,75 +34,34 @@ namespace reone {
 
 namespace game {
 
-SoundBlueprint::SoundBlueprint(const string &resRef) : _resRef(resRef) {
-}
+SoundBlueprint::SoundBlueprint(const string &resRef, const shared_ptr<GffStruct> &uts) :
+    _resRef(resRef),
+    _uts(uts) {
 
-void SoundBlueprint::load(const GffStruct &uts) {
-    _tag = uts.getString("Tag");
-    boost::to_lower(_tag);
-
-    _active = uts.getInt("Active") != 0;
-    _priority = uts.getInt("Priority");
-    _maxDistance = uts.getFloat("MaxDistance");
-    _minDistance = uts.getFloat("MinDistance");
-    _continuous = uts.getInt("Continuous") != 0;
-    _elevation = uts.getFloat("Elevation");
-    _looping = uts.getInt("Looping") != 0;
-    _positional = uts.getInt("Positional") != 0;
-    _interval = uts.getInt("Interval");
-    _volume = uts.getInt("Volume");
-
-    for (auto &sound : uts.getList("Sounds")) {
-        _sounds.push_back(sound.getString("Sound"));
+    if (!uts) {
+        throw invalid_argument("uts must not be null");
     }
 }
 
-const string &SoundBlueprint::tag() const {
-    return _tag;
-}
+void SoundBlueprint::load(Sound &sound) {
+    sound._tag = boost::to_lower_copy(_uts->getString("Tag"));
+    sound._active = _uts->getInt("Active") != 0;
 
-bool SoundBlueprint::active() const {
-    return _active;
-}
+    shared_ptr<TwoDaTable> priorityGroups(Resources::instance().get2DA("prioritygroups"));
+    sound._priority = priorityGroups->getInt(_uts->getInt("Priority"), "priority");
 
-int SoundBlueprint::priority() const {
-    return _priority;
-}
+    sound._maxDistance = _uts->getFloat("MaxDistance");
+    sound._minDistance = _uts->getFloat("MinDistance");
+    sound._continuous = _uts->getInt("Continuous") != 0;
+    sound._elevation = _uts->getFloat("Elevation");
+    sound._looping = _uts->getInt("Looping") != 0;
+    sound._positional = _uts->getInt("Positional") != 0;
+    sound._interval = _uts->getInt("Interval");
+    sound._volume = _uts->getInt("Volume");
 
-float SoundBlueprint::maxDistance() const {
-    return _maxDistance;
-}
-
-float SoundBlueprint::minDistance() const {
-    return _minDistance;
-}
-
-bool SoundBlueprint::continuous() const {
-    return _continuous;
-}
-
-float SoundBlueprint::elevation() const {
-    return _elevation;
-}
-
-bool SoundBlueprint::looping() const {
-    return _looping;
-}
-
-bool SoundBlueprint::positional() const {
-    return _positional;
-}
-
-int SoundBlueprint::interval() const {
-    return _interval;
-}
-
-int SoundBlueprint::volume() const {
-    return _volume;
-}
-
-const vector<string> &SoundBlueprint::sounds() const {
-    return _sounds;
+    for (auto &soundGffs : _uts->getList("Sounds")) {
+        sound._sounds.push_back(boost::to_lower_copy(soundGffs.getString("Sound")));
+    }
 }
 
 } // namespace game
