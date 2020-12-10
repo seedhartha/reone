@@ -46,6 +46,10 @@ void Object::runUserDefinedEvent(int eventNumber) {
     }
 }
 
+bool Object::isMinOneHP() const {
+    return _minOneHP;
+}
+
 uint32_t Object::id() const {
     return _id;
 }

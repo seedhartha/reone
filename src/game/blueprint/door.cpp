@@ -56,7 +56,14 @@ void DoorBlueprint::load(Door &door) {
     door._genericType = _utd->getInt("GenericType");
     door._static = _utd->getInt("Static", 0) != 0;
     door._selectable = !door._static;
+    door._minOneHP = _utd->getInt("Min1HP", 0) != 0;
+    door._hitPoints = _utd->getInt("HP");
+    door._currentHitPoints = _utd->getInt("CurrentHP");
 
+    loadScripts(door);
+}
+
+void DoorBlueprint::loadScripts(Door &door) {
     door._onOpen = _utd->getString("OnOpen");
     door._onFailToOpen = _utd->getString("OnFailToOpen");
 }
