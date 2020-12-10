@@ -82,6 +82,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         if (props.flags & kRaycastAABB) {
             shared_ptr<ModelSceneNode> model(object->model());
             if (!model) continue;
+            if (model->aabb().contains(origin)) continue;
 
             if (model->aabb().intersectLine(origin, dir, distance)) {
                 collisions.push_back(make_pair(object, distance));
