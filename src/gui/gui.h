@@ -115,10 +115,11 @@ private:
     GUI(const GUI &) = delete;
     GUI &operator=(const GUI &) = delete;
 
-    void drawBackground() const;
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
+
+    void drawBackground() const;
 
     Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
 };

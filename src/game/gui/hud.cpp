@@ -17,8 +17,9 @@
 
 #include "hud.h"
 
-#include "../../gui/control/label.h"
 #include "../../common/log.h"
+#include "../../gui/control/label.h"
+#include "../../render/mesh/quad.h"
 
 #include "../game.h"
 
@@ -197,6 +198,11 @@ void HUD::render() const {
     _debug.render();
 
     drawMinimap();
+
+    Party &party = _game->party();
+    for (int i = 0; i < party.size(); ++i) {
+        drawHealth(i);
+    }
 }
 
 void HUD::drawMinimap() const {
@@ -211,6 +217,30 @@ void HUD::drawMinimap() const {
 
     shared_ptr<Area> area(_game->module()->area());
     area->map().render(Map::Mode::Minimap, bounds);
+}
+
+void HUD::drawHealth(int memberIndex) const {
+    Party &party = _game->party();
+    shared_ptr<Creature> member(party.getMember(memberIndex));
+
+    int charIdx = (memberIndex == 0) ? 1 : (4 - memberIndex);
+    Control &lblChar = getControl("LBL_BACK" + to_string(charIdx));
+    const Control::Extent &extent = lblChar.extent();
+
+    float w = 5.0f;
+    float h = glm::clamp(member->currentHitPoints() / static_cast<float>(member->hitPoints()), 0.0f, 1.0f) * extent.height;
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
+    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+
+    LocalUniforms locals;
+    locals.general.model = move(transform);
+    locals.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+
+    Quad::getDefault().renderTriangles();
 }
 
 void HUD::showCombatHud() {

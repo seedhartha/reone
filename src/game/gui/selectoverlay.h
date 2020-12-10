@@ -37,6 +37,7 @@ class Texture;
 namespace game {
 
 class Game;
+class SpatialObject;
 
 class SelectionOverlay {
 public:
@@ -59,16 +60,15 @@ private:
     std::shared_ptr<render::Texture> _hostileScroll;
     std::shared_ptr<render::Texture> _hilightedScroll;
     std::unordered_map<ContextualAction, std::shared_ptr<render::Texture>> _textureByAction;
-    bool _hasHilighted { false };
-    bool _hasSelected { false };
+    std::shared_ptr<SpatialObject> _hilightedObject;
+    std::shared_ptr<SpatialObject> _selectedObject;
     std::vector<ContextualAction> _actions;
     glm::vec3 _hilightedScreenCoords { 0.0f };
     glm::vec3 _selectedScreenCoords { 0.0f };
-    std::string _selectedTitle;
     int _reticleHeight { 0 };
     int _selectedActionIdx { -1 };
-    bool _hilightedHostile;
-    bool _selectedHostile;
+    bool _hilightedHostile { false };
+    bool _selectedHostile { false };
 
     void addTextureByAction(ContextualAction action, const std::string &resRef);
 
@@ -77,6 +77,7 @@ private:
 
     void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
     void drawTitleBar() const;
+    void drawHealthBar() const;
     void drawActionBar() const;
 
     bool getActionScreenCoords(int index, float &x, float &y) const;
