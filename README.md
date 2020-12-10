@@ -10,6 +10,10 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 
 The project is in the early stages of development: resource management, rendering, audio, GUI and scripting subsystems are already implemented, and game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
+## Contributing
+
+reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap). For an overview of the project architecture and other developer resources, visit the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki.
+
 ## Installation
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
@@ -31,10 +35,6 @@ Controls:
 ## Configuration
 
 reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).
-
-## Contribution
-
-reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap). For an overview of the project architecture and other developer resources, visit the [development](https://github.com/seedhartha/reone/wiki/Development) page in the Wiki.
 
 ## Similar Projects
 
