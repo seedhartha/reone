@@ -189,11 +189,15 @@ void MainMenu::onModuleSelected(const string &name) {
     switch (_version) {
         case GameVersion::TheSithLords:
             playerCfg.appearance = kAppearanceAtton;
+            playerCfg.equipment.push_back("w_blaste_01");
             companionCfg.appearance = kAppearanceKreia;
+            companionCfg.equipment.push_back("w_melee_06");
             break;
         default:
             playerCfg.appearance = kAppearanceCarth;
+            playerCfg.equipment.push_back("g_w_blstrpstl001");
             companionCfg.appearance = kAppearanceBastila;
+            companionCfg.equipment.push_back("g_w_dblsbr004");
             break;
     }
 
