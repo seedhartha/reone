@@ -45,17 +45,17 @@ SoundBlueprint::SoundBlueprint(const string &resRef, const shared_ptr<GffStruct>
 
 void SoundBlueprint::load(Sound &sound) {
     sound._tag = boost::to_lower_copy(_uts->getString("Tag"));
-    sound._active = _uts->getInt("Active") != 0;
+    sound._active = _uts->getBool("Active");
 
     shared_ptr<TwoDaTable> priorityGroups(Resources::instance().get2DA("prioritygroups"));
     sound._priority = priorityGroups->getInt(_uts->getInt("Priority"), "priority");
 
     sound._maxDistance = _uts->getFloat("MaxDistance");
     sound._minDistance = _uts->getFloat("MinDistance");
-    sound._continuous = _uts->getInt("Continuous") != 0;
+    sound._continuous = _uts->getBool("Continuous");
     sound._elevation = _uts->getFloat("Elevation");
-    sound._looping = _uts->getInt("Looping") != 0;
-    sound._positional = _uts->getInt("Positional") != 0;
+    sound._looping = _uts->getBool("Looping");
+    sound._positional = _uts->getBool("Positional");
     sound._interval = _uts->getInt("Interval");
     sound._volume = _uts->getInt("Volume");
 

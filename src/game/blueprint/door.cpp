@@ -51,12 +51,12 @@ void DoorBlueprint::load(Door &door) {
     }
 
     door._conversation = boost::to_lower_copy(_utd->getString("Conversation"));
-    door._lockable = _utd->getInt("Lockable", 0) != 0;
-    door._locked = _utd->getInt("Locked", 0) != 0;
+    door._lockable = _utd->getBool("Lockable");
+    door._locked = _utd->getBool("Locked");
     door._genericType = _utd->getInt("GenericType");
-    door._static = _utd->getInt("Static", 0) != 0;
+    door._static = _utd->getBool("Static");
     door._selectable = !door._static;
-    door._minOneHP = _utd->getInt("Min1HP", 0) != 0;
+    door._minOneHP = _utd->getBool("Min1HP");
     door._hitPoints = _utd->getInt("HP");
     door._currentHitPoints = _utd->getInt("CurrentHP");
 

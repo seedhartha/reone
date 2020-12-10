@@ -46,6 +46,10 @@ const vector<GffStruct> &GffField::children() const {
     return _children;
 }
 
+bool GffField::asBool() const {
+    return _intValue != 0;
+}
+
 int64_t GffField::asInt() const {
     return _intValue;
 }
@@ -144,6 +148,11 @@ const GffField *GffStruct::find(const string &name) const {
         [&](const GffField &f) { return f.label() == name; });
 
     return it != _fields.end() ? &*it : nullptr;
+}
+
+bool GffStruct::getBool(const string &name, bool defaultValue) const {
+    const GffField *field = find(name);
+    return field ? field->asBool() : defaultValue;
 }
 
 int GffStruct::getInt(const string &name) const {
