@@ -133,10 +133,6 @@ void GffStruct::add(GffField &&field) {
     _fields.push_back(move(field));
 }
 
-void GffStruct::setType(GffFieldType type) {
-    _type = type;
-}
-
 const vector<GffField> &GffStruct::fields() const {
     return _fields;
 }
@@ -155,19 +151,9 @@ bool GffStruct::getBool(const string &name, bool defaultValue) const {
     return field ? field->asBool() : defaultValue;
 }
 
-int GffStruct::getInt(const string &name) const {
-    const GffField *field = find(name);
-    return static_cast<int>(field->asInt());
-}
-
 int GffStruct::getInt(const string &name, int defaultValue) const {
     const GffField *field = find(name);
     return field ? static_cast<int>(field->asInt()) : defaultValue;
-}
-
-float GffStruct::getFloat(const string &name) const {
-    const GffField *field = find(name);
-    return field->asFloat();
 }
 
 float GffStruct::getFloat(const string &name, float defaultValue) const {
@@ -175,9 +161,19 @@ float GffStruct::getFloat(const string &name, float defaultValue) const {
     return field ? field->asFloat() : defaultValue;
 }
 
-string GffStruct::getString(const string &name) const {
+string GffStruct::getString(const string &name, const char *defaultValue) const {
     const GffField *field = find(name);
-    return field ? field->asString() : "";
+    return field ? field->asString() : defaultValue;
+}
+
+glm::vec3 GffStruct::getVector(const string &name, glm::vec3 defaultValue) const {
+    const GffField *field = find(name);
+    return field ? field->asVector() : move(defaultValue);
+}
+
+glm::quat GffStruct::getOrientation(const string &name, glm::quat defaultValue) const {
+    const GffField *field = find(name);
+    return field ? field->asOrientation() : move(defaultValue);
 }
 
 const GffStruct &GffStruct::getStruct(const string &name) const {
@@ -190,14 +186,8 @@ const vector<GffStruct> &GffStruct::getList(const string &name) const {
     return field->children();
 }
 
-glm::vec3 GffStruct::getVector(const string &name) const {
-    const GffField *field = find(name);
-    return field ? field->asVector() : glm::vec3(0.0f);
-}
-
-glm::quat GffStruct::getOrientation(const string &name) const {
-    const GffField *field = find(name);
-    return field ? field->asOrientation() : glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+void GffStruct::setType(GffFieldType type) {
+    _type = type;
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {
