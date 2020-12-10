@@ -17,7 +17,7 @@
 
 #include "quickorcustom.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 #include "chargen.h"
 

@@ -22,7 +22,7 @@
 #include "../../game.h"
 #include "../../map.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 using namespace std;
 

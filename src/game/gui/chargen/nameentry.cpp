@@ -17,7 +17,7 @@
 
 #include "nameentry.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 #include "chargen.h"
 

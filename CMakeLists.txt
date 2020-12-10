@@ -364,7 +364,7 @@ set(GAME_HEADERS
     src/game/camera/staticcamera.h
     src/game/camera/thirdperson.h
     src/game/camera/types.h
-    src/game/characters.h
+    src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
     src/game/combat.h
@@ -373,6 +373,7 @@ set(GAME_HEADERS
     src/game/enginetype/effect.h
     src/game/enginetype/location.h
     src/game/enginetype/typefactory.h
+    src/game/factionutil.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -380,7 +381,7 @@ set(GAME_HEADERS
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
     src/game/gui/chargen/quickorcustom.h
-    src/game/gui/colors.h
+    src/game/gui/colorutil.h
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
@@ -419,11 +420,10 @@ set(GAME_HEADERS
     src/game/path.h
     src/game/pathfinder.h
     src/game/player.h
-    src/game/portraits.h
+    src/game/portraitutil.h
     src/game/room.h
     src/game/rp/attributes.h
-    src/game/rp/classes.h
-    src/game/rp/factions.h
+    src/game/rp/classutil.h
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
@@ -454,13 +454,14 @@ set(GAME_SOURCES
     src/game/camera/firstperson.cpp
     src/game/camera/staticcamera.cpp
     src/game/camera/thirdperson.cpp
-    src/game/characters.cpp
+    src/game/characterutil.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
     src/game/combat.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/enginetype/typefactory.cpp
+    src/game/factionutil.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
@@ -468,7 +469,7 @@ set(GAME_SOURCES
     src/game/gui/chargen/portraitselect.cpp
     src/game/gui/chargen/quick.cpp
     src/game/gui/chargen/quickorcustom.cpp
-    src/game/gui/colors.cpp
+    src/game/gui/colorutil.cpp
     src/game/gui/container.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
@@ -506,11 +507,10 @@ set(GAME_SOURCES
     src/game/path.cpp
     src/game/pathfinder.cpp
     src/game/player.cpp
-    src/game/portraits.cpp
+    src/game/portraitutil.cpp
     src/game/room.cpp
     src/game/rp/attributes.cpp
-    src/game/rp/classes.cpp
-    src/game/rp/factions.cpp
+    src/game/rp/classutil.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

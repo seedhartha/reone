@@ -21,18 +21,18 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/log.h"
+#include "../../common/streamutil.h"
 #include "../../common/timer.h"
 #include "../../net/types.h"
 #include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../script/types.h"
-#include "../../common/log.h"
-#include "../../common/streamutil.h"
 
 #include "../action/attack.h"
 #include "../blueprint/blueprints.h"
-#include "../portraits.h"
+#include "../portraitutil.h"
 #include "../script/util.h"
 
 #include "objectfactory.h"

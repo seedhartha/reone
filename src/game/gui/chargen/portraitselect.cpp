@@ -21,7 +21,7 @@
 #include "../../../resource/resources.h"
 #include "../../../common/random.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 #include "chargen.h"
 

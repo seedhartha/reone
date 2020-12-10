@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "colors.h"
+#include "colorutil.h"
 
 using namespace reone::resource;
 

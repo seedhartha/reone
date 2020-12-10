@@ -28,7 +28,7 @@
 #include "../../object/creature.h"
 #include "../../object/item.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 using namespace std;
 using namespace std::placeholders;

@@ -20,12 +20,12 @@
 #include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 
-#include "../../characters.h"
+#include "../../characterutil.h"
 #include "../../game.h"
 #include "../../object/creature.h"
-#include "../../rp/classes.h"
+#include "../../rp/classutil.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 #include "chargen.h"
 
