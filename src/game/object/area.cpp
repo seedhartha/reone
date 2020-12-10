@@ -178,7 +178,7 @@ void Area::loadScripts(const GffStruct &are) {
 }
 
 void Area::loadMap(const GffStruct &are) {
-    _map.load(_name, are.getStruct("Map"));
+    _map.load(_name, *are.getStruct("Map"));
 }
 
 void Area::loadGIT(const GffStruct &git) {
@@ -193,11 +193,10 @@ void Area::loadGIT(const GffStruct &git) {
 }
 
 void Area::loadProperties(const GffStruct &git) {
-    const GffStruct &gffs = git.getStruct("AreaProperties");
-    shared_ptr<TwoDaTable> musicTable(Resources::instance().get2DA("ambientmusic"));
-
-    int musicIdx = gffs.getInt("MusicDay");
+    shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
+    int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
+        shared_ptr<TwoDaTable> musicTable(Resources::instance().get2DA("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
@@ -205,7 +204,7 @@ void Area::loadProperties(const GffStruct &git) {
 void Area::loadCreatures(const GffStruct &git) {
     for (auto &gffs : git.getList("Creature List")) {
         shared_ptr<Creature> creature(_game->objectFactory().newCreature());
-        creature->load(gffs);
+        creature->load(*gffs);
         landObject(*creature);
         add(creature);
     }
@@ -214,7 +213,7 @@ void Area::loadCreatures(const GffStruct &git) {
 void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
         shared_ptr<Door> door(_game->objectFactory().newDoor());
-        door->load(gffs);
+        door->load(*gffs);
         add(door);
     }
 }
@@ -222,7 +221,7 @@ void Area::loadDoors(const GffStruct &git) {
 void Area::loadPlaceables(const GffStruct &git) {
     for (auto &gffs : git.getList("Placeable List")) {
         shared_ptr<Placeable> placeable(_game->objectFactory().newPlaceable());
-        placeable->load(gffs);
+        placeable->load(*gffs);
         add(placeable);
     }
 }
@@ -230,7 +229,7 @@ void Area::loadPlaceables(const GffStruct &git) {
 void Area::loadWaypoints(const GffStruct &git) {
     for (auto &gffs : git.getList("WaypointList")) {
         shared_ptr<Waypoint> waypoint(_game->objectFactory().newWaypoint());
-        waypoint->load(gffs);
+        waypoint->load(*gffs);
         add(waypoint);
     }
 }
@@ -238,7 +237,7 @@ void Area::loadWaypoints(const GffStruct &git) {
 void Area::loadTriggers(const GffStruct &git) {
     for (auto &gffs : git.getList("TriggerList")) {
         shared_ptr<Trigger> trigger(_game->objectFactory().newTrigger());
-        trigger->load(gffs);
+        trigger->load(*gffs);
         add(trigger);
     }
 }
@@ -246,7 +245,7 @@ void Area::loadTriggers(const GffStruct &git) {
 void Area::loadSounds(const GffStruct &git) {
     for (auto &gffs : git.getList("SoundList")) {
         shared_ptr<Sound> sound(_game->objectFactory().newSound());
-        sound->load(gffs);
+        sound->load(*gffs);
         add(sound);
     }
 }
@@ -254,7 +253,7 @@ void Area::loadSounds(const GffStruct &git) {
 void Area::loadCameras(const GffStruct &git) {
     for (auto &gffs : git.getList("CameraList")) {
         shared_ptr<CameraObject> camera(_game->objectFactory().newCamera());
-        camera->load(gffs);
+        camera->load(*gffs);
         add(camera);
     }
 }

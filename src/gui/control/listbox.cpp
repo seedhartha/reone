@@ -72,20 +72,17 @@ void ListBox::clearSelection() {
 void ListBox::load(const GffStruct &gffs) {
     Control::load(gffs);
 
-    const GffField *protoItem = gffs.find("PROTOITEM");
+    shared_ptr<GffStruct> protoItem(gffs.getStruct("PROTOITEM"));
     if (protoItem) {
-        const GffStruct &protoGffs = protoItem->asStruct();
-        ControlType type = _protoItemType == ControlType::Invalid ? getType(protoGffs) : _protoItemType;
-        _protoItem = of(_gui, type, getTag(protoGffs));
-        _protoItem->load(protoGffs);
+        ControlType type = _protoItemType == ControlType::Invalid ? getType(*protoItem) : _protoItemType;
+        _protoItem = of(_gui, type, getTag(*protoItem));
+        _protoItem->load(*protoItem);
         updateItems();
     }
-
-    const GffField *scrollBar = gffs.find("SCROLLBAR");
+    shared_ptr<GffStruct> scrollBar(gffs.getStruct("SCROLLBAR"));
     if (scrollBar) {
-        const GffStruct &scrollGffs = scrollBar->asStruct();
-        _scrollBar = of(_gui, getType(scrollGffs), getTag(scrollGffs));
-        _scrollBar->load(scrollGffs);
+        _scrollBar = of(_gui, getType(*scrollBar), getTag(*scrollBar));
+        _scrollBar->load(*scrollBar);
     }
 }
 

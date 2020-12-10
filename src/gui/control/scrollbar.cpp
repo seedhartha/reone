@@ -37,9 +37,9 @@ ScrollBar::ScrollBar(GUI *gui) : Control(gui, ControlType::ScrollBar) {
 void ScrollBar::load(const GffStruct &gffs) {
     Control::load(gffs);
 
-    const GffField *dir = gffs.find("DIR");
+    shared_ptr<GffStruct> dir(gffs.getStruct("DIR"));
     if (dir) {
-        string image(dir->asStruct().getString("IMAGE"));
+        string image(dir->getString("IMAGE"));
         _dir.image = Textures::instance().get(image, TextureType::Diffuse);
     }
 }

@@ -59,7 +59,7 @@ public:
 
     GffFieldType type() const;
     const std::string &label() const;
-    const std::vector<GffStruct> &children() const;
+    const std::vector<std::shared_ptr<GffStruct>> &children() const;
     bool asBool() const;
     int64_t asInt() const;
     uint64_t asUint() const;
@@ -75,7 +75,7 @@ public:
 private:
     GffFieldType _type { GffFieldType::Byte };
     std::string _label;
-    std::vector<GffStruct> _children;
+    std::vector<std::shared_ptr<GffStruct>> _children;
     std::string _strValue;
     ByteArray _data;
 
@@ -99,21 +99,16 @@ public:
 
     GffStruct &operator=(GffStruct &&) = default;
 
-    void add(GffField &&field);
-    const GffField *find(const std::string &name) const;
-
     bool getBool(const std::string &name, bool defaultValue = false) const;
     int getInt(const std::string &name, int defaultValue = 0) const;
     float getFloat(const std::string &name, float defaultValue = 0.0f) const;
     std::string getString(const std::string &name, const char *defaultValue = "") const;
     glm::vec3 getVector(const std::string &name, glm::vec3 defaultValue = glm::vec3(0.0f)) const;
     glm::quat getOrientation(const std::string &name, glm::quat defaultValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) const;
-    const GffStruct &getStruct(const std::string &name) const;
-    const std::vector<GffStruct> &getList(const std::string &name) const;
+    std::shared_ptr<GffStruct> getStruct(const std::string &name) const;
+    std::vector<std::shared_ptr<GffStruct>> getList(const std::string &name) const;
 
     const std::vector<GffField> &fields() const;
-
-    void setType(GffFieldType type);
 
 private:
     GffFieldType _type { GffFieldType::Byte };
@@ -121,6 +116,10 @@ private:
 
     GffStruct(const GffStruct &) = delete;
     GffStruct &operator=(const GffStruct &) = delete;
+
+    const GffField *find(const std::string &name) const;
+
+    friend class GffFile;
 };
 
 class GffFile : public BinaryFile {
@@ -149,7 +148,7 @@ private:
     std::shared_ptr<GffStruct> _top;
 
     void doLoad() override;
-    GffStruct readStruct(int idx);
+    std::unique_ptr<GffStruct> readStruct(int idx);
     GffField readField(int idx);
     std::string readLabel(int idx);
     std::vector<uint32_t> readFieldIndices(uint32_t off, int count);

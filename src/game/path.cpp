@@ -29,15 +29,15 @@ void Path::load(const GffStruct &pth) {
     vector<int> connections;
 
     for (auto &connection : pth.getList("Path_Conections")) {
-        int destination = connection.getInt("Destination");
+        int destination = connection->getInt("Destination");
         connections.push_back(destination);
     }
 
     for (auto &pointGffs : pth.getList("Path_Points")) {
-        int connectionCount = pointGffs.getInt("Conections");
-        int firstConnection = pointGffs.getInt("First_Conection");
-        float x = pointGffs.getFloat("X");
-        float y = pointGffs.getFloat("Y");
+        int connectionCount = pointGffs->getInt("Conections");
+        int firstConnection = pointGffs->getInt("First_Conection");
+        float x = pointGffs->getFloat("X");
+        float y = pointGffs->getFloat("Y");
 
         Point point;
         point.x = x;

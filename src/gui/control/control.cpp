@@ -114,16 +114,16 @@ void Control::load(const GffStruct &gffs) {
     _id = gffs.getInt("ID", -1);
     _padding = gffs.getInt("PADDING", 0);
 
-    loadExtent(gffs.getStruct("EXTENT"));
-    loadBorder(gffs.getStruct("BORDER"));
+    loadExtent(*gffs.getStruct("EXTENT"));
+    loadBorder(*gffs.getStruct("BORDER"));
 
-    const GffField *text = gffs.find("TEXT");
+    shared_ptr<GffStruct> text(gffs.getStruct("TEXT"));
     if (text) {
-        loadText(text->asStruct());
+        loadText(*text);
     }
-    const GffField *hilight = gffs.find("HILIGHT");
+    shared_ptr<GffStruct> hilight(gffs.getStruct("HILIGHT"));
     if (hilight) {
-        loadHilight(hilight->asStruct());
+        loadHilight(*hilight);
     }
 
     updateTransform();

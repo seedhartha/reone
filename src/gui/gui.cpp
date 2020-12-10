@@ -72,7 +72,7 @@ void GUI::load() {
     _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
-        loadControl(ctrlGffs);
+        loadControl(*ctrlGffs);
     }
 }
 
