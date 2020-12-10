@@ -244,9 +244,7 @@ void SelectionOverlay::drawTitleBar() const {
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
 
-        glm::vec3 color(getBaseColor(_game->version()));
-
-        _font->render(_selectedObject->title(), transform, color);
+        _font->render(_selectedObject->title(), transform, getColorFromSelectedObject());
     }
 }
 
@@ -265,7 +263,7 @@ void SelectionOverlay::drawHealthBar() const {
 
     LocalUniforms locals;
     locals.general.model = move(transform);
-    locals.general.color = glm::vec4(getBaseColor(_game->version()), 1.0f);
+    locals.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     locals.general.alpha = 1.0f;
 
     Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
@@ -333,6 +331,16 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
     y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kActionHeight - kOffsetToReticle - kActionBarMargin;
 
     return true;
+}
+
+const glm::vec3 &SelectionOverlay::getColorFromSelectedObject() const {
+    static glm::vec3 red(1.0f, 0.0f, 0.0f);
+
+    if (_selectedObject && _selectedHostile) {
+        return red;
+    }
+
+    return getBaseColor(_game->version());
 }
 
 } // namespace game
