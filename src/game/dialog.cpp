@@ -42,13 +42,13 @@ void Dialog::load(const string &resRef, const GffStruct &dlg) {
     _endScript = dlg.getString("EndConversation");
 
     for (auto &entry : dlg.getList("EntryList")) {
-        _entries.push_back(getEntryReply(entry));
+        _entries.push_back(getEntryReply(*entry));
     }
     for (auto &reply : dlg.getList("ReplyList")) {
-        _replies.push_back(getEntryReply(reply));
+        _replies.push_back(getEntryReply(*reply));
     }
     for (auto &entry : dlg.getList("StartingList")) {
-        _startEntries.push_back(getEntryReplyLink(entry));
+        _startEntries.push_back(getEntryReplyLink(*entry));
     }
 }
 
@@ -80,17 +80,11 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     boost::to_lower(entry.speaker);
     boost::to_lower(entry.listener);
 
-    const GffField *repliesList = gffs.find("RepliesList");
-    if (repliesList) {
-        for (auto &link : repliesList->children()) {
-            entry.replies.push_back(getEntryReplyLink(link));
-        }
+    for (auto &link : gffs.getList("RepliesList")) {
+        entry.replies.push_back(getEntryReplyLink(*link));
     }
-    const GffField *entriesList = gffs.find("EntriesList");
-    if (entriesList) {
-        for (auto &link : entriesList->children()) {
-            entry.entries.push_back(getEntryReplyLink(link));
-        }
+    for (auto &link : gffs.getList("EntriesList")) {
+        entry.entries.push_back(getEntryReplyLink(*link));
     }
 
     return move(entry);

@@ -60,7 +60,7 @@ void SoundBlueprint::load(Sound &sound) {
     sound._volume = _uts->getInt("Volume");
 
     for (auto &soundGffs : _uts->getList("Sounds")) {
-        sound._sounds.push_back(boost::to_lower_copy(soundGffs.getString("Sound")));
+        sound._sounds.push_back(boost::to_lower_copy(soundGffs->getString("Sound")));
     }
 }
 

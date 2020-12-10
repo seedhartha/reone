@@ -51,7 +51,7 @@ void CreatureBlueprint::load(Creature &creature) {
     creature._appearance = getAppearanceFromUtc();
 
     for (auto &item : _utc->getList("Equip_ItemList")) {
-        creature.equip(boost::to_lower_copy(item.getString("EquippedRes")));
+        creature.equip(boost::to_lower_copy(item->getString("EquippedRes")));
     }
 
     string portrait(getPortrait(_utc->getInt("PortraitId", -1)));
@@ -96,8 +96,8 @@ void CreatureBlueprint::loadAttributes(Creature &creature) {
     CreatureAttributes &attributes = creature.attributes();
 
     for (auto &classGff : _utc->getList("ClassList")) {
-        int clazz = classGff.getInt("Class");
-        int level = classGff.getInt("ClassLevel");
+        int clazz = classGff->getInt("Class");
+        int level = classGff->getInt("ClassLevel");
         attributes.addClassLevels(static_cast<ClassType>(clazz), level);
     }
     loadAbilities(attributes);
@@ -114,10 +114,10 @@ void CreatureBlueprint::loadAbilities(CreatureAttributes &attributes) {
 }
 
 void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
-    const vector<GffStruct> &skills = _utc->getList("SkillList");
+    vector<shared_ptr<GffStruct>> skills(_utc->getList("SkillList"));
     for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        attributes.setSkillRank(skill, skills[i].getInt("Rank"));
+        attributes.setSkillRank(skill, skills[i]->getInt("Rank"));
     }
 }
 

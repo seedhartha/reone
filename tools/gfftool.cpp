@@ -60,14 +60,14 @@ pt::ptree GffTool::getPropertyTree(const GffStruct &gffs) const {
 
         switch (field.type()) {
             case GffFieldType::Struct:
-                child = getPropertyTree(field.children()[0]);
+                child = getPropertyTree(*field.children()[0]);
                 tree.add_child(field.label(), child);
                 break;
 
             case GffFieldType::List:
                 children.clear();
                 for (auto &childGffs : fieldChildren) {
-                    child = getPropertyTree(childGffs);
+                    child = getPropertyTree(*childGffs);
                     children.push_back(make_pair("", child));
                 }
                 tree.add_child(field.label(), children);

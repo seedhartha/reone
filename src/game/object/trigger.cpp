@@ -57,9 +57,9 @@ void Trigger::load(const GffStruct &gffs) {
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
 
     for (auto &child : gffs.getList("Geometry")) {
-        float x = child.getFloat("PointX");
-        float y = child.getFloat("PointY");
-        float z = child.getFloat("PointZ");
+        float x = child->getFloat("PointX");
+        float y = child->getFloat("PointY");
+        float z = child->getFloat("PointZ");
 
         _geometry.push_back(_transform * glm::vec4(x, y, z, 1.0f));
     }

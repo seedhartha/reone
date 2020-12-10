@@ -42,7 +42,7 @@ const string &GffField::label() const {
     return _label;
 }
 
-const vector<GffStruct> &GffField::children() const {
+const vector<shared_ptr<GffStruct>> &GffField::children() const {
     return _children;
 }
 
@@ -113,7 +113,7 @@ vector<float> GffField::asFloatArray() const {
 }
 
 const GffStruct &GffField::asStruct() const {
-    return _children[0];
+    return *_children[0];
 }
 
 glm::vec3 GffField::asVector() const {
@@ -127,10 +127,6 @@ glm::quat GffField::asOrientation() const {
 }
 
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
-}
-
-void GffStruct::add(GffField &&field) {
-    _fields.push_back(move(field));
 }
 
 const vector<GffField> &GffStruct::fields() const {
@@ -176,18 +172,14 @@ glm::quat GffStruct::getOrientation(const string &name, glm::quat defaultValue) 
     return field ? field->asOrientation() : move(defaultValue);
 }
 
-const GffStruct &GffStruct::getStruct(const string &name) const {
+shared_ptr<GffStruct> GffStruct::getStruct(const string &name) const {
     const GffField *field = find(name);
-    return field->children()[0];
+    return field ? field->children()[0] : nullptr;
 }
 
-const vector<GffStruct> &GffStruct::getList(const string &name) const {
+vector<shared_ptr<GffStruct>> GffStruct::getList(const string &name) const {
     const GffField *field = find(name);
-    return field->children();
-}
-
-void GffStruct::setType(GffFieldType type) {
-    _type = type;
+    return field ? field->children() : vector<shared_ptr<GffStruct>>();
 }
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {
@@ -207,28 +199,28 @@ void GffFile::doLoad() {
     _listIndicesOffset = readUint32();
     _listIndicesCount = readUint32();
 
-    _top.reset(new GffStruct(readStruct(0)));
+    _top = move(readStruct(0));
 }
 
 shared_ptr<GffStruct> GffFile::top() const {
     return _top;
 }
 
-GffStruct GffFile::readStruct(int idx) {
+unique_ptr<GffStruct> GffFile::readStruct(int idx) {
     seek(_structOffset + 12 * idx);
 
     uint32_t type = readUint32();
     uint32_t dataOrDataOffset = readUint32();
     uint32_t fieldCount = readUint32();
 
-    GffStruct gffs(static_cast<GffFieldType>(type));
+    auto gffs = make_unique<GffStruct>(static_cast<GffFieldType>(type));
 
     if (fieldCount == 1) {
-        gffs.add(readField(dataOrDataOffset));
+        gffs->_fields.push_back(readField(dataOrDataOffset));
     } else {
         vector<uint32_t> indices(readFieldIndices(dataOrDataOffset, fieldCount));
         for (auto &idx : indices) {
-            gffs.add(readField(idx));
+            gffs->_fields.push_back(readField(idx));
         }
     }
 
