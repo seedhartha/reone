@@ -90,7 +90,8 @@ private:
     void updateRound(Round &round, float dt);
     void updateActivation();
 
-    void finishAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
+    void finishRound(Round &round);
+    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
 
     std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;

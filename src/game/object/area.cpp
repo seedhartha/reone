@@ -545,13 +545,14 @@ void Area::update(float dt) {
 
     for (auto &object : _objects) {
         object->update(dt);
+        if (object->isDead()) continue;
+
         _actionExecutor.executeActions(*object, dt);
     }
     _objectSelector.update();
-    updateHeartbeat(dt);
-
-    // TODO: enable when polished enough
     _combat.update(dt);
+
+    updateHeartbeat(dt);
 }
 
 bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {

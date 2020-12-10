@@ -31,6 +31,8 @@ class CreatureAnimationResolver {
 public:
     CreatureAnimationResolver(const Creature *creature);
 
+    std::string getDieAnimation() const;
+    std::string getDeadAnimation() const;
     std::string getPauseAnimation() const;
     std::string getRunAnimation() const;
     std::string getWalkAnimation() const;

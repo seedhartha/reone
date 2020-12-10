@@ -68,7 +68,8 @@ public:
         DuelAttack,
         BashAttack,
         Dodge,
-        Knockdown
+        Knockdown,
+        Die
     };
 
     struct Path {
@@ -172,7 +173,9 @@ private:
     void loadBlueprint(const resource::GffStruct &gffs);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
+
     void updateModel();
+    void updateHealth();
 
     ModelType parseModelType(const std::string &s) const;
 

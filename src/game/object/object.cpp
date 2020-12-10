@@ -50,6 +50,10 @@ bool Object::isMinOneHP() const {
     return _minOneHP;
 }
 
+bool Object::isDead() const {
+    return _dead;
+}
+
 uint32_t Object::id() const {
     return _id;
 }
@@ -88,6 +92,10 @@ int Object::currentHitPoints() const {
 
 void Object::setTag(const string &tag) {
     _tag = tag;
+}
+
+void Object::setMinOneHP(bool minOneHP) {
+    _minOneHP = minOneHP;
 }
 
 } // namespace game

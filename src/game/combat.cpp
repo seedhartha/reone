@@ -64,6 +64,8 @@ void Combat::update(float dt) {
 void Combat::updateCombatants() {
     ObjectList &creatures = _game->module()->area()->getObjectsByType(ObjectType::Creature);
     for (auto &object : creatures) {
+        if (object->isDead()) continue;
+
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
 
         vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
@@ -133,8 +135,9 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
     ObjectList creatures(area->getObjectsByType(ObjectType::Creature));
 
     for (auto &object : creatures) {
-        if (object.get() == &combatant) continue;
-        if (object->distanceTo(combatant) > range) continue;
+        if (object.get() == &combatant ||
+            object->isDead() ||
+            object->distanceTo(combatant) > range) continue;
 
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
         if (!getIsEnemy(combatant, *creature)) continue;
@@ -227,6 +230,10 @@ void Combat::updateRound(Round &round, float dt) {
     shared_ptr<Creature> defender(round.defender->creature);
     bool isDuel = round.defender->target == attacker;
 
+    if (attacker->isDead() || defender->isDead()) {
+        finishRound(round);
+        return;
+    }
     switch (round.state) {
         case RoundState::Started:
             attacker->face(*defender);
@@ -247,7 +254,7 @@ void Combat::updateRound(Round &round, float dt) {
 
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
-                finishAttack(attacker, defender);
+                executeAttack(attacker, defender);
 
                 if (isDuel) {
                     defender->face(*attacker);
@@ -263,12 +270,9 @@ void Combat::updateRound(Round &round, float dt) {
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
                 if (isDuel) {
-                    finishAttack(defender, attacker);
+                    executeAttack(defender, attacker);
                 }
-                attacker->setMovementRestricted(false);
-                defender->setMovementRestricted(false);
-                round.state = RoundState::Finished;
-                debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+                finishRound(round);
             }
             break;
 
@@ -277,7 +281,16 @@ void Combat::updateRound(Round &round, float dt) {
     }
 }
 
-void Combat::finishAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender) {
+void Combat::finishRound(Round &round) {
+    shared_ptr<Creature> attacker(round.attacker->creature);
+    shared_ptr<Creature> defender(round.defender->creature);
+    attacker->setMovementRestricted(false);
+    defender->setMovementRestricted(false);
+    round.state = RoundState::Finished;
+    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+}
+
+void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender) {
     // TODO: add armor bonus and dexterity modifier
     int defense = 10;
 

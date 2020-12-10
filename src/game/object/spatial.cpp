@@ -81,7 +81,7 @@ void SpatialObject::applyEffect(const shared_ptr<Effect> &effect) {
     auto damage = dynamic_pointer_cast<DamageEffect>(effect);
     if (damage) {
         debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damage->amount());
-        _currentHitPoints = glm::max(1, _currentHitPoints - damage->amount());
+        _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damage->amount());
     } else {
         _effects.push_back(effect);
     }
