@@ -73,6 +73,18 @@ float Item::attackRange() const {
     return static_cast<float>(_attackRange);
 }
 
+int Item::numDice() const {
+    return _numDice;
+}
+
+int Item::dieToRoll() const {
+    return _dieToRoll;
+}
+
+int Item::damageFlags() const {
+    return _damageFlags;
+}
+
 WeaponType Item::weaponType() const {
     return _weaponType;
 }

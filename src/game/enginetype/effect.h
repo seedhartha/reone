@@ -19,15 +19,18 @@
 
 #include <memory>
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
 
-class Creature;
-
 enum class EffectType {
-    Invalid = 0
+    Invalid = 0,
+    Damage = 0x100
 };
+
+class Creature;
 
 class Effect {
 public:
@@ -53,20 +56,22 @@ private:
     Effect &operator=(const Effect &) = delete;
 };
 
-/**
- * Calculate damage based on equipment and effects.
- */
 class DamageEffect : public Effect {
 public:
-    DamageEffect(const std::shared_ptr<Creature> &damager) :
-        Effect(EffectType::Invalid, 0),
+    DamageEffect(int amount, DamageType type, const std::shared_ptr<Creature> &damager) :
+        Effect(EffectType::Damage, 0),
+        _amount(amount),
+        _type(type),
         _damager(damager) {
     }
 
-    /* for feedback text, mostly */
-    std::shared_ptr<Creature> &getDamager() { return _damager; }
+    int amount() const { return _amount; }
+    DamageType type() const { return _type; }
+    std::shared_ptr<Creature> damager() const { return _damager; }
 
 private:
+    int _amount;
+    DamageType _type;
     std::shared_ptr<Creature> _damager;
 };
 

@@ -87,6 +87,23 @@ enum class WeaponWield {
     HeavyCarbine = 6
 };
 
+enum class DamageType {
+    Bludgeoning = 1,
+    Piercing = 2,
+    Slashing = 4,
+    Physical = 7,
+    Universal = 8,
+    Acid = 16,
+    Cold = 32,
+    LightSide = 64,
+    Electrical = 128,
+    Fire = 256,
+    DarkSide = 512,
+    Sonic = 1024,
+    Ion = 2048,
+    Blaster = 4096
+};
+
 class CreatureBlueprint;
 
 struct Options {

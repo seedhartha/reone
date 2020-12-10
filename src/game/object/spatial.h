@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <vector>
 
 #include "object.h"
@@ -27,6 +28,8 @@
 
 #include "../../render/walkmesh.h"
 #include "../../scene/node/modelscenenode.h"
+
+#include "../enginetype/effect.h"
 
 namespace reone {
 
@@ -45,6 +48,8 @@ public:
 
     void addItem(const std::shared_ptr<Item> &item);
     void moveItemsTo(SpatialObject &other);
+
+    void applyEffect(const std::shared_ptr<Effect> &eff);
 
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
@@ -85,6 +90,7 @@ protected:
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
     bool _selectable { false };
+    std::deque<std::shared_ptr<Effect>> _effects;
 
     SpatialObject(uint32_t id, ObjectType type, scene::SceneGraph *sceneGraph);
 

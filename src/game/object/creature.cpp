@@ -325,10 +325,6 @@ void Creature::clearPath() {
     _path.reset();
 }
 
-void Creature::applyEffect(unique_ptr<Effect> &&eff) {
-    _effects.push_back(move(eff));
-}
-
 const string &Creature::blueprintResRef() const {
     return _blueprintResRef;
 }
