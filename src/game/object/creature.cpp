@@ -49,30 +49,24 @@ namespace reone {
 
 namespace game {
 
-static string g_animPauseCreature("cpause1");
-static string g_animPauseCharacter("pause1");
-static string g_animWalkCreature("cwalk");
-static string g_animWalkCharacter("walk");
-static string g_animRunCreature("crun");
-static string g_animRunCharacter("run");
-static string g_animTalkHead("talk");
-static string g_animTalkBody("tlknorm");
-static string g_animGreeting("greeting");
-static string g_animUnlockDoor("unlockdr");
-
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
 Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Creature, sceneGraph), _objectFactory(objectFactory) {
+    SpatialObject(id, ObjectType::Creature, sceneGraph), 
+    _objectFactory(objectFactory),
+    _animResolver(this) {
 
     _drawDistance = 2048.0f;
     _selectable = true;
 }
 
 void Creature::load(const GffStruct &gffs) {
+    loadTransform(gffs);
     loadBlueprint(gffs);
+}
 
+void Creature::loadTransform(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
@@ -310,19 +304,19 @@ void Creature::updateModelAnimation() {
 
     switch (_movementType) {
         case MovementType::Run:
-            _model->playAnimation(getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            _model->playAnimation(_animResolver.getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             break;
         case MovementType::Walk:
-            _model->playAnimation(getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            _model->playAnimation(_animResolver.getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             break;
         default:
             if (_talking) {
-                _model->playAnimation(g_animTalkBody, kAnimationLoop | kAnimationPropagate);
+                _model->playAnimation(_animResolver.getTalkAnimation(), kAnimationLoop | kAnimationPropagate);
                 if (_headModel) {
-                    _headModel->playAnimation(g_animTalkHead, kAnimationLoop | kAnimationOverlay, 0.25f);
+                    _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), kAnimationLoop | kAnimationOverlay, 0.25f);
                 }
             } else {
-                _model->playAnimation(getPauseAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+                _model->playAnimation(_animResolver.getPauseAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
             }
             break;
     }
@@ -341,19 +335,19 @@ void Creature::playAnimation(Animation anim) {
     string animName;
     switch (anim) {
         case Animation::UnlockDoor:
-            animName = g_animUnlockDoor;
+            animName = _animResolver.getUnlockDoorAnimation();
             break;
         case Animation::DuelAttack:
-            animName = getDuelAttackAnimation();
+            animName = _animResolver.getDuelAttackAnimation();
             break;
         case Animation::BashAttack:
-            animName = getBashAttackAnimation();
+            animName = _animResolver.getBashAttackAnimation();
             break;
         case Animation::Dodge:
-            animName = getDodgeAnimation();
+            animName = _animResolver.getDodgeAnimation();
             break;
         case Animation::Knockdown:
-            animName = getKnockdownAnimation();
+            animName = _animResolver.getKnockdownAnimation();
             break;
         default:
             break;
@@ -424,146 +418,6 @@ void Creature::setTalking(bool talking) {
     _animDirty = true;
 }
 
-string Creature::getPauseAnimation() const {
-    if (_modelType == ModelType::Creature) {
-        return g_animPauseCreature;
-    }
-
-    // TODO: if (_lowHP) return "pauseinj" 
-
-    if (_inCombat) {
-        WeaponType type = WeaponType::None;
-        WeaponWield wield = WeaponWield::None;
-        getWeaponInfo(type, wield);
-
-        int wieldNumber = getWeaponWieldNumber(wield);
-        return str(boost::format("g%dr1") % wieldNumber);
-    }
-
-    return g_animPauseCharacter;
-}
-
-const string &Creature::getWalkAnimation() const {
-    switch (_modelType) {
-        case ModelType::Creature:
-            return g_animWalkCreature;
-        default:
-            return g_animWalkCharacter;
-    }
-}
-
-string Creature::getRunAnimation() const {
-    if (_modelType == ModelType::Creature) {
-        return g_animRunCreature;
-    }
-
-    // TODO: if (_lowHP) return "runinj" 
-
-    if (_inCombat) {
-        WeaponType type = WeaponType::None;
-        WeaponWield wield = WeaponWield::None;
-        getWeaponInfo(type, wield);
-
-        switch (wield) {
-            case WeaponWield::SingleSaber:
-                return isSlotEquipped(kInventorySlotLeftWeapon) ? "runds" : "runss";
-            case WeaponWield::TwoHandedSaber:
-                return "runst";
-            case WeaponWield::Rifle:
-            case WeaponWield::HeavyCarbine:
-                return  "runrf";
-            default:
-                break;
-        }
-    }
-
-    return g_animRunCharacter;
-}
-
-string Creature::getDuelAttackAnimation() const {
-    if (_modelType == ModelType::Creature) return "g0a1";
-
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
-
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    switch (type) {
-        case WeaponType::Melee:
-            return str(boost::format("c%da1") % wieldNumber);
-        case WeaponType::Ranged:
-            return str(boost::format("b%da1") % wieldNumber);
-        default:
-            return str(boost::format("g%da1") % wieldNumber);
-    }
-}
-
-bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
-    if (item) {
-        type = item->weaponType();
-        wield = item->weaponWield();
-        return true;
-    }
-
-    return false;
-}
-
-int Creature::getWeaponWieldNumber(WeaponWield wield) const {
-    switch (wield) {
-        case WeaponWield::StunBaton:
-            return 1;
-        case WeaponWield::SingleSaber:
-            return isSlotEquipped(kInventorySlotLeftWeapon) ? 4 : 2;
-        case WeaponWield::TwoHandedSaber:
-            return 3;
-        case WeaponWield::SingleBlaster:
-            return isSlotEquipped(kInventorySlotLeftWeapon) ? 6 : 5;
-        case WeaponWield::Rifle:
-            return 7;
-        case WeaponWield::HeavyCarbine:
-            return 9;
-        default:
-            return 8;
-    }
-}
-
-string Creature::getBashAttackAnimation() const {
-    if (_modelType == ModelType::Creature) return "g0a2";
-
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
-
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    switch (type) {
-        case WeaponType::Melee:
-            return str(boost::format("c%da2") % wieldNumber);
-        case WeaponType::Ranged:
-            return str(boost::format("b%da2") % wieldNumber);
-        default:
-            return str(boost::format("g%da2") % wieldNumber);
-    }
-}
-
-string Creature::getDodgeAnimation() const {
-    if (_modelType == ModelType::Creature) return "cdodgeg";
-
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
-
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    return str(boost::format("g%dg1") % wieldNumber);
-}
-
-string Creature::getKnockdownAnimation() const {
-    return _modelType == ModelType::Creature ? "ckdbck" : "g1y1";
-}
-
 void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
     int pointIdx = 0;
     if (_path) {
@@ -612,6 +466,10 @@ Gender Creature::gender() const {
     return _config.gender;
 }
 
+Creature::ModelType Creature::modelType() const {
+    return _modelType;
+}
+
 int Creature::appearance() const {
     return _config.appearance;
 }
@@ -640,7 +498,7 @@ CreatureAttributes &Creature::attributes() {
     return _attributes;
 }
 
-glm::vec3 Creature::selectablePosition() const {
+glm::vec3 Creature::getSelectablePosition() const {
     glm::vec3 position;
 
     if (_model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
@@ -654,7 +512,7 @@ Faction Creature::faction() const {
     return _faction;
 }
 
-float Creature::attackRange() const {
+float Creature::getAttackRange() const {
     float result = kDefaultAttackRange;
 
     shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
@@ -673,8 +531,16 @@ bool Creature::isMovementRestricted() const {
     return _movementRestricted;
 }
 
+bool Creature::isInCombat() const {
+    return _inCombat;
+}
+
 void Creature::setMovementRestricted(bool restricted) {
     _movementRestricted = restricted;
+}
+
+void Creature::setInCombat(bool active) {
+    _inCombat = active;
 }
 
 void Creature::setOnSpawn(const string &onSpawn) {

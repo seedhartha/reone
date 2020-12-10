@@ -648,7 +648,7 @@ void Area::fill(SceneGraph &sceneGraph) {
 glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
     static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
-    glm::vec3 position(object->selectablePosition());
+    glm::vec3 position(object->getSelectablePosition());
 
     return glm::project(position, view, projection, viewport);
 }

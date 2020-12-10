@@ -404,6 +404,8 @@ set(GAME_HEADERS
     src/game/object/area.h
     src/game/object/camera.h
     src/game/object/creature.h
+    src/game/object/creatureanimresolver.h
+    src/game/object/creaturemodelbuilder.h
     src/game/object/door.h
     src/game/object/item.h
     src/game/object/module.h
@@ -492,6 +494,8 @@ set(GAME_SOURCES
     src/game/object/area.cpp
     src/game/object/camera.cpp
     src/game/object/creature.cpp
+    src/game/object/creatureanimresolver.cpp
+    src/game/object/creaturemodelbuilder.cpp
     src/game/object/door.cpp
     src/game/object/item.cpp
     src/game/object/module.cpp
