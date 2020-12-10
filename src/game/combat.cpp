@@ -129,12 +129,35 @@ shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
 vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
     vector<shared_ptr<Creature>> result;
 
-    ObjectList creatures(_game->module()->area()->getObjectsByType(ObjectType::Creature));
+    shared_ptr<Area> area(_game->module()->area());
+    ObjectList creatures(area->getObjectsByType(ObjectType::Creature));
+
     for (auto &object : creatures) {
+        if (object.get() == &combatant) continue;
         if (object->distanceTo(combatant) > range) continue;
 
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
         if (!getIsEnemy(combatant, *creature)) continue;
+
+        glm::vec3 adjustedCombatantPos(combatant.position());
+        adjustedCombatantPos.z += 1.8f; // TODO: height based on appearance
+
+        glm::vec3 adjustedCreaturePos(creature->position());
+        adjustedCreaturePos.z += creature->model()->aabb().center().z;
+
+        glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
+
+        RaycastProperties castProps;
+        castProps.flags = kRaycastRooms | kRaycastObjects | kRaycastAABB;
+        castProps.objectTypes = { ObjectType::Door };
+        castProps.origin = adjustedCombatantPos;
+        castProps.direction = glm::normalize(combatantToCreature);
+        castProps.maxDistance = glm::length(combatantToCreature);
+
+        RaycastResult castResult;
+
+        const CollisionDetector &detector = area->collisionDetector();
+        if (detector.raycast(castProps, castResult)) continue;
 
         // TODO: check line-of-sight
 
