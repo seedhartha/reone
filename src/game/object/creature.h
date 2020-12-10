@@ -28,6 +28,7 @@
 #include "../rp/attributes.h"
 
 #include "creatureanimresolver.h"
+#include "creaturemodelbuilder.h"
 #include "item.h"
 #include "spatial.h"
 
@@ -162,6 +163,7 @@ private:
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
+    CreatureModelBuilder _modelBuilder;
     CreatureAnimationResolver _animResolver;
 
     // Scripts
@@ -177,11 +179,6 @@ private:
     void updateModel();
 
     ModelType parseModelType(const std::string &s) const;
-
-    std::string getBodyModelName() const;
-    std::string getBodyTextureName() const;
-    std::string getHeadModelName() const;
-    std::string getWeaponModelName(InventorySlot slot) const;
 
     friend class CreatureBlueprint;
 };
