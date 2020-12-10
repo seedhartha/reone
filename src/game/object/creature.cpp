@@ -32,6 +32,7 @@
 
 #include "../action/attack.h"
 #include "../blueprint/blueprints.h"
+#include "../rp/classutil.h"
 #include "../portraitutil.h"
 #include "../script/util.h"
 
@@ -129,6 +130,7 @@ void Creature::load(const CreatureConfiguration &config) {
         loadAppearance(*appearance, config.appearance);
         loadPortrait(config.appearance);
         _attributes.addClassLevels(config.clazz, 1);
+        _currentHitPoints = _hitPoints = _maxHitPoints = getClassHitPoints(config.clazz, 1);
     }
     for (auto &item : config.equipment) {
         equip(item);

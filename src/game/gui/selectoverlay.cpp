@@ -43,6 +43,7 @@ namespace game {
 static const int kOffsetToReticle = 8;
 static const int kTitleBarWidth = 250;
 static const int kTitleBarPadding = 6;
+static const int kHealthBarHeight = 6;
 static const int kActionCount = 3;
 static const int kActionBarMargin = 3;
 static const int kActionBarPadding = 3;
@@ -88,7 +89,7 @@ bool SelectionOverlay::handle(const SDL_Event &event) {
 bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     _selectedActionIdx = -1;
 
-    if (!_hasSelected) return false;
+    if (!_selectedObject) return false;
 
     for (int i = 0; i < kActionCount; ++i) {
         float x, y;
@@ -138,6 +139,9 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 }
 
 void SelectionOverlay::update() {
+    _hilightedObject.reset();
+    _selectedObject.reset();
+
     shared_ptr<Module> module(_game->module());
     shared_ptr<Area> area(module->area());
     ObjectSelector &selector = area->objectSelector();
@@ -150,39 +154,39 @@ void SelectionOverlay::update() {
     if (hilightedObjectId != -1) {
         shared_ptr<SpatialObject> object(area->find(hilightedObjectId));
         _hilightedScreenCoords = area->getSelectableScreenCoords(object, projection, view);
-        _hasHilighted = _hilightedScreenCoords.z < 1.0f;
 
-        shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
-        _hilightedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
-    } else {
-        _hasHilighted = false;
+        if (_hilightedScreenCoords.z < 1.0f) {
+            _hilightedObject = object;
+            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(object));
+            _hilightedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
+        }
     }
 
     int selectedObjectId = selector.selectedObjectId();
     if (selectedObjectId != -1) {
         shared_ptr<SpatialObject> object(area->find(selectedObjectId));
         _selectedScreenCoords = area->getSelectableScreenCoords(object, projection, view);
-        _hasSelected = _selectedScreenCoords.z < 1.0f;
-        _selectedTitle = object->title();
-        _actions = module->getContextualActions(object);
 
-        shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
-        _selectedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
-    } else {
-        _hasSelected = false;
+        if (_selectedScreenCoords.z < 1.0f) {
+            _selectedObject = object;
+            _actions = module->getContextualActions(object);
+            shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
+            _selectedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
+        }
     }
 }
 
 void SelectionOverlay::render() const {
-    if (_hasHilighted) {
+    if (_hilightedObject) {
         drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
     }
-    if (_hasSelected) {
+    if (_selectedObject) {
         drawReticle(_selectedHostile ? *_hostileReticle2 : *_friendlyReticle2, _selectedScreenCoords);
         if (!_actions.empty()) {
             drawActionBar();
         }
         drawTitleBar();
+        drawHealthBar();
     }
 }
 
@@ -206,13 +210,13 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 }
 
 void SelectionOverlay::drawTitleBar() const {
-    if (_selectedTitle.empty()) return;
+    if (_selectedObject->title().empty()) return;
 
     const GraphicsOptions &opts = _game->options().graphics;
     float barHeight = _font->height() + kTitleBarPadding;
     {
         float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
-        float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - barHeight - kOffsetToReticle;
+        float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - barHeight - kOffsetToReticle - kHealthBarHeight - 1.0f;
 
         if (!_actions.empty()) {
             y -= kActionHeight + 2 * kActionBarMargin;
@@ -232,7 +236,7 @@ void SelectionOverlay::drawTitleBar() const {
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
-        float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + barHeight) / 2 - kOffsetToReticle;
+        float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + barHeight) / 2 - kOffsetToReticle - kHealthBarHeight - 1.0f;
 
         if (!_actions.empty()) {
             y -= kActionHeight + 2 * kActionBarMargin;
@@ -242,8 +246,31 @@ void SelectionOverlay::drawTitleBar() const {
 
         glm::vec3 color(getBaseColor(_game->version()));
 
-        _font->render(_selectedTitle, transform, color);
+        _font->render(_selectedObject->title(), transform, color);
     }
+}
+
+void SelectionOverlay::drawHealthBar() const {
+    const GraphicsOptions &opts = _game->options().graphics;
+    float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
+    float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kHealthBarHeight - kOffsetToReticle;
+    float w = glm::clamp(_selectedObject->currentHitPoints() / static_cast<float>(_selectedObject->hitPoints()), 0.0f, 1.0f) * kTitleBarWidth;
+
+    if (!_actions.empty()) {
+        y -= kActionHeight + 2 * kActionBarMargin;
+    }
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
+
+    LocalUniforms locals;
+    locals.general.model = move(transform);
+    locals.general.color = glm::vec4(getBaseColor(_game->version()), 1.0f);
+    locals.general.alpha = 1.0f;
+
+    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+
+    Quad::getDefault().renderTriangles();
 }
 
 void SelectionOverlay::drawActionBar() const {
@@ -299,7 +326,7 @@ void SelectionOverlay::drawActionBar() const {
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
-    if (!_hasSelected) return false;
+    if (!_selectedObject) return false;
 
     const GraphicsOptions &opts = _game->options().graphics;
     x = opts.width * _selectedScreenCoords.x + (static_cast<float>(index - 1) - 0.5f) * kActionWidth + (index - 1) * kActionBarMargin;

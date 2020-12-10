@@ -50,6 +50,7 @@ private:
     void hideCombatHud();
     void refreshActionQueueItems() const;
 
+    void drawHealth(int memberIndex) const;
     void drawMinimap() const;
 };
 
