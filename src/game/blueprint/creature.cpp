@@ -59,6 +59,10 @@ void CreatureBlueprint::load(Creature &creature) {
 
     creature._faction = static_cast<Faction>(_utc->getInt("FactionID", -1));
     creature._conversation = boost::to_lower_copy(_utc->getString("Conversation"));
+    creature._minOneHP = _utc->getInt("Min1HP", 0) != 0;
+    creature._hitPoints = _utc->getInt("HitPoints");
+    creature._currentHitPoints = _utc->getInt("CurrentHitPoints");
+    creature._maxHitPoints = _utc->getInt("MaxHitPoints");
 
     loadTitle(creature);
     loadAttributes(creature);

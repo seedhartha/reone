@@ -56,6 +56,9 @@ void PlaceableBlueprint::load(Placeable &placeable) {
     placeable._hasInventory = _utp->getInt("HasInventory") != 0;
     placeable._usable = _utp->getInt("Useable") != 0;
     placeable._selectable = placeable._usable;
+    placeable._minOneHP = _utp->getInt("Min1HP", 0) != 0;
+    placeable._hitPoints = _utp->getInt("HP");
+    placeable._currentHitPoints = _utp->getInt("CurrentHP");
 
     loadItems(placeable);
     loadScripts(placeable);

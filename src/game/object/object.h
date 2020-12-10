@@ -38,6 +38,8 @@ public:
 
     void runUserDefinedEvent(int eventNumber);
 
+    bool isMinOneHP() const;
+
     uint32_t id() const;
     ObjectType type() const;
     const std::string &tag() const;
@@ -63,6 +65,7 @@ protected:
     std::string _title;
     std::string _conversation;
     ActionQueue _actionQueue;
+    bool _minOneHP { false };
     int _hitPoints { 0 };
     int _maxHitPoints { 0 };
     int _currentHitPoints { 0 };

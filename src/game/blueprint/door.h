@@ -42,6 +42,8 @@ private:
 
     DoorBlueprint(const DoorBlueprint &) = delete;
     DoorBlueprint &operator=(const DoorBlueprint &) = delete;
+
+    void loadScripts(Door &door);
 };
 
 } // namespace game
