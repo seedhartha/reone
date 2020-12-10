@@ -126,7 +126,7 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
             shared_ptr<Creature> partyLeader(_game->party().leader());
             ActionQueue &actions = partyLeader->actionQueue();
             actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(object),
-                        partyLeader->attackRange()));
+                        partyLeader->getAttackRange()));
             break;
         }
 

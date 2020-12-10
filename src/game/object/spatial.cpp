@@ -118,7 +118,7 @@ const vector<shared_ptr<Item>> &SpatialObject::items() const {
     return _items;
 }
 
-glm::vec3 SpatialObject::selectablePosition() const {
+glm::vec3 SpatialObject::getSelectablePosition() const {
     return _model->getCenterOfAABB();
 }
 

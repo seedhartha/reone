@@ -41,7 +41,10 @@ class SpatialObject : public Object {
 public:
     void update(float dt) override;
 
+    void face(const SpatialObject &other);
+
     void addItem(const std::shared_ptr<Item> &item);
+    void moveItemsTo(SpatialObject &other);
 
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
@@ -49,10 +52,9 @@ public:
 
     bool contains(const glm::vec3 &point) const;
 
-    void face(const SpatialObject &other);
-    void moveItemsTo(SpatialObject &other);
-
     bool isSelectable() const;
+
+    virtual glm::vec3 getSelectablePosition() const;
 
     Room *room() const;
     const glm::vec3 &position() const;
@@ -62,7 +64,6 @@ public:
     std::shared_ptr<scene::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
     const std::vector<std::shared_ptr<Item>> &items() const;
-    virtual glm::vec3 selectablePosition() const;
     float drawDistance() const;
 
     void setRoom(Room *room);

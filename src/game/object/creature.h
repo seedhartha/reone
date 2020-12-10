@@ -27,6 +27,7 @@
 #include "../enginetype/effect.h"
 #include "../rp/attributes.h"
 
+#include "creatureanimresolver.h"
 #include "item.h"
 #include "spatial.h"
 
@@ -51,6 +52,12 @@ enum class CombatState {
 
 class Creature : public SpatialObject {
 public:
+    enum class ModelType {
+        Creature,
+        Droid,
+        Character
+    };
+
     enum class MovementType {
         None,
         Walk,
@@ -77,7 +84,7 @@ public:
     void update(float dt) override;
     void clearAllActions() override;
 
-    glm::vec3 selectablePosition() const override;
+    glm::vec3 getSelectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
@@ -85,26 +92,28 @@ public:
 
     void playAnimation(Animation anim);
     void updateModelAnimation();
-
     void applyEffect(std::unique_ptr<Effect> &&eff);
 
     bool isMovementRestricted() const;
+    bool isInCombat() const;
+
+    float getAttackRange() const;
 
     const std::string &blueprintResRef() const;
     Gender gender() const;
+    ModelType modelType() const;
     int appearance() const;
     std::shared_ptr<render::Texture> portrait() const;
     float walkSpeed() const;
     float runSpeed() const;
     CreatureAttributes &attributes();
     Faction faction() const;
-    float attackRange() const;
 
     void setMovementType(MovementType type);
     void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
-    void setInCombat(bool active) { _inCombat = active; }
+    void setInCombat(bool active);
     void setOnSpawn(const std::string &onSpawn);
     void setOnUserDefined(const std::string &onUserDefined);
 
@@ -114,8 +123,9 @@ public:
     void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
-    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
     bool isSlotEquipped(InventorySlot slot) const;
+
+    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
 
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
 
@@ -123,20 +133,14 @@ public:
 
     // Pathfinding
 
-    std::shared_ptr<Path> &path();
-
     void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
     void clearPath();
+
+    std::shared_ptr<Path> &path();
 
     // END Pathfinding
 
 private:
-    enum class ModelType {
-        Creature,
-        Droid,
-        Character
-    };
-
     ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
     std::string _blueprintResRef;
@@ -158,6 +162,7 @@ private:
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
+    CreatureAnimationResolver _animResolver;
 
     // Scripts
 
@@ -165,28 +170,18 @@ private:
 
     // END Scripts
 
+    void loadTransform(const resource::GffStruct &gffs);
     void loadBlueprint(const resource::GffStruct &gffs);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
     void updateModel();
 
     ModelType parseModelType(const std::string &s) const;
-    bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
-    int getWeaponWieldNumber(WeaponWield wield) const;
 
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
     std::string getWeaponModelName(InventorySlot slot) const;
-
-    std::string getPauseAnimation() const;
-    std::string getRunAnimation() const;
-    const std::string &getWalkAnimation() const;
-
-    std::string getDuelAttackAnimation() const;
-    std::string getBashAttackAnimation() const;
-    std::string getDodgeAnimation() const;
-    std::string getKnockdownAnimation() const;
 
     friend class CreatureBlueprint;
 };
