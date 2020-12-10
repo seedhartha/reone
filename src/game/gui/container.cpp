@@ -26,7 +26,7 @@
 #include "../object/item.h"
 #include "../script/util.h"
 
-#include "colors.h"
+#include "colorutil.h"
 
 using namespace std;
 

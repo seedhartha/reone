@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 #include "chargen.h"
 

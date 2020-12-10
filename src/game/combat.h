@@ -26,8 +26,8 @@
 #include "../common/timer.h"
 
 #include "enginetype/effect.h"
+#include "factionutil.h"
 #include "object/creature.h"
-#include "rp/factions.h"
 #include "types.h"
 
 namespace reone {

@@ -23,10 +23,10 @@
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
-#include "../../portraits.h"
-#include "../../rp/classes.h"
+#include "../../portraitutil.h"
+#include "../../rp/classutil.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 using namespace std;
 using namespace std::placeholders;

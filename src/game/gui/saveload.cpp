@@ -26,7 +26,7 @@
 #include "../game.h"
 #include "../savedgame.h"
 
-#include "colors.h"
+#include "colorutil.h"
 
 namespace fs = boost::filesystem;
 

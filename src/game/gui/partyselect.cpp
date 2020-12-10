@@ -27,10 +27,10 @@
 
 #include "../blueprint/blueprints.h"
 #include "../game.h"
-#include "../portraits.h"
+#include "../portraitutil.h"
 #include "../script/util.h"
 
-#include "colors.h"
+#include "colorutil.h"
 
 using namespace std;
 

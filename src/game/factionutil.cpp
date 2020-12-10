@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "factions.h"
+#include "factionutil.h"
 
 #include <list>
 
-#include "../../common/log.h"
+#include "../common/log.h"
 
-#include "../object/creature.h"
+#include "object/creature.h"
 
 using namespace std;
 
@@ -85,10 +85,10 @@ vector<vector<bool>> initialize() {
         arr[j][i] = true;
     }
 
-    return std::move(arr);
+    return move(arr);
 }
 
-const vector<vector<bool>> _hostility = initialize();
+const vector<vector<bool>> g_hostility = initialize();
 
 bool getIsEnemy(const Creature &left, const Creature &right) {
     int leftFaction = static_cast<int>(left.faction());
@@ -101,7 +101,7 @@ bool getIsEnemy(const Creature &left, const Creature &right) {
         return false;
     }
 
-    return _hostility[leftFaction][rightFaction];
+    return g_hostility[leftFaction][rightFaction];
 }
 
 } // namespace game

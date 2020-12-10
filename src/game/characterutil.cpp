@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "characters.h"
+#include "characterutil.h"
 
 #include "../resource/resources.h"
 #include "../common/random.h"

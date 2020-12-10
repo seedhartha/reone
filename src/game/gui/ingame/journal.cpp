@@ -19,7 +19,7 @@
 
 #include "../../game.h"
 
-#include "../colors.h"
+#include "../colorutil.h"
 
 using namespace std;
 

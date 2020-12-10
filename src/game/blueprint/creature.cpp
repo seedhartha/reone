@@ -26,7 +26,7 @@
 #include "../../resource/resources.h"
 
 #include "../object/creature.h"
-#include "../portraits.h"
+#include "../portraitutil.h"
 
 using namespace std;
 
