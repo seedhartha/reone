@@ -77,6 +77,9 @@ void ItemBlueprint::load(Item &item) {
     item._icon = Textures::instance().get(iconResRef, TextureType::GUI);
 
     item._attackRange = baseItems->getInt(baseItem, "maxattackrange");
+    item._numDice = baseItems->getInt(baseItem, "numdice");
+    item._dieToRoll = baseItems->getInt(baseItem, "dietoroll");
+    item._damageFlags = baseItems->getInt(baseItem, "damageflags");
     item._weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
     item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
 }

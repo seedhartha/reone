@@ -23,6 +23,7 @@
 #include "glm/common.hpp"
 
 #include "../common/log.h"
+#include "../common/random.h"
 
 #include "game.h"
 
@@ -223,6 +224,8 @@ void Combat::updateRound(Round &round, float dt) {
 
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
+                finishAttack(attacker, defender);
+
                 if (isDuel) {
                     defender->face(*attacker);
                     defender->playAnimation(Creature::Animation::DuelAttack);
@@ -236,6 +239,9 @@ void Combat::updateRound(Round &round, float dt) {
 
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
+                if (isDuel) {
+                    finishAttack(defender, attacker);
+                }
                 attacker->setMovementRestricted(false);
                 defender->setMovementRestricted(false);
                 round.state = RoundState::Finished;
@@ -245,6 +251,25 @@ void Combat::updateRound(Round &round, float dt) {
 
         default:
             break;
+    }
+}
+
+void Combat::finishAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender) {
+    // TODO: add armor bonus and dexterity modifier
+    int defense = 10;
+
+    int attack = random(1, 20);
+    if (attack == 1) {
+        debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+        return;
+    }
+
+    if (attack == 20 || attack >= defense) {
+        debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+        auto effects = _damageResolver.getDamageEffects(attacker);
+        for (auto &effect : effects) {
+            defender->applyEffect(effect);
+        }
     }
 }
 

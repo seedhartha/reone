@@ -26,6 +26,7 @@
 #include "../common/timer.h"
 
 #include "enginetype/effect.h"
+#include "damageresolver.h"
 #include "factionutil.h"
 #include "object/creature.h"
 #include "types.h"
@@ -47,7 +48,6 @@ public:
     bool isActive() const;
 
     void onEnterCombatMode();
-
     void onExitCombatMode();
 
 private:
@@ -77,6 +77,7 @@ private:
 
     Game *_game;
     bool _active { false };
+    DamageResolver _damageResolver;
 
     Timer _heartbeatTimer { 0.0f };
     std::map<uint32_t, std::shared_ptr<Combatant>> _combatantById;
@@ -88,6 +89,8 @@ private:
     void updateRounds(float dt);
     void updateRound(Round &round, float dt);
     void updateActivation();
+
+    void finishAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
 
     std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;

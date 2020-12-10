@@ -369,6 +369,7 @@ set(GAME_HEADERS
     src/game/console.h
     src/game/combat.h
     src/game/cursors.h
+    src/game/damageresolver.h
     src/game/dialog.h
     src/game/enginetype/effect.h
     src/game/enginetype/location.h
@@ -461,6 +462,7 @@ set(GAME_SOURCES
     src/game/console.cpp
     src/game/combat.cpp
     src/game/cursors.cpp
+    src/game/damageresolver.cpp
     src/game/dialog.cpp
     src/game/enginetype/typefactory.cpp
     src/game/factionutil.cpp

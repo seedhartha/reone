@@ -18,13 +18,11 @@
 #pragma once
 
 #include <atomic>
-#include <queue>
 
 #include "../../resource/2dafile.h"
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
-#include "../enginetype/effect.h"
 #include "../rp/attributes.h"
 
 #include "creatureanimresolver.h"
@@ -93,7 +91,6 @@ public:
 
     void playAnimation(Animation anim);
     void updateModelAnimation();
-    void applyEffect(std::unique_ptr<Effect> &&eff);
 
     bool isMovementRestricted() const;
     bool isInCombat() const;
@@ -159,7 +156,6 @@ private:
     bool _animDirty { true };
     bool _animFireForget { false };
     Faction _faction { Faction::Invalid };
-    std::deque<std::unique_ptr<Effect>> _effects;
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };

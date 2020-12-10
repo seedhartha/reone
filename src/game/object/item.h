@@ -48,6 +48,9 @@ public:
     int modelVariation() const;
     std::shared_ptr<render::Texture> icon() const;
     float attackRange() const;
+    int numDice() const;
+    int dieToRoll() const;
+    int damageFlags() const;
     WeaponType weaponType() const;
     WeaponWield weaponWield() const;
 
@@ -61,6 +64,9 @@ private:
     std::shared_ptr<render::Texture> _icon;
     uint32_t _equipableSlots { 0 };
     int _attackRange { 0 };
+    int _numDice { 0 };
+    int _dieToRoll { 0 };
+    int _damageFlags { 0 };
     WeaponType _weaponType { WeaponType::None };
     WeaponWield _weaponWield { WeaponWield::None };
 

@@ -19,6 +19,8 @@
 
 #include "glm/gtx/euler_angles.hpp"
 
+#include "../../common/log.h"
+
 #include "../room.h"
 
 #include "item.h"
@@ -73,6 +75,16 @@ void SpatialObject::moveItemsTo(SpatialObject &other) {
         other._items.push_back(item);
     }
     _items.clear();
+}
+
+void SpatialObject::applyEffect(const shared_ptr<Effect> &effect) {
+    auto damage = dynamic_pointer_cast<DamageEffect>(effect);
+    if (damage) {
+        debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damage->amount());
+        _currentHitPoints = glm::max(1, _currentHitPoints - damage->amount());
+    } else {
+        _effects.push_back(effect);
+    }
 }
 
 void SpatialObject::update(float dt) {
