@@ -115,8 +115,6 @@ public:
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
     void setInCombat(bool active);
-    void setOnSpawn(const std::string &onSpawn);
-    void setOnUserDefined(const std::string &onUserDefined);
 
     // Equipment
 
@@ -140,6 +138,12 @@ public:
     std::shared_ptr<Path> &path();
 
     // END Pathfinding
+
+    // Scripts
+
+    void runSpawnScript();
+
+    // END Scripts
 
 private:
     CreatureConfiguration _config;

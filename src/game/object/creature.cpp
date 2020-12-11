@@ -439,12 +439,11 @@ void Creature::setInCombat(bool active) {
     _inCombat = active;
 }
 
-void Creature::setOnSpawn(const string &onSpawn) {
-    _onSpawn = onSpawn;
-}
-
-void Creature::setOnUserDefined(const string &onUserDefined) {
-    _onUserDefined = onUserDefined;
+void Creature::runSpawnScript() {
+    if (!_onSpawn.empty()) {
+        // TODO: enable when more routines are implemented
+        // runScript(_onSpawn, _id, kObjectInvalid, -1);
+    }
 }
 
 } // namespace game
