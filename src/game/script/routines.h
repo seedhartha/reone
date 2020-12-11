@@ -124,10 +124,12 @@ private:
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getExitingObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getFacing(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getFirstItemInInventory(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getModule(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getNextItemInInventory(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getTag(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -173,6 +175,7 @@ private:
     // Party
 
     script::Variable addAvailableNPCByTemplate(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable addPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getFirstPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getPartyMemberByIndex(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -180,6 +183,7 @@ private:
     script::Variable isAvailableCreature(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isNPCPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable isObjectPartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable removePartyMember(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable setPartyLeader(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable showPartySelectionGUI(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 

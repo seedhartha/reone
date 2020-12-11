@@ -207,6 +207,19 @@ void SpatialObject::setVisible(bool visible) {
     }
 }
 
+shared_ptr<Item> SpatialObject::getFirstItem() {
+    _itemIndex = 0;
+    return getNextItem();
+}
+
+shared_ptr<Item> SpatialObject::getNextItem() {
+    int itemCount = static_cast<int>(_items.size());
+    if (itemCount > _itemIndex) {
+        return _items[_itemIndex++];
+    }
+    return nullptr;
+}
+
 } // namespace game
 
 } // namespace reone

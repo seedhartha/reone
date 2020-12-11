@@ -41,16 +41,13 @@ public:
 
     bool handle(const SDL_Event &event);
 
-    bool addAvailableMember(int npc, const std::string &blueprint);
-    bool addMember(const std::shared_ptr<Creature> &member);
     void clear();
+    bool addMember(const std::shared_ptr<Creature> &member);
     void switchLeader();
 
-    const std::string &getAvailableMember(int npc) const;
     std::shared_ptr<Creature> getMember(int index) const;
     bool isNPCMember(int npc) const;
     bool isMember(const Object &object) const;
-    bool isMemberAvailable(int npc) const;
 
     bool empty() const;
     int size() const;
@@ -59,6 +56,17 @@ public:
 
     void setPartyLeader(int npc);
     void setPlayer(const std::shared_ptr<Creature> &player);
+
+    // Available members
+
+    bool addAvailableMember(int npc, const std::string &blueprint);
+    bool removeAvailableMember(int npc);
+
+    bool isMemberAvailable(int npc) const;
+
+    const std::string &getAvailableMember(int npc) const;
+
+    // END Available members
 
 private:
     Game *_game { nullptr };

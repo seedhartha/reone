@@ -18,6 +18,9 @@
 #include "routines.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
+#include "../../common/log.h"
 
 #include "../game.h"
 
@@ -103,6 +106,34 @@ Variable Routines::setPartyLeader(const vector<Variable> &args, ExecutionContext
     int npc = args[0].intValue;
     _game->party().setPartyLeader(npc);
     return Variable();
+}
+
+Variable Routines::addPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+
+    auto object = getObjectById(args[1].objectId, ctx);
+    if (object) {
+        auto creature = dynamic_pointer_cast<Creature>(object);
+        if (creature) {
+            int npc = args[0].intValue;
+            _game->party().addAvailableMember(npc, creature->blueprintResRef());
+            result.intValue = 1;
+        } else {
+            warn(boost::format("Routines: addPartyMember: object '%s' is not a creature") % object->tag());
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::removePartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
+    int npc = args[0].intValue;
+    bool removed = _game->party().removeAvailableMember(npc);
+
+    Variable result(0);
+    result.intValue = removed ? 1 : 0;
+
+    return move(result);
 }
 
 } // namespace game
