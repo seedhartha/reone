@@ -133,7 +133,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
         switch (object->type()) {
             case ObjectType::Creature:
-                cursor = CursorType::Talk;
+                cursor = getIsEnemy(static_cast<Creature &>(*object), *_game->party().leader()) ? CursorType::Attack : CursorType::Talk;
                 break;
             case ObjectType::Door:
                 cursor = CursorType::Door;
