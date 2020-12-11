@@ -559,8 +559,10 @@ void Routines::addKotorRoutines() {
     add("ShowTutorialWindow", Void, { Int });
     add("StartCreditSequence", Void, { Int });
     add("IsCreditSequenceInProgress", Int, { });
+
     add("SWMG_SetLateralAccelerationPerSecond", Void, { Float });
     add("SWMG_GetLateralAccelerationPerSecond", Float, { });
+
     add("GetCurrentAction", Int, { Object });
     add("GetDifficultyModifier", Float, { });
     add("GetAppearanceType", Int, { Object });
@@ -602,7 +604,9 @@ void Routines::addKotorRoutines() {
     add("WriteTimestampedLogEntry", Void, { String });
     add("GetModuleName", String, { });
     add("GetFactionLeader", Object, { Object });
+
     add("SWMG_SetSpeedBlurEffect", Void, { Int, Float });
+
     add("EndGame", Void, { Int });
     add("GetRunScriptVar", Int, { }, bind(&Routines::getRunScriptVar, this, _1, _2));
     add("GetCreatureMovmentType", Int, { Object });
@@ -622,6 +626,7 @@ void Routines::addKotorRoutines() {
     add("GetGlobalNumber", Int, { String }, bind(&Routines::getGlobalNumber, this, _1, _2));
     add("SetGlobalNumber", Void, { String, Int }, bind(&Routines::setGlobalNumber, this, _1, _2));
     add("AurPostString", Void, { String, Int, Int, Float });
+
     add("SWMG_GetLastEvent", String, { });
     add("SWMG_GetLastEventModelName", String, { });
     add("SWMG_GetObjectByName", Object, { String });
@@ -708,6 +713,7 @@ void Routines::addKotorRoutines() {
     add("SWMG_StartInvulnerability", Void, { Object });
     add("SWMG_GetPlayerMaxSpeed", Float, { });
     add("SWMG_SetPlayerMaxSpeed", Void, { Float });
+
     add("AddJournalWorldEntry", Void, { Int, String, String });
     add("AddJournalWorldEntryStrref", Void, { Int, Int });
     add("BarkString", Void, { Object, Int });
@@ -722,12 +728,14 @@ void Routines::addKotorRoutines() {
     add("SetLocalBoolean", Void, { Object, Int, Int }, bind(&Routines::setLocalBoolean, this, _1, _2));
     add("GetLocalNumber", Int, { Object, Int }, bind(&Routines::getLocalNumber, this, _1, _2));
     add("SetLocalNumber", Void, { Object, Int, Int }, bind(&Routines::setLocalNumber, this, _1, _2));
+
     add("SWMG_GetSoundFrequency", Int, { Object, Int });
     add("SWMG_SetSoundFrequency", Void, { Object, Int, Int });
     add("SWMG_GetSoundFrequencyIsRandom", Int, { Object, Int });
     add("SWMG_SetSoundFrequencyIsRandom", Void, { Object, Int, Int });
     add("SWMG_GetSoundVolume", Int, { Object, Int });
     add("SWMG_SetSoundVolume", Void, { Object, Int, Int });
+
     add("SoundObjectGetPitchVariance", Float, { Object });
     add("SoundObjectSetPitchVariance", Void, { Object, Float });
     add("SoundObjectGetVolume", Int, { Object });
@@ -756,8 +764,10 @@ void Routines::addKotorRoutines() {
     add("GivePlotXP", Void, { String, Int });
     add("GetMinOneHP", Int, { Object }, bind(&Routines::getMinOneHP, this, _1, _2));
     add("SetMinOneHP", Void, { Object, Int }, bind(&Routines::setMinOneHP, this, _1, _2));
+
     add("SWMG_GetPlayerTunnelInfinite", TVector, { });
     add("SWMG_SetPlayerTunnelInfinite", Void, { TVector });
+
     add("SetGlobalFadeIn", Void, { Float, Float, Float, Float, Float });
     add("SetGlobalFadeOut", Void, { Float, Float, Float, Float, Float });
     add("GetLastHostileTarget", Object, { Object });
