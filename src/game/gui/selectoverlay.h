@@ -81,7 +81,7 @@ private:
     void drawActionBar() const;
 
     bool getActionScreenCoords(int index, float &x, float &y) const;
-    const glm::vec3 &getColorFromSelectedObject() const;
+    glm::vec3 getColorFromSelectedObject() const;
 };
 
 } // namespace game
