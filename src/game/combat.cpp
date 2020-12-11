@@ -62,31 +62,85 @@ void Combat::update(float dt) {
 }
 
 void Combat::updateCombatants() {
-    ObjectList &creatures = _game->module()->area()->getObjectsByType(ObjectType::Creature);
+    auto creatures = _game->module()->area()->getObjectsByType(ObjectType::Creature);
     for (auto &object : creatures) {
-        if (object->isDead()) continue;
-
         shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
+        if (creature->isDead()) continue;
 
         vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
-        bool hasEnemies = !enemies.empty();
 
         auto maybeCombatant = _combatantById.find(creature->id());
         if (maybeCombatant != _combatantById.end()) {
-            if (hasEnemies) {
-                maybeCombatant->second->enemies = move(enemies);
-            } else {
-                _combatantById.erase(maybeCombatant);
-                creature->setInCombat(false);
-            }
-            continue;
+            maybeCombatant->second->enemies = move(enemies);
+        } else if (!enemies.empty()) {
+            addCombatant(creature, move(enemies));
         }
-        if (hasEnemies) {
-            auto combatant = make_shared<Combatant>();
-            combatant->creature = creature;
-            combatant->enemies = move(enemies);
-            _combatantById.insert(make_pair(creature->id(), move(combatant)));
-            creature->setInCombat(true);
+    }
+
+    removeStaleCombatants();
+}
+
+vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
+    vector<shared_ptr<Creature>> result;
+    shared_ptr<Area> area(_game->module()->area());
+
+    for (auto &object : area->getObjectsByType(ObjectType::Creature)) {
+        if (object.get() == &combatant ||
+            object->isDead() ||
+            object->distanceTo(combatant) > range) continue;
+
+        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
+        if (!getIsEnemy(combatant, *creature)) continue;
+
+        glm::vec3 adjustedCombatantPos(combatant.position());
+        adjustedCombatantPos.z += 1.8f; // TODO: height based on appearance
+
+        glm::vec3 adjustedCreaturePos(creature->position());
+        adjustedCreaturePos.z += creature->model()->aabb().center().z;
+
+        glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
+
+        RaycastProperties castProps;
+        castProps.flags = kRaycastRooms | kRaycastObjects | kRaycastAABB;
+        castProps.objectTypes = { ObjectType::Door };
+        castProps.origin = adjustedCombatantPos;
+        castProps.direction = glm::normalize(combatantToCreature);
+        castProps.maxDistance = glm::length(combatantToCreature);
+
+        RaycastResult castResult;
+
+        const CollisionDetector &detector = area->collisionDetector();
+        if (detector.raycast(castProps, castResult)) continue;
+
+        // TODO: check field of view
+
+        result.push_back(move(creature));
+    }
+
+    return move(result);
+}
+
+void Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enemies) {
+    debug(boost::format("Combat: add combatant '%s' with %d enemies") % creature->tag() % enemies.size(), 2);
+
+    creature->setInCombat(true);
+
+    auto combatant = make_shared<Combatant>();
+    combatant->creature = creature;
+    combatant->enemies = move(enemies);
+
+    _combatantById.insert(make_pair(creature->id(), move(combatant)));
+}
+
+void Combat::removeStaleCombatants() {
+    for (auto it = _combatantById.begin(); it != _combatantById.end(); ) {
+        shared_ptr<Combatant> combatantPtr(it->second);
+        bool isStale = combatantPtr->enemies.empty() || combatantPtr->creature->isDead();
+        if (isStale) {
+            combatantPtr->creature->setInCombat(false);
+            it = _combatantById.erase(it);
+        } else {
+            ++it;
         }
     }
 }
@@ -128,51 +182,10 @@ shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
     return move(result);
 }
 
-vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
-    vector<shared_ptr<Creature>> result;
-
-    shared_ptr<Area> area(_game->module()->area());
-    ObjectList creatures(area->getObjectsByType(ObjectType::Creature));
-
-    for (auto &object : creatures) {
-        if (object.get() == &combatant ||
-            object->isDead() ||
-            object->distanceTo(combatant) > range) continue;
-
-        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
-        if (!getIsEnemy(combatant, *creature)) continue;
-
-        glm::vec3 adjustedCombatantPos(combatant.position());
-        adjustedCombatantPos.z += 1.8f; // TODO: height based on appearance
-
-        glm::vec3 adjustedCreaturePos(creature->position());
-        adjustedCreaturePos.z += creature->model()->aabb().center().z;
-
-        glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
-
-        RaycastProperties castProps;
-        castProps.flags = kRaycastRooms | kRaycastObjects | kRaycastAABB;
-        castProps.objectTypes = { ObjectType::Door };
-        castProps.origin = adjustedCombatantPos;
-        castProps.direction = glm::normalize(combatantToCreature);
-        castProps.maxDistance = glm::length(combatantToCreature);
-
-        RaycastResult castResult;
-
-        const CollisionDetector &detector = area->collisionDetector();
-        if (detector.raycast(castProps, castResult)) continue;
-
-        // TODO: check line-of-sight
-
-        result.push_back(move(creature));
-    }
-
-    return move(result);
-}
-
 void Combat::updateRounds(float dt) {
     for (auto &pair : _combatantById) {
         shared_ptr<Combatant> attacker(pair.second);
+        if (attacker->creature->isDead()) continue;
 
         // Do not start a combat round, if attacker is a moving party leader
 
@@ -202,12 +215,8 @@ void Combat::updateRounds(float dt) {
 
         auto maybeDefenderRound = _roundByAttackerId.find(defender->id());
         bool isDuel = maybeDefenderRound != _roundByAttackerId.end() && maybeDefenderRound->second->defender == attacker;
-
         if (!isDuel) {
-            auto round = make_shared<Round>();
-            round->attacker = attacker;
-            round->defender = maybeDefender->second;
-            _roundByAttackerId.insert(make_pair(attacker->creature->id(), round));
+            addRound(attacker, maybeDefender->second);
         }
     }
     for (auto it = _roundByAttackerId.begin(); it != _roundByAttackerId.end(); ) {
@@ -221,6 +230,16 @@ void Combat::updateRounds(float dt) {
             ++it;
         }
     }
+}
+
+void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<Combatant> &defender) {
+    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % defender->creature->tag(), 2);
+
+    auto round = make_shared<Round>();
+    round->attacker = attacker;
+    round->defender = defender;
+
+    _roundByAttackerId.insert(make_pair(attacker->creature->id(), round));
 }
 
 void Combat::updateRound(Round &round, float dt) {
