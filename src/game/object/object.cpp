@@ -98,6 +98,10 @@ void Object::setMinOneHP(bool minOneHP) {
     _minOneHP = minOneHP;
 }
 
+void Object::setMaxHitPoints(int maxHitPoints) {
+    _maxHitPoints = maxHitPoints;
+}
+
 } // namespace game
 
 } // namespace reone
