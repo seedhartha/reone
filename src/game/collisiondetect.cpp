@@ -69,8 +69,9 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         ObjectType type = object->type();
         if (props.objectTypes.count(type) == 0) continue;
 
+        if ((props.flags & kRaycastAlive) && object->isDead()) continue;
         if (type == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
-        if (props.flags & kRaycastSelectable && !object->isSelectable()) continue;
+        if ((props.flags & kRaycastSelectable) && !object->isSelectable()) continue;
 
         float dist = object->distanceTo(glm::vec2(props.origin));
         if (dist > props.maxDistance) continue;

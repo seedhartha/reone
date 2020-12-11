@@ -312,7 +312,7 @@ bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest)
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB;
+    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Creature, ObjectType::Door };
@@ -512,7 +512,7 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
 
     if (_collisionDetector.raycast(props, result)) return false;
 
-    props.flags = kRaycastObjects | kRaycastAABB;
+    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
     props.objectTypes = { ObjectType::Creature };
     props.except = except;
 
