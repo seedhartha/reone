@@ -82,7 +82,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 }
 
 int ScriptExecution::run() {
-    debug("Script: " + _program->name());
+    debug("Script: run " + _program->name());
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {
@@ -107,7 +107,7 @@ int ScriptExecution::run() {
         _nextInstruction = ins.nextOffset;
 
         if (getDebugLogLevel() >= 2) {
-            debug("Script: " + describeInstruction(ins), 3);
+            debug("Script: instruction " + describeInstruction(ins), 3);
         }
         handler->second(ins);
 
@@ -232,7 +232,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     Variable retValue = routine.invoke(args, _context);
 
     if (getDebugLogLevel() >= 2) {
-        debug(boost::format("Script: %s -> %s") % routine.name() % retValue.toString(), 2);
+        debug(boost::format("Script: action: '%s' -> %s") % routine.name() % retValue.toString(), 2);
     }
     switch (routine.returnType()) {
         case VariableType::Void:
