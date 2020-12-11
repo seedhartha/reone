@@ -37,14 +37,20 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefKotor 
     { CursorType::Default, { 4, 5 } },
     { CursorType::Talk, { 14, 15 } },
     { CursorType::Door, { 26, 27 } },
-    { CursorType::Pickup, { 28, 29 } }
+    { CursorType::Pickup, { 28, 29 } },
+    { CursorType::DisableMine, { 36, 37 } },
+    { CursorType::RecoverMine, { 40, 41 } },
+    { CursorType::Attack, { 54, 55 } }
 };
 
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefTsl = {
     { CursorType::Default, { 3, 4 } },
     { CursorType::Talk, { 13, 14 } },
     { CursorType::Door, { 25, 26 } },
-    { CursorType::Pickup, { 27, 28 } }
+    { CursorType::Pickup, { 27, 28 } },
+    { CursorType::DisableMine, { 35, 36 } },
+    { CursorType::RecoverMine, { 39, 40 } },
+    { CursorType::Attack, { 53, 54 } }
 };
 
 Cursors &Cursors::instance() {

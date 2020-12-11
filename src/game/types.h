@@ -42,9 +42,12 @@ const int kEngineTypeInvalid = -1;
 enum class CursorType {
     None,
     Default,
+    Attack,
     Door,
     Talk,
-    Pickup
+    Pickup,
+    DisableMine,
+    RecoverMine
 };
 
 enum InventorySlot {
