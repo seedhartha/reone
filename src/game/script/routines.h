@@ -118,6 +118,7 @@ private:
     script::Variable createItemOnObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getArea(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getDistanceBetween(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getDistanceToObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getDistanceToObject2D(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getEnteringObject(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
@@ -208,10 +209,15 @@ private:
     // Role-playing
 
     script::Variable getClassByPosition(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getCurrentHitPoints(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getGender(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getHasSkill(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getHitDice(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
     script::Variable getLevelByClass(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getMaxHitPoints(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable getMinOneHP(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setMaxHitPoints(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+    script::Variable setMinOneHP(const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
     // END Role-playing
 

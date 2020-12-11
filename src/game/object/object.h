@@ -59,6 +59,7 @@ public:
 
     void setTag(const std::string &tag);
     void setMinOneHP(bool minOneHP);
+    void setMaxHitPoints(int maxHitPoints);
 
 protected:
     uint32_t _id { 0 };

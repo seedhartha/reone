@@ -296,6 +296,25 @@ Variable Routines::soundObjectStop(const vector<Variable> &args, ExecutionContex
     return Variable();
 }
 
+Variable Routines::getDistanceBetween(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0.0f);
+    auto left = getObjectById(args[0].objectId, ctx);
+    auto right = getObjectById(args[1].objectId, ctx);
+
+    if (left && right) {
+        auto spatialLeft = dynamic_pointer_cast<SpatialObject>(left);
+        auto spatialRight = dynamic_pointer_cast<SpatialObject>(right);
+
+        if (spatialLeft && spatialRight) {
+            result.floatValue = spatialLeft->distanceTo(*spatialRight);
+        } else {
+            warn(boost::format("Routines: getDistanceBetween: objects are not spatial: '%s', '%s'") % left->tag() % right->tag());
+        }
+    }
+
+    return move(result);
+}
+
 } // namespace game
 
 } // namespace reone

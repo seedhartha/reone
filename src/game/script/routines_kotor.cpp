@@ -88,8 +88,8 @@ void Routines::addKotorRoutines() {
     add("PlaySound", Void, { String });
     add("GetSpellTargetObject", Object, { });
     add("ActionCastSpellAtObject", Void, { Int, Object, Int, Int, Int, Int, Int });
-    add("GetCurrentHitPoints", Int, { Object });
-    add("GetMaxHitPoints", Int, { Object });
+    add("GetCurrentHitPoints", Int, { Object }, bind(&Routines::getCurrentHitPoints, this, _1, _2));
+    add("GetMaxHitPoints", Int, { Object }, bind(&Routines::getMaxHitPoints, this, _1, _2));
     add("EffectAssuredHit", Effect, { });
     add("GetLastItemEquipped", Object, { });
     add("GetSubScreenID", Int, { });
@@ -190,7 +190,7 @@ void Routines::addKotorRoutines() {
     add("EffectParalyze", Effect, { });
     add("EffectSpellImmunity", Effect, { Int });
     add("SetItemStackSize", Void, { Object, Int });
-    add("GetDistanceBetween", Float, { Object, Object });
+    add("GetDistanceBetween", Float, { Object, Object }, bind(&Routines::getDistanceBetween, this, _1, _2));
     add("SetReturnStrref", Void, { Int, Int, Int });
     add("EffectForceJump", Effect, { Object, Int });
     add("EffectSleep", Effect, { });
@@ -754,8 +754,8 @@ void Routines::addKotorRoutines() {
     add("ShowPartySelectionGUI", Void, { String, Int, Int }, bind(&Routines::showPartySelectionGUI, this, _1, _2));
     add("GetStandardFaction", Int, { Object });
     add("GivePlotXP", Void, { String, Int });
-    add("GetMinOneHP", Int, { Object });
-    add("SetMinOneHP", Void, { Object, Int });
+    add("GetMinOneHP", Int, { Object }, bind(&Routines::getMinOneHP, this, _1, _2));
+    add("SetMinOneHP", Void, { Object, Int }, bind(&Routines::setMinOneHP, this, _1, _2));
     add("SWMG_GetPlayerTunnelInfinite", TVector, { });
     add("SWMG_SetPlayerTunnelInfinite", Void, { TVector });
     add("SetGlobalFadeIn", Void, { Float, Float, Float, Float, Float });
@@ -797,7 +797,7 @@ void Routines::addKotorRoutines() {
     add("EffectCutSceneParalyze", Effect, { });
     add("EffectCutSceneStunned", Effect, { });
     add("CancelPostDialogCharacterSwitch", Void, { });
-    add("SetMaxHitPoints", Void, { Object, Int });
+    add("SetMaxHitPoints", Void, { Object, Int }, bind(&Routines::setMaxHitPoints, this, _1, _2));
     add("NoClicksFor", Void, { Float });
     add("HoldWorldFadeInForDialog", Void, { });
     add("ShipBuild", Int, { }, bind(&Routines::shipBuild, this, _1, _2));

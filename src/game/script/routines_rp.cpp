@@ -125,6 +125,59 @@ Variable Routines::getHasSkill(const vector<Variable> &args, ExecutionContext &c
     return move(result);
 }
 
+Variable Routines::getCurrentHitPoints(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+    int objectId = args.size() > 0 ? args[0].objectId : kObjectSelf;
+
+    auto object = getObjectById(objectId, ctx);
+    if (object) {
+        result.intValue = object->currentHitPoints();
+    }
+
+    return move(result);
+}
+
+Variable Routines::getMaxHitPoints(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+    int objectId = args.size() > 0 ? args[0].objectId : kObjectSelf;
+
+    auto object = getObjectById(objectId, ctx);
+    if (object) {
+        result.intValue = object->maxHitPoints();
+    }
+
+    return move(result);
+}
+
+Variable Routines::getMinOneHP(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(0);
+
+    auto object = getObjectById(args[0].objectId, ctx);
+    if (object) {
+        result.intValue = object->isMinOneHP() != 0;
+    }
+
+    return move(result);
+}
+
+Variable Routines::setMaxHitPoints(const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObjectById(args[0].objectId, ctx);
+    if (object) {
+        int maxHitPoints = args[1].intValue;
+        object->setMaxHitPoints(maxHitPoints);
+    }
+    return Variable();
+}
+
+Variable Routines::setMinOneHP(const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObjectById(args[0].objectId, ctx);
+    if (object) {
+        bool minOneHP = args[1].intValue != 0;
+        object->setMinOneHP(minOneHP);
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
