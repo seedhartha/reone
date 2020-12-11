@@ -84,6 +84,8 @@ public:
     void update(float dt) override;
     void clearAllActions() override;
 
+    bool isSelectable() const override;
+
     glm::vec3 getSelectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);

@@ -57,7 +57,7 @@ public:
 
     bool contains(const glm::vec3 &point) const;
 
-    bool isSelectable() const;
+    virtual bool isSelectable() const;
 
     virtual glm::vec3 getSelectablePosition() const;
 
@@ -89,7 +89,6 @@ protected:
     float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
-    bool _selectable { false };
     std::deque<std::shared_ptr<Effect>> _effects;
 
     SpatialObject(uint32_t id, ObjectType type, scene::SceneGraph *sceneGraph);

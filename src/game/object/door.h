@@ -31,6 +31,8 @@ class Door : public SpatialObject {
 public:
     Door(uint32_t id, scene::SceneGraph *sceneGraph);
 
+    bool isSelectable() const override;
+
     void load(const resource::GffStruct &gffs);
     void open(Object *triggerrer);
     void close(Object *triggerrer);

@@ -50,6 +50,8 @@ namespace reone {
 
 namespace game {
 
+constexpr int kStrRefRemains = 38151;
+
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
@@ -60,7 +62,10 @@ Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneG
     _animResolver(this) {
 
     _drawDistance = 2048.0f;
-    _selectable = true;
+}
+
+bool Creature::isSelectable() const {
+    return !_dead || !_items.empty();
 }
 
 void Creature::load(const GffStruct &gffs) {
@@ -203,7 +208,7 @@ void Creature::updateHealth() {
 
     playAnimation(Animation::Die);
     _dead = true;
-    _selectable = false;
+    _title = Resources::instance().getString(kStrRefRemains);
 
     debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 }

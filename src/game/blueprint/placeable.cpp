@@ -55,7 +55,6 @@ void PlaceableBlueprint::load(Placeable &placeable) {
     placeable._conversation = _utp->getString("Conversation");
     placeable._hasInventory = _utp->getBool("HasInventory");
     placeable._usable = _utp->getBool("Useable");
-    placeable._selectable = placeable._usable;
     placeable._minOneHP = _utp->getBool("Min1HP");
     placeable._hitPoints = _utp->getInt("HP");
     placeable._currentHitPoints = _utp->getInt("CurrentHP");

@@ -95,7 +95,7 @@ void SpatialObject::update(float dt) {
 }
 
 bool SpatialObject::isSelectable() const {
-    return _selectable;
+    return false;
 }
 
 SceneGraph &SpatialObject::sceneGraph() {
