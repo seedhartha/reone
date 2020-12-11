@@ -227,7 +227,7 @@ void SelectionOverlay::drawTitleBar() const {
 
         LocalUniforms locals;
         locals.general.model = move(transform);
-        locals.general.color = glm::vec4(0.0f);
+        locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.general.alpha = 0.5f;
 
         Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
@@ -264,7 +264,6 @@ void SelectionOverlay::drawHealthBar() const {
     LocalUniforms locals;
     locals.general.model = move(transform);
     locals.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
-    locals.general.alpha = 1.0f;
 
     Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
 
@@ -333,7 +332,7 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
     return true;
 }
 
-const glm::vec3 &SelectionOverlay::getColorFromSelectedObject() const {
+glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
     if (_selectedObject && _selectedHostile) {
