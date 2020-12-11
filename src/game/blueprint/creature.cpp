@@ -123,8 +123,8 @@ void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
 }
 
 void CreatureBlueprint::loadScripts(Creature &creature) {
-    creature.setOnSpawn(boost::to_lower_copy(_utc->getString("ScriptSpawn")));
-    creature.setOnUserDefined(boost::to_lower_copy(_utc->getString("ScriptUserDefine")));
+    creature._onSpawn = boost::to_lower_copy(_utc->getString("ScriptSpawn"));
+    creature._onUserDefined = boost::to_lower_copy(_utc->getString("ScriptUserDefine"));
 }
 
 void CreatureBlueprint::loadItems(Creature &creature) {

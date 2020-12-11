@@ -49,10 +49,10 @@ void Module::load(const string &name, const GffStruct &ifo) {
 
     loadInfo(ifo);
     loadArea(ifo);
+    loadPlayer();
 
     _area->initCameras(_info.entryPosition, _info.entryHeading);
-
-    loadPlayer();
+    _area->runSpawnScripts();
 }
 
 void Module::loadInfo(const GffStruct &ifo) {

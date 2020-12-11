@@ -587,6 +587,12 @@ bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool r
     return false;
 }
 
+void Area::runSpawnScripts() {
+    for (auto &creature : _objectsByType[ObjectType::Creature]) {
+        static_cast<Creature &>(*creature).runSpawnScript();
+    }
+}
+
 void Area::runOnEnterScript() {
     shared_ptr<Creature> player(_game->party().player());
     if (!player) return;

@@ -75,7 +75,6 @@ public:
     void initCameras(const glm::vec3 &entryPosition, float entryHeading);
     bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
-    void runOnEnterScript();
     void startDialog(SpatialObject &object, const std::string &resRef);
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
@@ -118,6 +117,13 @@ public:
     void unloadParty();
 
     // END Party
+
+    // Scripts
+
+    void runSpawnScripts();
+    void runOnEnterScript();
+
+    // END Scripts
 
 private:
     Game *_game { nullptr };
