@@ -41,7 +41,10 @@ namespace game {
 
 Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Door, sceneGraph) {
     _drawDistance = FLT_MAX;
-    _selectable = true;
+}
+
+bool Door::isSelectable() const {
+    return !_static && !_open;
 }
 
 void Door::load(const GffStruct &gffs) {
@@ -82,7 +85,6 @@ void Door::open(Object *triggerrer) {
         _model->playAnimation("opening1");
     }
     _open = true;
-    _selectable = false;
 }
 
 void Door::close(Object *triggerrer) {
@@ -91,7 +93,6 @@ void Door::close(Object *triggerrer) {
         _model->playAnimation("closing1");
     }
     _open = false;
-    _selectable = true;
 }
 
 bool Door::isOpen() const {

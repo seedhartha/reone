@@ -132,9 +132,16 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
         _area->objectSelector().hilight(object->id());
 
         switch (object->type()) {
-            case ObjectType::Creature:
-                cursor = getIsEnemy(static_cast<Creature &>(*object), *_game->party().leader()) ? CursorType::Attack : CursorType::Talk;
+            case ObjectType::Creature: {
+                if (object->isDead()) {
+                    cursor = CursorType::Pickup;
+                } else {
+                    auto creature = static_pointer_cast<Creature>(object);
+                    bool isEnemy = getIsEnemy(*creature, *_game->party().leader());
+                    cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
+                }
                 break;
+            }
             case ObjectType::Door:
                 cursor = CursorType::Door;
                 break;
@@ -157,16 +164,7 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (event.button != SDL_BUTTON_LEFT) return false;
 
     shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
-    if (!object || !object->isSelectable()) {
-        return false;
-    }
-
-    shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
-    if (creature) {
-        debug(boost::format("Creature '%s' with faction '%d' clicked on") % creature->tag() % static_cast<int>(creature->faction()));
-    } else {
-        debug(boost::format("Object '%s' clicked on") % object->tag());
-    }
+    if (!object || !object->isSelectable()) return false;
 
     uint32_t selectedObjectId = _area->objectSelector().selectedObjectId();
     if (object->id() != selectedObjectId) {
@@ -184,6 +182,8 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
         onCreatureClick(creature);
         return;
     }
+    debug(boost::format("Module: click: object '%s'") % object->tag());
+
     shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
     if (door) {
         onDoorClick(door);
@@ -197,12 +197,26 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 }
 
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
-    if (creature->conversation().empty()) return;
+    debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
     shared_ptr<Creature> partyLeader(_game->party().leader());
     ActionQueue &actions = partyLeader->actionQueue();
-    actions.clear();
-    actions.add(make_unique<StartConversationAction>(creature, creature->conversation()));
+
+    if (creature->isDead()) {
+        if (!creature->items().empty()) {
+            actions.clear();
+            actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
+        }
+    } else {
+        bool isEnemy = getIsEnemy(*partyLeader, *creature);
+        if (isEnemy) {
+            actions.clear();
+            actions.add(make_unique<AttackAction>(creature));
+        } else if (!creature->conversation().empty()) {
+            actions.clear();
+            actions.add(make_unique<StartConversationAction>(creature, creature->conversation()));
+        }
+    }
 }
 
 void Module::onDoorClick(const shared_ptr<Door> &door) {
@@ -242,13 +256,13 @@ void Module::update(float dt) {
 vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
     vector<ContextualAction> actions;
 
-    shared_ptr<Door> door = dynamic_pointer_cast<Door>(object);
+    shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
     if (door && door->isLocked()) {
         actions.push_back(ContextualAction::Unlock);
     }
 
-    shared_ptr<Creature> hostile = dynamic_pointer_cast<Creature>(object);
-    if (hostile && getIsEnemy(*(_game->party().leader()), *hostile)) {
+    shared_ptr<Creature> hostile(dynamic_pointer_cast<Creature>(object));
+    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().leader()), *hostile)) {
         actions.push_back(ContextualAction::Attack);
     }
     return move(actions);

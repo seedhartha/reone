@@ -157,8 +157,9 @@ void SelectionOverlay::update() {
 
         if (_hilightedScreenCoords.z < 1.0f) {
             _hilightedObject = object;
+
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(object));
-            _hilightedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
+            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
         }
     }
 
@@ -170,8 +171,9 @@ void SelectionOverlay::update() {
         if (_selectedScreenCoords.z < 1.0f) {
             _selectedObject = object;
             _actions = module->getContextualActions(object);
-            shared_ptr<Creature> target = dynamic_pointer_cast<Creature>(object);
-            _selectedHostile = target && getIsEnemy(*(_game->party().leader()), *target);
+
+            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(object));
+            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
         }
     }
 }

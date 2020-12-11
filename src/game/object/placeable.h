@@ -35,6 +35,8 @@ class Placeable : public SpatialObject {
 public:
     Placeable(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
+    bool isSelectable() const override;
+
     void load(const resource::GffStruct &gffs);
 
     bool hasInventory() const;
