@@ -69,6 +69,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         ObjectType type = object->type();
         if (props.objectTypes.count(type) == 0) continue;
 
+        if (type == ObjectType::Creature && static_cast<Creature &>(*object).isDead()) continue;
         if (type == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
         if (props.flags & kRaycastSelectable && !object->isSelectable()) continue;
 
