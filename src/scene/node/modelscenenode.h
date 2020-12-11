@@ -60,7 +60,6 @@ public:
     float alpha() const;
     const AABB &aabb() const;
 
-    void setModel(const std::shared_ptr<render::Model> &model);
     void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);

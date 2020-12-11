@@ -159,22 +159,25 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
     shared_ptr<Creature> player(_game->party().player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
-        for (auto &ownerItem : player->items()) {
-            if (ownerItem->tag() == item) {
-                itemObj = ownerItem;
+        for (auto &playerItem : player->items()) {
+            if (playerItem->tag() == item) {
+                itemObj = playerItem;
                 break;
             }
         }
     }
     InventorySlot slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Item> equipped = player->getEquippedItem(slot);
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
         if (equipped) {
-            player->unequip(equipped);
+            player->addItem(equipped);
+            partyLeader->unequip(equipped);
         }
         if (itemObj) {
-            player->equip(slot, itemObj);
+            partyLeader->equip(slot, itemObj);
+            player->removeItem(itemObj);
         }
         updateEquipment();
         selectSlot(Slot::None);
@@ -320,7 +323,7 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
 
 void Equipment::updateEquipment() {
     shared_ptr<Creature> partyLeader(_game->party().leader());
-    const map<InventorySlot, shared_ptr<Item>> &equipment = partyLeader->equipment();
+    auto &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
         string tag("LBL_INV_" + name.second);
@@ -351,9 +354,9 @@ void Equipment::updateItems() {
 
         lbItems.add(move(lbItem));
     }
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> player(_game->party().player());
 
-    for (auto &item : partyLeader->items()) {
+    for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
             if (!item->isEquippable()) continue;
         } else {

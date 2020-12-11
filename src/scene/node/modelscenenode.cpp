@@ -263,23 +263,6 @@ const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
     return _lightsAffectedBy;
 }
 
-void ModelSceneNode::setModel(const shared_ptr<Model> &model) {
-    _model = model;
-
-    for (auto &attached : _attachedModels) {
-        _modelNodeByNumber[attached.first]->removeChild(*attached.second);
-    }
-    for (auto &node : _modelNodeByNumber) {
-        removeChild(*node.second);
-    }
-
-    _modelNodeByIndex.clear();
-    _modelNodeByNumber.clear();
-    _attachedModels.clear();
-
-    initModelNodes();
-}
-
 void ModelSceneNode::setTextureOverride(const shared_ptr<Texture> &texture) {
     _textureOverride = texture;
 }

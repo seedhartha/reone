@@ -42,6 +42,10 @@ void SpatialObject::addItem(const shared_ptr<Item> &item) {
     _items.push_back(item);
 }
 
+void SpatialObject::removeItem(const shared_ptr<Item> &item) {
+    _items.erase(remove(_items.begin(), _items.end(), item), _items.end());
+}
+
 float SpatialObject::distanceTo(const glm::vec2 &point) const {
     return glm::distance(glm::vec2(_position), point);
 }

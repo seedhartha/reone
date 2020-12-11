@@ -47,54 +47,43 @@ CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creat
 }
 
 shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
-    shared_ptr<ModelSceneNode> model(_creature->model());
+    string modelName(getBodyModelName());
+    auto model = make_unique<ModelSceneNode>(&_creature->sceneGraph(), Models::instance().get(modelName));
+    if (!model) return nullptr;
 
-    string bodyModelName(getBodyModelName());
-    string bodyTextureName(getBodyTextureName());
-    string headModelName(getHeadModelName());
-    string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
-    string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
-
-    // Body
-
-    if (!model) {
-        model = make_unique<ModelSceneNode>(&_creature->sceneGraph(), Models::instance().get(bodyModelName));
-        model->setLightingEnabled(true);
-    } else {
-        model->setModel(Models::instance().get(bodyModelName));
-    }
+    model->setLightingEnabled(true);
 
     // Body texture
 
-    shared_ptr<Texture> texture;
+    string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        texture = Textures::instance().get(bodyTextureName, TextureType::Diffuse);
+        shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureType::Diffuse));
+        model->setTextureOverride(texture);
     }
-    model->setTextureOverride(texture);
 
     // Head
 
-    shared_ptr<Model> headModel;
+    string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
-        headModel = Models::instance().get(headModelName);
+        shared_ptr<Model> headModel(Models::instance().get(headModelName));
+        model->attach(g_headHookNode, headModel);
     }
-    model->attach(g_headHookNode, headModel);
 
     // Right weapon
 
-    shared_ptr<Model> leftWeaponModel;
+    string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
     if (!leftWeaponModelName.empty()) {
-        leftWeaponModel = Models::instance().get(leftWeaponModelName);
+        shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
+        model->attach("lhand", leftWeaponModel);
     }
-    model->attach("lhand", leftWeaponModel);
 
     // Right weapon
 
-    shared_ptr<Model> rightWeaponModel;
+    string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
     if (!rightWeaponModelName.empty()) {
-        rightWeaponModel = Models::instance().get(rightWeaponModelName);
+        shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
+        model->attach("rhand", rightWeaponModel);
     }
-    model->attach("rhand", rightWeaponModel);
 
     return move(model);
 }

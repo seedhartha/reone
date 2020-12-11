@@ -47,6 +47,7 @@ public:
     void face(const SpatialObject &other);
 
     void addItem(const std::shared_ptr<Item> &item);
+    void removeItem(const std::shared_ptr<Item> &item);
     void moveItemsTo(SpatialObject &other);
 
     void applyEffect(const std::shared_ptr<Effect> &eff);
