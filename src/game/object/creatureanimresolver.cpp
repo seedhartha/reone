@@ -29,8 +29,10 @@ namespace reone {
 
 namespace game {
 
-static string g_animDie("die");
-static string g_animDead("dead");
+static string g_animDieCreature("cdie");
+static string g_animDieCharacter("die");
+static string g_animDeadCreature("cdead");
+static string g_animDeadCharacter("dead");
 static string g_animPauseCreature("cpause1");
 static string g_animPauseCharacter("pause1");
 static string g_animWalkCreature("cwalk");
@@ -49,11 +51,11 @@ CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) :
 }
 
 string CreatureAnimationResolver::getDieAnimation() const {
-    return g_animDie;
+    return _creature->modelType() == Creature::ModelType::Creature ? g_animDieCreature : g_animDieCharacter;
 }
 
 string CreatureAnimationResolver::getDeadAnimation() const {
-    return g_animDead;
+    return _creature->modelType() == Creature::ModelType::Creature ? g_animDeadCreature : g_animDeadCharacter;
 }
 
 string CreatureAnimationResolver::getPauseAnimation() const {
