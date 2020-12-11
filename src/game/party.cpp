@@ -71,6 +71,15 @@ bool Party::addAvailableMember(int npc, const string &blueprint) {
     return true;
 }
 
+bool Party::removeAvailableMember(int npc) {
+    auto maybeMember = _availableMembers.find(npc);
+    if (maybeMember != _availableMembers.end()) {
+        _availableMembers.erase(maybeMember);
+        return true;
+    }
+    return false;
+}
+
 bool Party::addMember(const shared_ptr<Creature> &member) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");

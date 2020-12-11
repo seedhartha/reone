@@ -315,6 +315,46 @@ Variable Routines::getDistanceBetween(const vector<Variable> &args, ExecutionCon
     return move(result);
 }
 
+Variable Routines::getFirstItemInInventory(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = kObjectInvalid;
+
+    auto object = getObjectById(args.size() > 0 ? args[0].objectId : kObjectSelf, ctx);
+    if (object) {
+        auto spatial = dynamic_pointer_cast<SpatialObject>(object);
+        if (spatial) {
+            auto item = spatial->getFirstItem();
+            if (item) {
+                result.objectId = item->id();
+            }
+        } else {
+            warn(boost::format("Routines: getFirstItemInInventory: object '%s' is not spatial") % object->tag());
+        }
+    }
+
+    return move(result);
+}
+
+Variable Routines::getNextItemInInventory(const vector<Variable> &args, ExecutionContext &ctx) {
+    Variable result(VariableType::Object);
+    result.objectId = kObjectInvalid;
+
+    auto object = getObjectById(args.size() > 0 ? args[0].objectId : kObjectSelf, ctx);
+    if (object) {
+        auto spatial = dynamic_pointer_cast<SpatialObject>(object);
+        if (spatial) {
+            auto item = spatial->getNextItem();
+            if (item) {
+                result.objectId = item->id();
+            }
+        } else {
+            warn(boost::format("Routines: getNextItemInInventory: object '%s' is not spatial") % object->tag());
+        }
+    }
+
+    return move(result);
+}
+
 } // namespace game
 
 } // namespace reone

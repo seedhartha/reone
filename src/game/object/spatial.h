@@ -47,11 +47,6 @@ public:
 
     void face(const SpatialObject &other);
 
-    void addItem(const std::string &resRef);
-    void addItem(const std::shared_ptr<Item> &item);
-    void removeItem(const std::shared_ptr<Item> &item);
-    void moveItemsTo(SpatialObject &other);
-
     void applyEffect(const std::shared_ptr<Effect> &eff);
 
     float distanceTo(const glm::vec2 &point) const;
@@ -73,13 +68,26 @@ public:
     bool visible() const;
     std::shared_ptr<scene::ModelSceneNode> model() const;
     std::shared_ptr<render::Walkmesh> walkmesh() const;
-    const std::vector<std::shared_ptr<Item>> &items() const;
     float drawDistance() const;
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
     void setHeading(float heading);
     void setVisible(bool visible);
+
+    // Inventory
+
+    void addItem(const std::string &resRef);
+    void addItem(const std::shared_ptr<Item> &item);
+    void removeItem(const std::shared_ptr<Item> &item);
+    void moveItemsTo(SpatialObject &other);
+
+    std::shared_ptr<Item> getFirstItem();
+    std::shared_ptr<Item> getNextItem();
+
+    const std::vector<std::shared_ptr<Item>> &items() const;
+
+    // END Inventory
 
 protected:
     ObjectFactory *_objectFactory { nullptr };
@@ -99,6 +107,9 @@ protected:
     SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     virtual void updateTransform();
+
+private:
+    int _itemIndex { 0 };
 };
 
 } // namespace game

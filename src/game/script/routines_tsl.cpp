@@ -378,8 +378,8 @@ void Routines::addTslRoutines() {
     add("GetBlockingDoor", Object, { });
     add("GetIsDoorActionPossible", Int, { Object, Int });
     add("DoDoorAction", Void, { Object, Int });
-    add("GetFirstItemInInventory", Object, { Object });
-    add("GetNextItemInInventory", Object, { Object });
+    add("GetFirstItemInInventory", Object, { Object }, bind(&Routines::getFirstItemInInventory, this, _1, _2));
+    add("GetNextItemInInventory", Object, { Object }, bind(&Routines::getNextItemInInventory, this, _1, _2));
     add("GetClassByPosition", Int, { Int, Object }, bind(&Routines::getClassByPosition, this, _1, _2));
     add("GetLevelByPosition", Int, { Int, Object });
     add("GetLevelByClass", Int, { Int, Object }, bind(&Routines::getLevelByClass, this, _1, _2));
@@ -615,8 +615,8 @@ void Routines::addTslRoutines() {
     add("GetStrRefSoundDuration", Float, { Int });
     add("AddToParty", Void, { Object, Object });
     add("RemoveFromParty", Void, { Object });
-    add("AddPartyMember", Int, { Int, Object });
-    add("RemovePartyMember", Int, { Int });
+    add("AddPartyMember", Int, { Int, Object }, bind(&Routines::addPartyMember, this, _1, _2));
+    add("RemovePartyMember", Int, { Int }, bind(&Routines::removePartyMember, this, _1, _2));
     add("IsObjectPartyMember", Int, { Object }, bind(&Routines::isObjectPartyMember, this, _1, _2));
     add("GetPartyMemberByIndex", Object, { Int }, bind(&Routines::getPartyMemberByIndex, this, _1, _2));
     add("GetGlobalBoolean", Int, { String }, bind(&Routines::getGlobalBoolean, this, _1, _2));
