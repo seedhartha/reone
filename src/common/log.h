@@ -36,5 +36,6 @@ void debug(const boost::format &s, uint32_t level = 1);
 uint32_t getDebugLogLevel();
 
 void setDebugLogLevel(uint32_t level);
+void setLogToFile(bool logToFile);
 
 } // namespace reone

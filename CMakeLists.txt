@@ -644,7 +644,7 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libcommon)
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libcommon ${Boost_FILESYSTEM_LIBRARY})
 
         if(WIN32)
             target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)

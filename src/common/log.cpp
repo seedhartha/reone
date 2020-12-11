@@ -18,10 +18,17 @@
 #include "log.h"
 
 #include <iostream>
+#include <memory>
+
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 using namespace std;
 
 namespace reone {
+
+const char kLogFilename[] = "reone.log";
 
 enum class LogLevel {
     Error,
@@ -31,6 +38,9 @@ enum class LogLevel {
 };
 
 static uint32_t g_debugLevel = 0;
+static bool g_logToFile = false;
+
+static std::unique_ptr<fs::ofstream> g_logFile;
 
 inline static const char *describeLogLevel(LogLevel level) {
     switch (level) {
@@ -52,33 +62,45 @@ static void log(ostream &out, LogLevel level, const string &s) {
     out << msg << endl;
 }
 
+static void log(LogLevel level, const string &s) {
+    if (g_logToFile && !g_logFile) {
+        fs::path path(fs::current_path());
+        path.append(kLogFilename);
+
+        g_logFile = make_unique<fs::ofstream>(path);
+    }
+
+    auto &out = g_logToFile ? *g_logFile : cout;
+    log(out, level, s);
+}
+
 void error(const string &s) {
-    log(cerr, LogLevel::Error, s);
+    log(LogLevel::Error, s);
 }
 
 void error(const boost::format &s) {
-    log(cerr, LogLevel::Error, str(s));
+    log(LogLevel::Error, str(s));
 }
 
 void warn(const string &s) {
-    log(cout, LogLevel::Warn, s);
+    log(LogLevel::Warn, s);
 }
 
 void warn(const boost::format &s) {
-    log(cout, LogLevel::Warn, str(s));
+    log(LogLevel::Warn, str(s));
 }
 
 void info(const string &s) {
-    log(cout, LogLevel::Info, s);
+    log(LogLevel::Info, s);
 }
 
 void info(const boost::format &s) {
-    log(cout, LogLevel::Info, str(s));
+    log(LogLevel::Info, str(s));
 }
 
 void debug(const string &s, uint32_t level) {
     if (level <= getDebugLogLevel()) {
-        log(cout, LogLevel::Debug, s);
+        log(LogLevel::Debug, s);
     }
 }
 
@@ -92,6 +114,10 @@ uint32_t getDebugLogLevel() {
 
 void setDebugLogLevel(uint32_t level) {
     g_debugLevel = level;
+}
+
+void setLogToFile(bool logToFile) {
+    g_logToFile = logToFile;
 }
 
 } // namespace reone

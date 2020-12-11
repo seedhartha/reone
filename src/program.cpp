@@ -68,7 +68,8 @@ void Program::initOptions() {
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
-        ("debug", po::value<int>()->default_value(0), "debug log level (0-3)");
+        ("debug", po::value<int>()->default_value(0), "debug log level (0-3)")
+        ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
@@ -102,6 +103,7 @@ void Program::loadOptions() {
     _gameOpts.network.port = vars["port"].as<int>();
 
     setDebugLogLevel(vars["debug"].as<int>());
+    setLogToFile(vars["logfile"].as<bool>());
 
     if (vars.count("serve") > 0) {
         _multiplayerMode = MultiplayerMode::Server;
