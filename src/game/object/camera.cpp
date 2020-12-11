@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-CameraObject::CameraObject(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Camera, sceneGraph) {
+CameraObject::CameraObject(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Camera, objectFactory, sceneGraph) {
 }
 
 void CameraObject::load(const GffStruct &gffs) {

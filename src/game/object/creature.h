@@ -142,7 +142,6 @@ public:
     // END Pathfinding
 
 private:
-    ObjectFactory *_objectFactory { nullptr };
     CreatureConfiguration _config;
     std::string _blueprintResRef;
     int _appearance { 0 };

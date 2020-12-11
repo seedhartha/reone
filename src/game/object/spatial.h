@@ -38,6 +38,7 @@ namespace game {
 static const float kDefaultDrawDistance = 1024.0f;
 
 class Item;
+class ObjectFactory;
 class Room;
 
 class SpatialObject : public Object {
@@ -46,6 +47,7 @@ public:
 
     void face(const SpatialObject &other);
 
+    void addItem(const std::string &resRef);
     void addItem(const std::shared_ptr<Item> &item);
     void removeItem(const std::shared_ptr<Item> &item);
     void moveItemsTo(SpatialObject &other);
@@ -62,6 +64,7 @@ public:
 
     virtual glm::vec3 getSelectablePosition() const;
 
+    ObjectFactory &objectFactory();
     scene::SceneGraph &sceneGraph();
     Room *room() const;
     const glm::vec3 &position() const;
@@ -79,6 +82,7 @@ public:
     void setVisible(bool visible);
 
 protected:
+    ObjectFactory *_objectFactory { nullptr };
     scene::SceneGraph *_sceneGraph { nullptr };
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
@@ -92,7 +96,7 @@ protected:
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<std::shared_ptr<Effect>> _effects;
 
-    SpatialObject(uint32_t id, ObjectType type, scene::SceneGraph *sceneGraph);
+    SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     virtual void updateTransform();
 };

@@ -36,7 +36,8 @@ namespace reone {
 
 namespace game {
 
-Trigger::Trigger(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Trigger, sceneGraph) {
+Trigger::Trigger(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Trigger, objectFactory, sceneGraph) {
 }
 
 void Trigger::load(const GffStruct &gffs) {

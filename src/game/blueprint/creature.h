@@ -51,6 +51,7 @@ private:
     void loadAbilities(CreatureAttributes &attributes);
     void loadSkills(CreatureAttributes &attributes);
     void loadScripts(Creature &creature);
+    void loadItems(Creature &creature);
 };
 
 } // namespace game

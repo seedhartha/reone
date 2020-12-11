@@ -57,15 +57,15 @@ unique_ptr<Placeable> ObjectFactory::newPlaceable() {
 }
 
 unique_ptr<Door> ObjectFactory::newDoor() {
-    return make_unique<Door>(_counter++, _sceneGraph);
+    return make_unique<Door>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return make_unique<Waypoint>(_counter++, _sceneGraph);
+    return make_unique<Waypoint>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<Trigger> ObjectFactory::newTrigger() {
-    return make_unique<Trigger>(_counter++, _sceneGraph);
+    return make_unique<Trigger>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<Item> ObjectFactory::newItem() {
@@ -73,11 +73,11 @@ unique_ptr<Item> ObjectFactory::newItem() {
 }
 
 unique_ptr<Sound> ObjectFactory::newSound() {
-    return make_unique<Sound>(_counter++, _sceneGraph);
+    return make_unique<Sound>(_counter++, this, _sceneGraph);
 }
 
 unique_ptr<CameraObject> ObjectFactory::newCamera() {
-    return make_unique<CameraObject>(_counter++, _sceneGraph);
+    return make_unique<CameraObject>(_counter++, this, _sceneGraph);
 }
 
 } // namespace game

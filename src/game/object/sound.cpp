@@ -36,7 +36,8 @@ namespace reone {
 
 namespace game {
 
-Sound::Sound(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Sound, sceneGraph) {
+Sound::Sound(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Sound, objectFactory, sceneGraph) {
 }
 
 void Sound::load(const GffStruct &gffs) {
