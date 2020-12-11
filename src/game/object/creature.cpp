@@ -123,8 +123,17 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 }
 
 void Creature::updateModel() {
+    if (_model) {
+        _sceneGraph->removeRoot(_model);
+    }
     _model = _modelBuilder.build();
-    _headModel = _model->getAttachedModel(g_headHookNode);
+
+    if (_model) {
+        _headModel = _model->getAttachedModel(g_headHookNode);
+        _model->setLocalTransform(_transform);
+        _sceneGraph->addRoot(_model);
+        _animDirty = true;
+    }
 }
 
 void Creature::load(const CreatureConfiguration &config) {
@@ -261,8 +270,6 @@ void Creature::equip(const string &resRef) {
     } else if (item->isEquippable(kInventorySlotRightWeapon)) {
         equip(kInventorySlotRightWeapon, item);
     }
-
-    _items.push_back(item);
 }
 
 void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
