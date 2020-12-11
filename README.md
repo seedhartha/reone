@@ -8,7 +8,7 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 * Play KotOR and TSL from beginning to end
 * Create mods that drastically change the gameplay or improve the visuals
 
-The project is in the early stages of development: resource management, rendering, audio, GUI and scripting subsystems are already implemented, and game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
+The project is in the early stages of development at this point: resource management, scene management, rendering, audio, GUI and scripting subsystems are already implemented, while game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
 ## Contributing
 
@@ -18,7 +18,7 @@ reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> 
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
-To run a game using reone, you must legally own it - we do not endorse piracy. Nowadays both games can be downloaded from Steam or GOG.com. Keep in mind that reone is tested against vanilla versions of the games - mod support is not guaranteed.
+To run a game using reone, you must legally own it - we do not endorse piracy. Both games can be downloaded from Steam or GOG.com. Keep in mind that reone is tested against vanilla versions of the games - mod support is not guaranteed.
 
 Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
 
