@@ -393,6 +393,8 @@ CreatureAttributes &Creature::attributes() {
 }
 
 glm::vec3 Creature::getSelectablePosition() const {
+    if (_dead) return _model->getCenterOfAABB();
+
     glm::vec3 position;
 
     if (_model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
