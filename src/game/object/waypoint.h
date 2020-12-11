@@ -29,7 +29,7 @@ class WaypointBlueprint;
 
 class Waypoint : public SpatialObject {
 public:
-    Waypoint(uint32_t id, scene::SceneGraph *sceneGraph);
+    Waypoint(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     void load(const resource::GffStruct &gffs);
 

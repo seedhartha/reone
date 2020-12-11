@@ -40,8 +40,7 @@ namespace reone {
 namespace game {
 
 Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Placeable, sceneGraph),
-    _objectFactory(objectFactory) {
+    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph) {
 
     _drawDistance = 4096.0f;
 }
@@ -83,10 +82,6 @@ bool Placeable::hasInventory() const {
 
 bool Placeable::isUsable() const {
     return _usable;
-}
-
-ObjectFactory &Placeable::objectFactory() {
-    return *_objectFactory;
 }
 
 const string &Placeable::onInvDisturbed() const {

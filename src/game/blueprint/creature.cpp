@@ -67,6 +67,7 @@ void CreatureBlueprint::load(Creature &creature) {
     loadTitle(creature);
     loadAttributes(creature);
     loadScripts(creature);
+    loadItems(creature);
 }
 
 int CreatureBlueprint::getAppearanceFromUtc() const {
@@ -124,6 +125,13 @@ void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
 void CreatureBlueprint::loadScripts(Creature &creature) {
     creature.setOnSpawn(boost::to_lower_copy(_utc->getString("ScriptSpawn")));
     creature.setOnUserDefined(boost::to_lower_copy(_utc->getString("ScriptUserDefine")));
+}
+
+void CreatureBlueprint::loadItems(Creature &creature) {
+    for (auto &itemGffs : _utc->getList("ItemList")) {
+        string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
+        creature.addItem(resRef);
+    }
 }
 
 const string &CreatureBlueprint::resRef() const {

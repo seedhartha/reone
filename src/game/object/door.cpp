@@ -39,7 +39,8 @@ namespace reone {
 
 namespace game {
 
-Door::Door(uint32_t id, SceneGraph *sceneGraph) : SpatialObject(id, ObjectType::Door, sceneGraph) {
+Door::Door(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    SpatialObject(id, ObjectType::Door, objectFactory, sceneGraph) {
     _drawDistance = FLT_MAX;
 }
 

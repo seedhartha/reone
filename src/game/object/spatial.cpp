@@ -21,9 +21,11 @@
 
 #include "../../common/log.h"
 
+#include "../blueprint/blueprints.h"
 #include "../room.h"
 
 #include "item.h"
+#include "objectfactory.h"
 
 using namespace std;
 
@@ -34,8 +36,20 @@ namespace reone {
 
 namespace game {
 
-SpatialObject::SpatialObject(uint32_t id, ObjectType type, SceneGraph *sceneGraph) :
-    Object(id, type), _sceneGraph(sceneGraph) {
+SpatialObject::SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+    Object(id, type),
+    _objectFactory(objectFactory),
+    _sceneGraph(sceneGraph) {
+}
+
+void SpatialObject::addItem(const string &resRef) {
+    auto blueprint = Blueprints::instance().getItem(resRef);
+    if (!blueprint) return;
+
+    shared_ptr<Item> item(_objectFactory->newItem());
+    item->load(blueprint);
+
+    addItem(item);
 }
 
 void SpatialObject::addItem(const shared_ptr<Item> &item) {
@@ -100,6 +114,10 @@ void SpatialObject::update(float dt) {
 
 bool SpatialObject::isSelectable() const {
     return false;
+}
+
+ObjectFactory &SpatialObject::objectFactory() {
+    return *_objectFactory;
 }
 
 SceneGraph &SpatialObject::sceneGraph() {

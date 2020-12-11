@@ -42,11 +42,9 @@ public:
     bool hasInventory() const;
     bool isUsable() const;
 
-    ObjectFactory &objectFactory();
     const std::string &onInvDisturbed() const;
 
 private:
-    ObjectFactory *_objectFactory { nullptr };
     int  _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };

@@ -56,8 +56,7 @@ static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
 Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Creature, sceneGraph), 
-    _objectFactory(objectFactory),
+    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph),
     _modelBuilder(this),
     _animResolver(this) {
 
