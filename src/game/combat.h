@@ -58,13 +58,15 @@ private:
         Finished
     };
 
-    struct Round;
+    typedef std::vector<std::shared_ptr<Creature>> EnemiesList;
 
     struct Combatant {
         std::shared_ptr<Creature> creature;
-        std::vector<std::shared_ptr<Creature>> enemies;
+        EnemiesList enemies;
         std::shared_ptr<Creature> target;
     };
+
+    typedef std::map<uint32_t, std::shared_ptr<Combatant>> CombatantMap;
 
     struct Round {
         std::shared_ptr<Combatant> attacker;
@@ -80,7 +82,7 @@ private:
     DamageResolver _damageResolver;
 
     Timer _heartbeatTimer { 0.0f };
-    std::map<uint32_t, std::shared_ptr<Combatant>> _combatantById;
+    CombatantMap _combatantById;
     std::map<uint32_t, std::shared_ptr<Round>> _roundByAttackerId;
 
     void updateCombatants();
@@ -90,6 +92,9 @@ private:
     void updateRound(Round &round, float dt);
     void updateActivation();
 
+    void removeStaleCombatants();
+    void addCombatant(const std::shared_ptr<Creature> &creature, EnemiesList enemies);
+    void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<Combatant> &defender);
     void finishRound(Round &round);
     void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
 

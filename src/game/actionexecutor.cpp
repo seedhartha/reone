@@ -157,6 +157,10 @@ void ActionExecutor::executeStartConversation(Object &actor, StartConversationAc
 
 void ActionExecutor::executeAttack(Creature &actor, AttackAction &action, float dt) {
     shared_ptr<Creature> target(action.target());
+    if (target->isDead()) {
+        action.complete();
+        return;
+    }
     glm::vec3 dest(target->position());
 
     navigateCreature(actor, dest, true, action.range(), dt);

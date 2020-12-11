@@ -204,6 +204,8 @@ void Creature::updateHealth() {
     playAnimation(Animation::Die);
     _dead = true;
     _selectable = false;
+
+    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 }
 
 void Creature::clearAllActions() {
