@@ -87,11 +87,11 @@ Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionConte
 
 Variable Routines::getPartyMemberByIndex(const VariablesList &args, ExecutionContext &ctx) {
     int index = getInt(args, 0);
-    return _game->party().getMember(index);
+    return static_pointer_cast<ScriptObject>(_game->party().getMember(index));
 }
 
 Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->party().player();
+    return static_pointer_cast<ScriptObject>(_game->party().player());
 }
 
 Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
@@ -125,7 +125,7 @@ Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->party().player();
+    return static_pointer_cast<ScriptObject>(_game->party().player());
 }
 
 } // namespace game
