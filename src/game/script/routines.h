@@ -149,13 +149,17 @@ private:
     script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getArea(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getDistanceBetween2D(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceToObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceToObject2D(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getEnteringObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getExitingObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFirstItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsDead(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsInCombat(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsOpen(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
@@ -172,6 +176,8 @@ private:
 
     // Engine types
 
+    script::Variable getDistanceBetweenLocations(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getDistanceBetweenLocations2D(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFacingFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPositionFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
@@ -209,6 +215,7 @@ private:
     script::Variable getFirstPC(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPartyMemberByIndex(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getPartyMemberCount(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPCSpeaker(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable isAvailableCreature(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable isNPCPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
@@ -242,14 +249,17 @@ private:
 
     // Role-playing
 
+    script::Variable getAbilityScore(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getClassByPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getCurrentHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getGender(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getHasSkill(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getHitDice(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLevelByClass(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLevelByPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getSkillRank(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
 

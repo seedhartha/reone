@@ -128,6 +128,10 @@ Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) 
     return static_pointer_cast<ScriptObject>(_game->party().player());
 }
 
+Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->party().size();
+}
+
 } // namespace game
 
 } // namespace reone

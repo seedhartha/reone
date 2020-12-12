@@ -118,6 +118,10 @@ bool SpatialObject::isSelectable() const {
     return false;
 }
 
+bool SpatialObject::isOpen() const {
+    return _open;
+}
+
 ObjectFactory &SpatialObject::objectFactory() {
     return *_objectFactory;
 }

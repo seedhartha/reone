@@ -56,6 +56,7 @@ public:
     bool contains(const glm::vec3 &point) const;
 
     virtual bool isSelectable() const;
+    bool isOpen() const;
 
     virtual glm::vec3 getSelectablePosition() const;
 
@@ -103,6 +104,7 @@ protected:
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<std::shared_ptr<Effect>> _effects;
+    bool _open { false };
 
     SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 

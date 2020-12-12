@@ -22,6 +22,7 @@
 #include "../../common/log.h"
 
 #include "../blueprint/blueprints.h"
+#include "../enginetype/location.h"
 #include "../game.h"
 
 using namespace std;
@@ -266,6 +267,48 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
     }
 
     return move(result);
+}
+
+
+Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectA = getSpatialObject(args, 0);
+    if (!objectA) {
+        warn("Routines: getDistanceBetween2D: objectA is invalid");
+        return 0.0f;
+    }
+    auto objectB = getSpatialObject(args, 1);
+    if (!objectB) {
+        warn("Routines: getDistanceBetween2D: objectB is invalid");
+        return 0.0f;
+    }
+    return objectA->distanceTo(glm::vec2(objectB->position()));
+}
+
+Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: getIsDead: creature is invalid");
+        return false;
+    }
+    return creature->isDead();
+}
+
+Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 0, ctx);
+    if (!creature) {
+        warn("Routines: getIsInCombat: creature is invalid");
+        return false;
+    }
+    return creature->isInCombat();
+}
+
+Variable Routines::getIsOpen(const VariablesList & args, ExecutionContext & ctx) {
+    auto object = getSpatialObject(args, 0);
+    if (!object) {
+        warn("Routines: getIsOpen: object is invalid");
+        return false;
+    }
+    return object->isOpen();
 }
 
 } // namespace game

@@ -96,10 +96,6 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
     _open = false;
 }
 
-bool Door::isOpen() const {
-    return _open;
-}
-
 bool Door::isLockable() const {
     return _lockable;
 }
