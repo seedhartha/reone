@@ -291,6 +291,36 @@ Variable Routines::playMovie(const VariablesList &args, ExecutionContext &ctx) {
     return Variable();
 }
 
+Variable Routines::printString(const VariablesList &args, ExecutionContext &ctx) {
+    string str(getString(args, 0));
+    info(str);
+    return Variable();
+}
+
+Variable Routines::printFloat(const VariablesList &args, ExecutionContext &ctx) {
+    float value(getFloat(args, 0));
+    info(to_string(value));
+    return Variable();
+}
+
+Variable Routines::printInteger(const VariablesList &args, ExecutionContext &ctx) {
+    int value(getInt(args, 0));
+    info(to_string(value));
+    return Variable();
+}
+
+Variable Routines::printObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getObject(args, 0);
+    info(to_string(object->id()));
+    return Variable();
+}
+
+Variable Routines::printVector(const VariablesList &args, ExecutionContext &ctx) {
+    glm::vec3 value(getVector(args, 0));
+    info(boost::format("%f %f %f") % value.x % value.y % value.z);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

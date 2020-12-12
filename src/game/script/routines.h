@@ -135,6 +135,12 @@ private:
     script::Variable shipBuild(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable startNewModule(const VariablesList &args, script::ExecutionContext &ctx);
 
+    script::Variable printString(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable printFloat(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable printInteger(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable printObject(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable printVector(const VariablesList &args, script::ExecutionContext &ctx);
+
     // END Common
 
     // Objects

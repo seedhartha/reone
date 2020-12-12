@@ -40,11 +40,11 @@ namespace game {
 
 void Routines::addKotorRoutines() {
     add("Random", Int, { Int }, bind(&Routines::random, this, _1, _2));
-    add("PrintString", Void, { String });
-    add("PrintFloat", Void, { Float, Int, Int });
+    add("PrintString", Void, { String }, bind(&Routines::printString, this, _1, _2));
+    add("PrintFloat", Void, { Float, Int, Int }, bind(&Routines::printFloat, this, _1, _2));
     add("FloatToString", String, { Float, Int, Int }, bind(&Routines::floatToString, this, _1, _2));
-    add("PrintInteger", Void, { Int });
-    add("PrintObject", Void, { Object });
+    add("PrintInteger", Void, { Int }, bind(&Routines::printInteger, this, _1, _2));
+    add("PrintObject", Void, { Object }, bind(&Routines::printObject, this, _1, _2));
     add("AssignCommand", Void, { Object, Action }, bind(&Routines::assignCommand, this, _1, _2));
     add("DelayCommand", Void, { Float, Action }, bind(&Routines::delayCommand, this, _1, _2));
     add("ExecuteScript", Void, { String, Object, Int }, bind(&Routines::executeScript, this, _1, _2));
@@ -180,7 +180,7 @@ void Routines::addKotorRoutines() {
     add("GetItemStackSize", Int, { Object });
     add("GetAbilityScore", Int, { Object, Int });
     add("GetIsDead", Int, { Object });
-    add("PrintVector", Void, { TVector, Int });
+    add("PrintVector", Void, { TVector, Int }, bind(&Routines::printVector, this, _1, _2));
     add("Vector", TVector, { Float, Float, Float }, bind(&Routines::vectorCreate, this, _1, _2));
     add("SetFacingPoint", Void, { TVector });
     add("AngleToVector", TVector, { Float });
