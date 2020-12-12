@@ -43,15 +43,9 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
         return _func(args, ctx);
     }
     warn("Routines: not implemented: " + _name);
-    Variable result(_returnType);
 
-    switch (_returnType) {
-        case VariableType::Object:
-            result.objectId = kObjectInvalid;
-            break;
-        default:
-            break;
-    }
+    Variable result;
+    result.type = _returnType;
 
     return move(result);
 }

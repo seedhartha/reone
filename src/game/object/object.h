@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
 #include <unordered_map>
+
+#include "../../script/object.h"
 
 #include "../actionqueue.h"
 
@@ -29,24 +30,20 @@ namespace reone {
 
 namespace game {
 
-class Object {
+class Object : public script::ScriptObject {
 public:
-    virtual ~Object() = default;
-
     virtual void update(float dt);
     virtual void clearAllActions();
-
-    void runUserDefinedEvent(int eventNumber);
 
     bool isMinOneHP() const;
     bool isDead() const;
 
-    uint32_t id() const;
     ObjectType type() const;
     const std::string &tag() const;
     const std::string &title() const;
     const std::string &conversation() const;
     ActionQueue &actionQueue();
+    const std::string &onUserDefined() const;
 
     // Base maximum hit points, not considering any bonuses.
     int hitPoints() const;
@@ -62,7 +59,6 @@ public:
     void setMaxHitPoints(int maxHitPoints);
 
 protected:
-    uint32_t _id { 0 };
     ObjectType _type { ObjectType::None };
     std::string _tag;
     std::string _title;
@@ -81,10 +77,6 @@ protected:
     // END Scripts
 
     Object(uint32_t id, ObjectType type);
-
-private:
-    Object(const Object &) = delete;
-    Object &operator=(const Object &) = delete;
 };
 
 } // namespace game

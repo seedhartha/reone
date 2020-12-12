@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
+Object::Object(uint32_t id, ObjectType type) : ScriptObject(id), _type(type) {
 }
 
 void Object::update(float dt) {
@@ -40,22 +40,12 @@ void Object::clearAllActions() {
     _actionQueue.clear();
 }
 
-void Object::runUserDefinedEvent(int eventNumber) {
-    if (!_onUserDefined.empty()) {
-        runScript(_onUserDefined, _id, kObjectInvalid, eventNumber);
-    }
-}
-
 bool Object::isMinOneHP() const {
     return _minOneHP;
 }
 
 bool Object::isDead() const {
     return _dead;
-}
-
-uint32_t Object::id() const {
-    return _id;
 }
 
 ObjectType Object::type() const {
@@ -76,6 +66,10 @@ const string &Object::conversation() const {
 
 ActionQueue &Object::actionQueue() {
     return _actionQueue;
+}
+
+const string &Object::onUserDefined() const {
+    return _onUserDefined;
 }
 
 int Object::hitPoints() const {

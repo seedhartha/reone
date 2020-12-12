@@ -66,7 +66,6 @@ Game::Game(const fs::path &path, const Options &opts) :
     initGameVersion();
 
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
-    _engineTypeFactory = make_unique<EngineTypeFactory>();
 }
 
 void Game::initGameVersion() {
@@ -568,7 +567,7 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
     changeScreen(GameScreen::InGameMenu);
 }
 
-void Game::startDialog(SpatialObject &owner, const string &resRef) {
+void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
     stopMovement();
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Dialog);
@@ -580,7 +579,7 @@ void Game::stopMovement() {
     _module->player().stopMovement();
 }
 
-void Game::openContainer(SpatialObject *container) {
+void Game::openContainer(const shared_ptr<SpatialObject> &container) {
     setCursorType(CursorType::Default);
     _container->open(container);
     changeScreen(GameScreen::Container);
@@ -797,38 +796,8 @@ void Game::setLocalNumber(uint32_t objectId, int index, int value) {
     _localNumbers[objectId][index] = value;
 }
 
-int Game::eventUserDefined(int eventNumber) {
-    int id = _eventCounter++;
-
-    UserDefinedEvent event { eventNumber };
-    _events.insert(make_pair(id, move(event)));
-
-    return id;
-}
-
-int Game::getUserDefinedEventNumber(int eventId) {
-    auto maybeEvent = _events.find(eventId);
-    if (maybeEvent == _events.end()) {
-        warn("Game: event not found by id: " + to_string(eventId));
-        return -1;
-    }
-
-    return maybeEvent->second.eventNumber;
-}
-
 void Game::setRunScriptVar(int var) {
     _runScriptVar = var;
-}
-
-shared_ptr<Location> Game::newLocation(glm::vec3 position, float facing) {
-    shared_ptr<Location> location(_engineTypeFactory->newLocation(position, facing));
-    _locations.insert(make_pair(location->id(), location));
-    return location;
-}
-
-shared_ptr<Location> Game::getLocation(int id) const {
-    auto maybeLocation = _locations.find(id);
-    return maybeLocation != _locations.end() ? maybeLocation->second : nullptr;
 }
 
 } // namespace game

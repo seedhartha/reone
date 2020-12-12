@@ -80,7 +80,7 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::DoorWalkmesh);
 }
 
-void Door::open(Object *triggerrer) {
+void Door::open(const shared_ptr<Object> &triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("opened1");
         _model->playAnimation("opening1");
@@ -88,7 +88,7 @@ void Door::open(Object *triggerrer) {
     _open = true;
 }
 
-void Door::close(Object *triggerrer) {
+void Door::close(const shared_ptr<Object> &triggerrer) {
     if (_model) {
         _model->setDefaultAnimation("closed1");
         _model->playAnimation("closing1");

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -25,10 +24,25 @@
 
 namespace reone {
 
+namespace script {
+
+class ScriptObject;
+
+}
+
 namespace game {
 
-int runScript(const std::string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber);
-int runScript(const std::shared_ptr<script::ScriptProgram> &program, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber);
+int runScript(
+    const std::string &resRef,
+    std::shared_ptr<script::ScriptObject> caller,
+    std::shared_ptr<script::ScriptObject> triggerer,
+    int userDefinedEventNumber);
+
+int runScript(
+    const std::shared_ptr<script::ScriptProgram> &program,
+    std::shared_ptr<script::ScriptObject> caller,
+    std::shared_ptr<script::ScriptObject> triggerer,
+    int userDefinedEventNumber);
 
 } // namespace game
 

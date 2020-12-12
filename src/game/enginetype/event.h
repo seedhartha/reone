@@ -15,17 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "typefactory.h"
+#pragma once
 
-using namespace std;
+#include "../../script/enginetype.h"
 
 namespace reone {
 
 namespace game {
 
-shared_ptr<Location> EngineTypeFactory::newLocation(glm::vec3 position, float facing) {
-    return make_shared<Location>(++_idCounter, position, facing);
-}
+class Event : public script::EngineType  {
+public:
+    Event(int number) : _number(number) { }
+
+    int number() const { return _number; }
+
+private:
+    int _number;
+};
 
 } // namespace game
 

@@ -73,9 +73,9 @@ public:
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
     void initCameras(const glm::vec3 &entryPosition, float entryHeading);
-    bool moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt);
+    bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
-    void startDialog(SpatialObject &object, const std::string &resRef);
+    void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraHeading();
     void update3rdPersonCameraTarget();
 
@@ -175,7 +175,7 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void landObject(SpatialObject &object);
-    void checkTriggersIntersection(SpatialObject &triggerrer);
+    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
     void updateVisibility();
     void updateSounds();
     void updateHeartbeat(float dt);

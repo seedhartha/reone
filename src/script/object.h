@@ -15,26 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "objectaction.h"
+#pragma once
 
-#include <stdexcept>
-
-using namespace std;
+#include <cstdint>
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-ObjectAction::ObjectAction(ActionType type, const shared_ptr<Object> &object) : Action(type), _object(object) {
-    if (!object) {
-        throw invalid_argument("object must not be null");
-    }
-}
+class ScriptObject {
+public:
+    virtual ~ScriptObject() = default;
 
-shared_ptr<Object> ObjectAction::object() const {
-    return _object;
-}
+    uint32_t id() const { return _id; }
 
-} // namespace game
+protected:
+    uint32_t _id { 0 };
 
-} // namespace reone
+    ScriptObject(uint32_t id) : _id(id) { }
+
+private:
+    ScriptObject(const ScriptObject &) = delete;
+    ScriptObject &operator=(const ScriptObject &) = delete;
+};
+
+} // namespace script
+
+} // namespae reone

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "glm/vec3.hpp"
@@ -41,25 +42,29 @@ enum class VariableType {
     Action
 };
 
+class EngineType;
+class ScriptObject;
+
 struct Variable {
     VariableType type { VariableType::Void };
     std::string strValue;
     glm::vec3 vecValue;
+    std::shared_ptr<ScriptObject> object;
+    std::shared_ptr<EngineType> engineType;
     ExecutionContext context;
 
     union {
         int intValue { 0 };
         float floatValue;
-        int objectId;
-        int engineTypeId;
     };
 
     Variable() = default;
-    Variable(VariableType type);
     Variable(int value);
     Variable(float value);
-    Variable(const std::string &value);
-    Variable(const glm::vec3 &value);
+    Variable(std::string value);
+    Variable(glm::vec3 value);
+    Variable(const std::shared_ptr<ScriptObject> &object);
+    Variable(VariableType type, const std::shared_ptr<EngineType> &engineType);
     Variable(const ExecutionContext &context);
 
     Variable operator+(const Variable &other) const;

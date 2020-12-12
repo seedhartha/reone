@@ -37,6 +37,7 @@ using namespace std;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::script;
 
 namespace reone {
 
@@ -148,7 +149,7 @@ void PartySelection::onClick(const string &control) {
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
-            runScript(_context.exitScript, script::kObjectInvalid, script::kObjectInvalid, -1);
+            runScript(_context.exitScript, nullptr, nullptr, -1);
         }
     } else if (boost::starts_with(control, "BTN_NPC")) {
         onNpcButtonClick(control);

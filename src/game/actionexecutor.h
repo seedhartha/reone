@@ -38,7 +38,7 @@ class ActionExecutor {
 public:
     ActionExecutor(Game *game);
 
-    void executeActions(Object &object, float dt);
+    void executeActions(const std::shared_ptr<Object> &object, float dt);
 
 private:
     Game *_game { nullptr };
@@ -46,25 +46,25 @@ private:
     ActionExecutor(const ActionExecutor &) = delete;
     ActionExecutor &operator=(const ActionExecutor &) = delete;
 
-    bool navigateCreature(Creature &creature, const glm::vec3 &dest, bool run, float distance, float dt);
-    void advanceCreatureOnPath(Creature &creature, bool run, float dt);
+    bool navigateCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest, bool run, float distance, float dt);
+    void advanceCreatureOnPath(const std::shared_ptr<Creature> &creature, bool run, float dt);
     void selectNextPathPoint(Creature::Path &path);
-    void updateCreaturePath(Creature &creature, const glm::vec3 &dest);
+    void updateCreaturePath(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
 
     // Actions
 
-    void executeMoveToPoint(Creature &actor, MoveToPointAction &action, float dt);
-    void executeMoveToObject(Creature &actor, MoveToObjectAction &action, float dt);
-    void executeFollow(Creature &actor, FollowAction &action, float dt);
-    void executeDoCommand(Object &actor, CommandAction &command, float dt);
-    void executeStartConversation(Object &actor, StartConversationAction &action, float dt);
-    void executeAttack(Creature &actor, AttackAction &action, float dt);
-    void executeOpenDoor(Object &actor, ObjectAction &action, float dt);
-    void executeCloseDoor(Object &actor, ObjectAction &action, float dt);
-    void executeOpenContainer(Creature &actor, ObjectAction &action, float dt);
-    void executeOpenLock(Creature &actor, ObjectAction &action, float dt);
-    void executeJumpToObject(Object &actor, ObjectAction &action, float dt);
-    void executeJumpToLocation(Object &actor, LocationAction &action, float dt);
+    void executeMoveToPoint(const std::shared_ptr<Object> &actor, MoveToPointAction &action, float dt);
+    void executeMoveToObject(const std::shared_ptr<Object> &actor, MoveToObjectAction &action, float dt);
+    void executeFollow(const std::shared_ptr<Object> &actor, FollowAction &action, float dt);
+    void executeDoCommand(const std::shared_ptr<Object> &actor, CommandAction &command, float dt);
+    void executeStartConversation(const std::shared_ptr<Object> &actor, StartConversationAction &action, float dt);
+    void executeAttack(const std::shared_ptr<Object> &actor, AttackAction &action, float dt);
+    void executeOpenDoor(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
+    void executeCloseDoor(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
+    void executeOpenContainer(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
+    void executeOpenLock(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
+    void executeJumpToObject(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
+    void executeJumpToLocation(const std::shared_ptr<Object> &actor, LocationAction &action, float dt);
 
     // END Actions
 };

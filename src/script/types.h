@@ -19,17 +19,15 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace reone {
 
 namespace script {
 
-const uint32_t kObjectSelf = 0;
-const uint32_t kObjectInvalid = 1;
-
 struct Variable;
+
+class ScriptObject;
 class ScriptProgram;
 class Routine;
 
@@ -51,8 +49,8 @@ public:
 struct ExecutionContext {
     IRoutineProvider *routines { nullptr };
     std::shared_ptr<ExecutionState> savedState;
-    uint32_t callerId { kObjectInvalid };
-    uint32_t triggererId { kObjectInvalid };
+    std::shared_ptr<ScriptObject> caller;
+    std::shared_ptr<ScriptObject> triggerer;
     int userDefinedEventNumber { -1 };
 };
 

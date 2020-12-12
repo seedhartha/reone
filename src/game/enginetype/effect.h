@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include "../../script/enginetype.h"
+
 #include "../types.h"
 
 namespace reone {
@@ -32,34 +34,28 @@ enum class EffectType {
 
 class Creature;
 
-class Effect {
+class Effect : public script::EngineType {
 public:
-    Effect(EffectType type, float duration) : _type(type), _timeout(duration) {}
+    Effect(EffectType type, float duration) : _type(type), _timeout(duration) { }
 
-    virtual ~Effect() = default;
-
-    // managed by creature.update
+    // managed by Creature.update
     void update(float dt) {
         _timeout -= dt;
     }
 
-    bool isValid() const { return _timeout > 0; }
+    bool isValid() const { return _timeout > 0.0f; }
 
     EffectType type() const { return _type; }
 
 protected:
     EffectType _type;
     float _timeout;
-
-private:
-    Effect(const Effect &) = delete;
-    Effect &operator=(const Effect &) = delete;
 };
 
 class DamageEffect : public Effect {
 public:
     DamageEffect(int amount, DamageType type, const std::shared_ptr<Creature> &damager) :
-        Effect(EffectType::Damage, 0),
+        Effect(EffectType::Damage, 0.0f),
         _amount(amount),
         _type(type),
         _damager(damager) {

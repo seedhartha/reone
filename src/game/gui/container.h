@@ -34,13 +34,13 @@ public:
     Container(Game *game);
 
     void load() override;
-    void open(SpatialObject *contanier);
+    void open(const std::shared_ptr<SpatialObject> &contanier);
 
     SpatialObject &container() const;
 
 private:
     Game *_game { nullptr };
-    SpatialObject *_container { nullptr };
+    std::shared_ptr<SpatialObject> _container;
 
     void configureItemsListBox();
     void transferItemsToPlayer();

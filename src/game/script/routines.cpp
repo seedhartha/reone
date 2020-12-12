@@ -19,6 +19,9 @@
 
 #include "../../common/log.h"
 
+#include "../enginetype/event.h"
+#include "../enginetype/location.h"
+
 #include "../game.h"
 
 using namespace std;
@@ -56,15 +59,15 @@ void Routines::deinit() {
     _routines.clear();
 }
 
-void Routines::add(const string &name, VariableType retType, const vector<VariableType> &argTypes) {
+void Routines::add(const string &name, VariableType retType, const VariableTypesList &argTypes) {
     _routines.emplace_back(name, retType, argTypes);
 }
 
 void Routines::add(
     const string &name,
     VariableType retType,
-    const vector<VariableType> &argTypes,
-    const function<Variable(const vector<Variable> &, ExecutionContext &)> &fn) {
+    const VariableTypesList &argTypes,
+    const function<Variable(const VariablesList &, ExecutionContext &)> &fn) {
 
     _routines.emplace_back(name, retType, argTypes, fn);
 }
@@ -73,43 +76,99 @@ const Routine &Routines::get(int index) {
     return _routines[index];
 }
 
-shared_ptr<Object> Routines::getObjectById(int id, const ExecutionContext &ctx) const {
-    if (id == kObjectInvalid) {
-        warn("Routines: getObjectById: invalid object");
-        return nullptr;
-    }
-    uint32_t objectId = id == kObjectSelf ? ctx.callerId : id;
-
-    shared_ptr<Module> module(_game->module());
-    if (module->id() == objectId) {
-        return module;
-    }
-
-    shared_ptr<Area> area(module->area());
-    if (area->id() == objectId) {
-        return area;
-    }
-
-    shared_ptr<Object> object(area->find(objectId));
-    if (!object) {
-        warn("Routines: getObjectById: object not found: " + to_string(objectId));
-    }
-
-    return move(object);
+bool Routines::getBool(const VariablesList &args, int index, bool defValue) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? (args[index].intValue != 0) : defValue;
 }
 
-shared_ptr<Location> Routines::getLocationById(int id) const {
-    if (id == kEngineTypeInvalid) {
-        warn("Routines: getLocationById: invalid location");
-        return nullptr;
-    }
+int Routines::getInt(const VariablesList &args, int index, int defValue) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? args[index].intValue : defValue;
+}
 
-    shared_ptr<Location> location(_game->getLocation(id));
-    if (!location) {
-        warn("Routines: getLocationById: location not found: " + to_string(id));
-    }
+float Routines::getFloat(const VariablesList &args, int index, float defValue) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? args[index].floatValue : defValue;
+}
 
-    return move(location);
+string Routines::getString(const VariablesList &args, int index, string defValue) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? args[index].strValue : move(defValue);
+}
+
+glm::vec3 Routines::getVector(const VariablesList &args, int index, glm::vec3 defValue) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? args[index].vecValue : move(defValue);
+}
+
+shared_ptr<Object> Routines::getCaller(ExecutionContext &ctx) const {
+    return static_pointer_cast<Object>(ctx.caller);
+}
+
+shared_ptr<SpatialObject> Routines::getCallerAsSpatial(ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<SpatialObject>(ctx.caller);
+}
+
+shared_ptr<Object> Routines::getTriggerrer(ExecutionContext &ctx) const {
+    return static_pointer_cast<Object>(ctx.triggerer);
+}
+
+shared_ptr<Object> Routines::getObject(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? static_pointer_cast<Object>(args[index].object) : nullptr;
+}
+
+shared_ptr<Object> Routines::getObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    int argCount = static_cast<int>(args.size());
+    return static_pointer_cast<Object>(index < argCount ? args[index].object : ctx.caller);
+}
+
+shared_ptr<SpatialObject> Routines::getSpatialObject(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<SpatialObject>(args[index].object) : nullptr;
+}
+
+shared_ptr<SpatialObject> Routines::getSpatialObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    int argCount = static_cast<int>(args.size());
+    return dynamic_pointer_cast<SpatialObject>(index < argCount ? args[index].object : ctx.caller);
+}
+
+shared_ptr<Creature> Routines::getCreature(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Creature>(args[index].object) : nullptr;
+}
+
+shared_ptr<Creature> Routines::getCreatureOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    int argCount = static_cast<int>(args.size());
+    return dynamic_pointer_cast<Creature>(index < argCount ? args[index].object : ctx.caller);
+}
+
+shared_ptr<Door> Routines::getDoor(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Door>(args[index].object) : nullptr;
+}
+
+shared_ptr<Sound> Routines::getSound(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Sound>(args[index].object) : nullptr;
+}
+
+shared_ptr<Location> Routines::getLocationEngineType(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Location>(args[index].engineType) : nullptr;
+}
+
+shared_ptr<Event> Routines::getEvent(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Event>(args[index].engineType) : nullptr;
+}
+
+const ExecutionContext &Routines::getAction(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    if (index >= argCount) {
+        throw out_of_range("index is out of range");
+    }
+    return args[index].context;
 }
 
 } // namespace game

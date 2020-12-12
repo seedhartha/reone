@@ -32,23 +32,23 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::addAvailableNPCByTemplate(const vector<Variable> &args, ExecutionContext &ctx) {
-    int npc = args[0].intValue;
+Variable Routines::addAvailableNPCByTemplate(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
 
-    string blueprint(args[1].strValue);
+    string blueprint(getString(args, 1));
     boost::to_lower(blueprint);
 
     bool added = _game->party().addAvailableMember(npc, blueprint);
 
-    return Variable(added);
+    return added ? 1 : 0;
 }
 
-Variable Routines::showPartySelectionGUI(const vector<Variable> &args, ExecutionContext &ctx) {
-    string exitScript(args.size() >= 1 ? args[0].strValue : "");
+Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionContext &ctx) {
+    string exitScript(getString(args, 0, ""));
     boost::to_lower(exitScript);
 
-    int forceNpc1 = args.size() >= 2 ? args[1].intValue : -1;
-    int forceNpc2 = args.size() >= 3 ? args[1].intValue : -1;
+    int forceNpc1 = getInt(args, 1);
+    int forceNpc2 = getInt(args, 2);
 
     PartySelection::Context partyCtx;
     partyCtx.exitScript = move(exitScript);
@@ -60,80 +60,72 @@ Variable Routines::showPartySelectionGUI(const vector<Variable> &args, Execution
     return Variable();
 }
 
-Variable Routines::getIsPC(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> player(_game->party().player());
-    return Variable(player ? args[0].objectId == player->id() : false);
+Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: getIsPC: creature is invalid");
+        return 0;
+    }
+    auto player = _game->party().player();
+    return player == creature ? 1 : 0;
 }
 
-Variable Routines::isAvailableCreature(const vector<Variable> &args, ExecutionContext &ctx) {
-    int npc = args[0].intValue;
-    bool available = _game->party().isMemberAvailable(npc);
-
-    return Variable(available);
+Variable Routines::isAvailableCreature(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
+    bool isAvailable = _game->party().isMemberAvailable(npc);
+    return isAvailable ? 1 : 0;
 }
 
-Variable Routines::isObjectPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
-    return object ? _game->party().isMember(*object) : false;
+Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: isObjectPartyMember: creature is invalid");
+        return 0;
+    }
+    return _game->party().isMember(*creature) ? 1 : 0;
 }
 
-Variable Routines::getPartyMemberByIndex(const vector<Variable> &args, ExecutionContext &ctx) {
-    int index = args[0].intValue;
-    shared_ptr<Creature> member(_game->party().getMember(index));
-
-    Variable result(VariableType::Object);
-    result.objectId = member ? member->id() : kObjectInvalid;
-
-    return move(result);
+Variable Routines::getPartyMemberByIndex(const VariablesList &args, ExecutionContext &ctx) {
+    int index = getInt(args, 0);
+    return _game->party().getMember(index);
 }
 
-Variable Routines::getPCSpeaker(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Creature> player(_game->party().player());
-
-    Variable result(VariableType::Object);
-    result.objectId = player ? player->id() : kObjectInvalid;
-
-    return move(result);
+Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->party().player();
 }
 
-Variable Routines::isNPCPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
-    int npc = args[0].intValue;
-    bool result = _game->party().isNPCMember(npc);
-    return result ? 1 : 0;
+Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
+    bool isMember = _game->party().isNPCMember(npc);
+    return isMember ? 1 : 0;
 }
 
-Variable Routines::setPartyLeader(const vector<Variable> &args, ExecutionContext &ctx) {
-    int npc = args[0].intValue;
+Variable Routines::setPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
     _game->party().setPartyLeader(npc);
     return Variable();
 }
 
-Variable Routines::addPartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
-    Variable result(0);
-
-    auto object = getObjectById(args[1].objectId, ctx);
-    if (object) {
-        auto creature = dynamic_pointer_cast<Creature>(object);
-        if (creature) {
-            int npc = args[0].intValue;
-            _game->party().addAvailableMember(npc, creature->blueprintResRef());
-            result.intValue = 1;
-        } else {
-            warn(boost::format("Routines: addPartyMember: object '%s' is not a creature") % object->tag());
-        }
+Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 1);
+    if (!creature) {
+        warn("Routines: addPartyMember: creature is invalid");
+        return 0;
     }
+    int npc = getInt(args, 0);
+    _game->party().addAvailableMember(npc, creature->blueprintResRef());
 
-    return move(result);
+    return 1;
 }
 
-Variable Routines::removePartyMember(const vector<Variable> &args, ExecutionContext &ctx) {
-    int npc = args[0].intValue;
+Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
     bool removed = _game->party().removeAvailableMember(npc);
+    return removed ? 1 : 0;
+}
 
-    Variable result(0);
-    result.intValue = removed ? 1 : 0;
-
-    return move(result);
+Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->party().player();
 }
 
 } // namespace game
