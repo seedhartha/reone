@@ -34,8 +34,8 @@ public:
     bool isSelectable() const override;
 
     void load(const resource::GffStruct &gffs);
-    void open(Object *triggerrer);
-    void close(Object *triggerrer);
+    void open(const std::shared_ptr<Object> &triggerrer);
+    void close(const std::shared_ptr<Object> &triggerrer);
 
     bool isOpen() const;
     bool isLockable() const;

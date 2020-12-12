@@ -17,27 +17,22 @@
 
 #pragma once
 
-#include <memory>
-
-#include "location.h"
-
 namespace reone {
 
-namespace game {
+namespace script {
 
-class EngineTypeFactory {
+class EngineType {
 public:
-    EngineTypeFactory() = default;
+    virtual ~EngineType() = default;
 
-    std::shared_ptr<Location> newLocation(glm::vec3 position, float facing);
+protected:
+    EngineType() = default;
 
 private:
-    int _idCounter { 0 };
-
-    EngineTypeFactory(const EngineTypeFactory &) = delete;
-    EngineTypeFactory &operator=(const EngineTypeFactory &) = delete;
+    EngineType(const EngineType &) = delete;
+    EngineType &operator=(const EngineType &) = delete;
 };
 
-} // namespace game
+} // namespace script
 
-} // namespace reone
+} // namespae reone

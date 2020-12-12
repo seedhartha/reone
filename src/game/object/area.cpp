@@ -535,7 +535,8 @@ void Area::update(float dt) {
     doDestroyObjects();
 
     Object::update(dt);
-    _actionExecutor.executeActions(*this, dt);
+
+    _actionExecutor.executeActions(_game->module()->area(), dt);
 
     for (auto &room : _rooms) {
         room.second->update(dt);
@@ -547,7 +548,7 @@ void Area::update(float dt) {
         object->update(dt);
         if (object->isDead()) continue;
 
-        _actionExecutor.executeActions(*object, dt);
+        _actionExecutor.executeActions(object, dt);
     }
     _objectSelector.update();
     _combat.update(dt);
@@ -555,29 +556,29 @@ void Area::update(float dt) {
     updateHeartbeat(dt);
 }
 
-bool Area::moveCreatureTowards(Creature &creature, const glm::vec2 &dest, bool run, float dt) {
-    glm::vec3 position(creature.position());
+bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
+    glm::vec3 position(creature->position());
     glm::vec2 delta(dest - glm::vec2(position));
     glm::vec2 dir(glm::normalize(delta));
 
     float heading = -glm::atan(dir.x, dir.y);
-    creature.setHeading(heading);
+    creature->setHeading(heading);
 
-    float speed = run ? creature.runSpeed() : creature.walkSpeed();
+    float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
     position.x += dir.x * speedDt;
     position.y += dir.y * speedDt;
 
     Room *room = nullptr;
 
-    if (findCreatureObstacle(creature, position)) {
+    if (findCreatureObstacle(*creature, position)) {
         return false;
     }
-    if (getElevationAt(position, &creature, room, position.z)) {
-        creature.setRoom(room);
-        creature.setPosition(position);
+    if (getElevationAt(position, creature.get(), room, position.z)) {
+        creature->setRoom(room);
+        creature->setPosition(position);
 
-        if (creature.id() == _game->party().leader()->id()) {
+        if (creature == _game->party().leader()) {
             onPartyLeaderMoved();
         }
         checkTriggersIntersection(creature);
@@ -598,7 +599,7 @@ void Area::runOnEnterScript() {
     if (!player) return;
 
     if (!_onEnter.empty()) {
-        runScript(_onEnter, _id, player->id(), -1);
+        runScript(_onEnter, _game->module()->area(), player, -1);
     }
 }
 
@@ -667,9 +668,9 @@ void Area::update3rdPersonCameraHeading() {
     _thirdPersonCamera->setHeading(partyLeader->heading());
 }
 
-void Area::startDialog(SpatialObject &object, const string &resRef) {
+void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {
     string finalResRef(resRef);
-    if (resRef.empty()) finalResRef = object.conversation();
+    if (resRef.empty()) finalResRef = object->conversation();
     if (resRef.empty()) return;
 
     _game->startDialog(object, finalResRef);
@@ -782,24 +783,23 @@ void Area::updateSounds() {
     }
 }
 
-void Area::checkTriggersIntersection(SpatialObject &triggerrer) {
-    glm::vec2 position2d(triggerrer.position());
-    shared_ptr<SpatialObject> triggererPtr(find(triggerrer.id()));
+void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer) {
+    glm::vec2 position2d(triggerrer->position());
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
-        Trigger &trigger = static_cast<Trigger &>(*object);
-        if (trigger.distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
-        if (trigger.isTenant(triggererPtr) || !trigger.isIn(position2d)) continue;
+        auto trigger = static_pointer_cast<Trigger>(object);
+        if (trigger->distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
+        if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) continue;
 
-        debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger.tag() % triggerrer.tag());
-        trigger.addTenant(triggererPtr);
+        debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
+        trigger->addTenant(triggerrer);
 
-        if (!trigger.linkedToModule().empty()) {
-            _game->scheduleModuleTransition(trigger.linkedToModule(), trigger.linkedTo());
+        if (!trigger->linkedToModule().empty()) {
+            _game->scheduleModuleTransition(trigger->linkedToModule(), trigger->linkedTo());
             return;
         }
-        if (!trigger.onEnter().empty()) {
-            runScript(trigger.onEnter(), trigger.id(), triggerrer.id(), -1);
+        if (!trigger->onEnter().empty()) {
+            runScript(trigger->onEnter(), trigger, triggerrer, -1);
         }
     }
 }
@@ -809,7 +809,7 @@ void Area::updateHeartbeat(float dt) {
 
     if (_heartbeatTimeout == 0.0f) {
         if (!_onHeartbeat.empty()) {
-            runScript(_onHeartbeat, _id, -1, -1);
+            runScript(_onHeartbeat, _game->module()->area(), nullptr, -1);
         }
         _heartbeatTimeout = kHeartbeatInterval;
     }

@@ -19,24 +19,23 @@
 
 #include "glm/vec3.hpp"
 
+#include "../../script/enginetype.h"
+
 namespace reone {
 
 namespace game {
 
-class Location {
+class Location : public script::EngineType  {
 public:
-    Location(int id, glm::vec3 position, float facing) :
-        _id(id),
+    Location(glm::vec3 position, float facing) :
         _position(std::move(position)),
         _facing(facing) {
     }
 
-    int id() const { return _id; }
     const glm::vec3 &position() const { return _position; }
     float facing() const { return _facing; }
 
 private:
-    int _id { 0 };
     glm::vec3 _position;
     float _facing;
 };

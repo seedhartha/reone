@@ -42,14 +42,16 @@ SpatialObject::SpatialObject(uint32_t id, ObjectType type, ObjectFactory *object
     _sceneGraph(sceneGraph) {
 }
 
-void SpatialObject::addItem(const string &resRef) {
+shared_ptr<Item> SpatialObject::addItem(const string &resRef) {
     auto blueprint = Blueprints::instance().getItem(resRef);
-    if (!blueprint) return;
+    if (!blueprint) return nullptr;
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint);
 
-    addItem(item);
+    _items.push_back(item);
+
+    return move(item);
 }
 
 void SpatialObject::addItem(const shared_ptr<Item> &item) {

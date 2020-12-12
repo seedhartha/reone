@@ -35,6 +35,9 @@ namespace script {
 
 static const int kStartInstructionOffset = 13;
 
+constexpr int kObjectIdSelf = 0;
+constexpr int kObjectIdInvalid = 1;
+
 ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
     _handlers.insert(make_pair(ByteCode::CopyDownSP, bind(&ScriptExecution::executeCopyDownSP, this, _1)));
     _handlers.insert(make_pair(ByteCode::Reserve, bind(&ScriptExecution::executeReserve, this, _1)));
@@ -132,37 +135,37 @@ void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeReserve(const Instruction &ins) {
-    VariableType type;
+    Variable result;
     switch (ins.type) {
         case InstructionType::Int:
-            type = VariableType::Int;
+            result.type = VariableType::Int;
             break;
         case InstructionType::Float:
-            type = VariableType::Float;
+            result.type = VariableType::Float;
             break;
         case InstructionType::String:
-            type = VariableType::String;
+            result.type = VariableType::String;
             break;
         case InstructionType::Object:
-            type = VariableType::Object;
+            result.type = VariableType::Object;
             break;
         case InstructionType::Effect:
-            type = VariableType::Effect;
+            result.type = VariableType::Effect;
             break;
         case InstructionType::Event:
-            type = VariableType::Event;
+            result.type = VariableType::Event;
             break;
         case InstructionType::Location:
-            type = VariableType::Location;
+            result.type = VariableType::Location;
             break;
         case InstructionType::Talent:
-            type = VariableType::Talent;
+            result.type = VariableType::Talent;
             break;
         default:
-            type = VariableType::Void;
+            result.type = VariableType::Void;
             break;
     }
-    _stack.push_back(Variable(type));
+    _stack.push_back(move(result));
 }
 
 void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
@@ -183,9 +186,17 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             _stack.push_back(ins.floatValue);
             break;
         case InstructionType::Object: {
-            Variable var(VariableType::Object);
-            var.objectId = ins.objectId;
-            _stack.push_back(move(var));
+            shared_ptr<ScriptObject> object;
+            switch (ins.objectId) {
+                case kObjectIdSelf:
+                    object = _context.caller;
+                    break;
+                case kObjectIdInvalid:
+                    break;
+                default:
+                    throw logic_error("Invalid object id");
+            }
+            _stack.emplace_back(object);
             break;
         }
         case InstructionType::String:

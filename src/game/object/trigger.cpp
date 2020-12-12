@@ -84,9 +84,6 @@ void Trigger::update(float dt) {
     }
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
-        if (!_onExit.empty()) {
-            runScript(_onExit, id(), tenant->id(), -1);
-        }
     }
     SpatialObject::update(dt);
 }

@@ -31,7 +31,6 @@
 #include "../scene/scenegraph.h"
 
 #include "console.h"
-#include "enginetype/typefactory.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/dialog.h"
@@ -85,10 +84,10 @@ public:
     void openMainMenu();
     void openInGameMenu(InGameMenu::Tab tab);
     void openInGame();
-    void openContainer(SpatialObject *container);
+    void openContainer(const std::shared_ptr<SpatialObject> &container);
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
     void startCharacterGeneration();
-    void startDialog(SpatialObject &owner, const std::string &resRef);
+    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
     void quit();
 
     void playVideo(const std::string &name);
@@ -127,21 +126,6 @@ public:
 
     // END Globals/locals
 
-    // User defined events
-
-    int eventUserDefined(int eventNumber);
-    int getUserDefinedEventNumber(int eventId);
-
-    // END User defined events
-
-    // Engine types
-
-    std::shared_ptr<Location> newLocation(glm::vec3 position, float facing);
-
-    std::shared_ptr<Location> getLocation(int id) const;
-
-    // END Engine types
-
 protected:
     Options _options;
 
@@ -162,10 +146,6 @@ private:
         SaveLoad
     };
 
-    struct UserDefinedEvent {
-        int eventNumber { 0 };
-    };
-
     boost::filesystem::path _path;
     render::RenderWindow _window;
     scene::SceneGraph _sceneGraph;
@@ -173,7 +153,6 @@ private:
     Console _console;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
-    std::unique_ptr<EngineTypeFactory> _engineTypeFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
     uint32_t _ticks { 0 };
@@ -184,7 +163,6 @@ private:
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
-    std::map<int, std::shared_ptr<Location>> _locations;
 
     // Modules
 
@@ -226,13 +204,6 @@ private:
     std::map<uint32_t, std::map<int, int>> _localNumbers;
 
     // END Globals/locals
-
-    // User defined events
-
-    int _eventCounter { 0 };
-    std::map<int, UserDefinedEvent> _events;
-
-    // END User defined events
 
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;

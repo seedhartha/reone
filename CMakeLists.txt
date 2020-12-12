@@ -312,8 +312,10 @@ set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 ## libscript static library
 
 set(SCRIPT_HEADERS
+    src/script/enginetype.h
     src/script/execution.h
     src/script/ncsfile.h
+    src/script/object.h
     src/script/program.h
     src/script/routine.h
     src/script/scripts.h
@@ -372,8 +374,8 @@ set(GAME_HEADERS
     src/game/damageresolver.h
     src/game/dialog.h
     src/game/enginetype/effect.h
+    src/game/enginetype/event.h
     src/game/enginetype/location.h
-    src/game/enginetype/typefactory.h
     src/game/factionutil.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
@@ -464,7 +466,6 @@ set(GAME_SOURCES
     src/game/cursors.cpp
     src/game/damageresolver.cpp
     src/game/dialog.cpp
-    src/game/enginetype/typefactory.cpp
     src/game/factionutil.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp

@@ -89,7 +89,7 @@ void Container::configureItemsListBox() {
     protoItem.setIconFrame(Textures::instance().get(frameTex, TextureType::GUI));
 }
 
-void Container::open(SpatialObject *container) {
+void Container::open(const shared_ptr<SpatialObject> &container) {
     _container = container;
 
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
@@ -122,11 +122,11 @@ void Container::transferItemsToPlayer() {
     shared_ptr<Creature> player(_game->party().player());
     _container->moveItemsTo(*player);
 
-    Placeable *placeable = dynamic_cast<Placeable *>(_container);
+    auto placeable = dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {
         string script(placeable->onInvDisturbed());
         if (!script.empty()) {
-            runScript(script, placeable->id(), player->id(), -1);
+            runScript(script, placeable, player, -1);
         }
     }
 }

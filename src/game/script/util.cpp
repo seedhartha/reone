@@ -33,19 +33,18 @@ namespace reone {
 
 namespace game {
 
-int runScript(const string &resRef, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
-    shared_ptr<ScriptProgram> program(Scripts::instance().get(resRef));
-    if (!program) {
-        return -1;
-    }
-    return runScript(move(program), callerId, triggererId, userDefinedEventNumber);
+int runScript(const string &resRef, shared_ptr<ScriptObject> caller, shared_ptr<ScriptObject> triggerer, int userDefinedEventNumber) {
+    auto program = Scripts::instance().get(resRef);
+    if (!program) return -1;
+
+    return runScript(move(program), move(caller), move(triggerer), userDefinedEventNumber);
 }
 
-int runScript(const std::shared_ptr<ScriptProgram> &program, uint32_t callerId, uint32_t triggererId, int userDefinedEventNumber) {
+int runScript(const std::shared_ptr<ScriptProgram> &program, shared_ptr<ScriptObject> caller, shared_ptr<ScriptObject> triggerer, int userDefinedEventNumber) {
     ExecutionContext ctx;
     ctx.routines = &Routines::instance();
-    ctx.callerId = callerId;
-    ctx.triggererId = triggererId;
+    ctx.caller = move(caller);
+    ctx.triggerer = move(triggerer);
     ctx.userDefinedEventNumber = userDefinedEventNumber;
 
     return ScriptExecution(program, move(ctx)).run();

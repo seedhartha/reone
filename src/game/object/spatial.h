@@ -77,7 +77,7 @@ public:
 
     // Inventory
 
-    void addItem(const std::string &resRef);
+    std::shared_ptr<Item> addItem(const std::string &resRef);
     void addItem(const std::shared_ptr<Item> &item);
     void removeItem(const std::shared_ptr<Item> &item);
     void moveItemsTo(SpatialObject &other);

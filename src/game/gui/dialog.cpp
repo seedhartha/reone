@@ -129,13 +129,13 @@ void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
     onReplyClicked(replyIdx);
 }
 
-void DialogGUI::startDialog(SpatialObject &owner, const string &resRef) {
+void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
     shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Conversation));
     if (!dlg) {
         _game->openInGame();
         return;
     }
-    _owner = &owner;
+    _owner = owner;
     _currentSpeaker = _owner;
 
     _dialog.reset(new Dialog());
@@ -174,13 +174,13 @@ void DialogGUI::loadStartEntry() {
 }
 
 bool DialogGUI::checkCondition(const string &script) {
-    int result = runScript(script, _owner->id(), kObjectInvalid, -1);
+    int result = runScript(script, _owner, nullptr, -1);
     return result == -1 || result == 1;
 }
 
 void DialogGUI::loadCurrentEntry() {
     if (!_currentEntry->script.empty()) {
-        runScript(_currentEntry->script, _owner->id(), kObjectInvalid, -1);
+        runScript(_currentEntry->script, _owner, nullptr, -1);
     }
     Control &message = getControl("LBL_MESSAGE");
     message.setTextMessage(_currentEntry->text);
@@ -231,10 +231,10 @@ void DialogGUI::loadReplies() {
 
 void DialogGUI::finish() {
     if (!_dialog->endScript().empty()) {
-        runScript(_dialog->endScript(), _owner->id(), kObjectInvalid, -1);
+        runScript(_dialog->endScript(), _owner, nullptr, -1);
     }
     if (_currentSpeaker) {
-        Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->setTalking(false);
         }
@@ -244,17 +244,16 @@ void DialogGUI::finish() {
 
 void DialogGUI::loadCurrentSpeaker() {
     shared_ptr<Area> area(_game->module()->area());
-    SpatialObject *speaker = nullptr;
+    shared_ptr<SpatialObject> speaker;
 
     if (!_currentEntry->speaker.empty()) {
-        shared_ptr<SpatialObject> speakerPtr(area->find(_currentEntry->speaker));
-        speaker = speakerPtr.get();
+        speaker = area->find(_currentEntry->speaker);
     }
     if (!speaker) {
         speaker = _owner;
     }
     if (_currentSpeaker && _currentSpeaker != speaker) {
-        Creature *prevSpeakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        auto prevSpeakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (prevSpeakerCreature) {
             prevSpeakerCreature->setTalking(false);
         }
@@ -266,7 +265,7 @@ void DialogGUI::loadCurrentSpeaker() {
     if (_currentSpeaker) {
         player->face(*_currentSpeaker);
 
-        Creature *speakerCreature = dynamic_cast<Creature *>(_currentSpeaker);
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->setTalking(true);
             speakerCreature->face(*player);
@@ -359,7 +358,7 @@ void DialogGUI::pickReply(uint32_t index) {
     const Dialog::EntryReply &reply = _dialog->getReply(index);
 
     if (!reply.script.empty()) {
-        runScript(reply.script, _owner->id(), kObjectInvalid, -1);
+        runScript(reply.script, _owner, nullptr, -1);
     }
     if (reply.entries.empty()) {
         finish();

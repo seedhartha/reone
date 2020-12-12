@@ -19,6 +19,9 @@
 
 #include "../../common/log.h"
 
+#include "../enginetype/event.h"
+#include "../script/util.h"
+
 #include "../game.h"
 
 using namespace std;
@@ -29,24 +32,28 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::eventUserDefined(const vector<Variable> &args, ExecutionContext &ctx) {
-    Variable result(VariableType::Event);
-    result.engineTypeId = _game->eventUserDefined(args[0].intValue);
-    return move(result);
+Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext &ctx) {
+    int eventNumber = getInt(args, 0);
+    auto event = make_shared<Event>(eventNumber);
+    return Variable(VariableType::Event, event);
 }
 
-Variable Routines::signalEvent(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObjectById(args[0].objectId, ctx));
+Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getObject(args, 0);
     if (object) {
-        int eventNumber = _game->getUserDefinedEventNumber(args[1].engineTypeId);
-        if (eventNumber != -1) {
-            object->runUserDefinedEvent(eventNumber);
+        auto toRun = getEvent(args, 1);
+        if (toRun) {
+            runScript(object->onUserDefined(), object, nullptr, toRun->number());
+        } else {
+            warn("Routines: signalEvent: toRun is invalid");
         }
+    } else {
+        warn("Routines: signalEvent: object is invalid");
     }
     return Variable();
 }
 
-Variable Routines::getUserDefinedEventNumber(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable Routines::getUserDefinedEventNumber(const VariablesList &args, ExecutionContext &ctx) {
     return ctx.userDefinedEventNumber;
 }
 

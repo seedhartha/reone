@@ -17,6 +17,9 @@
 
 #include "routines.h"
 
+#include "../../common/log.h"
+
+#include "../enginetype/location.h"
 #include "../game.h"
 
 using namespace std;
@@ -27,41 +30,46 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::getFacingFromLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Location> location(getLocationById(args[0].engineTypeId));
-    return location ? location->facing() : -1.0f;
+Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+    auto location = getLocationEngineType(args, 0);
+    if (!location) {
+        warn("Routines: getFacingFromLocation: location is invalid");
+        return -1.0f;
+    }
+    return location->facing();
 }
 
-Variable Routines::getLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    Variable result(VariableType::Location);
-    result.engineTypeId = kEngineTypeInvalid;
+Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Location;
 
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(getObjectById(args[0].objectId, ctx)));
+    auto object = getSpatialObject(args, 0);
     if (object) {
         glm::vec3 position(object->position());
         float facing = object->heading();
-        shared_ptr<Location> location(_game->newLocation(move(position), facing));
-
-        Variable result(VariableType::Location);
-        result.engineTypeId = location->id();
+        result.engineType = make_shared<Location>(move(position), facing);
+    } else {
+        warn("Routines: getLocation: object is invalid");
     }
 
     return move(result);
 }
 
-Variable Routines::getPositionFromLocation(const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Location> location(getLocationById(args[0].engineTypeId));
-    return location ? location->position() : glm::vec3(0.0f);
+Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+    auto location = getLocationEngineType(args, 0);
+    if (!location) {
+        warn("Routines: getPositionFromLocation: location is invalid");
+        return glm::vec3(0.0f);
+    }
+    return location->position();
 }
 
-Variable Routines::location(const vector<Variable> &args, ExecutionContext &ctx) {
-    float facing = args[1].floatValue;
-    shared_ptr<Location> location(_game->newLocation(args[0].vecValue, facing));
+Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
+    glm::vec3 position(getVector(args, 0));
+    float orientation = getFloat(args, 1);
+    auto location = make_shared<Location>(move(position), orientation);
 
-    Variable result(VariableType::Location);
-    result.engineTypeId = location->id();
-
-    return move(result);
+    return Variable(VariableType::Location, location);
 }
 
 } // namespace game

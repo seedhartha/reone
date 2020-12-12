@@ -21,6 +21,9 @@
 
 #include <boost/format.hpp>
 
+#include "enginetype.h"
+#include "object.h"
+
 using namespace std;
 
 namespace reone {
@@ -98,19 +101,22 @@ Variable Variable::operator/(const Variable &other) const {
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
 }
 
-Variable::Variable(VariableType type) : type(type) {
-}
-
 Variable::Variable(int value) : type(VariableType::Int), intValue(value) {
 }
 
 Variable::Variable(float value) : type(VariableType::Float), floatValue(value) {
 }
 
-Variable::Variable(const string &value) : type(VariableType::String), strValue(value) {
+Variable::Variable(string value) : type(VariableType::String), strValue(move(value)) {
 }
 
-Variable::Variable(const glm::vec3 &value) : type(VariableType::Vector), vecValue(value) {
+Variable::Variable(glm::vec3 value) : type(VariableType::Vector), vecValue(move(value)) {
+}
+
+Variable::Variable(const shared_ptr<ScriptObject> &object) : type(VariableType::Object), object(object) {
+}
+
+Variable::Variable(VariableType type, const shared_ptr<EngineType> &engineType) : type(type), engineType(engineType) {
 }
 
 Variable::Variable(const ExecutionContext &ctx) : type(VariableType::Action), context(ctx) {
@@ -127,12 +133,12 @@ bool Variable::operator==(const Variable &other) const {
         case VariableType::String:
             return strValue == other.strValue;
         case VariableType::Object:
-            return objectId == other.objectId;
+            return object == other.object;
         case VariableType::Effect:
         case VariableType::Event:
         case VariableType::Location:
         case VariableType::Talent:
-            return engineTypeId == other.engineTypeId;
+            return engineType == other.engineType;
         default:
             throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
     }
@@ -189,6 +195,8 @@ bool Variable::operator>=(const Variable &other) const {
 }
 
 const string Variable::toString() const {
+    static string empty;
+
     switch (type) {
         case VariableType::Void:
             return "void";
@@ -197,14 +205,9 @@ const string Variable::toString() const {
         case VariableType::Float:
             return to_string(floatValue);
         case VariableType::Object:
-            return to_string(objectId);
+            return object ? to_string(object->id()) : empty;
         case VariableType::String:
             return str(boost::format("\"%s\"") % strValue);
-        case VariableType::Effect:
-        case VariableType::Event:
-        case VariableType::Location:
-        case VariableType::Talent:
-            return to_string(engineTypeId);
         default:
             return "[not implemented]";
     }

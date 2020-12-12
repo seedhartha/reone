@@ -136,7 +136,7 @@ void Player::update(float dt) {
         dest.x -= 100.0f * glm::sin(heading);
         dest.y += 100.0f * glm::cos(heading);
 
-        if (_area->moveCreatureTowards(*partyLeader, dest, true, dt)) {
+        if (_area->moveCreatureTowards(partyLeader, dest, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
         }
     } else if (actions.empty()) {

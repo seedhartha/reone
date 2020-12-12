@@ -41,7 +41,7 @@ public:
     DialogGUI(Game *game);
 
     void load() override;
-    void startDialog(SpatialObject &owner, const std::string &resRef);
+    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
     void pickReply(uint32_t index);
 
     bool handle(const SDL_Event &event) override;
@@ -51,11 +51,11 @@ public:
 
 private:
     Game *_game { nullptr };
-    SpatialObject *_owner { nullptr };
+    std::shared_ptr<SpatialObject> _owner;
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundHandle> _currentVoice;
-    SpatialObject *_currentSpeaker { nullptr };
+    std::shared_ptr<SpatialObject> _currentSpeaker;
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
     float _endEntryTimeout { 0.0f };

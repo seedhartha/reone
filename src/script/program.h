@@ -122,7 +122,7 @@ struct Instruction {
         int routine { 0 };
         int intValue;
         float floatValue;
-        int objectId;
+        int objectId; // used only for CONSTO
         int sizeLocals;
         int sizeNoDestroy;
     };
