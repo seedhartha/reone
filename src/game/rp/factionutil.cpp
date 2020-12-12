@@ -19,9 +19,9 @@
 
 #include <list>
 
-#include "../common/log.h"
+#include "../../common/log.h"
 
-#include "object/creature.h"
+#include "../object/creature.h"
 
 using namespace std;
 

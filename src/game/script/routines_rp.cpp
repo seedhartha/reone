@@ -129,6 +129,56 @@ Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx)
     return Variable();
 }
 
+Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectToChangeFaction = getCreature(args, 0);
+    if (!objectToChangeFaction) {
+        warn("Routines: changeFaction: objectToChangeFaction is invalid");
+        return Variable();
+    }
+    auto memberOfFactionToJoin = getCreature(args, 1);
+    if (!memberOfFactionToJoin) {
+        warn("Routines: changeFaction: memberOfFactionToJoin is invalid");
+        return Variable();
+    }
+    objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
+
+    return Variable();
+}
+
+Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
+    auto creatureToChange = getCreature(args, 0);
+    if (creatureToChange) {
+        Faction faction = static_cast<Faction>(getInt(args, 1));
+        creatureToChange->setFaction(faction);
+    } else {
+        warn("Routines: changeToStandardFaction: creatureToChange is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &ctx) {
+    auto firstObject = getCreature(args, 0);
+    if (!firstObject) {
+        warn("Routines: getStandardFaction: firstObject is invalid");
+        return 0;
+    }
+    auto secondObject = getCreatureOrCaller(args, 1, ctx);
+    if (!secondObject) {
+        warn("Routines: getStandardFaction: secondObject is invalid");
+        return 0;
+    }
+    return firstObject->faction() == secondObject->faction() ? 1 : 0;
+}
+
+Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getCreature(args, 0);
+    if (!object) {
+        warn("Routines: getStandardFaction: object is invalid");
+        return static_cast<int>(Faction::Invalid);
+    }
+    return static_cast<int>(object->faction());
+}
+
 } // namespace game
 
 } // namespace reone

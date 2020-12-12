@@ -211,8 +211,8 @@ void Routines::addTslRoutines() {
     add("ResistForce", Int, { Object, Object });
     add("GetEffectType", Int, { Effect });
     add("EffectAreaOfEffect", Effect, { Int, String, String, String });
-    add("GetFactionEqual", Int, { Object, Object });
-    add("ChangeFaction", Void, { Object, Object });
+    add("GetFactionEqual", Int, { Object, Object }, bind(&Routines::getFactionEqual, this, _1, _2));
+    add("ChangeFaction", Void, { Object, Object }, bind(&Routines::changeFaction, this, _1, _2));
     add("GetIsListening", Int, { Object });
     add("SetListening", Void, { Object, Int });
     add("SetListenPattern", Void, { Object, String, Int });
@@ -451,7 +451,7 @@ void Routines::addTslRoutines() {
     add("GetIsEncounterCreature", Int, { Object });
     add("GetLastPlayerDying", Object, { });
     add("GetStartingLocation", Location, { });
-    add("ChangeToStandardFaction", Void, { Object, Int });
+    add("ChangeToStandardFaction", Void, { Object, Int }, bind(&Routines::changeToStandardFaction, this, _1, _2));
     add("SoundObjectPlay", Void, { Object }, bind(&Routines::soundObjectPlay, this, _1, _2));
     add("SoundObjectStop", Void, { Object }, bind(&Routines::soundObjectStop, this, _1, _2));
     add("SoundObjectSetVolume", Void, { Object, Int });
@@ -758,7 +758,7 @@ void Routines::addTslRoutines() {
     add("ClearAllEffects", Void, { });
     add("GetLastConversation", String, { });
     add("ShowPartySelectionGUI", Void, { String, Int, Int, Int }, bind(&Routines::showPartySelectionGUI, this, _1, _2));
-    add("GetStandardFaction", Int, { Object });
+    add("GetStandardFaction", Int, { Object }, bind(&Routines::getStandardFaction, this, _1, _2));
     add("GivePlotXP", Void, { String, Int });
     add("GetMinOneHP", Int, { Object }, bind(&Routines::getMinOneHP, this, _1, _2));
     add("SetMinOneHP", Void, { Object, Int }, bind(&Routines::setMinOneHP, this, _1, _2));

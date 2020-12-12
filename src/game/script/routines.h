@@ -247,6 +247,11 @@ private:
     script::Variable setMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
 
+    script::Variable changeFaction(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable changeToStandardFaction(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getFactionEqual(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getStandardFaction(const VariablesList &args, script::ExecutionContext &ctx);
+
     // END Role-playing
 
     // Math
