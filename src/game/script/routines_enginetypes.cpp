@@ -72,6 +72,34 @@ Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
     return Variable(VariableType::Location, location);
 }
 
+Variable Routines::getDistanceBetweenLocations(const VariablesList &args, ExecutionContext &ctx) {
+    auto locationA = getLocationEngineType(args, 0);
+    if (!locationA) {
+        warn("Routines: getDistanceBetweenLocations: locationA is invalid");
+        return 0.0f;
+    }
+    auto locationB = getLocationEngineType(args, 1);
+    if (!locationB) {
+        warn("Routines: getDistanceBetweenLocations: locationB is invalid");
+        return 0.0f;
+    }
+    return glm::distance(locationA->position(), locationB->position());
+}
+
+Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, ExecutionContext &ctx) {
+    auto locationA = getLocationEngineType(args, 0);
+    if (!locationA) {
+        warn("Routines: getDistanceBetweenLocations2D: locationA is invalid");
+        return 0.0f;
+    }
+    auto locationB = getLocationEngineType(args, 1);
+    if (!locationB) {
+        warn("Routines: getDistanceBetweenLocations2D: locationB is invalid");
+        return 0.0f;
+    }
+    return glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
+}
+
 } // namespace game
 
 } // namespace reone

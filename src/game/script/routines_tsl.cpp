@@ -165,7 +165,7 @@ void Routines::addTslRoutines() {
     add("TurnsToSeconds", Float, { Int }, bind(&Routines::turnsToSeconds, this, _1, _2));
     add("SoundObjectSetFixedVariance", Void, { Object, Float });
     add("GetGoodEvilValue", Int, { Object });
-    add("GetPartyMemberCount", Int, { });
+    add("GetPartyMemberCount", Int, { }, bind(&Routines::getPartyMemberCount, this, _1, _2));
     add("GetAlignmentGoodEvil", Int, { Object });
     add("GetFirstObjectInShape", Object, { Int, Float, Location, Int, Int, TVector });
     add("GetNextObjectInShape", Object, { Int, Float, Location, Int, Int, TVector });
@@ -178,8 +178,8 @@ void Routines::addTslRoutines() {
     add("ActionTakeItem", Void, { Object, Object });
     add("VectorNormalize", TVector, { TVector }, bind(&Routines::vectorNormalize, this, _1, _2));
     add("GetItemStackSize", Int, { Object });
-    add("GetAbilityScore", Int, { Object, Int });
-    add("GetIsDead", Int, { Object });
+    add("GetAbilityScore", Int, { Object, Int }, bind(&Routines::getAbilityScore, this, _1, _2));
+    add("GetIsDead", Int, { Object }, bind(&Routines::getIsDead, this, _1, _2));
     add("PrintVector", Void, { TVector, Int }, bind(&Routines::printVector, this, _1, _2));
     add("Vector", TVector, { Float, Float, Float }, bind(&Routines::vectorCreate, this, _1, _2));
     add("SetFacingPoint", Void, { TVector });
@@ -337,7 +337,7 @@ void Routines::addTslRoutines() {
     add("EventConversation", Event, { });
     add("SetEncounterDifficulty", Void, { Int, Object });
     add("GetEncounterDifficulty", Int, { Object });
-    add("GetDistanceBetweenLocations", Float, { Location, Location });
+    add("GetDistanceBetweenLocations", Float, { Location, Location }, bind(&Routines::getDistanceBetweenLocations, this, _1, _2));
     add("GetReflexAdjustedDamage", Int, { Int, Object, Int, Int, Object });
     add("PlayAnimation", Void, { Int, Float, Float });
     add("TalentSpell", Talent, { Int });
@@ -354,12 +354,12 @@ void Routines::addTslRoutines() {
     add("GetIsPlayableRacialType", Int, { Object });
     add("JumpToLocation", Void, { Location }, bind(&Routines::jumpToLocation, this, _1, _2));
     add("EffectTemporaryHitpoints", Effect, { Int }, bind(&Routines::effectTemporaryHitpoints, this, _1, _2));
-    add("GetSkillRank", Int, { Int, Object });
+    add("GetSkillRank", Int, { Int, Object }, bind(&Routines::getSkillRank, this, _1, _2));
     add("GetAttackTarget", Object, { Object });
     add("GetLastAttackType", Int, { Object });
     add("GetLastAttackMode", Int, { Object });
-    add("GetDistanceBetween2D", Float, { Object, Object });
-    add("GetIsInCombat", Int, { Object, Int });
+    add("GetDistanceBetween2D", Float, { Object, Object }, bind(&Routines::getDistanceBetween2D, this, _1, _2));
+    add("GetIsInCombat", Int, { Object, Int }, bind(&Routines::getIsInCombat, this, _1, _2));
     add("GetLastAssociateCommand", Int, { Object });
     add("GiveGoldToCreature", Void, { Object, Int });
     add("SetIsDestroyable", Void, { Int, Int, Int });
@@ -373,7 +373,7 @@ void Routines::addTslRoutines() {
     add("GetAbilityModifier", Int, { Int, Object });
     add("GetIdentified", Int, { Object });
     add("SetIdentified", Void, { Object, Int });
-    add("GetDistanceBetweenLocations2D", Float, { Location, Location });
+    add("GetDistanceBetweenLocations2D", Float, { Location, Location }, bind(&Routines::getDistanceBetweenLocations2D, this, _1, _2));
     add("GetDistanceToObject2D", Float, { Object }, bind(&Routines::getDistanceToObject2D, this, _1, _2));
     add("GetBlockingDoor", Object, { });
     add("GetIsDoorActionPossible", Int, { Object, Int });
@@ -381,7 +381,7 @@ void Routines::addTslRoutines() {
     add("GetFirstItemInInventory", Object, { Object }, bind(&Routines::getFirstItemInInventory, this, _1, _2));
     add("GetNextItemInInventory", Object, { Object }, bind(&Routines::getNextItemInInventory, this, _1, _2));
     add("GetClassByPosition", Int, { Int, Object }, bind(&Routines::getClassByPosition, this, _1, _2));
-    add("GetLevelByPosition", Int, { Int, Object });
+    add("GetLevelByPosition", Int, { Int, Object }, bind(&Routines::getLevelByPosition, this, _1, _2));
     add("GetLevelByClass", Int, { Int, Object }, bind(&Routines::getLevelByClass, this, _1, _2));
     add("GetDamageDealtByType", Int, { Int });
     add("GetTotalDamageDealt", Int, { });
@@ -482,7 +482,7 @@ void Routines::addTslRoutines() {
     add("GetItemActivator", Object, { });
     add("GetItemActivatedTargetLocation", Location, { });
     add("GetItemActivatedTarget", Object, { });
-    add("GetIsOpen", Int, { Object });
+    add("GetIsOpen", Int, { Object }, bind(&Routines::getIsOpen, this, _1, _2));
     add("TakeGoldFromCreature", Void, { Int, Object, Int });
     add("GetIsInConversation", Int, { Object });
     add("EffectAbilityDecrease", Effect, { Int, Int }, bind(&Routines::effectAbilityDecrease, this, _1, _2));

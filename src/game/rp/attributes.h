@@ -30,12 +30,15 @@ namespace game {
 class CreatureAttributes {
 public:
     void addClassLevels(ClassType clazz, int levels);
-    void setAbilityScore(Ability ability, int score);
-    void setSkillRank(Skill ability, int rank);
 
     ClassType getClassByPosition(int position) const;
+    int getLevelByPosition(int position) const;
     int getClassLevel(ClassType clazz) const;
     int getHitDice() const { return _hitDice; }
+
+    // Abilities
+
+    int getAbilityScore(Ability ability) const { return _abilities.find(ability)->second; }
 
     int strength() const { return _abilities.find(Ability::Strength)->second; }
     int dexterity() const { return _abilities.find(Ability::Dexterity)->second; }
@@ -44,7 +47,15 @@ public:
     int wisdom() const { return _abilities.find(Ability::Wisdom)->second; }
     int charisma() const { return _abilities.find(Ability::Charisma)->second; }
 
-    bool hasSkill(Skill skill) const { return _skills.find(skill)->second > 0; }
+    void setAbilityScore(Ability ability, int score);
+
+    // END Abilities
+
+    // Skills
+
+    bool hasSkill(Skill skill) const;
+
+    int getSkillRank(Skill skill) const;
 
     int computerUse() const { return _skills.find(Skill::ComputerUse)->second; }
     int demolitions() const { return _skills.find(Skill::Demolitions)->second; }
@@ -54,6 +65,10 @@ public:
     int repair() const { return _skills.find(Skill::Repair)->second; }
     int security() const { return _skills.find(Skill::Security)->second; }
     int treatInjury() const { return _skills.find(Skill::TreatInjury)->second; }
+
+    void setSkillRank(Skill ability, int rank);
+
+    // END Skills
 
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;

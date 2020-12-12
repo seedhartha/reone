@@ -37,7 +37,6 @@ public:
     void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
 
-    bool isOpen() const;
     bool isLockable() const;
     bool isLocked() const;
     bool isStatic() const;
@@ -53,7 +52,6 @@ public:
     void setLocked(bool locked);
 
 private:
-    bool _open { false };
     bool _lockable { false };
     bool _locked { false };
     int _genericType { 0 };

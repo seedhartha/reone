@@ -222,6 +222,39 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
     return game::getIsNeutral(*target, *source);
 }
 
+Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: getAbilityScore: creature is invalid");
+        return 0;
+    }
+    Ability type = static_cast<Ability>(getInt(args, 1));
+
+    return creature->attributes().getAbilityScore(type);
+}
+
+Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 1, ctx);
+    if (!creature) {
+        warn("Routines: getLevelByPosition: creature is invalid");
+        return 0;
+    }
+    int position = getInt(args, 0);
+
+    return creature->attributes().getLevelByPosition(position);
+}
+
+Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getCreatureOrCaller(args, 1, ctx);
+    if (!object) {
+        warn("Routines: getSkillRank: object is invalid");
+        return 0;
+    }
+    Skill skill = static_cast<Skill>(getInt(args, 0));
+
+    return object->attributes().getSkillRank(skill);
+}
+
 } // namespace game
 
 } // namespace reone

@@ -57,12 +57,28 @@ ClassType CreatureAttributes::getClassByPosition(int position) const {
         ClassType::Invalid;
 }
 
+int CreatureAttributes::getLevelByPosition(int position) const {
+    return (position - 1) < static_cast<int>(_classLevels.size()) ?
+        _classLevels[static_cast<size_t>(position) - 1].second :
+        0;
+}
+
 int CreatureAttributes::getClassLevel(ClassType clazz) const {
     auto maybeClassLevel = find_if(
         _classLevels.begin(), _classLevels.end(),
         [&clazz](auto &classLevel) { return classLevel.first == clazz; });
 
     return maybeClassLevel != _classLevels.end() ? maybeClassLevel->second : 0;
+}
+
+bool CreatureAttributes::hasSkill(Skill skill) const {
+    auto maybeSkill = _skills.find(skill);
+    return maybeSkill != _skills.end() ? maybeSkill->second > 0 : false;
+}
+
+int CreatureAttributes::getSkillRank(Skill skill) const {
+    auto maybeSkill = _skills.find(skill);
+    return maybeSkill != _skills.end() ? maybeSkill->second : -1;
 }
 
 } // namespace game
