@@ -141,6 +141,8 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     _dialog.reset(new Dialog());
     _dialog->load(resRef, *dlg);
 
+    debug("Dialog: start " + resRef);
+
     loadAnimatedCamera();
     loadStartEntry();
 }
@@ -165,6 +167,8 @@ void DialogGUI::loadStartEntry() {
             break;
         }
     }
+    debug("Dialog: entry selected: " + to_string(entryIdx), 2);
+
     if (entryIdx == -1) {
         _game->openInGame();
         return;
@@ -223,6 +227,7 @@ void DialogGUI::loadReplies() {
     }
 
     if (activeReplies.empty()) {
+        debug("Dialog: finish (no active replies)");
         finish();
     } else {
         hideControl("LB_REPLIES");
@@ -355,12 +360,14 @@ void DialogGUI::scheduleEndOfEntry() {
 }
 
 void DialogGUI::pickReply(uint32_t index) {
+    debug("Dialog: pick reply " + to_string(index), 2);
     const Dialog::EntryReply &reply = _dialog->getReply(index);
 
     if (!reply.script.empty()) {
         runScript(reply.script, _owner, nullptr, -1);
     }
     if (reply.entries.empty()) {
+        debug("Dialog: finish (no entries)");
         finish();
         return;
     }
@@ -376,8 +383,10 @@ void DialogGUI::pickReply(uint32_t index) {
             break;
         }
     }
+    debug("Dialog: entry selected: " + to_string(entryIdx), 2);
 
     if (entryIdx == -1) {
+        debug("Dialog: finish (no entry selected)");
         finish();
         return;
     }
