@@ -276,6 +276,100 @@ private:
     script::Variable vectorMagnitude(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Math
+
+    // Effects
+
+    script::Variable effectAssuredHit(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectHeal(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamage(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAbilityIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageResistance(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectResurrection(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectACIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSavingThrowIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAttackIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageReduction(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectEntangle(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDeath(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectKnockdown(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectParalyze(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSpellImmunity(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceJump(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSleep(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectTemporaryForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectConfused(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectFrightened(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectChoke(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectStunned(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectRegenerate(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectMovementSpeedIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAreaOfEffect(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectVisualEffect(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectLinkEffects(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectBeam(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceResistanceIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectBodyFuel(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectPoison(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAssuredDeflection(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForcePushTargeted(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectHaste(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectImmunity(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageImmunityIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectTemporaryHitpoints(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSkillIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectHealForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectHitPointChangeWhenDying(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDroidStun(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForcePushed(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceResisted(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceFizzle(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAbilityDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectAttackDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageImmunityDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectACDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectMovementSpeedDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSavingThrowDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSkillDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceResistanceDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectInvisibility(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectConcealment(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceShield(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDispelMagicAll(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDisguise(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectTrueSeeing(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSeeInvisible(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectTimeStop(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectBlasterDeflectionIncrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectBlasterDeflectionDecrease(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectHorrified(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectSpellLevelAbsorption(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDispelMagicBest(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectMissChance(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectModifyAttacks(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDamageShield(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceDrain(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectPsychicStatic(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectLightsaberThrow(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectWhirlWind(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectCutSceneHorrified(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectCutSceneParalyze(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectCutSceneStunned(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceBody(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectFury(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectBlind(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectFPRegenModifier(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectVPRegenModifier(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectCrush(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDroidConfused(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectForceSight(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectMindTrick(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectFactionModifier(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable effectDroidScramble(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END Effects
 };
 
 } // namespace game
