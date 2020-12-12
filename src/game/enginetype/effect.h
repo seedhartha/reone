@@ -23,20 +23,17 @@
 
 #include "../types.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
-
-enum class EffectType {
-    Invalid = 0,
-    Damage = 0x100
-};
 
 class Creature;
 
 class Effect : public script::EngineType {
 public:
-    Effect(EffectType type, float duration) : _type(type), _timeout(duration) { }
+    Effect(EffectType type, float duration = 0.0f) : _type(type), _timeout(duration) { }
 
     // managed by Creature.update
     void update(float dt) {
@@ -55,7 +52,7 @@ protected:
 class DamageEffect : public Effect {
 public:
     DamageEffect(int amount, DamageType type, const std::shared_ptr<Creature> &damager) :
-        Effect(EffectType::Damage, 0.0f),
+        Effect(EffectType::Damage),
         _amount(amount),
         _type(type),
         _damager(damager) {

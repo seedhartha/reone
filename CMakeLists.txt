@@ -375,6 +375,7 @@ set(GAME_HEADERS
     src/game/enginetype/effect.h
     src/game/enginetype/event.h
     src/game/enginetype/location.h
+    src/game/enginetype/types.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -522,6 +523,7 @@ set(GAME_SOURCES
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp
     src/game/script/routines_common.cpp
+    src/game/script/routines_effects.cpp
     src/game/script/routines_enginetypes.cpp
     src/game/script/routines_events.cpp
     src/game/script/routines_kotor.cpp
