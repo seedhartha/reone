@@ -43,7 +43,7 @@ Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext &ctx) {
-    return getTriggerrer(ctx);
+    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
 }
 
 Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
@@ -56,22 +56,22 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
 
     // Apparently, empty string in this context stands for the player
     if (tag.empty()) {
-        return _game->party().player();
+        return static_pointer_cast<ScriptObject>(_game->party().player());
     }
     int nth = getInt(args, 1, 0);
 
-    return _game->module()->area()->find(tag, nth);
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->find(tag, nth));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
     string tag(getString(args, 0));
     boost::to_lower(tag);
 
-    return _game->module()->area()->find(tag);
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->find(tag));
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->area();
+    return static_pointer_cast<ScriptObject>(_game->module()->area());
 }
 
 Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ctx) {
@@ -132,15 +132,18 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module();
+    return static_pointer_cast<ScriptObject>(_game->module());
 }
 
 Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
+    static string empty;
+
     auto object = getObject(args, 0);
     if (!object) {
         warn("Routines: getTag: object is invalid");
-        return "";
+        return empty;
     }
+
     return object->tag();
 }
 
@@ -175,7 +178,7 @@ Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionCon
 }
 
 Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
-    return getTriggerrer(ctx);
+    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
 }
 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
