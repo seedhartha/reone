@@ -21,6 +21,7 @@
 #include "../../common/log.h"
 
 #include "../game.h"
+#include "../rp/factionutil.h"
 
 #include "objectfactory.h"
 

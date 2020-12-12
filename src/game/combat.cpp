@@ -26,6 +26,7 @@
 #include "../common/random.h"
 
 #include "game.h"
+#include "rp/factionutil.h"
 
 using namespace std;
 
