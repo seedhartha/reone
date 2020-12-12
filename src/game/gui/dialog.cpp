@@ -160,7 +160,7 @@ void DialogGUI::loadStartEntry() {
     for (auto &link : _dialog->startEntries()) {
         if (link.active.empty()) {
             entryIdx = link.index;
-            continue;
+            break;
         }
         if (checkCondition(link.active)) {
             entryIdx = link.index;
@@ -376,7 +376,7 @@ void DialogGUI::pickReply(uint32_t index) {
     for (auto &link : reply.entries) {
         if (link.active.empty()) {
             entryIdx = link.index;
-            continue;
+            break;
         }
         if (checkCondition(link.active)) {
             entryIdx = link.index;
