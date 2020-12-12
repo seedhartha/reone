@@ -28,6 +28,7 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
+#include "../rp/factionutil.h"
 
 #include "colorutil.h"
 

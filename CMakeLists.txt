@@ -371,12 +371,10 @@ set(GAME_HEADERS
     src/game/console.h
     src/game/combat.h
     src/game/cursors.h
-    src/game/damageresolver.h
     src/game/dialog.h
     src/game/enginetype/effect.h
     src/game/enginetype/event.h
     src/game/enginetype/location.h
-    src/game/factionutil.h
     src/game/game.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -429,6 +427,8 @@ set(GAME_HEADERS
     src/game/room.h
     src/game/rp/attributes.h
     src/game/rp/classutil.h
+    src/game/rp/damageresolver.h
+    src/game/rp/factionutil.h
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
@@ -464,9 +464,7 @@ set(GAME_SOURCES
     src/game/console.cpp
     src/game/combat.cpp
     src/game/cursors.cpp
-    src/game/damageresolver.cpp
     src/game/dialog.cpp
-    src/game/factionutil.cpp
     src/game/game.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
@@ -518,6 +516,8 @@ set(GAME_SOURCES
     src/game/room.cpp
     src/game/rp/attributes.cpp
     src/game/rp/classutil.cpp
+    src/game/rp/damageresolver.cpp
+    src/game/rp/factionutil.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

@@ -17,11 +17,11 @@
 
 #include "damageresolver.h"
 
-#include "../common/random.h"
+#include "../../common/random.h"
 
-#include "enginetype/effect.h"
-#include "object/creature.h"
-#include "types.h"
+#include "../enginetype/effect.h"
+#include "../object/creature.h"
+#include "../types.h"
 
 using namespace std;
 

@@ -26,9 +26,8 @@
 #include "../common/timer.h"
 
 #include "enginetype/effect.h"
-#include "damageresolver.h"
-#include "factionutil.h"
 #include "object/creature.h"
+#include "rp/damageresolver.h"
 #include "types.h"
 
 namespace reone {
