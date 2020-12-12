@@ -29,79 +29,103 @@ namespace reone {
 
 namespace game {
 
-constexpr static int kMaxFactionCount = 25;
+enum class Disposition {
+    Neutral,
+    Friend,
+    Enemy
+};
 
-const list<Faction> g_hostileFactions { Faction::Hostile1, Faction::Hostile2 };
-const list<Faction> g_friendlyFactions { Faction::Friendly1, Faction::Friendly2 };
-const list<Faction> g_surrenderFactions { Faction::Surrender1, Faction::Surrender2 };
-const list<Faction> g_gizkaFactions { Faction::Gizka1, Faction::Gizka2 };
+typedef unordered_map<Faction, unordered_map<Faction, Disposition>> DispositionsMap;
 
-list<pair<Faction, Faction>> groupPairs(list<Faction> group1, list<Faction> group2) {
-    list<pair<Faction, Faction>> aggr;
-    for (auto &f1 : group1) {
-        for (auto &f2 : group2) {
-            aggr.push_back(make_pair(f1, f2));
-        }
-    }
-    return move(aggr);
+static const list<Faction> g_hostileFactions { Faction::Hostile1, Faction::Hostile2 };
+static const list<Faction> g_friendlyFactions { Faction::Friendly1, Faction::Friendly2 };
+static const list<Faction> g_surrenderFactions { Faction::Surrender1, Faction::Surrender2 };
+static const list<Faction> g_gizkaFactions { Faction::Gizka1, Faction::Gizka2 };
+
+static void setMutualDisposition(Faction left, Faction right, Disposition disposition, DispositionsMap &dispositions) {
+    dispositions[left][right] = disposition;
+    dispositions[right][left] = disposition;
 }
 
-list<pair<Faction, Faction>> propagateHostileLinks() {
-    list<pair<Faction, Faction>> aggr;
-
-    // aggregate factions that are hostile towards each other?
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, g_friendlyFactions));
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, g_surrenderFactions));
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, g_gizkaFactions));
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, { Faction::EndarSpire }));
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, { Faction::Predator }));
-    aggr.splice(aggr.end(), groupPairs(g_hostileFactions, { Faction::Prey }));
-    aggr.splice(aggr.end(), groupPairs(g_friendlyFactions, { Faction::Predator }));
-    aggr.splice(aggr.end(), groupPairs(g_friendlyFactions, { Faction::Prey }));
-    aggr.splice(aggr.end(), groupPairs(g_friendlyFactions, { Faction::Rancor }));
-    aggr.splice(aggr.end(), groupPairs(g_friendlyFactions, { Faction::Tuskan }));
-
-    aggr.insert(aggr.end(), make_pair(Faction::Predator, Faction::Prey));
-
-    return move(aggr);
+static void setMutualFriends(Faction left, Faction right, DispositionsMap &dispositions) {
+    setMutualDisposition(left, right, Disposition::Friend, dispositions);
 }
 
-vector<vector<bool>> initialize() {
-    vector<vector<bool>> arr(kMaxFactionCount, vector<bool>(kMaxFactionCount, false));
-
-    // set insane faction hostile to all factions
-    for (size_t i = 0; i < kMaxFactionCount; ++i) {
-        size_t j = static_cast<size_t>(Faction::Insane);
-        arr[i][j] = true;
-        arr[j][i] = true;
-    }
-
-    // propagate hostile links to map
-    for (auto &pr : propagateHostileLinks()) {
-        size_t i = static_cast<size_t>(pr.first);
-        size_t j = static_cast<size_t>(pr.second);
-
-        arr[i][j] = true;
-        arr[j][i] = true;
-    }
-
-    return move(arr);
+static void setMutualEnemies(Faction left, Faction right, DispositionsMap &dispositions) {
+    setMutualDisposition(left, right, Disposition::Enemy, dispositions);
 }
 
-const vector<vector<bool>> g_hostility = initialize();
+static DispositionsMap initDispositions() {
+    DispositionsMap result;
 
-bool getIsEnemy(const Creature &left, const Creature &right) {
-    int leftFaction = static_cast<int>(left.faction());
-    int rightFaction = static_cast<int>(right.faction());
+    // Friendlies
 
-    if (leftFaction < 0 || leftFaction >= kMaxFactionCount || rightFaction < 0 || rightFaction >= kMaxFactionCount) {
-        debug(boost::format("Source %s Faction: %d") % left.tag() % leftFaction);
-        debug(boost::format("Target %s Faction: %d") % right.tag() % rightFaction);
+    setMutualFriends(Faction::Friendly1, Faction::Friendly2, result);
 
-        return false;
-    }
+    setMutualEnemies(Faction::Friendly1, Faction::Hostile1, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Hostile2, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Insane, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Predator, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Rancor, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Tuskan, result);
 
-    return g_hostility[leftFaction][rightFaction];
+    setMutualEnemies(Faction::Friendly2, Faction::Hostile1, result);
+    setMutualEnemies(Faction::Friendly2, Faction::Hostile2, result);
+    setMutualEnemies(Faction::Friendly2, Faction::Insane, result);
+    setMutualEnemies(Faction::Friendly2, Faction::Predator, result);
+    setMutualEnemies(Faction::Friendly2, Faction::Rancor, result);
+    setMutualEnemies(Faction::Friendly2, Faction::Tuskan, result);
+
+    // END Friendlies
+
+    // Hostiles
+
+    setMutualFriends(Faction::Hostile1, Faction::Hostile2, result);
+
+    setMutualEnemies(Faction::Hostile1, Faction::EndarSpire, result);
+    setMutualEnemies(Faction::Hostile1, Faction::Insane, result);
+    setMutualEnemies(Faction::Hostile1, Faction::Predator, result);
+    setMutualEnemies(Faction::Hostile1, Faction::Tuskan, result);
+
+    setMutualEnemies(Faction::Hostile2, Faction::EndarSpire, result);
+    setMutualEnemies(Faction::Hostile2, Faction::Insane, result);
+    setMutualEnemies(Faction::Hostile2, Faction::Predator, result);
+    setMutualEnemies(Faction::Hostile2, Faction::Rancor, result);
+    setMutualEnemies(Faction::Hostile2, Faction::Tuskan, result);
+
+    // END Hostiles
+
+    setMutualFriends(Faction::Surrender1, Faction::Surrender2, result);
+    setMutualFriends(Faction::Gizka1, Faction::Gizka2, result);
+    setMutualEnemies(Faction::Predator, Faction::Prey, result);
+
+    return move(result);
+}
+
+static DispositionsMap g_dispositions = initDispositions();
+
+static Disposition getDisposition(Faction target, Faction source) {
+    if (target == source) return Disposition::Friend;
+
+    auto maybeSourceDispositions = g_dispositions.find(source);
+    if (maybeSourceDispositions == g_dispositions.end()) return Disposition::Neutral;
+
+    auto maybeDisposition = maybeSourceDispositions->second.find(target);
+    if (maybeDisposition == maybeSourceDispositions->second.end()) return Disposition::Neutral;
+
+    return maybeDisposition->second;
+}
+
+bool getIsEnemy(const Creature &target, const Creature &source) {
+    return getDisposition(target.faction(), source.faction()) == Disposition::Enemy;
+}
+
+bool getIsFriend(const Creature &target, const Creature &source) {
+    return getDisposition(target.faction(), source.faction()) == Disposition::Friend;
+}
+
+bool getIsNeutral(const Creature &target, const Creature &source) {
+    return getDisposition(target.faction(), source.faction()) == Disposition::Neutral;
 }
 
 } // namespace game
