@@ -274,9 +274,9 @@ void Routines::addTslRoutines() {
     add("StringToInt", Int, { String }, bind(&Routines::stringToInt, this, _1, _2));
     add("StringToFloat", Float, { String }, bind(&Routines::stringToFloat, this, _1, _2));
     add("ActionCastSpellAtLocation", Void, { Int, Location, Int, Int, Int, Int });
-    add("GetIsEnemy", Int, { Object, Object });
-    add("GetIsFriend", Int, { Object, Object });
-    add("GetIsNeutral", Int, { Object, Object });
+    add("GetIsEnemy", Int, { Object, Object }, bind(&Routines::getIsEnemy, this, _1, _2));
+    add("GetIsFriend", Int, { Object, Object }, bind(&Routines::getIsFriend, this, _1, _2));
+    add("GetIsNeutral", Int, { Object, Object }, bind(&Routines::getIsNeutral, this, _1, _2));
     add("GetPCSpeaker", Object, { }, bind(&Routines::getPCSpeaker, this, _1, _2));
     add("GetStringByStrRef", String, { Int }, bind(&Routines::getStringByStrRef, this, _1, _2));
     add("ActionSpeakStringByStrRef", Void, { Int, Int });

@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include <memory>
-
 namespace reone {
 
 namespace game {
 
 class Creature;
 
-bool getIsEnemy(const Creature &left, const Creature &right);
+bool getIsEnemy(const Creature &target, const Creature &source);
+bool getIsFriend(const Creature &target, const Creature &source);
+bool getIsNeutral(const Creature &target, const Creature &source);
 
 } // namespace game
 

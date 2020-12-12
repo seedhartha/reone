@@ -21,6 +21,7 @@
 
 #include "../game.h"
 #include "../object/creature.h"
+#include "../rp/factionutil.h"
 
 using namespace std;
 
@@ -177,6 +178,48 @@ Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContex
         return static_cast<int>(Faction::Invalid);
     }
     return static_cast<int>(object->faction());
+}
+
+Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getCreature(args, 0);
+    if (!target) {
+        warn("Routines: getIsEnemy: target is invalid");
+        return 0;
+    }
+    auto source = getCreatureOrCaller(args, 1, ctx);
+    if (!source) {
+        warn("Routines: getIsEnemy: source is invalid");
+        return 0;
+    }
+    return game::getIsEnemy(*target, *source);
+}
+
+Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getCreature(args, 0);
+    if (!target) {
+        warn("Routines: getIsFriend: target is invalid");
+        return 0;
+    }
+    auto source = getCreatureOrCaller(args, 1, ctx);
+    if (!source) {
+        warn("Routines: getIsFriend: source is invalid");
+        return 0;
+    }
+    return game::getIsFriend(*target, *source);
+}
+
+Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getCreature(args, 0);
+    if (!target) {
+        warn("Routines: getIsNeutral: target is invalid");
+        return 0;
+    }
+    auto source = getCreatureOrCaller(args, 1, ctx);
+    if (!source) {
+        warn("Routines: getIsNeutral: source is invalid");
+        return 0;
+    }
+    return game::getIsNeutral(*target, *source);
 }
 
 } // namespace game
