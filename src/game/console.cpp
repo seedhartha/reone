@@ -58,9 +58,10 @@ Console::Console(Game *game) :
 
 void Console::initCommands() {
     addCommand("clear", bind(&Console::cmdClear, this, _1));
+    addCommand("describe", bind(&Console::cmdDescribe, this, _1));
     addCommand("listanim", bind(&Console::cmdListAnim, this, _1));
     addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
-    addCommand("describe", bind(&Console::cmdDescribe, this, _1));
+    addCommand("kill", bind(&Console::cmdKill, this, _1));
 }
 
 void Console::addCommand(const std::string &name, const CommandHandler &handler) {
@@ -70,6 +71,36 @@ void Console::addCommand(const std::string &name, const CommandHandler &handler)
 void Console::cmdClear(vector<string> tokens) {
     _output.clear();
     _outputOffset = 0;
+}
+
+void Console::cmdDescribe(vector<string> tokens) {
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto object = selector.selectedObject();
+    if (!object) {
+        print("describe: no object selected");
+        return;
+    }
+    glm::vec3 position(object->position());
+
+    stringstream ss;
+    ss
+        << setprecision(2) << fixed
+        << "id=" << object->id()
+        << " " << "tag=\"" << object->tag() << "\""
+        << " " << "tpl=\"" << object->blueprintResRef() << "\""
+        << " " << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
+
+    switch (object->type()) {
+        case ObjectType::Creature: {
+            auto creature = static_pointer_cast<Creature>(object);
+            ss << " " << "fac=" << static_cast<int>(creature->faction());
+            break;
+        }
+        default:
+            break;
+    }
+
+    print(ss.str());
 }
 
 void Console::cmdListAnim(vector<string> tokens) {
@@ -109,36 +140,15 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     object->model()->playAnimation(tokens[1], kAnimationLoop);
 }
 
-void Console::cmdDescribe(vector<string> tokens) {
+void Console::cmdKill(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("describe: no object selected");
+        print("kill: no object selected");
         return;
     }
-    glm::vec3 position(object->position());
-    float heading(object->heading());
-
-    stringstream ss;
-    ss
-        << setprecision(2) << fixed
-        << "id=" << object->id()
-        << " " << "tag=\"" << object->tag() << "\""
-        << " " << "tpl=\"" << object->blueprintResRef() << "\""
-        << " " << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]"
-        << " " << "facing=" << glm::degrees(heading);
-
-    switch (object->type()) {
-        case ObjectType::Creature: {
-            auto creature = static_pointer_cast<Creature>(object);
-            ss << " " << "fac=" << static_cast<int>(creature->faction());
-            break;
-        }
-        default:
-            break;
-    }
-
-    print(ss.str());
+    auto effect = make_unique<DamageEffect>(100000, DamageType::Universal, nullptr);
+    object->applyEffect(move(effect));
 }
 
 void Console::print(const string &text) {
