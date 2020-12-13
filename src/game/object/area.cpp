@@ -476,9 +476,8 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDL_SCANCODE_SLASH: {
-            int objectId = _objectSelector.selectedObjectId();
-            if (objectId != -1) {
-                shared_ptr<SpatialObject> object(find(objectId));
+            auto object = _objectSelector.selectedObject();
+            if (object) {
                 printDebugInfo(*object);
             }
             return true;

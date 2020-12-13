@@ -45,50 +45,44 @@ ObjectSelector::ObjectSelector(const Area *area, const Party *party) :
 }
 
 void ObjectSelector::update() {
-    if (_hilightedObjectId != -1) {
-        shared_ptr<SpatialObject> object(_area->find(_hilightedObjectId));
-        if (!object || !object->isSelectable()) {
-            _hilightedObjectId = -1;
-        }
+    if (_hilightedObject && !_hilightedObject->isSelectable()) {
+        _hilightedObject.reset();
     }
-    if (_selectedObjectId != -1) {
-        shared_ptr<SpatialObject> object(_area->find(_selectedObjectId));
-        if (!object || !object->isSelectable()) {
-            _selectedObjectId = -1;
-        }
+    if (_selectedObject && !_selectedObject->isSelectable()) {
+        _selectedObject.reset();
     }
 }
 
 void ObjectSelector::selectNext(bool reverse) {
-    vector<uint32_t> selectables;
-    getSelectableObjects(selectables);
+    vector<shared_ptr<SpatialObject>> selectables(getSelectableObjects());
 
     if (selectables.empty()) {
-        _selectedObjectId = -1;
+        _selectedObject.reset();
         return;
     }
-    if (_selectedObjectId == -1) {
-        _selectedObjectId = selectables.front();
+    if (!_selectedObject) {
+        _selectedObject = selectables.front();
         return;
     }
     if (reverse) {
-        auto selected = std::find(selectables.rbegin(), selectables.rend(), _selectedObjectId);
+        auto selected = std::find(selectables.rbegin(), selectables.rend(), _selectedObject);
         if (selected != selectables.rend()) {
             selected++;
         }
-        _selectedObjectId = selected != selectables.rend() ? *selected : selectables.back();
+        _selectedObject = selected != selectables.rend() ? *selected : selectables.back();
 
     } else {
-        auto selected = std::find(selectables.begin(), selectables.end(), _selectedObjectId);
+        auto selected = std::find(selectables.begin(), selectables.end(), _selectedObject);
         if (selected != selectables.end()) {
             selected++;
         }
-        _selectedObjectId = selected != selectables.end() ? *selected : selectables.front();
+        _selectedObject = selected != selectables.end() ? *selected : selectables.front();
     }
 }
 
-void ObjectSelector::getSelectableObjects(vector<uint32_t> &ids) const {
-    vector<pair<uint32_t, float>> selectables;
+vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
+    vector<shared_ptr<SpatialObject>> result;
+    vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
     shared_ptr<SpatialObject> partyLeader(_party->leader());
     glm::vec3 origin(partyLeader->position());
@@ -102,36 +96,38 @@ void ObjectSelector::getSelectableObjects(vector<uint32_t> &ids) const {
         float dist = object->distanceTo(origin);
         if (dist > kSelectionDistance) continue;
 
-        selectables.push_back(make_pair(object->id(), dist));
+        distances.push_back(make_pair(object, dist));
     }
 
-    sort(selectables.begin(), selectables.end(), [](const pair<uint32_t, float> &left, const pair<uint32_t, float> &right) {
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
         return left.second < right.second;
     });
-    for (auto &selectable : selectables) {
-        ids.push_back(selectable.first);
+    for (auto &pair : distances) {
+        result.push_back(pair.first);
     }
+
+    return move(result);
 }
 
 void ObjectSelector::selectNearest() {
-    _selectedObjectId = -1;
+    _selectedObject.reset();
     selectNext();
 }
 
-void ObjectSelector::hilight(uint32_t objectId) {
-    _hilightedObjectId = objectId;
+void ObjectSelector::hilight(const shared_ptr<SpatialObject> &object) {
+    _hilightedObject = object;
 }
 
-void ObjectSelector::select(uint32_t objectId) {
-    _selectedObjectId = objectId;
+void ObjectSelector::select(const shared_ptr<SpatialObject> &object) {
+    _selectedObject = object;
 }
 
-int ObjectSelector::hilightedObjectId() const {
-    return _hilightedObjectId;
+shared_ptr<SpatialObject> ObjectSelector::hilightedObject() const {
+    return _hilightedObject;
 }
 
-int ObjectSelector::selectedObjectId() const {
-    return _selectedObjectId;
+shared_ptr<SpatialObject> ObjectSelector::selectedObject() const {
+    return _selectedObject;
 }
 
 } // namespace game
