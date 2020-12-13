@@ -210,14 +210,14 @@ void MainMenu::onModuleSelected(const string &name) {
     player->load(playerCfg);
     player->setTag("PLAYER");
     player->setFaction(Faction::Friendly1);
-    player->setMinOneHP(true);
+    player->setImmortal(true);
     party.addMember(player);
     party.setPlayer(player);
 
     shared_ptr<Creature> companion(_game->objectFactory().newCreature());
     companion->load(companionCfg);
     companion->setFaction(Faction::Friendly1);
-    companion->setMinOneHP(true);
+    companion->setImmortal(true);
     companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
     party.addMember(companion);
 
