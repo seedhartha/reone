@@ -64,7 +64,14 @@ Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneG
 }
 
 bool Creature::isSelectable() const {
-    return !_dead || !_items.empty();
+    bool hasDropableItems = false;
+    for (auto &item : _items) {
+        if (item->isDropable()) {
+            hasDropableItems = true;
+            break;
+        }
+    }
+    return !_dead || hasDropableItems;
 }
 
 void Creature::load(const GffStruct &gffs) {

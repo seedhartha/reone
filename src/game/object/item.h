@@ -39,6 +39,7 @@ public:
 
     bool isEquippable() const;
     bool isEquippable(InventorySlot slot) const;
+    bool isDropable() const;
 
     const std::string &localizedName() const;
     const std::string &baseBodyVariation() const;
@@ -53,6 +54,8 @@ public:
     int damageFlags() const;
     WeaponType weaponType() const;
     WeaponWield weaponWield() const;
+
+    void setDropable(bool dropable);
 
 private:
     std::string _localizedName;
@@ -69,6 +72,7 @@ private:
     int _damageFlags { 0 };
     WeaponType _weaponType { WeaponType::None };
     WeaponWield _weaponWield { WeaponWield::None };
+    bool _dropable { true };
 
     friend class ItemBlueprint;
 };

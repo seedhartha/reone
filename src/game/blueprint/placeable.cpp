@@ -66,12 +66,7 @@ void PlaceableBlueprint::load(Placeable &placeable) {
 void PlaceableBlueprint::loadItems(Placeable &placeable) {
     for (auto &itemGffs : _utp->getList("ItemList")) {
         string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
-        shared_ptr<ItemBlueprint> itemBlueprint(Blueprints::instance().getItem(resRef));
-
-        shared_ptr<Item> item(placeable.objectFactory().newItem());
-        item->load(itemBlueprint);
-
-        placeable._items.push_back(move(item));
+        placeable.addItem(resRef, true);
     }
 }
 

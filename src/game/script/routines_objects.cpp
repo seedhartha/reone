@@ -121,7 +121,7 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
 
         if (!itemTemplate.empty()) {
             int count = getInt(args, 2);
-            result.object = target->addItem(itemTemplate);
+            result.object = target->addItem(itemTemplate, true);
         } else {
             warn("Routines: createItemOnObject: itemTemplate is invalid");
         }

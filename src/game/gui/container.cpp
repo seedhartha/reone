@@ -96,6 +96,8 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
     lbItems.clear();
 
     for (auto &item : container->items()) {
+        if (!item->isDropable()) continue;
+
         ListBox::Item lbItem;
         lbItem.tag = item->tag();
         lbItem.icon = item->icon();
@@ -120,7 +122,7 @@ void Container::onClick(const string &control) {
 
 void Container::transferItemsToPlayer() {
     shared_ptr<Creature> player(_game->party().player());
-    _container->moveItemsTo(*player);
+    _container->moveDropableItemsTo(*player);
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {

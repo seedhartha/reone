@@ -42,12 +42,13 @@ SpatialObject::SpatialObject(uint32_t id, ObjectType type, ObjectFactory *object
     _sceneGraph(sceneGraph) {
 }
 
-shared_ptr<Item> SpatialObject::addItem(const string &resRef) {
+shared_ptr<Item> SpatialObject::addItem(const string &resRef, bool dropable) {
     auto blueprint = Blueprints::instance().getItem(resRef);
     if (!blueprint) return nullptr;
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint);
+    item->setDropable(dropable);
 
     _items.push_back(item);
 
@@ -90,11 +91,15 @@ void SpatialObject::face(const SpatialObject &other) {
     updateTransform();
 }
 
-void SpatialObject::moveItemsTo(SpatialObject &other) {
-    for (auto &item : _items) {
-        other._items.push_back(item);
+void SpatialObject::moveDropableItemsTo(SpatialObject &other) {
+    for (auto it = _items.begin(); it != _items.end(); ) {
+        if ((*it)->isDropable()) {
+            other._items.push_back(*it);
+            it = _items.erase(it);
+        } else {
+            ++it;
+        }
     }
-    _items.clear();
 }
 
 void SpatialObject::applyEffect(const shared_ptr<Effect> &effect) {
