@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "../../common/aabb.h"
 
@@ -55,6 +57,7 @@ public:
 
     void initGL();
 
+    std::vector<std::string> getAnimationNames() const;
     Animation *getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
