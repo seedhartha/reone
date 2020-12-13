@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxOutputLineCount = 50;
+constexpr int kMaxOutputLineCount = 100;
 constexpr int kVisibleLineCount = 15;
 
 Console::Console(Game *game) :
@@ -55,6 +55,7 @@ Console::Console(Game *game) :
 
 void Console::initCommands() {
     addCommand("clear", bind(&Console::cmdClear, this, _1));
+    addCommand("listanim", bind(&Console::cmdListAnim, this, _1));
     addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
 }
 
@@ -65,6 +66,27 @@ void Console::addCommand(const std::string &name, const CommandHandler &handler)
 void Console::cmdClear(vector<string> tokens) {
     _output.clear();
     _outputOffset = 0;
+}
+
+void Console::cmdListAnim(vector<string> tokens) {
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto selectedObject = selector.selectedObject();
+    if (!selectedObject) {
+        print("listanim: no object selected");
+        return;
+    }
+
+    string substr;
+    if (static_cast<int>(tokens.size()) > 1) {
+        substr = tokens[1];
+    }
+
+    vector<string> anims(selectedObject->model()->model()->getAnimationNames());
+    for (auto &anim : anims) {
+        if (substr.empty() || boost::contains(anim, substr)) {
+            print(anim);
+        }
+    }
 }
 
 void Console::cmdPlayAnim(vector<string> tokens) {

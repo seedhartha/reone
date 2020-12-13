@@ -61,6 +61,22 @@ void Model::initGL() {
     _rootNode->initGL();
 }
 
+vector<string> Model::getAnimationNames() const {
+    vector<string> result;
+
+    if (_superModel) {
+        vector<string> superAnims(_superModel->getAnimationNames());
+        for (auto &anim : superAnims) {
+            result.push_back(anim);
+        }
+    }
+    for (auto &anim : _animations) {
+        result.push_back(anim.first);
+    }
+
+    return move(result);
+}
+
 Animation *Model::getAnimation(const string &name) const {
     auto maybeAnim = _animations.find(name);
     if (maybeAnim != _animations.end()) {
