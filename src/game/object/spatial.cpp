@@ -42,17 +42,30 @@ SpatialObject::SpatialObject(uint32_t id, ObjectType type, ObjectFactory *object
     _sceneGraph(sceneGraph) {
 }
 
-shared_ptr<Item> SpatialObject::addItem(const string &resRef, bool dropable) {
+shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {
     auto blueprint = Blueprints::instance().getItem(resRef);
     if (!blueprint) return nullptr;
 
-    shared_ptr<Item> item(_objectFactory->newItem());
-    item->load(blueprint);
-    item->setDropable(dropable);
+    shared_ptr<Item> result;
 
-    _items.push_back(item);
+    auto maybeItem = find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
+        return item->blueprintResRef() == resRef;
+    });
+    if (maybeItem != _items.end()) {
+        result = *maybeItem;
+        int prevStackSize = result->stackSize();
+        result->setStackSize(prevStackSize + stackSize);
 
-    return move(item);
+    } else {
+        result = _objectFactory->newItem();
+        result->load(blueprint);
+        result->setStackSize(stackSize);
+        result->setDropable(dropable);
+
+        _items.push_back(result);
+    }
+
+    return move(result);
 }
 
 void SpatialObject::addItem(const shared_ptr<Item> &item) {

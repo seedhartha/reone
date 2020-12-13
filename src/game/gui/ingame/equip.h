@@ -65,6 +65,8 @@ private:
     void updateItems();
     void updatePortraits();
     void selectSlot(Slot slot);
+
+    std::shared_ptr<render::Texture> getItemFrameTexture(int stackSize) const;
 };
 
 } // namespace game

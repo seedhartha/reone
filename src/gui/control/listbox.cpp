@@ -146,9 +146,9 @@ void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const
 
         _protoItem->setFocus(_hilightedIndex == itemIdx);
 
-        ImageButton *imageButton = dynamic_cast<ImageButton *>(_protoItem.get());
+        auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
-            imageButton->render(itemOffset, _items[itemIdx].text, _items[itemIdx].icon);
+            imageButton->render(itemOffset, _items[itemIdx].text, _items[itemIdx].iconText, _items[itemIdx].iconTexture, _items[itemIdx].iconFrame);
         } else {
             _protoItem->render(itemOffset, _items[itemIdx].text);
         }

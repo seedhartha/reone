@@ -27,14 +27,24 @@ class ImageButton : public Control {
 public:
     ImageButton(GUI *gui);
 
-    void render(const glm::ivec2 &offset, const std::string &textOverride, const std::shared_ptr<render::Texture> &icon) const;
+    void load(const resource::GffStruct &gffs) override;
 
-    void setIconFrame(const std::shared_ptr<render::Texture> &texture);
+    void render(
+        const glm::ivec2 &offset,
+        const std::string &textOverride,
+        const std::string &iconText,
+        const std::shared_ptr<render::Texture> &iconTexture,
+        const std::shared_ptr<render::Texture> &iconFrame) const;
 
 private:
     std::shared_ptr<render::Texture> _iconFrame;
+    std::shared_ptr<render::Font> _iconFont;
 
-    void drawIcon(const glm::ivec2 &offset, const std::shared_ptr<render::Texture> &icon) const;
+    void drawIcon(
+        const glm::ivec2 &offset,
+        const std::string &iconText,
+        const std::shared_ptr<render::Texture> &iconTexture,
+        const std::shared_ptr<render::Texture> &iconFrame) const;
 };
 
 } // namespace gui

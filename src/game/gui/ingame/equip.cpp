@@ -114,14 +114,6 @@ void Equipment::configureItemsListBox() {
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
     protoItem.setBorderColor(getBaseColor(_version));
     protoItem.setHilightColor(getHilightColor(_version));
-
-    string frameTex;
-    if (_version == GameVersion::TheSithLords) {
-        frameTex = "uibit_eqp_itm1";
-    } else {
-        frameTex = "lbl_hex_3";
-    }
-    protoItem.setIconFrame(Textures::instance().get(frameTex, TextureType::GUI));
 }
 
 static InventorySlot getInventorySlot(Equipment::Slot slot) {
@@ -350,7 +342,8 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
         lbItem.text = Resources::instance().getString(kStrRefNone);
-        lbItem.icon = Textures::instance().get("inone", TextureType::GUI);
+        lbItem.iconTexture = Textures::instance().get("inone", TextureType::GUI);
+        lbItem.iconFrame = getItemFrameTexture(1);
 
         lbItems.add(move(lbItem));
     }
@@ -366,10 +359,24 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = item->tag();
         lbItem.text = item->localizedName();
-        lbItem.icon = item->icon();
+        lbItem.iconTexture = item->icon();
+        lbItem.iconFrame = getItemFrameTexture(item->stackSize());
 
+        if (item->stackSize() > 1) {
+            lbItem.iconText = to_string(item->stackSize());
+        }
         lbItems.add(move(lbItem));
     }
+}
+
+shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
+    string resRef;
+    if (_version == GameVersion::TheSithLords) {
+        resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
+    } else {
+        resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
+    }
+    return Textures::instance().get(resRef, TextureType::GUI);
 }
 
 } // namespace game

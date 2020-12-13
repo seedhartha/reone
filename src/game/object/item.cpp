@@ -93,12 +93,20 @@ WeaponWield Item::weaponWield() const {
     return _weaponWield;
 }
 
+int Item::stackSize() const {
+    return _stackSize;
+}
+
 bool Item::isDropable() const {
     return _dropable;
 }
 
 void Item::setDropable(bool dropable) {
     _dropable = dropable;
+}
+
+void Item::setStackSize(int stackSize) {
+    _stackSize = stackSize;
 }
 
 } // namespace game

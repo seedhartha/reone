@@ -78,7 +78,7 @@ public:
 
     // Inventory
 
-    std::shared_ptr<Item> addItem(const std::string &resRef, bool dropable);
+    std::shared_ptr<Item> addItem(const std::string &resRef, int stackSize = 1, bool dropable = true);
     void addItem(const std::shared_ptr<Item> &item);
     void removeItem(const std::shared_ptr<Item> &item);
     void moveDropableItemsTo(SpatialObject &other);
