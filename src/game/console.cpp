@@ -17,19 +17,26 @@
 
 #include "console.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "glm/ext.hpp"
 
 #include "../common/log.h"
+
 #include "../render/font.h"
 #include "../render/fonts.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../resource/resources.h"
 
+#include "game.h"
+
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::render;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -38,7 +45,51 @@ namespace game {
 constexpr int kMaxOutputLineCount = 50;
 constexpr int kVisibleLineCount = 15;
 
-Console::Console(const GraphicsOptions &opts) : _opts(opts), _input(kTextInputConsole) {
+Console::Console(Game *game) :
+    _game(game),
+    _opts(game->options().graphics),
+    _input(kTextInputConsole) {
+
+    initCommands();
+}
+
+void Console::initCommands() {
+    addCommand("clear", bind(&Console::cmdClear, this, _1));
+    addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
+}
+
+void Console::addCommand(const std::string &name, const CommandHandler &handler) {
+    _commands.insert(make_pair(name, handler));
+}
+
+void Console::cmdClear(vector<string> tokens) {
+    _output.clear();
+    _outputOffset = 0;
+}
+
+void Console::cmdPlayAnim(vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: playanim anim_name");
+        return;
+    }
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto selectedObject = selector.selectedObject();
+    if (!selectedObject) {
+        print("playanim: no object selected");
+        return;
+    }
+    selectedObject->model()->playAnimation(tokens[1], kAnimationLoop);
+}
+
+void Console::print(const string &text) {
+    _output.push_front(text);
+    trimOutput();
+}
+
+void Console::trimOutput() {
+    for (int i = static_cast<int>(_output.size()) - kMaxOutputLineCount; i > 0; --i) {
+        _output.pop_back();
+    }
 }
 
 void Console::load() {
@@ -103,14 +154,16 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Console::executeInputText() {
-    debug(boost::format("Console: execute \"%s\"") % _input.text());
-    _output.push_front(_input.text());
-    trimOutput();
-}
+    vector<string> tokens;
+    boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
 
-void Console::trimOutput() {
-    for (int i = static_cast<int>(_output.size()) - kMaxOutputLineCount; i > 0; --i) {
-        _output.pop_back();
+    if (tokens.empty()) return;
+
+    auto maybeCommand = _commands.find(tokens[0]);
+    if (maybeCommand != _commands.end()) {
+        maybeCommand->second(move(tokens));
+    } else {
+        print("Unsupported command: " + tokens[0]);
     }
 }
 
@@ -149,7 +202,7 @@ void Console::drawLines() const {
     // Output
 
     for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
-        const string &line = _output[i + _outputOffset];
+        const string &line = _output[static_cast<size_t>(i) + _outputOffset];
         transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
         _font->render(line, transform, glm::vec3(1.0f), TextGravity::Right);
     }

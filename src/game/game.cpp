@@ -60,7 +60,7 @@ Game::Game(const fs::path &path, const Options &opts) :
     _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
-    _console(opts.graphics),
+    _console(this),
     _party(this) {
 
     initGameVersion();
