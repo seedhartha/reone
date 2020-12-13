@@ -17,6 +17,9 @@
 
 #include "console.h"
 
+#include <iomanip>
+#include <sstream>
+
 #include <boost/algorithm/string.hpp>
 
 #include "glm/ext.hpp"
@@ -57,6 +60,7 @@ void Console::initCommands() {
     addCommand("clear", bind(&Console::cmdClear, this, _1));
     addCommand("listanim", bind(&Console::cmdListAnim, this, _1));
     addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
+    addCommand("describe", bind(&Console::cmdDescribe, this, _1));
 }
 
 void Console::addCommand(const std::string &name, const CommandHandler &handler) {
@@ -70,8 +74,8 @@ void Console::cmdClear(vector<string> tokens) {
 
 void Console::cmdListAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto selectedObject = selector.selectedObject();
-    if (!selectedObject) {
+    auto object = selector.selectedObject();
+    if (!object) {
         print("listanim: no object selected");
         return;
     }
@@ -81,7 +85,9 @@ void Console::cmdListAnim(vector<string> tokens) {
         substr = tokens[1];
     }
 
-    vector<string> anims(selectedObject->model()->model()->getAnimationNames());
+    vector<string> anims(object->model()->model()->getAnimationNames());
+    sort(anims.begin(), anims.end());
+
     for (auto &anim : anims) {
         if (substr.empty() || boost::contains(anim, substr)) {
             print(anim);
@@ -95,12 +101,44 @@ void Console::cmdPlayAnim(vector<string> tokens) {
         return;
     }
     ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto selectedObject = selector.selectedObject();
-    if (!selectedObject) {
+    auto object = selector.selectedObject();
+    if (!object) {
         print("playanim: no object selected");
         return;
     }
-    selectedObject->model()->playAnimation(tokens[1], kAnimationLoop);
+    object->model()->playAnimation(tokens[1], kAnimationLoop);
+}
+
+void Console::cmdDescribe(vector<string> tokens) {
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto object = selector.selectedObject();
+    if (!object) {
+        print("describe: no object selected");
+        return;
+    }
+    glm::vec3 position(object->position());
+    float heading(object->heading());
+
+    stringstream ss;
+    ss
+        << setprecision(2) << fixed
+        << "id=" << object->id()
+        << " " << "tag=\"" << object->tag() << "\""
+        << " " << "tpl=\"" << object->blueprintResRef() << "\""
+        << " " << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]"
+        << " " << "facing=" << glm::degrees(heading);
+
+    switch (object->type()) {
+        case ObjectType::Creature: {
+            auto creature = static_pointer_cast<Creature>(object);
+            ss << " " << "fac=" << static_cast<int>(creature->faction());
+            break;
+        }
+        default:
+            break;
+    }
+
+    print(ss.str());
 }
 
 void Console::print(const string &text) {

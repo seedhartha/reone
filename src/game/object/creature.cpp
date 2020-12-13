@@ -98,10 +98,7 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
 }
 
 void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
-    _blueprintResRef = blueprint->resRef();
-
     blueprint->load(*this);
-
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _appearance);
 }
@@ -357,10 +354,6 @@ void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32
 
 void Creature::clearPath() {
     _path.reset();
-}
-
-const string &Creature::blueprintResRef() const {
-    return _blueprintResRef;
 }
 
 Gender Creature::gender() const {

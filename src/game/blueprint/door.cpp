@@ -43,6 +43,7 @@ DoorBlueprint::DoorBlueprint(const string &resRef, const shared_ptr<GffStruct> &
 }
 
 void DoorBlueprint::load(Door &door) {
+    door._blueprintResRef = _resRef;
     door._tag = boost::to_lower_copy(_utd->getString("Tag"));
 
     int locNameStrRef = _utd->getInt("LocName", -1);

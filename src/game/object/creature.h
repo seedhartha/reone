@@ -100,7 +100,6 @@ public:
 
     float getAttackRange() const;
 
-    const std::string &blueprintResRef() const;
     Gender gender() const;
     ModelType modelType() const;
     int appearance() const;
@@ -148,7 +147,6 @@ public:
 
 private:
     CreatureConfiguration _config;
-    std::string _blueprintResRef;
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;

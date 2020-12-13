@@ -44,6 +44,7 @@ PlaceableBlueprint::PlaceableBlueprint(const string &resRef, const shared_ptr<Gf
 }
 
 void PlaceableBlueprint::load(Placeable &placeable) {
+    placeable._blueprintResRef = _resRef;
     placeable._tag = boost::to_lower_copy(_utp->getString("Tag"));
 
     int locNameStrRef = _utp->getInt("LocName", -1);

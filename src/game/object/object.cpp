@@ -56,6 +56,10 @@ const string &Object::tag() const {
     return _tag;
 }
 
+const string &Object::blueprintResRef() const {
+    return _blueprintResRef;
+}
+
 const string &Object::title() const {
     return _title;
 }
