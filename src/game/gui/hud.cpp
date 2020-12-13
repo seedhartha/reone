@@ -220,6 +220,8 @@ void HUD::drawMinimap() const {
 }
 
 void HUD::drawHealth(int memberIndex) const {
+    if (_version == GameVersion::TheSithLords) return;
+
     Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
 
