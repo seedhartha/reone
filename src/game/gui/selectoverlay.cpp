@@ -111,24 +111,20 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     shared_ptr<Area> area(_game->module()->area());
     ObjectSelector &selector = area->objectSelector();
 
-    int selectedObjectId = selector.selectedObjectId();
-    if (selectedObjectId == -1) return false;
-
-    shared_ptr<SpatialObject> object(area->find(selectedObjectId));
-    if (!object) return false;
+    auto selectedObject = selector.selectedObject();
+    if (!selectedObject) return false;
 
     switch (_actions[_selectedActionIdx]) {
         case ContextualAction::Unlock: {
             ActionQueue &actions = _game->party().leader()->actionQueue();
-            actions.add(make_unique<ObjectAction>(ActionType::OpenLock, object));
+            actions.add(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
         }
 
         case ContextualAction::Attack: {
             shared_ptr<Creature> partyLeader(_game->party().leader());
             ActionQueue &actions = partyLeader->actionQueue();
-            actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(object),
-                        partyLeader->getAttackRange()));
+            actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange()));
             break;
         }
 
@@ -151,29 +147,27 @@ void SelectionOverlay::update() {
     glm::mat4 projection(camera->sceneNode()->projection());
     glm::mat4 view(camera->sceneNode()->view());
 
-    int hilightedObjectId = selector.hilightedObjectId();
-    if (hilightedObjectId != -1) {
-        shared_ptr<SpatialObject> object(area->find(hilightedObjectId));
-        _hilightedScreenCoords = area->getSelectableScreenCoords(object, projection, view);
+    auto hilightedObject = selector.hilightedObject();
+    if (hilightedObject) {
+        _hilightedScreenCoords = area->getSelectableScreenCoords(hilightedObject, projection, view);
 
         if (_hilightedScreenCoords.z < 1.0f) {
-            _hilightedObject = object;
+            _hilightedObject = hilightedObject;
 
-            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(object));
+            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(hilightedObject));
             _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
         }
     }
 
-    int selectedObjectId = selector.selectedObjectId();
-    if (selectedObjectId != -1) {
-        shared_ptr<SpatialObject> object(area->find(selectedObjectId));
-        _selectedScreenCoords = area->getSelectableScreenCoords(object, projection, view);
+    auto selectedObject = selector.selectedObject();
+    if (selectedObject) {
+        _selectedScreenCoords = area->getSelectableScreenCoords(selectedObject, projection, view);
 
         if (_selectedScreenCoords.z < 1.0f) {
-            _selectedObject = object;
-            _actions = module->getContextualActions(object);
+            _selectedObject = selectedObject;
+            _actions = module->getContextualActions(selectedObject);
 
-            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(object));
+            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(selectedObject));
             _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
         }
     }

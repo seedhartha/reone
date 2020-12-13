@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace reone {
@@ -27,6 +28,7 @@ namespace game {
 const float kSelectionDistance = 8.0f;
 
 class Area;
+class SpatialObject;
 class Party;
 
 class ObjectSelector {
@@ -35,19 +37,20 @@ public:
 
     void update();
     void selectNext(bool reverse = false);
-    void getSelectableObjects(std::vector<uint32_t> &ids) const;
     void selectNearest();
-    void hilight(uint32_t objectId);
-    void select(uint32_t objectId);
+    void hilight(const std::shared_ptr<SpatialObject> &object);
+    void select(const std::shared_ptr<SpatialObject> &object);
 
-    int hilightedObjectId() const;
-    int selectedObjectId() const;
+    std::vector<std::shared_ptr<SpatialObject>> getSelectableObjects() const;
+
+    std::shared_ptr<SpatialObject> hilightedObject() const;
+    std::shared_ptr<SpatialObject> selectedObject() const;
 
 private:
     const Area *_area { nullptr };
     const Party *_party { nullptr };
-    int _hilightedObjectId { -1 };
-    int _selectedObjectId { -1 };
+    std::shared_ptr<SpatialObject> _hilightedObject;
+    std::shared_ptr<SpatialObject> _selectedObject;
 
     ObjectSelector(const ObjectSelector &) = delete;
     ObjectSelector &operator=(const ObjectSelector &) = delete;

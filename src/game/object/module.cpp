@@ -131,7 +131,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
     shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
     if (object && object->isSelectable()) {
-        _area->objectSelector().hilight(object->id());
+        _area->objectSelector().hilight(object);
 
         switch (object->type()) {
             case ObjectType::Creature: {
@@ -154,7 +154,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                 break;
         }
     } else {
-        _area->objectSelector().hilight(-1);
+        _area->objectSelector().hilight(nullptr);
     }
 
     _game->setCursorType(cursor);
@@ -168,9 +168,9 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
     if (!object || !object->isSelectable()) return false;
 
-    uint32_t selectedObjectId = _area->objectSelector().selectedObjectId();
-    if (object->id() != selectedObjectId) {
-        _area->objectSelector().select(object->id());
+    auto selectedObject = _area->objectSelector().selectedObject();
+    if (object != selectedObject) {
+        _area->objectSelector().select(object);
         return true;
     }
     onObjectClick(object);
