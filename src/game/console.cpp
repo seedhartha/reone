@@ -19,12 +19,12 @@
 
 #include "glm/ext.hpp"
 
+#include "../common/log.h"
 #include "../render/font.h"
 #include "../render/fonts.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../resource/resources.h"
-#include "../common/log.h"
 
 using namespace std;
 
@@ -35,24 +35,41 @@ namespace reone {
 
 namespace game {
 
-static const int kLineCount = 10;
+constexpr int kMaxOutputLineCount = 50;
+constexpr int kVisibleLineCount = 15;
 
 Console::Console(const GraphicsOptions &opts) : _opts(opts), _input(kTextInputConsole) {
 }
 
 void Console::load() {
-    _font = Fonts::instance().get("fnt_d16x16");
+    _font = Fonts::instance().get("fnt_console");
 }
 
 bool Console::handle(const SDL_Event &event) {
     if (_open && _input.handle(event)) return true;
 
     switch (event.type) {
+        case SDL_MOUSEWHEEL:
+            return handleMouseWheel(event.wheel);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
         default:
             return false;
     }
+}
+
+bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+    bool up = event.y < 0;
+    if (up) {
+        if (_outputOffset > 0) {
+            --_outputOffset;
+        }
+    } else {
+        if (_outputOffset < static_cast<int>(_output.size()) - kVisibleLineCount + 1) {
+            ++_outputOffset;
+        }
+    }
+    return true;
 }
 
 bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
@@ -87,6 +104,14 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
 
 void Console::executeInputText() {
     debug(boost::format("Console: execute \"%s\"") % _input.text());
+    _output.push_front(_input.text());
+    trimOutput();
+}
+
+void Console::trimOutput() {
+    for (int i = static_cast<int>(_output.size()) - kMaxOutputLineCount; i > 0; --i) {
+        _output.pop_back();
+    }
 }
 
 void Console::render() const {
@@ -95,7 +120,7 @@ void Console::render() const {
 }
 
 void Console::drawBackground() const {
-    float height = kLineCount * _font->height();
+    float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
@@ -111,13 +136,23 @@ void Console::drawBackground() const {
 }
 
 void Console::drawLines() const {
-    float height = kLineCount * _font->height();
+    float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
 
+    // Input
+
     string text("> " + _input.text());
     _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
+
+    // Output
+
+    for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
+        const string &line = _output[i + _outputOffset];
+        transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
+        _font->render(line, transform, glm::vec3(1.0f), TextGravity::Right);
+    }
 }
 
 bool Console::isOpen() const {

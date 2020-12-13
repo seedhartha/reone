@@ -20,6 +20,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <queue>
 
 #include "SDL2/SDL_events.h"
 
@@ -46,14 +47,17 @@ private:
     render::GraphicsOptions _opts;
     bool _open { false };
     gui::TextInput _input;
+    std::deque<std::string> _output;
+    int _outputOffset { 0 };
 
     Console(const Console &) = delete;
     Console &operator=(const Console &) = delete;
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
 
     void executeInputText();
+    void trimOutput();
 
     void drawBackground() const;
     void drawLines() const;
