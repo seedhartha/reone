@@ -29,8 +29,9 @@ Specify a game path to run the game, e.g. `reone --game C:\swkotor`
 Controls:
 * Use WASD and ZC keys to move around
 * Left click to interact with an object
-* Use V key to switch the camera type
+* Press V to switch the camera type
 * Use "-" and "+" keys to adjust the game speed
+* Press "~" to toggle the debug console
 
 ## Configuration
 

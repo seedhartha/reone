@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <queue>
+#include <unordered_map>
 
 #include "SDL2/SDL_events.h"
 
@@ -32,9 +33,11 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Console {
 public:
-    Console(const render::GraphicsOptions &opts);
+    Console(Game *game);
 
     void load();
     bool handle(const SDL_Event &event);
@@ -43,12 +46,16 @@ public:
     bool isOpen() const;
 
 private:
-    std::shared_ptr<render::Font> _font;
+    typedef std::function<void(std::vector<std::string>)> CommandHandler;
+
+    Game *_game;
     render::GraphicsOptions _opts;
+    std::shared_ptr<render::Font> _font;
     bool _open { false };
     gui::TextInput _input;
     std::deque<std::string> _output;
     int _outputOffset { 0 };
+    std::unordered_map<std::string, CommandHandler> _commands;
 
     Console(const Console &) = delete;
     Console &operator=(const Console &) = delete;
@@ -57,10 +64,21 @@ private:
     bool handleKeyUp(const SDL_KeyboardEvent &event);
 
     void executeInputText();
+    void print(const std::string &text);
     void trimOutput();
 
     void drawBackground() const;
     void drawLines() const;
+
+    // Commands
+
+    void initCommands();
+    void addCommand(const std::string &name, const CommandHandler &handler);
+
+    void cmdClear(std::vector<std::string> tokens);
+    void cmdPlayAnim(std::vector<std::string> tokens);
+
+    // END Commands
 };
 
 } // namespace game
