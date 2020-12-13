@@ -47,6 +47,7 @@ CreatureBlueprint::CreatureBlueprint(const string &resRef, const shared_ptr<GffS
 }
 
 void CreatureBlueprint::load(Creature &creature) {
+    creature._blueprintResRef = _resRef;
     creature._tag = boost::to_lower_copy(_utc->getString("Tag"));
     creature._appearance = getAppearanceFromUtc();
 

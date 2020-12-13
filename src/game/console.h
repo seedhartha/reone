@@ -78,6 +78,7 @@ private:
     void cmdClear(std::vector<std::string> tokens);
     void cmdListAnim(std::vector<std::string> tokens);
     void cmdPlayAnim(std::vector<std::string> tokens);
+    void cmdDescribe(std::vector<std::string> tokens);
 
     // END Commands
 };

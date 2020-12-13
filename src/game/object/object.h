@@ -40,6 +40,7 @@ public:
 
     ObjectType type() const;
     const std::string &tag() const;
+    const std::string &blueprintResRef() const;
     const std::string &title() const;
     const std::string &conversation() const;
     ActionQueue &actionQueue();
@@ -61,6 +62,7 @@ public:
 protected:
     ObjectType _type { ObjectType::None };
     std::string _tag;
+    std::string _blueprintResRef;
     std::string _title;
     std::string _conversation;
     ActionQueue _actionQueue;
