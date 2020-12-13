@@ -120,8 +120,8 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
         boost::to_lower(itemTemplate);
 
         if (!itemTemplate.empty()) {
-            int count = getInt(args, 2);
-            result.object = target->addItem(itemTemplate, true);
+            int stackSize = getInt(args, 2, 1);
+            result.object = target->addItem(itemTemplate, stackSize, true);
         } else {
             warn("Routines: createItemOnObject: itemTemplate is invalid");
         }

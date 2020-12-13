@@ -17,21 +17,36 @@
 
 #include "imagebutton.h"
 
+#include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
 
 using namespace std;
 
 using namespace reone::render;
+using namespace reone::resource;
 
 namespace reone {
 
 namespace gui {
 
+constexpr char kIconFontResRef[] = "dialogfont10x10a";
+
 ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
     _clickable = true;
 }
 
-void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, const shared_ptr<Texture> &icon) const {
+void ImageButton::load(const GffStruct &gffs) {
+    Control::load(gffs);
+    _iconFont = Fonts::instance().get(kIconFontResRef);
+}
+
+void ImageButton::render(
+    const glm::ivec2 &offset,
+    const string &textOverride,
+    const string &iconText,
+    const shared_ptr<Texture> &iconTexture,
+    const shared_ptr<Texture> &iconFrame) const {
+
     if (!_visible) return;
 
     glm::ivec2 borderOffset(offset);
@@ -45,7 +60,7 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
         drawBorder(*_border, borderOffset, size);
     }
 
-    drawIcon(offset, icon);
+    drawIcon(offset, iconText, iconTexture, iconFrame);
 
     if (!textOverride.empty() || !_text.text.empty()) {
         string text(!textOverride.empty() ? textOverride : _text.text);
@@ -53,45 +68,49 @@ void ImageButton::render(const glm::ivec2 &offset, const string &textOverride, c
     }
 }
 
-void ImageButton::drawIcon(const glm::ivec2 &offset, const shared_ptr<Texture> &icon) const {
-    if (!_iconFrame && !icon) return;
+void ImageButton::drawIcon(
+    const glm::ivec2 &offset,
+    const string &iconText,
+    const shared_ptr<Texture> &iconTexture,
+    const shared_ptr<Texture> &iconFrame) const {
+
+    if (!iconFrame && !iconTexture) return;
+
+    glm::vec3 color(1.0f);
+    if (_focus && _hilight) {
+        color = _hilight->color;
+    } else if (_border) {
+        color = _border->color;
+    }
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
-    {
-        glm::vec3 frameColor(1.0f);
-        if (_focus && _hilight) {
-            frameColor = _hilight->color;
-        } else if (_border) {
-            frameColor = _border->color;
-        }
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-        locals.general.color = glm::vec4(frameColor, 1.0f);
+    LocalUniforms locals;
+    locals.general.model = transform;
+    locals.general.color = glm::vec4(color, 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    }
+    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    if (_iconFrame) {
-        _iconFrame->bind(0);
+    if (iconFrame) {
+        iconFrame->bind(0);
         Quad::getDefault().renderTriangles();
     }
-    {
-        LocalUniforms locals;
-        locals.general.model = transform;
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    }
-    if (icon) {
-        icon->bind(0);
+    locals.general.color = glm::vec4(1.0f);
+
+    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
+    if (iconTexture) {
+        iconTexture->bind(0);
         Quad::getDefault().renderTriangles();
     }
-}
-
-void ImageButton::setIconFrame(const shared_ptr<Texture> &texture) {
-    _iconFrame = texture;
+    if (!iconText.empty()) {
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
+        _iconFont->render(iconText, transform, color, TextGravity::Left);
+    }
 }
 
 } // namespace gui

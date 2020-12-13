@@ -45,6 +45,8 @@ private:
     void configureItemsListBox();
     void transferItemsToPlayer();
 
+    std::shared_ptr<render::Texture> getItemFrameTexture(int stackSize) const;
+
     // Event handlers
 
     void onClick(const std::string &control) override;

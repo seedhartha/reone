@@ -46,6 +46,7 @@ ItemBlueprint::ItemBlueprint(const string &resRef, const shared_ptr<GffStruct> &
 }
 
 void ItemBlueprint::load(Item &item) {
+    item._blueprintResRef = _resRef;
     item._tag = boost::to_lower_copy(_uti->getString("Tag"));
     item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
 

@@ -54,8 +54,10 @@ public:
     int damageFlags() const;
     WeaponType weaponType() const;
     WeaponWield weaponWield() const;
+    int stackSize() const;
 
     void setDropable(bool dropable);
+    void setStackSize(int size);
 
 private:
     std::string _localizedName;
@@ -73,6 +75,7 @@ private:
     WeaponType _weaponType { WeaponType::None };
     WeaponWield _weaponWield { WeaponWield::None };
     bool _dropable { true };
+    int _stackSize { 1 };
 
     friend class ItemBlueprint;
 };

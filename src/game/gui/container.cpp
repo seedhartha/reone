@@ -79,14 +79,6 @@ void Container::configureItemsListBox() {
     text.align = Control::TextAlign::LeftCenter;
 
     protoItem.setText(text);
-
-    string frameTex;
-    if (_version == GameVersion::TheSithLords) {
-        frameTex = "uibit_eqp_itm1";
-    } else {
-        frameTex = "lbl_hex_3";
-    }
-    protoItem.setIconFrame(Textures::instance().get(frameTex, TextureType::GUI));
 }
 
 void Container::open(const shared_ptr<SpatialObject> &container) {
@@ -100,11 +92,25 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
 
         ListBox::Item lbItem;
         lbItem.tag = item->tag();
-        lbItem.icon = item->icon();
         lbItem.text = item->localizedName();
+        lbItem.iconTexture = item->icon();
+        lbItem.iconFrame = getItemFrameTexture(item->stackSize());
 
+        if (item->stackSize() > 1) {
+            lbItem.iconText = to_string(item->stackSize());
+        }
         lbItems.add(move(lbItem));
     }
+}
+
+shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
+    string resRef;
+    if (_version == GameVersion::TheSithLords) {
+        resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
+    } else {
+        resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
+    }
+    return Textures::instance().get(resRef, TextureType::GUI);
 }
 
 SpatialObject &Container::container() const {

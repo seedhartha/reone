@@ -80,6 +80,7 @@ private:
     void cmdListAnim(std::vector<std::string> tokens);
     void cmdPlayAnim(std::vector<std::string> tokens);
     void cmdKill(std::vector<std::string> tokens);
+    void cmdAddItem(std::vector<std::string> tokens);
 
     // END Commands
 };
