@@ -90,27 +90,34 @@ void Console::executeInputText() {
 }
 
 void Console::render() const {
+    drawBackground();
+    drawLines();
+}
+
+void Console::drawBackground() const {
     float height = kLineCount * _font->height();
-    {
-        glm::mat4 transform(1.0f);
-        transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-        locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        locals.general.alpha = 0.5f;
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    }
+    LocalUniforms locals;
+    locals.general.model = move(transform);
+    locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    locals.general.alpha = 0.5f;
+
+    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+
     Quad::getDefault().renderTriangles();
+}
+
+void Console::drawLines() const {
+    float height = kLineCount * _font->height();
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
 
     string text("> " + _input.text());
-    {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
-
-        _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
-    }
+    _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
 }
 
 bool Console::isOpen() const {

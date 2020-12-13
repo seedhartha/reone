@@ -52,7 +52,11 @@ private:
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
+
     void executeInputText();
+
+    void drawBackground() const;
+    void drawLines() const;
 };
 
 } // namespace game
