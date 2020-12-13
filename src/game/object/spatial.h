@@ -78,10 +78,10 @@ public:
 
     // Inventory
 
-    std::shared_ptr<Item> addItem(const std::string &resRef);
+    std::shared_ptr<Item> addItem(const std::string &resRef, bool dropable);
     void addItem(const std::shared_ptr<Item> &item);
     void removeItem(const std::shared_ptr<Item> &item);
-    void moveItemsTo(SpatialObject &other);
+    void moveDropableItemsTo(SpatialObject &other);
 
     std::shared_ptr<Item> getFirstItem();
     std::shared_ptr<Item> getNextItem();

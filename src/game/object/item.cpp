@@ -93,6 +93,14 @@ WeaponWield Item::weaponWield() const {
     return _weaponWield;
 }
 
+bool Item::isDropable() const {
+    return _dropable;
+}
+
+void Item::setDropable(bool dropable) {
+    _dropable = dropable;
+}
+
 } // namespace game
 
 } // namespace reone
