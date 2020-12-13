@@ -114,7 +114,8 @@ public:
     void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
-    void setInCombat(bool active);
+    void setInCombat(bool inCombat);
+    void setImmortal(bool immortal);
 
     // Equipment
 
@@ -167,6 +168,7 @@ private:
     int _portraitId { 0 };
     CreatureModelBuilder _modelBuilder;
     CreatureAnimationResolver _animResolver;
+    bool _immortal { false };
 
     // Scripts
 

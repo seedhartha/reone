@@ -219,7 +219,7 @@ void Creature::updateModelAnimation() {
 }
 
 void Creature::updateHealth() {
-    if (_dead || _currentHitPoints > 0) return;
+    if (_currentHitPoints > 0 || _immortal || _dead) return;
 
     playAnimation(Animation::Die);
     _dead = true;
@@ -442,8 +442,12 @@ void Creature::setMovementRestricted(bool restricted) {
     _movementRestricted = restricted;
 }
 
-void Creature::setInCombat(bool active) {
-    _inCombat = active;
+void Creature::setInCombat(bool inCombat) {
+    _inCombat = inCombat;
+}
+
+void Creature::setImmortal(bool immortal) {
+    _immortal = immortal;
 }
 
 void Creature::runSpawnScript() {

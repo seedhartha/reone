@@ -226,7 +226,7 @@ void PartySelection::changeParty() {
         shared_ptr<Creature> creature(_game->objectFactory().newCreature());
         creature->load(blueprint);
         creature->setFaction(Faction::Friendly1);
-        creature->setMinOneHP(true);
+        creature->setImmortal(true);
         creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
         party.addMember(creature);
     }
