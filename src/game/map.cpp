@@ -41,6 +41,8 @@ namespace reone {
 
 namespace game {
 
+constexpr int kArrowSize = 32;
+
 Map::Map(Game *game) : _game(game) {
     if (!game) {
         throw invalid_argument("game must not be null");
@@ -177,8 +179,8 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, arrowPos);
     transform = glm::rotate(transform, heading, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform = glm::translate(transform, glm::vec3(-0.5f * _arrow->width(), -0.5f * _arrow->height(), 0.0f));
-    transform = glm::scale(transform, glm::vec3(_arrow->width(), _arrow->height(), 1.0f));
+    transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
+    transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
     LocalUniforms locals;
     locals.general.model = transform;
