@@ -19,6 +19,7 @@
 
 #include "../../common/log.h"
 
+#include "../enginetype/location.h"
 #include "../game.h"
 
 using namespace std;
@@ -116,6 +117,22 @@ Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &c
     int value = getInt(args, 2);
     _game->setLocalNumber(object->id(), index, value);
 
+    return Variable();
+}
+
+Variable Routines::getGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
+    string id(getString(args, 0));
+    return Variable(VariableType::Location, _game->getGlobalLocation(id));
+}
+
+Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
+    string id(getString(args, 0));
+    auto value = getLocationEngineType(args, 1);
+    if (value) {
+        _game->setGlobalLocation(id, value);
+    } else {
+        warn("Routines: setGlobalLocation: value is invalid");
+    }
     return Variable();
 }
 
