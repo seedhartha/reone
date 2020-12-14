@@ -97,9 +97,13 @@ bool SpatialObject::contains(const glm::vec3 &point) const {
 }
 
 void SpatialObject::face(const SpatialObject &other) {
-    if (_id == other._id) return;
+    if (_id != other._id) {
+        face(other._position);
+    }
+}
 
-    glm::vec2 dir(glm::normalize(other._position - _position));
+void SpatialObject::face(const glm::vec3 &point) {
+    glm::vec2 dir(glm::normalize(point - _position));
     _facing = -glm::atan(dir.x, dir.y);
     updateTransform();
 }

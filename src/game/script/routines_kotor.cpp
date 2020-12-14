@@ -181,7 +181,7 @@ void Routines::addKotorRoutines() {
     add("GetIsDead", Int, { Object }, &Routines::getIsDead);
     add("PrintVector", Void, { TVector, Int }, &Routines::printVector);
     add("Vector", TVector, { Float, Float, Float }, &Routines::vectorCreate);
-    add("SetFacingPoint", Void, { TVector });
+    add("SetFacingPoint", Void, { TVector }, &Routines::setFacingPoint);
     add("AngleToVector", TVector, { Float });
     add("VectorToAngle", Float, { TVector });
     add("TouchAttackMelee", Int, { Object, Int });

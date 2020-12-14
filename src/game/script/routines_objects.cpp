@@ -342,6 +342,17 @@ Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
     return Variable();
 }
 
+Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
+    if (caller) {
+        glm::vec3 target(getVector(args, 0));
+        caller->face(target);
+    } else {
+        warn("Routines: setFacingPoint: invalid caller");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
