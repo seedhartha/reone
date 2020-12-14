@@ -100,6 +100,12 @@ Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, Exec
     return glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
 }
 
+Variable Routines::getStartingLocation(const VariablesList &args, ExecutionContext &ctx) {
+    const ModuleInfo &info = _game->module()->info();
+    auto location = make_shared<Location>(info.entryPosition, info.entryFacing);
+    return Variable(VariableType::Location, move(location));
+}
+
 } // namespace game
 
 } // namespace reone

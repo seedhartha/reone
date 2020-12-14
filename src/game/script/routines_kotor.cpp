@@ -449,7 +449,7 @@ void Routines::addKotorRoutines() {
     add("GetIsDusk", Int, { });
     add("GetIsEncounterCreature", Int, { Object });
     add("GetLastPlayerDying", Object, { });
-    add("GetStartingLocation", Location, { });
+    add("GetStartingLocation", Location, { }, &Routines::getStartingLocation);
     add("ChangeToStandardFaction", Void, { Object, Int }, &Routines::changeToStandardFaction);
     add("SoundObjectPlay", Void, { Object }, &Routines::soundObjectPlay);
     add("SoundObjectStop", Void, { Object }, &Routines::soundObjectStop);

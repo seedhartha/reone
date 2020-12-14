@@ -193,6 +193,7 @@ private:
     script::Variable getFacingFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPositionFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getStartingLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable location(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Engine types
