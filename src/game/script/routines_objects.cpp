@@ -302,13 +302,33 @@ Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ct
     return creature->isInCombat();
 }
 
-Variable Routines::getIsOpen(const VariablesList & args, ExecutionContext & ctx) {
+Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getSpatialObject(args, 0);
     if (!object) {
         warn("Routines: getIsOpen: object is invalid");
         return false;
     }
     return object->isOpen();
+}
+
+Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
+    auto item = getItem(args, 0);
+    if (!item) {
+        warn("Routines: getItemStackSize: item is invalid");
+        return 0;
+    }
+    return item->stackSize();
+}
+
+Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
+    auto item = getItem(args, 0);
+    if (item) {
+        int stackSize = getInt(args, 1);
+        item->setStackSize(stackSize);
+    } else {
+        warn("Routines: setItemStackSize: item is invalid");
+    }
+    return Variable();
 }
 
 } // namespace game
