@@ -174,6 +174,7 @@ private:
     script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectType(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
@@ -181,6 +182,7 @@ private:
     script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
 
