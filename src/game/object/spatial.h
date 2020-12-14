@@ -47,6 +47,7 @@ public:
 
     void face(const SpatialObject &other);
     void face(const glm::vec3 &point);
+    void faceAwayFrom(const SpatialObject &other);
 
     void applyEffect(const std::shared_ptr<Effect> &eff);
 

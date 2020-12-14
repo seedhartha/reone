@@ -591,7 +591,7 @@ void Routines::addTslRoutines() {
     add("SetTrapDetectedBy", Int, { Object, Object });
     add("GetIsTrapped", Int, { Object });
     add("SetEffectIcon", Effect, { Effect, Int });
-    add("FaceObjectAwayFromObject", Void, { Object, Object });
+    add("FaceObjectAwayFromObject", Void, { Object, Object }, &Routines::faceObjectAwayFromObject);
     add("PopUpDeathGUIPanel", Void, { Object, Int, Int, Int, String });
     add("SetTrapDisabled", Void, { Object });
     add("GetLastHostileActor", Object, { Object });
