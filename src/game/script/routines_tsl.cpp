@@ -144,7 +144,7 @@ void Routines::addTslRoutines() {
     add("d100", Int, { Int }, &Routines::d100);
     add("VectorMagnitude", Float, { TVector }, &Routines::vectorMagnitude);
     add("GetMetaMagicFeat", Int, { });
-    add("GetObjectType", Int, { Object });
+    add("GetObjectType", Int, { Object }, &Routines::getObjectType);
     add("GetRacialType", Int, { Object });
     add("FortitudeSave", Int, { Object, Int, Int, Object });
     add("ReflexSave", Int, { Object, Int, Int, Object });
@@ -291,7 +291,7 @@ void Routines::addTslRoutines() {
     add("EffectPoison", Effect, { Int }, &Routines::effectPoison);
     add("GetLoadFromSaveGame", Int, { }, &Routines::getLoadFromSaveGame);
     add("EffectAssuredDeflection", Effect, { Int }, &Routines::effectAssuredDeflection);
-    add("GetName", String, { Object });
+    add("GetName", String, { Object }, &Routines::getName);
     add("GetLastSpeaker", Object, { });
     add("BeginConversation", Int, { String, Object });
     add("GetLastPerceived", Object, { });
