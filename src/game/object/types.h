@@ -22,17 +22,22 @@ namespace reone {
 namespace game {
 
 enum class ObjectType {
-    None,
-    Module,
-    Area,
-    Creature,
-    Door,
-    Placeable,
-    Waypoint,
-    Trigger,
-    Item,
-    Sound,
-    Camera
+    Creature = 1,
+    Item = 2,
+    Trigger = 4,
+    Door = 8,
+    AreaOfEffect = 16,
+    Waypoint = 32,
+    Placeable = 64,
+    Store = 128,
+    Encounter = 256,
+    Sound = 512,
+
+    Module = 0x1000,
+    Area = 0x1001,
+    Camera = 0x1002,
+
+    Invalid = 0x7fff
 };
 
 enum class Animation {
