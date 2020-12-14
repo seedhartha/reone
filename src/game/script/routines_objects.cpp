@@ -337,7 +337,7 @@ Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
         float direction = getFloat(args, 0);
         caller->setFacing(glm::radians(direction));
     } else {
-        warn("Routines: setFacing: invalid caller");
+        warn("Routines: setFacing: caller is invalid");
     }
     return Variable();
 }
@@ -348,9 +348,30 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
         glm::vec3 target(getVector(args, 0));
         caller->face(target);
     } else {
-        warn("Routines: setFacingPoint: invalid caller");
+        warn("Routines: setFacingPoint: caller is invalid");
     }
     return Variable();
+}
+
+Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
+    static string empty;
+
+    auto object = getObject(args, 0);
+    if (!object) {
+        warn("Routines: getName: object is invalid");
+        return empty;
+    }
+
+    return object->title();
+}
+
+Variable Routines::getObjectType(const VariablesList & args, ExecutionContext & ctx) {
+    auto target = getObject(args, 0);
+    if (!target) {
+        warn("Routines: getObjectType: target is invalid");
+        return static_cast<int>(ObjectType::Invalid);
+    }
+    return static_cast<int>(target->type());
 }
 
 } // namespace game

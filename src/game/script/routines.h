@@ -170,8 +170,10 @@ private:
     script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getName(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getObjectType(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
