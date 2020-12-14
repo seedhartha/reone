@@ -394,6 +394,37 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
     return Variable();
 }
 
+Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: getXP: creature is invalid");
+        return 0;
+    }
+    return creature->xp();
+}
+
+Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        int xpAmount = getInt(args, 1);
+        creature->setXP(xpAmount);
+    } else {
+        warn("Routines: setXP: creature is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        int xpAmount = getInt(args, 1);
+        creature->giveXP(xpAmount);
+    } else {
+        warn("Routines: giveXPToCreature: creature is invalid");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
