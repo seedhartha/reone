@@ -255,6 +255,78 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
     return object->attributes().getSkillRank(skill);
 }
 
+Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (!creature) {
+        warn("Routines: getXP: creature is invalid");
+        return 0;
+    }
+    return creature->xp();
+}
+
+Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        int xpAmount = getInt(args, 1);
+        creature->setXP(xpAmount);
+    } else {
+        warn("Routines: setXP: creature is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        int xpAmount = getInt(args, 1);
+        creature->giveXP(xpAmount);
+    } else {
+        warn("Routines: giveXPToCreature: creature is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::getMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->module()->area()->maxStealthXP();
+}
+
+Variable Routines::setMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+    int max = getInt(args, 0);
+    _game->module()->area()->setMaxStealthXP(max);
+    return Variable();
+}
+
+Variable Routines::getCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->module()->area()->currentStealthXP();
+}
+
+Variable Routines::setCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+    int current = getInt(args, 0);
+    _game->module()->area()->setCurrentStealthXP(current);
+    return Variable();
+}
+
+Variable Routines::getStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
+    bool enabled = _game->module()->area()->isStealthXPEnabled();
+    return enabled ? 1 : 0;
+}
+
+Variable Routines::setStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
+    bool enabled = getBool(args, 0);
+    _game->module()->area()->setStealthXPEnabled(enabled);
+    return Variable();
+}
+
+Variable Routines::getStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->module()->area()->stealthXPDecrement();
+}
+
+Variable Routines::setStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
+    int decrement = getInt(args, 0);
+    _game->module()->area()->setStealthXPDecrement(decrement);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

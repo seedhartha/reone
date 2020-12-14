@@ -118,6 +118,21 @@ public:
 
     // END Party
 
+    // Stealth
+
+    bool isStealthXPEnabled() const;
+
+    int maxStealthXP() const;
+    int currentStealthXP() const;
+    int stealthXPDecrement() const;
+
+    void setStealthXPEnabled(bool value);
+    void setMaxStealthXP(int value);
+    void setCurrentStealthXP(int value);
+    void setStealthXPDecrement(int value);
+
+    // END Stealth
+
     // Scripts
 
     void runSpawnScripts();
@@ -170,6 +185,15 @@ private:
 
     // END Objects
 
+    // Stealth
+
+    bool _stealthXPEnabled { false };
+    int _maxStealthXP { 0 };
+    int _currentStealthXP { 0 };
+    int _stealthXPDecrement { 0 };
+
+    // END Stealth
+
     void add(const std::shared_ptr<SpatialObject> &object);
     void determineObjectRoom(SpatialObject &object);
     void doDestroyObject(uint32_t objectId);
@@ -198,6 +222,7 @@ private:
     void loadAmbientColor(const resource::GffStruct &are);
     void loadScripts(const resource::GffStruct &are);
     void loadMap(const resource::GffStruct &are);
+    void loadStealthXP(const resource::GffStruct &are);
 
     void loadProperties(const resource::GffStruct &git);
     void loadCreatures(const resource::GffStruct &git);
