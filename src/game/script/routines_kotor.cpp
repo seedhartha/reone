@@ -48,7 +48,7 @@ void Routines::addKotorRoutines() {
     add("DelayCommand", Void, { Float, Action }, &Routines::delayCommand);
     add("ExecuteScript", Void, { String, Object, Int }, &Routines::executeScript);
     add("ClearAllActions", Void, { }, &Routines::clearAllActions);
-    add("SetFacing", Void, { Float });
+    add("SetFacing", Void, { Float }, &Routines::setFacing);
     add("SwitchPlayerCharacter", Int, { Int });
     add("SetTime", Void, { Int, Int, Int, Int });
     add("SetPartyLeader", Int, { Int }, &Routines::setPartyLeader);
