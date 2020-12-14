@@ -493,8 +493,8 @@ void Routines::addKotorRoutines() {
     add("EffectSavingThrowDecrease", Effect, { Int, Int, Int }, &Routines::effectSavingThrowDecrease);
     add("EffectSkillDecrease", Effect, { Int, Int }, &Routines::effectSkillDecrease);
     add("EffectForceResistanceDecrease", Effect, { Int }, &Routines::effectForceResistanceDecrease);
-    add("GetPlotFlag", Int, { Object });
-    add("SetPlotFlag", Void, { Object, Int });
+    add("GetPlotFlag", Int, { Object }, &Routines::getPlotFlag);
+    add("SetPlotFlag", Void, { Object, Int }, &Routines::setPlotFlag);
     add("EffectInvisibility", Effect, { Int }, &Routines::effectInvisibility);
     add("EffectConcealment", Effect, { Int }, &Routines::effectConcealment);
     add("EffectForceShield", Effect, { Int }, &Routines::effectForceShield);

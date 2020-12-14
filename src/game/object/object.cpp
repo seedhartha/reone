@@ -88,6 +88,10 @@ int Object::currentHitPoints() const {
     return _currentHitPoints;
 }
 
+int Object::plotFlag() const {
+    return _plotFlag;
+}
+
 void Object::setTag(const string &tag) {
     _tag = tag;
 }
@@ -98,6 +102,10 @@ void Object::setMinOneHP(bool minOneHP) {
 
 void Object::setMaxHitPoints(int maxHitPoints) {
     _maxHitPoints = maxHitPoints;
+}
+
+void Object::setPlotFlag(int flag) {
+    _plotFlag = flag;
 }
 
 } // namespace game

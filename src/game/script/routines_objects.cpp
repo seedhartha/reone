@@ -365,13 +365,33 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
     return object->title();
 }
 
-Variable Routines::getObjectType(const VariablesList & args, ExecutionContext & ctx) {
+Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObject(args, 0);
     if (!target) {
         warn("Routines: getObjectType: target is invalid");
         return static_cast<int>(ObjectType::Invalid);
     }
     return static_cast<int>(target->type());
+}
+
+Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getObjectOrCaller(args, 0, ctx);
+    if (!target) {
+        warn("Routines: getPlotFlag: target is invalid");
+        return 0;
+    }
+    return target->plotFlag();
+}
+
+Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getObject(args, 0);
+    if (target) {
+        int plotFlag = getInt(args, 1);
+        target->setPlotFlag(plotFlag);
+    } else {
+        warn("Routines: setPlotFlag: target is invalid");
+    }
+    return Variable();
 }
 
 } // namespace game

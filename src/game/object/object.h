@@ -44,7 +44,12 @@ public:
     const std::string &title() const;
     const std::string &conversation() const;
     ActionQueue &actionQueue();
-    const std::string &onUserDefined() const;
+    int plotFlag() const;
+
+    void setTag(const std::string &tag);
+    void setPlotFlag(int flag);
+
+    // Hit Points
 
     // Base maximum hit points, not considering any bonuses.
     int hitPoints() const;
@@ -55,9 +60,16 @@ public:
     // Current hit points, not counting any bonuses.
     int currentHitPoints() const;
 
-    void setTag(const std::string &tag);
     void setMinOneHP(bool minOneHP);
     void setMaxHitPoints(int maxHitPoints);
+
+    // END Hit Points
+
+    // Scripts
+
+    const std::string &onUserDefined() const;
+
+    // END Scripts
 
 protected:
     ObjectType _type { ObjectType::Invalid };
@@ -71,6 +83,7 @@ protected:
     int _maxHitPoints { 0 };
     int _currentHitPoints { 0 };
     bool _dead { false };
+    int _plotFlag { 0 };
 
     // Scripts
 
