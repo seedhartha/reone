@@ -64,11 +64,15 @@ private:
 
     void add(const std::string &name, script::VariableType retType, const VariableTypesList &argTypes);
 
+    template <class T>
     void add(
         const std::string &name,
         script::VariableType retType,
         const VariableTypesList &argTypes,
-        const std::function<script::Variable(const VariablesList &, script::ExecutionContext &ctx)> &fn);
+        const T &fn) {
+
+        _routines.emplace_back(name, retType, argTypes, std::bind(fn, this, _1, _2));
+    }
 
     void addKotorRoutines();
     void addTslRoutines();

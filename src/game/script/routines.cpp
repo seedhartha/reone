@@ -63,15 +63,6 @@ void Routines::add(const string &name, VariableType retType, const VariableTypes
     _routines.emplace_back(name, retType, argTypes);
 }
 
-void Routines::add(
-    const string &name,
-    VariableType retType,
-    const VariableTypesList &argTypes,
-    const function<Variable(const VariablesList &, ExecutionContext &)> &fn) {
-
-    _routines.emplace_back(name, retType, argTypes, fn);
-}
-
 const Routine &Routines::get(int index) {
     return _routines[index];
 }
