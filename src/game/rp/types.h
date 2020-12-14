@@ -96,7 +96,6 @@ enum class Skill {
 };
 
 enum class Feat {
-    AdvancedDodge = 0,
     AdvancedJediDefense = 1,
     AdvancedGuardStance = 2,
     Ambidexterity = 3,
@@ -119,7 +118,6 @@ enum class Feat {
     ImprovedSniperShot = 20,
     IronWill = 21,
     LightningReflexes = 22,
-    MasterDdodge = 23,
     MasterJediDefense = 24,
     MasterGuardStance = 25,
     MultiShot = 26,
@@ -155,7 +153,6 @@ enum class Feat {
     UncannyDodge1 = 56,
     UncannyDodge2 = 57,
     SkillFocusComputerUse = 58,
-    Dodge = 59,
     SneakAttack1d6 = 60,
     SneakAttack2d6 = 61,
     SneakAttack3d6 = 62,
@@ -191,6 +188,9 @@ enum class Feat {
     ImprovedRapidShot = 92,
     ProficiencyAll = 93,
     BattleMeditation = 94,
+
+    // TSL
+
     Evasion = 125,
     Targeting1 = 126,
     Targeting2 = 127,
@@ -267,6 +267,8 @@ enum class Feat {
     MasterPreciseShot = 242,
     PreciseShotIV = 243,
     PreciseShotV = 244
+
+    // END TSL
 };
 
 enum class ForcePower {
@@ -335,6 +337,9 @@ enum class ForcePower {
     Taunt = 61,
     WhirlingDervish = 62,
     Rage = 63,
+
+    // TSL
+
     MasterEnergyResistance = 133,
     MasterHeal = 134,
     ForceBarrier = 135,
@@ -393,6 +398,8 @@ enum class ForcePower {
     WookieeRageI = 271,
     WookieeRageII = 272,
     WookieeRageIII = 273
+
+    // END TSL
 };
 
 } // namespace game
