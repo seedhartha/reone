@@ -430,7 +430,7 @@ Variable Routines::effectFury(const VariablesList &args, ExecutionContext &ctx) 
 }
 
 Variable Routines::effectBlind(const VariablesList &args, ExecutionContext &ctx) {
-    auto effect = make_shared<Effect>(EffectType::Blind);
+    auto effect = make_shared<Effect>(EffectType::Blindness);
     return Variable(VariableType::Effect, static_pointer_cast<EngineType>(effect));
 }
 
