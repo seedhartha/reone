@@ -46,6 +46,7 @@ public:
     void update(float dt) override;
 
     void face(const SpatialObject &other);
+    void face(const glm::vec3 &point);
 
     void applyEffect(const std::shared_ptr<Effect> &eff);
 
