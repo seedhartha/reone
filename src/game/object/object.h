@@ -60,7 +60,7 @@ public:
     void setMaxHitPoints(int maxHitPoints);
 
 protected:
-    ObjectType _type { ObjectType::None };
+    ObjectType _type { ObjectType::Invalid };
     std::string _tag;
     std::string _blueprintResRef;
     std::string _title;
