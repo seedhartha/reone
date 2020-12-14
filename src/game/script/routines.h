@@ -71,7 +71,7 @@ private:
         const VariableTypesList &argTypes,
         const T &fn) {
 
-        _routines.emplace_back(name, retType, argTypes, std::bind(fn, this, _1, _2));
+        _routines.emplace_back(name, retType, argTypes, std::bind(fn, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     void addKotorRoutines();

@@ -45,7 +45,7 @@ namespace game {
 struct ModuleInfo {
     std::string entryArea;
     glm::vec3 entryPosition { 0.0f };
-    float entryHeading { 0.0f };
+    float entryFacing { 0.0f };
 };
 
 class Door;
@@ -82,7 +82,7 @@ private:
     void onObjectClick(const std::shared_ptr<SpatialObject> &object);
     void onPlaceableClick(const std::shared_ptr<Placeable> &placeable);
 
-    void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &heading) const;
+    void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &facing) const;
 
     // Loading
 

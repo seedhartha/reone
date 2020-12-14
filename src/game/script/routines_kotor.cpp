@@ -18,7 +18,6 @@
 #include "routines.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::script;
 

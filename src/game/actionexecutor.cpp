@@ -327,7 +327,7 @@ void ActionExecutor::executeJumpToObject(const shared_ptr<Object> &actor, Object
 
     auto spatialActor = static_pointer_cast<SpatialObject>(actor);
     spatialActor->setPosition(spatialObject->position());
-    spatialActor->setHeading(spatialObject->heading());
+    spatialActor->setFacing(spatialObject->facing());
 
     action.complete();
 }
@@ -335,7 +335,7 @@ void ActionExecutor::executeJumpToObject(const shared_ptr<Object> &actor, Object
 void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, LocationAction &action, float dt) {
     auto spatialActor = static_pointer_cast<SpatialObject>(actor);
     spatialActor->setPosition(action.location()->position());
-    spatialActor->setHeading(action.location()->facing());
+    spatialActor->setFacing(action.location()->facing());
 
     action.complete();
 }

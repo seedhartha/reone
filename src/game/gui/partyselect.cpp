@@ -231,7 +231,7 @@ void PartySelection::changeParty() {
         party.addMember(creature);
     }
 
-    area->loadParty(player->position(), player->heading());
+    area->loadParty(player->position(), player->facing());
     area->fill(_game->sceneGraph());
 }
 

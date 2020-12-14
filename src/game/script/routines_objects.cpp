@@ -188,7 +188,7 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
         warn("Routines: getFacing: target is invalid");
         return -1.0f;
     }
-    return glm::degrees(target->heading());
+    return glm::degrees(target->facing());
 }
 
 Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {

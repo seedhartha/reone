@@ -112,17 +112,17 @@ void Player::update(float dt) {
     shared_ptr<Creature> partyLeader(_party->leader());
     if (!partyLeader || partyLeader->isMovementRestricted()) return;
 
-    float heading = 0.0f;
+    float facing = 0.0f;
     bool movement = true;
 
     if (_moveForward) {
-        heading = _camera->heading();
+        facing = _camera->facing();
     } else if (_moveBackward) {
-        heading = _camera->heading() + glm::pi<float>();
+        facing = _camera->facing() + glm::pi<float>();
     } else if (_moveLeft) {
-        heading = _camera->heading() + glm::half_pi<float>();
+        facing = _camera->facing() + glm::half_pi<float>();
     } else if (_moveRight) {
-        heading = _camera->heading() - glm::half_pi<float>();
+        facing = _camera->facing() - glm::half_pi<float>();
     } else {
         movement = false;
     }
@@ -133,8 +133,8 @@ void Player::update(float dt) {
         actions.clear();
 
         glm::vec2 dest(partyLeader->position());
-        dest.x -= 100.0f * glm::sin(heading);
-        dest.y += 100.0f * glm::cos(heading);
+        dest.x -= 100.0f * glm::sin(facing);
+        dest.y += 100.0f * glm::cos(facing);
 
         if (_area->moveCreatureTowards(partyLeader, dest, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);

@@ -53,7 +53,7 @@ void Door::load(const GffStruct &gffs) {
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
 
-    _heading = gffs.getFloat("Bearing");
+    _facing = gffs.getFloat("Bearing");
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
 

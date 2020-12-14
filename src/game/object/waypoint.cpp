@@ -43,7 +43,7 @@ void Waypoint::load(const GffStruct &gffs) {
 
     float dirX = gffs.getFloat("XOrientation");
     float dirY = gffs.getFloat("YOrientation");
-    _heading = -glm::atan(dirX, dirY);
+    _facing = -glm::atan(dirX, dirY);
 
     updateTransform();
 }

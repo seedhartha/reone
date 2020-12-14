@@ -32,7 +32,7 @@ public:
     void stopMovement() override;
 
     void setPosition(const glm::vec3 &position);
-    void setHeading(float heading);
+    void setFacing(float facing);
 
 private:
     glm::vec3 _position { 0.0f };

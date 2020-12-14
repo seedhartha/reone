@@ -161,24 +161,24 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
         arrowPos.y = bounds[1] + 0.5f * bounds[3];
     }
 
-    float heading;
+    float facing;
     switch (_northAxis) {
         case 0:
-            heading = -partyLeader->heading();
+            facing = -partyLeader->facing();
             break;
         case 1:
-            heading = glm::pi<float>() - partyLeader->heading();
+            facing = glm::pi<float>() - partyLeader->facing();
             break;
         case 2:
-            heading = glm::three_over_two_pi<float>() - partyLeader->heading();
+            facing = glm::three_over_two_pi<float>() - partyLeader->facing();
             break;
         default:
-            heading = glm::half_pi<float>() - partyLeader->heading();
+            facing = glm::half_pi<float>() - partyLeader->facing();
             break;
     }
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, arrowPos);
-    transform = glm::rotate(transform, heading, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::rotate(transform, facing, glm::vec3(0.0f, 0.0f, 1.0f));
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 

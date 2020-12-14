@@ -49,8 +49,8 @@ bool FirstPersonCamera::handle(const SDL_Event &event) {
 }
 
 bool FirstPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
-    _heading = glm::mod(
-        _heading - event.xrel * kMouseMultiplier,
+    _facing = glm::mod(
+        _facing - event.xrel * kMouseMultiplier,
         glm::two_pi<float>());
 
     _pitch = glm::clamp(
@@ -65,7 +65,7 @@ bool FirstPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
 void FirstPersonCamera::updateSceneNode() {
     glm::quat orientation(glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f));
-    orientation *= glm::quat(glm::vec3(_pitch, _heading, 0.0f));
+    orientation *= glm::quat(glm::vec3(_pitch, _facing, 0.0f));
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, _position);
@@ -121,31 +121,31 @@ bool FirstPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void FirstPersonCamera::update(float dt) {
-    float headingSin = glm::sin(_heading) * kMovementSpeed * dt;
-    float headingCos = glm::cos(_heading) * kMovementSpeed * dt;
+    float facingSin = glm::sin(_facing) * kMovementSpeed * dt;
+    float facingCos = glm::cos(_facing) * kMovementSpeed * dt;
     float pitchSin = glm::sin(_pitch) * kMovementSpeed * dt;
     bool positionChanged = false;
 
     if (_moveForward) {
-        _position.x -= headingSin;
-        _position.y += headingCos;
+        _position.x -= facingSin;
+        _position.y += facingCos;
         _position.z += pitchSin;
         positionChanged = true;
     }
     if (_moveLeft) {
-        _position.x -= headingCos;
-        _position.y -= headingSin;
+        _position.x -= facingCos;
+        _position.y -= facingSin;
         positionChanged = true;
     }
     if (_moveBackward) {
-        _position.x += headingSin;
-        _position.y -= headingCos;
+        _position.x += facingSin;
+        _position.y -= facingCos;
         _position.z -= pitchSin;
         positionChanged = true;
     }
     if (_moveRight) {
-        _position.x += headingCos;
-        _position.y += headingSin;
+        _position.x += facingCos;
+        _position.y += facingSin;
         positionChanged = true;
     }
     if (positionChanged) {
@@ -165,8 +165,8 @@ void FirstPersonCamera::setPosition(const glm::vec3 &pos) {
     updateSceneNode();
 }
 
-void FirstPersonCamera::setHeading(float heading) {
-    _heading = heading;
+void FirstPersonCamera::setFacing(float facing) {
+    _facing = facing;
     updateSceneNode();
 }
 
