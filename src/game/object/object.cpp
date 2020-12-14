@@ -60,8 +60,8 @@ const string &Object::blueprintResRef() const {
     return _blueprintResRef;
 }
 
-const string &Object::title() const {
-    return _title;
+const string &Object::name() const {
+    return _name;
 }
 
 const string &Object::conversation() const {

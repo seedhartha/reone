@@ -65,7 +65,7 @@ void CreatureBlueprint::load(Creature &creature) {
     creature._currentHitPoints = _utc->getInt("CurrentHitPoints");
     creature._maxHitPoints = _utc->getInt("MaxHitPoints");
 
-    loadTitle(creature);
+    loadName(creature);
     loadAttributes(creature);
     loadScripts(creature);
     loadItems(creature);
@@ -75,7 +75,7 @@ int CreatureBlueprint::getAppearanceFromUtc() const {
     return _utc->getInt("Appearance_Type");
 }
 
-void CreatureBlueprint::loadTitle(Creature &creature) {
+void CreatureBlueprint::loadName(Creature &creature) {
     string firstName, lastName;
 
     int firstNameStrRef = _utc->getInt("FirstName", -1);
@@ -88,9 +88,9 @@ void CreatureBlueprint::loadTitle(Creature &creature) {
     }
 
     if (!firstName.empty() && !lastName.empty()) {
-        creature._title = firstName + " " + lastName;
+        creature._name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
-        creature._title = firstName;
+        creature._name = firstName;
     }
 }
 

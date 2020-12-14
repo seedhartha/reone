@@ -48,7 +48,7 @@ void DoorBlueprint::load(Door &door) {
 
     int locNameStrRef = _utd->getInt("LocName", -1);
     if (locNameStrRef != -1) {
-        door._title = Resources::instance().getString(locNameStrRef);
+        door._name = Resources::instance().getString(locNameStrRef);
     }
 
     door._conversation = boost::to_lower_copy(_utd->getString("Conversation"));

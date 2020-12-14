@@ -46,7 +46,7 @@ private:
     CreatureBlueprint(const CreatureBlueprint &) = delete;
     CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 
-    void loadTitle(Creature &creature);
+    void loadName(Creature &creature);
     void loadAttributes(Creature &creature);
     void loadAbilities(CreatureAttributes &attributes);
     void loadSkills(CreatureAttributes &attributes);

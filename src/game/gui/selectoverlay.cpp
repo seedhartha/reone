@@ -207,7 +207,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 }
 
 void SelectionOverlay::drawTitleBar() const {
-    if (_selectedObject->title().empty()) return;
+    if (_selectedObject->name().empty()) return;
 
     const GraphicsOptions &opts = _game->options().graphics;
     float barHeight = _font->height() + kTitleBarPadding;
@@ -241,7 +241,7 @@ void SelectionOverlay::drawTitleBar() const {
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
 
-        _font->render(_selectedObject->title(), transform, getColorFromSelectedObject());
+        _font->render(_selectedObject->name(), transform, getColorFromSelectedObject());
     }
 }
 
