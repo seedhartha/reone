@@ -331,6 +331,17 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
     return Variable();
 }
 
+Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
+    if (caller) {
+        float direction = getFloat(args, 0);
+        caller->setFacing(glm::radians(direction));
+    } else {
+        warn("Routines: setFacing: invalid caller");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
