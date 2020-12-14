@@ -362,7 +362,7 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
         return empty;
     }
 
-    return object->title();
+    return object->name();
 }
 
 Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {

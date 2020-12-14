@@ -49,7 +49,7 @@ void PlaceableBlueprint::load(Placeable &placeable) {
 
     int locNameStrRef = _utp->getInt("LocName", -1);
     if (locNameStrRef != -1) {
-        placeable._title = Resources::instance().getString(locNameStrRef);
+        placeable._name = Resources::instance().getString(locNameStrRef);
     }
 
     placeable._appearance = _utp->getInt("Appearance");

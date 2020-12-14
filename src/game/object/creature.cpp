@@ -220,7 +220,7 @@ void Creature::updateHealth() {
 
     playAnimation(Animation::Die);
     _dead = true;
-    _title = Resources::instance().getString(kStrRefRemains);
+    _name = Resources::instance().getString(kStrRefRemains);
 
     debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 }
