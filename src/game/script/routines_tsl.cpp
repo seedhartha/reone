@@ -177,7 +177,7 @@ void Routines::addTslRoutines() {
     add("ActionGiveItem", Void, { Object, Object });
     add("ActionTakeItem", Void, { Object, Object });
     add("VectorNormalize", TVector, { TVector }, bind(&Routines::vectorNormalize, this, _1, _2));
-    add("GetItemStackSize", Int, { Object });
+    add("GetItemStackSize", Int, { Object }, bind(&Routines::getItemStackSize, this, _1, _2));
     add("GetAbilityScore", Int, { Object, Int }, bind(&Routines::getAbilityScore, this, _1, _2));
     add("GetIsDead", Int, { Object }, bind(&Routines::getIsDead, this, _1, _2));
     add("PrintVector", Void, { TVector, Int }, bind(&Routines::printVector, this, _1, _2));
@@ -189,7 +189,7 @@ void Routines::addTslRoutines() {
     add("TouchAttackRanged", Int, { Object, Int });
     add("EffectParalyze", Effect, { }, bind(&Routines::effectParalyze, this, _1, _2));
     add("EffectSpellImmunity", Effect, { Int }, bind(&Routines::effectSpellImmunity, this, _1, _2));
-    add("SetItemStackSize", Void, { Object, Int });
+    add("SetItemStackSize", Void, { Object, Int }, bind(&Routines::setItemStackSize, this, _1, _2));
     add("GetDistanceBetween", Float, { Object, Object }, bind(&Routines::getDistanceBetween, this, _1, _2));
     add("SetReturnStrref", Void, { Int, Int, Int });
     add("EffectForceJump", Effect, { Object, Int }, bind(&Routines::effectForceJump, this, _1, _2));
@@ -514,7 +514,7 @@ void Routines::addTslRoutines() {
     add("EffectSpellLevelAbsorption", Effect, { Int, Int, Int }, bind(&Routines::effectSpellLevelAbsorption, this, _1, _2));
     add("EffectDispelMagicBest", Effect, { Int }, bind(&Routines::effectDispelMagicBest, this, _1, _2));
     add("GetCurrentStealthXP", Int, { });
-    add("GetNumStackedItems", Int, { Object });
+    add("GetNumStackedItems", Int, { Object }, bind(&Routines::getItemStackSize, this, _1, _2));
     add("SurrenderToEnemies", Void, { });
     add("EffectMissChance", Effect, { Int }, bind(&Routines::effectMissChance, this, _1, _2));
     add("SetCurrentStealthXP", Void, { Int });

@@ -34,6 +34,7 @@ class Creature;
 class Door;
 class Event;
 class Game;
+class Item;
 class Location;
 class Object;
 class Sound;
@@ -73,24 +74,25 @@ private:
     void addTslRoutines();
 
     bool getBool(const VariablesList &args, int index, bool defValue = false) const;
-    int getInt(const VariablesList &args, int index, int defValue = 0) const;
+    const script::ExecutionContext &getAction(const VariablesList &args, int index) const;
     float getFloat(const VariablesList &args, int index, float defValue = 0.0f) const;
-    std::string getString(const VariablesList &args, int index, std::string defValue = "") const;
     glm::vec3 getVector(const VariablesList &args, int index, glm::vec3 defValue = glm::vec3(0.0f)) const;
-    std::shared_ptr<Object> getCaller(script::ExecutionContext &ctx) const;
-    std::shared_ptr<SpatialObject> getCallerAsSpatial(script::ExecutionContext &ctx) const;
-    std::shared_ptr<Object> getTriggerrer(script::ExecutionContext &ctx) const;
-    std::shared_ptr<Object> getObject(const VariablesList &args, int index) const;
-    std::shared_ptr<Object> getObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index) const;
-    std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    int getInt(const VariablesList &args, int index, int defValue = 0) const;
     std::shared_ptr<Creature> getCreature(const VariablesList &args, int index) const;
     std::shared_ptr<Creature> getCreatureOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<Door> getDoor(const VariablesList &args, int index) const;
-    std::shared_ptr<Sound> getSound(const VariablesList &args, int index) const;
-    std::shared_ptr<Location> getLocationEngineType(const VariablesList &args, int index) const;
     std::shared_ptr<Event> getEvent(const VariablesList &args, int index) const;
-    const script::ExecutionContext &getAction(const VariablesList &args, int index) const;
+    std::shared_ptr<Item> getItem(const VariablesList &args, int index) const;
+    std::shared_ptr<Location> getLocationEngineType(const VariablesList &args, int index) const;
+    std::shared_ptr<Object> getCaller(script::ExecutionContext &ctx) const;
+    std::shared_ptr<Object> getObject(const VariablesList &args, int index) const;
+    std::shared_ptr<Object> getObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    std::shared_ptr<Object> getTriggerrer(script::ExecutionContext &ctx) const;
+    std::shared_ptr<Sound> getSound(const VariablesList &args, int index) const;
+    std::shared_ptr<SpatialObject> getCallerAsSpatial(script::ExecutionContext &ctx) const;
+    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index) const;
+    std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    std::string getString(const VariablesList &args, int index, std::string defValue = "") const;
 
     // Common
 
@@ -161,6 +163,7 @@ private:
     script::Variable getIsObjectValid(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsOpen(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
@@ -168,6 +171,7 @@ private:
     script::Variable getPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
