@@ -100,7 +100,7 @@ void SpatialObject::face(const SpatialObject &other) {
     if (_id == other._id) return;
 
     glm::vec2 dir(glm::normalize(other._position - _position));
-    _heading = -glm::atan(dir.x, dir.y);
+    _facing = -glm::atan(dir.x, dir.y);
     updateTransform();
 }
 
@@ -156,8 +156,8 @@ const glm::vec3 &SpatialObject::position() const {
     return _position;
 }
 
-float SpatialObject::heading() const {
-    return _heading;
+float SpatialObject::facing() const {
+    return _facing;
 }
 
 const glm::mat4 &SpatialObject::transform() const {
@@ -208,16 +208,16 @@ void SpatialObject::updateTransform() {
     _transform = glm::translate(glm::mat4(1.0f), _position);
     _transform *= glm::mat4_cast(_orientation);
 
-    if (_heading != 0.0f) {
-        _transform *= glm::eulerAngleZ(_heading);
+    if (_facing != 0.0f) {
+        _transform *= glm::eulerAngleZ(_facing);
     }
     if (_model) {
         _model->setLocalTransform(_transform);
     }
 }
 
-void SpatialObject::setHeading(float heading) {
-    _heading = heading;
+void SpatialObject::setFacing(float facing) {
+    _facing = facing;
     updateTransform();
 }
 

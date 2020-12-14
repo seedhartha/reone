@@ -36,7 +36,7 @@ public:
     void stopMovement() override;
 
     void setTargetPosition(const glm::vec3 &position);
-    void setHeading(float heading);
+    void setFacing(float facing);
     void setFindObstacle(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn);
     void setStyle(const CameraStyle& style);
 

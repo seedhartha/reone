@@ -258,7 +258,7 @@ void Area::loadCameras(const GffStruct &git) {
     }
 }
 
-void Area::initCameras(const glm::vec3 &entryPosition, float entryHeading) {
+void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
@@ -266,12 +266,12 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryHeading) {
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView));
     _firstPersonCamera->setPosition(position);
-    _firstPersonCamera->setHeading(entryHeading);
+    _firstPersonCamera->setFacing(entryFacing);
 
     _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _cameraStyle);
     _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
-    _thirdPersonCamera->setHeading(entryHeading);
+    _thirdPersonCamera->setFacing(entryFacing);
 
     _dialogCamera = make_unique<DialogCamera>(sceneGraph, _cameraStyle, _cameraAspect);
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
@@ -417,7 +417,7 @@ ObjectList &Area::getObjectsByType(ObjectType type) {
 
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
-    float heading = object.heading();
+    float facing = object.facing();
     Room *room = nullptr;
 
     if (getElevationAt(position, &object, room, position.z)) {
@@ -435,13 +435,13 @@ void Area::landObject(SpatialObject &object) {
     }
 }
 
-void Area::loadParty(const glm::vec3 &position, float heading) {
+void Area::loadParty(const glm::vec3 &position, float facing) {
     Party &party = _game->party();
 
     for (int i = 0; i < party.size(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
         member->setPosition(position);
-        member->setHeading(heading);
+        member->setFacing(facing);
 
         landObject(*member);
         add(member);
@@ -560,8 +560,8 @@ bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::
     glm::vec2 delta(dest - glm::vec2(position));
     glm::vec2 dir(glm::normalize(delta));
 
-    float heading = -glm::atan(dir.x, dir.y);
-    creature->setHeading(heading);
+    float facing = -glm::atan(dir.x, dir.y);
+    creature->setFacing(facing);
 
     float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
@@ -660,11 +660,11 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
     return glm::project(position, view, projection, viewport);
 }
 
-void Area::update3rdPersonCameraHeading() {
+void Area::update3rdPersonCameraFacing() {
     shared_ptr<SpatialObject> partyLeader(_game->party().leader());
     if (!partyLeader) return;
 
-    _thirdPersonCamera->setHeading(partyLeader->heading());
+    _thirdPersonCamera->setFacing(partyLeader->facing());
 }
 
 void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {

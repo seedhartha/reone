@@ -51,7 +51,7 @@ void Module::load(const string &name, const GffStruct &ifo) {
     loadInfo(ifo);
     loadArea(ifo);
 
-    _area->initCameras(_info.entryPosition, _info.entryHeading);
+    _area->initCameras(_info.entryPosition, _info.entryFacing);
     _area->runSpawnScripts();
 
     loadPlayer();
@@ -64,7 +64,7 @@ void Module::loadInfo(const GffStruct &ifo) {
 
     float dirX = ifo.getFloat("Mod_Entry_Dir_X");
     float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
-    _info.entryHeading = -glm::atan(dirX, dirY);
+    _info.entryFacing = -glm::atan(dirX, dirY);
 
     _info.entryArea = ifo.getString("Mod_Entry_Area");
 }
@@ -86,24 +86,24 @@ void Module::loadPlayer() {
 
 void Module::loadParty(const string &entry) {
     glm::vec3 position(0.0f);
-    float heading = 0.0f;
-    getEntryPoint(entry, position, heading);
+    float facing = 0.0f;
+    getEntryPoint(entry, position, facing);
 
-    _area->loadParty(position, heading);
+    _area->loadParty(position, facing);
     _area->onPartyLeaderMoved();
-    _area->update3rdPersonCameraHeading();
+    _area->update3rdPersonCameraFacing();
     _area->runOnEnterScript();
 }
 
-void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &heading) const {
+void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &facing) const {
     position = _info.entryPosition;
-    heading = _info.entryHeading;
+    facing = _info.entryFacing;
 
     if (!waypoint.empty()) {
         shared_ptr<SpatialObject> object(_area->find(waypoint));
         if (object) {
             position = object->position();
-            heading = object->heading();
+            facing = object->facing();
         }
     }
 }

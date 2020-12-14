@@ -64,7 +64,7 @@ public:
     scene::SceneGraph &sceneGraph();
     Room *room() const;
     const glm::vec3 &position() const;
-    float heading() const;
+    float facing() const;
     const glm::mat4 &transform() const;
     bool visible() const;
     std::shared_ptr<scene::ModelSceneNode> model() const;
@@ -73,7 +73,7 @@ public:
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
-    void setHeading(float heading);
+    void setFacing(float facing);
     void setVisible(bool visible);
 
     // Inventory
@@ -95,7 +95,7 @@ protected:
     scene::SceneGraph *_sceneGraph { nullptr };
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    float _heading { 0.0f };
+    float _facing { 0.0f };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
     std::shared_ptr<scene::ModelSceneNode> _model;

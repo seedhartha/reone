@@ -36,11 +36,11 @@ public:
 
     virtual void stopMovement();
 
-    float heading() const;
+    float facing() const;
     std::shared_ptr<scene::CameraSceneNode> sceneNode() const;
 
 protected:
-    float _heading { 0.0f };
+    float _facing { 0.0f };
     std::shared_ptr<scene::CameraSceneNode> _sceneNode;
 
     Camera() = default;

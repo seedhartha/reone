@@ -72,11 +72,11 @@ public:
 
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
-    void initCameras(const glm::vec3 &entryPosition, float entryHeading);
+    void initCameras(const glm::vec3 &entryPosition, float entryFacing);
     bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
-    void update3rdPersonCameraHeading();
+    void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
 
     std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
@@ -113,7 +113,7 @@ public:
 
     // Party
 
-    void loadParty(const glm::vec3 &position, float heading);
+    void loadParty(const glm::vec3 &position, float facing);
     void unloadParty();
 
     // END Party

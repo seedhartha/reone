@@ -283,7 +283,7 @@ void Game::toggleInGameCameraType() {
             FirstPersonCamera &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
             ThirdPersonCamera &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
             firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
-            firstPerson.setHeading(thirdPerson.heading());
+            firstPerson.setFacing(thirdPerson.facing());
             _cameraType = CameraType::FirstPerson;
             break;
         }

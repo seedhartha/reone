@@ -94,16 +94,16 @@ void ThirdPersonCamera::update(float dt) {
     if (_rotationSpeed > kMaxRotationSpeed) {
         _rotationSpeed = kMaxRotationSpeed;
     }
-    _heading += (_rotateCCW ? 1.0f : -1.0f) * _rotationSpeed * dt;
-    _heading = glm::mod(_heading, glm::two_pi<float>());
+    _facing += (_rotateCCW ? 1.0f : -1.0f) * _rotationSpeed * dt;
+    _facing = glm::mod(_facing, glm::two_pi<float>());
 
     updateSceneNode();
 }
 
 void ThirdPersonCamera::updateSceneNode() {
     glm::vec3 position(_targetPosition);
-    position.x += _style.distance * glm::sin(_heading);
-    position.y -= _style.distance * glm::cos(_heading);
+    position.x += _style.distance * glm::sin(_facing);
+    position.y -= _style.distance * glm::cos(_facing);
     position.z += _style.height;
 
     if (_findObstacle) {
@@ -132,8 +132,8 @@ void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {
     updateSceneNode();
 }
 
-void ThirdPersonCamera::setHeading(float heading) {
-    _heading = heading;
+void ThirdPersonCamera::setFacing(float facing) {
+    _facing = facing;
     updateSceneNode();
 }
 

@@ -35,8 +35,8 @@ void Camera::update(float dt) {
 void Camera::stopMovement() {
 }
 
-float Camera::heading() const {
-    return _heading;
+float Camera::facing() const {
+    return _facing;
 }
 
 shared_ptr<CameraSceneNode> Camera::sceneNode() const {
