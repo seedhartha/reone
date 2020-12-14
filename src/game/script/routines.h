@@ -204,11 +204,13 @@ private:
     // Globals/locals
 
     script::Variable getGlobalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getGlobalLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getGlobalNumber(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getGlobalString(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocalNumber(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setGlobalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setGlobalLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setGlobalNumber(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setGlobalString(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setLocalBoolean(const VariablesList &args, script::ExecutionContext &ctx);

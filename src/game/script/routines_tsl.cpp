@@ -736,8 +736,8 @@ void Routines::addTslRoutines() {
     add("SoundObjectGetPitchVariance", Float, { Object });
     add("SoundObjectSetPitchVariance", Void, { Object, Float });
     add("SoundObjectGetVolume", Int, { Object });
-    add("GetGlobalLocation", Location, { String });
-    add("SetGlobalLocation", Void, { String, Location });
+    add("GetGlobalLocation", Location, { String }, &Routines::getGlobalLocation);
+    add("SetGlobalLocation", Void, { String, Location }, &Routines::setGlobalLocation);
     add("AddAvailableNPCByObject", Int, { Int, Object });
     add("RemoveAvailableNPC", Int, { Int });
     add("IsAvailableCreature", Int, { Int }, &Routines::isAvailableCreature);
