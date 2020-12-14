@@ -408,6 +408,10 @@ Faction Creature::faction() const {
     return _faction;
 }
 
+int Creature::xp() const {
+    return _xp;
+}
+
 float Creature::getAttackRange() const {
     float result = kDefaultAttackRange;
 
@@ -443,11 +447,19 @@ void Creature::setImmortal(bool immortal) {
     _immortal = immortal;
 }
 
+void Creature::setXP(int xp) {
+    _xp = xp;
+}
+
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
         // TODO: enable when more routines are implemented
         // runScript(_onSpawn, _id, kObjectInvalid, -1);
     }
+}
+
+void Creature::giveXP(int amount) {
+    _xp += amount;
 }
 
 } // namespace game

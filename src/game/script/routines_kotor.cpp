@@ -431,9 +431,9 @@ void Routines::addKotorRoutines() {
     add("GetIsLinkImmune", Int, { Object, Effect });
     add("EffectDroidStun", Effect, { }, &Routines::effectDroidStun);
     add("EffectForcePushed", Effect, { }, &Routines::effectForcePushed);
-    add("GiveXPToCreature", Void, { Object, Int });
-    add("SetXP", Void, { Object, Int });
-    add("GetXP", Int, { Object });
+    add("GiveXPToCreature", Void, { Object, Int }, &Routines::giveXPToCreature);
+    add("SetXP", Void, { Object, Int }, &Routines::setXP);
+    add("GetXP", Int, { Object }, &Routines::getXP);
     add("IntToHexString", String, { Int }, &Routines::intToHexString);
     add("GetBaseItemType", Int, { Object });
     add("GetItemHasItemProperty", Int, { Object, Int });

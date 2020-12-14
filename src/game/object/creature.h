@@ -95,6 +95,8 @@ public:
     void playAnimation(Animation anim);
     void updateModelAnimation();
 
+    void giveXP(int amount);
+
     bool isMovementRestricted() const;
     bool isInCombat() const;
 
@@ -108,6 +110,7 @@ public:
     float runSpeed() const;
     CreatureAttributes &attributes();
     Faction faction() const;
+    int xp() const;
 
     void setMovementType(MovementType type);
     void setTalking(bool talking);
@@ -115,6 +118,7 @@ public:
     void setMovementRestricted(bool restricted);
     void setInCombat(bool inCombat);
     void setImmortal(bool immortal);
+    void setXP(int xp);
 
     // Equipment
 
@@ -167,6 +171,7 @@ private:
     CreatureModelBuilder _modelBuilder;
     CreatureAnimationResolver _animResolver;
     bool _immortal { false };
+    int _xp { 0 };
 
     // Scripts
 
