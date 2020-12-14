@@ -142,6 +142,7 @@ void Area::loadARE(const GffStruct &are) {
     loadAmbientColor(are);
     loadScripts(are);
     loadMap(are);
+    loadStealthXP(are);
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
@@ -179,6 +180,12 @@ void Area::loadScripts(const GffStruct &are) {
 
 void Area::loadMap(const GffStruct &are) {
     _map.load(_name, *are.getStruct("Map"));
+}
+
+void Area::loadStealthXP(const GffStruct &are) {
+    _stealthXPEnabled = are.getBool("StealthXPEnabled");
+    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
+    _maxStealthXP = are.getInt("StealthXPMax");
 }
 
 void Area::loadGIT(const GffStruct &git) {
@@ -883,6 +890,38 @@ void Area::setCombatTPCamera() {
 
 void Area::setDefaultTPCamera() {
     _thirdPersonCamera->setStyle(_cameraStyle);
+}
+
+bool Area::isStealthXPEnabled() const {
+    return _stealthXPEnabled;
+}
+
+int Area::maxStealthXP() const {
+    return _maxStealthXP;
+}
+
+int Area::currentStealthXP() const {
+    return _currentStealthXP;
+}
+
+int Area::stealthXPDecrement() const {
+    return _stealthXPDecrement;
+}
+
+void Area::setStealthXPEnabled(bool value) {
+    _stealthXPEnabled = value;
+}
+
+void Area::setMaxStealthXP(int value) {
+    _maxStealthXP = value;
+}
+
+void Area::setCurrentStealthXP(int value) {
+    _currentStealthXP = value;
+}
+
+void Area::setStealthXPDecrement(int value) {
+    _stealthXPDecrement = value;
 }
 
 } // namespace game
