@@ -425,6 +425,22 @@ Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext 
     return Variable();
 }
 
+Variable Routines::faceObjectAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto facer = getSpatialObject(args, 0);
+    if (!facer) {
+        warn("Routines: faceObjectAwayFromObject: facer is invalid");
+        return Variable();
+    }
+    auto objectToFaceAwayFrom = getSpatialObject(args, 1);
+    if (!objectToFaceAwayFrom) {
+        warn("Routines: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid");
+        return Variable();
+    }
+    facer->faceAwayFrom(*objectToFaceAwayFrom);
+
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

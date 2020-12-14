@@ -108,6 +108,14 @@ void SpatialObject::face(const glm::vec3 &point) {
     updateTransform();
 }
 
+void SpatialObject::faceAwayFrom(const SpatialObject &other) {
+    if (_id == other._id) return;
+
+    glm::vec2 dir(glm::normalize(_position - other.position()));
+    _facing = -glm::atan(dir.x, dir.y);
+    updateTransform();
+}
+
 void SpatialObject::moveDropableItemsTo(SpatialObject &other) {
     for (auto it = _items.begin(); it != _items.end(); ) {
         if ((*it)->isDropable()) {

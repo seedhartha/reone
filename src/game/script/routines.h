@@ -153,6 +153,7 @@ private:
 
     script::Variable createItemOnObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable faceObjectAwayFromObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getArea(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween2D(const VariablesList &args, script::ExecutionContext &ctx);
