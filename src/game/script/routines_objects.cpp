@@ -410,6 +410,26 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
     return Variable();
 }
 
+Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
+    auto item = getItem(args, 0);
+    if (!item) {
+        warn("Routines: getIdentified: item is invalid");
+        return 0;
+    }
+    return item->isIdentified() ? 1 : 0;
+}
+
+Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
+    auto item = getItem(args, 0);
+    if (item) {
+        bool identified = getBool(args, 1);
+        item->setIdentified(identified);
+    } else {
+        warn("Routines: setIdentified: item is invalid");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

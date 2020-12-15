@@ -370,8 +370,8 @@ void Routines::addKotorRoutines() {
     add("ActionInteractObject", Void, { Object });
     add("GetLastUsedBy", Object, { });
     add("GetAbilityModifier", Int, { Int, Object });
-    add("GetIdentified", Int, { Object });
-    add("SetIdentified", Void, { Object, Int });
+    add("GetIdentified", Int, { Object }, &Routines::getIdentified);
+    add("SetIdentified", Void, { Object, Int }, &Routines::setIdentified);
     add("GetDistanceBetweenLocations2D", Float, { Location, Location }, &Routines::getDistanceBetweenLocations2D);
     add("GetDistanceToObject2D", Float, { Object }, &Routines::getDistanceToObject2D);
     add("GetBlockingDoor", Object, { });

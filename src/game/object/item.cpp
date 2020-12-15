@@ -109,6 +109,14 @@ void Item::setStackSize(int stackSize) {
     _stackSize = stackSize;
 }
 
+bool Item::isIdentified() const {
+    return _identified;
+}
+
+void Item::setIdentified(bool value) {
+    _identified = value;
+}
+
 } // namespace game
 
 } // namespace reone
