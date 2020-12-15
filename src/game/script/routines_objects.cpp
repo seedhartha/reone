@@ -430,6 +430,26 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
+Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getObjectOrCaller(args, 0, ctx);
+    if (!target) {
+        warn("Routines: getCommandable: target is invalid");
+        return 0;
+    }
+    return target->isCommandable() ? 1 : 0;
+}
+
+Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &ctx) {
+    auto target = getObjectOrCaller(args, 1, ctx);
+    if (target) {
+        bool commandable = getBool(args, 0);
+        target->setCommandable(commandable);
+    } else {
+        warn("Routines: setCommandable: target is invalid");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

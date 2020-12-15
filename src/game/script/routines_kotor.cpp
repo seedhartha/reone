@@ -200,8 +200,8 @@ void Routines::addKotorRoutines() {
     add("EffectChoke", Effect, { }, &Routines::effectChoke);
     add("SetGlobalString", Void, { String, String }, &Routines::setGlobalString);
     add("EffectStunned", Effect, { }, &Routines::effectStunned);
-    add("SetCommandable", Void, { Int, Object });
-    add("GetCommandable", Int, { Object });
+    add("SetCommandable", Void, { Int, Object }, &Routines::setCommandable);
+    add("GetCommandable", Int, { Object }, &Routines::getCommandable);
     add("EffectRegenerate", Effect, { Int, Float }, &Routines::effectRegenerate);
     add("EffectMovementSpeedIncrease", Effect, { Int }, &Routines::effectMovementSpeedIncrease);
     add("GetHitDice", Int, { Object }, &Routines::getHitDice);
