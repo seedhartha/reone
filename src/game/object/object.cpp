@@ -48,6 +48,10 @@ bool Object::isDead() const {
     return _dead;
 }
 
+bool Object::isCommandable() const {
+    return _commandable;
+}
+
 ObjectType Object::type() const {
     return _type;
 }
@@ -106,6 +110,10 @@ void Object::setMaxHitPoints(int maxHitPoints) {
 
 void Object::setPlotFlag(int flag) {
     _plotFlag = flag;
+}
+
+void Object::setCommandable(bool value) {
+    _commandable = value;
 }
 
 } // namespace game

@@ -37,6 +37,7 @@ public:
 
     bool isMinOneHP() const;
     bool isDead() const;
+    bool isCommandable() const;
 
     ObjectType type() const;
     const std::string &blueprintResRef() const;
@@ -48,6 +49,7 @@ public:
 
     void setTag(const std::string &tag);
     void setPlotFlag(int flag);
+    void setCommandable(bool value);
 
     // Hit Points
 
@@ -84,6 +86,7 @@ protected:
     int _currentHitPoints { 0 };
     bool _dead { false };
     int _plotFlag { 0 };
+    bool _commandable { true };
 
     // Scripts
 
