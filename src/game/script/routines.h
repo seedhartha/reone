@@ -163,6 +163,7 @@ private:
     script::Variable getExitingObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFirstItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIdentified(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsDead(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsInCombat(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const VariablesList &args, script::ExecutionContext &ctx);
@@ -181,6 +182,7 @@ private:
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setIdentified(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
