@@ -240,6 +240,425 @@ Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
+Variable Routines::actionRandomWalk(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::RandomWalk);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionRandomWalk: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::MoveToLocation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionMoveToLocation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionMoveAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::MoveAwayFromObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionMoveAwayFromObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::EquipItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionEquipItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UnequipItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUnequipItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::PickUpItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionPickUpItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::DropItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionPutDownItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::AttackObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionAttack: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionSpeakString(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::SpeakString);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionSpeakString: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::PlayAnimation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionPlayAnimation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::CastSpellAtObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionCastSpellAtObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::GiveItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionGiveItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::TakeItem);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionTakeItem: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::ForceFollowObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionForceFollowObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionWait(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::Wait);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionWait: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionCastSpellAtLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::CastSpellAtLocation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionCastSpellAtLocation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionSpeakStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::SpeakStringByStrRef);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionSpeakStringByStrRef: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UseFeat);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUseFeat: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UseSkill);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUseSkill: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UseTalentOnObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUseSkill: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUseTalentAtLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UseTalentAtLocation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUseTalentAtLocation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionInteractObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::InteractObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionInteractObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionMoveAwayFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::MoveAwayFromLocation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionMoveAwayFromLocation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionSurrenderToEnemies(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::SurrenderToEnemies);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionSurrenderToEnemies: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionEquipMostDamagingMelee(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::EquipMostDamagingMelee);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionEquipMostDamagingMelee: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionEquipMostDamagingRanged(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::EquipMostDamagingRanged);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionEquipMostDamagingRanged: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionEquipMostEffectiveArmor(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::EquipMostEffectiveArmor);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionEquipMostEffectiveArmor: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionUnlockObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::UnlockObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionUnlockObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionLockObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::LockObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionLockObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionCastFakeSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::CastFakeSpellAtObject);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionCastFakeSpellAtObject: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionCastFakeSpellAtLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::CastFakeSpellAtLocation);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionCastFakeSpellAtLocation: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionBarkString(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::BarkString);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionBarkString: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionFollowLeader(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::FollowLeader);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionFollowLeader: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionFollowOwner(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::FollowOwner);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionFollowOwner: caller is invalid");
+    }
+    return Variable();
+}
+
+Variable Routines::actionSwitchWeapons(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: handle arguments
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        auto action = make_unique<Action>(ActionType::SwitchWeapons);
+        caller->actionQueue().add(move(action));
+    } else {
+        warn("Routines: actionSwitchWeapons: caller is invalid");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

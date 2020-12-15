@@ -100,6 +100,10 @@ shared_ptr<SpatialObject> Routines::getCallerAsSpatial(ExecutionContext &ctx) co
     return dynamic_pointer_cast<SpatialObject>(ctx.caller);
 }
 
+shared_ptr<Creature> Routines::getCallerAsCreature(ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<Creature>(ctx.caller);
+}
+
 shared_ptr<Object> Routines::getTriggerrer(ExecutionContext &ctx) const {
     return static_pointer_cast<Object>(ctx.triggerer);
 }
