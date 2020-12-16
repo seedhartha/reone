@@ -260,13 +260,13 @@ void Combat::updateRound(Round &round, float dt) {
             attacker->setMovementType(Creature::MovementType::None);
             attacker->setMovementRestricted(true);
             if (isDuel) {
-                attacker->playAnimation(Creature::Animation::DuelAttack);
+                attacker->playAnimation(CombatAnimation::DuelAttack);
                 defender->face(*attacker);
                 defender->setMovementType(Creature::MovementType::None);
                 defender->setMovementRestricted(true);
-                defender->playAnimation(Creature::Animation::Dodge);
+                defender->playAnimation(CombatAnimation::Dodge);
             } else {
-                attacker->playAnimation(Creature::Animation::BashAttack);
+                attacker->playAnimation(CombatAnimation::BashAttack);
             }
             round.state = RoundState::FirstTurn;
             debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
@@ -278,9 +278,9 @@ void Combat::updateRound(Round &round, float dt) {
 
                 if (isDuel) {
                     defender->face(*attacker);
-                    defender->playAnimation(Creature::Animation::DuelAttack);
+                    defender->playAnimation(CombatAnimation::DuelAttack);
                     attacker->face(*defender);
-                    attacker->playAnimation(Creature::Animation::Dodge);
+                    attacker->playAnimation(CombatAnimation::Dodge);
                 }
                 round.state = RoundState::SecondTurn;
                 debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);

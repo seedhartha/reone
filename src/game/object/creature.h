@@ -63,15 +63,6 @@ public:
         Run
     };
 
-    enum class Animation {
-        UnlockDoor,
-        DuelAttack,
-        BashAttack,
-        Dodge,
-        Knockdown,
-        Die
-    };
-
     struct Path {
         glm::vec3 destination { 0.0f };
         std::vector<glm::vec3> points;
@@ -91,9 +82,6 @@ public:
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
     void load(const CreatureConfiguration &config);
-
-    void playAnimation(Animation anim);
-    void updateModelAnimation();
 
     void giveXP(int amount);
 
@@ -119,6 +107,17 @@ public:
     void setInCombat(bool inCombat);
     void setImmortal(bool immortal);
     void setXP(int xp);
+
+    // Animation
+
+    // END Animation
+
+    void playAnimation(Animation animation, float speed = 1.0f) override;
+
+    void playAnimation(CombatAnimation animation);
+    void playAnimation(const std::string &name, bool looping = false, float speed = 1.0f);
+
+    void updateModelAnimation();
 
     // Equipment
 
@@ -168,8 +167,8 @@ private:
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
-    CreatureModelBuilder _modelBuilder;
     CreatureAnimationResolver _animResolver;
+    CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
 

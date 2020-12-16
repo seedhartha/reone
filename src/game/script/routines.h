@@ -182,6 +182,7 @@ private:
     script::Variable getPosition(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable playAnimation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setCommandable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);

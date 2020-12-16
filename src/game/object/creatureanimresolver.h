@@ -21,6 +21,8 @@
 
 #include "../types.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
@@ -31,27 +33,23 @@ class CreatureAnimationResolver {
 public:
     CreatureAnimationResolver(const Creature *creature);
 
-    std::string getDieAnimation() const;
+    std::string getAnimationName(Animation animation) const;
+
+    std::string getBashAttackAnimation() const;
     std::string getDeadAnimation() const;
+    std::string getDieAnimation() const;
+    std::string getDodgeAnimation() const;
+    std::string getDuelAttackAnimation() const;
+    std::string getHeadTalkAnimation() const;
+    std::string getKnockdownAnimation() const;
     std::string getPauseAnimation() const;
     std::string getRunAnimation() const;
+    std::string getTalkNormalAnimation() const;
+    std::string getUnlockDoorAnimation() const;
     std::string getWalkAnimation() const;
 
-    std::string getUnlockDoorAnimation() const;
-    std::string getTalkAnimation() const;
-    std::string getHeadTalkAnimation() const;
-
-    // Attack animations
-
-    std::string getDuelAttackAnimation() const;
-    std::string getBashAttackAnimation() const;
-    std::string getDodgeAnimation() const;
-    std::string getKnockdownAnimation() const;
-
-    // END Attack animations
-
 private:
-    const Creature *_creature { nullptr };
+    const Creature *_creature;
 
     bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
     int getWeaponWieldNumber(WeaponWield wield) const;

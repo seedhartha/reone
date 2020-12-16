@@ -141,6 +141,13 @@ enum class Animation {
     // END Placeable
 };
 
+enum class CombatAnimation {
+    DuelAttack,
+    BashAttack,
+    Dodge,
+    Knockdown
+};
+
 } // namespace game
 
 } // namespace reone

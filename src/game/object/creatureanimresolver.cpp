@@ -39,14 +39,32 @@ static string g_animWalkCreature("cwalk");
 static string g_animWalkCharacter("walk");
 static string g_animRunCreature("crun");
 static string g_animRunCharacter("run");
-static string g_animTalkHead("talk");
-static string g_animTalkBody("tlknorm");
+static string g_animTalk("talk");
+static string g_animTalkNormal("tlknorm");
 static string g_animGreeting("greeting");
 static string g_animUnlockDoor("unlockdr");
 
 CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) : _creature(creature) {
     if (!creature) {
         throw invalid_argument("creature must not be null");
+    }
+}
+
+string CreatureAnimationResolver::getAnimationName(Animation animation) const {
+    static string empty;
+
+    string result;
+    switch (animation) {
+        case Animation::LoopingDead:
+            return getDeadAnimation();
+        case Animation::LoopingPause:
+            return getPauseAnimation();
+        case Animation::LoopingUnlockDoor:
+            return getUnlockDoorAnimation();
+        case Animation::LoopingTalkNormal:
+            return getTalkNormalAnimation();
+        default:
+            return empty;
     }
 }
 
@@ -148,12 +166,12 @@ string CreatureAnimationResolver::getUnlockDoorAnimation() const {
     return g_animUnlockDoor;
 }
 
-string CreatureAnimationResolver::getTalkAnimation() const {
-    return g_animTalkBody;
+string CreatureAnimationResolver::getTalkNormalAnimation() const {
+    return g_animTalkNormal;
 }
 
 string CreatureAnimationResolver::getHeadTalkAnimation() const {
-    return g_animTalkHead;
+    return g_animTalk;
 }
 
 string CreatureAnimationResolver::getDuelAttackAnimation() const {

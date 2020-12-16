@@ -450,6 +450,19 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
+Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
+    if (caller) {
+        Animation animation = static_cast<Animation>(getInt(args, 0));
+        float speed = getFloat(args, 1, 1.0f);
+        float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
+        caller->playAnimation(animation, speed);
+    } else {
+        warn("Routines: playAnimation: caller is invalid");
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
