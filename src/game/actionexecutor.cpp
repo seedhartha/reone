@@ -305,7 +305,7 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
         bool reached = navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
         if (reached) {
             creatureActor->face(*door);
-            creatureActor->playAnimation(Creature::Animation::UnlockDoor);
+            creatureActor->playAnimation(Animation::LoopingUnlockDoor);
 
             door->setLocked(false);
             door->open(actor);

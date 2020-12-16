@@ -338,7 +338,7 @@ void Routines::addTslRoutines() {
     add("GetEncounterDifficulty", Int, { Object });
     add("GetDistanceBetweenLocations", Float, { Location, Location }, &Routines::getDistanceBetweenLocations);
     add("GetReflexAdjustedDamage", Int, { Int, Object, Int, Int, Object });
-    add("PlayAnimation", Void, { Int, Float, Float });
+    add("PlayAnimation", Void, { Int, Float, Float }, &Routines::playAnimation);
     add("TalentSpell", Talent, { Int });
     add("TalentFeat", Talent, { Int });
     add("TalentSkill", Talent, { Int });

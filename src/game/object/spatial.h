@@ -31,6 +31,8 @@
 
 #include "../enginetype/effect.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
@@ -48,6 +50,8 @@ public:
     void face(const SpatialObject &other);
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);
+
+    virtual void playAnimation(Animation animation, float speed);
 
     void applyEffect(const std::shared_ptr<Effect> &eff);
 
@@ -111,6 +115,8 @@ protected:
     SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
 
     virtual void updateTransform();
+
+    bool isAnimationLooping(Animation animation) const;
 
 private:
     int _itemIndex { 0 };

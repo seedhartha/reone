@@ -202,7 +202,7 @@ void Creature::updateModelAnimation() {
             if (_dead) {
                 _model->playAnimation(_animResolver.getDeadAnimation(), kAnimationPropagate | kAnimationBlend);
             } else if (_talking) {
-                _model->playAnimation(_animResolver.getTalkAnimation(), kAnimationLoop | kAnimationPropagate);
+                _model->playAnimation(_animResolver.getTalkNormalAnimation(), kAnimationLoop | kAnimationPropagate);
                 if (_headModel) {
                     _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), kAnimationLoop | kAnimationOverlay, 0.25f);
                 }
@@ -218,7 +218,7 @@ void Creature::updateModelAnimation() {
 void Creature::updateHealth() {
     if (_currentHitPoints > 0 || _immortal || _dead) return;
 
-    playAnimation(Animation::Die);
+    playAnimation(_animResolver.getDieAnimation());
     _dead = true;
     _name = Resources::instance().getString(kStrRefRemains);
 
@@ -230,36 +230,55 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(Animation anim) {
+void Creature::playAnimation(Animation animation, float speed) {
+    string animName(_animResolver.getAnimationName(animation));
+    if (animName.empty()) {
+        warn("Creature: playAnimation: unsupported animation: " + to_string(static_cast<int>(animation)));
+        return;
+    }
+    playAnimation(animName, isAnimationLooping(animation), speed);
+}
+
+void Creature::playAnimation(const string &name, bool looping, float speed) {
     if (!_model || _movementType != MovementType::None) return;
 
+    int flags = kAnimationPropagate | kAnimationBlend;
+    if (looping) {
+        flags |= kAnimationLoop;
+    }
+    _model->playAnimation(name, flags, speed);
+
+    if (looping) {
+        _animFireForget = true;
+    }
+}
+
+void Creature::playAnimation(CombatAnimation animation) {
     string animName;
-    switch (anim) {
-        case Animation::UnlockDoor:
-            animName = _animResolver.getUnlockDoorAnimation();
-            break;
-        case Animation::DuelAttack:
+    bool looping = false;
+
+    switch (animation) {
+        case CombatAnimation::DuelAttack:
             animName = _animResolver.getDuelAttackAnimation();
             break;
-        case Animation::BashAttack:
+        case CombatAnimation::BashAttack:
             animName = _animResolver.getBashAttackAnimation();
             break;
-        case Animation::Dodge:
+        case CombatAnimation::Dodge:
             animName = _animResolver.getDodgeAnimation();
             break;
-        case Animation::Knockdown:
+        case CombatAnimation::Knockdown:
             animName = _animResolver.getKnockdownAnimation();
-            break;
-        case Animation::Die:
-            animName = _animResolver.getDieAnimation();
+            looping = true;
             break;
         default:
             break;
     }
-    if (!animName.empty()) {
-        _model->playAnimation(animName, kAnimationPropagate | kAnimationBlend);
-        _animFireForget = true;
+
+    if (animName.empty()) {
+        warn("Creature: playAnimation: unsupported combat animation: " + to_string(static_cast<int>(animation)));
     }
+    playAnimation(animName, looping);
 }
 
 void Creature::equip(const string &resRef) {
