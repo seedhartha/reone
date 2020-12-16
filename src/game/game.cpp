@@ -209,6 +209,7 @@ void Game::loadModule(const string &name, const string &entry) {
         Resources::instance().loadModule(name);
 
         if (_module) {
+            _module->area()->runOnExitScript();
             _module->area()->unloadParty();
         }
 

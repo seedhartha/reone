@@ -25,6 +25,7 @@
 
 #include "SDL2/SDL_events.h"
 
+#include "../../common/timer.h"
 #include "../../render/types.h"
 #include "../../resource/gfffile.h"
 #include "../../resource/types.h"
@@ -137,6 +138,7 @@ public:
 
     void runSpawnScripts();
     void runOnEnterScript();
+    void runOnExitScript();
 
     // END Scripts
 
@@ -153,7 +155,7 @@ private:
     CameraStyle _cameraStyle;
     CameraStyle _combatCamStyle;
     std::string _music;
-    float _heartbeatTimeout { kHeartbeatInterval };
+    Timer _heartbeatTimer;
     Map _map;
 
     // Scripts
