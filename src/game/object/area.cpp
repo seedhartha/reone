@@ -69,7 +69,8 @@ Area::Area(uint32_t id, Game *game) :
     _objectSelector(this, &game->party()),
     _actionExecutor(game),
     _combat(game),
-    _map(game) {
+    _map(game),
+    _heartbeatTimer(kHeartbeatInterval) {
 
     const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
@@ -601,12 +602,21 @@ void Area::runSpawnScripts() {
 }
 
 void Area::runOnEnterScript() {
-    shared_ptr<Creature> player(_game->party().player());
+    if (_onEnter.empty()) return;
+
+    auto player = _game->party().player();
     if (!player) return;
 
-    if (!_onEnter.empty()) {
-        runScript(_onEnter, _game->module()->area(), player, -1);
-    }
+    runScript(_onEnter, _game->module()->area(), player, -1);
+}
+
+void Area::runOnExitScript() {
+    if (_onExit.empty()) return;
+
+    auto player = _game->party().player();
+    if (!player) return;
+
+    runScript(_onExit, _game->module()->area(), player, -1);
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
@@ -811,13 +821,13 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 }
 
 void Area::updateHeartbeat(float dt) {
-    _heartbeatTimeout = glm::max(0.0f, _heartbeatTimeout - dt);
+    _heartbeatTimer.update(dt);
 
-    if (_heartbeatTimeout == 0.0f) {
+    if (_heartbeatTimer.hasTimedOut()) {
         if (!_onHeartbeat.empty()) {
             runScript(_onHeartbeat, _game->module()->area(), nullptr, -1);
         }
-        _heartbeatTimeout = kHeartbeatInterval;
+        _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }
 
