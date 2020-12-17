@@ -41,6 +41,9 @@ ScriptRunner::ScriptRunner(Game *game) : _game(game) {
 }
 
 int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber) {
+    // TODO: currently using hardcoded AI
+    if (resRef == "k_ai_master") return -1;
+
     auto program = Scripts::instance().get(resRef);
     if (!program) return -1;
 
