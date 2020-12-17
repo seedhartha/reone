@@ -29,7 +29,11 @@ namespace game {
 
 class Door : public SpatialObject {
 public:
-    Door(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    Door(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     bool isSelectable() const override;
 

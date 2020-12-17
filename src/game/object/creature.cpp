@@ -54,8 +54,13 @@ constexpr int kStrRefRemains = 38151;
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
-Creature::Creature(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph),
+Creature::Creature(
+    uint32_t id,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    ScriptRunner *scriptRunner
+) :
+    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph, scriptRunner),
     _modelBuilder(this),
     _animResolver(this) {
 

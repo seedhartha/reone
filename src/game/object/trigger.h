@@ -31,7 +31,11 @@ class TriggerBlueprint;
 
 class Trigger : public SpatialObject {
 public:
-    Trigger(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    Trigger(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     void update(float dt) override;
 

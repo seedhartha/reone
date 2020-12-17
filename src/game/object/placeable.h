@@ -33,7 +33,11 @@ class ObjectFactory;
 
 class Placeable : public SpatialObject {
 public:
-    Placeable(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    Placeable(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     bool isSelectable() const override;
 

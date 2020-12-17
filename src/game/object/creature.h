@@ -70,7 +70,11 @@ public:
         int pointIdx { 0 };
     };
 
-    Creature(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    Creature(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     void update(float dt) override;
     void clearAllActions() override;

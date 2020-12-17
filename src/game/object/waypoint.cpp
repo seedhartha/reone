@@ -29,8 +29,18 @@ namespace reone {
 
 namespace game {
 
-Waypoint::Waypoint(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Waypoint, objectFactory, sceneGraph) {
+Waypoint::Waypoint(
+    uint32_t id,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    ScriptRunner *scriptRunner
+) :
+    SpatialObject(
+        id,
+        ObjectType::Waypoint,
+        objectFactory,
+        sceneGraph,
+        scriptRunner) {
 }
 
 void Waypoint::load(const GffStruct &gffs) {

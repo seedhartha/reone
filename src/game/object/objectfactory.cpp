@@ -49,23 +49,23 @@ unique_ptr<Area> ObjectFactory::newArea() {
 }
 
 unique_ptr<Creature> ObjectFactory::newCreature() {
-    return make_unique<Creature>(_counter++, this, _sceneGraph);
+    return make_unique<Creature>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return make_unique<Placeable>(_counter++, this, _sceneGraph);
+    return make_unique<Placeable>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<Door> ObjectFactory::newDoor() {
-    return make_unique<Door>(_counter++, this, _sceneGraph);
+    return make_unique<Door>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return make_unique<Waypoint>(_counter++, this, _sceneGraph);
+    return make_unique<Waypoint>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<Trigger> ObjectFactory::newTrigger() {
-    return make_unique<Trigger>(_counter++, this, _sceneGraph);
+    return make_unique<Trigger>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<Item> ObjectFactory::newItem() {
@@ -73,11 +73,11 @@ unique_ptr<Item> ObjectFactory::newItem() {
 }
 
 unique_ptr<Sound> ObjectFactory::newSound() {
-    return make_unique<Sound>(_counter++, this, _sceneGraph);
+    return make_unique<Sound>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 unique_ptr<CameraObject> ObjectFactory::newCamera() {
-    return make_unique<CameraObject>(_counter++, this, _sceneGraph);
+    return make_unique<CameraObject>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 } // namespace game
