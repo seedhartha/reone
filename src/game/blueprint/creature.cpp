@@ -133,7 +133,7 @@ void CreatureBlueprint::loadItems(Creature &creature) {
     for (auto &itemGffs : _utc->getList("ItemList")) {
         string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
         bool dropable = itemGffs->getBool("Dropable");
-        creature.addItem(resRef, dropable);
+        creature.addItem(resRef, 1, dropable);
     }
 }
 

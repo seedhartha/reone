@@ -67,7 +67,7 @@ void PlaceableBlueprint::load(Placeable &placeable) {
 void PlaceableBlueprint::loadItems(Placeable &placeable) {
     for (auto &itemGffs : _utp->getList("ItemList")) {
         string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
-        placeable.addItem(resRef, true);
+        placeable.addItem(resRef, 1, true);
     }
 }
 
