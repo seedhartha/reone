@@ -414,7 +414,7 @@ void Routines::addKotorRoutines() {
     add("EffectHealForcePoints", Effect, { Int }, &Routines::effectHealForcePoints);
     add("SendMessageToPC", Void, { Object, String });
     add("GetAttemptedSpellTarget", Object, { });
-    add("GetLastOpenedBy", Object, { });
+    add("GetLastOpenedBy", Object, { }, &Routines::getLastOpenedBy);
     add("GetHasSpell", Int, { Int, Object });
     add("OpenStore", Void, { Object, Object, Int, Int });
     add("ActionSurrenderToEnemies", Void, { }, &Routines::actionSurrenderToEnemies);
