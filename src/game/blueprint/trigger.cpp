@@ -42,6 +42,7 @@ TriggerBlueprint::TriggerBlueprint(const string &resRef, const shared_ptr<GffStr
 
 void TriggerBlueprint::load(Trigger &trigger) {
     trigger._tag = boost::to_lower_copy(_utt->getString("Tag"));
+    trigger._heartbeat = boost::to_lower_copy(_utt->getString("ScriptHeartbeat"));
     trigger._onEnter = boost::to_lower_copy(_utt->getString("ScriptOnEnter"));
     trigger._onExit = boost::to_lower_copy(_utt->getString("ScriptOnExit"));
 }

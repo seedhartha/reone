@@ -124,6 +124,7 @@ void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
 }
 
 void CreatureBlueprint::loadScripts(Creature &creature) {
+    creature._heartbeat = boost::to_lower_copy(_utc->getString("ScriptHeartbeat"));
     creature._onSpawn = boost::to_lower_copy(_utc->getString("ScriptSpawn"));
     creature._onUserDefined = boost::to_lower_copy(_utc->getString("ScriptUserDefine"));
 }

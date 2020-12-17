@@ -72,6 +72,7 @@ void PlaceableBlueprint::loadItems(Placeable &placeable) {
 }
 
 void PlaceableBlueprint::loadScripts(Placeable &placeable) {
+    placeable._heartbeat = _utp->getString("OnHeartbeat");
     placeable._onInvDisturbed = _utp->getString("OnInvDisturbed");
 }
 

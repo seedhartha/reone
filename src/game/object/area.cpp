@@ -826,6 +826,12 @@ void Area::updateHeartbeat(float dt) {
         if (!_onHeartbeat.empty()) {
             _game->scriptRunner().run(_onHeartbeat, _id);
         }
+        for (auto &object : _objects) {
+            string heartbeat(object->heartbeat());
+            if (!heartbeat.empty()) {
+                _game->scriptRunner().run(heartbeat, object->id());
+            }
+        }
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }
