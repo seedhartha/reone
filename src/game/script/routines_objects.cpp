@@ -463,6 +463,10 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
+Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &ctx) {
+    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
+}
+
 } // namespace game
 
 } // namespace reone

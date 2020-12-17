@@ -172,6 +172,7 @@ private:
     script::Variable getIsOpen(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastOpenedBy(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getName(const VariablesList &args, script::ExecutionContext &ctx);
