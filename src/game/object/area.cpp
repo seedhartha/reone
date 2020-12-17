@@ -37,7 +37,6 @@
 #include "../blueprint/sound.h"
 #include "../game.h"
 #include "../room.h"
-#include "../script/util.h"
 
 #include "objectfactory.h"
 
@@ -607,7 +606,7 @@ void Area::runOnEnterScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    runScript(_onEnter, _game->module()->area(), player, -1);
+    _game->scriptRunner().run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
@@ -616,7 +615,7 @@ void Area::runOnExitScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    runScript(_onExit, _game->module()->area(), player, -1);
+    _game->scriptRunner().run(_onExit, _id, player->id());
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
@@ -815,7 +814,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->onEnter().empty()) {
-            runScript(trigger->onEnter(), trigger, triggerrer, -1);
+            _game->scriptRunner().run(trigger->onEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -825,7 +824,7 @@ void Area::updateHeartbeat(float dt) {
 
     if (_heartbeatTimer.hasTimedOut()) {
         if (!_onHeartbeat.empty()) {
-            runScript(_onHeartbeat, _game->module()->area(), nullptr, -1);
+            _game->scriptRunner().run(_onHeartbeat, _id);
         }
         _heartbeatTimer.reset(kHeartbeatInterval);
     }

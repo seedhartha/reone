@@ -15,39 +15,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "util.h"
+#include "runner.h"
 
-#include "../../resource/resources.h"
+#include <stdexcept>
+
 #include "../../script/execution.h"
 #include "../../script/scripts.h"
-#include "../../script/types.h"
+
+#include "../game.h"
 
 #include "routines.h"
 
 using namespace std;
 
-using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-int runScript(const string &resRef, shared_ptr<ScriptObject> caller, shared_ptr<ScriptObject> triggerer, int userDefinedEventNumber) {
+ScriptRunner::ScriptRunner(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
+}
+
+int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber) {
     auto program = Scripts::instance().get(resRef);
     if (!program) return -1;
 
-    return runScript(move(program), move(caller), move(triggerer), userDefinedEventNumber);
-}
-
-int runScript(const std::shared_ptr<ScriptProgram> &program, shared_ptr<ScriptObject> caller, shared_ptr<ScriptObject> triggerer, int userDefinedEventNumber) {
     ExecutionContext ctx;
     ctx.routines = &Routines::instance();
-    ctx.caller = move(caller);
-    ctx.triggerer = move(triggerer);
+    ctx.caller = _game->getObjectById(callerId);
+    ctx.triggerer = _game->getObjectById(triggerrerId);
     ctx.userDefinedEventNumber = userDefinedEventNumber;
 
-    return ScriptExecution(program, move(ctx)).run();
+    return ScriptExecution(program, ctx).run();
 }
 
 } // namespace game

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <memory>
 #include <set>
 #include <vector>
 
@@ -42,6 +41,7 @@
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
+#include "../script/runner.h"
 
 #include "object.h"
 

@@ -34,7 +34,6 @@
 #include "../blueprint/blueprints.h"
 #include "../rp/classutil.h"
 #include "../portraitutil.h"
-#include "../script/util.h"
 
 #include "objectfactory.h"
 

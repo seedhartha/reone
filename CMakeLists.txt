@@ -433,7 +433,7 @@ set(GAME_HEADERS
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
-    src/game/script/util.h
+    src/game/script/runner.h
     src/game/types.h)
 
 set(GAME_SOURCES
@@ -533,7 +533,7 @@ set(GAME_SOURCES
     src/game/script/routines_party.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
-    src/game/script/util.cpp)
+    src/game/script/runner.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

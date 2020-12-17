@@ -24,7 +24,6 @@
 #include "../../resource/resources.h"
 
 #include "../blueprint/blueprints.h"
-#include "../script/util.h"
 
 using namespace std;
 

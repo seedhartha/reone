@@ -20,7 +20,6 @@
 #include "../../common/log.h"
 
 #include "../enginetype/event.h"
-#include "../script/util.h"
 
 #include "../game.h"
 
@@ -43,7 +42,7 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
     if (object) {
         auto toRun = getEvent(args, 1);
         if (toRun) {
-            runScript(object->onUserDefined(), object, nullptr, toRun->number());
+            _game->scriptRunner().run(object->onUserDefined(), object->id(), kObjectInvalid, toRun->number());
         } else {
             warn("Routines: signalEvent: toRun is invalid");
         }

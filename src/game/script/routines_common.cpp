@@ -25,7 +25,6 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
-#include "../script/util.h"
 
 using namespace std;
 
@@ -244,8 +243,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
         int scriptVar = getInt(args, 2, -1);
 
         _game->setRunScriptVar(scriptVar);
-
-        runScript(script, target, nullptr, -1);
+        _game->scriptRunner().run(script, target->id());
     } else {
         warn("Routines: executeScript: target is invalid");
     }

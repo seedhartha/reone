@@ -17,32 +17,39 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
-#include "../../script/program.h"
+#include "../../script/types.h"
 
 namespace reone {
 
-namespace script {
-
-class ScriptObject;
-
-}
-
 namespace game {
 
-int runScript(
-    const std::string &resRef,
-    std::shared_ptr<script::ScriptObject> caller,
-    std::shared_ptr<script::ScriptObject> triggerer,
-    int userDefinedEventNumber);
+class Game;
+class Object;
 
-int runScript(
-    const std::shared_ptr<script::ScriptProgram> &program,
-    std::shared_ptr<script::ScriptObject> caller,
-    std::shared_ptr<script::ScriptObject> triggerer,
-    int userDefinedEventNumber);
+/**
+ * An interface for game objects to run their scripts. This is needed because
+ * runScript accepts smart pointers to game objects.
+ */
+class ScriptRunner {
+public:
+    ScriptRunner(Game *game);
+
+    int run(
+        const std::string &resRef,
+        uint32_t callerId = script::kObjectInvalid,
+        uint32_t triggerrerId = script::kObjectInvalid,
+        int userDefinedEventNumber = -1);
+
+private:
+    Game *_game;
+
+    ScriptRunner(const ScriptRunner &) = delete;
+    ScriptRunner &operator=(const ScriptRunner &) = delete;
+};
 
 } // namespace game
 

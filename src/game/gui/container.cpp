@@ -24,7 +24,6 @@
 
 #include "../game.h"
 #include "../object/item.h"
-#include "../script/util.h"
 
 #include "colorutil.h"
 
@@ -134,7 +133,7 @@ void Container::transferItemsToPlayer() {
     if (placeable) {
         string script(placeable->onInvDisturbed());
         if (!script.empty()) {
-            runScript(script, placeable, player, -1);
+            _game->scriptRunner().run(script, placeable->id(), player->id());
         }
     }
 }

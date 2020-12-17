@@ -27,13 +27,13 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(const std::shared_ptr<Creature> &object, float range = kDefaultAttackRange) :
+    AttackAction(const std::shared_ptr<SpatialObject> &object, float range = kDefaultAttackRange) :
         ObjectAction(ActionType::AttackObject, object),
         _range(range) {
     }
 
-    std::shared_ptr<Creature> target() const {
-        return std::static_pointer_cast<Creature>(_object);
+    std::shared_ptr<SpatialObject> target() const {
+        return std::static_pointer_cast<SpatialObject>(_object);
     }
 
     float range() const { return _range; }

@@ -19,8 +19,6 @@
 
 #include "../../script/types.h"
 
-#include "../script/util.h"
-
 using namespace std;
 
 using namespace reone::script;
