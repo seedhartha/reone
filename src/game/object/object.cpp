@@ -74,6 +74,10 @@ ActionQueue &Object::actionQueue() {
     return _actionQueue;
 }
 
+const string &Object::heartbeat() const {
+    return _heartbeat;
+}
+
 const string &Object::onUserDefined() const {
     return _onUserDefined;
 }

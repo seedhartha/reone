@@ -64,6 +64,7 @@ void DoorBlueprint::load(Door &door) {
 }
 
 void DoorBlueprint::loadScripts(Door &door) {
+    door._heartbeat = _utd->getString("OnHeartbeat");
     door._onOpen = _utd->getString("OnOpen");
     door._onFailToOpen = _utd->getString("OnFailToOpen");
 }
