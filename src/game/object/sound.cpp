@@ -89,7 +89,7 @@ void Sound::update(float dt) {
         if (sounds.empty()) {
             _active = false;
             return;
-        } else if (++_soundIdx == soundCount) {
+        } else if (++_soundIdx >= soundCount) {
             if (_looping) {
                 _soundIdx = 0;
             } else {
