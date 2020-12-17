@@ -39,8 +39,13 @@ namespace reone {
 
 namespace game {
 
-Placeable::Placeable(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph) {
+Placeable::Placeable(
+    uint32_t id,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    ScriptRunner *scriptRunner
+) :
+    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph, scriptRunner) {
 
     _drawDistance = 4096.0f;
 }

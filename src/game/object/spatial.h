@@ -42,6 +42,7 @@ static const float kDefaultDrawDistance = 1024.0f;
 class Item;
 class ObjectFactory;
 class Room;
+class ScriptRunner;
 
 class SpatialObject : public Object {
 public:
@@ -97,8 +98,9 @@ public:
     // END Inventory
 
 protected:
-    ObjectFactory *_objectFactory { nullptr };
-    scene::SceneGraph *_sceneGraph { nullptr };
+    ObjectFactory *_objectFactory;
+    scene::SceneGraph *_sceneGraph;
+    ScriptRunner *_scriptRunner;
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
     float _facing { 0.0f };
@@ -112,7 +114,12 @@ protected:
     std::deque<std::shared_ptr<Effect>> _effects;
     bool _open { false };
 
-    SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    SpatialObject(
+        uint32_t id,
+        ObjectType type,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     virtual void updateTransform();
 

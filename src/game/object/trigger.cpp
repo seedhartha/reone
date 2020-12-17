@@ -24,6 +24,7 @@
 #include "../../resource/resources.h"
 
 #include "../blueprint/blueprints.h"
+#include "../script/runner.h"
 
 using namespace std;
 
@@ -35,8 +36,18 @@ namespace reone {
 
 namespace game {
 
-Trigger::Trigger(uint32_t id, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Trigger, objectFactory, sceneGraph) {
+Trigger::Trigger(
+    uint32_t id,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    ScriptRunner *scriptRunner
+) :
+    SpatialObject(
+        id,
+        ObjectType::Trigger,
+        objectFactory,
+        sceneGraph,
+        scriptRunner) {
 }
 
 void Trigger::load(const GffStruct &gffs) {
@@ -83,6 +94,9 @@ void Trigger::update(float dt) {
     }
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
+        if (!_onExit.empty()) {
+            _scriptRunner->run(_onExit, _id, tenant->id());
+        }
     }
     SpatialObject::update(dt);
 }

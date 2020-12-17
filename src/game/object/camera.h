@@ -29,7 +29,11 @@ namespace game {
 
 class CameraObject : public SpatialObject, public Camera {
 public:
-    CameraObject(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    CameraObject(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     void load(const resource::GffStruct &gffs);
 

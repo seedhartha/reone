@@ -33,7 +33,11 @@ namespace game {
 
 class Sound : public SpatialObject {
 public:
-    Sound(uint32_t id, ObjectFactory *objectFactory, scene::SceneGraph *sceneGraph);
+    Sound(
+        uint32_t id,
+        ObjectFactory *objectFactory,
+        scene::SceneGraph *sceneGraph,
+        ScriptRunner *scriptRunner);
 
     void update(float dt) override;
 

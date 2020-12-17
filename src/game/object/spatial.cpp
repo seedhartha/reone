@@ -36,10 +36,17 @@ namespace reone {
 
 namespace game {
 
-SpatialObject::SpatialObject(uint32_t id, ObjectType type, ObjectFactory *objectFactory, SceneGraph *sceneGraph) :
+SpatialObject::SpatialObject(
+    uint32_t id,
+    ObjectType type,
+    ObjectFactory *objectFactory,
+    SceneGraph *sceneGraph,
+    ScriptRunner *scriptRunner
+) :
     Object(id, type),
     _objectFactory(objectFactory),
-    _sceneGraph(sceneGraph) {
+    _sceneGraph(sceneGraph),
+    _scriptRunner(scriptRunner) {
 }
 
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {
