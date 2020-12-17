@@ -202,7 +202,7 @@ void Combat::updateRounds(float dt) {
         AttackAction *action = getAttackAction(attacker->creature);
         if (!action) continue;
 
-        shared_ptr<Creature> defender(action->target());
+        shared_ptr<SpatialObject> defender(action->target());
         if (!defender || defender->distanceTo(*attacker->creature) > action->range()) continue;
 
         // Check if target is valid combatant

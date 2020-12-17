@@ -44,6 +44,7 @@
 #include "object/objectfactory.h"
 #include "object/spatial.h"
 #include "party.h"
+#include "script/runner.h"
 #include "types.h"
 
 namespace reone {
@@ -96,6 +97,7 @@ public:
 
     Camera *getActiveCamera() const;
     int getRunScriptVar() const;
+    std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     resource::GameVersion version() const;
     const Options &options() const;
@@ -105,6 +107,7 @@ public:
     Party &party();
     CharacterGeneration &characterGeneration();
     CameraType cameraType() const;
+    ScriptRunner &scriptRunner();
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -165,6 +168,7 @@ private:
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
+    ScriptRunner _scriptRunner;
 
     // Modules
 

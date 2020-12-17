@@ -28,7 +28,6 @@
 #include "../blueprint/blueprints.h"
 #include "../game.h"
 #include "../portraitutil.h"
-#include "../script/util.h"
 
 #include "colorutil.h"
 
@@ -149,7 +148,7 @@ void PartySelection::onClick(const string &control) {
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
-            runScript(_context.exitScript, nullptr, nullptr, -1);
+            _game->scriptRunner().run(_context.exitScript);
         }
     } else if (boost::starts_with(control, "BTN_NPC")) {
         onNpcButtonClick(control);

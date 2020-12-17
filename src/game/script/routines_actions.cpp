@@ -324,14 +324,19 @@ Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
     auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::AttackObject);
-        caller->actionQueue().add(move(action));
-    } else {
+    if (!caller) {
         warn("Routines: actionAttack: caller is invalid");
+        return Variable();
     }
+    auto attackee = getSpatialObject(args, 0);
+    if (!attackee) {
+        warn("Routines: actionAttack: attackee is invalid");
+        return Variable();
+    }
+    auto action = make_unique<AttackAction>(attackee);
+    caller->actionQueue().add(move(action));
+
     return Variable();
 }
 

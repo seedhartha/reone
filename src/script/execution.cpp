@@ -35,9 +35,6 @@ namespace script {
 
 static const int kStartInstructionOffset = 13;
 
-constexpr int kObjectIdSelf = 0;
-constexpr int kObjectIdInvalid = 1;
-
 ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
     _handlers.insert(make_pair(ByteCode::CopyDownSP, bind(&ScriptExecution::executeCopyDownSP, this, _1)));
     _handlers.insert(make_pair(ByteCode::Reserve, bind(&ScriptExecution::executeReserve, this, _1)));
@@ -188,10 +185,10 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
         case InstructionType::Object: {
             shared_ptr<ScriptObject> object;
             switch (ins.objectId) {
-                case kObjectIdSelf:
+                case kObjectSelf:
                     object = _context.caller;
                     break;
-                case kObjectIdInvalid:
+                case kObjectInvalid:
                     break;
                 default:
                     throw logic_error("Invalid object id");

@@ -62,7 +62,7 @@ private:
     struct Combatant {
         std::shared_ptr<Creature> creature;
         EnemiesList enemies;
-        std::shared_ptr<Creature> target;
+        std::shared_ptr<SpatialObject> target;
     };
 
     typedef std::map<uint32_t, std::shared_ptr<Combatant>> CombatantMap;

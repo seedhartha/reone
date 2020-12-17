@@ -61,7 +61,8 @@ Game::Game(const fs::path &path, const Options &opts) :
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
-    _party(this) {
+    _party(this),
+    _scriptRunner(this) {
 
     initGameVersion();
 
@@ -304,6 +305,24 @@ Camera *Game::getActiveCamera() const {
 
 int Game::getRunScriptVar() const {
     return _runScriptVar;
+}
+
+shared_ptr<Object> Game::getObjectById(uint32_t id) const {
+    switch (id) {
+        case kObjectSelf:
+            throw invalid_argument("id is invalid");
+        case kObjectInvalid:
+            return nullptr;
+        default:
+            break;
+    }
+
+    if (_module->id() == id) return _module;
+
+    auto area = _module->area();
+    if (area->id() == id) return area;
+
+    return area->find(id);
 }
 
 void Game::drawGUI() {
@@ -740,6 +759,10 @@ CharacterGeneration &Game::characterGeneration() {
 
 CameraType Game::cameraType() const {
     return _cameraType;
+}
+
+ScriptRunner &Game::scriptRunner() {
+    return _scriptRunner;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
