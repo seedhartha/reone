@@ -252,7 +252,7 @@ void Creature::playAnimation(const string &name, bool looping, float speed) {
     }
     _model->playAnimation(name, flags, speed);
 
-    if (looping) {
+    if (!looping) {
         _animFireForget = true;
     }
 }
