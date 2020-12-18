@@ -476,8 +476,7 @@ void Creature::setXP(int xp) {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        // TODO: enable when more routines are implemented
-        // runScript(_onSpawn, _id, kObjectInvalid, -1);
+        _scriptRunner->run(_onSpawn, _id, kObjectInvalid);
     }
 }
 
