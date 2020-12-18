@@ -76,8 +76,8 @@ unique_ptr<Sound> ObjectFactory::newSound() {
     return make_unique<Sound>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
-unique_ptr<CameraObject> ObjectFactory::newCamera() {
-    return make_unique<CameraObject>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+unique_ptr<PlaceableCamera> ObjectFactory::newCamera() {
+    return make_unique<PlaceableCamera>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
 } // namespace game

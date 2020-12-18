@@ -259,7 +259,7 @@ void Area::loadSounds(const GffStruct &git) {
 
 void Area::loadCameras(const GffStruct &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<CameraObject> camera(_game->objectFactory().newCamera());
+        shared_ptr<PlaceableCamera> camera(_game->objectFactory().newCamera());
         camera->load(*gffs);
         add(camera);
     }
@@ -891,7 +891,7 @@ Camera &Area::getCamera(CameraType type) {
 
 void Area::setStaticCamera(int cameraId) {
     for (auto &object : _objectsByType[ObjectType::Camera]) {
-        CameraObject &camera = static_cast<CameraObject &>(*object);
+        PlaceableCamera &camera = static_cast<PlaceableCamera &>(*object);
         if (camera.cameraId() == cameraId) {
             _staticCamera->setObject(camera);
             break;

@@ -27,9 +27,9 @@ namespace reone {
 
 namespace game {
 
-class CameraObject : public SpatialObject, public Camera {
+class PlaceableCamera : public SpatialObject, public Camera {
 public:
-    CameraObject(
+    PlaceableCamera(
         uint32_t id,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph,

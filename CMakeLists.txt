@@ -405,7 +405,6 @@ set(GAME_HEADERS
     src/game/gui/selectoverlay.h
     src/game/map.h
     src/game/object/area.h
-    src/game/object/camera.h
     src/game/object/creature.h
     src/game/object/creatureanimresolver.h
     src/game/object/creaturemodelbuilder.h
@@ -415,6 +414,7 @@ set(GAME_HEADERS
     src/game/object/object.h
     src/game/object/objectfactory.h
     src/game/object/placeable.h
+    src/game/object/placeablecamera.h
     src/game/object/sound.h
     src/game/object/spatial.h
     src/game/object/trigger.h
@@ -497,7 +497,6 @@ set(GAME_SOURCES
     src/game/gui/selectoverlay.cpp
     src/game/map.cpp
     src/game/object/area.cpp
-    src/game/object/camera.cpp
     src/game/object/creature.cpp
     src/game/object/creatureanimresolver.cpp
     src/game/object/creaturemodelbuilder.cpp
@@ -507,6 +506,7 @@ set(GAME_SOURCES
     src/game/object/object.cpp
     src/game/object/objectfactory.cpp
     src/game/object/placeable.cpp
+    src/game/object/placeablecamera.cpp
     src/game/object/sound.cpp
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
