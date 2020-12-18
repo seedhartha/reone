@@ -156,6 +156,7 @@ private:
     script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable faceObjectAwayFromObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getArea(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getAreaUnescapable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getCommandable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween2D(const VariablesList &args, script::ExecutionContext &ctx);
@@ -184,6 +185,7 @@ private:
     script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable playAnimation(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setAreaUnescapable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setCommandable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);

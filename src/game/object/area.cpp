@@ -939,6 +939,14 @@ void Area::setStealthXPDecrement(int value) {
     _stealthXPDecrement = value;
 }
 
+bool Area::isUnescapable() const {
+    return _unescapable;
+}
+
+void Area::setUnescapable(bool value) {
+    _unescapable = value;
+}
+
 } // namespace game
 
 } // namespace reone

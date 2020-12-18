@@ -473,6 +473,16 @@ Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &
     return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
 }
 
+Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->module()->area()->isUnescapable() ? 1 : 0;
+}
+
+Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
+    bool unescapable = getBool(args, 0);
+    _game->module()->area()->setUnescapable(unescapable);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
