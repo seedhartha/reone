@@ -107,6 +107,18 @@ enum class DamageType {
     Blaster = 4096
 };
 
+enum class AttackResult {
+    Invalid = 0,
+    HitSuccessful = 1,
+    CriticalHit = 2,
+    AutomaticHit = 3,
+    Miss = 4,
+    AttackResisted = 5,
+    AttackFailed = 6,
+    Parried = 8,
+    Deflected = 9
+};
+
 class CreatureBlueprint;
 
 struct Options {
