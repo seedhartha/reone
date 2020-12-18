@@ -68,7 +68,13 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
     string tag(getString(args, 0));
     boost::to_lower(tag);
 
-    return static_pointer_cast<ScriptObject>(_game->module()->area()->find(tag));
+    for (auto &waypoint : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+        if (waypoint->tag() == tag) {
+            return static_pointer_cast<ScriptObject>(waypoint);
+        }
+    }
+
+    return shared_ptr<ScriptObject>();
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
