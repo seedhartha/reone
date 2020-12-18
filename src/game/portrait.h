@@ -17,35 +17,21 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../resource/types.h"
+#include <string>
+#include <memory>
 
-#include "../../portrait.h"
+#include "../render/texture.h"
 
 namespace reone {
 
 namespace game {
 
-class CharacterGeneration;
-
-class PortraitSelection : public gui::GUI {
-public:
-    PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
-
-    void load() override;
-
-    void updatePortraits();
-    void resetCurrentPortrait();
-
-private:
-    CharacterGeneration *_charGen { nullptr };
-    std::vector<Portrait> _portraits;
-    int _currentPortrait { 0 };
-
-    void onClick(const std::string &control) override;
-
-    void loadCurrentPortrait();
-    void setButtonColors(const std::string &tag);
+struct Portrait {
+    std::string resRef;
+    std::shared_ptr<render::Texture> image;
+    int appearanceNumber { 0 };
+    int appearanceS { 0 };
+    int appearanceL { 0 };
 };
 
 } // namespace game

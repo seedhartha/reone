@@ -17,8 +17,10 @@
 
 #include "characterutil.h"
 
-#include "../resource/resources.h"
 #include "../common/random.h"
+#include "../resource/resources.h"
+
+#include "portrait.h"
 
 using namespace std;
 

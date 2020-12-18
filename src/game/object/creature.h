@@ -23,6 +23,7 @@
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
+#include "../creatureconfig.h"
 #include "../rp/attributes.h"
 
 #include "creatureanimresolver.h"

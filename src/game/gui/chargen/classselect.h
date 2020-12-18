@@ -20,7 +20,7 @@
 #include "../../../gui/gui.h"
 #include "../../../resource/types.h"
 
-#include "../../types.h"
+#include "../../creatureconfig.h"
 
 namespace reone {
 
