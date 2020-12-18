@@ -171,10 +171,10 @@ void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, AttackAction
 bool ActionExecutor::navigateCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest, bool run, float distance, float dt) {
     if (creature->isMovementRestricted()) return false;
 
-    const glm::vec3 &origin = creature->position();
-    float distToDest = glm::distance2(origin, dest);
+    glm::vec2 origin(creature->position());
+    float distToDest = glm::distance(origin, glm::vec2(dest));
 
-    if (distToDest <= distance * distance) {
+    if (distToDest <= distance) {
         creature->setMovementType(Creature::MovementType::None);
         creature->clearPath();
         return true;
