@@ -23,13 +23,13 @@ namespace reone {
 
 namespace game {
 
-class CameraObject;
+class PlaceableCamera;
 
 class StaticCamera : public Camera {
 public:
     StaticCamera(scene::SceneGraph *sceneGraph, float aspect);
 
-    void setObject(const CameraObject &object);
+    void setObject(const PlaceableCamera &object);
 
 private:
     float _aspect { 1.0f };

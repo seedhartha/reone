@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camera.h"
+#include "placeablecamera.h"
 
 #include "glm/gtx/euler_angles.hpp"
 
@@ -28,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-CameraObject::CameraObject(
+PlaceableCamera::PlaceableCamera(
     uint32_t id,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph,
@@ -42,7 +42,7 @@ CameraObject::CameraObject(
         scriptRunner) {
 }
 
-void CameraObject::load(const GffStruct &gffs) {
+void PlaceableCamera::load(const GffStruct &gffs) {
     _cameraId = gffs.getInt("CameraID");
     _fieldOfView = gffs.getFloat("FieldOfView");
 
@@ -60,11 +60,11 @@ void CameraObject::load(const GffStruct &gffs) {
     updateTransform();
 }
 
-int CameraObject::cameraId() const {
+int PlaceableCamera::cameraId() const {
     return _cameraId;
 }
 
-float CameraObject::fieldOfView() const {
+float PlaceableCamera::fieldOfView() const {
     return _fieldOfView;
 }
 

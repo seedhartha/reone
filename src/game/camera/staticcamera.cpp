@@ -19,7 +19,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../object/camera.h"
+#include "../object/placeablecamera.h"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ StaticCamera::StaticCamera(SceneGraph *sceneGraph, float aspect) : _aspect(aspec
     _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f));
 }
 
-void StaticCamera::setObject(const CameraObject &object) {
+void StaticCamera::setObject(const PlaceableCamera &object) {
     glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, 0.1f, 10000.0f));
 
     _sceneNode->setLocalTransform(object.transform());
