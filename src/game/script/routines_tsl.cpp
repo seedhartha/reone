@@ -52,8 +52,8 @@ void Routines::addTslRoutines() {
     add("SwitchPlayerCharacter", Int, { Int });
     add("SetTime", Void, { Int, Int, Int, Int });
     add("SetPartyLeader", Int, { Int }, &Routines::setPartyLeader);
-    add("SetAreaUnescapable", Void, { Int });
-    add("GetAreaUnescapable", Int, { });
+    add("SetAreaUnescapable", Void, { Int }, &Routines::setAreaUnescapable);
+    add("GetAreaUnescapable", Int, { }, &Routines::getAreaUnescapable);
     add("GetTimeHour", Int, { });
     add("GetTimeMinute", Int, { });
     add("GetTimeSecond", Int, { });

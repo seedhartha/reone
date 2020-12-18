@@ -80,6 +80,8 @@ public:
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
 
+    bool isUnescapable() const;
+
     std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
@@ -92,6 +94,8 @@ public:
     const RoomMap &rooms() const;
     Combat &combat();
     Map &map();
+
+    void setUnescapable(bool value);
 
     // Objects
 
@@ -157,6 +161,7 @@ private:
     std::string _music;
     Timer _heartbeatTimer;
     Map _map;
+    bool _unescapable { false };
 
     // Scripts
 
