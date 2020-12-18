@@ -17,35 +17,33 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../resource/types.h"
+#include <string>
+#include <memory>
+#include <vector>
 
-#include "../../portrait.h"
+#include "rp/types.h"
 
 namespace reone {
 
 namespace game {
 
-class CharacterGeneration;
+class CreatureBlueprint;
 
-class PortraitSelection : public gui::GUI {
-public:
-    PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+struct CreatureConfiguration {
+    std::shared_ptr<CreatureBlueprint> blueprint;
+    Gender gender { Gender::Male };
+    ClassType clazz { ClassType::Soldier };
+    int appearance { 0 };
+    std::vector<std::string> equipment;
 
-    void load() override;
-
-    void updatePortraits();
-    void resetCurrentPortrait();
-
-private:
-    CharacterGeneration *_charGen { nullptr };
-    std::vector<Portrait> _portraits;
-    int _currentPortrait { 0 };
-
-    void onClick(const std::string &control) override;
-
-    void loadCurrentPortrait();
-    void setButtonColors(const std::string &tag);
+    bool operator==(const CreatureConfiguration &other) {
+        return
+            blueprint == other.blueprint &&
+            gender == other.gender &&
+            clazz == other.clazz &&
+            appearance == other.appearance &&
+            equipment == other.equipment;
+    }
 };
 
 } // namespace game

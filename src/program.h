@@ -20,6 +20,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include "game/options.h"
 #include "game/types.h"
 #include "mp/types.h"
 #include "net/types.h"

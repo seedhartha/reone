@@ -17,21 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "glm/vec3.hpp"
-#include "glm/mat4x4.hpp"
-
-#include "../audio/types.h"
-#include "../net/types.h"
-#include "../render/texture.h"
-#include "../render/types.h"
-#include "../resource/types.h"
-
-#include "rp/types.h"
-
 namespace reone {
 
 namespace game {
@@ -117,40 +102,6 @@ enum class AttackResult {
     AttackFailed = 6,
     Parried = 8,
     Deflected = 9
-};
-
-class CreatureBlueprint;
-
-struct Options {
-    std::string module;
-    render::GraphicsOptions graphics;
-    audio::AudioOptions audio;
-    net::NetworkOptions network;
-};
-
-struct CreatureConfiguration {
-    std::shared_ptr<CreatureBlueprint> blueprint;
-    Gender gender { Gender::Male };
-    ClassType clazz { ClassType::Soldier };
-    int appearance { 0 };
-    std::vector<std::string> equipment;
-
-    bool operator==(const CreatureConfiguration &other) {
-        return
-            blueprint == other.blueprint &&
-            gender == other.gender &&
-            clazz == other.clazz &&
-            appearance == other.appearance &&
-            equipment == other.equipment;
-    }
-};
-
-struct Portrait {
-    std::string resRef;
-    std::shared_ptr<render::Texture> image;
-    int appearanceNumber { 0 };
-    int appearanceS { 0 };
-    int appearanceL { 0 };
 };
 
 } // namespace game

@@ -43,6 +43,7 @@
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
+#include "options.h"
 #include "party.h"
 #include "script/runner.h"
 #include "types.h"

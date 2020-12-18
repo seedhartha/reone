@@ -370,6 +370,7 @@ set(GAME_HEADERS
     src/game/collisiondetect.h
     src/game/console.h
     src/game/combat.h
+    src/game/creatureconfig.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/effect.h
@@ -420,10 +421,12 @@ set(GAME_HEADERS
     src/game/object/types.h
     src/game/object/waypoint.h
     src/game/objectselect.h
+    src/game/options.h
     src/game/party.h
     src/game/path.h
     src/game/pathfinder.h
     src/game/player.h
+    src/game/portrait.h
     src/game/portraitutil.h
     src/game/room.h
     src/game/rp/attributes.h

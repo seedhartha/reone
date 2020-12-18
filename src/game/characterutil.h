@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "creatureconfig.h"
 #include "types.h"
 
 namespace reone {
