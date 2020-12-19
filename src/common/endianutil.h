@@ -17,9 +17,24 @@
 
 #pragma once
 
+#include <type_traits>
+
+#include "types.h"
+
 namespace reone {
 
+Endianess getEndianess();
+
+/* only permits fundamental integral types or extended integral types */
 template <class T>
-void swapBytes(T &val);
+std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value> swapBytes(T &val) {
+	char *c = reinterpret_cast<char*>(&val);
+	for (size_t i=0; i*2 < sizeof(T); ++i) std::swap(c[i], c[sizeof(T) - i - 1]);
+}
+
+template <class T>
+void swapBytesIfNotSystemEndianess(T &val, Endianess other) {
+    if (other != getEndianess()) swapBytes(val);
+}
 
 } // namespace reone

@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "types.h"
+#include "endianutil.h"
 
 namespace reone {
 
@@ -47,6 +48,21 @@ public:
     std::string getCString();
     std::string getString(int len);
 
+    void read(char &obj); // alias for getByte
+    void read(std::string &obj);
+
+    template <class T>
+    void read(T &obj) {
+        _stream->read(reinterpret_cast<char*>(&obj), sizeof(T));
+        swapBytesIfNotSystemEndianess(obj, _endianess);
+    }
+
+    template<class T>
+    StreamReader &operator>>(T &obj) {
+        read(obj);
+        return *this;
+    }
+
     bool eof() const;
 
     template <class T>
@@ -58,11 +74,6 @@ private:
 
     StreamReader(const StreamReader &) = delete;
     StreamReader &operator=(const StreamReader &) = delete;
-
-    bool isSameEndianess() const;
-
-    template <class T>
-    void fixEndianess(T &val);
 };
 
 } // namespace reone

@@ -566,12 +566,17 @@ set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 ## libmp static library
 
 set(MP_HEADERS
+    src/mp/delta.h
+    src/mp/objects.h
+    src/mp/snapshot.h
     src/mp/command.h
     src/mp/game.h
     src/mp/types.h
     src/mp/util.h)
 
 set(MP_SOURCES
+    src/mp/delta.cpp
+    src/mp/snapshot.cpp
     src/mp/command.cpp
     src/mp/game.cpp
     src/mp/util.cpp)
@@ -650,7 +655,7 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libcommon ${Boost_FILESYSTEM_LIBRARY})
+        target_link_libraries(test_${TEST_NAME} PRIVATE libmp libgame libscript libcommon ${Boost_FILESYSTEM_LIBRARY})
 
         if(WIN32)
             target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)

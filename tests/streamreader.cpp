@@ -21,11 +21,54 @@
 
 #include <boost/test/included/unit_test.hpp>
 
+#include "../src/common/streamwriter.h"
 #include "../src/common/streamreader.h"
+#include "../src/common/endianutil.h"
 
 using namespace std;
 
 using namespace reone;
+
+constexpr float TOL = 1E-6f;
+
+void UnitTestPacket(Endianess en) {
+    uint64_t A = 0xff00ee334466aa55;
+    uint64_t B = 0x123;
+    int32_t C = 0x00ff3344;
+    int32_t D = 0xff000000;
+    double E = 0.124385738472;
+    double F = 10024.1324324738742;
+    float G = 13.24323f;
+    float H = 0.11111243f;
+    uint8_t I = 0x01;
+
+    StreamWriter writer(std::make_shared<stringstream>(), en);
+    writer << A << B << C << D << E << F << G << H << I;
+
+    uint64_t a, b;
+    uint32_t c, d;
+    double e, f;
+    float g, h;
+    uint8_t i;
+
+    StreamReader reader(static_pointer_cast<stringstream>(writer.getStream()), en);
+    reader >> a >> b >> c >> d >> e >> f >> g >> h >> i;
+
+    BOOST_TEST((a == A));
+    BOOST_TEST((b == B));
+    BOOST_TEST((c == C));
+    BOOST_TEST((d == D));
+    BOOST_TEST((abs(e - E) < TOL));
+    BOOST_TEST((abs(f - F) < TOL));
+    BOOST_TEST((abs(g - G) < TOL));
+    BOOST_TEST((abs(h - H) < TOL));
+    BOOST_TEST((i == I));
+}
+
+BOOST_AUTO_TEST_CASE(test_packet_readwrite) {
+    UnitTestPacket(Endianess::Big);
+    UnitTestPacket(Endianess::Little);
+}
 
 BOOST_AUTO_TEST_CASE(test_get_little_endian) {
     shared_ptr<istringstream> stream(new istringstream(string("\x01" "\xe8\x03" "\xa0\x86\x01\x00" "\x00\xe4\x0b\x54\x02\x00\x00\x00" "\x60\x79\xfe\xff" "\x00\x00\x80\x3f" "abc\0defgh", 32)));

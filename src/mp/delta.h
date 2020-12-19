@@ -15,19 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cstdint>
-#include "endianutil.h"
+#pragma once
+
+#include "../common/streamreader.h"
+#include "../common/streamwriter.h"
 
 namespace reone {
 
-Endianess initEndianess() {
-    uint16_t test = 0x1100;
-    return static_cast<bool>(*(char*)&test) ? Endianess::Big : Endianess::Little;
-}
+namespace mp {
 
-Endianess getEndianess() {
-    static Endianess endianess = initEndianess();
-    return endianess;
-}
+template <class T>
+void writeDelta(StreamWriter &writer, T &cur, T &old);
+
+template <class T>
+void readDelta(StreamReader &reader, T &obj);
+
+} // namespace net
 
 } // namespace reone

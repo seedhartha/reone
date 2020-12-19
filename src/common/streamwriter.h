@@ -23,6 +23,7 @@
 #include <string>
 
 #include "types.h"
+#include "../common/endianutil.h"
 
 namespace reone {
 
@@ -34,20 +35,30 @@ public:
     void putInt64(int64_t val);
     void putCString(const std::string &str);
 
+    void write(char obj); // alias for putByte
+    void write(const std::string &obj);
+
+    /* only permits fundamental integral types or extended integral types */
+    template <class T>
+    void write(T obj) {
+        swapBytesIfNotSystemEndianess(obj, _endianess);
+        _stream->write(reinterpret_cast<char*>(&obj), sizeof(T));
+    }
+
+    template<class T>
+    StreamWriter &operator<<(T obj) {
+        write(obj);
+        return *this;
+    }
+
+    const std::shared_ptr<std::ostream> &getStream();
+
 private:
     std::shared_ptr<std::ostream> _stream;
     Endianess _endianess;
 
     StreamWriter(const StreamWriter &) = delete;
     StreamWriter &operator=(const StreamWriter &) = delete;
-
-    bool isSameEndianess() const;
-
-    template <class T>
-    void put(T val);
-
-    template <class T>
-    void fixEndianess(T &val);
 };
 
 } // namespace reone

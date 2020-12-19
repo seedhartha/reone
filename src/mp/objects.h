@@ -15,19 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <cstdint>
-#include "endianutil.h"
 
 namespace reone {
 
-Endianess initEndianess() {
-    uint16_t test = 0x1100;
-    return static_cast<bool>(*(char*)&test) ? Endianess::Big : Endianess::Little;
-}
+namespace mp {
 
-Endianess getEndianess() {
-    static Endianess endianess = initEndianess();
-    return endianess;
-}
+struct BaseStatus { };
+
+// dummy structure for testing
+struct CreatureStatus : public BaseStatus {
+    float x { 0.0f };
+    float y { 0.0f };
+    float z { 0.0f };
+    double heading { 0.0 };
+    uint8_t anim { 0 };
+    uint8_t animframe { 0 };
+    uint8_t faction { 0 };		// hostile reticle
+    uint16_t equipment1 { 0 };	// set equipment model
+    uint16_t equipment2 { 0 };
+    uint16_t equipment3 { 0 };
+    uint16_t equipment4 { 0 };
+    uint16_t equipment5 { 0 };
+    uint16_t equipment6 { 0 };
+};
+
+} // namespace net
 
 } // namespace reone
