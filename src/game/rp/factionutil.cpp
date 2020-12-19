@@ -37,11 +37,6 @@ enum class Disposition {
 
 typedef unordered_map<Faction, unordered_map<Faction, Disposition>> DispositionsMap;
 
-static const list<Faction> g_hostileFactions { Faction::Hostile1, Faction::Hostile2 };
-static const list<Faction> g_friendlyFactions { Faction::Friendly1, Faction::Friendly2 };
-static const list<Faction> g_surrenderFactions { Faction::Surrender1, Faction::Surrender2 };
-static const list<Faction> g_gizkaFactions { Faction::Gizka1, Faction::Gizka2 };
-
 static void setMutualDisposition(Faction left, Faction right, Disposition disposition, DispositionsMap &dispositions) {
     dispositions[left][right] = disposition;
     dispositions[right][left] = disposition;
