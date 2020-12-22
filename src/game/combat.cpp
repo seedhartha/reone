@@ -63,22 +63,27 @@ void Combat::update(float dt) {
 }
 
 void Combat::updateCombatants() {
-    auto creatures = _game->module()->area()->getObjectsByType(ObjectType::Creature);
-    for (auto &object : creatures) {
-        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
-        if (creature->isDead()) continue;
-
-        vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
-
-        auto maybeCombatant = _combatantById.find(creature->id());
-        if (maybeCombatant != _combatantById.end()) {
-            maybeCombatant->second->enemies = move(enemies);
-        } else if (!enemies.empty()) {
-            addCombatant(creature, move(enemies));
+    for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Creature)) {
+        auto creature = static_pointer_cast<Creature>(object);
+        if (!creature->isDead()) {
+            updateCombatant(creature);
         }
     }
-
     removeStaleCombatants();
+}
+
+void Combat::updateCombatant(const shared_ptr<Creature> &creature) {
+    vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
+
+    auto maybeCombatant = _combatantById.find(creature->id());
+    if (maybeCombatant != _combatantById.end()) {
+        maybeCombatant->second->enemies = move(enemies);
+        return;
+    }
+
+    if (!enemies.empty()) {
+        addCombatant(creature, move(enemies));
+    }
 }
 
 vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
@@ -202,22 +207,22 @@ void Combat::updateRounds(float dt) {
         AttackAction *action = getAttackAction(attacker->creature);
         if (!action) continue;
 
-        shared_ptr<SpatialObject> defender(action->target());
-        if (!defender || defender->distanceTo(*attacker->creature) > action->range()) continue;
+        shared_ptr<SpatialObject> target(action->target());
+        if (!target || target->distanceTo(*attacker->creature) > action->range()) continue;
 
         // Check if target is valid combatant
 
-        auto maybeDefender = _combatantById.find(defender->id());
-        if (maybeDefender == _combatantById.end()) continue;
+        auto maybeTargetCombatant = _combatantById.find(target->id());
+        if (maybeTargetCombatant == _combatantById.end()) continue;
 
-        attacker->target = defender;
+        attacker->target = target;
 
         // Create a combat round if not a duel
 
-        auto maybeDefenderRound = _roundByAttackerId.find(defender->id());
-        bool isDuel = maybeDefenderRound != _roundByAttackerId.end() && maybeDefenderRound->second->defender == attacker;
+        auto maybeTargetRound = _roundByAttackerId.find(target->id());
+        bool isDuel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker;
         if (!isDuel) {
-            addRound(attacker, maybeDefender->second);
+            addRound(attacker, maybeTargetCombatant->second);
         }
     }
     for (auto it = _roundByAttackerId.begin(); it != _roundByAttackerId.end(); ) {
@@ -233,12 +238,12 @@ void Combat::updateRounds(float dt) {
     }
 }
 
-void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<Combatant> &defender) {
-    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % defender->creature->tag(), 2);
+void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<Combatant> &target) {
+    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % target->creature->tag(), 2);
 
     auto round = make_shared<Round>();
     round->attacker = attacker;
-    round->defender = defender;
+    round->target = target;
 
     _roundByAttackerId.insert(make_pair(attacker->creature->id(), round));
 }
@@ -247,50 +252,50 @@ void Combat::updateRound(Round &round, float dt) {
     round.advance(dt);
 
     shared_ptr<Creature> attacker(round.attacker->creature);
-    shared_ptr<Creature> defender(round.defender->creature);
-    bool isDuel = round.defender->target == attacker;
+    shared_ptr<Creature> target(round.target->creature);
+    bool isDuel = round.target->target == attacker;
 
-    if (attacker->isDead() || defender->isDead()) {
+    if (attacker->isDead() || target->isDead()) {
         finishRound(round);
         return;
     }
     switch (round.state) {
         case RoundState::Started:
-            attacker->face(*defender);
+            attacker->face(*target);
             attacker->setMovementType(Creature::MovementType::None);
             attacker->setMovementRestricted(true);
             if (isDuel) {
                 attacker->playAnimation(CombatAnimation::DuelAttack);
-                defender->face(*attacker);
-                defender->setMovementType(Creature::MovementType::None);
-                defender->setMovementRestricted(true);
-                defender->playAnimation(CombatAnimation::Dodge);
+                target->face(*attacker);
+                target->setMovementType(Creature::MovementType::None);
+                target->setMovementRestricted(true);
+                target->playAnimation(CombatAnimation::Dodge);
             } else {
                 attacker->playAnimation(CombatAnimation::BashAttack);
             }
             round.state = RoundState::FirstTurn;
-            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
             break;
 
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
-                executeAttack(attacker, defender);
+                executeAttack(attacker, target);
 
                 if (isDuel) {
-                    defender->face(*attacker);
-                    defender->playAnimation(CombatAnimation::DuelAttack);
-                    attacker->face(*defender);
+                    target->face(*attacker);
+                    target->playAnimation(CombatAnimation::DuelAttack);
+                    attacker->face(*target);
                     attacker->playAnimation(CombatAnimation::Dodge);
                 }
                 round.state = RoundState::SecondTurn;
-                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
             }
             break;
 
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
                 if (isDuel) {
-                    executeAttack(defender, attacker);
+                    executeAttack(target, attacker);
                 }
                 finishRound(round);
             }
@@ -303,28 +308,28 @@ void Combat::updateRound(Round &round, float dt) {
 
 void Combat::finishRound(Round &round) {
     shared_ptr<Creature> attacker(round.attacker->creature);
-    shared_ptr<Creature> defender(round.defender->creature);
+    shared_ptr<Creature> target(round.target->creature);
     attacker->setMovementRestricted(false);
-    defender->setMovementRestricted(false);
+    target->setMovementRestricted(false);
     round.state = RoundState::Finished;
-    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
 }
 
-void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender) {
+void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target) {
     // TODO: add armor bonus and dexterity modifier
     int defense = 10;
 
     int attack = random(1, 20);
     if (attack == 1) {
-        debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+        debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
         return;
     }
 
     if (attack == 20 || attack >= defense) {
-        debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % defender->tag(), 2);
+        debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
         auto effects = _damageResolver.getDamageEffects(attacker);
         for (auto &effect : effects) {
-            defender->applyEffect(effect);
+            target->applyEffect(effect);
         }
     }
 }

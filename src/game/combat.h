@@ -76,7 +76,7 @@ private:
 
     struct Round {
         std::shared_ptr<Combatant> attacker;
-        std::shared_ptr<Combatant> defender;
+        std::shared_ptr<Combatant> target;
         RoundState state { RoundState::Started };
         float time { 0.0f };
 
@@ -92,6 +92,7 @@ private:
     std::map<uint32_t, std::shared_ptr<Round>> _roundByAttackerId;
 
     void updateCombatants();
+    void updateCombatant(const std::shared_ptr<Creature> &creature);
     void updateAI();
     void updateCombatantAI(Combatant &combatant);
     void updateRounds(float dt);
