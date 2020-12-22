@@ -19,9 +19,9 @@
 
 #include <boost/format.hpp>
 
+#include "../src/common/log.h"
 #include "../src/resource/rimfile.h"
 #include "../src/resource/util.h"
-#include "../src/common/log.h"
 
 using namespace std;
 

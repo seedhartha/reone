@@ -17,10 +17,10 @@
 
 #include "listbox.h"
 
+#include "../../common/log.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../gui.h"
 

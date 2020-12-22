@@ -17,11 +17,11 @@
 
 #include "gui.h"
 
+#include "../common/log.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../render/textures.h"
 #include "../resource/resources.h"
-#include "../common/log.h"
 
 using namespace std;
 using namespace std::placeholders;

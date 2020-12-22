@@ -21,11 +21,11 @@
 
 #include "../../audio/player.h"
 #include "../../audio/util.h"
+#include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
 #include "../../render/models.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../game.h"
 

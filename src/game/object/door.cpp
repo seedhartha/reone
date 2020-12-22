@@ -19,12 +19,12 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/streamutil.h"
 #include "../../render/models.h"
 #include "../../render/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../script/scripts.h"
-#include "../../common/streamutil.h"
 
 #include "../blueprint/blueprints.h"
 

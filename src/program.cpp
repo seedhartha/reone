@@ -21,8 +21,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "mp/game.h"
 #include "common/log.h"
+#include "mp/game.h"
 
 using namespace std;
 

@@ -21,13 +21,13 @@
 
 #include "glm/ext.hpp"
 
+#include "../../common/log.h"
 #include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/textures.h"
 #include "../../render/util.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../gui.h"
 

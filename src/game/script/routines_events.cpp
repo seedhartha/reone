@@ -20,7 +20,6 @@
 #include "../../common/log.h"
 
 #include "../enginetype/event.h"
-
 #include "../game.h"
 
 using namespace std;
