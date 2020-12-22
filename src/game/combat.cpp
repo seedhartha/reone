@@ -352,6 +352,16 @@ void Combat::onExitCombatMode() {
     _game->module()->area()->setDefaultTPCamera();
 }
 
+void Combat::cutsceneAttack(
+    const shared_ptr<Creature> &attacker,
+    const shared_ptr<SpatialObject> &target,
+    int animation,
+    AttackResult result,
+    int damage) {
+
+    // TODO: implement
+}
+
 } // namespace game
 
 } // namespace reone

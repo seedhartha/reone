@@ -483,6 +483,27 @@ Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContex
     return Variable();
 }
 
+Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
+    if (!caller) {
+        warn("Routines: cutsceneAttack: caller is invalid");
+        return Variable();
+    }
+    auto target = getSpatialObject(args, 0);
+    if (!target) {
+        warn("Routines: cutsceneAttack: target is invalid");
+        return Variable();
+    }
+    int animation = getInt(args, 1);
+    AttackResult attackResult = static_cast<AttackResult>(getInt(args, 2));
+    int damage = getInt(args, 3);
+
+    Combat &combat = _game->module()->area()->combat();
+    combat.cutsceneAttack(caller, target, animation, attackResult, damage);
+
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

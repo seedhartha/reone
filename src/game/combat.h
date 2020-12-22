@@ -44,6 +44,16 @@ public:
 
     void update(float dt);
 
+    /**
+     * Initiates a combat round with a predefined animation, attack result and damage.
+     */
+    void cutsceneAttack(
+        const std::shared_ptr<Creature> &attacker,
+        const std::shared_ptr<SpatialObject> &target,
+        int animation,
+        AttackResult result,
+        int damage);
+
     bool isActive() const;
 
     void onEnterCombatMode();
