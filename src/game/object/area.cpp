@@ -148,11 +148,11 @@ void Area::loadARE(const GffStruct &are) {
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
     shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
-    _cameraStyle.load(styleTable->rows().at(styleIdx));
+    _camStyleDefault.load(styleTable->rows().at(styleIdx));
 
     auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
     if (combatStyleRow) {
-        _combatCamStyle.load(*combatStyleRow);
+        _camStyleCombat.load(*combatStyleRow);
     }
     else {
         throw logic_error("Combat camera style failed to load.");
@@ -275,12 +275,12 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _cameraStyle);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _camStyleDefault);
     _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _cameraStyle, _cameraAspect);
+    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _camStyleDefault, _cameraAspect);
     _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
 
     _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
@@ -837,7 +837,7 @@ void Area::updateHeartbeat(float dt) {
 }
 
 const CameraStyle &Area::cameraStyle() const {
-    return _cameraStyle;
+    return _camStyleDefault;
 }
 
 const string &Area::music() const {
@@ -899,12 +899,15 @@ void Area::setStaticCamera(int cameraId) {
     }
 }
 
-void Area::setCombatTPCamera() {
-    _thirdPersonCamera->setStyle(_combatCamStyle);
-}
-
-void Area::setDefaultTPCamera() {
-    _thirdPersonCamera->setStyle(_cameraStyle);
+void Area::setThirdPartyCameraStyle(CameraStyleType type) {
+    switch (type) {
+        case CameraStyleType::Combat:
+            _thirdPersonCamera->setStyle(_camStyleCombat);
+            break;
+        default:
+            _thirdPersonCamera->setStyle(_camStyleDefault);
+            break;
+    }
 }
 
 bool Area::isStealthXPEnabled() const {
