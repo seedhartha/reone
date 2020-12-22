@@ -541,7 +541,7 @@ void Routines::addTslRoutines() {
     add("DuplicateHeadAppearance", Void, { Object, Object });
     add("ActionCastFakeSpellAtObject", Void, { Int, Object, Int }, &Routines::actionCastFakeSpellAtObject);
     add("ActionCastFakeSpellAtLocation", Void, { Int, Location, Int }, &Routines::actionCastFakeSpellAtLocation);
-    add("CutsceneAttack", Void, { Object, Int, Int, Int });
+    add("CutsceneAttack", Void, { Object, Int, Int, Int }, &Routines::cutsceneAttack);
     add("SetCameraMode", Void, { Object, Int });
     add("SetLockOrientationInDialog", Void, { Object, Int });
     add("SetLockHeadFollowInDialog", Void, { Object, Int });
