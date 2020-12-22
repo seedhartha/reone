@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "program.h"
 #include "common/log.h"
+#include "program.h"
 
 using namespace std;
 

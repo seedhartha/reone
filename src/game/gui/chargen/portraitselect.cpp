@@ -17,9 +17,9 @@
 
 #include "portraitselect.h"
 
+#include "../../../common/random.h"
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
-#include "../../../common/random.h"
 
 #include "../colorutil.h"
 

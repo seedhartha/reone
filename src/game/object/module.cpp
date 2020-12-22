@@ -17,8 +17,8 @@
 
 #include "module.h"
 
-#include "../../resource/resources.h"
 #include "../../common/log.h"
+#include "../../resource/resources.h"
 
 #include "../game.h"
 #include "../rp/factionutil.h"

@@ -25,7 +25,6 @@
 #include "glm/ext.hpp"
 
 #include "../common/log.h"
-
 #include "../render/font.h"
 #include "../render/fonts.h"
 #include "../render/mesh/quad.h"

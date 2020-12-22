@@ -17,8 +17,8 @@
 
 #include "scripts.h"
 
-#include "../resource/resources.h"
 #include "../common/streamutil.h"
+#include "../resource/resources.h"
 
 #include "ncsfile.h"
 
