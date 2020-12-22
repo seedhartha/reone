@@ -334,9 +334,11 @@ void Combat::updateActivation() {
     bool active = partyLeader && _combatantById.count(partyLeader->id()) != 0;
     if (_active == active) return;
 
-    if (active) onEnterCombatMode();
-    else onExitCombatMode();
-
+    if (active) {
+        onEnterCombatMode();
+    } else {
+        onExitCombatMode();
+    }
     _active = active;
 }
 
@@ -345,11 +347,11 @@ bool Combat::isActive() const {
 }
 
 void Combat::onEnterCombatMode() {
-    _game->module()->area()->setCombatTPCamera();
+    _game->module()->area()->setThirdPartyCameraStyle(CameraStyleType::Combat);
 }
 
 void Combat::onExitCombatMode() {
-    _game->module()->area()->setDefaultTPCamera();
+    _game->module()->area()->setThirdPartyCameraStyle(CameraStyleType::Default);
 }
 
 void Combat::cutsceneAttack(

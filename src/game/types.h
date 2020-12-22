@@ -104,6 +104,11 @@ enum class AttackResult {
     Deflected = 9
 };
 
+enum class CameraStyleType {
+    Default,
+    Combat
+};
+
 } // namespace game
 
 } // namespace reone

@@ -111,8 +111,7 @@ public:
     Camera &getCamera(CameraType type);
 
     void setStaticCamera(int cameraId);
-    void setCombatTPCamera();
-    void setDefaultTPCamera();
+    void setThirdPartyCameraStyle(CameraStyleType type);
 
     // END Cameras
 
@@ -156,8 +155,8 @@ private:
     std::string _name;
     RoomMap _rooms;
     std::unique_ptr<resource::Visibility> _visibility;
-    CameraStyle _cameraStyle;
-    CameraStyle _combatCamStyle;
+    CameraStyle _camStyleDefault;
+    CameraStyle _camStyleCombat;
     std::string _music;
     Timer _heartbeatTimer;
     Map _map;
