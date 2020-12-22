@@ -56,9 +56,6 @@ public:
 
     bool isActive() const;
 
-    void onEnterCombatMode();
-    void onExitCombatMode();
-
 private:
     enum class RoundState {
         Started,
@@ -106,6 +103,9 @@ private:
     void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<Combatant> &defender);
     void finishRound(Round &round);
     void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
+
+    void onEnterCombatMode();
+    void onExitCombatMode();
 
     std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;
