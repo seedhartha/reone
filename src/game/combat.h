@@ -45,7 +45,9 @@ public:
     void update(float dt);
 
     /**
-     * Initiates a combat round with a predefined animation, attack result and damage.
+     * Initiates a combat round between the attacker and the target with a
+     * predefined animation, attack result and damage. If attacker is already
+     * participating in a combat round, said round if finished.
      */
     void cutsceneAttack(
         const std::shared_ptr<Creature> &attacker,
@@ -80,6 +82,11 @@ private:
         RoundState state { RoundState::Started };
         float time { 0.0f };
 
+        bool cutscene { false }; /**< animation, attack result and damage are predefined */
+        int animation { 0 };
+        AttackResult attackResult { AttackResult::Invalid };
+        int damage { 0 };
+
         void advance(float dt);
     };
 
@@ -100,8 +107,9 @@ private:
     void updateActivation();
 
     void removeStaleCombatants();
-    void addCombatant(const std::shared_ptr<Creature> &creature, EnemiesList enemies);
+    std::shared_ptr<Combatant> addCombatant(const std::shared_ptr<Creature> &creature, EnemiesList enemies);
     void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<SpatialObject> &target);
+    void addRound(const std::shared_ptr<Round> &round);
     void finishRound(Round &round);
     void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target);
 
