@@ -126,7 +126,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
     return move(result);
 }
 
-void Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enemies) {
+shared_ptr<Combat::Combatant> Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enemies) {
     debug(boost::format("Combat: add combatant '%s' with %d enemies") % creature->tag() % enemies.size(), 2);
 
     creature->setInCombat(true);
@@ -135,13 +135,24 @@ void Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enem
     combatant->creature = creature;
     combatant->enemies = move(enemies);
 
-    _combatantById.insert(make_pair(creature->id(), move(combatant)));
+    _combatantById.insert(make_pair(creature->id(), combatant));
+
+    return move(combatant);
 }
 
 void Combat::removeStaleCombatants() {
     for (auto it = _combatantById.begin(); it != _combatantById.end(); ) {
         shared_ptr<Combatant> combatantPtr(it->second);
-        bool isStale = combatantPtr->enemies.empty() || combatantPtr->creature->isDead();
+
+        // Combatant is considered stale if he is either dead or (has no enemies
+        // and is not participating in a combat round)
+        bool isStale = combatantPtr->creature->isDead();
+        if (!isStale) {
+            auto maybeRound = _roundByAttackerId.find(combatantPtr->creature->id());
+            if (maybeRound == _roundByAttackerId.end() && combatantPtr->enemies.empty()) {
+                isStale = true;
+            }
+        }
         if (isStale) {
             combatantPtr->creature->setInCombat(false);
             it = _combatantById.erase(it);
@@ -234,13 +245,15 @@ void Combat::updateRounds(float dt) {
 }
 
 void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<SpatialObject> &target) {
-    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % target->tag(), 2);
-
     auto round = make_shared<Round>();
     round->attacker = attacker;
     round->target = target;
+    addRound(round);
+}
 
-    _roundByAttackerId.insert(make_pair(attacker->creature->id(), round));
+void Combat::addRound(const shared_ptr<Round> &round) {
+    debug(boost::format("Combat: add round: '%s' -> '%s'") % round->attacker->creature->tag() % round->target->tag(), 2);
+    _roundByAttackerId.insert(make_pair(round->attacker->creature->id(), round));
 }
 
 void Combat::updateRound(Round &round, float dt) {
@@ -366,7 +379,31 @@ void Combat::cutsceneAttack(
     AttackResult result,
     int damage) {
 
-    // TODO: implement
+    shared_ptr<Combatant> combatant;
+
+    // If attacker is not a combatant, add him to the combatant map
+    auto maybeCombatant = _combatantById.find(attacker->id());
+    if (maybeCombatant != _combatantById.end()) {
+        combatant = maybeCombatant->second;
+    } else {
+        combatant = addCombatant(attacker, vector<shared_ptr<Creature>>());
+    }
+
+    // If attacker is already participating in a combat round, finish said round
+    auto maybeRound = _roundByAttackerId.find(attacker->id());
+    if (maybeRound != _roundByAttackerId.end()) {
+        finishRound(*maybeRound->second);
+    }
+
+    // Add a new combat round
+    auto round = make_shared<Round>();
+    round->attacker = move(combatant);
+    round->target = target;
+    round->cutscene = true;
+    round->animation = animation;
+    round->attackResult = result;
+    round->damage = damage;
+    addRound(round);
 }
 
 } // namespace game
