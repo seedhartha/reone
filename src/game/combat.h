@@ -76,7 +76,7 @@ private:
 
     struct Round {
         std::shared_ptr<Combatant> attacker;
-        std::shared_ptr<Combatant> target;
+        std::shared_ptr<SpatialObject> target;
         RoundState state { RoundState::Started };
         float time { 0.0f };
 
@@ -101,9 +101,9 @@ private:
 
     void removeStaleCombatants();
     void addCombatant(const std::shared_ptr<Creature> &creature, EnemiesList enemies);
-    void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<Combatant> &defender);
+    void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<SpatialObject> &target);
     void finishRound(Round &round);
-    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &defender);
+    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target);
 
     void onEnterCombatMode();
     void onExitCombatMode();

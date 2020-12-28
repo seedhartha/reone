@@ -95,7 +95,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
             object->isDead() ||
             object->distanceTo(combatant) > range) continue;
 
-        shared_ptr<Creature> creature(static_pointer_cast<Creature>(object));
+        auto creature = static_pointer_cast<Creature>(object);
         if (!getIsEnemy(combatant, *creature)) continue;
 
         glm::vec3 adjustedCombatantPos(combatant.position());
@@ -210,19 +210,14 @@ void Combat::updateRounds(float dt) {
         shared_ptr<SpatialObject> target(action->target());
         if (!target || target->distanceTo(*attacker->creature) > action->range()) continue;
 
-        // Check if target is valid combatant
-
-        auto maybeTargetCombatant = _combatantById.find(target->id());
-        if (maybeTargetCombatant == _combatantById.end()) continue;
-
         attacker->target = target;
 
         // Create a combat round if not a duel
 
         auto maybeTargetRound = _roundByAttackerId.find(target->id());
-        bool isDuel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker;
+        bool isDuel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker->creature;
         if (!isDuel) {
-            addRound(attacker, maybeTargetCombatant->second);
+            addRound(attacker, target);
         }
     }
     for (auto it = _roundByAttackerId.begin(); it != _roundByAttackerId.end(); ) {
@@ -238,8 +233,8 @@ void Combat::updateRounds(float dt) {
     }
 }
 
-void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<Combatant> &target) {
-    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % target->creature->tag(), 2);
+void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<SpatialObject> &target) {
+    debug(boost::format("Combat: add round: '%s' -> '%s'") % attacker->creature->tag() % target->tag(), 2);
 
     auto round = make_shared<Round>();
     round->attacker = attacker;
@@ -252,50 +247,53 @@ void Combat::updateRound(Round &round, float dt) {
     round.advance(dt);
 
     shared_ptr<Creature> attacker(round.attacker->creature);
-    shared_ptr<Creature> target(round.target->creature);
-    bool isDuel = round.target->target == attacker;
+    bool isDuel = round.target == attacker;
 
-    if (attacker->isDead() || target->isDead()) {
+    if (attacker->isDead() || round.target->isDead()) {
         finishRound(round);
         return;
     }
     switch (round.state) {
         case RoundState::Started:
-            attacker->face(*target);
+            attacker->face(*round.target);
             attacker->setMovementType(Creature::MovementType::None);
             attacker->setMovementRestricted(true);
             if (isDuel) {
                 attacker->playAnimation(CombatAnimation::DuelAttack);
-                target->face(*attacker);
-                target->setMovementType(Creature::MovementType::None);
-                target->setMovementRestricted(true);
-                target->playAnimation(CombatAnimation::Dodge);
+
+                auto targetCreature = static_pointer_cast<Creature>(round.target);
+                targetCreature->face(*attacker);
+                targetCreature->setMovementType(Creature::MovementType::None);
+                targetCreature->setMovementRestricted(true);
+                targetCreature->playAnimation(CombatAnimation::Dodge);
             } else {
                 attacker->playAnimation(CombatAnimation::BashAttack);
             }
             round.state = RoundState::FirstTurn;
-            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
             break;
 
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
-                executeAttack(attacker, target);
+                executeAttack(attacker, round.target);
 
                 if (isDuel) {
-                    target->face(*attacker);
-                    target->playAnimation(CombatAnimation::DuelAttack);
-                    attacker->face(*target);
+                    attacker->face(*round.target);
                     attacker->playAnimation(CombatAnimation::Dodge);
+
+                    auto targetCreature = static_pointer_cast<Creature>(round.target);
+                    targetCreature->face(*attacker);
+                    targetCreature->playAnimation(CombatAnimation::DuelAttack);
                 }
                 round.state = RoundState::SecondTurn;
-                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
             }
             break;
 
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
                 if (isDuel) {
-                    executeAttack(target, attacker);
+                    executeAttack(static_pointer_cast<Creature>(round.target), attacker);
                 }
                 finishRound(round);
             }
@@ -308,11 +306,13 @@ void Combat::updateRound(Round &round, float dt) {
 
 void Combat::finishRound(Round &round) {
     shared_ptr<Creature> attacker(round.attacker->creature);
-    shared_ptr<Creature> target(round.target->creature);
     attacker->setMovementRestricted(false);
-    target->setMovementRestricted(false);
+    if (round.target->type() == ObjectType::Creature) {
+        auto targetCreature = static_pointer_cast<Creature>(round.target);
+        targetCreature->setMovementRestricted(false);
+    }
     round.state = RoundState::Finished;
-    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
 }
 
 void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target) {
