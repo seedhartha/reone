@@ -132,6 +132,12 @@ Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionConte
     return _game->party().size();
 }
 
+Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
+    bool removed = _game->party().removeAvailableMember(npc);
+    return removed ? 1 : 0;
+}
+
 } // namespace game
 
 } // namespace reone

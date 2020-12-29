@@ -256,6 +256,7 @@ private:
     script::Variable isAvailableCreature(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable isNPCPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable isObjectPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable removeAvailableNPC(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable removePartyMember(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setPartyLeader(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable showPartySelectionGUI(const VariablesList &args, script::ExecutionContext &ctx);

@@ -739,7 +739,7 @@ void Routines::addTslRoutines() {
     add("GetGlobalLocation", Location, { String }, &Routines::getGlobalLocation);
     add("SetGlobalLocation", Void, { String, Location }, &Routines::setGlobalLocation);
     add("AddAvailableNPCByObject", Int, { Int, Object });
-    add("RemoveAvailableNPC", Int, { Int });
+    add("RemoveAvailableNPC", Int, { Int }, &Routines::removeAvailableNPC);
     add("IsAvailableCreature", Int, { Int }, &Routines::isAvailableCreature);
     add("AddAvailableNPCByTemplate", Int, { Int, String }, &Routines::addAvailableNPCByTemplate);
     add("SpawnAvailableNPC", Object, { Int, Location });
