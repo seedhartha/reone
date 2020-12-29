@@ -54,8 +54,6 @@ public:
 
     virtual void playAnimation(Animation animation, float speed);
 
-    void applyEffect(const std::shared_ptr<Effect> &eff);
-
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
     float distanceTo(const SpatialObject &other) const;
@@ -97,7 +95,20 @@ public:
 
     // END Inventory
 
+    // Effects
+
+    void clearAllEffects();
+    void applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration = 0.0f);
+
+    // END Effects
+
 protected:
+    struct AppliedEffect {
+        std::shared_ptr<Effect> effect;
+        DurationType durationType { DurationType::Instant };
+        float duration { 0.0f };
+    };
+
     ObjectFactory *_objectFactory;
     scene::SceneGraph *_sceneGraph;
     ScriptRunner *_scriptRunner;
@@ -111,7 +122,7 @@ protected:
     float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
-    std::deque<std::shared_ptr<Effect>> _effects;
+    std::deque<AppliedEffect> _effects;
     bool _open { false };
 
     SpatialObject(
@@ -127,6 +138,9 @@ protected:
 
 private:
     int _itemIndex { 0 };
+
+    void updateEffects(float dt);
+    void applyInstantEffect(Effect &effect);
 };
 
 } // namespace game

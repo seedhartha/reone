@@ -342,7 +342,7 @@ void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std:
         debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
         auto effects = _damageResolver.getDamageEffects(attacker);
         for (auto &effect : effects) {
-            target->applyEffect(effect);
+            target->applyEffect(effect, DurationType::Instant);
         }
     }
 }

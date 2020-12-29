@@ -20,6 +20,7 @@
 #include "../../common/log.h"
 
 #include "../enginetype/effect.h"
+#include "../object/spatial.h"
 
 using namespace std;
 
@@ -474,6 +475,22 @@ Variable Routines::effectDroidScramble(const VariablesList &args, ExecutionConte
     return Variable(VariableType::Effect, static_pointer_cast<EngineType>(effect));
 }
 
+Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
+    caller->clearAllEffects();
+    return Variable();
+}
+
+Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto durationType = static_cast<DurationType>(getInt(args, 0));
+    auto effect = getEffect(args, 1);
+    auto target = getSpatialObject(args, 2);
+    float duration = getFloat(args, 3, 0.0f);
+
+    target->applyEffect(effect, durationType, duration);
+
+    return Variable();
+}
 
 } // namespace game
 

@@ -148,7 +148,7 @@ void Console::cmdKill(vector<string> tokens) {
         return;
     }
     auto effect = make_unique<DamageEffect>(100000, DamageType::Universal, nullptr);
-    object->applyEffect(move(effect));
+    object->applyEffect(move(effect), DurationType::Instant);
 }
 
 void Console::cmdAddItem(vector<string> tokens) {

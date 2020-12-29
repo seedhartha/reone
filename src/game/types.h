@@ -109,6 +109,12 @@ enum class CameraStyleType {
     Combat
 };
 
+enum class DurationType {
+    Instant = 0,
+    Temporary = 1,
+    Permanent = 2
+};
+
 } // namespace game
 
 } // namespace reone

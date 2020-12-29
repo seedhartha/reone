@@ -171,6 +171,11 @@ shared_ptr<Item> Routines::getItem(const VariablesList &args, int index) const {
     return index < argCount ? dynamic_pointer_cast<Item>(args[index].object) : nullptr;
 }
 
+shared_ptr<Effect> Routines::getEffect(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Effect>(args[index].engineType) : nullptr;
+}
+
 } // namespace game
 
 } // namespace reone

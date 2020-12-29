@@ -134,13 +134,29 @@ void SpatialObject::moveDropableItemsTo(SpatialObject &other) {
     }
 }
 
-void SpatialObject::applyEffect(const shared_ptr<Effect> &effect) {
-    auto damage = dynamic_pointer_cast<DamageEffect>(effect);
-    if (damage) {
-        debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damage->amount(), 2);
-        _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damage->amount());
+void SpatialObject::applyEffect(const shared_ptr<Effect> &effect, DurationType durationType, float duration) {
+    if (durationType == DurationType::Instant) {
+        applyInstantEffect(*effect);
     } else {
-        _effects.push_back(effect);
+        AppliedEffect appliedEffect;
+        appliedEffect.effect = effect;
+        appliedEffect.durationType = durationType;
+        appliedEffect.duration = duration;
+        _effects.push_back(move(appliedEffect));
+    }
+}
+
+void SpatialObject::applyInstantEffect(Effect &effect) {
+    switch (effect.type()) {
+        case EffectType::Damage: {
+            auto &damageEffect = static_cast<DamageEffect &>(effect);
+            debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damageEffect.amount(), 2);
+            _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damageEffect.amount());
+            break;
+        }
+        default:
+            warn("SpatialObject: applyInstantEffect: effect not implement: " + to_string(static_cast<int>(effect.type())));
+            break;
     }
 }
 
@@ -148,6 +164,23 @@ void SpatialObject::update(float dt) {
     Object::update(dt);
     if (_model) {
         _model->update(dt);
+    }
+    updateEffects(dt);
+}
+
+void SpatialObject::updateEffects(float dt) {
+    for (auto it = _effects.begin(); it != _effects.end(); ) {
+        AppliedEffect &effect = *it;
+        bool temporary = effect.durationType == DurationType::Temporary;
+        if (temporary) {
+            effect.duration = glm::max(0.0f, effect.duration - dt);
+        }
+        if (temporary && effect.duration == 0.0f) {
+            applyInstantEffect(*effect.effect);
+            it = _effects.erase(it);
+        } else {
+            ++it;
+        }
     }
 }
 
@@ -272,6 +305,10 @@ shared_ptr<Item> SpatialObject::getNextItem() {
         return _items[_itemIndex++];
     }
     return nullptr;
+}
+
+void SpatialObject::clearAllEffects() {
+    _effects.clear();
 }
 
 } // namespace game
