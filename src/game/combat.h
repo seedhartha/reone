@@ -113,6 +113,11 @@ private:
     void finishRound(Round &round);
     void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target);
 
+    /**
+     * @param damage amount of damage to inflict, or -1 to calculate damage
+     */
+    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
+
     void onEnterCombatMode();
     void onExitCombatMode();
 

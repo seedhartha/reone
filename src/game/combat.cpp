@@ -288,8 +288,11 @@ void Combat::updateRound(Round &round, float dt) {
 
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
-                executeAttack(attacker, round.target);
-
+                if (round.cutscene) {
+                    executeAttack(attacker, round.target, round.attackResult, round.damage);
+                } else {
+                    executeAttack(attacker, round.target);
+                }
                 if (isDuel) {
                     attacker->face(*round.target);
                     attacker->playAnimation(CombatAnimation::Dodge);
@@ -329,21 +332,46 @@ void Combat::finishRound(Round &round) {
 }
 
 void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target) {
-    // TODO: add armor bonus and dexterity modifier
-    int defense = 10;
-
     int attack = random(1, 20);
-    if (attack == 1) {
-        debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
-        return;
+    int defense = 10; // TODO: add armor bonus and dexterity modifier
+    AttackResult result;
+
+    if (attack == 20) {
+        result = AttackResult::AutomaticHit;
+    } else if (attack >= defense) {
+        result = AttackResult::HitSuccessful;
+    } else {
+        result = AttackResult::Miss;
     }
 
-    if (attack == 20 || attack >= defense) {
-        debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
-        auto effects = _damageResolver.getDamageEffects(attacker);
-        for (auto &effect : effects) {
-            target->applyEffect(effect, DurationType::Instant);
+    executeAttack(attacker, target, result);
+}
+
+void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage) {
+    switch (result) {
+        case AttackResult::Miss:
+        case AttackResult::AttackResisted:
+        case AttackResult::AttackFailed:
+        case AttackResult::Parried:
+        case AttackResult::Deflected:
+            debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+            break;
+        case AttackResult::HitSuccessful:
+        case AttackResult::CriticalHit:
+        case AttackResult::AutomaticHit: {
+            debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+            if (damage == -1) {
+                auto effects = _damageResolver.getDamageEffects(attacker);
+                for (auto &effect : effects) {
+                    target->applyEffect(effect, DurationType::Instant);
+                }
+            } else {
+                target->applyEffect(make_shared<DamageEffect>(damage, DamageType::Universal, attacker), DurationType::Instant);
+            }
+            break;
         }
+        default:
+            throw invalid_argument("Combat: executeAttack: result is invalid");
     }
 }
 
