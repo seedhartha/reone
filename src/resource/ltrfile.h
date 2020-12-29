@@ -17,38 +17,38 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../gui/textinput.h"
-#include "../../../resource/ltrfile.h"
+#include "binfile.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class CharacterGeneration;
-
-class NameEntry : public gui::GUI {
+/**
+ * Encapsulates the LTR file format, used to generate random names.
+ */
+class LtrFile : public BinaryFile {
 public:
-    NameEntry(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    LtrFile();
 
-    void load() override;
-    bool handle(const SDL_Event &event) override;
+    std::string getRandomName(int maxLength) const;
 
 private:
-    CharacterGeneration *_charGen { nullptr };
-    gui::TextInput _input;
-    gui::Control *_nameBoxEdit { nullptr };
-    resource::LtrFile _maleLtr;
-    resource::LtrFile _femaleLtr;
-    resource::LtrFile _lastNameLtr;
+    struct LetterSet {
+        std::vector<float> start;
+        std::vector<float> mid;
+        std::vector<float> end;
+    };
 
-    void onClick(const std::string &control) override;
+    int _letterCount { 0 };
+    LetterSet _singleLetters;
+    std::vector<LetterSet> _doubleLetters;
+    std::vector<std::vector<LetterSet>> _trippleLetters;
 
-    void loadLtrFile(const std::string &resRef, resource::LtrFile &ltr);
+    void doLoad() override;
 
-    std::string getRandomName() const;
+    void readLetterSet(LetterSet &set);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

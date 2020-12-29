@@ -99,6 +99,7 @@ set(RESOURCE_HEADERS
     src/resource/folder.h
     src/resource/gfffile.h
     src/resource/keyfile.h
+    src/resource/ltrfile.h
     src/resource/lytfile.h
     src/resource/pefile.h
     src/resource/resources.h
@@ -116,6 +117,7 @@ set(RESOURCE_SOURCES
     src/resource/folder.cpp
     src/resource/gfffile.cpp
     src/resource/keyfile.cpp
+    src/resource/ltrfile.cpp
     src/resource/lytfile.cpp
     src/resource/pefile.cpp
     src/resource/rimfile.cpp
