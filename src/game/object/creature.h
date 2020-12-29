@@ -79,6 +79,7 @@ public:
 
     void update(float dt) override;
     void clearAllActions() override;
+    void die() override;
 
     bool isSelectable() const override;
 

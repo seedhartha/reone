@@ -227,11 +227,7 @@ void Creature::updateModelAnimation() {
 void Creature::updateHealth() {
     if (_currentHitPoints > 0 || _immortal || _dead) return;
 
-    playAnimation(_animResolver.getDieAnimation());
-    _dead = true;
-    _name = Resources::instance().getString(kStrRefRemains);
-
-    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
+    die();
 }
 
 void Creature::clearAllActions() {
@@ -487,6 +483,16 @@ void Creature::runSpawnScript() {
 
 void Creature::giveXP(int amount) {
     _xp += amount;
+}
+
+void Creature::die() {
+    _currentHitPoints = 0;
+    _dead = true;
+    _name = Resources::instance().getString(kStrRefRemains);
+
+    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
+
+    playAnimation(_animResolver.getDieAnimation());
 }
 
 } // namespace game
