@@ -18,6 +18,7 @@
 #include "creature.h"
 
 #include <climits>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
@@ -102,7 +103,11 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
 }
 
 void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
+    if (!blueprint) {
+        throw invalid_argument("blueprint must not be null");
+    }
     blueprint->load(*this);
+
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _appearance);
 }

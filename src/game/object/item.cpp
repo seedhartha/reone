@@ -17,6 +17,8 @@
 
 #include "item.h"
 
+#include <stdexcept>
+
 using namespace std;
 
 using namespace reone::render;
@@ -30,6 +32,9 @@ Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
 void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
+    if (!blueprint) {
+        throw invalid_argument("blueprint must not be null");
+    }
     blueprint->load(*this);
 }
 

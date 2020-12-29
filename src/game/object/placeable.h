@@ -42,6 +42,7 @@ public:
     bool isSelectable() const override;
 
     void load(const resource::GffStruct &gffs);
+    void load(const std::shared_ptr<PlaceableBlueprint> &blueprint);
 
     bool hasInventory() const;
     bool isUsable() const;

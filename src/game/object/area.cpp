@@ -18,6 +18,7 @@
 #include "area.h"
 
 #include <algorithm>
+#include <stdexcept>
 #include <sstream>
 
 #include <boost/format.hpp>
@@ -33,8 +34,10 @@
 #include "../../resource/resources.h"
 #include "../../scene/node/cubenode.h"
 
+#include "../blueprint/blueprints.h"
 #include "../blueprint/trigger.h"
 #include "../blueprint/sound.h"
+#include "../enginetype/location.h"
 #include "../game.h"
 #include "../room.h"
 
@@ -948,6 +951,54 @@ bool Area::isUnescapable() const {
 
 void Area::setUnescapable(bool value) {
     _unescapable = value;
+}
+
+shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
+    if (!location) {
+        throw invalid_argument("location must not be null");
+    }
+    shared_ptr<Object> object;
+
+    switch (type) {
+        case ObjectType::Item: {
+            auto blueprint = Blueprints::instance().getItem(blueprintResRef);
+            auto item = _game->objectFactory().newItem();
+            item->load(blueprint);
+            object = move(item);
+            break;
+        }
+        case ObjectType::Creature: {
+            auto blueprint = Blueprints::instance().getCreature(blueprintResRef);
+            auto creature = _game->objectFactory().newCreature();
+            creature->load(blueprint);
+            creature->setPosition(location->position());
+            creature->setFacing(location->facing());
+            object = move(creature);
+            break;
+        }
+        case ObjectType::Placeable: {
+            auto blueprint = Blueprints::instance().getPlaceable(blueprintResRef);
+            auto placeable = _game->objectFactory().newPlaceable();
+            placeable->load(blueprint);
+            object = move(placeable);
+            break;
+        }
+        default:
+            warn("Area: createObject: unsupported object type: " + to_string(static_cast<int>(type)));
+            break;
+    }
+    if (!object) return nullptr;
+
+    auto spatial = dynamic_pointer_cast<SpatialObject>(object);
+    if (spatial) {
+        add(spatial);
+        auto model = spatial->model();
+        if (model) {
+            _game->sceneGraph().addRoot(model);
+        }
+    }
+
+    return move(object);
 }
 
 } // namespace game

@@ -48,7 +48,7 @@ class ScriptObject;
 struct Variable {
     VariableType type { VariableType::Void };
     std::string strValue;
-    glm::vec3 vecValue;
+    glm::vec3 vecValue { 0.0f };
     std::shared_ptr<ScriptObject> object;
     std::shared_ptr<EngineType> engineType;
     ExecutionContext context;

@@ -504,6 +504,15 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
+Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
+    auto location = getLocationEngineType(args, 2);
+    bool useAppearAnimation = getBool(args, 3, false);
+
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->createObject(objectType, blueprintResRef, location));
+}
+
 } // namespace game
 
 } // namespace reone
