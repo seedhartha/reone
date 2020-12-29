@@ -212,7 +212,7 @@ void PartySelection::changeParty() {
 
     Party &party = _game->party();
     party.clear();
-    party.addMember(party.player());
+    party.addMember(kNpcPlayer, party.player());
 
     shared_ptr<Creature> player(_game->party().player());
 
@@ -227,11 +227,10 @@ void PartySelection::changeParty() {
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);
         creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
-        party.addMember(creature);
+        party.addMember(i, creature);
     }
 
-    area->loadParty(player->position(), player->facing());
-    area->fill(_game->sceneGraph());
+    area->reloadParty();
 }
 
 } // namespace game

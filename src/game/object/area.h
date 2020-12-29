@@ -128,6 +128,7 @@ public:
 
     void loadParty(const glm::vec3 &position, float facing);
     void unloadParty();
+    void reloadParty();
 
     // END Party
 

@@ -158,7 +158,7 @@ void CharacterGeneration::finish() {
 
     Party &party = _game->party();
     party.clear();
-    party.addMember(player);
+    party.addMember(kNpcPlayer, player);
     party.setPlayer(player);
 
     _game->loadModule(moduleName);

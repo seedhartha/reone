@@ -466,6 +466,13 @@ void Area::unloadParty() {
     }
 }
 
+void Area::reloadParty() {
+    shared_ptr<Creature> player(_game->party().player());
+    loadParty(player->position(), player->facing());
+
+    fill(_game->sceneGraph());
+}
+
 bool Area::handle(const SDL_Event &event) {
     switch (event.type) {
         case SDL_KEYDOWN:
