@@ -17,6 +17,9 @@
 
 #include "nameentry.h"
 
+#include "../../../common/streamutil.h"
+#include "../../../resource/resources.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -50,27 +53,48 @@ NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const Gr
 void NameEntry::load() {
     GUI::load();
 
+    _nameBoxEdit = &getControl("NAME_BOX_EDIT");
+
     setControlText("NAME_BOX_EDIT", "");
-    disableControl("BTN_RANDOM");
+
+    loadLtrFile("humanm", _maleLtr);
+    loadLtrFile("humanf", _femaleLtr);
+    loadLtrFile("humanl", _lastNameLtr);
+}
+
+void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
+    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::LetterComboProbability));
+    ltr.load(wrap(data));
 }
 
 bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
-        setControlText("NAME_BOX_EDIT", _input.text());
+        _nameBoxEdit->setTextMessage(_input.text());
         return true;
     }
-
     return GUI::handle(event);
 }
 
 void NameEntry::onClick(const string &control) {
-    if (control == "END_BTN") {
+    if (control == "BTN_RANDOM") {
+        _nameBoxEdit->setTextMessage(getRandomName());
+
+    } else if (control == "END_BTN") {
         _charGen->setQuickStep(2);
         _charGen->openQuick();
 
     } else if (control == "BTN_BACK") {
         _charGen->openQuick();
     }
+}
+
+string NameEntry::getRandomName() const {
+    Gender gender = _charGen->character().gender;
+    const LtrFile &ltr = gender == Gender::Female ? _femaleLtr : _maleLtr;
+    string firstName(ltr.getRandomName(8));
+    string lastName(ltr.getRandomName(8));
+
+    return firstName + " " + lastName;
 }
 
 } // namespace game
