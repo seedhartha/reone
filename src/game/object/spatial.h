@@ -48,6 +48,8 @@ class SpatialObject : public Object {
 public:
     void update(float dt) override;
 
+    virtual void die();
+
     void face(const SpatialObject &other);
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);

@@ -154,6 +154,9 @@ void SpatialObject::applyInstantEffect(Effect &effect) {
             _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damageEffect.amount());
             break;
         }
+        case EffectType::Death:
+            die();
+            break;
         default:
             warn("SpatialObject: applyInstantEffect: effect not implement: " + to_string(static_cast<int>(effect.type())));
             break;
@@ -309,6 +312,9 @@ shared_ptr<Item> SpatialObject::getNextItem() {
 
 void SpatialObject::clearAllEffects() {
     _effects.clear();
+}
+
+void SpatialObject::die() {
 }
 
 } // namespace game
