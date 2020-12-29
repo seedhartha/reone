@@ -179,6 +179,11 @@ private:
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getName(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNearestCreature(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNearestCreatureToLocation(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNearestObject(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNearestObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNearestObjectToLocation(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectType(const VariablesList &args, script::ExecutionContext &ctx);

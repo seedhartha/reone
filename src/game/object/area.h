@@ -106,6 +106,13 @@ public:
 
     ObjectList &getObjectsByType(ObjectType type);
 
+    /**
+     * Find the nth nearest object for which the specified predicate returns true.
+     * 
+     * @param nth a 0-based object index
+     */
+    std::shared_ptr<SpatialObject> getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate);
+
     // END Objects
 
     // Cameras

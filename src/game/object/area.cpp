@@ -1001,6 +1001,25 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     return move(object);
 }
 
+shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
+    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
+
+    for (auto &object : _objects) {
+        if (predicate(object)) {
+            candidates.push_back(make_pair(object, object->distanceTo(origin)));
+        }
+    }
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    int numCandidates = static_cast<int>(candidates.size());
+    if (nth >= numCandidates) {
+        warn(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % numCandidates);
+        return nullptr;
+    }
+
+    return candidates[nth].first;
+}
+
 } // namespace game
 
 } // namespace reone

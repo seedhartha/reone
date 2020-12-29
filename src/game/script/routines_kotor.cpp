@@ -76,7 +76,7 @@ void Routines::addKotorRoutines() {
     add("ActionPutDownItem", Void, { Object }, &Routines::actionPutDownItem);
     add("GetLastAttacker", Object, { Object });
     add("ActionAttack", Void, { Object, Int }, &Routines::actionAttack);
-    add("GetNearestCreature", Object, { Int, Int, Object, Int, Int, Int, Int, Int });
+    add("GetNearestCreature", Object, { Int, Int, Object, Int, Int, Int, Int, Int }, &Routines::getNearestCreature);
     add("ActionSpeakString", Void, { String, Int }, &Routines::actionSpeakString);
     add("ActionPlayAnimation", Void, { Int, Float, Float }, &Routines::actionPlayAnimation);
     add("GetDistanceToObject", Float, { Object }, &Routines::getDistanceToObject);
@@ -264,10 +264,10 @@ void Routines::addKotorRoutines() {
     add("GetPositionFromLocation", TVector, { Location }, &Routines::getPositionFromLocation);
     add("EffectBodyFuel", Effect, { }, &Routines::effectBodyFuel);
     add("GetFacingFromLocation", Float, { Location }, &Routines::getFacingFromLocation);
-    add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int });
-    add("GetNearestObject", Object, { Int, Object, Int });
-    add("GetNearestObjectToLocation", Object, { Int, Location, Int });
-    add("GetNearestObjectByTag", Object, { String, Object, Int });
+    add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int }, &Routines::getNearestCreatureToLocation);
+    add("GetNearestObject", Object, { Int, Object, Int }, &Routines::getNearestObject);
+    add("GetNearestObjectToLocation", Object, { Int, Location, Int }, &Routines::getNearestObjectToLocation);
+    add("GetNearestObjectByTag", Object, { String, Object, Int }, &Routines::getNearestObjectByTag);
     add("IntToFloat", Float, { Int }, &Routines::intToFloat);
     add("FloatToInt", Int, { Float }, &Routines::floatToInt);
     add("StringToInt", Int, { String }, &Routines::stringToInt);
