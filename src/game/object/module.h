@@ -46,6 +46,9 @@ struct ModuleInfo {
     std::string entryArea;
     glm::vec3 entryPosition { 0.0f };
     float entryFacing { 0.0f };
+    int dawnHour { 0 };
+    int duskHour { 0 };
+    int minPerHour { 0 };
 };
 
 class Door;
@@ -55,6 +58,14 @@ class Placeable;
 
 class Module : public Object {
 public:
+    struct Time {
+        int day { 0 };
+        int hour { 0 };
+        int minute { 0 };
+        int second { 0 };
+        int millisecond { 0 };
+    };
+
     Module(uint32_t id, Game *game);
 
     void load(const std::string &name, const resource::GffStruct &ifo);
@@ -69,6 +80,9 @@ public:
     const ModuleInfo &info() const;
     std::shared_ptr<Area> area() const;
     Player &player();
+    const Time &time() const;
+
+    void setTime(int hour, int minute, int second, int millisecond);
 
 private:
     Game *_game { nullptr };
@@ -76,6 +90,7 @@ private:
     ModuleInfo _info;
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
+    Time _time;
 
     void onCreatureClick(const std::shared_ptr<Creature> &creature);
     void onDoorClick(const std::shared_ptr<Door> &door);
