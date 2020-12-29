@@ -37,6 +37,7 @@ enum class ObjectType {
     Area = 0x1001,
     Camera = 0x1002,
 
+    All = 0x7fff,
     Invalid = 0x7fff
 };
 

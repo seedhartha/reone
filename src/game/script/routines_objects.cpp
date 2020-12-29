@@ -513,6 +513,78 @@ Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx
     return static_pointer_cast<ScriptObject>(_game->module()->area()->createObject(objectType, blueprintResRef, location));
 }
 
+Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContext &ctx) {
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
+    auto target = getSpatialObjectOrCaller(args, 2, ctx);
+    int nth = getInt(args, 3, 1);
+    int secondCriteriaType = getInt(args, 4, -1);
+    int secondCriteriaValue = getInt(args, 5, -1);
+    int thirdCriteriaType = getInt(args, 6, -1);
+    int thirdCriteriaValue = getInt(args, 7, -1);
+
+    // TODO: handle criterias
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [](auto &object) {
+        return object->type() == ObjectType::Creature;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
+    auto location = getLocationEngineType(args, 2);
+    int nth = getInt(args, 3, 1);
+    int secondCriteriaType = getInt(args, 4, -1);
+    int secondCriteriaValue = getInt(args, 5, -1);
+    int thirdCriteriaType = getInt(args, 6, -1);
+    int thirdCriteriaValue = getInt(args, 7, -1);
+
+    // TODO: handle criterias
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [](auto &object) {
+        return object->type() == ObjectType::Creature;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0, static_cast<int>(ObjectType::All)));
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+        return object->type() == objectType;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    auto location = getLocationEngineType(args, 1);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
+        return object->type() == objectType;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
+    string tag(boost::to_lower_copy(getString(args, 0)));
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+        return object->tag() == tag;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
 } // namespace game
 
 } // namespace reone
