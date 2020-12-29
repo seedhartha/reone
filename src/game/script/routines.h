@@ -153,6 +153,7 @@ private:
     // Objects
 
     script::Variable createItemOnObject(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable createObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable cutsceneAttack(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable faceObjectAwayFromObject(const VariablesList &args, script::ExecutionContext &ctx);

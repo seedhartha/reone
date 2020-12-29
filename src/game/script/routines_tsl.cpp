@@ -281,7 +281,7 @@ void Routines::addTslRoutines() {
     add("ActionSpeakStringByStrRef", Void, { Int, Int }, &Routines::actionSpeakStringByStrRef);
     add("DestroyObject", Void, { Object, Float, Int, Float, Int }, &Routines::destroyObject);
     add("GetModule", Object, { }, &Routines::getModule);
-    add("CreateObject", Object, { Int, String, Location, Int });
+    add("CreateObject", Object, { Int, String, Location, Int }, &Routines::createObject);
     add("EventSpellCastAt", Event, { Object, Int, Int });
     add("GetLastSpellCaster", Object, { });
     add("GetLastSpell", Int, { });

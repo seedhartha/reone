@@ -99,6 +99,8 @@ public:
 
     // Objects
 
+    std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
+
     std::shared_ptr<SpatialObject> find(uint32_t id) const;
     std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
 
