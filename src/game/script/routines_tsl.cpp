@@ -258,7 +258,7 @@ void Routines::addTslRoutines() {
     add("GetIsPC", Int, { Object }, &Routines::getIsPC);
     add("FeetToMeters", Float, { Float }, &Routines::feetToMeters);
     add("YardsToMeters", Float, { Float }, &Routines::yardsToMeters);
-    add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
+    add("ApplyEffectToObject", Void, { Int, Effect, Object, Float }, &Routines::applyEffectToObject);
     add("SpeakString", Void, { String, Int });
     add("GetSpellTargetLocation", Location, { });
     add("GetPositionFromLocation", TVector, { Location }, &Routines::getPositionFromLocation);
@@ -754,7 +754,7 @@ void Routines::addTslRoutines() {
     add("SetNPCAIStyle", Void, { Object, Int });
     add("SetNPCSelectability", Void, { Int, Int });
     add("GetNPCSelectability", Int, { Int });
-    add("ClearAllEffects", Void, { });
+    add("ClearAllEffects", Void, { }, &Routines::clearAllEffects);
     add("GetLastConversation", String, { });
     add("ShowPartySelectionGUI", Void, { String, Int, Int, Int }, &Routines::showPartySelectionGUI);
     add("GetStandardFaction", Int, { Object }, &Routines::getStandardFaction);
