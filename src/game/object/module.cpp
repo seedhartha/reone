@@ -36,6 +36,11 @@ namespace reone {
 
 namespace game {
 
+constexpr int kMaxMillisecond = 1000;
+constexpr int kMaxSecond = 60;
+constexpr int kMaxMinute = 60;
+constexpr int kMaxHour = 24;
+
 Module::Module(uint32_t id, Game *game) :
     Object(id, ObjectType::Module),
     _game(game) {
@@ -58,6 +63,10 @@ void Module::load(const string &name, const GffStruct &ifo) {
 }
 
 void Module::loadInfo(const GffStruct &ifo) {
+    // Entry location
+
+    _info.entryArea = ifo.getString("Mod_Entry_Area");
+
     _info.entryPosition.x = ifo.getFloat("Mod_Entry_X");
     _info.entryPosition.y = ifo.getFloat("Mod_Entry_Y");
     _info.entryPosition.z = ifo.getFloat("Mod_Entry_Z");
@@ -66,7 +75,17 @@ void Module::loadInfo(const GffStruct &ifo) {
     float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
     _info.entryFacing = -glm::atan(dirX, dirY);
 
-    _info.entryArea = ifo.getString("Mod_Entry_Area");
+    // END Entry location
+
+    // Time
+
+    _info.dawnHour = ifo.getInt("Mod_DawnHour");
+    _info.duskHour = ifo.getInt("Mod_DuskHour");
+    _info.minPerHour = ifo.getInt("Mod_MinPerHour");
+
+    _time.hour = ifo.getInt("Mod_StartHour");
+
+    // END Time
 }
 
 void Module::loadArea(const GffStruct &ifo) {
@@ -284,6 +303,37 @@ shared_ptr<Area> Module::area() const {
 
 Player &Module::player() {
     return *_player;
+}
+
+const Module::Time &Module::time() const {
+    return _time;
+}
+
+void Module::setTime(int hour, int minute, int second, int millisecond) {
+    if (millisecond <= _time.millisecond) {
+        _time.millisecond = millisecond;
+    } else {
+        _time.millisecond = millisecond % kMaxMillisecond;
+        second += millisecond / kMaxMillisecond;
+    }
+    if (second <= _time.second) {
+        _time.second = second;
+    } else {
+        _time.second = second % kMaxSecond;
+        minute += second / kMaxSecond;
+    }
+    if (minute <= _time.minute) {
+        _time.minute = minute;
+    } else {
+        _time.minute = minute % kMaxMinute;
+        hour += minute / kMaxMinute;
+    }
+    if (hour <= _time.hour) {
+        _time.hour = hour;
+    } else {
+        _time.hour = hour % kMaxHour;
+        _time.day += hour / kMaxHour;
+    }
 }
 
 } // namespace game

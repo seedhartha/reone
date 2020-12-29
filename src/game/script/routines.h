@@ -472,6 +472,20 @@ private:
     script::Variable effectWhirlWind(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Effects
+
+    // Time
+
+    script::Variable getIsDawn(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsDay(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsDusk(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsNight(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getTimeHour(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getTimeMillisecond(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getTimeMinute(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getTimeSecond(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setTime(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END Time
 };
 
 } // namespace game

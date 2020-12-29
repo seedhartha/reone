@@ -534,6 +534,7 @@ set(GAME_SOURCES
     src/game/script/routines_math.cpp
     src/game/script/routines_rp.cpp
     src/game/script/routines_party.cpp
+    src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
     src/game/script/runner.cpp)
