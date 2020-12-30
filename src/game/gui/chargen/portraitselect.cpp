@@ -152,13 +152,13 @@ void PortraitSelection::onClick(const string &control) {
                 break;
         }
         character.appearance = appearance;
-        _charGen->setQuickStep(1);
         _charGen->setCharacter(character);
-        _charGen->openQuick();
+        _charGen->goToNextStep();
+        _charGen->openSteps();
 
     } else if (control == "BTN_BACK") {
         resetCurrentPortrait();
-        _charGen->openQuick();
+        _charGen->openSteps();
     }
 }
 

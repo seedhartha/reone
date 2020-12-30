@@ -25,23 +25,16 @@ namespace game {
 
 class CharacterGeneration;
 
-class QuickCharacterGeneration : public gui::GUI {
+class CharGenAbilities : public gui::GUI {
 public:
-    QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    CharGenAbilities(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 
-    void goToNextStep();
-
-    void setStep(int step);
-
 private:
-    CharacterGeneration *_charGen { nullptr };
-    int _step { 0 };
+    CharacterGeneration *_charGen;
 
     void onClick(const std::string &control) override;
-
-    void doSetStep(int step);
 };
 
 } // namespace game

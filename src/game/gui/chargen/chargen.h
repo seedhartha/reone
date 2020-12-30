@@ -23,9 +23,13 @@
 
 #include "../../object/creature.h"
 
+#include "abilities.h"
 #include "classselect.h"
+#include "custom.h"
+#include "feats.h"
 #include "nameentry.h"
 #include "portraitselect.h"
+#include "skills.h"
 #include "quick.h"
 #include "quickorcustom.h"
 
@@ -38,13 +42,22 @@ enum class CharGenScreen {
     QuickOrCustom,
     Quick,
     PortraitSelection,
-    Name
+    Name,
+    Custom,
+    Abilities,
+    Skills,
+    Feats
 };
 
 class Game;
 
 class CharacterGeneration : public gui::GUI {
 public:
+    enum class Type {
+        Quick,
+        Custom
+    };
+
     CharacterGeneration(Game *game);
 
     void load() override;
@@ -53,31 +66,45 @@ public:
     void render() const override;
     void render3D() const override;
 
+    void startQuick();
+    void startCustom();
     void finish();
     void cancel();
+
     void openClassSelection();
     void openNameEntry();
+    void openAbilities();
+    void openSkills();
+    void openFeats();
     void openPortraitSelection();
     void openQuick();
     void openQuickOrCustom();
+    void openCustom();
+    void openSteps();
+
+    void goToNextStep();
 
     const CreatureConfiguration &character() const;
 
     void setCharacter(const CreatureConfiguration &config);
-    void setQuickStep(int step);
 
 private:
     Game *_game { nullptr };
     CharGenScreen _screen { CharGenScreen::ClassSelection };
     CreatureConfiguration _character;
     std::unique_ptr<Creature> _creature;
+    Type _type  { Type::Quick };
 
     // Sub GUI
 
     std::unique_ptr<ClassSelection> _classSelection;
     std::unique_ptr<QuickOrCustom> _quickOrCustom;
     std::unique_ptr<QuickCharacterGeneration> _quick;
+    std::unique_ptr<CustomCharacterGeneration> _custom;
     std::unique_ptr<PortraitSelection> _portraitSelection;
+    std::unique_ptr<CharGenAbilities> _abilities;
+    std::unique_ptr<CharGenSkills> _skills;
+    std::unique_ptr<CharGenFeats> _feats;
     std::unique_ptr<NameEntry> _nameEntry;
 
     // END Sub GUI
@@ -96,6 +123,10 @@ private:
     void loadQuick();
     void loadPortraitSelection();
     void loadNameEntry();
+    void loadCustom();
+    void loadAbilities();
+    void loadSkills();
+    void loadFeats();
 
     // END Loading
 };

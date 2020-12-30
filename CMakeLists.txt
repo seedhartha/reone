@@ -380,12 +380,16 @@ set(GAME_HEADERS
     src/game/enginetype/location.h
     src/game/enginetype/types.h
     src/game/game.h
+    src/game/gui/chargen/abilities.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
+    src/game/gui/chargen/custom.h
+    src/game/gui/chargen/feats.h
     src/game/gui/chargen/nameentry.h
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
     src/game/gui/chargen/quickorcustom.h
+    src/game/gui/chargen/skills.h
     src/game/gui/colorutil.h
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
@@ -472,12 +476,16 @@ set(GAME_SOURCES
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp
+    src/game/gui/chargen/abilities.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
+    src/game/gui/chargen/custom.cpp
+    src/game/gui/chargen/feats.cpp
     src/game/gui/chargen/nameentry.cpp
     src/game/gui/chargen/portraitselect.cpp
     src/game/gui/chargen/quick.cpp
     src/game/gui/chargen/quickorcustom.cpp
+    src/game/gui/chargen/skills.cpp
     src/game/gui/colorutil.cpp
     src/game/gui/container.cpp
     src/game/gui/debugoverlay.cpp

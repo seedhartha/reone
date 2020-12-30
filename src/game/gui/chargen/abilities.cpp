@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "quickorcustom.h"
+#include "abilities.h"
 
 #include "../colorutil.h"
 
@@ -23,7 +23,6 @@
 
 using namespace std;
 
-using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -31,11 +30,11 @@ namespace reone {
 
 namespace game {
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
     _charGen(charGen) {
 
-    _resRef = getResRef("qorcpnl");
+    _resRef = getResRef("abchrgen");
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -46,21 +45,25 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
     }
 }
 
-void QuickOrCustom::load() {
+void CharGenAbilities::load() {
     GUI::load();
 
-    if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
-    }
+    disableControl("STR_POINTS_BTN");
+    disableControl("DEX_POINTS_BTN");
+    disableControl("CON_POINTS_BTN");
+    disableControl("INT_POINTS_BTN");
+    disableControl("WIS_POINTS_BTN");
+    disableControl("CHA_POINTS_BTN");
+
+    disableControl("BTN_RECOMMENDED");
 }
 
-void QuickOrCustom::onClick(const string &control) {
-    if (control == "QUICK_CHAR_BTN") {
-        _charGen->startQuick();
-    } else if (control == "CUST_CHAR_BTN") {
-        _charGen->startCustom();
+void CharGenAbilities::onClick(const string &control) {
+    if (control == "BTN_ACCEPT") {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
     } else if (control == "BTN_BACK") {
-        _charGen->openClassSelection();
+        _charGen->openSteps();
     }
 }
 
