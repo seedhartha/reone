@@ -25,9 +25,9 @@ namespace game {
 
 class CharacterGeneration;
 
-class QuickCharacterGeneration : public gui::GUI {
+class CustomCharacterGeneration : public gui::GUI {
 public:
-    QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    CustomCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
 

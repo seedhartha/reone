@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "quickorcustom.h"
+#include "skills.h"
 
 #include "../colorutil.h"
 
@@ -23,7 +23,6 @@
 
 using namespace std;
 
-using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -31,11 +30,11 @@ namespace reone {
 
 namespace game {
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
     _charGen(charGen) {
 
-    _resRef = getResRef("qorcpnl");
+    _resRef = getResRef("skchrgen");
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -46,21 +45,27 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
     }
 }
 
-void QuickOrCustom::load() {
+void CharGenSkills::load() {
     GUI::load();
 
-    if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
-    }
+    disableControl("COMPUTER_USE_POINTS_BTN");
+    disableControl("DEMOLITIONS_POINTS_BTN");
+    disableControl("STEALTH_POINTS_BTN");
+    disableControl("AWARENESS_POINTS_BTN");
+    disableControl("PERSUADE_POINTS_BTN");
+    disableControl("REP_MINUS_BTN");
+    disableControl("SECURITY_POINTS_BTN");
+    disableControl("TREAT_INJURY_POINTS_BTN");
+
+    disableControl("BTN_RECOMMENDED");
 }
 
-void QuickOrCustom::onClick(const string &control) {
-    if (control == "QUICK_CHAR_BTN") {
-        _charGen->startQuick();
-    } else if (control == "CUST_CHAR_BTN") {
-        _charGen->startCustom();
+void CharGenSkills::onClick(const string &control) {
+    if (control == "BTN_ACCEPT") {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
     } else if (control == "BTN_BACK") {
-        _charGen->openClassSelection();
+        _charGen->openSteps();
     }
 }
 

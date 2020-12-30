@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "quickorcustom.h"
+#include "feats.h"
 
 #include "../colorutil.h"
 
@@ -23,7 +23,6 @@
 
 using namespace std;
 
-using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -31,11 +30,11 @@ namespace reone {
 
 namespace game {
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
+CharGenFeats::CharGenFeats(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GUI(version, opts),
     _charGen(charGen) {
 
-    _resRef = getResRef("qorcpnl");
+    _resRef = getResRef("ftchrgen");
 
     if (version == GameVersion::TheSithLords) {
         _resolutionX = 800;
@@ -46,21 +45,19 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
     }
 }
 
-void QuickOrCustom::load() {
+void CharGenFeats::load() {
     GUI::load();
 
-    if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
-    }
+    disableControl("BTN_SELECT");
+    disableControl("BTN_RECOMMENDED");
 }
 
-void QuickOrCustom::onClick(const string &control) {
-    if (control == "QUICK_CHAR_BTN") {
-        _charGen->startQuick();
-    } else if (control == "CUST_CHAR_BTN") {
-        _charGen->startCustom();
+void CharGenFeats::onClick(const string &control) {
+    if (control == "BTN_ACCEPT") {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
     } else if (control == "BTN_BACK") {
-        _charGen->openClassSelection();
+        _charGen->openSteps();
     }
 }
 

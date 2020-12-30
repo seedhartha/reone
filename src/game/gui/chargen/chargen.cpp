@@ -78,6 +78,10 @@ void CharacterGeneration::load() {
     loadQuick();
     loadPortraitSelection();
     loadNameEntry();
+    loadCustom();
+    loadAbilities();
+    loadSkills();
+    loadFeats();
 }
 
 void CharacterGeneration::loadClassSelection() {
@@ -95,9 +99,29 @@ void CharacterGeneration::loadQuick() {
     _quick->load();
 }
 
+void CharacterGeneration::loadCustom() {
+    _custom = make_unique<CustomCharacterGeneration>(this, _version, _gfxOpts);
+    _custom->load();
+}
+
 void CharacterGeneration::loadPortraitSelection() {
     _portraitSelection = make_unique<PortraitSelection>(this, _version, _gfxOpts);
     _portraitSelection->load();
+}
+
+void CharacterGeneration::loadAbilities() {
+    _abilities = make_unique<CharGenAbilities>(this, _version, _gfxOpts);
+    _abilities->load();
+}
+
+void CharacterGeneration::loadSkills() {
+    _skills = make_unique<CharGenSkills>(this, _version, _gfxOpts);
+    _skills->load();
+}
+
+void CharacterGeneration::loadFeats() {
+    _feats = make_unique<CharGenFeats>(this, _version, _gfxOpts);
+    _feats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
@@ -120,8 +144,16 @@ GUI *CharacterGeneration::getSubGUI() const {
             return _quickOrCustom.get();
         case CharGenScreen::Quick:
             return _quick.get();
+        case CharGenScreen::Custom:
+            return _custom.get();
         case CharGenScreen::PortraitSelection:
             return _portraitSelection.get();
+        case CharGenScreen::Abilities:
+            return _abilities.get();
+        case CharGenScreen::Skills:
+            return _skills.get();
+        case CharGenScreen::Feats:
+            return _feats.get();
         case CharGenScreen::Name:
             return _nameEntry.get();
         default:
@@ -144,6 +176,86 @@ void CharacterGeneration::render3D() const {
     getSubGUI()->render3D();
 }
 
+void CharacterGeneration::openClassSelection() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::ClassSelection);
+}
+
+void CharacterGeneration::changeScreen(CharGenScreen screen) {
+    GUI *gui = getSubGUI();
+    if (gui) {
+        gui->resetFocus();
+    }
+    _screen = screen;
+}
+
+void CharacterGeneration::openQuickOrCustom() {
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::QuickOrCustom);
+}
+
+void CharacterGeneration::startCustom() {
+    _type = Type::Custom;
+    _custom->setStep(0);
+    openSteps();
+}
+
+void CharacterGeneration::startQuick() {
+    _type = Type::Quick;
+    _quick->setStep(0);
+    openSteps();
+}
+
+void CharacterGeneration::openSteps() {
+    switch (_type) {
+        case Type::Custom:
+            openCustom();
+            break;
+        default:
+            openQuick();
+            break;
+    }
+}
+
+void CharacterGeneration::openQuick() {
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Quick);
+}
+
+void CharacterGeneration::openCustom() {
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Custom);
+}
+
+void CharacterGeneration::openPortraitSelection() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::PortraitSelection);
+}
+
+void CharacterGeneration::openAbilities() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Abilities);
+}
+
+void CharacterGeneration::openSkills() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Skills);
+}
+
+void CharacterGeneration::openFeats() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Feats);
+}
+
+void CharacterGeneration::openNameEntry() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Name);
+}
+
+void CharacterGeneration::cancel() {
+    _game->openMainMenu();
+}
+
 void CharacterGeneration::finish() {
     string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
@@ -164,41 +276,11 @@ void CharacterGeneration::finish() {
     _game->loadModule(moduleName);
 }
 
-void CharacterGeneration::cancel() {
-    _game->openMainMenu();
-}
-
-void CharacterGeneration::openClassSelection() {
-    hideControl("MODEL_LBL");
-    changeScreen(CharGenScreen::ClassSelection);
-}
-
-void CharacterGeneration::changeScreen(CharGenScreen screen) {
-    GUI *gui = getSubGUI();
-    if (gui) {
-        gui->resetFocus();
-    }
-    _screen = screen;
-}
-
-void CharacterGeneration::openNameEntry() {
-    hideControl("MODEL_LBL");
-    changeScreen(CharGenScreen::Name);
-}
-
-void CharacterGeneration::openPortraitSelection() {
-    hideControl("MODEL_LBL");
-    changeScreen(CharGenScreen::PortraitSelection);
-}
-
-void CharacterGeneration::openQuick() {
-    showControl("MODEL_LBL");
-    changeScreen(CharGenScreen::Quick);
-}
-
-void CharacterGeneration::openQuickOrCustom() {
-    showControl("MODEL_LBL");
-    changeScreen(CharGenScreen::QuickOrCustom);
+void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
+    _character = config;
+    loadCharacterModel();
+    updateAttributes();
+    _portraitSelection->updatePortraits();
 }
 
 void CharacterGeneration::loadCharacterModel() {
@@ -240,17 +322,6 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     return creature->model();
 }
 
-const CreatureConfiguration &CharacterGeneration::character() const {
-    return _character;
-}
-
-void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
-    _character = config;
-    loadCharacterModel();
-    updateAttributes();
-    _portraitSelection->updatePortraits();
-}
-
 void CharacterGeneration::updateAttributes() {
     setControlText("LBL_CLASS", getClassTitle(_character.clazz));
 
@@ -269,8 +340,19 @@ void CharacterGeneration::updateAttributes() {
     setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
 }
 
-void CharacterGeneration::setQuickStep(int step) {
-    _quick->setStep(step);
+void CharacterGeneration::goToNextStep() {
+    switch (_type) {
+        case Type::Custom:
+            _custom->goToNextStep();
+            break;
+        default:
+            _quick->goToNextStep();
+            break;
+    }
+}
+
+const CreatureConfiguration &CharacterGeneration::character() const {
+    return _character;
 }
 
 } // namespace game
