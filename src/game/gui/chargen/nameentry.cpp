@@ -80,21 +80,18 @@ void NameEntry::onClick(const string &control) {
         _nameBoxEdit->setTextMessage(getRandomName());
 
     } else if (control == "END_BTN") {
-        _charGen->setQuickStep(2);
-        _charGen->openQuick();
+        _charGen->goToNextStep();
+        _charGen->openSteps();
 
     } else if (control == "BTN_BACK") {
-        _charGen->openQuick();
+        _charGen->openSteps();
     }
 }
 
 string NameEntry::getRandomName() const {
     Gender gender = _charGen->character().gender;
-    const LtrFile &ltr = gender == Gender::Female ? _femaleLtr : _maleLtr;
-    string firstName(ltr.getRandomName(8));
-    string lastName(ltr.getRandomName(8));
-
-    return firstName + " " + lastName;
+    const LtrFile &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
+    return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }
 
 } // namespace game
