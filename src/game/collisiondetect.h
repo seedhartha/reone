@@ -64,7 +64,7 @@ public:
     CollisionDetector(Area *area);
 
     /**
-     * @return `true` if ray intersects an obstacle, `false` otherwise.
+     * @return true if ray intersects an obstacle, false otherwise
      */
     bool raycast(const RaycastProperties &props, RaycastResult &result) const;
 

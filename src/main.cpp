@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
+
 #include "common/log.h"
 #include "program.h"
 
@@ -28,11 +30,10 @@ int main(int argc, char **argv) {
     }
     catch (const exception &ex) {
         try {
-            error(ex.what());
+            error("Program terminated exceptionally: " + string(ex.what()));
         }
         catch (...) {
         }
-
         return 1;
     }
 }
