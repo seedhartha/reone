@@ -21,16 +21,12 @@
 #include <boost/program_options/options_description.hpp>
 
 #include "game/options.h"
-#include "game/types.h"
 #include "mp/types.h"
-#include "net/types.h"
-#include "resource/types.h"
 
 namespace reone {
 
 /**
- * Encapsulates the program-level logic (i.e., option management). Starts a
- * `Game` instance.
+ * Encapsulates option management. Starts a Game instance.
  *
  * @see game::Game
  */
@@ -38,27 +34,24 @@ class Program {
 public:
     Program(int argc, char **argv);
 
+    /**
+     * Process command line arguments and start an appropriate Game instance.
+     *
+     * @return the exit code
+     */
     int run();
 
 private:
-    bool _showHelp { false };
-    boost::filesystem::path _gamePath;
-    game::Options _gameOpts;
-    mp::MultiplayerMode _multiplayerMode { mp::MultiplayerMode::None };
-
-    // Command line arguments
-
-    int _argc { 0 };
-    char **_argv { nullptr };
-
-    // END Command line arguments
-
-    // Intermediate options
+    int _argc;
+    char **_argv;
 
     boost::program_options::options_description _commonOpts;
     boost::program_options::options_description _cmdLineOpts { "Usage" };
 
-    // END Intermediate options
+    bool _showHelp { false };
+    boost::filesystem::path _gamePath;
+    game::Options _gameOpts;
+    mp::MultiplayerMode _multiplayerMode { mp::MultiplayerMode::None };
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
