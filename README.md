@@ -25,7 +25,7 @@ Developer resources:
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
-A legal copy of the game is required to run it using reone - both KotOR and TSL can be obtained from Steam or GOG.com. Keep in mind that mod support is not guaranteed at this point.
+reone must only be used to run a legal copy of the game - both KotOR and TSL can be obtained from Steam or GOG.com. Keep in mind that mod compatibility is not being tested and thus cannot be guaranteed.
 
 Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
 
@@ -56,6 +56,6 @@ reone is not the only project aiming to reimplement the Odyssey engine - there a
 
 In contrast, this is what reone offers:
 
-- KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora Engine games - codebase is lighter and development is more focused.
+- KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora engine games - codebase is lighter and development is more focused.
 - Written in C++ - industry standard language, faster than the JavaScript implementation.
 - Custom game engine based on SDL 2 and OpenGL 3.3 - does not depend on Unity, which is a proprietary software with a learning curve of itself.
