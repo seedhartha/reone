@@ -42,7 +42,7 @@ static const int kDefaultMovieVolume = 85;
 static const int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
-    if (argv) {
+    if (!argv) {
         throw invalid_argument("argv must not be null");
     }
 }
