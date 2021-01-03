@@ -328,7 +328,7 @@ void CharacterGeneration::updateAttributes() {
     setControlText("LBL_CLASS", clazz->name());
 
     CreatureAttributes attrs(clazz->defaultAttributes());
-    int vitality = clazz->getHitPoints(1) + (attrs.constitution() - 10) / 2;
+    int vitality = clazz->hitdie() + (attrs.constitution() - 10) / 2;
     int defense = 10 + clazz->getDefenseBonus(1) + (attrs.dexterity() - 10) / 2;
 
     setControlText("LBL_VIT", to_string(vitality));

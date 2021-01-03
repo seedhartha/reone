@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 
 #include "../../resource/2dafile.h"
 
@@ -37,21 +38,19 @@ public:
 
     void load(const resource::TwoDaRow &row);
 
-    /**
-     * Compute a number of hit points that creature of this class and the
-     * specified level would have.
-     */
-    int getHitPoints(int level);
+    bool isClassSkill(Skill skill) const;
 
     /**
      * Compute a defense bonus that creature of this class and the specified
      * level would have.
      */
-    int getDefenseBonus(int level);
+    int getDefenseBonus(int level) const;
 
     const std::string &name() const;
     const std::string &description() const;
+    int hitdie() const;
     const CreatureAttributes &defaultAttributes() const;
+    int skillPointBase() const;
 
 private:
     ClassType _type;
@@ -59,6 +58,8 @@ private:
     std::string _description;
     int _hitdie { 0 };
     CreatureAttributes _defaultAttributes;
+    int _skillPointBase { 0 };
+    std::unordered_set<Skill> _classSkills;
 };
 
 } // namespace game
