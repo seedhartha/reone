@@ -24,7 +24,7 @@
 
 #include "../../game.h"
 #include "../../portraitutil.h"
-#include "../../rp/classutil.h"
+#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
@@ -323,11 +323,13 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 }
 
 void CharacterGeneration::updateAttributes() {
-    setControlText("LBL_CLASS", getClassTitle(_character.clazz));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character.clazz));
 
-    CreatureAttributes attrs(getClassAttributes(_character.clazz));
-    int vitality = getClassHitPoints(_character.clazz, 1) + (attrs.constitution() - 10) / 2;
-    int defense = 10 + getClassDefenseBonus(_character.clazz, 1) + (attrs.dexterity() - 10) / 2;
+    setControlText("LBL_CLASS", clazz->name());
+
+    CreatureAttributes attrs(clazz->defaultAttributes());
+    int vitality = clazz->getHitPoints(1) + (attrs.constitution() - 10) / 2;
+    int defense = 10 + clazz->getDefenseBonus(1) + (attrs.dexterity() - 10) / 2;
 
     setControlText("LBL_VIT", to_string(vitality));
     setControlText("LBL_DEF", to_string(defense));
