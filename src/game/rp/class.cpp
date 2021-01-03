@@ -17,6 +17,8 @@
 
 #include "class.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -27,6 +29,8 @@ namespace reone {
 
 namespace game {
 
+static const char kSkillsTableResRef[] = "skills";
+
 CreatureClass::CreatureClass(ClassType type) : _type(type) {
 }
 
@@ -34,6 +38,7 @@ void CreatureClass::load(const TwoDaRow &row) {
     _name = Resources::instance().getString(row.getInt("name"));
     _description = Resources::instance().getString(row.getInt("description"));
     _hitdie = row.getInt("hitdie");
+    _skillPointBase = row.getInt("skillpointbase");
 
     _defaultAttributes.setAbilityScore(Ability::Strength, row.getInt("str"));
     _defaultAttributes.setAbilityScore(Ability::Dexterity, row.getInt("dex"));
@@ -41,13 +46,22 @@ void CreatureClass::load(const TwoDaRow &row) {
     _defaultAttributes.setAbilityScore(Ability::Intelligence, row.getInt("int"));
     _defaultAttributes.setAbilityScore(Ability::Wisdom, row.getInt("wis"));
     _defaultAttributes.setAbilityScore(Ability::Charisma, row.getInt("cha"));
+
+    string alias(boost::to_lower_copy(row.getString("skillstable")));
+    shared_ptr<TwoDaTable> skills(Resources::instance().get2DA(kSkillsTableResRef));
+    const vector<TwoDaRow> &rows = skills->rows();
+    for (int i = 0; i < static_cast<int>(rows.size()); ++i) {
+        if (row.getInt(alias + "_class") == 1) {
+            _classSkills.insert(static_cast<Skill>(i));
+        }
+    }
 }
 
-int CreatureClass::getHitPoints(int level) {
-    return level * _hitdie;
+bool CreatureClass::isClassSkill(Skill skill) const {
+    return _classSkills.count(skill) > 0;
 }
 
-int CreatureClass::getDefenseBonus(int level) {
+int CreatureClass::getDefenseBonus(int level) const {
     switch (_type) {
         case ClassType::JediConsular:
         case ClassType::JediGuardian:
@@ -67,8 +81,16 @@ const string &CreatureClass::description() const {
     return _description;
 }
 
+int CreatureClass::hitdie() const {
+    return _hitdie;
+}
+
 const CreatureAttributes &CreatureClass::defaultAttributes() const {
     return _defaultAttributes;
+}
+
+int CreatureClass::skillPointBase() const {
+    return _skillPointBase;
 }
 
 } // namespace game

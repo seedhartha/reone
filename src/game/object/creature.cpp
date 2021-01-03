@@ -156,7 +156,7 @@ void Creature::load(const CreatureConfiguration &config) {
         loadAppearance(*appearance, config.appearance);
         loadPortrait(config.appearance);
         _attributes.addClassLevels(config.clazz, 1);
-        _currentHitPoints = _hitPoints = _maxHitPoints = Classes::instance().get(config.clazz)->getHitPoints(1);
+        _currentHitPoints = _hitPoints = _maxHitPoints = Classes::instance().get(config.clazz)->hitdie();
     }
     for (auto &item : config.equipment) {
         equip(item);
