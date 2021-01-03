@@ -47,11 +47,15 @@ void CreatureClass::load(const TwoDaRow &row) {
     _defaultAttributes.setAbilityScore(Ability::Wisdom, row.getInt("wis"));
     _defaultAttributes.setAbilityScore(Ability::Charisma, row.getInt("cha"));
 
-    string alias(boost::to_lower_copy(row.getString("skillstable")));
+    string skillsTable(boost::to_lower_copy(row.getString("skillstable")));
+    loadClassSkills(skillsTable);
+}
+
+void CreatureClass::loadClassSkills(const string &skillsTable) {
     shared_ptr<TwoDaTable> skills(Resources::instance().get2DA(kSkillsTableResRef));
     const vector<TwoDaRow> &rows = skills->rows();
     for (int i = 0; i < static_cast<int>(rows.size()); ++i) {
-        if (row.getInt(alias + "_class") == 1) {
+        if (rows[i].getInt(skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<Skill>(i));
         }
     }

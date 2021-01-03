@@ -318,6 +318,10 @@ void GUI::setControlFocus(const string &tag, bool focus) {
     configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
 }
 
+void GUI::setControlVisible(const string &tag, bool visible) {
+    configureControl(tag, [&visible](Control &ctrl) { ctrl.setVisible(visible); });
+}
+
 Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),

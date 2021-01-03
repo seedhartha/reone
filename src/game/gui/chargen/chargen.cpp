@@ -233,6 +233,7 @@ void CharacterGeneration::openPortraitSelection() {
 }
 
 void CharacterGeneration::openAbilities() {
+    _abilities->reset();
     hideControl("MODEL_LBL");
     changeScreen(CharGenScreen::Abilities);
 }
