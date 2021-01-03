@@ -60,6 +60,8 @@ private:
     CreatureAttributes _defaultAttributes;
     int _skillPointBase { 0 };
     std::unordered_set<Skill> _classSkills;
+
+    void loadClassSkills(const std::string &skillsTable);
 };
 
 } // namespace game

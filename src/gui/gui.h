@@ -60,6 +60,7 @@ public:
     void setControlFocus(const std::string &tag, bool focus);
     void setControlFocusable(const std::string &tag, bool focusable);
     void setControlText(const std::string &tag, const std::string &text);
+    void setControlVisible(const std::string &tag, bool visible);
 
 protected:
     enum class ScalingMode {
