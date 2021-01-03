@@ -23,7 +23,7 @@
 #include "../../characterutil.h"
 #include "../../game.h"
 #include "../../object/creature.h"
-#include "../../rp/classutil.h"
+#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
@@ -220,7 +220,7 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
     ClassButton &button = _classButtons[idx];
 
     string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]));
-    classText += " " + getClassTitle(button.config.clazz);
+    classText += " " + Classes::instance().get(button.config.clazz)->name();
 
     string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]));
 

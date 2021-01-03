@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "../../resource/2dafile.h"
+
 #include "attributes.h"
 #include "types.h"
 
@@ -26,10 +28,38 @@ namespace reone {
 
 namespace game {
 
-std::string getClassTitle(ClassType clazz);
-CreatureAttributes getClassAttributes(ClassType clazz);
-int getClassHitPoints(ClassType clazz, int level);
-int getClassDefenseBonus(ClassType clazz, int level);
+/**
+ * Represents a creature class.
+ */
+class CreatureClass {
+public:
+    CreatureClass(ClassType type);
+
+    void load(const resource::TwoDaRow &row);
+
+    /**
+     * Compute a number of hit points that creature of this class and the
+     * specified level would have.
+     */
+    int getHitPoints(int level);
+
+    /**
+     * Compute a defense bonus that creature of this class and the specified
+     * level would have.
+     */
+    int getDefenseBonus(int level);
+
+    const std::string &name() const;
+    const std::string &description() const;
+    const CreatureAttributes &defaultAttributes() const;
+
+private:
+    ClassType _type;
+    std::string _name;
+    std::string _description;
+    int _hitdie { 0 };
+    CreatureAttributes _defaultAttributes;
+};
 
 } // namespace game
 
