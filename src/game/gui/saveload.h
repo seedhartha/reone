@@ -39,7 +39,7 @@ public:
 
     void load() override;
 
-    void update();
+    void refresh();
 
     void setMode(Mode mode);
 

@@ -31,7 +31,7 @@ public:
 
     void load() override;
 
-    void updatePortraits();
+    void refreshPortraits();
 
 private:
     Game *_game { nullptr };

@@ -30,8 +30,9 @@ public:
     CharacterMenu(Game *game);
 
     void load() override;
+    void update(float dt) override;
 
-    void updatePortraits();
+    void refreshPortraits();
 
 private:
     Game *_game { nullptr };

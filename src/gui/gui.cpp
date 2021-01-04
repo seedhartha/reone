@@ -17,6 +17,8 @@
 
 #include "gui.h"
 
+#include <stdexcept>
+
 #include "../common/log.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
@@ -44,6 +46,9 @@ string GUI::getResRef(const string &base) const {
 }
 
 void GUI::load() {
+    if (_resRef.empty()) {
+        throw logic_error("resRef must not be empty");
+    }
     info("GUI: load " + _resRef);
 
     shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));

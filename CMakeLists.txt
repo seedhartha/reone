@@ -404,6 +404,7 @@ set(GAME_HEADERS
     src/game/gui/ingame/map.h
     src/game/gui/ingame/messages.h
     src/game/gui/ingame/options.h
+    src/game/gui/levelup.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/partyselect.h
@@ -501,6 +502,7 @@ set(GAME_SOURCES
     src/game/gui/ingame/map.cpp
     src/game/gui/ingame/messages.cpp
     src/game/gui/ingame/options.cpp
+    src/game/gui/levelup.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/partyselect.cpp

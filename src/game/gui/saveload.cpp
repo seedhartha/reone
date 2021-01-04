@@ -79,7 +79,7 @@ void SaveLoad::load() {
     protoItem.setHilightColor(_defaultHilightColor);
 }
 
-void SaveLoad::update() {
+void SaveLoad::refresh() {
     string panelName(Resources::instance().getString(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
 
     Control &lblPanelName = getControl("LBL_PANELNAME");
@@ -157,7 +157,7 @@ void SaveLoad::onClick(const string &control) {
                     saveIdx = getNewSaveIndex();
                 }
                 saveGame(saveIdx);
-                update();
+                refresh();
                 break;
             default:
                 if (saveIdx != -1) {
@@ -169,7 +169,7 @@ void SaveLoad::onClick(const string &control) {
         int saveIdx = getSelectedSaveIndex();
         if (saveIdx != -1) {
             deleteGame(saveIdx);
-            update();
+            refresh();
         }
     } else if (control == "BTN_BACK") {
         ListBox &lbGames = getControl<ListBox>("LB_GAMES");
