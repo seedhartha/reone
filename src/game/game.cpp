@@ -200,6 +200,9 @@ void Game::loadModule(const string &name, string entry) {
         if (!_partySelect) {
             loadPartySelection();
         }
+        if (!_levelUp) {
+            loadLevelUp();
+        }
 
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
@@ -392,6 +395,11 @@ void Game::loadSaveLoad() {
     _saveLoad->load();
 }
 
+void Game::loadLevelUp() {
+    _levelUp.reset(new LevelUpMenu(this));
+    _levelUp->load();
+}
+
 void Game::loadInGame() {
     _inGame.reset(new InGameMenu(this));
     _inGame->load();
@@ -417,6 +425,8 @@ GUI *Game::getScreenGUI() const {
             return _partySelect.get();
         case GameScreen::SaveLoad:
             return _saveLoad.get();
+        case GameScreen::LevelUp:
+            return _levelUp.get();
         default:
             return nullptr;
     }
@@ -615,8 +625,13 @@ void Game::openPartySelection(const PartySelection::Context &ctx) {
 void Game::openSaveLoad(SaveLoad::Mode mode) {
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
-    _saveLoad->update();
+    _saveLoad->refresh();
     changeScreen(GameScreen::SaveLoad);
+}
+
+void Game::openLevelUp() {
+    setCursorType(CursorType::Default);
+    changeScreen(GameScreen::LevelUp);
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {

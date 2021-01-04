@@ -190,17 +190,17 @@ void InGameMenu::updateTabButtons() {
 }
 
 void InGameMenu::openInventory() {
-    _inventory->updatePortraits();
+    _inventory->refreshPortraits();
     changeTab(Tab::Inventory);
 }
 
 void InGameMenu::openCharacter() {
-    _character->updatePortraits();
+    _character->refreshPortraits();
     changeTab(Tab::Character);
 }
 
 void InGameMenu::openAbilities() {
-    _abilities->updatePortraits();
+    _abilities->refreshPortraits();
     changeTab(Tab::Abilities);
 }
 

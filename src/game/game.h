@@ -36,6 +36,7 @@
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
+#include "gui/levelup.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/partyselect.h"
@@ -138,6 +139,7 @@ public:
     void openInGameMenu(InGameMenu::Tab tab);
     void openContainer(const std::shared_ptr<SpatialObject> &container);
     void openPartySelection(const PartySelection::Context &ctx);
+    void openLevelUp();
 
     void startCharacterGeneration();
     void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
@@ -185,7 +187,8 @@ private:
         Dialog,
         Container,
         PartySelection,
-        SaveLoad
+        SaveLoad,
+        LevelUp
     };
 
     boost::filesystem::path _path;
@@ -227,6 +230,7 @@ private:
     std::unique_ptr<Container> _container;
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
+    std::unique_ptr<LevelUpMenu> _levelUp;
 
     // END GUI
 
@@ -287,6 +291,7 @@ private:
     void loadMainMenu();
     void loadPartySelection();
     void loadSaveLoad();
+    void loadLevelUp();
 
     // END Loading
 

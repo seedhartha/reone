@@ -94,12 +94,17 @@ void CharacterMenu::load() {
     hideControl("LBL_EXPERIENCE_STAT");
     hideControl("LBL_NEEDED_XP");
 
-    disableControl("BTN_LEVELUP");
     disableControl("BTN_AUTO");
     disableControl("BTN_SCRIPTS");
 }
 
-void CharacterMenu::updatePortraits() {
+void CharacterMenu::update(float dt) {
+    shared_ptr<Creature> leader(_game->party().leader());
+    setControlVisible("BTN_LEVELUP", leader->isLevelUpPending());
+    setControlVisible("BTN_AUTO", leader->isLevelUpPending());
+}
+
+void CharacterMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();
@@ -116,6 +121,8 @@ void CharacterMenu::updatePortraits() {
 void CharacterMenu::onClick(const string &control) {
     if (control == "BTN_EXIT") {
         _game->openInGame();
+    } else if (control == "BTN_LEVELUP") {
+        _game->openLevelUp();
     }
 }
 

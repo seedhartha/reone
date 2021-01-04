@@ -61,7 +61,7 @@ void AbilitiesMenu::load() {
     disableControl("BTN_FEATS");
 }
 
-void AbilitiesMenu::updatePortraits() {
+void AbilitiesMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();

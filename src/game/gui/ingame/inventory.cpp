@@ -63,7 +63,7 @@ void InventoryMenu::load() {
     setControlFocusable("BTN_CHANGE2", false);
 }
 
-void InventoryMenu::updatePortraits() {
+void InventoryMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();

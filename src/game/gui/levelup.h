@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../../gui/gui.h"
 
 namespace reone {
 
@@ -25,16 +25,12 @@ namespace game {
 
 class Game;
 
-class AbilitiesMenu : public gui::GUI {
+class LevelUpMenu : public gui::GUI {
 public:
-    AbilitiesMenu(Game *game);
-
-    void load() override;
-
-    void refreshPortraits();
+    LevelUpMenu(Game *game);
 
 private:
-    Game *_game { nullptr };
+    Game *_game;
 
     void onClick(const std::string &control) override;
 };
