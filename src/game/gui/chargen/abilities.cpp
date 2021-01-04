@@ -40,7 +40,7 @@ constexpr int kStartingPoints = 30;
 constexpr int kMinAbilityScore = 8;
 constexpr int kMaxAbilityScore = 18;
 
-static const unordered_map<std::string, Ability> g_abilityByAlias {
+static const unordered_map<string, Ability> g_abilityByAlias {
     { "STR", Ability::Strength },
     { "DEX", Ability::Dexterity },
     { "CON", Ability::Constitution },
@@ -118,7 +118,7 @@ void CharGenAbilities::refreshControls() {
 }
 
 int CharGenAbilities::getPointCost(Ability ability) const {
-    return glm::clamp((_attributes.getAbilityScore(ability) - 10) / 2, 1, 3);
+    return glm::clamp(_attributes.getAbilityModifier(ability), 1, 3);
 }
 
 static Ability getAbilityByAlias(const string &alias) {

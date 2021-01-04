@@ -19,6 +19,8 @@
 
 #include "../../../gui/gui.h"
 
+#include "../../rp/attributes.h"
+
 namespace reone {
 
 namespace game {
@@ -31,10 +33,21 @@ public:
 
     void load() override;
 
+    void reset();
+
 private:
     CharacterGeneration *_charGen;
+    CreatureAttributes _attributes;
+    int _points { 0 };
 
     void onClick(const std::string &control) override;
+
+    void refreshControls();
+    void updateCharacter();
+
+    bool canIncreaseSkill(Skill skill) const;
+
+    int getPointCost(Skill skill) const;
 };
 
 } // namespace game
