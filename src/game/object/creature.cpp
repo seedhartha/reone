@@ -33,7 +33,6 @@
 
 #include "../action/attack.h"
 #include "../blueprint/blueprints.h"
-#include "../rp/classes.h"
 #include "../portraitutil.h"
 
 #include "objectfactory.h"
@@ -102,7 +101,7 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
     load(blueprint);
 }
 
-void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
+void Creature::load(const shared_ptr<Blueprint<Creature>> &blueprint) {
     if (!blueprint) {
         throw invalid_argument("blueprint must not be null");
     }
@@ -110,11 +109,11 @@ void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
 
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _appearance);
+    loadPortrait(_appearance);
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
     _appearance = row;
-    _config.appearance = row;
     _modelType = parseModelType(table.getString(row, "modeltype"));
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
     _runSpeed = table.getFloat(row, "rundist", 0.0f);
@@ -145,21 +144,6 @@ void Creature::updateModel() {
         _model->setLocalTransform(_transform);
         _sceneGraph->addRoot(_model);
         _animDirty = true;
-    }
-}
-
-void Creature::load(const CreatureConfiguration &config) {
-    if (config.blueprint) {
-        load(config.blueprint);
-    } else {
-        shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
-        loadAppearance(*appearance, config.appearance);
-        loadPortrait(config.appearance);
-        _attributes.addClassLevels(config.clazz, 1);
-        _currentHitPoints = _hitPoints = _maxHitPoints = Classes::instance().get(config.clazz)->hitdie();
-    }
-    for (auto &item : config.equipment) {
-        equip(item);
     }
 }
 
@@ -381,7 +365,7 @@ void Creature::clearPath() {
 }
 
 Gender Creature::gender() const {
-    return _config.gender;
+    return _gender;
 }
 
 Creature::ModelType Creature::modelType() const {
@@ -389,7 +373,7 @@ Creature::ModelType Creature::modelType() const {
 }
 
 int Creature::appearance() const {
-    return _config.appearance;
+    return _appearance;
 }
 
 shared_ptr<Texture> Creature::portrait() const {

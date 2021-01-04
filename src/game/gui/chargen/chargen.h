@@ -21,6 +21,7 @@
 #include "../../../scene/node/modelscenenode.h"
 #include "../../../scene/scenegraph.h"
 
+#include "../../blueprint/creature.h"
 #include "../../object/creature.h"
 
 #include "abilities.h"
@@ -84,14 +85,14 @@ public:
 
     void goToNextStep();
 
-    const CreatureConfiguration &character() const;
+    const StaticCreatureBlueprint &character() const;
 
-    void setCharacter(const CreatureConfiguration &config);
+    void setCharacter(StaticCreatureBlueprint character);
 
 private:
     Game *_game { nullptr };
     CharGenScreen _screen { CharGenScreen::ClassSelection };
-    CreatureConfiguration _character;
+    std::shared_ptr<StaticCreatureBlueprint> _character;
     std::unique_ptr<Creature> _creature;
     Type _type  { Type::Quick };
 

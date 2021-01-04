@@ -19,10 +19,13 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "../../resource/gfffile.h"
 
 #include "../rp/attributes.h"
+
+#include "blueprint.h"
 
 namespace reone {
 
@@ -30,11 +33,14 @@ namespace game {
 
 class Creature;
 
-class CreatureBlueprint {
+/**
+ * Creature blueprint that loads data from a UTC file.
+ */
+class CreatureBlueprint : public Blueprint<Creature> {
 public:
     CreatureBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utc);
 
-    void load(Creature &creature);
+    void load(Creature &creature) override;
 
     const std::string &resRef() const;
     int getAppearanceFromUtc() const;
@@ -52,6 +58,32 @@ private:
     void loadSkills(CreatureAttributes &attributes);
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
+};
+
+/**
+ * Creature blueprint that has its data set manually.
+ */
+class StaticCreatureBlueprint : public Blueprint<Creature> {
+public:
+    void load(Creature &creature) override;
+
+    void clearEquipment();
+    void addEquippedItem(const std::string &resRef);
+
+    ClassType getClass() const;
+
+    Gender gender() const;
+    int appearance() const;
+
+    void setGender(Gender gender);
+    void setClass(ClassType clazz);
+    void setAppearance(int appearance);
+
+private:
+    Gender _gender { Gender::Male };
+    ClassType _class { ClassType::Soldier };
+    int _appearance { 0 };
+    std::vector<std::string> _equipment;
 };
 
 } // namespace game

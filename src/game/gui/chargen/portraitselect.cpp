@@ -21,6 +21,8 @@
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
 
+#include "../../blueprint/creature.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -77,8 +79,8 @@ void PortraitSelection::updatePortraits() {
     _portraits.clear();
 
     shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
-    const CreatureConfiguration &character = _charGen->character();
-    int sex = character.gender == Gender::Female ? 1 : 0;
+    const StaticCreatureBlueprint &character = _charGen->character();
+    int sex = character.gender() == Gender::Female ? 1 : 0;
 
     for (auto &row : portraits->rows()) {
         if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
@@ -103,12 +105,12 @@ void PortraitSelection::updatePortraits() {
 }
 
 void PortraitSelection::resetCurrentPortrait() {
-    const CreatureConfiguration &character = _charGen->character();
+    const StaticCreatureBlueprint &character = _charGen->character();
     auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&character](const Portrait &portrait) {
         return
-            portrait.appearanceNumber == character.appearance ||
-            portrait.appearanceS == character.appearance ||
-            portrait.appearanceL == character.appearance;
+            portrait.appearanceNumber == character.appearance() ||
+            portrait.appearanceS == character.appearance() ||
+            portrait.appearanceL == character.appearance();
     });
     _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
     loadCurrentPortrait();
@@ -138,9 +140,9 @@ void PortraitSelection::onClick(const string &control) {
         loadCurrentPortrait();
 
     } else if (control == "BTN_ACCEPT") {
-        CreatureConfiguration character(_charGen->character());
+        StaticCreatureBlueprint character(_charGen->character());
         int appearance;
-        switch (character.clazz) {
+        switch (character.getClass()) {
             case ClassType::Scoundrel:
                 appearance = _portraits[_currentPortrait].appearanceS;
                 break;
@@ -151,7 +153,7 @@ void PortraitSelection::onClick(const string &control) {
                 appearance = _portraits[_currentPortrait].appearanceNumber;
                 break;
         }
-        character.appearance = appearance;
+        character.setAppearance(appearance);
         _charGen->setCharacter(character);
         _charGen->goToNextStep();
         _charGen->openSteps();
