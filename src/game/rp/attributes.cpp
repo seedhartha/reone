@@ -25,6 +25,9 @@ namespace reone {
 
 namespace game {
 
+constexpr int kDefaultAbilityScore = 8;
+constexpr int kDefaultSkillRank = 0;
+
 void CreatureAttributes::addClassLevels(ClassType clazz, int levels) {
     for (int i = 0; i < static_cast<int>(_classLevels.size()); ++i) {
         if (_classLevels[i].first == clazz) {
@@ -41,6 +44,40 @@ void CreatureAttributes::computeHitDice() {
     for (auto &classLevel : _classLevels) {
         _hitDice += classLevel.second;
     }
+}
+
+int CreatureAttributes::getAbilityScore(Ability ability) const {
+    auto maybeAbility = _abilities.find(ability);
+    return maybeAbility != _abilities.end() ? maybeAbility->second : kDefaultAbilityScore;
+}
+
+int CreatureAttributes::getAbilityModifier(Ability ability) const {
+    int score = getAbilityScore(ability);
+    return (score - 10) / 2;
+}
+
+int CreatureAttributes::strength() const {
+    return getAbilityScore(Ability::Strength);
+}
+
+int CreatureAttributes::dexterity() const {
+    return getAbilityScore(Ability::Dexterity);
+}
+
+int CreatureAttributes::constitution() const {
+    return getAbilityScore(Ability::Constitution);
+}
+
+int CreatureAttributes::intelligence() const {
+    return getAbilityScore(Ability::Intelligence);
+}
+
+int CreatureAttributes::wisdom() const {
+    return getAbilityScore(Ability::Wisdom);
+}
+
+int CreatureAttributes::charisma() const {
+    return getAbilityScore(Ability::Charisma);
 }
 
 void CreatureAttributes::setAbilityScore(Ability ability, int score) {
@@ -78,7 +115,39 @@ bool CreatureAttributes::hasSkill(Skill skill) const {
 
 int CreatureAttributes::getSkillRank(Skill skill) const {
     auto maybeSkill = _skills.find(skill);
-    return maybeSkill != _skills.end() ? maybeSkill->second : -1;
+    return maybeSkill != _skills.end() ? maybeSkill->second : kDefaultSkillRank;
+}
+
+int CreatureAttributes::computerUse() const {
+    return getSkillRank(Skill::ComputerUse);
+}
+
+int CreatureAttributes::demolitions() const {
+    return getSkillRank(Skill::Demolitions);
+}
+
+int CreatureAttributes::stealth() const {
+    return getSkillRank(Skill::Stealth);
+}
+
+int CreatureAttributes::awareness() const {
+    return getSkillRank(Skill::Awareness);
+}
+
+int CreatureAttributes::persuade() const {
+    return getSkillRank(Skill::Persuade);
+}
+
+int CreatureAttributes::repair() const {
+    return getSkillRank(Skill::Repair);
+}
+
+int CreatureAttributes::security() const {
+    return getSkillRank(Skill::Security);
+}
+
+int CreatureAttributes::treatInjury() const {
+    return getSkillRank(Skill::TreatInjury);
 }
 
 } // namespace game

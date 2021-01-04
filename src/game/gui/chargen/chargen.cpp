@@ -239,6 +239,7 @@ void CharacterGeneration::openAbilities() {
 }
 
 void CharacterGeneration::openSkills() {
+    _skills->reset();
     hideControl("MODEL_LBL");
     changeScreen(CharGenScreen::Skills);
 }
@@ -333,8 +334,8 @@ void CharacterGeneration::updateAttributes() {
     setControlText("LBL_CLASS", clazz->name());
 
     CreatureAttributes attrs(clazz->defaultAttributes());
-    int vitality = clazz->hitdie() + (attrs.constitution() - 10) / 2;
-    int defense = 10 + clazz->getDefenseBonus(1) + (attrs.dexterity() - 10) / 2;
+    int vitality = clazz->hitdie() + attrs.getAbilityModifier(Ability::Constitution);
+    int defense = 10 + clazz->getDefenseBonus(1) + attrs.getAbilityModifier(Ability::Dexterity);
 
     setControlText("LBL_VIT", to_string(vitality));
     setControlText("LBL_DEF", to_string(defense));

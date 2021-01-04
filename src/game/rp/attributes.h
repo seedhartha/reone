@@ -27,8 +27,6 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultAbilityScore = 8;
-
 class CreatureAttributes {
 public:
     void addClassLevels(ClassType clazz, int levels);
@@ -40,17 +38,15 @@ public:
 
     // Abilities
 
-    int getAbilityScore(Ability ability) const {
-        auto maybeAbility = _abilities.find(ability);
-        return maybeAbility != _abilities.end() ? maybeAbility->second : kDefaultAbilityScore;
-    }
+    int getAbilityScore(Ability ability) const;
+    int getAbilityModifier(Ability ability) const;
 
-    int strength() const { return getAbilityScore(Ability::Strength); }
-    int dexterity() const { return getAbilityScore(Ability::Dexterity); }
-    int constitution() const { return getAbilityScore(Ability::Constitution); }
-    int intelligence() const { return getAbilityScore(Ability::Intelligence); }
-    int wisdom() const { return getAbilityScore(Ability::Wisdom); }
-    int charisma() const { return getAbilityScore(Ability::Charisma); }
+    int strength() const;
+    int dexterity() const;
+    int constitution() const;
+    int intelligence() const;
+    int wisdom() const;
+    int charisma() const;
 
     void setAbilityScore(Ability ability, int score);
 
@@ -62,14 +58,14 @@ public:
 
     int getSkillRank(Skill skill) const;
 
-    int computerUse() const { return _skills.find(Skill::ComputerUse)->second; }
-    int demolitions() const { return _skills.find(Skill::Demolitions)->second; }
-    int stealth() const { return _skills.find(Skill::Stealth)->second; }
-    int awareness() const { return _skills.find(Skill::Awareness)->second; }
-    int persuade() const { return _skills.find(Skill::Persuade)->second; }
-    int repair() const { return _skills.find(Skill::Repair)->second; }
-    int security() const { return _skills.find(Skill::Security)->second; }
-    int treatInjury() const { return _skills.find(Skill::TreatInjury)->second; }
+    int computerUse() const;
+    int demolitions() const;
+    int stealth() const;
+    int awareness() const;
+    int persuade() const;
+    int repair() const;
+    int security() const;
+    int treatInjury() const;
 
     void setSkillRank(Skill ability, int rank);
 
