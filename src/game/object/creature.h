@@ -91,6 +91,7 @@ public:
 
     bool isMovementRestricted() const;
     bool isInCombat() const;
+    bool isLevelUpPending() const;
 
     float getAttackRange() const;
 
