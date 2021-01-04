@@ -22,6 +22,7 @@
 
 #include "blueprint/creature.h"
 #include "portrait.h"
+#include "rp/classes.h"
 
 using namespace std;
 
@@ -72,10 +73,13 @@ unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType cla
             break;
     }
 
+    shared_ptr<CreatureClass> creatureClass = Classes::instance().get(clazz);
+
     auto character = make_unique<StaticCreatureBlueprint>();
     character->setGender(gender);
     character->setClass(clazz);
     character->setAppearance(appearance);
+    character->setAttributes(creatureClass->defaultAttributes());
     character->addEquippedItem("g_a_clothes01");
 
     return move(character);

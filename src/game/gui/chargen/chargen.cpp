@@ -278,10 +278,14 @@ void CharacterGeneration::finish() {
 }
 
 void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
+    int currentAppearance = _character ? _character->appearance() : -1;
     _character = make_unique<StaticCreatureBlueprint>(character);
-    loadCharacterModel();
+
+    if (currentAppearance != character.appearance()) {
+        loadCharacterModel();
+        _portraitSelection->updatePortraits();
+    }
     updateAttributes();
-    _portraitSelection->updatePortraits();
 }
 
 void CharacterGeneration::loadCharacterModel() {
@@ -335,12 +339,12 @@ void CharacterGeneration::updateAttributes() {
     setControlText("LBL_VIT", to_string(vitality));
     setControlText("LBL_DEF", to_string(defense));
 
-    setControlText("STR_AB_LBL", to_string(attrs.strength()));
-    setControlText("DEX_AB_LBL", to_string(attrs.dexterity()));
-    setControlText("CON_AB_LBL", to_string(attrs.constitution()));
-    setControlText("INT_AB_LBL", to_string(attrs.intelligence()));
-    setControlText("WIS_AB_LBL", to_string(attrs.wisdom()));
-    setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
+    setControlText("STR_AB_LBL", to_string(_character->attributes().strength()));
+    setControlText("DEX_AB_LBL", to_string(_character->attributes().dexterity()));
+    setControlText("CON_AB_LBL", to_string(_character->attributes().constitution()));
+    setControlText("INT_AB_LBL", to_string(_character->attributes().intelligence()));
+    setControlText("WIS_AB_LBL", to_string(_character->attributes().wisdom()));
+    setControlText("CHA_AB_LBL", to_string(_character->attributes().charisma()));
 }
 
 void CharacterGeneration::goToNextStep() {

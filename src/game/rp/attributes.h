@@ -27,6 +27,8 @@ namespace reone {
 
 namespace game {
 
+constexpr int kDefaultAbilityScore = 8;
+
 class CreatureAttributes {
 public:
     void addClassLevels(ClassType clazz, int levels);
@@ -38,14 +40,17 @@ public:
 
     // Abilities
 
-    int getAbilityScore(Ability ability) const { return _abilities.find(ability)->second; }
+    int getAbilityScore(Ability ability) const {
+        auto maybeAbility = _abilities.find(ability);
+        return maybeAbility != _abilities.end() ? maybeAbility->second : kDefaultAbilityScore;
+    }
 
-    int strength() const { return _abilities.find(Ability::Strength)->second; }
-    int dexterity() const { return _abilities.find(Ability::Dexterity)->second; }
-    int constitution() const { return _abilities.find(Ability::Constitution)->second; }
-    int intelligence() const { return _abilities.find(Ability::Intelligence)->second; }
-    int wisdom() const { return _abilities.find(Ability::Wisdom)->second; }
-    int charisma() const { return _abilities.find(Ability::Charisma)->second; }
+    int strength() const { return getAbilityScore(Ability::Strength); }
+    int dexterity() const { return getAbilityScore(Ability::Dexterity); }
+    int constitution() const { return getAbilityScore(Ability::Constitution); }
+    int intelligence() const { return getAbilityScore(Ability::Intelligence); }
+    int wisdom() const { return getAbilityScore(Ability::Wisdom); }
+    int charisma() const { return getAbilityScore(Ability::Charisma); }
 
     void setAbilityScore(Ability ability, int score);
 

@@ -32,6 +32,7 @@ namespace game {
 static const char kSkillsTableResRef[] = "skills";
 
 CreatureClass::CreatureClass(ClassType type) : _type(type) {
+    _defaultAttributes.addClassLevels(type, 1);
 }
 
 void CreatureClass::load(const TwoDaRow &row) {

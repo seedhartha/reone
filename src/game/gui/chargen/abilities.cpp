@@ -127,8 +127,11 @@ static Ability getAbilityByAlias(const string &alias) {
 
 void CharGenAbilities::onClick(const string &control) {
     if (control == "BTN_ACCEPT") {
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        if (_points == 0) {
+            updateCharacter();
+            _charGen->goToNextStep();
+            _charGen->openSteps();
+        }
     } else if (control == "BTN_BACK") {
         _charGen->openSteps();
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
@@ -142,6 +145,12 @@ void CharGenAbilities::onClick(const string &control) {
         _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) + 1);
         refreshControls();
     }
+}
+
+void CharGenAbilities::updateCharacter() {
+    StaticCreatureBlueprint blueprint(_charGen->character());
+    blueprint.setAttributes(_attributes);
+    _charGen->setCharacter(move(blueprint));
 }
 
 } // namespace game

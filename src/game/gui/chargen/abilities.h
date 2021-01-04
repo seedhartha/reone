@@ -43,6 +43,7 @@ private:
     void onClick(const std::string &control) override;
 
     void refreshControls();
+    void updateCharacter();
 
     int getPointCost(Ability ability) const;
 };
