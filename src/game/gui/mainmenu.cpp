@@ -201,7 +201,13 @@ void MainMenu::onModuleSelected(const string &name) {
             break;
     }
 
+    CreatureAttributes attributes;
+    attributes.addClassLevels(ClassType::Soldier, 1);
+
+    playerCfg->setAttributes(attributes);
     playerCfg->addEquippedItem("g_a_clothes01");
+
+    companionCfg->setAttributes(attributes);
     companionCfg->addEquippedItem("g_a_clothes01");
 
     Party &party = _game->party();

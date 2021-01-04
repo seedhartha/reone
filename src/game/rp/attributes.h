@@ -34,7 +34,8 @@ public:
     ClassType getClassByPosition(int position) const;
     int getLevelByPosition(int position) const;
     int getClassLevel(ClassType clazz) const;
-    int getHitDice() const { return _hitDice; }
+    int getHitDice() const;
+    int getAggregateLevel() const;
 
     // Abilities
 

@@ -62,6 +62,7 @@ void Console::initCommands() {
     addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
     addCommand("kill", bind(&Console::cmdKill, this, _1));
     addCommand("additem", bind(&Console::cmdAddItem, this, _1));
+    addCommand("givexp", bind(&Console::cmdGiveXP, this, _1));
 }
 
 void Console::addCommand(const std::string &name, const CommandHandler &handler) {
@@ -164,6 +165,21 @@ void Console::cmdAddItem(vector<string> tokens) {
     }
     int stackSize = static_cast<int>(tokens.size()) > 2 ? stoi(tokens[2]) : 1;
     object->addItem(tokens[1], stackSize);
+}
+
+void Console::cmdGiveXP(vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: givexp amount");
+        return;
+    }
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
+    if (!object) {
+        print("givexp: no creature selected");
+        return;
+    }
+    int amount = stoi(tokens[1]);
+    object->giveXP(amount);
 }
 
 void Console::print(const string &text) {

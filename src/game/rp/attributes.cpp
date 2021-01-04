@@ -108,6 +108,18 @@ int CreatureAttributes::getClassLevel(ClassType clazz) const {
     return maybeClassLevel != _classLevels.end() ? maybeClassLevel->second : 0;
 }
 
+int CreatureAttributes::getHitDice() const {
+    return _hitDice;
+}
+
+int CreatureAttributes::getAggregateLevel() const {
+    int result = 0;
+    for (auto &level : _classLevels) {
+        result += level.second;
+    }
+    return result;
+}
+
 bool CreatureAttributes::hasSkill(Skill skill) const {
     auto maybeSkill = _skills.find(skill);
     return maybeSkill != _skills.end() ? maybeSkill->second > 0 : false;

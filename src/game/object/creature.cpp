@@ -443,6 +443,11 @@ bool Creature::isInCombat() const {
     return _inCombat;
 }
 
+bool Creature::isLevelUpPending() const {
+    int level = _attributes.getAggregateLevel();
+    return _xp >= level * (level + 1) * 500;
+}
+
 void Creature::setMovementRestricted(bool restricted) {
     _movementRestricted = restricted;
 }

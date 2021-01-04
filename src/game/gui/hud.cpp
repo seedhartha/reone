@@ -104,13 +104,7 @@ void HUD::load() {
     hideControl("LBL_INDICATEBG");
     hideControl("LBL_ITEMRCVD");
     hideControl("LBL_ITEMLOST");
-    hideControl("LBL_LEVELUP1");
-    hideControl("LBL_LEVELUP2");
-    hideControl("LBL_LEVELUP3");
     hideControl("LBL_LIGHTSHIFT");
-    hideControl("LBL_LVLUPBG1");
-    hideControl("LBL_LVLUPBG2");
-    hideControl("LBL_LVLUPBG3");
     hideControl("LBL_MAP");
     hideControl("LBL_MOULDING1");
     hideControl("LBL_MOULDING2");
@@ -174,9 +168,13 @@ void HUD::update(float dt) {
             lblChar.setVisible(true);
             lblChar.setBorderFill(member->portrait());
             lblBack.setVisible(true);
+            setControlVisible("LBL_LVLUPBG" + to_string(charIdx), member->isLevelUpPending());
+            setControlVisible("LBL_LEVELUP" + to_string(charIdx), member->isLevelUpPending());
         } else {
             lblChar.setVisible(false);
             lblBack.setVisible(false);
+            hideControl("LBL_LVLUPBG" + to_string(charIdx));
+            hideControl("LBL_LEVELUP" + to_string(charIdx));
         }
     }
 
