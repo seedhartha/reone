@@ -20,6 +20,7 @@
 #include "../common/random.h"
 #include "../resource/resources.h"
 
+#include "blueprint/creature.h"
 #include "portrait.h"
 
 using namespace std;
@@ -31,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz) {
+unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz) {
     vector<Portrait> portraits;
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
@@ -71,13 +72,13 @@ CreatureConfiguration randomCharacter(Gender gender, ClassType clazz) {
             break;
     }
 
-    CreatureConfiguration config;
-    config.gender = gender;
-    config.clazz = clazz;
-    config.appearance = appearance;
-    config.equipment.push_back("g_a_clothes01");
+    auto character = make_unique<StaticCreatureBlueprint>();
+    character->setGender(gender);
+    character->setClass(clazz);
+    character->setAppearance(appearance);
+    character->addEquippedItem("g_a_clothes01");
 
-    return move(config);
+    return move(character);
 }
 
 } // namespace game

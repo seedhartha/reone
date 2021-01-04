@@ -183,26 +183,26 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    CreatureConfiguration playerCfg;
-    CreatureConfiguration companionCfg;
+    auto playerCfg = make_shared<StaticCreatureBlueprint>();
+    auto companionCfg = make_shared<StaticCreatureBlueprint>();
 
     switch (_version) {
         case GameVersion::TheSithLords:
-            playerCfg.appearance = kAppearanceAtton;
-            playerCfg.equipment.push_back("w_blaste_01");
-            companionCfg.appearance = kAppearanceKreia;
-            companionCfg.equipment.push_back("w_melee_06");
+            playerCfg->setAppearance(kAppearanceAtton);
+            playerCfg->addEquippedItem("w_blaste_01");
+            companionCfg->setAppearance(kAppearanceKreia);
+            companionCfg->addEquippedItem("w_melee_06");
             break;
         default:
-            playerCfg.appearance = kAppearanceCarth;
-            playerCfg.equipment.push_back("g_w_blstrpstl001");
-            companionCfg.appearance = kAppearanceBastila;
-            companionCfg.equipment.push_back("g_w_dblsbr004");
+            playerCfg->setAppearance(kAppearanceCarth);
+            playerCfg->addEquippedItem("g_w_blstrpstl001");
+            companionCfg->setAppearance(kAppearanceBastila);
+            companionCfg->addEquippedItem("g_w_dblsbr004");
             break;
     }
 
-    playerCfg.equipment.push_back("g_a_clothes01");
-    companionCfg.equipment.push_back("g_a_clothes01");
+    playerCfg->addEquippedItem("g_a_clothes01");
+    companionCfg->addEquippedItem("g_a_clothes01");
 
     Party &party = _game->party();
 

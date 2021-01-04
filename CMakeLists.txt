@@ -353,6 +353,7 @@ set(GAME_HEADERS
     src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
+    src/game/blueprint/blueprint.h
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
     src/game/blueprint/door.h
@@ -372,7 +373,6 @@ set(GAME_HEADERS
     src/game/collisiondetect.h
     src/game/console.h
     src/game/combat.h
-    src/game/creatureconfig.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/effect.h

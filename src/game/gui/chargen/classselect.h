@@ -20,13 +20,14 @@
 #include "../../../gui/gui.h"
 #include "../../../resource/types.h"
 
-#include "../../creatureconfig.h"
+#include "../../rp/types.h"
 
 namespace reone {
 
 namespace game {
 
 class Game;
+class StaticCreatureBlueprint;
 
 class ClassSelection : public gui::GUI {
 public:
@@ -38,7 +39,7 @@ private:
     struct ClassButton {
         gui::Control *control { nullptr };
         glm::ivec2 center { 0 };
-        CreatureConfiguration config;
+        std::shared_ptr<StaticCreatureBlueprint> character;
     };
 
     Game *_game { nullptr };
@@ -48,7 +49,7 @@ private:
 
     void configureClassButtons();
     void configureClassModels();
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const CreatureConfiguration &config, scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, scene::SceneGraph &sceneGraph);
     void configureClassModel(int index, Gender gender, ClassType clazz);
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);

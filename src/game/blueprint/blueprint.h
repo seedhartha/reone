@@ -17,33 +17,22 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
-#include <vector>
-
-#include "rp/types.h"
-
 namespace reone {
 
 namespace game {
 
-class CreatureBlueprint;
+/**
+ * Generic blueprint interface.
+ */
+template <class T>
+class Blueprint {
+public:
+    virtual ~Blueprint() = default;
 
-struct CreatureConfiguration {
-    std::shared_ptr<CreatureBlueprint> blueprint;
-    Gender gender { Gender::Male };
-    ClassType clazz { ClassType::Soldier };
-    int appearance { 0 };
-    std::vector<std::string> equipment;
-
-    bool operator==(const CreatureConfiguration &other) {
-        return
-            blueprint == other.blueprint &&
-            gender == other.gender &&
-            clazz == other.clazz &&
-            appearance == other.appearance &&
-            equipment == other.equipment;
-    }
+    /**
+     * Fill the specified object from this blueprint.
+     */
+    virtual void load(T &obj) = 0;
 };
 
 } // namespace game

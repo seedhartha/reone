@@ -23,7 +23,7 @@
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
-#include "../creatureconfig.h"
+#include "../blueprint/blueprint.h"
 #include "../rp/attributes.h"
 
 #include "creatureanimresolver.h"
@@ -39,7 +39,6 @@ namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
 
-class CreatureBlueprint;
 class ObjectFactory;
 
 enum class CombatState {
@@ -86,8 +85,7 @@ public:
     glm::vec3 getSelectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);
-    void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
-    void load(const CreatureConfiguration &config);
+    void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
 
@@ -155,7 +153,7 @@ public:
     // END Scripts
 
 private:
-    CreatureConfiguration _config;
+    Gender _gender { Gender::Male };
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
@@ -195,6 +193,7 @@ private:
     ModelType parseModelType(const std::string &s) const;
 
     friend class CreatureBlueprint;
+    friend class StaticCreatureBlueprint;
 };
 
 } // namespace game

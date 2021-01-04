@@ -260,11 +260,11 @@ void CharacterGeneration::cancel() {
 void CharacterGeneration::finish() {
     string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
-    CreatureConfiguration config(_character);
-    config.equipment.clear();
+    auto character = make_shared<StaticCreatureBlueprint>(*_character);
+    character->clearEquipment();
 
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->load(config);
+    player->load(character);
     player->setTag("PLAYER");
     player->setFaction(Faction::Friendly1);
     player->setImmortal(true);
@@ -277,8 +277,8 @@ void CharacterGeneration::finish() {
     _game->loadModule(moduleName);
 }
 
-void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
-    _character = config;
+void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
+    _character = make_unique<StaticCreatureBlueprint>(character);
     loadCharacterModel();
     updateAttributes();
     _portraitSelection->updatePortraits();
@@ -306,7 +306,7 @@ void CharacterGeneration::loadCharacterModel() {
 
     lblModel.setScene3D(move(scene));
 
-    string portrait(getPortraitByAppearance(_character.appearance));
+    string portrait(getPortraitByAppearance(_character->appearance()));
     if (!portrait.empty()) {
         Control &lblPortrait = getControl("PORTRAIT_LBL");
         lblPortrait.setBorderFill(portrait);
@@ -324,7 +324,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character.clazz));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->getClass()));
 
     setControlText("LBL_CLASS", clazz->name());
 
@@ -354,8 +354,8 @@ void CharacterGeneration::goToNextStep() {
     }
 }
 
-const CreatureConfiguration &CharacterGeneration::character() const {
-    return _character;
+const StaticCreatureBlueprint &CharacterGeneration::character() const {
+    return *_character;
 }
 
 } // namespace game

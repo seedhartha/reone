@@ -185,7 +185,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
     unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
-        .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].config, sceneGraph); })
+        .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].character, sceneGraph); })
         .modelScale(kModelScale)
         .modelOffset(glm::vec2(0.0f, kModelOffsetY))
         .cameraTransform(cameraTransform)
@@ -197,11 +197,11 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
     control.setScene3D(move(scene));
 }
 
-shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, SceneGraph &sceneGraph) {
     unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(config);
+    creature->load(character);
     creature->updateModelAnimation();
 
     return creature->model();
@@ -219,10 +219,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
 
     ClassButton &button = _classButtons[idx];
 
-    string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]));
-    classText += " " + Classes::instance().get(button.config.clazz)->name();
+    string classText(Resources::instance().getString(g_genderStrRefs[button.character->gender()]));
+    classText += " " + Classes::instance().get(button.character->getClass())->name();
 
-    string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]));
+    string descText(Resources::instance().getString(g_classDescStrRefs[button.character->getClass()]));
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);
@@ -242,7 +242,7 @@ void ClassSelection::onClick(const string &control) {
     CharacterGeneration &charGen = _game->characterGeneration();
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
-        charGen.setCharacter(_classButtons[idx].config);
+        charGen.setCharacter(*_classButtons[idx].character);
         charGen.openQuickOrCustom();
         return;
     }
