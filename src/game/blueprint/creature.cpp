@@ -144,7 +144,7 @@ const string &CreatureBlueprint::resRef() const {
 
 void StaticCreatureBlueprint::load(Creature &creature) {
     creature._appearance = _appearance;
-    creature._attributes.addClassLevels(_class, 1);
+    creature._attributes = _attributes;
     creature._currentHitPoints = creature._hitPoints = creature._maxHitPoints = Classes::instance().get(_class)->hitdie();
 
     for (auto &item : _equipment) {
@@ -172,6 +172,10 @@ int StaticCreatureBlueprint::appearance() const {
     return _appearance;
 }
 
+const CreatureAttributes &StaticCreatureBlueprint::attributes() const {
+    return _attributes;
+}
+
 void StaticCreatureBlueprint::setGender(Gender gender) {
     _gender = gender;
 }
@@ -182,6 +186,10 @@ void StaticCreatureBlueprint::setClass(ClassType clazz) {
 
 void StaticCreatureBlueprint::setAppearance(int appearance) {
     _appearance = appearance;
+}
+
+void StaticCreatureBlueprint::setAttributes(CreatureAttributes attributes) {
+    _attributes = move(attributes);
 }
 
 } // namespace game
