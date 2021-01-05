@@ -51,6 +51,10 @@ void Room::update(float dt) {
     }
 }
 
+bool Room::isVisible() const {
+    return _visible;
+}
+
 const string &Room::name() const {
     return _name;
 }
@@ -65,10 +69,6 @@ shared_ptr<ModelSceneNode> Room::model() const {
 
 const Walkmesh *Room::walkmesh() const {
     return _walkmesh.get();
-}
-
-bool Room::visible() const {
-    return _visible;
 }
 
 void Room::setVisible(bool visible) {

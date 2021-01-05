@@ -113,7 +113,16 @@ void Area::loadVIS() {
     VisFile vis;
     vis.load(wrap(Resources::instance().get(_name, ResourceType::Vis)));
 
-    _visibility = make_unique<Visibility>(vis.visibility());
+    _visibility = fixVisibility(vis.visibility());
+}
+
+Visibility Area::fixVisibility(const Visibility &visibility) {
+    Visibility result;
+    for (auto &pair : visibility) {
+        result.insert(pair);
+        result.insert(make_pair(pair.second, pair.first));
+    }
+    return move(result);
 }
 
 void Area::loadPTH() {
@@ -733,8 +742,12 @@ void Area::updateVisibility() {
             room.second->setVisible(true);
         }
     } else {
-        auto adjRoomNames = _visibility->equal_range(leaderRoom->name());
+        auto adjRoomNames = _visibility.equal_range(leaderRoom->name());
         for (auto &room : _rooms) {
+            // Room is visible if either of the following is true:
+            // 1. party leader is not in a room
+            // 2. this room is the party leaders room
+            // 3. this room is adjacent to the party leaders room
             bool visible = !leaderRoom || room.second.get() == leaderRoom;
             if (!visible) {
                 for (auto adjRoom = adjRoomNames.first; adjRoom != adjRoomNames.second; adjRoom++) {
