@@ -27,7 +27,6 @@
 
 #include "../object/creature.h"
 #include "../portraitutil.h"
-#include "../rp/classes.h"
 
 using namespace std;
 
@@ -145,7 +144,7 @@ const string &CreatureBlueprint::resRef() const {
 void StaticCreatureBlueprint::load(Creature &creature) {
     creature._appearance = _appearance;
     creature._attributes = _attributes;
-    creature._currentHitPoints = creature._hitPoints = creature._maxHitPoints = Classes::instance().get(_class)->hitdie();
+    creature._currentHitPoints = creature._hitPoints = creature._maxHitPoints = _attributes.getAggregateHitDie();
 
     for (auto &item : _equipment) {
         creature.equip(item);
@@ -160,8 +159,8 @@ void StaticCreatureBlueprint::addEquippedItem(const string &resRef) {
     _equipment.push_back(resRef);
 }
 
-ClassType StaticCreatureBlueprint::getClass() const {
-    return _class;
+ClassType StaticCreatureBlueprint::getLatestClass() const {
+    return _attributes.getLatestClass();
 }
 
 Gender StaticCreatureBlueprint::gender() const {
@@ -178,10 +177,6 @@ const CreatureAttributes &StaticCreatureBlueprint::attributes() const {
 
 void StaticCreatureBlueprint::setGender(Gender gender) {
     _gender = gender;
-}
-
-void StaticCreatureBlueprint::setClass(ClassType clazz) {
-    _class = clazz;
 }
 
 void StaticCreatureBlueprint::setAppearance(int appearance) {

@@ -29,13 +29,26 @@ namespace game {
 
 class CreatureAttributes {
 public:
+    /**
+     * @return the sum of (level * hitdie) of all classes
+     */
+    int getAggregateHitDie() const;
+
+    // Classes
+
     void addClassLevels(ClassType clazz, int levels);
 
     ClassType getClassByPosition(int position) const;
+    ClassType getLatestClass() const;
     int getLevelByPosition(int position) const;
     int getClassLevel(ClassType clazz) const;
-    int getHitDice() const;
+
+    /**
+     * @return the sum of all class levels, aka "hit dice"
+     */
     int getAggregateLevel() const;
+
+    // END Classes
 
     // Abilities
 
@@ -74,11 +87,8 @@ public:
 
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
-    int _hitDice { 0 };
     std::map<Ability, int> _abilities;
     std::map<Skill, int> _skills;
-
-    void computeHitDice();
 };
 
 } // namespace game

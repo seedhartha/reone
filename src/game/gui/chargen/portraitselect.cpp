@@ -106,8 +106,12 @@ void PortraitSelection::resetCurrentPortrait() {
             portrait.appearanceS == character.appearance() ||
             portrait.appearanceL == character.appearance();
     });
-    _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
-    loadCurrentPortrait();
+    if (maybePortrait != _portraits.end()) {
+        _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
+        loadCurrentPortrait();
+    } else {
+        _currentPortrait = -1;
+    }
 }
 
 void PortraitSelection::loadCurrentPortrait() {
@@ -136,7 +140,7 @@ void PortraitSelection::onClick(const string &control) {
     } else if (control == "BTN_ACCEPT") {
         StaticCreatureBlueprint character(_charGen->character());
         int appearance;
-        switch (character.getClass()) {
+        switch (character.getLatestClass()) {
             case ClassType::Scoundrel:
                 appearance = _portraits[_currentPortrait].appearanceS;
                 break;

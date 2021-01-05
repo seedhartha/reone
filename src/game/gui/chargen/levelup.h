@@ -31,6 +31,8 @@ public:
 
     void load() override;
 
+    void reset();
+
     void goToNextStep();
 
     void setStep(int step);
@@ -38,6 +40,7 @@ public:
 private:
     CharacterGeneration *_charGen;
     int _step { 0 };
+    bool _hasAttributes { false };
 
     void onClick(const std::string &control) override;
 

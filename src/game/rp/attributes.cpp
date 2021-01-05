@@ -19,6 +19,8 @@
 
 #include <algorithm>
 
+#include "classes.h"
+
 using namespace std;
 
 namespace reone {
@@ -36,14 +38,6 @@ void CreatureAttributes::addClassLevels(ClassType clazz, int levels) {
         }
     }
     _classLevels.push_back(make_pair(clazz, levels));
-    computeHitDice();
-}
-
-void CreatureAttributes::computeHitDice() {
-    _hitDice = 0;
-    for (auto &classLevel : _classLevels) {
-        _hitDice += classLevel.second;
-    }
 }
 
 int CreatureAttributes::getAbilityScore(Ability ability) const {
@@ -94,6 +88,10 @@ ClassType CreatureAttributes::getClassByPosition(int position) const {
         ClassType::Invalid;
 }
 
+ClassType CreatureAttributes::getLatestClass() const {
+    return _classLevels.empty() ? ClassType::Invalid : _classLevels.back().first;
+}
+
 int CreatureAttributes::getLevelByPosition(int position) const {
     return (position - 1) < static_cast<int>(_classLevels.size()) ?
         _classLevels[static_cast<size_t>(position) - 1].second :
@@ -108,14 +106,18 @@ int CreatureAttributes::getClassLevel(ClassType clazz) const {
     return maybeClassLevel != _classLevels.end() ? maybeClassLevel->second : 0;
 }
 
-int CreatureAttributes::getHitDice() const {
-    return _hitDice;
+int CreatureAttributes::getAggregateHitDie() const {
+    int result = 0;
+    for (auto &pair : _classLevels) {
+        result += pair.second * Classes::instance().get(pair.first)->hitdie();
+    }
+    return result;
 }
 
 int CreatureAttributes::getAggregateLevel() const {
     int result = 0;
-    for (auto &level : _classLevels) {
-        result += level.second;
+    for (auto &pair : _classLevels) {
+        result += pair.second;
     }
     return result;
 }

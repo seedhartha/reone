@@ -77,7 +77,6 @@ unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType cla
 
     auto character = make_unique<StaticCreatureBlueprint>();
     character->setGender(gender);
-    character->setClass(clazz);
     character->setAppearance(appearance);
     character->setAttributes(creatureClass->defaultAttributes());
     character->addEquippedItem("g_a_clothes01");

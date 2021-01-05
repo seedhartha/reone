@@ -210,6 +210,19 @@ void CharacterGeneration::startQuick() {
 
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
+
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    const CreatureAttributes &attributes = partyLeader->attributes();
+    StaticCreatureBlueprint character;
+    character.setAppearance(partyLeader->appearance());
+    character.setGender(partyLeader->gender());
+    character.setAttributes(attributes);
+    setCharacter(move(character));
+
+    int nextLevel = partyLeader->attributes().getAggregateLevel() + 1;
+    bool hasAttributes = nextLevel % 4 == 0;
+    _levelUp->setStep(hasAttributes ? 0 : 1);
+
     openSteps();
 }
 
@@ -265,6 +278,7 @@ void CharacterGeneration::openNameEntry() {
 }
 
 void CharacterGeneration::openLevelUp() {
+    _levelUp->reset();
     showControl("MODEL_LBL");
     changeScreen(CharGenScreen::LevelUp);
 }
@@ -278,23 +292,30 @@ void CharacterGeneration::cancel() {
 }
 
 void CharacterGeneration::finish() {
-    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+    if (_type == Type::LevelUp) {
+        shared_ptr<Creature> partyLeader(_game->party().leader());
+        partyLeader->attributes() = _character->attributes();
+        _game->openInGame();
 
-    auto character = make_shared<StaticCreatureBlueprint>(*_character);
-    character->clearEquipment();
+    } else {
+        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
 
-    shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->load(character);
-    player->setTag("PLAYER");
-    player->setFaction(Faction::Friendly1);
-    player->setImmortal(true);
+        auto character = make_shared<StaticCreatureBlueprint>(*_character);
+        character->clearEquipment();
 
-    Party &party = _game->party();
-    party.clear();
-    party.addMember(kNpcPlayer, player);
-    party.setPlayer(player);
+        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        player->load(character);
+        player->setTag("PLAYER");
+        player->setFaction(Faction::Friendly1);
+        player->setImmortal(true);
 
-    _game->loadModule(moduleName);
+        Party &party = _game->party();
+        party.clear();
+        party.addMember(kNpcPlayer, player);
+        party.setPlayer(player);
+
+        _game->loadModule(moduleName);
+    }
 }
 
 void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
@@ -348,7 +369,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->getClass()));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->getLatestClass()));
     setControlText("LBL_CLASS", clazz->name());
 
     CreatureAttributes attrs(_character->attributes());
@@ -369,6 +390,9 @@ void CharacterGeneration::updateAttributes() {
 
 void CharacterGeneration::goToNextStep() {
     switch (_type) {
+        case Type::LevelUp:
+            _levelUp->goToNextStep();
+            break;
         case Type::Custom:
             _custom->goToNextStep();
             break;
