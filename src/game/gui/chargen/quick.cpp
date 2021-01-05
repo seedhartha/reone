@@ -47,7 +47,7 @@ void QuickCharacterGeneration::load() {
     doSetStep(0);
 
     if (_version == GameVersion::KotOR) {
-        configureControl("LBL_DECORATION", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+        setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 

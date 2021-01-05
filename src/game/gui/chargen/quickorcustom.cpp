@@ -44,7 +44,7 @@ void QuickOrCustom::load() {
     GUI::load();
 
     if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+        setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 
