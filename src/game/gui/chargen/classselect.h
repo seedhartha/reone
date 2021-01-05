@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
 #include "../../../resource/types.h"
 
 #include "../../rp/types.h"
+
+#include "../gui.h"
 
 namespace reone {
 
@@ -29,7 +30,7 @@ namespace game {
 class Game;
 class StaticCreatureBlueprint;
 
-class ClassSelection : public gui::GUI {
+class ClassSelection : public GameGUI {
 public:
     ClassSelection(Game *game);
 

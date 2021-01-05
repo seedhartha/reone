@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../resource/types.h"
+#include "../gui.h"
 
 #include "../../portrait.h"
 
@@ -28,7 +27,7 @@ namespace game {
 
 class CharacterGeneration;
 
-class PortraitSelection : public gui::GUI {
+class PortraitSelection : public GameGUI {
 public:
     PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 

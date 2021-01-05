@@ -36,7 +36,6 @@
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
-#include "gui/levelup.h"
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/partyselect.h"
@@ -187,8 +186,7 @@ private:
         Dialog,
         Container,
         PartySelection,
-        SaveLoad,
-        LevelUp
+        SaveLoad
     };
 
     boost::filesystem::path _path;
@@ -230,7 +228,6 @@ private:
     std::unique_ptr<Container> _container;
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
-    std::unique_ptr<LevelUpMenu> _levelUp;
 
     // END GUI
 
@@ -291,7 +288,6 @@ private:
     void loadMainMenu();
     void loadPartySelection();
     void loadSaveLoad();
-    void loadLevelUp();
 
     // END Loading
 

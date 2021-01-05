@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../resource/types.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -27,7 +26,7 @@ namespace game {
 class Creature;
 class Game;
 
-class Equipment : public gui::GUI {
+class Equipment : public GameGUI {
 public:
     enum class Slot {
         None,

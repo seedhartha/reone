@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -25,7 +25,7 @@ namespace game {
 
 class Game;
 
-class InventoryMenu : public gui::GUI {
+class InventoryMenu : public GameGUI {
 public:
     InventoryMenu(Game *game);
 

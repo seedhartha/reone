@@ -385,6 +385,7 @@ set(GAME_HEADERS
     src/game/gui/chargen/classselect.h
     src/game/gui/chargen/custom.h
     src/game/gui/chargen/feats.h
+    src/game/gui/chargen/levelup.h
     src/game/gui/chargen/nameentry.h
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
@@ -394,6 +395,7 @@ set(GAME_HEADERS
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
+    src/game/gui/gui.h
     src/game/gui/hud.h
     src/game/gui/ingame/abilities.h
     src/game/gui/ingame/character.h
@@ -404,7 +406,6 @@ set(GAME_HEADERS
     src/game/gui/ingame/map.h
     src/game/gui/ingame/messages.h
     src/game/gui/ingame/options.h
-    src/game/gui/levelup.h
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/partyselect.h
@@ -483,6 +484,7 @@ set(GAME_SOURCES
     src/game/gui/chargen/classselect.cpp
     src/game/gui/chargen/custom.cpp
     src/game/gui/chargen/feats.cpp
+    src/game/gui/chargen/levelup.cpp
     src/game/gui/chargen/nameentry.cpp
     src/game/gui/chargen/portraitselect.cpp
     src/game/gui/chargen/quick.cpp
@@ -492,6 +494,7 @@ set(GAME_SOURCES
     src/game/gui/container.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
+    src/game/gui/gui.cpp
     src/game/gui/hud.cpp
     src/game/gui/ingame/abilities.cpp
     src/game/gui/ingame/character.cpp
@@ -502,7 +505,6 @@ set(GAME_SOURCES
     src/game/gui/ingame/map.cpp
     src/game/gui/ingame/messages.cpp
     src/game/gui/ingame/options.cpp
-    src/game/gui/levelup.cpp
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/partyselect.cpp

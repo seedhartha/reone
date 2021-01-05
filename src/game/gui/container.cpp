@@ -42,18 +42,12 @@ static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
 Container::Container(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("container");
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 305;
-        _resolutionY = 327;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void Container::load() {

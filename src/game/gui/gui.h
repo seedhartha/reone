@@ -15,29 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "levelup.h"
+#pragma once
 
-#include "../game.h"
-
-using namespace reone::gui;
+#include "../../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-LevelUpMenu::LevelUpMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
-    _game(game) {
+/**
+ * Encapsulates game-specific GUI configuration.
+ */
+class GameGUI : public gui::GUI {
+protected:
+    GameGUI(resource::GameVersion version, const render::GraphicsOptions &options);
 
-    _resRef = getResRef("leveluppnl");
-    _backgroundType = BackgroundType::Menu;
-}
-
-void LevelUpMenu::onClick(const std::string &control) {
-    if (control == "BTN_BACK") {
-        _game->openInGame();
-    }
-}
+    void initForGame();
+};
 
 } // namespace game
 

@@ -17,22 +17,31 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
 namespace game {
 
-class Game;
+class CharacterGeneration;
 
-class LevelUpMenu : public gui::GUI {
+class LevelUpMenu : public GameGUI {
 public:
-    LevelUpMenu(Game *game);
+    LevelUpMenu(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &options);
+
+    void load() override;
+
+    void goToNextStep();
+
+    void setStep(int step);
 
 private:
-    Game *_game;
+    CharacterGeneration *_charGen;
+    int _step { 0 };
 
     void onClick(const std::string &control) override;
+
+    void doSetStep(int step);
 };
 
 } // namespace game

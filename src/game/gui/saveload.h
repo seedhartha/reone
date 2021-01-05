@@ -19,7 +19,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "../../gui/gui.h"
+#include "gui.h"
 
 namespace reone {
 
@@ -27,7 +27,7 @@ namespace game {
 
 class Game;
 
-class SaveLoad : public gui::GUI {
+class SaveLoad : public GameGUI {
 public:
     enum class Mode {
         Save,

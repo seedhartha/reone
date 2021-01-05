@@ -200,8 +200,8 @@ void Game::loadModule(const string &name, string entry) {
         if (!_partySelect) {
             loadPartySelection();
         }
-        if (!_levelUp) {
-            loadLevelUp();
+        if (!_charGen) {
+            loadCharacterGeneration();
         }
 
         Models::instance().invalidateCache();
@@ -395,11 +395,6 @@ void Game::loadSaveLoad() {
     _saveLoad->load();
 }
 
-void Game::loadLevelUp() {
-    _levelUp.reset(new LevelUpMenu(this));
-    _levelUp->load();
-}
-
 void Game::loadInGame() {
     _inGame.reset(new InGameMenu(this));
     _inGame->load();
@@ -425,8 +420,6 @@ GUI *Game::getScreenGUI() const {
             return _partySelect.get();
         case GameScreen::SaveLoad:
             return _saveLoad.get();
-        case GameScreen::LevelUp:
-            return _levelUp.get();
         default:
             return nullptr;
     }
@@ -631,7 +624,8 @@ void Game::openSaveLoad(SaveLoad::Mode mode) {
 
 void Game::openLevelUp() {
     setCursorType(CursorType::Default);
-    changeScreen(GameScreen::LevelUp);
+    _charGen->startLevelUp();
+    changeScreen(GameScreen::CharacterGeneration);
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {

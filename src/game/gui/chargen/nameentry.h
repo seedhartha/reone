@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
 #include "../../../gui/textinput.h"
 #include "../../../resource/ltrfile.h"
+
+#include "../gui.h"
 
 namespace reone {
 
@@ -27,7 +28,7 @@ namespace game {
 
 class CharacterGeneration;
 
-class NameEntry : public gui::GUI {
+class NameEntry : public GameGUI {
 public:
     NameEntry(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 

@@ -55,19 +55,17 @@ static map<int, string> g_portraitByAppearance = {
 };
 
 PartySelection::PartySelection(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (game->version() == GameVersion::TheSithLords) {
+    if (_version == GameVersion::TheSithLords) {
         _resRef = "partyselect_p";
-        _resolutionX = 800;
-        _resolutionY = 600;
     } else {
         _resRef = "partyselection";
         _backgroundType = BackgroundType::Menu;
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
     }
+
+    initForGame();
 }
 
 void PartySelection::load() {

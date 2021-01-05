@@ -15,13 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "quickorcustom.h"
+#include "gui.h"
 
-#include "../colorutil.h"
-
-#include "chargen.h"
-
-using namespace std;
+#include "colorutil.h"
 
 using namespace reone::gui;
 using namespace reone::render;
@@ -31,30 +27,16 @@ namespace reone {
 
 namespace game {
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
-    _charGen(charGen) {
-
-    _resRef = getResRef("qorcpnl");
-
-    initForGame();
+GameGUI::GameGUI(GameVersion version, const GraphicsOptions &options) : GUI(version, options) {
 }
 
-void QuickOrCustom::load() {
-    GUI::load();
-
-    if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
-    }
-}
-
-void QuickOrCustom::onClick(const string &control) {
-    if (control == "QUICK_CHAR_BTN") {
-        _charGen->startQuick();
-    } else if (control == "CUST_CHAR_BTN") {
-        _charGen->startCustom();
-    } else if (control == "BTN_BACK") {
-        _charGen->openClassSelection();
+void GameGUI::initForGame() {
+    if (_version == GameVersion::TheSithLords) {
+        _resolutionX = 800;
+        _resolutionY = 600;
+    } else {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = getHilightColor(_version);
     }
 }
 
