@@ -44,19 +44,13 @@ static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
 CharacterGeneration::CharacterGeneration(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("maincg");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 };
 
 void CharacterGeneration::load() {
@@ -82,6 +76,7 @@ void CharacterGeneration::load() {
     loadAbilities();
     loadSkills();
     loadFeats();
+    loadLevelUp();
 }
 
 void CharacterGeneration::loadClassSelection() {
@@ -129,6 +124,11 @@ void CharacterGeneration::loadNameEntry() {
     _nameEntry->load();
 }
 
+void CharacterGeneration::loadLevelUp() {
+    _levelUp = make_unique<LevelUpMenu>(this, _version, _gfxOpts);
+    _levelUp->load();
+}
+
 bool CharacterGeneration::handle(const SDL_Event &event) {
     if (getSubGUI()->handle(event)) {
         return true;
@@ -156,6 +156,8 @@ GUI *CharacterGeneration::getSubGUI() const {
             return _feats.get();
         case CharGenScreen::Name:
             return _nameEntry.get();
+        case CharGenScreen::LevelUp:
+            return _levelUp.get();
         default:
             throw logic_error("CharGen: invalid screen: " + to_string(static_cast<int>(_screen)));
     }
@@ -206,8 +208,16 @@ void CharacterGeneration::startQuick() {
     openSteps();
 }
 
+void CharacterGeneration::startLevelUp() {
+    _type = Type::LevelUp;
+    openSteps();
+}
+
 void CharacterGeneration::openSteps() {
     switch (_type) {
+        case Type::LevelUp:
+            openLevelUp();
+            break;
         case Type::Custom:
             openCustom();
             break;
@@ -254,8 +264,17 @@ void CharacterGeneration::openNameEntry() {
     changeScreen(CharGenScreen::Name);
 }
 
+void CharacterGeneration::openLevelUp() {
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::LevelUp);
+}
+
 void CharacterGeneration::cancel() {
-    _game->openMainMenu();
+    if (_type == Type::LevelUp) {
+        _game->openInGame();
+    } else {
+        _game->openMainMenu();
+    }
 }
 
 void CharacterGeneration::finish() {
@@ -330,22 +349,22 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 
 void CharacterGeneration::updateAttributes() {
     shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->getClass()));
-
     setControlText("LBL_CLASS", clazz->name());
 
-    CreatureAttributes attrs(clazz->defaultAttributes());
-    int vitality = clazz->hitdie() + attrs.getAbilityModifier(Ability::Constitution);
-    int defense = 10 + clazz->getDefenseBonus(1) + attrs.getAbilityModifier(Ability::Dexterity);
+    CreatureAttributes attrs(_character->attributes());
 
+    int vitality = clazz->hitdie() + attrs.getAbilityModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));
+
+    int defense = 10 + clazz->getDefenseBonus(1) + attrs.getAbilityModifier(Ability::Dexterity);
     setControlText("LBL_DEF", to_string(defense));
 
-    setControlText("STR_AB_LBL", to_string(_character->attributes().strength()));
-    setControlText("DEX_AB_LBL", to_string(_character->attributes().dexterity()));
-    setControlText("CON_AB_LBL", to_string(_character->attributes().constitution()));
-    setControlText("INT_AB_LBL", to_string(_character->attributes().intelligence()));
-    setControlText("WIS_AB_LBL", to_string(_character->attributes().wisdom()));
-    setControlText("CHA_AB_LBL", to_string(_character->attributes().charisma()));
+    setControlText("STR_AB_LBL", to_string(attrs.strength()));
+    setControlText("DEX_AB_LBL", to_string(attrs.dexterity()));
+    setControlText("CON_AB_LBL", to_string(attrs.constitution()));
+    setControlText("INT_AB_LBL", to_string(attrs.intelligence()));
+    setControlText("WIS_AB_LBL", to_string(attrs.wisdom()));
+    setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
 }
 
 void CharacterGeneration::goToNextStep() {

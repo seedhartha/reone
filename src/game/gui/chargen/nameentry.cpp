@@ -35,19 +35,13 @@ namespace reone {
 namespace game {
 
 NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen),
     _input(kTextInputLetters | kTextInputWhitespace) {
 
     _resRef = getResRef("name");
 
-    if (version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void NameEntry::load() {

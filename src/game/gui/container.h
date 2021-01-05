@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-
-#include "../../resource/types.h"
+#include "gui.h"
 
 #include "../object/spatial.h"
 
@@ -29,7 +27,7 @@ namespace game {
 
 class Game;
 
-class Container : public gui::GUI {
+class Container : public GameGUI {
 public:
     Container(Game *game);
 

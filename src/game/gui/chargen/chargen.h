@@ -17,17 +17,19 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
 #include "../../../scene/node/modelscenenode.h"
 #include "../../../scene/scenegraph.h"
 
 #include "../../blueprint/creature.h"
 #include "../../object/creature.h"
 
+#include "../gui.h"
+
 #include "abilities.h"
 #include "classselect.h"
 #include "custom.h"
 #include "feats.h"
+#include "levelup.h"
 #include "nameentry.h"
 #include "portraitselect.h"
 #include "skills.h"
@@ -47,16 +49,18 @@ enum class CharGenScreen {
     Custom,
     Abilities,
     Skills,
-    Feats
+    Feats,
+    LevelUp
 };
 
 class Game;
 
-class CharacterGeneration : public gui::GUI {
+class CharacterGeneration : public GameGUI {
 public:
     enum class Type {
         Quick,
-        Custom
+        Custom,
+        LevelUp
     };
 
     CharacterGeneration(Game *game);
@@ -69,6 +73,8 @@ public:
 
     void startQuick();
     void startCustom();
+    void startLevelUp();
+
     void finish();
     void cancel();
 
@@ -82,6 +88,7 @@ public:
     void openQuickOrCustom();
     void openCustom();
     void openSteps();
+    void openLevelUp();
 
     void goToNextStep();
 
@@ -107,6 +114,7 @@ private:
     std::unique_ptr<CharGenSkills> _skills;
     std::unique_ptr<CharGenFeats> _feats;
     std::unique_ptr<NameEntry> _nameEntry;
+    std::unique_ptr<LevelUpMenu> _levelUp;
 
     // END Sub GUI
 
@@ -128,6 +136,7 @@ private:
     void loadAbilities();
     void loadSkills();
     void loadFeats();
+    void loadLevelUp();
 
     // END Loading
 };

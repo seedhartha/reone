@@ -58,22 +58,16 @@ static map<ClassType, int> g_classDescStrRefs {
 };
 
 ClassSelection::ClassSelection(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("classsel");
 
-    switch (game->version()) {
-        case GameVersion::TheSithLords:
-            _resolutionX = 800;
-            _resolutionY = 600;
-            break;
-        default:
-            _backgroundType = BackgroundType::Menu;
-            _hasDefaultHilightColor = true;
-            _defaultHilightColor = getHilightColor(_version);
-            break;
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
     }
+
+    initForGame();
 }
 
 void ClassSelection::load() {

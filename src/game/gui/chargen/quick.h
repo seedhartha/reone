@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -25,7 +25,7 @@ namespace game {
 
 class CharacterGeneration;
 
-class QuickCharacterGeneration : public gui::GUI {
+class QuickCharacterGeneration : public GameGUI {
 public:
     QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 

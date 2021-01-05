@@ -50,18 +50,12 @@ static const unordered_map<string, Ability> g_abilityByAlias {
 };
 
 CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("abchrgen");
 
-    if (version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void CharGenAbilities::load() {

@@ -34,18 +34,12 @@ namespace reone {
 namespace game {
 
 CustomCharacterGeneration::CustomCharacterGeneration(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("custpnl");
 
-    if (_version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void CustomCharacterGeneration::load() {

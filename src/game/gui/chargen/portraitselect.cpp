@@ -38,22 +38,16 @@ namespace reone {
 namespace game {
 
 PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
 
-    switch (version) {
-        case GameVersion::TheSithLords:
-            _resolutionX = 800;
-            _resolutionY = 600;
-            break;
-        default:
-            _backgroundType = BackgroundType::Menu;
-            _hasDefaultHilightColor = true;
-            _defaultHilightColor = getHilightColor(_version);
-            break;
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
     }
+
+    initForGame();
 }
 
 void PortraitSelection::load() {
