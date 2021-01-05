@@ -243,17 +243,17 @@ void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
 
     for (auto &name : g_slotNames) {
-        configureControl("LBL_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
-        configureControl("BTN_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
+        setControlVisible("LBL_INV_" + name.second, noneSelected);
+        setControlVisible("BTN_INV_" + name.second, noneSelected);
     }
 
-    getControl("LB_DESC").setVisible(!noneSelected);
-    getControl("LBL_SLOTNAME").setVisible(noneSelected);
+    setControlVisible("LB_DESC", !noneSelected);
+    setControlVisible("LBL_SLOTNAME", noneSelected);
 
     if (_version == GameVersion::KotOR) {
-        getControl("LBL_PORT_BORD").setVisible(noneSelected);
-        getControl("LBL_PORTRAIT").setVisible(noneSelected);
-        getControl("LBL_TXTBAR").setVisible(noneSelected);
+        setControlVisible("LBL_PORT_BORD", noneSelected);
+        setControlVisible("LBL_PORTRAIT", noneSelected);
+        setControlVisible("LBL_TXTBAR", noneSelected);
     }
     _selectedSlot = slot;
 

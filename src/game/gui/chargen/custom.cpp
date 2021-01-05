@@ -47,7 +47,7 @@ void CustomCharacterGeneration::load() {
     doSetStep(0);
 
     if (_version == GameVersion::KotOR) {
-        configureControl("LBL_BG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+        setControlDiscardColor("LBL_BG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 

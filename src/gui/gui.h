@@ -61,6 +61,7 @@ public:
     void setControlFocusable(const std::string &tag, bool focusable);
     void setControlText(const std::string &tag, const std::string &text);
     void setControlVisible(const std::string &tag, bool visible);
+    void setControlDiscardColor(const std::string &tag, glm::vec3 color);
 
 protected:
     enum class ScalingMode {

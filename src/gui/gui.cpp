@@ -327,6 +327,10 @@ void GUI::setControlVisible(const string &tag, bool visible) {
     configureControl(tag, [&visible](Control &ctrl) { ctrl.setVisible(visible); });
 }
 
+void GUI::setControlDiscardColor(const string &tag, glm::vec3 color) {
+    configureControl(tag, [&color](Control & ctrl) { ctrl.setDiscardColor(color); });
+}
+
 Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),
