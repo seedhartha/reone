@@ -17,6 +17,8 @@
 
 #include "dialog.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 
 #include "../resource/resources.h"
@@ -40,6 +42,7 @@ void Dialog::load(const string &resRef, const GffStruct &dlg) {
     _skippable = dlg.getBool("Skippable");
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
+    _animatedCutscene = dlg.getBool("AnimatedCut");
 
     for (auto &entry : dlg.getList("EntryList")) {
         _entries.push_back(getEntryReply(*entry));
@@ -49,6 +52,9 @@ void Dialog::load(const string &resRef, const GffStruct &dlg) {
     }
     for (auto &entry : dlg.getList("StartingList")) {
         _startEntries.push_back(getEntryReplyLink(*entry));
+    }
+    for (auto &stunt : dlg.getList("StuntList")) {
+        _stunts.push_back(getStunt(*stunt));
     }
 }
 
@@ -86,12 +92,33 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     for (auto &link : gffs.getList("EntriesList")) {
         entry.entries.push_back(getEntryReplyLink(*link));
     }
+    for (auto &anim : gffs.getList("AnimList")) {
+        entry.animations.push_back(getParticipantAnimation(*anim));
+    }
 
     return move(entry);
 }
 
+Dialog::Stunt Dialog::getStunt(const GffStruct &gffs) const {
+    Stunt stunt;
+    stunt.participant = boost::to_lower_copy(gffs.getString("Participant"));
+    stunt.stuntModel = boost::to_lower_copy(gffs.getString("StuntModel"));
+    return move(stunt);
+}
+
+Dialog::ParticipantAnimation Dialog::getParticipantAnimation(const GffStruct &gffs) const {
+    ParticipantAnimation anim;
+    anim.participant = boost::to_lower_copy(gffs.getString("Participant"));
+    anim.animation = gffs.getInt("Animation");
+    return move(anim);
+}
+
 bool Dialog::isSkippable() const {
     return _skippable;
+}
+
+bool Dialog::isAnimatedCutscene() const {
+    return _animatedCutscene;
 }
 
 const string &Dialog::cameraModel() const {
@@ -108,6 +135,13 @@ const Dialog::EntryReply &Dialog::getEntry(int index) const {
 
 const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
+}
+
+const Dialog::Stunt &Dialog::getStunt(const string &participant) const {
+    for (auto &stunt : _stunts) {
+        if (stunt.participant == participant) return stunt;
+    }
+    throw logic_error("Stunt not found by participant: " + participant);
 }
 
 const string &Dialog::endScript() const {
