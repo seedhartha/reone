@@ -50,7 +50,7 @@ void LevelUpMenu::load() {
 }
 
 void LevelUpMenu::reset() {
-    const StaticCreatureBlueprint &character = _charGen->character();
+    StaticCreatureBlueprint &character = _charGen->character();
     int nextLevel = character.attributes().getAggregateLevel() + 1;
     _hasAttributes = nextLevel  % 4 == 0;
 

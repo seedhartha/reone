@@ -96,30 +96,29 @@ void CreatureBlueprint::loadName(Creature &creature) {
 
 void CreatureBlueprint::loadAttributes(Creature &creature) {
     CreatureAttributes &attributes = creature.attributes();
-
     for (auto &classGff : _utc->getList("ClassList")) {
         int clazz = classGff->getInt("Class");
         int level = classGff->getInt("ClassLevel");
         attributes.addClassLevels(static_cast<ClassType>(clazz), level);
     }
-    loadAbilities(attributes);
-    loadSkills(attributes);
+    loadAbilities(attributes.abilities());
+    loadSkills(attributes.skills());
 }
 
-void CreatureBlueprint::loadAbilities(CreatureAttributes &attributes) {
-    attributes.setAbilityScore(Ability::Strength, _utc->getInt("Str"));
-    attributes.setAbilityScore(Ability::Dexterity, _utc->getInt("Dex"));
-    attributes.setAbilityScore(Ability::Constitution, _utc->getInt("Con"));
-    attributes.setAbilityScore(Ability::Intelligence, _utc->getInt("Int"));
-    attributes.setAbilityScore(Ability::Wisdom, _utc->getInt("Wis"));
-    attributes.setAbilityScore(Ability::Charisma, _utc->getInt("Cha"));
+void CreatureBlueprint::loadAbilities(CreatureAbilities &abilities) {
+    abilities.setScore(Ability::Strength, _utc->getInt("Str"));
+    abilities.setScore(Ability::Dexterity, _utc->getInt("Dex"));
+    abilities.setScore(Ability::Constitution, _utc->getInt("Con"));
+    abilities.setScore(Ability::Intelligence, _utc->getInt("Int"));
+    abilities.setScore(Ability::Wisdom, _utc->getInt("Wis"));
+    abilities.setScore(Ability::Charisma, _utc->getInt("Cha"));
 }
 
-void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
-    vector<shared_ptr<GffStruct>> skills(_utc->getList("SkillList"));
-    for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
+void CreatureBlueprint::loadSkills(CreatureSkills &skills) {
+    vector<shared_ptr<GffStruct>> skillsUtc(_utc->getList("SkillList"));
+    for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        attributes.setSkillRank(skill, skills[i]->getInt("Rank"));
+        skills.setRank(skill, skillsUtc[i]->getInt("Rank"));
     }
 }
 
@@ -159,10 +158,6 @@ void StaticCreatureBlueprint::addEquippedItem(const string &resRef) {
     _equipment.push_back(resRef);
 }
 
-ClassType StaticCreatureBlueprint::getLatestClass() const {
-    return _attributes.getLatestClass();
-}
-
 Gender StaticCreatureBlueprint::gender() const {
     return _gender;
 }
@@ -171,7 +166,7 @@ int StaticCreatureBlueprint::appearance() const {
     return _appearance;
 }
 
-const CreatureAttributes &StaticCreatureBlueprint::attributes() const {
+CreatureAttributes &StaticCreatureBlueprint::attributes() {
     return _attributes;
 }
 

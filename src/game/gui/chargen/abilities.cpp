@@ -71,16 +71,19 @@ void CharGenAbilities::load() {
     disableControl("BTN_RECOMMENDED");
 }
 
-void CharGenAbilities::reset() {
-    _attributes = _charGen->character().attributes();
-    _attributes.setAbilityScore(Ability::Strength, 8);
-    _attributes.setAbilityScore(Ability::Dexterity, 8);
-    _attributes.setAbilityScore(Ability::Constitution, 8);
-    _attributes.setAbilityScore(Ability::Intelligence, 8);
-    _attributes.setAbilityScore(Ability::Wisdom, 8);
-    _attributes.setAbilityScore(Ability::Charisma, 8);
+void CharGenAbilities::reset(bool newGame) {
+    CreatureAttributes &attributes = _charGen->character().attributes();
+    _abilities = attributes.abilities();
+    _points = newGame ? kStartingPoints : 1;
 
-    _points = kStartingPoints;
+    if (newGame) {
+        _abilities.setScore(Ability::Strength, kMinAbilityScore);
+        _abilities.setScore(Ability::Dexterity, kMinAbilityScore);
+        _abilities.setScore(Ability::Constitution, kMinAbilityScore);
+        _abilities.setScore(Ability::Intelligence, kMinAbilityScore);
+        _abilities.setScore(Ability::Wisdom, kMinAbilityScore);
+        _abilities.setScore(Ability::Charisma, kMinAbilityScore);
+    }
 
     refreshControls();
 }
@@ -90,30 +93,30 @@ void CharGenAbilities::refreshControls() {
     setControlText("COST_POINTS_LBL", "");
     setControlText("LBL_ABILITY_MOD", "");
 
-    setControlVisible("STR_MINUS_BTN", _attributes.strength() > kMinAbilityScore);
-    setControlVisible("DEX_MINUS_BTN", _attributes.dexterity() > kMinAbilityScore);
-    setControlVisible("CON_MINUS_BTN", _attributes.constitution() > kMinAbilityScore);
-    setControlVisible("INT_MINUS_BTN", _attributes.intelligence() > kMinAbilityScore);
-    setControlVisible("WIS_MINUS_BTN", _attributes.wisdom() > kMinAbilityScore);
-    setControlVisible("CHA_MINUS_BTN", _attributes.charisma() > kMinAbilityScore);
+    setControlVisible("STR_MINUS_BTN", _abilities.strength() > kMinAbilityScore);
+    setControlVisible("DEX_MINUS_BTN", _abilities.dexterity() > kMinAbilityScore);
+    setControlVisible("CON_MINUS_BTN", _abilities.constitution() > kMinAbilityScore);
+    setControlVisible("INT_MINUS_BTN", _abilities.intelligence() > kMinAbilityScore);
+    setControlVisible("WIS_MINUS_BTN", _abilities.wisdom() > kMinAbilityScore);
+    setControlVisible("CHA_MINUS_BTN", _abilities.charisma() > kMinAbilityScore);
 
-    setControlText("STR_POINTS_BTN", to_string(_attributes.strength()));
-    setControlText("DEX_POINTS_BTN", to_string(_attributes.dexterity()));
-    setControlText("CON_POINTS_BTN", to_string(_attributes.constitution()));
-    setControlText("INT_POINTS_BTN", to_string(_attributes.intelligence()));
-    setControlText("WIS_POINTS_BTN", to_string(_attributes.wisdom()));
-    setControlText("CHA_POINTS_BTN", to_string(_attributes.charisma()));
+    setControlText("STR_POINTS_BTN", to_string(_abilities.strength()));
+    setControlText("DEX_POINTS_BTN", to_string(_abilities.dexterity()));
+    setControlText("CON_POINTS_BTN", to_string(_abilities.constitution()));
+    setControlText("INT_POINTS_BTN", to_string(_abilities.intelligence()));
+    setControlText("WIS_POINTS_BTN", to_string(_abilities.wisdom()));
+    setControlText("CHA_POINTS_BTN", to_string(_abilities.charisma()));
 
-    setControlVisible("STR_PLUS_BTN", _points >= getPointCost(Ability::Strength) && _attributes.strength() < kMaxAbilityScore);
-    setControlVisible("DEX_PLUS_BTN", _points >= getPointCost(Ability::Dexterity) && _attributes.dexterity() < kMaxAbilityScore);
-    setControlVisible("CON_PLUS_BTN", _points >= getPointCost(Ability::Constitution) && _attributes.constitution() < kMaxAbilityScore);
-    setControlVisible("INT_PLUS_BTN", _points >= getPointCost(Ability::Intelligence) && _attributes.intelligence() < kMaxAbilityScore);
-    setControlVisible("WIS_PLUS_BTN", _points >= getPointCost(Ability::Wisdom) && _attributes.wisdom() < kMaxAbilityScore);
-    setControlVisible("CHA_PLUS_BTN", _points >= getPointCost(Ability::Charisma) && _attributes.charisma() < kMaxAbilityScore);
+    setControlVisible("STR_PLUS_BTN", _points >= getPointCost(Ability::Strength) && _abilities.strength() < kMaxAbilityScore);
+    setControlVisible("DEX_PLUS_BTN", _points >= getPointCost(Ability::Dexterity) && _abilities.dexterity() < kMaxAbilityScore);
+    setControlVisible("CON_PLUS_BTN", _points >= getPointCost(Ability::Constitution) && _abilities.constitution() < kMaxAbilityScore);
+    setControlVisible("INT_PLUS_BTN", _points >= getPointCost(Ability::Intelligence) && _abilities.intelligence() < kMaxAbilityScore);
+    setControlVisible("WIS_PLUS_BTN", _points >= getPointCost(Ability::Wisdom) && _abilities.wisdom() < kMaxAbilityScore);
+    setControlVisible("CHA_PLUS_BTN", _points >= getPointCost(Ability::Charisma) && _abilities.charisma() < kMaxAbilityScore);
 }
 
 int CharGenAbilities::getPointCost(Ability ability) const {
-    return glm::clamp(_attributes.getAbilityModifier(ability), 1, 3);
+    return glm::clamp(_abilities.getModifier(ability), 1, 3);
 }
 
 static Ability getAbilityByAlias(const string &alias) {
@@ -131,21 +134,19 @@ void CharGenAbilities::onClick(const string &control) {
         _charGen->openSteps();
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
-        _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) - 1);
+        _abilities.setScore(ability, _abilities.getScore(ability) - 1);
         _points += getPointCost(ability);
         refreshControls();
     } else if (boost::ends_with(control, "_PLUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
         _points -= getPointCost(ability);
-        _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) + 1);
+        _abilities.setScore(ability, _abilities.getScore(ability) + 1);
         refreshControls();
     }
 }
 
 void CharGenAbilities::updateCharacter() {
-    StaticCreatureBlueprint blueprint(_charGen->character());
-    blueprint.setAttributes(_attributes);
-    _charGen->setCharacter(move(blueprint));
+    _charGen->setAbilities(_abilities);
 }
 
 } // namespace game

@@ -17,35 +17,30 @@
 
 #pragma once
 
-#include "../../rp/abilities.h"
+#include <map>
 
-#include "../gui.h"
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-class CharacterGeneration;
-
-class CharGenAbilities : public GameGUI {
+class CreatureAbilities {
 public:
-    CharGenAbilities(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    int getScore(Ability ability) const;
+    int getModifier(Ability ability) const;
 
-    void load() override;
+    int strength() const;
+    int dexterity() const;
+    int constitution() const;
+    int intelligence() const;
+    int wisdom() const;
+    int charisma() const;
 
-    void reset(bool newGame);
+    void setScore(Ability ability, int score);
 
 private:
-    CharacterGeneration *_charGen;
-    CreatureAbilities _abilities;
-    int _points { 0 };
-
-    void onClick(const std::string &control) override;
-
-    void refreshControls();
-    void updateCharacter();
-
-    int getPointCost(Ability ability) const;
+    std::map<Ability, int> _scores;
 };
 
 } // namespace game

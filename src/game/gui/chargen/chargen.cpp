@@ -256,13 +256,13 @@ void CharacterGeneration::openPortraitSelection() {
 }
 
 void CharacterGeneration::openAbilities() {
-    _abilities->reset();
+    _abilities->reset(_type != Type::LevelUp);
     hideControl("MODEL_LBL");
     changeScreen(CharGenScreen::Abilities);
 }
 
 void CharacterGeneration::openSkills() {
-    _skills->reset();
+    _skills->reset(_type != Type::LevelUp);
     hideControl("MODEL_LBL");
     changeScreen(CharGenScreen::Skills);
 }
@@ -329,6 +329,15 @@ void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
     updateAttributes();
 }
 
+void CharacterGeneration::setAbilities(CreatureAbilities abilities) {
+    _character->attributes().setAbilities(move(abilities));
+    updateAttributes();
+}
+
+void CharacterGeneration::setSkills(CreatureSkills skills) {
+    _character->attributes().setSkills(move(skills));
+}
+
 void CharacterGeneration::loadCharacterModel() {
     Control &lblModel = getControl("MODEL_LBL");
     const Control::Extent &extent = lblModel.extent();
@@ -369,23 +378,23 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->getLatestClass()));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->attributes().getEffectiveClass()));
     setControlText("LBL_CLASS", clazz->name());
 
-    CreatureAttributes attrs(_character->attributes());
+    const CreatureAbilities &abilities =  _character->attributes().abilities();
 
-    int vitality = clazz->hitdie() + attrs.getAbilityModifier(Ability::Constitution);
+    int vitality = clazz->hitdie() + abilities.getModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));
 
-    int defense = 10 + clazz->getDefenseBonus(1) + attrs.getAbilityModifier(Ability::Dexterity);
+    int defense = 10 + clazz->getDefenseBonus(1) + abilities.getModifier(Ability::Dexterity);
     setControlText("LBL_DEF", to_string(defense));
 
-    setControlText("STR_AB_LBL", to_string(attrs.strength()));
-    setControlText("DEX_AB_LBL", to_string(attrs.dexterity()));
-    setControlText("CON_AB_LBL", to_string(attrs.constitution()));
-    setControlText("INT_AB_LBL", to_string(attrs.intelligence()));
-    setControlText("WIS_AB_LBL", to_string(attrs.wisdom()));
-    setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
+    setControlText("STR_AB_LBL", to_string(abilities.strength()));
+    setControlText("DEX_AB_LBL", to_string(abilities.dexterity()));
+    setControlText("CON_AB_LBL", to_string(abilities.constitution()));
+    setControlText("INT_AB_LBL", to_string(abilities.intelligence()));
+    setControlText("WIS_AB_LBL", to_string(abilities.wisdom()));
+    setControlText("CHA_AB_LBL", to_string(abilities.charisma()));
 }
 
 void CharacterGeneration::goToNextStep() {
@@ -402,7 +411,7 @@ void CharacterGeneration::goToNextStep() {
     }
 }
 
-const StaticCreatureBlueprint &CharacterGeneration::character() const {
+StaticCreatureBlueprint &CharacterGeneration::character() {
     return *_character;
 }
 
