@@ -276,12 +276,12 @@ void applyShadows(vec3 normal, inout vec3 color) {
         vec3 projCoords = 0.5 * (lightSpacePos.xyz / lightSpacePos.w) + 0.5;
         if (projCoords.z > 1.0) continue;
 
-        float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
-        float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
         float closestDepth = getShadowmapDepth(i, projCoords.xy);
         float currentDepth = projCoords.z;
 
         if (currentDepth > closestDepth) {
+            float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
+            float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
             color *= 1.0 - shadow;
         }
     }
