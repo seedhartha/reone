@@ -140,7 +140,7 @@ void PortraitSelection::onClick(const string &control) {
     } else if (control == "BTN_ACCEPT") {
         StaticCreatureBlueprint character(_charGen->character());
         int appearance;
-        switch (character.getLatestClass()) {
+        switch (character.attributes().getEffectiveClass()) {
             case ClassType::Scoundrel:
                 appearance = _portraits[_currentPortrait].appearanceS;
                 break;

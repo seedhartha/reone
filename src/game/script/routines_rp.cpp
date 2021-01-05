@@ -76,7 +76,7 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
         return 0;
     }
     Skill skill = static_cast<Skill>(getInt(args, 0));
-    return creature->attributes().hasSkill(skill) ? 1 : 0;
+    return creature->attributes().skills().contains(skill) ? 1 : 0;
 }
 
 Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionContext &ctx) {
@@ -230,7 +230,7 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
     }
     Ability type = static_cast<Ability>(getInt(args, 1));
 
-    return creature->attributes().getAbilityScore(type);
+    return creature->attributes().abilities().getScore(type);
 }
 
 Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContext &ctx) {
@@ -252,7 +252,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
     }
     Skill skill = static_cast<Skill>(getInt(args, 0));
 
-    return object->attributes().getSkillRank(skill);
+    return object->attributes().skills().getRank(skill);
 }
 
 Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {

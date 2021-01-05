@@ -437,11 +437,13 @@ set(GAME_HEADERS
     src/game/portrait.h
     src/game/portraitutil.h
     src/game/room.h
+    src/game/rp/abilities.h
     src/game/rp/attributes.h
     src/game/rp/class.h
     src/game/rp/classes.h
     src/game/rp/damageresolver.h
     src/game/rp/factionutil.h
+    src/game/rp/skills.h
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
@@ -533,11 +535,13 @@ set(GAME_SOURCES
     src/game/player.cpp
     src/game/portraitutil.cpp
     src/game/room.cpp
+    src/game/rp/abilities.cpp
     src/game/rp/attributes.cpp
     src/game/rp/class.cpp
     src/game/rp/classes.cpp
     src/game/rp/damageresolver.cpp
     src/game/rp/factionutil.cpp
+    src/game/rp/skills.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

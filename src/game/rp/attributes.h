@@ -17,29 +17,26 @@
 
 #pragma once
 
-#include <map>
-#include <utility>
 #include <vector>
 
+#include "abilities.h"
+#include "skills.h"
 #include "types.h"
 
 namespace reone {
 
 namespace game {
 
+/**
+ * Aggregate for creature role-playing attributes: classes, abilities, skills,
+ * feats and Force Powers.
+ */
 class CreatureAttributes {
 public:
-    /**
-     * @return the sum of (level * hitdie) of all classes
-     */
-    int getAggregateHitDie() const;
-
-    // Classes
-
     void addClassLevels(ClassType clazz, int levels);
 
     ClassType getClassByPosition(int position) const;
-    ClassType getLatestClass() const;
+    ClassType getEffectiveClass() const;
     int getLevelByPosition(int position) const;
     int getClassLevel(ClassType clazz) const;
 
@@ -48,47 +45,21 @@ public:
      */
     int getAggregateLevel() const;
 
-    // END Classes
+    /**
+    * @return the sum of (level * hitdie) of all classes
+    */
+    int getAggregateHitDie() const;
 
-    // Abilities
+    CreatureAbilities &abilities();
+    CreatureSkills &skills();
 
-    int getAbilityScore(Ability ability) const;
-    int getAbilityModifier(Ability ability) const;
-
-    int strength() const;
-    int dexterity() const;
-    int constitution() const;
-    int intelligence() const;
-    int wisdom() const;
-    int charisma() const;
-
-    void setAbilityScore(Ability ability, int score);
-
-    // END Abilities
-
-    // Skills
-
-    bool hasSkill(Skill skill) const;
-
-    int getSkillRank(Skill skill) const;
-
-    int computerUse() const;
-    int demolitions() const;
-    int stealth() const;
-    int awareness() const;
-    int persuade() const;
-    int repair() const;
-    int security() const;
-    int treatInjury() const;
-
-    void setSkillRank(Skill ability, int rank);
-
-    // END Skills
+    void setAbilities(CreatureAbilities abilities);
+    void setSkills(CreatureSkills skills);
 
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
-    std::map<Ability, int> _abilities;
-    std::map<Skill, int> _skills;
+    CreatureAbilities _abilities;
+    CreatureSkills _skills;
 };
 
 } // namespace game

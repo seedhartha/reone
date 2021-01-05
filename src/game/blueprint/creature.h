@@ -54,8 +54,8 @@ private:
 
     void loadName(Creature &creature);
     void loadAttributes(Creature &creature);
-    void loadAbilities(CreatureAttributes &attributes);
-    void loadSkills(CreatureAttributes &attributes);
+    void loadAbilities(CreatureAbilities &abilities);
+    void loadSkills(CreatureSkills &skills);
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
 };
@@ -70,11 +70,9 @@ public:
     void clearEquipment();
     void addEquippedItem(const std::string &resRef);
 
-    ClassType getLatestClass() const;
-
     Gender gender() const;
     int appearance() const;
-    const CreatureAttributes &attributes() const;
+    CreatureAttributes &attributes();
 
     void setGender(Gender gender);
     void setAppearance(int appearance);

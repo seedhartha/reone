@@ -92,9 +92,11 @@ public:
 
     void goToNextStep();
 
-    const StaticCreatureBlueprint &character() const;
+    StaticCreatureBlueprint &character();
 
     void setCharacter(StaticCreatureBlueprint character);
+    void setAbilities(CreatureAbilities abilities);
+    void setSkills(CreatureSkills skills);
 
 private:
     Game *_game { nullptr };
