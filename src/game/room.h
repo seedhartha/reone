@@ -43,11 +43,12 @@ public:
     void removeTenant(SpatialObject *object);
     void update(float dt);
 
+    bool isVisible() const;
+
     const std::string &name() const;
     const glm::vec3 &position() const;
     std::shared_ptr<scene::ModelSceneNode> model() const;
     const render::Walkmesh *walkmesh() const;
-    bool visible() const;
 
     void setVisible(bool visible);
 

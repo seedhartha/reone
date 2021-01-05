@@ -164,7 +164,7 @@ private:
     Pathfinder _pathfinder;
     std::string _name;
     RoomMap _rooms;
-    std::unique_ptr<resource::Visibility> _visibility;
+    resource::Visibility _visibility;
     CameraStyle _camStyleDefault;
     CameraStyle _camStyleCombat;
     std::string _music;
@@ -219,6 +219,13 @@ private:
     void updateVisibility();
     void updateSounds();
     void updateHeartbeat(float dt);
+
+    /**
+     * Certain VIS files in the original game have a bug: room A is visible from
+     * room B, but room B is not visible from room A. This function makes room
+     * relations symmetric.
+     */
+    resource::Visibility fixVisibility(const resource::Visibility &visiblity);
 
     void printDebugInfo(const SpatialObject &object);
 
