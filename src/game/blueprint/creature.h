@@ -70,20 +70,18 @@ public:
     void clearEquipment();
     void addEquippedItem(const std::string &resRef);
 
-    ClassType getClass() const;
+    ClassType getLatestClass() const;
 
     Gender gender() const;
     int appearance() const;
     const CreatureAttributes &attributes() const;
 
     void setGender(Gender gender);
-    void setClass(ClassType clazz);
     void setAppearance(int appearance);
     void setAttributes(CreatureAttributes attributes);
 
 private:
     Gender _gender { Gender::Male };
-    ClassType _class { ClassType::Soldier };
     int _appearance { 0 };
     CreatureAttributes _attributes;
     std::vector<std::string> _equipment;

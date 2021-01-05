@@ -46,7 +46,7 @@ Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) 
         warn("Routines: getGender: creature is invalid");
         return static_cast<int>(Gender::None);
     }
-    return static_cast<int>(creature->attributes().getHitDice());
+    return static_cast<int>(creature->attributes().getAggregateLevel());
 }
 
 Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContext &ctx) {

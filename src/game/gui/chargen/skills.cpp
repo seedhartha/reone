@@ -75,8 +75,16 @@ void CharGenSkills::load() {
 
 void CharGenSkills::reset() {
     _attributes = _charGen->character().attributes();
+    _attributes.setSkillRank(Skill::ComputerUse, 0);
+    _attributes.setSkillRank(Skill::Demolitions, 0);
+    _attributes.setSkillRank(Skill::Stealth, 0);
+    _attributes.setSkillRank(Skill::Awareness, 0);
+    _attributes.setSkillRank(Skill::Persuade, 0);
+    _attributes.setSkillRank(Skill::Repair, 0);
+    _attributes.setSkillRank(Skill::Security, 0);
+    _attributes.setSkillRank(Skill::TreatInjury, 0);
 
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_charGen->character().getClass()));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_charGen->character().getLatestClass()));
     _points = glm::max(4, (clazz->skillPointBase() + _attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
     refreshControls();
@@ -114,7 +122,7 @@ void CharGenSkills::refreshControls() {
 }
 
 bool CharGenSkills::canIncreaseSkill(Skill skill) const {
-    ClassType clazz = _charGen->character().getClass();
+    ClassType clazz = _charGen->character().getLatestClass();
 
     shared_ptr<CreatureClass> creatureClass(Classes::instance().get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
@@ -158,7 +166,7 @@ void CharGenSkills::updateCharacter() {
 }
 
 int CharGenSkills::getPointCost(Skill skill) const {
-    ClassType clazz = _charGen->character().getClass();
+    ClassType clazz = _charGen->character().getLatestClass();
     shared_ptr<CreatureClass> creatureClass(Classes::instance().get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }

@@ -17,6 +17,8 @@
 
 #include "levelup.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../../game.h"
 
 #include "../colorutil.h"
@@ -47,9 +49,34 @@ void LevelUpMenu::load() {
     }
 }
 
+void LevelUpMenu::reset() {
+    const StaticCreatureBlueprint &character = _charGen->character();
+    int nextLevel = character.attributes().getAggregateLevel() + 1;
+    _hasAttributes = nextLevel  % 4 == 0;
+
+    // TODO: feats and Force Powers are not yet implemented
+
+    setControlVisible("LBL_1", _hasAttributes);
+    setControlVisible("LBL_3", false);
+    setControlVisible("LBL_4", false);
+    setControlVisible("LBL_NUM1", _hasAttributes);
+    setControlVisible("LBL_NUM3", false);
+    setControlVisible("LBL_NUM4", false);
+    setControlVisible("BTN_STEPNAME1", _hasAttributes);
+    setControlVisible("BTN_STEPNAME3", false);
+    setControlVisible("BTN_STEPNAME4", false);
+}
+
 void LevelUpMenu::goToNextStep() {
-    if (_step < 5) {
-        doSetStep(_step + 1);
+    switch (_step) {
+        case 0:
+            doSetStep(1);
+            break;
+        case 1:
+            doSetStep(4);
+            break;
+        default:
+            break;
     }
 }
 
@@ -104,6 +131,19 @@ void LevelUpMenu::doSetStep(int step) {
 void LevelUpMenu::onClick(const std::string &control) {
     if (control == "BTN_BACK") {
         _charGen->cancel();
+    } else if (boost::starts_with(control, "BTN_STEPNAME")) {
+        int step = control[12] - '0';
+        switch (step) {
+            case 1:
+                _charGen->openAbilities();
+                break;
+            case 2:
+                _charGen->openSkills();
+                break;
+            default:
+                _charGen->finish();
+                break;
+        }
     }
 }
 

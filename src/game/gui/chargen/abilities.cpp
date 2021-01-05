@@ -72,6 +72,7 @@ void CharGenAbilities::load() {
 }
 
 void CharGenAbilities::reset() {
+    _attributes = _charGen->character().attributes();
     _attributes.setAbilityScore(Ability::Strength, 8);
     _attributes.setAbilityScore(Ability::Dexterity, 8);
     _attributes.setAbilityScore(Ability::Constitution, 8);
