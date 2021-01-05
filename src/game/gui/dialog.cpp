@@ -28,6 +28,7 @@
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
+#include "../../render/models.h"
 #include "../../resource/resources.h"
 #include "../../script/execution.h"
 
@@ -144,6 +145,7 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
 
     loadAnimatedCamera();
     loadStartEntry();
+    loadStuntModels();
 }
 
 void DialogGUI::loadAnimatedCamera() {
@@ -356,6 +358,13 @@ void DialogGUI::scheduleEndOfEntry() {
         return;
     }
     _endEntryTimeout = kDefaultEntryDuration;
+}
+
+void DialogGUI::loadStuntModels() {
+    _stuntByParticipant.clear();
+    for (auto &stunt : _dialog->stunts()) {
+        _stuntByParticipant.insert(make_pair(stunt.participant, Models::instance().get(stunt.stuntModel)));
+    }
 }
 
 void DialogGUI::pickReply(uint32_t index) {

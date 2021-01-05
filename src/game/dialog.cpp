@@ -137,11 +137,8 @@ const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
 }
 
-const Dialog::Stunt &Dialog::getStunt(const string &participant) const {
-    for (auto &stunt : _stunts) {
-        if (stunt.participant == participant) return stunt;
-    }
-    throw logic_error("Stunt not found by participant: " + participant);
+const vector<Dialog::Stunt> &Dialog::stunts() const {
+    return _stunts;
 }
 
 const string &Dialog::endScript() const {

@@ -56,6 +56,7 @@ private:
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundHandle> _currentVoice;
     std::shared_ptr<SpatialObject> _currentSpeaker;
+    std::map<std::string, std::shared_ptr<render::Model>> _stuntByParticipant;
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
     float _endEntryTimeout { 0.0f };
@@ -67,11 +68,6 @@ private:
     void configureReplies();
     void endCurrentEntry();
     void finish();
-    void loadAnimatedCamera();
-    void loadCurrentEntry();
-    void loadCurrentSpeaker();
-    void loadReplies();
-    void loadStartEntry();
     void playVoiceOver();
     void scheduleEndOfEntry();
     void updateCamera();
@@ -90,6 +86,13 @@ private:
 
     void loadTopFrame();
     void loadBottomFrame();
+
+    void loadAnimatedCamera();
+    void loadCurrentEntry();
+    void loadCurrentSpeaker();
+    void loadReplies();
+    void loadStartEntry();
+    void loadStuntModels();
 
     // END Loading
 };

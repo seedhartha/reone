@@ -73,11 +73,12 @@ public:
     bool isSkippable() const;
     bool isAnimatedCutscene() const;
 
-    const std::string &cameraModel() const;
-    const std::vector<EntryReplyLink> &startEntries() const;
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
-    const Stunt &getStunt(const std::string &participant) const;
+
+    const std::string &cameraModel() const;
+    const std::vector<EntryReplyLink> &startEntries() const;
+    const std::vector<Stunt> &stunts() const;
     const std::string &endScript() const;
 
 private:
