@@ -77,11 +77,9 @@ void CurFile::loadData() {
     Texture::Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    _texture = make_shared<Texture>("", TextureType::Cursor);
-    _texture->_width = mipMap.width;
-    _texture->_height = mipMap.height;
-    _texture->_pixelFormat = PixelFormat::BGRA;
-    _texture->_layers.push_back(move(layer));
+    _texture = make_shared<Texture>("", TextureType::Cursor, _width, _width);
+    _texture->init();
+    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
 }
 
 shared_ptr<Texture> CurFile::texture() {
