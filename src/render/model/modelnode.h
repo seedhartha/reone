@@ -54,6 +54,8 @@ public:
 
     void initGL();
 
+    bool isSelfIllumEnabled() const;
+
     bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
     const glm::vec3 &getCenterOfAABB() const;
@@ -68,7 +70,6 @@ public:
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
     const glm::vec3 &color() const;
-    bool isSelfIllumEnabled() const;
     const glm::vec3 &selfIllumColor() const;
     float alpha() const;
     float radius() const;

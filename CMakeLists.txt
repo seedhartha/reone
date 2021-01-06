@@ -247,7 +247,6 @@ endif()
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/scene/node/aabbnode.h
     src/scene/node/cameranode.h
     src/scene/node/cubenode.h
     src/scene/node/lightnode.h
@@ -260,7 +259,6 @@ set(SCENE_HEADERS
     src/scene/scenenodeanimator.h)
 
 set(SCENE_SOURCES
-    src/scene/node/aabbnode.cpp
     src/scene/node/cameranode.cpp
     src/scene/node/cubenode.cpp
     src/scene/node/lightnode.cpp

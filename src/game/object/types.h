@@ -21,6 +21,8 @@ namespace reone {
 
 namespace game {
 
+static const char kObjectTagPlayer[] = "player";
+
 enum class ObjectType {
     Creature = 1,
     Item = 2,
@@ -41,7 +43,7 @@ enum class ObjectType {
     Invalid = 0x7fff
 };
 
-enum class Animation {
+enum class AnimationType {
     // Looping
 
     LoopingPause = 0,

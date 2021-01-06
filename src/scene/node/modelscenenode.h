@@ -45,6 +45,12 @@ public:
     std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
+    void refreshAABB();
+
+    bool hasTextureOverride() const;
+    bool isVisible() const;
+    bool isOnScreen() const;
+
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
@@ -53,10 +59,7 @@ public:
 
     const std::string &name() const;
     std::shared_ptr<render::Model> model() const;
-    bool hasTextureOverride() const;
     std::shared_ptr<render::Texture> textureOverride() const;
-    bool isVisible() const;
-    bool isOnScreen() const;
     float alpha() const;
     const AABB &aabb() const;
 
@@ -69,6 +72,7 @@ public:
 
     void playDefaultAnimation();
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
 
     bool isAnimationFinished() const;
 
@@ -99,10 +103,10 @@ private:
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };
-    bool _drawAABB { false };
     bool _lightingEnabled { false };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
+    AABB _aabb;
 
     void initModelNodes();
     std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;

@@ -778,7 +778,7 @@ void Area::updateVisibility() {
         glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
         float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
         float drawDistance = object->drawDistance();
-        bool onScreen = distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb);
+        bool onScreen = distanceToCamera < drawDistance && (object->isStuntMode() || cameraNode->isInFrustum(aabb));
         model->setOnScreen(onScreen);
     }
 }

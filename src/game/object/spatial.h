@@ -54,7 +54,7 @@ public:
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);
 
-    virtual void playAnimation(Animation animation, float speed);
+    virtual void playAnimation(AnimationType animation, float speed);
 
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
@@ -104,6 +104,22 @@ public:
 
     // END Effects
 
+    // Stunt mode
+
+    bool isStuntMode() const;
+
+    /**
+     * Places this object into the stunt mode. Objects in this mode have their
+     * position and orientation fixed to the world origin. Subsequent changes to
+     * position and orientation will be buffered and applied when
+     * stopStuntMode is called.
+     */
+    void startStuntMode();
+
+    void stopStuntMode();
+
+    // END Stunt mode
+
 protected:
     struct AppliedEffect {
         std::shared_ptr<Effect> effect;
@@ -126,6 +142,7 @@ protected:
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<AppliedEffect> _effects;
     bool _open { false };
+    bool _stunt { false };
 
     SpatialObject(
         uint32_t id,
@@ -136,7 +153,7 @@ protected:
 
     virtual void updateTransform();
 
-    bool isAnimationLooping(Animation animation) const;
+    bool isAnimationLooping(AnimationType animation) const;
 
 private:
     int _itemIndex { 0 };

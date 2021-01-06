@@ -50,18 +50,18 @@ CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) :
     }
 }
 
-string CreatureAnimationResolver::getAnimationName(Animation animation) const {
+string CreatureAnimationResolver::getAnimationName(AnimationType animation) const {
     static string empty;
 
     string result;
     switch (animation) {
-        case Animation::LoopingDead:
+        case AnimationType::LoopingDead:
             return getDeadAnimation();
-        case Animation::LoopingPause:
+        case AnimationType::LoopingPause:
             return getPauseAnimation();
-        case Animation::LoopingUnlockDoor:
+        case AnimationType::LoopingUnlockDoor:
             return getUnlockDoorAnimation();
-        case Animation::LoopingTalkNormal:
+        case AnimationType::LoopingTalkNormal:
             return getTalkNormalAnimation();
         default:
             return empty;

@@ -305,7 +305,7 @@ void CharacterGeneration::finish() {
 
         shared_ptr<Creature> player(_game->objectFactory().newCreature());
         player->load(character);
-        player->setTag("PLAYER");
+        player->setTag(kObjectTagPlayer);
         player->setFaction(Faction::Friendly1);
         player->setImmortal(true);
 

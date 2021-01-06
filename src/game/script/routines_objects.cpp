@@ -459,7 +459,7 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
 Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (caller) {
-        Animation animation = static_cast<Animation>(getInt(args, 0));
+        AnimationType animation = static_cast<AnimationType>(getInt(args, 0));
         float speed = getFloat(args, 1, 1.0f);
         float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
         caller->playAnimation(animation, speed);

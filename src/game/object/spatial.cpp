@@ -187,15 +187,15 @@ void SpatialObject::updateEffects(float dt) {
     }
 }
 
-void SpatialObject::playAnimation(Animation animation, float speed) {
+void SpatialObject::playAnimation(AnimationType animation, float speed) {
 }
 
-bool SpatialObject::isAnimationLooping(Animation animation) const {
+bool SpatialObject::isAnimationLooping(AnimationType animation) const {
     int ordinal = static_cast<int>(animation);
 
     return
-        animation == Animation::LoopingChoke ||
-        (ordinal >= static_cast<int>(Animation::LoopingPause) && ordinal <= static_cast<int>(Animation::LoopingMeditateStand));
+        animation == AnimationType::LoopingChoke ||
+        (ordinal >= static_cast<int>(AnimationType::LoopingPause) && ordinal <= static_cast<int>(AnimationType::LoopingMeditateStand));
 }
 
 bool SpatialObject::isSelectable() const {
@@ -277,7 +277,7 @@ void SpatialObject::updateTransform() {
     if (_facing != 0.0f) {
         _transform *= glm::eulerAngleZ(_facing);
     }
-    if (_model) {
+    if (_model && !_stunt) {
         _model->setLocalTransform(_transform);
     }
 }
@@ -315,6 +315,26 @@ void SpatialObject::clearAllEffects() {
 }
 
 void SpatialObject::die() {
+}
+
+bool SpatialObject::isStuntMode() const {
+    return _stunt;
+}
+
+void SpatialObject::startStuntMode() {
+    if (_model) {
+        _model->setLocalTransform(glm::mat4(1.0f));
+    }
+    _stunt = true;
+}
+
+void SpatialObject::stopStuntMode() {
+    if (!_stunt) return;
+
+    if (_model) {
+        _model->setLocalTransform(_transform);
+    }
+    _stunt = false;
 }
 
 } // namespace game
