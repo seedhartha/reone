@@ -139,9 +139,11 @@ enum class AnimationType {
     PlaceableAnimloop07 = 210,
     PlaceableAnimloop08 = 211,
     PlaceableAnimloop09 = 212,
-    PlaceableAnimloop10 = 213
+    PlaceableAnimloop10 = 213,
 
     // END Placeable
+
+    Invalid = 32767
 };
 
 enum class CombatAnimation {

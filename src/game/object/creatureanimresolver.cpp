@@ -21,6 +21,8 @@
 
 #include <boost/format.hpp>
 
+#include "../../common/log.h"
+
 #include "creature.h"
 
 using namespace std;
@@ -29,20 +31,26 @@ namespace reone {
 
 namespace game {
 
-static string g_animDieCreature("cdie");
-static string g_animDieCharacter("die");
-static string g_animDeadCreature("cdead");
 static string g_animDeadCharacter("dead");
-static string g_animPauseCreature("cpause1");
-static string g_animPauseCharacter("pause1");
-static string g_animWalkCreature("cwalk");
-static string g_animWalkCharacter("walk");
-static string g_animRunCreature("crun");
-static string g_animRunCharacter("run");
-static string g_animTalk("talk");
-static string g_animTalkNormal("tlknorm");
+static string g_animDeadCreature("cdead");
+static string g_animDieCharacter("die");
+static string g_animDieCreature("cdie");
 static string g_animGreeting("greeting");
+static string g_animPauseCharacter("pause1");
+static string g_animPauseCreature("cpause1");
+static string g_animRunCharacter("run");
+static string g_animRunCreature("crun");
+static string g_animTalk("talk");
+static string g_animTalkForceful("tlkforce");
+static string g_animTalkInjured("talkinj");
+static string g_animTalkLaughing("tlklaugh");
+static string g_animTalkNormal("tlknorm");
+static string g_animTalkPleading("tlkplead");
+static string g_animTalkSad("tlksad");
 static string g_animUnlockDoor("unlockdr");
+static string g_animVictory("victory");
+static string g_animWalkCharacter("walk");
+static string g_animWalkCreature("cwalk");
 
 CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) : _creature(creature) {
     if (!creature) {
@@ -55,15 +63,89 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
 
     string result;
     switch (animation) {
-        case AnimationType::LoopingDead:
-            return getDeadAnimation();
         case AnimationType::LoopingPause:
             return getPauseAnimation();
-        case AnimationType::LoopingUnlockDoor:
-            return getUnlockDoorAnimation();
+        case AnimationType::LoopingTalkSad:
+            return g_animTalkSad;
         case AnimationType::LoopingTalkNormal:
-            return getTalkNormalAnimation();
+            return g_animTalkNormal;
+        case AnimationType::LoopingTalkPleading:
+            return g_animTalkPleading;
+        case AnimationType::LoopingTalkForceful:
+            return g_animTalkForceful;
+        case AnimationType::LoopingTalkLaughing:
+            return g_animTalkLaughing;
+        case AnimationType::LoopingDead:
+            return getDeadAnimation();
+        case AnimationType::LoopingTalkInjured:
+            return g_animTalkInjured;
+        case AnimationType::LoopingUnlockDoor:
+            return g_animUnlockDoor;
+        case AnimationType::FireForgetVictory1:
+            return g_animVictory;
+
+        case AnimationType::LoopingPause2:
+        case AnimationType::LoopingListen:
+        case AnimationType::LoopingMeditate:
+        case AnimationType::LoopingWorship:
+        case AnimationType::LoopingGetLow:
+        case AnimationType::LoopingGetMid:
+        case AnimationType::LoopingPauseTired:
+        case AnimationType::LoopingPauseDrunk:
+        case AnimationType::LoopingFlirt:
+        case AnimationType::LoopingUseComputer:
+        case AnimationType::LoopingDance:
+        case AnimationType::LoopingDance1:
+        case AnimationType::LoopingHorror:
+        case AnimationType::LoopingReady:
+        case AnimationType::LoopingDeactivate:
+        case AnimationType::LoopingSpasm:
+        case AnimationType::LoopingSleep:
+        case AnimationType::LoopingProne:
+        case AnimationType::LoopingPause3:
+        case AnimationType::LoopingWeld:
+        case AnimationType::LoopingListenInjured:
+        case AnimationType::LoopingTreatInjured:
+        case AnimationType::LoopingDeadProne:
+        case AnimationType::LoopingKneelTalkAngry:
+        case AnimationType::LoopingKneelTalkSad:
+        case AnimationType::LoopingCheckBody:
+        case AnimationType::LoopingSitAndMeditate:
+        case AnimationType::LoopingSitChair:
+        case AnimationType::LoopingSitChairDrink:
+        case AnimationType::LoopingSitChairPazak:
+        case AnimationType::LoopingSitChairComp1:
+        case AnimationType::LoopingSitChairComp2:
+        case AnimationType::LoopingRage:
+        case AnimationType::LoopingClosed:
+        case AnimationType::LoopingStealth:
+        case AnimationType::LoopingChokeWorking:
+        case AnimationType::LoopingMeditateStand:
+        case AnimationType::LoopingChoke:
+        case AnimationType::FireForgetHeadTurnLeft:
+        case AnimationType::FireForgetHeadTurnRight:
+        case AnimationType::FireForgetPauseScratchHead:
+        case AnimationType::FireForgetPauseBored:
+        case AnimationType::FireForgetSalute:
+        case AnimationType::FireForgetBow:
+        case AnimationType::FireForgetGreeting:
+        case AnimationType::FireForgetTaunt:
+        case AnimationType::FireForgetVictory2:
+        case AnimationType::FireForgetVictory3:
+        case AnimationType::FireForgetInject:
+        case AnimationType::FireForgetUseComputer:
+        case AnimationType::FireForgetPersuade:
+        case AnimationType::FireForgetActivate:
+        case AnimationType::FireForgetThrowHigh:
+        case AnimationType::FireForgetThrowLow:
+        case AnimationType::FireForgetCustom01:
+        case AnimationType::FireForgetTreatInjured:
+        case AnimationType::FireForgetForceCast:
+        case AnimationType::FireForgetOpen:
+        case AnimationType::FireForgetDiveRoll:
+        case AnimationType::FireForgetScream:
         default:
+            warn("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(animation)));
             return empty;
     }
 }
@@ -160,10 +242,6 @@ string CreatureAnimationResolver::getRunAnimation() const {
     }
 
     return g_animRunCharacter;
-}
-
-string CreatureAnimationResolver::getUnlockDoorAnimation() const {
-    return g_animUnlockDoor;
 }
 
 string CreatureAnimationResolver::getTalkNormalAnimation() const {

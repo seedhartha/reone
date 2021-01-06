@@ -86,6 +86,7 @@ private:
     glm::vec3 getTalkPosition(const SpatialObject &object) const;
     DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
+    AnimationType getAnimationType(int ordinal) const;
 
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
@@ -104,8 +105,8 @@ private:
 
     // Participants
 
-    void loadParticipants();
-    void releaseParticipants();
+    void loadStuntParticipants();
+    void releaseStuntParticipants();
 
     // END Participants
 };
