@@ -251,7 +251,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
 
-        border.fill->bind(0);
+        setActiveTextureUnit(0);
+        border.fill->bind();
 
         bool additive = border.fill->isAdditive();
         if (additive) {
@@ -266,7 +267,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        border.edge->bind(0);
+        setActiveTextureUnit(0);
+        border.edge->bind();
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -341,7 +343,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        border.corner->bind(0);
+        setActiveTextureUnit(0);
+        border.corner->bind();
 
         // Top left corner
         {

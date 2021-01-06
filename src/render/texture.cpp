@@ -197,8 +197,11 @@ void Texture::refresh2D() {
     }
 }
 
-void Texture::bind(int unit) {
-    glActiveTexture(GL_TEXTURE0 + unit);
+void Texture::bind() {
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
+}
+
+void Texture::unbind() {
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 

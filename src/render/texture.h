@@ -64,7 +64,8 @@ public:
 
     void clearPixels(PixelFormat format);
 
-    void bind(int unit);
+    void bind();
+    void unbind();
 
     bool isAdditive() const;
 

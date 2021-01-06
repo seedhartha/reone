@@ -25,6 +25,7 @@
 #include "mesh/quad.h"
 #include "shaders.h"
 #include "texture.h"
+#include "util.h"
 
 using namespace std;
 
@@ -53,7 +54,8 @@ void Cursor::render() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    texture->bind(0);
+    setActiveTextureUnit(0);
+    texture->bind();
 
     Quad::getDefault().renderTriangles();
 }
