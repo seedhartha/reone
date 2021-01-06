@@ -76,9 +76,6 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
             texture = tga.texture();
         }
     }
-    if (texture) {
-        texture->initGL();
-    }
 
     return move(texture);
 }

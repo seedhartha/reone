@@ -60,26 +60,18 @@ void TgaFile::doLoad() {
 }
 
 void TgaFile::loadTexture() {
-    int finalSize = 4 * _width * _height;
-
-    _texture = make_shared<Texture>(_resRef, _texType);
-    _texture->_width = _width;
-    _texture->_height = _height;
-    _texture->_pixelFormat = PixelFormat::BGRA;
-    _texture->_layers.resize(1);
-
-    Texture::Layer &layer = _texture->_layers.front();
-    layer.mipMaps.resize(1);
-
-    Texture::MipMap &mipMap = layer.mipMaps.front();
+    Texture::MipMap mipMap;
     mipMap.width = _width;
     mipMap.height = _height;
-    mipMap.data.resize(finalSize);
+
+    int sizeRgba = 4 * _width * _height;
 
     if (_imageType == ImageType::Grayscale) {
+        mipMap.data.resize(sizeRgba);
+        char *pi = &mipMap.data[0];
+
         int size = _width * _height;
         ByteArray buf(_reader->getArray<char>(size));
-        char *pi = &mipMap.data[0];
 
         for (int i = 0; i < size; ++i) {
             pi[0] = buf[i];
@@ -89,10 +81,16 @@ void TgaFile::loadTexture() {
             pi += 4;
         }
     } else {
-        ByteArray data(_reader->getArray<char>(finalSize));
+        ByteArray data(_reader->getArray<char>(sizeRgba));
         mipMap.data = move(data);
     }
 
+    Texture::Layer layer;
+    layer.mipMaps.push_back(move(mipMap));
+
+    _texture = make_shared<Texture>(_resRef, _texType, _width, _height);
+    _texture->init();
+    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
 }
 
 shared_ptr<Texture> TgaFile::texture() const {

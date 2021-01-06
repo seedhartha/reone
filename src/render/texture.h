@@ -37,28 +37,8 @@ enum class PixelFormat {
     DXT5
 };
 
-class CurFile;
-class TgaFile;
-class TpcFile;
-
 class Texture {
 public:
-    Texture(const std::string &name, TextureType type);
-    ~Texture();
-
-    void initGL();
-    void deinitGL();
-    void bind(int unit);
-
-    bool isAdditive() const;
-
-    const std::string &name() const;
-    int width() const;
-    int height() const;
-    PixelFormat pixelFormat() const;
-    const TextureFeatures &features() const;
-
-private:
     struct MipMap {
         int width { 0 };
         int height { 0 };
@@ -69,28 +49,65 @@ private:
         std::vector<MipMap> mipMaps;
     };
 
-    bool _glInited { false };
+    Texture(std::string name, TextureType type, int w, int h);
+    ~Texture();
+
+    /**
+     * Generates and configures an OpenGL texture.
+     */
+    void init();
+
+    /**
+     * Deletes the OpenGL texture.
+     */
+    void deinit();
+
+    void clearPixels(PixelFormat format);
+
+    void bind(int unit);
+
+    bool isAdditive() const;
+
+    const std::string &name() const;
+    uint32_t textureId() const;
+    int width() const;
+    int height() const;
+    PixelFormat pixelFormat() const;
+    const TextureFeatures &features() const;
+
+    void setPixels(std::vector<Layer> layers, PixelFormat format);
+    void setFeatures(TextureFeatures features);
+
+private:
     std::string _name;
-    TextureType _type { TextureType::Diffuse };
-    PixelFormat _pixelFormat { PixelFormat::BGR };
-    int _width { 0 };
-    int _height { 0 };
-    std::vector<Layer> _layers;
-    TextureFeatures _features;
+    TextureType _type;
+    int _width;
+    int _height;
+
+    bool _inited { false };
     uint32_t _textureId { 0 };
 
-    Texture(const Texture &) = delete;
+    std::vector<Layer> _layers;
+    PixelFormat _pixelFormat { PixelFormat::BGR };
+    TextureFeatures _features;
 
+    Texture(const Texture &) = delete;
     Texture &operator=(const Texture &) = delete;
 
-    inline bool isCubeMap() const;
-    void fillTextureTarget(uint32_t target, int level, int width, int height, const ByteArray &data);
-    int glInternalPixelFormat() const;
-    uint32_t glPixelFormat() const;
+    void configure2D();
+    void configureCubeMap();
 
-    friend class CurFile;
-    friend class TgaFile;
-    friend class TpcFile;
+    void refresh();
+    void refresh2D();
+    void refreshCubeMap();
+
+    void fillTarget(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
+
+    bool isCubeMap() const;
+
+    int getMinFilter() const;
+    int getInternalPixelFormat() const;
+    uint32_t getPixelFormat() const;
 };
 
 } // namespace render

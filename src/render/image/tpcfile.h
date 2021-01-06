@@ -52,7 +52,7 @@ private:
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
     void loadTexture();
-    PixelFormat pixelFormat() const;
+    PixelFormat getPixelFormat() const;
 };
 
 } // namespace render

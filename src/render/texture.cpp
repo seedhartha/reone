@@ -29,82 +29,116 @@ namespace reone {
 
 namespace render {
 
-Texture::Texture(const string &name, TextureType type) : _name(name), _type(type) {
+constexpr int kNumCubeMapSides = 6;
+
+Texture::Texture(string name, TextureType type, int w, int h) :
+    _name(move(name)), _type(type), _width(w), _height(h) {
 }
 
-void Texture::initGL() {
-    if (_glInited) return;
+void Texture::init() {
+    if (_inited) return;
 
     glGenTextures(1, &_textureId);
 
     if (isCubeMap()) {
-        glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        int i = 0;
-        for (auto &layer : _layers) {
-            const MipMap &mipMap = layer.mipMaps.front();
-            fillTextureTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i++, 0, mipMap.width, mipMap.height, mipMap.data);
-        }
-
-        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
+        configureCubeMap();
     } else {
-        glBindTexture(GL_TEXTURE_2D, _textureId);
-        const Layer &layer = _layers.front();
-        int mipMapCount = static_cast<int>(layer.mipMaps.size());
-        if (mipMapCount > 1) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);
-        }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (_type == TextureType::GUI || _type == TextureType::Cursor) ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        if (_type == TextureType::GUI) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        }
-
-        int i = 0;
-        for (auto &mipMap : layer.mipMaps) {
-            fillTextureTarget(GL_TEXTURE_2D, i++, mipMap.width, mipMap.height, mipMap.data);
-        }
-        if (mipMapCount == 1) {
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        configure2D();
     }
 
-    _glInited = true;
+    _inited = true;
 }
 
 bool Texture::isCubeMap() const {
-    return _layers.size() == 6;
+    return _type == TextureType::EnvironmentMap;
 }
 
-void Texture::fillTextureTarget(uint32_t target, int level, int width, int height, const ByteArray &data) {
+void Texture::configureCubeMap() {
+    glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+void Texture::configure2D() {
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (_type == TextureType::GUI) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+}
+
+int Texture::getMinFilter() const {
+    return (_type == TextureType::GUI || _type == TextureType::Cursor) ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+}
+
+Texture::~Texture() {
+    deinit();
+}
+
+void Texture::deinit() {
+    if (!_inited) return;
+
+    glDeleteTextures(1, &_textureId);
+
+    _inited = false;
+}
+
+void Texture::clearPixels(PixelFormat format) {
+    if (!_inited) {
+        throw logic_error("Texture has not been initialized: " + _name);
+    }
+    _layers.clear();
+    _pixelFormat = format;
+
+    refresh();
+}
+
+void Texture::refresh() {
+    if (isCubeMap()) {
+        refreshCubeMap();
+    } else {
+        refresh2D();
+    }
+}
+
+void Texture::refreshCubeMap() {
+    glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
+
+    for (int i = 0; i < kNumCubeMapSides; ++i) {
+        if (i < _layers.size()) {
+            const MipMap &mipMap = _layers[i].mipMaps.front();
+            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, &mipMap.data[0], mipMap.data.size());
+        } else {
+            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
+        }
+    }
+}
+
+void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
         case PixelFormat::RGB:
         case PixelFormat::RGBA:
         case PixelFormat::BGR:
         case PixelFormat::BGRA:
-            glTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, glPixelFormat(), GL_UNSIGNED_BYTE, &data[0]);
+            glTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, getPixelFormat(), GL_UNSIGNED_BYTE, pixels);
             break;
-
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, level, glInternalPixelFormat(), width, height, 0, static_cast<int>(data.size()), &data[0]);
+            glCompressedTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, size, pixels);
             break;
+        default:
+            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
-int Texture::glInternalPixelFormat() const {
+int Texture::getInternalPixelFormat() const {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
             return GL_LUMINANCE;
@@ -119,11 +153,11 @@ int Texture::glInternalPixelFormat() const {
         case PixelFormat::DXT5:
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         default:
-            throw runtime_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
-uint32_t Texture::glPixelFormat() const {
+uint32_t Texture::getPixelFormat() const {
     switch (_pixelFormat) {
         case PixelFormat::RGB:
             return GL_RGB;
@@ -136,22 +170,31 @@ uint32_t Texture::glPixelFormat() const {
             return GL_BGR;
         case PixelFormat::BGRA:
             return GL_BGRA;
-
         default:
-            throw runtime_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
-Texture::~Texture() {
-    deinitGL();
-}
+void Texture::refresh2D() {
+    glBindTexture(GL_TEXTURE_2D, _textureId);
 
-void Texture::deinitGL() {
-    if (!_glInited) return;
-
-    glDeleteTextures(1, &_textureId);
-
-    _glInited = false;
+    if (!_layers.empty()) {
+        const Layer &layer = _layers.front();
+        int mipMapCount = layer.mipMaps.size();
+        if (mipMapCount > 1) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);
+        }
+        for (int i = 0; i < layer.mipMaps.size(); ++i) {
+            const MipMap &mipMap = layer.mipMaps[i];
+            fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, &mipMap.data[0], mipMap.data.size());
+        }
+        if (mipMapCount == 1) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+    } else {
+        fillTarget(GL_TEXTURE_2D, 0, _width, _height);
+    }
 }
 
 void Texture::bind(int unit) {
@@ -165,6 +208,10 @@ bool Texture::isAdditive() const {
 
 const string &Texture::name() const {
     return _name;
+}
+
+uint32_t Texture::textureId() const {
+    return _textureId;
 }
 
 int Texture::width() const {
@@ -181,6 +228,23 @@ PixelFormat Texture::pixelFormat() const {
 
 const TextureFeatures &Texture::features() const {
     return _features;
+}
+
+void Texture::setPixels(vector<Layer> layers, PixelFormat format) {
+    if (!_inited) {
+        throw logic_error("Texture has not been initialized: " + _name);
+    }
+    if (layers.empty()) {
+        throw invalid_argument("layers is empty");
+    }
+    _layers = move(layers);
+    _pixelFormat = format;
+
+    refresh();
+}
+
+void Texture::setFeatures(TextureFeatures features) {
+    _features = move(features);
 }
 
 } // namespace render

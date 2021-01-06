@@ -103,10 +103,7 @@ shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
     CurFile curFile;
     curFile.load(wrap(data));
 
-    shared_ptr<Texture> texture(curFile.texture());
-    texture->initGL();
-
-    return move(texture);
+    return curFile.texture();
 }
 
 } // namespace game
