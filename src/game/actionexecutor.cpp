@@ -94,6 +94,9 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
         case ActionType::JumpToLocation:
             executeJumpToLocation(object, *dynamic_cast<LocationAction *>(action), dt);
             break;
+        case ActionType::PlayAnimation:
+            executePlayAnimation(object, *dynamic_cast<PlayAnimationAction *>(action), dt);
+            break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
             action->complete();
@@ -336,6 +339,12 @@ void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, Loca
     spatialActor->setPosition(action.location()->position());
     spatialActor->setFacing(action.location()->facing());
 
+    action.complete();
+}
+
+void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, PlayAnimationAction &action, float dt) {
+    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
+    spatialActor->playAnimation(action.animation(), action.speed());
     action.complete();
 }
 

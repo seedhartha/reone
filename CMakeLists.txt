@@ -348,6 +348,7 @@ set(GAME_HEADERS
     src/game/action/movetoobject.h
     src/game/action/movetopoint.h
     src/game/action/objectaction.h
+    src/game/action/playanimation.h
     src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
