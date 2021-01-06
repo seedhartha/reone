@@ -45,7 +45,6 @@ public:
     std::string getPauseAnimation() const;
     std::string getRunAnimation() const;
     std::string getTalkNormalAnimation() const;
-    std::string getUnlockDoorAnimation() const;
     std::string getWalkAnimation() const;
 
 private:

@@ -17,6 +17,9 @@
 
 #include "dialog.h"
 
+#include <unordered_map>
+
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "SDL2/SDL_timer.h"
@@ -53,6 +56,40 @@ namespace game {
 constexpr int kDefaultEntryDuration = 1000;
 
 static bool g_allEntriesSkippable = false;
+
+static const unordered_map<string, AnimationType> g_animTypeByName {
+    { "dead", AnimationType::LoopingDead },
+    { "taunt", AnimationType::FireForgetTaunt },
+    { "greeting", AnimationType::FireForgetGreeting },
+    { "listen", AnimationType::LoopingListen },
+    { "worship", AnimationType::LoopingWorship },
+    { "salute", AnimationType::FireForgetSalute },
+    { "bow", AnimationType::FireForgetBow },
+    { "talk_normal", AnimationType::LoopingTalkNormal },
+    { "talk_pleading", AnimationType::LoopingTalkPleading },
+    { "talk_forceful", AnimationType::LoopingTalkForceful },
+    { "talk_laughing", AnimationType::LoopingTalkLaughing },
+    { "talk_sad", AnimationType::LoopingTalkSad },
+    { "victory", AnimationType::FireForgetVictory1 },
+    { "scratch_head", AnimationType::FireForgetPauseScratchHead },
+    { "drunk", AnimationType::LoopingPauseDrunk },
+    { "inject", AnimationType::FireForgetInject },
+    { "flirt", AnimationType::LoopingFlirt },
+    { "use_computer_lp", AnimationType::LoopingUseComputer },
+    { "horror", AnimationType::LoopingHorror },
+    { "use_computer", AnimationType::FireForgetUseComputer },
+    { "persuade", AnimationType::FireForgetPersuade },
+    { "activate", AnimationType::FireForgetActivate },
+    { "sleep", AnimationType::LoopingSleep },
+    { "prone", AnimationType::LoopingProne },
+    { "ready", AnimationType::LoopingReady },
+    { "pause", AnimationType::LoopingPause },
+    { "choked", AnimationType::LoopingChoke },
+    { "talk_injured", AnimationType::LoopingTalkInjured },
+    { "listen_injured", AnimationType::LoopingListenInjured },
+    { "kneel_talk_angry", AnimationType::LoopingKneelTalkAngry },
+    { "kneel_talk_sad", AnimationType::LoopingKneelTalkSad }
+};
 
 enum EndEntryFlags {
     kEndEntryOnAnimFinish = 1,
@@ -146,7 +183,7 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     debug("Dialog: start " + resRef);
 
     loadAnimatedCamera();
-    loadParticipants();
+    loadStuntParticipants();
     loadStartEntry();
 }
 
@@ -221,7 +258,7 @@ void DialogGUI::loadReplies() {
                 singleEmptyReply = true;
                 break;
             } else {
-            text = "[empty]";
+                text = "[empty]";
             }
         }
         replies.add({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
@@ -239,8 +276,9 @@ void DialogGUI::loadReplies() {
 }
 
 void DialogGUI::finish() {
-    releaseParticipants();
-
+    if (_dialog->isAnimatedCutscene()) {
+        releaseStuntParticipants();
+    }
     if (!_dialog->endScript().empty()) {
         _game->scriptRunner().run(_dialog->endScript(), _owner->id());
     }
@@ -253,7 +291,7 @@ void DialogGUI::finish() {
     _game->openInGame();
 }
 
-void DialogGUI::releaseParticipants() {
+void DialogGUI::releaseStuntParticipants() {
     for (auto &participant : _participantByTag) {
         participant.second.creature->stopStuntMode();
     }
@@ -371,7 +409,9 @@ void DialogGUI::scheduleEndOfEntry() {
     _endEntryTimeout = kDefaultEntryDuration;
 }
 
-void DialogGUI::loadParticipants() {
+void DialogGUI::loadStuntParticipants() {
+    if (!_dialog->isAnimatedCutscene()) return;
+
     _participantByTag.clear();
 
     for (auto &stunt : _dialog->stunts()) {
@@ -380,42 +420,69 @@ void DialogGUI::loadParticipants() {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
             continue;
         }
-        shared_ptr<Model> model(Models::instance().get(stunt.stuntModel));
-        if (!model) {
-            warn("Dialog: stunt model not found: " + stunt.stuntModel);
-            continue;
-        }
-        creature->startStuntMode();
-
         Participant participant;
-        participant.model = model;
         participant.creature = creature;
+
+        if (_dialog->isAnimatedCutscene()) {
+            shared_ptr<Model> model(Models::instance().get(stunt.stuntModel));
+            if (!model) {
+                warn("Dialog: stunt model not found: " + stunt.stuntModel);
+                continue;
+            }
+            participant.model = model;
+            creature->startStuntMode();
+        }
 
         _participantByTag.insert(make_pair(stunt.participant, move(participant)));
     }
 }
 
 void DialogGUI::updateParticipantAnimations() {
-    if (!_dialog->isAnimatedCutscene()) return;
-
     for (auto &anim : _currentEntry->animations) {
-        auto maybeParticipant = _participantByTag.find(anim.participant);
-        if (maybeParticipant == _participantByTag.end()) {
-            warn("Dialog: participant not found by tag: " + anim.participant);
-            continue;
+        if (_dialog->isAnimatedCutscene()) {
+            auto maybeParticipant = _participantByTag.find(anim.participant);
+            if (maybeParticipant == _participantByTag.end()) {
+                warn("Dialog: participant not found by tag: " + anim.participant);
+                continue;
+            }
+            const Participant &participant = maybeParticipant->second;
+            string animName(getStuntAnimationName(anim.animation));
+            shared_ptr<Animation> animation(participant.model->getAnimation(animName));
+            if (animation) {
+                participant.creature->playAnimation(animation, kAnimationPropagate);
+            }
+        } else {
+            auto participant = dynamic_pointer_cast<Creature>(_game->module()->area()->find(anim.participant));
+            if (!participant) {
+                warn("Dialog: participant creature not found by tag: " + anim.participant);
+                continue;
+            }
+            AnimationType animType = getAnimationType(anim.animation);
+            if (animType != AnimationType::Invalid) {
+                participant->playAnimation(animType);
+            }
         }
-        string animName(getStuntAnimationName(anim.animation));
-        const Participant &participant = maybeParticipant->second;
-
-        shared_ptr<Animation> animation(participant.model->getAnimation(animName));
-        if (!animation) continue;
-
-        participant.creature->playAnimation(animation, kAnimationPropagate);
     }
 }
 
 string DialogGUI::getStuntAnimationName(int ordinal) const {
     return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
+}
+
+AnimationType DialogGUI::getAnimationType(int ordinal) const {
+    shared_ptr<TwoDaTable> animations(Resources::instance().get2DA("dialoganimations"));
+    const vector<TwoDaRow> &rows = animations->rows();
+    int index = ordinal - 10000;
+
+    if (index < 0 || index >= static_cast<int>(rows.size())) {
+        warn("Dialog: animation index out of bounds: " + to_string(index));
+        return AnimationType::Invalid;
+    }
+
+    string name(boost::to_lower_copy(rows[index].getString("name")));
+    auto maybeAnimType = g_animTypeByName.find(name);
+
+    return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;
 }
 
 void DialogGUI::pickReply(uint32_t index) {

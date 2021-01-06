@@ -223,11 +223,9 @@ void Creature::clearAllActions() {
 
 void Creature::playAnimation(AnimationType anim, float speed) {
     string animName(_animResolver.getAnimationName(anim));
-    if (animName.empty()) {
-        warn("Creature: playAnimation: unsupported animation: " + to_string(static_cast<int>(anim)));
-        return;
-    }
-    int flags = kAnimationPropagate | kAnimationBlend;
+    if (animName.empty()) return;
+
+    int flags = kAnimationPropagate;
     if (isAnimationLooping(anim)) {
         flags |= kAnimationLoop;
     }
