@@ -51,6 +51,7 @@ static string g_animUnlockDoor("unlockdr");
 static string g_animVictory("victory");
 static string g_animWalkCharacter("walk");
 static string g_animWalkCreature("cwalk");
+static string g_animWeld("weld");
 
 CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) : _creature(creature) {
     if (!creature) {
@@ -83,6 +84,8 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
             return g_animUnlockDoor;
         case AnimationType::FireForgetVictory1:
             return g_animVictory;
+        case AnimationType::LoopingWeld:
+            return g_animWeld;
 
         case AnimationType::LoopingPause2:
         case AnimationType::LoopingListen:
@@ -103,7 +106,6 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::LoopingSleep:
         case AnimationType::LoopingProne:
         case AnimationType::LoopingPause3:
-        case AnimationType::LoopingWeld:
         case AnimationType::LoopingListenInjured:
         case AnimationType::LoopingTreatInjured:
         case AnimationType::LoopingDeadProne:

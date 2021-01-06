@@ -22,6 +22,7 @@
 #include "../action/commandaction.h"
 #include "../action/locationaction.h"
 #include "../action/movetoobject.h"
+#include "../action/playanimation.h"
 #include "../action/startconversation.h"
 #include "../enginetype/location.h"
 #include "../game.h"
@@ -353,10 +354,13 @@ Variable Routines::actionSpeakString(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        auto action = make_unique<Action>(ActionType::PlayAnimation);
+        AnimationType animation = static_cast<AnimationType>(getInt(args, 0));
+        float speed = getFloat(args, 1, 1.0f);
+        float duration = getFloat(args, 2, 0.0f);
+
+        auto action = make_unique<PlayAnimationAction>(animation, speed, duration);
         caller->actionQueue().add(move(action));
     } else {
         warn("Routines: actionPlayAnimation: caller is invalid");
