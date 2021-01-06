@@ -21,6 +21,8 @@
 
 #include "SDL2/SDL_opengl.h"
 
+#include "../util.h"
+
 using namespace std;
 
 namespace reone {
@@ -38,20 +40,25 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     bool additive = false;
 
     if (diffuse) {
-        diffuse->bind(0);
+        setActiveTextureUnit(0);
+        diffuse->bind();
         additive = diffuse->isAdditive();
     }
     if (_envmap) {
-        _envmap->bind(1);
+        setActiveTextureUnit(1);
+        _envmap->bind();
     }
     if (_lightmap) {
-        _lightmap->bind(2);
+        setActiveTextureUnit(2);
+        _lightmap->bind();
     }
     if (_bumpyShiny) {
-        _bumpyShiny->bind(3);
+        setActiveTextureUnit(3);
+        _bumpyShiny->bind();
     }
     if (_bumpmap) {
-        _bumpmap->bind(4);
+        setActiveTextureUnit(4);
+        _bumpmap->bind();
     }
 
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;

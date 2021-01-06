@@ -19,6 +19,7 @@
 
 #include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
+#include "../../render/util.h"
 
 using namespace std;
 
@@ -94,7 +95,8 @@ void ImageButton::drawIcon(
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     if (iconFrame) {
-        iconFrame->bind(0);
+        setActiveTextureUnit(0);
+        iconFrame->bind();
         Quad::getDefault().renderTriangles();
     }
 
@@ -103,7 +105,8 @@ void ImageButton::drawIcon(
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     if (iconTexture) {
-        iconTexture->bind(0);
+        setActiveTextureUnit(0);
+        iconTexture->bind();
         Quad::getDefault().renderTriangles();
     }
     if (!iconText.empty()) {

@@ -26,6 +26,8 @@ namespace render {
 void withDepthTest(const std::function<void()> &block);
 void withAdditiveBlending(const std::function<void()> &block);
 
+void setActiveTextureUnit(int n);
+
 } // namespace render
 
 } // namespace reone

@@ -46,6 +46,10 @@ void withAdditiveBlending(const std::function<void()> &block) {
     glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
 }
 
+void setActiveTextureUnit(int n) {
+    glActiveTexture(GL_TEXTURE0 + n);
+}
+
 } // namespace render
 
 } // namespace reone

@@ -23,6 +23,7 @@
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../render/textures.h"
+#include "../render/util.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -276,7 +277,8 @@ void GUI::drawBackground() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    _background->bind(0);
+    setActiveTextureUnit(0);
+    _background->bind();
 
     Quad::getDefault().renderTriangles();
 }
