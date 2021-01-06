@@ -33,7 +33,7 @@ class CreatureAnimationResolver {
 public:
     CreatureAnimationResolver(const Creature *creature);
 
-    std::string getAnimationName(Animation animation) const;
+    std::string getAnimationName(AnimationType animation) const;
 
     std::string getBashAttackAnimation() const;
     std::string getDeadAnimation() const;

@@ -141,7 +141,9 @@ void Creature::updateModel() {
 
     if (_model) {
         _headModel = _model->getAttachedModel(g_headHookNode);
-        _model->setLocalTransform(_transform);
+        if (!_stunt) {
+            _model->setLocalTransform(_transform);
+        }
         _sceneGraph->addRoot(_model);
         _animDirty = true;
     }
@@ -219,27 +221,40 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(Animation animation, float speed) {
-    string animName(_animResolver.getAnimationName(animation));
+void Creature::playAnimation(AnimationType anim, float speed) {
+    string animName(_animResolver.getAnimationName(anim));
     if (animName.empty()) {
-        warn("Creature: playAnimation: unsupported animation: " + to_string(static_cast<int>(animation)));
+        warn("Creature: playAnimation: unsupported animation: " + to_string(static_cast<int>(anim)));
         return;
     }
-    playAnimation(animName, isAnimationLooping(animation), speed);
-}
-
-void Creature::playAnimation(const string &name, bool looping, float speed) {
-    if (!_model || _movementType != MovementType::None) return;
-
     int flags = kAnimationPropagate | kAnimationBlend;
-    if (looping) {
+    if (isAnimationLooping(anim)) {
         flags |= kAnimationLoop;
     }
-    _model->playAnimation(name, flags, speed);
+    playAnimation(animName, flags, speed);
+}
 
-    if (!looping) {
+void Creature::playAnimation(const string &name, int flags, float speed) {
+    doPlayAnimation(flags, [&]() {
+        _model->playAnimation(name, flags, speed);
+    });
+}
+
+void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
+    if (!_model || _movementType != MovementType::None) return;
+
+    callback();
+
+    if (!(flags & kAnimationLoop)) {
         _animFireForget = true;
     }
+}
+
+void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed) {
+    doPlayAnimation(flags, [&]() {
+        // TODO: scale should be computed from this creatures model and the animations model
+        _model->playAnimation(anim, flags, speed, 1.0f);
+    });
 }
 
 void Creature::playAnimation(CombatAnimation animation) {
@@ -266,8 +281,13 @@ void Creature::playAnimation(CombatAnimation animation) {
 
     if (animName.empty()) {
         warn("Creature: playAnimation: unsupported combat animation: " + to_string(static_cast<int>(animation)));
+        return;
     }
-    playAnimation(animName, looping);
+    int flags = kAnimationPropagate | kAnimationBlend;
+    if (looping) {
+        flags |= kAnimationLoop;
+    }
+    playAnimation(animName, flags);
 }
 
 void Creature::equip(const string &resRef) {

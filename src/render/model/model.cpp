@@ -17,6 +17,8 @@
 
 #include "model.h"
 
+#include "../../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -77,14 +79,15 @@ vector<string> Model::getAnimationNames() const {
     return move(result);
 }
 
-Animation *Model::getAnimation(const string &name) const {
+shared_ptr<Animation> Model::getAnimation(const string &name) const {
     auto maybeAnim = _animations.find(name);
     if (maybeAnim != _animations.end()) {
-        return maybeAnim->second.get();
+        return maybeAnim->second;
     }
     if (_superModel) {
         return _superModel->getAnimation(name);
     }
+    warn(boost::format("Model: animation not found: '%s' '%s'") % name % _name);
 
     return nullptr;
 }

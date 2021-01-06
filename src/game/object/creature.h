@@ -18,6 +18,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 #include "../../resource/2dafile.h"
 #include "../../resource/gfffile.h"
@@ -117,10 +118,11 @@ public:
 
     // END Animation
 
-    void playAnimation(Animation animation, float speed = 1.0f) override;
+    void playAnimation(AnimationType anim, float speed = 1.0f) override;
 
-    void playAnimation(CombatAnimation animation);
-    void playAnimation(const std::string &name, bool looping = false, float speed = 1.0f);
+    void playAnimation(CombatAnimation anim);
+    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
 
     void updateModelAnimation();
 
@@ -183,15 +185,25 @@ private:
 
     // END Scripts
 
+    void updateModel();
+    void updateHealth();
+
+    ModelType parseModelType(const std::string &s) const;
+
+    // Loading
+
     void loadTransform(const resource::GffStruct &gffs);
     void loadBlueprint(const resource::GffStruct &gffs);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
 
-    void updateModel();
-    void updateHealth();
+    // END Loading
 
-    ModelType parseModelType(const std::string &s) const;
+    // Animation
+
+    void doPlayAnimation(int flags, const std::function<void()> &callback);
+
+    // END Animation
 
     friend class CreatureBlueprint;
     friend class StaticCreatureBlueprint;

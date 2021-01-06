@@ -214,7 +214,7 @@ void MainMenu::onModuleSelected(const string &name) {
 
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
     player->load(playerCfg);
-    player->setTag("PLAYER");
+    player->setTag(kObjectTagPlayer);
     player->setFaction(Faction::Friendly1);
     player->setImmortal(true);
     party.addMember(kNpcPlayer, player);

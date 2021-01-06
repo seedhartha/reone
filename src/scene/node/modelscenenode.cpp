@@ -24,7 +24,6 @@
 
 #include "../scenegraph.h"
 
-#include "aabbnode.h"
 #include "lightnode.h"
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
@@ -37,6 +36,8 @@ using namespace reone::resource;
 namespace reone {
 
 namespace scene {
+
+static bool g_drawAABB = false;
 
 ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, const set<string> &skipNodes) :
     SceneNode(sceneGraph),
@@ -73,6 +74,8 @@ void ModelSceneNode::initModelNodes() {
             }
         }
     }
+
+    refreshAABB();
 }
 
 unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
@@ -92,6 +95,9 @@ void ModelSceneNode::update(float dt) {
 }
 
 void ModelSceneNode::render() const {
+    if (g_drawAABB) {
+        AABBMesh::instance().render(_aabb, _absoluteTransform);
+    }
 }
 
 void ModelSceneNode::playDefaultAnimation() {
@@ -103,11 +109,18 @@ void ModelSceneNode::playDefaultAnimation() {
 }
 
 void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
-    _animator.playAnimation(name, flags, speed);
+    shared_ptr<Animation> animation(_model->getAnimation(name));
+    if (animation) {
+        playAnimation(animation, flags, speed, _model->animationScale());
+    }
+}
+
+void ModelSceneNode::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
+    _animator.playAnimation(anim, flags, speed, scale);
 
     if (flags & kAnimationPropagate) {
         for (auto &attached : _attachedModels) {
-            attached.second->playAnimation(name, flags, speed);
+            attached.second->playAnimation(anim, flags, speed, scale);
         }
     }
 }
@@ -220,7 +233,7 @@ bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &posi
 }
 
 glm::vec3 ModelSceneNode::getCenterOfAABB() const {
-    return _absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f);
+    return _absoluteTransform * glm::vec4(_aabb.center(), 1.0f);
 }
 
 const string &ModelSceneNode::name() const {
@@ -252,7 +265,7 @@ float ModelSceneNode::alpha() const {
 }
 
 const AABB &ModelSceneNode::aabb() const {
-    return _model->aabb();
+    return _aabb;
 }
 
 bool ModelSceneNode::isLightingEnabled() const {
@@ -301,7 +314,10 @@ bool ModelSceneNode::isAnimationFinished() const {
 }
 
 void ModelSceneNode::setDefaultAnimation(const string &name) {
-    _animator.setDefaultAnimation(name);
+    shared_ptr<Animation> animation(_model->getAnimation(name));
+    if (!animation) return;
+
+    _animator.setDefaultAnimation(animation);
 
     for (auto &attached : _attachedModels) {
         attached.second->setDefaultAnimation(name);
@@ -314,6 +330,30 @@ void ModelSceneNode::setLightingEnabled(bool enabled) {
 
 void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {
     _lightsAffectedBy = lights;
+}
+
+void ModelSceneNode::refreshAABB() {
+    _aabb.reset();
+
+    stack<SceneNode *> nodes;
+    nodes.push(this);
+
+    while (!nodes.empty()) {
+        SceneNode *node = nodes.top();
+        nodes.pop();
+
+        auto modelNodeSceneNode = dynamic_cast<ModelNodeSceneNode *>(node);
+        if (modelNodeSceneNode) {
+            shared_ptr<Mesh> mesh(modelNodeSceneNode->modelNode()->mesh());
+            if (mesh) {
+                _aabb.expand(mesh->aabb() * node->localTransform());
+            }
+        }
+
+        for (auto &child : node->children()) {
+            nodes.push(child.get());
+        }
+    }
 }
 
 } // namespace scene

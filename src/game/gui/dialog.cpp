@@ -50,7 +50,9 @@ namespace reone {
 
 namespace game {
 
-static const int kDefaultEntryDuration = 1000;
+constexpr int kDefaultEntryDuration = 1000;
+
+static bool g_allEntriesSkippable = false;
 
 enum EndEntryFlags {
     kEndEntryOnAnimFinish = 1,
@@ -144,8 +146,8 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     debug("Dialog: start " + resRef);
 
     loadAnimatedCamera();
+    loadParticipants();
     loadStartEntry();
-    loadStuntModels();
 }
 
 void DialogGUI::loadAnimatedCamera() {
@@ -195,6 +197,7 @@ void DialogGUI::loadCurrentEntry() {
     playVoiceOver();
     scheduleEndOfEntry();
     updateCamera();
+    updateParticipantAnimations();
 }
 
 void DialogGUI::loadReplies() {
@@ -236,6 +239,8 @@ void DialogGUI::loadReplies() {
 }
 
 void DialogGUI::finish() {
+    releaseParticipants();
+
     if (!_dialog->endScript().empty()) {
         _game->scriptRunner().run(_dialog->endScript(), _owner->id());
     }
@@ -246,6 +251,12 @@ void DialogGUI::finish() {
         }
     }
     _game->openInGame();
+}
+
+void DialogGUI::releaseParticipants() {
+    for (auto &participant : _participantByTag) {
+        participant.second.creature->stopStuntMode();
+    }
 }
 
 void DialogGUI::loadCurrentSpeaker() {
@@ -360,11 +371,51 @@ void DialogGUI::scheduleEndOfEntry() {
     _endEntryTimeout = kDefaultEntryDuration;
 }
 
-void DialogGUI::loadStuntModels() {
-    _stuntByParticipant.clear();
+void DialogGUI::loadParticipants() {
+    _participantByTag.clear();
+
     for (auto &stunt : _dialog->stunts()) {
-        _stuntByParticipant.insert(make_pair(stunt.participant, Models::instance().get(stunt.stuntModel)));
+        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(_game->module()->area()->find(stunt.participant)));
+        if (!creature) {
+            warn("Dialog: participant creature not found by tag: " + stunt.participant);
+            continue;
+        }
+        shared_ptr<Model> model(Models::instance().get(stunt.stuntModel));
+        if (!model) {
+            warn("Dialog: stunt model not found: " + stunt.stuntModel);
+            continue;
+        }
+        creature->startStuntMode();
+
+        Participant participant;
+        participant.model = model;
+        participant.creature = creature;
+
+        _participantByTag.insert(make_pair(stunt.participant, move(participant)));
     }
+}
+
+void DialogGUI::updateParticipantAnimations() {
+    if (!_dialog->isAnimatedCutscene()) return;
+
+    for (auto &anim : _currentEntry->animations) {
+        auto maybeParticipant = _participantByTag.find(anim.participant);
+        if (maybeParticipant == _participantByTag.end()) {
+            warn("Dialog: participant not found by tag: " + anim.participant);
+            continue;
+        }
+        string animName(getStuntAnimationName(anim.animation));
+        const Participant &participant = maybeParticipant->second;
+
+        shared_ptr<Animation> animation(participant.model->getAnimation(animName));
+        if (!animation) continue;
+
+        participant.creature->playAnimation(animation, kAnimationPropagate);
+    }
+}
+
+string DialogGUI::getStuntAnimationName(int ordinal) const {
+    return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
 }
 
 void DialogGUI::pickReply(uint32_t index) {
@@ -404,7 +455,7 @@ void DialogGUI::pickReply(uint32_t index) {
 
 bool DialogGUI::handle(const SDL_Event &event) {
     if (!_entryEnded &&
-        _dialog->isSkippable() &&
+        (g_allEntriesSkippable || _dialog->isSkippable()) &&
         event.type == SDL_MOUSEBUTTONDOWN) {
 
         endCurrentEntry();

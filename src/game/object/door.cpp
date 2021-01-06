@@ -95,7 +95,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
     if (_model) {
-        _model->setDefaultAnimation("closed1");
+        _model->setDefaultAnimation("closed");
         _model->playAnimation("closing1");
     }
     _open = false;
