@@ -35,7 +35,7 @@ namespace game {
 
 AnimatedCamera::AnimatedCamera(SceneGraph *sceneGraph, float aspect) : _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
-    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f));
+    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f), _zFar);
     updateProjection();
 }
 

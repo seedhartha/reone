@@ -17,6 +17,7 @@
 
 #include "shaders.h"
 
+#include <cstdarg>
 #include <stdexcept>
 
 #include <boost/format.hpp>
@@ -43,19 +44,13 @@ static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
-const int MAX_SHADOW_LIGHTS = 2;
 const int MAX_BONES = 128;
+const float SHADOW_FAR_PLANE = 1000.0;
 
 struct Light {
     vec4 position;
     vec4 color;
     float radius;
-};
-
-struct ShadowLight {
-    vec4 position;
-    mat4 view;
-    mat4 projection;
 };
 
 layout(std140) uniform General {
@@ -86,11 +81,6 @@ layout(std140) uniform Lighting {
     Light uLights[MAX_LIGHTS];
 };
 
-layout(std140) uniform Shadows {
-    int uShadowLightCount;
-    ShadowLight uShadowLights[MAX_SHADOW_LIGHTS];
-};
-
 layout(std140) uniform Skeletal {
     uniform mat4 uAbsTransform;
     uniform mat4 uAbsTransformInv;
@@ -98,7 +88,7 @@ layout(std140) uniform Skeletal {
 };
 )END";
 
-static const GLchar kGUIVertexShader[] = R"END(
+static const GLchar kSourceVertexGUI[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -113,10 +103,9 @@ void main() {
 }
 )END";
 
-static const GLchar kModelVertexShader[] = R"END(
+static const GLchar kSourceVertexModel[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
-uniform mat4 uLightSpaceMatrix;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -164,7 +153,38 @@ void main() {
 }
 )END";
 
-static const GLchar kWhiteFragmentShader[] = R"END(
+static const GLchar kSourceVertexDepth[] = R"END(
+layout(location = 0) in vec3 aPosition;
+
+void main() {
+    gl_Position = uModel * vec4(aPosition, 1.0);
+}
+)END";
+
+static const GLchar kSourceGeometryDepth[] = R"END(
+const int NUM_CUBE_FACES = 6;
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices=18) out;
+
+uniform mat4 uShadowMatrices[NUM_CUBE_FACES];
+
+out vec4 fragPosition;
+
+void main() {
+    for (int face = 0; face < NUM_CUBE_FACES; ++face) {
+        gl_Layer = face;
+        for (int i = 0; i < 3; ++i) {
+            fragPosition = gl_in[i].gl_Position;
+            gl_Position = uShadowMatrices[face] * fragPosition;
+            EmitVertex();
+        }
+        EndPrimitive();
+    }
+}
+)END";
+
+static const GLchar kSourceFragmentWhite[] = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -174,7 +194,7 @@ void main() {
 }
 )END";
 
-static const GLchar kGUIFragmentShader[] = R"END(
+static const GLchar kSourceFragmentGUI[] = R"END(
 uniform sampler2D uTexture;
 
 in vec2 fragTexCoords;
@@ -194,17 +214,20 @@ void main() {
 }
 )END";
 
-static const GLchar kModelFragmentShader[] = R"END(
+static const GLchar kSourceFragmentModel[] = R"END(
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
+const float SHADOW_VALUE = 0.5;
 
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
 uniform samplerCube uEnvmap;
 uniform samplerCube uBumpyShiny;
-uniform sampler2D uShadowmaps[MAX_SHADOW_LIGHTS];
+uniform samplerCube uShadowmap;
 
 uniform vec3 uCameraPosition;
+uniform bool uShadowLightPresent;
+uniform vec3 uShadowLightPosition;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -252,38 +275,18 @@ void applyLighting(vec3 normal, inout vec3 color) {
     }
 }
 
-float getShadowmapDepth(int index, vec2 texCoords) {
-    if (index == 1) {
-        return texture(uShadowmaps[1], texCoords).r;
-    } else {
-        return texture(uShadowmaps[0], texCoords).r;
-    }
-    /*
-    if (index == 2) {
-        return texture(uShadowmaps[2], texCoords).r;
-    else if (index == 1) {
-        return texture(uShadowmaps[1], texCoords).r;
-    } else {
-        return texture(uShadowmaps[0], texCoords).r;
-    }
-    */
-}
-
 void applyShadows(vec3 normal, inout vec3 color) {
-    for (int i = 0; i < uShadowLightCount; ++i) {
-        vec4 lightSpacePos = uShadowLights[i].projection * uShadowLights[i].view * vec4(fragPosition, 1.0);
+    if (!uShadowLightPresent) return;
 
-        vec3 projCoords = 0.5 * (lightSpacePos.xyz / lightSpacePos.w) + 0.5;
-        if (projCoords.z > 1.0) continue;
+    vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
 
-        float closestDepth = getShadowmapDepth(i, projCoords.xy);
-        float currentDepth = projCoords.z;
+    float closestDepth = texture(uShadowmap, fragToLight).r;
+    closestDepth *= SHADOW_FAR_PLANE;
 
-        if (currentDepth > closestDepth) {
-            float distToCenter = distance(vec2(0.5), projCoords.xy); // between 0.0 and 0.5
-            float shadow = 0.5 * (1.0 - smoothstep(0.25, 0.5, distToCenter));
-            color *= 1.0 - shadow;
-        }
+    float currentDepth = length(fragToLight);
+
+    if (currentDepth > closestDepth) {
+        color *= 1.0 - SHADOW_VALUE;
     }
 }
 
@@ -326,7 +329,7 @@ void main() {
 }
 )END";
 
-static const GLchar kGaussianBlurFragmentShader[] = R"END(
+static const GLchar kSourceFragmentBlur[] = R"END(
 uniform sampler2D uTexture;
 
 out vec4 fragColor;
@@ -346,7 +349,7 @@ void main() {
 }
 )END";
 
-static const GLchar kBloomFragmentShader[] = R"END(
+static const GLchar kSourceFragmentBloom[] = R"END(
 uniform sampler2D uGeometry;
 uniform sampler2D uBloom;
 
@@ -362,6 +365,32 @@ void main() {
 }
 )END";
 
+static const GLchar kSourceFragmentDepth[] = R"END(
+uniform vec3 uShadowLightPosition;
+
+in vec4 fragPosition;
+
+void main() {
+    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
+    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
+    gl_FragDepth = lightDistance;
+}
+)END";
+
+static const GLchar kSourceFragmentDebugShadows[] = R"END(
+uniform samplerCube uShadowmap;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 cubeMapCoords = 2.0 * fragTexCoords - 1.0;
+    float value = texture(uShadowmap, vec3(cubeMapCoords, -1.0)).r;
+    fragColor = vec4(vec3(value), 1.0);
+}
+)END";
+
 Shaders &Shaders::instance() {
     static Shaders instance;
     return instance;
@@ -373,24 +402,29 @@ Shaders::Shaders() {
 }
 
 void Shaders::initGL() {
-    initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kGUIVertexShader);
-    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kModelVertexShader);
-    initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kWhiteFragmentShader);
-    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, kGUIFragmentShader);
-    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, kModelFragmentShader);
-    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, kGaussianBlurFragmentShader);
-    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, kBloomFragmentShader);
+    initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kSourceVertexGUI);
+    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kSourceVertexModel);
+    initShader(ShaderName::VertexDepth, GL_VERTEX_SHADER, kSourceVertexDepth);
+    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, kSourceGeometryDepth);
+    initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kSourceFragmentWhite);
+    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, kSourceFragmentGUI);
+    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, kSourceFragmentModel);
+    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, kSourceFragmentBlur);
+    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, kSourceFragmentBloom);
+    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, kSourceFragmentDepth);
+    initShader(ShaderName::FragmentDebugShadows, GL_FRAGMENT_SHADER, kSourceFragmentDebugShadows);
 
-    initProgram(ShaderProgram::GUIGUI, ShaderName::VertexGUI, ShaderName::FragmentGUI);
-    initProgram(ShaderProgram::GUIBlur, ShaderName::VertexGUI, ShaderName::FragmentBlur);
-    initProgram(ShaderProgram::GUIBloom, ShaderName::VertexGUI, ShaderName::FragmentBloom);
-    initProgram(ShaderProgram::GUIWhite, ShaderName::VertexGUI, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::ModelWhite, ShaderName::VertexModel, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::ModelModel, ShaderName::VertexModel, ShaderName::FragmentModel);
+    initProgram(ShaderProgram::GUIGUI, 2, ShaderName::VertexGUI, ShaderName::FragmentGUI);
+    initProgram(ShaderProgram::GUIBlur, 2, ShaderName::VertexGUI, ShaderName::FragmentBlur);
+    initProgram(ShaderProgram::GUIBloom, 2, ShaderName::VertexGUI, ShaderName::FragmentBloom);
+    initProgram(ShaderProgram::GUIWhite, 2, ShaderName::VertexGUI, ShaderName::FragmentWhite);
+    initProgram(ShaderProgram::GUIDebugShadows, 2, ShaderName::VertexGUI, ShaderName::FragmentDebugShadows);
+    initProgram(ShaderProgram::ModelWhite, 2, ShaderName::VertexModel, ShaderName::FragmentWhite);
+    initProgram(ShaderProgram::ModelModel, 2, ShaderName::VertexModel, ShaderName::FragmentModel);
+    initProgram(ShaderProgram::DepthDepth, 3, ShaderName::VertexDepth, ShaderName::GeometryDepth, ShaderName::FragmentDepth);
 
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
-    glGenBuffers(1, &_shadowsUbo);
     glGenBuffers(1, &_skeletalUbo);
 
     for (auto &program : _programs) {
@@ -407,25 +441,17 @@ void Shaders::initGL() {
         if (lightingBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
         }
-        uint32_t shadowsBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Shadows");
-        if (shadowsBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, shadowsBlockIdx, kShadowsBindingPointIndex);
-        }
         uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
         if (skeletalBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
         }
 
-        setUniform("uEnvmap", TextureUniforms::envmap);
-        setUniform("uLightmap", TextureUniforms::lightmap);
-        setUniform("uBumpyShiny", TextureUniforms::bumpyShiny);
-        setUniform("uBumpmap", TextureUniforms::bumpmap);
-        setUniform("uBloom", TextureUniforms::bloom);
-
-        for (int i = 0; i < kMaxShadowLightCount; ++i) {
-            string name(str(boost::format("uShadowmaps[%d]") % i));
-            setUniform(name, TextureUniforms::shadowmap0 + i);
-        }
+        setUniform("uEnvmap", TextureUnits::envmap);
+        setUniform("uLightmap", TextureUnits::lightmap);
+        setUniform("uBumpyShiny", TextureUnits::bumpyShiny);
+        setUniform("uBumpmap", TextureUnits::bumpmap);
+        setUniform("uBloom", TextureUnits::bloom);
+        setUniform("uShadowmap", TextureUnits::shadowmap);
 
         _activeOrdinal = 0;
         glUseProgram(0);
@@ -451,18 +477,24 @@ void Shaders::initShader(ShaderName name, unsigned int type, const char *source)
     _shaders.insert(make_pair(name, shader));
 }
 
-void Shaders::initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader) {
-    unsigned int vsOrdinal = _shaders.find(vertexShader)->second;
-    unsigned int fsOrdinal = _shaders.find(fragmentShader)->second;
-
+void Shaders::initProgram(ShaderProgram program, int shaderCount, ...) {
     GLuint ordinal = glCreateProgram();
+
+    va_list args;
+    va_start(args, shaderCount);
+    for (int i = 0; i < shaderCount; ++i) {
+        ShaderName name = va_arg(args, ShaderName);
+        unsigned int shaderOrdinal = _shaders.find(name)->second;
+        glAttachShader(ordinal, shaderOrdinal);
+    }
+    va_end(args);
+
+    glLinkProgram(ordinal);
+
     GLint success;
     char log[512];
     GLsizei logSize;
 
-    glAttachShader(ordinal, vsOrdinal);
-    glAttachShader(ordinal, fsOrdinal);
-    glLinkProgram(ordinal);
     glGetProgramiv(ordinal, GL_LINK_STATUS, &success);
 
     if (!success) {
@@ -481,10 +513,6 @@ void Shaders::deinitGL() {
     if (_skeletalUbo) {
         glDeleteBuffers(1, &_skeletalUbo);
         _skeletalUbo = 0;
-    }
-    if (_shadowsUbo) {
-        glDeleteBuffers(1, &_shadowsUbo);
-        _shadowsUbo = 0;
     }
     if (_lightingUbo) {
         glDeleteBuffers(1, &_lightingUbo);
@@ -618,9 +646,15 @@ void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
         setUniform("uProjection", globals.projection);
         setUniform("uView", globals.view);
         setUniform("uCameraPosition", globals.cameraPosition);
+        setUniform("uShadowLightPresent", globals.shadowLightPresent);
 
-        glBindBufferBase(GL_UNIFORM_BUFFER, kShadowsBindingPointIndex, _shadowsUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(ShadowsUniforms), &globals.shadows, GL_STATIC_DRAW);
+        if (globals.shadowLightPresent) {
+            setUniform("uShadowLightPosition", globals.shadowLightPosition);
+
+            for (int i = 0; i < kNumCubeFaces; ++i) {
+                setUniform(str(boost::format("uShadowMatrices[%d]") % i), globals.shadowMatrices[i]);
+            }
+        }
     }
     glUseProgram(ordinal);
     _activeOrdinal = ordinal;

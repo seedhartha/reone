@@ -29,12 +29,14 @@ namespace reone {
 
 namespace game {
 
+constexpr float kFarPlane = 10000.0f;
+
 StaticCamera::StaticCamera(SceneGraph *sceneGraph, float aspect) : _aspect(aspect) {
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f));
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f), kFarPlane);
 }
 
 void StaticCamera::setObject(const PlaceableCamera &object) {
-    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, 0.1f, 10000.0f));
+    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, 0.1f, kFarPlane));
 
     _sceneNode->setLocalTransform(object.transform());
     _sceneNode->setProjection(projection);

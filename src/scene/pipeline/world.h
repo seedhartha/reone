@@ -41,7 +41,7 @@ private:
     render::Framebuffer _geometry;
     render::Framebuffer _verticalBlur;
     render::Framebuffer _horizontalBlur;
-    std::vector<std::unique_ptr<render::Framebuffer>> _shadows;
+    render::Framebuffer _shadows;
 
     WorldRenderPipeline(const WorldRenderPipeline &) = delete;
     WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
@@ -51,6 +51,8 @@ private:
     void applyHorizontalBlur() const;
     void applyVerticalBlur() const;
     void drawResult() const;
+
+    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapSide side) const;
 };
 
 } // namespace scene

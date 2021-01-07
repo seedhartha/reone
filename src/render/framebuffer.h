@@ -29,7 +29,7 @@ namespace render {
 
 class Framebuffer {
 public:
-    Framebuffer(int w, int h, int colorBufferCount = 1);
+    Framebuffer(int w, int h, int colorBufferCount = 1, bool cubeMapDepthBuffer = false);
     ~Framebuffer();
 
     void init();
@@ -50,7 +50,9 @@ public:
 private:
     int _width { 0 };
     int _height { 0 };
-    int _colorBufferCount { 0 };
+    int _numColorBuffers { 0 };
+    bool _cubeMapDepthBuffer { false };
+
     bool _inited { false };
     uint32_t _framebuffer { 0 };
     std::vector<std::unique_ptr<Texture>> _colorBuffers;

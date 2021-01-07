@@ -30,7 +30,8 @@ namespace reone {
 
 namespace render {
 
-const int kMaxShadowLightCount = 2;
+constexpr int kMaxShadowLightCount = 2;
+constexpr int kNumCubeFaces = 6;
 
 enum class TextureType {
     Diffuse,
@@ -40,12 +41,22 @@ enum class TextureType {
     GUI,
     Cursor,
     ColorBuffer,
-    DepthBuffer
+    DepthBuffer,
+    CubeMapDepthBuffer
 };
 
 enum class TextureBlending {
     None,
     Additive
+};
+
+enum class CubeMapSide {
+    PositiveX = 0,
+    NegativeX = 1,
+    PositiveY = 2,
+    NegativeY = 3,
+    PositiveZ = 4,
+    NegativeZ = 5
 };
 
 struct GraphicsOptions {
@@ -63,12 +74,6 @@ struct TextureFeatures {
     float fontHeight { 0.0f };
     std::vector<glm::vec3> upperLeftCoords;
     std::vector<glm::vec3> lowerRightCoords;
-};
-
-struct ShadowLight {
-    glm::vec4 position { 0.0f };
-    glm::mat4 view { 1.0f };
-    glm::mat4 projection { 1.0f };
 };
 
 class IEventHandler {
