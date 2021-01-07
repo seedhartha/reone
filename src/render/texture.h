@@ -104,9 +104,16 @@ private:
 
     void fillTarget(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
 
+    /**
+    * @return true if texture of this type is a cube map, false otherwise
+    */
     bool isCubeMap() const;
 
-    int getMinFilter() const;
+    /**
+     * @return true if texture of this type should have mip maps, false otherwise
+     */
+    bool hasMipMaps() const;
+
     int getInternalPixelFormat() const;
     uint32_t getPixelFormat() const;
 };

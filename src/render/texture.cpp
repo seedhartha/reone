@@ -64,7 +64,7 @@ void Texture::configureCubeMap() {
 
 void Texture::configure2D() {
     glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     if (_type == TextureType::GUI) {
@@ -73,8 +73,8 @@ void Texture::configure2D() {
     }
 }
 
-int Texture::getMinFilter() const {
-    return (_type == TextureType::GUI || _type == TextureType::Cursor) ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+bool Texture::hasMipMaps() const {
+    return _type != TextureType::GUI && _type != TextureType::Cursor;
 }
 
 Texture::~Texture() {
@@ -189,7 +189,7 @@ void Texture::refresh2D() {
             const MipMap &mipMap = layer.mipMaps[i];
             fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, &mipMap.data[0], mipMap.data.size());
         }
-        if (mipMapCount == 1) {
+        if (mipMapCount == 1 && hasMipMaps()) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
     } else {
