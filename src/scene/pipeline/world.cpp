@@ -152,7 +152,7 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
         Quad::getDefault().renderTriangles();
     });
 
-    _geometry.unbindColorBuffer();
+    _geometry.unbindColorBuffer(1);
     _horizontalBlur.unbind();
 }
 
@@ -182,7 +182,7 @@ void WorldRenderPipeline::applyVerticalBlur() const {
         Quad::getDefault().renderTriangles();
     });
 
-    _horizontalBlur.unbindColorBuffer();
+    _horizontalBlur.unbindColorBuffer(0);
     _verticalBlur.unbind();
 }
 
@@ -209,10 +209,10 @@ void WorldRenderPipeline::drawResult() const {
     Quad::getDefault().renderTriangles();
 
     setActiveTextureUnit(TextureUniforms::bloom);
-    _verticalBlur.unbindColorBuffer();
+    _verticalBlur.unbindColorBuffer(0);
 
     setActiveTextureUnit(0);
-    _geometry.unbindColorBuffer();
+    _geometry.unbindColorBuffer(0);
 }
 
 } // namespace scene
