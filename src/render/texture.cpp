@@ -29,8 +29,6 @@ namespace reone {
 
 namespace render {
 
-constexpr int kNumCubeMapSides = 6;
-
 Texture::Texture(string name, TextureType type, int w, int h) :
     _name(move(name)), _type(type), _width(w), _height(h) {
 }
@@ -50,16 +48,25 @@ void Texture::init() {
 }
 
 bool Texture::isCubeMap() const {
-    return _type == TextureType::EnvironmentMap;
+    return _type == TextureType::EnvironmentMap || _type == TextureType::CubeMapDepthBuffer;
 }
 
 void Texture::configureCubeMap() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, getMinFilter());
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getMagFilter());
+
+    if (_type == TextureType::CubeMapDepthBuffer) {
+        static float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor);
+    } else {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
 }
 
 void Texture::configure2D() {
@@ -86,13 +93,26 @@ void Texture::configure2D() {
 }
 
 int Texture::getMinFilter() const {
-    if (_type == TextureType::DepthBuffer) return GL_NEAREST;
+    if (isDepthBuffer()) return GL_NEAREST;
 
     return hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
 }
 
+bool Texture::hasMipMaps() const {
+    return
+        _type != TextureType::GUI &&
+        _type != TextureType::Cursor &&
+        _type != TextureType::ColorBuffer &&
+        _type != TextureType::DepthBuffer &&
+        _type != TextureType::EnvironmentMap;
+}
+
+bool Texture::isDepthBuffer() const {
+    return _type == TextureType::DepthBuffer || _type == TextureType::CubeMapDepthBuffer;
+}
+
 int Texture::getMagFilter() const {
-    return _type == TextureType::DepthBuffer ? GL_NEAREST : GL_LINEAR;
+    return isDepthBuffer() ? GL_NEAREST : GL_LINEAR;
 }
 
 Texture::~Texture() {
@@ -128,7 +148,7 @@ void Texture::refresh() {
 void Texture::refreshCubeMap() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
 
-    for (int i = 0; i < kNumCubeMapSides; ++i) {
+    for (int i = 0; i < kNumCubeFaces; ++i) {
         if (i < _layers.size()) {
             const MipMap &mipMap = _layers[i].mipMaps.front();
             fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, &mipMap.data[0], mipMap.data.size());
@@ -218,20 +238,12 @@ void Texture::refresh2D() {
     }
 }
 
-bool Texture::hasMipMaps() const {
-    return
-        _type != TextureType::GUI &&
-        _type != TextureType::Cursor &&
-        _type != TextureType::ColorBuffer &&
-        _type != TextureType::DepthBuffer;
-}
-
 void Texture::bind() const {
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
 void Texture::unbind() const {
-    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
 }
 
 bool Texture::isAdditive() const {

@@ -27,7 +27,8 @@ namespace reone {
 
 namespace render {
 
-Framebuffer::Framebuffer(int w, int h, int colorBufferCount) : _width(w), _height(h), _colorBufferCount(colorBufferCount) {
+Framebuffer::Framebuffer(int w, int h, int numColorBuffers, bool cubeMapDepthBuffer) :
+    _width(w), _height(h), _numColorBuffers(numColorBuffers), _cubeMapDepthBuffer(cubeMapDepthBuffer) {
 }
 
 Framebuffer::~Framebuffer() {
@@ -37,8 +38,8 @@ Framebuffer::~Framebuffer() {
 void Framebuffer::init() {
     if (_inited) return;
 
-    if (_colorBufferCount > 0) {
-        for (int i = 0; i < _colorBufferCount; ++i) {
+    if (_numColorBuffers > 0) {
+        for (int i = 0; i < _numColorBuffers; ++i) {
             auto texture = make_unique<Texture>("color" + to_string(i), TextureType::ColorBuffer, _width, _height);
             texture->init();
             texture->clearPixels(PixelFormat::RGBA);
@@ -47,17 +48,23 @@ void Framebuffer::init() {
         }
     }
 
-    _depthBuffer = make_unique<Texture>("depth", TextureType::DepthBuffer, _width, _height);
+    _depthBuffer = make_unique<Texture>("depth", _cubeMapDepthBuffer ? TextureType::CubeMapDepthBuffer : TextureType::DepthBuffer, _width, _height);
     _depthBuffer->init();
     _depthBuffer->clearPixels(PixelFormat::Depth);
 
     glGenFramebuffers(1, &_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 
-    for (int i = 0; i < _colorBufferCount; ++i) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _colorBuffers[i]->textureId(), 0);
+    if (_numColorBuffers > 0) {
+        for (int i = 0; i < _numColorBuffers; ++i) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _colorBuffers[i]->textureId(), 0);
+        }
     }
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthBuffer->textureId(), 0);
+    if (_cubeMapDepthBuffer) {
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthBuffer->textureId(), 0);
+    } else {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthBuffer->textureId(), 0);
+    }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         throw runtime_error("Framebuffer is not complete");

@@ -84,14 +84,12 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         if (mesh->hasBumpmapTexture()) {
             locals.general.bumpmapEnabled = true;
         }
-
         bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
         if (receivesShadows) {
             locals.general.shadowsEnabled = true;
         }
-
         shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
-        if (!shadowPass && skin) {
+        if (skin) {
             locals.general.skeletalEnabled = true;
             locals.skeletal = Shaders::instance().skeletalUniforms();
             locals.skeletal->absTransform = _modelNode->absoluteTransform();
@@ -110,12 +108,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 }
             }
         }
-
-        if (!shadowPass && _modelNode->isSelfIllumEnabled()) {
+        if (_modelNode->isSelfIllumEnabled()) {
             locals.general.selfIllumEnabled = true;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (!shadowPass && _modelSceneNode->isLightingEnabled()) {
+        if (_modelSceneNode->isLightingEnabled()) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.lightingEnabled = true;
@@ -131,7 +128,8 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             }
         }
     }
-    ShaderProgram program = shadowPass ? ShaderProgram::ModelWhite : ShaderProgram::ModelModel;
+
+    ShaderProgram program = shadowPass ? ShaderProgram::DepthDepth : ShaderProgram::ModelModel;
     Shaders::instance().activate(program, locals);
 
     mesh->render(_modelSceneNode->textureOverride());

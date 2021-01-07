@@ -110,6 +110,8 @@ private:
     */
     bool isCubeMap() const;
 
+    bool isDepthBuffer() const;
+
     /**
      * @return true if texture of this type should have mip maps, false otherwise
      */

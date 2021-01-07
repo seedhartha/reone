@@ -54,11 +54,13 @@ public:
 
     // Lights
 
-    const std::vector<render::ShadowLight> &shadowLights() const;
+    bool isShadowLightPresent() const;
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
+    const glm::vec3 &shadowLightPosition() const;
+
     void setAmbientLightColor(const glm::vec3 &color);
 
     // END Lights
@@ -73,16 +75,15 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    std::vector<render::ShadowLight> _shadowLights;
+    bool _shadowLightPresent { false };
+    glm::vec3 _shadowLightPosition { 0.0f };
     std::shared_ptr<SceneNode> _refNode;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
     void refreshMeshesAndLights();
-    void refreshShadowLights();
-
-    glm::mat4 getLightProjection() const;
+    void refreshShadowLight();
 };
 
 } // namespace scene
