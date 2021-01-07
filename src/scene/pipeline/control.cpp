@@ -87,7 +87,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
 
         Quad::getDefault().renderTriangles();
 
-        _geometry.unbindColorBuffer();
+        _geometry.unbindColorBuffer(0);
     }
 }
 

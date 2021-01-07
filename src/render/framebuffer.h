@@ -18,7 +18,10 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
+
+#include "texture.h"
 
 namespace reone {
 
@@ -31,11 +34,14 @@ public:
 
     void init();
     void deinit();
+
     void bind() const;
     void unbind() const;
+
     void bindColorBuffer(int n) const;
+    void unbindColorBuffer(int n) const;
+
     void bindDepthBuffer() const;
-    void unbindColorBuffer() const;
     void unbindDepthBuffer() const;
 
     int width() const;
@@ -47,8 +53,8 @@ private:
     int _colorBufferCount { 0 };
     bool _inited { false };
     uint32_t _framebuffer { 0 };
-    std::vector<uint32_t> _colorBuffers;
-    uint32_t _depthBuffer { 0 };
+    std::vector<std::unique_ptr<Texture>> _colorBuffers;
+    std::unique_ptr<Texture> _depthBuffer;
 
     Framebuffer(const Framebuffer &) = delete;
     Framebuffer &operator=(const Framebuffer &) = delete;

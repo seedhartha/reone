@@ -38,7 +38,9 @@ enum class TextureType {
     EnvironmentMap,
     Bumpmap,
     GUI,
-    Cursor
+    Cursor,
+    ColorBuffer,
+    DepthBuffer
 };
 
 enum class TextureBlending {

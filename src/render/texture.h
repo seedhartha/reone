@@ -34,7 +34,8 @@ enum class PixelFormat {
     BGR,
     BGRA,
     DXT1,
-    DXT5
+    DXT5,
+    Depth
 };
 
 class Texture {
@@ -64,8 +65,8 @@ public:
 
     void clearPixels(PixelFormat format);
 
-    void bind();
-    void unbind();
+    void bind() const;
+    void unbind() const;
 
     bool isAdditive() const;
 
@@ -116,6 +117,8 @@ private:
 
     int getInternalPixelFormat() const;
     uint32_t getPixelFormat() const;
+    int getMinFilter() const;
+    int getMagFilter() const;
 };
 
 } // namespace render

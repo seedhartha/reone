@@ -64,17 +64,35 @@ void Texture::configureCubeMap() {
 
 void Texture::configure2D() {
     glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getMagFilter());
 
-    if (_type == TextureType::GUI) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    switch (_type) {
+        case TextureType::GUI:
+        case TextureType::ColorBuffer:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            break;
+        case TextureType::DepthBuffer: {
+            static float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+            break;
+        }
+        default:
+            break;
     }
 }
 
-bool Texture::hasMipMaps() const {
-    return _type != TextureType::GUI && _type != TextureType::Cursor;
+int Texture::getMinFilter() const {
+    if (_type == TextureType::DepthBuffer) return GL_NEAREST;
+
+    return hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+}
+
+int Texture::getMagFilter() const {
+    return _type == TextureType::DepthBuffer ? GL_NEAREST : GL_LINEAR;
 }
 
 Texture::~Texture() {
@@ -132,6 +150,9 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
             glCompressedTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, size, pixels);
+            break;
+        case PixelFormat::Depth:
+            glTexImage2D(target, level, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
             break;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
@@ -197,11 +218,19 @@ void Texture::refresh2D() {
     }
 }
 
-void Texture::bind() {
+bool Texture::hasMipMaps() const {
+    return
+        _type != TextureType::GUI &&
+        _type != TextureType::Cursor &&
+        _type != TextureType::ColorBuffer &&
+        _type != TextureType::DepthBuffer;
+}
+
+void Texture::bind() const {
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
-void Texture::unbind() {
+void Texture::unbind() const {
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
 }
 
