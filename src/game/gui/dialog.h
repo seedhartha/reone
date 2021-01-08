@@ -77,6 +77,7 @@ private:
     void scheduleEndOfEntry();
     void updateCamera();
     void updateParticipantAnimations();
+    void repositionMessage();
 
     void onReplyClicked(int index);
 
