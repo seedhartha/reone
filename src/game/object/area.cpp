@@ -581,16 +581,14 @@ void Area::update(float dt) {
     updateHeartbeat(dt);
 }
 
-bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
-    glm::vec3 position(creature->position());
-    glm::vec2 delta(dest - glm::vec2(position));
-    glm::vec2 dir(glm::normalize(delta));
-
+bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
     float facing = -glm::atan(dir.x, dir.y);
     creature->setFacing(facing);
 
     float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
+
+    glm::vec3 position(creature->position());
     position.x += dir.x * speedDt;
     position.y += dir.y * speedDt;
 
@@ -611,6 +609,12 @@ bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::
     }
 
     return false;
+}
+
+bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
+    glm::vec2 delta(dest - glm::vec2(creature->position()));
+    glm::vec2 dir(glm::normalize(delta));
+    return moveCreature(creature, dir, run, dt);
 }
 
 void Area::runSpawnScripts() {

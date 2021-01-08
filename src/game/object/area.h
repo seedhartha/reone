@@ -74,11 +74,13 @@ public:
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
-    bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
+
+    bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
+    bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
 
     bool isUnescapable() const;
 
