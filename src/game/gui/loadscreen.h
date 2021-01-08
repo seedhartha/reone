@@ -23,11 +23,18 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class LoadingScreen : public gui::GUI {
 public:
-    LoadingScreen(resource::GameVersion version, const render::GraphicsOptions &opts);
+    LoadingScreen(Game *game);
 
     void load() override;
+
+    void setImage(const std::string &resRef);
+
+private:
+    Game *_game;
 };
 
 } // namespace game

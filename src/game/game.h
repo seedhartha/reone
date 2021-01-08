@@ -302,7 +302,7 @@ private:
 
     // Helper methods
 
-    void withLoadingScreen(const std::function<void()> &block);
+    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
 
     // END Helper methods
 };
