@@ -372,7 +372,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(find(objectId));
+    shared_ptr<SpatialObject> object(getObjectById(objectId));
     if (!object) return;
     {
         Room *room = object->room();
@@ -415,14 +415,14 @@ void Area::doDestroyObject(uint32_t objectId) {
     }
 }
 
-shared_ptr<SpatialObject> Area::find(uint32_t id) const {
+shared_ptr<SpatialObject> Area::getObjectById(uint32_t id) const {
     auto object = _objectById.find(id);
     if (object == _objectById.end()) return nullptr;
 
     return object->second;
 }
 
-shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
+shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const {
     auto objects = _objectsByTag.find(tag);
     if (objects == _objectsByTag.end()) return nullptr;
     if (nth >= objects->second.size()) return nullptr;

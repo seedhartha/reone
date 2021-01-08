@@ -326,7 +326,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     auto area = _module->area();
     if (area->id() == id) return area;
 
-    return area->find(id);
+    return area->getObjectById(id);
 }
 
 void Game::drawGUI() {
