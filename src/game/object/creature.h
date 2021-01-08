@@ -128,8 +128,8 @@ public:
 
     // Equipment
 
-    void equip(const std::string &resRef);
-    void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    bool equip(const std::string &resRef);
+    bool equip(InventorySlot slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
     bool isSlotEquipped(InventorySlot slot) const;

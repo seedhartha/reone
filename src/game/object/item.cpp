@@ -122,6 +122,14 @@ void Item::setIdentified(bool value) {
     _identified = value;
 }
 
+bool Item::isEquipped() const {
+    return _equipped;
+}
+
+void Item::setEquipped(bool equipped) {
+    _equipped = equipped;
+}
+
 } // namespace game
 
 } // namespace reone

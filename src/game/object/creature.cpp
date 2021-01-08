@@ -293,37 +293,47 @@ void Creature::playAnimation(CombatAnimation animation) {
     playAnimation(animName, flags);
 }
 
-void Creature::equip(const string &resRef) {
+bool Creature::equip(const string &resRef) {
     shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint);
 
+    bool equipped = false;
+
     if (item->isEquippable(kInventorySlotBody)) {
-        equip(kInventorySlotBody, item);
+        equipped = equip(kInventorySlotBody, item);
     } else if (item->isEquippable(kInventorySlotRightWeapon)) {
-        equip(kInventorySlotRightWeapon, item);
+        equipped = equip(kInventorySlotRightWeapon, item);
     }
+
+    return equipped;
 }
 
-void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
-    if (item->isEquippable(slot)) {
-        _equipment[slot] = item;
-    }
+bool Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
+    if (!item->isEquippable(slot)) return false;
+
+    _equipment[slot] = item;
+    item->setEquipped(true);
+
     if (_model) {
         updateModel();
     }
+
+    return true;
 }
 
 void Creature::unequip(const shared_ptr<Item> &item) {
     for (auto &equipped : _equipment) {
         if (equipped.second == item) {
+            item->setEquipped(false);
             _equipment.erase(equipped.first);
+
+            if (_model) {
+                updateModel();
+            }
             break;
         }
-    }
-    if (_model) {
-        updateModel();
     }
 }
 

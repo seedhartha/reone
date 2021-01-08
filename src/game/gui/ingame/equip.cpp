@@ -24,6 +24,7 @@
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
 
+#include "../../blueprint/blueprints.h"
 #include "../../game.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
@@ -158,12 +159,20 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
 
     if (equipped != itemObj) {
         if (equipped) {
-            player->addItem(equipped);
             partyLeader->unequip(equipped);
+            player->addItem(equipped);
         }
         if (itemObj) {
-            partyLeader->equip(slot, itemObj);
-            player->removeItem(itemObj);
+            bool last;
+            if (player->removeItem(itemObj, last)) {
+                if (last) {
+                    partyLeader->equip(slot, itemObj);
+                } else {
+                    shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
+                    clonedItem->load(Blueprints::instance().getItem(itemObj->blueprintResRef()));
+                    partyLeader->equip(slot, clonedItem);
+                }
+            }
         }
         updateEquipment();
         selectSlot(Slot::None);

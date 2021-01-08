@@ -41,6 +41,7 @@ public:
     bool isEquippable(InventorySlot slot) const;
     bool isDropable() const;
     bool isIdentified() const;
+    bool isEquipped() const;
 
     const std::string &localizedName() const;
     const std::string &baseBodyVariation() const;
@@ -60,6 +61,7 @@ public:
     void setDropable(bool dropable);
     void setStackSize(int size);
     void setIdentified(bool value);
+    void setEquipped(bool equipped);
 
 private:
     std::string _localizedName;
@@ -79,6 +81,7 @@ private:
     bool _dropable { true };
     int _stackSize { 1 };
     bool _identified { true };
+    bool _equipped { false };
 
     friend class ItemBlueprint;
 };
