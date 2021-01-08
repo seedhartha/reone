@@ -288,18 +288,18 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setFacing(entryFacing);
 
     _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _camStyleDefault);
-    _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
+    _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
     _dialogCamera = make_unique<DialogCamera>(sceneGraph, _camStyleDefault, _cameraAspect);
-    _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
+    _dialogCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
 
     _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
     _staticCamera = make_unique<StaticCamera>(sceneGraph, _cameraAspect);
 }
 
-bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
+bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
 
@@ -320,7 +320,7 @@ bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, gl
     return false;
 }
 
-bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
+bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
     glm::vec3 origin(creature.position());
     origin.z += kCreatureObstacleTestZ;
 
@@ -588,23 +588,40 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
 
-    glm::vec3 position(creature->position());
-    position.x += dir.x * speedDt;
-    position.y += dir.y * speedDt;
+    glm::vec3 dest(creature->position());
+    dest.x += dir.x * speedDt;
+    dest.y += dir.y * speedDt;
 
-    Room *room = nullptr;
+    // If obstacle is found once, try taking to the right
+    if (getCreatureObstacle(*creature, dest)) {
+        // TODO: possibly use the intersected face normal?
+        facing -= glm::half_pi<float>();
+        glm::vec2 right(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
 
-    if (findCreatureObstacle(*creature, position)) {
-        return false;
+        dest = creature->position();
+        dest.x += right.x * speedDt;
+        dest.y += right.y * speedDt;
+
+        // If obstacle is found twice, abort movement
+        if (getCreatureObstacle(*creature, dest)) return false;
     }
-    if (getElevationAt(position, creature.get(), room, position.z)) {
+
+    return doMoveCreature(creature, dest);
+}
+
+bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest) {
+    float z;
+    Room *room;
+
+    if (getElevationAt(dest, creature.get(), room, z)) {
         creature->setRoom(room);
-        creature->setPosition(position);
+        creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
         if (creature == _game->party().leader()) {
             onPartyLeaderMoved();
         }
         checkTriggersIntersection(creature);
+
         return true;
     }
 

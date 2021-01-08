@@ -213,11 +213,8 @@ private:
     // END Stealth
 
     void add(const std::shared_ptr<SpatialObject> &object);
-    void determineObjectRoom(SpatialObject &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
-    void landObject(SpatialObject &object);
-    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
     void updateVisibility();
     void updateSounds();
     void updateHeartbeat(float dt);
@@ -231,9 +228,7 @@ private:
 
     void printDebugInfo(const SpatialObject &object);
 
-    bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
-    bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
-    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
+    bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
 
     // Loading
 
@@ -265,6 +260,28 @@ private:
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
     // END User input
+
+    // Collision detection
+
+    void determineObjectRoom(SpatialObject &object);
+    void landObject(SpatialObject &object);
+    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
+
+    bool getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
+
+    /**
+    * Find the closest obstacle in the creatures path.
+    *
+    * @param creature moving creature
+    * @param dest creatures destination
+    *
+    * @return true if obstacle is found, false otherwise
+    */
+    bool getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
+
+    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
+
+    // END Collision detection
 };
 
 } // namespace game
