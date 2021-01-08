@@ -44,6 +44,8 @@ public:
     void clear();
     void switchLeader();
 
+    void onHeartbeat();
+
     bool empty() const;
     int size() const;
     std::shared_ptr<Creature> player() const;

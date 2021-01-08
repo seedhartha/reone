@@ -32,7 +32,8 @@ namespace reone {
 
 namespace game {
 
-static const int kMaxMemberCount = 3;
+constexpr int kMaxMemberCount = 3;
+constexpr float kTeleMemberDistance = 32.0f;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {
@@ -121,13 +122,27 @@ void Party::switchLeader() {
 }
 
 void Party::onLeaderChanged() {
-    _members[0].creature->actionQueue().clear();
-
-    for (int i = 1; i < static_cast<int>(_members.size()); ++i) {
-        _members[i].creature->actionQueue().clear();
-        _members[i].creature->actionQueue().add(make_unique<FollowAction>(_members[0].creature, 1.0f));
+    for (auto &member : _members) {
+        member.creature->actionQueue().clear();
     }
     _game->module()->area()->onPartyLeaderMoved();
+}
+
+void Party::onHeartbeat() {
+    shared_ptr<Creature> leader(_members[0].creature);
+
+    for (int i = 1; i < _members.size(); ++i) {
+        shared_ptr<Creature> member(_members[i].creature);
+        ActionQueue &actions = member->actionQueue();
+        shared_ptr<Action> action(actions.currentAction());
+        if (!action) {
+            actions.add(make_unique<FollowAction>(leader, 1.0f));
+        }
+        if (member->distanceTo(*leader) > kTeleMemberDistance) {
+            member->setPosition(leader->position());
+            _game->module()->area()->landObject(*member);
+        }
+    }
 }
 
 const string &Party::getAvailableMember(int npc) const {

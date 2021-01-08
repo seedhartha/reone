@@ -876,6 +876,8 @@ void Area::updateHeartbeat(float dt) {
                 _game->scriptRunner().run(heartbeat, object->id());
             }
         }
+        _game->party().onHeartbeat();
+
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }
