@@ -37,7 +37,7 @@ namespace reone {
 namespace scene {
 
 constexpr int kShadowResolution = 4096;
-constexpr float kShadowFarPlane = 1000.0f;
+constexpr float kShadowFarPlane = 10000.0f;
 
 static bool g_debugShadows = false;
 

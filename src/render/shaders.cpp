@@ -37,15 +37,14 @@ namespace render {
 static const int kFeaturesBindingPointIndex = 1;
 static const int kGeneralBindingPointIndex = 2;
 static const int kLightingBindingPointIndex = 3;
-static const int kShadowsBindingPointIndex = 4;
-static const int kSkeletalBindingPointIndex = 5;
+static const int kSkeletalBindingPointIndex = 4;
 
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 8;
 const int MAX_BONES = 128;
-const float SHADOW_FAR_PLANE = 1000.0;
+const float SHADOW_FAR_PLANE = 10000.0;
 
 struct Light {
     vec4 position;
