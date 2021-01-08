@@ -143,13 +143,13 @@ void Control::loadBorder(const GffStruct &gffs) {
 
     _border = make_shared<Border>();
 
-    if (!corner.empty()) {
+    if (!corner.empty() && corner != "0") {
         _border->corner = Textures::instance().get(corner, TextureType::GUI);
     }
-    if (!edge.empty()) {
+    if (!edge.empty() && edge != "0") {
         _border->edge = Textures::instance().get(edge, TextureType::GUI);
     }
-    if (!fill.empty()) {
+    if (!fill.empty() && fill != "0") {
         _border->fill = Textures::instance().get(fill, TextureType::GUI);
     }
 
@@ -174,13 +174,13 @@ void Control::loadHilight(const GffStruct &gffs) {
 
     _hilight = make_shared<Border>();
 
-    if (!corner.empty()) {
+    if (!corner.empty() && corner != "0") {
         _hilight->corner = Textures::instance().get(corner, TextureType::GUI);
     }
-    if (!edge.empty()) {
+    if (!edge.empty() && edge != "0") {
         _hilight->edge = Textures::instance().get(edge, TextureType::GUI);
     }
-    if (!fill.empty()) {
+    if (!fill.empty() && fill != "0") {
         _hilight->fill = Textures::instance().get(fill, TextureType::GUI);
     }
 

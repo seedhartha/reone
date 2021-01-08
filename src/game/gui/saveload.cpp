@@ -52,7 +52,10 @@ SaveLoad::SaveLoad(Game *game) :
     _game(game) {
 
     _resRef = getResRef("saveload");
-    _backgroundType = BackgroundType::Menu;
+
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
+    }
 
     initForGame();
 }
