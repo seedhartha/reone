@@ -42,6 +42,8 @@ public:
 
     const std::string &text() const;
 
+    void setText(std::string text);
+
 private:
     int _mask { 0 };
     std::string _text;

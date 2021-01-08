@@ -247,10 +247,17 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
                 string text(_input.text());
                 if (!text.empty()) {
                     executeInputText();
+                    _history.push(_input.text());
                     _input.clear();
                 }
                 return true;
             }
+            case SDLK_UP:
+                if (!_history.empty()) {
+                    _input.setText(_history.top());
+                    _history.pop();
+                }
+                return true;
             default:
                 return false;
         }

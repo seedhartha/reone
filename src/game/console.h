@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <memory>
+#include <stack>
 #include <string>
 #include <queue>
 #include <unordered_map>
@@ -56,6 +57,7 @@ private:
     std::deque<std::string> _output;
     int _outputOffset { 0 };
     std::unordered_map<std::string, CommandHandler> _commands;
+    std::stack<std::string> _history;
 
     Console(const Console &) = delete;
     Console &operator=(const Console &) = delete;
