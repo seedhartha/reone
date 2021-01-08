@@ -87,7 +87,7 @@ shared_ptr<Animation> Model::getAnimation(const string &name) const {
     if (_superModel) {
         return _superModel->getAnimation(name);
     }
-    warn(boost::format("Model: animation not found: '%s' '%s'") % name % _name);
+    debug(boost::format("Model: animation not found: '%s' '%s'") % name % _name, 2);
 
     return nullptr;
 }
