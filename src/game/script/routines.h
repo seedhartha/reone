@@ -154,7 +154,6 @@ private:
 
     // Objects
 
-    script::Variable createItemOnObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable createObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable cutsceneAttack(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
@@ -169,14 +168,10 @@ private:
     script::Variable getEnteringObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getExitingObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFacing(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFirstItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIdentified(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsDead(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsInCombat(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsObjectValid(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsOpen(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLastOpenedBy(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
@@ -186,7 +181,6 @@ private:
     script::Variable getNearestObject(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getNearestObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getNearestObjectToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getObjectType(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
@@ -198,14 +192,26 @@ private:
     script::Variable setCommandable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacing(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setIdentified(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setLocked(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Objects
+
+    // Items
+
+    script::Variable createItemOnObject(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getFirstItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIdentified(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getItemPossessedBy(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setIdentified(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END Items
 
     // Engine types
 

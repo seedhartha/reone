@@ -96,6 +96,7 @@ public:
 
     std::shared_ptr<Item> getFirstItem();
     std::shared_ptr<Item> getNextItem();
+    std::shared_ptr<Item> getItemByTag(const std::string &tag);
 
     const std::vector<std::shared_ptr<Item>> &items() const;
 

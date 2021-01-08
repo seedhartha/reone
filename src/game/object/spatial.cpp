@@ -310,6 +310,13 @@ shared_ptr<Item> SpatialObject::getNextItem() {
     return nullptr;
 }
 
+shared_ptr<Item> SpatialObject::getItemByTag(const string &tag) {
+    for (auto &item : _items) {
+        if (item->tag() == tag) return item;
+    }
+    return nullptr;
+}
+
 void SpatialObject::clearAllEffects() {
     _effects.clear();
 }
