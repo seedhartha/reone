@@ -71,7 +71,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::LoopingHorror:
             return "horror";
         case AnimationType::LoopingDeactivate:
-            return "deactivate";
+            return getFirstIfCreatureModel(empty, "deactivate");
         case AnimationType::LoopingSpasm:
             return getFirstIfCreatureModel("cspasm", "spasm");
         case AnimationType::LoopingSleep:
