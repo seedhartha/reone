@@ -108,8 +108,11 @@ void Console::cmdListAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("listanim: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("listanim: no object selected");
+            return;
+        }
     }
 
     string substr;
@@ -135,8 +138,11 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("playanim: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("playanim: no object selected");
+            return;
+        }
     }
     object->model()->playAnimation(tokens[1], kAnimationLoop);
 }
@@ -160,8 +166,11 @@ void Console::cmdAddItem(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("additem: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("additem: no object selected");
+            return;
+        }
     }
     int stackSize = static_cast<int>(tokens.size()) > 2 ? stoi(tokens[2]) : 1;
     object->addItem(tokens[1], stackSize);
@@ -175,8 +184,11 @@ void Console::cmdGiveXP(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
     if (!object) {
-        print("givexp: no creature selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("givexp: no object selected");
+            return;
+        }
     }
     int amount = stoi(tokens[1]);
     object->giveXP(amount);
