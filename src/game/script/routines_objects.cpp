@@ -81,21 +81,6 @@ Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
     return static_pointer_cast<ScriptObject>(_game->module()->area());
 }
 
-Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto creature = getCreatureOrCaller(args, 1, ctx);
-    if (creature) {
-        InventorySlot slot = static_cast<InventorySlot>(getInt(args, 0));
-        result.object = creature->getEquippedItem(slot);
-    } else {
-        warn("Routines: getItemInSlot: creature is invalid");
-    }
-
-    return move(result);
-}
-
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getDoor(args, 0);
     if (target) {
@@ -114,28 +99,6 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
         return 0;
     }
     return target->isLocked() ? 1 : 0;
-}
-
-Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 1, ctx);
-    if (target) {
-        string itemTemplate(getString(args, 0));
-        boost::to_lower(itemTemplate);
-
-        if (!itemTemplate.empty()) {
-            int stackSize = getInt(args, 2, 1);
-            result.object = target->addItem(itemTemplate, stackSize, true);
-        } else {
-            warn("Routines: createItemOnObject: itemTemplate is invalid");
-        }
-    } else {
-        warn("Routines: createItemOnObject: target is invalid");
-    }
-
-    return move(result);
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
@@ -241,41 +204,6 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
     return objectA->distanceTo(*objectB);
 }
 
-Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
-    if (target) {
-        auto item = target->getFirstItem();
-        if (item) {
-            result.object = move(item);
-        }
-    } else {
-        warn("Routines: getFirstItemInInventory: target is invalid");
-    }
-
-    return move(result);
-}
-
-Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
-    if (target) {
-        auto item = target->getNextItem();
-        if (item) {
-            result.object = move(item);
-        }
-    } else {
-        warn("Routines: getNextItemInInventory: target is invalid");
-    }
-
-    return move(result);
-}
-
-
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
@@ -315,26 +243,6 @@ Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
         return false;
     }
     return object->isOpen();
-}
-
-Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (!item) {
-        warn("Routines: getItemStackSize: item is invalid");
-        return 0;
-    }
-    return item->stackSize();
-}
-
-Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (item) {
-        int stackSize = getInt(args, 1);
-        item->setStackSize(stackSize);
-    } else {
-        warn("Routines: setItemStackSize: item is invalid");
-    }
-    return Variable();
 }
 
 Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
@@ -413,26 +321,6 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
     }
     facer->faceAwayFrom(*objectToFaceAwayFrom);
 
-    return Variable();
-}
-
-Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (!item) {
-        warn("Routines: getIdentified: item is invalid");
-        return 0;
-    }
-    return item->isIdentified() ? 1 : 0;
-}
-
-Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (item) {
-        bool identified = getBool(args, 1);
-        item->setIdentified(identified);
-    } else {
-        warn("Routines: setIdentified: item is invalid");
-    }
     return Variable();
 }
 

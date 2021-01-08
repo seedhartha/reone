@@ -68,7 +68,7 @@ void Routines::addTslRoutines() {
     add("GetPosition", TVector, { Object }, &Routines::getPosition);
     add("GetFacing", Float, { Object }, &Routines::getFacing);
     add("GetItemPossessor", Object, { Object });
-    add("GetItemPossessedBy", Object, { Object, String });
+    add("GetItemPossessedBy", Object, { Object, String }, &Routines::getItemPossessedBy);
     add("CreateItemOnObject", Object, { String, Object, Int, Int }, &Routines::createItemOnObject);
     add("ActionEquipItem", Void, { Object, Int, Int }, &Routines::actionEquipItem);
     add("ActionUnequipItem", Void, { Object, Int }, &Routines::actionUnequipItem);

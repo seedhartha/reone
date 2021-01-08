@@ -548,6 +548,7 @@ set(GAME_SOURCES
     src/game/script/routines_effects.cpp
     src/game/script/routines_enginetypes.cpp
     src/game/script/routines_events.cpp
+    src/game/script/routines_items.cpp
     src/game/script/routines_kotor.cpp
     src/game/script/routines_objects.cpp
     src/game/script/routines_math.cpp
