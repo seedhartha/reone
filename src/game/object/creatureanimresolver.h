@@ -50,6 +50,11 @@ public:
 private:
     const Creature *_creature;
 
+    /**
+     * @return creatureAnim if model type is creature, elseAnim otherwise
+     */
+    std::string getFirstIfCreatureModel(std::string creatureAnim, std::string elseAnim) const;
+
     bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
     int getWeaponWieldNumber(WeaponWield wield) const;
 };
