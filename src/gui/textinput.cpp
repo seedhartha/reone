@@ -103,6 +103,10 @@ const string &TextInput::text() const {
     return _text;
 }
 
+void TextInput::setText(string text) {
+    _text = move(text);
+}
+
 } // namespace gui
 
 } // namespace reone
