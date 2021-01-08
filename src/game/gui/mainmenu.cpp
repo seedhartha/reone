@@ -27,6 +27,7 @@
 #include "../../render/models.h"
 #include "../../resource/resources.h"
 
+#include "../blueprint/blueprints.h"
 #include "../game.h"
 
 #include "colorutil.h"
@@ -44,16 +45,15 @@ namespace reone {
 
 namespace game {
 
-static const bool kWarpEnabled = true;
+constexpr float kKotorModelSize = 1.3f;
+constexpr float kKotorModelOffsetY = 1.25f;
 
-static const int kAppearanceBastila = 4;
-static const int kAppearanceCarth = 6;
-static const int kAppearanceDarthRevan = 22;
-static const int kAppearanceAtton = 452;
-static const int kAppearanceKreia = 455;
+static const char kBlueprintResRefCarth[] = "p_carth";
+static const char kBlueprintResRefBastila[] = "p_bastilla";
+static const char kBlueprintResRefAtton[] = "p_atton";
+static const char kBlueprintResRefKreia[] = "p_kreia";
 
-static const float kKotorModelSize = 1.3f;
-static const float kKotorModelOffsetY = 1.25f;
+static bool g_warpEnabled = true;
 
 MainMenu::MainMenu(Game *game) :
     GUI(game->version(), game->options().graphics),
@@ -85,7 +85,7 @@ void MainMenu::load() {
     setControlDisabled("BTN_MOVIES", true);
     setControlDisabled("BTN_OPTIONS", true);
 
-    if (!kWarpEnabled) {
+    if (!g_warpEnabled) {
         hideControl("BTN_WARP");
     }
     configureButtons();
@@ -183,49 +183,43 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    auto playerCfg = make_shared<StaticCreatureBlueprint>();
-    auto companionCfg = make_shared<StaticCreatureBlueprint>();
+    shared_ptr<CreatureBlueprint> playerBlueprint;
+    shared_ptr<CreatureBlueprint> companionBlueprint;
 
     switch (_version) {
         case GameVersion::TheSithLords:
-            playerCfg->setAppearance(kAppearanceAtton);
-            playerCfg->addEquippedItem("w_blaste_01");
-            companionCfg->setAppearance(kAppearanceKreia);
-            companionCfg->addEquippedItem("w_melee_06");
+            playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
+            companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
             break;
         default:
-            playerCfg->setAppearance(kAppearanceCarth);
-            playerCfg->addEquippedItem("g_w_blstrpstl001");
-            companionCfg->setAppearance(kAppearanceBastila);
-            companionCfg->addEquippedItem("g_w_dblsbr004");
+            playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefCarth);
+            companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefBastila);
             break;
     }
-
-    CreatureAttributes attributes;
-    attributes.addClassLevels(ClassType::Soldier, 1);
-
-    playerCfg->setAttributes(attributes);
-    playerCfg->addEquippedItem("g_a_clothes01");
-
-    companionCfg->setAttributes(attributes);
-    companionCfg->addEquippedItem("g_a_clothes01");
 
     Party &party = _game->party();
 
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->load(playerCfg);
+    player->load(playerBlueprint);
     player->setTag(kObjectTagPlayer);
-    player->setFaction(Faction::Friendly1);
     player->setImmortal(true);
     party.addMember(kNpcPlayer, player);
     party.setPlayer(player);
 
     shared_ptr<Creature> companion(_game->objectFactory().newCreature());
-    companion->load(companionCfg);
-    companion->setFaction(Faction::Friendly1);
+    companion->load(companionBlueprint);
     companion->setImmortal(true);
-    companion->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
     party.addMember(0, companion);
+
+    switch (_version) {
+        case GameVersion::TheSithLords:
+            player->equip("w_blaste_01");
+            companion->equip("w_melee_06");
+            break;
+        default:
+            companion->equip("g_w_dblsbr004");
+            break;
+    }
 
     _game->loadModule(name);
 }
