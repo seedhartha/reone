@@ -17,6 +17,7 @@
 
 #include "textures.h"
 
+#include "../common/log.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
@@ -60,7 +61,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
 
     bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
     if (tryTpc) {
-        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture));
+        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture, false));
         if (tpcData) {
             TpcFile tpc(resRef, type);
             tpc.load(wrap(tpcData));
@@ -69,12 +70,16 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga));
+        shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
         if (tgaData) {
             TgaFile tga(resRef, type);
             tga.load(wrap(tgaData));
             texture = tga.texture();
         }
+    }
+
+    if (!texture) {
+        warn("Textures: not found: " + resRef);
     }
 
     return move(texture);
