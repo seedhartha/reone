@@ -78,6 +78,7 @@ public:
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
+    void landObject(SpatialObject &object);
 
     bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
     bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
@@ -264,7 +265,6 @@ private:
     // Collision detection
 
     void determineObjectRoom(SpatialObject &object);
-    void landObject(SpatialObject &object);
     void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
 
     bool getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
