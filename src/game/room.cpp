@@ -72,15 +72,15 @@ const Walkmesh *Room::walkmesh() const {
 }
 
 void Room::setVisible(bool visible) {
+    for (auto &tenant : _tenants) {
+        tenant->setVisible(visible);
+    }
     if (_visible == visible) return;
 
     _visible = visible;
 
     if (_model) {
         _model->setVisible(visible);
-    }
-    for (auto &tenant : _tenants) {
-        tenant->setVisible(visible);
     }
 }
 
