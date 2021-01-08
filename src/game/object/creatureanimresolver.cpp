@@ -57,7 +57,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::LoopingTalkForceful:
             return "tlkforce";
         case AnimationType::LoopingTalkLaughing:
-            return "tlklaugh";
+            return getFirstIfCreatureModel(empty, "tlklaugh");
         case AnimationType::LoopingTalkSad:
             return "tlksad";
         case AnimationType::LoopingFlirt:
@@ -79,7 +79,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::LoopingProne:
             return "prone";
         case AnimationType::LoopingPause3:
-            return "pause3";
+            return getFirstIfCreatureModel(empty, "pause3");
         case AnimationType::LoopingWeld:
             return "weld";
         case AnimationType::LoopingDead:
@@ -155,7 +155,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::FireForgetDiveRoll:
         case AnimationType::FireForgetScream:
         default:
-            warn("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(animation)));
+            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(animation)), 2);
             return empty;
     }
 }

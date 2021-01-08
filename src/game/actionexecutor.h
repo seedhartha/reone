@@ -66,7 +66,7 @@ private:
     void executeOpenLock(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeJumpToObject(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeJumpToLocation(const std::shared_ptr<Object> &actor, LocationAction &action, float dt);
-    void executePlayAnimation(const std::shared_ptr<Object> &actor, PlayAnimationAction &action, float dt);
+    void executePlayAnimation(const std::shared_ptr<Object> &actor, const std::shared_ptr<PlayAnimationAction> &action, float dt);
 
     // END Actions
 };

@@ -186,6 +186,10 @@ void Creature::updateModelAnimation() {
     }
     if (!_animDirty) return;
 
+    if (_animAction) {
+        _animAction->complete();
+        _animAction.reset();
+    }
     switch (_movementType) {
         case MovementType::Run:
             _model->playAnimation(_animResolver.getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
@@ -221,7 +225,7 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(AnimationType anim, float speed) {
+void Creature::playAnimation(AnimationType anim, float speed, shared_ptr<Action> actionToComplete) {
     string animName(_animResolver.getAnimationName(anim));
     if (animName.empty()) return;
 
@@ -229,11 +233,12 @@ void Creature::playAnimation(AnimationType anim, float speed) {
     if (isAnimationLooping(anim)) {
         flags |= kAnimationLoop;
     }
-    playAnimation(animName, flags, speed);
+    playAnimation(animName, flags, speed, actionToComplete);
 }
 
-void Creature::playAnimation(const string &name, int flags, float speed) {
+void Creature::playAnimation(const string &name, int flags, float speed, shared_ptr<Action> actionToComplete) {
     doPlayAnimation(flags, [&]() {
+        _animAction = actionToComplete;
         _model->playAnimation(name, flags, speed);
     });
 }

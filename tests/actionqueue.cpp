@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_action_completion) {
     actionQueue.add(make_unique<Action>(ActionType::PauseConversation));
     actionQueue.add(make_unique<Action>(ActionType::ResumeConversation));
 
-    Action *currentAction = actionQueue.currentAction();
+    shared_ptr<Action> currentAction(actionQueue.currentAction());
     BOOST_TEST((currentAction && currentAction->type() == ActionType::PauseConversation));
 
     currentAction->complete();
