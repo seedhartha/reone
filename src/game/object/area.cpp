@@ -1035,9 +1035,9 @@ shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nt
     }
     sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
-    int numCandidates = static_cast<int>(candidates.size());
-    if (nth >= numCandidates) {
-        warn(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % numCandidates);
+    int candidateCount = static_cast<int>(candidates.size());
+    if (nth >= candidateCount) {
+        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount, 2);
         return nullptr;
     }
 
