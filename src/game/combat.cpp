@@ -36,8 +36,8 @@ namespace game {
 
 constexpr float kRoundDuration = 3.0f;
 
-static AttackAction *getAttackAction(const shared_ptr<Creature> &combatant) {
-    return dynamic_cast<AttackAction *>(combatant->actionQueue().currentAction());
+static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
+    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().currentAction());
 }
 
 void Combat::Round::advance(float dt) {
@@ -174,7 +174,7 @@ void Combat::updateCombatantAI(Combatant &combatant) {
     shared_ptr<Creature> enemy(getNearestEnemy(combatant));
     if (!enemy) return;
 
-    AttackAction *action = getAttackAction(creature);
+    shared_ptr<AttackAction> action(getAttackAction(creature));
     if (action && action->target() == enemy) return;
 
     ActionQueue &actions = creature->actionQueue();
@@ -215,7 +215,7 @@ void Combat::updateRounds(float dt) {
 
         // Check if attacker is close enough to attack its target
 
-        AttackAction *action = getAttackAction(attacker->creature);
+        shared_ptr<AttackAction> action(getAttackAction(attacker->creature));
         if (!action) continue;
 
         shared_ptr<SpatialObject> target(action->target());

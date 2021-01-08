@@ -54,8 +54,6 @@ public:
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);
 
-    virtual void playAnimation(AnimationType animation, float speed);
-
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
     float distanceTo(const SpatialObject &other) const;
@@ -82,6 +80,12 @@ public:
     void setPosition(const glm::vec3 &position);
     void setFacing(float facing);
     void setVisible(bool visible);
+
+    // Animation
+
+    virtual void playAnimation(AnimationType animation, float speed, std::shared_ptr<Action> actionToComplete = nullptr);
+
+    // END Animation
 
     // Inventory
 

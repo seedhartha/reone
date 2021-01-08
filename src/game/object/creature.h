@@ -118,10 +118,10 @@ public:
 
     // END Animation
 
-    void playAnimation(AnimationType anim, float speed = 1.0f) override;
+    void playAnimation(AnimationType anim, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim);
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
     void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
 
     void updateModelAnimation();
@@ -178,6 +178,7 @@ private:
     CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
+    std::shared_ptr<Action> _animAction; ///< action used to start the last animation
 
     // Scripts
 

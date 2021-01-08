@@ -33,14 +33,14 @@ public:
     void delay(std::unique_ptr<Action> action, float seconds);
     void update();
 
-    using iterator = std::deque<std::unique_ptr<Action>>::iterator;
+    using iterator = std::deque<std::shared_ptr<Action>>::iterator;
     iterator begin();
     iterator end();
 
     bool empty() const;
     int size() const;
 
-    Action *currentAction();
+    std::shared_ptr<Action> currentAction();
 
 private:
     struct DelayedAction {
@@ -48,7 +48,7 @@ private:
         uint32_t timestamp { 0 };
     };
 
-    std::deque<std::unique_ptr<Action>> _actions;
+    std::deque<std::shared_ptr<Action>> _actions;
     std::vector<DelayedAction> _delayed;
 
     void removeCompletedActions();
