@@ -320,12 +320,18 @@ void CharacterGeneration::finish() {
 
 void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
     int currentAppearance = _character ? _character->appearance() : -1;
+    Gender currentGender = _character ? _character->gender() : Gender::None;
+
     _character = make_unique<StaticCreatureBlueprint>(character);
 
     if (currentAppearance != character.appearance()) {
         loadCharacterModel();
         _portraitSelection->updatePortraits();
     }
+    if (currentGender != character.gender()) {
+        _nameEntry->loadRandomName();
+    }
+
     updateAttributes();
 }
 

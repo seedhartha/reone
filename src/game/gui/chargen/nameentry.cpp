@@ -47,13 +47,12 @@ NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const Gr
 void NameEntry::load() {
     GUI::load();
 
-    _nameBoxEdit = &getControl("NAME_BOX_EDIT");
-
-    setControlText("NAME_BOX_EDIT", "");
-
     loadLtrFile("humanm", _maleLtr);
     loadLtrFile("humanf", _femaleLtr);
     loadLtrFile("humanl", _lastNameLtr);
+
+    _nameBoxEdit = &getControl("NAME_BOX_EDIT");
+    _nameBoxEdit->setTextMessage("");
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
@@ -71,7 +70,7 @@ bool NameEntry::handle(const SDL_Event &event) {
 
 void NameEntry::onClick(const string &control) {
     if (control == "BTN_RANDOM") {
-        _nameBoxEdit->setTextMessage(getRandomName());
+        loadRandomName();
 
     } else if (control == "END_BTN") {
         _charGen->goToNextStep();
@@ -80,6 +79,10 @@ void NameEntry::onClick(const string &control) {
     } else if (control == "BTN_BACK") {
         _charGen->openSteps();
     }
+}
+
+void NameEntry::loadRandomName() {
+    _nameBoxEdit->setTextMessage(getRandomName());
 }
 
 string NameEntry::getRandomName() const {
