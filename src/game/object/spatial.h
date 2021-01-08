@@ -91,7 +91,7 @@ public:
 
     std::shared_ptr<Item> addItem(const std::string &resRef, int stackSize = 1, bool dropable = true);
     void addItem(const std::shared_ptr<Item> &item);
-    void removeItem(const std::shared_ptr<Item> &item);
+    bool removeItem(const std::shared_ptr<Item> &item, bool &last);
     void moveDropableItemsTo(SpatialObject &other);
 
     std::shared_ptr<Item> getFirstItem();

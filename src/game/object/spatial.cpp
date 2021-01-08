@@ -76,11 +76,29 @@ shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, boo
 }
 
 void SpatialObject::addItem(const shared_ptr<Item> &item) {
-    _items.push_back(item);
+    auto maybeItem = find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
+    if (maybeItem != _items.end()) {
+        (*maybeItem)->setStackSize((*maybeItem)->stackSize() + 1);
+    } else {
+        _items.push_back(item);
+    }
 }
 
-void SpatialObject::removeItem(const shared_ptr<Item> &item) {
-    _items.erase(remove(_items.begin(), _items.end(), item), _items.end());
+bool SpatialObject::removeItem(const shared_ptr<Item> &item, bool &last) {
+    auto maybeItem = find(_items.begin(), _items.end(), item);
+    if (maybeItem == _items.end()) return false;
+
+    last = false;
+
+    int stackSize = (*maybeItem)->stackSize();
+    if (stackSize > 1) {
+        (*maybeItem)->setStackSize(stackSize - 1);
+    } else {
+        last = true;
+        _items.erase(maybeItem);
+    }
+
+    return true;
 }
 
 float SpatialObject::distanceTo(const glm::vec2 &point) const {
