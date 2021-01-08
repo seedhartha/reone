@@ -184,7 +184,7 @@ void Game::loadMainMenu() {
 void Game::loadModule(const string &name, string entry) {
     info("Game: load module: " + name);
 
-    withLoadingScreen([this, &name, &entry]() {
+    withLoadingScreen("load_" + name, [this, &name, &entry]() {
         if (!_hud) {
             loadHUD();
         }
@@ -241,10 +241,11 @@ void Game::loadModule(const string &name, string entry) {
     });
 }
 
-void Game::withLoadingScreen(const function<void()> &block) {
+void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
     if (!_loadScreen) {
         loadLoadingScreen();
     }
+    _loadScreen->setImage(imageResRef);
     changeScreen(GameScreen::Loading);
     drawAll();
     block();
@@ -511,7 +512,7 @@ float Game::measureFrameTime() {
 }
 
 void Game::loadLoadingScreen() {
-    _loadScreen.reset(new LoadingScreen(_version, _options.graphics));
+    _loadScreen.reset(new LoadingScreen(this));
     _loadScreen->load();
 }
 
@@ -531,7 +532,8 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    withLoadingScreen([this]() {
+    string imageResRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
+    withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
         }
