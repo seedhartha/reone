@@ -416,7 +416,12 @@ void DialogGUI::loadStuntParticipants() {
     _participantByTag.clear();
 
     for (auto &stunt : _dialog->stunts()) {
-        shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(_game->module()->area()->find(stunt.participant)));
+        shared_ptr<Creature> creature;
+        if (stunt.participant == "owner") {
+            creature = dynamic_pointer_cast<Creature>(_owner);
+        } else {
+            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->find(stunt.participant));
+        }
         if (!creature) {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
             continue;
@@ -453,7 +458,12 @@ void DialogGUI::updateParticipantAnimations() {
                 participant.creature->playAnimation(animation, kAnimationPropagate);
             }
         } else {
-            auto participant = dynamic_pointer_cast<Creature>(_game->module()->area()->find(anim.participant));
+            shared_ptr<Creature> participant;
+            if (anim.participant == "owner") {
+                participant = dynamic_pointer_cast<Creature>(_owner);
+            } else {
+                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->find(anim.participant));
+            }
             if (!participant) {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);
                 continue;
