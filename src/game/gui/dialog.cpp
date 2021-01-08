@@ -303,7 +303,7 @@ void DialogGUI::loadCurrentSpeaker() {
     shared_ptr<SpatialObject> speaker;
 
     if (!_currentEntry->speaker.empty()) {
-        speaker = area->find(_currentEntry->speaker);
+        speaker = area->getObjectByTag(_currentEntry->speaker);
     }
     if (!speaker) {
         speaker = _owner;
@@ -420,7 +420,7 @@ void DialogGUI::loadStuntParticipants() {
         if (stunt.participant == "owner") {
             creature = dynamic_pointer_cast<Creature>(_owner);
         } else {
-            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->find(stunt.participant));
+            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(stunt.participant));
         }
         if (!creature) {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
@@ -462,7 +462,7 @@ void DialogGUI::updateParticipantAnimations() {
             if (anim.participant == "owner") {
                 participant = dynamic_pointer_cast<Creature>(_owner);
             } else {
-                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->find(anim.participant));
+                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(anim.participant));
             }
             if (!participant) {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);

@@ -61,7 +61,7 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
     }
     int nth = getInt(args, 1, 0);
 
-    return static_pointer_cast<ScriptObject>(_game->module()->area()->find(tag, nth));
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->getObjectByTag(tag, nth));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
