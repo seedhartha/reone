@@ -277,15 +277,16 @@ void Module::update(float dt) {
 vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
     vector<ContextualAction> actions;
 
-    shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
+    auto door = dynamic_pointer_cast<Door>(object);
     if (door && door->isLocked() && _game->party().leader()->attributes().skills().contains(Skill::Security)) {
         actions.push_back(ContextualAction::Unlock);
     }
 
-    shared_ptr<Creature> hostile(dynamic_pointer_cast<Creature>(object));
+    auto hostile = dynamic_pointer_cast<Creature>(object);
     if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().leader()), *hostile)) {
         actions.push_back(ContextualAction::Attack);
     }
+
     return move(actions);
 }
 
