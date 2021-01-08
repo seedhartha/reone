@@ -47,7 +47,9 @@ public:
     enum class TextAlign {
         LeftCenter = 9,
         CenterBottom = 10,
-        CenterCenter = 18
+        CenterCenter = 18,
+
+        CenterTop = 0x1000
     };
 
     struct Extent {

@@ -475,6 +475,9 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
         case TextAlign::CenterBottom:
             position.y = _extent.top + size.y - static_cast<int>((lineCount - 0.5f) * _text.font->height());
             break;
+        case TextAlign::CenterTop:
+            position.y = _extent.top + static_cast<int>((lineCount - 0.5f) * _text.font->height());
+            break;
         default:
             position.y = _extent.top + size.y / 2;
             break;

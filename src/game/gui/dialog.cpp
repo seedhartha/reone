@@ -235,6 +235,7 @@ void DialogGUI::loadCurrentEntry() {
     scheduleEndOfEntry();
     updateCamera();
     updateParticipantAnimations();
+    repositionMessage();
 }
 
 void DialogGUI::loadReplies() {
@@ -485,6 +486,24 @@ AnimationType DialogGUI::getAnimationType(int ordinal) const {
     return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;
 }
 
+void DialogGUI::repositionMessage() {
+    Control &message = getControl("LBL_MESSAGE");
+    Control::Extent extent(message.extent());
+    Control::Text text(message.text());
+
+    if (_entryEnded) {
+        extent.top = -_rootControl->extent().top;
+        text.align = Control::TextAlign::CenterBottom;
+    } else {
+        Control &replies = getControl("LB_REPLIES");
+        extent.top = replies.extent().top;
+        text.align = Control::TextAlign::CenterTop;
+    }
+
+    message.setExtent(move(extent));
+    message.setText(move(text));
+}
+
 void DialogGUI::pickReply(uint32_t index) {
     debug("Dialog: pick reply " + to_string(index), 2);
     const Dialog::EntryReply &reply = _dialog->getReply(index);
@@ -546,6 +565,7 @@ void DialogGUI::endCurrentEntry() {
     } else {
         showControl("LB_REPLIES");
         updateCamera();
+        repositionMessage();
     }
 }
 
