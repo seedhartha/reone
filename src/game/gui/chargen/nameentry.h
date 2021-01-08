@@ -35,6 +35,8 @@ public:
     void load() override;
     bool handle(const SDL_Event &event) override;
 
+    void loadRandomName();
+
 private:
     CharacterGeneration *_charGen { nullptr };
     gui::TextInput _input;
