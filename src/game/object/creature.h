@@ -120,7 +120,7 @@ public:
 
     void playAnimation(AnimationType anim, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
 
-    void playAnimation(CombatAnimation anim);
+    void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
     void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
 
@@ -135,6 +135,7 @@ public:
     bool isSlotEquipped(InventorySlot slot) const;
 
     std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    CreatureWieldType getWieldType() const;
 
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
 

@@ -260,28 +260,32 @@ void Combat::updateRound(Round &round, float dt) {
     round.advance(dt);
 
     shared_ptr<Creature> attacker(round.attacker->creature);
-    bool isDuel = round.target == attacker;
 
     if (attacker->isDead() || round.target->isDead()) {
         finishRound(round);
         return;
     }
+
+    auto maybeTargetCombatant = _combatantById.find(round.target->id());
+    bool duel = maybeTargetCombatant != _combatantById.end() && maybeTargetCombatant->second->target == attacker;
+
     switch (round.state) {
         case RoundState::Started:
+            round.attackResult = determineAttackResult(attacker, round.target, duel, round.cutsceneAttackResult);
+
             attacker->face(*round.target);
             attacker->setMovementType(Creature::MovementType::None);
             attacker->setMovementRestricted(true);
-            if (isDuel) {
-                attacker->playAnimation(CombatAnimation::DuelAttack);
+            attacker->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
 
+            if (duel) {
                 auto targetCreature = static_pointer_cast<Creature>(round.target);
                 targetCreature->face(*attacker);
                 targetCreature->setMovementType(Creature::MovementType::None);
                 targetCreature->setMovementRestricted(true);
-                targetCreature->playAnimation(CombatAnimation::Dodge);
-            } else {
-                attacker->playAnimation(CombatAnimation::BashAttack);
+                targetCreature->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
             }
+
             round.state = RoundState::FirstTurn;
             debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
             break;
@@ -289,17 +293,19 @@ void Combat::updateRound(Round &round, float dt) {
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
                 if (round.cutscene) {
-                    executeAttack(attacker, round.target, round.attackResult, round.damage);
+                    applyAttackResult(attacker, round.target, round.attackResult, round.cutsceneDamage);
                 } else {
-                    executeAttack(attacker, round.target);
+                    applyAttackResult(attacker, round.target, round.attackResult);
                 }
-                if (isDuel) {
-                    attacker->face(*round.target);
-                    attacker->playAnimation(CombatAnimation::Dodge);
-
+                if (duel) {
                     auto targetCreature = static_pointer_cast<Creature>(round.target);
+                    round.attackResult = determineAttackResult(targetCreature, attacker, true);
+
                     targetCreature->face(*attacker);
-                    targetCreature->playAnimation(CombatAnimation::DuelAttack);
+                    targetCreature->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
+
+                    attacker->face(*round.target);
+                    attacker->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
                 }
                 round.state = RoundState::SecondTurn;
                 debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
@@ -308,8 +314,8 @@ void Combat::updateRound(Round &round, float dt) {
 
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
-                if (isDuel) {
-                    executeAttack(static_pointer_cast<Creature>(round.target), attacker);
+                if (duel) {
+                    applyAttackResult(static_pointer_cast<Creature>(round.target), attacker, round.attackResult);
                 }
                 finishRound(round);
             }
@@ -331,34 +337,18 @@ void Combat::finishRound(Round &round) {
     debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
 }
 
-void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target) {
-    int attack = random(1, 20);
-    int defense = 10; // TODO: add armor bonus and dexterity modifier
-    AttackResult result;
-
-    if (attack == 20) {
-        result = AttackResult::AutomaticHit;
-    } else if (attack >= defense) {
-        result = AttackResult::HitSuccessful;
-    } else {
-        result = AttackResult::Miss;
-    }
-
-    executeAttack(attacker, target, result);
-}
-
-void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage) {
-    switch (result) {
-        case AttackResult::Miss:
-        case AttackResult::AttackResisted:
-        case AttackResult::AttackFailed:
-        case AttackResult::Parried:
-        case AttackResult::Deflected:
+void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, AttackResult result, int damage) {
+    switch (result.type) {
+        case AttackResultType::Miss:
+        case AttackResultType::AttackResisted:
+        case AttackResultType::AttackFailed:
+        case AttackResultType::Parried:
+        case AttackResultType::Deflected:
             debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
             break;
-        case AttackResult::HitSuccessful:
-        case AttackResult::CriticalHit:
-        case AttackResult::AutomaticHit: {
+        case AttackResultType::HitSuccessful:
+        case AttackResultType::CriticalHit:
+        case AttackResultType::AutomaticHit: {
             debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
             if (damage == -1) {
                 auto effects = _damageResolver.getDamageEffects(attacker);
@@ -371,7 +361,7 @@ void Combat::executeAttack(const std::shared_ptr<Creature> &attacker, const std:
             break;
         }
         default:
-            throw invalid_argument("Combat: executeAttack: result is invalid");
+            throw invalid_argument("Combat: applyAttackResult: result is invalid");
     }
 }
 
@@ -404,7 +394,7 @@ void Combat::cutsceneAttack(
     const shared_ptr<Creature> &attacker,
     const shared_ptr<SpatialObject> &target,
     int animation,
-    AttackResult result,
+    AttackResultType result,
     int damage) {
 
     shared_ptr<Combatant> combatant;
@@ -428,10 +418,101 @@ void Combat::cutsceneAttack(
     round->attacker = move(combatant);
     round->target = target;
     round->cutscene = true;
-    round->animation = animation;
-    round->attackResult = result;
-    round->damage = damage;
+    round->cutsceneAnimation = animation;
+    round->cutsceneAttackResult = result;
+    round->cutsceneDamage = damage;
     addRound(round);
+}
+
+static bool isMeleeWieldType(CreatureWieldType type) {
+    switch (type) {
+        case CreatureWieldType::SingleSword:
+        case CreatureWieldType::DoubleBladedSword:
+        case CreatureWieldType::DualSwords:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool isAttackSuccessful(AttackResultType type) {
+    switch (type) {
+        case AttackResultType::HitSuccessful:
+        case AttackResultType::CriticalHit:
+        case AttackResultType::AutomaticHit:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool isRangedWieldType(CreatureWieldType type) {
+    switch (type) {
+        case CreatureWieldType::BlasterPistol:
+        case CreatureWieldType::DualPistols:
+        case CreatureWieldType::BlasterRifle:
+        case CreatureWieldType::HeavyWeapon:
+            return true;
+        default:
+            return false;
+    }
+}
+
+Combat::AttackResult Combat::determineAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, bool duel, AttackResultType type) {
+    AttackResult result;
+
+    if (type != AttackResultType::Invalid) {
+        result.type = type;
+    } else {
+        int attack = random(1, 20);
+        int defense = 10; // TODO: add armor bonus and dexterity modifier
+
+        if (attack == 20) {
+            result.type = AttackResultType::AutomaticHit;
+        } else if (attack >= defense) {
+            result.type = AttackResultType::HitSuccessful;
+        } else {
+            result.type = AttackResultType::Miss;
+        }
+    }
+
+    CreatureWieldType attackerWield = attacker->getWieldType();
+    CreatureWieldType targetWield = CreatureWieldType::None;
+
+    auto targetCreature = dynamic_pointer_cast<Creature>(target);
+    if (targetCreature) {
+        targetWield = targetCreature->getWieldType();
+    }
+
+    if (duel) {
+        if (isMeleeWieldType(attackerWield) && isMeleeWieldType(targetWield)) {
+            result.attackerAnimation = CombatAnimation::MeleeDuelAttack;
+            result.animationVariant = random(1, 5);
+            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDuelDamage : CombatAnimation::MeleeDuelParry;
+        } else if (isMeleeWieldType(attackerWield)) {
+            result.attackerAnimation = CombatAnimation::MeleeAttack;
+            result.animationVariant = random(1, 2);
+            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDamage : CombatAnimation::MeleeDodge;
+        } else if (isRangedWieldType(attackerWield)) {
+            result.attackerAnimation = CombatAnimation::RangedAttack;
+            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::Damage : CombatAnimation::Dodge;
+        } else {
+            result.attackerAnimation = CombatAnimation::Attack;
+            result.animationVariant = random(1, 2);
+            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::Damage : CombatAnimation::Dodge;
+        }
+    } else {
+        if (isRangedWieldType(attackerWield)) {
+            result.attackerAnimation = CombatAnimation::RangedAttack;
+        } else {
+            result.attackerAnimation = CombatAnimation::Attack;
+            result.animationVariant = random(1, 2);
+        }
+    }
+
+    result.attackerWieldType = attackerWield;
+
+    return move(result);
 }
 
 } // namespace game

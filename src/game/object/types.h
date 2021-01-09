@@ -147,10 +147,22 @@ enum class AnimationType {
 };
 
 enum class CombatAnimation {
-    DuelAttack,
-    BashAttack,
+    None,
+    Draw,
+    Ready,
+    Attack,
+    Damage,
     Dodge,
-    Knockdown
+
+    MeleeAttack,
+    MeleeDamage,
+    MeleeDodge,
+
+    MeleeDuelAttack,
+    MeleeDuelDamage,
+    MeleeDuelParry,
+
+    RangedAttack
 };
 
 } // namespace game

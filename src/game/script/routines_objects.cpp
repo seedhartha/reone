@@ -383,7 +383,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
         return Variable();
     }
     int animation = getInt(args, 1);
-    AttackResult attackResult = static_cast<AttackResult>(getInt(args, 2));
+    AttackResultType attackResult = static_cast<AttackResultType>(getInt(args, 2));
     int damage = getInt(args, 3);
 
     Combat &combat = _game->module()->area()->combat();

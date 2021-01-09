@@ -260,37 +260,11 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float
     });
 }
 
-void Creature::playAnimation(CombatAnimation animation) {
-    string animName;
-    bool looping = false;
+void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant) {
+    string animName(_animResolver.getAnimationName(anim, wield, variant));
+    if (animName.empty()) return;
 
-    switch (animation) {
-        case CombatAnimation::DuelAttack:
-            animName = _animResolver.getDuelAttackAnimation();
-            break;
-        case CombatAnimation::BashAttack:
-            animName = _animResolver.getBashAttackAnimation();
-            break;
-        case CombatAnimation::Dodge:
-            animName = _animResolver.getDodgeAnimation();
-            break;
-        case CombatAnimation::Knockdown:
-            animName = _animResolver.getKnockdownAnimation();
-            looping = true;
-            break;
-        default:
-            break;
-    }
-
-    if (animName.empty()) {
-        warn("Creature: playAnimation: unsupported combat animation: " + to_string(static_cast<int>(animation)));
-        return;
-    }
-    int flags = kAnimationPropagate | kAnimationBlend;
-    if (looping) {
-        flags |= kAnimationLoop;
-    }
-    playAnimation(animName, flags);
+    playAnimation(animName, kAnimationPropagate);
 }
 
 bool Creature::equip(const string &resRef) {
@@ -515,6 +489,33 @@ void Creature::die() {
     debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 
     playAnimation(_animResolver.getDieAnimation());
+}
+
+CreatureWieldType Creature::getWieldType() const {
+    auto rightWeapon = getEquippedItem(InventorySlot::kInventorySlotRightWeapon);
+    auto leftWeapon = getEquippedItem(InventorySlot::kInventorySlotLeftWeapon);
+
+    if (rightWeapon && leftWeapon) {
+        return (rightWeapon->weaponWield() == WeaponWield::BlasterPistol) ? CreatureWieldType::DualPistols : CreatureWieldType::DualSwords;
+    } else if (rightWeapon) {
+        switch (rightWeapon->weaponWield()) {
+            case WeaponWield::SingleSword:
+                return CreatureWieldType::SingleSword;
+            case WeaponWield::DoubleBladedSword:
+                return CreatureWieldType::DoubleBladedSword;
+            case WeaponWield::BlasterPistol:
+                return CreatureWieldType::BlasterPistol;
+            case WeaponWield::BlasterRifle:
+                return CreatureWieldType::BlasterRifle;
+            case WeaponWield::HeavyWeapon:
+                return CreatureWieldType::HeavyWeapon;
+            case WeaponWield::StunBaton:
+            default:
+                return CreatureWieldType::StunBaton;
+        }
+    }
+
+    return CreatureWieldType::HandToHand;
 }
 
 } // namespace game

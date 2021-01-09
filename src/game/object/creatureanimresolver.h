@@ -33,15 +33,12 @@ class CreatureAnimationResolver {
 public:
     CreatureAnimationResolver(const Creature *creature);
 
-    std::string getAnimationName(AnimationType animation) const;
+    std::string getAnimationName(AnimationType anim) const;
+    std::string getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const;
 
-    std::string getBashAttackAnimation() const;
     std::string getDeadAnimation() const;
     std::string getDieAnimation() const;
-    std::string getDodgeAnimation() const;
-    std::string getDuelAttackAnimation() const;
     std::string getHeadTalkAnimation() const;
-    std::string getKnockdownAnimation() const;
     std::string getPauseAnimation() const;
     std::string getRunAnimation() const;
     std::string getTalkNormalAnimation() const;

@@ -37,11 +37,11 @@ CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) :
     }
 }
 
-string CreatureAnimationResolver::getAnimationName(AnimationType animation) const {
+string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
     static string empty;
 
     string result;
-    switch (animation) {
+    switch (anim) {
         case AnimationType::LoopingPause:
             return getPauseAnimation();
         case AnimationType::LoopingPause2:
@@ -156,7 +156,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::FireForgetDiveRoll:
         case AnimationType::FireForgetScream:
         default:
-            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(animation)), 2);
+            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)), 2);
             return empty;
     }
 }
@@ -205,15 +205,15 @@ int CreatureAnimationResolver::getWeaponWieldNumber(WeaponWield wield) const {
     switch (wield) {
         case WeaponWield::StunBaton:
             return 1;
-        case WeaponWield::SingleSaber:
+        case WeaponWield::SingleSword:
             return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 4 : 2;
-        case WeaponWield::TwoHandedSaber:
+        case WeaponWield::DoubleBladedSword:
             return 3;
-        case WeaponWield::SingleBlaster:
+        case WeaponWield::BlasterPistol:
             return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 6 : 5;
-        case WeaponWield::Rifle:
+        case WeaponWield::BlasterRifle:
             return 7;
-        case WeaponWield::HeavyCarbine:
+        case WeaponWield::HeavyWeapon:
             return 9;
         default:
             return 8;
@@ -235,12 +235,12 @@ string CreatureAnimationResolver::getRunAnimation() const {
         getWeaponInfo(type, wield);
 
         switch (wield) {
-            case WeaponWield::SingleSaber:
+            case WeaponWield::SingleSword:
                 return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? "runds" : "runss";
-            case WeaponWield::TwoHandedSaber:
+            case WeaponWield::DoubleBladedSword:
                 return "runst";
-            case WeaponWield::Rifle:
-            case WeaponWield::HeavyCarbine:
+            case WeaponWield::BlasterRifle:
+            case WeaponWield::HeavyWeapon:
                 return "runrf";
             default:
                 break;
@@ -258,58 +258,39 @@ string CreatureAnimationResolver::getHeadTalkAnimation() const {
     return "talk";
 }
 
-string CreatureAnimationResolver::getDuelAttackAnimation() const {
-    if (_creature->modelType() == Creature::ModelType::Creature) return "g0a1";
+static string formatCombatAnimation(const string &format, CreatureWieldType wield, int variant) {
+    return str(boost::format(format) % static_cast<int>(wield) % variant);
+}
 
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
+string CreatureAnimationResolver::getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const {
+    static string empty;
 
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    switch (type) {
-        case WeaponType::Melee:
-            return str(boost::format("c%da1") % wieldNumber);
-        case WeaponType::Ranged:
-            return str(boost::format("b%da1") % wieldNumber);
+    switch (anim) {
+        case CombatAnimation::Draw:
+            return getFirstIfCreatureModel(empty, formatCombatAnimation("g%dw%d", wield, 1));
+        case CombatAnimation::Ready:
+            return getFirstIfCreatureModel("creadyr", formatCombatAnimation("g%dr%d", wield, 1));
+        case CombatAnimation::Attack:
+            return getFirstIfCreatureModel("g0a1", formatCombatAnimation("g%da%d", wield, variant));
+        case CombatAnimation::Damage:
+            return getFirstIfCreatureModel("cdamages", formatCombatAnimation("g%dd%d", wield, variant));
+        case CombatAnimation::Dodge:
+            return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("g%dg%d", wield, variant));
+        case CombatAnimation::MeleeAttack:
+            return getFirstIfCreatureModel("m0a1", formatCombatAnimation("m%da%d", wield, variant));
+        case CombatAnimation::MeleeDamage:
+            return getFirstIfCreatureModel("cdamages", formatCombatAnimation("m%dd%d", wield, variant));
+        case CombatAnimation::MeleeDodge:
+            return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("m%dg%d", wield, variant));
+        case CombatAnimation::MeleeDuelDamage:
+            return formatCombatAnimation("c%dd%d", wield, variant);
+        case CombatAnimation::MeleeDuelParry:
+            return formatCombatAnimation("c%dp%d", wield, variant);
+        case CombatAnimation::RangedAttack:
+            return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
         default:
-            return str(boost::format("g%da1") % wieldNumber);
+            return empty;
     }
-}
-
-string CreatureAnimationResolver::getBashAttackAnimation() const {
-    if (_creature->modelType() == Creature::ModelType::Creature) return "g0a2";
-
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
-
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    switch (type) {
-        case WeaponType::Melee:
-            return str(boost::format("c%da2") % wieldNumber);
-        case WeaponType::Ranged:
-            return str(boost::format("b%da2") % wieldNumber);
-        default:
-            return str(boost::format("g%da2") % wieldNumber);
-    }
-}
-
-string CreatureAnimationResolver::getDodgeAnimation() const {
-    if (_creature->modelType() == Creature::ModelType::Creature) return "cdodgeg";
-
-    WeaponType type = WeaponType::None;
-    WeaponWield wield = WeaponWield::None;
-    getWeaponInfo(type, wield);
-
-    int wieldNumber = getWeaponWieldNumber(wield);
-
-    return str(boost::format("g%dg1") % wieldNumber);
-}
-
-string CreatureAnimationResolver::getKnockdownAnimation() const {
-    return getFirstIfCreatureModel("ckdbck", "g1y1");
 }
 
 } // namespace game
