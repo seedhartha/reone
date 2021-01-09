@@ -19,6 +19,7 @@ Developer resources:
 - [Project Architecture](https://github.com/seedhartha/reone/wiki/Project-Architecture)
 - [Code Style](https://github.com/seedhartha/reone/wiki/Code-Style)
 - [Tooling](https://github.com/seedhartha/reone/wiki/Tooling)
+- [Research](https://github.com/seedhartha/reone/wiki/Research)
 - [Knowledge Database](https://github.com/seedhartha/reone/wiki/Knowledge-Database)
 
 ## Installation
