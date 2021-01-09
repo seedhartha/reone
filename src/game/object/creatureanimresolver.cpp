@@ -60,6 +60,8 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
             return getFirstIfCreatureModel(empty, "tlklaugh");
         case AnimationType::LoopingTalkSad:
             return "tlksad";
+        case AnimationType::LoopingPauseTired:
+            return "pausetrd";
         case AnimationType::LoopingFlirt:
             return "flirt";
         case AnimationType::LoopingUseComputer:
@@ -128,7 +130,6 @@ string CreatureAnimationResolver::getAnimationName(AnimationType animation) cons
         case AnimationType::LoopingWorship:
         case AnimationType::LoopingGetLow:
         case AnimationType::LoopingGetMid:
-        case AnimationType::LoopingPauseTired:
         case AnimationType::LoopingPauseDrunk:
         case AnimationType::LoopingReady:
         case AnimationType::LoopingDeadProne:
