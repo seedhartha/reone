@@ -53,7 +53,7 @@ public:
         const std::shared_ptr<Creature> &attacker,
         const std::shared_ptr<SpatialObject> &target,
         int animation,
-        AttackResult result,
+        AttackResultType result,
         int damage);
 
     bool isActive() const;
@@ -76,16 +76,25 @@ private:
 
     typedef std::map<uint32_t, std::shared_ptr<Combatant>> CombatantMap;
 
+    struct AttackResult {
+        AttackResultType type { AttackResultType::Invalid };
+        CreatureWieldType attackerWieldType { CreatureWieldType::None };
+        CombatAnimation attackerAnimation { CombatAnimation::None };
+        int animationVariant { 1 };
+        CombatAnimation targetAnimation { CombatAnimation::None };
+    };
+
     struct Round {
         std::shared_ptr<Combatant> attacker;
         std::shared_ptr<SpatialObject> target;
         RoundState state { RoundState::Started };
         float time { 0.0f };
+        AttackResult attackResult;
 
         bool cutscene { false }; /**< animation, attack result and damage are predefined */
-        int animation { 0 };
-        AttackResult attackResult { AttackResult::Invalid };
-        int damage { 0 };
+        int cutsceneAnimation { 0 };
+        AttackResultType cutsceneAttackResult { AttackResultType::Invalid };
+        int cutsceneDamage { -1 };
 
         void advance(float dt);
     };
@@ -111,18 +120,20 @@ private:
     void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<SpatialObject> &target);
     void addRound(const std::shared_ptr<Round> &round);
     void finishRound(Round &round);
-    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target);
-
-    /**
-     * @param damage amount of damage to inflict, or -1 to calculate damage
-     */
-    void executeAttack(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
 
     void onEnterCombatMode();
     void onExitCombatMode();
 
     std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;
+
+    // Attacks
+
+    AttackResult determineAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, bool duel, AttackResultType type = AttackResultType::Invalid);
+
+    void applyAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
+
+    // END Attacks
 };
 
 } // namespace game

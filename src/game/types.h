@@ -68,11 +68,24 @@ enum class WeaponType {
 enum class WeaponWield {
     None = 0,
     StunBaton = 1,
-    SingleSaber = 2,
-    TwoHandedSaber = 3,
-    SingleBlaster = 4,
-    Rifle = 5,
-    HeavyCarbine = 6
+    SingleSword = 2,
+    DoubleBladedSword = 3,
+    BlasterPistol = 4,
+    BlasterRifle = 5,
+    HeavyWeapon = 6
+};
+
+enum class CreatureWieldType {
+    None = 0,
+    StunBaton = 1,
+    SingleSword = 2,
+    DoubleBladedSword = 3,
+    DualSwords = 4,
+    BlasterPistol = 5,
+    DualPistols = 6,
+    BlasterRifle = 7,
+    HandToHand = 8,
+    HeavyWeapon = 9
 };
 
 enum class DamageType {
@@ -92,7 +105,7 @@ enum class DamageType {
     Blaster = 4096
 };
 
-enum class AttackResult {
+enum class AttackResultType {
     Invalid = 0,
     HitSuccessful = 1,
     CriticalHit = 2,
