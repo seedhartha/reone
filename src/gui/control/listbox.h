@@ -44,8 +44,8 @@ public:
 
     ListBox(GUI *gui);
 
-    void clear();
-    void add(Item item);
+    void clearItems();
+    void addItem(Item item);
 
     void clearSelection();
 

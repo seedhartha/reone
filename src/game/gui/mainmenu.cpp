@@ -172,7 +172,7 @@ void MainMenu::startModuleSelection() {
 
     ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
     for (auto &module : Resources::instance().moduleNames()) {
-        modules.add({ module, module });
+        modules.addItem({ module, module });
     }
 }
 

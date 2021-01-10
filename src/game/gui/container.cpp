@@ -78,7 +78,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
     _container = container;
 
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clear();
+    lbItems.clearItems();
 
     for (auto &item : container->items()) {
         if (!item->isDropable()) continue;
@@ -92,7 +92,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
 }
 

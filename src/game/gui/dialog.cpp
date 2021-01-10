@@ -240,7 +240,7 @@ void DialogGUI::loadCurrentEntry() {
 
 void DialogGUI::loadReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-    replies.clear();
+    replies.clearItems();
 
     vector<int> activeReplies;
     for (auto &link : _currentEntry->replies) {
@@ -262,7 +262,7 @@ void DialogGUI::loadReplies() {
                 text = "[empty]";
             }
         }
-        replies.add({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
+        replies.addItem({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
     }
     if (singleEmptyReply) {
         _autoPickReplyIdx = activeReplies.front();

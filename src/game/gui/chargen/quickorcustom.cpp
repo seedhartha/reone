@@ -17,6 +17,9 @@
 
 #include "quickorcustom.h"
 
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/resources.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -30,6 +33,9 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
+
+constexpr int kStrRefQuickHelpText = 241;
+constexpr int kStrRefCustomHelpText = 242;
 
 QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GameGUI(version, opts),
@@ -55,6 +61,23 @@ void QuickOrCustom::onClick(const string &control) {
         _charGen->startCustom();
     } else if (control == "BTN_BACK") {
         _charGen->openClassSelection();
+    }
+}
+
+void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
+    if (focus) {
+        string text;
+        if (control == "QUICK_CHAR_BTN") {
+            text = Resources::instance().getString(kStrRefQuickHelpText);
+        } else if (control == "CUST_CHAR_BTN") {
+            text = Resources::instance().getString(kStrRefCustomHelpText);
+        }
+        ListBox::Item item;
+        item.text = text;
+
+        ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+        lbDesc.clearItems();
+        lbDesc.addItem(move(item));
     }
 }
 

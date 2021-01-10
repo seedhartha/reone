@@ -339,7 +339,7 @@ void Equipment::updateEquipment() {
 
 void Equipment::updateItems() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clear();
+    lbItems.clearItems();
 
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
@@ -348,7 +348,7 @@ void Equipment::updateItems() {
         lbItem.iconTexture = Textures::instance().get("inone", TextureType::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
     shared_ptr<Creature> player(_game->party().player());
 
@@ -368,7 +368,7 @@ void Equipment::updateItems() {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
 }
 
