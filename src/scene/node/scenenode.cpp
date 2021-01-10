@@ -55,6 +55,9 @@ void SceneNode::render() const {
     }
 }
 
+void SceneNode::renderSingle(bool shadowPass) const {
+}
+
 float SceneNode::distanceTo(const glm::vec3 &point) const {
     return glm::distance(glm::vec3(_absoluteTransform[3]), point);
 }

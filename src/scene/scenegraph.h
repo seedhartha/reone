@@ -30,6 +30,7 @@ namespace reone {
 namespace scene {
 
 class CameraSceneNode;
+class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
 class SceneNode;
@@ -48,6 +49,8 @@ public:
 
     void build();
     void prepareFrame();
+
+    std::shared_ptr<CameraSceneNode> activeCamera() const;
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setReferenceNode(const std::shared_ptr<SceneNode> &node);
@@ -72,6 +75,7 @@ private:
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
+    std::vector<EmitterSceneNode *> _emitters;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
@@ -82,7 +86,7 @@ private:
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
-    void refreshMeshesAndLights();
+    void refreshMeshesLightsAndEmitters();
     void refreshShadowLight();
 };
 

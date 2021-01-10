@@ -17,21 +17,20 @@
 
 #pragma once
 
+#include "mesh.h"
+
 namespace reone {
 
-class Timer {
+namespace render {
+
+class BillboardMesh : public Mesh {
 public:
-    Timer() = default;
-    Timer(float timeout);
-
-    void update(float dt);
-    void reset(float timeout);
-    void cancel();
-
-    bool hasTimedOut() const;
+    static BillboardMesh &instance();
 
 private:
-    float _timeout { 0.0f };
+    BillboardMesh();
 };
+
+} // namespace render
 
 } // namespace reone

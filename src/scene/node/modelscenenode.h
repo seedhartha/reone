@@ -32,6 +32,7 @@ namespace reone {
 
 namespace scene {
 
+class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
 
@@ -98,6 +99,7 @@ private:
     SceneNodeAnimator _animator;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
+    std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     std::shared_ptr<render::Texture> _textureOverride;
     bool _visible { true };

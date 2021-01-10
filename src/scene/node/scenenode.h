@@ -34,6 +34,7 @@ public:
     void removeChild(SceneNode &node);
 
     virtual void render() const;
+    virtual void renderSingle(bool shadowPass) const;
 
     float distanceTo(const glm::vec3 &point) const;
 

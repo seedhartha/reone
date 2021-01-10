@@ -78,6 +78,7 @@ public:
     std::shared_ptr<Light> light() const;
     std::shared_ptr<ModelMesh> mesh() const;
     std::shared_ptr<Skin> skin() const;
+    std::shared_ptr<Emitter> emitter() const;
     const std::vector<std::shared_ptr<ModelNode>> &children() const;
 
 private:
