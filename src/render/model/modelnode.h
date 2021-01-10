@@ -21,6 +21,7 @@
 
 #include "glm/gtx/quaternion.hpp"
 
+#include "../emitter.h"
 #include "../mesh/modelmesh.h"
 
 namespace reone {
@@ -111,6 +112,7 @@ private:
     std::shared_ptr<Light> _light;
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
+    std::shared_ptr<Emitter> _emitter;
     std::vector<std::shared_ptr<ModelNode>> _children;
 
     ModelNode(const ModelNode &) = delete;
