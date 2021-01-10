@@ -487,7 +487,11 @@ Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionConte
     auto target = getSpatialObject(args, 2);
     float duration = getFloat(args, 3, 0.0f);
 
-    target->applyEffect(effect, durationType, duration);
+    if (target) {
+        target->applyEffect(effect, durationType, duration);
+    } else {
+        warn("Routines: applyEffectToObject: target is invalid");
+    }
 
     return Variable();
 }

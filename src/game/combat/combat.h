@@ -23,12 +23,14 @@
 #include <queue>
 #include <set>
 
-#include "../common/timer.h"
+#include "../../common/timer.h"
 
-#include "enginetype/effect.h"
-#include "object/creature.h"
-#include "rp/damageresolver.h"
-#include "types.h"
+#include "../enginetype/effect.h"
+#include "../object/creature.h"
+#include "../types.h"
+
+#include "attackresolver.h"
+#include "damageresolver.h"
 
 namespace reone {
 
@@ -76,14 +78,6 @@ private:
 
     typedef std::map<uint32_t, std::shared_ptr<Combatant>> CombatantMap;
 
-    struct AttackResult {
-        AttackResultType type { AttackResultType::Invalid };
-        CreatureWieldType attackerWieldType { CreatureWieldType::None };
-        CombatAnimation attackerAnimation { CombatAnimation::None };
-        int animationVariant { 1 };
-        CombatAnimation targetAnimation { CombatAnimation::None };
-    };
-
     struct Round {
         std::shared_ptr<Combatant> attacker;
         std::shared_ptr<SpatialObject> target;
@@ -101,6 +95,7 @@ private:
 
     Game *_game;
     bool _active { false };
+    AttackResolver _attackResolver;
     DamageResolver _damageResolver;
 
     Timer _heartbeatTimer { 0.0f };
@@ -128,8 +123,6 @@ private:
     std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;
 
     // Attacks
-
-    AttackResult determineAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, bool duel, AttackResultType type = AttackResultType::Invalid);
 
     void applyAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
 
