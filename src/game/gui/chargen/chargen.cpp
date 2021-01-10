@@ -401,6 +401,18 @@ void CharacterGeneration::updateAttributes() {
     setControlText("INT_AB_LBL", to_string(abilities.intelligence()));
     setControlText("WIS_AB_LBL", to_string(abilities.wisdom()));
     setControlText("CHA_AB_LBL", to_string(abilities.charisma()));
+
+    const SavingThrows &throws = clazz->getSavingThrows(1);
+
+    if (_version == GameVersion::TheSithLords) {
+        setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
+        setControlText("NEW_REFL_LBL", to_string(throws.reflex));
+        setControlText("NEW_WILL_LBL", to_string(throws.will));
+    } else {
+        setControlText("OLD_FORT_LBL", to_string(throws.fortitude));
+        setControlText("OLD_REFL_LBL", to_string(throws.reflex));
+        setControlText("OLD_WILL_LBL", to_string(throws.will));
+    }
 }
 
 void CharacterGeneration::goToNextStep() {

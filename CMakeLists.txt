@@ -442,6 +442,7 @@ set(GAME_HEADERS
     src/game/rp/classes.h
     src/game/rp/damageresolver.h
     src/game/rp/factionutil.h
+    src/game/rp/savingthrows.h
     src/game/rp/skills.h
     src/game/rp/types.h
     src/game/savedgame.h

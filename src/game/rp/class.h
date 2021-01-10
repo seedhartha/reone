@@ -23,15 +23,13 @@
 #include "../../resource/2dafile.h"
 
 #include "attributes.h"
+#include "savingthrows.h"
 #include "types.h"
 
 namespace reone {
 
 namespace game {
 
-/**
- * Represents a creature class.
- */
 class CreatureClass {
 public:
     CreatureClass(ClassType type);
@@ -41,10 +39,15 @@ public:
     bool isClassSkill(Skill skill) const;
 
     /**
-     * Compute a defense bonus that creature of this class and the specified
+     * Calculates a defense bonus that creature of this class and the specified
      * level would have.
      */
     int getDefenseBonus(int level) const;
+
+    /**
+     * @return class saving throws at the specified creature level
+     */
+    const SavingThrows &getSavingThrows(int level) const;
 
     const std::string &name() const;
     const std::string &description() const;
@@ -60,8 +63,10 @@ private:
     CreatureAttributes _defaultAttributes;
     int _skillPointBase { 0 };
     std::unordered_set<Skill> _classSkills;
+    std::unordered_map<int, SavingThrows> _savingThrowsByLevel;
 
     void loadClassSkills(const std::string &skillsTable);
+    void loadSavingThrows(const std::string &savingThrowTable);
 };
 
 } // namespace game
