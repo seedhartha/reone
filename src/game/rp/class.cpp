@@ -51,6 +51,9 @@ void CreatureClass::load(const TwoDaRow &row) {
 
     string skillsTable(boost::to_lower_copy(row.getString("skillstable")));
     loadClassSkills(skillsTable);
+
+    string savingThrowTable(boost::to_lower_copy(row.getString("savingthrowtable")));
+    loadSavingThrows(savingThrowTable);
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
@@ -60,6 +63,20 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
         if (rows[i].getInt(skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<Skill>(i));
         }
+    }
+}
+
+void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
+    shared_ptr<TwoDaTable> table(Resources::instance().get2DA(savingThrowTable));
+    for (auto &row : table->rows()) {
+        int level = row.getInt("level");
+
+        SavingThrows throws;
+        throws.fortitude = row.getInt("fortsave");
+        throws.reflex = row.getInt("refsave");
+        throws.will = row.getInt("willsave");
+
+        _savingThrowsByLevel.insert(make_pair(level, move(throws)));
     }
 }
 
@@ -77,6 +94,14 @@ int CreatureClass::getDefenseBonus(int level) const {
         default:
             return 0;
     }
+}
+
+const SavingThrows &CreatureClass::getSavingThrows(int level) const {
+    auto maybeThrows = _savingThrowsByLevel.find(level);
+    if (maybeThrows == _savingThrowsByLevel.end()) {
+        throw logic_error("Saving throws not found for level " + to_string(level));
+    }
+    return maybeThrows->second;
 }
 
 const string &CreatureClass::name() const {
