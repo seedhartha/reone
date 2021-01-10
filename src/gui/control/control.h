@@ -124,6 +124,7 @@ public:
     void setText(const Text &text);
     void setTextColor(const glm::vec3 & color);
     void setTextMessage(const std::string &text);
+    void setTextFont(const std::shared_ptr<render::Font> &font);
     void setUseBorderColorOverride(bool use);
     void setVisible(bool visible);
 

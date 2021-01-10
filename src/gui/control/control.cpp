@@ -453,14 +453,19 @@ vector<string> Control::breakText(const string &text, int maxWidth) const {
     string line;
 
     for (auto &token : tokens) {
-        string candidate(line + token);
-        if (_text.font->measure(candidate) > maxWidth) {
-            lines.push_back(move(candidate));
-            line.clear();
+        string candidate(line);
+        if (!candidate.empty()) {
+            candidate += " ";
+        }
+        candidate += token;
+
+        if (_text.font->measure(candidate) < maxWidth) {
+            line = move(candidate);
+        } else {
+            lines.push_back(line);
+            line = token;
             continue;
         }
-        line = move(candidate);
-        line += " ";
     }
     if (!line.empty()) {
         boost::trim_right(line);
@@ -617,6 +622,10 @@ void Control::setText(const Text &text) {
 
 void Control::setTextMessage(const string &text) {
     _text.text = text;
+}
+
+void Control::setTextFont(const shared_ptr<Font> &font) {
+    _text.font = font;
 }
 
 void Control::setTextColor(const glm::vec3 &color) {

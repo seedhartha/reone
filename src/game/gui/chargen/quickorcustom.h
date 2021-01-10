@@ -35,6 +35,7 @@ private:
     CharacterGeneration *_charGen { nullptr };
 
     void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game

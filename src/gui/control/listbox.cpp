@@ -53,14 +53,14 @@ void ListBox::updateItems() {
     }
 }
 
-void ListBox::clear() {
+void ListBox::clearItems() {
     _items.clear();
     _itemOffset = 0;
     _hilightedIndex = -1;
     updateItems();
 }
 
-void ListBox::add(Item item) {
+void ListBox::addItem(Item item) {
     _items.push_back(move(item));
     updateItems();
 }

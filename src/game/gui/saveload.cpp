@@ -92,13 +92,13 @@ void SaveLoad::refresh() {
     indexSavedGames();
 
     ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.clear();
+    lbGames.clearItems();
 
     for (auto &save : _saves) {
         ListBox::Item item;
         item.tag = to_string(save.index);
         item.text = save.name;
-        lbGames.add(move(item));
+        lbGames.addItem(move(item));
     }
 }
 
