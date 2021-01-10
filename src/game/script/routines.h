@@ -256,6 +256,7 @@ private:
     script::Variable addPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getFirstPC(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getIsPC(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getPartyLeader(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPartyMemberByIndex(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPartyMemberCount(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getPCSpeaker(const VariablesList &args, script::ExecutionContext &ctx);

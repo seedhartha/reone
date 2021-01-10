@@ -146,6 +146,10 @@ Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContex
     return removed ? 1 : 0;
 }
 
+Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
+    return static_pointer_cast<ScriptObject>(_game->party().leader());
+}
+
 } // namespace game
 
 } // namespace reone

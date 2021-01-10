@@ -779,7 +779,7 @@ void Routines::addTslRoutines() {
     add("ActionFollowLeader", Void, { }, &Routines::actionFollowLeader);
     add("SetForcePowerUnsuccessful", Void, { Int, Object });
     add("GetIsDebilitated", Int, { Object });
-    add("PlayMovie", Void, { String, Int });
+    add("PlayMovie", Void, { String, Int }, &Routines::playMovie);
     add("SaveNPCState", Void, { Int });
     add("GetCategoryFromTalent", Int, { Talent });
     add("SurrenderByFaction", Void, { Int, Int });
@@ -901,7 +901,7 @@ void Routines::addTslRoutines() {
     add("GetIsPuppet", Int, { Object });
     add("ActionFollowOwner", Void, { Float }, &Routines::actionFollowOwner);
     add("GetIsPartyLeader", Int, { Object });
-    add("GetPartyLeader", Object, { });
+    add("GetPartyLeader", Object, { }, &Routines::getPartyLeader);
     add("RemoveNPCFromPartyToBase", Int, { Int });
     add("CreatureFlourishWeapon", Void, { Object });
     add("EffectMindTrick", Effect, { }, &Routines::effectMindTrick);
