@@ -22,11 +22,11 @@
 
 #include "glm/common.hpp"
 
-#include "../common/log.h"
-#include "../common/random.h"
+#include "../../common/log.h"
+#include "../../common/random.h"
 
-#include "game.h"
-#include "rp/factionutil.h"
+#include "../game.h"
+#include "../rp/factionutil.h"
 
 using namespace std;
 
@@ -271,7 +271,7 @@ void Combat::updateRound(Round &round, float dt) {
 
     switch (round.state) {
         case RoundState::Started:
-            round.attackResult = determineAttackResult(attacker, round.target, duel, round.cutsceneAttackResult);
+            round.attackResult = _attackResolver.getAttackResult(attacker, round.target, duel, round.cutsceneAttackResult);
 
             attacker->face(*round.target);
             attacker->setMovementType(Creature::MovementType::None);
@@ -299,7 +299,7 @@ void Combat::updateRound(Round &round, float dt) {
                 }
                 if (duel) {
                     auto targetCreature = static_pointer_cast<Creature>(round.target);
-                    round.attackResult = determineAttackResult(targetCreature, attacker, true);
+                    round.attackResult = _attackResolver.getAttackResult(targetCreature, attacker, true);
 
                     targetCreature->face(*attacker);
                     targetCreature->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
@@ -422,97 +422,6 @@ void Combat::cutsceneAttack(
     round->cutsceneAttackResult = result;
     round->cutsceneDamage = damage;
     addRound(round);
-}
-
-static bool isMeleeWieldType(CreatureWieldType type) {
-    switch (type) {
-        case CreatureWieldType::SingleSword:
-        case CreatureWieldType::DoubleBladedSword:
-        case CreatureWieldType::DualSwords:
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool isAttackSuccessful(AttackResultType type) {
-    switch (type) {
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
-        case AttackResultType::AutomaticHit:
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool isRangedWieldType(CreatureWieldType type) {
-    switch (type) {
-        case CreatureWieldType::BlasterPistol:
-        case CreatureWieldType::DualPistols:
-        case CreatureWieldType::BlasterRifle:
-        case CreatureWieldType::HeavyWeapon:
-            return true;
-        default:
-            return false;
-    }
-}
-
-Combat::AttackResult Combat::determineAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, bool duel, AttackResultType type) {
-    AttackResult result;
-
-    if (type != AttackResultType::Invalid) {
-        result.type = type;
-    } else {
-        int attack = random(1, 20);
-        int defense = 10; // TODO: add armor bonus and dexterity modifier
-
-        if (attack == 20) {
-            result.type = AttackResultType::AutomaticHit;
-        } else if (attack >= defense) {
-            result.type = AttackResultType::HitSuccessful;
-        } else {
-            result.type = AttackResultType::Miss;
-        }
-    }
-
-    CreatureWieldType attackerWield = attacker->getWieldType();
-    CreatureWieldType targetWield = CreatureWieldType::None;
-
-    auto targetCreature = dynamic_pointer_cast<Creature>(target);
-    if (targetCreature) {
-        targetWield = targetCreature->getWieldType();
-    }
-
-    if (duel) {
-        if (isMeleeWieldType(attackerWield) && isMeleeWieldType(targetWield)) {
-            result.attackerAnimation = CombatAnimation::MeleeDuelAttack;
-            result.animationVariant = random(1, 5);
-            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDuelDamage : CombatAnimation::MeleeDuelParry;
-        } else if (isMeleeWieldType(attackerWield)) {
-            result.attackerAnimation = CombatAnimation::MeleeAttack;
-            result.animationVariant = random(1, 2);
-            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDamage : CombatAnimation::MeleeDodge;
-        } else if (isRangedWieldType(attackerWield)) {
-            result.attackerAnimation = CombatAnimation::RangedAttack;
-            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::Damage : CombatAnimation::Dodge;
-        } else {
-            result.attackerAnimation = CombatAnimation::Attack;
-            result.animationVariant = random(1, 2);
-            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::Damage : CombatAnimation::Dodge;
-        }
-    } else {
-        if (isRangedWieldType(attackerWield)) {
-            result.attackerAnimation = CombatAnimation::RangedAttack;
-        } else {
-            result.attackerAnimation = CombatAnimation::Attack;
-            result.animationVariant = random(1, 2);
-        }
-    }
-
-    result.attackerWieldType = attackerWield;
-
-    return move(result);
 }
 
 } // namespace game

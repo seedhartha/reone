@@ -371,7 +371,10 @@ set(GAME_HEADERS
     src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
-    src/game/combat.h
+    src/game/combat/attackresolver.h
+    src/game/combat/attackresult.h
+    src/game/combat/combat.h
+    src/game/combat/damageresolver.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/effect.h
@@ -440,7 +443,6 @@ set(GAME_HEADERS
     src/game/rp/attributes.h
     src/game/rp/class.h
     src/game/rp/classes.h
-    src/game/rp/damageresolver.h
     src/game/rp/factionutil.h
     src/game/rp/savingthrows.h
     src/game/rp/skills.h
@@ -477,7 +479,9 @@ set(GAME_SOURCES
     src/game/characterutil.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
-    src/game/combat.cpp
+    src/game/combat/attackresolver.cpp
+    src/game/combat/combat.cpp
+    src/game/combat/damageresolver.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp
@@ -539,7 +543,6 @@ set(GAME_SOURCES
     src/game/rp/attributes.cpp
     src/game/rp/class.cpp
     src/game/rp/classes.cpp
-    src/game/rp/damageresolver.cpp
     src/game/rp/factionutil.cpp
     src/game/rp/skills.cpp
     src/game/savedgame.cpp
