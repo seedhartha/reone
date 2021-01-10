@@ -58,10 +58,14 @@ enum class ControllerType {
     Position = 8,
     Orientation = 20,
     Color = 76,
-    Radius = 88,
+    Radius_Birthrate = 88,
     SelfIllumColor = 100,
+    LifeExpectancy = 120,
     Alpha = 132,
-    Multiplier = 140
+    Multiplier = 140,
+    SizeStart = 144,
+    SizeX = 172,
+    SizeY = 176
 };
 
 MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
@@ -217,6 +221,10 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     node->_absTransform = absTransform;
     node->_absTransformInv = glm::inverse(absTransform);
 
+    if (flags & kNodeHasEmitter) {
+        node->_emitter = make_shared<Emitter>();
+    }
+
     readControllers(controllerKeyCount, controllerKeyOffset, controllerData, *node);
 
     if (flags & kNodeHasLight) {
@@ -269,27 +277,48 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 readOrientationController(rowCount, columnCount, timeIndex, dataIndex, data, node);
                 break;
             case ControllerType::Color:
-                // TODO: multiple rows
                 readColorController(dataIndex, data, node);
+                break;
+            case ControllerType::Radius_Birthrate:
+                if (node._flags & kNodeHasLight) {
+                    readRadiusController(dataIndex, data, node);
+                } else if (node._flags & kNodeHasEmitter) {
+                    readBirthrateController(dataIndex, data, node);
+                }
                 break;
             case ControllerType::SelfIllumColor:
                 if (node._flags & kNodeHasMesh) {
-                    // TODO: multiple rows
                     node._selfIllumEnabled = true;
                     readSelfIllumColorController(dataIndex, data, node);
                 }
                 break;
+            case ControllerType::LifeExpectancy:
+                if (node._flags & kNodeHasEmitter) {
+                    readLifeExpectancyController(dataIndex, data, node);
+                }
+                break;
             case ControllerType::Alpha:
-                // TODO: multiple rows
                 readAlphaController(dataIndex, data, node);
                 break;
-            case ControllerType::Radius:
-                // TODO: multiple rows
-                readRadiusController(dataIndex, data, node);
-                break;
             case ControllerType::Multiplier:
-                // TODO: multiple rows
-                readMultiplierController(dataIndex, data, node);
+                if (node._flags & kNodeHasLight) {
+                    readMultiplierController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeX:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeXController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeY:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeYController(dataIndex, data, node);
+                }
                 break;
             default:
                 debug(boost::format("MDL: unsupported controller type: \"%s\" %d") % _name % static_cast<int>(type), 3);
@@ -397,8 +426,28 @@ void MdlFile::readRadiusController(uint16_t dataIndex, const vector<float> &data
     node._radius = data[dataIndex];
 }
 
+void MdlFile::readBirthrateController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_birthrate = data[dataIndex];
+}
+
 void MdlFile::readMultiplierController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._multiplier = data[dataIndex];
+}
+
+void MdlFile::readLifeExpectancyController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_lifeExpectancy = data[dataIndex];
+}
+
+void MdlFile::readSizeStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_sizeStart = data[dataIndex];
+}
+
+void MdlFile::readSizeXController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_size.x = data[dataIndex];
+}
+
+void MdlFile::readSizeYController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_size.y = data[dataIndex];
 }
 
 void MdlFile::readLight(ModelNode &node) {
@@ -634,8 +683,6 @@ static Emitter::RenderType parseEmitterRender(const string &str) {
 }
 
 void MdlFile::readEmitter(ModelNode &node) {
-    node._emitter = make_shared<Emitter>();
-
     ignore(5 * 4);
 
     node._emitter->_gridWidth = readUint32();
