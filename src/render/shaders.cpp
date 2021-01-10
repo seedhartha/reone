@@ -72,6 +72,8 @@ layout(std140) uniform General {
     uniform vec4 uDiscardColor;
     uniform vec2 uBlurResolution;
     uniform vec2 uBlurDirection;
+    uniform vec2 uBillboardGridSize;
+    uniform int uBillboardFrame;
 };
 
 layout(std140) uniform Lighting {
@@ -376,6 +378,30 @@ void main() {
 }
 )END";
 
+static const GLchar kSourceFragmentBillboard[] = R"END(
+uniform sampler2D uTexture;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    float oneOverGridX = 1.0 / uBillboardGridSize.x;
+    float oneOverGridY = 1.0 / uBillboardGridSize.y;
+
+    vec2 texCoords = fragTexCoords;
+    texCoords.x *= oneOverGridX;
+    texCoords.y *= oneOverGridY;
+
+    if (uBillboardFrame > 0) {
+        texCoords.y += oneOverGridY * (uBillboardFrame / int(uBillboardGridSize.x));
+        texCoords.x += oneOverGridX * (uBillboardFrame % int(uBillboardGridSize.x));
+    }
+
+    fragColor = texture(uTexture, texCoords);
+}
+)END";
+
 static const GLchar kSourceFragmentDebugShadows[] = R"END(
 uniform samplerCube uShadowmap;
 
@@ -411,6 +437,7 @@ void Shaders::initGL() {
     initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, kSourceFragmentBlur);
     initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, kSourceFragmentBloom);
     initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, kSourceFragmentDepth);
+    initShader(ShaderName::FragmentBillboard, GL_FRAGMENT_SHADER, kSourceFragmentBillboard);
     initShader(ShaderName::FragmentDebugShadows, GL_FRAGMENT_SHADER, kSourceFragmentDebugShadows);
 
     initProgram(ShaderProgram::GUIGUI, 2, ShaderName::VertexGUI, ShaderName::FragmentGUI);
@@ -420,6 +447,7 @@ void Shaders::initGL() {
     initProgram(ShaderProgram::GUIDebugShadows, 2, ShaderName::VertexGUI, ShaderName::FragmentDebugShadows);
     initProgram(ShaderProgram::ModelWhite, 2, ShaderName::VertexModel, ShaderName::FragmentWhite);
     initProgram(ShaderProgram::ModelModel, 2, ShaderName::VertexModel, ShaderName::FragmentModel);
+    initProgram(ShaderProgram::ModelBillboard, 2, ShaderName::VertexModel, ShaderName::FragmentBillboard);
     initProgram(ShaderProgram::DepthDepth, 3, ShaderName::VertexDepth, ShaderName::GeometryDepth, ShaderName::FragmentDepth);
 
     glGenBuffers(1, &_generalUbo);

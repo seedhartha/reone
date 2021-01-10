@@ -44,6 +44,7 @@ enum class ShaderProgram {
     GUIDebugShadows,
     ModelWhite,
     ModelModel,
+    ModelBillboard,
     DepthDepth
 };
 
@@ -88,6 +89,9 @@ struct GeneralUniforms {
     glm::vec4 discardColor { 0.0f };
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
+    glm::vec2 billboardGridSize { 0.0f };
+    int billboardFrame { 0 };
+    char padding3[4];
 };
 
 struct SkeletalUniforms {
@@ -142,7 +146,8 @@ private:
         FragmentBlur,
         FragmentBloom,
         FragmentDepth,
-        FragmentDebugShadows
+        FragmentDebugShadows,
+        FragmentBillboard
     };
 
     std::unordered_map<ShaderName, uint32_t> _shaders;

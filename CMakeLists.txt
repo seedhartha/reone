@@ -146,6 +146,7 @@ set(RENDER_HEADERS
     src/render/image/tpcfile.h
     src/render/image/txifile.h
     src/render/mesh/aabb.h
+    src/render/mesh/billboard.h
     src/render/mesh/cube.h
     src/render/mesh/quad.h
     src/render/mesh/mesh.h
@@ -177,6 +178,7 @@ set(RENDER_SOURCES
     src/render/image/tpcfile.cpp
     src/render/image/txifile.cpp
     src/render/mesh/aabb.cpp
+    src/render/mesh/billboard.cpp
     src/render/mesh/cube.cpp
     src/render/mesh/quad.cpp
     src/render/mesh/mesh.cpp
@@ -251,6 +253,7 @@ endif()
 set(SCENE_HEADERS
     src/scene/node/cameranode.h
     src/scene/node/cubenode.h
+    src/scene/node/emitternode.h
     src/scene/node/lightnode.h
     src/scene/node/modelnodescenenode.h
     src/scene/node/modelscenenode.h
@@ -263,6 +266,7 @@ set(SCENE_HEADERS
 set(SCENE_SOURCES
     src/scene/node/cameranode.cpp
     src/scene/node/cubenode.cpp
+    src/scene/node/emitternode.cpp
     src/scene/node/lightnode.cpp
     src/scene/node/modelnodescenenode.cpp
     src/scene/node/modelscenenode.cpp

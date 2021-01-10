@@ -15,23 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "billboard.h"
+
+using namespace std;
 
 namespace reone {
 
-class Timer {
-public:
-    Timer() = default;
-    Timer(float timeout);
+namespace render {
 
-    void update(float dt);
-    void reset(float timeout);
-    void cancel();
-
-    bool hasTimedOut() const;
-
-private:
-    float _timeout { 0.0f };
+static vector<float> g_vertices = {
+    -0.5f, 0.0f, -0.5f, 0.0f, 0.0f,
+     0.5f, 0.0f, -0.5f, 1.0f, 0.0f,
+     0.5f, 0.0f,  0.5f, 1.0f, 1.0f,
+    -0.5f, 0.0f,  0.5f, 0.0f, 1.0f
 };
+
+static vector<uint16_t> g_indices = {
+    0, 1, 2, 2, 3, 0
+};
+
+static Mesh::VertexOffsets g_offsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, 5 * sizeof(float) };
+
+BillboardMesh &BillboardMesh::instance() {
+    static BillboardMesh mesh;
+    return mesh;
+}
+
+BillboardMesh::BillboardMesh() {
+    _vertices = move(g_vertices);
+    _indices = move(g_indices);
+    _offsets = move(g_offsets);
+}
+
+} // namespace render
 
 } // namespace reone

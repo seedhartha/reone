@@ -60,10 +60,13 @@ enum class ControllerType {
     Color = 76,
     Radius_Birthrate = 88,
     SelfIllumColor = 100,
+    FrameEnd = 108,
+    FrameStart = 112,
     LifeExpectancy = 120,
     Alpha = 132,
-    Multiplier = 140,
+    Multiplier_RandomVelocity = 140,
     SizeStart = 144,
+    Velocity = 168,
     SizeX = 172,
     SizeY = 176
 };
@@ -292,6 +295,16 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                     readSelfIllumColorController(dataIndex, data, node);
                 }
                 break;
+            case ControllerType::FrameEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readFrameEndController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::FrameStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readFrameStartController(dataIndex, data, node);
+                }
+                break;
             case ControllerType::LifeExpectancy:
                 if (node._flags & kNodeHasEmitter) {
                     readLifeExpectancyController(dataIndex, data, node);
@@ -300,14 +313,21 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
             case ControllerType::Alpha:
                 readAlphaController(dataIndex, data, node);
                 break;
-            case ControllerType::Multiplier:
+            case ControllerType::Multiplier_RandomVelocity:
                 if (node._flags & kNodeHasLight) {
                     readMultiplierController(dataIndex, data, node);
+                } else if (node._flags & kNodeHasEmitter) {
+                    readRandomVelocityController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeStart:
                 if (node._flags & kNodeHasEmitter) {
                     readSizeStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::Velocity:
+                if (node._flags & kNodeHasEmitter) {
+                    readVelocityController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeX:
@@ -448,6 +468,22 @@ void MdlFile::readSizeXController(uint16_t dataIndex, const vector<float> &data,
 
 void MdlFile::readSizeYController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._emitter->_size.y = data[dataIndex];
+}
+
+void MdlFile::readFrameEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_frameEnd = data[dataIndex];
+}
+
+void MdlFile::readFrameStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_frameStart = data[dataIndex];
+}
+
+void MdlFile::readRandomVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_randomVelocity = data[dataIndex];
+}
+
+void MdlFile::readVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_velocity = data[dataIndex];
 }
 
 void MdlFile::readLight(ModelNode &node) {
@@ -695,7 +731,7 @@ void MdlFile::readEmitter(ModelNode &node) {
 
     ignore(32);
 
-    node._emitter->_texture = Textures::instance().get(readCString(32), TextureType::Diffuse);
+    node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
 
     ignore(56);
 }

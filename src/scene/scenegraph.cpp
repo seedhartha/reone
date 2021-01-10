@@ -23,6 +23,7 @@
 #include "../render/mesh/quad.h"
 
 #include "node/cameranode.h"
+#include "node/emitternode.h"
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
@@ -34,6 +35,8 @@ using namespace reone::render;
 namespace reone {
 
 namespace scene {
+
+static bool g_emittersEnabled = false;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -59,7 +62,7 @@ void SceneGraph::build() {
 void SceneGraph::prepareFrame() {
     if (!_activeCamera) return;
 
-    refreshMeshesAndLights();
+    refreshMeshesLightsAndEmitters();
     refreshShadowLight();
 
     for (auto &root : _roots) {
@@ -68,7 +71,7 @@ void SceneGraph::prepareFrame() {
             modelNode->updateLighting();
         }
     }
-    unordered_map<ModelNodeSceneNode *, float> cameraDistances;
+    unordered_map<SceneNode *, float> cameraDistances;
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
 
     for (auto &mesh : _transparentMeshes) {
@@ -88,11 +91,12 @@ void SceneGraph::prepareFrame() {
     });
 }
 
-void SceneGraph::refreshMeshesAndLights() {
+void SceneGraph::refreshMeshesLightsAndEmitters() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
+    _emitters.clear();
 
     for (auto &root : _roots) {
         stack<SceneNode *> nodes;
@@ -123,6 +127,11 @@ void SceneGraph::refreshMeshesAndLights() {
                     LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
                     if (light) {
                         _lights.push_back(light);
+                    } else if (g_emittersEnabled) {
+                        auto emitter = dynamic_cast<EmitterSceneNode *>(node);
+                        if (emitter) {
+                            _emitters.push_back(emitter);
+                        }
                     }
                 }
             }
@@ -179,6 +188,9 @@ void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
     for (auto &mesh : _opaqueMeshes) {
         mesh->renderSingle(false);
     }
+    for (auto &emitter : _emitters) {
+        emitter->renderSingle(false);
+    }
     for (auto &mesh : _transparentMeshes) {
         mesh->renderSingle(false);
     }
@@ -217,6 +229,10 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
 
 const glm::vec3 &SceneGraph::ambientLightColor() const {
     return _ambientLightColor;
+}
+
+shared_ptr<CameraSceneNode> SceneGraph::activeCamera() const {
+    return _activeCamera;
 }
 
 void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {

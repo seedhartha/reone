@@ -36,7 +36,7 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void renderSingle(bool shadowPass) const;
+    void renderSingle(bool shadowPass) const override;
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

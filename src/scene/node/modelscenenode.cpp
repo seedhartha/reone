@@ -24,6 +24,7 @@
 
 #include "../scenegraph.h"
 
+#include "emitternode.h"
 #include "lightnode.h"
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
@@ -69,8 +70,15 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                shared_ptr<LightSceneNode> lightNode(new LightSceneNode(_sceneGraph, light->priority, child->color(), child->radius(), child->multiplier(), light->shadow));
+                auto lightNode = make_shared<LightSceneNode>(_sceneGraph, light->priority, child->color(), child->radius(), child->multiplier(), light->shadow);
                 childNode->addChild(lightNode);
+            }
+
+            shared_ptr<Emitter> emitter(child->emitter());
+            if (emitter) {
+                auto emitterNode = make_shared<EmitterSceneNode>(child, emitter, _sceneGraph);
+                childNode->addChild(emitterNode);
+                _emitters.push_back(emitterNode);
             }
         }
     }
@@ -89,6 +97,9 @@ void ModelSceneNode::update(float dt) {
 
     _animator.update(dt);
 
+    for (auto &emitter : _emitters) {
+        emitter->update(dt);
+    }
     for (auto &attached : _attachedModels) {
         attached.second->update(dt);
     }

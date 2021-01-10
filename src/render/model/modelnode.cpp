@@ -163,6 +163,10 @@ shared_ptr<ModelNode::Skin> ModelNode::skin() const {
     return _skin;
 }
 
+shared_ptr<Emitter> ModelNode::emitter() const {
+    return _emitter;
+}
+
 const vector<shared_ptr<ModelNode>> &ModelNode::children() const {
     return _children;
 }
