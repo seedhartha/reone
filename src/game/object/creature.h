@@ -179,7 +179,7 @@ private:
     CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
-    std::shared_ptr<Action> _animAction; ///< action used to start the last animation
+    std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
 
     // Scripts
 

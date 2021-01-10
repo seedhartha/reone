@@ -223,7 +223,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
         readLight(*node);
     }
     if (flags & kNodeHasEmitter) {
-        ignore(216);
+        readEmitter(*node);
     }
     if (flags & kNodeHasReference) {
         ignore(68);
@@ -613,6 +613,44 @@ Model::Classification MdlFile::getClassification(int value) const {
 
 shared_ptr<Model> MdlFile::model() const {
     return _model;
+}
+
+static Emitter::UpdateType parseEmitterUpdate(const string &str) {
+    Emitter::UpdateType result = Emitter::UpdateType::Invalid;
+    if (str == "Fountain") {
+        result = Emitter::UpdateType::Fountain;
+    }
+    return result;
+}
+
+static Emitter::RenderType parseEmitterRender(const string &str) {
+    Emitter::RenderType result = Emitter::RenderType::Invalid;
+    if (str == "Normal") {
+        result = Emitter::RenderType::Normal;
+    } else if (str == "Billboard_to_World_Z") {
+        result = Emitter::RenderType::BillboardToWorldZ;
+    }
+    return result;
+}
+
+void MdlFile::readEmitter(ModelNode &node) {
+    node._emitter = make_shared<Emitter>();
+
+    ignore(5 * 4);
+
+    node._emitter->_gridWidth = readUint32();
+    node._emitter->_gridHeight = readUint32();
+
+    ignore(4);
+
+    node._emitter->_updateType = parseEmitterUpdate(readCString(32));
+    node._emitter->_renderType = parseEmitterRender(readCString(32));
+
+    ignore(32);
+
+    node._emitter->_texture = Textures::instance().get(readCString(32), TextureType::Diffuse);
+
+    ignore(56);
 }
 
 } // namespace render
