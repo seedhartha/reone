@@ -725,8 +725,8 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDLK_EQUALS:
-            if (_gameSpeed < 4.0f) {
-                _gameSpeed = glm::min(4.0f, _gameSpeed + 1.0f);
+            if (_gameSpeed < 8.0f) {
+                _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
             }
             return true;
 
