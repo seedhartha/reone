@@ -808,6 +808,18 @@ static Emitter::RenderType parseEmitterRender(const string &str) {
     return result;
 }
 
+static Emitter::BlendType parseEmitterBlend(const string &str) {
+    Emitter::BlendType result = Emitter::BlendType::Invalid;
+    if (str == "Normal") {
+        result = Emitter::BlendType::Normal;
+    } else if (str == "Punch") {
+        result = Emitter::BlendType::Punch;
+    } else if (str == "Lighten") {
+        result = Emitter::BlendType::Lighten;
+    }
+    return result;
+}
+
 void MdlFile::readEmitter(ModelNode &node) {
     ignore(5 * 4);
 
@@ -818,9 +830,7 @@ void MdlFile::readEmitter(ModelNode &node) {
 
     node._emitter->_updateType = parseEmitterUpdate(readCString(32));
     node._emitter->_renderType = parseEmitterRender(readCString(32));
-
-    ignore(32);
-
+    node._emitter->_blendType = parseEmitterBlend(readCString(32));
     node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
 
     ignore(24);

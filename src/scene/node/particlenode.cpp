@@ -22,6 +22,9 @@
 #include "glm/common.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "GL/glew.h"
+#include "SDL2/SDL_opengl.h"
+
 #include "../../render/mesh/billboard.h"
 #include "../../render/shaders.h"
 #include "../../render/util.h"
@@ -90,8 +93,19 @@ void ParticleSceneNode::updateAnimation(float dt) {
     _alpha = interpolateConstraints(_emitter->alpha(), maturity);
 }
 
+static bool isSupportedBlendType(Emitter::BlendType type) {
+    switch (type) {
+        case Emitter::BlendType::Normal:
+        case Emitter::BlendType::Lighten:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void ParticleSceneNode::renderSingle(bool shadowPass) const {
     if (shadowPass) return;
+    if (!isSupportedBlendType(_emitter->blendType())) return;
 
     LocalUniforms locals;
     locals.general.color = glm::vec4(_color, 1.0f);
@@ -106,7 +120,22 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     setActiveTextureUnit(0);
     _emitter->texture()->bind();
 
+    bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
+
+    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
+    if (lighten) {
+        glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
+        glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
+        glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
+        glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
+
     BillboardMesh::instance().renderTriangles();
+
+    if (lighten) {
+        glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+    }
 }
 
 bool ParticleSceneNode::isExpired() const {
