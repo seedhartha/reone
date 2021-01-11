@@ -226,8 +226,8 @@ void Combat::updateRounds(float dt) {
         // Create a combat round if not a duel
 
         auto maybeTargetRound = _roundByAttackerId.find(target->id());
-        bool isDuel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker->creature;
-        if (!isDuel) {
+        bool duel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker->creature;
+        if (!duel) {
             addRound(attacker, target);
         }
     }
