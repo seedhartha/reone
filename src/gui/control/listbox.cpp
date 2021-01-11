@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 
 #include "listbox.h"
 
+#include "../../common/log.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../gui.h"
 
@@ -53,14 +53,14 @@ void ListBox::updateItems() {
     }
 }
 
-void ListBox::clear() {
+void ListBox::clearItems() {
     _items.clear();
     _itemOffset = 0;
     _hilightedIndex = -1;
     updateItems();
 }
 
-void ListBox::add(Item item) {
+void ListBox::addItem(Item item) {
     _items.push_back(move(item));
     updateItems();
 }

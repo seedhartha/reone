@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public:
     void initGL();
 
     std::vector<std::string> getAnimationNames() const;
-    Animation *getAnimation(const std::string &name) const;
+    std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
@@ -77,7 +77,7 @@ private:
     Classification _classification { Classification::Other };
     std::string _name;
     std::shared_ptr<ModelNode> _rootNode;
-    std::unordered_map<std::string, std::unique_ptr<Animation>> _animations;
+    std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;

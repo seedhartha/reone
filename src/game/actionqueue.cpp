@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ ActionQueue::iterator ActionQueue::end() {
 
 void ActionQueue::removeCompletedActions() {
     while (true) {
-        const Action *action = currentAction();
+        shared_ptr<Action> action(currentAction());
         if (!action || !action->isCompleted()) return;
 
         _actions.pop_front();
@@ -90,8 +90,8 @@ int ActionQueue::size() const {
     return static_cast<int>(_actions.size());
 }
 
-Action *ActionQueue::currentAction() {
-   return _actions.empty() ? nullptr : _actions.front().get();
+shared_ptr<Action> ActionQueue::currentAction() {
+   return _actions.empty() ? nullptr : _actions.front();
 }
 
 } // namespace game

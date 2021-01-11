@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,19 +48,16 @@ static const int kStrRefSaveGame = 1588;
 static const int kStrRefLoad = 1589;
 
 SaveLoad::SaveLoad(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("saveload");
-    _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
     }
+
+    initForGame();
 }
 
 void SaveLoad::load() {
@@ -79,7 +76,7 @@ void SaveLoad::load() {
     protoItem.setHilightColor(_defaultHilightColor);
 }
 
-void SaveLoad::update() {
+void SaveLoad::refresh() {
     string panelName(Resources::instance().getString(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
 
     Control &lblPanelName = getControl("LBL_PANELNAME");
@@ -95,13 +92,13 @@ void SaveLoad::update() {
     indexSavedGames();
 
     ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.clear();
+    lbGames.clearItems();
 
     for (auto &save : _saves) {
         ListBox::Item item;
         item.tag = to_string(save.index);
         item.text = save.name;
-        lbGames.add(move(item));
+        lbGames.addItem(move(item));
     }
 }
 
@@ -157,7 +154,7 @@ void SaveLoad::onClick(const string &control) {
                     saveIdx = getNewSaveIndex();
                 }
                 saveGame(saveIdx);
-                update();
+                refresh();
                 break;
             default:
                 if (saveIdx != -1) {
@@ -169,7 +166,7 @@ void SaveLoad::onClick(const string &control) {
         int saveIdx = getSelectedSaveIndex();
         if (saveIdx != -1) {
             deleteGame(saveIdx);
-            update();
+            refresh();
         }
     } else if (control == "BTN_BACK") {
         ListBox &lbGames = getControl<ListBox>("LB_GAMES");

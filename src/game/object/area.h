@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 #include "../../resource/gfffile.h"
 #include "../../resource/types.h"
 
-#include "../combat.h"
 #include "../actionexecutor.h"
 #include "../camera/animatedcamera.h"
 #include "../camera/dialogcamera.h"
@@ -38,6 +37,7 @@
 #include "../camera/thirdperson.h"
 #include "../camera/types.h"
 #include "../collisiondetect.h"
+#include "../combat/combat.h"
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
@@ -74,11 +74,14 @@ public:
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
-    bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
     void onPartyLeaderMoved();
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
+    void landObject(SpatialObject &object);
+
+    bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
+    bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
 
     bool isUnescapable() const;
 
@@ -99,10 +102,19 @@ public:
 
     // Objects
 
-    std::shared_ptr<SpatialObject> find(uint32_t id) const;
-    std::shared_ptr<SpatialObject> find(const std::string &tag, int nth = 0) const;
+    std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
+
+    std::shared_ptr<SpatialObject> getObjectById(uint32_t id) const;
+    std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
 
     ObjectList &getObjectsByType(ObjectType type);
+
+    /**
+     * Find the nth nearest object for which the specified predicate returns true.
+     * 
+     * @param nth a 0-based object index
+     */
+    std::shared_ptr<SpatialObject> getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate);
 
     // END Objects
 
@@ -111,8 +123,7 @@ public:
     Camera &getCamera(CameraType type);
 
     void setStaticCamera(int cameraId);
-    void setCombatTPCamera();
-    void setDefaultTPCamera();
+    void setThirdPartyCameraStyle(CameraStyleType type);
 
     // END Cameras
 
@@ -120,6 +131,7 @@ public:
 
     void loadParty(const glm::vec3 &position, float facing);
     void unloadParty();
+    void reloadParty();
 
     // END Party
 
@@ -155,9 +167,9 @@ private:
     Pathfinder _pathfinder;
     std::string _name;
     RoomMap _rooms;
-    std::unique_ptr<resource::Visibility> _visibility;
-    CameraStyle _cameraStyle;
-    CameraStyle _combatCamStyle;
+    resource::Visibility _visibility;
+    CameraStyle _camStyleDefault;
+    CameraStyle _camStyleCombat;
     std::string _music;
     Timer _heartbeatTimer;
     Map _map;
@@ -202,20 +214,22 @@ private:
     // END Stealth
 
     void add(const std::shared_ptr<SpatialObject> &object);
-    void determineObjectRoom(SpatialObject &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
-    void landObject(SpatialObject &object);
-    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
     void updateVisibility();
     void updateSounds();
     void updateHeartbeat(float dt);
 
+    /**
+     * Certain VIS files in the original game have a bug: room A is visible from
+     * room B, but room B is not visible from room A. This function makes room
+     * relations symmetric.
+     */
+    resource::Visibility fixVisibility(const resource::Visibility &visiblity);
+
     void printDebugInfo(const SpatialObject &object);
 
-    bool findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
-    bool findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
-    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
+    bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
 
     // Loading
 
@@ -247,6 +261,27 @@ private:
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
     // END User input
+
+    // Collision detection
+
+    void determineObjectRoom(SpatialObject &object);
+    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
+
+    bool getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
+
+    /**
+    * Find the closest obstacle in the creatures path.
+    *
+    * @param creature moving creature
+    * @param dest creatures destination
+    *
+    * @return true if obstacle is found, false otherwise
+    */
+    bool getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
+
+    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
+
+    // END Collision detection
 };
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,9 @@ public:
     enum class TextAlign {
         LeftCenter = 9,
         CenterBottom = 10,
-        CenterCenter = 18
+        CenterCenter = 18,
+
+        CenterTop = 0x1000
     };
 
     struct Extent {
@@ -122,6 +124,7 @@ public:
     void setText(const Text &text);
     void setTextColor(const glm::vec3 & color);
     void setTextMessage(const std::string &text);
+    void setTextFont(const std::shared_ptr<render::Font> &font);
     void setUseBorderColorOverride(bool use);
     void setVisible(bool visible);
 

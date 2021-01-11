@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,46 +53,49 @@ ActionExecutor::ActionExecutor(Game *game) : _game(game) {
 void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) {
     ActionQueue &actionQueue = object->actionQueue();
 
-    Action *action = actionQueue.currentAction();
+    shared_ptr<Action> action(actionQueue.currentAction());
     if (!action) return;
 
     ActionType type = action->type();
     switch (type) {
         case ActionType::MoveToPoint:
-            executeMoveToPoint(object, *dynamic_cast<MoveToPointAction *>(action), dt);
+            executeMoveToPoint(object, *dynamic_pointer_cast<MoveToPointAction>(action), dt);
             break;
         case ActionType::MoveToObject:
-            executeMoveToObject(object, *dynamic_cast<MoveToObjectAction *>(action), dt);
+            executeMoveToObject(object, *dynamic_pointer_cast<MoveToObjectAction>(action), dt);
             break;
         case ActionType::Follow:
-            executeFollow(object, *dynamic_cast<FollowAction *>(action), dt);
+            executeFollow(object, *dynamic_pointer_cast<FollowAction>(action), dt);
             break;
         case ActionType::DoCommand:
-            executeDoCommand(object, *dynamic_cast<CommandAction *>(action), dt);
+            executeDoCommand(object, *dynamic_pointer_cast<CommandAction>(action), dt);
             break;
         case ActionType::StartConversation:
-            executeStartConversation(object, *dynamic_cast<StartConversationAction *>(action), dt);
+            executeStartConversation(object, *dynamic_pointer_cast<StartConversationAction>(action), dt);
             break;
         case ActionType::AttackObject:
-            executeAttack(object, *dynamic_cast<AttackAction *>(action), dt);
+            executeAttack(object, *dynamic_pointer_cast<AttackAction>(action), dt);
             break;
         case ActionType::OpenDoor:
-            executeOpenDoor(object, *dynamic_cast<ObjectAction *>(action), dt);
+            executeOpenDoor(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::CloseDoor:
-            executeCloseDoor(object, *dynamic_cast<ObjectAction *>(action), dt);
+            executeCloseDoor(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::OpenContainer:
-            executeOpenContainer(object, *dynamic_cast<ObjectAction *>(action), dt);
+            executeOpenContainer(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::OpenLock:
-            executeOpenLock(object, *dynamic_cast<ObjectAction *>(action), dt);
+            executeOpenLock(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::JumpToObject:
-            executeJumpToObject(object, *dynamic_cast<ObjectAction *>(action), dt);
+            executeJumpToObject(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::JumpToLocation:
-            executeJumpToLocation(object, *dynamic_cast<LocationAction *>(action), dt);
+            executeJumpToLocation(object, *dynamic_pointer_cast<LocationAction>(action), dt);
+            break;
+        case ActionType::PlayAnimation:
+            executePlayAnimation(object, dynamic_pointer_cast<PlayAnimationAction>(action), dt);
             break;
         default:
             warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
@@ -304,7 +307,7 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
         bool reached = navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
         if (reached) {
             creatureActor->face(*door);
-            creatureActor->playAnimation(Animation::LoopingUnlockDoor);
+            creatureActor->playAnimation(AnimationType::LoopingUnlockDoor);
 
             door->setLocked(false);
             door->open(actor);
@@ -337,6 +340,11 @@ void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, Loca
     spatialActor->setFacing(action.location()->facing());
 
     action.complete();
+}
+
+void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const shared_ptr<PlayAnimationAction> &action, float dt) {
+    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
+    spatialActor->playAnimation(action->animation(), action->speed(), action);
 }
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "../common/log.h"
 #include "../render/mesh/quad.h"
 #include "../render/textures.h"
+#include "../render/util.h"
 #include "../resource/types.h"
 
 #include "game.h"
@@ -107,7 +108,8 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        _texture->bind(0);
+        setActiveTextureUnit(0);
+        _texture->bind();
 
         // TODO: use librender abstraction
 
@@ -134,7 +136,8 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        _texture->bind(0);
+        setActiveTextureUnit(0);
+        _texture->bind();
 
         Quad::getDefault().renderTriangles();
     }
@@ -187,7 +190,8 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    _arrow->bind(0);
+    setActiveTextureUnit(0);
+    _arrow->bind();
 
     Quad::getDefault().renderTriangles();
 }

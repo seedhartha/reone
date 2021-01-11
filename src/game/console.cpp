@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include "glm/ext.hpp"
 
 #include "../common/log.h"
-
 #include "../render/font.h"
 #include "../render/fonts.h"
 #include "../render/mesh/quad.h"
@@ -63,6 +62,7 @@ void Console::initCommands() {
     addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
     addCommand("kill", bind(&Console::cmdKill, this, _1));
     addCommand("additem", bind(&Console::cmdAddItem, this, _1));
+    addCommand("givexp", bind(&Console::cmdGiveXP, this, _1));
 }
 
 void Console::addCommand(const std::string &name, const CommandHandler &handler) {
@@ -108,8 +108,11 @@ void Console::cmdListAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("listanim: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("listanim: no object selected");
+            return;
+        }
     }
 
     string substr;
@@ -135,8 +138,11 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("playanim: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("playanim: no object selected");
+            return;
+        }
     }
     object->model()->playAnimation(tokens[1], kAnimationLoop);
 }
@@ -149,7 +155,7 @@ void Console::cmdKill(vector<string> tokens) {
         return;
     }
     auto effect = make_unique<DamageEffect>(100000, DamageType::Universal, nullptr);
-    object->applyEffect(move(effect));
+    object->applyEffect(move(effect), DurationType::Instant);
 }
 
 void Console::cmdAddItem(vector<string> tokens) {
@@ -160,11 +166,32 @@ void Console::cmdAddItem(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        print("additem: no object selected");
-        return;
+        object = _game->party().leader();
+        if (!object) {
+            print("additem: no object selected");
+            return;
+        }
     }
     int stackSize = static_cast<int>(tokens.size()) > 2 ? stoi(tokens[2]) : 1;
     object->addItem(tokens[1], stackSize);
+}
+
+void Console::cmdGiveXP(vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: givexp amount");
+        return;
+    }
+    ObjectSelector &selector = _game->module()->area()->objectSelector();
+    auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
+    if (!object) {
+        object = _game->party().leader();
+        if (!object) {
+            print("givexp: no object selected");
+            return;
+        }
+    }
+    int amount = stoi(tokens[1]);
+    object->giveXP(amount);
 }
 
 void Console::print(const string &text) {
@@ -220,10 +247,17 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
                 string text(_input.text());
                 if (!text.empty()) {
                     executeInputText();
+                    _history.push(_input.text());
                     _input.clear();
                 }
                 return true;
             }
+            case SDLK_UP:
+                if (!_history.empty()) {
+                    _input.setText(_history.top());
+                    _history.pop();
+                }
+                return true;
             default:
                 return false;
         }

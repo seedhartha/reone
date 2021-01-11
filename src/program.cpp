@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,17 @@
 #include "program.h"
 
 #include <iostream>
+#include <stdexcept>
 
 #include <boost/program_options.hpp>
 
-#include "mp/game.h"
 #include "common/log.h"
+#include "mp/game.h"
 
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::net;
 using namespace reone::mp;
-using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -43,6 +42,9 @@ static const int kDefaultMovieVolume = 85;
 static const int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
+    if (!argv) {
+        throw invalid_argument("argv must not be null");
+    }
 }
 
 int Program::run() {
@@ -117,13 +119,13 @@ int Program::runGame() {
     switch (_multiplayerMode) {
         case MultiplayerMode::Client:
         case MultiplayerMode::Server:
-            game.reset(new MultiplayerGame(_multiplayerMode, _gamePath, _gameOpts));
+            game = make_unique<MultiplayerGame>(_multiplayerMode, _gamePath, _gameOpts);
             break;
+        case MultiplayerMode::None:
         default:
-            game.reset(new Game(_gamePath, _gameOpts));
+            game = make_unique<Game>(_gamePath, _gameOpts);
             break;
     }
-
     return game->run();
 }
 

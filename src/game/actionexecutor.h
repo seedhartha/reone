@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
 
 #include "glm/vec3.hpp"
 
+#include "action/attack.h"
 #include "action/commandaction.h"
 #include "action/follow.h"
 #include "action/locationaction.h"
 #include "action/movetoobject.h"
 #include "action/movetopoint.h"
+#include "action/playanimation.h"
 #include "action/startconversation.h"
-#include "action/attack.h"
 #include "object/creature.h"
 
 namespace reone {
@@ -65,6 +66,7 @@ private:
     void executeOpenLock(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeJumpToObject(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeJumpToLocation(const std::shared_ptr<Object> &actor, LocationAction &action, float dt);
+    void executePlayAnimation(const std::shared_ptr<Object> &actor, const std::shared_ptr<PlayAnimationAction> &action, float dt);
 
     // END Actions
 };

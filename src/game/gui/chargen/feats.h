@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,26 @@
 
 #pragma once
 
-#include "../../common/aabb.h"
-
-#include "scenenode.h"
+#include "../gui.h"
 
 namespace reone {
 
-namespace scene {
+namespace game {
 
-class AABBSceneNode : public SceneNode {
+class CharacterGeneration;
+
+class CharGenFeats : public GameGUI {
 public:
-    AABBSceneNode(SceneGraph *sceneGraph, const AABB &abbb);
+    CharGenFeats(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
-    void render() const override;
-
-    const AABB &aabb() const;
+    void load() override;
 
 private:
-    AABB _aabb;
+    CharacterGeneration *_charGen;
+
+    void onClick(const std::string &control) override;
 };
 
-} // namespace scene
+} // namespace game
 
 } // namespace reone

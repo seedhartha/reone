@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ public:
     bool isSelectable() const override;
 
     void load(const resource::GffStruct &gffs);
+    void load(const std::shared_ptr<PlaceableBlueprint> &blueprint);
 
     bool hasInventory() const;
     bool isUsable() const;

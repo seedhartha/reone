@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,10 @@ namespace reone {
 namespace render {
 
 Animation::Animation(const string &name, float length, float transitionTime, const shared_ptr<ModelNode> &rootNode) :
-    _name(name), _length(length), _transitionTime(transitionTime), _rootNode(rootNode) {
+    _name(name),
+    _length(length),
+    _transitionTime(transitionTime),
+    _rootNode(rootNode) {
 
     queue<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);

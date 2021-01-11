@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -25,11 +25,13 @@ namespace game {
 
 class CharacterGeneration;
 
-class QuickCharacterGeneration : public gui::GUI {
+class QuickCharacterGeneration : public GameGUI {
 public:
     QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
+
+    void goToNextStep();
 
     void setStep(int step);
 

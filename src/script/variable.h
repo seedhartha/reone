@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class ScriptObject;
 struct Variable {
     VariableType type { VariableType::Void };
     std::string strValue;
-    glm::vec3 vecValue;
+    glm::vec3 vecValue { 0.0f };
     std::shared_ptr<ScriptObject> object;
     std::shared_ptr<EngineType> engineType;
     ExecutionContext context;

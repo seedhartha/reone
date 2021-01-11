@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace game {
 
 AnimatedCamera::AnimatedCamera(SceneGraph *sceneGraph, float aspect) : _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
-    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f));
+    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f), _zFar);
     updateProjection();
 }
 

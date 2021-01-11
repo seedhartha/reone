@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ namespace reone {
 
 class Timer {
 public:
+    Timer() = default;
     Timer(float timeout);
 
     void update(float dt);
@@ -30,7 +31,7 @@ public:
     bool hasTimedOut() const;
 
 private:
-    float _timeout;
+    float _timeout { 0.0f };
 };
 
 } // namespace reone

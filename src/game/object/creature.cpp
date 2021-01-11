@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "creature.h"
 
 #include <climits>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
@@ -32,7 +33,6 @@
 
 #include "../action/attack.h"
 #include "../blueprint/blueprints.h"
-#include "../rp/classutil.h"
 #include "../portraitutil.h"
 
 #include "objectfactory.h"
@@ -103,15 +103,19 @@ void Creature::loadBlueprint(const GffStruct &gffs) {
     load(blueprint);
 }
 
-void Creature::load(const shared_ptr<CreatureBlueprint> &blueprint) {
+void Creature::load(const shared_ptr<Blueprint<Creature>> &blueprint) {
+    if (!blueprint) {
+        throw invalid_argument("blueprint must not be null");
+    }
     blueprint->load(*this);
+
     shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _appearance);
+    loadPortrait(_appearance);
 }
 
 void Creature::loadAppearance(const TwoDaTable &table, int row) {
     _appearance = row;
-    _config.appearance = row;
     _modelType = parseModelType(table.getString(row, "modeltype"));
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
     _runSpeed = table.getFloat(row, "rundist", 0.0f);
@@ -139,24 +143,11 @@ void Creature::updateModel() {
 
     if (_model) {
         _headModel = _model->getAttachedModel(g_headHookNode);
-        _model->setLocalTransform(_transform);
+        if (!_stunt) {
+            _model->setLocalTransform(_transform);
+        }
         _sceneGraph->addRoot(_model);
         _animDirty = true;
-    }
-}
-
-void Creature::load(const CreatureConfiguration &config) {
-    if (config.blueprint) {
-        load(config.blueprint);
-    } else {
-        shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
-        loadAppearance(*appearance, config.appearance);
-        loadPortrait(config.appearance);
-        _attributes.addClassLevels(config.clazz, 1);
-        _currentHitPoints = _hitPoints = _maxHitPoints = getClassHitPoints(config.clazz, 1);
-    }
-    for (auto &item : config.equipment) {
-        equip(item);
     }
 }
 
@@ -197,6 +188,10 @@ void Creature::updateModelAnimation() {
     }
     if (!_animDirty) return;
 
+    if (_animAction) {
+        _animAction->complete();
+        _animAction.reset();
+    }
     switch (_movementType) {
         case MovementType::Run:
             _model->playAnimation(_animResolver.getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
@@ -224,11 +219,7 @@ void Creature::updateModelAnimation() {
 void Creature::updateHealth() {
     if (_currentHitPoints > 0 || _immortal || _dead) return;
 
-    playAnimation(_animResolver.getDieAnimation());
-    _dead = true;
-    _name = Resources::instance().getString(kStrRefRemains);
-
-    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
+    die();
 }
 
 void Creature::clearAllActions() {
@@ -236,93 +227,89 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(Animation animation, float speed) {
-    string animName(_animResolver.getAnimationName(animation));
-    if (animName.empty()) {
-        warn("Creature: playAnimation: unsupported animation: " + to_string(static_cast<int>(animation)));
-        return;
-    }
-    playAnimation(animName, isAnimationLooping(animation), speed);
-}
+void Creature::playAnimation(AnimationType anim, float speed, shared_ptr<Action> actionToComplete) {
+    string animName(_animResolver.getAnimationName(anim));
+    if (animName.empty()) return;
 
-void Creature::playAnimation(const string &name, bool looping, float speed) {
-    if (!_model || _movementType != MovementType::None) return;
-
-    int flags = kAnimationPropagate | kAnimationBlend;
-    if (looping) {
+    int flags = kAnimationPropagate;
+    if (isAnimationLooping(anim)) {
         flags |= kAnimationLoop;
     }
+    playAnimation(animName, flags, speed, actionToComplete);
+}
 
-    _animInfo = make_unique<AnimInfo>();
-    _animInfo->name = name;
-    _animInfo->flag = flags;
-    _animInfo->speed = speed;
-    _model->playAnimation(name, flags, speed);
+void Creature::playAnimation(const string &name, int flags, float speed, shared_ptr<Action> actionToComplete) {
+    doPlayAnimation(flags, [&]() {
+        _animAction = actionToComplete;
+        _model->playAnimation(name, flags, speed);
+    });
+}
 
-    if (!looping) {
+void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
+    if (!_model || _movementType != MovementType::None) return;
+
+    callback();
+
+    if (!(flags & kAnimationLoop)) {
         _animFireForget = true;
     }
 }
 
-void Creature::playAnimation(CombatAnimation animation) {
-    string animName;
-    bool looping = false;
-
-    switch (animation) {
-        case CombatAnimation::DuelAttack:
-            animName = _animResolver.getDuelAttackAnimation();
-            break;
-        case CombatAnimation::BashAttack:
-            animName = _animResolver.getBashAttackAnimation();
-            break;
-        case CombatAnimation::Dodge:
-            animName = _animResolver.getDodgeAnimation();
-            break;
-        case CombatAnimation::Knockdown:
-            animName = _animResolver.getKnockdownAnimation();
-            looping = true;
-            break;
-        default:
-            break;
-    }
-
-    if (animName.empty()) {
-        warn("Creature: playAnimation: unsupported combat animation: " + to_string(static_cast<int>(animation)));
-    }
-    playAnimation(animName, looping);
+void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed) {
+    doPlayAnimation(flags, [&]() {
+        // TODO: scale should be computed from this creatures model and the animations model
+        _model->playAnimation(anim, flags, speed, 1.0f);
+    });
 }
 
-void Creature::equip(const string &resRef) {
+void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant) {
+    string animName(_animResolver.getAnimationName(anim, wield, variant));
+    if (animName.empty()) return;
+
+    playAnimation(animName, kAnimationPropagate);
+}
+
+bool Creature::equip(const string &resRef) {
     shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(resRef));
 
     shared_ptr<Item> item(_objectFactory->newItem());
     item->load(blueprint);
 
+    bool equipped = false;
+
     if (item->isEquippable(kInventorySlotBody)) {
-        equip(kInventorySlotBody, item);
+        equipped = equip(kInventorySlotBody, item);
     } else if (item->isEquippable(kInventorySlotRightWeapon)) {
-        equip(kInventorySlotRightWeapon, item);
+        equipped = equip(kInventorySlotRightWeapon, item);
     }
+
+    return equipped;
 }
 
-void Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
-    if (item->isEquippable(slot)) {
-        _equipment[slot] = item;
-    }
+bool Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
+    if (!item->isEquippable(slot)) return false;
+
+    _equipment[slot] = item;
+    item->setEquipped(true);
+
     if (_model) {
         updateModel();
     }
+
+    return true;
 }
 
 void Creature::unequip(const shared_ptr<Item> &item) {
     for (auto &equipped : _equipment) {
         if (equipped.second == item) {
+            item->setEquipped(false);
             _equipment.erase(equipped.first);
+
+            if (_model) {
+                updateModel();
+            }
             break;
         }
-    }
-    if (_model) {
-        updateModel();
     }
 }
 
@@ -387,7 +374,7 @@ void Creature::clearPath() {
 }
 
 Gender Creature::gender() const {
-    return _config.gender;
+    return _gender;
 }
 
 Creature::ModelType Creature::modelType() const {
@@ -395,7 +382,7 @@ Creature::ModelType Creature::modelType() const {
 }
 
 int Creature::appearance() const {
-    return _config.appearance;
+    return _appearance;
 }
 
 shared_ptr<Texture> Creature::portrait() const {
@@ -463,6 +450,11 @@ bool Creature::isMovementRestricted() const {
 
 bool Creature::isInCombat() const {
     return _inCombat;
+}
+
+bool Creature::isLevelUpPending() const {
+    int level = _attributes.getAggregateLevel();
+    return _xp >= level * (level + 1) * 500;
 }
 
 void Creature::setMovementRestricted(bool restricted) {
@@ -624,6 +616,50 @@ string Creature::getAnimName(uint16_t index) const {
 
 void Creature::giveXP(int amount) {
     _xp += amount;
+}
+
+void Creature::die() {
+    _currentHitPoints = 0;
+    _dead = true;
+    _name = Resources::instance().getString(kStrRefRemains);
+
+    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
+
+    playAnimation(_animResolver.getDieAnimation());
+    runDeathScript();
+}
+
+void Creature::runDeathScript() {
+    if (!_onDeath.empty()) {
+        _scriptRunner->run(_onDeath, _id, kObjectInvalid);
+    }
+}
+
+CreatureWieldType Creature::getWieldType() const {
+    auto rightWeapon = getEquippedItem(InventorySlot::kInventorySlotRightWeapon);
+    auto leftWeapon = getEquippedItem(InventorySlot::kInventorySlotLeftWeapon);
+
+    if (rightWeapon && leftWeapon) {
+        return (rightWeapon->weaponWield() == WeaponWield::BlasterPistol) ? CreatureWieldType::DualPistols : CreatureWieldType::DualSwords;
+    } else if (rightWeapon) {
+        switch (rightWeapon->weaponWield()) {
+            case WeaponWield::SingleSword:
+                return CreatureWieldType::SingleSword;
+            case WeaponWield::DoubleBladedSword:
+                return CreatureWieldType::DoubleBladedSword;
+            case WeaponWield::BlasterPistol:
+                return CreatureWieldType::BlasterPistol;
+            case WeaponWield::BlasterRifle:
+                return CreatureWieldType::BlasterRifle;
+            case WeaponWield::HeavyWeapon:
+                return CreatureWieldType::HeavyWeapon;
+            case WeaponWield::StunBaton:
+            default:
+                return CreatureWieldType::StunBaton;
+        }
+    }
+
+    return CreatureWieldType::HandToHand;
 }
 
 } // namespace game

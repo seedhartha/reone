@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
-#include "../../../resource/types.h"
+#include "../gui.h"
 
 #include "../../portrait.h"
 
@@ -28,7 +27,7 @@ namespace game {
 
 class CharacterGeneration;
 
-class PortraitSelection : public gui::GUI {
+class PortraitSelection : public GameGUI {
 public:
     PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 

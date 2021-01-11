@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,19 +32,13 @@ namespace reone {
 namespace game {
 
 CharacterMenu::CharacterMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("character");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void CharacterMenu::load() {
@@ -94,12 +88,17 @@ void CharacterMenu::load() {
     hideControl("LBL_EXPERIENCE_STAT");
     hideControl("LBL_NEEDED_XP");
 
-    disableControl("BTN_LEVELUP");
     disableControl("BTN_AUTO");
     disableControl("BTN_SCRIPTS");
 }
 
-void CharacterMenu::updatePortraits() {
+void CharacterMenu::update(float dt) {
+    shared_ptr<Creature> leader(_game->party().leader());
+    setControlVisible("BTN_LEVELUP", leader->isLevelUpPending());
+    setControlVisible("BTN_AUTO", leader->isLevelUpPending());
+}
+
+void CharacterMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();
@@ -116,6 +115,8 @@ void CharacterMenu::updatePortraits() {
 void CharacterMenu::onClick(const string &control) {
     if (control == "BTN_EXIT") {
         _game->openInGame();
+    } else if (control == "BTN_LEVELUP") {
+        _game->openLevelUp();
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include "glm/common.hpp"
+
 #include "../../script/enginetype.h"
 
 #include "../types.h"
@@ -33,20 +35,13 @@ class Creature;
 
 class Effect : public script::EngineType {
 public:
-    Effect(EffectType type, float duration = 0.0f) : _type(type), _timeout(duration) { }
-
-    // managed by Creature.update
-    void update(float dt) {
-        _timeout -= dt;
+    Effect(EffectType type) : _type(type) {
     }
-
-    bool isValid() const { return _timeout > 0.0f; }
 
     EffectType type() const { return _type; }
 
 protected:
     EffectType _type;
-    float _timeout;
 };
 
 class DamageEffect : public Effect {

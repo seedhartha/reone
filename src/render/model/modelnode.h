@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "glm/gtx/quaternion.hpp"
 
+#include "../emitter.h"
 #include "../mesh/modelmesh.h"
 
 namespace reone {
@@ -54,6 +55,8 @@ public:
 
     void initGL();
 
+    bool isSelfIllumEnabled() const;
+
     bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
     const glm::vec3 &getCenterOfAABB() const;
@@ -68,7 +71,6 @@ public:
     const glm::mat4 &absoluteTransform() const;
     const glm::mat4 &absoluteTransformInverse() const;
     const glm::vec3 &color() const;
-    bool isSelfIllumEnabled() const;
     const glm::vec3 &selfIllumColor() const;
     float alpha() const;
     float radius() const;
@@ -76,6 +78,7 @@ public:
     std::shared_ptr<Light> light() const;
     std::shared_ptr<ModelMesh> mesh() const;
     std::shared_ptr<Skin> skin() const;
+    std::shared_ptr<Emitter> emitter() const;
     const std::vector<std::shared_ptr<ModelNode>> &children() const;
 
 private:
@@ -110,6 +113,7 @@ private:
     std::shared_ptr<Light> _light;
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
+    std::shared_ptr<Emitter> _emitter;
     std::vector<std::shared_ptr<ModelNode>> _children;
 
     ModelNode(const ModelNode &) = delete;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "mesh/quad.h"
 #include "shaders.h"
 #include "texture.h"
+#include "util.h"
 
 using namespace std;
 
@@ -53,7 +54,8 @@ void Cursor::render() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    texture->bind(0);
+    setActiveTextureUnit(0);
+    texture->bind();
 
     Quad::getDefault().renderTriangles();
 }

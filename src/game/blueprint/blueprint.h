@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabbnode.h"
-
-#include "../../render/mesh/aabb.h"
-
-#include "../scenegraph.h"
-
-using namespace reone::render;
+#pragma once
 
 namespace reone {
 
-namespace scene {
+namespace game {
 
-AABBSceneNode::AABBSceneNode(SceneGraph *sceneGraph, const AABB &aabb) : SceneNode(sceneGraph), _aabb(aabb) {
-}
+/**
+ * Generic blueprint interface.
+ */
+template <class T>
+class Blueprint {
+public:
+    virtual ~Blueprint() = default;
 
-void AABBSceneNode::render() const {
-    AABBMesh::instance().render(_aabb, _absoluteTransform);
-}
+    /**
+     * Fill the specified object from this blueprint.
+     */
+    virtual void load(T &obj) = 0;
+};
 
-const AABB &AABBSceneNode::aabb() const {
-    return _aabb;
-}
-
-} // namespace scene
+} // namespace game
 
 } // namespace reone

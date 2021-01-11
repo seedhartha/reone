@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,20 +37,20 @@ bool SceneNodeAnimator::AnimationChannel::isActive() const {
     return animation && !finished;
 }
 
-bool SceneNodeAnimator::AnimationChannel::isSameAnimation(const string &name, int flags, float speed) const {
+bool SceneNodeAnimator::AnimationChannel::isSameAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) const {
     return
-        this->animation &&
-        this->name == name &&
+        this->animation == anim &&
         this->flags == flags &&
-        this->speed == speed;
+        this->speed == speed &&
+        this->scale == scale;
 }
 
-void SceneNodeAnimator::AnimationChannel::setAnimation(Animation *animation, int flags, float speed) {
-    this->name = animation->name();
+void SceneNodeAnimator::AnimationChannel::setAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
+    this->animation = anim;
     this->flags = flags;
     this->speed = speed;
+    this->scale = scale;
     this->time = 0.0f;
-    this->animation = animation;
     this->finished = false;
     this->transition = false;
     this->freeze = false;
@@ -84,6 +84,7 @@ void SceneNodeAnimator::update(float dt) {
     _absTransforms.clear();
     updateAbsoluteTransforms(_modelSceneNode->model()->rootNode());
     updateNodeTransforms(_modelSceneNode->model()->rootNode());
+    _modelSceneNode->refreshAABB();
 }
 
 void SceneNodeAnimator::updateChannel(int channel, float dt) {
@@ -106,7 +107,7 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
         if (!skip) {
             float time = channel.transition ? channel.animation->transitionTime() : channel.time;
             glm::vec3 animPosition(0.0f);
-            if (animNode.getPosition(time, animPosition, _modelSceneNode->model()->animationScale())) {
+            if (animNode.getPosition(time, animPosition, channel.scale)) {
                 position += animPosition;
             }
             glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);
@@ -211,38 +212,33 @@ void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
 }
 
 void SceneNodeAnimator::playDefaultAnimation() {
-    if (_defaultAnim.empty()) return;
-
-    playAnimation(_defaultAnim, kAnimationLoop | kAnimationBlend);
+    if (_defaultAnimation) {
+        playAnimation(_defaultAnimation, kAnimationLoop | kAnimationBlend);
+    }
 }
 
-void SceneNodeAnimator::playAnimation(const string &name, int flags, float speed) {
-    if (_channels[0].isSameAnimation(name, flags, speed)) return;
-
-    Animation *animation = _modelSceneNode->model()->getAnimation(name);
-    if (!animation) return;
+void SceneNodeAnimator::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
+    if (_channels[0].isSameAnimation(anim, flags, speed, scale)) return;
 
     for (int i = 1; i < kChannelCount; ++i) {
         _channels[i].stopAnimation();
     }
-
     bool set = false;
     if (_channels[0].isActive()) {
         if (flags & kAnimationOverlay) {
             _channels[1] = _channels[0];
         } else if (flags & kAnimationBlend) {
             _channels[1] = _channels[0];
-            _channels[0].setAnimation(animation, flags, speed);
-            _channels[0].time = glm::max(0.0f, animation->transitionTime() - kTransitionDuration);
+            _channels[0].setAnimation(anim, flags, speed, scale);
+            _channels[0].time = glm::max(0.0f, anim->transitionTime() - kTransitionDuration);
             _channels[0].transition = true;
             _channels[1].transition = false;
             _channels[1].freeze = true;
-
             set = true;
         }
     }
     if (!set) {
-        _channels[0].setAnimation(animation, flags, speed);
+        _channels[0].setAnimation(anim, flags, speed, scale);
     }
 }
 
@@ -250,8 +246,8 @@ bool SceneNodeAnimator::isAnimationFinished() const {
     return !_channels[0].isActive();
 }
 
-void SceneNodeAnimator::setDefaultAnimation(const string &name) {
-    _defaultAnim = name;
+void SceneNodeAnimator::setDefaultAnimation(const shared_ptr<Animation> &anim) {
+    _defaultAnimation = anim;
 }
 
 } // namespace scene

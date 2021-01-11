@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,10 +58,25 @@ enum class ControllerType {
     Position = 8,
     Orientation = 20,
     Color = 76,
-    Radius = 88,
+    AlphaEnd = 80,
+    AlphaStart = 84,
+    Radius_Birthrate = 88,
     SelfIllumColor = 100,
+    FrameEnd = 108,
+    FrameStart = 112,
+    LifeExpectancy = 120,
     Alpha = 132,
-    Multiplier = 140
+    Multiplier_RandomVelocity = 140,
+    SizeStart = 144,
+    SizeEnd = 148,
+    Velocity = 168,
+    SizeX = 172,
+    SizeY = 176,
+    AlphaMid = 216,
+    SizeMid = 232,
+    ColorMid = 284,
+    ColorEnd = 380,
+    ColorStart = 392
 };
 
 MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
@@ -217,13 +232,17 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     node->_absTransform = absTransform;
     node->_absTransformInv = glm::inverse(absTransform);
 
+    if (flags & kNodeHasEmitter) {
+        node->_emitter = make_shared<Emitter>();
+    }
+
     readControllers(controllerKeyCount, controllerKeyOffset, controllerData, *node);
 
     if (flags & kNodeHasLight) {
         readLight(*node);
     }
     if (flags & kNodeHasEmitter) {
-        ignore(216);
+        readEmitter(*node);
     }
     if (flags & kNodeHasReference) {
         ignore(68);
@@ -269,28 +288,110 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 readOrientationController(rowCount, columnCount, timeIndex, dataIndex, data, node);
                 break;
             case ControllerType::Color:
-                // TODO: multiple rows
                 readColorController(dataIndex, data, node);
+                break;
+            case ControllerType::Radius_Birthrate:
+                if (node._flags & kNodeHasLight) {
+                    readRadiusController(dataIndex, data, node);
+                } else if (node._flags & kNodeHasEmitter) {
+                    readBirthrateController(dataIndex, data, node);
+                }
                 break;
             case ControllerType::SelfIllumColor:
                 if (node._flags & kNodeHasMesh) {
-                    // TODO: multiple rows
                     node._selfIllumEnabled = true;
                     readSelfIllumColorController(dataIndex, data, node);
                 }
                 break;
+            case ControllerType::FrameEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readFrameEndController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::FrameStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readFrameStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::LifeExpectancy:
+                if (node._flags & kNodeHasEmitter) {
+                    readLifeExpectancyController(dataIndex, data, node);
+                }
+                break;
             case ControllerType::Alpha:
-                // TODO: multiple rows
                 readAlphaController(dataIndex, data, node);
                 break;
-            case ControllerType::Radius:
-                // TODO: multiple rows
-                readRadiusController(dataIndex, data, node);
+            case ControllerType::Multiplier_RandomVelocity:
+                if (node._flags & kNodeHasLight) {
+                    readMultiplierController(dataIndex, data, node);
+                } else if (node._flags & kNodeHasEmitter) {
+                    readRandomVelocityController(dataIndex, data, node);
+                }
                 break;
-            case ControllerType::Multiplier:
-                // TODO: multiple rows
-                readMultiplierController(dataIndex, data, node);
+            case ControllerType::Velocity:
+                if (node._flags & kNodeHasEmitter) {
+                    readVelocityController(dataIndex, data, node);
+                }
                 break;
+            case ControllerType::SizeX:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeXController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeY:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeYController(dataIndex, data, node);
+                }
+                break;
+
+            case ControllerType::SizeStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeEndController(dataIndex, data, node);
+                }
+                break;
+
+            case ControllerType::ColorStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::ColorMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::ColorEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorEndController(dataIndex, data, node);
+                }
+                break;
+
+            case ControllerType::AlphaStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::AlphaMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::AlphaEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaEndController(dataIndex, data, node);
+                }
+                break;
+
             default:
                 debug(boost::format("MDL: unsupported controller type: \"%s\" %d") % _name % static_cast<int>(type), 3);
                 break;
@@ -397,8 +498,82 @@ void MdlFile::readRadiusController(uint16_t dataIndex, const vector<float> &data
     node._radius = data[dataIndex];
 }
 
+void MdlFile::readBirthrateController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_birthrate = data[dataIndex];
+}
+
 void MdlFile::readMultiplierController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._multiplier = data[dataIndex];
+}
+
+void MdlFile::readLifeExpectancyController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_lifeExpectancy = data[dataIndex];
+}
+
+void MdlFile::readSizeStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_particleSize.start = data[dataIndex];
+}
+
+void MdlFile::readSizeMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_particleSize.mid = data[dataIndex];
+}
+
+void MdlFile::readSizeEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_particleSize.end = data[dataIndex];
+}
+
+void MdlFile::readColorStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.start.r = data[dataIndex + 0];
+    node._emitter->_color.start.g = data[dataIndex + 1];
+    node._emitter->_color.start.b = data[dataIndex + 2];
+}
+
+void MdlFile::readColorMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.mid.r = data[dataIndex + 0];
+    node._emitter->_color.mid.g = data[dataIndex + 1];
+    node._emitter->_color.mid.b = data[dataIndex + 2];
+}
+
+void MdlFile::readColorEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.end.r = data[dataIndex + 0];
+    node._emitter->_color.end.g = data[dataIndex + 1];
+    node._emitter->_color.end.b = data[dataIndex + 2];
+}
+
+void MdlFile::readAlphaStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.start = data[dataIndex];
+}
+
+void MdlFile::readAlphaMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.mid = data[dataIndex];
+}
+
+void MdlFile::readAlphaEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.end = data[dataIndex];
+}
+
+void MdlFile::readSizeXController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_size.x = data[dataIndex];
+}
+
+void MdlFile::readSizeYController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_size.y = data[dataIndex];
+}
+
+void MdlFile::readFrameEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_frameEnd = data[dataIndex];
+}
+
+void MdlFile::readFrameStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_frameStart = data[dataIndex];
+}
+
+void MdlFile::readRandomVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_randomVelocity = data[dataIndex];
+}
+
+void MdlFile::readVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_velocity = data[dataIndex];
 }
 
 void MdlFile::readLight(ModelNode &node) {
@@ -613,6 +788,68 @@ Model::Classification MdlFile::getClassification(int value) const {
 
 shared_ptr<Model> MdlFile::model() const {
     return _model;
+}
+
+static Emitter::UpdateType parseEmitterUpdate(const string &str) {
+    Emitter::UpdateType result = Emitter::UpdateType::Invalid;
+    if (str == "Fountain") {
+        result = Emitter::UpdateType::Fountain;
+    } else if (str == "Single") {
+        result = Emitter::UpdateType::Single;
+    } else if (str == "Explosion") {
+        result = Emitter::UpdateType::Explosion;
+    } else {
+        warn("parseEmitterUpdate: unsupported value: " + str);
+    }
+    return result;
+}
+
+static Emitter::RenderType parseEmitterRender(const string &str) {
+    Emitter::RenderType result = Emitter::RenderType::Invalid;
+    if (str == "Normal") {
+        result = Emitter::RenderType::Normal;
+    } else if (str == "Billboard_to_World_Z") {
+        result = Emitter::RenderType::BillboardToWorldZ;
+    } else if (str == "Motion_Blur") {
+        result = Emitter::RenderType::MotionBlur;
+    } else {
+        warn("parseEmitterRender: unsupported value: " + str);
+    }
+    return result;
+}
+
+static Emitter::BlendType parseEmitterBlend(const string &str) {
+    Emitter::BlendType result = Emitter::BlendType::Invalid;
+    if (str == "Normal") {
+        result = Emitter::BlendType::Normal;
+    } else if (str == "Punch") {
+        result = Emitter::BlendType::Punch;
+    } else if (str == "Lighten") {
+        result = Emitter::BlendType::Lighten;
+    } else {
+        warn("parseEmitterBlend: unsupported value: " + str);
+    }
+    return result;
+}
+
+void MdlFile::readEmitter(ModelNode &node) {
+    ignore(5 * 4);
+
+    node._emitter->_gridWidth = readUint32();
+    node._emitter->_gridHeight = readUint32();
+
+    ignore(4);
+
+    node._emitter->_updateType = parseEmitterUpdate(readCString(32));
+    node._emitter->_renderType = parseEmitterRender(readCString(32));
+    node._emitter->_blendType = parseEmitterBlend(readCString(32));
+    node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
+
+    ignore(24);
+
+    node._emitter->_renderOrder = readUint16();
+
+    ignore(30);
 }
 
 } // namespace render

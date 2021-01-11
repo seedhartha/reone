@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,19 +31,13 @@ namespace reone {
 namespace game {
 
 AbilitiesMenu::AbilitiesMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("abilities");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void AbilitiesMenu::load() {
@@ -61,7 +55,7 @@ void AbilitiesMenu::load() {
     disableControl("BTN_FEATS");
 }
 
-void AbilitiesMenu::updatePortraits() {
+void AbilitiesMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();

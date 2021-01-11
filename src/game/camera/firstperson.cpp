@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ static const float kMouseMultiplier = glm::pi<float>() / 2000.0f;
 
 FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(fovy, aspect, zNear, zFar));
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection);
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, zFar);
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,19 +55,17 @@ static map<int, string> g_portraitByAppearance = {
 };
 
 PartySelection::PartySelection(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
-    if (game->version() == GameVersion::TheSithLords) {
+    if (_version == GameVersion::TheSithLords) {
         _resRef = "partyselect_p";
-        _resolutionX = 800;
-        _resolutionY = 600;
     } else {
         _resRef = "partyselection";
         _backgroundType = BackgroundType::Menu;
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
     }
+
+    initForGame();
 }
 
 void PartySelection::load() {
@@ -212,7 +210,7 @@ void PartySelection::changeParty() {
 
     Party &party = _game->party();
     party.clear();
-    party.addMember(party.player());
+    party.addMember(kNpcPlayer, party.player());
 
     shared_ptr<Creature> player(_game->party().player());
 
@@ -227,11 +225,10 @@ void PartySelection::changeParty() {
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);
         creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
-        party.addMember(creature);
+        party.addMember(i, creature);
     }
 
-    area->loadParty(player->position(), player->facing());
-    area->fill(_game->sceneGraph());
+    area->reloadParty();
 }
 
 } // namespace game

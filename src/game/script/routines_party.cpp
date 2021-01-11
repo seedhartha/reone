@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx
 
 Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool isMember = _game->party().isNPCMember(npc);
+    bool isMember = _game->party().isMember(npc);
     return isMember ? 1 : 0;
 }
 
@@ -120,8 +120,16 @@ Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &c
 
 Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool removed = _game->party().removeAvailableMember(npc);
-    return removed ? 1 : 0;
+    if (!_game->party().isMember(npc)) return 0;
+
+    shared_ptr<Area> area(_game->module()->area());
+    area->unloadParty();
+
+    _game->party().removeMember(npc);
+
+    area->reloadParty();
+
+    return 1;
 }
 
 Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
@@ -130,6 +138,16 @@ Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) 
 
 Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
     return _game->party().size();
+}
+
+Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
+    int npc = getInt(args, 0);
+    bool removed = _game->party().removeAvailableMember(npc);
+    return removed ? 1 : 0;
+}
+
+Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
+    return static_pointer_cast<ScriptObject>(_game->party().leader());
 }
 
 } // namespace game

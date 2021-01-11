@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include "../../resource/resources.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::gui;
@@ -29,24 +31,27 @@ namespace reone {
 
 namespace game {
 
-LoadingScreen::LoadingScreen(GameVersion version, const GraphicsOptions &opts) : GUI(version, opts) {
-    _resRef = getResRef("loadscreen");
-    _backgroundType = BackgroundType::Load;
+LoadingScreen::LoadingScreen(Game *game) :
+    GUI(game->version(), game->options().graphics),
+    _game(game) {
 
-    if (version == GameVersion::TheSithLords) {
+    _resRef = getResRef("loadscreen");
+
+    if (_version == GameVersion::TheSithLords) {
         _resolutionX = 800;
         _resolutionY = 600;
+    } else {
+        _backgroundType = BackgroundType::Load;
     }
 }
 
 void LoadingScreen::load() {
     GUI::load();
-
-    configureRootContol([this](Control &ctrl) {
-        string resRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
-        ctrl.setBorderFill(resRef);
-    });
     setControlText("LBL_HINT", "");
+}
+
+void LoadingScreen::setImage(const string &resRef) {
+    configureRootContol([&resRef](Control &ctrl) { ctrl.setBorderFill(resRef); });
 }
 
 } // namespace game

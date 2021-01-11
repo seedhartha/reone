@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/textures.h"
+#include "../../render/util.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -47,7 +48,8 @@ void ScrollBar::load(const GffStruct &gffs) {
 void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
     if (!_dir.image) return;
 
-    _dir.image->bind(0);
+    setActiveTextureUnit(0);
+    _dir.image->bind();
 
     if (_canScrollUp) drawUpArrow(offset);
     if (_canScrollDown) drawDownArrow(offset);

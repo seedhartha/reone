@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -190,17 +190,17 @@ void InGameMenu::updateTabButtons() {
 }
 
 void InGameMenu::openInventory() {
-    _inventory->updatePortraits();
+    _inventory->refreshPortraits();
     changeTab(Tab::Inventory);
 }
 
 void InGameMenu::openCharacter() {
-    _character->updatePortraits();
+    _character->refreshPortraits();
     changeTab(Tab::Character);
 }
 
 void InGameMenu::openAbilities() {
-    _abilities->updatePortraits();
+    _abilities->refreshPortraits();
     changeTab(Tab::Abilities);
 }
 

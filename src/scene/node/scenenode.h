@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ public:
     void removeChild(SceneNode &node);
 
     virtual void render() const;
+    virtual void renderSingle(bool shadowPass) const;
 
     float distanceTo(const glm::vec3 &point) const;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 #include "SDL2/SDL_opengl.h"
 
+#include "../util.h"
+
 using namespace std;
 
 namespace reone {
@@ -38,35 +40,31 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     bool additive = false;
 
     if (diffuse) {
-        diffuse->bind(0);
+        setActiveTextureUnit(0);
+        diffuse->bind();
         additive = diffuse->isAdditive();
     }
     if (_envmap) {
-        _envmap->bind(1);
+        setActiveTextureUnit(1);
+        _envmap->bind();
     }
     if (_lightmap) {
-        _lightmap->bind(2);
+        setActiveTextureUnit(2);
+        _lightmap->bind();
     }
     if (_bumpyShiny) {
-        _bumpyShiny->bind(3);
+        setActiveTextureUnit(3);
+        _bumpyShiny->bind();
     }
     if (_bumpmap) {
-        _bumpmap->bind(4);
+        setActiveTextureUnit(4);
+        _bumpmap->bind();
     }
 
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     if (additive) {
-        glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-        glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-        glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-        glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-
-    Mesh::renderTriangles();
-
-    if (additive) {
-        glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+        withAdditiveBlending([this]() { Mesh::renderTriangles(); });
+    } else {
+        Mesh::renderTriangles();
     }
 }
 

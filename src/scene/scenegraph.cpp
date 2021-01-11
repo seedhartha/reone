@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
+#include "node/particlenode.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ namespace reone {
 
 namespace scene {
 
-static const float kMaxLightDistance = 16.0f;
+static bool g_emittersEnabled = true;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -61,8 +62,8 @@ void SceneGraph::build() {
 void SceneGraph::prepareFrame() {
     if (!_activeCamera) return;
 
-    refreshMeshesAndLights();
-    refreshShadowLights();
+    refreshNodeLists();
+    refreshShadowLight();
 
     for (auto &root : _roots) {
         ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(root.get());
@@ -70,9 +71,10 @@ void SceneGraph::prepareFrame() {
             modelNode->updateLighting();
         }
     }
-    unordered_map<ModelNodeSceneNode *, float> cameraDistances;
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
 
+    // Sort transparent meshes
+    unordered_map<SceneNode *, float> cameraDistances;
+    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
     for (auto &mesh : _transparentMeshes) {
         cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
     }
@@ -88,13 +90,27 @@ void SceneGraph::prepareFrame() {
 
         return leftDistance > rightDistance;
     });
+
+    // Sort particles
+    unordered_map<SceneNode *, float> particlesZ;
+    for (auto &particle : _particles) {
+        glm::vec4 screen(_activeCamera->projection() * _activeCamera->view() * particle->absoluteTransform()[3]);
+        screen /= screen.w;
+        particlesZ.insert(make_pair(particle, screen.z));
+    }
+    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
+        float leftZ = particlesZ.find(left)->second;
+        float rightZ = particlesZ.find(right)->second;
+        return leftZ > rightZ;
+    });
 }
 
-void SceneGraph::refreshMeshesAndLights() {
+void SceneGraph::refreshNodeLists() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
+    _particles.clear();
 
     for (auto &root : _roots) {
         stack<SceneNode *> nodes;
@@ -125,6 +141,11 @@ void SceneGraph::refreshMeshesAndLights() {
                     LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
                     if (light) {
                         _lights.push_back(light);
+                    } else if (g_emittersEnabled) {
+                        auto particle = dynamic_cast<ParticleSceneNode *>(node);
+                        if (particle) {
+                            _particles.push_back(particle);
+                        }
                     }
                 }
             }
@@ -135,8 +156,8 @@ void SceneGraph::refreshMeshesAndLights() {
     }
 }
 
-void SceneGraph::refreshShadowLights() {
-    _shadowLights.clear();
+void SceneGraph::refreshShadowLight() {
+    _shadowLightPresent = false;
 
     if (!_refNode) return;
 
@@ -145,23 +166,11 @@ void SceneGraph::refreshShadowLights() {
     getLightsAt(refNodePos, lights);
 
     for (auto &light : lights) {
-        if (!light->shadow()) continue;
-        if (_shadowLights.size() >= kMaxShadowLightCount) break;
-
-        glm::vec3 lightPos(light->absoluteTransform()[3]);
-        glm::vec3 lightToRefNode(lightPos - refNodePos);
-        glm::vec3 lightDir(glm::normalize(lightToRefNode));
-
-        float dist = glm::min(glm::length(lightToRefNode), kMaxLightDistance);
-        lightPos = refNodePos + dist * lightDir;
-
-        glm::mat4 view(glm::lookAt(lightPos, refNodePos, glm::vec3(0.0f, 0.0f, 1.0f)));
-
-        ShadowLight shadowLight;
-        shadowLight.position = glm::vec4(lightPos, 1.0f);
-        shadowLight.view = view;
-        shadowLight.projection = getLightProjection();
-        _shadowLights.push_back(move(shadowLight));
+        if (light->shadow()) {
+            _shadowLightPresent = true;
+            _shadowLightPosition = light->absoluteTransform()[3];
+            return;
+        }
     }
 }
 
@@ -172,13 +181,8 @@ void SceneGraph::render() const {
     globals.projection = _activeCamera->projection();
     globals.view = _activeCamera->view();
     globals.cameraPosition = _activeCamera->absoluteTransform()[3];
-
-    int lightCount = static_cast<int>(_shadowLights.size());
-    globals.shadows.shadowLightCount = lightCount;
-    for (int i = 0; i < lightCount; ++i) {
-        ShadowLight &light = globals.shadows.shadowLights[i];
-        light = _shadowLights[i];
-    }
+    globals.shadowLightPresent = _shadowLightPresent;
+    globals.shadowLightPosition = _shadowLightPosition;
 
     Shaders::instance().setGlobalUniforms(globals);
 
@@ -201,10 +205,9 @@ void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
     for (auto &mesh : _transparentMeshes) {
         mesh->renderSingle(false);
     }
-}
-
-const vector<ShadowLight> &SceneGraph::shadowLights() const {
-    return _shadowLights;
+    for (auto &particle : _particles) {
+        particle->renderSingle(false);
+    }
 }
 
 void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
@@ -238,12 +241,12 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
     }
 }
 
-glm::mat4 SceneGraph::getLightProjection() const {
-    return glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, 1000.0f);
-}
-
 const glm::vec3 &SceneGraph::ambientLightColor() const {
     return _ambientLightColor;
+}
+
+shared_ptr<CameraSceneNode> SceneGraph::activeCamera() const {
+    return _activeCamera;
 }
 
 void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
@@ -256,6 +259,14 @@ void SceneGraph::setReferenceNode(const shared_ptr<SceneNode> &node) {
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
+}
+
+bool SceneGraph::isShadowLightPresent() const {
+    return _shadowLightPresent;
+}
+
+const glm::vec3 &SceneGraph::shadowLightPosition() const {
+    return _shadowLightPosition;
 }
 
 } // namespace scene

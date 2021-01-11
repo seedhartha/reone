@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,10 +103,7 @@ shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
     CurFile curFile;
     curFile.load(wrap(data));
 
-    shared_ptr<Texture> texture(curFile.texture());
-    texture->initGL();
-
-    return move(texture);
+    return curFile.texture();
 }
 
 } // namespace game

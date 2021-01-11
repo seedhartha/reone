@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "../../common/log.h"
 
 #include "../enginetype/effect.h"
+#include "../object/spatial.h"
 
 using namespace std;
 
@@ -474,6 +475,26 @@ Variable Routines::effectDroidScramble(const VariablesList &args, ExecutionConte
     return Variable(VariableType::Effect, static_pointer_cast<EngineType>(effect));
 }
 
+Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
+    caller->clearAllEffects();
+    return Variable();
+}
+
+Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto durationType = static_cast<DurationType>(getInt(args, 0));
+    auto effect = getEffect(args, 1);
+    auto target = getSpatialObject(args, 2);
+    float duration = getFloat(args, 3, 0.0f);
+
+    if (target) {
+        target->applyEffect(effect, durationType, duration);
+    } else {
+        warn("Routines: applyEffectToObject: target is invalid");
+    }
+
+    return Variable();
+}
 
 } // namespace game
 

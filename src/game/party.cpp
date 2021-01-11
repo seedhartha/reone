@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ namespace reone {
 
 namespace game {
 
-static const int kMaxMemberCount = 3;
+constexpr int kMaxMemberCount = 3;
+constexpr float kTeleMemberDistance = 32.0f;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {
@@ -80,12 +81,15 @@ bool Party::removeAvailableMember(int npc) {
     return false;
 }
 
-bool Party::addMember(const shared_ptr<Creature> &member) {
+bool Party::addMember(int npc, const shared_ptr<Creature> &creature) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");
         return false;
     }
-    _members.push_back(member);
+    Member member;
+    member.npc = npc;
+    member.creature = creature;
+    _members.push_back(move(member));
 
     return true;
 }
@@ -100,13 +104,13 @@ void Party::switchLeader() {
 
     switch (count) {
         case 2: {
-            shared_ptr<Creature> tmp(_members[0]);
+            Member tmp(_members[0]);
             _members[0] = _members[1];
             _members[1] = tmp;
             break;
         }
         case 3: {
-            shared_ptr<Creature> tmp(_members[0]);
+            Member tmp(_members[0]);
             _members[0] = _members[1];
             _members[1] = _members[2];
             _members[2] = tmp;
@@ -118,13 +122,27 @@ void Party::switchLeader() {
 }
 
 void Party::onLeaderChanged() {
-    _members[0]->actionQueue().clear();
-
-    for (int i = 1; i < static_cast<int>(_members.size()); ++i) {
-        _members[i]->actionQueue().clear();
-        _members[i]->actionQueue().add(make_unique<FollowAction>(_members[0], 1.0f));
+    for (auto &member : _members) {
+        member.creature->actionQueue().clear();
     }
     _game->module()->area()->onPartyLeaderMoved();
+}
+
+void Party::onHeartbeat() {
+    shared_ptr<Creature> leader(_members[0].creature);
+
+    for (int i = 1; i < _members.size(); ++i) {
+        shared_ptr<Creature> member(_members[i].creature);
+        ActionQueue &actions = member->actionQueue();
+        shared_ptr<Action> action(actions.currentAction());
+        if (!action) {
+            actions.add(make_unique<FollowAction>(leader, 1.0f));
+        }
+        if (member->distanceTo(*leader) > kTeleMemberDistance) {
+            member->setPosition(leader->position());
+            _game->module()->area()->landObject(*member);
+        }
+    }
 }
 
 const string &Party::getAvailableMember(int npc) const {
@@ -132,7 +150,7 @@ const string &Party::getAvailableMember(int npc) const {
 }
 
 shared_ptr<Creature> Party::getMember(int index) const {
-    return _members.size() > index ? _members[index] : nullptr;
+    return _members.size() > index ? _members[index].creature : nullptr;
 }
 
 bool Party::empty() const {
@@ -143,24 +161,10 @@ int Party::size() const {
     return static_cast<int>(_members.size());
 }
 
-bool Party::isNPCMember(int npc) const {
-    auto maybeMember = _availableMembers.find(npc);
-    if (maybeMember == _availableMembers.end()) return false;
-
-    if (npc != kNpcPlayer) {
-        for (auto &member : _members) {
-            if (member->blueprintResRef() == maybeMember->second) {
-                return true;
-            }
-        }
-    } else {
-        for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
-            if (_members[i]->id() == _player->id()) {
-                return true;
-            }
-        }
+bool Party::isMember(int npc) const {
+    for (auto &member : _members) {
+        if (member.npc == npc) return true;
     }
-
     return false;
 }
 
@@ -170,7 +174,7 @@ bool Party::isMemberAvailable(int npc) const {
 
 bool Party::isMember(const Object &object) const {
     for (auto &member : _members) {
-        if (member->id() == object.id()) return true;
+        if (member.creature->id() == object.id()) return true;
     }
     return false;
 }
@@ -180,30 +184,15 @@ shared_ptr<Creature> Party::player() const {
 }
 
 shared_ptr<Creature> Party::leader() const {
-    return !_members.empty() ? _members[0] : nullptr;
+    return !_members.empty() ? _members[0].creature : nullptr;
 }
 
 void Party::setPartyLeader(int npc) {
     int memberIdx = -1;
-
-    if (npc != kNpcPlayer) {
-        auto maybeMember = _availableMembers.find(npc);
-        if (maybeMember == _availableMembers.end()) {
-            warn("Party: NPC is not available: " + to_string(npc));
-            return;
-        }
-        for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
-            if (_members[i]->blueprintResRef()  == maybeMember->second) {
-                memberIdx = -1;
-                break;
-            }
-        }
-    } else {
-        for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
-            if (_members[i]->id() == _player->id()) {
-                memberIdx = i;
-                break;
-            }
+    for (int i = 0; i < static_cast<int>(_members.size()); ++i) {
+        if (_members[i].npc == npc) {
+            memberIdx = i;
+            break;
         }
     }
     if (memberIdx == -1) {
@@ -212,7 +201,7 @@ void Party::setPartyLeader(int npc) {
     }
     if (memberIdx == 0) return;
 
-    shared_ptr<Creature> tmp(_members[0]);
+    Member tmp(_members[0]);
     _members[0] = _members[memberIdx];
     _members[memberIdx] = tmp;
 
@@ -221,6 +210,15 @@ void Party::setPartyLeader(int npc) {
 
 void Party::setPlayer(const shared_ptr<Creature> &player) {
     _player = player;
+}
+
+bool Party::removeMember(int npc) {
+    auto maybeMember = find_if(_members.begin(), _members.end(), [&npc](auto &member) { return member.npc == npc; });
+    if (maybeMember != _members.end()) {
+        _members.erase(maybeMember);
+        return true;
+    }
+    return false;
 }
 
 } // namespace game

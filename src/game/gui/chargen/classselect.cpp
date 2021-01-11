@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "../../characterutil.h"
 #include "../../game.h"
 #include "../../object/creature.h"
-#include "../../rp/classutil.h"
+#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
@@ -58,22 +58,16 @@ static map<ClassType, int> g_classDescStrRefs {
 };
 
 ClassSelection::ClassSelection(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("classsel");
 
-    switch (game->version()) {
-        case GameVersion::TheSithLords:
-            _resolutionX = 800;
-            _resolutionY = 600;
-            break;
-        default:
-            _backgroundType = BackgroundType::Menu;
-            _hasDefaultHilightColor = true;
-            _defaultHilightColor = getHilightColor(_version);
-            break;
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
     }
+
+    initForGame();
 }
 
 void ClassSelection::load() {
@@ -185,7 +179,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
     unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
-        .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].config, sceneGraph); })
+        .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].character, sceneGraph); })
         .modelScale(kModelScale)
         .modelOffset(glm::vec2(0.0f, kModelOffsetY))
         .cameraTransform(cameraTransform)
@@ -197,11 +191,11 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
     control.setScene3D(move(scene));
 }
 
-shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const CreatureConfiguration &config, SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, SceneGraph &sceneGraph) {
     unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(config);
+    creature->load(character);
     creature->updateModelAnimation();
 
     return creature->model();
@@ -218,11 +212,12 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
     }
 
     ClassButton &button = _classButtons[idx];
+    ClassType clazz = button.character->attributes().getEffectiveClass();
 
-    string classText(Resources::instance().getString(g_genderStrRefs[button.config.gender]));
-    classText += " " + getClassTitle(button.config.clazz);
+    string classText(Resources::instance().getString(g_genderStrRefs[button.character->gender()]));
+    classText += " " + Classes::instance().get(clazz)->name();
 
-    string descText(Resources::instance().getString(g_classDescStrRefs[button.config.clazz]));
+    string descText(Resources::instance().getString(g_classDescStrRefs[clazz]));
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);
@@ -242,7 +237,7 @@ void ClassSelection::onClick(const string &control) {
     CharacterGeneration &charGen = _game->characterGeneration();
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {
-        charGen.setCharacter(_classButtons[idx].config);
+        charGen.setCharacter(*_classButtons[idx].character);
         charGen.openQuickOrCustom();
         return;
     }

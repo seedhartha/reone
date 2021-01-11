@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -169,6 +169,11 @@ const ExecutionContext &Routines::getAction(const VariablesList &args, int index
 shared_ptr<Item> Routines::getItem(const VariablesList &args, int index) const {
     int argCount = static_cast<int>(args.size());
     return index < argCount ? dynamic_pointer_cast<Item>(args[index].object) : nullptr;
+}
+
+shared_ptr<Effect> Routines::getEffect(const VariablesList &args, int index) const {
+    int argCount = static_cast<int>(args.size());
+    return index < argCount ? dynamic_pointer_cast<Effect>(args[index].engineType) : nullptr;
 }
 
 } // namespace game

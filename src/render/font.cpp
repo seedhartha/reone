@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "glm/ext.hpp"
 
 #include "shaders.h"
+#include "util.h"
 
 using namespace std;
 
@@ -108,7 +109,8 @@ void Font::initGL() {
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
-    _texture->bind(0);
+    setActiveTextureUnit(0);
+    _texture->bind();
 
     glBindVertexArray(_vertexArrayId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);

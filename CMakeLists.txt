@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The reone project contributors
+# Copyright (c) 2020-2021 The reone project contributors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ set(RESOURCE_HEADERS
     src/resource/folder.h
     src/resource/gfffile.h
     src/resource/keyfile.h
+    src/resource/ltrfile.h
     src/resource/lytfile.h
     src/resource/pefile.h
     src/resource/resources.h
@@ -116,6 +117,7 @@ set(RESOURCE_SOURCES
     src/resource/folder.cpp
     src/resource/gfffile.cpp
     src/resource/keyfile.cpp
+    src/resource/ltrfile.cpp
     src/resource/lytfile.cpp
     src/resource/pefile.cpp
     src/resource/rimfile.cpp
@@ -134,6 +136,7 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 set(RENDER_HEADERS
     src/render/bwmfile.h
     src/render/cursor.h
+    src/render/emitter.h
     src/render/font.h
     src/render/fonts.h
     src/render/fps.h
@@ -143,6 +146,7 @@ set(RENDER_HEADERS
     src/render/image/tpcfile.h
     src/render/image/txifile.h
     src/render/mesh/aabb.h
+    src/render/mesh/billboard.h
     src/render/mesh/cube.h
     src/render/mesh/quad.h
     src/render/mesh/mesh.h
@@ -164,6 +168,7 @@ set(RENDER_HEADERS
 set(RENDER_SOURCES
     src/render/bwmfile.cpp
     src/render/cursor.cpp
+    src/render/emitter.cpp
     src/render/font.cpp
     src/render/fonts.cpp
     src/render/fps.cpp
@@ -173,6 +178,7 @@ set(RENDER_SOURCES
     src/render/image/tpcfile.cpp
     src/render/image/txifile.cpp
     src/render/mesh/aabb.cpp
+    src/render/mesh/billboard.cpp
     src/render/mesh/cube.cpp
     src/render/mesh/quad.cpp
     src/render/mesh/mesh.cpp
@@ -245,12 +251,13 @@ endif()
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/scene/node/aabbnode.h
     src/scene/node/cameranode.h
     src/scene/node/cubenode.h
+    src/scene/node/emitternode.h
     src/scene/node/lightnode.h
     src/scene/node/modelnodescenenode.h
     src/scene/node/modelscenenode.h
+    src/scene/node/particlenode.h
     src/scene/node/scenenode.h
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
@@ -258,12 +265,13 @@ set(SCENE_HEADERS
     src/scene/scenenodeanimator.h)
 
 set(SCENE_SOURCES
-    src/scene/node/aabbnode.cpp
     src/scene/node/cameranode.cpp
     src/scene/node/cubenode.cpp
+    src/scene/node/emitternode.cpp
     src/scene/node/lightnode.cpp
     src/scene/node/modelnodescenenode.cpp
     src/scene/node/modelscenenode.cpp
+    src/scene/node/particlenode.cpp
     src/scene/node/scenenode.cpp
     src/scene/pipeline/control.cpp
     src/scene/pipeline/world.cpp
@@ -348,9 +356,11 @@ set(GAME_HEADERS
     src/game/action/movetoobject.h
     src/game/action/movetopoint.h
     src/game/action/objectaction.h
+    src/game/action/playanimation.h
     src/game/action/startconversation.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
+    src/game/blueprint/blueprint.h
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
     src/game/blueprint/door.h
@@ -369,8 +379,10 @@ set(GAME_HEADERS
     src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
-    src/game/combat.h
-    src/game/creatureconfig.h
+    src/game/combat/attackresolver.h
+    src/game/combat/attackresult.h
+    src/game/combat/combat.h
+    src/game/combat/damageresolver.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/effect.h
@@ -378,16 +390,22 @@ set(GAME_HEADERS
     src/game/enginetype/location.h
     src/game/enginetype/types.h
     src/game/game.h
+    src/game/gui/chargen/abilities.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
+    src/game/gui/chargen/custom.h
+    src/game/gui/chargen/feats.h
+    src/game/gui/chargen/levelup.h
     src/game/gui/chargen/nameentry.h
     src/game/gui/chargen/portraitselect.h
     src/game/gui/chargen/quick.h
     src/game/gui/chargen/quickorcustom.h
+    src/game/gui/chargen/skills.h
     src/game/gui/colorutil.h
     src/game/gui/container.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
+    src/game/gui/gui.h
     src/game/gui/hud.h
     src/game/gui/ingame/abilities.h
     src/game/gui/ingame/character.h
@@ -429,10 +447,13 @@ set(GAME_HEADERS
     src/game/portrait.h
     src/game/portraitutil.h
     src/game/room.h
+    src/game/rp/abilities.h
     src/game/rp/attributes.h
-    src/game/rp/classutil.h
-    src/game/rp/damageresolver.h
+    src/game/rp/class.h
+    src/game/rp/classes.h
     src/game/rp/factionutil.h
+    src/game/rp/savingthrows.h
+    src/game/rp/skills.h
     src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
@@ -466,20 +487,28 @@ set(GAME_SOURCES
     src/game/characterutil.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
-    src/game/combat.cpp
+    src/game/combat/attackresolver.cpp
+    src/game/combat/combat.cpp
+    src/game/combat/damageresolver.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp
+    src/game/gui/chargen/abilities.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
+    src/game/gui/chargen/custom.cpp
+    src/game/gui/chargen/feats.cpp
+    src/game/gui/chargen/levelup.cpp
     src/game/gui/chargen/nameentry.cpp
     src/game/gui/chargen/portraitselect.cpp
     src/game/gui/chargen/quick.cpp
     src/game/gui/chargen/quickorcustom.cpp
+    src/game/gui/chargen/skills.cpp
     src/game/gui/colorutil.cpp
     src/game/gui/container.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
+    src/game/gui/gui.cpp
     src/game/gui/hud.cpp
     src/game/gui/ingame/abilities.cpp
     src/game/gui/ingame/character.cpp
@@ -518,10 +547,12 @@ set(GAME_SOURCES
     src/game/player.cpp
     src/game/portraitutil.cpp
     src/game/room.cpp
+    src/game/rp/abilities.cpp
     src/game/rp/attributes.cpp
-    src/game/rp/classutil.cpp
-    src/game/rp/damageresolver.cpp
+    src/game/rp/class.cpp
+    src/game/rp/classes.cpp
     src/game/rp/factionutil.cpp
+    src/game/rp/skills.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp
@@ -529,11 +560,13 @@ set(GAME_SOURCES
     src/game/script/routines_effects.cpp
     src/game/script/routines_enginetypes.cpp
     src/game/script/routines_events.cpp
+    src/game/script/routines_items.cpp
     src/game/script/routines_kotor.cpp
     src/game/script/routines_objects.cpp
     src/game/script/routines_math.cpp
     src/game/script/routines_rp.cpp
     src/game/script/routines_party.cpp
+    src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
     src/game/script/runner.cpp)

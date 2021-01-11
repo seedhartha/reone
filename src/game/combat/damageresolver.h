@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,25 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
 #include <vector>
-
-#include "rp/types.h"
 
 namespace reone {
 
 namespace game {
 
-class CreatureBlueprint;
+class Creature;
+class DamageEffect;
+class SpatialObject;
 
-struct CreatureConfiguration {
-    std::shared_ptr<CreatureBlueprint> blueprint;
-    Gender gender { Gender::Male };
-    ClassType clazz { ClassType::Soldier };
-    int appearance { 0 };
-    std::vector<std::string> equipment;
-
-    bool operator==(const CreatureConfiguration &other) {
-        return
-            blueprint == other.blueprint &&
-            gender == other.gender &&
-            clazz == other.clazz &&
-            appearance == other.appearance &&
-            equipment == other.equipment;
-    }
+/**
+ * Calculates damage effects based on damager abilities and equipment.
+ *
+ * https://strategywiki.org/wiki/Star_Wars:_Knights_of_the_Old_Republic/Combat
+ */
+class DamageResolver {
+public:
+    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(const std::shared_ptr<Creature> &damager);
 };
 
 } // namespace game

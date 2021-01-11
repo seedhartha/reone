@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 
 #include "cursor.h"
 #include "mesh/aabb.h"
+#include "mesh/billboard.h"
 #include "mesh/cube.h"
 #include "mesh/quad.h"
 #include "shaders.h"
@@ -74,6 +75,7 @@ void RenderWindow::init() {
 
     Shaders::instance().initGL();
     CubeMesh::instance().initGL();
+    BillboardMesh::instance().initGL();
     AABBMesh::instance().initGL();
     Quad::getDefault().initGL();
     Quad::getXFlipped().initGL();
@@ -93,6 +95,7 @@ void RenderWindow::deinit() {
     Quad::getYFlipped().deinitGL();
     Quad::getXYFlipped().deinitGL();
     AABBMesh::instance().deinitGL();
+    BillboardMesh::instance().deinitGL();
     CubeMesh::instance().deinitGL();
     Shaders::instance().deinitGL();
 

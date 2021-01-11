@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,10 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
 #include "../../../gui/textinput.h"
+#include "../../../resource/ltrfile.h"
+
+#include "../gui.h"
 
 namespace reone {
 
@@ -26,18 +28,28 @@ namespace game {
 
 class CharacterGeneration;
 
-class NameEntry : public gui::GUI {
+class NameEntry : public GameGUI {
 public:
     NameEntry(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
 
+    void loadRandomName();
+
 private:
     CharacterGeneration *_charGen { nullptr };
     gui::TextInput _input;
+    gui::Control *_nameBoxEdit { nullptr };
+    resource::LtrFile _maleLtr;
+    resource::LtrFile _femaleLtr;
+    resource::LtrFile _lastNameLtr;
 
     void onClick(const std::string &control) override;
+
+    void loadLtrFile(const std::string &resRef, resource::LtrFile &ltr);
+
+    std::string getRandomName() const;
 };
 
 } // namespace game

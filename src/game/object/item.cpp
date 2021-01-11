@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 #include "item.h"
 
+#include <stdexcept>
+
 using namespace std;
 
 using namespace reone::render;
@@ -30,6 +32,9 @@ Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
 void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
+    if (!blueprint) {
+        throw invalid_argument("blueprint must not be null");
+    }
     blueprint->load(*this);
 }
 
@@ -115,6 +120,14 @@ bool Item::isIdentified() const {
 
 void Item::setIdentified(bool value) {
     _identified = value;
+}
+
+bool Item::isEquipped() const {
+    return _equipped;
+}
+
+void Item::setEquipped(bool equipped) {
+    _equipped = equipped;
 }
 
 } // namespace game

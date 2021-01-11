@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,12 +42,9 @@ public:
     bool handle(const SDL_Event &event);
 
     void clear();
-    bool addMember(const std::shared_ptr<Creature> &member);
     void switchLeader();
 
-    std::shared_ptr<Creature> getMember(int index) const;
-    bool isNPCMember(int npc) const;
-    bool isMember(const Object &object) const;
+    void onHeartbeat();
 
     bool empty() const;
     int size() const;
@@ -56,6 +53,22 @@ public:
 
     void setPartyLeader(int npc);
     void setPlayer(const std::shared_ptr<Creature> &player);
+
+    // Members
+
+    /**
+     * @param npc NPC number or kNpcPlayer for the player character
+     */
+    bool addMember(int npc, const std::shared_ptr<Creature> &creature);
+
+    bool removeMember(int npc);
+
+    bool isMember(int npc) const;
+    bool isMember(const Object &object) const;
+
+    std::shared_ptr<Creature> getMember(int index) const;
+
+    // END Members
 
     // Available members
 
@@ -69,10 +82,15 @@ public:
     // END Available members
 
 private:
+    struct Member {
+        int npc { 0 };
+        std::shared_ptr<Creature> creature;
+    };
+
     Game *_game { nullptr };
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
-    std::vector<std::shared_ptr<Creature>> _members;
+    std::vector<Member> _members;
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 

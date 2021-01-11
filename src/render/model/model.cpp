@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 #include "model.h"
+
+#include "../../common/log.h"
 
 using namespace std;
 
@@ -77,14 +79,15 @@ vector<string> Model::getAnimationNames() const {
     return move(result);
 }
 
-Animation *Model::getAnimation(const string &name) const {
+shared_ptr<Animation> Model::getAnimation(const string &name) const {
     auto maybeAnim = _animations.find(name);
     if (maybeAnim != _animations.end()) {
-        return maybeAnim->second.get();
+        return maybeAnim->second;
     }
     if (_superModel) {
         return _superModel->getAnimation(name);
     }
+    debug(boost::format("Model: animation not found: '%s' '%s'") % name % _name, 2);
 
     return nullptr;
 }

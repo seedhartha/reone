@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ namespace scene {
 class CameraSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
+class ParticleSceneNode;
 class SceneNode;
 
 class SceneGraph {
@@ -49,16 +50,20 @@ public:
     void build();
     void prepareFrame();
 
+    std::shared_ptr<CameraSceneNode> activeCamera() const;
+
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setReferenceNode(const std::shared_ptr<SceneNode> &node);
 
     // Lights
 
-    const std::vector<render::ShadowLight> &shadowLights() const;
+    bool isShadowLightPresent() const;
 
     void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
 
     const glm::vec3 &ambientLightColor() const;
+    const glm::vec3 &shadowLightPosition() const;
+
     void setAmbientLightColor(const glm::vec3 &color);
 
     // END Lights
@@ -70,19 +75,19 @@ private:
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
+    std::vector<ParticleSceneNode *> _particles;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    std::vector<render::ShadowLight> _shadowLights;
+    bool _shadowLightPresent { false };
+    glm::vec3 _shadowLightPosition { 0.0f };
     std::shared_ptr<SceneNode> _refNode;
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
-    void refreshMeshesAndLights();
-    void refreshShadowLights();
-
-    glm::mat4 getLightProjection() const;
+    void refreshNodeLists();
+    void refreshShadowLight();
 };
 
 } // namespace scene

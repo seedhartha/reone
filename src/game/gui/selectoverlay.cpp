@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "../../render/shaders.h"
 #include "../../render/texture.h"
 #include "../../render/textures.h"
+#include "../../render/util.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -201,7 +202,8 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    texture.bind(0);
+    setActiveTextureUnit(0);
+    texture.bind();
 
     Quad::getDefault().renderTriangles();
 }
@@ -291,7 +293,8 @@ void SelectionOverlay::drawActionBar() const {
         } else {
             frameTexture = _friendlyScroll;
         }
-        frameTexture->bind(0);
+        setActiveTextureUnit(0);
+        frameTexture->bind();
 
         Quad::getDefault().renderTriangles();
 
@@ -311,7 +314,8 @@ void SelectionOverlay::drawActionBar() const {
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-                texture->bind(0);
+                setActiveTextureUnit(0);
+                texture->bind();
 
                 Quad::getDefault().renderTriangles();
             }

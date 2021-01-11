@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,34 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "../gui.h"
 
 namespace reone {
 
 namespace game {
 
-class Creature;
-class DamageEffect;
-class SpatialObject;
+class CharacterGeneration;
 
-/**
- * Calculates damage effects based on damager abilities and equipment.
- *
- * https://strategywiki.org/wiki/Star_Wars:_Knights_of_the_Old_Republic/Combat
- */
-class DamageResolver {
+class LevelUpMenu : public GameGUI {
 public:
-    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(const std::shared_ptr<Creature> &damager);
+    LevelUpMenu(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &options);
+
+    void load() override;
+
+    void reset();
+
+    void goToNextStep();
+
+    void setStep(int step);
+
+private:
+    CharacterGeneration *_charGen;
+    int _step { 0 };
+    bool _hasAttributes { false };
+
+    void onClick(const std::string &control) override;
+
+    void doSetStep(int step);
 };
 
 } // namespace game

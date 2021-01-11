@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,36 +96,36 @@ void CreatureBlueprint::loadName(Creature &creature) {
 
 void CreatureBlueprint::loadAttributes(Creature &creature) {
     CreatureAttributes &attributes = creature.attributes();
-
     for (auto &classGff : _utc->getList("ClassList")) {
         int clazz = classGff->getInt("Class");
         int level = classGff->getInt("ClassLevel");
         attributes.addClassLevels(static_cast<ClassType>(clazz), level);
     }
-    loadAbilities(attributes);
-    loadSkills(attributes);
+    loadAbilities(attributes.abilities());
+    loadSkills(attributes.skills());
 }
 
-void CreatureBlueprint::loadAbilities(CreatureAttributes &attributes) {
-    attributes.setAbilityScore(Ability::Strength, _utc->getInt("Str"));
-    attributes.setAbilityScore(Ability::Dexterity, _utc->getInt("Dex"));
-    attributes.setAbilityScore(Ability::Constitution, _utc->getInt("Con"));
-    attributes.setAbilityScore(Ability::Intelligence, _utc->getInt("Int"));
-    attributes.setAbilityScore(Ability::Wisdom, _utc->getInt("Wis"));
-    attributes.setAbilityScore(Ability::Charisma, _utc->getInt("Cha"));
+void CreatureBlueprint::loadAbilities(CreatureAbilities &abilities) {
+    abilities.setScore(Ability::Strength, _utc->getInt("Str"));
+    abilities.setScore(Ability::Dexterity, _utc->getInt("Dex"));
+    abilities.setScore(Ability::Constitution, _utc->getInt("Con"));
+    abilities.setScore(Ability::Intelligence, _utc->getInt("Int"));
+    abilities.setScore(Ability::Wisdom, _utc->getInt("Wis"));
+    abilities.setScore(Ability::Charisma, _utc->getInt("Cha"));
 }
 
-void CreatureBlueprint::loadSkills(CreatureAttributes &attributes) {
-    vector<shared_ptr<GffStruct>> skills(_utc->getList("SkillList"));
-    for (int i = 0; i < static_cast<int>(skills.size()); ++i) {
+void CreatureBlueprint::loadSkills(CreatureSkills &skills) {
+    vector<shared_ptr<GffStruct>> skillsUtc(_utc->getList("SkillList"));
+    for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        attributes.setSkillRank(skill, skills[i]->getInt("Rank"));
+        skills.setRank(skill, skillsUtc[i]->getInt("Rank"));
     }
 }
 
 void CreatureBlueprint::loadScripts(Creature &creature) {
     creature._heartbeat = boost::to_lower_copy(_utc->getString("ScriptHeartbeat"));
     creature._onSpawn = boost::to_lower_copy(_utc->getString("ScriptSpawn"));
+    creature._onDeath = boost::to_lower_copy(_utc->getString("ScriptDeath"));
     creature._onUserDefined = boost::to_lower_copy(_utc->getString("ScriptUserDefine"));
 }
 
@@ -139,6 +139,48 @@ void CreatureBlueprint::loadItems(Creature &creature) {
 
 const string &CreatureBlueprint::resRef() const {
     return _resRef;
+}
+
+void StaticCreatureBlueprint::load(Creature &creature) {
+    creature._appearance = _appearance;
+    creature._attributes = _attributes;
+    creature._currentHitPoints = creature._hitPoints = creature._maxHitPoints = _attributes.getAggregateHitDie();
+
+    for (auto &item : _equipment) {
+        creature.equip(item);
+    }
+}
+
+void StaticCreatureBlueprint::clearEquipment() {
+    _equipment.clear();
+}
+
+void StaticCreatureBlueprint::addEquippedItem(const string &resRef) {
+    _equipment.push_back(resRef);
+}
+
+Gender StaticCreatureBlueprint::gender() const {
+    return _gender;
+}
+
+int StaticCreatureBlueprint::appearance() const {
+    return _appearance;
+}
+
+CreatureAttributes &StaticCreatureBlueprint::attributes() {
+    return _attributes;
+}
+
+void StaticCreatureBlueprint::setGender(Gender gender) {
+    _gender = gender;
+}
+
+void StaticCreatureBlueprint::setAppearance(int appearance) {
+    _appearance = appearance;
+}
+
+void StaticCreatureBlueprint::setAttributes(CreatureAttributes attributes) {
+    _attributes = move(attributes);
 }
 
 } // namespace game

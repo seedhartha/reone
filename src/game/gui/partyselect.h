@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include "gui.h"
 
 namespace reone {
 
@@ -33,7 +33,7 @@ static const int kNpcCount = 9;
 
 class Game;
 
-class PartySelection : public gui::GUI {
+class PartySelection : public GameGUI {
 public:
     struct Context {
         std::string exitScript;

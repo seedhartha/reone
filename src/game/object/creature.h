@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 #include "../../resource/2dafile.h"
 #include "../../resource/gfffile.h"
 #include "../../script/types.h"
 
-#include "../creatureconfig.h"
+#include "../blueprint/blueprint.h"
 #include "../rp/attributes.h"
 
 #include "creatureanimresolver.h"
@@ -47,7 +48,6 @@ namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
 
-class CreatureBlueprint;
 class ObjectFactory;
 
 enum class CombatState {
@@ -87,19 +87,20 @@ public:
 
     void update(float dt) override;
     void clearAllActions() override;
+    void die() override;
 
     bool isSelectable() const override;
 
     glm::vec3 getSelectablePosition() const override;
 
     void load(const resource::GffStruct &gffs);
-    void load(const std::shared_ptr<CreatureBlueprint> &blueprint);
-    void load(const CreatureConfiguration &config);
+    void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
 
     bool isMovementRestricted() const;
     bool isInCombat() const;
+    bool isLevelUpPending() const;
 
     float getAttackRange() const;
 
@@ -125,22 +126,24 @@ public:
 
     // END Animation
 
-    void playAnimation(Animation animation, float speed = 1.0f) override;
+    void playAnimation(AnimationType anim, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
 
-    void playAnimation(CombatAnimation animation);
-    void playAnimation(const std::string &name, bool looping = false, float speed = 1.0f);
+    void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
+    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
 
     void updateModelAnimation();
 
     // Equipment
 
-    void equip(const std::string &resRef);
-    void equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    bool equip(const std::string &resRef);
+    bool equip(InventorySlot slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
     bool isSlotEquipped(InventorySlot slot) const;
 
     std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    CreatureWieldType getWieldType() const;
 
     const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
 
@@ -173,7 +176,7 @@ public:
     // END Multiplayer
 
 private:
-    CreatureConfiguration _config;
+    Gender _gender { Gender::Male };
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
@@ -195,24 +198,39 @@ private:
     CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
+    std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
 
     // Scripts
 
     std::string _onSpawn;
+    std::string _onDeath;
 
     // END Scripts
+
+    void updateModel();
+    void updateHealth();
+
+    void runDeathScript();
+
+    ModelType parseModelType(const std::string &s) const;
+
+    // Loading
 
     void loadTransform(const resource::GffStruct &gffs);
     void loadBlueprint(const resource::GffStruct &gffs);
     void loadAppearance(const resource::TwoDaTable &table, int row);
     void loadPortrait(int appearance);
 
-    void updateModel();
-    void updateHealth();
+    // END Loading
 
-    ModelType parseModelType(const std::string &s) const;
+    // Animation
+
+    void doPlayAnimation(int flags, const std::function<void()> &callback);
+
+    // END Animation
 
     friend class CreatureBlueprint;
+    friend class StaticCreatureBlueprint;
 };
 
 } // namespace game

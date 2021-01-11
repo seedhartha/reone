@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -38,8 +39,8 @@ namespace scene {
 enum AnimationFlags {
     kAnimationLoop = 1,
     kAnimationPropagate = 2,
-    kAnimationBlend = 4, // blend previous animation into the next one
-    kAnimationOverlay = 8 // overlay next animation on top of the previous one
+    kAnimationBlend = 4, /**< blend previous animation into the next one */
+    kAnimationOverlay = 8 /**< overlay next animation on top of the previous one */
 };
 
 class ModelSceneNode;
@@ -51,37 +52,38 @@ public:
     void update(float dt);
 
     void playDefaultAnimation();
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
 
     bool isAnimationFinished() const;
 
-    void setDefaultAnimation(const std::string &name);
+    void setDefaultAnimation(const std::shared_ptr<render::Animation> &anim);
 
 private:
     static const int kChannelCount = 2;
 
     struct AnimationChannel {
-        std::string name;
+        std::shared_ptr<render::Animation> animation;
         int flags { 0 };
         float speed { 1.0f };
+        float scale { 1.0f };
         float time { 0.0f };
-        render::Animation *animation { nullptr };
         bool finished { false };
         bool transition { false };
         bool freeze { false };
         std::unordered_map<uint16_t, glm::mat4> localTransforms;
 
         bool isActive() const;
-        bool isSameAnimation(const std::string &name, int flags, float speed) const;
+        bool isSameAnimation(const std::shared_ptr<render::Animation> &anim, int flags, float speed, float scale) const;
 
-        void setAnimation(render::Animation *animation, int flags = 0, float speed = 1.0f);
+        void setAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
+
         void stopAnimation();
     };
 
     ModelSceneNode *_modelSceneNode { nullptr };
     std::set<std::string> _skipNodes;
     AnimationChannel _channels[kChannelCount];
-    std::string _defaultAnim;
+    std::shared_ptr<render::Animation> _defaultAnimation;
     std::unordered_map<uint16_t, glm::mat4> _absTransforms;
 
     void updateChannel(int channel, float dt);

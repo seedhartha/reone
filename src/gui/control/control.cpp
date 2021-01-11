@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 
 #include "glm/ext.hpp"
 
+#include "../../common/log.h"
 #include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/textures.h"
 #include "../../render/util.h"
 #include "../../resource/resources.h"
-#include "../../common/log.h"
 
 #include "../gui.h"
 
@@ -143,13 +143,13 @@ void Control::loadBorder(const GffStruct &gffs) {
 
     _border = make_shared<Border>();
 
-    if (!corner.empty()) {
+    if (!corner.empty() && corner != "0") {
         _border->corner = Textures::instance().get(corner, TextureType::GUI);
     }
-    if (!edge.empty()) {
+    if (!edge.empty() && edge != "0") {
         _border->edge = Textures::instance().get(edge, TextureType::GUI);
     }
-    if (!fill.empty()) {
+    if (!fill.empty() && fill != "0") {
         _border->fill = Textures::instance().get(fill, TextureType::GUI);
     }
 
@@ -174,13 +174,13 @@ void Control::loadHilight(const GffStruct &gffs) {
 
     _hilight = make_shared<Border>();
 
-    if (!corner.empty()) {
+    if (!corner.empty() && corner != "0") {
         _hilight->corner = Textures::instance().get(corner, TextureType::GUI);
     }
-    if (!edge.empty()) {
+    if (!edge.empty() && edge != "0") {
         _hilight->edge = Textures::instance().get(edge, TextureType::GUI);
     }
-    if (!fill.empty()) {
+    if (!fill.empty() && fill != "0") {
         _hilight->fill = Textures::instance().get(fill, TextureType::GUI);
     }
 
@@ -251,7 +251,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
         }
 
-        border.fill->bind(0);
+        setActiveTextureUnit(0);
+        border.fill->bind();
 
         bool additive = border.fill->isAdditive();
         if (additive) {
@@ -266,7 +267,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        border.edge->bind(0);
+        setActiveTextureUnit(0);
+        border.edge->bind();
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -341,7 +343,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        border.corner->bind(0);
+        setActiveTextureUnit(0);
+        border.corner->bind();
 
         // Top left corner
         {
@@ -450,14 +453,19 @@ vector<string> Control::breakText(const string &text, int maxWidth) const {
     string line;
 
     for (auto &token : tokens) {
-        string candidate(line + token);
-        if (_text.font->measure(candidate) > maxWidth) {
-            lines.push_back(move(candidate));
-            line.clear();
+        string candidate(line);
+        if (!candidate.empty()) {
+            candidate += " ";
+        }
+        candidate += token;
+
+        if (_text.font->measure(candidate) < maxWidth) {
+            line = move(candidate);
+        } else {
+            lines.push_back(line);
+            line = token;
             continue;
         }
-        line = move(candidate);
-        line += " ";
     }
     if (!line.empty()) {
         boost::trim_right(line);
@@ -471,6 +479,9 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
     switch (_text.align) {
         case TextAlign::CenterBottom:
             position.y = _extent.top + size.y - static_cast<int>((lineCount - 0.5f) * _text.font->height());
+            break;
+        case TextAlign::CenterTop:
+            position.y = _extent.top + static_cast<int>((lineCount - 0.5f) * _text.font->height());
             break;
         default:
             position.y = _extent.top + size.y / 2;
@@ -611,6 +622,10 @@ void Control::setText(const Text &text) {
 
 void Control::setTextMessage(const string &text) {
     _text.text = text;
+}
+
+void Control::setTextFont(const shared_ptr<Font> &font) {
+    _text.font = font;
 }
 
 void Control::setTextColor(const glm::vec3 &color) {

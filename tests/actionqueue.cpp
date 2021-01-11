@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_action_completion) {
     actionQueue.add(make_unique<Action>(ActionType::PauseConversation));
     actionQueue.add(make_unique<Action>(ActionType::ResumeConversation));
 
-    Action *currentAction = actionQueue.currentAction();
+    shared_ptr<Action> currentAction(actionQueue.currentAction());
     BOOST_TEST((currentAction && currentAction->type() == ActionType::PauseConversation));
 
     currentAction->complete();

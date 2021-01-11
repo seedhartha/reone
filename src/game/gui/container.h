@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-
-#include "../../resource/types.h"
+#include "gui.h"
 
 #include "../object/spatial.h"
 
@@ -29,7 +27,7 @@ namespace game {
 
 class Game;
 
-class Container : public gui::GUI {
+class Container : public GameGUI {
 public:
     Container(Game *game);
 

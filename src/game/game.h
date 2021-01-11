@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ class Video;
 namespace game {
 
 /**
- * Facade for the game logic. Contains the main game loop. Delegates work to the
- * instances of `Module` and `GUI`.
+ * Entry point for the game logic: contains the main game loop and delegates
+ * work to the instances of Module and GUI. Serves as a Service Locator.
  *
  * @see game::Module
  * @see gui::GUI
@@ -76,20 +76,16 @@ public:
     Game(const boost::filesystem::path &path, const Options &opts);
     virtual ~Game() = default;
 
-    bool handle(const SDL_Event &event) override;
-
+    /**
+     * Initialize the engine, run the main game loop and clean up on exit.
+     *
+     * @return the exit code
+     */
     int run();
 
-    void loadModule(const std::string &name, const std::string &entry = "");
-    void openSaveLoad(SaveLoad::Mode mode);
-    void openPartySelection(const PartySelection::Context &ctx);
-    void openMainMenu();
-    void openInGameMenu(InGameMenu::Tab tab);
-    void openInGame();
-    void openContainer(const std::shared_ptr<SpatialObject> &container);
-    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
-    void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
+    /**
+     * Request termination of the main game loop.
+     */
     void quit();
 
     void playVideo(const std::string &name);
@@ -114,23 +110,64 @@ public:
     void setLoadFromSaveGame(bool load);
     void setRunScriptVar(int var);
 
+    // Module Loading
+
+    /**
+     * Load a module with the specified name and entry point.
+     *
+     * @param name name of the module to load
+     * @param entry tag of the waypoint to spawn at, or empty string to use the default entry point
+     */
+    void loadModule(const std::string &name, std::string entry = "");
+
+    /**
+     * Schedule transition to the specified module with the specified entry point.
+     *
+     * @param name name of the module to load
+     * @param entry tag of the waypoint to spawn at
+     */
+    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
+
+    // END Module Loading
+
+    // Game Screens
+
+    void openMainMenu();
+    void openSaveLoad(SaveLoad::Mode mode);
+    void openInGame();
+    void openInGameMenu(InGameMenu::Tab tab);
+    void openContainer(const std::shared_ptr<SpatialObject> &container);
+    void openPartySelection(const PartySelection::Context &ctx);
+    void openLevelUp();
+
+    void startCharacterGeneration();
+    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
+
+    // END Game Screens
+
     // Globals/locals
 
     bool getGlobalBoolean(const std::string &name) const;
+    bool getLocalBoolean(uint32_t objectId, int index) const;
     int getGlobalNumber(const std::string &name) const;
-    std::string getGlobalString(const std::string &name) const;
+    int getLocalNumber(uint32_t objectId, int index) const;
     std::shared_ptr<Location> getGlobalLocation(const std::string &name) const;
-    bool getLocalBoolean(uint32_t objectId, int idx) const;
-    int getLocalNumber(uint32_t objectId, int idx) const;
+    std::string getGlobalString(const std::string &name) const;
 
     void setGlobalBoolean(const std::string &name, bool value);
+    void setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location);
     void setGlobalNumber(const std::string &name, int value);
     void setGlobalString(const std::string &name, const std::string &value);
-    void setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location);
-    void setLocalBoolean(uint32_t objectId, int idx, bool value);
-    void setLocalNumber(uint32_t objectId, int idx, int value);
+    void setLocalBoolean(uint32_t objectId, int index, bool value);
+    void setLocalNumber(uint32_t objectId, int index, int value);
 
     // END Globals/locals
+
+    // IEventHandler
+
+    bool handle(const SDL_Event &event) override;
+
+    // END IEventHandler
 
 protected:
     Options _options;
@@ -265,7 +302,7 @@ private:
 
     // Helper methods
 
-    void withLoadingScreen(const std::function<void()> &block);
+    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
 
     // END Helper methods
 };

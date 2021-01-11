@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "../camera/dialogcamera.h"
 #include "../dialog.h"
-#include "../object/spatial.h"
+#include "../object/creature.h"
 
 namespace reone {
 
@@ -50,12 +50,18 @@ public:
     CameraType getCamera(int &cameraId) const;
 
 private:
+    struct Participant {
+        std::shared_ptr<render::Model> model;
+        std::shared_ptr<Creature> creature;
+    };
+
     Game *_game { nullptr };
     std::shared_ptr<SpatialObject> _owner;
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<Dialog::EntryReply> _currentEntry;
     std::shared_ptr<audio::SoundHandle> _currentVoice;
     std::shared_ptr<SpatialObject> _currentSpeaker;
+    std::map<std::string, Participant> _participantByTag;
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
     float _endEntryTimeout { 0.0f };
@@ -67,14 +73,11 @@ private:
     void configureReplies();
     void endCurrentEntry();
     void finish();
-    void loadAnimatedCamera();
-    void loadCurrentEntry();
-    void loadCurrentSpeaker();
-    void loadReplies();
-    void loadStartEntry();
     void playVoiceOver();
     void scheduleEndOfEntry();
     void updateCamera();
+    void updateParticipantAnimations();
+    void repositionMessage();
 
     void onReplyClicked(int index);
 
@@ -83,6 +86,8 @@ private:
 
     glm::vec3 getTalkPosition(const SpatialObject &object) const;
     DialogCamera::Variant getRandomCameraVariant() const;
+    std::string getStuntAnimationName(int ordinal) const;
+    AnimationType getAnimationType(int ordinal) const;
 
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
@@ -91,7 +96,20 @@ private:
     void loadTopFrame();
     void loadBottomFrame();
 
+    void loadAnimatedCamera();
+    void loadCurrentEntry();
+    void loadCurrentSpeaker();
+    void loadReplies();
+    void loadStartEntry();
+
     // END Loading
+
+    // Participants
+
+    void loadStuntParticipants();
+    void releaseStuntParticipants();
+
+    // END Participants
 };
 
 } // namespace game

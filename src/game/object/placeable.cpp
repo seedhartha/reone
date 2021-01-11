@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 #include "placeable.h"
+
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
@@ -68,8 +70,14 @@ void Placeable::load(const GffStruct &gffs) {
 
 void Placeable::loadBlueprint(const GffStruct &gffs) {
     string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
-
     shared_ptr<PlaceableBlueprint> blueprint(Blueprints::instance().getPlaceable(resRef));
+    load(blueprint);
+}
+
+void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
+    if (!blueprint) {
+        throw invalid_argument("blueprint must not be null");
+    }
     blueprint->load(*this);
 
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("placeables"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 
 #include "quickorcustom.h"
 
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/resources.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -31,37 +34,50 @@ namespace reone {
 
 namespace game {
 
+constexpr int kStrRefQuickHelpText = 241;
+constexpr int kStrRefCustomHelpText = 242;
+
 QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
 
-    if (version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void QuickOrCustom::load() {
     GUI::load();
 
-    disableControl("CUST_CHAR_BTN");
-
     if (_version == GameVersion::KotOR) {
-        configureControl("LBL_RBG", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+        setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 
 void QuickOrCustom::onClick(const string &control) {
     if (control == "QUICK_CHAR_BTN") {
-        _charGen->setQuickStep(0);
-        _charGen->openQuick();
+        _charGen->startQuick();
+    } else if (control == "CUST_CHAR_BTN") {
+        _charGen->startCustom();
     } else if (control == "BTN_BACK") {
         _charGen->openClassSelection();
+    }
+}
+
+void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
+    if (focus) {
+        string text;
+        if (control == "QUICK_CHAR_BTN") {
+            text = Resources::instance().getString(kStrRefQuickHelpText);
+        } else if (control == "CUST_CHAR_BTN") {
+            text = Resources::instance().getString(kStrRefCustomHelpText);
+        }
+        ListBox::Item item;
+        item.text = text;
+
+        ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+        lbDesc.clearItems();
+        lbDesc.addItem(move(item));
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,11 +77,9 @@ void CurFile::loadData() {
     Texture::Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    _texture = make_shared<Texture>("", TextureType::Cursor);
-    _texture->_width = mipMap.width;
-    _texture->_height = mipMap.height;
-    _texture->_pixelFormat = PixelFormat::BGRA;
-    _texture->_layers.push_back(move(layer));
+    _texture = make_shared<Texture>("", TextureType::Cursor, _width, _width);
+    _texture->init();
+    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
 }
 
 shared_ptr<Texture> CurFile::texture() {

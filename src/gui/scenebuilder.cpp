@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection));
+    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection, _zFar));
     camera->setLocalTransform(_cameraTransform);
 
     sceneGraph->addRoot(model);

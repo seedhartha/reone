@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ namespace reone {
 
 namespace scene {
 
-CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection) :
-    SceneNode(sceneGraph), _projection(projection) {
+CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection, float farPlane) :
+    SceneNode(sceneGraph), _projection(projection), _farPlane(farPlane) {
 
     updateFrustum();
 }
@@ -93,6 +93,14 @@ const glm::mat4 &CameraSceneNode::view() const {
 void CameraSceneNode::setProjection(const glm::mat4 &projection) {
     _projection = projection;
     updateFrustum();
+}
+
+float CameraSceneNode::farPlane() const {
+    return _farPlane;
+}
+
+void CameraSceneNode::setFarPlane(float far) {
+    _farPlane = far;
 }
 
 } // namespace scene

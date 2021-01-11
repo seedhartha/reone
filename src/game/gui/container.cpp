@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,18 +42,12 @@ static const int kGiveItemResRef = 47885;
 static const int kInventoryResRef = 393;
 
 Container::Container(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("container");
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 305;
-        _resolutionY = 327;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void Container::load() {
@@ -84,7 +78,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
     _container = container;
 
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clear();
+    lbItems.clearItems();
 
     for (auto &item : container->items()) {
         if (!item->isDropable()) continue;
@@ -98,7 +92,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
 }
 

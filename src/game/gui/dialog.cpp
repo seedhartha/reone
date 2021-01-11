@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 
 #include "dialog.h"
 
+#include <unordered_map>
+
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "SDL2/SDL_timer.h"
@@ -28,6 +31,7 @@
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
+#include "../../render/models.h"
 #include "../../resource/resources.h"
 #include "../../script/execution.h"
 
@@ -49,7 +53,43 @@ namespace reone {
 
 namespace game {
 
-static const int kDefaultEntryDuration = 1000;
+constexpr int kDefaultEntryDuration = 1000;
+
+static bool g_allEntriesSkippable = false;
+
+static const unordered_map<string, AnimationType> g_animTypeByName {
+    { "dead", AnimationType::LoopingDead },
+    { "taunt", AnimationType::FireForgetTaunt },
+    { "greeting", AnimationType::FireForgetGreeting },
+    { "listen", AnimationType::LoopingListen },
+    { "worship", AnimationType::LoopingWorship },
+    { "salute", AnimationType::FireForgetSalute },
+    { "bow", AnimationType::FireForgetBow },
+    { "talk_normal", AnimationType::LoopingTalkNormal },
+    { "talk_pleading", AnimationType::LoopingTalkPleading },
+    { "talk_forceful", AnimationType::LoopingTalkForceful },
+    { "talk_laughing", AnimationType::LoopingTalkLaughing },
+    { "talk_sad", AnimationType::LoopingTalkSad },
+    { "victory", AnimationType::FireForgetVictory1 },
+    { "scratch_head", AnimationType::FireForgetPauseScratchHead },
+    { "drunk", AnimationType::LoopingPauseDrunk },
+    { "inject", AnimationType::FireForgetInject },
+    { "flirt", AnimationType::LoopingFlirt },
+    { "use_computer_lp", AnimationType::LoopingUseComputer },
+    { "horror", AnimationType::LoopingHorror },
+    { "use_computer", AnimationType::FireForgetUseComputer },
+    { "persuade", AnimationType::FireForgetPersuade },
+    { "activate", AnimationType::FireForgetActivate },
+    { "sleep", AnimationType::LoopingSleep },
+    { "prone", AnimationType::LoopingProne },
+    { "ready", AnimationType::LoopingReady },
+    { "pause", AnimationType::LoopingPause },
+    { "choked", AnimationType::LoopingChoke },
+    { "talk_injured", AnimationType::LoopingTalkInjured },
+    { "listen_injured", AnimationType::LoopingListenInjured },
+    { "kneel_talk_angry", AnimationType::LoopingKneelTalkAngry },
+    { "kneel_talk_sad", AnimationType::LoopingKneelTalkSad }
+};
 
 enum EndEntryFlags {
     kEndEntryOnAnimFinish = 1,
@@ -143,6 +183,7 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     debug("Dialog: start " + resRef);
 
     loadAnimatedCamera();
+    loadStuntParticipants();
     loadStartEntry();
 }
 
@@ -193,11 +234,13 @@ void DialogGUI::loadCurrentEntry() {
     playVoiceOver();
     scheduleEndOfEntry();
     updateCamera();
+    updateParticipantAnimations();
+    repositionMessage();
 }
 
 void DialogGUI::loadReplies() {
     ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-    replies.clear();
+    replies.clearItems();
 
     vector<int> activeReplies;
     for (auto &link : _currentEntry->replies) {
@@ -216,10 +259,10 @@ void DialogGUI::loadReplies() {
                 singleEmptyReply = true;
                 break;
             } else {
-            text = "[empty]";
+                text = "[empty]";
             }
         }
-        replies.add({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
+        replies.addItem({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
     }
     if (singleEmptyReply) {
         _autoPickReplyIdx = activeReplies.front();
@@ -234,6 +277,9 @@ void DialogGUI::loadReplies() {
 }
 
 void DialogGUI::finish() {
+    if (_dialog->isAnimatedCutscene()) {
+        releaseStuntParticipants();
+    }
     if (!_dialog->endScript().empty()) {
         _game->scriptRunner().run(_dialog->endScript(), _owner->id());
     }
@@ -246,12 +292,18 @@ void DialogGUI::finish() {
     _game->openInGame();
 }
 
+void DialogGUI::releaseStuntParticipants() {
+    for (auto &participant : _participantByTag) {
+        participant.second.creature->stopStuntMode();
+    }
+}
+
 void DialogGUI::loadCurrentSpeaker() {
     shared_ptr<Area> area(_game->module()->area());
     shared_ptr<SpatialObject> speaker;
 
     if (!_currentEntry->speaker.empty()) {
-        speaker = area->find(_currentEntry->speaker);
+        speaker = area->getObjectByTag(_currentEntry->speaker);
     }
     if (!speaker) {
         speaker = _owner;
@@ -358,6 +410,110 @@ void DialogGUI::scheduleEndOfEntry() {
     _endEntryTimeout = kDefaultEntryDuration;
 }
 
+void DialogGUI::loadStuntParticipants() {
+    if (!_dialog->isAnimatedCutscene()) return;
+
+    _participantByTag.clear();
+
+    for (auto &stunt : _dialog->stunts()) {
+        shared_ptr<Creature> creature;
+        if (stunt.participant == "owner") {
+            creature = dynamic_pointer_cast<Creature>(_owner);
+        } else {
+            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(stunt.participant));
+        }
+        if (!creature) {
+            warn("Dialog: participant creature not found by tag: " + stunt.participant);
+            continue;
+        }
+        Participant participant;
+        participant.creature = creature;
+
+        if (_dialog->isAnimatedCutscene()) {
+            shared_ptr<Model> model(Models::instance().get(stunt.stuntModel));
+            if (!model) {
+                warn("Dialog: stunt model not found: " + stunt.stuntModel);
+                continue;
+            }
+            participant.model = model;
+            creature->startStuntMode();
+        }
+
+        _participantByTag.insert(make_pair(stunt.participant, move(participant)));
+    }
+}
+
+void DialogGUI::updateParticipantAnimations() {
+    for (auto &anim : _currentEntry->animations) {
+        if (_dialog->isAnimatedCutscene()) {
+            auto maybeParticipant = _participantByTag.find(anim.participant);
+            if (maybeParticipant == _participantByTag.end()) {
+                warn("Dialog: participant not found by tag: " + anim.participant);
+                continue;
+            }
+            const Participant &participant = maybeParticipant->second;
+            string animName(getStuntAnimationName(anim.animation));
+            shared_ptr<Animation> animation(participant.model->getAnimation(animName));
+            if (animation) {
+                participant.creature->playAnimation(animation, kAnimationPropagate);
+            }
+        } else {
+            shared_ptr<Creature> participant;
+            if (anim.participant == "owner") {
+                participant = dynamic_pointer_cast<Creature>(_owner);
+            } else {
+                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(anim.participant));
+            }
+            if (!participant) {
+                warn("Dialog: participant creature not found by tag: " + anim.participant);
+                continue;
+            }
+            AnimationType animType = getAnimationType(anim.animation);
+            if (animType != AnimationType::Invalid) {
+                participant->playAnimation(animType);
+            }
+        }
+    }
+}
+
+string DialogGUI::getStuntAnimationName(int ordinal) const {
+    return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
+}
+
+AnimationType DialogGUI::getAnimationType(int ordinal) const {
+    shared_ptr<TwoDaTable> animations(Resources::instance().get2DA("dialoganimations"));
+    const vector<TwoDaRow> &rows = animations->rows();
+    int index = ordinal - 10000;
+
+    if (index < 0 || index >= static_cast<int>(rows.size())) {
+        warn("Dialog: animation index out of bounds: " + to_string(index));
+        return AnimationType::Invalid;
+    }
+
+    string name(boost::to_lower_copy(rows[index].getString("name")));
+    auto maybeAnimType = g_animTypeByName.find(name);
+
+    return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;
+}
+
+void DialogGUI::repositionMessage() {
+    Control &message = getControl("LBL_MESSAGE");
+    Control::Extent extent(message.extent());
+    Control::Text text(message.text());
+
+    if (_entryEnded) {
+        extent.top = -_rootControl->extent().top;
+        text.align = Control::TextAlign::CenterBottom;
+    } else {
+        Control &replies = getControl("LB_REPLIES");
+        extent.top = replies.extent().top;
+        text.align = Control::TextAlign::CenterTop;
+    }
+
+    message.setExtent(move(extent));
+    message.setText(move(text));
+}
+
 void DialogGUI::pickReply(uint32_t index) {
     debug("Dialog: pick reply " + to_string(index), 2);
     const Dialog::EntryReply &reply = _dialog->getReply(index);
@@ -395,7 +551,7 @@ void DialogGUI::pickReply(uint32_t index) {
 
 bool DialogGUI::handle(const SDL_Event &event) {
     if (!_entryEnded &&
-        _dialog->isSkippable() &&
+        (g_allEntriesSkippable || _dialog->isSkippable()) &&
         event.type == SDL_MOUSEBUTTONDOWN) {
 
         endCurrentEntry();
@@ -419,6 +575,7 @@ void DialogGUI::endCurrentEntry() {
     } else {
         showControl("LB_REPLIES");
         updateCamera();
+        repositionMessage();
     }
 }
 

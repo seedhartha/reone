@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,11 +132,9 @@ void Player::update(float dt) {
     if (movement) {
         actions.clear();
 
-        glm::vec2 dest(partyLeader->position());
-        dest.x -= 100.0f * glm::sin(facing);
-        dest.y += 100.0f * glm::cos(facing);
+        glm::vec2 dir(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
 
-        if (_area->moveCreatureTowards(partyLeader, dest, true, dt)) {
+        if (_area->moveCreature(partyLeader, dir, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
         }
     } else if (actions.empty()) {

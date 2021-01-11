@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
     }
     int nth = getInt(args, 1, 0);
 
-    return static_pointer_cast<ScriptObject>(_game->module()->area()->find(tag, nth));
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->getObjectByTag(tag, nth));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -79,21 +79,6 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
     return static_pointer_cast<ScriptObject>(_game->module()->area());
-}
-
-Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto creature = getCreatureOrCaller(args, 1, ctx);
-    if (creature) {
-        InventorySlot slot = static_cast<InventorySlot>(getInt(args, 0));
-        result.object = creature->getEquippedItem(slot);
-    } else {
-        warn("Routines: getItemInSlot: creature is invalid");
-    }
-
-    return move(result);
 }
 
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
@@ -114,28 +99,6 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
         return 0;
     }
     return target->isLocked() ? 1 : 0;
-}
-
-Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 1, ctx);
-    if (target) {
-        string itemTemplate(getString(args, 0));
-        boost::to_lower(itemTemplate);
-
-        if (!itemTemplate.empty()) {
-            int stackSize = getInt(args, 2, 1);
-            result.object = target->addItem(itemTemplate, stackSize, true);
-        } else {
-            warn("Routines: createItemOnObject: itemTemplate is invalid");
-        }
-    } else {
-        warn("Routines: createItemOnObject: target is invalid");
-    }
-
-    return move(result);
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
@@ -241,41 +204,6 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
     return objectA->distanceTo(*objectB);
 }
 
-Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
-    if (target) {
-        auto item = target->getFirstItem();
-        if (item) {
-            result.object = move(item);
-        }
-    } else {
-        warn("Routines: getFirstItemInInventory: target is invalid");
-    }
-
-    return move(result);
-}
-
-Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
-
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
-    if (target) {
-        auto item = target->getNextItem();
-        if (item) {
-            result.object = move(item);
-        }
-    } else {
-        warn("Routines: getNextItemInInventory: target is invalid");
-    }
-
-    return move(result);
-}
-
-
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
@@ -315,26 +243,6 @@ Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
         return false;
     }
     return object->isOpen();
-}
-
-Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (!item) {
-        warn("Routines: getItemStackSize: item is invalid");
-        return 0;
-    }
-    return item->stackSize();
-}
-
-Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (item) {
-        int stackSize = getInt(args, 1);
-        item->setStackSize(stackSize);
-    } else {
-        warn("Routines: setItemStackSize: item is invalid");
-    }
-    return Variable();
 }
 
 Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
@@ -416,26 +324,6 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
     return Variable();
 }
 
-Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (!item) {
-        warn("Routines: getIdentified: item is invalid");
-        return 0;
-    }
-    return item->isIdentified() ? 1 : 0;
-}
-
-Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
-    if (item) {
-        bool identified = getBool(args, 1);
-        item->setIdentified(identified);
-    } else {
-        warn("Routines: setIdentified: item is invalid");
-    }
-    return Variable();
-}
-
 Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObjectOrCaller(args, 0, ctx);
     if (!target) {
@@ -459,7 +347,7 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
 Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (caller) {
-        Animation animation = static_cast<Animation>(getInt(args, 0));
+        AnimationType animation = static_cast<AnimationType>(getInt(args, 0));
         float speed = getFloat(args, 1, 1.0f);
         float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
         caller->playAnimation(animation, speed);
@@ -481,6 +369,108 @@ Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContex
     bool unescapable = getBool(args, 0);
     _game->module()->area()->setUnescapable(unescapable);
     return Variable();
+}
+
+Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
+    if (!caller) {
+        warn("Routines: cutsceneAttack: caller is invalid");
+        return Variable();
+    }
+    auto target = getSpatialObject(args, 0);
+    if (!target) {
+        warn("Routines: cutsceneAttack: target is invalid");
+        return Variable();
+    }
+    int animation = getInt(args, 1);
+    AttackResultType attackResult = static_cast<AttackResultType>(getInt(args, 2));
+    int damage = getInt(args, 3);
+
+    Combat &combat = _game->module()->area()->combat();
+    combat.cutsceneAttack(caller, target, animation, attackResult, damage);
+
+    return Variable();
+}
+
+Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
+    auto location = getLocationEngineType(args, 2);
+    bool useAppearAnimation = getBool(args, 3, false);
+
+    return static_pointer_cast<ScriptObject>(_game->module()->area()->createObject(objectType, blueprintResRef, location));
+}
+
+Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContext &ctx) {
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
+    auto target = getSpatialObjectOrCaller(args, 2, ctx);
+    int nth = getInt(args, 3, 1);
+    int secondCriteriaType = getInt(args, 4, -1);
+    int secondCriteriaValue = getInt(args, 5, -1);
+    int thirdCriteriaType = getInt(args, 6, -1);
+    int thirdCriteriaValue = getInt(args, 7, -1);
+
+    // TODO: handle criterias
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [](auto &object) {
+        return object->type() == ObjectType::Creature;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
+    auto location = getLocationEngineType(args, 2);
+    int nth = getInt(args, 3, 1);
+    int secondCriteriaType = getInt(args, 4, -1);
+    int secondCriteriaValue = getInt(args, 5, -1);
+    int thirdCriteriaType = getInt(args, 6, -1);
+    int thirdCriteriaValue = getInt(args, 7, -1);
+
+    // TODO: handle criterias
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [](auto &object) {
+        return object->type() == ObjectType::Creature;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0, static_cast<int>(ObjectType::All)));
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+        return object->type() == objectType;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    auto location = getLocationEngineType(args, 1);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
+        return object->type() == objectType;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
+}
+
+Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
+    string tag(boost::to_lower_copy(getString(args, 0)));
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    int nth = getInt(args, 2, 1);
+
+    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+        return object->tag() == tag;
+    }));
+
+    return static_pointer_cast<ScriptObject>(object);
 }
 
 } // namespace game

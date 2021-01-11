@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 #include "../common/random.h"
 #include "../resource/resources.h"
 
+#include "blueprint/creature.h"
 #include "portrait.h"
+#include "rp/classes.h"
 
 using namespace std;
 
@@ -31,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz) {
+unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz) {
     vector<Portrait> portraits;
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
@@ -71,13 +73,15 @@ CreatureConfiguration randomCharacter(Gender gender, ClassType clazz) {
             break;
     }
 
-    CreatureConfiguration config;
-    config.gender = gender;
-    config.clazz = clazz;
-    config.appearance = appearance;
-    config.equipment.push_back("g_a_clothes01");
+    shared_ptr<CreatureClass> creatureClass = Classes::instance().get(clazz);
 
-    return move(config);
+    auto character = make_unique<StaticCreatureBlueprint>();
+    character->setGender(gender);
+    character->setAppearance(appearance);
+    character->setAttributes(creatureClass->defaultAttributes());
+    character->addEquippedItem("g_a_clothes01");
+
+    return move(character);
 }
 
 } // namespace game

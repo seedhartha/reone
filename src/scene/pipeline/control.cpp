@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,12 +82,12 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        glActiveTexture(GL_TEXTURE0);
+        setActiveTextureUnit(0);
         _geometry.bindColorBuffer(0);
 
         Quad::getDefault().renderTriangles();
 
-        _geometry.unbindColorBuffer();
+        _geometry.unbindColorBuffer(0);
     }
 }
 

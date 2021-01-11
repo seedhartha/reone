@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,23 +33,24 @@ class CreatureAnimationResolver {
 public:
     CreatureAnimationResolver(const Creature *creature);
 
-    std::string getAnimationName(Animation animation) const;
+    std::string getAnimationName(AnimationType anim) const;
+    std::string getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const;
 
-    std::string getBashAttackAnimation() const;
     std::string getDeadAnimation() const;
     std::string getDieAnimation() const;
-    std::string getDodgeAnimation() const;
-    std::string getDuelAttackAnimation() const;
     std::string getHeadTalkAnimation() const;
-    std::string getKnockdownAnimation() const;
     std::string getPauseAnimation() const;
     std::string getRunAnimation() const;
     std::string getTalkNormalAnimation() const;
-    std::string getUnlockDoorAnimation() const;
     std::string getWalkAnimation() const;
 
 private:
     const Creature *_creature;
+
+    /**
+     * @return creatureAnim if model type is creature, elseAnim otherwise
+     */
+    std::string getFirstIfCreatureModel(std::string creatureAnim, std::string elseAnim) const;
 
     bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
     int getWeaponWieldNumber(WeaponWield wield) const;

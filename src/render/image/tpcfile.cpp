@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,33 +89,40 @@ int TpcFile::getMipMapDataSize(int width, int height) const {
 }
 
 void TpcFile::loadTexture() {
-    _texture = make_shared<Texture>(_resRef, _type);
-    _texture->_width = _width;
-    _texture->_height = _height;
-    _texture->_pixelFormat = pixelFormat();
-    _texture->_layers.resize(_cubeMap ? 6 : 1);
-
     seek(128);
 
-    for (auto &layer : _texture->_layers) {
-        layer.mipMaps.resize(_mipMapCount);
+    int layerCount = _cubeMap ? 6 : 1;
 
-        for (int j = 0; j < _mipMapCount; ++j) {
-            Texture::MipMap &mipMap = layer.mipMaps[j];
+    vector<Texture::Layer> layers;
+    layers.reserve(layerCount);
+
+    for (int i = 0; i < layerCount; ++i) {
+        vector<Texture::MipMap> mipMaps;
+        mipMaps.reserve(_mipMapCount);
+
+        for (int i = 0; i < _mipMapCount; ++i) {
+            Texture::MipMap mipMap;
             int dataSize;
-            if (j == 0) {
+            if (i == 0) {
                 mipMap.width = _width;
                 mipMap.height = _height;
                 dataSize = _dataSize;
             } else {
-                getMipMapSize(j, mipMap.width, mipMap.height);
+                getMipMapSize(i, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
             ByteArray data(_reader->getArray<char>(dataSize));
             mipMap.data = move(data);
+            mipMaps.push_back(move(mipMap));
         }
+
+        Texture::Layer layer;
+        layer.mipMaps = move(mipMaps);
+
+        layers.push_back(move(layer));
     }
 
+    TextureFeatures features;
     size_t pos = tell();
 
     if (pos < _size) {
@@ -124,11 +131,16 @@ void TpcFile::loadTexture() {
         TxiFile txi;
         txi.load(wrap(data));
 
-        _texture->_features = txi.features();
+        features = txi.features();
     }
+
+    _texture = make_shared<Texture>(_resRef, _type, _width, _height);
+    _texture->init();
+    _texture->setPixels(move(layers), getPixelFormat());
+    _texture->setFeatures(move(features));
 }
 
-PixelFormat TpcFile::pixelFormat() const {
+PixelFormat TpcFile::getPixelFormat() const {
     if (!_compressed) {
         switch (_encoding) {
             case EncodingType::Grayscale:

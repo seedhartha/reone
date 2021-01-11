@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -25,7 +25,7 @@ namespace game {
 
 class CharacterGeneration;
 
-class QuickOrCustom : public gui::GUI {
+class QuickOrCustom : public GameGUI {
 public:
     QuickOrCustom(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
 
@@ -35,6 +35,7 @@ private:
     CharacterGeneration *_charGen { nullptr };
 
     void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game

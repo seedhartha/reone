@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,13 +54,11 @@ class SpatialObject : public Object {
 public:
     void update(float dt) override;
 
+    virtual void die();
+
     void face(const SpatialObject &other);
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);
-
-    virtual void playAnimation(Animation animation, float speed);
-
-    void applyEffect(const std::shared_ptr<Effect> &eff);
 
     float distanceTo(const glm::vec2 &point) const;
     float distanceTo(const glm::vec3 &point) const;
@@ -89,15 +87,22 @@ public:
     void setFacing(float facing);
     void setVisible(bool visible);
 
+    // Animation
+
+    virtual void playAnimation(AnimationType animation, float speed, std::shared_ptr<Action> actionToComplete = nullptr);
+
+    // END Animation
+
     // Inventory
 
     std::shared_ptr<Item> addItem(const std::string &resRef, int stackSize = 1, bool dropable = true);
     void addItem(const std::shared_ptr<Item> &item);
-    void removeItem(const std::shared_ptr<Item> &item);
+    bool removeItem(const std::shared_ptr<Item> &item, bool &last);
     void moveDropableItemsTo(SpatialObject &other);
 
     std::shared_ptr<Item> getFirstItem();
     std::shared_ptr<Item> getNextItem();
+    std::shared_ptr<Item> getItemByTag(const std::string &tag);
 
     const std::vector<std::shared_ptr<Item>> &items() const;
 
@@ -110,7 +115,36 @@ public:
 
     // END Multiplayer
 
+    // Effects
+
+    void clearAllEffects();
+    void applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration = 0.0f);
+
+    // END Effects
+
+    // Stunt mode
+
+    bool isStuntMode() const;
+
+    /**
+     * Places this object into the stunt mode. Objects in this mode have their
+     * position and orientation fixed to the world origin. Subsequent changes to
+     * position and orientation will be buffered and applied when
+     * stopStuntMode is called.
+     */
+    void startStuntMode();
+
+    void stopStuntMode();
+
+    // END Stunt mode
+
 protected:
+    struct AppliedEffect {
+        std::shared_ptr<Effect> effect;
+        DurationType durationType { DurationType::Instant };
+        float duration { 0.0f };
+    };
+
     ObjectFactory *_objectFactory;
     scene::SceneGraph *_sceneGraph;
     ScriptRunner *_scriptRunner;
@@ -124,8 +158,9 @@ protected:
     float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
-    std::deque<std::shared_ptr<Effect>> _effects;
+    std::deque<AppliedEffect> _effects;
     bool _open { false };
+    bool _stunt { false };
 
     SpatialObject(
         uint32_t id,
@@ -136,10 +171,13 @@ protected:
 
     virtual void updateTransform();
 
-    bool isAnimationLooping(Animation animation) const;
+    bool isAnimationLooping(AnimationType animation) const;
 
 private:
     int _itemIndex { 0 };
+
+    void updateEffects(float dt);
+    void applyInstantEffect(Effect &effect);
 };
 
 } // namespace game

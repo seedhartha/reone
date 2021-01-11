@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,17 @@
 
 #pragma once
 
-#include "creatureconfig.h"
-#include "types.h"
+#include <memory>
+
+#include "rp/types.h"
 
 namespace reone {
 
 namespace game {
 
-CreatureConfiguration randomCharacter(Gender gender, ClassType clazz);
+class StaticCreatureBlueprint;
+
+std::unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz);
 
 } // namespace game
 

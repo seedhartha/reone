@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <memory>
+#include <stack>
 #include <string>
 #include <queue>
 #include <unordered_map>
@@ -56,6 +57,7 @@ private:
     std::deque<std::string> _output;
     int _outputOffset { 0 };
     std::unordered_map<std::string, CommandHandler> _commands;
+    std::stack<std::string> _history;
 
     Console(const Console &) = delete;
     Console &operator=(const Console &) = delete;
@@ -81,6 +83,7 @@ private:
     void cmdPlayAnim(std::vector<std::string> tokens);
     void cmdKill(std::vector<std::string> tokens);
     void cmdAddItem(std::vector<std::string> tokens);
+    void cmdGiveXP(std::vector<std::string> tokens);
 
     // END Commands
 };

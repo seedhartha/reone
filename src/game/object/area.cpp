@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "area.h"
 
 #include <algorithm>
+#include <stdexcept>
 #include <sstream>
 
 #include <boost/format.hpp>
@@ -33,8 +34,10 @@
 #include "../../resource/resources.h"
 #include "../../scene/node/cubenode.h"
 
+#include "../blueprint/blueprints.h"
 #include "../blueprint/trigger.h"
 #include "../blueprint/sound.h"
+#include "../enginetype/location.h"
 #include "../game.h"
 #include "../room.h"
 
@@ -110,7 +113,16 @@ void Area::loadVIS() {
     VisFile vis;
     vis.load(wrap(Resources::instance().get(_name, ResourceType::Vis)));
 
-    _visibility = make_unique<Visibility>(vis.visibility());
+    _visibility = fixVisibility(vis.visibility());
+}
+
+Visibility Area::fixVisibility(const Visibility &visibility) {
+    Visibility result;
+    for (auto &pair : visibility) {
+        result.insert(pair);
+        result.insert(make_pair(pair.second, pair.first));
+    }
+    return move(result);
 }
 
 void Area::loadPTH() {
@@ -148,11 +160,11 @@ void Area::loadARE(const GffStruct &are) {
 void Area::loadCameraStyle(const GffStruct &are) {
     int styleIdx = are.getInt("CameraStyle");
     shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
-    _cameraStyle.load(styleTable->rows().at(styleIdx));
+    _camStyleDefault.load(styleTable->rows().at(styleIdx));
 
     auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
     if (combatStyleRow) {
-        _combatCamStyle.load(*combatStyleRow);
+        _camStyleCombat.load(*combatStyleRow);
     }
     else {
         throw logic_error("Combat camera style failed to load.");
@@ -275,19 +287,19 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _cameraStyle);
-    _thirdPersonCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _camStyleDefault);
+    _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _cameraStyle, _cameraAspect);
-    _dialogCamera->setFindObstacle(bind(&Area::findCameraObstacle, this, _1, _2, _3));
+    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _camStyleDefault, _cameraAspect);
+    _dialogCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
 
     _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
     _staticCamera = make_unique<StaticCamera>(sceneGraph, _cameraAspect);
 }
 
-bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
+bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
 
@@ -308,7 +320,7 @@ bool Area::findCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, gl
     return false;
 }
 
-bool Area::findCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
+bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
     glm::vec3 origin(creature.position());
     origin.z += kCreatureObstacleTestZ;
 
@@ -360,7 +372,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(find(objectId));
+    shared_ptr<SpatialObject> object(getObjectById(objectId));
     if (!object) return;
     {
         Room *room = object->room();
@@ -403,14 +415,14 @@ void Area::doDestroyObject(uint32_t objectId) {
     }
 }
 
-shared_ptr<SpatialObject> Area::find(uint32_t id) const {
+shared_ptr<SpatialObject> Area::getObjectById(uint32_t id) const {
     auto object = _objectById.find(id);
     if (object == _objectById.end()) return nullptr;
 
     return object->second;
 }
 
-shared_ptr<SpatialObject> Area::find(const string &tag, int nth) const {
+shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const {
     auto objects = _objectsByTag.find(tag);
     if (objects == _objectsByTag.end()) return nullptr;
     if (nth >= objects->second.size()) return nullptr;
@@ -461,6 +473,13 @@ void Area::unloadParty() {
     for (int i = 0; i < party.size(); ++i) {
         doDestroyObject(party.getMember(i)->id());
     }
+}
+
+void Area::reloadParty() {
+    shared_ptr<Creature> player(_game->party().player());
+    loadParty(player->position(), player->facing());
+
+    fill(_game->sceneGraph());
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -562,36 +581,57 @@ void Area::update(float dt) {
     updateHeartbeat(dt);
 }
 
-bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
-    glm::vec3 position(creature->position());
-    glm::vec2 delta(dest - glm::vec2(position));
-    glm::vec2 dir(glm::normalize(delta));
-
+bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
     float facing = -glm::atan(dir.x, dir.y);
     creature->setFacing(facing);
 
     float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
-    position.x += dir.x * speedDt;
-    position.y += dir.y * speedDt;
 
-    Room *room = nullptr;
+    glm::vec3 dest(creature->position());
+    dest.x += dir.x * speedDt;
+    dest.y += dir.y * speedDt;
 
-    if (findCreatureObstacle(*creature, position)) {
-        return false;
+    // If obstacle is found once, try taking to the right
+    if (getCreatureObstacle(*creature, dest)) {
+        // TODO: possibly use the intersected face normal?
+        facing -= glm::half_pi<float>();
+        glm::vec2 right(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
+
+        dest = creature->position();
+        dest.x += right.x * speedDt;
+        dest.y += right.y * speedDt;
+
+        // If obstacle is found twice, abort movement
+        if (getCreatureObstacle(*creature, dest)) return false;
     }
-    if (getElevationAt(position, creature.get(), room, position.z)) {
+
+    return doMoveCreature(creature, dest);
+}
+
+bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest) {
+    float z;
+    Room *room;
+
+    if (getElevationAt(dest, creature.get(), room, z)) {
         creature->setRoom(room);
-        creature->setPosition(position);
+        creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
         if (creature == _game->party().leader()) {
             onPartyLeaderMoved();
         }
         checkTriggersIntersection(creature);
+
         return true;
     }
 
     return false;
+}
+
+bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
+    glm::vec2 delta(dest - glm::vec2(creature->position()));
+    glm::vec2 dir(glm::normalize(delta));
+    return moveCreature(creature, dir, run, dt);
 }
 
 void Area::runSpawnScripts() {
@@ -723,8 +763,12 @@ void Area::updateVisibility() {
             room.second->setVisible(true);
         }
     } else {
-        auto adjRoomNames = _visibility->equal_range(leaderRoom->name());
+        auto adjRoomNames = _visibility.equal_range(leaderRoom->name());
         for (auto &room : _rooms) {
+            // Room is visible if either of the following is true:
+            // 1. party leader is not in a room
+            // 2. this room is the party leaders room
+            // 3. this room is adjacent to the party leaders room
             bool visible = !leaderRoom || room.second.get() == leaderRoom;
             if (!visible) {
                 for (auto adjRoom = adjRoomNames.first; adjRoom != adjRoomNames.second; adjRoom++) {
@@ -755,7 +799,7 @@ void Area::updateVisibility() {
         glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
         float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
         float drawDistance = object->drawDistance();
-        bool onScreen = distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb);
+        bool onScreen = distanceToCamera < drawDistance && (object->isStuntMode() || cameraNode->isInFrustum(aabb));
         model->setOnScreen(onScreen);
     }
 }
@@ -832,12 +876,14 @@ void Area::updateHeartbeat(float dt) {
                 _game->scriptRunner().run(heartbeat, object->id());
             }
         }
+        _game->party().onHeartbeat();
+
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }
 
 const CameraStyle &Area::cameraStyle() const {
-    return _cameraStyle;
+    return _camStyleDefault;
 }
 
 const string &Area::music() const {
@@ -899,12 +945,15 @@ void Area::setStaticCamera(int cameraId) {
     }
 }
 
-void Area::setCombatTPCamera() {
-    _thirdPersonCamera->setStyle(_combatCamStyle);
-}
-
-void Area::setDefaultTPCamera() {
-    _thirdPersonCamera->setStyle(_cameraStyle);
+void Area::setThirdPartyCameraStyle(CameraStyleType type) {
+    switch (type) {
+        case CameraStyleType::Combat:
+            _thirdPersonCamera->setStyle(_camStyleCombat);
+            break;
+        default:
+            _thirdPersonCamera->setStyle(_camStyleDefault);
+            break;
+    }
 }
 
 bool Area::isStealthXPEnabled() const {
@@ -945,6 +994,73 @@ bool Area::isUnescapable() const {
 
 void Area::setUnescapable(bool value) {
     _unescapable = value;
+}
+
+shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
+    if (!location) {
+        throw invalid_argument("location must not be null");
+    }
+    shared_ptr<Object> object;
+
+    switch (type) {
+        case ObjectType::Item: {
+            auto blueprint = Blueprints::instance().getItem(blueprintResRef);
+            auto item = _game->objectFactory().newItem();
+            item->load(blueprint);
+            object = move(item);
+            break;
+        }
+        case ObjectType::Creature: {
+            auto blueprint = Blueprints::instance().getCreature(blueprintResRef);
+            auto creature = _game->objectFactory().newCreature();
+            creature->load(blueprint);
+            creature->setPosition(location->position());
+            creature->setFacing(location->facing());
+            object = move(creature);
+            break;
+        }
+        case ObjectType::Placeable: {
+            auto blueprint = Blueprints::instance().getPlaceable(blueprintResRef);
+            auto placeable = _game->objectFactory().newPlaceable();
+            placeable->load(blueprint);
+            object = move(placeable);
+            break;
+        }
+        default:
+            warn("Area: createObject: unsupported object type: " + to_string(static_cast<int>(type)));
+            break;
+    }
+    if (!object) return nullptr;
+
+    auto spatial = dynamic_pointer_cast<SpatialObject>(object);
+    if (spatial) {
+        add(spatial);
+        auto model = spatial->model();
+        if (model) {
+            _game->sceneGraph().addRoot(model);
+        }
+    }
+
+    return move(object);
+}
+
+shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
+    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
+
+    for (auto &object : _objects) {
+        if (predicate(object)) {
+            candidates.push_back(make_pair(object, object->distanceTo(origin)));
+        }
+    }
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    int candidateCount = static_cast<int>(candidates.size());
+    if (nth >= candidateCount) {
+        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount, 2);
+        return nullptr;
+    }
+
+    return candidates[nth].first;
 }
 
 } // namespace game

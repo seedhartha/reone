@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
 
+#include "../../blueprint/blueprints.h"
 #include "../../game.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
@@ -72,19 +73,13 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
 };
 
 Equipment::Equipment(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("equip");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void Equipment::load() {
@@ -164,12 +159,20 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
 
     if (equipped != itemObj) {
         if (equipped) {
-            player->addItem(equipped);
             partyLeader->unequip(equipped);
+            player->addItem(equipped);
         }
         if (itemObj) {
-            partyLeader->equip(slot, itemObj);
-            player->removeItem(itemObj);
+            bool last;
+            if (player->removeItem(itemObj, last)) {
+                if (last) {
+                    partyLeader->equip(slot, itemObj);
+                } else {
+                    shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
+                    clonedItem->load(Blueprints::instance().getItem(itemObj->blueprintResRef()));
+                    partyLeader->equip(slot, clonedItem);
+                }
+            }
         }
         updateEquipment();
         selectSlot(Slot::None);
@@ -249,17 +252,17 @@ void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
 
     for (auto &name : g_slotNames) {
-        configureControl("LBL_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
-        configureControl("BTN_INV_" + name.second, [&noneSelected](Control &control) { control.setVisible(noneSelected); });
+        setControlVisible("LBL_INV_" + name.second, noneSelected);
+        setControlVisible("BTN_INV_" + name.second, noneSelected);
     }
 
-    getControl("LB_DESC").setVisible(!noneSelected);
-    getControl("LBL_SLOTNAME").setVisible(noneSelected);
+    setControlVisible("LB_DESC", !noneSelected);
+    setControlVisible("LBL_SLOTNAME", noneSelected);
 
     if (_version == GameVersion::KotOR) {
-        getControl("LBL_PORT_BORD").setVisible(noneSelected);
-        getControl("LBL_PORTRAIT").setVisible(noneSelected);
-        getControl("LBL_TXTBAR").setVisible(noneSelected);
+        setControlVisible("LBL_PORT_BORD", noneSelected);
+        setControlVisible("LBL_PORTRAIT", noneSelected);
+        setControlVisible("LBL_TXTBAR", noneSelected);
     }
     _selectedSlot = slot;
 
@@ -336,7 +339,7 @@ void Equipment::updateEquipment() {
 
 void Equipment::updateItems() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clear();
+    lbItems.clearItems();
 
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
@@ -345,7 +348,7 @@ void Equipment::updateItems() {
         lbItem.iconTexture = Textures::instance().get("inone", TextureType::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
     shared_ptr<Creature> player(_game->party().player());
 
@@ -365,7 +368,7 @@ void Equipment::updateItems() {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        lbItems.add(move(lbItem));
+        lbItems.addItem(move(lbItem));
     }
 }
 

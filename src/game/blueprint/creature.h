@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,13 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "../../resource/gfffile.h"
 
 #include "../rp/attributes.h"
+
+#include "blueprint.h"
 
 namespace reone {
 
@@ -30,11 +33,14 @@ namespace game {
 
 class Creature;
 
-class CreatureBlueprint {
+/**
+ * Creature blueprint that loads data from a UTC file.
+ */
+class CreatureBlueprint : public Blueprint<Creature> {
 public:
     CreatureBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utc);
 
-    void load(Creature &creature);
+    void load(Creature &creature) override;
 
     const std::string &resRef() const;
     int getAppearanceFromUtc() const;
@@ -48,10 +54,35 @@ private:
 
     void loadName(Creature &creature);
     void loadAttributes(Creature &creature);
-    void loadAbilities(CreatureAttributes &attributes);
-    void loadSkills(CreatureAttributes &attributes);
+    void loadAbilities(CreatureAbilities &abilities);
+    void loadSkills(CreatureSkills &skills);
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
+};
+
+/**
+ * Creature blueprint that has its data set manually.
+ */
+class StaticCreatureBlueprint : public Blueprint<Creature> {
+public:
+    void load(Creature &creature) override;
+
+    void clearEquipment();
+    void addEquippedItem(const std::string &resRef);
+
+    Gender gender() const;
+    int appearance() const;
+    CreatureAttributes &attributes();
+
+    void setGender(Gender gender);
+    void setAppearance(int appearance);
+    void setAttributes(CreatureAttributes attributes);
+
+private:
+    Gender _gender { Gender::Male };
+    int _appearance { 0 };
+    CreatureAttributes _attributes;
+    std::vector<std::string> _equipment;
 };
 
 } // namespace game

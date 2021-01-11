@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,30 +41,30 @@ enum class ShaderProgram {
     GUIBlur,
     GUIBloom,
     GUIWhite,
+    GUIDebugShadows,
     ModelWhite,
-    ModelModel
+    ModelModel,
+    BillboardBillboard,
+    DepthDepth
 };
 
-struct TextureUniforms {
+struct TextureUnits {
     static constexpr int envmap { 1 };
     static constexpr int lightmap { 2 };
     static constexpr int bumpyShiny { 3 };
     static constexpr int bumpmap { 4 };
     static constexpr int bloom { 5 };
-    static constexpr int shadowmap0 { 6 };
-};
-
-struct ShadowsUniforms {
-    int shadowLightCount { 0 };
-    char padding[12];
-    ShadowLight shadowLights[kMaxShadowLightCount];
+    static constexpr int shadowmap { 6 };
 };
 
 struct GlobalUniforms {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
     glm::vec3 cameraPosition { 0.0f };
-    ShadowsUniforms shadows;
+    float farPlane { 1.0f };
+    bool shadowLightPresent { false };
+    glm::vec3 shadowLightPosition { 0.0f };
+    glm::mat4 shadowMatrices[kNumCubeFaces];
 };
 
 struct GeneralUniforms {
@@ -89,6 +89,12 @@ struct GeneralUniforms {
     glm::vec4 discardColor { 0.0f };
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
+    glm::vec2 billboardGridSize { 0.0f };
+    glm::vec2 billboardSize { 0.0f };
+    glm::vec4 particleCenter { 0.0f };
+    int billboardFrame { 0 };
+    int billboardToWorldZ { 0 };
+    char padding3[8];
 };
 
 struct SkeletalUniforms {
@@ -133,13 +139,19 @@ public:
 
 private:
     enum class ShaderName {
+        GeometryDepth,
         VertexGUI,
         VertexModel,
+        VertexDepth,
+        VertexBillboard,
         FragmentWhite,
         FragmentGUI,
         FragmentModel,
         FragmentBlur,
-        FragmentBloom
+        FragmentBloom,
+        FragmentDepth,
+        FragmentDebugShadows,
+        FragmentBillboard
     };
 
     std::unordered_map<ShaderName, uint32_t> _shaders;
@@ -153,7 +165,6 @@ private:
 
     uint32_t _generalUbo { 0 };
     uint32_t _lightingUbo { 0 };
-    uint32_t _shadowsUbo { 0 };
     uint32_t _skeletalUbo { 0 };
 
     // END Uniform buffer objects
@@ -165,7 +176,7 @@ private:
     Shaders &operator=(const Shaders &) = delete;
 
     void initShader(ShaderName name, unsigned int type, const char *source);
-    void initProgram(ShaderProgram program, ShaderName vertexShader, ShaderName fragmentShader);
+    void initProgram(ShaderProgram program, int shaderCount, ...);
     unsigned int getOrdinal(ShaderProgram program) const;
     void setLocalUniforms(const LocalUniforms &locals);
     void setUniform(const std::string &name, int value);

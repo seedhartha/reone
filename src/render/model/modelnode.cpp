@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,6 +161,10 @@ shared_ptr<ModelMesh> ModelNode::mesh() const {
 
 shared_ptr<ModelNode::Skin> ModelNode::skin() const {
     return _skin;
+}
+
+shared_ptr<Emitter> ModelNode::emitter() const {
+    return _emitter;
 }
 
 const vector<shared_ptr<ModelNode>> &ModelNode::children() const {

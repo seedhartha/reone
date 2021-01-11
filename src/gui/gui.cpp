@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,14 @@
 
 #include "gui.h"
 
+#include <stdexcept>
+
+#include "../common/log.h"
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../render/textures.h"
+#include "../render/util.h"
 #include "../resource/resources.h"
-#include "../common/log.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -44,6 +47,9 @@ string GUI::getResRef(const string &base) const {
 }
 
 void GUI::load() {
+    if (_resRef.empty()) {
+        throw logic_error("resRef must not be empty");
+    }
     info("GUI: load " + _resRef);
 
     shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));
@@ -271,7 +277,8 @@ void GUI::drawBackground() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    _background->bind(0);
+    setActiveTextureUnit(0);
+    _background->bind();
 
     Quad::getDefault().renderTriangles();
 }
@@ -316,6 +323,14 @@ void GUI::setControlText(const string &tag, const string &text) {
 
 void GUI::setControlFocus(const string &tag, bool focus) {
     configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
+}
+
+void GUI::setControlVisible(const string &tag, bool visible) {
+    configureControl(tag, [&visible](Control &ctrl) { ctrl.setVisible(visible); });
+}
+
+void GUI::setControlDiscardColor(const string &tag, glm::vec3 color) {
+    configureControl(tag, [&color](Control & ctrl) { ctrl.setDiscardColor(color); });
 }
 
 Control &GUI::getControl(const string &tag) const {

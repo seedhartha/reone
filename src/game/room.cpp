@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,10 @@ void Room::update(float dt) {
     }
 }
 
+bool Room::isVisible() const {
+    return _visible;
+}
+
 const string &Room::name() const {
     return _name;
 }
@@ -67,20 +71,16 @@ const Walkmesh *Room::walkmesh() const {
     return _walkmesh.get();
 }
 
-bool Room::visible() const {
-    return _visible;
-}
-
 void Room::setVisible(bool visible) {
+    for (auto &tenant : _tenants) {
+        tenant->setVisible(visible);
+    }
     if (_visible == visible) return;
 
     _visible = visible;
 
     if (_model) {
         _model->setVisible(visible);
-    }
-    for (auto &tenant : _tenants) {
-        tenant->setVisible(visible);
     }
 }
 

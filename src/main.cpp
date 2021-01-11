@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "program.h"
+#include <stdexcept>
+
 #include "common/log.h"
+#include "program.h"
 
 using namespace std;
 
@@ -28,11 +30,10 @@ int main(int argc, char **argv) {
     }
     catch (const exception &ex) {
         try {
-            error(ex.what());
+            error("Program terminated exceptionally: " + string(ex.what()));
         }
         catch (...) {
         }
-
         return 1;
     }
 }

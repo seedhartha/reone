@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,18 +34,12 @@ namespace reone {
 namespace game {
 
 QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("quickpnl");
 
-    if (_version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void QuickCharacterGeneration::load() {
@@ -53,7 +47,7 @@ void QuickCharacterGeneration::load() {
     doSetStep(0);
 
     if (_version == GameVersion::KotOR) {
-        configureControl("LBL_DECORATION", [](Control &ctrl) { ctrl.setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f)); });
+        setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 
@@ -89,6 +83,12 @@ void QuickCharacterGeneration::doSetStep(int step) {
     setControlFocus("BTN_STEPNAME1", _step == 0);
     setControlFocus("BTN_STEPNAME2", _step == 1);
     setControlFocus("BTN_STEPNAME3", _step == 2);
+}
+
+void QuickCharacterGeneration::goToNextStep() {
+    if (_step < 3) {
+        doSetStep(_step + 1);
+    }
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {

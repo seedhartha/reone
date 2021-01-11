@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ namespace reone {
 
 namespace game {
 
+static const char kObjectTagPlayer[] = "player";
+
 enum class ObjectType {
     Creature = 1,
     Item = 2,
@@ -37,10 +39,11 @@ enum class ObjectType {
     Area = 0x1001,
     Camera = 0x1002,
 
+    All = 0x7fff,
     Invalid = 0x7fff
 };
 
-enum class Animation {
+enum class AnimationType {
     // Looping
 
     LoopingPause = 0,
@@ -136,16 +139,30 @@ enum class Animation {
     PlaceableAnimloop07 = 210,
     PlaceableAnimloop08 = 211,
     PlaceableAnimloop09 = 212,
-    PlaceableAnimloop10 = 213
+    PlaceableAnimloop10 = 213,
 
     // END Placeable
+
+    Invalid = 32767
 };
 
 enum class CombatAnimation {
-    DuelAttack,
-    BashAttack,
+    None,
+    Draw,
+    Ready,
+    Attack,
+    Damage,
     Dodge,
-    Knockdown
+
+    MeleeAttack,
+    MeleeDamage,
+    MeleeDodge,
+
+    MeleeDuelAttack,
+    MeleeDuelDamage,
+    MeleeDuelParry,
+
+    RangedAttack
 };
 
 } // namespace game

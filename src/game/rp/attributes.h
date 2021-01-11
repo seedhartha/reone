@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,66 +17,49 @@
 
 #pragma once
 
-#include <map>
-#include <utility>
 #include <vector>
 
+#include "abilities.h"
+#include "skills.h"
 #include "types.h"
 
 namespace reone {
 
 namespace game {
 
+/**
+ * Aggregate for creature role-playing attributes: classes, abilities, skills,
+ * feats and Force Powers.
+ */
 class CreatureAttributes {
 public:
     void addClassLevels(ClassType clazz, int levels);
 
     ClassType getClassByPosition(int position) const;
+    ClassType getEffectiveClass() const;
     int getLevelByPosition(int position) const;
     int getClassLevel(ClassType clazz) const;
-    int getHitDice() const { return _hitDice; }
 
-    // Abilities
+    /**
+     * @return the sum of all class levels, aka "hit dice"
+     */
+    int getAggregateLevel() const;
 
-    int getAbilityScore(Ability ability) const { return _abilities.find(ability)->second; }
+    /**
+    * @return the sum of (level * hitdie) of all classes
+    */
+    int getAggregateHitDie() const;
 
-    int strength() const { return _abilities.find(Ability::Strength)->second; }
-    int dexterity() const { return _abilities.find(Ability::Dexterity)->second; }
-    int constitution() const { return _abilities.find(Ability::Constitution)->second; }
-    int intelligence() const { return _abilities.find(Ability::Intelligence)->second; }
-    int wisdom() const { return _abilities.find(Ability::Wisdom)->second; }
-    int charisma() const { return _abilities.find(Ability::Charisma)->second; }
+    CreatureAbilities &abilities();
+    CreatureSkills &skills();
 
-    void setAbilityScore(Ability ability, int score);
-
-    // END Abilities
-
-    // Skills
-
-    bool hasSkill(Skill skill) const;
-
-    int getSkillRank(Skill skill) const;
-
-    int computerUse() const { return _skills.find(Skill::ComputerUse)->second; }
-    int demolitions() const { return _skills.find(Skill::Demolitions)->second; }
-    int stealth() const { return _skills.find(Skill::Stealth)->second; }
-    int awareness() const { return _skills.find(Skill::Awareness)->second; }
-    int persuade() const { return _skills.find(Skill::Persuade)->second; }
-    int repair() const { return _skills.find(Skill::Repair)->second; }
-    int security() const { return _skills.find(Skill::Security)->second; }
-    int treatInjury() const { return _skills.find(Skill::TreatInjury)->second; }
-
-    void setSkillRank(Skill ability, int rank);
-
-    // END Skills
+    void setAbilities(CreatureAbilities abilities);
+    void setSkills(CreatureSkills skills);
 
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
-    int _hitDice { 0 };
-    std::map<Ability, int> _abilities;
-    std::map<Skill, int> _skills;
-
-    void computeHitDice();
+    CreatureAbilities _abilities;
+    CreatureSkills _skills;
 };
 
 } // namespace game

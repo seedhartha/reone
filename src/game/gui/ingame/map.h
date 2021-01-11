@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include <memory>
-
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 namespace reone {
 
@@ -28,7 +26,7 @@ namespace game {
 class Game;
 class Map;
 
-class MapMenu : public gui::GUI {
+class MapMenu : public GameGUI {
 public:
     MapMenu(Game *game);
 

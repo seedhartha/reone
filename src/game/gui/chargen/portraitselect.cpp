@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,11 @@
 
 #include "portraitselect.h"
 
+#include "../../../common/random.h"
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
-#include "../../../common/random.h"
+
+#include "../../blueprint/creature.h"
 
 #include "../colorutil.h"
 
@@ -36,22 +38,16 @@ namespace reone {
 namespace game {
 
 PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
 
-    switch (version) {
-        case GameVersion::TheSithLords:
-            _resolutionX = 800;
-            _resolutionY = 600;
-            break;
-        default:
-            _backgroundType = BackgroundType::Menu;
-            _hasDefaultHilightColor = true;
-            _defaultHilightColor = getHilightColor(_version);
-            break;
+    if (_version == GameVersion::KotOR) {
+        _backgroundType = BackgroundType::Menu;
     }
+
+    initForGame();
 }
 
 void PortraitSelection::load() {
@@ -77,8 +73,8 @@ void PortraitSelection::updatePortraits() {
     _portraits.clear();
 
     shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
-    const CreatureConfiguration &character = _charGen->character();
-    int sex = character.gender == Gender::Female ? 1 : 0;
+    const StaticCreatureBlueprint &character = _charGen->character();
+    int sex = character.gender() == Gender::Female ? 1 : 0;
 
     for (auto &row : portraits->rows()) {
         if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
@@ -103,15 +99,19 @@ void PortraitSelection::updatePortraits() {
 }
 
 void PortraitSelection::resetCurrentPortrait() {
-    const CreatureConfiguration &character = _charGen->character();
+    const StaticCreatureBlueprint &character = _charGen->character();
     auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&character](const Portrait &portrait) {
         return
-            portrait.appearanceNumber == character.appearance ||
-            portrait.appearanceS == character.appearance ||
-            portrait.appearanceL == character.appearance;
+            portrait.appearanceNumber == character.appearance() ||
+            portrait.appearanceS == character.appearance() ||
+            portrait.appearanceL == character.appearance();
     });
-    _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
-    loadCurrentPortrait();
+    if (maybePortrait != _portraits.end()) {
+        _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
+        loadCurrentPortrait();
+    } else {
+        _currentPortrait = -1;
+    }
 }
 
 void PortraitSelection::loadCurrentPortrait() {
@@ -138,9 +138,9 @@ void PortraitSelection::onClick(const string &control) {
         loadCurrentPortrait();
 
     } else if (control == "BTN_ACCEPT") {
-        CreatureConfiguration character(_charGen->character());
+        StaticCreatureBlueprint character(_charGen->character());
         int appearance;
-        switch (character.clazz) {
+        switch (character.attributes().getEffectiveClass()) {
             case ClassType::Scoundrel:
                 appearance = _portraits[_currentPortrait].appearanceS;
                 break;
@@ -151,14 +151,14 @@ void PortraitSelection::onClick(const string &control) {
                 appearance = _portraits[_currentPortrait].appearanceNumber;
                 break;
         }
-        character.appearance = appearance;
-        _charGen->setQuickStep(1);
+        character.setAppearance(appearance);
         _charGen->setCharacter(character);
-        _charGen->openQuick();
+        _charGen->goToNextStep();
+        _charGen->openSteps();
 
     } else if (control == "BTN_BACK") {
         resetCurrentPortrait();
-        _charGen->openQuick();
+        _charGen->openSteps();
     }
 }
 

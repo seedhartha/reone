@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include <algorithm>
 
+#include "classes.h"
+
 using namespace std;
 
 namespace reone {
@@ -33,28 +35,16 @@ void CreatureAttributes::addClassLevels(ClassType clazz, int levels) {
         }
     }
     _classLevels.push_back(make_pair(clazz, levels));
-    computeHitDice();
-}
-
-void CreatureAttributes::computeHitDice() {
-    _hitDice = 0;
-    for (auto &classLevel : _classLevels) {
-        _hitDice += classLevel.second;
-    }
-}
-
-void CreatureAttributes::setAbilityScore(Ability ability, int score) {
-    _abilities[ability] = score;
-}
-
-void CreatureAttributes::setSkillRank(Skill skill, int rank) {
-    _skills[skill] = rank;
 }
 
 ClassType CreatureAttributes::getClassByPosition(int position) const {
     return (position - 1) < static_cast<int>(_classLevels.size()) ?
         _classLevels[static_cast<size_t>(position) - 1].first :
         ClassType::Invalid;
+}
+
+ClassType CreatureAttributes::getEffectiveClass() const {
+    return _classLevels.empty() ? ClassType::Invalid : _classLevels.back().first;
 }
 
 int CreatureAttributes::getLevelByPosition(int position) const {
@@ -71,14 +61,36 @@ int CreatureAttributes::getClassLevel(ClassType clazz) const {
     return maybeClassLevel != _classLevels.end() ? maybeClassLevel->second : 0;
 }
 
-bool CreatureAttributes::hasSkill(Skill skill) const {
-    auto maybeSkill = _skills.find(skill);
-    return maybeSkill != _skills.end() ? maybeSkill->second > 0 : false;
+int CreatureAttributes::getAggregateHitDie() const {
+    int result = 0;
+    for (auto &pair : _classLevels) {
+        result += pair.second * Classes::instance().get(pair.first)->hitdie();
+    }
+    return result;
 }
 
-int CreatureAttributes::getSkillRank(Skill skill) const {
-    auto maybeSkill = _skills.find(skill);
-    return maybeSkill != _skills.end() ? maybeSkill->second : -1;
+int CreatureAttributes::getAggregateLevel() const {
+    int result = 0;
+    for (auto &pair : _classLevels) {
+        result += pair.second;
+    }
+    return result;
+}
+
+CreatureAbilities &CreatureAttributes::abilities() {
+    return _abilities;
+}
+
+CreatureSkills &CreatureAttributes::skills() {
+    return _skills;
+}
+
+void CreatureAttributes::setAbilities(CreatureAbilities abilities) {
+    _abilities = move(abilities);
+}
+
+void CreatureAttributes::setSkills(CreatureSkills skills) {
+    _skills = move(skills);
 }
 
 } // namespace game

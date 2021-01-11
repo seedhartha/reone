@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@
 
 #include "world.h"
 
+#include <stdexcept>
+
 #include "glm/ext.hpp"
 
 #include "GL/glew.h"
 
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
+#include "../../render/textures.h"
 #include "../../render/util.h"
 
 using namespace std;
@@ -33,28 +36,25 @@ namespace reone {
 
 namespace scene {
 
-static const int kShadowResolution = 2048;
+constexpr int kShadowResolution = 2048;
+constexpr float kShadowFarPlane = 10000.0f;
+
+static bool g_debugShadows = false;
 
 WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
     _scene(scene),
     _opts(opts),
     _geometry(opts.width, opts.height, 2),
     _verticalBlur(opts.width, opts.height),
-    _horizontalBlur(opts.width, opts.height) {
-
-    for (int i = 0; i < kMaxShadowLightCount; ++i) {
-        _shadows.push_back(make_unique<Framebuffer>(kShadowResolution, kShadowResolution, 0));
-    }
+    _horizontalBlur(opts.width, opts.height),
+    _shadows(kShadowResolution, kShadowResolution, 0, true) {
 }
 
 void WorldRenderPipeline::init() {
     _geometry.init();
     _verticalBlur.init();
     _horizontalBlur.init();
-
-    for (auto &shadows : _shadows) {
-        shadows->init();
-    }
+    _shadows.init();
 }
 
 void WorldRenderPipeline::render() const {
@@ -75,36 +75,56 @@ void WorldRenderPipeline::render() const {
 }
 
 void WorldRenderPipeline::drawShadows() const {
-    const vector<ShadowLight> &lights = _scene->shadowLights();
-
-    int lightCount = static_cast<int>(lights.size());
-    if (lightCount == 0) return;
+    if (!_scene->isShadowLightPresent()) return;
 
     int viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
-
     glViewport(0, 0, kShadowResolution, kShadowResolution);
 
+    _shadows.bind();
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
+    glm::vec3 lightPosition(_scene->shadowLightPosition());
+
     GlobalUniforms globals;
+    globals.shadowLightPresent = true;
+    globals.shadowLightPosition = lightPosition;
 
-    for (int i = 0; i < lightCount; ++i) {
-        _shadows[i]->bind();
-
-        glDrawBuffer(GL_NONE);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        globals.cameraPosition = lights[i].position;
-        globals.projection = lights[i].projection;
-        globals.view = lights[i].view;
-
-        Shaders::instance().setGlobalUniforms(globals);
-
-        withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
-
-        _shadows[i]->unbind();
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        auto side = static_cast<CubeMapSide>(i);
+        globals.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
     }
 
+    Shaders::instance().setGlobalUniforms(globals);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
+
+    _shadows.unbind();
+
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+}
+
+glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapSide side) const {
+    switch (side) {
+        case CubeMapSide::PositiveX:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        case CubeMapSide::NegativeX:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        case CubeMapSide::PositiveY:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+        case CubeMapSide::NegativeY:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+        case CubeMapSide::PositiveZ:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+        case CubeMapSide::NegativeZ:
+            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+        default:
+            throw invalid_argument("side is invalid");
+    }
 }
 
 void WorldRenderPipeline::drawGeometry() const {
@@ -115,13 +135,17 @@ void WorldRenderPipeline::drawGeometry() const {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    int lightCount = static_cast<int>(_scene->shadowLights().size());
-
-    for (int i = 0; i < lightCount; ++i) {
-        glActiveTexture(GL_TEXTURE0 + TextureUniforms::shadowmap0 + i);
-        _shadows[i]->bindDepthBuffer();
+    if (_scene->isShadowLightPresent()) {
+        setActiveTextureUnit(TextureUnits::shadowmap);
+        _shadows.bindDepthBuffer();
     }
+
     withDepthTest([this]() { _scene->render(); });
+
+    if (_scene->isShadowLightPresent()) {
+        setActiveTextureUnit(TextureUnits::shadowmap);
+        _shadows.unbindDepthBuffer();
+    }
 
     _geometry.unbind();
 }
@@ -145,14 +169,14 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
 
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
-    glActiveTexture(GL_TEXTURE0);
+    setActiveTextureUnit(0);
     _geometry.bindColorBuffer(1);
 
     withDepthTest([]() {
         Quad::getDefault().renderTriangles();
     });
 
-    _geometry.unbindColorBuffer();
+    _geometry.unbindColorBuffer(1);
     _horizontalBlur.unbind();
 }
 
@@ -175,14 +199,14 @@ void WorldRenderPipeline::applyVerticalBlur() const {
 
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
-    glActiveTexture(GL_TEXTURE0);
+    setActiveTextureUnit(0);
     _horizontalBlur.bindColorBuffer(0);
 
     withDepthTest([]() {
         Quad::getDefault().renderTriangles();
     });
 
-    _horizontalBlur.unbindColorBuffer();
+    _horizontalBlur.unbindColorBuffer(0);
     _verticalBlur.unbind();
 }
 
@@ -193,26 +217,40 @@ void WorldRenderPipeline::drawResult() const {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.bloomEnabled = true;
-    locals.general.model = move(transform);
+    if (g_debugShadows) {
+        LocalUniforms locals;
+        locals.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
+        Shaders::instance().activate(ShaderProgram::GUIDebugShadows, locals);
 
-    glActiveTexture(GL_TEXTURE0);
-    _geometry.bindColorBuffer(0);
-    //_shadows[0]->bindDepthBuffer();
+        setActiveTextureUnit(TextureUnits::shadowmap);
+        _shadows.bindDepthBuffer();
 
-    glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
-    _verticalBlur.bindColorBuffer(0);
+        Quad::getDefault().renderTriangles();
 
-    Quad::getDefault().renderTriangles();
+        _shadows.unbindDepthBuffer();
 
-    glActiveTexture(GL_TEXTURE0 + TextureUniforms::bloom);
-    _verticalBlur.unbindColorBuffer();
+    } else {
+        LocalUniforms locals;
+        locals.general.bloomEnabled = true;
+        locals.general.model = move(transform);
 
-    glActiveTexture(GL_TEXTURE0);
-    _geometry.unbindColorBuffer();
+        Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
+
+        setActiveTextureUnit(0);
+        _geometry.bindColorBuffer(0);
+
+        setActiveTextureUnit(TextureUnits::bloom);
+        _verticalBlur.bindColorBuffer(0);
+
+        Quad::getDefault().renderTriangles();
+
+        setActiveTextureUnit(TextureUnits::bloom);
+        _verticalBlur.unbindColorBuffer(0);
+
+        setActiveTextureUnit(0);
+        _geometry.unbindColorBuffer(0);
+    }
 }
 
 } // namespace scene

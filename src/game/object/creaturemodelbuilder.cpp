@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,9 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
-        model->attach("lhand", leftWeaponModel);
+        if (leftWeaponModel) {
+            model->attach("lhand", leftWeaponModel);
+        }
     }
 
     // Right weapon
@@ -82,7 +84,9 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
-        model->attach("rhand", rightWeaponModel);
+        if (rightWeaponModel) {
+            model->attach("rhand", rightWeaponModel);
+        }
     }
 
     return move(model);

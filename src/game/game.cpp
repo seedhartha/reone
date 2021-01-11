@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 #include "../audio/player.h"
 #include "../audio/soundhandle.h"
 #include "../audio/util.h"
+#include "../common/jobs.h"
+#include "../common/log.h"
+#include "../common/pathutil.h"
 #include "../render/models.h"
 #include "../render/textures.h"
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
-#include "../common/jobs.h"
-#include "../common/log.h"
-#include "../common/pathutil.h"
 #include "../video/bikfile.h"
 #include "../video/video.h"
 
@@ -181,10 +181,10 @@ void Game::loadMainMenu() {
     _mainMenu->load();
 }
 
-void Game::loadModule(const string &name, const string &entry) {
+void Game::loadModule(const string &name, string entry) {
     info("Game: load module: " + name);
 
-    withLoadingScreen([this, &name, &entry]() {
+    withLoadingScreen("load_" + name, [this, &name, &entry]() {
         if (!_hud) {
             loadHUD();
         }
@@ -199,6 +199,9 @@ void Game::loadModule(const string &name, const string &entry) {
         }
         if (!_partySelect) {
             loadPartySelection();
+        }
+        if (!_charGen) {
+            loadCharacterGeneration();
         }
 
         Models::instance().invalidateCache();
@@ -238,10 +241,11 @@ void Game::loadModule(const string &name, const string &entry) {
     });
 }
 
-void Game::withLoadingScreen(const function<void()> &block) {
+void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
     if (!_loadScreen) {
         loadLoadingScreen();
     }
+    _loadScreen->setImage(imageResRef);
     changeScreen(GameScreen::Loading);
     drawAll();
     block();
@@ -322,7 +326,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     auto area = _module->area();
     if (area->id() == id) return area;
 
-    return area->find(id);
+    return area->getObjectById(id);
 }
 
 void Game::drawGUI() {
@@ -508,7 +512,7 @@ float Game::measureFrameTime() {
 }
 
 void Game::loadLoadingScreen() {
-    _loadScreen.reset(new LoadingScreen(_version, _options.graphics));
+    _loadScreen.reset(new LoadingScreen(this));
     _loadScreen->load();
 }
 
@@ -528,7 +532,8 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    withLoadingScreen([this]() {
+    string imageResRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
+    withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
         }
@@ -615,8 +620,14 @@ void Game::openPartySelection(const PartySelection::Context &ctx) {
 void Game::openSaveLoad(SaveLoad::Mode mode) {
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
-    _saveLoad->update();
+    _saveLoad->refresh();
     changeScreen(GameScreen::SaveLoad);
+}
+
+void Game::openLevelUp() {
+    setCursorType(CursorType::Default);
+    _charGen->startLevelUp();
+    changeScreen(GameScreen::CharacterGeneration);
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
@@ -714,8 +725,8 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDLK_EQUALS:
-            if (_gameSpeed < 4.0f) {
-                _gameSpeed = glm::min(4.0f, _gameSpeed + 1.0f);
+            if (_gameSpeed < 8.0f) {
+                _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
             }
             return true;
 

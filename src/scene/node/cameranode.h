@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,20 +29,23 @@ const int kFrustumPlaneCount = 6;
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection);
+    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection, float farPlane);
 
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const AABB &aabb) const;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
+    float farPlane() const;
 
     void setProjection(const glm::mat4 &projection);
+    void setFarPlane(float far);
 
 private:
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
     glm::vec4 _frustum[kFrustumPlaneCount];
+    float _farPlane { 1.0f };
 
     void updateAbsoluteTransform() override;
 

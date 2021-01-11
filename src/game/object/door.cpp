@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/streamutil.h"
 #include "../../render/models.h"
 #include "../../render/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../script/scripts.h"
-#include "../../common/streamutil.h"
 
 #include "../blueprint/blueprints.h"
 
@@ -95,7 +95,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
     if (_model) {
-        _model->setDefaultAnimation("closed1");
+        _model->setDefaultAnimation("closed");
         _model->playAnimation("closing1");
     }
     _open = false;

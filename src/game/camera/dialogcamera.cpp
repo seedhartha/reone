@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ namespace game {
 
 DialogCamera::DialogCamera(SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
-    _sceneNode = make_shared<CameraSceneNode>(sceneGraph, projection);
+    _sceneNode = make_shared<CameraSceneNode>(sceneGraph, projection, zFar);
 }
 
 void DialogCamera::setSpeakerPosition(const glm::vec3 &position) {

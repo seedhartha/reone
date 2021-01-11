@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,6 +101,10 @@ bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
 
 const string &TextInput::text() const {
     return _text;
+}
+
+void TextInput::setText(string text) {
+    _text = move(text);
 }
 
 } // namespace gui

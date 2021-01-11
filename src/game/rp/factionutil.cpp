@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,11 +37,6 @@ enum class Disposition {
 
 typedef unordered_map<Faction, unordered_map<Faction, Disposition>> DispositionsMap;
 
-static const list<Faction> g_hostileFactions { Faction::Hostile1, Faction::Hostile2 };
-static const list<Faction> g_friendlyFactions { Faction::Friendly1, Faction::Friendly2 };
-static const list<Faction> g_surrenderFactions { Faction::Surrender1, Faction::Surrender2 };
-static const list<Faction> g_gizkaFactions { Faction::Gizka1, Faction::Gizka2 };
-
 static void setMutualDisposition(Faction left, Faction right, Disposition disposition, DispositionsMap &dispositions) {
     dispositions[left][right] = disposition;
     dispositions[right][left] = disposition;
@@ -60,10 +55,9 @@ static DispositionsMap initDispositions() {
 
     // Friendlies
 
-    setMutualFriends(Faction::Friendly1, Faction::Friendly2, result);
-
     setMutualEnemies(Faction::Friendly1, Faction::Hostile1, result);
     setMutualEnemies(Faction::Friendly1, Faction::Hostile2, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Friendly2, result);
     setMutualEnemies(Faction::Friendly1, Faction::Insane, result);
     setMutualEnemies(Faction::Friendly1, Faction::Predator, result);
     setMutualEnemies(Faction::Friendly1, Faction::Rancor, result);

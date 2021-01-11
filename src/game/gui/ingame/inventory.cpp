@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,19 +32,13 @@ namespace reone {
 namespace game {
 
 InventoryMenu::InventoryMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("inventory");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void InventoryMenu::load() {
@@ -63,7 +57,7 @@ void InventoryMenu::load() {
     setControlFocusable("BTN_CHANGE2", false);
 }
 
-void InventoryMenu::updatePortraits() {
+void InventoryMenu::refreshPortraits() {
     if (_version != GameVersion::KotOR) return;
 
     Party &party = _game->party();

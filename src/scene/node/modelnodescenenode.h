@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void renderSingle(bool shadowPass) const;
+    void renderSingle(bool shadowPass) const override;
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

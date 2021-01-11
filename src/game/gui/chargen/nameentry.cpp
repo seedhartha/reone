@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 
 #include "nameentry.h"
 
+#include "../../../common/streamutil.h"
+#include "../../../resource/resources.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -32,45 +35,60 @@ namespace reone {
 namespace game {
 
 NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GUI(version, opts),
+    GameGUI(version, opts),
     _charGen(charGen),
     _input(kTextInputLetters | kTextInputWhitespace) {
 
     _resRef = getResRef("name");
 
-    if (version == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 }
 
 void NameEntry::load() {
     GUI::load();
 
-    setControlText("NAME_BOX_EDIT", "");
-    disableControl("BTN_RANDOM");
+    loadLtrFile("humanm", _maleLtr);
+    loadLtrFile("humanf", _femaleLtr);
+    loadLtrFile("humanl", _lastNameLtr);
+
+    _nameBoxEdit = &getControl("NAME_BOX_EDIT");
+    _nameBoxEdit->setTextMessage("");
+}
+
+void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
+    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::LetterComboProbability));
+    ltr.load(wrap(data));
 }
 
 bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
-        setControlText("NAME_BOX_EDIT", _input.text());
+        _nameBoxEdit->setTextMessage(_input.text());
         return true;
     }
-
     return GUI::handle(event);
 }
 
 void NameEntry::onClick(const string &control) {
-    if (control == "END_BTN") {
-        _charGen->setQuickStep(2);
-        _charGen->openQuick();
+    if (control == "BTN_RANDOM") {
+        loadRandomName();
+
+    } else if (control == "END_BTN") {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
 
     } else if (control == "BTN_BACK") {
-        _charGen->openQuick();
+        _charGen->openSteps();
     }
+}
+
+void NameEntry::loadRandomName() {
+    _nameBoxEdit->setTextMessage(getRandomName());
+}
+
+string NameEntry::getRandomName() const {
+    Gender gender = _charGen->character().gender();
+    const LtrFile &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
+    return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }
 
 } // namespace game

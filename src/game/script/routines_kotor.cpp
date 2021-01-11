@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,14 +50,14 @@ void Routines::addKotorRoutines() {
     add("ClearAllActions", Void, { }, &Routines::clearAllActions);
     add("SetFacing", Void, { Float }, &Routines::setFacing);
     add("SwitchPlayerCharacter", Int, { Int });
-    add("SetTime", Void, { Int, Int, Int, Int });
+    add("SetTime", Void, { Int, Int, Int, Int }, &Routines::setTime);
     add("SetPartyLeader", Int, { Int }, &Routines::setPartyLeader);
     add("SetAreaUnescapable", Void, { Int }, &Routines::setAreaUnescapable);
     add("GetAreaUnescapable", Int, { }, &Routines::getAreaUnescapable);
-    add("GetTimeHour", Int, { });
-    add("GetTimeMinute", Int, { });
-    add("GetTimeSecond", Int, { });
-    add("GetTimeMillisecond", Int, { });
+    add("GetTimeHour", Int, { }, &Routines::getTimeHour);
+    add("GetTimeMinute", Int, { }, &Routines::getTimeMinute);
+    add("GetTimeSecond", Int, { }, &Routines::getTimeSecond);
+    add("GetTimeMillisecond", Int, { }, &Routines::getTimeMillisecond);
     add("ActionRandomWalk", Void, { }, &Routines::actionRandomWalk);
     add("ActionMoveToLocation", Void, { Location, Int }, &Routines::actionMoveToLocation);
     add("ActionMoveToObject", Void, { Object, Int, Float }, &Routines::actionMoveToObject);
@@ -68,7 +68,7 @@ void Routines::addKotorRoutines() {
     add("GetPosition", TVector, { Object }, &Routines::getPosition);
     add("GetFacing", Float, { Object }, &Routines::getFacing);
     add("GetItemPossessor", Object, { Object });
-    add("GetItemPossessedBy", Object, { Object, String });
+    add("GetItemPossessedBy", Object, { Object, String }, &Routines::getItemPossessedBy);
     add("CreateItemOnObject", Object, { String, Object, Int }, &Routines::createItemOnObject);
     add("ActionEquipItem", Void, { Object, Int, Int }, &Routines::actionEquipItem);
     add("ActionUnequipItem", Void, { Object, Int }, &Routines::actionUnequipItem);
@@ -76,7 +76,7 @@ void Routines::addKotorRoutines() {
     add("ActionPutDownItem", Void, { Object }, &Routines::actionPutDownItem);
     add("GetLastAttacker", Object, { Object });
     add("ActionAttack", Void, { Object, Int }, &Routines::actionAttack);
-    add("GetNearestCreature", Object, { Int, Int, Object, Int, Int, Int, Int, Int });
+    add("GetNearestCreature", Object, { Int, Int, Object, Int, Int, Int, Int, Int }, &Routines::getNearestCreature);
     add("ActionSpeakString", Void, { String, Int }, &Routines::actionSpeakString);
     add("ActionPlayAnimation", Void, { Int, Float, Float }, &Routines::actionPlayAnimation);
     add("GetDistanceToObject", Float, { Object }, &Routines::getDistanceToObject);
@@ -258,16 +258,16 @@ void Routines::addKotorRoutines() {
     add("GetIsPC", Int, { Object }, &Routines::getIsPC);
     add("FeetToMeters", Float, { Float }, &Routines::feetToMeters);
     add("YardsToMeters", Float, { Float }, &Routines::yardsToMeters);
-    add("ApplyEffectToObject", Void, { Int, Effect, Object, Float });
+    add("ApplyEffectToObject", Void, { Int, Effect, Object, Float }, &Routines::applyEffectToObject);
     add("SpeakString", Void, { String, Int });
     add("GetSpellTargetLocation", Location, { });
     add("GetPositionFromLocation", TVector, { Location }, &Routines::getPositionFromLocation);
     add("EffectBodyFuel", Effect, { }, &Routines::effectBodyFuel);
     add("GetFacingFromLocation", Float, { Location }, &Routines::getFacingFromLocation);
-    add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int });
-    add("GetNearestObject", Object, { Int, Object, Int });
-    add("GetNearestObjectToLocation", Object, { Int, Location, Int });
-    add("GetNearestObjectByTag", Object, { String, Object, Int });
+    add("GetNearestCreatureToLocation", Object, { Int, Int, Location, Int, Int, Int, Int, Int }, &Routines::getNearestCreatureToLocation);
+    add("GetNearestObject", Object, { Int, Object, Int }, &Routines::getNearestObject);
+    add("GetNearestObjectToLocation", Object, { Int, Location, Int }, &Routines::getNearestObjectToLocation);
+    add("GetNearestObjectByTag", Object, { String, Object, Int }, &Routines::getNearestObjectByTag);
     add("IntToFloat", Float, { Int }, &Routines::intToFloat);
     add("FloatToInt", Int, { Float }, &Routines::floatToInt);
     add("StringToInt", Int, { String }, &Routines::stringToInt);
@@ -281,7 +281,7 @@ void Routines::addKotorRoutines() {
     add("ActionSpeakStringByStrRef", Void, { Int, Int }, &Routines::actionSpeakStringByStrRef);
     add("DestroyObject", Void, { Object, Float, Int, Float }, &Routines::destroyObject);
     add("GetModule", Object, { }, &Routines::getModule);
-    add("CreateObject", Object, { Int, String, Location, Int });
+    add("CreateObject", Object, { Int, String, Location, Int }, &Routines::createObject);
     add("EventSpellCastAt", Event, { Object, Int, Int });
     add("GetLastSpellCaster", Object, { });
     add("GetLastSpell", Int, { });
@@ -443,10 +443,10 @@ void Routines::addKotorRoutines() {
     add("EffectForceResisted", Effect, { Object }, &Routines::effectForceResisted);
     add("ExploreAreaForPlayer", Void, { Object, Object });
     add("ActionEquipMostEffectiveArmor", Void, { }, &Routines::actionEquipMostEffectiveArmor);
-    add("GetIsDay", Int, { });
-    add("GetIsNight", Int, { });
-    add("GetIsDawn", Int, { });
-    add("GetIsDusk", Int, { });
+    add("GetIsDay", Int, { }, &Routines::getIsDay);
+    add("GetIsNight", Int, { }, &Routines::getIsNight);
+    add("GetIsDawn", Int, { }, &Routines::getIsDawn);
+    add("GetIsDusk", Int, { }, &Routines::getIsDusk);
     add("GetIsEncounterCreature", Int, { Object });
     add("GetLastPlayerDying", Object, { });
     add("GetStartingLocation", Location, { }, &Routines::getStartingLocation);
@@ -541,7 +541,7 @@ void Routines::addKotorRoutines() {
     add("DuplicateHeadAppearance", Void, { Object, Object });
     add("ActionCastFakeSpellAtObject", Void, { Int, Object, Int }, &Routines::actionCastFakeSpellAtObject);
     add("ActionCastFakeSpellAtLocation", Void, { Int, Location, Int }, &Routines::actionCastFakeSpellAtLocation);
-    add("CutsceneAttack", Void, { Object, Int, Int, Int });
+    add("CutsceneAttack", Void, { Object, Int, Int, Int }, &Routines::cutsceneAttack);
     add("SetCameraMode", Void, { Object, Int });
     add("SetLockOrientationInDialog", Void, { Object, Int });
     add("SetLockHeadFollowInDialog", Void, { Object, Int });
@@ -741,7 +741,7 @@ void Routines::addKotorRoutines() {
     add("GetGlobalLocation", Location, { String }, &Routines::getGlobalLocation);
     add("SetGlobalLocation", Void, { String, Location }, &Routines::setGlobalLocation);
     add("AddAvailableNPCByObject", Int, { Int, Object });
-    add("RemoveAvailableNPC", Int, { Int });
+    add("RemoveAvailableNPC", Int, { Int }, &Routines::removeAvailableNPC);
     add("IsAvailableCreature", Int, { Int }, &Routines::isAvailableCreature);
     add("AddAvailableNPCByTemplate", Int, { Int, String }, &Routines::addAvailableNPCByTemplate);
     add("SpawnAvailableNPC", Object, { Int, Location });
@@ -756,7 +756,7 @@ void Routines::addKotorRoutines() {
     add("SetNPCAIStyle", Void, { Object, Int });
     add("SetNPCSelectability", Void, { Int, Int });
     add("GetNPCSelectability", Int, { Int });
-    add("ClearAllEffects", Void, { });
+    add("ClearAllEffects", Void, { }, &Routines::clearAllEffects);
     add("GetLastConversation", String, { });
     add("ShowPartySelectionGUI", Void, { String, Int, Int }, &Routines::showPartySelectionGUI);
     add("GetStandardFaction", Int, { Object }, &Routines::getStandardFaction);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 #include "../../game.h"
 #include "../../portraitutil.h"
-#include "../../rp/classutil.h"
+#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
@@ -44,19 +44,13 @@ static const float kModelScale = 1.05f;
 static const float kModelOffsetY = 0.9f;
 
 CharacterGeneration::CharacterGeneration(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("maincg");
     _backgroundType = BackgroundType::Menu;
 
-    if (game->version() == GameVersion::TheSithLords) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
-        _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
-    }
+    initForGame();
 };
 
 void CharacterGeneration::load() {
@@ -78,6 +72,11 @@ void CharacterGeneration::load() {
     loadQuick();
     loadPortraitSelection();
     loadNameEntry();
+    loadCustom();
+    loadAbilities();
+    loadSkills();
+    loadFeats();
+    loadLevelUp();
 }
 
 void CharacterGeneration::loadClassSelection() {
@@ -95,14 +94,39 @@ void CharacterGeneration::loadQuick() {
     _quick->load();
 }
 
+void CharacterGeneration::loadCustom() {
+    _custom = make_unique<CustomCharacterGeneration>(this, _version, _gfxOpts);
+    _custom->load();
+}
+
 void CharacterGeneration::loadPortraitSelection() {
     _portraitSelection = make_unique<PortraitSelection>(this, _version, _gfxOpts);
     _portraitSelection->load();
 }
 
+void CharacterGeneration::loadAbilities() {
+    _abilities = make_unique<CharGenAbilities>(this, _version, _gfxOpts);
+    _abilities->load();
+}
+
+void CharacterGeneration::loadSkills() {
+    _skills = make_unique<CharGenSkills>(this, _version, _gfxOpts);
+    _skills->load();
+}
+
+void CharacterGeneration::loadFeats() {
+    _feats = make_unique<CharGenFeats>(this, _version, _gfxOpts);
+    _feats->load();
+}
+
 void CharacterGeneration::loadNameEntry() {
     _nameEntry = make_unique<NameEntry>(this, _version, _gfxOpts);
     _nameEntry->load();
+}
+
+void CharacterGeneration::loadLevelUp() {
+    _levelUp = make_unique<LevelUpMenu>(this, _version, _gfxOpts);
+    _levelUp->load();
 }
 
 bool CharacterGeneration::handle(const SDL_Event &event) {
@@ -120,10 +144,20 @@ GUI *CharacterGeneration::getSubGUI() const {
             return _quickOrCustom.get();
         case CharGenScreen::Quick:
             return _quick.get();
+        case CharGenScreen::Custom:
+            return _custom.get();
         case CharGenScreen::PortraitSelection:
             return _portraitSelection.get();
+        case CharGenScreen::Abilities:
+            return _abilities.get();
+        case CharGenScreen::Skills:
+            return _skills.get();
+        case CharGenScreen::Feats:
+            return _feats.get();
         case CharGenScreen::Name:
             return _nameEntry.get();
+        case CharGenScreen::LevelUp:
+            return _levelUp.get();
         default:
             throw logic_error("CharGen: invalid screen: " + to_string(static_cast<int>(_screen)));
     }
@@ -144,30 +178,6 @@ void CharacterGeneration::render3D() const {
     getSubGUI()->render3D();
 }
 
-void CharacterGeneration::finish() {
-    string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
-
-    CreatureConfiguration config(_character);
-    config.equipment.clear();
-
-    shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->load(config);
-    player->setTag("PLAYER");
-    player->setFaction(Faction::Friendly1);
-    player->setImmortal(true);
-
-    Party &party = _game->party();
-    party.clear();
-    party.addMember(player);
-    party.setPlayer(player);
-
-    _game->loadModule(moduleName);
-}
-
-void CharacterGeneration::cancel() {
-    _game->openMainMenu();
-}
-
 void CharacterGeneration::openClassSelection() {
     hideControl("MODEL_LBL");
     changeScreen(CharGenScreen::ClassSelection);
@@ -181,14 +191,53 @@ void CharacterGeneration::changeScreen(CharGenScreen screen) {
     _screen = screen;
 }
 
-void CharacterGeneration::openNameEntry() {
-    hideControl("MODEL_LBL");
-    changeScreen(CharGenScreen::Name);
+void CharacterGeneration::openQuickOrCustom() {
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::QuickOrCustom);
 }
 
-void CharacterGeneration::openPortraitSelection() {
-    hideControl("MODEL_LBL");
-    changeScreen(CharGenScreen::PortraitSelection);
+void CharacterGeneration::startCustom() {
+    _type = Type::Custom;
+    _custom->setStep(0);
+    openSteps();
+}
+
+void CharacterGeneration::startQuick() {
+    _type = Type::Quick;
+    _quick->setStep(0);
+    openSteps();
+}
+
+void CharacterGeneration::startLevelUp() {
+    _type = Type::LevelUp;
+
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    const CreatureAttributes &attributes = partyLeader->attributes();
+    StaticCreatureBlueprint character;
+    character.setAppearance(partyLeader->appearance());
+    character.setGender(partyLeader->gender());
+    character.setAttributes(attributes);
+    setCharacter(move(character));
+
+    int nextLevel = partyLeader->attributes().getAggregateLevel() + 1;
+    bool hasAttributes = nextLevel % 4 == 0;
+    _levelUp->setStep(hasAttributes ? 0 : 1);
+
+    openSteps();
+}
+
+void CharacterGeneration::openSteps() {
+    switch (_type) {
+        case Type::LevelUp:
+            openLevelUp();
+            break;
+        case Type::Custom:
+            openCustom();
+            break;
+        default:
+            openQuick();
+            break;
+    }
 }
 
 void CharacterGeneration::openQuick() {
@@ -196,9 +245,103 @@ void CharacterGeneration::openQuick() {
     changeScreen(CharGenScreen::Quick);
 }
 
-void CharacterGeneration::openQuickOrCustom() {
+void CharacterGeneration::openCustom() {
     showControl("MODEL_LBL");
-    changeScreen(CharGenScreen::QuickOrCustom);
+    changeScreen(CharGenScreen::Custom);
+}
+
+void CharacterGeneration::openPortraitSelection() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::PortraitSelection);
+}
+
+void CharacterGeneration::openAbilities() {
+    _abilities->reset(_type != Type::LevelUp);
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Abilities);
+}
+
+void CharacterGeneration::openSkills() {
+    _skills->reset(_type != Type::LevelUp);
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Skills);
+}
+
+void CharacterGeneration::openFeats() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Feats);
+}
+
+void CharacterGeneration::openNameEntry() {
+    hideControl("MODEL_LBL");
+    changeScreen(CharGenScreen::Name);
+}
+
+void CharacterGeneration::openLevelUp() {
+    _levelUp->reset();
+    showControl("MODEL_LBL");
+    changeScreen(CharGenScreen::LevelUp);
+}
+
+void CharacterGeneration::cancel() {
+    if (_type == Type::LevelUp) {
+        _game->openInGame();
+    } else {
+        _game->openMainMenu();
+    }
+}
+
+void CharacterGeneration::finish() {
+    if (_type == Type::LevelUp) {
+        shared_ptr<Creature> partyLeader(_game->party().leader());
+        partyLeader->attributes() = _character->attributes();
+        _game->openInGame();
+
+    } else {
+        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+
+        auto character = make_shared<StaticCreatureBlueprint>(*_character);
+        character->clearEquipment();
+
+        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        player->load(character);
+        player->setTag(kObjectTagPlayer);
+        player->setFaction(Faction::Friendly1);
+        player->setImmortal(true);
+
+        Party &party = _game->party();
+        party.clear();
+        party.addMember(kNpcPlayer, player);
+        party.setPlayer(player);
+
+        _game->loadModule(moduleName);
+    }
+}
+
+void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
+    int currentAppearance = _character ? _character->appearance() : -1;
+    Gender currentGender = _character ? _character->gender() : Gender::None;
+
+    _character = make_unique<StaticCreatureBlueprint>(character);
+
+    if (currentAppearance != character.appearance()) {
+        loadCharacterModel();
+        _portraitSelection->updatePortraits();
+    }
+    if (currentGender != character.gender()) {
+        _nameEntry->loadRandomName();
+    }
+
+    updateAttributes();
+}
+
+void CharacterGeneration::setAbilities(CreatureAbilities abilities) {
+    _character->attributes().setAbilities(move(abilities));
+    updateAttributes();
+}
+
+void CharacterGeneration::setSkills(CreatureSkills skills) {
+    _character->attributes().setSkills(move(skills));
 }
 
 void CharacterGeneration::loadCharacterModel() {
@@ -223,7 +366,7 @@ void CharacterGeneration::loadCharacterModel() {
 
     lblModel.setScene3D(move(scene));
 
-    string portrait(getPortraitByAppearance(_character.appearance));
+    string portrait(getPortraitByAppearance(_character->appearance()));
     if (!portrait.empty()) {
         Control &lblPortrait = getControl("PORTRAIT_LBL");
         lblPortrait.setBorderFill(portrait);
@@ -240,37 +383,54 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     return creature->model();
 }
 
-const CreatureConfiguration &CharacterGeneration::character() const {
-    return _character;
-}
-
-void CharacterGeneration::setCharacter(const CreatureConfiguration &config) {
-    _character = config;
-    loadCharacterModel();
-    updateAttributes();
-    _portraitSelection->updatePortraits();
-}
-
 void CharacterGeneration::updateAttributes() {
-    setControlText("LBL_CLASS", getClassTitle(_character.clazz));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->attributes().getEffectiveClass()));
+    setControlText("LBL_CLASS", clazz->name());
 
-    CreatureAttributes attrs(getClassAttributes(_character.clazz));
-    int vitality = getClassHitPoints(_character.clazz, 1) + (attrs.constitution() - 10) / 2;
-    int defense = 10 + getClassDefenseBonus(_character.clazz, 1) + (attrs.dexterity() - 10) / 2;
+    const CreatureAbilities &abilities =  _character->attributes().abilities();
 
+    int vitality = clazz->hitdie() + abilities.getModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));
+
+    int defense = 10 + clazz->getDefenseBonus(1) + abilities.getModifier(Ability::Dexterity);
     setControlText("LBL_DEF", to_string(defense));
 
-    setControlText("STR_AB_LBL", to_string(attrs.strength()));
-    setControlText("DEX_AB_LBL", to_string(attrs.dexterity()));
-    setControlText("CON_AB_LBL", to_string(attrs.constitution()));
-    setControlText("INT_AB_LBL", to_string(attrs.intelligence()));
-    setControlText("WIS_AB_LBL", to_string(attrs.wisdom()));
-    setControlText("CHA_AB_LBL", to_string(attrs.charisma()));
+    setControlText("STR_AB_LBL", to_string(abilities.strength()));
+    setControlText("DEX_AB_LBL", to_string(abilities.dexterity()));
+    setControlText("CON_AB_LBL", to_string(abilities.constitution()));
+    setControlText("INT_AB_LBL", to_string(abilities.intelligence()));
+    setControlText("WIS_AB_LBL", to_string(abilities.wisdom()));
+    setControlText("CHA_AB_LBL", to_string(abilities.charisma()));
+
+    const SavingThrows &throws = clazz->getSavingThrows(1);
+
+    if (_version == GameVersion::TheSithLords) {
+        setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
+        setControlText("NEW_REFL_LBL", to_string(throws.reflex));
+        setControlText("NEW_WILL_LBL", to_string(throws.will));
+    } else {
+        setControlText("OLD_FORT_LBL", to_string(throws.fortitude));
+        setControlText("OLD_REFL_LBL", to_string(throws.reflex));
+        setControlText("OLD_WILL_LBL", to_string(throws.will));
+    }
 }
 
-void CharacterGeneration::setQuickStep(int step) {
-    _quick->setStep(step);
+void CharacterGeneration::goToNextStep() {
+    switch (_type) {
+        case Type::LevelUp:
+            _levelUp->goToNextStep();
+            break;
+        case Type::Custom:
+            _custom->goToNextStep();
+            break;
+        default:
+            _quick->goToNextStep();
+            break;
+    }
+}
+
+StaticCreatureBlueprint &CharacterGeneration::character() {
+    return *_character;
 }
 
 } // namespace game

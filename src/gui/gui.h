@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,6 +60,8 @@ public:
     void setControlFocus(const std::string &tag, bool focus);
     void setControlFocusable(const std::string &tag, bool focusable);
     void setControlText(const std::string &tag, const std::string &text);
+    void setControlVisible(const std::string &tag, bool visible);
+    void setControlDiscardColor(const std::string &tag, glm::vec3 color);
 
 protected:
     enum class ScalingMode {

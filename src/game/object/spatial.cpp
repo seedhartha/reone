@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,11 +79,29 @@ shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, boo
 }
 
 void SpatialObject::addItem(const shared_ptr<Item> &item) {
-    _items.push_back(item);
+    auto maybeItem = find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
+    if (maybeItem != _items.end()) {
+        (*maybeItem)->setStackSize((*maybeItem)->stackSize() + 1);
+    } else {
+        _items.push_back(item);
+    }
 }
 
-void SpatialObject::removeItem(const shared_ptr<Item> &item) {
-    _items.erase(remove(_items.begin(), _items.end(), item), _items.end());
+bool SpatialObject::removeItem(const shared_ptr<Item> &item, bool &last) {
+    auto maybeItem = find(_items.begin(), _items.end(), item);
+    if (maybeItem == _items.end()) return false;
+
+    last = false;
+
+    int stackSize = (*maybeItem)->stackSize();
+    if (stackSize > 1) {
+        (*maybeItem)->setStackSize(stackSize - 1);
+    } else {
+        last = true;
+        _items.erase(maybeItem);
+    }
+
+    return true;
 }
 
 float SpatialObject::distanceTo(const glm::vec2 &point) const {
@@ -137,13 +155,32 @@ void SpatialObject::moveDropableItemsTo(SpatialObject &other) {
     }
 }
 
-void SpatialObject::applyEffect(const shared_ptr<Effect> &effect) {
-    auto damage = dynamic_pointer_cast<DamageEffect>(effect);
-    if (damage) {
-        debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damage->amount(), 2);
-        _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damage->amount());
+void SpatialObject::applyEffect(const shared_ptr<Effect> &effect, DurationType durationType, float duration) {
+    if (durationType == DurationType::Instant) {
+        applyInstantEffect(*effect);
     } else {
-        _effects.push_back(effect);
+        AppliedEffect appliedEffect;
+        appliedEffect.effect = effect;
+        appliedEffect.durationType = durationType;
+        appliedEffect.duration = duration;
+        _effects.push_back(move(appliedEffect));
+    }
+}
+
+void SpatialObject::applyInstantEffect(Effect &effect) {
+    switch (effect.type()) {
+        case EffectType::Damage: {
+            auto &damageEffect = static_cast<DamageEffect &>(effect);
+            debug(boost::format("SpatialObject: '%s' takes %d damage") % _tag % damageEffect.amount(), 2);
+            _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damageEffect.amount());
+            break;
+        }
+        case EffectType::Death:
+            die();
+            break;
+        default:
+            warn("SpatialObject: applyInstantEffect: effect not implement: " + to_string(static_cast<int>(effect.type())));
+            break;
     }
 }
 
@@ -152,17 +189,34 @@ void SpatialObject::update(float dt) {
     if (_model) {
         _model->update(dt);
     }
+    updateEffects(dt);
 }
 
-void SpatialObject::playAnimation(Animation animation, float speed) {
+void SpatialObject::updateEffects(float dt) {
+    for (auto it = _effects.begin(); it != _effects.end(); ) {
+        AppliedEffect &effect = *it;
+        bool temporary = effect.durationType == DurationType::Temporary;
+        if (temporary) {
+            effect.duration = glm::max(0.0f, effect.duration - dt);
+        }
+        if (temporary && effect.duration == 0.0f) {
+            applyInstantEffect(*effect.effect);
+            it = _effects.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
-bool SpatialObject::isAnimationLooping(Animation animation) const {
+void SpatialObject::playAnimation(AnimationType animation, float speed, shared_ptr<Action> actionToComplete) {
+}
+
+bool SpatialObject::isAnimationLooping(AnimationType animation) const {
     int ordinal = static_cast<int>(animation);
 
     return
-        animation == Animation::LoopingChoke ||
-        (ordinal >= static_cast<int>(Animation::LoopingPause) && ordinal <= static_cast<int>(Animation::LoopingMeditateStand));
+        animation == AnimationType::LoopingChoke ||
+        (ordinal >= static_cast<int>(AnimationType::LoopingPause) && ordinal <= static_cast<int>(AnimationType::LoopingMeditateStand));
 }
 
 bool SpatialObject::isSelectable() const {
@@ -268,7 +322,7 @@ void SpatialObject::updateTransform() {
     if (_facing != 0.0f) {
         _transform *= glm::eulerAngleZ(_facing);
     }
-    if (_model) {
+    if (_model && !_stunt) {
         _model->setLocalTransform(_transform);
     }
 }
@@ -299,6 +353,40 @@ shared_ptr<Item> SpatialObject::getNextItem() {
         return _items[_itemIndex++];
     }
     return nullptr;
+}
+
+shared_ptr<Item> SpatialObject::getItemByTag(const string &tag) {
+    for (auto &item : _items) {
+        if (item->tag() == tag) return item;
+    }
+    return nullptr;
+}
+
+void SpatialObject::clearAllEffects() {
+    _effects.clear();
+}
+
+void SpatialObject::die() {
+}
+
+bool SpatialObject::isStuntMode() const {
+    return _stunt;
+}
+
+void SpatialObject::startStuntMode() {
+    if (_model) {
+        _model->setLocalTransform(glm::mat4(1.0f));
+    }
+    _stunt = true;
+}
+
+void SpatialObject::stopStuntMode() {
+    if (!_stunt) return;
+
+    if (_model) {
+        _model->setLocalTransform(_transform);
+    }
+    _stunt = false;
 }
 
 } // namespace game
