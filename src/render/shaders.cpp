@@ -242,7 +242,6 @@ void main() {
 
 static const GLchar kSourceFragmentModel[] = R"END(
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
-const float SHADOW_VALUE = 0.5;
 
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
@@ -301,24 +300,37 @@ void applyLighting(vec3 normal, inout vec3 color) {
     }
 }
 
-void applyShadows(vec3 normal, inout vec3 color) {
-    if (!uShadowLightPresent) return;
+float getShadowValue() {
+    if (!uShadowLightPresent) return 0.0;
 
     vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
-
-    float closestDepth = texture(uShadowmap, fragToLight).r;
-    closestDepth *= SHADOW_FAR_PLANE;
-
     float currentDepth = length(fragToLight);
 
-    if (currentDepth > closestDepth) {
-        color *= 1.0 - SHADOW_VALUE;
+    float shadow = 0.0;
+    float bias = 0.05;
+    float samples = 4.0;
+    float offset = 0.1;
+
+    for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
+        for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
+            for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
+                float closestDepth = texture(uShadowmap, fragToLight + vec3(x, y, z)).r;
+                closestDepth *= SHADOW_FAR_PLANE;
+
+                if (currentDepth - bias > closestDepth) {
+                    shadow += 1.0;
+                }
+            }
+        }
     }
+
+    return shadow / (samples * samples * samples);
 }
 
 void main() {
     vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
     vec3 surfaceColor = diffuseSample.rgb;
+    float shadow = 0.0f;
     vec3 lightColor = vec3(0.0);
     vec3 normal = normalize(fragNormal);
 
@@ -337,7 +349,7 @@ void main() {
         lightColor = vec3(1.0);
     }
     if (uShadowsEnabled) {
-        applyShadows(normal, lightColor);
+        lightColor *= (1.0 - 0.5 * getShadowValue());
     }
     float finalAlpha = uAlpha;
 
