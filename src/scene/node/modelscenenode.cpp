@@ -48,6 +48,35 @@ ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &
     initModelNodes();
 }
 
+static bool validateEmitter(const Emitter &emitter) {
+    switch (emitter.updateType()) {
+        case Emitter::UpdateType::Fountain:
+            break;
+        default:
+            warn("validateEmitter: unsupported update type: " + to_string(static_cast<int>(emitter.updateType())));
+            return false;
+    }
+
+    switch (emitter.renderType()) {
+        case Emitter::RenderType::Normal:
+            break;
+        default:
+            warn("validateEmitter: unsupported render type: " + to_string(static_cast<int>(emitter.renderType())));
+            return false;
+    }
+
+    switch (emitter.blendType()) {
+        case Emitter::BlendType::Normal:
+        case Emitter::BlendType::Lighten:
+            break;
+        default:
+            warn("validateEmitter: unsupported blend type: " + to_string(static_cast<int>(emitter.blendType())));
+            return false;
+    }
+
+    return true;
+}
+
 void ModelSceneNode::initModelNodes() {
     shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(_model->rootNode()));
     addChild(rootNode);
@@ -75,7 +104,7 @@ void ModelSceneNode::initModelNodes() {
             }
 
             shared_ptr<Emitter> emitter(child->emitter());
-            if (emitter) {
+            if (emitter && validateEmitter(*emitter)) {
                 auto emitterNode = make_shared<EmitterSceneNode>(emitter, _sceneGraph);
                 childNode->addChild(emitterNode);
                 _emitters.push_back(emitterNode);

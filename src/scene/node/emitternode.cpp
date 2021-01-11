@@ -49,9 +49,6 @@ void EmitterSceneNode::init() {
 }
 
 void EmitterSceneNode::update(float dt) {
-    if (_emitter->updateType() != Emitter::UpdateType::Fountain) return;
-    if (_emitter->renderType() != Emitter::RenderType::Normal) return;
-
     spawnParticles(dt);
     updateParticles(dt);
 }
