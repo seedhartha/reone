@@ -103,6 +103,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     locals.general.billboardSize = glm::vec2(_size);
     locals.general.particleCenter = _absoluteTransform[3];
     locals.general.billboardFrame = _frame;
+    locals.general.billboardToWorldZ = _emitter->renderType() == Emitter::RenderType::BillboardToWorldZ;
 
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 

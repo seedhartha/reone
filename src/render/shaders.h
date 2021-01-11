@@ -93,7 +93,8 @@ struct GeneralUniforms {
     glm::vec2 billboardSize { 0.0f };
     glm::vec4 particleCenter { 0.0f };
     int billboardFrame { 0 };
-    char padding3[12];
+    int billboardToWorldZ { 0 };
+    char padding3[8];
 };
 
 struct SkeletalUniforms {

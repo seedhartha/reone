@@ -76,6 +76,7 @@ layout(std140) uniform General {
     uniform vec2 uBillboardSize;
     uniform vec4 uParticleCenter;
     uniform int uBillboardFrame;
+    uniform bool uBillboardToWorldZ;
 };
 
 layout(std140) uniform Lighting {
@@ -165,6 +166,9 @@ void main() {
 )END";
 
 static const GLchar kSourceVertexBillboard[] = R"END(
+const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
+const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
+
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -174,13 +178,23 @@ layout(location = 2) in vec2 aTexCoords;
 out vec2 fragTexCoords;
 
 void main() {
-    vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-    vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
+    vec3 position;
 
-    vec3 position =
-        uParticleCenter.xyz +
-        cameraRight * aPosition.x * uBillboardSize.x +
-        cameraUp * aPosition.y * uBillboardSize.y;
+    if (uBillboardToWorldZ) {
+        position = 
+            uParticleCenter.xyz +
+            RIGHT * aPosition.x * uBillboardSize.x +
+            FORWARD * aPosition.y * uBillboardSize.y;
+
+    } else {
+        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
+        vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
+
+        position =
+            uParticleCenter.xyz +
+            cameraRight * aPosition.x * uBillboardSize.x +
+            cameraUp * aPosition.y * uBillboardSize.y;
+    }
 
     gl_Position = uProjection * uView * vec4(position, 1.0);
     fragTexCoords = aTexCoords;
