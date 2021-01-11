@@ -76,7 +76,7 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<Emitter> emitter(child->emitter());
             if (emitter) {
-                auto emitterNode = make_shared<EmitterSceneNode>(child, emitter, _sceneGraph);
+                auto emitterNode = make_shared<EmitterSceneNode>(emitter, _sceneGraph);
                 childNode->addChild(emitterNode);
                 _emitters.push_back(emitterNode);
             }

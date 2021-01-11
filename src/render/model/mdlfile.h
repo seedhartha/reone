@@ -61,8 +61,14 @@ private:
     // Controllers
 
     void readAlphaController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readAlphaEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readAlphaMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readAlphaStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readBirthrateController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readColorEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readColorMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readColorStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readFrameEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readFrameStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readLifeExpectancyController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
@@ -72,6 +78,8 @@ private:
     void readRadiusController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readRandomVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSelfIllumColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readSizeEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readSizeMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeXController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeYController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);

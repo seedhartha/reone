@@ -19,38 +19,39 @@
 
 #include "scenenode.h"
 
-#include <vector>
-
-#include "glm/vec3.hpp"
-
-#include "../../common/timer.h"
 #include "../../render/emitter.h"
 
 namespace reone {
 
 namespace scene {
 
-class ParticleSceneNode;
-
-class EmitterSceneNode : public SceneNode {
+class ParticleSceneNode : public SceneNode {
 public:
-    EmitterSceneNode(const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
+    ParticleSceneNode(glm::vec3 position, float velocity, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt);
 
-    std::shared_ptr<render::Emitter> emitter() const { return _emitter; }
+    void renderSingle(bool shadowPass) const override;
+
+    bool isExpired() const;
+
+    int renderOrder() const;
 
 private:
     std::shared_ptr<render::Emitter> _emitter;
+    glm::vec3 _position { 0.0f };
+    float _velocity { 0.0f };
+    int _renderOrder { 0 };
 
-    float _birthInterval { 0.0f };
-    Timer _birthTimer;
-    std::vector<std::shared_ptr<ParticleSceneNode>> _particles;
+    float _lifetime { 0.0f };
+    int _frame { 0 };
+    float _size { 1.0f };
+    glm::vec3 _color { 1.0f };
+    float _alpha { 1.0f };
 
     void init();
-
-    void spawnParticles(float dt);
-    void updateParticles(float dt);
+    void updateAnimation(float dt);
+    void updateLocalTransform();
 };
 
 } // namespace scene

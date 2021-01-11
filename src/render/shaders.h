@@ -44,7 +44,7 @@ enum class ShaderProgram {
     GUIDebugShadows,
     ModelWhite,
     ModelModel,
-    ModelBillboard,
+    BillboardBillboard,
     DepthDepth
 };
 
@@ -90,8 +90,10 @@ struct GeneralUniforms {
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
     glm::vec2 billboardGridSize { 0.0f };
+    glm::vec2 billboardSize { 0.0f };
+    glm::vec4 particleCenter { 0.0f };
     int billboardFrame { 0 };
-    char padding3[4];
+    char padding3[12];
 };
 
 struct SkeletalUniforms {
@@ -140,6 +142,7 @@ private:
         VertexGUI,
         VertexModel,
         VertexDepth,
+        VertexBillboard,
         FragmentWhite,
         FragmentGUI,
         FragmentModel,

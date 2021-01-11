@@ -23,10 +23,10 @@
 #include "../render/mesh/quad.h"
 
 #include "node/cameranode.h"
-#include "node/emitternode.h"
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
+#include "node/particlenode.h"
 
 using namespace std;
 
@@ -36,7 +36,7 @@ namespace reone {
 
 namespace scene {
 
-static bool g_emittersEnabled = false;
+static bool g_emittersEnabled = true;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -62,7 +62,7 @@ void SceneGraph::build() {
 void SceneGraph::prepareFrame() {
     if (!_activeCamera) return;
 
-    refreshMeshesLightsAndEmitters();
+    refreshNodeLists();
     refreshShadowLight();
 
     for (auto &root : _roots) {
@@ -71,9 +71,10 @@ void SceneGraph::prepareFrame() {
             modelNode->updateLighting();
         }
     }
+
+    // Sort transparent meshes
     unordered_map<SceneNode *, float> cameraDistances;
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
-
     for (auto &mesh : _transparentMeshes) {
         cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
     }
@@ -89,14 +90,27 @@ void SceneGraph::prepareFrame() {
 
         return leftDistance > rightDistance;
     });
+
+    // Sort particles
+    unordered_map<SceneNode *, float> particlesZ;
+    for (auto &particle : _particles) {
+        glm::vec4 screen(_activeCamera->projection() * _activeCamera->view() * particle->absoluteTransform()[3]);
+        screen /= screen.w;
+        particlesZ.insert(make_pair(particle, screen.z));
+    }
+    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
+        float leftZ = particlesZ.find(left)->second;
+        float rightZ = particlesZ.find(right)->second;
+        return leftZ > rightZ;
+    });
 }
 
-void SceneGraph::refreshMeshesLightsAndEmitters() {
+void SceneGraph::refreshNodeLists() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
-    _emitters.clear();
+    _particles.clear();
 
     for (auto &root : _roots) {
         stack<SceneNode *> nodes;
@@ -128,9 +142,9 @@ void SceneGraph::refreshMeshesLightsAndEmitters() {
                     if (light) {
                         _lights.push_back(light);
                     } else if (g_emittersEnabled) {
-                        auto emitter = dynamic_cast<EmitterSceneNode *>(node);
-                        if (emitter) {
-                            _emitters.push_back(emitter);
+                        auto particle = dynamic_cast<ParticleSceneNode *>(node);
+                        if (particle) {
+                            _particles.push_back(particle);
                         }
                     }
                 }
@@ -188,11 +202,11 @@ void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
     for (auto &mesh : _opaqueMeshes) {
         mesh->renderSingle(false);
     }
-    for (auto &emitter : _emitters) {
-        emitter->renderSingle(false);
-    }
     for (auto &mesh : _transparentMeshes) {
         mesh->renderSingle(false);
+    }
+    for (auto &particle : _particles) {
+        particle->renderSingle(false);
     }
 }
 
