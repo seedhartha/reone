@@ -27,13 +27,13 @@ namespace reone {
 
 namespace render {
 
-void withDepthTest(const std::function<void()> &block) {
+void withDepthTest(const function<void()> &block) {
     glEnable(GL_DEPTH_TEST);
     block();
     glDisable(GL_DEPTH_TEST);
 }
 
-void withAdditiveBlending(const std::function<void()> &block) {
+void withAdditiveBlending(const function<void()> &block) {
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
     glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);

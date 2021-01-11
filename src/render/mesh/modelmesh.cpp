@@ -61,19 +61,10 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
         _bumpmap->bind();
     }
 
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     if (additive) {
-        glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-        glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-        glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-        glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-
-    Mesh::renderTriangles();
-
-    if (additive) {
-        glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+        withAdditiveBlending([this]() { Mesh::renderTriangles(); });
+    } else {
+        Mesh::renderTriangles();
     }
 }
 

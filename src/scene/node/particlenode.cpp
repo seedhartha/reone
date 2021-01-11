@@ -111,20 +111,10 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     _emitter->texture()->bind();
 
     bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
-
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     if (lighten) {
-        glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-        glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-        glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-        glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-
-    BillboardMesh::instance().renderTriangles();
-
-    if (lighten) {
-        glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+        withAdditiveBlending([]() { BillboardMesh::instance().renderTriangles(); });
+    } else {
+        BillboardMesh::instance().renderTriangles();
     }
 }
 
