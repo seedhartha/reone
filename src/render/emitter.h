@@ -40,6 +40,13 @@ public:
         BillboardToWorldZ
     };
 
+    enum class BlendType {
+        Invalid,
+        Normal,
+        Punch,
+        Lighten
+    };
+
     template <class T>
     struct Constraints {
         T start;
@@ -49,6 +56,7 @@ public:
 
     UpdateType updateType() const { return _updateType; }
     RenderType renderType() const { return _renderType; }
+    BlendType blendType() const { return _blendType; }
     int renderOrder() const { return _renderOrder; }
 
     std::shared_ptr<Texture> texture() const { return _texture; }
@@ -69,6 +77,7 @@ public:
 private:
     UpdateType _updateType { UpdateType::Invalid };
     RenderType _renderType { RenderType::Invalid };
+    BlendType _blendType { BlendType::Invalid };
     int _renderOrder { 0 };
 
     std::shared_ptr<Texture> _texture;
