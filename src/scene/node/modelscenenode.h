@@ -73,6 +73,7 @@ public:
     bool isAnimationFinished() const;
 
     void setDefaultAnimation(const std::string &name);
+    std::string getAnimName() { return _animator-> }
 
     // END Animation
 

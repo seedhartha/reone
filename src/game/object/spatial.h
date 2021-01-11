@@ -35,6 +35,12 @@
 
 namespace reone {
 
+namespace mp {
+
+class BaseStatus;
+
+}
+
 namespace game {
 
 static const float kDefaultDrawDistance = 1024.0f;
@@ -96,6 +102,13 @@ public:
     const std::vector<std::shared_ptr<Item>> &items() const;
 
     // END Inventory
+
+    // Multiplayer
+
+    virtual std::unique_ptr<mp::BaseStatus> captureStatus();
+    virtual void loadStatus(std::unique_ptr<mp::BaseStatus> && stat);
+
+    // END Multiplayer
 
 protected:
     ObjectFactory *_objectFactory;

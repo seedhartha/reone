@@ -36,6 +36,7 @@
 #include "../portraitutil.h"
 
 #include "objectfactory.h"
+#include "../../mp/objects.h"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+using namespace reone::mp;
 
 namespace reone {
 
@@ -250,6 +252,11 @@ void Creature::playAnimation(const string &name, bool looping, float speed) {
     if (looping) {
         flags |= kAnimationLoop;
     }
+
+    _animInfo = make_unique<AnimInfo>();
+    _animInfo->name = name;
+    _animInfo->flag = flags;
+    _animInfo->speed = speed;
     _model->playAnimation(name, flags, speed);
 
     if (!looping) {
@@ -479,6 +486,141 @@ void Creature::runSpawnScript() {
         _scriptRunner->run(_onSpawn, _id, kObjectInvalid);
     }
 }
+
+/* { modelName : sorted[ animNames ] } */
+unordered_map<string, vector<string>> modelAnimMap;
+unique_ptr<BaseStatus> Creature::captureStatus() {
+    auto stat = make_unique<CreatureStatus>();
+
+    stat->x = _position.x;
+    stat->y = _position.y;
+    stat->z = _position.z;
+    stat->facing = _facing;
+    stat->maxHitPoints = _maxHitPoints;
+    stat->currentHitPoints = _currentHitPoints;
+
+    /* Outdated:
+    if (_animInfo) {
+        stat->animStates |= static_cast<uint8_t>(AnimationState::SetBodyAnim);
+        stat->animIndex = getAnimIndex(_animInfo->name);
+        stat->animSpeed = _animInfo->speed;
+        stat->animFlag = _animInfo->flag;
+        stat->animTimestamp = _animInfo->timestamp;
+    } */
+
+    // casual animation
+    if (_talking) 
+        stat->animStates |= static_cast<uint8_t>(AnimationState::Talking);
+    if (_inCombat)
+        stat->animStates |= static_cast<uint8_t>(AnimationState::InCombat);
+    if (_movementType != MovementType::None)
+        stat->animStates |= static_cast<uint8_t>(AnimationState::HasMovement);
+    if (_movementType == MovementType::Run)
+        stat->animStates |= static_cast<uint8_t>(AnimationState::Run);
+
+    auto item = getEquippedItem(kInventorySlotHead);
+    stat->equipmentHead = item ? item->blueprintResRef() : "";
+    item = getEquippedItem(kInventorySlotBody);
+    stat->equipmentBody = item ? item->blueprintResRef() : "";
+    item = getEquippedItem(kInventorySlotLeftWeapon);
+    stat->equipmentLeftWeapon = item ? item->blueprintResRef() : "";
+    item = getEquippedItem(kInventorySlotRightWeapon);
+    stat->equipmentRightWeapon = item ? item->blueprintResRef() : "";
+
+    return move(stat);
+}
+
+void Creature::loadStatus(unique_ptr<BaseStatus> &&stat) {
+    if (CreatureStatus *sp = dynamic_cast<CreatureStatus*>(stat.get())) {
+        _position.x = sp->x;
+        _position.y = sp->y;
+        _position.z = sp->z;
+        _facing = sp->facing;
+        _maxHitPoints = sp->maxHitPoints;
+        _currentHitPoints = sp->currentHitPoints;
+
+        // casual animation
+        _talking = sp->animStates & static_cast<uint8_t>(AnimationState::Talking);
+        _inCombat = sp->animStates & static_cast<uint8_t>(AnimationState::InCombat);
+        if (sp->animStates & static_cast<uint8_t>(AnimationState::HasMovement)) {
+            if (sp->animStates & static_cast<uint8_t>(AnimationState::Run)) {
+                _movementType == MovementType::Run;
+            } else {
+                _movementType = MovementType::Walk;
+            }
+        }
+
+        // set equipments
+        if (sp->equipmentHead.empty()) {
+            if (isSlotEquipped(kInventorySlotHead)) {
+                unequip(getEquippedItem(kInventorySlotHead));
+            }
+        } else if (!(isSlotEquipped(kInventorySlotHead)
+            && getEquippedItem(kInventorySlotHead)->blueprintResRef() == sp->equipmentHead)) {
+            equip(sp->equipmentHead);
+        }
+
+        if (sp->equipmentBody.empty()) {
+            if (isSlotEquipped(kInventorySlotBody)) {
+                unequip(getEquippedItem(kInventorySlotBody));
+            }
+        } else if (!(isSlotEquipped(kInventorySlotBody)
+            && getEquippedItem(kInventorySlotBody)->blueprintResRef() == sp->equipmentBody)) {
+            equip(sp->equipmentBody);
+        }
+
+        if (sp->equipmentLeftWeapon.empty()) {
+            if (isSlotEquipped(kInventorySlotLeftWeapon)) {
+                unequip(getEquippedItem(kInventorySlotLeftWeapon));
+            }
+        } else if (!(isSlotEquipped(kInventorySlotLeftWeapon)
+            && getEquippedItem(kInventorySlotLeftWeapon)->blueprintResRef() == sp->equipmentLeftWeapon)) {
+            equip(sp->equipmentLeftWeapon);
+        }
+
+        if (sp->equipmentRightWeapon.empty()) {
+            if (isSlotEquipped(kInventorySlotRightWeapon)) {
+                unequip(getEquippedItem(kInventorySlotRightWeapon));
+            }
+        } else if (!(isSlotEquipped(kInventorySlotRightWeapon)
+            && getEquippedItem(kInventorySlotRightWeapon)->blueprintResRef() == sp->equipmentRightWeapon)) {
+            equip(sp->equipmentRightWeapon);
+        }
+    }
+}
+
+uint16_t Creature::getAnimIndex(const string &name) const {
+    // memorize
+    if (modelAnimMap.count(_model->name()) == 0) {
+        auto animNames = _model->model()->getAnimationNames();
+        sort(animNames.begin(), animNames.end());
+        modelAnimMap[_model->name()] = move(animNames);
+    }
+
+    // binary search index
+    vector<string> &modelAnims = modelAnimMap[_model->name()];
+    auto it = lower_bound(modelAnims.begin(), modelAnims.end(), name);
+    if (it == modelAnims.end() || *it != name) {
+        throw logic_error("Model animation not found: " + name);
+    }
+    return static_cast<uint16_t>(it - modelAnims.begin());
+}
+
+string Creature::getAnimName(uint16_t index) const {
+    // memorize
+    if (modelAnimMap.count(_model->name()) == 0) {
+        auto animNames = _model->model()->getAnimationNames();
+        sort(animNames.begin(), animNames.end());
+        modelAnimMap[_model->name()] = move(animNames);
+    }
+
+    const auto &names = modelAnimMap[_model->name()];
+    if (index > names.size()) {
+        throw logic_error("Animation Index not found: " + to_string(index));
+    }
+    return names[index];
+}
+
 
 void Creature::giveXP(int amount) {
     _xp += amount;

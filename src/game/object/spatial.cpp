@@ -27,10 +27,13 @@
 #include "item.h"
 #include "objectfactory.h"
 
+#include "../../mp/objects.h"
+
 using namespace std;
 
 using namespace reone::render;
 using namespace reone::scene;
+using namespace reone::mp;
 
 namespace reone {
 
@@ -208,6 +211,30 @@ shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
 
 const vector<shared_ptr<Item>> &SpatialObject::items() const {
     return _items;
+}
+
+unique_ptr<BaseStatus> SpatialObject::captureStatus() {
+    auto stat = std::make_unique<SpatialStatus>();
+
+    stat->x = _position.x;
+    stat->y = _position.y;
+    stat->z = _position.z;
+    stat->facing = _facing;
+    stat->maxHitPoints = _maxHitPoints;
+    stat->currentHitPoints = _currentHitPoints;
+
+    return move(stat);
+}
+
+void SpatialObject::loadStatus(unique_ptr<BaseStatus> &&stat) {
+    if (SpatialStatus *sp = dynamic_cast<SpatialStatus*>(stat.get())) {
+        _position.x = sp->x;
+        _position.y = sp->y;
+        _position.z = sp->z;
+        _facing = sp->facing;
+        _maxHitPoints = sp->maxHitPoints;
+        _currentHitPoints = sp->currentHitPoints;
+    }
 }
 
 glm::vec3 SpatialObject::getSelectablePosition() const {

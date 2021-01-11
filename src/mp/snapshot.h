@@ -28,7 +28,14 @@
 #include "../common/streamreader.h"
 #include "../common/streamwriter.h"
 
+
 namespace reone {
+
+namespace game {
+
+class Area;
+
+}
 
 namespace mp {
 
@@ -43,31 +50,86 @@ struct Snapshot {
     Snapshot &operator=(const Snapshot &) = delete;
     //Snapshot &operator=(Snapshot&&) = delete;
 
+    /* { id: resource_ref } */
+    std::map<uint32_t, std::string> objectAddition;
+    std::list<uint32_t> objectDeletion;
 
-    std::map<uint32_t, std::unique_ptr<BaseStatus>> id_table;
+    /* { id: status } */
+    std::map<uint32_t, std::unique_ptr<BaseStatus>> objectStat;
+
+    /* { resource_ref: quantity }*/
+    std::map<std::string, uint32_t> inventoryAddition;
+    std::map<std::string, uint32_t> inventoryDeletion;
+
+    /* id, animinfo */
+    std::map<uint32_t, std::unique_ptr<AnimInfo>> animCommands;
+
+    std::list<std::unique_ptr<Ballistic>> bullets;
+
     uint32_t seq;
     uint32_t tick;
 };
 
 /* 
 * memory-efficient (cough cough) snapshot system
-* sort of like a skip list */
+* sort of like a skip list
+* 
+* Server routine:
+* 1. freeze(newTick)
+* 2. serialize()
+* 3. broadcast()
+* 
+* Client routine:
+* 1. freeze()
+* 2. deserialize()
+*/
 class History {
 public:
-    History(uint32_t maxLen) : _maxLen(maxLen) {
+    History(uint32_t maxLen, game::Area *area) : _maxLen(maxLen),
+        _area(area) {
         _snapshots.reserve(_maxLen);
-        _snapshots.push_back(std::make_unique<Snapshot>(_seq, 0)); // TODO: dummy tick
+        _snapshots.push_back(std::make_unique<Snapshot>(++_seq, 0)); 
+        // TODO: dummy tick
     }
 
-    void addSnapshot(uint32_t newTick);
+    // creates a new snapshot
+    void freeze(uint32_t newTick);
 
     // Server functions
+    
+    void addObject(uint32_t id, std::string resRef);
+    void delObject(uint32_t id);
 
-    /* read status by type + insert to current snapshot */
-    void insert(uint32_t id);
+    void updateObject(uint32_t id);
 
-    /* serialize */
+    void addToInventory(std::string resRef, uint16_t quantity);
+    void remFrInventory(std::string resRef, uint16_t quantity);
+    
+    void collectAnimCmds(); //server function
+
+    void addBallistic(std::unique_ptr<Ballistic> &&bullet);
+
+    /* 
+    * Header:
+    * uint32_t seq
+    * uint32_t last ACK
+    * uint32_t tick
+    * 
+    * Body serialize lists:
+    * 1. objectAddition         x
+    * 2. objectDeletion         x
+    * 3. deltaStrings
+    * 4. inventoryAddition      x
+    * 5. inventoryDeletion      x
+    * 6. bullets                x
+    * 7. animation commands     x
+    * 8. other commands         x
+    * 
+    * TODO: replace strings with int (via dynamic programming) to
+    *   minimize transmission size, wherever possible.
+    */
     void serialize(StreamWriter &writer, uint32_t lastAckSeq);
+    void serialize(StreamWriter &writer); // from scratch
 
     // END Server functions
 
@@ -75,26 +137,30 @@ public:
 
     /* multiple StreamReader may be requried 
     * If newer seq, add new snapshot 
-    * If older than _seq, discard */
+    * If older than _seq, discard
+    */
     void deserialize(StreamReader &reader, uint32_t lastAckSeq);
 
     // END client functions
 
 private:
+    game::Area *_area;
+
     std::vector<std::unique_ptr<Snapshot>> _snapshots;
     uint32_t _top { 0 }; // rotated by _maxLen
     uint32_t _seq { 0 };
     uint32_t _maxLen;
 
-    Snapshot &getMaster();
+    Snapshot &getCurrent(); // the one being built
+    Snapshot &getMaster();  // last frozen snapshot
     Snapshot &getSnapshot(uint32_t seq);
 
     BaseStatus *getStatus(uint32_t id); //only latest
     BaseStatus *getStatus(uint32_t id, uint32_t seq);
 
     /* { id : [ lastSeq1, lastSeq2, ... (from new to old) ] }*/
-    std::map<uint32_t, std::list<uint32_t>> _activeObjects;
-    std::map<uint32_t, std::unique_ptr<BaseStatus>> _staleObjects;
+    std::map<uint32_t, std::list<uint32_t>>         _activeObjects; // life cycle of obj up to getCurrent()
+    std::map<uint32_t, std::unique_ptr<BaseStatus>> _staleObjects; /* last known state */
 };
 
 } // namespace net

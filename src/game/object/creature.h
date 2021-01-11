@@ -35,6 +35,14 @@ namespace reone {
 
 class Timer;
 
+namespace mp {
+
+class BaseStatus;
+
+struct AnimInfo;
+
+}
+
 namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
@@ -152,6 +160,17 @@ public:
     void runSpawnScript();
 
     // END Scripts
+
+    // Multiplayer
+
+    std::unique_ptr<mp::BaseStatus> captureStatus() override;
+    void loadStatus(std::unique_ptr<mp::BaseStatus> && stat) override;
+
+    uint16_t getAnimIndex(const std::string &name) const;
+    std::string getAnimName(uint16_t index) const;
+    std::unique_ptr<mp::AnimInfo> _animInfo;
+
+    // END Multiplayer
 
 private:
     CreatureConfiguration _config;
