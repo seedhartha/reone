@@ -30,9 +30,9 @@ namespace reone {
 namespace scene {
 
 class CameraSceneNode;
-class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
+class ParticleSceneNode;
 class SceneNode;
 
 class SceneGraph {
@@ -75,7 +75,7 @@ private:
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
-    std::vector<EmitterSceneNode *> _emitters;
+    std::vector<ParticleSceneNode *> _particles;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
@@ -86,7 +86,7 @@ private:
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;
 
-    void refreshMeshesLightsAndEmitters();
+    void refreshNodeLists();
     void refreshShadowLight();
 };
 

@@ -257,6 +257,7 @@ set(SCENE_HEADERS
     src/scene/node/lightnode.h
     src/scene/node/modelnodescenenode.h
     src/scene/node/modelscenenode.h
+    src/scene/node/particlenode.h
     src/scene/node/scenenode.h
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
@@ -270,6 +271,7 @@ set(SCENE_SOURCES
     src/scene/node/lightnode.cpp
     src/scene/node/modelnodescenenode.cpp
     src/scene/node/modelscenenode.cpp
+    src/scene/node/particlenode.cpp
     src/scene/node/scenenode.cpp
     src/scene/pipeline/control.cpp
     src/scene/pipeline/world.cpp

@@ -58,6 +58,8 @@ enum class ControllerType {
     Position = 8,
     Orientation = 20,
     Color = 76,
+    AlphaEnd = 80,
+    AlphaStart = 84,
     Radius_Birthrate = 88,
     SelfIllumColor = 100,
     FrameEnd = 108,
@@ -66,9 +68,15 @@ enum class ControllerType {
     Alpha = 132,
     Multiplier_RandomVelocity = 140,
     SizeStart = 144,
+    SizeEnd = 148,
     Velocity = 168,
     SizeX = 172,
-    SizeY = 176
+    SizeY = 176,
+    AlphaMid = 216,
+    SizeMid = 232,
+    ColorMid = 284,
+    ColorEnd = 380,
+    ColorStart = 392
 };
 
 MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
@@ -320,11 +328,6 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                     readRandomVelocityController(dataIndex, data, node);
                 }
                 break;
-            case ControllerType::SizeStart:
-                if (node._flags & kNodeHasEmitter) {
-                    readSizeStartController(dataIndex, data, node);
-                }
-                break;
             case ControllerType::Velocity:
                 if (node._flags & kNodeHasEmitter) {
                     readVelocityController(dataIndex, data, node);
@@ -340,6 +343,55 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                     readSizeYController(dataIndex, data, node);
                 }
                 break;
+
+            case ControllerType::SizeStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::SizeEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readSizeEndController(dataIndex, data, node);
+                }
+                break;
+
+            case ControllerType::ColorStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::ColorMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::ColorEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readColorEndController(dataIndex, data, node);
+                }
+                break;
+
+            case ControllerType::AlphaStart:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaStartController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::AlphaMid:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaMidController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::AlphaEnd:
+                if (node._flags & kNodeHasEmitter) {
+                    readAlphaEndController(dataIndex, data, node);
+                }
+                break;
+
             default:
                 debug(boost::format("MDL: unsupported controller type: \"%s\" %d") % _name % static_cast<int>(type), 3);
                 break;
@@ -459,7 +511,45 @@ void MdlFile::readLifeExpectancyController(uint16_t dataIndex, const vector<floa
 }
 
 void MdlFile::readSizeStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_sizeStart = data[dataIndex];
+    node._emitter->_particleSize.start = data[dataIndex];
+}
+
+void MdlFile::readSizeMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_particleSize.mid = data[dataIndex];
+}
+
+void MdlFile::readSizeEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_particleSize.end = data[dataIndex];
+}
+
+void MdlFile::readColorStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.start.r = data[dataIndex + 0];
+    node._emitter->_color.start.g = data[dataIndex + 1];
+    node._emitter->_color.start.b = data[dataIndex + 2];
+}
+
+void MdlFile::readColorMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.mid.r = data[dataIndex + 0];
+    node._emitter->_color.mid.g = data[dataIndex + 1];
+    node._emitter->_color.mid.b = data[dataIndex + 2];
+}
+
+void MdlFile::readColorEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_color.end.r = data[dataIndex + 0];
+    node._emitter->_color.end.g = data[dataIndex + 1];
+    node._emitter->_color.end.b = data[dataIndex + 2];
+}
+
+void MdlFile::readAlphaStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.start = data[dataIndex];
+}
+
+void MdlFile::readAlphaMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.mid = data[dataIndex];
+}
+
+void MdlFile::readAlphaEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_alpha.end = data[dataIndex];
 }
 
 void MdlFile::readSizeXController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
@@ -733,7 +823,11 @@ void MdlFile::readEmitter(ModelNode &node) {
 
     node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
 
-    ignore(56);
+    ignore(24);
+
+    node._emitter->_renderOrder = readUint16();
+
+    ignore(30);
 }
 
 } // namespace render

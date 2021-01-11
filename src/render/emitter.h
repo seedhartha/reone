@@ -40,9 +40,16 @@ public:
         BillboardToWorldZ
     };
 
-public:
+    template <class T>
+    struct Constraints {
+        T start;
+        T mid;
+        T end;
+    };
+
     UpdateType updateType() const { return _updateType; }
     RenderType renderType() const { return _renderType; }
+    int renderOrder() const { return _renderOrder; }
 
     std::shared_ptr<Texture> texture() const { return _texture; }
     int gridWidth() const { return _gridWidth; }
@@ -51,7 +58,9 @@ public:
     int frameEnd() const { return _frameEnd; }
 
     const glm::vec2 &size() const { return _size; }
-    float sizeStart() const { return _sizeStart; }
+    const Constraints<float> &particleSize() const { return _particleSize; }
+    const Constraints<glm::vec3> &color() const { return _color; }
+    const Constraints<float> &alpha() const { return _alpha; }
     int birthrate() const { return _birthrate; }
     int lifeExpectancy() const { return _lifeExpectancy; }
     float velocity() const { return _velocity; }
@@ -60,6 +69,7 @@ public:
 private:
     UpdateType _updateType { UpdateType::Invalid };
     RenderType _renderType { RenderType::Invalid };
+    int _renderOrder { 0 };
 
     std::shared_ptr<Texture> _texture;
     int _gridWidth { 0 };
@@ -68,11 +78,14 @@ private:
     int _frameEnd { 0 };
 
     glm::vec2 _size { 0.0f };
-    float _sizeStart { 0.0f };
     int _birthrate { 0 }; /**< rate of particle birth per second */
     int _lifeExpectancy { 0 }; /**< life of each particle in seconds */
     float _velocity { 0.0f };
     float _randomVelocity { 0.0f };
+
+    Constraints<float> _particleSize;
+    Constraints<glm::vec3> _color;
+    Constraints<float> _alpha;
 
     friend class MdlFile;
 };
