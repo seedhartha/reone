@@ -184,11 +184,14 @@ private:
     // Scripts
 
     std::string _onSpawn;
+    std::string _onDeath;
 
     // END Scripts
 
     void updateModel();
     void updateHealth();
+
+    void runDeathScript();
 
     ModelType parseModelType(const std::string &s) const;
 

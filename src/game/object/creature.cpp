@@ -489,6 +489,13 @@ void Creature::die() {
     debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 
     playAnimation(_animResolver.getDieAnimation());
+    runDeathScript();
+}
+
+void Creature::runDeathScript() {
+    if (!_onDeath.empty()) {
+        _scriptRunner->run(_onDeath, _id, kObjectInvalid);
+    }
 }
 
 CreatureWieldType Creature::getWieldType() const {
