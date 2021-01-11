@@ -31,13 +31,16 @@ class Emitter {
 public:
     enum class UpdateType {
         Invalid,
-        Fountain
+        Fountain,
+        Single,
+        Explosion
     };
 
     enum class RenderType {
         Invalid,
         Normal,
-        BillboardToWorldZ
+        BillboardToWorldZ,
+        MotionBlur
     };
 
     enum class BlendType {

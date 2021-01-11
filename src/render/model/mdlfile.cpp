@@ -794,6 +794,12 @@ static Emitter::UpdateType parseEmitterUpdate(const string &str) {
     Emitter::UpdateType result = Emitter::UpdateType::Invalid;
     if (str == "Fountain") {
         result = Emitter::UpdateType::Fountain;
+    } else if (str == "Single") {
+        result = Emitter::UpdateType::Single;
+    } else if (str == "Explosion") {
+        result = Emitter::UpdateType::Explosion;
+    } else {
+        warn("parseEmitterUpdate: unsupported value: " + str);
     }
     return result;
 }
@@ -804,6 +810,10 @@ static Emitter::RenderType parseEmitterRender(const string &str) {
         result = Emitter::RenderType::Normal;
     } else if (str == "Billboard_to_World_Z") {
         result = Emitter::RenderType::BillboardToWorldZ;
+    } else if (str == "Motion_Blur") {
+        result = Emitter::RenderType::MotionBlur;
+    } else {
+        warn("parseEmitterRender: unsupported value: " + str);
     }
     return result;
 }
@@ -816,6 +826,8 @@ static Emitter::BlendType parseEmitterBlend(const string &str) {
         result = Emitter::BlendType::Punch;
     } else if (str == "Lighten") {
         result = Emitter::BlendType::Lighten;
+    } else {
+        warn("parseEmitterBlend: unsupported value: " + str);
     }
     return result;
 }

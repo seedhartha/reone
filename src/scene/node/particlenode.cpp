@@ -93,19 +93,8 @@ void ParticleSceneNode::updateAnimation(float dt) {
     _alpha = interpolateConstraints(_emitter->alpha(), maturity);
 }
 
-static bool isSupportedBlendType(Emitter::BlendType type) {
-    switch (type) {
-        case Emitter::BlendType::Normal:
-        case Emitter::BlendType::Lighten:
-            return true;
-        default:
-            return false;
-    }
-}
-
 void ParticleSceneNode::renderSingle(bool shadowPass) const {
     if (shadowPass) return;
-    if (!isSupportedBlendType(_emitter->blendType())) return;
 
     LocalUniforms locals;
     locals.general.color = glm::vec4(_color, 1.0f);
