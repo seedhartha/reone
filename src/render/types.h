@@ -30,7 +30,7 @@ namespace reone {
 
 namespace render {
 
-constexpr int kMaxShadowLightCount = 2;
+constexpr int kMaxLightCount = 4;
 constexpr int kNumCubeFaces = 6;
 
 enum class TextureType {
