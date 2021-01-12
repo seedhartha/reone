@@ -805,11 +805,21 @@ void Area::updateVisibility() {
 }
 
 void Area::updateSounds() {
-    Camera *camera = _game->getActiveCamera();
-    if (!camera) return;
+    glm::vec3 refPosition;
+
+    shared_ptr<Creature> partyLeader(_game->party().leader());
+    if (partyLeader) {
+        refPosition = partyLeader->position();
+    } else {
+        Camera *camera = _game->getActiveCamera();
+        if (camera) {
+            refPosition = camera->sceneNode()->absoluteTransform()[3];
+        } else {
+            return;
+        }
+    }
 
     vector<pair<Sound *, float>> soundDistances;
-    glm::vec3 cameraPosition(camera->sceneNode()->absoluteTransform()[3]);
 
     for (auto &sound : _objectsByType[ObjectType::Sound]) {
         Sound *soundPtr = static_cast<Sound *>(sound.get());
@@ -819,7 +829,7 @@ void Area::updateSounds() {
 
         float maxDist = soundPtr->maxDistance();
 
-        float dist = soundPtr->distanceTo(cameraPosition);
+        float dist = soundPtr->distanceTo(refPosition);
         if (dist > maxDist) continue;
 
         soundDistances.push_back(make_pair(soundPtr, dist));
