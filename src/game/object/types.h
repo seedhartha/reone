@@ -158,11 +158,11 @@ enum class CombatAnimation {
     MeleeDamage,
     MeleeDodge,
 
-    MeleeDuelAttack,
-    MeleeDuelDamage,
-    MeleeDuelParry,
+    CinematicMeleeAttack,
+    CinematicMeleeDamage,
+    CinematicMeleeParry,
 
-    RangedAttack
+    BlasterAttack
 };
 
 } // namespace game
