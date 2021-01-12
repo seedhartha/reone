@@ -282,13 +282,13 @@ string CreatureAnimationResolver::getAnimationName(CombatAnimation anim, Creatur
             return getFirstIfCreatureModel("cdamages", formatCombatAnimation("m%dd%d", wield, variant));
         case CombatAnimation::MeleeDodge:
             return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("m%dg%d", wield, variant));
-        case CombatAnimation::MeleeDuelAttack:
+        case CombatAnimation::CinematicMeleeAttack:
             return formatCombatAnimation("c%da%d", wield, variant);
-        case CombatAnimation::MeleeDuelDamage:
+        case CombatAnimation::CinematicMeleeDamage:
             return formatCombatAnimation("c%dd%d", wield, variant);
-        case CombatAnimation::MeleeDuelParry:
+        case CombatAnimation::CinematicMeleeParry:
             return formatCombatAnimation("c%dp%d", wield, variant);
-        case CombatAnimation::RangedAttack:
+        case CombatAnimation::BlasterAttack:
             return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
         default:
             return empty;
