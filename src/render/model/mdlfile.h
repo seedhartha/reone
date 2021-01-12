@@ -83,6 +83,7 @@ private:
     void readSizeStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeXController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeYController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readSpreadController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
 
     // END Controllers

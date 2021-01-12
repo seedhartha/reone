@@ -76,6 +76,7 @@ public:
     int lifeExpectancy() const { return _lifeExpectancy; }
     float velocity() const { return _velocity; }
     float randomVelocity() const { return _randomVelocity; }
+    float spread() const { return _spread; }
 
 private:
     UpdateType _updateType { UpdateType::Invalid };
@@ -94,6 +95,7 @@ private:
     int _lifeExpectancy { 0 }; /**< life of each particle in seconds */
     float _velocity { 0.0f };
     float _randomVelocity { 0.0f };
+    float _spread { 0.0f };
 
     Constraints<float> _particleSize;
     Constraints<glm::vec3> _color;

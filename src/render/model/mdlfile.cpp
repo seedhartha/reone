@@ -69,6 +69,7 @@ enum class ControllerType {
     Multiplier_RandomVelocity = 140,
     SizeStart = 144,
     SizeEnd = 148,
+    Spread = 160,
     Velocity = 168,
     SizeX = 172,
     SizeY = 176,
@@ -328,6 +329,11 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                     readRandomVelocityController(dataIndex, data, node);
                 }
                 break;
+            case ControllerType::Spread:
+                if (node._flags & kNodeHasEmitter) {
+                    readSpreadController(dataIndex, data, node);
+                }
+                break;
             case ControllerType::Velocity:
                 if (node._flags & kNodeHasEmitter) {
                     readVelocityController(dataIndex, data, node);
@@ -574,6 +580,10 @@ void MdlFile::readRandomVelocityController(uint16_t dataIndex, const vector<floa
 
 void MdlFile::readVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._emitter->_velocity = data[dataIndex];
+}
+
+void MdlFile::readSpreadController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_spread = data[dataIndex];
 }
 
 void MdlFile::readLight(ModelNode &node) {
