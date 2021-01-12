@@ -73,6 +73,18 @@ void Program::initOptions() {
         ("input-file", po::value<string>(), "path to input file");
 }
 
+static fs::path getDestination(const po::variables_map &vars) {
+    fs::path result;
+    if (vars.count("dest") > 0) {
+        result = vars["dest"].as<string>();
+    } else if (vars.count("input-file") > 0) {
+        result = fs::path(vars["input-file"].as<string>()).parent_path();
+    } else {
+        result = fs::current_path();
+    }
+    return move(result);
+}
+
 void Program::loadOptions() {
     po::positional_options_description positional;
     positional.add("input-file", 1);
@@ -87,7 +99,7 @@ void Program::loadOptions() {
     po::notify(vars);
 
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
-    _destPath = vars.count("dest") > 0 ? vars["dest"].as<string>() : fs::current_path();
+    _destPath = getDestination(vars);
     _inputFilePath = vars.count("input-file") > 0 ? vars["input-file"].as<string>() : "";
     _keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
 
