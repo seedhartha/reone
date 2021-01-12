@@ -143,7 +143,7 @@ void SceneGraph::refreshNodeLists() {
                         _lights.push_back(light);
                     } else if (g_emittersEnabled) {
                         auto particle = dynamic_cast<ParticleSceneNode *>(node);
-                        if (particle) {
+                        if (particle && _activeCamera->isInFrustum(particle->absoluteTransform()[3])) {
                             _particles.push_back(particle);
                         }
                     }
