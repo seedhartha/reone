@@ -47,7 +47,7 @@ static vector<uint16_t> g_indices = {
     6, 0, 3, 3, 5, 6
 };
 
-static Mesh::VertexOffsets g_offsets = { 0, -1, -1, -1, -1, -1, 3 * sizeof(float) };
+static Mesh::VertexOffsets g_offsets = { 0, -1, -1, -1, -1, -1, -1, -1, 3 * sizeof(float) };
 
 CubeMesh &CubeMesh::instance() {
     static CubeMesh mesh;

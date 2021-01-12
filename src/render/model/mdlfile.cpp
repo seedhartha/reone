@@ -637,7 +637,11 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     uint32_t mdxTextureOffset = readUint32();
     uint32_t mdxLightmapOffset = readUint32();
 
-    ignore(24);
+    ignore(8);
+
+    uint32_t mdxTanSpaceOffset = readUint32();
+
+    ignore(12);
 
     uint16_t vertexCount = readUint16();
     uint16_t textureCount = readUint16();
@@ -683,9 +687,14 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
 
     Mesh::VertexOffsets offsets;
     offsets.vertexCoords = mdxVerticesOffset;
-    offsets.normals = mdxNormalsOffset != 0xffff ? mdxNormalsOffset : -1;
-    offsets.texCoords1 = mdxTextureOffset != 0xffff ? mdxTextureOffset : -1;
-    offsets.texCoords2 = mdxLightmapOffset != 0xffff ? mdxLightmapOffset : -1;
+    offsets.normals = mdxNormalsOffset != 0xffffffff ? mdxNormalsOffset : -1;
+    offsets.texCoords1 = mdxTextureOffset != 0xffffffff ? mdxTextureOffset : -1;
+    offsets.texCoords2 = mdxLightmapOffset != 0xffffffff ? mdxLightmapOffset : -1;
+    if (mdxTanSpaceOffset != 0xffffffff) {
+        offsets.tangents = mdxTanSpaceOffset + 3 * sizeof(float);
+        offsets.bitangents = mdxTanSpaceOffset + 0;
+        offsets.normals = mdxTanSpaceOffset + 6 * sizeof(float);
+    }
     offsets.stride = mdxVertexSize;
 
     unique_ptr<ModelMesh> mesh(new ModelMesh(render, transparency, shadow));

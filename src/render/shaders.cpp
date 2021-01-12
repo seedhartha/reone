@@ -115,13 +115,16 @@ layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoords;
 layout(location = 3) in vec2 aLightmapCoords;
-layout(location = 4) in vec4 aBoneWeights;
-layout(location = 5) in vec4 aBoneIndices;
+layout(location = 4) in vec3 aTangent;
+layout(location = 5) in vec3 aBitangent;
+layout(location = 6) in vec4 aBoneWeights;
+layout(location = 7) in vec4 aBoneIndices;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
 out vec2 fragTexCoords;
 out vec2 fragLightmapCoords;
+out mat3 fragTanSpace;
 
 void main() {
     vec3 newPosition = vec3(0.0);
@@ -154,6 +157,13 @@ void main() {
     fragNormal = mat3(transpose(inverse(uModel))) * aNormal;
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
+
+    if (uBumpmapEnabled) {
+        vec3 T = normalize(vec3(uModel * vec4(aTangent, 0.0)));
+        vec3 B = normalize(vec3(uModel * vec4(aBitangent, 0.0)));
+        vec3 N = normalize(vec3(uModel * vec4(aNormal, 0.0)));
+        fragTanSpace = mat3(T, B, N);
+    }
 }
 )END";
 
@@ -272,6 +282,7 @@ in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
+in mat3 fragTanSpace;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
@@ -279,6 +290,13 @@ layout(location = 1) out vec4 fragColorBright;
 void applyLightmap(inout vec3 color) {
     vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
     color *= lightmapSample.rgb;
+}
+
+vec3 getNormalFromBumpmap() {
+    vec3 result = texture(uBumpmap, fragTexCoords).rgb;
+    result = normalize(result * 2.0 - 1.0);
+    result = normalize(fragTanSpace * result);
+    return result;
 }
 
 void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
@@ -350,6 +368,9 @@ void main() {
 
     if (uLightmapEnabled) {
         applyLightmap(surfaceColor);
+    }
+    if (uBumpmapEnabled) {
+        normal = getNormalFromBumpmap();
     }
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);

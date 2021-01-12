@@ -72,13 +72,21 @@ void Mesh::initGL() {
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.texCoords2));
     }
-    if (_offsets.boneWeights != -1) {
+    if (_offsets.tangents != -1) {
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneWeights));
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.tangents));
+    }
+    if (_offsets.bitangents != -1) {
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.bitangents));
+    }
+    if (_offsets.boneWeights != -1) {
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneWeights));
     }
     if (_offsets.boneIndices != -1) {
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneIndices));
+        glEnableVertexAttribArray(7);
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneIndices));
     }
 
     glBindVertexArray(0);

@@ -39,6 +39,8 @@ public:
         int normals { -1 };
         int texCoords1 { -1 };
         int texCoords2 { -1 };
+        int tangents { -1 };
+        int bitangents { -1 };
         int boneWeights { -1 };
         int boneIndices { -1 };
         int stride { 0 };
