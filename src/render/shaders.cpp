@@ -42,7 +42,7 @@ static const int kSkeletalBindingPointIndex = 4;
 static const GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
-const int MAX_LIGHTS = 8;
+const int MAX_LIGHTS = 4;
 const int MAX_BONES = 128;
 const float SHADOW_FAR_PLANE = 10000.0;
 
@@ -267,6 +267,9 @@ void main() {
 static const GLchar kSourceFragmentModel[] = R"END(
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
 
+const float SPECULAR_STRENGTH = 0.2;
+const float SHININESS = 8.0;
+
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
@@ -307,29 +310,35 @@ void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
     color += sample.rgb * a;
 }
 
-void applyLighting(vec3 normal, inout vec3 color) {
-    color += uAmbientLightColor.rgb;
+void applyLighting(vec3 normal, float shadow, inout vec3 color) {
+    vec3 ambient = uAmbientLightColor.rgb * color;
 
-    if (uLightCount == 0) return;
+    if (uLightCount == 0) {
+        color = ambient;
+        return;
+    }
+
+    vec3 result = vec3(0.0);
+    vec3 viewDir = normalize(uCameraPosition - fragPosition);
 
     for (int i = 0; i < uLightCount; ++i) {
-        vec3 surfaceToLight = uLights[i].position.xyz - fragPosition;
-        vec3 lightDir = normalize(surfaceToLight);
+        vec3 lightDir = normalize(uLights[i].position.xyz - fragPosition);
+        float diff = max(dot(lightDir, normal), 0.0);
 
-        vec3 surfaceToCamera = normalize(uCameraPosition - fragPosition);
-        float diffuse = max(dot(normal, lightDir), 0.0);
-        float specular = 0.0;
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        float spec = SPECULAR_STRENGTH * pow(max(dot(normal, halfwayDir), 0.0), SHININESS);
 
-        if (diffuse > 0.0) {
-            specular = 0.25 * pow(max(0.0, dot(surfaceToCamera, reflect(-lightDir, normal))), 32);
-        }
-        float distToLight = length(surfaceToLight);
-
-        float attenuation = clamp(1.0 - distToLight / uLights[i].radius, 0.0, 1.0);
+        float distance = length(uLights[i].position.xyz - fragPosition);
+        float attenuation = clamp(1.0 - distance / uLights[i].radius, 0.0, 1.0);
         attenuation *= attenuation;
 
-        color += attenuation * (diffuse + specular) * uLights[i].color.rgb;
+        vec3 diffuse = uLights[i].color.rgb * diff * color * attenuation;
+        vec3 specular = uLights[i].color.rgb * spec * color * attenuation;
+
+        result += (1.0 - shadow) * (diffuse + specular);
     }
+
+    color = ambient + result;
 }
 
 float getShadowValue() {
@@ -377,21 +386,20 @@ void main() {
     } else if (uBumpyShinyEnabled) {
         applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor);
     }
-    if (uLightingEnabled) {
-        applyLighting(normal, lightColor);
-        lightColor = min(lightColor, 1.0);
-    } else {
-        lightColor = vec3(1.0);
-    }
     if (uShadowsEnabled) {
-        lightColor *= (1.0 - 0.5 * getShadowValue());
+        shadow = getShadowValue();
+    }
+    if (uLightingEnabled) {
+        applyLighting(normal, shadow, surfaceColor);
+    } else {
+        surfaceColor *= 1.0 - 0.5 * shadow;
     }
     float finalAlpha = uAlpha;
 
     if (!uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
     }
-    fragColor = vec4(lightColor * surfaceColor, finalAlpha);
+    fragColor = vec4(surfaceColor, finalAlpha);
 
     if (uSelfIllumEnabled) {
         vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb;
