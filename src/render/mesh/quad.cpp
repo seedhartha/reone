@@ -54,7 +54,7 @@ static vector<float> g_flipXYVertices = {
 
 static vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };
 
-static Mesh::VertexOffsets g_offsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, 5 * sizeof(float) };
+static Mesh::VertexOffsets g_offsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, -1, -1, 5 * sizeof(float) };
 
 Quad &Quad::getDefault() {
     static Quad quad(move(g_defaultVertices));
