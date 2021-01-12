@@ -52,7 +52,7 @@ bool ModelNodeSceneNode::shouldRender() const {
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return mesh && !mesh->shouldRender() && mesh->shouldCastShadows();
+    return mesh && mesh->shouldCastShadows();
 }
 
 bool ModelNodeSceneNode::isTransparent() const {
