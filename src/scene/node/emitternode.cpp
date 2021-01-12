@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "glm/gtc/constants.hpp"
+
 #include "../../common/random.h"
 
 #include "particlenode.h"
@@ -62,7 +64,13 @@ void EmitterSceneNode::spawnParticles(float dt) {
             float halfH = 0.005f * _emitter->size().y;
             glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
 
-            float velocity = (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
+            float sign;
+            if (_emitter->spread() > glm::pi<float>() && random(0, 1) != 0) {
+                sign = -1.0f;
+            } else {
+                sign = 1.0f;
+            }
+            float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
 
             auto particle = make_shared<ParticleSceneNode>(position, velocity, _emitter, _sceneGraph);
             _particles.push_back(particle);
