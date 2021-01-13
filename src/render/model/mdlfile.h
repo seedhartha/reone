@@ -69,6 +69,7 @@ private:
     void readColorEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readColorMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readColorStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readFPSController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readFrameEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readFrameStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readLifeExpectancyController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);

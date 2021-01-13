@@ -38,11 +38,12 @@ public:
     int renderOrder() const;
 
 private:
+    glm::vec3 _position;
+    float _velocity;
     std::shared_ptr<render::Emitter> _emitter;
-    glm::vec3 _position { 0.0f };
-    float _velocity { 0.0f };
-    int _renderOrder { 0 };
 
+    float _animLength { 0.0f };
+    int _renderOrder { 0 };
     float _lifetime { 0.0f };
     int _frame { 0 };
     float _size { 1.0f };

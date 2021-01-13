@@ -77,6 +77,8 @@ public:
     float velocity() const { return _velocity; }
     float randomVelocity() const { return _randomVelocity; }
     float spread() const { return _spread; }
+    bool loop() const { return _loop; }
+    int fps() const { return _fps; }
 
 private:
     UpdateType _updateType { UpdateType::Invalid };
@@ -96,6 +98,8 @@ private:
     float _velocity { 0.0f };
     float _randomVelocity { 0.0f };
     float _spread { 0.0f };
+    bool _loop { false };
+    int _fps { 0 };
 
     Constraints<float> _particleSize;
     Constraints<glm::vec3> _color;

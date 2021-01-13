@@ -62,6 +62,7 @@ enum class ControllerType {
     AlphaStart = 84,
     Radius_Birthrate = 88,
     SelfIllumColor = 100,
+    FPS = 104,
     FrameEnd = 108,
     FrameStart = 112,
     LifeExpectancy = 120,
@@ -302,6 +303,11 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 if (node._flags & kNodeHasMesh) {
                     node._selfIllumEnabled = true;
                     readSelfIllumColorController(dataIndex, data, node);
+                }
+                break;
+            case ControllerType::FPS:
+                if (node._flags & kNodeHasEmitter) {
+                    readFPSController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::FrameEnd:
@@ -586,6 +592,10 @@ void MdlFile::readSpreadController(uint16_t dataIndex, const vector<float> &data
     node._emitter->_spread = data[dataIndex];
 }
 
+void MdlFile::readFPSController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._emitter->_fps = data[dataIndex];
+}
+
 void MdlFile::readLight(ModelNode &node) {
     node._light = make_shared<ModelNode::Light>();
 
@@ -864,8 +874,9 @@ void MdlFile::readEmitter(ModelNode &node) {
     node._emitter->_blendType = parseEmitterBlend(readCString(32));
     node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
 
-    ignore(24);
+    ignore(20);
 
+    node._emitter->_loop = readUint32() != 0;
     node._emitter->_renderOrder = readUint16();
 
     ignore(30);
