@@ -52,6 +52,7 @@ static bool validateEmitter(const Emitter &emitter) {
     switch (emitter.updateType()) {
         case Emitter::UpdateType::Fountain:
         case Emitter::UpdateType::Single:
+        case Emitter::UpdateType::Explosion:
             break;
         default:
             warn("validateEmitter: unsupported update type: " + to_string(static_cast<int>(emitter.updateType())));

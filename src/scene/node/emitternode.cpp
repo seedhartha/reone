@@ -60,6 +60,7 @@ void EmitterSceneNode::update(float dt) {
 void EmitterSceneNode::spawnParticles(float dt) {
     switch (_emitter->updateType()) {
         case Emitter::UpdateType::Fountain:
+        case Emitter::UpdateType::Explosion:
             _birthTimer.update(dt);
             if (_birthTimer.hasTimedOut()) {
                 if (_particles.size() < kMaxParticleCount) {
