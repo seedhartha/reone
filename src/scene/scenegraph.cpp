@@ -163,14 +163,11 @@ void SceneGraph::refreshShadowLight() {
 
     glm::vec3 refNodePos(_refNode->absoluteTransform()[3]);
     vector<LightSceneNode *> lights;
-    getLightsAt(refNodePos, lights);
+    getLightsAt(refNodePos, lights, 1, [](auto &light) { return light.shadow(); });
 
-    for (auto &light : lights) {
-        if (light->shadow()) {
-            _shadowLightPresent = true;
-            _shadowLightPosition = light->absoluteTransform()[3];
-            return;
-        }
+    if (!lights.empty()) {
+        _shadowLightPresent = true;
+        _shadowLightPosition = lights.front()->absoluteTransform()[3];
     }
 }
 
@@ -210,12 +207,15 @@ void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
+void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights, int count, function<bool(const LightSceneNode &)> predicate) const {
     unordered_map<LightSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
+        if (!predicate(*light)) continue;
+
         float distance = light->distanceTo(position);
+
         float radius = light->radius();
         if (distance > radius) continue;
 
@@ -236,8 +236,8 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
         return leftDistance < rightDistance;
     });
 
-    if (lights.size() > kMaxLightCount) {
-        lights.erase(lights.begin() + kMaxLightCount, lights.end());
+    if (lights.size() > count) {
+        lights.erase(lights.begin() + count, lights.end());
     }
 }
 

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <vector>
@@ -59,7 +60,11 @@ public:
 
     bool isShadowLightPresent() const;
 
-    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
+    void getLightsAt(
+        const glm::vec3 &position,
+        std::vector<LightSceneNode *> &lights,
+        int count = render::kMaxLightCount,
+        std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const;
     const glm::vec3 &shadowLightPosition() const;
