@@ -16,6 +16,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
+add_subdirectory(external/libtga)
 add_subdirectory(external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
@@ -39,7 +40,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/external/s3tc)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/external/libtga ${CMAKE_SOURCE_DIR}/external/s3tc)
 
 if(ENABLE_VIDEO)
     if(WIN32)
@@ -634,11 +635,11 @@ set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_D
 
 target_link_libraries(reone PRIVATE
     libmp libnet libgame libscript libgui libscene libvideo librender libaudio libresource libcommon
+    libs3tc
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
     ${OPENGL_LIBRARIES}
-    ${MAD_LIBRARY}
-    libs3tc)
+    ${MAD_LIBRARY})
 
 if(ENABLE_VIDEO)
     target_link_libraries(reone PRIVATE ${FFMPEG_LIBRARIES})
@@ -669,11 +670,24 @@ if(BUILD_TOOLS)
         tools/program.cpp
         tools/rimtool.cpp
         tools/tlktool.cpp
-        tools/tools.cpp)
+        tools/tools.cpp
+        tools/tpctool.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    target_link_libraries(reone-tools PRIVATE libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
+    target_link_libraries(reone-tools PRIVATE
+        librender libresource libcommon
+        libtga libs3tc
+        GLEW::GLEW
+        ${OPENGL_LIBRARIES}
+        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
+    if(WIN32)
+        target_link_libraries(reone PRIVATE SDL2::SDL2)
+    else()
+        target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES})
+    endif()
 endif()
 
 ## END reone-tools executable

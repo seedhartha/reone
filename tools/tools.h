@@ -42,7 +42,7 @@ namespace tools {
  * Operations:
  * - list — list file contents
  * - extract — extract file contents
- * - convert — convert file to JSON
+ * - convert — convert file to a more practical format, e.g. JSON, TGA
  */
 class Tool {
 public:
@@ -98,6 +98,11 @@ public:
 
 private:
     boost::property_tree::ptree getPropertyTree(const resource::GffStruct &gffs) const;
+};
+
+class TpcTool : public Tool {
+public:
+    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
 } // namespace tools
