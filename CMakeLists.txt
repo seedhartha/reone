@@ -16,6 +16,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
+add_subdirectory(external/s3tc)
+
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_TESTS "build unit tests" OFF)
 option(ENABLE_VIDEO "enable video playback" ON)
@@ -37,7 +39,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/external/s3tc)
 
 if(ENABLE_VIDEO)
     if(WIN32)
@@ -635,7 +637,8 @@ target_link_libraries(reone PRIVATE
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
     ${OPENGL_LIBRARIES}
-    ${MAD_LIBRARY})
+    ${MAD_LIBRARY}
+    libs3tc)
 
 if(ENABLE_VIDEO)
     target_link_libraries(reone PRIVATE ${FFMPEG_LIBRARIES})
