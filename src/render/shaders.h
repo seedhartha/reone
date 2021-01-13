@@ -32,8 +32,7 @@ namespace reone {
 
 namespace render {
 
-const int kMaxLightCount = 8;
-const int kMaxBoneCount = 128;
+constexpr int kMaxBoneCount = 128;
 
 enum class ShaderProgram {
     None,
