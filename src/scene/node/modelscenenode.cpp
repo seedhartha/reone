@@ -51,6 +51,7 @@ ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &
 static bool validateEmitter(const Emitter &emitter) {
     switch (emitter.updateType()) {
         case Emitter::UpdateType::Fountain:
+        case Emitter::UpdateType::Single:
             break;
         default:
             warn("validateEmitter: unsupported update type: " + to_string(static_cast<int>(emitter.updateType())));

@@ -33,7 +33,7 @@ namespace reone {
 
 namespace scene {
 
-constexpr int kMaxParticleCount = 16;
+constexpr int kMaxParticleCount = 24;
 
 EmitterSceneNode::EmitterSceneNode(const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),
@@ -47,7 +47,9 @@ EmitterSceneNode::EmitterSceneNode(const shared_ptr<Emitter> &emitter, SceneGrap
 }
 
 void EmitterSceneNode::init() {
-    _birthInterval = 1.0f / _emitter->birthrate();
+    if (_emitter->birthrate() != 0) {
+        _birthInterval = 1.0f / static_cast<float>(_emitter->birthrate());
+    }
 }
 
 void EmitterSceneNode::update(float dt) {
@@ -56,28 +58,43 @@ void EmitterSceneNode::update(float dt) {
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
-    _birthTimer.update(dt);
-
-    if (_birthTimer.hasTimedOut()) {
-        if (_particles.size() < kMaxParticleCount) {
-            float halfW = 0.005f * _emitter->size().x;
-            float halfH = 0.005f * _emitter->size().y;
-            glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
-
-            float sign;
-            if (_emitter->spread() > glm::pi<float>() && random(0, 1) != 0) {
-                sign = -1.0f;
-            } else {
-                sign = 1.0f;
+    switch (_emitter->updateType()) {
+        case Emitter::UpdateType::Fountain:
+            _birthTimer.update(dt);
+            if (_birthTimer.hasTimedOut()) {
+                if (_particles.size() < kMaxParticleCount) {
+                    doSpawnParticle(dt);
+                }
+                _birthTimer.reset(_birthInterval);
             }
-            float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
-
-            auto particle = make_shared<ParticleSceneNode>(position, velocity, _emitter, _sceneGraph);
-            _particles.push_back(particle);
-            addChild(particle);
-        }
-        _birthTimer.reset(_birthInterval);
+            break;
+        case Emitter::UpdateType::Single:
+            if (!_spawned || (_particles.empty() && _emitter->loop())) {
+                doSpawnParticle(dt);
+                _spawned = true;
+            }
+            break;
+        default:
+            break;
     }
+}
+
+void EmitterSceneNode::doSpawnParticle(float dt) {
+    float halfW = 0.005f * _emitter->size().x;
+    float halfH = 0.005f * _emitter->size().y;
+    glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
+
+    float sign;
+    if (_emitter->spread() > glm::pi<float>() && random(0, 1) != 0) {
+        sign = -1.0f;
+    } else {
+        sign = 1.0f;
+    }
+    float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
+
+    auto particle = make_shared<ParticleSceneNode>(position, velocity, _emitter, _sceneGraph);
+    _particles.push_back(particle);
+    addChild(particle);
 }
 
 void EmitterSceneNode::updateParticles(float dt) {

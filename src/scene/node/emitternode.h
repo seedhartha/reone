@@ -46,11 +46,14 @@ private:
     float _birthInterval { 0.0f };
     Timer _birthTimer;
     std::vector<std::shared_ptr<ParticleSceneNode>> _particles;
+    bool _spawned { false };
 
     void init();
 
     void spawnParticles(float dt);
     void updateParticles(float dt);
+
+    void doSpawnParticle(float dt);
 };
 
 } // namespace scene

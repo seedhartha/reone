@@ -51,6 +51,7 @@ ParticleSceneNode::ParticleSceneNode(glm::vec3 position, float velocity, const s
 }
 
 void ParticleSceneNode::init() {
+    _animLength = (_emitter->frameEnd() - _emitter->frameStart() + 1) / static_cast<float>(_emitter->fps());
     _renderOrder = _emitter->renderOrder();
     _frame = _emitter->frameStart();
 
@@ -62,14 +63,18 @@ void ParticleSceneNode::updateLocalTransform() {
 }
 
 void ParticleSceneNode::update(float dt) {
-    _lifetime = glm::min(_lifetime + dt, static_cast<float>(_emitter->lifeExpectancy()));
-
-    if (_lifetime < _emitter->lifeExpectancy()) {
+    if (_emitter->lifeExpectancy() != -1) {
+        _lifetime = glm::min(_lifetime + dt, static_cast<float>(_emitter->lifeExpectancy()));
+    } else if (_lifetime == _animLength) {
+        _lifetime = 0.0f;
+    } else {
+        _lifetime = glm::min(_lifetime + dt, _animLength);
+    }
+    if (!isExpired()) {
         _position.z += _velocity * dt;
         updateLocalTransform();
+        updateAnimation(dt);
     }
-
-    updateAnimation(dt);
 }
 
 template <class T>
@@ -86,7 +91,12 @@ static T interpolateConstraints(const Emitter::Constraints<T> &constraints, floa
 }
 
 void ParticleSceneNode::updateAnimation(float dt) {
-    float maturity = _lifetime / static_cast<float>(_emitter->lifeExpectancy());
+    float maturity;
+    if (_emitter->lifeExpectancy() != -1) {
+        maturity = _lifetime / static_cast<float>(_emitter->lifeExpectancy());
+    } else {
+        maturity = _lifetime / _animLength;
+    }
     _frame =  glm::ceil(_emitter->frameStart() + maturity * (_emitter->frameEnd() - _emitter->frameStart()));
     _size = interpolateConstraints(_emitter->particleSize(), maturity);
     _color = interpolateConstraints(_emitter->color(), maturity);
@@ -122,7 +132,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
 }
 
 bool ParticleSceneNode::isExpired() const {
-    return _lifetime >= _emitter->lifeExpectancy();
+    return _emitter->lifeExpectancy() != -1 && _lifetime >= _emitter->lifeExpectancy();
 }
 
 int ParticleSceneNode::renderOrder() const {
