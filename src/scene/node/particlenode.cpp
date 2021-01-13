@@ -96,6 +96,9 @@ void ParticleSceneNode::updateAnimation(float dt) {
 void ParticleSceneNode::renderSingle(bool shadowPass) const {
     if (shadowPass) return;
 
+    shared_ptr<Texture> texture(_emitter->texture());
+    if (!texture) return;
+
     LocalUniforms locals;
     locals.general.color = glm::vec4(_color, 1.0f);
     locals.general.alpha = _alpha;
@@ -108,7 +111,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 
     setActiveTextureUnit(0);
-    _emitter->texture()->bind();
+    texture->bind();
 
     bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
     if (lighten) {
