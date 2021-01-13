@@ -50,7 +50,13 @@ public:
         std::vector<MipMap> mipMaps;
     };
 
-    Texture(std::string name, TextureType type, int w, int h);
+    /**
+     * @param w texture width
+     * @param h texture height
+     * @param headless true if texture will not be used for rendering
+     */
+    Texture(std::string name, TextureType type, int w, int h, bool headless = false);
+
     ~Texture();
 
     /**
@@ -74,6 +80,7 @@ public:
     uint32_t textureId() const;
     int width() const;
     int height() const;
+    const std::vector<Layer> &layers() const;
     PixelFormat pixelFormat() const;
     const TextureFeatures &features() const;
 
@@ -85,6 +92,7 @@ private:
     TextureType _type;
     int _width;
     int _height;
+    bool _headless;
 
     bool _inited { false };
     uint32_t _textureId { 0 };

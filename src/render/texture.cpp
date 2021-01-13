@@ -29,8 +29,8 @@ namespace reone {
 
 namespace render {
 
-Texture::Texture(string name, TextureType type, int w, int h) :
-    _name(move(name)), _type(type), _width(w), _height(h) {
+Texture::Texture(string name, TextureType type, int w, int h, bool headless) :
+    _name(move(name)), _type(type), _width(w), _height(h), _headless(headless) {
 }
 
 void Texture::init() {
@@ -128,13 +128,15 @@ void Texture::deinit() {
 }
 
 void Texture::clearPixels(PixelFormat format) {
-    if (!_inited) {
+    if (!_headless && !_inited) {
         throw logic_error("Texture has not been initialized: " + _name);
     }
     _layers.clear();
     _pixelFormat = format;
 
-    refresh();
+    if (!_headless) {
+        refresh();
+    }
 }
 
 void Texture::refresh() {
@@ -266,6 +268,10 @@ int Texture::height() const {
     return _height;
 }
 
+const vector<Texture::Layer> &Texture::layers() const {
+    return _layers;
+}
+
 PixelFormat Texture::pixelFormat() const {
     return _pixelFormat;
 }
@@ -275,7 +281,7 @@ const TextureFeatures &Texture::features() const {
 }
 
 void Texture::setPixels(vector<Layer> layers, PixelFormat format) {
-    if (!_inited) {
+    if (!_headless && !_inited) {
         throw logic_error("Texture has not been initialized: " + _name);
     }
     if (layers.empty()) {
@@ -284,7 +290,9 @@ void Texture::setPixels(vector<Layer> layers, PixelFormat format) {
     _layers = move(layers);
     _pixelFormat = format;
 
-    refresh();
+    if (!_headless) {
+        refresh();
+    }
 }
 
 void Texture::setFeatures(TextureFeatures features) {

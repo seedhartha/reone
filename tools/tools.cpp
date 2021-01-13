@@ -57,6 +57,8 @@ unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
         return make_unique<TwoDaTool>();
     } else if (ext == ".tlk") {
         return make_unique<TlkTool>();
+    } else if (ext == ".tpc") {
+        return make_unique<TpcTool>();
     } else {
         return make_unique<GffTool>();
     }

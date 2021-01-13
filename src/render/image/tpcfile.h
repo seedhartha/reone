@@ -27,7 +27,11 @@ namespace render {
 
 class TpcFile : public resource::BinaryFile {
 public:
-    TpcFile(const std::string &resRef, TextureType type);
+    /**
+     * @param headless true if texture will not be used for rendering
+     */
+    TpcFile(const std::string &resRef, TextureType type, bool headless = false);
+
     std::shared_ptr<Texture> texture() const;
 
 private:
@@ -39,6 +43,8 @@ private:
 
     std::string _resRef;
     TextureType _type;
+    bool _headless;
+
     uint32_t _dataSize { 0 };
     bool _compressed { false };
     uint16_t _width { 0 };

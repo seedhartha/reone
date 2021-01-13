@@ -31,7 +31,8 @@ namespace reone {
 
 namespace render {
 
-TpcFile::TpcFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _type(type) {
+TpcFile::TpcFile(const string &resRef, TextureType type, bool headless) :
+    BinaryFile(0), _resRef(resRef), _type(type), _headless(headless) {
 }
 
 void TpcFile::doLoad() {
@@ -134,8 +135,10 @@ void TpcFile::loadTexture() {
         features = txi.features();
     }
 
-    _texture = make_shared<Texture>(_resRef, _type, _width, _height);
-    _texture->init();
+    _texture = make_shared<Texture>(_resRef, _type, _width, _height, _headless);
+    if (!_headless) {
+        _texture->init();
+    }
     _texture->setPixels(move(layers), getPixelFormat());
     _texture->setFeatures(move(features));
 }
