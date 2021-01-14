@@ -114,8 +114,7 @@ void TpcFile::loadTexture() {
                 getMipMapSize(i, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
-            ByteArray data(_reader->getArray<char>(dataSize));
-            mipMap.data = move(data);
+            mipMap.data = _reader->getArray<char>(dataSize);
             mipMaps.push_back(move(mipMap));
         }
 

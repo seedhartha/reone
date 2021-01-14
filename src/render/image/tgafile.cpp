@@ -81,32 +81,9 @@ void TgaFile::loadTexture() {
         mipMap.height = cubeMap ? _width : _height;
 
         int pixelCount = mipMap.width * mipMap.height;
-        int sizeRgb = (_alpha ? 4 : 3) * pixelCount;
-        mipMap.data.resize(sizeRgb);
-        char *mipMapPtr = &mipMap.data[0];
+        int dataSize = (_imageType == ImageType::Grayscale ? 1 : (_alpha ? 4 : 3)) * pixelCount;
 
-        if (_imageType == ImageType::Grayscale) {
-            ByteArray buf(_reader->getArray<char>(pixelCount));
-            for (int i = 0; i < pixelCount; ++i) {
-                *(mipMapPtr++) = buf[i];
-                *(mipMapPtr++) = buf[i];
-                *(mipMapPtr++) = buf[i];
-            }
-        } else {
-            ByteArray buf(_reader->getArray<char>(sizeRgb));
-            for (int y = 0; y < mipMap.height; ++y) {
-                for (int x = 0; x < mipMap.width; ++x) {
-                    int pixelIdx = x + y * mipMap.width;
-                    char *bufPtr = &buf[(_alpha ? 4ll : 3ll) * pixelIdx];
-                    *(mipMapPtr++) = bufPtr[0];
-                    *(mipMapPtr++) = bufPtr[1];
-                    *(mipMapPtr++) = bufPtr[2];
-                    if (_alpha) {
-                        *(mipMapPtr++) = bufPtr[3];
-                    }
-                }
-            }
-        }
+        mipMap.data = _reader->getArray<char>(dataSize);
 
         Texture::Layer layer;
         layer.mipMaps.push_back(move(mipMap));
@@ -114,7 +91,10 @@ void TgaFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    PixelFormat format = _alpha ? PixelFormat::BGRA : PixelFormat::BGR;
+    PixelFormat format = _imageType == ImageType::Grayscale ?
+        PixelFormat::Grayscale :
+        (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+
     if (cubeMap) {
         prepareCubeMap(layers, format, format);
     }

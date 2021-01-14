@@ -75,6 +75,7 @@ public:
     void unbind() const;
 
     bool isAdditive() const;
+    bool isGrayscale() const;
 
     const std::string &name() const;
     uint32_t textureId() const;
