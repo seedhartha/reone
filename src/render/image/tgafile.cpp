@@ -37,7 +37,7 @@ void TgaFile::doLoad() {
         case ImageType::RGBA:
             break;
         default:
-            throw runtime_error("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            throw runtime_error("Unsupported image type: " + to_string(static_cast<int>(_imageType)));
     }
 
     ignore(9);
@@ -46,51 +46,75 @@ void TgaFile::doLoad() {
     _height = readUint16();
 
     uint8_t bpp = readByte();
+    _alpha = _imageType == ImageType::RGBA && bpp == 32;
 
-    if ((_imageType == ImageType::RGBA && bpp != 32) ||
+    if ((_imageType == ImageType::RGBA && bpp != 24 && bpp != 32) ||
         (_imageType == ImageType::Grayscale && bpp != 8)) {
 
-        throw runtime_error("TGA: unsupported bits per pixel: " + to_string(bpp));
+        throw runtime_error("Unsupported bits per pixel: " + to_string(bpp));
     }
 
-    ignore(1);
+    uint8_t descriptor = readByte();
+
+    bool flipY = (descriptor & 0x10) != 0;
+    if (flipY) {
+        throw runtime_error("Vertically flipped images are not supported");
+    }
+
     ignore(idLength);
 
     loadTexture();
 }
 
 void TgaFile::loadTexture() {
-    Texture::MipMap mipMap;
-    mipMap.width = _width;
-    mipMap.height = _height;
+    bool cubeMap = _height / _width == 6;
+    int layerCount = cubeMap ? 6 : 1;
 
-    int sizeRgba = 4 * _width * _height;
+    vector<Texture::Layer> layers;
+    layers.reserve(layerCount);
 
-    if (_imageType == ImageType::Grayscale) {
-        mipMap.data.resize(sizeRgba);
-        char *pi = &mipMap.data[0];
+    for (int i = 0; i < layerCount; ++i) {
+        Texture::MipMap mipMap;
+        mipMap.width = _width;
+        mipMap.height = cubeMap ? _width : _height;
 
-        int size = _width * _height;
-        ByteArray buf(_reader->getArray<char>(size));
+        int pixelCount = mipMap.width * mipMap.height;
+        int sizeRgb = (_alpha ? 4 : 3) * pixelCount;
+        mipMap.data.resize(sizeRgb);
+        char *mipMapPtr = &mipMap.data[0];
 
-        for (int i = 0; i < size; ++i) {
-            pi[0] = buf[i];
-            pi[1] = buf[i];
-            pi[2] = buf[i];
-            pi[3] = static_cast<char>(0xff);
-            pi += 4;
+        if (_imageType == ImageType::Grayscale) {
+            ByteArray buf(_reader->getArray<char>(pixelCount));
+            for (int i = 0; i < pixelCount; ++i) {
+                *(mipMapPtr++) = buf[i];
+                *(mipMapPtr++) = buf[i];
+                *(mipMapPtr++) = buf[i];
+            }
+        } else {
+            ByteArray buf(_reader->getArray<char>(sizeRgb));
+            for (int y = 0; y < mipMap.height; ++y) {
+                for (int x = 0; x < mipMap.width; ++x) {
+                    int pixelIdx = x + y * mipMap.width;
+                    char *bufPtr = &buf[(_alpha ? 4ll : 3ll) * pixelIdx];
+                    *(mipMapPtr++) = bufPtr[0];
+                    *(mipMapPtr++) = bufPtr[1];
+                    *(mipMapPtr++) = bufPtr[2];
+                    if (_alpha) {
+                        *(mipMapPtr++) = bufPtr[3];
+                    }
+                }
+            }
         }
-    } else {
-        ByteArray data(_reader->getArray<char>(sizeRgba));
-        mipMap.data = move(data);
-    }
 
-    Texture::Layer layer;
-    layer.mipMaps.push_back(move(mipMap));
+        Texture::Layer layer;
+        layer.mipMaps.push_back(move(mipMap));
+
+        layers.push_back(move(layer));
+    }
 
     _texture = make_shared<Texture>(_resRef, _texType, _width, _height);
     _texture->init();
-    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
+    _texture->setPixels(move(layers), _alpha ? PixelFormat::BGRA : PixelFormat::BGR);
 }
 
 shared_ptr<Texture> TgaFile::texture() const {

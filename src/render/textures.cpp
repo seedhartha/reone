@@ -17,6 +17,8 @@
 
 #include "textures.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../common/log.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
@@ -51,7 +53,8 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;
     }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, type)));
+    string lcResRef(boost::to_lower_copy(resRef));
+    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, type)));
 
     return inserted.first->second;
 }
@@ -59,22 +62,19 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
     shared_ptr<Texture> texture;
 
-    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
-    if (tryTpc) {
+    shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
+    if (tgaData) {
+        TgaFile tga(resRef, type);
+        tga.load(wrap(tgaData));
+        texture = tga.texture();
+    }
+
+    if (!texture) {
         shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture, false));
         if (tpcData) {
             TpcFile tpc(resRef, type);
             tpc.load(wrap(tpcData));
             texture = tpc.texture();
-        }
-    }
-
-    if (!texture) {
-        shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
-        if (tgaData) {
-            TgaFile tga(resRef, type);
-            tga.load(wrap(tgaData));
-            texture = tga.texture();
         }
     }
 
