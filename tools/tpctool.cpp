@@ -145,7 +145,7 @@ void TpcTool::convert(const fs::path &path, const fs::path &destPath) const {
     TGA *tga = TGAOpen(const_cast<char *>(tgaPath.string().c_str()), "wb");
     if (!tga) {
         error("TGA: write failed: " + tgaPath.string());
-        goto cleanup;
+        return;
     }
 
     tga->hdr = header;
@@ -156,7 +156,8 @@ void TpcTool::convert(const fs::path &path, const fs::path &destPath) const {
         error("TPC: convert failed: " + msg);
     }
 
-cleanup:
+    // Cleanup
+
     TGAClose(tga);
 }
 
