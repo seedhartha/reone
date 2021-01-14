@@ -286,6 +286,7 @@ in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
 in mat3 fragTanSpace;
+in vec3 fragTanSpaceNormal;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
@@ -335,7 +336,7 @@ void applyLighting(vec3 normal, float shadow, inout vec3 color) {
         vec3 diffuse = uLights[i].color.rgb * diff * color * attenuation;
         vec3 specular = uLights[i].color.rgb * spec * color * attenuation;
 
-        result += (1.0 - shadow) * (diffuse + specular);
+        result += (1.0 - 0.5 * shadow) * (diffuse + specular);
     }
 
     color = ambient + result;

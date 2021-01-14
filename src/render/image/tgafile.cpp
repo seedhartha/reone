@@ -17,6 +17,8 @@
 
 #include "tgafile.h"
 
+#include "../textureutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -112,9 +114,14 @@ void TgaFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
+    PixelFormat format = _alpha ? PixelFormat::BGRA : PixelFormat::BGR;
+    if (cubeMap) {
+        prepareCubeMap(layers, format, format);
+    }
+
     _texture = make_shared<Texture>(_resRef, _texType, _width, _height);
     _texture->init();
-    _texture->setPixels(move(layers), _alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+    _texture->setPixels(move(layers), format);
 }
 
 shared_ptr<Texture> TgaFile::texture() const {

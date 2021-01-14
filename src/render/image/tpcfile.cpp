@@ -21,6 +21,8 @@
 
 #include "../../common/streamutil.h"
 
+#include "../textureutil.h"
+
 #include "txifile.h"
 
 using namespace std;
@@ -135,11 +137,16 @@ void TpcFile::loadTexture() {
         features = txi.features();
     }
 
+    PixelFormat format = getPixelFormat();
+    if (_cubeMap) {
+        prepareCubeMap(layers, format, format);
+    }
+
     _texture = make_shared<Texture>(_resRef, _type, _width, _height, _headless);
     if (!_headless) {
         _texture->init();
     }
-    _texture->setPixels(move(layers), getPixelFormat());
+    _texture->setPixels(move(layers), format);
     _texture->setFeatures(move(features));
 }
 
