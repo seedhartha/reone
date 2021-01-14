@@ -30,6 +30,7 @@ namespace render {
 class TgaFile : public resource::BinaryFile {
 public:
     TgaFile(const std::string &resRef, TextureType type);
+
     std::shared_ptr<render::Texture> texture() const;
 
 private:
@@ -39,10 +40,12 @@ private:
     };
 
     std::string _resRef;
-    TextureType _texType { TextureType::Diffuse };
+    TextureType _texType;
+
     ImageType _imageType { ImageType::RGBA };
     int _width { 0 };
     int _height { 0 };
+    bool _alpha { false };
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
