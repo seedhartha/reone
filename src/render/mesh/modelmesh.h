@@ -54,6 +54,7 @@ public:
 
     int transparency() const;
     const std::shared_ptr<Texture> &diffuseTexture() const;
+    const std::shared_ptr<Texture> &bumpmapTexture() const;
 
 private:
     bool _render { false };

@@ -77,6 +77,7 @@ layout(std140) uniform General {
     uniform vec4 uParticleCenter;
     uniform int uBillboardFrame;
     uniform bool uBillboardToWorldZ;
+    uniform bool uGrayscaleBumpmap;
 };
 
 layout(std140) uniform Lighting {
@@ -158,7 +159,7 @@ void main() {
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
-    if (uBumpmapEnabled) {
+    if (uBumpmapEnabled && !uGrayscaleBumpmap) {
         vec3 T = normalize(vec3(uModel * vec4(aTangent, 0.0)));
         vec3 B = normalize(vec3(uModel * vec4(aBitangent, 0.0)));
         vec3 N = normalize(vec3(uModel * vec4(aNormal, 0.0)));
@@ -286,7 +287,6 @@ in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
 in mat3 fragTanSpace;
-in vec3 fragTanSpaceNormal;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
@@ -296,11 +296,23 @@ void applyLightmap(inout vec3 color) {
     color *= lightmapSample.rgb;
 }
 
-vec3 getNormalFromBumpmap() {
-    vec3 result = texture(uBumpmap, fragTexCoords).rgb;
-    result = normalize(result * 2.0 - 1.0);
-    result = normalize(fragTanSpace * result);
-    return result;
+void applyBumpmapToNormal(inout vec3 normal) {
+    if (uGrayscaleBumpmap) {
+        vec2 dSTdx = dFdx(fragTexCoords);
+        vec2 dSTdy = dFdy(fragTexCoords);
+
+        float Hll = texture(uBumpmap, fragTexCoords).x;
+        float dBx = texture(uBumpmap, fragTexCoords + dSTdx).x - Hll;
+        float dBy = texture(uBumpmap, fragTexCoords + dSTdy).x - Hll;
+        float scale = 0.2;
+
+        normal = vec3(0.5 - (dBx * scale), 0.5 - (dBy * scale), 1.0);
+
+    } else {
+        normal = texture(uBumpmap, fragTexCoords).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+        normal = normalize(fragTanSpace * normal);
+    }
 }
 
 void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
@@ -380,7 +392,7 @@ void main() {
         applyLightmap(surfaceColor);
     }
     if (uBumpmapEnabled) {
-        normal = getNormalFromBumpmap();
+        applyBumpmapToNormal(normal);
     }
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);

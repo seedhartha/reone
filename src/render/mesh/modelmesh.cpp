@@ -118,6 +118,10 @@ const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
     return _diffuse;
 }
 
+const shared_ptr<Texture> &ModelMesh::bumpmapTexture() const {
+    return _bumpmap;
+}
+
 } // namespace render
 
 } // namespace reone

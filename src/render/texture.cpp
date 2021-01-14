@@ -184,7 +184,7 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
 int Texture::getInternalPixelFormat() const {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
-            return GL_LUMINANCE;
+            return GL_RED;
         case PixelFormat::RGB:
         case PixelFormat::BGR:
             return GL_RGB8;
@@ -202,9 +202,10 @@ int Texture::getInternalPixelFormat() const {
 
 uint32_t Texture::getPixelFormat() const {
     switch (_pixelFormat) {
+        case PixelFormat::Grayscale:
+            return GL_RED;
         case PixelFormat::RGB:
             return GL_RGB;
-        case PixelFormat::Grayscale:
         case PixelFormat::RGBA:
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
@@ -250,6 +251,10 @@ void Texture::unbind() const {
 
 bool Texture::isAdditive() const {
     return _features.blending == TextureBlending::Additive;
+}
+
+bool Texture::isGrayscale() const {
+    return _pixelFormat == PixelFormat::Grayscale;
 }
 
 const string &Texture::name() const {
