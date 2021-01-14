@@ -701,9 +701,8 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     offsets.texCoords1 = mdxTextureOffset != 0xffffffff ? mdxTextureOffset : -1;
     offsets.texCoords2 = mdxLightmapOffset != 0xffffffff ? mdxLightmapOffset : -1;
     if (mdxTanSpaceOffset != 0xffffffff) {
+        offsets.bitangents = mdxTanSpaceOffset + 0 * sizeof(float);
         offsets.tangents = mdxTanSpaceOffset + 3 * sizeof(float);
-        offsets.bitangents = mdxTanSpaceOffset + 0;
-        offsets.normals = mdxTanSpaceOffset + 6 * sizeof(float);
     }
     offsets.stride = mdxVertexSize;
 
