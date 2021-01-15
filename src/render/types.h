@@ -69,12 +69,13 @@ struct TextureFeatures {
     std::string envMapTexture;
     std::string bumpyShinyTexture;
     std::string bumpMapTexture;
-    float bumpMapScaling { 0.1f };
+    float bumpMapScaling { 0.0f };
     TextureBlending blending { TextureBlending::None };
     int numChars { 0 };
     float fontHeight { 0.0f };
     std::vector<glm::vec3> upperLeftCoords;
     std::vector<glm::vec3> lowerRightCoords;
+    float waterAlpha { -1.0f };
 };
 
 class IEventHandler {

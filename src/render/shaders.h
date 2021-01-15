@@ -94,9 +94,10 @@ struct GeneralUniforms {
     int billboardFrame { 0 };
     int billboardToWorldZ { 0 };
     int grayscaleBumpmap { 0 };
-    float bumpmapScaling { 0.1f };
+    float bumpmapScaling { 0.0f };
     glm::vec2 uvOffset { 0.0f };
-    char padding3[8];
+    int water { 0 };
+    float waterAlpha { 1.0f };
 };
 
 struct SkeletalUniforms {

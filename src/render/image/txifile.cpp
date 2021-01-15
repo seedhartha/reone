@@ -78,6 +78,8 @@ void TxiFile::processLine(const vector<string> &tokens) {
                 _lowerRightCoordCount = stoi(tokens[1]);
                 _features.lowerRightCoords.reserve(_lowerRightCoordCount);
                 _state = State::LowerRightCoords;
+            } else if (key == "wateralpha") {
+                _features.waterAlpha = stof(tokens[1]);
             }
             break;
 
