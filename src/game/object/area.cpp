@@ -592,10 +592,10 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     dest.x += dir.x * speedDt;
     dest.y += dir.y * speedDt;
 
-    // If obstacle is found once, try taking to the right
+    // If obstacle is found once, try moving south east
     if (getCreatureObstacle(*creature, dest)) {
         // TODO: possibly use the intersected face normal?
-        facing -= glm::half_pi<float>();
+        facing -= 0.75f * glm::pi<float>();
         glm::vec2 right(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
 
         dest = creature->position();
