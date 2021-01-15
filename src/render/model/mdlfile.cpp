@@ -633,7 +633,13 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     uint32_t indexOffOffset, indexCount;
     readArrayDefinition(indexOffOffset, indexCount);
 
-    ignore(52);
+    ignore(32);
+
+    bool animateUv = readUint32() != 0;
+    float uvDirectionX = readFloat();
+    float uvDirectionY = readFloat();
+    float uvJitter = readFloat();
+    float uvJitterSpeed = readFloat();
 
     uint32_t mdxVertexSize = readUint32();
 
@@ -729,6 +735,13 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     }
     if (!lightmap.empty()) {
         mesh->_lightmap = Textures::instance().get(lightmap, TextureType::Lightmap);
+    }
+    if (animateUv) {
+        mesh->_uvAnimation.animated = true;
+        mesh->_uvAnimation.directionX = uvDirectionX;
+        mesh->_uvAnimation.directionY = uvDirectionY;
+        mesh->_uvAnimation.jitter = uvJitter;
+        mesh->_uvAnimation.jitterSpeed = uvJitterSpeed;
     }
 
     return move(mesh);

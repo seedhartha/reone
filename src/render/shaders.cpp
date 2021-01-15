@@ -79,6 +79,7 @@ layout(std140) uniform General {
     uniform bool uBillboardToWorldZ;
     uniform bool uGrayscaleBumpmap;
     uniform float uBumpmapScaling;
+    uniform vec2 uUvOffset;
 };
 
 layout(std140) uniform Lighting {
@@ -294,22 +295,24 @@ layout(location = 1) out vec4 fragColorBright;
 
 void applyLightmap(inout vec3 color) {
     vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-    color *= lightmapSample.rgb;
+    vec3 result = lightmapSample.rgb;
+    result *= color;
+    color = result;
 }
 
-void applyBumpmapToNormal(inout vec3 normal) {
+void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
     if (uGrayscaleBumpmap) {
-        vec2 dSTdx = dFdx(fragTexCoords);
-        vec2 dSTdy = dFdy(fragTexCoords);
+        vec2 dSTdx = dFdx(uv);
+        vec2 dSTdy = dFdy(uv);
 
-        float Hll = texture(uBumpmap, fragTexCoords).r;
-        float dBx = texture(uBumpmap, fragTexCoords + dSTdx).r - Hll;
-        float dBy = texture(uBumpmap, fragTexCoords + dSTdy).r - Hll;
+        float Hll = texture(uBumpmap, uv).r;
+        float dBx = texture(uBumpmap, uv + dSTdx).r - Hll;
+        float dBy = texture(uBumpmap, uv + dSTdy).r - Hll;
 
         normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
 
     } else {
-        normal = texture(uBumpmap, fragTexCoords).rgb;
+        normal = texture(uBumpmap, uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
         normal = normalize(fragTanSpace * normal);
     }
@@ -382,7 +385,8 @@ float getShadowValue() {
 }
 
 void main() {
-    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
+    vec2 uv = fragTexCoords + uUvOffset;
+    vec4 diffuseSample = texture(uDiffuse, uv);
     vec3 surfaceColor = diffuseSample.rgb;
     float shadow = 0.0f;
     vec3 lightColor = vec3(0.0);
@@ -392,7 +396,7 @@ void main() {
         applyLightmap(surfaceColor);
     }
     if (uBumpmapEnabled) {
-        applyBumpmapToNormal(normal);
+        applyBumpmapToNormal(normal, uv);
     }
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);

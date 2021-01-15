@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "../../common/random.h"
+
 #include "../scenegraph.h"
 
 #include "lightnode.h"
@@ -32,6 +34,8 @@ namespace reone {
 
 namespace scene {
 
+constexpr float kUvAnimationSpeed = 250.0f;
+
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
     _modelSceneNode(modelSceneNode),
@@ -43,6 +47,18 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
     if (!modelNode) {
         throw invalid_argument("modelNode must not be null");
     }
+}
+
+void ModelNodeSceneNode::update(float dt) {
+    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    if (!mesh) return;
+
+    const ModelMesh::UVAnimation &uvAnimation = mesh->uvAnimation();
+    if (!uvAnimation.animated) return;
+
+    glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
+    _uvOffset += kUvAnimationSpeed * dir * dt;
+    _uvOffset -= glm::floor(_uvOffset);
 }
 
 bool ModelNodeSceneNode::shouldRender() const {
@@ -130,6 +146,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
             }
         }
+        locals.general.uvOffset = _uvOffset;
     }
 
     ShaderProgram program = shadowPass ? ShaderProgram::DepthDepth : ShaderProgram::ModelModel;

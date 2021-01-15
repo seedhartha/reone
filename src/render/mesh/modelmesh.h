@@ -37,6 +37,14 @@ class MdlFile;
  */
 class ModelMesh : public Mesh {
 public:
+    struct UVAnimation {
+        bool animated { false };
+        float directionX { 0.0f };
+        float directionY { 0.0f };
+        float jitter { 0.0f };
+        float jitterSpeed { 0.0f };
+    };
+
     ModelMesh(bool render, int transparency, bool shadow);
 
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
@@ -53,6 +61,8 @@ public:
     bool hasBumpmapTexture() const;
 
     int transparency() const;
+    const UVAnimation &uvAnimation() const;
+
     const std::shared_ptr<Texture> &diffuseTexture() const;
     const std::shared_ptr<Texture> &bumpmapTexture() const;
 
@@ -60,11 +70,17 @@ private:
     bool _render { false };
     int _transparency { 0 };
     bool _shadow { false };
+    UVAnimation _uvAnimation;
+
+    // Textures
+
     std::shared_ptr<Texture> _diffuse;
     std::shared_ptr<Texture> _envmap;
     std::shared_ptr<Texture> _lightmap;
     std::shared_ptr<Texture> _bumpyShiny;
     std::shared_ptr<Texture> _bumpmap;
+
+    // END Textures
 
     friend class MdlFile;
 };
