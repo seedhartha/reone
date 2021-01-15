@@ -80,6 +80,8 @@ layout(std140) uniform General {
     uniform bool uGrayscaleBumpmap;
     uniform float uBumpmapScaling;
     uniform vec2 uUvOffset;
+    uniform bool uWater;
+    uniform float uWaterAlpha;
 };
 
 layout(std140) uniform Lighting {
@@ -411,7 +413,7 @@ void main() {
     } else {
         surfaceColor *= 1.0 - 0.5 * shadow;
     }
-    float finalAlpha = uAlpha;
+    float finalAlpha = uWater ? uWaterAlpha : uAlpha;
 
     if (!uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
@@ -419,7 +421,7 @@ void main() {
     fragColor = vec4(surfaceColor, finalAlpha);
 
     if (uSelfIllumEnabled) {
-        vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb;
+        vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
         fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
     } else {
         fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
