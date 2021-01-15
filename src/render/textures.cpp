@@ -26,6 +26,7 @@
 #include "image/curfile.h"
 #include "image/tgafile.h"
 #include "image/tpcfile.h"
+#include "image/txifile.h"
 
 using namespace std;
 
@@ -67,6 +68,13 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         TgaFile tga(resRef, type);
         tga.load(wrap(tgaData));
         texture = tga.texture();
+
+        shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::ExtraTextureInfo, false));
+        if (txiData) {
+            TxiFile txi;
+            txi.load(wrap(txiData));
+            texture->setFeatures(txi.features());
+        }
     }
 
     if (!texture) {
