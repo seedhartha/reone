@@ -78,6 +78,7 @@ layout(std140) uniform General {
     uniform int uBillboardFrame;
     uniform bool uBillboardToWorldZ;
     uniform bool uGrayscaleBumpmap;
+    uniform float uBumpmapScaling;
 };
 
 layout(std140) uniform Lighting {
@@ -301,12 +302,11 @@ void applyBumpmapToNormal(inout vec3 normal) {
         vec2 dSTdx = dFdx(fragTexCoords);
         vec2 dSTdy = dFdy(fragTexCoords);
 
-        float Hll = texture(uBumpmap, fragTexCoords).x;
-        float dBx = texture(uBumpmap, fragTexCoords + dSTdx).x - Hll;
-        float dBy = texture(uBumpmap, fragTexCoords + dSTdy).x - Hll;
-        float scale = 0.2;
+        float Hll = texture(uBumpmap, fragTexCoords).r;
+        float dBx = texture(uBumpmap, fragTexCoords + dSTdx).r - Hll;
+        float dBy = texture(uBumpmap, fragTexCoords + dSTdy).r - Hll;
 
-        normal = vec3(0.5 - (dBx * scale), 0.5 - (dBy * scale), 1.0);
+        normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
 
     } else {
         normal = texture(uBumpmap, fragTexCoords).rgb;

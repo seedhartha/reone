@@ -21,6 +21,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -60,6 +62,8 @@ void TxiFile::processLine(const vector<string> &tokens) {
                 _features.bumpyShinyTexture = tokens[1];
             } else if (key == "bumpmaptexture") {
                 _features.bumpMapTexture = tokens[1];
+            } else if (key == "bumpmapscaling") {
+                _features.bumpMapScaling = stof(tokens[1]);
             } else if (key == "blending") {
                 _features.blending = parseBlending(tokens[1]);
             } else if (key == "numchars") {
@@ -104,11 +108,13 @@ void TxiFile::processLine(const vector<string> &tokens) {
 }
 
 TextureBlending TxiFile::parseBlending(const string &s) const {
+    TextureBlending result = TextureBlending::None;
     if (s == "additive") {
-        return TextureBlending::Additive;
+        result = TextureBlending::Additive;
+    } else {
+        warn("TXI: unsupported blending mode: " + s);
     }
-
-    return TextureBlending::None;
+    return result;
 }
 
 const TextureFeatures &TxiFile::features() const {

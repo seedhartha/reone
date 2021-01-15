@@ -81,9 +81,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         if (mesh->hasBumpyShinyTexture()) {
             locals.general.bumpyShinyEnabled = true;
         }
-        if (mesh->hasBumpmapTexture()) {
+        shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
+        if (bumpmapTexture) {
             locals.general.bumpmapEnabled = true;
-            locals.general.grayscaleBumpmap = mesh->bumpmapTexture()->isGrayscale();
+            locals.general.grayscaleBumpmap = bumpmapTexture->isGrayscale();
+            locals.general.bumpmapScaling = bumpmapTexture->features().bumpMapScaling;
         }
         bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
         if (receivesShadows) {
