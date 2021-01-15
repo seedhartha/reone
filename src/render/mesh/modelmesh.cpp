@@ -114,6 +114,10 @@ int ModelMesh::transparency() const {
     return _transparency;
 }
 
+const ModelMesh::UVAnimation &ModelMesh::uvAnimation() const {
+    return _uvAnimation;
+}
+
 const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
     return _diffuse;
 }

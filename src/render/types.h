@@ -69,7 +69,7 @@ struct TextureFeatures {
     std::string envMapTexture;
     std::string bumpyShinyTexture;
     std::string bumpMapTexture;
-    float bumpMapScaling { 0.1 };
+    float bumpMapScaling { 0.1f };
     TextureBlending blending { TextureBlending::None };
     int numChars { 0 };
     float fontHeight { 0.0f };

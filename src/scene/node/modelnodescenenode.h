@@ -36,6 +36,8 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
+    void update(float dt);
+
     void renderSingle(bool shadowPass) const override;
 
     bool shouldRender() const;
@@ -54,6 +56,7 @@ private:
     render::ModelNode *_modelNode { nullptr };
     glm::mat4 _animTransform { 1.0f };
     glm::mat4 _boneTransform { 1.0f };
+    glm::vec2 _uvOffset { 0.0f };
 };
 
 } // namespace scene

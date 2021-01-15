@@ -129,6 +129,9 @@ void ModelSceneNode::update(float dt) {
 
     _animator.update(dt);
 
+    for (auto &modelNode : _modelNodeByNumber) {
+        modelNode.second->update(dt);
+    }
     for (auto &emitter : _emitters) {
         emitter->update(dt);
     }
