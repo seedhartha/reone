@@ -166,10 +166,13 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
             }
         }
-        float waterAlpha = mesh->diffuseTexture()->features().waterAlpha;
-        locals.general.uvOffset = _uvOffset;
-        locals.general.water = waterAlpha == -1.0f ? 0 : 1;
-        locals.general.waterAlpha = waterAlpha;
+        shared_ptr<Texture> diffuseTexture(mesh->diffuseTexture());
+        if (diffuseTexture) {
+            float waterAlpha = diffuseTexture->features().waterAlpha;
+            locals.general.uvOffset = _uvOffset;
+            locals.general.water = waterAlpha == -1.0f ? 0 : 1;
+            locals.general.waterAlpha = waterAlpha;
+        }
     }
 
     ShaderProgram program = shadowPass ? ShaderProgram::DepthDepth : ShaderProgram::ModelModel;
