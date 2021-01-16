@@ -297,11 +297,9 @@ in mat3 fragTanSpace;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
-void applyLightmap(inout vec3 color) {
+void applyLightmap(inout vec3 color, float strength) {
     vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-    vec3 result = lightmapSample.rgb;
-    result *= color;
-    color = result;
+    color = mix(color, color * lightmapSample.rgb, strength);
 }
 
 vec2 normalizeUV(vec2 uv) {
@@ -343,22 +341,21 @@ void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
         float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
 
         normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
-        normal = normalize(normal * 2.0 - 1.0);
-        normal = normalize(fragTanSpace * normal);
 
     } else {
         normal = texture(uBumpmap, uv).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
-        normal = normalize(fragTanSpace * normal);
     }
+
+    normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(fragTanSpace * normal);
 }
 
-void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color) {
+void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color, out float alpha) {
     vec3 I = normalize(fragPosition - uCameraPosition);
     vec3 R = reflect(I, normal);
     vec4 sample = texture(image, R);
-
     color += sample.rgb * a;
+    alpha = sample.a;
 }
 
 void applyLighting(vec3 normal, float shadow, inout vec3 color) {
@@ -420,22 +417,24 @@ float getShadowValue() {
 }
 
 void main() {
-    vec4 diffuseSample = texture(uDiffuse, fragTexCoords + uUvOffset);
+    vec2 uv = fragTexCoords + uUvOffset;
+    vec4 diffuseSample = texture(uDiffuse, uv);
     vec3 surfaceColor = diffuseSample.rgb;
+    vec3 normal = normalize(fragNormal);
+    float envmapAlpha = 1.0;
     float shadow = 0.0;
     vec3 lightColor = vec3(0.0);
-    vec3 normal = normalize(fragNormal);
 
     if (uLightmapEnabled) {
-        applyLightmap(surfaceColor);
+        applyLightmap(surfaceColor, 1.0);
     }
     if (uBumpmapEnabled) {
-        applyBumpmapToNormal(normal, fragTexCoords);
+        applyBumpmapToNormal(normal, uv);
     }
     if (uEnvmapEnabled) {
-        applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);
+        applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
     } else if (uBumpyShinyEnabled) {
-        applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor);
+        applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
     }
     if (uShadowsEnabled) {
         shadow = getShadowValue();
