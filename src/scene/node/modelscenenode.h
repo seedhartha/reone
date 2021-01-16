@@ -47,6 +47,7 @@ public:
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     void refreshAABB();
+    void detonate();
 
     bool hasTextureOverride() const;
     bool isVisible() const;

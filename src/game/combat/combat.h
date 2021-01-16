@@ -90,6 +90,9 @@ private:
         AttackResultType cutsceneAttackResult { AttackResultType::Invalid };
         int cutsceneDamage { -1 };
 
+        std::shared_ptr<scene::ModelSceneNode> projectile;
+        glm::vec3 projectileTarget { 0.0f };
+
         void advance(float dt);
     };
 
@@ -127,6 +130,13 @@ private:
     void applyAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
 
     // END Attacks
+
+    // Projectiles
+
+    void fireProjectile(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, Round &round);
+    void updateProjectile(Round &round, float dt);
+
+    // END Projectiles
 };
 
 } // namespace game

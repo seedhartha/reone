@@ -46,6 +46,7 @@ public:
 
     void setParent(const SceneNode *parent);
     virtual void setLocalTransform(const glm::mat4 &transform);
+    void setPosition(glm::vec3 position);
 
 protected:
     SceneGraph *_sceneGraph { nullptr };

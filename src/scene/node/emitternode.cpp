@@ -60,17 +60,19 @@ void EmitterSceneNode::update(float dt) {
 void EmitterSceneNode::spawnParticles(float dt) {
     switch (_emitter->updateType()) {
         case Emitter::UpdateType::Fountain:
-            _birthTimer.update(dt);
-            if (_birthTimer.hasTimedOut()) {
-                if (_particles.size() < kMaxParticleCount) {
-                    doSpawnParticle(dt);
+            if (_emitter->birthrate() != 0.0f) {
+                _birthTimer.update(dt);
+                if (_birthTimer.hasTimedOut()) {
+                    if (_particles.size() < kMaxParticleCount) {
+                        doSpawnParticle();
+                    }
+                    _birthTimer.reset(_birthInterval);
                 }
-                _birthTimer.reset(_birthInterval);
             }
             break;
         case Emitter::UpdateType::Single:
             if (!_spawned || (_particles.empty() && _emitter->loop())) {
-                doSpawnParticle(dt);
+                doSpawnParticle();
                 _spawned = true;
             }
             break;
@@ -79,7 +81,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
     }
 }
 
-void EmitterSceneNode::doSpawnParticle(float dt) {
+void EmitterSceneNode::doSpawnParticle() {
     float halfW = 0.005f * _emitter->size().x;
     float halfH = 0.005f * _emitter->size().y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
@@ -109,6 +111,10 @@ void EmitterSceneNode::updateParticles(float dt) {
             ++it;
         }
     }
+}
+
+void EmitterSceneNode::detonate() {
+    doSpawnParticle();
 }
 
 } // namespace scene

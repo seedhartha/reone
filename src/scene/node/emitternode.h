@@ -38,6 +38,8 @@ public:
 
     void update(float dt);
 
+    void detonate();
+
     std::shared_ptr<render::Emitter> emitter() const { return _emitter; }
 
 private:
@@ -53,7 +55,7 @@ private:
     void spawnParticles(float dt);
     void updateParticles(float dt);
 
-    void doSpawnParticle(float dt);
+    void doSpawnParticle();
 };
 
 } // namespace scene

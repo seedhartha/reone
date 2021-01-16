@@ -102,6 +102,10 @@ int Item::stackSize() const {
     return _stackSize;
 }
 
+shared_ptr<Item::AmmunitionType> Item::ammunitionType() const {
+    return _ammunitionType;
+}
+
 bool Item::isDropable() const {
     return _dropable;
 }

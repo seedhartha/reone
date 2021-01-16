@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 
@@ -83,6 +84,17 @@ void ItemBlueprint::load(Item &item) {
     item._damageFlags = baseItems->getInt(baseItem, "damageflags");
     item._weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
     item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
+
+    int ammunitionType = baseItems->getInt(baseItem, "ammunitiontype", -1);
+    if (ammunitionType != -1) {
+        loadAmmunitionType(ammunitionType, item);
+    }
+}
+
+void ItemBlueprint::loadAmmunitionType(int ordinal, Item &item) {
+    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("ammunitiontypes"));
+    item._ammunitionType = make_shared<Item::AmmunitionType>();
+    item._ammunitionType->model = Models::instance().get(table->getString(ordinal, "model"));
 }
 
 const string &ItemBlueprint::resRef() const {
