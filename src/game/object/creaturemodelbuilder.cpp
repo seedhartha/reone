@@ -48,6 +48,8 @@ CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creat
 
 shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
+    if (modelName.empty()) return nullptr;
+
     auto model = make_unique<ModelSceneNode>(&_creature->sceneGraph(), Models::instance().get(modelName));
     if (!model) return nullptr;
 
