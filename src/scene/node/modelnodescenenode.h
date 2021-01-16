@@ -57,6 +57,8 @@ private:
     glm::mat4 _animTransform { 1.0f };
     glm::mat4 _boneTransform { 1.0f };
     glm::vec2 _uvOffset { 0.0f };
+    float _bumpmapTime { 0.0f };
+    int _bumpmapFrame { 0 };
 };
 
 } // namespace scene

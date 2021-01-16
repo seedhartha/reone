@@ -59,6 +59,11 @@ enum class CubeMapSide {
     NegativeZ = 5
 };
 
+enum class TextureProcedureType {
+    Invalid,
+    Cycle
+};
+
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
@@ -76,6 +81,10 @@ struct TextureFeatures {
     std::vector<glm::vec3> upperLeftCoords;
     std::vector<glm::vec3> lowerRightCoords;
     float waterAlpha { -1.0f };
+    TextureProcedureType procedureType { TextureProcedureType::Invalid };
+    int numX { 0 };
+    int numY { 0 };
+    int fps { 0 };
 };
 
 class IEventHandler {

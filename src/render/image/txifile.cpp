@@ -49,6 +49,16 @@ void TxiFile::load(const shared_ptr<istream> &in) {
     } while (!in->eof());
 }
 
+static TextureProcedureType parseProcedureType(const string &str) {
+    TextureProcedureType result = TextureProcedureType::Invalid;
+    if (str == "cycle") {
+        result = TextureProcedureType::Cycle;
+    } else {
+        warn("TXI: invalid procedure type: " + str);
+    }
+    return result;
+}
+
 void TxiFile::processLine(const vector<string> &tokens) {
     string key;
     glm::vec3 vec;
@@ -80,6 +90,14 @@ void TxiFile::processLine(const vector<string> &tokens) {
                 _state = State::LowerRightCoords;
             } else if (key == "wateralpha") {
                 _features.waterAlpha = stof(tokens[1]);
+            } else if (key == "proceduretype") {
+                _features.procedureType = parseProcedureType(tokens[1]);
+            } else if (key == "numx") {
+                _features.numX = stoi(tokens[1]);
+            } else if (key == "numy") {
+                _features.numY = stoi(tokens[1]);
+            } else if (key == "fps") {
+                _features.fps = stoi(tokens[1]);
             }
             break;
 

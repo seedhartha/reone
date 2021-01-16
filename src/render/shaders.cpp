@@ -82,6 +82,8 @@ layout(std140) uniform General {
     uniform vec2 uUvOffset;
     uniform bool uWater;
     uniform float uWaterAlpha;
+    uniform vec2 uBumpmapGridSize;
+    uniform int uBumpmapFrame;
 };
 
 layout(std140) uniform Lighting {
@@ -302,14 +304,43 @@ void applyLightmap(inout vec3 color) {
     color = result;
 }
 
+vec2 normalizeUV(vec2 uv) {
+    vec2 result = uv;
+    if (abs(result.x) > 1.0) {
+        result.x -= int(result.x);
+    }
+    if (abs(result.y) > 1.0) {
+        result.y -= int(result.y);
+    }
+    if (result.x < 0.0) {
+        result.x = 1.0 + result.x;
+    }
+    if (result.y < 0.0) {
+        result.y = 1.0 + result.y;
+    }
+    return result;
+}
+
 void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
     if (uGrayscaleBumpmap) {
-        vec2 dSTdx = dFdx(uv);
-        vec2 dSTdy = dFdy(uv);
+        float oneOverGridX = 1.0 / uBumpmapGridSize.x;
+        float oneOverGridY = 1.0 / uBumpmapGridSize.y;
 
-        float Hll = texture(uBumpmap, uv).r;
-        float dBx = texture(uBumpmap, uv + dSTdx).r - Hll;
-        float dBy = texture(uBumpmap, uv + dSTdy).r - Hll;
+        vec2 dSTdx = dFdx(uv) * oneOverGridX;
+        vec2 dSTdy = dFdy(uv) * oneOverGridY;
+
+        vec2 bumpmapUv = normalizeUV(uv);
+        bumpmapUv.x *= oneOverGridX;
+        bumpmapUv.y *= oneOverGridY;
+
+        if (uBumpmapFrame > 0) {
+            bumpmapUv.y += oneOverGridY * (uBumpmapFrame / int(uBumpmapGridSize.x));
+            bumpmapUv.x += oneOverGridX * (uBumpmapFrame % int(uBumpmapGridSize.x));
+        }
+
+        float Hll = texture(uBumpmap, bumpmapUv).r;
+        float dBx = texture(uBumpmap, bumpmapUv + dSTdx).r - Hll;
+        float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
 
         normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
 
@@ -387,10 +418,9 @@ float getShadowValue() {
 }
 
 void main() {
-    vec2 uv = fragTexCoords + uUvOffset;
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(uDiffuse, fragTexCoords + uUvOffset);
     vec3 surfaceColor = diffuseSample.rgb;
-    float shadow = 0.0f;
+    float shadow = 0.0;
     vec3 lightColor = vec3(0.0);
     vec3 normal = normalize(fragNormal);
 
@@ -398,7 +428,7 @@ void main() {
         applyLightmap(surfaceColor);
     }
     if (uBumpmapEnabled) {
-        applyBumpmapToNormal(normal, uv);
+        applyBumpmapToNormal(normal, fragTexCoords);
     }
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor);
