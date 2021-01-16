@@ -42,6 +42,8 @@ private:
 
     ItemBlueprint(const ItemBlueprint &) = delete;
     ItemBlueprint &operator=(const ItemBlueprint &) = delete;
+
+    void loadAmmunitionType(int ordinal, Item &item);
 };
 
 } // namespace game

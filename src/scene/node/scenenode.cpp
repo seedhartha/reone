@@ -102,6 +102,10 @@ void SceneNode::setLocalTransform(const glm::mat4 &transform) {
     updateAbsoluteTransform();
 }
 
+void SceneNode::setPosition(glm::vec3 position) {
+    setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+}
+
 } // namespace scene
 
 } // namespace reone

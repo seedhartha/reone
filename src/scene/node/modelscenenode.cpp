@@ -62,6 +62,7 @@ static bool validateEmitter(const Emitter &emitter) {
     switch (emitter.renderType()) {
         case Emitter::RenderType::Normal:
         case Emitter::RenderType::BillboardToWorldZ:
+        case Emitter::RenderType::MotionBlur:
             break;
         default:
             warn("validateEmitter: unsupported render type: " + to_string(static_cast<int>(emitter.renderType())));
@@ -399,6 +400,12 @@ void ModelSceneNode::refreshAABB() {
         for (auto &child : node->children()) {
             nodes.push(child.get());
         }
+    }
+}
+
+void ModelSceneNode::detonate() {
+    for (auto &emitter : _emitters) {
+        emitter->detonate();
     }
 }
 

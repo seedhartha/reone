@@ -876,8 +876,8 @@ static Emitter::BlendType parseEmitterBlend(const string &str) {
 void MdlFile::readEmitter(ModelNode &node) {
     ignore(5 * 4);
 
-    node._emitter->_gridWidth = readUint32();
-    node._emitter->_gridHeight = readUint32();
+    node._emitter->_gridWidth = glm::max(readUint32(), 1u);
+    node._emitter->_gridHeight = glm::max(readUint32(), 1u);
 
     ignore(4);
 

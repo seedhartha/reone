@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include "../../render/model/model.h"
 #include "../../render/texture.h"
 #include "../../resource/gfffile.h"
 
@@ -33,6 +34,10 @@ namespace game {
 
 class Item : public Object {
 public:
+    struct AmmunitionType {
+        std::shared_ptr<render::Model> model;
+    };
+
     Item(uint32_t id);
 
     void load(const std::shared_ptr<ItemBlueprint> &blueprint);
@@ -57,6 +62,7 @@ public:
     WeaponType weaponType() const;
     WeaponWield weaponWield() const;
     int stackSize() const;
+    std::shared_ptr<AmmunitionType> ammunitionType() const;
 
     void setDropable(bool dropable);
     void setStackSize(int size);
@@ -82,6 +88,7 @@ private:
     int _stackSize { 1 };
     bool _identified { true };
     bool _equipped { false };
+    std::shared_ptr<AmmunitionType> _ammunitionType;
 
     friend class ItemBlueprint;
 };
