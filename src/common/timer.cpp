@@ -21,23 +21,25 @@
 
 namespace reone {
 
-Timer::Timer(float timeout) : _timeout(timeout) {
-}
-
-void Timer::update(float dt) {
-    _timeout = glm::max(0.0f, _timeout - dt);
+Timer::Timer(float timeout) {
+    reset(timeout);
 }
 
 void Timer::reset(float timeout) {
-    _timeout = timeout;
+    _time = timeout;
+}
+
+bool Timer::advance(float secs) {
+    _time = glm::min(0.0f, _time - secs);
+    return isTimedOut();
+}
+
+bool Timer::isTimedOut() const {
+    return _time == 0.0f;
 }
 
 void Timer::cancel() {
-    _timeout = 0.0f;
-}
-
-bool Timer::hasTimedOut() const {
-    return _timeout == 0.0f;
+    _time = 0.0f;
 }
 
 } // namespace reone

@@ -874,9 +874,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 }
 
 void Area::updateHeartbeat(float dt) {
-    _heartbeatTimer.update(dt);
-
-    if (_heartbeatTimer.hasTimedOut()) {
+    if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
             _game->scriptRunner().run(_onHeartbeat, _id);
         }
@@ -887,7 +885,6 @@ void Area::updateHeartbeat(float dt) {
             }
         }
         _game->party().onHeartbeat();
-
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }

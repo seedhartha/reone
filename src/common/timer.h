@@ -19,19 +19,32 @@
 
 namespace reone {
 
+/**
+ * Utility class to handle timed events.
+ */
 class Timer {
 public:
     Timer() = default;
     Timer(float timeout);
 
-    void update(float dt);
     void reset(float timeout);
+
+    /**
+     * Advances this timer by the specified amount of seconds.
+     *
+     * @return true if timer times out, false otherwise
+     */
+    bool advance(float secs);
+
+    /**
+     * Cancels this timer, putting it the timed out state.
+     */
     void cancel();
 
-    bool hasTimedOut() const;
+    bool isTimedOut() const;
 
 private:
-    float _timeout { 0.0f };
+    float _time { 0.0f };
 };
 
 } // namespace reone
