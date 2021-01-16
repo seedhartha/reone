@@ -29,7 +29,7 @@ class ToggleButton;
 
 namespace game {
 
-static const int kNpcCount = 9;
+static constexpr int kNpcCount = 9;
 
 class Game;
 

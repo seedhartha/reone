@@ -40,8 +40,8 @@ namespace reone {
 
 namespace game {
 
-static const float kModelScale = 1.05f;
-static const float kModelOffsetY = 0.9f;
+static constexpr float kModelScale = 1.05f;
+static constexpr float kModelOffsetY = 0.9f;
 
 CharacterGeneration::CharacterGeneration(Game *game) :
     GameGUI(game->version(), game->options().graphics),

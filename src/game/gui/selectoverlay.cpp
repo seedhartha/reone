@@ -42,15 +42,15 @@ namespace reone {
 
 namespace game {
 
-static const int kOffsetToReticle = 8;
-static const int kTitleBarWidth = 250;
-static const int kTitleBarPadding = 6;
-static const int kHealthBarHeight = 6;
-static const int kActionCount = 3;
-static const int kActionBarMargin = 3;
-static const int kActionBarPadding = 3;
-static const int kActionWidth = 35;
-static const int kActionHeight = 59;
+static constexpr int kOffsetToReticle = 8;
+static constexpr int kTitleBarWidth = 250;
+static constexpr int kTitleBarPadding = 6;
+static constexpr int kHealthBarHeight = 6;
+static constexpr int kActionCount = 3;
+static constexpr int kActionBarMargin = 3;
+static constexpr int kActionBarPadding = 3;
+static constexpr int kActionWidth = 35;
+static constexpr int kActionHeight = 59;
 
 SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
     if (!game) {

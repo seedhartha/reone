@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-static const int kStrRefNone = 363;
+static constexpr int kStrRefNone = 363;
 
 static unordered_map<Equipment::Slot, string> g_slotNames = {
     { Equipment::Slot::Implant, "IMPLANT" },

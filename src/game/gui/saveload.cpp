@@ -39,13 +39,13 @@ namespace reone {
 
 namespace game {
 
-static const char kSavesDirectoryName[] = "saves";
-static const char kSaveFilename[] = "savegame.sav";
+static constexpr char kSavesDirectoryName[] = "saves";
+static constexpr char kSaveFilename[] = "savegame.sav";
 
-static const int kStrRefLoadGame = 1585;
-static const int kStrRefSave = 1587;
-static const int kStrRefSaveGame = 1588;
-static const int kStrRefLoad = 1589;
+static constexpr int kStrRefLoadGame = 1585;
+static constexpr int kStrRefSave = 1587;
+static constexpr int kStrRefSaveGame = 1588;
+static constexpr int kStrRefLoad = 1589;
 
 SaveLoad::SaveLoad(Game *game) :
     GameGUI(game->version(), game->options().graphics),

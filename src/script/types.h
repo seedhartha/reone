@@ -25,8 +25,8 @@ namespace reone {
 
 namespace script {
 
-constexpr uint32_t kObjectSelf = 0;
-constexpr uint32_t kObjectInvalid = 1;
+static constexpr uint32_t kObjectSelf = 0;
+static constexpr uint32_t kObjectInvalid = 1;
 
 struct Variable;
 

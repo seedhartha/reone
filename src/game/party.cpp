@@ -32,8 +32,8 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxMemberCount = 3;
-constexpr float kTeleMemberDistance = 32.0f;
+static constexpr int kMaxMemberCount = 3;
+static constexpr float kTeleMemberDistance = 32.0f;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {

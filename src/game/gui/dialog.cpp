@@ -53,7 +53,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultEntryDuration = 1000;
+static constexpr int kDefaultEntryDuration = 1000;
 
 static bool g_allEntriesSkippable = false;
 

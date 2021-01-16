@@ -33,7 +33,7 @@ namespace reone {
 
 namespace scene {
 
-constexpr int kMaxParticleCount = 24;
+static constexpr int kMaxParticleCount = 24;
 
 EmitterSceneNode::EmitterSceneNode(const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),

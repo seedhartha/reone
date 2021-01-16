@@ -32,7 +32,7 @@ namespace reone {
 
 namespace audio {
 
-static const int kMaxBufferCount = 8;
+static constexpr int kMaxBufferCount = 8;
 
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position) :
     _stream(stream),

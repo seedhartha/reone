@@ -37,9 +37,9 @@ namespace reone {
 
 namespace game {
 
-static const int kSwitchToResRef = 47884;
-static const int kGiveItemResRef = 47885;
-static const int kInventoryResRef = 393;
+static constexpr int kSwitchToResRef = 47884;
+static constexpr int kGiveItemResRef = 47885;
+static constexpr int kInventoryResRef = 393;
 
 Container::Container(Game *game) :
     GameGUI(game->version(), game->options().graphics),

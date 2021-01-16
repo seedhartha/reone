@@ -30,8 +30,8 @@ namespace reone {
 
 namespace render {
 
-constexpr int kMaxLightCount = 4;
-constexpr int kNumCubeFaces = 6;
+static constexpr int kMaxLightCount = 4;
+static constexpr int kNumCubeFaces = 6;
 
 enum class TextureType {
     Diffuse,

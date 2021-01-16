@@ -28,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-static const float kDefaultRaycastDistance = 8.0f;
+static constexpr float kDefaultRaycastDistance = 8.0f;
 
 enum RaycastFlags {
     kRaycastRooms = 1,

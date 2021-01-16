@@ -32,8 +32,8 @@ namespace reone {
 
 namespace resource {
 
-static const int kSignatureSize = 8;
-static const char kSignature[] = "2DA V2.b";
+static constexpr int kSignatureSize = 8;
+static constexpr char kSignature[] = "2DA V2.b";
 
 void TwoDaRow::add(const string &column, const string &value) {
     _values.insert(make_pair(column, value));

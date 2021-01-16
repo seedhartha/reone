@@ -36,8 +36,8 @@ namespace reone {
 
 namespace scene {
 
-constexpr int kShadowResolution = 2048;
-constexpr float kShadowFarPlane = 10000.0f;
+static constexpr int kShadowResolution = 2048;
+static constexpr float kShadowFarPlane = 10000.0f;
 
 static bool g_debugShadows = false;
 
@@ -130,7 +130,7 @@ glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapS
 void WorldRenderPipeline::drawGeometry() const {
     _geometry.bind();
 
-    static const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, buffers);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

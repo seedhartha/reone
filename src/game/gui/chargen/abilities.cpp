@@ -36,9 +36,9 @@ namespace reone {
 
 namespace game {
 
-constexpr int kStartingPoints = 30;
-constexpr int kMinAbilityScore = 8;
-constexpr int kMaxAbilityScore = 18;
+static constexpr int kStartingPoints = 30;
+static constexpr int kMinAbilityScore = 8;
+static constexpr int kMaxAbilityScore = 18;
 
 static const unordered_map<string, Ability> g_abilityByAlias {
     { "STR", Ability::Strength },

@@ -35,11 +35,11 @@ namespace po = boost::program_options;
 
 namespace reone {
 
-static const char *kConfigFilename = "reone.cfg";
-static const int kDefaultMusicVolume = 85;
-static const int kDefaultSoundVolume = 85;
-static const int kDefaultMovieVolume = 85;
-static const int kDefaultMultiplayerPort = 2003;
+static constexpr char *kConfigFilename = "reone.cfg";
+static constexpr int kDefaultMusicVolume = 85;
+static constexpr int kDefaultSoundVolume = 85;
+static constexpr int kDefaultMovieVolume = 85;
+static constexpr int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
     if (!argv) {

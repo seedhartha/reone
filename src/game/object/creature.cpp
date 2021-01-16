@@ -49,7 +49,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kStrRefRemains = 38151;
+static constexpr int kStrRefRemains = 38151;
 
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");

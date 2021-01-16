@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-static const int kMaxFollowerCount = 2;
+static constexpr int kMaxFollowerCount = 2;
 
 static int g_strRefAdd = 38455;
 static int g_strRefRemove = 38456;

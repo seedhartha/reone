@@ -28,7 +28,7 @@ namespace reone {
 template <class Frame>
 class MediaStream {
 public:
-    static const int kBufferSize = 8;
+    static constexpr int kBufferSize = 8;
 
     virtual ~MediaStream() {
     }

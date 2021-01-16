@@ -58,11 +58,11 @@ namespace reone {
 
 namespace game {
 
-static const float kDefaultFieldOfView = 75.0f;
-static const float kMaxDistanceToTestCollision = 8.0f;
-static const float kElevationTestZ = 1024.0f;
-static const float kCreatureObstacleTestZ = 0.1f;
-static const int kMaxSoundCount = 4;
+static constexpr float kDefaultFieldOfView = 75.0f;
+static constexpr float kMaxDistanceToTestCollision = 8.0f;
+static constexpr float kElevationTestZ = 1024.0f;
+static constexpr float kCreatureObstacleTestZ = 0.1f;
+static constexpr int kMaxSoundCount = 4;
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),

@@ -35,7 +35,7 @@ namespace reone {
 
 namespace scene {
 
-constexpr float kUvAnimationSpeed = 250.0f;
+static constexpr float kUvAnimationSpeed = 250.0f;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
