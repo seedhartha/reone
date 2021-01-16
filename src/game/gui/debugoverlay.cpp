@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-static const char kFontResRef[] = "fnt_d16x16b";
+static constexpr char kFontResRef[] = "fnt_d16x16b";
 
 DebugOverlay::DebugOverlay(const GraphicsOptions &opts) : _opts(opts) {
 }

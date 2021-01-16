@@ -34,8 +34,8 @@ namespace reone {
 
 namespace game {
 
-constexpr int kStrRefQuickHelpText = 241;
-constexpr int kStrRefCustomHelpText = 242;
+static constexpr int kStrRefQuickHelpText = 241;
+static constexpr int kStrRefCustomHelpText = 242;
 
 QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GameGUI(version, opts),

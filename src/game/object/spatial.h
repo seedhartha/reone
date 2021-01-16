@@ -37,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-static const float kDefaultDrawDistance = 1024.0f;
+static constexpr float kDefaultDrawDistance = 1024.0f;
 
 class Item;
 class ObjectFactory;

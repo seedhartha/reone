@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kArrowSize = 32;
+static constexpr int kArrowSize = 32;
 
 Map::Map(Game *game) : _game(game) {
     if (!game) {

@@ -33,7 +33,7 @@ namespace reone {
 
 namespace script {
 
-static const int kStartInstructionOffset = 13;
+static constexpr int kStartInstructionOffset = 13;
 
 ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
     _handlers.insert(make_pair(ByteCode::CopyDownSP, bind(&ScriptExecution::executeCopyDownSP, this, _1)));

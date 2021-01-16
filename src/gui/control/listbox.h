@@ -25,7 +25,7 @@ namespace reone {
 
 namespace gui {
 
-static const int kDefaultSlotCount = 6;
+static constexpr int kDefaultSlotCount = 6;
 
 class ListBox : public Control {
 public:

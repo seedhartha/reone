@@ -31,7 +31,7 @@ namespace reone {
 
 namespace scene {
 
-static const float kTransitionDuration = 0.25f;
+static constexpr float kTransitionDuration = 0.25f;
 
 bool SceneNodeAnimator::AnimationChannel::isActive() const {
     return animation && !finished;

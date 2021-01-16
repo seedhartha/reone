@@ -29,7 +29,7 @@ namespace reone {
 
 namespace resource {
 
-static const int kSignatureSize = 8;
+static constexpr int kSignatureSize = 8;
 
 GffField::GffField(GffFieldType type, const string &label) : _type(type), _label(label) {
 }

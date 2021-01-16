@@ -39,22 +39,22 @@ namespace reone {
 
 namespace resource {
 
-static const char kKeyFileName[] = "chitin.key";
-static const char kPatchFileName[] = "patch.erf";
-static const char kTalkTableFileName[] = "dialog.tlk";
-static const char kExeFileNameKotor[] = "swkotor.exe";
-static const char kExeFileNameTsl[] = "swkotor2.exe";
+static constexpr char kKeyFileName[] = "chitin.key";
+static constexpr char kPatchFileName[] = "patch.erf";
+static constexpr char kTalkTableFileName[] = "dialog.tlk";
+static constexpr char kExeFileNameKotor[] = "swkotor.exe";
+static constexpr char kExeFileNameTsl[] = "swkotor2.exe";
 
-static const char kModulesDirectoryName[] = "modules";
-static const char kOverrideDirectoryName[] = "override";
-static const char kMusicDirectoryName[] = "streammusic";
-static const char kSoundsDirectoryName[] = "streamsounds";
-static const char kVoiceDirectoryName[] = "streamvoice";
-static const char kWavesDirectoryName[] = "streamwaves";
-static const char kTexturePackDirectoryName[] = "texturepacks";
+static constexpr char kModulesDirectoryName[] = "modules";
+static constexpr char kOverrideDirectoryName[] = "override";
+static constexpr char kMusicDirectoryName[] = "streammusic";
+static constexpr char kSoundsDirectoryName[] = "streamsounds";
+static constexpr char kVoiceDirectoryName[] = "streamvoice";
+static constexpr char kWavesDirectoryName[] = "streamwaves";
+static constexpr char kTexturePackDirectoryName[] = "texturepacks";
 
-static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
-static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+static constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+static constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
 
 static map<string, shared_ptr<TwoDaTable>> g_2daCache;
 static map<string, shared_ptr<GffStruct>> g_gffCache;

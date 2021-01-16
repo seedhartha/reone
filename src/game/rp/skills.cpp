@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultSkillRank = 0;
+static constexpr int kDefaultSkillRank = 0;
 
 bool CreatureSkills::contains(Skill skill) const {
     auto maybeRank = _ranks.find(skill);

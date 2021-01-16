@@ -34,8 +34,8 @@ namespace reone {
 
 namespace render {
 
-static const int kVertexValuesPerGlyph = 20;
-static const int kIndicesPerGlyph = 6;
+static constexpr int kVertexValuesPerGlyph = 20;
+static constexpr int kIndicesPerGlyph = 6;
 
 void Font::load(const shared_ptr<Texture> &texture) {
     if (!texture) {

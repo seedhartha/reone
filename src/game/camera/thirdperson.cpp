@@ -27,9 +27,9 @@ namespace reone {
 
 namespace game {
 
-static const float kMinRotationSpeed = 1.0f;
-static const float kMaxRotationSpeed = 2.5f;
-static const float kRotationAcceleration = 1.0f;
+static constexpr float kMinRotationSpeed = 1.0f;
+static constexpr float kMaxRotationSpeed = 2.5f;
+static constexpr float kRotationAcceleration = 1.0f;
 
 ThirdPersonCamera::ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));

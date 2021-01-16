@@ -37,7 +37,7 @@ namespace reone {
 
 namespace gui {
 
-static const int kItemPadding = 3;
+static constexpr int kItemPadding = 3;
 
 ListBox::ListBox(GUI *gui) : Control(gui, ControlType::ListBox) {
     _clickable = true;

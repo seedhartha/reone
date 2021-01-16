@@ -37,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-constexpr float kRoundDuration = 3.0f;
+static constexpr float kRoundDuration = 3.0f;
 
 static bool g_projectilesEnabled = false;
 

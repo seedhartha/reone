@@ -23,7 +23,7 @@ namespace reone {
 
 namespace render {
 
-static const int kMeasurePeriodMillis = 500;
+static constexpr int kMeasurePeriodMillis = 500;
 
 void FpsCounter::reset() {
     _startTicks = SDL_GetTicks();

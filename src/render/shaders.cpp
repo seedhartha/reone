@@ -34,12 +34,12 @@ namespace reone {
 
 namespace render {
 
-static const int kFeaturesBindingPointIndex = 1;
-static const int kGeneralBindingPointIndex = 2;
-static const int kLightingBindingPointIndex = 3;
-static const int kSkeletalBindingPointIndex = 4;
+static constexpr int kFeaturesBindingPointIndex = 1;
+static constexpr int kGeneralBindingPointIndex = 2;
+static constexpr int kLightingBindingPointIndex = 3;
+static constexpr int kSkeletalBindingPointIndex = 4;
 
-static const GLchar kCommonShaderHeader[] = R"END(
+static constexpr GLchar kCommonShaderHeader[] = R"END(
 #version 330
 
 const int MAX_LIGHTS = 4;
@@ -99,7 +99,7 @@ layout(std140) uniform Skeletal {
 };
 )END";
 
-static const GLchar kSourceVertexGUI[] = R"END(
+static constexpr GLchar kSourceVertexGUI[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -114,7 +114,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceVertexModel[] = R"END(
+static constexpr GLchar kSourceVertexModel[] = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -174,7 +174,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceVertexDepth[] = R"END(
+static constexpr GLchar kSourceVertexDepth[] = R"END(
 layout(location = 0) in vec3 aPosition;
 
 void main() {
@@ -182,7 +182,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceVertexBillboard[] = R"END(
+static constexpr GLchar kSourceVertexBillboard[] = R"END(
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
@@ -218,7 +218,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceGeometryDepth[] = R"END(
+static constexpr GLchar kSourceGeometryDepth[] = R"END(
 const int NUM_CUBE_FACES = 6;
 
 layout(triangles) in;
@@ -241,7 +241,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentWhite[] = R"END(
+static constexpr GLchar kSourceFragmentWhite[] = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -251,7 +251,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentGUI[] = R"END(
+static constexpr GLchar kSourceFragmentGUI[] = R"END(
 uniform sampler2D uTexture;
 
 in vec2 fragTexCoords;
@@ -271,7 +271,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentModel[] = R"END(
+static constexpr GLchar kSourceFragmentModel[] = R"END(
 const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
 
 const float SPECULAR_STRENGTH = 0.2;
@@ -460,7 +460,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentBlur[] = R"END(
+static constexpr GLchar kSourceFragmentBlur[] = R"END(
 uniform sampler2D uTexture;
 
 out vec4 fragColor;
@@ -480,7 +480,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentBloom[] = R"END(
+static constexpr GLchar kSourceFragmentBloom[] = R"END(
 uniform sampler2D uGeometry;
 uniform sampler2D uBloom;
 
@@ -496,7 +496,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentDepth[] = R"END(
+static constexpr GLchar kSourceFragmentDepth[] = R"END(
 uniform vec3 uShadowLightPosition;
 
 in vec4 fragPosition;
@@ -508,7 +508,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentBillboard[] = R"END(
+static constexpr GLchar kSourceFragmentBillboard[] = R"END(
 uniform sampler2D uTexture;
 
 in vec2 fragTexCoords;
@@ -533,7 +533,7 @@ void main() {
 }
 )END";
 
-static const GLchar kSourceFragmentDebugShadows[] = R"END(
+static constexpr GLchar kSourceFragmentDebugShadows[] = R"END(
 uniform samplerCube uShadowmap;
 
 in vec2 fragTexCoords;

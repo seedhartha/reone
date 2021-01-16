@@ -36,10 +36,10 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxMillisecond = 1000;
-constexpr int kMaxSecond = 60;
-constexpr int kMaxMinute = 60;
-constexpr int kMaxHour = 24;
+static constexpr int kMaxMillisecond = 1000;
+static constexpr int kMaxSecond = 60;
+static constexpr int kMaxMinute = 60;
+static constexpr int kMaxHour = 24;
 
 Module::Module(uint32_t id, Game *game) :
     Object(id, ObjectType::Module),

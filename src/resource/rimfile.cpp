@@ -27,8 +27,8 @@ namespace reone {
 
 namespace resource {
 
-static const int kSignatureSize = 8;
-static const char kSignature[] = "RIM V1.0";
+static constexpr int kSignatureSize = 8;
+static constexpr char kSignature[] = "RIM V1.0";
 
 RimFile::RimFile() : BinaryFile(kSignatureSize, kSignature) {
 }

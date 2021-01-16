@@ -44,8 +44,8 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxOutputLineCount = 100;
-constexpr int kVisibleLineCount = 15;
+static constexpr int kMaxOutputLineCount = 100;
+static constexpr int kVisibleLineCount = 15;
 
 Console::Console(Game *game) :
     _game(game),

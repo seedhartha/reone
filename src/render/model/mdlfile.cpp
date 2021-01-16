@@ -37,9 +37,9 @@ namespace reone {
 
 namespace render {
 
-static const int kSignatureSize = 4;
-static const char kSignature[] = "\0\0\0\0";
-static const int kMdlDataOffset = 12;
+static constexpr int kSignatureSize = 4;
+static constexpr char kSignature[] = "\0\0\0\0";
+static constexpr int kMdlDataOffset = 12;
 
 enum {
     kNodeHasHeader = 1,

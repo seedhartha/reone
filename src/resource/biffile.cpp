@@ -25,8 +25,8 @@ namespace reone {
 
 namespace resource {
 
-static const int kSignatureSize = 8;
-static const char kSignature[] = "BIFFV1  ";
+static constexpr int kSignatureSize = 8;
+static constexpr char kSignature[] = "BIFFV1  ";
 
 BifFile::BifFile() : BinaryFile(kSignatureSize, kSignature) {
 }

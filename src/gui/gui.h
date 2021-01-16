@@ -33,8 +33,8 @@ namespace reone {
 
 namespace gui {
 
-static const int kDefaultResolutionX = 640;
-static const int kDefaultResolutionY = 480;
+static constexpr int kDefaultResolutionX = 640;
+static constexpr int kDefaultResolutionY = 480;
 
 class GUI {
 public:

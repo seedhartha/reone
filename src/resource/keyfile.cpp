@@ -27,8 +27,8 @@ namespace reone {
 
 namespace resource {
 
-static const int kSignatureSize = 8;
-static const char kSignature[] = "KEY V1  ";
+static constexpr int kSignatureSize = 8;
+static constexpr char kSignature[] = "KEY V1  ";
 
 KeyFile::KeyFile() : BinaryFile(kSignatureSize, kSignature) {
 }

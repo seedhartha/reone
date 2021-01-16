@@ -59,7 +59,7 @@ public:
     void setDefaultAnimation(const std::shared_ptr<render::Animation> &anim);
 
 private:
-    static const int kChannelCount = 2;
+    static constexpr int kChannelCount = 2;
 
     struct AnimationChannel {
         std::shared_ptr<render::Animation> animation;

@@ -25,8 +25,8 @@ namespace reone {
 
 namespace resource {
 
-static const int kNameMaskString = 0x80000000;
-static const int kSiblingMaskDir = 0x80000000;
+static constexpr int kNameMaskString = 0x80000000;
+static constexpr int kSiblingMaskDir = 0x80000000;
 
 PEFile::PEFile() : BinaryFile(2, "MZ") {
 }
