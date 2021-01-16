@@ -98,6 +98,9 @@ struct GeneralUniforms {
     glm::vec2 uvOffset { 0.0f };
     int water { 0 };
     float waterAlpha { 1.0f };
+    glm::vec2 bumpmapGridSize { 1.0f };
+    int bumpmapFrame { 0 };
+    char padding3[4];
 };
 
 struct SkeletalUniforms {

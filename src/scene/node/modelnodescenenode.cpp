@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../../common/log.h"
 #include "../../common/random.h"
 
 #include "../scenegraph.h"
@@ -53,12 +54,29 @@ void ModelNodeSceneNode::update(float dt) {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
+    // UV animation
     const ModelMesh::UVAnimation &uvAnimation = mesh->uvAnimation();
-    if (!uvAnimation.animated) return;
+    if (uvAnimation.animated) {
+        glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
+        _uvOffset += kUvAnimationSpeed * dir * dt;
+        _uvOffset -= glm::floor(_uvOffset);
+    }
 
-    glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
-    _uvOffset += kUvAnimationSpeed * dir * dt;
-    _uvOffset -= glm::floor(_uvOffset);
+    // Bumpmap UV animation
+    shared_ptr<Texture> bumpmap(mesh->bumpmapTexture());
+    if (bumpmap) {
+        const TextureFeatures &features = bumpmap->features();
+        if (features.procedureType == TextureProcedureType::Cycle) {
+            // TODO: only use the top row because each row is a different animation?
+            int frameCount = features.numX * features.numY;
+            float length = frameCount / static_cast<float>(features.fps);
+            _bumpmapTime = glm::min(_bumpmapTime + dt, length);
+            _bumpmapFrame = glm::round((frameCount - 1) * (_bumpmapTime / length));
+            if (_bumpmapTime == length) {
+                _bumpmapTime = 0.0f;
+            }
+        }
+    }
 }
 
 bool ModelNodeSceneNode::shouldRender() const {
@@ -102,6 +120,8 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.general.bumpmapEnabled = true;
             locals.general.grayscaleBumpmap = bumpmapTexture->isGrayscale();
             locals.general.bumpmapScaling = bumpmapTexture->features().bumpMapScaling;
+            locals.general.bumpmapGridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
+            locals.general.bumpmapFrame = _bumpmapFrame;
         }
         bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
         if (receivesShadows) {
