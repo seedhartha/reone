@@ -56,12 +56,10 @@ Combat::Combat(Game *game) : _game(game) {
 }
 
 void Combat::update(float dt) {
-    _heartbeatTimer.update(dt);
-
-    if (_heartbeatTimer.hasTimedOut()) {
-        _heartbeatTimer.reset(kHeartbeatInterval);
+    if (_heartbeatTimer.advance(dt)) {
         updateCombatants();
         updateAI();
+        _heartbeatTimer.reset(kHeartbeatInterval);
     }
     updateRounds(dt);
     updateActivation();
