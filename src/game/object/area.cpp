@@ -74,8 +74,23 @@ Area::Area(uint32_t id, Game *game) :
     _map(game),
     _heartbeatTimer(kHeartbeatInterval) {
 
+    init();
+}
+
+void Area::init() {
     const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
+
+    _objectsByType.insert(make_pair(ObjectType::Creature, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Item, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Trigger, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Door, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::AreaOfEffect, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Waypoint, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Placeable, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Store, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Encounter, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Sound, ObjectList()));
 }
 
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
@@ -349,7 +364,7 @@ bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) 
 void Area::add(const shared_ptr<SpatialObject> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
-    _objectById.insert(make_pair(object->id(), object));
+    _objectById[object->id()] = object;
     _objectsByTag[object->tag()].push_back(object);
 
     determineObjectRoom(*object);

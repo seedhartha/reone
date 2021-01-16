@@ -213,6 +213,8 @@ private:
 
     // END Stealth
 
+    void init();
+
     void add(const std::shared_ptr<SpatialObject> &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
