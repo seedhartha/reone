@@ -30,7 +30,7 @@ void Timer::reset(float timeout) {
 }
 
 bool Timer::advance(float secs) {
-    _time = glm::min(0.0f, _time - secs);
+    _time = glm::max(0.0f, _time - secs);
     return isTimedOut();
 }
 
