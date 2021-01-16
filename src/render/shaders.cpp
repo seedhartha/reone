@@ -165,7 +165,7 @@ void main() {
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
-    if (uBumpmapEnabled && !uGrayscaleBumpmap) {
+    if (uBumpmapEnabled) {
         vec3 T = normalize(vec3(uModel * vec4(aTangent, 0.0)));
         vec3 B = normalize(vec3(uModel * vec4(aBitangent, 0.0)));
         vec3 N = normalize(vec3(uModel * vec4(aNormal, 0.0)));
@@ -343,6 +343,8 @@ void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
         float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
 
         normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
+        normal = normalize(normal * 2.0 - 1.0);
+        normal = normalize(fragTanSpace * normal);
 
     } else {
         normal = texture(uBumpmap, uv).rgb;
