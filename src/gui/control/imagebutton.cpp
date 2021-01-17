@@ -112,7 +112,7 @@ void ImageButton::drawIcon(
     if (!iconText.empty()) {
         transform = glm::mat4(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
-        _iconFont->render(iconText, transform, color, TextGravity::Left);
+        _iconFont->render(iconText, transform, color, TextGravity::LeftCenter);
     }
 }
 

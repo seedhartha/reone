@@ -415,32 +415,23 @@ void Control::drawText(const string &text, const glm::ivec2 &offset, const glm::
     float textWidth = _text.font->measure(text);
     int lineCount = static_cast<int>(glm::ceil(textWidth / static_cast<float>(size.x)));
 
-    TextGravity gravity;
-    switch (_text.align) {
-        case TextAlign::LeftCenter:
-            gravity = TextGravity::Right;
-            break;
-        default:
-            gravity = TextGravity::Center;
-            break;
-    }
-
     glm::ivec2 position;
+    TextGravity gravity;
     glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
     if (lineCount == 1) {
-        getTextPosition(position, 1, size);
+        getTextPosition(position, 1, size, gravity);
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
         _text.font->render(text, transform, color, gravity);
 
     } else {
         vector<string> lines(breakText(text, size.x));
-        getTextPosition(position, static_cast<int>(lines.size()), size);
+        getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
 
         for (auto &line : lines) {
             glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
-            position.y += static_cast<int>(_text.font->height());
             _text.font->render(line, transform, color, gravity);
+            position.y += static_cast<int>(_text.font->height());
         }
     }
 }
@@ -475,22 +466,45 @@ vector<string> Control::breakText(const string &text, int maxWidth) const {
     return move(lines);
 }
 
-void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size) const {
+void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
+    // Gravity
     switch (_text.align) {
+        case TextAlign::LeftCenter:
+            gravity = TextGravity::RightCenter;
+            break;
         case TextAlign::CenterBottom:
-            position.y = _extent.top + size.y - static_cast<int>((lineCount - 0.5f) * _text.font->height());
+            gravity = TextGravity::CenterTop;
+            break;
+        case TextAlign::CenterCenter:
+            gravity = TextGravity::CenterCenter;
             break;
         case TextAlign::CenterTop:
-            position.y = _extent.top + static_cast<int>((lineCount - 0.5f) * _text.font->height());
+        default:
+            gravity = TextGravity::CenterBottom;
             break;
+    }
+    // Vertical alignment
+    switch (_text.align) {
+        case TextAlign::CenterBottom:
+            position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
+            break;
+        case TextAlign::CenterTop:
+            position.y = _extent.top;
+            break;
+        case TextAlign::LeftCenter:
+        case TextAlign::CenterCenter:
         default:
             position.y = _extent.top + size.y / 2;
             break;
     }
+    // Horizontal alignment
     switch (_text.align) {
         case TextAlign::LeftCenter:
             position.x = _extent.left;
             break;
+        case TextAlign::CenterBottom:
+        case TextAlign::CenterCenter:
+        case TextAlign::CenterTop:
         default:
             position.x = _extent.left + size.x / 2;
             break;

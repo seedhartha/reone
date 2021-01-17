@@ -184,7 +184,8 @@ private:
     void loadText(const resource::GffStruct &gffs);
     void loadHilight(const resource::GffStruct &gffs);
     std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
-    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size) const;
+
+    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, render::TextGravity &gravity) const;
 };
 
 } // namespace gui

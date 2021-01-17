@@ -502,16 +502,16 @@ void DialogGUI::repositionMessage() {
     Control::Text text(message.text());
 
     if (_entryEnded) {
-        extent.top = -_rootControl->extent().top;
         text.align = Control::TextAlign::CenterBottom;
+        extent.top = -_rootControl->extent().top;
     } else {
+        text.align = Control::TextAlign::CenterTop;
         Control &replies = getControl("LB_REPLIES");
         extent.top = replies.extent().top;
-        text.align = Control::TextAlign::CenterTop;
     }
 
-    message.setExtent(move(extent));
     message.setText(move(text));
+    message.setExtent(move(extent));
 }
 
 void DialogGUI::pickReply(uint32_t index) {
