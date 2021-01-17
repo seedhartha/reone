@@ -24,6 +24,8 @@
 
 #include "../src/common/pathutil.h"
 
+#include "moduleprobe.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -42,17 +44,27 @@ int Program::run() {
     initOptions();
     loadOptions();
     initGameVersion();
-    initTool();
 
     switch (_command) {
         case Command::List:
-            _tool->list(_inputFilePath, _keyPath);
-            break;
         case Command::Extract:
-            _tool->extract(_inputFilePath, _keyPath, _destPath);
-            break;
         case Command::Convert:
-            _tool->convert(_inputFilePath, _destPath);
+            initFileTool();
+            switch (_command) {
+                case Command::List:
+                    _tool->list(_target, _keyPath);
+                    break;
+                case Command::Extract:
+                    _tool->extract(_target, _keyPath, _destPath);
+                    break;
+                case Command::Convert:
+                    _tool->convert(_target, _destPath);
+                    break;
+                default:
+                    break;
+            }
+        case Command::ModuleProbe:
+            ModuleProbe().probe(_target, _gamePath, _destPath);
             break;
         default:
             cout << _cmdLineOpts << endl;
@@ -68,17 +80,18 @@ void Program::initOptions() {
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("convert", "convert 2DA or GFF file to JSON")
+        ("modprobe", "probe module and produce a JSON file describing it")
         ("game", po::value<string>(), "path to game directory")
         ("dest", po::value<string>(), "path to destination directory")
-        ("input-file", po::value<string>(), "path to input file");
+        ("target", po::value<string>(), "target name or path to input file");
 }
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
     if (vars.count("dest") > 0) {
         result = vars["dest"].as<string>();
-    } else if (vars.count("input-file") > 0) {
-        result = fs::path(vars["input-file"].as<string>()).parent_path();
+    } else if (vars.count("target") > 0) {
+        result = fs::path(vars["target"].as<string>()).parent_path();
     } else {
         result = fs::current_path();
     }
@@ -87,7 +100,7 @@ static fs::path getDestination(const po::variables_map &vars) {
 
 void Program::loadOptions() {
     po::positional_options_description positional;
-    positional.add("input-file", 1);
+    positional.add("target", 1);
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_cmdLineOpts)
@@ -100,7 +113,7 @@ void Program::loadOptions() {
 
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
     _destPath = getDestination(vars);
-    _inputFilePath = vars.count("input-file") > 0 ? vars["input-file"].as<string>() : "";
+    _target = vars.count("target") > 0 ? vars["target"].as<string>() : "";
     _keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
 
     if (vars.count("help")) {
@@ -111,6 +124,8 @@ void Program::loadOptions() {
         _command = Command::Extract;
     } else if (vars.count("convert")) {
         _command = Command::Convert;
+    } else if (vars.count("modprobe")) {
+        _command = Command::ModuleProbe;
     }
 }
 
@@ -119,18 +134,18 @@ void Program::initGameVersion() {
     _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
 }
 
-void Program::initTool() {
+void Program::initFileTool() {
     switch (_command) {
         case Command::List:
         case Command::Extract:
         case Command::Convert:
-            if (!fs::exists(_inputFilePath)) {
-                throw runtime_error("Input file does not exist: " + _inputFilePath.string());
+            if (!fs::exists(_target)) {
+                throw runtime_error("Input file does not exist: " + _target);
             }
-            _tool = getToolByPath(_version, _inputFilePath);
+            _tool = getFileToolByPath(_version, _target);
             break;
         default:
-            break;
+            throw logic_error("Unsupported file tool command: " + to_string(static_cast<int>(_command)));
     }
 }
 

@@ -659,6 +659,7 @@ endif()
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
+        tools/moduleprobe.h
         tools/program.h
         tools/tools.h)
 
@@ -669,6 +670,7 @@ if(BUILD_TOOLS)
         tools/erftool.cpp
         tools/gfftool.cpp
         tools/keytool.cpp
+        tools/moduleprobe.cpp
         tools/program.cpp
         tools/rimtool.cpp
         tools/tlktool.cpp

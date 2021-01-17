@@ -27,41 +27,48 @@ namespace reone {
 
 namespace tools {
 
-void Tool::list(const fs::path &path, const fs::path &keyPath) const {
+void FileTool::list(const fs::path &path, const fs::path &keyPath) const {
     throwNotImplemented();
 }
 
-void Tool::extract(const fs::path &path, const fs::path &keyPath, const fs::path &destPath) const {
-    throwNotImplemented();
-}
-
-void Tool::convert(const fs::path &path, const fs::path &destPath) const {
-    throwNotImplemented();
-}
-
-void Tool::throwNotImplemented() const {
+void FileTool::throwNotImplemented() const {
     throw logic_error("Not implemented");
 }
 
-unique_ptr<Tool> getToolByPath(GameVersion version, const fs::path &path) {
+void FileTool::extract(const fs::path &path, const fs::path &keyPath, const fs::path &destPath) const {
+    throwNotImplemented();
+}
+
+void FileTool::convert(const fs::path &path, const fs::path &destPath) const {
+    throwNotImplemented();
+}
+
+unique_ptr<FileTool> getFileToolByPath(GameVersion version, const fs::path &path) {
+    if (fs::is_directory(path)) {
+        throw invalid_argument("path must not point to a directory");
+    }
+    unique_ptr<FileTool> result;
+
     string ext(path.extension().string());
     if (ext == ".key") {
-        return make_unique<KeyTool>();
+        result = make_unique<KeyTool>();
     } else if (ext == ".bif") {
-        return make_unique<BifTool>();
+        result = make_unique<BifTool>();
     } else if (ext == ".erf" || ext == ".mod" || ext == ".sav") {
-        return make_unique<ErfTool>();
+        result = make_unique<ErfTool>();
     } else if (ext == ".rim") {
-        return make_unique<RimTool>();
+        result = make_unique<RimTool>();
     } else if (ext == ".2da") {
-        return make_unique<TwoDaTool>();
+        result = make_unique<TwoDaTool>();
     } else if (ext == ".tlk") {
-        return make_unique<TlkTool>();
+        result =  make_unique<TlkTool>();
     } else if (ext == ".tpc") {
-        return make_unique<TpcTool>();
+        result = make_unique<TpcTool>();
     } else {
-        return make_unique<GffTool>();
+        result = make_unique<GffTool>();
     }
+
+    return move(result);
 }
 
 } // namespace tools

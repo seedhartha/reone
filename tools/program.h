@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <string>
 #include <memory>
 
 #include <boost/filesystem/path.hpp>
@@ -40,16 +41,17 @@ private:
         Help,
         List,
         Extract,
-        Convert
+        Convert,
+        ModuleProbe
     };
 
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
-    boost::filesystem::path _inputFilePath;
+    std::string _target;
     boost::filesystem::path _keyPath;
     resource::GameVersion _version { resource::GameVersion::KotOR };
     Command _command { Command::None };
-    std::unique_ptr<Tool> _tool;
+    std::unique_ptr<FileTool> _tool;
 
     // Command line arguments
 
@@ -66,7 +68,7 @@ private:
     void initOptions();
     void loadOptions();
     void initGameVersion();
-    void initTool();
+    void initFileTool();
 };
 
 } // namespace tools
