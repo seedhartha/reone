@@ -53,8 +53,9 @@ void EmitterSceneNode::init() {
 }
 
 void EmitterSceneNode::update(float dt) {
+    removeExpiredParticles(dt);
     spawnParticles(dt);
-    updateParticles(dt);
+    SceneNode::update(dt);
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
@@ -98,11 +99,9 @@ void EmitterSceneNode::doSpawnParticle() {
     addChild(particle);
 }
 
-void EmitterSceneNode::updateParticles(float dt) {
+void EmitterSceneNode::removeExpiredParticles(float dt) {
     for (auto it = _particles.begin(); it != _particles.end(); ) {
         auto &particle = (*it);
-        particle->update(dt);
-
         if (particle->isExpired()) {
             removeChild(*particle);
             it = _particles.erase(it);

@@ -171,6 +171,12 @@ void SceneGraph::refreshShadowLight() {
     }
 }
 
+void SceneGraph::update(float dt) {
+    for (auto &root : _roots) {
+        root->update(dt);
+    }
+}
+
 void SceneGraph::render() const {
     if (!_activeCamera) return;
 

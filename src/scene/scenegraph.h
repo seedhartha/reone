@@ -40,6 +40,7 @@ class SceneGraph {
 public:
     SceneGraph(const render::GraphicsOptions &opts);
 
+    void update(float dt);
     void render() const;
     void renderNoGlobalUniforms(bool shadowPass) const;
 

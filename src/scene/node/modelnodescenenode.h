@@ -36,7 +36,7 @@ class ModelNodeSceneNode : public SceneNode {
 public:
     ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
 
-    void update(float dt);
+    void update(float dt) override;
 
     void renderSingle(bool shadowPass) const override;
 

@@ -46,9 +46,6 @@ void Room::removeTenant(SpatialObject *object) {
 }
 
 void Room::update(float dt) {
-    if (_model) {
-        _model->update(dt);
-    }
 }
 
 bool Room::isVisible() const {

@@ -36,7 +36,7 @@ class EmitterSceneNode : public SceneNode {
 public:
     EmitterSceneNode(const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
-    void update(float dt);
+    void update(float dt) override;
 
     void detonate();
 
@@ -53,7 +53,7 @@ private:
     void init();
 
     void spawnParticles(float dt);
-    void updateParticles(float dt);
+    void removeExpiredParticles(float dt);
 
     void doSpawnParticle();
 };

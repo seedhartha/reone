@@ -130,15 +130,7 @@ void ModelSceneNode::update(float dt) {
 
     _animator.update(dt);
 
-    for (auto &modelNode : _modelNodeByNumber) {
-        modelNode.second->update(dt);
-    }
-    for (auto &emitter : _emitters) {
-        emitter->update(dt);
-    }
-    for (auto &attached : _attachedModels) {
-        attached.second->update(dt);
-    }
+    SceneNode::update(dt);
 }
 
 void ModelSceneNode::render() const {

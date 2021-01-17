@@ -40,7 +40,7 @@ class ModelSceneNode : public SceneNode {
 public:
     ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
 
-    void update(float dt);
+    void update(float dt) override;
     void render() const override;
 
     std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);

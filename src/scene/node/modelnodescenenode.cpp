@@ -52,31 +52,32 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
 
 void ModelNodeSceneNode::update(float dt) {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh) return;
+    if (mesh) {
+        // UV animation
+        const ModelMesh::UVAnimation &uvAnimation = mesh->uvAnimation();
+        if (uvAnimation.animated) {
+            glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
+            _uvOffset += kUvAnimationSpeed * dir * dt;
+            _uvOffset -= glm::floor(_uvOffset);
+        }
 
-    // UV animation
-    const ModelMesh::UVAnimation &uvAnimation = mesh->uvAnimation();
-    if (uvAnimation.animated) {
-        glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
-        _uvOffset += kUvAnimationSpeed * dir * dt;
-        _uvOffset -= glm::floor(_uvOffset);
-    }
-
-    // Bumpmap UV animation
-    shared_ptr<Texture> bumpmap(mesh->bumpmapTexture());
-    if (bumpmap) {
-        const TextureFeatures &features = bumpmap->features();
-        if (features.procedureType == TextureProcedureType::Cycle) {
-            // TODO: only use the top row because each row is a different animation?
-            int frameCount = features.numX * features.numY;
-            float length = frameCount / static_cast<float>(features.fps);
-            _bumpmapTime = glm::min(_bumpmapTime + dt, length);
-            _bumpmapFrame = glm::round((frameCount - 1) * (_bumpmapTime / length));
-            if (_bumpmapTime == length) {
-                _bumpmapTime = 0.0f;
+        // Bumpmap UV animation
+        shared_ptr<Texture> bumpmap(mesh->bumpmapTexture());
+        if (bumpmap) {
+            const TextureFeatures &features = bumpmap->features();
+            if (features.procedureType == TextureProcedureType::Cycle) {
+                // TODO: only use the top row because each row is a different animation?
+                int frameCount = features.numX * features.numY;
+                float length = frameCount / static_cast<float>(features.fps);
+                _bumpmapTime = glm::min(_bumpmapTime + dt, length);
+                _bumpmapFrame = glm::round((frameCount - 1) * (_bumpmapTime / length));
+                if (_bumpmapTime == length) {
+                    _bumpmapTime = 0.0f;
+                }
             }
         }
     }
+    SceneNode::update(dt);
 }
 
 bool ModelNodeSceneNode::shouldRender() const {

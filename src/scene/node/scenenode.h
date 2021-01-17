@@ -33,6 +33,8 @@ public:
     void addChild(const std::shared_ptr<SceneNode> &node);
     void removeChild(SceneNode &node);
 
+    virtual void update(float dt);
+
     virtual void render() const;
     virtual void renderSingle(bool shadowPass) const;
 

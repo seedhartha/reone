@@ -29,7 +29,7 @@ class ParticleSceneNode : public SceneNode {
 public:
     ParticleSceneNode(glm::vec3 position, float velocity, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
-    void update(float dt);
+    void update(float dt) override;
 
     void renderSingle(bool shadowPass) const override;
 
