@@ -51,7 +51,9 @@ ParticleSceneNode::ParticleSceneNode(glm::vec3 position, float velocity, const s
 }
 
 void ParticleSceneNode::init() {
-    _animLength = (_emitter->frameEnd() - _emitter->frameStart() + 1) / static_cast<float>(_emitter->fps());
+    if (_emitter->fps() > 0) {
+        _animLength = (_emitter->frameEnd() - _emitter->frameStart() + 1) / static_cast<float>(_emitter->fps());
+    }
     _renderOrder = _emitter->renderOrder();
     _frame = _emitter->frameStart();
 
@@ -94,8 +96,10 @@ void ParticleSceneNode::updateAnimation(float dt) {
     float maturity;
     if (_emitter->lifeExpectancy() != -1) {
         maturity = _lifetime / static_cast<float>(_emitter->lifeExpectancy());
-    } else {
+    } else if (_animLength > 0.0f) {
         maturity = _lifetime / _animLength;
+    } else {
+        maturity = 0.0f;
     }
     _frame =  glm::ceil(_emitter->frameStart() + maturity * (_emitter->frameEnd() - _emitter->frameStart()));
     _size = interpolateConstraints(_emitter->particleSize(), maturity);
@@ -109,14 +113,19 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     shared_ptr<Texture> texture(_emitter->texture());
     if (!texture) return;
 
+    glm::mat4 transform(1.0f);
+    transform = _absoluteTransform;
+    transform = glm::scale(transform, glm::vec3(_size));
+
     LocalUniforms locals;
+    locals.general.model = move(transform);
     locals.general.color = glm::vec4(_color, 1.0f);
     locals.general.alpha = _alpha;
     locals.general.billboardGridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
     locals.general.billboardSize = glm::vec2(_size);
     locals.general.particleCenter = _absoluteTransform[3];
     locals.general.billboardFrame = _frame;
-    locals.general.billboardToWorldZ = _emitter->renderType() == Emitter::RenderType::BillboardToWorldZ;
+    locals.general.billboardRender = static_cast<int>(_emitter->renderType());
 
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 

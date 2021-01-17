@@ -76,7 +76,7 @@ layout(std140) uniform General {
     uniform vec2 uBillboardSize;
     uniform vec4 uParticleCenter;
     uniform int uBillboardFrame;
-    uniform bool uBillboardToWorldZ;
+    uniform int uBillboardRender;
     uniform bool uGrayscaleBumpmap;
     uniform float uBumpmapScaling;
     uniform vec2 uUvOffset;
@@ -183,6 +183,10 @@ void main() {
 )END";
 
 static constexpr GLchar kSourceVertexBillboard[] = R"END(
+const int BILLBOARD_RENDER_NORMAL = 1;
+const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
+const int BILLBOARD_RENDER_MOTION_BLUR = 3;
+
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
@@ -195,25 +199,30 @@ layout(location = 2) in vec2 aTexCoords;
 out vec2 fragTexCoords;
 
 void main() {
-    vec3 position;
+    vec4 position;
 
-    if (uBillboardToWorldZ) {
-        position = 
+    if (uBillboardRender == BILLBOARD_RENDER_TO_WORLD_Z) {
+        position = vec4(
             uParticleCenter.xyz +
             RIGHT * aPosition.x * uBillboardSize.x +
-            FORWARD * aPosition.y * uBillboardSize.y;
+            FORWARD * aPosition.y * uBillboardSize.y,
+            1.0);
+
+    } else if (uBillboardRender == BILLBOARD_RENDER_MOTION_BLUR) {
+        position = uModel * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
 
     } else {
         vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
         vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
 
-        position =
+        position = vec4(
             uParticleCenter.xyz +
             cameraRight * aPosition.x * uBillboardSize.x +
-            cameraUp * aPosition.y * uBillboardSize.y;
+            cameraUp * aPosition.y * uBillboardSize.y,
+            1.0);
     }
 
-    gl_Position = uProjection * uView * vec4(position, 1.0);
+    gl_Position = uProjection * uView * position;
     fragTexCoords = aTexCoords;
 }
 )END";
