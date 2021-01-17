@@ -37,14 +37,15 @@ class GffStruct;
 namespace tools {
 
 /**
- * Abstract tool class. Each implementation covers a single file format.
+ * Abstract tool, operating on a single file. Each implementation covers a
+ * particular file format.
  *
  * Operations:
  * - list — list file contents
  * - extract — extract file contents
  * - convert — convert file to a more practical format, e.g. JSON, TGA
  */
-class Tool {
+class FileTool {
 public:
     virtual void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const;
     virtual void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const;
@@ -54,14 +55,14 @@ private:
     void throwNotImplemented() const;
 };
 
-std::unique_ptr<Tool> getToolByPath(resource::GameVersion version, const boost::filesystem::path &path);
+std::unique_ptr<FileTool> getFileToolByPath(resource::GameVersion version, const boost::filesystem::path &path);
 
-class KeyTool : public Tool {
+class KeyTool : public FileTool {
 public:
     void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
 };
 
-class BifTool : public Tool {
+class BifTool : public FileTool {
 public:
     void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
     void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
@@ -70,29 +71,29 @@ private:
     int getFileIndexByFilename(const std::vector<resource::KeyFile::FileEntry> &files, const std::string &filename) const;
 };
 
-class ErfTool : public Tool {
+class ErfTool : public FileTool {
 public:
     void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
     void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
 };
 
-class RimTool : public Tool {
+class RimTool : public FileTool {
 public:
     void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
     void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
 };
 
-class TwoDaTool : public Tool {
+class TwoDaTool : public FileTool {
 public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
-class TlkTool : public Tool {
+class TlkTool : public FileTool {
 public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
-class GffTool : public Tool {
+class GffTool : public FileTool {
 public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 
@@ -100,7 +101,7 @@ private:
     boost::property_tree::ptree getPropertyTree(const resource::GffStruct &gffs) const;
 };
 
-class TpcTool : public Tool {
+class TpcTool : public FileTool {
 public:
     void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
