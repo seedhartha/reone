@@ -471,6 +471,7 @@ void Game::update() {
     }
 
     _window.update(dt);
+    _sceneGraph.update(dt);
 }
 
 void Game::updateVideo(float dt) {

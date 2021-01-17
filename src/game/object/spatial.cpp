@@ -183,9 +183,6 @@ void SpatialObject::applyInstantEffect(Effect &effect) {
 
 void SpatialObject::update(float dt) {
     Object::update(dt);
-    if (_model) {
-        _model->update(dt);
-    }
     updateEffects(dt);
 }
 

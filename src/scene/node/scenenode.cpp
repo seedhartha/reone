@@ -49,6 +49,12 @@ void SceneNode::removeChild(SceneNode &node) {
     }
 }
 
+void SceneNode::update(float dt) {
+    for (auto &child : _children) {
+        child->update(dt);
+    }
+}
+
 void SceneNode::render() const {
     for (auto &child : _children) {
         child->render();
