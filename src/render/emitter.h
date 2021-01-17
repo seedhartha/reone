@@ -37,10 +37,10 @@ public:
     };
 
     enum class RenderType {
-        Invalid,
-        Normal,
-        BillboardToWorldZ,
-        MotionBlur
+        Invalid = 0,
+        Normal = 1,
+        BillboardToWorldZ = 2,
+        MotionBlur = 3
     };
 
     enum class BlendType {

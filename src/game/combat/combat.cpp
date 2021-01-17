@@ -21,6 +21,7 @@
 #include <climits>
 
 #include "glm/common.hpp"
+#include "glm/gtx/euler_angles.hpp"
 
 #include "../../common/log.h"
 #include "../../common/random.h"
@@ -39,7 +40,7 @@ namespace game {
 
 static constexpr float kRoundDuration = 3.0f;
 
-static bool g_projectilesEnabled = false;
+static bool g_projectilesEnabled = true;
 
 static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
     return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().currentAction());
@@ -384,7 +385,15 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectile = make_shared<ModelSceneNode>(&_game->sceneGraph(), ammunitionType->model);
     round.projectile->setPosition(projectilePosition);
     round.projectile->detonate();
-    round.projectileTarget = target->model()->getCenterOfAABB();
+
+    shared_ptr<ModelSceneNode> targetModel(target->model());
+    glm::vec3 projectileTarget, impactPosition;
+    if (targetModel->getNodeAbsolutePosition("impact", impactPosition)) {
+        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impactPosition, 1.0f);
+    } else {
+        projectileTarget = targetModel->absoluteTransform()[3];
+    }
+    round.projectileTarget = projectileTarget;
 
     _game->sceneGraph().addRoot(round.projectile);
 }
@@ -392,15 +401,23 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 void Combat::updateProjectile(Round &round, float dt) {
     if (!round.projectile) return;
 
-    float roundTimeLeft = (round.state == RoundState::FirstTurn ? 0.5f * kRoundDuration : kRoundDuration) - round.time;
     glm::vec3 projectilePosition(round.projectile->absoluteTransform()[3]);
-
     glm::vec3 targetToProjectile(round.projectileTarget - projectilePosition);
+
     float distance = glm::length(targetToProjectile);
+    float roundTimeLeft = (round.state == RoundState::FirstTurn ? 0.5f * kRoundDuration : kRoundDuration) - round.time;
     float speed = distance / roundTimeLeft;
 
     projectilePosition += speed * glm::normalize(targetToProjectile) * dt;
-    round.projectile->setPosition(projectilePosition);
+
+    glm::vec3 dir(glm::normalize(targetToProjectile));
+    float facing = glm::half_pi<float>() - glm::atan(dir.x, dir.y);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, projectilePosition);
+    transform *= glm::eulerAngleZ(facing);
+
+    round.projectile->setLocalTransform(transform);
 }
 
 void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, AttackResult result, int damage) {

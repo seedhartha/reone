@@ -92,7 +92,7 @@ struct GeneralUniforms {
     glm::vec2 billboardSize { 0.0f };
     glm::vec4 particleCenter { 0.0f };
     int billboardFrame { 0 };
-    int billboardToWorldZ { 0 };
+    int billboardRender { 0 };
     int grayscaleBumpmap { 0 };
     float bumpmapScaling { 0.0f };
     glm::vec2 uvOffset { 0.0f };
