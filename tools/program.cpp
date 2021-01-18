@@ -63,6 +63,7 @@ int Program::run() {
                 default:
                     break;
             }
+            break;
         case Command::ModuleProbe:
             ModuleProbe().probe(_target, _gamePath, _destPath);
             break;
