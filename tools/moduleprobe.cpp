@@ -128,12 +128,16 @@ pt::ptree ModuleProbe::describeModule() {
     appearance.load(wrap(getResource("appearance", ResourceType::TwoDa)));
     auto appearanceTable = appearance.table();
 
+    TwoDaFile placeables;
+    placeables.load(wrap(getResource("placeables", ResourceType::TwoDa)));
+    auto placeablesTable = placeables.table();
+
     // Areas
 
     pt::ptree areas;
     for (auto &areaGffs : ifoGffs->getList("Mod_Area_list")) {
         string name(areaGffs->getString("Area_Name"));
-        areas.push_back(make_pair("", describeArea(name, *appearanceTable)));
+        areas.push_back(make_pair("", describeArea(name, *appearanceTable, *placeablesTable)));
     }
     description.add_child("areas", areas);
 
@@ -142,7 +146,7 @@ pt::ptree ModuleProbe::describeModule() {
     return move(description);
 }
 
-pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appearance) {
+pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appearance, const resource::TwoDaTable &placeables) {
     GffFile are;
     are.load(wrap(_rimMain.find(name, ResourceType::Area)));
     auto areGffs = are.top();
@@ -192,9 +196,9 @@ pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appear
 
     // Placeables
 
-    pt::ptree placeables;
+    pt::ptree placeablesTree;
     for (auto &gitPlaceable : gitGffs->getList("Placeable List")) {
-        placeables.push_back(make_pair("", describePlaceable(*gitPlaceable)));
+        placeablesTree.push_back(make_pair("", describePlaceable(*gitPlaceable, placeables)));
     }
 
     // END Placeables
@@ -207,6 +211,24 @@ pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appear
     }
 
     // END Triggers
+
+    // Waypoints
+
+    pt::ptree waypoints;
+    for (auto &gitWaypoint : gitGffs->getList("WaypointList")) {
+        waypoints.push_back(make_pair("", describeWaypoint(*gitWaypoint)));
+    }
+
+    // END Waypoints
+
+    // Sounds
+
+    pt::ptree sounds;
+    for (auto &gitSound : gitGffs->getList("SoundList")) {
+        sounds.push_back(make_pair("", describeSound(*gitSound)));
+    }
+
+    // END Sounds
 
     // Scripts
 
@@ -221,13 +243,29 @@ pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appear
     pt::ptree area;
     area.put("name", name);
     area.put("title", getString(areGffs->getInt("Name")));
-    area.add_child("rooms", rooms);
-    area.add_child("creatures", creatures);
-    area.add_child("doors", doors);
-    area.add_child("placeables", placeables);
-    area.add_child("triggers", triggers);
     if (!scripts.empty()) {
         area.add_child("scripts", scripts);
+    }
+    if (!rooms.empty()) {
+        area.add_child("rooms", rooms);
+    }
+    if (!creatures.empty()) {
+        area.add_child("creatures", creatures);
+    }
+    if (!doors.empty()) {
+        area.add_child("doors", doors);
+    }
+    if (!placeablesTree.empty()) {
+        area.add_child("placeables", placeablesTree);
+    }
+    if (!triggers.empty()) {
+        area.add_child("triggers", triggers);
+    }
+    if (!waypoints.empty()) {
+        area.add_child("waypoints", waypoints);
+    }
+    if (!sounds.empty()) {
+        area.add_child("sounds", sounds);
     }
 
     return move(area);
@@ -276,9 +314,6 @@ pt::ptree ModuleProbe::describeCreature(const GffStruct &gitCreature, const TwoD
     utc.load(wrap(getResource(gitCreature.getString("TemplateResRef"), ResourceType::CreatureBlueprint)));
     auto utcGffs = utc.top();
 
-    pt::ptree appearanceTree;
-    appearanceTree.put("label", appearance.getString(utcGffs->getInt("Appearance_Type"), "label"));
-
     pt::ptree equipment;
     for (auto &utcItem : utcGffs->getList("Equip_ItemList")) {
         pt::ptree item;
@@ -314,7 +349,7 @@ pt::ptree ModuleProbe::describeCreature(const GffStruct &gitCreature, const TwoD
     blueprint.put("tag", utcGffs->getString("Tag"));
     putIfNotEmpty("first_name", getString(utcGffs->getInt("FirstName")), blueprint);
     putIfNotEmpty("last_name", getString(utcGffs->getInt("LastName")), blueprint);
-    blueprint.add_child("appearance", appearanceTree);
+    blueprint.put("appearance", appearance.getString(utcGffs->getInt("Appearance_Type"), "label"));
     blueprint.put("faction", describeFaction(utcGffs->getInt("FactionID")));
     putIfNotEmpty("conversation", utcGffs->getString("Conversation"), blueprint);
     if (!equipment.empty()) {
@@ -380,7 +415,7 @@ pt::ptree ModuleProbe::describeDoor(const GffStruct &gitDoor) {
     return move(door);
 }
 
-pt::ptree ModuleProbe::describePlaceable(const GffStruct &gitPlaceable) {
+pt::ptree ModuleProbe::describePlaceable(const GffStruct &gitPlaceable, const TwoDaTable &placeables) {
     GffFile utp;
     utp.load(wrap(getResource(gitPlaceable.getString("TemplateResRef"), ResourceType::PlaceableBlueprint)));
     auto utpGffs = utp.top();
@@ -411,7 +446,9 @@ pt::ptree ModuleProbe::describePlaceable(const GffStruct &gitPlaceable) {
 
     pt::ptree blueprint;
     blueprint.put("resref", utpGffs->getString("TemplateResRef"));
+    blueprint.put("tag", utpGffs->getString("Tag"));
     blueprint.put("loc_name", getString(utpGffs->getInt("LocName")));
+    blueprint.put("appearance", placeables.getString(utpGffs->getInt("Appearance"), "label"));
     blueprint.put("static", utpGffs->getBool("Static"));
     putIfNotEmpty("conversation", utpGffs->getString("Conversation"), blueprint);
     blueprint.put("locked", utpGffs->getBool("Locked"));
@@ -468,6 +505,7 @@ pt::ptree ModuleProbe::describeTrigger(const GffStruct &gitTrigger) {
 
     pt::ptree blueprint;
     blueprint.put("resref", uttGffs->getString("TemplateResRef"));
+    blueprint.put("tag", uttGffs->getString("Tag"));
     blueprint.put("localized_name", getString(uttGffs->getInt("LocalizedName")));
     if (!scripts.empty()) {
         blueprint.add_child("scripts", scripts);
@@ -476,10 +514,72 @@ pt::ptree ModuleProbe::describeTrigger(const GffStruct &gitTrigger) {
     pt::ptree trigger;
     trigger.add_child("position", position);
     trigger.add_child("orientation", orientation);
-    trigger.add_child("points", geometry);
+    trigger.add_child("geometry", geometry);
     trigger.add_child("blueprint", blueprint);
 
     return move(trigger);
+}
+
+pt::ptree ModuleProbe::describeWaypoint(const GffStruct &gitWaypoint) {
+    pt::ptree position;
+    position.put("x", gitWaypoint.getFloat("XPosition"));
+    position.put("y", gitWaypoint.getFloat("YPosition"));
+    position.put("z", gitWaypoint.getFloat("ZPosition"));
+
+    pt::ptree orientation;
+    orientation.put("x", gitWaypoint.getFloat("XOrientation"));
+    orientation.put("y", gitWaypoint.getFloat("YOrientation"));
+
+    pt::ptree waypoint;
+    waypoint.put("blueprint_resref", gitWaypoint.getString("TemplateResRef"));
+    waypoint.put("tag", gitWaypoint.getString("Tag"));
+    waypoint.put("localized_name", getString(gitWaypoint.getInt("LocalizedName")));
+    waypoint.add_child("position", position);
+    waypoint.add_child("orientation", orientation);
+
+    return move(waypoint);
+}
+
+pt::ptree ModuleProbe::describeSound(const GffStruct &gitSound) {
+    GffFile uts;
+    uts.load(wrap(getResource(gitSound.getString("TemplateResRef"), ResourceType::SoundBlueprint)));
+    auto utsGffs = uts.top();
+
+    pt::ptree position;
+    position.put("x", gitSound.getFloat("XPosition"));
+    position.put("y", gitSound.getFloat("YPosition"));
+    position.put("z", gitSound.getFloat("ZPosition"));
+
+    TwoDaFile priorityGroups;
+    priorityGroups.load(wrap(getResource("prioritygroups", ResourceType::TwoDa)));
+    auto priorityGroupsTable = priorityGroups.table();
+
+    pt::ptree sounds;
+    for (auto &utsSound : utsGffs->getList("Sounds")) {
+        pt::ptree sound;
+        sound.put("resref", utsSound->getString("Sound"));
+        sounds.push_back(make_pair("", sound));
+    }
+
+    pt::ptree blueprint;
+    blueprint.put("resref", utsGffs->getString("TemplateResRef"));
+    blueprint.put("tag", utsGffs->getString("Tag"));
+    blueprint.put("loc_name", getString(utsGffs->getInt("LocName")));
+    blueprint.put("active", utsGffs->getBool("Active"));
+    blueprint.put("continous", utsGffs->getBool("Continous"));
+    blueprint.put("looping", utsGffs->getBool("Looping"));
+    blueprint.put("positional", utsGffs->getBool("Positional"));
+    blueprint.put("priority", priorityGroupsTable->getString(utsGffs->getInt("Priority"), "label"));
+    blueprint.put("interval", utsGffs->getInt("Interval"));
+    if (!sounds.empty()) {
+        blueprint.add_child("sounds", sounds);
+    }
+
+    pt::ptree sound;
+    sound.add_child("position", position);
+    sound.add_child("blueprint", blueprint);
+
+    return move(sound);
 }
 
 void ModuleProbe::writeDescription(const string &moduleName, const pt::ptree &tree, const fs::path &destPath) {

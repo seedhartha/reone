@@ -58,11 +58,13 @@ private:
 
     void loadResources(const std::string &moduleName);
     boost::property_tree::ptree describeModule();
-    boost::property_tree::ptree describeArea(const std::string &name, const resource::TwoDaTable &appearance);
+    boost::property_tree::ptree describeArea(const std::string &name, const resource::TwoDaTable &appearance, const resource::TwoDaTable &placeables);
     boost::property_tree::ptree describeCreature(const resource::GffStruct &gitCreature, const resource::TwoDaTable &appearance);
     boost::property_tree::ptree describeDoor(const resource::GffStruct &gitDoor);
-    boost::property_tree::ptree describePlaceable(const resource::GffStruct &gitPlaceable);
+    boost::property_tree::ptree describePlaceable(const resource::GffStruct &gitPlaceable, const resource::TwoDaTable &placeables);
     boost::property_tree::ptree describeTrigger(const resource::GffStruct &gitTrigger);
+    boost::property_tree::ptree describeWaypoint(const resource::GffStruct &gitWaypoint);
+    boost::property_tree::ptree describeSound(const resource::GffStruct &gitSound);
     void writeDescription(const std::string &moduleName, const boost::property_tree::ptree &tree, const boost::filesystem::path &destPath);
 
     std::shared_ptr<ByteArray> getResource(const std::string &resRef, resource::ResourceType type);
