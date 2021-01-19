@@ -52,15 +52,23 @@ private:
     ScriptExecution(const ScriptExecution &) = delete;
     ScriptExecution &operator=(const ScriptExecution &) = delete;
 
+    template <class T>
+    void registerHandler(ByteCode code, T handler) {
+        _handlers.insert(std::make_pair(code, std::bind(handler, this, std::placeholders::_1)));
+    }
+
+    Variable getVectorFromStack();
+    Variable getFloatFromStack();
+    void getTwoIntegersFromStack(Variable &left, Variable &right);
+
+    // Handlers
+
     void executeCopyDownSP(const Instruction &ins);
     void executeReserve(const Instruction &ins);
     void executeCopyTopSP(const Instruction &ins);
     void executePushConstant(const Instruction &ins);
     void executeCallRoutine(const Instruction &ins);
-    Variable getVectorFromStack();
-    Variable getFloatFromStack();
     void executeLogicalAnd(const Instruction &ins);
-    void getTwoIntegersFromStack(Variable &left, Variable &right);
     void executeLogicalOr(const Instruction &ins);
     void executeInclusiveBitwiseOr(const Instruction &ins);
     void executeExclusiveBitwiseOr(const Instruction &ins);
@@ -97,6 +105,8 @@ private:
     void executeSaveBP(const Instruction &ins);
     void executeRestoreBP(const Instruction &ins);
     void executeStoreState(const Instruction &ins);
+
+    // END Handlers
 };
 
 } // namespace script
