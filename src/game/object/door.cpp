@@ -113,6 +113,10 @@ bool Door::isStatic() const {
     return _static;
 }
 
+bool Door::isKeyRequired() const {
+    return _keyRequired;
+}
+
 const string &Door::getOnOpen() const {
     return _onOpen;
 }
