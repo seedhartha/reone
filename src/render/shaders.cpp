@@ -38,6 +38,7 @@ static constexpr int kFeaturesBindingPointIndex = 1;
 static constexpr int kGeneralBindingPointIndex = 2;
 static constexpr int kLightingBindingPointIndex = 3;
 static constexpr int kSkeletalBindingPointIndex = 4;
+static constexpr int kBillboardBindingPointIndex = 5;
 
 static constexpr GLchar kCommonShaderHeader[] = R"END(
 #version 330
@@ -64,6 +65,7 @@ layout(std140) uniform General {
     bool uBloomEnabled;
     bool uDiscardEnabled;
     bool uShadowsEnabled;
+    bool uBillboardEnabled;
 
     uniform mat4 uModel;
     uniform vec4 uColor;
@@ -72,11 +74,7 @@ layout(std140) uniform General {
     uniform vec4 uDiscardColor;
     uniform vec2 uBlurResolution;
     uniform vec2 uBlurDirection;
-    uniform vec2 uBillboardGridSize;
-    uniform vec2 uBillboardSize;
-    uniform vec4 uParticleCenter;
-    uniform int uBillboardFrame;
-    uniform int uBillboardRender;
+
     uniform bool uGrayscaleBumpmap;
     uniform float uBumpmapScaling;
     uniform vec2 uUvOffset;
@@ -96,6 +94,14 @@ layout(std140) uniform Skeletal {
     uniform mat4 uAbsTransform;
     uniform mat4 uAbsTransformInv;
     uniform mat4 uBones[MAX_BONES];
+};
+
+layout(std140) uniform Billboard {
+    uniform vec2 uBillboardGridSize;
+    uniform vec2 uBillboardSize;
+    uniform vec4 uParticleCenter;
+    uniform int uBillboardFrame;
+    uniform int uBillboardRender;
 };
 )END";
 
@@ -594,6 +600,7 @@ void Shaders::initGL() {
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
     glGenBuffers(1, &_skeletalUbo);
+    glGenBuffers(1, &_billboardUbo);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -612,6 +619,10 @@ void Shaders::initGL() {
         uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
         if (skeletalBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
+        }
+        uint32_t billboardBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Billboard");
+        if (billboardBlockIdx != GL_INVALID_INDEX) {
+            glUniformBlockBinding(_activeOrdinal, billboardBlockIdx, kBillboardBindingPointIndex);
         }
 
         setUniform("uEnvmap", TextureUnits::envmap);
@@ -678,6 +689,10 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinitGL() {
+    if (_billboardUbo) {
+        glDeleteBuffers(1, &_billboardUbo);
+        _billboardUbo = 0;
+    }
     if (_skeletalUbo) {
         glDeleteBuffers(1, &_skeletalUbo);
         _skeletalUbo = 0;
@@ -731,6 +746,10 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     if (locals.general.lightingEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
+    }
+    if (locals.general.billboardEnabled) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniform), &locals.billboard, GL_STATIC_DRAW);
     }
 }
 
