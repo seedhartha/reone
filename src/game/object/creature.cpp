@@ -29,6 +29,7 @@
 #include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 #include "../../script/types.h"
 
 #include "../action/attack.h"
@@ -192,21 +193,21 @@ void Creature::updateModelAnimation() {
     }
     switch (_movementType) {
         case MovementType::Run:
-            _model->playAnimation(_animResolver.getRunAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            _model->playAnimation(_animResolver.getRunAnimation(), AnimationFlags::loopPropagateBlend);
             break;
         case MovementType::Walk:
-            _model->playAnimation(_animResolver.getWalkAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+            _model->playAnimation(_animResolver.getWalkAnimation(), AnimationFlags::loopPropagateBlend);
             break;
         default:
             if (_dead) {
-                _model->playAnimation(_animResolver.getDeadAnimation(), kAnimationPropagate | kAnimationBlend);
+                _model->playAnimation(_animResolver.getDeadAnimation(), AnimationFlags::propagateBlend);
             } else if (_talking) {
-                _model->playAnimation(_animResolver.getTalkNormalAnimation(), kAnimationLoop | kAnimationPropagate);
+                _model->playAnimation(_animResolver.getTalkNormalAnimation(), AnimationFlags::loop | AnimationFlags::propagate);
                 if (_headModel) {
-                    _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), kAnimationLoop | kAnimationOverlay, 0.25f);
+                    _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loop | AnimationFlags::overlay, 0.25f);
                 }
             } else {
-                _model->playAnimation(_animResolver.getPauseAnimation(), kAnimationLoop | kAnimationPropagate | kAnimationBlend);
+                _model->playAnimation(_animResolver.getPauseAnimation(), AnimationFlags::loopPropagateBlend);
             }
             break;
     }
@@ -229,9 +230,9 @@ void Creature::playAnimation(AnimationType anim, float speed, shared_ptr<Action>
     string animName(_animResolver.getAnimationName(anim));
     if (animName.empty()) return;
 
-    int flags = kAnimationPropagate;
+    int flags = AnimationFlags::propagate;
     if (isAnimationLooping(anim)) {
-        flags |= kAnimationLoop;
+        flags |= AnimationFlags::loop;
     }
     playAnimation(animName, flags, speed, actionToComplete);
 }
@@ -248,7 +249,7 @@ void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
 
     callback();
 
-    if (!(flags & kAnimationLoop)) {
+    if (!(flags & AnimationFlags::loop)) {
         _animFireForget = true;
     }
 }
@@ -264,7 +265,7 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
     string animName(_animResolver.getAnimationName(anim, wield, variant));
     if (animName.empty()) return;
 
-    playAnimation(animName, kAnimationPropagate);
+    playAnimation(animName, AnimationFlags::propagate);
 }
 
 bool Creature::equip(const string &resRef) {

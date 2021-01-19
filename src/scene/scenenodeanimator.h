@@ -25,28 +25,24 @@
 
 #include "glm/mat4x4.hpp"
 
+#include "../render/model/animation.h"
+#include "../render/model/modelnode.h"
+
 namespace reone {
-
-namespace render {
-
-class Animation;
-class ModelNode;
-
-}
 
 namespace scene {
 
-enum AnimationFlags {
-    kAnimationLoop = 1,
-    kAnimationPropagate = 2,
-    kAnimationBlend = 4, /**< blend previous animation into the next one */
-    kAnimationOverlay = 8 /**< overlay next animation on top of the previous one */
-};
-
 class ModelSceneNode;
 
+/**
+ * Class, responsible for applying model animations to scene nodes.
+ */
 class SceneNodeAnimator {
 public:
+    /**
+     * @param modelSceneNode scene node to apply animations to
+     * @param skipNodes names of model nodes, to which animations will not be applied
+     */
     SceneNodeAnimator(ModelSceneNode *modelSceneNode, const std::set<std::string> &skipNodes);
 
     void update(float dt);
@@ -56,6 +52,9 @@ public:
 
     bool isAnimationFinished() const;
 
+    /**
+     * Sets animation to play when current animations finish playing.
+     */
     void setDefaultAnimation(const std::shared_ptr<render::Animation> &anim);
 
 private:

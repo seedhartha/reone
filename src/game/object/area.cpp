@@ -33,6 +33,7 @@
 #include "../../resource/format/visfile.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/cubenode.h"
+#include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../blueprint/trigger.h"
@@ -115,7 +116,7 @@ void Area::loadLYT() {
 
         shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(&_game->sceneGraph(), model));
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-        sceneNode->playAnimation("animloop1", kAnimationLoop);
+        sceneNode->playAnimation("animloop1", AnimationFlags::loop);
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
         unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));

@@ -270,7 +270,8 @@ set(SCENE_HEADERS
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
     src/scene/scenegraph.h
-    src/scene/scenenodeanimator.h)
+    src/scene/scenenodeanimator.h
+    src/scene/types.h)
 
 set(SCENE_SOURCES
     src/scene/node/cameranode.cpp

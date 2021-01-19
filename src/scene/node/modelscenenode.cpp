@@ -23,6 +23,7 @@
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"
+#include "../types.h"
 
 #include "emitternode.h"
 #include "lightnode.h"
@@ -157,7 +158,7 @@ void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
 void ModelSceneNode::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
     _animator.playAnimation(anim, flags, speed, scale);
 
-    if (flags & kAnimationPropagate) {
+    if (flags & AnimationFlags::propagate) {
         for (auto &attached : _attachedModels) {
             attached.second->playAnimation(anim, flags, speed, scale);
         }

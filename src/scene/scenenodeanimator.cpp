@@ -22,6 +22,7 @@
 
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
+#include "types.h"
 
 using namespace std;
 
@@ -151,7 +152,7 @@ void SceneNodeAnimator::updateAbsoluteTransforms(ModelNode &modelNode, const glm
         } else {
             localTransform = modelNode.localTransform();
         }
-    } else if (_channels[0].flags & kAnimationOverlay) {
+    } else if (_channels[0].flags & AnimationFlags::overlay) {
         auto maybeTransform0 = _channels[0].localTransforms.find(modelNode.nodeNumber());
         bool hasTransform0 = maybeTransform0 != _channels[0].localTransforms.end();
         auto maybeTransform1 = _channels[1].localTransforms.find(modelNode.nodeNumber());
@@ -200,7 +201,7 @@ void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
     float length = channel.animation->length();
     channel.time += channel.speed * dt;
 
-    bool loop = channel.flags & kAnimationLoop;
+    bool loop = channel.flags & AnimationFlags::loop;
     if (loop) {
         channel.time = glm::mod(channel.time, length);
     } else {
@@ -213,7 +214,7 @@ void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
 
 void SceneNodeAnimator::playDefaultAnimation() {
     if (_defaultAnimation) {
-        playAnimation(_defaultAnimation, kAnimationLoop | kAnimationBlend);
+        playAnimation(_defaultAnimation, AnimationFlags::loop | AnimationFlags::blend);
     }
 }
 
@@ -225,9 +226,9 @@ void SceneNodeAnimator::playAnimation(const shared_ptr<Animation> &anim, int fla
     }
     bool set = false;
     if (_channels[0].isActive()) {
-        if (flags & kAnimationOverlay) {
+        if (flags & AnimationFlags::overlay) {
             _channels[1] = _channels[0];
-        } else if (flags & kAnimationBlend) {
+        } else if (flags & AnimationFlags::blend) {
             _channels[1] = _channels[0];
             _channels[0].setAnimation(anim, flags, speed, scale);
             _channels[0].time = glm::max(0.0f, anim->transitionTime() - kTransitionDuration);
