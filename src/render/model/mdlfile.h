@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/binfile.h"
+#include "../../resource/format/binfile.h"
 #include "../../resource/types.h"
 
 #include "../model/model.h"

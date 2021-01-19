@@ -25,14 +25,14 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "2dafile.h"
-#include "gfffile.h"
+#include "format/2dafile.h"
+#include "format/gfffile.h"
+#include "format/keyfile.h"
+#include "format/pefile.h"
+#include "format/tlkfile.h"
 #include "keybifprovider.h"
-#include "keyfile.h"
-#include "pefile.h"
 #include "resourceprovider.h"
 #include "stringprocessor.h"
-#include "tlkfile.h"
 
 namespace reone {
 

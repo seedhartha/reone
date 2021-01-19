@@ -29,8 +29,8 @@
 #include "../../common/streamutil.h"
 #include "../../render/models.h"
 #include "../../render/walkmeshes.h"
-#include "../../resource/lytfile.h"
-#include "../../resource/visfile.h"
+#include "../../resource/format/lytfile.h"
+#include "../../resource/format/visfile.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/cubenode.h"
 

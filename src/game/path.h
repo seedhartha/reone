@@ -21,7 +21,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "../resource/gfffile.h"
+#include "../resource/format/gfffile.h"
 
 namespace reone {
 

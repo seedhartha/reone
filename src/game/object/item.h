@@ -21,7 +21,7 @@
 
 #include "../../render/model/model.h"
 #include "../../render/texture.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "../blueprint/item.h"
 #include "../types.h"

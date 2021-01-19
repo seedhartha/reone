@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 
 #include "../src/common/log.h"
-#include "../src/resource/rimfile.h"
+#include "../src/resource/format/rimfile.h"
 #include "../src/resource/typeutil.h"
 
 using namespace std;

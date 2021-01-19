@@ -17,9 +17,10 @@
 
 #pragma once
 
+#include "../resourceprovider.h"
+#include "../types.h"
+
 #include "binfile.h"
-#include "resourceprovider.h"
-#include "types.h"
 
 namespace reone {
 

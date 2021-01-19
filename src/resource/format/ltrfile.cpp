@@ -22,7 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../common/random.h"
+#include "../../common/random.h"
 
 using namespace std;
 

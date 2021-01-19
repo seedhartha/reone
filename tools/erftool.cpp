@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 
 #include "../src/common/log.h"
-#include "../src/resource/erffile.h"
+#include "../src/resource/format/erffile.h"
 #include "../src/resource/typeutil.h"
 
 using namespace std;

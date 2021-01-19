@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "../resource/gfffile.h"
+#include "../resource/format/gfffile.h"
 
 namespace reone {
 

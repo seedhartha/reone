@@ -24,11 +24,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/2dafile.h"
-#include "../src/resource/gfffile.h"
+#include "../src/resource/format/2dafile.h"
+#include "../src/resource/format/gfffile.h"
 #include "../src/resource/keybifprovider.h"
-#include "../src/resource/rimfile.h"
-#include "../src/resource/tlkfile.h"
+#include "../src/resource/format/rimfile.h"
+#include "../src/resource/format/tlkfile.h"
 
 namespace reone {
 

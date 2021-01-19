@@ -19,7 +19,7 @@
 
 #include "spatial.h"
 
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "../camera/camera.h"
 

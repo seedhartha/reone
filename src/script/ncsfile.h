@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "../resource/binfile.h"
+#include "../resource/format/binfile.h"
 
 #include "program.h"
 

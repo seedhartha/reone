@@ -24,8 +24,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../common/streamreader.h"
-#include "../common/types.h"
+#include "../../common/streamreader.h"
+#include "../../common/types.h"
 
 namespace reone {
 
