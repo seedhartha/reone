@@ -46,6 +46,17 @@ void withAdditiveBlending(const function<void()> &block) {
     glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
 }
 
+void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
+    int oldViewport[4];
+    glGetIntegerv(GL_VIEWPORT, &oldViewport[0]);
+
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+    block();
+
+    glViewport(oldViewport[0], oldViewport[1], oldViewport[2], oldViewport[3]);
+}
+
 void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
 }

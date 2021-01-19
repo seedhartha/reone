@@ -19,12 +19,15 @@
 
 #include <functional>
 
+#include "glm/vec4.hpp"
+
 namespace reone {
 
 namespace render {
 
 void withDepthTest(const std::function<void()> &block);
 void withAdditiveBlending(const std::function<void()> &block);
+void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
 
 void setActiveTextureUnit(int n);
 
