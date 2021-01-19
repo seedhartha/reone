@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace reone {
 
@@ -91,6 +92,7 @@ enum class ResourceType : uint16_t {
     Invalid = 0xffff
 };
 
+typedef std::vector<uint32_t> SoundSet;
 typedef std::multimap<std::string, std::string> Visibility;
 
 } // namespace resource

@@ -22,6 +22,7 @@
 
 #include "../../resource/format/2dafile.h"
 #include "../../resource/format/gfffile.h"
+#include "../../resource/types.h"
 #include "../../script/types.h"
 
 #include "../blueprint/blueprint.h"
@@ -180,6 +181,7 @@ private:
     bool _immortal { false };
     int _xp { 0 };
     std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
+    std::shared_ptr<resource::SoundSet> _soundSet;
 
     // Scripts
 

@@ -26,6 +26,7 @@
 #include "format/biffile.h"
 #include "format/erffile.h"
 #include "format/rimfile.h"
+#include "format/ssffile.h"
 #include "folder.h"
 #include "typeutil.h"
 
@@ -314,6 +315,21 @@ shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
         }
 
         return move(table);
+    });
+}
+
+shared_ptr<SoundSet> Resources::getSoundSet(const string &resRef) {
+    return findResource<SoundSet>(resRef, _soundSetCache, [this, &resRef]() {
+        shared_ptr<ByteArray> data(get(resRef, ResourceType::Ssf));
+        shared_ptr<SoundSet> soundSet;
+
+        if (data) {
+            SsfFile ssf;
+            ssf.load(wrap(data));
+            soundSet = make_shared<SoundSet>(ssf.soundSet());
+        }
+
+        return move(soundSet);
     });
 }
 
