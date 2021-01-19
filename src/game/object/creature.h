@@ -20,8 +20,8 @@
 #include <atomic>
 #include <functional>
 
-#include "../../resource/2dafile.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/2dafile.h"
+#include "../../resource/format/gfffile.h"
 #include "../../script/types.h"
 
 #include "../blueprint/blueprint.h"

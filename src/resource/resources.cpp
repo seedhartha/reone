@@ -23,10 +23,10 @@
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
-#include "biffile.h"
-#include "erffile.h"
+#include "format/biffile.h"
+#include "format/erffile.h"
+#include "format/rimfile.h"
 #include "folder.h"
-#include "rimfile.h"
 #include "typeutil.h"
 
 using namespace std;

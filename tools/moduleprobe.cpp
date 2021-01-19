@@ -23,7 +23,7 @@
 
 #include "../src/common/pathutil.h"
 #include "../src/common/streamutil.h"
-#include "../src/resource/lytfile.h"
+#include "../src/resource/format/lytfile.h"
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../../gui/textinput.h"
-#include "../../../resource/ltrfile.h"
+#include "../../../resource/format/ltrfile.h"
 
 #include "../gui.h"
 

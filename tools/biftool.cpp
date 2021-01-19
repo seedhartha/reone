@@ -21,7 +21,7 @@
 #include <boost/format.hpp>
 
 #include "../src/common/log.h"
-#include "../src/resource/biffile.h"
+#include "../src/resource/format/biffile.h"
 #include "../src/resource/typeutil.h"
 
 using namespace std;

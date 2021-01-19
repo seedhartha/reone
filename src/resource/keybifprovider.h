@@ -19,8 +19,8 @@
 
 #include <unordered_map>
 
-#include "biffile.h"
-#include "keyfile.h"
+#include "format/biffile.h"
+#include "format/keyfile.h"
 #include "resourceprovider.h"
 
 namespace reone {

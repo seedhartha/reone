@@ -24,7 +24,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "../src/resource/keyfile.h"
+#include "../src/resource/format/keyfile.h"
 
 namespace reone {
 

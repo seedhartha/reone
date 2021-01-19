@@ -17,48 +17,52 @@
 
 #pragma once
 
+#include "../resourceprovider.h"
+#include "../types.h"
+
 #include "binfile.h"
-#include "types.h"
 
 namespace reone {
 
 namespace resource {
 
-class KeyFile : public BinaryFile {
+class ErfFile : public BinaryFile, public IResourceProvider {
 public:
-    struct FileEntry {
-        uint32_t fileSize { 0 };
-        std::string filename;
-    };
-
-    struct KeyEntry {
-        std::string resRef;
+    struct Key {
+        std::string resRef { 0 };
+        uint32_t resId { 0 };
         ResourceType resType { ResourceType::Invalid };
-        int bifIdx { 0 };
-        int resIdx { 0 };
     };
 
-    KeyFile();
+    struct Resource {
+        uint32_t offset { 0 };
+        uint32_t size { 0 };
+    };
 
-    const std::string &getFilename(int idx) const;
-    bool find(const std::string &resRef, ResourceType type, KeyEntry &key) const;
+    ErfFile();
 
-    const std::vector<FileEntry> &files() const;
-    const std::vector<KeyEntry> &keys() const;
+    bool supports(ResourceType type) const override;
+    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    ByteArray getResourceData(int idx);
+
+    int entryCount() const;
+    const std::vector<Key> &keys() const;
 
 private:
-    int _bifCount { 0 };
-    int _keyCount { 0 };
-    uint32_t _filesOffset { 0 };
+    int _entryCount { 0 };
     uint32_t _keysOffset { 0 };
-    std::vector<FileEntry> _files;
-    std::vector<KeyEntry> _keys;
+    uint32_t _resourcesOffset { 0 };
+    std::vector<Key> _keys;
+    std::vector<Resource> _resources;
 
     void doLoad() override;
-    void loadFiles();
-    FileEntry readFileEntry();
+
+    void checkSignature();
     void loadKeys();
-    KeyEntry readKeyEntry();
+    Key readKey();
+    void loadResources();
+    Resource readResource();
+    ByteArray getResourceData(const Resource &res);
 };
 
 } // namespace resource

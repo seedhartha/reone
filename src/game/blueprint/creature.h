@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "../rp/attributes.h"
 

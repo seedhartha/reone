@@ -95,44 +95,44 @@ set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 ## libresource static library
 
 set(RESOURCE_HEADERS
-    src/resource/2dafile.h
-    src/resource/biffile.h
-    src/resource/binfile.h
-    src/resource/erffile.h
     src/resource/folder.h
-    src/resource/gfffile.h
+    src/resource/format/2dafile.h
+    src/resource/format/biffile.h
+    src/resource/format/binfile.h
+    src/resource/format/erffile.h
+    src/resource/format/gfffile.h
+    src/resource/format/keyfile.h
+    src/resource/format/ltrfile.h
+    src/resource/format/lytfile.h
+    src/resource/format/pefile.h
+    src/resource/format/rimfile.h
+    src/resource/format/tlkfile.h
+    src/resource/format/visfile.h
     src/resource/keybifprovider.h
-    src/resource/keyfile.h
-    src/resource/ltrfile.h
-    src/resource/lytfile.h
-    src/resource/pefile.h
     src/resource/resourceprovider.h
     src/resource/resources.h
-    src/resource/rimfile.h
     src/resource/stringprocessor.h
-    src/resource/tlkfile.h
     src/resource/types.h
-    src/resource/typeutil.h
-    src/resource/visfile.h)
+    src/resource/typeutil.h)
 
 set(RESOURCE_SOURCES
-    src/resource/2dafile.cpp
-    src/resource/biffile.cpp
-    src/resource/binfile.cpp
-    src/resource/erffile.cpp
     src/resource/folder.cpp
-    src/resource/gfffile.cpp
+    src/resource/format/2dafile.cpp
+    src/resource/format/biffile.cpp
+    src/resource/format/binfile.cpp
+    src/resource/format/erffile.cpp
+    src/resource/format/gfffile.cpp
+    src/resource/format/keyfile.cpp
+    src/resource/format/ltrfile.cpp
+    src/resource/format/lytfile.cpp
+    src/resource/format/pefile.cpp
+    src/resource/format/rimfile.cpp
+    src/resource/format/tlkfile.cpp
+    src/resource/format/visfile.cpp
     src/resource/keybifprovider.cpp
-    src/resource/keyfile.cpp
-    src/resource/ltrfile.cpp
-    src/resource/lytfile.cpp
-    src/resource/pefile.cpp
-    src/resource/rimfile.cpp
     src/resource/resources.cpp
     src/resource/stringprocessor.cpp
-    src/resource/tlkfile.cpp
-    src/resource/typeutil.cpp
-    src/resource/visfile.cpp)
+    src/resource/typeutil.cpp)
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
 set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

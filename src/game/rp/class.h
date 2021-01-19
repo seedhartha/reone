@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "../../resource/2dafile.h"
+#include "../../resource/format/2dafile.h"
 
 #include "attributes.h"
 #include "savingthrows.h"
