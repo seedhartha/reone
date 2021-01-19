@@ -20,15 +20,10 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
-
-#include "../audio/stream.h"
-#include "../render/font.h"
-#include "../render/model/model.h"
-#include "../render/walkmesh.h"
-#include "../script/program.h"
 
 #include "2dafile.h"
 #include "gfffile.h"
@@ -41,6 +36,11 @@ namespace reone {
 
 namespace resource {
 
+/**
+ * Encapsulates game resource management. Contains a prioritized list of
+ * resource providers, that it queries for resources by ResRef and ResType.
+ * Caches found resources.
+ */
 class Resources {
 public:
     static Resources &instance();
@@ -48,28 +48,53 @@ public:
     void init(GameVersion version, const boost::filesystem::path &gamePath);
     void deinit();
 
-    void invalidateCache();
     void loadModule(const std::string &name);
 
-    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<TwoDaTable> get2DA(const std::string &resRef);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
 
-    std::string getString(int32_t ref) const;
+    /**
+     * Searches for the raw resource data by ResRef and ResType.
+     */
+    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
 
+    /**
+     * Searches for a string in the global talktable by StrRef.
+     *
+     * @return string from the global talktable if found, empty string otherwise
+     */
+    std::string getString(int strRef) const;
+
+    /**
+     * @return list of available module names
+     */
     const std::vector<std::string> &moduleNames() const;
 
 private:
     GameVersion _version { GameVersion::KotOR };
     boost::filesystem::path _gamePath;
+    std::vector<std::string> _moduleNames;
+
+    // Resource providers
+
     KeyFile _keyFile;
     TlkFile _tlkFile;
     PEFile _exeFile;
-    std::vector<std::string> _moduleNames;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
-    std::vector<std::unique_ptr<IResourceProvider>> _transientProviders;
+    std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
+
+    // END Resource providers
+
+    // Resource caches
+
+    std::unordered_map<std::string, std::shared_ptr<TwoDaTable>> _2daCache;
+    std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
+    std::unordered_map<std::string, std::shared_ptr<ByteArray>> _resCache;
+    std::unordered_map<std::string, std::shared_ptr<TalkTable>> _talkTableCache;
+
+    // END Resource caches
 
     Resources() = default;
     Resources(const Resources &) = delete;
@@ -87,11 +112,13 @@ private:
     void indexTexturePacks();
     void indexTransientErfFile(const boost::filesystem::path &path);
     void indexTransientRimFile(const boost::filesystem::path &path);
+
+    void invalidateCache();
     void loadModuleNames();
     void stripDeveloperNotes(std::string &text) const;
 
     std::shared_ptr<ByteArray> get(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
-    inline std::string getCacheKey(const std::string &resRef, ResourceType type) const;
+    std::string getCacheKey(const std::string &resRef, ResourceType type) const;
 };
 
 } // namespace resource

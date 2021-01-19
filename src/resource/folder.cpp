@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "util.h"
+#include "typeutil.h"
 
 using namespace std;
 
