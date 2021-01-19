@@ -26,7 +26,8 @@ namespace resource {
 class BifFile : public BinaryFile {
 public:
     BifFile();
-    ByteArray getResourceData(int idx);
+
+    std::unique_ptr<ByteArray> getResourceData(int idx);
 
 private:
     struct ResourceEntry {
