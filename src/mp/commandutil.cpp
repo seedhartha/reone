@@ -15,12 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "commandutil.h"
+
+#include <map>
+
+#include <boost/format.hpp>
+
+using namespace std;
 
 namespace reone {
 
-namespace audio {
+namespace mp {
 
-} // namespace audio
+static const string &describeCommandType(CommandType type) {
+    static map<CommandType, string> descriptions;
+
+    auto maybeDescription = descriptions.find(type);
+    if (maybeDescription != descriptions.end()) {
+        return maybeDescription->second;
+    }
+
+    auto inserted = descriptions.insert(make_pair(type, to_string(static_cast<int>(type))));
+    return inserted.first->second;
+}
+
+string describeCommand(const Command &command) {
+    string desc(describeCommandType(command.type()));
+    desc += str(boost::format(" {id=%d}") % command.id());
+
+    return move(desc);
+}
+
+} // namespace mp
 
 } // namespace reone

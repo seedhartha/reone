@@ -27,8 +27,8 @@
 
 #include "../common/log.h"
 #include "../render/mesh/quad.h"
+#include "../render/stateutil.h"
 #include "../render/textures.h"
-#include "../render/util.h"
 #include "../resource/types.h"
 
 #include "game.h"

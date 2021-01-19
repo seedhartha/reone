@@ -25,8 +25,8 @@
 #include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
+#include "../../render/stateutil.h"
 #include "../../render/textures.h"
-#include "../../render/util.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"

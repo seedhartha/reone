@@ -19,7 +19,7 @@
 
 #include "../common/log.h"
 
-#include "util.h"
+#include "commandutil.h"
 
 using namespace std;
 using namespace std::placeholders;

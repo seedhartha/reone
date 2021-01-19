@@ -27,7 +27,7 @@
 
 #include "../../render/mesh/billboard.h"
 #include "../../render/shaders.h"
-#include "../../render/util.h"
+#include "../../render/stateutil.h"
 
 using namespace std;
 

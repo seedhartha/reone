@@ -21,7 +21,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../util.h"
+#include "../stateutil.h"
 
 using namespace std;
 

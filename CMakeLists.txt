@@ -165,11 +165,11 @@ set(RENDER_HEADERS
     src/render/model/modelnode.h
     src/render/models.h
     src/render/shaders.h
+    src/render/stateutil.h
     src/render/texture.h
     src/render/textures.h
     src/render/textureutil.h
     src/render/types.h
-    src/render/util.h
     src/render/walkmesh.h
     src/render/walkmeshes.h
     src/render/window.h)
@@ -198,10 +198,10 @@ set(RENDER_SOURCES
     src/render/model/modelnode.cpp
     src/render/models.cpp
     src/render/shaders.cpp
+    src/render/stateutil.cpp
     src/render/texture.cpp
     src/render/textures.cpp
     src/render/textureutil.cpp
-    src/render/util.cpp
     src/render/walkmesh.cpp
     src/render/walkmeshes.cpp
     src/render/window.cpp)
@@ -221,8 +221,7 @@ set(AUDIO_HEADERS
     src/audio/soundhandle.h
     src/audio/soundinstance.h
     src/audio/stream.h
-    src/audio/types.h
-    src/audio/util.h)
+    src/audio/types.h)
 
 set(AUDIO_SOURCES
     src/audio/files.cpp
@@ -231,8 +230,7 @@ set(AUDIO_SOURCES
     src/audio/player.cpp
     src/audio/soundhandle.cpp
     src/audio/soundinstance.cpp
-    src/audio/stream.cpp
-    src/audio/util.cpp)
+    src/audio/stream.cpp)
 
 add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -332,22 +330,22 @@ set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 set(SCRIPT_HEADERS
     src/script/enginetype.h
     src/script/execution.h
+    src/script/instrutil.h
     src/script/ncsfile.h
     src/script/object.h
     src/script/program.h
     src/script/routine.h
     src/script/scripts.h
     src/script/types.h
-    src/script/util.h
     src/script/variable.h)
 
 set(SCRIPT_SOURCES
     src/script/execution.cpp
+    src/script/instrutil.cpp
     src/script/ncsfile.cpp
     src/script/program.cpp
     src/script/routine.cpp
     src/script/scripts.cpp
-    src/script/util.cpp
     src/script/variable.cpp)
 
 add_library(libscript STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
@@ -610,14 +608,14 @@ set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 
 set(MP_HEADERS
     src/mp/command.h
+    src/mp/commandutil.h
     src/mp/game.h
-    src/mp/types.h
-    src/mp/util.h)
+    src/mp/types.h)
 
 set(MP_SOURCES
     src/mp/command.cpp
-    src/mp/game.cpp
-    src/mp/util.cpp)
+    src/mp/commandutil.cpp
+    src/mp/game.cpp)
 
 add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})
 set_target_properties(libmp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
