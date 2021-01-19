@@ -18,76 +18,12 @@
 #include "endianutil.h"
 
 #include <cstdint>
-#include <cstring>
-
-using namespace std;
 
 namespace reone {
 
-template <>
-void swapBytes(uint16_t &val) {
-    val = ((val >> 8) & 0xff) | ((val & 0xff) << 8);
-}
-
-template <>
-void swapBytes(uint32_t &val) {
-    val = ((val >> 24) & 0xff) |
-        (((val >> 16) & 0xff) << 8) |
-        (((val >> 8) & 0xff) << 16) |
-        ((val & 0xff) << 24);
-}
-
-template <>
-void swapBytes(uint64_t &val) {
-    val = ((val >> 56) & 0xff) |
-        (((val >> 48) & 0xff) << 8) |
-        (((val >> 40) & 0xff) << 16) |
-        (((val >> 32) & 0xff) << 24) |
-        (((val >> 24) & 0xff) << 32) |
-        (((val >> 16) & 0xff) << 40) |
-        (((val >> 8) & 0xff) << 48) |
-        ((val & 0xff) << 56);
-}
-
-template <>
-void swapBytes(int16_t &val) {
-    val = ((val >> 8) & 0xff) | ((val & 0xff) << 8);
-}
-
-template <>
-void swapBytes(int32_t &val) {
-    val = ((val >> 24) & 0xff) |
-        (((val >> 16) & 0xff) << 8) |
-        (((val >> 8) & 0xff) << 16) |
-        ((val & 0xff) << 24);
-}
-
-template <>
-void swapBytes(int64_t &val) {
-    val = ((val >> 56) & 0xff) |
-        (((val >> 48) & 0xff) << 8) |
-        (((val >> 40) & 0xff) << 16) |
-        (((val >> 32) & 0xff) << 24) |
-        (((val >> 24) & 0xff) << 32) |
-        (((val >> 16) & 0xff) << 40) |
-        (((val >> 8) & 0xff) << 48) |
-        ((val & 0xff) << 56);
-}
-
-template <>
-void swapBytes(float &val) {
-    uint32_t uintVal;
-    memcpy(&uintVal, &val, 4);
-    swapBytes(uintVal);
-    memcpy(&val, &uintVal, 4);
-}
-
-template <>
-void swapBytes(double &val) {
-    uint64_t uintVal;
-    memcpy(&uintVal, &val, 8);
-    swapBytes(uintVal);
-    memcpy(&val, &uintVal, 8);
+Endianess getSystemEndianess() {
+    static uint16_t test = 0x1100;
+    return static_cast<bool>(*reinterpret_cast<uint8_t *>(&test)) ? Endianess::Big : Endianess::Little;
 }
 
 } // namespace reone
