@@ -121,11 +121,12 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     locals.general.model = move(transform);
     locals.general.color = glm::vec4(_color, 1.0f);
     locals.general.alpha = _alpha;
-    locals.general.billboardGridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
-    locals.general.billboardSize = glm::vec2(_size);
-    locals.general.particleCenter = _absoluteTransform[3];
-    locals.general.billboardFrame = _frame;
-    locals.general.billboardRender = static_cast<int>(_emitter->renderType());
+    locals.general.billboardEnabled = true;
+    locals.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
+    locals.billboard.size = glm::vec2(_size);
+    locals.billboard.particleCenter = _absoluteTransform[3];
+    locals.billboard.frame = _frame;
+    locals.billboard.render = static_cast<int>(_emitter->renderType());
 
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 
