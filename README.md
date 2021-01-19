@@ -38,6 +38,7 @@ Controls:
 
 - Use WASD and ZC keys to move around
 - Left click to interact with an object
+- Press Space to pause the game
 - Press V to switch the camera type
 - Use "-" and "+" keys to adjust the game speed
 - Press "~" to toggle the debug console
