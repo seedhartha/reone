@@ -144,7 +144,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
             return;
         }
     }
-    object->model()->playAnimation(tokens[1], kAnimationLoop);
+    object->model()->playAnimation(tokens[1], AnimationFlags::loop);
 }
 
 void Console::cmdKill(vector<string> tokens) {

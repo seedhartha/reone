@@ -33,6 +33,7 @@
 #include "../../gui/control/panel.h"
 #include "../../render/models.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 #include "../../script/execution.h"
 
 #include "../game.h"
@@ -455,7 +456,7 @@ void DialogGUI::updateParticipantAnimations() {
             string animName(getStuntAnimationName(anim.animation));
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
-                participant.creature->playAnimation(animation, kAnimationPropagate);
+                participant.creature->playAnimation(animation, AnimationFlags::propagate);
             }
         } else {
             shared_ptr<Creature> participant;
