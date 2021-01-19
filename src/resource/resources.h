@@ -27,6 +27,7 @@
 
 #include "2dafile.h"
 #include "gfffile.h"
+#include "keybifprovider.h"
 #include "keyfile.h"
 #include "pefile.h"
 #include "resourceprovider.h"
@@ -79,7 +80,6 @@ private:
 
     // Resource providers
 
-    KeyFile _keyFile;
     TlkFile _tlkFile;
     PEFile _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
@@ -106,7 +106,7 @@ private:
     void indexDirectory(const boost::filesystem::path &path);
     void indexErfFile(const boost::filesystem::path &path);
     void indexExeFile();
-    void indexKeyFile();
+    void indexKeyBifFiles();
     void indexOverrideDirectory();
     void indexTalkTable();
     void indexTexturePacks();

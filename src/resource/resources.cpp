@@ -37,22 +37,21 @@ namespace reone {
 
 namespace resource {
 
-static constexpr char kKeyFileName[] = "chitin.key";
-static constexpr char kPatchFileName[] = "patch.erf";
-static constexpr char kTalkTableFileName[] = "dialog.tlk";
-static constexpr char kExeFileNameKotor[] = "swkotor.exe";
-static constexpr char kExeFileNameTsl[] = "swkotor2.exe";
+static const char kPatchFileName[] = "patch.erf";
+static const char kTalkTableFileName[] = "dialog.tlk";
+static const char kExeFileNameKotor[] = "swkotor.exe";
+static const char kExeFileNameTsl[] = "swkotor2.exe";
 
-static constexpr char kModulesDirectoryName[] = "modules";
-static constexpr char kOverrideDirectoryName[] = "override";
-static constexpr char kMusicDirectoryName[] = "streammusic";
-static constexpr char kSoundsDirectoryName[] = "streamsounds";
-static constexpr char kVoiceDirectoryName[] = "streamvoice";
-static constexpr char kWavesDirectoryName[] = "streamwaves";
-static constexpr char kTexturePackDirectoryName[] = "texturepacks";
+static const char kModulesDirectoryName[] = "modules";
+static const char kOverrideDirectoryName[] = "override";
+static const char kMusicDirectoryName[] = "streammusic";
+static const char kSoundsDirectoryName[] = "streamsounds";
+static const char kVoiceDirectoryName[] = "streamvoice";
+static const char kWavesDirectoryName[] = "streamwaves";
+static const char kTexturePackDirectoryName[] = "texturepacks";
 
-static constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
-static constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
 
 Resources &Resources::instance() {
     static Resources instance;
@@ -63,7 +62,7 @@ void Resources::init(GameVersion version, const fs::path &gamePath) {
     _version = version;
     _gamePath = gamePath;
 
-    indexKeyFile();
+    indexKeyBifFiles();
     indexTexturePacks();
     indexAudioFiles();
     indexOverrideDirectory();
@@ -72,15 +71,11 @@ void Resources::init(GameVersion version, const fs::path &gamePath) {
     loadModuleNames();
 }
 
-void Resources::indexKeyFile() {
-    fs::path path(getPathIgnoreCase(_gamePath, kKeyFileName));
+void Resources::indexKeyBifFiles() {
+    auto keyBif = make_unique<KeyBifResourceProvider>(_gamePath);
+    keyBif->init();
 
-    if (path.empty()) {
-        throw runtime_error(str(boost::format("Key file not found: %s %s") % _gamePath % kKeyFileName));
-    }
-    _keyFile.load(path);
-
-    debug(boost::format("Resources: indexed: %s") % path);
+    _providers.push_back(move(keyBif));
 }
 
 void Resources::indexTexturePacks() {
@@ -264,20 +259,6 @@ shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bo
     shared_ptr<ByteArray> data = get(_transientProviders, resRef, type);
     if (!data) {
         data = get(_providers, resRef, type);
-    }
-    if (!data) {
-        KeyFile::KeyEntry key;
-        if (_keyFile.find(resRef, type, key)) {
-            string filename(_keyFile.getFilename(key.bifIdx).c_str());
-            boost::replace_all(filename, "\\", "/");
-
-            fs::path bifPath(getPathIgnoreCase(_gamePath, filename));
-
-            BifFile bif;
-            bif.load(bifPath);
-
-            data = make_shared<ByteArray>(bif.getResourceData(key.resIdx));
-        }
     }
     if (!data && logNotFound) {
         warn("Resources: not found: " + cacheKey);
