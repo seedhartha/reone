@@ -17,8 +17,6 @@
 
 #include "endianutil.h"
 
-#include <cstdint>
-
 namespace reone {
 
 Endianess getSystemEndianess() {
