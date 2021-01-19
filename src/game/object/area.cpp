@@ -580,27 +580,32 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
 
 void Area::update(float dt) {
     doDestroyObjects();
-
-    Object::update(dt);
-
-    _actionExecutor.executeActions(_game->module()->area(), dt);
-
-    for (auto &room : _rooms) {
-        room.second->update(dt);
-    }
     updateVisibility();
     updateSounds();
 
-    for (auto &object : _objects) {
-        object->update(dt);
-        if (object->isDead()) continue;
-
-        _actionExecutor.executeActions(object, dt);
-    }
     _objectSelector.update();
-    _combat.update(dt);
 
-    updateHeartbeat(dt);
+    if (!_game->isPaused()) {
+        Object::update(dt);
+
+        _actionExecutor.executeActions(_game->module()->area(), dt);
+
+        for (auto &room : _rooms) {
+            room.second->update(dt);
+        }
+
+        for (auto &object : _objects) {
+            object->update(dt);
+
+            if (!object->isDead()) {
+                _actionExecutor.executeActions(object, dt);
+            }
+        }
+
+        _combat.update(dt);
+
+        updateHeartbeat(dt);
+    }
 }
 
 bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {

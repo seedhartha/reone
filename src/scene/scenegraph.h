@@ -56,6 +56,7 @@ public:
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setReferenceNode(const std::shared_ptr<SceneNode> &node);
+    void setUpdate(bool update);
 
     // Lights
 
@@ -88,6 +89,7 @@ private:
     bool _shadowLightPresent { false };
     glm::vec3 _shadowLightPosition { 0.0f };
     std::shared_ptr<SceneNode> _refNode;
+    bool _update { true };
 
     SceneGraph(const SceneGraph &) = delete;
     SceneGraph &operator=(const SceneGraph &) = delete;

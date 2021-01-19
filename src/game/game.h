@@ -91,6 +91,7 @@ public:
     void playVideo(const std::string &name);
 
     bool isLoadFromSaveGame() const;
+    bool isPaused() const { return _paused; }
 
     Camera *getActiveCamera() const;
     int getRunScriptVar() const;
@@ -109,6 +110,7 @@ public:
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
     void setRunScriptVar(int var);
+    void setPaused(bool paused);
 
     // Module Loading
 
@@ -207,6 +209,7 @@ private:
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
     ScriptRunner _scriptRunner;
+    bool _paused { false };
 
     // Modules
 
