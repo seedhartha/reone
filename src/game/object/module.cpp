@@ -138,6 +138,9 @@ bool Module::handle(const SDL_Event &event) {
         case SDL_MOUSEBUTTONDOWN:
             if (handleMouseButtonDown(event.button)) return true;
             break;
+        case SDL_KEYDOWN:
+            if (handleKeyDown(event.key)) return true;
+            break;
         default:
             break;
     }
@@ -268,7 +271,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 }
 
 void Module::update(float dt) {
-    if (_game->cameraType() == CameraType::ThirdPerson) {
+    if (!_game->isPaused() && _game->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     _area->update(dt);
@@ -288,6 +291,19 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
     }
 
     return move(actions);
+}
+
+bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
+    switch (event.keysym.sym) {
+        case SDLK_SPACE: {
+            bool paused = !_game->isPaused();
+            _game->setPaused(paused);
+            _game->sceneGraph().setUpdate(!paused);
+            return true;
+        }
+        default:
+            return false;
+    }
 }
 
 const string &Module::name() const {

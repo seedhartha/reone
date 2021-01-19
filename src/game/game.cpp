@@ -470,7 +470,10 @@ void Game::update() {
     }
 
     _window.update(dt);
-    _sceneGraph.update(dt);
+
+    if (!_paused) {
+        _sceneGraph.update(dt);
+    }
 }
 
 void Game::updateVideo(float dt) {
@@ -842,6 +845,10 @@ void Game::setLocalNumber(uint32_t objectId, int index, int value) {
 
 void Game::setRunScriptVar(int var) {
     _runScriptVar = var;
+}
+
+void Game::setPaused(bool paused) {
+    _paused = paused;
 }
 
 } // namespace game

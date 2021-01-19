@@ -172,6 +172,8 @@ void SceneGraph::refreshShadowLight() {
 }
 
 void SceneGraph::update(float dt) {
+    if (!_update) return;
+
     for (auto &root : _roots) {
         root->update(dt);
     }
@@ -261,6 +263,10 @@ void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
 
 void SceneGraph::setReferenceNode(const shared_ptr<SceneNode> &node) {
     _refNode = node;
+}
+
+void SceneGraph::setUpdate(bool update) {
+    _update = update;
 }
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
