@@ -105,7 +105,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytFile lyt;
-    lyt.load(wrap(Resources::instance().get(_name, ResourceType::AreaLayout)));
+    lyt.load(wrap(Resources::instance().get(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(Models::instance().get(lytRoom.name));
@@ -117,7 +117,7 @@ void Area::loadLYT() {
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         sceneNode->playAnimation("animloop1", kAnimationLoop);
 
-        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
+        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
         unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));
 
         _rooms.insert(make_pair(room->name(), move(room)));
@@ -141,7 +141,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Path));
+    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Pth));
 
     Path path;
     path.load(*pth);

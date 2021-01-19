@@ -82,7 +82,7 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     string modelName(boost::to_lower_copy(table->getString(_genericType, "modelname")));
     _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
 
-    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::DoorWalkmesh);
+    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {

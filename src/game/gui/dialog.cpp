@@ -169,7 +169,7 @@ void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
-    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Conversation));
+    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Dlg));
     if (!dlg) {
         _game->openInGame();
         return;

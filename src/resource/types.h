@@ -17,11 +17,9 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
-#include <memory>
 #include <string>
-
-#include "../common/types.h"
 
 namespace reone {
 
@@ -32,73 +30,68 @@ enum class GameVersion {
     TheSithLords
 };
 
+/**
+ * Used together with a ResRef to locate game resources.
+ */
 enum class ResourceType : uint16_t {
-    Invalid = 0xffff,
-    Inventory = 0,
+    Res = 0,
     Bmp = 1,
     Tga = 3,
     Wav = 4,
-    PackedLayerTexture = 6,
+    Plt = 6,
     Ini = 7,
-    Text = 10,
-    Model = 2002,
-    ScriptSource = 2009,
-    CompiledScript = 2010,
-    Area = 2012,
-    Tileset = 2013,
-    ModuleInfo = 2014,
-    Creature = 2015,
-    Walkmesh = 2016,
+    Txt = 10,
+    Mdl = 2002,
+    Nss = 2009,
+    Ncs = 2010,
+    Are = 2012,
+    Set = 2013,
+    Ifo = 2014,
+    Bic = 2015,
+    Wok = 2016,
     TwoDa = 2017,
-    ExtraTextureInfo = 2022,
-    GameInstance = 2023,
+    Txi = 2022,
+    Git = 2023,
     Bti = 2024,
-    ItemBlueprint = 2025,
+    Uti = 2025,
     Btc = 2026,
-    CreatureBlueprint = 2027,
-    Conversation = 2029,
-    TilePalette = 2030,
-    TriggerBlueprint = 2032,
+    Utc = 2027,
+    Dlg = 2029,
+    Itp = 2030,
+    Utt = 2032,
     Dds = 2033,
-    SoundBlueprint = 2035,
-    LetterComboProbability = 2036,
+    Uts = 2035,
+    Ltr = 2036,
     Gff = 2037,
-    Faction = 2038,
-    EncounterBlueprint = 2040,
-    DoorBlueprint = 2042,
-    PlaceableBlueprint = 2044,
-    DefaultValues = 2045,
-    GameInstanceComments = 2046,
+    Fac = 2038,
+    Ute = 2040,
+    Utd = 2042,
+    Utp = 2044,
+    Dft = 2045,
+    Gic = 2046,
     Gui = 2047,
-    MerchantBlueprint = 2051,
-    DoorWalkmesh = 2052,
-    PlaceableWalkmesh = 2053,
-    Journal = 2056,
+    Utm = 2051,
+    Dwk = 2052,
+    Pwk = 2053,
+    Jrl = 2056,
     Mod = 2057,
-    WaypointBlueprint = 2058,
-    SoundSet = 2060,
-    ScriptDebugger = 2064,
-    PlotManager = 2065,
-    PlotWizardBlueprint = 2066,
-    AreaLayout = 3000,
+    Utw = 2058,
+    Ssf = 2060,
+    Ndb = 2064,
+    Ptm = 2065,
+    Ptt = 2066,
+    Lyt = 3000,
     Vis = 3001,
-    Path = 3003,
+    Pth = 3003,
     Lip = 3004,
-    Texture = 3007,
+    Tpc = 3007,
     Mdx = 3008,
-    Mp3 = 4000
+    Mp3 = 4000,
+
+    Invalid = 0xffff
 };
 
 typedef std::multimap<std::string, std::string> Visibility;
-
-class IResourceProvider {
-public:
-    virtual ~IResourceProvider() {
-    }
-
-    virtual bool supports(ResourceType type) const = 0;
-    virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
-};
 
 } // namespace resource
 

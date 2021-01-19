@@ -86,7 +86,7 @@ pt::ptree ModuleProbe::describeModule() {
     pt::ptree description;
 
     GffFile ifo;
-    ifo.load(wrap(_rimMain.find("module", ResourceType::ModuleInfo)));
+    ifo.load(wrap(_rimMain.find("module", ResourceType::Ifo)));
     auto ifoGffs = ifo.top();
 
     // Entry
@@ -148,15 +148,15 @@ pt::ptree ModuleProbe::describeModule() {
 
 pt::ptree ModuleProbe::describeArea(const string &name, const TwoDaTable &appearance, const resource::TwoDaTable &placeables) {
     GffFile are;
-    are.load(wrap(_rimMain.find(name, ResourceType::Area)));
+    are.load(wrap(_rimMain.find(name, ResourceType::Are)));
     auto areGffs = are.top();
 
     GffFile git;
-    git.load(wrap(_rimMain.find(name, ResourceType::GameInstance)));
+    git.load(wrap(_rimMain.find(name, ResourceType::Git)));
     auto gitGffs = git.top();
 
     LytFile lyt;
-    lyt.load(wrap(getResource(name, ResourceType::AreaLayout)));
+    lyt.load(wrap(getResource(name, ResourceType::Lyt)));
 
     // Rooms
 
@@ -311,7 +311,7 @@ pt::ptree ModuleProbe::describeCreature(const GffStruct &gitCreature, const TwoD
     orientation.put("y", gitCreature.getFloat("YOrientation"));
 
     GffFile utc;
-    utc.load(wrap(getResource(gitCreature.getString("TemplateResRef"), ResourceType::CreatureBlueprint)));
+    utc.load(wrap(getResource(gitCreature.getString("TemplateResRef"), ResourceType::Utc)));
     auto utcGffs = utc.top();
 
     pt::ptree equipment;
@@ -372,7 +372,7 @@ pt::ptree ModuleProbe::describeCreature(const GffStruct &gitCreature, const TwoD
 
 pt::ptree ModuleProbe::describeDoor(const GffStruct &gitDoor) {
     GffFile utd;
-    utd.load(wrap(getResource(gitDoor.getString("TemplateResRef"), ResourceType::DoorBlueprint)));
+    utd.load(wrap(getResource(gitDoor.getString("TemplateResRef"), ResourceType::Utd)));
     auto utdGffs = utd.top();
 
     pt::ptree scripts;
@@ -417,7 +417,7 @@ pt::ptree ModuleProbe::describeDoor(const GffStruct &gitDoor) {
 
 pt::ptree ModuleProbe::describePlaceable(const GffStruct &gitPlaceable, const TwoDaTable &placeables) {
     GffFile utp;
-    utp.load(wrap(getResource(gitPlaceable.getString("TemplateResRef"), ResourceType::PlaceableBlueprint)));
+    utp.load(wrap(getResource(gitPlaceable.getString("TemplateResRef"), ResourceType::Utp)));
     auto utpGffs = utp.top();
 
     pt::ptree items;
@@ -472,7 +472,7 @@ pt::ptree ModuleProbe::describePlaceable(const GffStruct &gitPlaceable, const Tw
 
 pt::ptree ModuleProbe::describeTrigger(const GffStruct &gitTrigger) {
     GffFile utt;
-    utt.load(wrap(getResource(gitTrigger.getString("TemplateResRef"), ResourceType::TriggerBlueprint)));
+    utt.load(wrap(getResource(gitTrigger.getString("TemplateResRef"), ResourceType::Utt)));
     auto uttGffs = utt.top();
 
     pt::ptree position;
@@ -542,7 +542,7 @@ pt::ptree ModuleProbe::describeWaypoint(const GffStruct &gitWaypoint) {
 
 pt::ptree ModuleProbe::describeSound(const GffStruct &gitSound) {
     GffFile uts;
-    uts.load(wrap(getResource(gitSound.getString("TemplateResRef"), ResourceType::SoundBlueprint)));
+    uts.load(wrap(getResource(gitSound.getString("TemplateResRef"), ResourceType::Uts)));
     auto utsGffs = uts.top();
 
     pt::ptree position;

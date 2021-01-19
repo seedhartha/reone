@@ -17,40 +17,32 @@
 
 #pragma once
 
-#include <set>
-
-#include <boost/filesystem.hpp>
+#include <memory>
+#include <string>
 
 #include "../common/types.h"
 
-#include "resourceprovider.h"
 #include "types.h"
 
 namespace reone {
 
 namespace resource {
 
-class Folder : public IResourceProvider {
+/**
+ * Common interface to query for game resources.
+ */
+class IResourceProvider {
 public:
-    Folder() = default;
-    void load(const boost::filesystem::path &path);
+    virtual ~IResourceProvider() {
+    }
 
-    bool supports(ResourceType type) const override;
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
 
-private:
-    struct Resource {
-        boost::filesystem::path path;
-        ResourceType type;
-    };
-
-    boost::filesystem::path _path;
-    std::multimap<std::string, Resource> _resources;
-
-    Folder(const Folder &) = delete;
-    Folder &operator=(const Folder &) = delete;
-
-    void loadDirectory(const boost::filesystem::path &path);
+    /**
+     * @return true if this resource provider supports the specified ResType,
+     *         false otherwise
+     */
+    virtual bool supports(ResourceType type) const = 0;
 };
 
 } // namespace resource

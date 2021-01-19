@@ -105,6 +105,7 @@ set(RESOURCE_HEADERS
     src/resource/ltrfile.h
     src/resource/lytfile.h
     src/resource/pefile.h
+    src/resource/resourceprovider.h
     src/resource/resources.h
     src/resource/rimfile.h
     src/resource/tlkfile.h

@@ -69,7 +69,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
-        shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::ExtraTextureInfo, false));
+        shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
         if (txiData) {
             TxiFile txi;
             txi.load(wrap(txiData));
@@ -78,7 +78,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture, false));
+        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Tpc, false));
         if (tpcData) {
             TpcFile tpc(resRef, type);
             tpc.load(wrap(tpcData));
