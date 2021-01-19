@@ -35,7 +35,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kSignature[] = "SAV";
+static const char kSignature[] = "SAV";
 
 SavedGame::SavedGame(const fs::path &path) : _path(path) {
 }

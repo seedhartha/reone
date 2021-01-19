@@ -49,7 +49,7 @@ namespace reone {
 
 namespace video {
 
-static constexpr char kSignature[] = "BIKi";
+static const char kSignature[] = "BIKi";
 
 #if REONE_ENABLE_VIDEO
 

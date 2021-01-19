@@ -39,8 +39,8 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kSavesDirectoryName[] = "saves";
-static constexpr char kSaveFilename[] = "savegame.sav";
+static const char kSavesDirectoryName[] = "saves";
+static const char kSaveFilename[] = "savegame.sav";
 
 static constexpr int kStrRefLoadGame = 1585;
 static constexpr int kStrRefSave = 1587;

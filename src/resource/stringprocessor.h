@@ -17,28 +17,22 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <string>
 
-#include "biffile.h"
-#include "keyfile.h"
-#include "resourceprovider.h"
+#include "types.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace resource {
 
-class KeyBifResourceProvider : public IResourceProvider {
+class StringProcessor {
 public:
-    void init(const boost::filesystem::path &gamePath);
-
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
-
-    bool supports(ResourceType type) const override;
+    void process(std::string &str, GameVersion ver) const;
 
 private:
-    boost::filesystem::path _gamePath;
-    KeyFile _keyFile;
-    std::unordered_map<int, std::unique_ptr<BifFile>> _bifCache;
+    void stripDeveloperNotes(std::string &str) const;
 };
 
 } // namespace resource

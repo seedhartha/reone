@@ -30,7 +30,7 @@ namespace reone {
 
 namespace gui {
 
-static constexpr char kIconFontResRef[] = "dialogfont10x10a";
+static const char kIconFontResRef[] = "dialogfont10x10a";
 
 ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
     _clickable = true;

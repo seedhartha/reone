@@ -38,18 +38,13 @@ namespace tools {
 
 void ModuleProbe::probe(const string &name, const fs::path &gamePath, const fs::path &destPath) {
     _gamePath = gamePath;
+    _keyBifProvider.init(_gamePath);
     loadResources(name);
     pt::ptree description(describeModule());
     writeDescription(name, description, destPath);
 }
 
 void ModuleProbe::loadResources(const string &moduleName) {
-    fs::path keyPath(getPathIgnoreCase(_gamePath, "chitin.key", false));
-    if (!fs::exists(keyPath)) {
-        throw runtime_error("Key file not found: " + keyPath.string());
-    }
-    _keyFile.load(keyPath);
-
     fs::path tlkPath(getPathIgnoreCase(_gamePath, "dialog.tlk", false));
     if (!fs::exists(tlkPath)) {
         throw runtime_error("TLK file not found: " + tlkPath.string());
@@ -597,31 +592,16 @@ shared_ptr<ByteArray> ModuleProbe::getResource(const string &resRef, ResourceTyp
     auto maybeResource = _resourceCache.find(cacheKey);
     if (maybeResource != _resourceCache.end()) return maybeResource->second;
 
-    KeyFile::KeyEntry key;
-    if (_keyFile.find(resRef, type, key)) {
-        auto maybeBif = _bifByIndex.find(key.bifIdx);
-        if (maybeBif != _bifByIndex.end()) {
-            result = make_shared<ByteArray>(maybeBif->second->getResourceData(key.resIdx));
+    result = _rimMain.find(resRef, type);
 
-        } else {
-            fs::path bifPath(_gamePath);
-            bifPath.append(_keyFile.getFilename(key.bifIdx));
-
-            auto bif = make_unique<BifFile>();
-            bif->load(bifPath);
-
-            result = make_shared<ByteArray>(bif->getResourceData(key.resIdx));
-
-            _bifByIndex.insert(make_pair(key.bifIdx, move(bif)));
-        }
-    } else {
-        result = _rimMain.find(resRef, type);
-        if (!result) {
-            result = _rimBlueprints.find(resRef, type);
-            if (!result) {
-                throw runtime_error("Resource not found: " + resRef + " " + to_string(static_cast<int>(type)));
-            }
-        }
+    if (!result) {
+        result = _rimBlueprints.find(resRef, type);
+    }
+    if (!result) {
+        result = _keyBifProvider.find(resRef, type);
+    }
+    if (!result) {
+        throw runtime_error("Resource not found: " + resRef + " " + to_string(static_cast<int>(type)));
     }
 
     _resourceCache.insert(make_pair(cacheKey, result));

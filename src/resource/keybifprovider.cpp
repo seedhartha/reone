@@ -34,13 +34,12 @@ namespace resource {
 
 static const char kKeyFilename[] = "chitin.key";
 
-KeyBifResourceProvider::KeyBifResourceProvider(const fs::path &gamePath) : _gamePath(gamePath) {
-}
+void KeyBifResourceProvider::init(const fs::path &gamePath) {
+    _gamePath = gamePath;
 
-void KeyBifResourceProvider::init() {
-    fs::path path(getPathIgnoreCase(_gamePath, kKeyFilename));
+    fs::path path(getPathIgnoreCase(gamePath, kKeyFilename));
     if (path.empty()) {
-        throw runtime_error(str(boost::format("Key file not found: %s %s") % _gamePath % kKeyFilename));
+        throw runtime_error(str(boost::format("Key file not found: %s %s") % gamePath % kKeyFilename));
     }
     _keyFile.load(path);
 }

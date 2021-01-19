@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kSkillsTableResRef[] = "skills";
+static const char kSkillsTableResRef[] = "skills";
 
 CreatureClass::CreatureClass(ClassType type) : _type(type) {
     _defaultAttributes.addClassLevels(type, 1);

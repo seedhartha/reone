@@ -28,8 +28,8 @@ namespace reone {
 namespace resource {
 
 static constexpr int kSignatureSize = 8;
-static constexpr char kSignatureErf[] = "ERF V1.0";
-static constexpr char kSignatureMod[] = "MOD V1.0";
+static const char kSignatureErf[] = "ERF V1.0";
+static const char kSignatureMod[] = "MOD V1.0";
 
 ErfFile::ErfFile() : BinaryFile(0, nullptr) {
 }

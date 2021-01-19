@@ -31,6 +31,7 @@
 #include "keyfile.h"
 #include "pefile.h"
 #include "resourceprovider.h"
+#include "stringprocessor.h"
 #include "tlkfile.h"
 
 namespace reone {
@@ -77,6 +78,7 @@ private:
     GameVersion _version { GameVersion::KotOR };
     boost::filesystem::path _gamePath;
     std::vector<std::string> _moduleNames;
+    StringProcessor _stringProcessor;
 
     // Resource providers
 
@@ -115,7 +117,6 @@ private:
 
     void invalidateCache();
     void loadModuleNames();
-    void stripDeveloperNotes(std::string &text) const;
 
     std::shared_ptr<ByteArray> get(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
     std::string getCacheKey(const std::string &resRef, ResourceType type) const;

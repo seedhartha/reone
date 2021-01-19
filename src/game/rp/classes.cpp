@@ -27,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kClassesTableResRef[] = "classes";
+static const char kClassesTableResRef[] = "classes";
 
 Classes &Classes::instance() {
     static Classes classes;
