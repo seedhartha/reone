@@ -24,8 +24,8 @@
 
 #include "mesh/quad.h"
 #include "shaders.h"
+#include "stateutil.h"
 #include "texture.h"
-#include "util.h"
 
 using namespace std;
 

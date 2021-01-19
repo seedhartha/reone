@@ -19,7 +19,7 @@
 
 #include "../../render/fonts.h"
 #include "../../render/mesh/quad.h"
-#include "../../render/util.h"
+#include "../../render/stateutil.h"
 
 using namespace std;
 

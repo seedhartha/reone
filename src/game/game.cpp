@@ -22,7 +22,6 @@
 #include "../audio/files.h"
 #include "../audio/player.h"
 #include "../audio/soundhandle.h"
-#include "../audio/util.h"
 #include "../common/jobs.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"

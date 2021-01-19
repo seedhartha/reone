@@ -23,8 +23,8 @@
 
 #include "../common/log.h"
 
+#include "instrutil.h"
 #include "routine.h"
-#include "util.h"
 
 using namespace std;
 using namespace std::placeholders;
