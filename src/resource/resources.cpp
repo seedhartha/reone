@@ -17,8 +17,6 @@
 
 #include "resources.h"
 
-#include <map>
-
 #include <boost/algorithm/string.hpp>
 
 #include "../common/log.h"
@@ -29,7 +27,7 @@
 #include "erffile.h"
 #include "folder.h"
 #include "rimfile.h"
-#include "util.h"
+#include "typeutil.h"
 
 using namespace std;
 
@@ -55,11 +53,6 @@ static constexpr char kTexturePackDirectoryName[] = "texturepacks";
 
 static constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
 static constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
-
-static map<string, shared_ptr<TwoDaTable>> g_2daCache;
-static map<string, shared_ptr<GffStruct>> g_gffCache;
-static map<string, shared_ptr<ByteArray>> g_resCache;
-static map<string, shared_ptr<TalkTable>> g_talkTableCache;
 
 Resources &Resources::instance() {
     static Resources instance;
@@ -193,10 +186,10 @@ void Resources::deinit() {
 }
 
 void Resources::invalidateCache() {
-    g_2daCache.clear();
-    g_gffCache.clear();
-    g_resCache.clear();
-    g_talkTableCache.clear();
+    _2daCache.clear();
+    _gffCache.clear();
+    _resCache.clear();
+    _talkTableCache.clear();
 }
 
 void Resources::loadModule(const string &name) {
@@ -235,7 +228,7 @@ void Resources::indexTransientErfFile(const fs::path &path) {
 }
 
 template <class T>
-static shared_ptr<T> findResource(const string &key, map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
+static shared_ptr<T> findResource(const string &key, unordered_map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
     auto maybeResource = cache.find(key);
     if (maybeResource != cache.end()) {
         return maybeResource->second;
@@ -246,7 +239,7 @@ static shared_ptr<T> findResource(const string &key, map<string, shared_ptr<T>> 
 }
 
 shared_ptr<TwoDaTable> Resources::get2DA(const string &resRef) {
-    return findResource<TwoDaTable>(resRef, g_2daCache, [this, &resRef]() {
+    return findResource<TwoDaTable>(resRef, _2daCache, [this, &resRef]() {
         shared_ptr<ByteArray> data(get(resRef, ResourceType::TwoDa));
         shared_ptr<TwoDaTable> table;
 
@@ -262,8 +255,8 @@ shared_ptr<TwoDaTable> Resources::get2DA(const string &resRef) {
 
 shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bool logNotFound) {
     string cacheKey(getCacheKey(resRef, type));
-    auto res = g_resCache.find(cacheKey);
-    if (res != g_resCache.end()) {
+    auto res = _resCache.find(cacheKey);
+    if (res != _resCache.end()) {
         return res->second;
     }
     debug("Resources: load " + cacheKey, 2);
@@ -289,7 +282,7 @@ shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bo
     if (!data && logNotFound) {
         warn("Resources: not found: " + cacheKey);
     }
-    auto pair = g_resCache.insert(make_pair(cacheKey, move(data)));
+    auto pair = _resCache.insert(make_pair(cacheKey, move(data)));
 
     return pair.first->second;
 }
@@ -314,7 +307,7 @@ shared_ptr<ByteArray> Resources::get(const vector<unique_ptr<IResourceProvider>>
 shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {
     string cacheKey(getCacheKey(resRef, type));
 
-    return findResource<GffStruct>(cacheKey, g_gffCache, [this, &resRef, &type]() {
+    return findResource<GffStruct>(cacheKey, _gffCache, [this, &resRef, &type]() {
         shared_ptr<ByteArray> data(get(resRef, type));
         shared_ptr<GffStruct> gffs;
 
@@ -329,7 +322,7 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
 }
 
 shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
-    return findResource<TalkTable>(resRef, g_talkTableCache, [this, &resRef]() {
+    return findResource<TalkTable>(resRef, _talkTableCache, [this, &resRef]() {
         shared_ptr<ByteArray> data(get(resRef, ResourceType::Dlg));
         shared_ptr<TalkTable> table;
 
@@ -347,15 +340,15 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
     return _exeFile.find(name, type);
 }
 
-string Resources::getString(int32_t ref) const {
+string Resources::getString(int strRef) const {
     static string empty;
 
     shared_ptr<TalkTable> table(_tlkFile.table());
-    if (ref == -1 || ref >= table->stringCount()) {
+    if (strRef == -1 || strRef >= table->stringCount()) {
         return empty;
     }
 
-    string text(table->getString(ref).text);
+    string text(table->getString(strRef).text);
     if (_version == GameVersion::TheSithLords) {
         stripDeveloperNotes(text);
     }
@@ -365,16 +358,16 @@ string Resources::getString(int32_t ref) const {
 
 void Resources::stripDeveloperNotes(string &text) const {
     do {
-        int openBracketIdx = text.find_first_of('{', 0);
+        size_t openBracketIdx = text.find_first_of('{', 0);
         if (openBracketIdx == -1) break;
 
-        int closeBracketIdx = text.find_first_of('}', openBracketIdx + 1);
+        size_t closeBracketIdx = text.find_first_of('}', static_cast<int64_t>(openBracketIdx) + 1);
         if (closeBracketIdx == -1) break;
 
         int textLen = static_cast<int>(text.size());
-        int noteLen = closeBracketIdx - openBracketIdx + 1;
+        size_t noteLen = closeBracketIdx - openBracketIdx + 1;
 
-        for (int i = openBracketIdx; i + noteLen < textLen; ++i) {
+        for (size_t i = openBracketIdx; i + noteLen < textLen; ++i) {
             text[i] = text[i + noteLen];
         }
 

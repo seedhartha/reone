@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <map>
+#include <unordered_map>
 
 #include <stdexcept>
 
@@ -29,13 +29,13 @@ namespace reone {
 
 namespace resource {
 
-static map<ResourceType, string> g_extByType = {
+static unordered_map<ResourceType, string> g_extByType {
     { ResourceType::Res, "inv" },
     { ResourceType::Bmp, "bmp" },
     { ResourceType::Tga, "tga" },
     { ResourceType::Wav, "wav" },
     { ResourceType::Plt, "plt" },
-    { ResourceType::Ini, "init" },
+    { ResourceType::Ini, "ini" },
     { ResourceType::Txt, "txt" },
     { ResourceType::Mdl, "mdl" },
     { ResourceType::Nss, "nss" },
@@ -82,9 +82,10 @@ static map<ResourceType, string> g_extByType = {
     { ResourceType::Lip, "lip" },
     { ResourceType::Tpc, "tpc" },
     { ResourceType::Mdx, "mdx" },
-    { ResourceType::Mp3, "mp3" } };
+    { ResourceType::Mp3, "mp3" }
+};
 
-static map<string, ResourceType> g_typeByExt;
+static unordered_map<string, ResourceType> g_typeByExt;
 static bool g_typeByExtInited = false;
 
 const string &getExtByResType(ResourceType type) {

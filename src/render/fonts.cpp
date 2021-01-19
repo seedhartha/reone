@@ -20,6 +20,7 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
+#include "font.h"
 #include "textures.h"
 
 using namespace std;

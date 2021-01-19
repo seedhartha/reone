@@ -110,7 +110,7 @@ set(RESOURCE_HEADERS
     src/resource/rimfile.h
     src/resource/tlkfile.h
     src/resource/types.h
-    src/resource/util.h
+    src/resource/typeutil.h
     src/resource/visfile.h)
 
 set(RESOURCE_SOURCES
@@ -127,7 +127,7 @@ set(RESOURCE_SOURCES
     src/resource/rimfile.cpp
     src/resource/resources.cpp
     src/resource/tlkfile.cpp
-    src/resource/util.cpp
+    src/resource/typeutil.cpp
     src/resource/visfile.cpp)
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
