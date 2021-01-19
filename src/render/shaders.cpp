@@ -39,6 +39,7 @@ static constexpr int kGeneralBindingPointIndex = 2;
 static constexpr int kLightingBindingPointIndex = 3;
 static constexpr int kSkeletalBindingPointIndex = 4;
 static constexpr int kBillboardBindingPointIndex = 5;
+static constexpr int kBumpmapBindingPointIndex = 6;
 
 static constexpr GLchar kCommonShaderHeader[] = R"END(
 #version 330
@@ -74,14 +75,9 @@ layout(std140) uniform General {
     uniform vec4 uDiscardColor;
     uniform vec2 uBlurResolution;
     uniform vec2 uBlurDirection;
-
-    uniform bool uGrayscaleBumpmap;
-    uniform float uBumpmapScaling;
     uniform vec2 uUvOffset;
     uniform bool uWater;
     uniform float uWaterAlpha;
-    uniform vec2 uBumpmapGridSize;
-    uniform int uBumpmapFrame;
 };
 
 layout(std140) uniform Lighting {
@@ -102,6 +98,13 @@ layout(std140) uniform Billboard {
     uniform vec4 uParticleCenter;
     uniform int uBillboardFrame;
     uniform int uBillboardRender;
+};
+
+layout(std140) uniform Bumpmap {
+    uniform bool uGrayscaleBumpmap;
+    uniform float uBumpmapScaling;
+    uniform vec2 uBumpmapGridSize;
+    uniform int uBumpmapFrame;
 };
 )END";
 
@@ -601,6 +604,7 @@ void Shaders::initGL() {
     glGenBuffers(1, &_lightingUbo);
     glGenBuffers(1, &_skeletalUbo);
     glGenBuffers(1, &_billboardUbo);
+    glGenBuffers(1, &_bumpmapUbo);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -623,6 +627,10 @@ void Shaders::initGL() {
         uint32_t billboardBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Billboard");
         if (billboardBlockIdx != GL_INVALID_INDEX) {
             glUniformBlockBinding(_activeOrdinal, billboardBlockIdx, kBillboardBindingPointIndex);
+        }
+        uint32_t bumpmapBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Bumpmap");
+        if (bumpmapBlockIdx != GL_INVALID_INDEX) {
+            glUniformBlockBinding(_activeOrdinal, bumpmapBlockIdx, kBumpmapBindingPointIndex);
         }
 
         setUniform("uEnvmap", TextureUnits::envmap);
@@ -689,6 +697,10 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinitGL() {
+    if (_bumpmapUbo) {
+        glDeleteBuffers(1, &_bumpmapUbo);
+        _bumpmapUbo = 0;
+    }
     if (_billboardUbo) {
         glDeleteBuffers(1, &_billboardUbo);
         _billboardUbo = 0;
@@ -749,7 +761,11 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     }
     if (locals.general.billboardEnabled) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniform), &locals.billboard, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniforms), &locals.billboard, GL_STATIC_DRAW);
+    }
+    if (locals.general.bumpmapEnabled) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBumpmapBindingPointIndex, _bumpmapUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BumpmapUniforms), &locals.bumpmap, GL_STATIC_DRAW);
     }
 }
 
