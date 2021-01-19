@@ -58,6 +58,7 @@ private:
     void loadSkills(CreatureSkills &skills);
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
+    void loadSoundSet(Creature &creature);
 };
 
 /**

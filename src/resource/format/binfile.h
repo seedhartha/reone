@@ -32,7 +32,9 @@ namespace reone {
 namespace resource {
 
 /**
- * Abstract class with utility methods for reading binary files.
+ * Abstract class with utility methods for reading binary files. Descendants are
+ * expected to specify the file signature through the constructor and override
+ * the doLoad function.
  */
 class BinaryFile {
 public:

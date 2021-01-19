@@ -106,6 +106,7 @@ set(RESOURCE_HEADERS
     src/resource/format/lytfile.h
     src/resource/format/pefile.h
     src/resource/format/rimfile.h
+    src/resource/format/ssffile.h
     src/resource/format/tlkfile.h
     src/resource/format/visfile.h
     src/resource/keybifprovider.h
@@ -127,6 +128,7 @@ set(RESOURCE_SOURCES
     src/resource/format/lytfile.cpp
     src/resource/format/pefile.cpp
     src/resource/format/rimfile.cpp
+    src/resource/format/ssffile.cpp
     src/resource/format/tlkfile.cpp
     src/resource/format/visfile.cpp
     src/resource/keybifprovider.cpp

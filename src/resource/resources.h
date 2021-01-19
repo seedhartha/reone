@@ -33,6 +33,7 @@
 #include "keybifprovider.h"
 #include "resourceprovider.h"
 #include "stringprocessor.h"
+#include "types.h"
 
 namespace reone {
 
@@ -56,6 +57,7 @@ public:
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
+    std::shared_ptr<SoundSet> getSoundSet(const std::string &resRef);
 
     /**
      * Searches for the raw resource data by ResRef and ResType.
@@ -95,6 +97,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
     std::unordered_map<std::string, std::shared_ptr<ByteArray>> _resCache;
     std::unordered_map<std::string, std::shared_ptr<TalkTable>> _talkTableCache;
+    std::unordered_map<std::string, std::shared_ptr<SoundSet>> _soundSetCache;
 
     // END Resource caches
 
