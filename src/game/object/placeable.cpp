@@ -86,7 +86,7 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
     _model->setLightingEnabled(true);
 
-    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::PlaceableWalkmesh);
+    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
 }
 
 bool Placeable::hasInventory() const {

@@ -221,7 +221,7 @@ void Game::loadModule(const string &name, string entry) {
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::ModuleInfo));
+            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::Ifo));
 
             _module = _objectFactory->newModule();
             _module->load(name, *ifo);

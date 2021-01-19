@@ -330,7 +330,7 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
 
 shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
     return findResource<TalkTable>(resRef, g_talkTableCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(get(resRef, ResourceType::Conversation));
+        shared_ptr<ByteArray> data(get(resRef, ResourceType::Dlg));
         shared_ptr<TalkTable> table;
 
         if (data) {

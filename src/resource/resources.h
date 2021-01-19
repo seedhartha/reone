@@ -34,6 +34,7 @@
 #include "gfffile.h"
 #include "keyfile.h"
 #include "pefile.h"
+#include "resourceprovider.h"
 #include "tlkfile.h"
 
 namespace reone {

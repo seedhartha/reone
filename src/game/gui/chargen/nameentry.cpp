@@ -56,7 +56,7 @@ void NameEntry::load() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
-    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::LetterComboProbability));
+    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
 

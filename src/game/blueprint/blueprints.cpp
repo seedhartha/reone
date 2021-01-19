@@ -43,7 +43,7 @@ void Blueprints::invalidateCache() {
 }
 
 shared_ptr<CreatureBlueprint> Blueprints::getCreature(const string &resRef) {
-    return get<CreatureBlueprint>(resRef, ResourceType::CreatureBlueprint, _creatureCache);
+    return get<CreatureBlueprint>(resRef, ResourceType::Utc, _creatureCache);
 }
 
 template <class T>
@@ -66,23 +66,23 @@ shared_ptr<T> Blueprints::doGet(const string &resRef, ResourceType type) {
 }
 
 shared_ptr<DoorBlueprint> Blueprints::getDoor(const string &resRef) {
-    return get<DoorBlueprint>(resRef, ResourceType::DoorBlueprint, _doorCache);
+    return get<DoorBlueprint>(resRef, ResourceType::Utd, _doorCache);
 }
 
 shared_ptr<ItemBlueprint> Blueprints::getItem(const string &resRef) {
-    return get<ItemBlueprint>(resRef, ResourceType::ItemBlueprint, _itemCache);
+    return get<ItemBlueprint>(resRef, ResourceType::Uti, _itemCache);
 }
 
 shared_ptr<PlaceableBlueprint> Blueprints::getPlaceable(const string &resRef) {
-    return get<PlaceableBlueprint>(resRef, ResourceType::PlaceableBlueprint, _placeableCache);
+    return get<PlaceableBlueprint>(resRef, ResourceType::Utp, _placeableCache);
 }
 
 shared_ptr<SoundBlueprint> Blueprints::getSound(const string &resRef) {
-    return get<SoundBlueprint>(resRef, ResourceType::SoundBlueprint, _soundCache);
+    return get<SoundBlueprint>(resRef, ResourceType::Uts, _soundCache);
 }
 
 shared_ptr<TriggerBlueprint> Blueprints::getTrigger(const string &resRef) {
-    return get<TriggerBlueprint>(resRef, ResourceType::TriggerBlueprint, _triggerCache);
+    return get<TriggerBlueprint>(resRef, ResourceType::Utt, _triggerCache);
 }
 
 } // namespace game
