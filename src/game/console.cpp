@@ -30,6 +30,7 @@
 #include "../render/mesh/quad.h"
 #include "../render/shaders.h"
 #include "../resource/resources.h"
+#include "../scene/types.h"
 
 #include "game.h"
 
