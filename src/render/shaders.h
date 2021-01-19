@@ -88,14 +88,9 @@ struct GeneralUniforms {
     glm::vec4 discardColor { 0.0f };
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
-    int grayscaleBumpmap { 0 };
-    float bumpmapScaling { 0.0f };
     glm::vec2 uvOffset { 0.0f };
     int water { 0 };
     float waterAlpha { 1.0f };
-    glm::vec2 bumpmapGridSize { 1.0f };
-    int bumpmapFrame { 0 };
-    char padding3[4];
 };
 
 struct SkeletalUniforms {
@@ -118,7 +113,7 @@ struct LightingUniforms {
     ShaderLight lights[kMaxLightCount];
 };
 
-struct BillboardUniform {
+struct BillboardUniforms {
     glm::vec2 gridSize { 0.0f };
     glm::vec2 size { 0.0f };
     glm::vec4 particleCenter { 0.0f };
@@ -127,9 +122,18 @@ struct BillboardUniform {
     char padding[8];
 };
 
+struct BumpmapUniforms {
+    int grayscale { 0 };
+    float scaling { 0.0f };
+    glm::vec2 gridSize { 1.0f };
+    int frame { 0 };
+    char padding[12];
+};
+
 struct LocalUniforms {
     GeneralUniforms general;
-    BillboardUniform billboard;
+    BillboardUniforms billboard;
+    BumpmapUniforms bumpmap;
     std::shared_ptr<SkeletalUniforms> skeletal;
     std::shared_ptr<LightingUniforms> lighting;
 };
@@ -178,6 +182,7 @@ private:
     uint32_t _lightingUbo { 0 };
     uint32_t _skeletalUbo { 0 };
     uint32_t _billboardUbo { 0 };
+    uint32_t _bumpmapUbo { 0 };
 
     // END Uniform buffer objects
 

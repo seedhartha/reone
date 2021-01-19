@@ -119,10 +119,10 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
         if (bumpmapTexture) {
             locals.general.bumpmapEnabled = true;
-            locals.general.grayscaleBumpmap = bumpmapTexture->isGrayscale();
-            locals.general.bumpmapScaling = bumpmapTexture->features().bumpMapScaling;
-            locals.general.bumpmapGridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
-            locals.general.bumpmapFrame = _bumpmapFrame;
+            locals.bumpmap.grayscale = bumpmapTexture->isGrayscale();
+            locals.bumpmap.scaling = bumpmapTexture->features().bumpMapScaling;
+            locals.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
+            locals.bumpmap.frame = _bumpmapFrame;
         }
         bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
         if (receivesShadows) {
