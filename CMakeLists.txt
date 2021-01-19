@@ -109,6 +109,7 @@ set(RESOURCE_HEADERS
     src/resource/resourceprovider.h
     src/resource/resources.h
     src/resource/rimfile.h
+    src/resource/stringprocessor.h
     src/resource/tlkfile.h
     src/resource/types.h
     src/resource/typeutil.h
@@ -128,6 +129,7 @@ set(RESOURCE_SOURCES
     src/resource/pefile.cpp
     src/resource/rimfile.cpp
     src/resource/resources.cpp
+    src/resource/stringprocessor.cpp
     src/resource/tlkfile.cpp
     src/resource/typeutil.cpp
     src/resource/visfile.cpp)

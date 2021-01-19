@@ -72,8 +72,8 @@ void Resources::init(GameVersion version, const fs::path &gamePath) {
 }
 
 void Resources::indexKeyBifFiles() {
-    auto keyBif = make_unique<KeyBifResourceProvider>(_gamePath);
-    keyBif->init();
+    auto keyBif = make_unique<KeyBifResourceProvider>();
+    keyBif->init(_gamePath);
 
     _providers.push_back(move(keyBif));
 }
@@ -330,31 +330,9 @@ string Resources::getString(int strRef) const {
     }
 
     string text(table->getString(strRef).text);
-    if (_version == GameVersion::TheSithLords) {
-        stripDeveloperNotes(text);
-    }
+    _stringProcessor.process(text, _version);
 
     return move(text);
-}
-
-void Resources::stripDeveloperNotes(string &text) const {
-    do {
-        size_t openBracketIdx = text.find_first_of('{', 0);
-        if (openBracketIdx == -1) break;
-
-        size_t closeBracketIdx = text.find_first_of('}', static_cast<int64_t>(openBracketIdx) + 1);
-        if (closeBracketIdx == -1) break;
-
-        int textLen = static_cast<int>(text.size());
-        size_t noteLen = closeBracketIdx - openBracketIdx + 1;
-
-        for (size_t i = openBracketIdx; i + noteLen < textLen; ++i) {
-            text[i] = text[i + noteLen];
-        }
-
-        text.resize(textLen - noteLen);
-
-    } while (true);
 }
 
 const vector<string> &Resources::moduleNames() const {

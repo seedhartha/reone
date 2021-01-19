@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kObjectTagPlayer[] = "player";
+static const char kObjectTagPlayer[] = "player";
 
 enum class ObjectType {
     Creature = 1,

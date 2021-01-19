@@ -25,9 +25,8 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../src/resource/2dafile.h"
-#include "../src/resource/biffile.h"
 #include "../src/resource/gfffile.h"
-#include "../src/resource/keyfile.h"
+#include "../src/resource/keybifprovider.h"
 #include "../src/resource/rimfile.h"
 #include "../src/resource/tlkfile.h"
 
@@ -49,8 +48,7 @@ public:
 
 private:
     boost::filesystem::path _gamePath;
-    resource::KeyFile _keyFile;
-    std::unordered_map<int, std::unique_ptr<resource::BifFile>> _bifByIndex;
+    resource::KeyBifResourceProvider _keyBifProvider;
     std::shared_ptr<resource::TalkTable> _talkTable;
     resource::RimFile _rimMain;
     resource::RimFile _rimBlueprints;
