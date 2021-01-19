@@ -44,6 +44,7 @@ public:
     bool isLockable() const;
     bool isLocked() const;
     bool isStatic() const;
+    bool isKeyRequired() const;
 
     const std::string &getOnOpen() const;
     const std::string &getOnFailToOpen() const;
@@ -60,6 +61,7 @@ private:
     bool _locked { false };
     int _genericType { 0 };
     bool _static { false };
+    bool _keyRequired { false };
     std::string _linkedToModule;
     std::string _linkedTo;
     std::string _transitionDestin;

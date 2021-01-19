@@ -56,6 +56,7 @@ void DoorBlueprint::load(Door &door) {
     door._locked = _utd->getBool("Locked");
     door._genericType = _utd->getInt("GenericType");
     door._static = _utd->getBool("Static");
+    door._keyRequired = _utd->getBool("KeyRequired");
     door._minOneHP = _utd->getBool("Min1HP");
     door._hitPoints = _utd->getInt("HP");
     door._currentHitPoints = _utd->getInt("CurrentHP");

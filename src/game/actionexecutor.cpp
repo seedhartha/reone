@@ -309,13 +309,16 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
             creatureActor->face(*door);
             creatureActor->playAnimation(AnimationType::LoopingUnlockDoor);
 
-            door->setLocked(false);
-            door->open(actor);
+            if (!door->isKeyRequired()) {
+                door->setLocked(false);
+                door->open(actor);
 
-            string onOpen(door->getOnOpen());
-            if (!onOpen.empty()) {
-                _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                string onOpen(door->getOnOpen());
+                if (!onOpen.empty()) {
+                    _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                }
             }
+
             action.complete();
         }
     } else {
