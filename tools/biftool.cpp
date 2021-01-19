@@ -87,9 +87,9 @@ void BifTool::extract(const fs::path &path, const fs::path &keyPath, const fs::p
         fs::path resPath(destPath);
         resPath.append(key.resRef + "." + getExtByResType(key.resType));
 
-        ByteArray data(bif.getResourceData(key.resIdx));
+        auto data = bif.getResourceData(key.resIdx);
         fs::ofstream res(resPath, ios::binary);
-        res.write(data.data(), data.size());
+        res.write(data->data(), data->size());
     }
 }
 

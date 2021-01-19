@@ -52,7 +52,7 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, Re
 
     auto maybeBif = _bifCache.find(key.bifIdx);
     if (maybeBif != _bifCache.end()) {
-        result = make_unique<ByteArray>(maybeBif->second->getResourceData(key.resIdx));
+        result = maybeBif->second->getResourceData(key.resIdx);
 
     } else {
         string filename(_keyFile.getFilename(key.bifIdx).c_str());
@@ -66,7 +66,7 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, Re
         auto bif = make_unique<BifFile>();
         bif->load(bifPath);
 
-        result = make_unique<ByteArray>(bif->getResourceData(key.resIdx));
+        result = bif->getResourceData(key.resIdx);
 
         _bifCache.insert(make_pair(key.bifIdx, move(bif)));
     }

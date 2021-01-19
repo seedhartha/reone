@@ -37,13 +37,13 @@ void BifFile::doLoad() {
     _tableOffset = readUint32();
 }
 
-ByteArray BifFile::getResourceData(int idx) {
+unique_ptr<ByteArray> BifFile::getResourceData(int idx) {
     if (idx >= _resourceCount) {
         throw out_of_range("BIF: resource index out of range: " + to_string(idx));
     }
     ResourceEntry entry(readResourceEntry(idx));
 
-    return readArray<char>(entry.offset, entry.fileSize);
+    return make_unique<ByteArray>(readArray<char>(entry.offset, entry.fileSize));
 }
 
 BifFile::ResourceEntry BifFile::readResourceEntry(int idx) {
