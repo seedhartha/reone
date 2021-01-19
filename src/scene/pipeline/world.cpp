@@ -77,35 +77,31 @@ void WorldRenderPipeline::render() const {
 void WorldRenderPipeline::drawShadows() const {
     if (!_scene->isShadowLightPresent()) return;
 
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    glViewport(0, 0, kShadowResolution, kShadowResolution);
+    withViewport(glm::ivec4(0, 0, kShadowResolution, kShadowResolution), [this]() {
+        _shadows.bind();
 
-    _shadows.bind();
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
 
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+        glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
+        glm::vec3 lightPosition(_scene->shadowLightPosition());
 
-    glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
-    glm::vec3 lightPosition(_scene->shadowLightPosition());
+        GlobalUniforms globals;
+        globals.shadowLightPresent = true;
+        globals.shadowLightPosition = lightPosition;
 
-    GlobalUniforms globals;
-    globals.shadowLightPresent = true;
-    globals.shadowLightPosition = lightPosition;
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            auto side = static_cast<CubeMapSide>(i);
+            globals.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
+        }
 
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        auto side = static_cast<CubeMapSide>(i);
-        globals.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
-    }
+        Shaders::instance().setGlobalUniforms(globals);
 
-    Shaders::instance().setGlobalUniforms(globals);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
 
-    glClear(GL_DEPTH_BUFFER_BIT);
-    withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
-
-    _shadows.unbind();
-
-    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+        _shadows.unbind();
+    });
 }
 
 glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapSide side) const {
