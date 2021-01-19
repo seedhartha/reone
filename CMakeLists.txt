@@ -101,6 +101,7 @@ set(RESOURCE_HEADERS
     src/resource/erffile.h
     src/resource/folder.h
     src/resource/gfffile.h
+    src/resource/keybifprovider.h
     src/resource/keyfile.h
     src/resource/ltrfile.h
     src/resource/lytfile.h
@@ -120,6 +121,7 @@ set(RESOURCE_SOURCES
     src/resource/erffile.cpp
     src/resource/folder.cpp
     src/resource/gfffile.cpp
+    src/resource/keybifprovider.cpp
     src/resource/keyfile.cpp
     src/resource/ltrfile.cpp
     src/resource/lytfile.cpp
