@@ -357,7 +357,7 @@ void ModelSceneNode::setDefaultAnimation(const string &name) {
     shared_ptr<Animation> animation(_model->getAnimation(name));
     if (!animation) return;
 
-    _animator.setDefaultAnimation(animation);
+    _animator.setDefaultAnimation(animation, AnimationFlags::loopBlend);
 
     for (auto &attached : _attachedModels) {
         attached.second->setDefaultAnimation(name);

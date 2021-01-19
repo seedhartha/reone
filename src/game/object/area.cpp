@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "glm/gtx/norm.hpp"
@@ -116,7 +117,12 @@ void Area::loadLYT() {
 
         shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(&_game->sceneGraph(), model));
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-        sceneNode->playAnimation("animloop1", AnimationFlags::loop);
+
+        for (auto &anim : model->getAnimationNames()) {
+            if (boost::starts_with(anim, "animloop")) {
+                sceneNode->playAnimation(anim, AnimationFlags::loopOverlay);
+            }
+        }
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
         unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));
