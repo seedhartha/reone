@@ -188,8 +188,14 @@ bool GUI::handle(const SDL_Event &event) {
             }
             break;
         }
-        case SDL_MOUSEBUTTONDOWN: {
+        case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
+                _leftMouseDown = true;
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
+                _leftMouseDown = false;
                 glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
                 if (control) {
@@ -198,7 +204,6 @@ bool GUI::handle(const SDL_Event &event) {
                 }
             }
             break;
-        }
 
         case SDL_MOUSEWHEEL:
             if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y)) return true;

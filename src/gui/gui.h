@@ -114,6 +114,8 @@ protected:
     // END User input
 
 private:
+    bool _leftMouseDown { false };
+
     GUI(const GUI &) = delete;
     GUI &operator=(const GUI &) = delete;
 
