@@ -269,7 +269,7 @@ void GUI::render3D() const {
 
 void GUI::drawBackground() const {
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -0.9));
+    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     LocalUniforms locals;
