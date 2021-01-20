@@ -47,6 +47,8 @@ void CharGenFeats::load() {
 }
 
 void CharGenFeats::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         _charGen->goToNextStep();
         _charGen->openSteps();

@@ -129,6 +129,8 @@ void LevelUpMenu::doSetStep(int step) {
 }
 
 void LevelUpMenu::onClick(const std::string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_BACK") {
         _charGen->cancel();
     } else if (boost::starts_with(control, "BTN_STEPNAME")) {

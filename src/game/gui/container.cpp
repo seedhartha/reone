@@ -111,6 +111,8 @@ SpatialObject &Container::container() const {
 }
 
 void Container::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_OK") {
         transferItemsToPlayer();
         _game->openInGame();

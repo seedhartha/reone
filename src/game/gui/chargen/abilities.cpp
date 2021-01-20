@@ -124,6 +124,8 @@ static Ability getAbilityByAlias(const string &alias) {
 }
 
 void CharGenAbilities::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         if (_points == 0) {
             updateCharacter();

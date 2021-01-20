@@ -146,6 +146,8 @@ void SaveLoad::setMode(Mode mode) {
 }
 
 void SaveLoad::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_SAVELOAD") {
         int saveIdx = getSelectedSaveIndex();
         switch (_mode) {

@@ -124,6 +124,8 @@ void PortraitSelection::loadCurrentPortrait() {
 }
 
 void PortraitSelection::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     int portraitCount = static_cast<int>(_portraits.size());
 
     if (control == "BTN_ARRL") {

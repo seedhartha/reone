@@ -113,6 +113,8 @@ void CharacterMenu::refreshPortraits() {
 }
 
 void CharacterMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EXIT") {
         _game->openInGame();
     } else if (control == "BTN_LEVELUP") {

@@ -43,7 +43,7 @@ static unordered_map<InGameMenu::Tab, string> g_tabTags {
 };
 
 InGameMenu::InGameMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("top");
@@ -221,6 +221,8 @@ void InGameMenu::openOptions() {
 }
 
 void InGameMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "LBLH_EQU") {
         openEquipment();
     } else if (control == "LBLH_INV") {

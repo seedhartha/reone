@@ -113,6 +113,8 @@ void CustomCharacterGeneration::goToNextStep() {
 }
 
 void CustomCharacterGeneration::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_CANCEL") {
         setStep(0);
         _charGen->openQuickOrCustom();

@@ -45,6 +45,8 @@ void OptionsMenu::load() {
 }
 
 void OptionsMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_LOADGAME") {
         _game->openSaveLoad(SaveLoad::Mode::LoadFromInGame);
     } else if (control == "BTN_SAVEGAME") {

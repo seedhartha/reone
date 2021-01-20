@@ -55,6 +55,8 @@ void QuickOrCustom::load() {
 }
 
 void QuickOrCustom::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "QUICK_CHAR_BTN") {
         _charGen->startQuick();
     } else if (control == "CUST_CHAR_BTN") {
@@ -65,6 +67,8 @@ void QuickOrCustom::onClick(const string &control) {
 }
 
 void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
+    GameGUI::onFocusChanged(control, focus);
+
     if (focus) {
         string text;
         if (control == "QUICK_CHAR_BTN") {

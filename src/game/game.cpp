@@ -35,6 +35,7 @@
 
 #include "blueprint/blueprints.h"
 #include "cursors.h"
+#include "gui/sounds.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -99,6 +100,7 @@ void Game::init() {
     Models::instance().init(_version);
     Textures::instance().init(_version);
     AudioPlayer::instance().init(_options.audio);
+    GUISounds::instance().init();
     Routines::instance().init(_version, this);
 
     setCursorType(CursorType::Default);

@@ -138,6 +138,8 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
 }
 
 void PartySelection::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         onAcceptButtonClick();
 

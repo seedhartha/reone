@@ -143,6 +143,8 @@ static Skill getSkillByAlias(const string &alias) {
 }
 
 void CharGenSkills::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         if (_points == 0) {
             updateCharacter();

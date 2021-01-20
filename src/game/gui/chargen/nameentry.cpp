@@ -69,6 +69,8 @@ bool NameEntry::handle(const SDL_Event &event) {
 }
 
 void NameEntry::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_RANDOM") {
         loadRandomName();
 
