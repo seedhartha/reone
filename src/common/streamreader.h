@@ -58,11 +58,6 @@ private:
 
     StreamReader(const StreamReader &) = delete;
     StreamReader &operator=(const StreamReader &) = delete;
-
-    bool isSameEndianess() const;
-
-    template <class T>
-    void fixEndianess(T &val);
 };
 
 } // namespace reone

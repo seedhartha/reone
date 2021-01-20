@@ -57,67 +57,56 @@ uint8_t StreamReader::getByte() {
 uint16_t StreamReader::getUint16() {
     uint16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
-}
-
-template <class T>
-void StreamReader::fixEndianess(T &val) {
-    if (!isSameEndianess()) {
-        swapBytes(val);
-    }
-}
-
-bool StreamReader::isSameEndianess() const {
-    return _endianess == Endianess::Little;
 }
 
 uint32_t StreamReader::getUint32() {
     uint32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 uint64_t StreamReader::getUint64() {
     uint64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 int16_t StreamReader::getInt16() {
     int16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 int32_t StreamReader::getInt32() {
     int32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 int64_t StreamReader::getInt64() {
     int64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 float StreamReader::getFloat() {
     float val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
 double StreamReader::getDouble() {
     double val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    fixEndianess(val);
+    swapBytesIfNotSystemEndianess(val, _endianess);
     return val;
 }
 
