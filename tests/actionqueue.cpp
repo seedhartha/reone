@@ -34,13 +34,13 @@ BOOST_AUTO_TEST_CASE(test_action_completion) {
     BOOST_TEST((currentAction && currentAction->type() == ActionType::PauseConversation));
 
     currentAction->complete();
-    actionQueue.update();
+    actionQueue.update(0.0f);
 
     currentAction = actionQueue.currentAction();
     BOOST_TEST((currentAction && currentAction->type() == ActionType::ResumeConversation));
 
     currentAction->complete();
-    actionQueue.update();
+    actionQueue.update(0.0f);
 
     currentAction = actionQueue.currentAction();
     BOOST_TEST(!currentAction);
