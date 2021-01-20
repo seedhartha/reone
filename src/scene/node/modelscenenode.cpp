@@ -121,7 +121,7 @@ void ModelSceneNode::initModelNodes() {
 }
 
 unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
-    unique_ptr<ModelNodeSceneNode> sceneNode(new ModelNodeSceneNode(_sceneGraph, this, &node));
+    auto sceneNode = make_unique<ModelNodeSceneNode>(_sceneGraph, this, &node);
     sceneNode->setLocalTransform(node.absoluteTransform());
     return move(sceneNode);
 }
@@ -182,7 +182,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
         for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
             skipNodes.insert(node->name());
         }
-        shared_ptr<ModelSceneNode> modelNode(new ModelSceneNode(_sceneGraph, model, skipNodes));
+        auto modelNode = make_shared<ModelSceneNode>(_sceneGraph, model, skipNodes);
         modelNode->setLightingEnabled(_lightingEnabled && model->classification() != Model::Classification::Lightsaber);
         parentNode->addChild(modelNode);
 

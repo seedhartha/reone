@@ -61,7 +61,7 @@ shared_ptr<Font> Fonts::doGet(const string &resRef) {
     shared_ptr<Font> font;
 
     if (texture) {
-        font.reset(new Font());
+        font = make_shared<Font>();
         font->load(texture);
         if (font) {
             font->initGL();

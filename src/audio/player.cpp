@@ -122,7 +122,7 @@ shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, 
         warn("AudioPlayer: file not found: " + resRef);
         return nullptr;
     }
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
+    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
     return sound->handle();
 }
@@ -152,7 +152,7 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
+    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
     return sound->handle();
 }

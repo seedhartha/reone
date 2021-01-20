@@ -17,7 +17,6 @@
 
 #include "streamwriter.h"
 
-#include <cstring>
 #include <stdexcept>
 
 #include "endianutil.h"

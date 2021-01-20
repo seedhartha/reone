@@ -35,7 +35,7 @@ namespace net {
 void Server::start(int port) {
     info("Starting TCP server on port: " + to_string(port));
 
-    shared_ptr<tcp::socket> socket(new tcp::socket(_service));
+    auto socket = make_shared<tcp::socket>(_service);
 
     _acceptor = make_unique<tcp::acceptor>(_service, tcp::endpoint(ip::address_v4::any(), port));
     _acceptor->async_accept(*socket, bind(&Server::handleAccept, this, socket, _1));
@@ -52,7 +52,7 @@ void Server::handleAccept(shared_ptr<tcp::socket> &socket, const boost::system::
     string tag(str(boost::format("%s") % socket->remote_endpoint()));
     info("TCP: client connected: " + tag);
 
-    unique_ptr<Connection> client(new Connection(socket));
+    auto client = make_unique<Connection>(socket);
     client->setTag(tag);
     client->setOnAbort([this, &client](const string &tag) { stopClient(tag); });
     client->setOnCommandReceived([this, tag](const ByteArray &data) {
@@ -65,7 +65,7 @@ void Server::handleAccept(shared_ptr<tcp::socket> &socket, const boost::system::
         _onClientConnected(tag);
     }
 
-    shared_ptr<tcp::socket> nextSocket(new tcp::socket(_service));
+    auto nextSocket = make_shared<tcp::socket>(_service);
     _acceptor->async_accept(*nextSocket, bind(&Server::handleAccept, this, nextSocket, _1));
 }
 

@@ -48,7 +48,7 @@ void MultiplayerGame::init() {
             _server->start(_options.network.port);
             break;
         case MultiplayerMode::Client:
-            _client.reset(new Client());
+            _client = make_unique<Client>();
             _client->setOnCommandReceived(bind(&MultiplayerGame::onCommandReceived, this, _1));
             _client->start(_options.network.host, _options.network.port);
             break;

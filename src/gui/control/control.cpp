@@ -625,7 +625,7 @@ void Control::setHilight(const Border &hilight) {
 
 void Control::setHilightColor(const glm::vec3 &color) {
     if (!_hilight) {
-        _hilight.reset(new Border());
+        _hilight = make_shared<Border>();
     }
     _hilight->color = color;
 }

@@ -40,7 +40,7 @@ void LytFile::load(const fs::path &path) {
     if (!fs::exists(path)) {
         throw runtime_error("LYT: file not found: " + path.string());
     }
-    _in.reset(new fs::ifstream(path));
+    _in = make_shared<fs::ifstream>(path);
     _path = path;
 
     load();

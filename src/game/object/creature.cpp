@@ -359,7 +359,7 @@ void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32
             }
         }
     }
-    unique_ptr<Path> path(new Path());
+    auto path = make_unique<Path>();
     path->destination = dest;
     path->points = points;
     path->timeFound = timeFound;

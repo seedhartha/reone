@@ -39,7 +39,7 @@ SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, f
     _loop(loop),
     _gain(gain),
     _positional(positional),
-    _handle(new SoundHandle(stream->duration(), move(position))) {
+    _handle(make_shared<SoundHandle>(stream->duration(), move(position))) {
 }
 
 void SoundInstance::init() {

@@ -115,7 +115,7 @@ void Area::loadLYT() {
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(&_game->sceneGraph(), model));
+        auto sceneNode = make_shared<ModelSceneNode>(&_game->sceneGraph(), model);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
 
         for (auto &anim : model->getAnimationNames()) {
@@ -125,7 +125,7 @@ void Area::loadLYT() {
         }
 
         shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
-        unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));
+        auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
 
         _rooms.insert(make_pair(room->name(), move(room)));
     }

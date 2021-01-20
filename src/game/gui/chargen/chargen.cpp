@@ -374,7 +374,7 @@ void CharacterGeneration::loadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
+    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
 
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(_character);

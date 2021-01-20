@@ -36,7 +36,7 @@ SceneBuilder::SceneBuilder(const GraphicsOptions &opts) : _opts(opts) {
 }
 
 unique_ptr<Control::Scene3D> SceneBuilder::build() {
-    unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_opts));
+    auto sceneGraph = make_unique<SceneGraph>(_opts);
     shared_ptr<ModelSceneNode> model(_modelSupplier(*sceneGraph));
 
     if (!model) {
@@ -49,7 +49,7 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection, _zFar));
+    auto camera = make_shared<CameraSceneNode>(sceneGraph.get(), projection, _zFar);
     camera->setLocalTransform(_cameraTransform);
 
     sceneGraph->addRoot(model);
@@ -57,7 +57,7 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
     sceneGraph->setAmbientLightColor(_ambientLightColor);
     sceneGraph->setActiveCamera(camera);
 
-    unique_ptr<Control::Scene3D> scene3d(new Control::Scene3D());
+    auto scene3d = make_unique<Control::Scene3D>();
     scene3d->model = model;
     scene3d->sceneGraph = move(sceneGraph);
 
