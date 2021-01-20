@@ -31,7 +31,7 @@ Object::Object(uint32_t id, ObjectType type) : ScriptObject(id), _type(type) {
 }
 
 void Object::update(float dt) {
-    _actionQueue.update();
+    _actionQueue.update(dt);
 }
 
 void Object::clearAllActions() {

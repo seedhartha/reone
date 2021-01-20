@@ -40,13 +40,13 @@ void ActionQueue::add(unique_ptr<Action> action) {
 void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = move(action);
-    delayed.timestamp = SDL_GetTicks() + static_cast<int>(1000.0f * seconds);
+    delayed.timer.reset(seconds);
     _delayed.push_back(move(delayed));
 }
 
-void ActionQueue::update() {
+void ActionQueue::update(float dt) {
     removeCompletedActions();
-    updateDelayedActions();
+    updateDelayedActions(dt);
 }
 
 ActionQueue::iterator ActionQueue::begin() {
@@ -66,18 +66,16 @@ void ActionQueue::removeCompletedActions() {
     }
 }
 
-void ActionQueue::updateDelayedActions() {
-    uint32_t now = SDL_GetTicks();
-
+void ActionQueue::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
-        if (now >= delayed.timestamp) {
+        if (delayed.timer.advance(dt)) {
             _actions.push_back(move(delayed.action));
         }
     }
     auto delayedToRemove = remove_if(
         _delayed.begin(),
         _delayed.end(),
-        [&now](const DelayedAction &delayed) { return now >= delayed.timestamp; });
+        [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
 
     _delayed.erase(delayedToRemove, _delayed.end());
 }

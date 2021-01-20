@@ -20,6 +20,8 @@
 #include <memory>
 #include <queue>
 
+#include "../common/timer.h"
+
 #include "action/action.h"
 
 namespace reone {
@@ -29,9 +31,11 @@ namespace game {
 class ActionQueue {
 public:
     void clear();
+
     void add(std::unique_ptr<Action> action);
     void delay(std::unique_ptr<Action> action, float seconds);
-    void update();
+
+    void update(float dt);
 
     using iterator = std::deque<std::shared_ptr<Action>>::iterator;
     iterator begin();
@@ -45,14 +49,14 @@ public:
 private:
     struct DelayedAction {
         std::unique_ptr<Action> action;
-        uint32_t timestamp { 0 };
+        Timer timer;
     };
 
     std::deque<std::shared_ptr<Action>> _actions;
     std::vector<DelayedAction> _delayed;
 
     void removeCompletedActions();
-    void updateDelayedActions();
+    void updateDelayedActions(float dt);
 };
 
 } // namespace game
