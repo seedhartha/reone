@@ -222,13 +222,20 @@ bool GUI::handleKeyUp(SDL_Scancode key) {
 }
 
 void GUI::updateFocus(int x, int y) {
-    resetFocus();
-
     Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
+    if (control == _focus) return;
+
+    if (_focus) {
+        if (_focus->isFocusable()) {
+            _focus->setFocus(false);
+        }
+        onFocusChanged(_focus->tag(), false);
+    }
+    _focus = control;
+
     if (control) {
         control->setFocus(true);
-        _focus = control;
-        onFocusChanged(_focus->tag(), true);
+        onFocusChanged(control->tag(), true);
     }
 }
 

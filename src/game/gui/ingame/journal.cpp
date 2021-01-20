@@ -49,6 +49,8 @@ void JournalMenu::load() {
 }
 
 void JournalMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EXIT") {
         _game->openInGame();
     }

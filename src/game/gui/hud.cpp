@@ -34,7 +34,7 @@ namespace reone {
 namespace game {
 
 HUD::HUD(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game),
     _debug(game->options().graphics),
     _select(game) {
@@ -294,6 +294,8 @@ void HUD::refreshActionQueueItems() const {
 }
 
 void HUD::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EQU") {
         _game->openInGameMenu(InGameMenu::Tab::Equipment);
     } else if (control == "BTN_INV") {

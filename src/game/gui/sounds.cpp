@@ -15,43 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "messages.h"
+#include "sounds.h"
 
-#include "../../game.h"
-
-#include "../colorutil.h"
+#include "../../audio/files.h"
+#include "../../resource/resources.h"
+#include "../../resource/format/2dafile.h"
 
 using namespace std;
 
-using namespace reone::gui;
+using namespace reone::audio;
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
-    _game(game) {
-
-    _resRef = getResRef("messages");
-    _backgroundType = BackgroundType::Menu;
-
-    initForGame();
+GUISounds &GUISounds::instance() {
+    static GUISounds instance;
+    return instance;
 }
 
-void MessagesMenu::load() {
-    GUI::load();
-
-    disableControl("BTN_SHOW");
-}
-
-void MessagesMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
+static void loadSound(const TwoDaTable &table, const string &label, shared_ptr<AudioStream> &sound) {
+    const TwoDaRow *maybeRow = table.findRowByColumnValue("label", label);
+    if (maybeRow) {
+        sound = AudioFiles::instance().get(maybeRow->getString("soundresref"));
     }
+}
+
+void GUISounds::init() {
+    shared_ptr<TwoDaTable> sounds(Resources::instance().get2DA("guisounds"));
+    loadSound(*sounds, "Clicked_Default", _onClick);
+    loadSound(*sounds, "Entered_Default", _onEnter);
+}
+
+GUISounds::~GUISounds() {
+    deinit();
+}
+
+void GUISounds::deinit() {
+    _onClick.reset();
+    _onEnter.reset();
 }
 
 } // namespace game

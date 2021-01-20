@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../gui/gui.h"
+#include "../gui.h"
 
 #include "abilities.h"
 #include "character.h"
@@ -34,7 +34,7 @@ namespace game {
 
 class Game;
 
-class InGameMenu : public gui::GUI {
+class InGameMenu : public GameGUI {
 public:
     enum class Tab {
         None,
@@ -54,6 +54,8 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
     void render() const override;
+
+    void onClick(const std::string &control) override;
 
     void openEquipment();
     void openInventory();
@@ -76,8 +78,6 @@ private:
     std::unique_ptr<JournalMenu> _journal;
     std::unique_ptr<MapMenu> _map;
     std::unique_ptr<OptionsMenu> _options;
-
-    void onClick(const std::string &control) override;
 
     void updateTabButtons();
     void changeTab(Tab tab);

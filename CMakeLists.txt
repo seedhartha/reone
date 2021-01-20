@@ -432,6 +432,7 @@ set(GAME_HEADERS
     src/game/gui/partyselect.h
     src/game/gui/saveload.h
     src/game/gui/selectoverlay.h
+    src/game/gui/sounds.h
     src/game/map.h
     src/game/object/area.h
     src/game/object/creature.h
@@ -535,6 +536,7 @@ set(GAME_SOURCES
     src/game/gui/partyselect.cpp
     src/game/gui/saveload.cpp
     src/game/gui/selectoverlay.cpp
+    src/game/gui/sounds.cpp
     src/game/map.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp

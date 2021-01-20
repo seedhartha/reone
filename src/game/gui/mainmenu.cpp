@@ -55,7 +55,7 @@ static const char kBlueprintResRefKreia[] = "p_kreia";
 static bool g_warpEnabled = true;
 
 MainMenu::MainMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->version(), game->options().graphics),
     _game(game) {
 
     switch (game->version()) {
@@ -145,6 +145,8 @@ shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
 }
 
 void MainMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_NEWGAME") {
         _game->startCharacterGeneration();
     } else if (control == "BTN_LOADGAME") {

@@ -15,44 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "messages.h"
+#pragma once
 
-#include "../../game.h"
+#include <memory>
 
-#include "../colorutil.h"
-
-using namespace std;
-
-using namespace reone::gui;
-using namespace reone::resource;
+#include "../../audio/stream.h"
 
 namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
-    _game(game) {
+class GUISounds {
+public:
+    static GUISounds &instance();
 
-    _resRef = getResRef("messages");
-    _backgroundType = BackgroundType::Menu;
+    ~GUISounds();
 
-    initForGame();
-}
+    void init();
+    void deinit();
 
-void MessagesMenu::load() {
-    GUI::load();
+    std::shared_ptr<audio::AudioStream> onClick() const { return _onClick; }
+    std::shared_ptr<audio::AudioStream> onEnter() const { return _onEnter; }
 
-    disableControl("BTN_SHOW");
-}
+private:
+    GUISounds() = default;
 
-void MessagesMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    }
-}
+    std::shared_ptr<audio::AudioStream> _onClick;
+    std::shared_ptr<audio::AudioStream> _onEnter;
+};
 
 } // namespace game
 

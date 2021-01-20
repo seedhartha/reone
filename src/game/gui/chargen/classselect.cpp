@@ -202,6 +202,8 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_p
 }
 
 void ClassSelection::onFocusChanged(const string &control, bool focus) {
+    GameGUI::onFocusChanged(control, focus);
+
     int idx = getClassButtonIndexByTag(control);
     if (idx == -1) return;
 
@@ -234,6 +236,8 @@ int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
 }
 
 void ClassSelection::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     CharacterGeneration &charGen = _game->characterGeneration();
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {

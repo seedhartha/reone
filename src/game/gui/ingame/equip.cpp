@@ -231,6 +231,8 @@ void Equipment::preloadControl(Control &control) {
 }
 
 void Equipment::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EQUIP" || control == "BTN_BACK") {
         if (_selectedSlot == Slot::None) {
             _game->openInGame();

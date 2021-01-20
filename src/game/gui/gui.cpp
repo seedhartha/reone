@@ -17,8 +17,14 @@
 
 #include "gui.h"
 
-#include "colorutil.h"
+#include "../../audio/player.h"
 
+#include "colorutil.h"
+#include "sounds.h"
+
+using namespace std;
+
+using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
@@ -28,6 +34,16 @@ namespace reone {
 namespace game {
 
 GameGUI::GameGUI(GameVersion version, const GraphicsOptions &options) : GUI(version, options) {
+}
+
+void GameGUI::onClick(const string &control) {
+    AudioPlayer::instance().play(GUISounds::instance().onClick(), AudioType::Sound);
+}
+
+void GameGUI::onFocusChanged(const string &control, bool focus) {
+    if (focus) {
+        AudioPlayer::instance().play(GUISounds::instance().onEnter(), AudioType::Sound);
+    }
 }
 
 void GameGUI::initForGame() {
