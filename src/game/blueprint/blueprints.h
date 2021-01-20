@@ -58,12 +58,6 @@ private:
     Blueprints() = default;
     Blueprints(const Blueprints &) = delete;
     Blueprints &operator=(const Blueprints &) = delete;
-
-    template <class T>
-    std::shared_ptr<T> get(const std::string &resRef, resource::ResourceType type, std::unordered_map<std::string, std::shared_ptr<T>> &cache);
-
-    template <class T>
-    std::shared_ptr<T> doGet(const std::string &resRef, resource::ResourceType type);
 };
 
 } // namespace game
