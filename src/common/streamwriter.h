@@ -22,6 +22,7 @@
 #include <ostream>
 #include <string>
 
+#include "endianutil.h"
 #include "types.h"
 
 namespace reone {
@@ -41,13 +42,13 @@ private:
     StreamWriter(const StreamWriter &) = delete;
     StreamWriter &operator=(const StreamWriter &) = delete;
 
-    bool isSameEndianess() const;
-
     template <class T>
-    void put(T val);
-
-    template <class T>
-    void fixEndianess(T &val);
+    void put(T val) {
+        swapBytesIfNotSystemEndianess(val, _endianess);
+        char buf[sizeof(T)];
+        memcpy(buf, &val, sizeof(T));
+        _stream->write(buf, sizeof(T));
+    }
 };
 
 } // namespace reone

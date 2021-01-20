@@ -49,23 +49,4 @@ void StreamWriter::putCString(const string &str) {
     _stream->put('\0');
 }
 
-template <class T>
-void StreamWriter::put(T val) {
-    fixEndianess(val);
-    char buf[sizeof(T)];
-    memcpy(buf, &val, sizeof(T));
-    _stream->write(buf, sizeof(T));
-}
-
-template <class T>
-void StreamWriter::fixEndianess(T &val) {
-    if (!isSameEndianess()) {
-        swapBytes(val);
-    }
-}
-
-bool StreamWriter::isSameEndianess() const {
-    return _endianess == Endianess::Little;
-}
-
 } // namespace reone
