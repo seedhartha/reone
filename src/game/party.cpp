@@ -134,7 +134,7 @@ void Party::onHeartbeat() {
     for (int i = 1; i < _members.size(); ++i) {
         shared_ptr<Creature> member(_members[i].creature);
         ActionQueue &actions = member->actionQueue();
-        shared_ptr<Action> action(actions.currentAction());
+        shared_ptr<Action> action(actions.getCurrentAction());
         if (!action) {
             actions.add(make_unique<FollowAction>(leader, 1.0f));
         }

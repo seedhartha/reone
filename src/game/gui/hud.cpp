@@ -281,21 +281,15 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actionQueue = _game->party().leader()->actionQueue();
+    int i = 0;
 
-    auto it = actionQueue.begin();
-    for (int i = 0; i < 4; ++i) {
-        string fill;
+    for (auto &action : _game->party().leader()->actionQueue().actions()) {
+        if (action->type() != ActionType::AttackObject) continue;
 
-        // TODO: if (isDisplayableAction(*it))
-        while (it != actionQueue.end() && (*it)->type() != ActionType::AttackObject)
-            ++it;
-        if (it != actionQueue.end()) {
-            fill = "i_attack";
-            ++it;
-        }
-        Control& item = getControl("LBL_QUEUE" + to_string(i));
-        item.setBorderFill(fill);
+        Control &item = getControl("LBL_QUEUE" + to_string(i));
+        item.setBorderFill("i_attack");
+
+        if (++i == 4) break;
     }
 }
 
@@ -319,11 +313,7 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_CLEARALL") {
         _game->party().leader()->actionQueue().clear();
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        auto &actionQueue = _game->party().leader()->actionQueue();
-
-        for (auto &action : actionQueue) {
-
-            // TODO: if (isDisplayableAction(*it))
+        for (auto &action : _game->party().leader()->actionQueue().actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;

@@ -19,8 +19,6 @@
 
 #include <algorithm>
 
-#include "SDL2/SDL_timer.h"
-
 using namespace std;
 
 namespace reone {
@@ -49,17 +47,9 @@ void ActionQueue::update(float dt) {
     updateDelayedActions(dt);
 }
 
-ActionQueue::iterator ActionQueue::begin() {
-    return _actions.begin();
-}
-
-ActionQueue::iterator ActionQueue::end() {
-    return _actions.end();
-}
-
 void ActionQueue::removeCompletedActions() {
     while (true) {
-        shared_ptr<Action> action(currentAction());
+        shared_ptr<Action> action(getCurrentAction());
         if (!action || !action->isCompleted()) return;
 
         _actions.pop_front();
@@ -80,16 +70,16 @@ void ActionQueue::updateDelayedActions(float dt) {
     _delayed.erase(delayedToRemove, _delayed.end());
 }
 
-bool ActionQueue::empty() const {
+bool ActionQueue::isEmpty() const {
     return _actions.empty();
 }
 
-int ActionQueue::size() const {
+int ActionQueue::getSize() const {
     return static_cast<int>(_actions.size());
 }
 
-shared_ptr<Action> ActionQueue::currentAction() {
-   return _actions.empty() ? nullptr : _actions.front();
+shared_ptr<Action> ActionQueue::getCurrentAction() const {
+    return _actions.empty() ? nullptr : _actions.front();
 }
 
 } // namespace game

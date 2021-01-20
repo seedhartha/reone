@@ -137,7 +137,7 @@ void Player::update(float dt) {
         if (_area->moveCreature(partyLeader, dir, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
         }
-    } else if (actions.empty()) {
+    } else if (actions.isEmpty()) {
         partyLeader->setMovementType(Creature::MovementType::None);
     }
 }

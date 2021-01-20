@@ -53,7 +53,7 @@ ActionExecutor::ActionExecutor(Game *game) : _game(game) {
 void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) {
     ActionQueue &actionQueue = object->actionQueue();
 
-    shared_ptr<Action> action(actionQueue.currentAction());
+    shared_ptr<Action> action(actionQueue.getCurrentAction());
     if (!action) return;
 
     ActionType type = action->type();
