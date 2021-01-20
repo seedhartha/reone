@@ -47,6 +47,7 @@ public:
     enum class TextAlign {
         LeftCenter = 9,
         CenterBottom = 10,
+        LeftCenter2 = 17,
         CenterCenter = 18,
 
         CenterTop = 0x1000
