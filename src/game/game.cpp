@@ -176,7 +176,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::loadMainMenu() {
-    _mainMenu.reset(new MainMenu(this));
+    _mainMenu = make_unique<MainMenu>(this);
     _mainMenu->load();
 }
 
@@ -371,32 +371,32 @@ void Game::drawCursor() {
 }
 
 void Game::loadHUD() {
-    _hud.reset(new HUD(this));
+    _hud = make_unique<HUD>(this);
     _hud->load();
 }
 
 void Game::loadDialog() {
-    _dialog.reset(new DialogGUI(this));
+    _dialog = make_unique<DialogGUI>(this);
     _dialog->load();
 }
 
 void Game::loadContainer() {
-    _container.reset(new Container(this));
+    _container = make_unique<Container>(this);
     _container->load();
 }
 
 void Game::loadPartySelection() {
-    _partySelect.reset(new PartySelection(this));
+    _partySelect = make_unique<PartySelection>(this);
     _partySelect->load();
 }
 
 void Game::loadSaveLoad() {
-    _saveLoad.reset(new SaveLoad(this));
+    _saveLoad = make_unique<SaveLoad>(this);
     _saveLoad->load();
 }
 
 void Game::loadInGame() {
-    _inGame.reset(new InGameMenu(this));
+    _inGame = make_unique<InGameMenu>(this);
     _inGame->load();
 }
 
@@ -515,12 +515,12 @@ float Game::measureFrameTime() {
 }
 
 void Game::loadLoadingScreen() {
-    _loadScreen.reset(new LoadingScreen(this));
+    _loadScreen = make_unique<LoadingScreen>(this);
     _loadScreen->load();
 }
 
 void Game::loadCharacterGeneration() {
-    _charGen.reset(new CharacterGeneration(this));
+    _charGen = make_unique<CharacterGeneration>(this);
     _charGen->load();
 }
 

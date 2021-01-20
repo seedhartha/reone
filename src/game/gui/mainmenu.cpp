@@ -136,7 +136,7 @@ void MainMenu::setButtonColors(const string &tag) {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    shared_ptr<ModelSceneNode> model(new ModelSceneNode(&sceneGraph, Models::instance().get("mainmenu")));
+    auto model = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("mainmenu"));
     model->setDefaultAnimation("default");
     model->playDefaultAnimation();
     model->setLightingEnabled(true);

@@ -27,7 +27,7 @@ using namespace reone::script;
 
 BOOST_AUTO_TEST_CASE(test_destruct) {
     Instruction instr;
-    shared_ptr<ScriptProgram> program(new ScriptProgram(""));
+    auto program = make_shared<ScriptProgram>("");
 
     instr.offset = 13;
     instr.byteCode = ByteCode::PushConstant;
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
 
 BOOST_AUTO_TEST_CASE(test_cptopbp) {
     Instruction instr;
-    shared_ptr<ScriptProgram> program(new ScriptProgram(""));
+    auto program = make_shared<ScriptProgram>("");
 
     instr.offset = 13;
     instr.byteCode = ByteCode::PushConstant;

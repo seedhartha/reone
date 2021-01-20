@@ -158,7 +158,7 @@ void MdlFile::openMDX() {
     if (!fs::exists(mdxPath)) {
         throw runtime_error("MDL: MDX file not found: " + mdxPath.string());
     }
-    _mdx.reset(new fs::ifstream(mdxPath, ios::binary));
+    _mdx = make_unique<fs::ifstream>(mdxPath, ios::binary);
     _mdxReader = make_unique<StreamReader>(_mdx);
 }
 
@@ -224,7 +224,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     readArrayDefinition(controllerDataOffset, controllerDataCount);
     vector<float> controllerData(readArray<float>(kMdlDataOffset + controllerDataOffset, controllerDataCount));
 
-    unique_ptr<ModelNode> node(new ModelNode(_nodeIndex++, parent));
+    auto node = make_unique<ModelNode>(_nodeIndex++, parent);
     node->_flags = flags;
     node->_nodeNumber = nodeNumber;
     node->_name = name;
@@ -712,7 +712,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     }
     offsets.stride = mdxVertexSize;
 
-    unique_ptr<ModelMesh> mesh(new ModelMesh(render, transparency, shadow));
+    auto mesh = make_unique<ModelMesh>(render, transparency, shadow);
     mesh->_vertices = move(vertices);
     mesh->_indices = move(indices);
     mesh->_offsets = move(offsets);

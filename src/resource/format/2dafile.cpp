@@ -116,7 +116,7 @@ const vector<TwoDaRow> &TwoDaTable::rows() const {
     return _rows;
 }
 
-TwoDaFile::TwoDaFile() : BinaryFile(kSignatureSize, kSignature), _table(new TwoDaTable()) {
+TwoDaFile::TwoDaFile() : BinaryFile(kSignatureSize, kSignature), _table(make_shared<TwoDaTable>()) {
 }
 
 void TwoDaFile::doLoad() {

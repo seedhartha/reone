@@ -119,7 +119,7 @@ void Connection::doSend(const Command &command) {
     data.insert(data.begin(), (cmdLength >> 8) & 0xff);
     data.insert(data.begin(), cmdLength & 0xff);
 
-    shared_ptr<boost::asio::streambuf> buffer(new boost::asio::streambuf());
+    auto buffer = make_shared<boost::asio::streambuf>();
     ostream out(buffer.get());
     out.write(&data[0], data.size());
 

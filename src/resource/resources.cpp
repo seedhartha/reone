@@ -93,7 +93,7 @@ void Resources::indexTexturePacks() {
 }
 
 void Resources::indexErfFile(const fs::path &path) {
-    unique_ptr<ErfFile> erf(new ErfFile());
+    auto erf = make_unique<ErfFile>();
     erf->load(path);
 
     _providers.push_back(move(erf));
@@ -123,7 +123,7 @@ void Resources::indexAudioFiles() {
 }
 
 void Resources::indexDirectory(const fs::path &path) {
-    unique_ptr<Folder> folder(new Folder());
+    auto folder = make_unique<Folder>();
     folder->load(path);
 
     _providers.push_back(move(folder));
@@ -206,7 +206,7 @@ void Resources::loadModule(const string &name) {
 }
 
 void Resources::indexTransientRimFile(const fs::path &path) {
-    unique_ptr<RimFile> rim(new RimFile());
+    auto rim = make_unique<RimFile>();
     rim->load(path);
 
     _transientProviders.push_back(move(rim));
@@ -215,7 +215,7 @@ void Resources::indexTransientRimFile(const fs::path &path) {
 }
 
 void Resources::indexTransientErfFile(const fs::path &path) {
-    unique_ptr<ErfFile> erf(new ErfFile());
+    auto erf = make_unique<ErfFile>();
     erf->load(path);
 
     _transientProviders.push_back(move(erf));

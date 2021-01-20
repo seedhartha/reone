@@ -119,7 +119,7 @@ void DialogGUI::loadTopFrame() {
 }
 
 void DialogGUI::addFrame(int top, int height) {
-    unique_ptr<Panel> frame(new Panel(this));
+    auto frame = make_unique<Panel>(this);
 
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
@@ -178,7 +178,7 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     _owner = owner;
     _currentSpeaker = _owner;
 
-    _dialog.reset(new Dialog());
+    _dialog = make_shared<Dialog>();
     _dialog->load(resRef, *dlg);
 
     debug("Dialog: start " + resRef);
@@ -214,7 +214,7 @@ void DialogGUI::loadStartEntry() {
         _game->openInGame();
         return;
     }
-    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+    _currentEntry = make_shared<Dialog::EntryReply>(_dialog->getEntry(entryIdx));
     loadCurrentEntry();
 }
 
@@ -546,7 +546,7 @@ void DialogGUI::pickReply(uint32_t index) {
         finish();
         return;
     }
-    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
+    _currentEntry = make_shared<Dialog::EntryReply>(_dialog->getEntry(entryIdx));
     loadCurrentEntry();
 }
 
