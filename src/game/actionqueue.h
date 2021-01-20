@@ -37,14 +37,12 @@ public:
 
     void update(float dt);
 
-    using iterator = std::deque<std::shared_ptr<Action>>::iterator;
-    iterator begin();
-    iterator end();
+    bool isEmpty() const;
 
-    bool empty() const;
-    int size() const;
+    int getSize() const;
+    std::shared_ptr<Action> getCurrentAction() const;
 
-    std::shared_ptr<Action> currentAction();
+    const std::deque<std::shared_ptr<Action>> &actions() const { return _actions; }
 
 private:
     struct DelayedAction {

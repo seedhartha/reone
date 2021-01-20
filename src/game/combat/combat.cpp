@@ -43,7 +43,7 @@ static constexpr float kRoundDuration = 3.0f;
 static bool g_projectilesEnabled = true;
 
 static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
-    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().currentAction());
+    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().getCurrentAction());
 }
 
 void Combat::Round::advance(float dt) {
