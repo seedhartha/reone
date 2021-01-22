@@ -87,6 +87,32 @@ bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
     return true;
 }
 
+bool ModelNode::getScale(float time, float &scale) const {
+    if (_scaleFrames.empty()) return false;
+
+    const ScaleKeyframe *left = &_scaleFrames.front();
+    const ScaleKeyframe *right = left;
+
+    for (auto it = _scaleFrames.begin(); it != _scaleFrames.end(); ++it) {
+        if (it->time >= time) {
+            right = &*it;
+            if (it != _scaleFrames.begin()) left = &*(it - 1);
+            break;
+        }
+    }
+
+    if (left == right) {
+        scale = left->scale;
+        return true;
+    }
+
+    float factor = (time - left->time) / (right->time - left->time);
+
+    scale = glm::mix(left->scale, right->scale, factor);
+
+    return true;
+}
+
 const glm::vec3 &ModelNode::getCenterOfAABB() const {
     return _mesh->aabb().center();
 }

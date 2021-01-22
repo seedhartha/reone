@@ -456,7 +456,7 @@ void DialogGUI::updateParticipantAnimations() {
             string animName(getStuntAnimationName(anim.animation));
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
-                participant.creature->playAnimation(animation, AnimationFlags::propagate);
+                participant.creature->playAnimation(animation);
             }
         } else {
             shared_ptr<Creature> participant;

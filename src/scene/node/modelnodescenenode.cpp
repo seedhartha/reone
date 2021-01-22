@@ -92,9 +92,8 @@ bool ModelNodeSceneNode::shouldCastShadows() const {
 
 bool ModelNodeSceneNode::isTransparent() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh || _modelSceneNode->model()->classification() == Model::Classification::Character) {
-        return false;
-    }
+    if (!mesh || _modelSceneNode->model()->classification() == Model::Classification::Character) return false;
+
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 

@@ -59,6 +59,8 @@ public:
 
     bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
+    bool getScale(float time, float &scale) const;
+
     const glm::vec3 &getCenterOfAABB() const;
 
     int index() const;
@@ -92,6 +94,11 @@ private:
         glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
     };
 
+    struct ScaleKeyframe {
+        float time { 0.0f };
+        float scale { 0.0f };
+    };
+
     int _index { 0 };
     const ModelNode *_parent { nullptr };
     uint16_t _flags { 0 };
@@ -104,6 +111,7 @@ private:
     glm::mat4 _absTransformInv { 1.0f };
     std::vector<PositionKeyframe> _positionFrames;
     std::vector<OrientationKeyframe> _orientationFrames;
+    std::vector<ScaleKeyframe> _scaleFrames;
     glm::vec3 _color { 0.0f };
     bool _selfIllumEnabled { false };
     glm::vec3 _selfIllumColor { 0.0f };

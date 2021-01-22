@@ -57,6 +57,7 @@ AABBMesh &AABBMesh::instance() {
 }
 
 AABBMesh::AABBMesh() {
+    _vertexCount = 8;
     _vertices = g_vertices;
     _indices = g_indices;
     _offsets = g_offsets;
