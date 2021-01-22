@@ -42,6 +42,7 @@ BillboardMesh &BillboardMesh::instance() {
 }
 
 BillboardMesh::BillboardMesh() {
+    _vertexCount = 4;
     _vertices = move(g_vertices);
     _indices = move(g_indices);
     _offsets = move(g_offsets);

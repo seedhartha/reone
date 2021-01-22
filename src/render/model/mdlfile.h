@@ -46,7 +46,7 @@ private:
     void openMDX();
 
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
-    std::unique_ptr<render::ModelMesh> readMesh();
+    std::unique_ptr<render::ModelMesh> readMesh(const std::string &nodeName, int nodeFlags);
     std::unique_ptr<render::ModelNode> readNode(uint32_t offset, render::ModelNode *parent);
     std::vector<std::unique_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     void readArrayDefinition(uint32_t &offset, uint32_t &count);
@@ -78,6 +78,7 @@ private:
     void readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readRadiusController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readRandomVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSelfIllumColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);

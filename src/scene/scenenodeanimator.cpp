@@ -110,6 +110,7 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
         ModelNode *modelNode = sceneNode->modelNode();
         glm::vec3 position(modelNode->position());
         glm::quat orientation(modelNode->orientation());
+        float scale = 1.0f;
 
         bool skip = _skipNodes.count(modelNode->name()) > 0;
         if (!skip) {
@@ -122,9 +123,14 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
             if (animNode.getOrientation(time, animOrientation)) {
                 orientation = animOrientation;
             }
+            float animScale;
+            if (animNode.getScale(time, animScale)) {
+                scale = animScale;
+            }
         }
 
         glm::mat4 transform(1.0f);
+        transform = glm::scale(transform, glm::vec3(scale));
         transform = glm::translate(transform, position);
         transform *= glm::mat4_cast(orientation);
         channel.localTransforms.insert(make_pair(modelNode->nodeNumber(), transform));

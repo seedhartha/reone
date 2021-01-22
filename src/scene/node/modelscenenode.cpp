@@ -157,12 +157,6 @@ void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
 
 void ModelSceneNode::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
     _animator.playAnimation(anim, flags, speed, scale);
-
-    if (flags & AnimationFlags::propagate) {
-        for (auto &attached : _attachedModels) {
-            attached.second->playAnimation(anim, flags, speed, scale);
-        }
-    }
 }
 
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {

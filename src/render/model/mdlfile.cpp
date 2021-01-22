@@ -38,25 +38,25 @@ namespace reone {
 namespace render {
 
 static constexpr int kSignatureSize = 4;
-static const char kSignature[] = "\0\0\0\0";
 static constexpr int kMdlDataOffset = 12;
 
-enum {
-    kNodeHasHeader = 1,
-    kNodeHasLight = 2,
-    kNodeHasEmitter = 4,
-    kNodeHasReference = 16,
-    kNodeHasMesh = 32,
-    kNodeHasSkin = 64,
-    kNodeHasAnim = 128,
-    kNodeHasDangly = 256,
-    kNodeHasAABB = 512,
-    kNodeHasSaber = 2048
-};
+static constexpr int kNodeHasHeader = 1;
+static constexpr int kNodeHasLight = 2;
+static constexpr int kNodeHasEmitter = 4;
+static constexpr int kNodeHasReference = 16;
+static constexpr int kNodeHasMesh = 32;
+static constexpr int kNodeHasSkin = 64;
+static constexpr int kNodeHasAnim = 128;
+static constexpr int kNodeHasDangly = 256;
+static constexpr int kNodeHasAABB = 512;
+static constexpr int kNodeHasSaber = 2048;
+
+static const char kSignature[] = "\0\0\0\0";
 
 enum class ControllerType {
     Position = 8,
     Orientation = 20,
+    Scale = 36,
     Color = 76,
     AlphaEnd = 80,
     AlphaStart = 84,
@@ -250,7 +250,7 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
         ignore(68);
     }
     if (flags & kNodeHasMesh) {
-        node->_mesh = readMesh();
+        node->_mesh = readMesh(name, flags);
     }
     if (flags & kNodeHasSkin) {
         readSkin(*node);
@@ -288,6 +288,9 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 break;
             case ControllerType::Orientation:
                 readOrientationController(rowCount, columnCount, timeIndex, dataIndex, data, node);
+                break;
+            case ControllerType::Scale:
+                readScaleController(rowCount, timeIndex, dataIndex, data, node);
                 break;
             case ControllerType::Color:
                 readColorController(dataIndex, data, node);
@@ -490,6 +493,18 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
     }
 }
 
+void MdlFile::readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    node._scaleFrames.resize(rowCount);
+
+    for (int i = 0; i < rowCount; ++i) {
+        ModelNode::ScaleKeyframe frame;
+        frame.time = data[timeIndex + i];
+        frame.scale = data[dataIndex + i];
+
+        node._scaleFrames[i] = move(frame);
+    }
+}
+
 void MdlFile::readColorController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     node._color.r = data[dataIndex + 0];
     node._color.g = data[dataIndex + 1];
@@ -612,7 +627,7 @@ void MdlFile::readLight(ModelNode &node) {
     ignore(8);
 }
 
-unique_ptr<ModelMesh> MdlFile::readMesh() {
+unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     ignore(8);
 
     uint32_t faceOffset, faceCount;
@@ -662,8 +677,9 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     uint16_t vertexCount = readUint16();
     uint16_t textureCount = readUint16();
 
-    ignore(3);
+    ignore(2);
 
+    uint8_t backgroundGeometry = readByte();
     uint8_t shadow = readByte();
 
     ignore(1);
@@ -675,44 +691,106 @@ unique_ptr<ModelMesh> MdlFile::readMesh() {
     if (_version == GameVersion::TheSithLords) ignore(8);
 
     uint32_t mdxDataOffset = readUint32();
-
-    ignore(4);
-
+    uint32_t vertCoordsOffset = readUint32();
     size_t endPos = tell();
 
     if (faceCount == 0) {
         warn(boost::format("MDL: invalid face count: %d, model %s") % to_string(faceCount) % _name);
         return nullptr;
     }
-    if (mdxVertexSize == 0) {
+    if (mdxVertexSize == 0 && !(nodeFlags & kNodeHasSaber)) {
         warn(boost::format("MDL: invalid MDX vertex size: %d, model %s") % to_string(mdxVertexSize) % _name);
         return nullptr;
     }
 
-    seek(kMdlDataOffset + indexOffOffset);
-    uint32_t indexOffset = readUint32();
-    seek(kMdlDataOffset + indexOffset);
-    vector<uint16_t> indices(readArray<uint16_t>(3 * faceCount));
+    vector<float> vertices;
+    Mesh::VertexOffsets offsets;
+    vector<uint16_t> indices;
+
+    if (nodeFlags & kNodeHasSaber) {
+        // Lightsaber blade is a special case. It consists of four to eight planes.
+        // Some of these planes are normal meshes, but some differ in that their
+        // geometry is stored in the MDL, not MDX.
+        //
+        // Evidently, values stored in the MDL are vertex coordinates, textures
+        // coordinates and normals, yet they do not form a valid shape when used
+        // as-is.
+
+        uint32_t saberCoordsOffset = readUint32();
+        uint32_t texCoordsOffset = readUint32();
+        uint32_t normalsOffset = readUint32();
+
+        seek(static_cast<size_t>(kMdlDataOffset) + saberCoordsOffset);
+        vector<float> vertexCoords(readArray<float>(3 * vertexCount));
+
+        // Here we use MDL values to determine the size of the plane, and
+        // instead, feed predefined geometry into the mesh.
+
+        AABB aabb;
+        for (int i = 0; i < 3 * vertexCount; ++i) {
+            aabb.expand(glm::make_vec3(&vertexCoords[i]));
+            i += 3;
+        }
+        float minx = aabb.min().x;
+        float minz = aabb.min().z;
+        float maxx = aabb.max().x;
+        float maxz = aabb.max().z;
+        float sizex = maxx - minx;
+        float sizez = maxz - sizez;
+
+        vertexCount = 10;
+        vertices = {
+            0.0f,  0.0f,         minx,                0.5f, 0.2f,
+            0.0f,  0.0f,         minx + 0.1f * sizex, 0.5f, 0.5f,
+            0.0f, -0.5f * sizez, minx + 0.1f * sizex, 0.2f, 0.2f,
+            0.0f,  0.0f,         maxx - 0.1f * sizex, 0.5f, 0.5f,
+            0.0f, -0.5f * sizez, maxx - 0.1f * sizex, 0.2f, 0.5f,
+            0.0f, -0.5f * sizez, maxx,                0.2f, 0.8f,
+            0.0f,  0.0f,         maxx,                0.5f, 0.8f,
+            0.0f,  0.5f * sizez, minx + 0.1f * sizex, 0.8f, 0.2f,
+            0.0f,  0.5f * sizez, maxx - 0.1f * sizex, 0.8f, 0.5f,
+            0.0f,  0.5f * sizez, maxx,                0.8f, 0.8f
+        };
+        indices = {
+            0, 1, 2,
+            1, 3, 2, 2, 3, 4,
+            3, 5, 4, 3, 6, 5,
+            0, 7, 1,
+            1, 7, 3, 7, 8, 3,
+            3, 8, 9, 3, 9, 6
+        };
+
+        offsets.vertexCoords = 0;
+        offsets.texCoords1 = 3 * sizeof(float);
+        offsets.normals = -1;
+        offsets.stride = 5 * sizeof(float);
+
+    } else {
+        int valPerVert = mdxVertexSize / sizeof(float);
+        int vertValCount = valPerVert * vertexCount;
+        _mdxReader->seek(mdxDataOffset);
+        vertices = _mdxReader->getArray<float>(vertValCount);
+
+        offsets.vertexCoords = mdxVerticesOffset;
+        offsets.normals = mdxNormalsOffset != 0xffffffff ? mdxNormalsOffset : -1;
+        offsets.texCoords1 = mdxTextureOffset != 0xffffffff ? mdxTextureOffset : -1;
+        offsets.texCoords2 = mdxLightmapOffset != 0xffffffff ? mdxLightmapOffset : -1;
+        if (mdxTanSpaceOffset != 0xffffffff) {
+            offsets.bitangents = mdxTanSpaceOffset + 0 * sizeof(float);
+            offsets.tangents = mdxTanSpaceOffset + 3 * sizeof(float);
+        }
+        offsets.stride = mdxVertexSize;
+
+        seek(kMdlDataOffset + indexOffOffset);
+        uint32_t indexOffset = readUint32();
+        seek(kMdlDataOffset + indexOffset);
+        indices = readArray<uint16_t>(3 * faceCount);
+    }
 
     seek(endPos);
 
-    int valPerVert = mdxVertexSize / sizeof(float);
-    int vertValCount = valPerVert * vertexCount;
-    _mdxReader->seek(mdxDataOffset);
-    vector<float> vertices(_mdxReader->getArray<float>(vertValCount));
-
-    Mesh::VertexOffsets offsets;
-    offsets.vertexCoords = mdxVerticesOffset;
-    offsets.normals = mdxNormalsOffset != 0xffffffff ? mdxNormalsOffset : -1;
-    offsets.texCoords1 = mdxTextureOffset != 0xffffffff ? mdxTextureOffset : -1;
-    offsets.texCoords2 = mdxLightmapOffset != 0xffffffff ? mdxLightmapOffset : -1;
-    if (mdxTanSpaceOffset != 0xffffffff) {
-        offsets.bitangents = mdxTanSpaceOffset + 0 * sizeof(float);
-        offsets.tangents = mdxTanSpaceOffset + 3 * sizeof(float);
-    }
-    offsets.stride = mdxVertexSize;
-
     auto mesh = make_unique<ModelMesh>(render, transparency, shadow);
+    mesh->_vertexCount = vertexCount;
     mesh->_vertices = move(vertices);
     mesh->_indices = move(indices);
     mesh->_offsets = move(offsets);

@@ -55,6 +55,7 @@ CubeMesh &CubeMesh::instance() {
 }
 
 CubeMesh::CubeMesh() {
+    _vertexCount = 8;
     _vertices = move(g_vertices);
     _indices = move(g_indices);
     _offsets = move(g_offsets);

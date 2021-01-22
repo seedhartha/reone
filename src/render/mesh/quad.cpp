@@ -77,6 +77,7 @@ Quad &Quad::getXYFlipped() {
 }
 
 Quad::Quad(vector<float> &&vertices) {
+    _vertexCount = 4;
     _vertices = move(vertices);
     _indices = g_indices;
     _offsets = g_offsets;

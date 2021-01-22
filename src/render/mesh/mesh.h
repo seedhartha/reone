@@ -55,6 +55,7 @@ public:
 
 protected:
     bool _glInited { false };
+    int _vertexCount { 0 };
     std::vector<float> _vertices;
     std::vector<uint16_t> _indices;
     VertexOffsets _offsets;
