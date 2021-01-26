@@ -496,7 +496,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
         case TextAlign::LeftCenter2:
         case TextAlign::CenterCenter:
         default:
-            position.y = _extent.top + size.y / 2;
+            position.y = _extent.top + size.y / 2 - static_cast<int>(glm::max(0, (lineCount - 2)) * _text.font->height());
             break;
     }
     // Horizontal alignment
