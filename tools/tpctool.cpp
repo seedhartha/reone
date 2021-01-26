@@ -51,7 +51,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
 
     int totalHeight = layerCount * w;
     int pixelsSize = (alpha ? 4ll : 3ll) * w * totalHeight;
-    auto pixels = make_unique<uint8_t[]>(pixelsSize);
+    auto pixels = new uint8_t[pixelsSize];
     uint8_t *pixelsPtr = &pixels[0];
 
     for (int i = 0; i < layerCount; ++i) {
