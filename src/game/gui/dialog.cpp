@@ -56,6 +56,8 @@ namespace game {
 
 static constexpr float kDefaultEntryDuration = 1000.0f;
 
+static const char kControlTagTopFrame[] = "TOP";
+static const char kControlTagBottomFrame[] = "BOTTOM";
 static const char kControlTagMessage[] = "LBL_MESSAGE";
 static const char kControlTagReplies[] = "LB_REPLIES";
 
@@ -138,10 +140,10 @@ void DialogGUI::configureReplies() {
 }
 
 void DialogGUI::loadTopFrame() {
-    addFrame(-_rootControl->extent().top, getControl(kControlTagMessage).extent().height);
+    addFrame(kControlTagTopFrame, -_rootControl->extent().top, getControl(kControlTagMessage).extent().height);
 }
 
-void DialogGUI::addFrame(int top, int height) {
+void DialogGUI::addFrame(string tag, int top, int height) {
     auto frame = make_unique<Panel>(this);
 
     Control::Extent extent;
@@ -153,6 +155,7 @@ void DialogGUI::addFrame(int top, int height) {
     frame->setExtent(move(extent));
     frame->setBorderFill("blackfill");
 
+    _controlByTag.insert(make_pair(tag, frame.get()));
     _controls.insert(_controls.begin(), move(frame));
 }
 
@@ -160,7 +163,7 @@ void DialogGUI::loadBottomFrame() {
     int rootTop = _rootControl->extent().top;
     int height = _gfxOpts.height - rootTop;
 
-    addFrame(_gfxOpts.height - rootTop - height, height);
+    addFrame(kControlTagBottomFrame, _gfxOpts.height - rootTop - height, height);
 }
 
 void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
@@ -179,9 +182,27 @@ void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string
     _owner = owner;
     _currentSpeaker = _owner;
 
+    loadDialogBackground();
     loadCameraModel();
     loadStuntParticipants();
     loadStartEntry();
+}
+
+static BackgroundType getBackgroundType(ComputerType compType) {
+    switch (compType) {
+        case ComputerType::Rakatan:
+            return BackgroundType::Computer1;
+        default:
+            return BackgroundType::Computer0;
+    }
+}
+
+void DialogGUI::loadDialogBackground() {
+    if (_dialog->conversationType() == ConversationType::Computer) {
+        loadBackground(getBackgroundType(_dialog->computerType()));
+    } else {
+        loadBackground(BackgroundType::None);
+    }
 }
 
 void DialogGUI::loadCameraModel() {

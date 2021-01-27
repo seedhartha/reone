@@ -22,6 +22,8 @@
 
 #include "../resource/format/gfffile.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
@@ -80,6 +82,8 @@ public:
     const std::vector<EntryReplyLink> &startEntries() const;
     const std::vector<Stunt> &stunts() const;
     const std::string &endScript() const;
+    ConversationType conversationType() const { return _conversationType; }
+    ComputerType computerType() const { return _computerType; }
 
 private:
     bool _skippable { false };
@@ -91,6 +95,8 @@ private:
     int _entryIndex { -1 };
     bool _animatedCutscene { false };
     std::vector<Stunt> _stunts;
+    ConversationType _conversationType { ConversationType::Cinematic };
+    ComputerType _computerType { ComputerType::Normal };
 
     Dialog(const Dialog &) = delete;
     Dialog &operator=(const Dialog &) = delete;

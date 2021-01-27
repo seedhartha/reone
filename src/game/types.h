@@ -128,6 +128,16 @@ enum class DurationType {
     Permanent = 2
 };
 
+enum class ConversationType {
+    Cinematic = 0,
+    Computer = 1
+};
+
+enum class ComputerType {
+    Normal = 0,
+    Rakatan = 1
+};
+
 } // namespace game
 
 } // namespace reone

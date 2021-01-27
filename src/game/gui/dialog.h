@@ -69,7 +69,7 @@ private:
     bool _entryEnded { false };
 
     bool checkCondition(const std::string &script);
-    void addFrame(int top, int height);
+    void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();
     void endCurrentEntry();
@@ -97,6 +97,7 @@ private:
     void loadTopFrame();
     void loadBottomFrame();
 
+    void loadDialogBackground();
     void loadCameraModel();
     void loadCurrentEntry(bool start = false);
     void loadCurrentSpeaker();
