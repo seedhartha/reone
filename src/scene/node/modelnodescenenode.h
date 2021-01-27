@@ -45,6 +45,8 @@ public:
 
     bool isTransparent() const;
 
+    float distanceTo(const glm::vec3 &point) const override;
+
     const ModelSceneNode *modelSceneNode() const;
     render::ModelNode *modelNode() const;
     const glm::mat4 &boneTransform() const;

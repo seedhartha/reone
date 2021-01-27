@@ -184,6 +184,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     mesh->render(_modelSceneNode->textureOverride());
 }
 
+float ModelNodeSceneNode::distanceTo(const glm::vec3 &point) const {
+    glm::vec3 origin(_absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f));
+    return glm::distance(origin, point);
+}
+
 const ModelSceneNode *ModelNodeSceneNode::modelSceneNode() const {
     return _modelSceneNode;
 }

@@ -38,7 +38,7 @@ public:
     virtual void render() const;
     virtual void renderSingle(bool shadowPass) const;
 
-    float distanceTo(const glm::vec3 &point) const;
+    virtual float distanceTo(const glm::vec3 &point) const;
 
     const SceneNode *parent() const;
     const glm::mat4 &localTransform() const;
