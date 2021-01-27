@@ -304,8 +304,8 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 break;
             case ControllerType::SelfIllumColor:
                 if (node._flags & kNodeHasMesh) {
-                    node._selfIllumEnabled = true;
                     readSelfIllumColorController(dataIndex, data, node);
+                    node._selfIllumEnabled = glm::length(node._selfIllumColor) > 0.0f;
                 }
                 break;
             case ControllerType::FPS:
@@ -633,8 +633,10 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     uint32_t faceOffset, faceCount;
     readArrayDefinition(faceOffset, faceCount);
 
-    ignore(64);
+    ignore(40);
 
+    vector<float> diffuseColor(readArray<float>(3));
+    vector<float> ambientColor(readArray<float>(3));
     uint32_t transparency = readUint32();
 
     string diffuse(readCString(32));
@@ -797,8 +799,11 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     auto mesh = make_unique<ModelMesh>(render, transparency, shadow);
     mesh->_vertexCount = vertexCount;
     mesh->_vertices = move(vertices);
-    mesh->_indices = move(indices);
     mesh->_offsets = move(offsets);
+    mesh->_indices = move(indices);
+    mesh->_backgroundGeometry = backgroundGeometry != 0;
+    mesh->_diffuseColor = glm::make_vec3(&diffuseColor[0]);
+    mesh->_ambientColor = glm::make_vec3(&ambientColor[0]);
     mesh->computeAABB();
 
     if (!diffuse.empty() && diffuse != "null") {

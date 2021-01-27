@@ -117,6 +117,7 @@ void Area::loadLYT() {
 
         auto sceneNode = make_shared<ModelSceneNode>(&_game->sceneGraph(), model);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+        sceneNode->setLightingEnabled(true);
 
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {

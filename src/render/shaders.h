@@ -103,10 +103,13 @@ struct ShaderLight {
     glm::vec4 position { 0.0f };
     glm::vec4 color { 1.0f };
     float radius { 1.0f };
-    char padding[12];
+    float multiplier { 1.0f };
+    char padding[8];
 };
 
 struct LightingUniforms {
+    glm::vec4 meshDiffuseColor { 1.0f };
+    glm::vec4 meshAmbientColor { 1.0f };
     glm::vec4 ambientLightColor { 1.0f };
     int lightCount { 0 };
     char padding[12];

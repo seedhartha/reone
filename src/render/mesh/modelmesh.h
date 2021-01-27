@@ -53,6 +53,7 @@ public:
     bool shouldCastShadows() const;
 
     bool isTransparent() const;
+    bool isBackgroundGeometry() const { return _backgroundGeometry; }
 
     bool hasDiffuseTexture() const;
     bool hasEnvmapTexture() const;
@@ -61,6 +62,8 @@ public:
     bool hasBumpmapTexture() const;
 
     int transparency() const;
+    const glm::vec3 &diffuseColor() const { return _diffuseColor; }
+    const glm::vec3 &ambientColor() const { return _ambientColor; }
     const UVAnimation &uvAnimation() const;
 
     const std::shared_ptr<Texture> &diffuseTexture() const;
@@ -70,6 +73,9 @@ private:
     bool _render { false };
     int _transparency { 0 };
     bool _shadow { false };
+    bool _backgroundGeometry { false };
+    glm::vec3 _diffuseColor { 0.0f };
+    glm::vec3 _ambientColor { 0.0f };
     UVAnimation _uvAnimation;
 
     // Textures
