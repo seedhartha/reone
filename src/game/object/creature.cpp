@@ -216,7 +216,7 @@ void Creature::updateModelAnimation() {
             if (_dead) {
                 shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getDeadAnimation()));
                 if (anim) {
-                    _model->playAnimation(anim, AnimationFlags::loopBlend);
+                    _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
                     if (_headModel) {
                         _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
                     }
@@ -233,7 +233,7 @@ void Creature::updateModelAnimation() {
             } else {
                 shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getPauseAnimation()));
                 if (anim) {
-                    _model->playAnimation(anim, AnimationFlags::loopBlend);
+                    _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
                     if (_headModel) {
                         _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
                     }
