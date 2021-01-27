@@ -708,13 +708,15 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     vector<uint16_t> indices;
 
     if (nodeFlags & kNodeHasSaber) {
-        // Lightsaber blade is a special case. It consists of four to eight planes.
-        // Some of these planes are normal meshes, but some differ in that their
-        // geometry is stored in the MDL, not MDX.
+        static int referenceIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
+
+        // Lightsaber blade is a special case. It consists of four to eight
+        // planes. Some of these planes are normal meshes, but some differ in
+        // that their geometry is stored in the MDL, not MDX.
         //
-        // Evidently, values stored in the MDL are vertex coordinates, textures
-        // coordinates and normals, yet they do not form a valid shape when used
-        // as-is.
+        // Values stored in the MDL are vertex coordinates, texture coordinates
+        // and normals. However, most of the vertex coordinates seem to be
+        // procedurally generated based on vertices 0-7 and 88-95.
 
         uint32_t saberCoordsOffset = readUint32();
         uint32_t texCoordsOffset = readUint32();
@@ -723,47 +725,50 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
         seek(static_cast<size_t>(kMdlDataOffset) + saberCoordsOffset);
         vector<float> vertexCoords(readArray<float>(3 * vertexCount));
 
-        // Here we use MDL values to determine the size of the plane, and
-        // instead, feed predefined geometry into the mesh.
+        seek(static_cast<size_t>(kMdlDataOffset) + texCoordsOffset);
+        vector<float> texCoords(readArray<float>(2 * vertexCount));
 
-        AABB aabb;
-        for (int i = 0; i < 3 * vertexCount; ++i) {
-            aabb.expand(glm::make_vec3(&vertexCoords[i]));
-            i += 3;
+        seek(static_cast<size_t>(kMdlDataOffset) + normalsOffset);
+        vector<float> normals(readArray<float>(3 * vertexCount));
+
+        vertexCount = 16;
+        vertices.resize(8ll * vertexCount);
+        float *verticesPtr = &vertices[0];
+
+        for (int i = 0; i < vertexCount; ++i) {
+            int referenceIdx = referenceIndices[i];
+
+            // Vertex coordinates
+            float *vertexCoordsPtr = &vertexCoords[3ll * referenceIdx];
+            *(verticesPtr++) = vertexCoordsPtr[0];
+            *(verticesPtr++) = vertexCoordsPtr[1];
+            *(verticesPtr++) = vertexCoordsPtr[2];
+
+            // Texture coordinates
+            float *texCoordsPtr = &texCoords[2ll * referenceIdx];
+            *(verticesPtr++) = texCoordsPtr[0];
+            *(verticesPtr++) = texCoordsPtr[1];
+
+            // Normals
+            float *normalsPtr = &normals[3ll * referenceIdx];
+            *(verticesPtr++) = normalsPtr[0];
+            *(verticesPtr++) = normalsPtr[1];
+            *(verticesPtr++) = normalsPtr[2];
         }
-        float minx = aabb.min().x;
-        float minz = aabb.min().z;
-        float maxx = aabb.max().x;
-        float maxz = aabb.max().z;
-        float sizex = maxx - minx;
-        float sizez = maxz - sizez;
-
-        vertexCount = 10;
-        vertices = {
-            0.0f,  0.0f,         minx,                0.5f, 0.2f,
-            0.0f,  0.0f,         minx + 0.1f * sizex, 0.5f, 0.5f,
-            0.0f, -0.5f * sizez, minx + 0.1f * sizex, 0.2f, 0.2f,
-            0.0f,  0.0f,         maxx - 0.1f * sizex, 0.5f, 0.5f,
-            0.0f, -0.5f * sizez, maxx - 0.1f * sizex, 0.2f, 0.5f,
-            0.0f, -0.5f * sizez, maxx,                0.2f, 0.8f,
-            0.0f,  0.0f,         maxx,                0.5f, 0.8f,
-            0.0f,  0.5f * sizez, minx + 0.1f * sizex, 0.8f, 0.2f,
-            0.0f,  0.5f * sizez, maxx - 0.1f * sizex, 0.8f, 0.5f,
-            0.0f,  0.5f * sizez, maxx,                0.8f, 0.8f
-        };
-        indices = {
-            0, 1, 2,
-            1, 3, 2, 2, 3, 4,
-            3, 5, 4, 3, 6, 5,
-            0, 7, 1,
-            1, 7, 3, 7, 8, 3,
-            3, 8, 9, 3, 9, 6
-        };
 
         offsets.vertexCoords = 0;
         offsets.texCoords1 = 3 * sizeof(float);
-        offsets.normals = -1;
-        offsets.stride = 5 * sizeof(float);
+        offsets.normals = 5 * sizeof(float);
+        offsets.stride = 8 * sizeof(float);
+
+        indices = {
+            0, 13, 12, 0, 1, 13,
+            1, 14, 13, 1, 2, 14,
+            2, 15, 14, 2, 3, 15,
+            8, 4, 5, 8, 5, 9,
+            9, 5, 6, 9, 6, 10,
+            10, 6, 7, 10, 7, 11
+        };
 
     } else {
         int valPerVert = mdxVertexSize / sizeof(float);
