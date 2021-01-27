@@ -151,7 +151,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.general.selfIllumEnabled = true;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (_modelSceneNode->isLightingEnabled() && !mesh->hasLightmapTexture() && !_modelNode->isSelfIllumEnabled()) {
+        if (_modelSceneNode->isLightingEnabled() && !mesh->hasLightmapTexture() && !_modelNode->isSelfIllumEnabled() && !mesh->diffuseTexture()->isAdditive()) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.lightingEnabled = true;
