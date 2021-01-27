@@ -101,6 +101,12 @@ void GUI::loadBackground(BackgroundType type) {
         case BackgroundType::Load:
             resRef += "load";
             break;
+        case BackgroundType::Computer0:
+            resRef += "comp0";
+            break;
+        case BackgroundType::Computer1:
+            resRef += "comp1";
+            break;
         default:
             return;
     }

@@ -35,7 +35,9 @@ enum class ControlType {
 enum class BackgroundType {
     None,
     Menu,
-    Load
+    Load,
+    Computer0,
+    Computer1
 };
 
 } // namespace gui
