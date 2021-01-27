@@ -102,6 +102,7 @@ public:
     scene::SceneGraph &sceneGraph();
     ObjectFactory &objectFactory();
     std::shared_ptr<Module> module() const;
+    HUD &hud() const { return *_hud; }
     Party &party();
     CharacterGeneration &characterGeneration();
     CameraType cameraType() const;

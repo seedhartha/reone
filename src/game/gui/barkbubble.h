@@ -17,12 +17,9 @@
 
 #pragma once
 
-#include "../../resource/types.h"
-
-#include "barkbubble.h"
-#include "debugoverlay.h"
 #include "gui.h"
-#include "selectoverlay.h"
+
+#include "../../common/timer.h"
 
 namespace reone {
 
@@ -30,32 +27,18 @@ namespace game {
 
 class Game;
 
-class HUD : public GameGUI {
+class BarkBubble : public GameGUI {
 public:
-    HUD(Game *game);
+    BarkBubble(Game *game);
 
     void load() override;
-
-    bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() const override;
 
-    void onClick(const std::string &control) override;
-
-    BarkBubble &barkBubble() const { return *_barkBubble; }
+    void setBarkText(const std::string &text, float duration);
 
 private:
-    Game *_game { nullptr };
-    SelectionOverlay _select;
-    DebugOverlay _debug;
-    std::unique_ptr<BarkBubble> _barkBubble;
-
-    void showCombatHud();
-    void hideCombatHud();
-    void refreshActionQueueItems() const;
-
-    void drawHealth(int memberIndex) const;
-    void drawMinimap() const;
+    std::string _barkText;
+    Timer _timer;
 };
 
 } // namespace game

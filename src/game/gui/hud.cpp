@@ -56,8 +56,12 @@ HUD::HUD(Game *game) :
 
 void HUD::load() {
     GUI::load();
+
     _debug.load();
     _select.load();
+
+    _barkBubble = make_unique<BarkBubble>(_game);
+    _barkBubble->load();
 
     hideControl("BTN_CLEARALL");
     hideControl("BTN_SWAPWEAPONS");
@@ -187,13 +191,11 @@ void HUD::update(float dt) {
     }
 
     _select.update();
+    _barkBubble->update(dt);
 }
 
 void HUD::render() const {
     GUI::render();
-
-    _select.render();
-    _debug.render();
 
     drawMinimap();
 
@@ -201,6 +203,10 @@ void HUD::render() const {
     for (int i = 0; i < party.size(); ++i) {
         drawHealth(i);
     }
+
+    _barkBubble->render();
+    _select.render();
+    _debug.render();
 }
 
 void HUD::drawMinimap() const {
