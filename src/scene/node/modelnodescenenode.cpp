@@ -151,19 +151,22 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.general.selfIllumEnabled = true;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (_modelSceneNode->isLightingEnabled()) {
+        if (_modelSceneNode->isLightingEnabled() && !mesh->hasLightmapTexture() && !_modelNode->isSelfIllumEnabled()) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.lightingEnabled = true;
             locals.lighting = Shaders::instance().lightingUniforms();
+            locals.lighting->meshDiffuseColor = glm::vec4(mesh->diffuseColor(), 1.0f);
+            locals.lighting->meshAmbientColor = glm::vec4(mesh->ambientColor(), 1.0f);
             locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
             locals.lighting->lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < locals.lighting->lightCount; ++i) {
                 ShaderLight &shaderLight = locals.lighting->lights[i];
                 shaderLight.position = lights[i]->absoluteTransform()[3];
-                shaderLight.radius = lights[i]->radius();
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
+                shaderLight.radius = lights[i]->radius();
+                shaderLight.multiplier = lights[i]->multiplier();
             }
         }
         shared_ptr<Texture> diffuseTexture(mesh->diffuseTexture());

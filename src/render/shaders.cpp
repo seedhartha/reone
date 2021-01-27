@@ -52,6 +52,7 @@ struct Light {
     vec4 position;
     vec4 color;
     float radius;
+    float multiplier;
 };
 
 layout(std140) uniform General {
@@ -81,6 +82,8 @@ layout(std140) uniform General {
 };
 
 layout(std140) uniform Lighting {
+    vec4 uMeshDiffuseColor;
+    vec4 uMeshAmbientColor;
     vec4 uAmbientLightColor;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
@@ -377,7 +380,7 @@ void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color, out 
 }
 
 void applyLighting(vec3 normal, float shadow, inout vec3 color) {
-    vec3 ambient = uAmbientLightColor.rgb * color;
+    vec3 ambient = uAmbientLightColor.rgb * uMeshAmbientColor.rgb * color;
 
     if (uLightCount == 0) {
         color = ambient;
@@ -398,8 +401,8 @@ void applyLighting(vec3 normal, float shadow, inout vec3 color) {
         float attenuation = clamp(1.0 - distance / uLights[i].radius, 0.0, 1.0);
         attenuation *= attenuation;
 
-        vec3 diffuse = uLights[i].color.rgb * diff * color * attenuation;
-        vec3 specular = uLights[i].color.rgb * spec * color * attenuation;
+        vec3 diffuse = diff * uLights[i].color.rgb * uMeshDiffuseColor.rgb * color * attenuation;
+        vec3 specular = spec * uLights[i].color.rgb * color * attenuation;
 
         result += (1.0 - 0.5 * shadow) * (diffuse + specular);
     }
