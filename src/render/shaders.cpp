@@ -447,15 +447,15 @@ void main() {
         applyBumpmapToNormal(normal, uv);
     }
 
+    if (uLightmapEnabled) {
+        applyLightmap(surfaceColor, uWater ? 0.2 : 1.0);
+    }
+
     float envmapAlpha = 1.0;
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
     } else if (uBumpyShinyEnabled) {
         applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
-    }
-
-    if (uLightmapEnabled) {
-        applyLightmap(surfaceColor, uWater ? 0.2 : 1.0);
     }
 
     float shadow = 0.0;
