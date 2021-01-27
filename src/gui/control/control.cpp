@@ -412,58 +412,53 @@ const glm::vec3 &Control::getBorderColor() const {
 }
 
 void Control::drawText(const string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const {
-    float textWidth = _text.font->measure(text);
-    int lineCount = static_cast<int>(glm::ceil(textWidth / static_cast<float>(size.x)));
-
     glm::ivec2 position;
     TextGravity gravity;
     glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
-    if (lineCount == 1) {
-        getTextPosition(position, 1, size, gravity);
+    vector<string> lines(breakText(text, size.x));
+    getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
+
+    for (auto &line : lines) {
         glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
-        _text.font->render(text, transform, color, gravity);
-
-    } else {
-        vector<string> lines(breakText(text, size.x));
-        getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
-
-        for (auto &line : lines) {
-            glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
-            _text.font->render(line, transform, color, gravity);
-            position.y += static_cast<int>(_text.font->height());
-        }
+        _text.font->render(line, transform, color, gravity);
+        position.y += static_cast<int>(_text.font->height());
     }
 }
 
 vector<string> Control::breakText(const string &text, int maxWidth) const {
-    vector<string> tokens;
-    boost::split(tokens, text, boost::is_space(), boost::token_compress_on);
+    vector<string> fixedLines;
+    boost::split(fixedLines, text, boost::is_any_of("\n"));
 
-    vector<string> lines;
-    string line;
+    vector<string> result;
 
-    for (auto &token : tokens) {
-        string candidate(line);
-        if (!candidate.empty()) {
-            candidate += " ";
+    for (auto &fixedLine : fixedLines) {
+        vector<string> tokens;
+        boost::split(tokens, fixedLine, boost::is_space(), boost::token_compress_on);
+
+        string buffer;
+        for (auto &token : tokens) {
+            string test(buffer);
+            if (!test.empty()) {
+                test += " ";
+            }
+            test += token;
+
+            if (_text.font->measure(test) < maxWidth) {
+                buffer = move(test);
+            } else {
+                result.push_back(buffer);
+                buffer = token;
+            }
         }
-        candidate += token;
 
-        if (_text.font->measure(candidate) < maxWidth) {
-            line = move(candidate);
-        } else {
-            lines.push_back(line);
-            line = token;
-            continue;
+        if (!buffer.empty()) {
+            boost::trim_right(buffer);
+            result.push_back(move(buffer));
         }
     }
-    if (!line.empty()) {
-        boost::trim_right(line);
-        lines.push_back(move(line));
-    }
 
-    return move(lines);
+    return move(result);
 }
 
 void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
