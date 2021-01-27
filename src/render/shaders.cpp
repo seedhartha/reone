@@ -371,11 +371,11 @@ void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
     normal = normalize(fragTanSpace * normal);
 }
 
-void applyEnvmap(samplerCube image, vec3 normal, float a, inout vec3 color, out float alpha) {
+void applyEnvmap(samplerCube image, vec3 normal, float strength, inout vec3 color, out float alpha) {
     vec3 I = normalize(fragPosition - uCameraPosition);
     vec3 R = reflect(I, normal);
     vec4 sample = texture(image, R);
-    color += sample.rgb * a;
+    color += strength * sample.rgb;
     alpha = sample.a;
 }
 
@@ -442,21 +442,23 @@ void main() {
     vec4 diffuseSample = texture(uDiffuse, uv);
     vec3 surfaceColor = diffuseSample.rgb;
     vec3 normal = normalize(fragNormal);
-    float envmapAlpha = 1.0;
-    float shadow = 0.0;
-    vec3 lightColor = vec3(0.0);
 
-    if (uLightmapEnabled) {
-        applyLightmap(surfaceColor, 1.0);
-    }
     if (uBumpmapEnabled) {
         applyBumpmapToNormal(normal, uv);
     }
+
+    float envmapAlpha = 1.0;
     if (uEnvmapEnabled) {
         applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
     } else if (uBumpyShinyEnabled) {
         applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
     }
+
+    if (uLightmapEnabled) {
+        applyLightmap(surfaceColor, uWater ? 0.2 : 1.0);
+    }
+
+    float shadow = 0.0;
     if (uShadowsEnabled) {
         shadow = getShadowValue();
     }
@@ -465,12 +467,15 @@ void main() {
     } else {
         surfaceColor *= 1.0 - 0.5 * shadow;
     }
-    float finalAlpha = uWater ? uWaterAlpha : uAlpha;
 
+    float finalAlpha = uAlpha;
     if (!uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
     }
     fragColor = vec4(surfaceColor, finalAlpha);
+    if (uWater) {
+        fragColor *= uWaterAlpha;
+    }
 
     if (uSelfIllumEnabled) {
         vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
