@@ -101,6 +101,14 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
+    shared_ptr<Texture> diffuseTexture;
+    if (_modelSceneNode->hasTextureOverride()) {
+        diffuseTexture = _modelSceneNode->textureOverride();
+    }
+    if (!diffuseTexture) {
+        diffuseTexture = mesh->diffuseTexture();
+    }
+
     LocalUniforms locals;
     locals.general.model = _absoluteTransform;
     locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
@@ -151,7 +159,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.general.selfIllumEnabled = true;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (_modelSceneNode->isLightingEnabled() && !mesh->hasLightmapTexture() && !_modelNode->isSelfIllumEnabled() && !mesh->diffuseTexture()->isAdditive()) {
+        if (_modelSceneNode->isLightingEnabled() &&
+            !mesh->hasLightmapTexture() &&
+            !_modelNode->isSelfIllumEnabled() &&
+            (!diffuseTexture || !diffuseTexture->isAdditive())) {
+
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.lightingEnabled = true;
@@ -169,7 +181,6 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 shaderLight.multiplier = lights[i]->multiplier();
             }
         }
-        shared_ptr<Texture> diffuseTexture(mesh->diffuseTexture());
         if (diffuseTexture) {
             float waterAlpha = diffuseTexture->features().waterAlpha;
             locals.general.uvOffset = _uvOffset;
@@ -181,7 +192,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     ShaderProgram program = shadowPass ? ShaderProgram::DepthDepth : ShaderProgram::ModelModel;
     Shaders::instance().activate(program, locals);
 
-    mesh->render(_modelSceneNode->textureOverride());
+    mesh->render(diffuseTexture);
 }
 
 float ModelNodeSceneNode::distanceTo(const glm::vec3 &point) const {

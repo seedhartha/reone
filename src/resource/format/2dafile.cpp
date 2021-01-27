@@ -76,12 +76,16 @@ const TwoDaRow *TwoDaTable::findRowByColumnValue(const string &columnName, const
     return nullptr;
 }
 
-const string &TwoDaTable::getString(int row, const string &column) const {
+string TwoDaTable::getString(int row, const string &column, string defValue) const {
+    static string empty;
+
     if (row < 0 || row >= _rows.size()) {
-        throw out_of_range("2DA: row index out of range: " + to_string(row));
+        error("2DA: row index out of range: " + to_string(row));
+        return empty;
     }
     if (find(_headers.begin(), _headers.end(), column) == _headers.end()) {
-        throw logic_error("2DA: column not found: " + column);
+        error("2DA: column not found: " + column);
+        return empty;
     }
 
     return _rows[row].getString(column);
