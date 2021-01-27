@@ -62,6 +62,7 @@ private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
     std::shared_ptr<SpatialObject> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
+    std::vector<int> _activeReplies;
     int _autoPickReplyIdx { -1 };
     int _endEntryFlags { 0 };
     float _endEntryTimeout { 0.0f };
@@ -81,13 +82,13 @@ private:
 
     void onReplyClicked(int index);
 
-    bool handleKeyDown(SDL_Scancode key) override;
     bool handleKeyUp(SDL_Scancode key) override;
 
     glm::vec3 getTalkPosition(const SpatialObject &object) const;
     DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
     AnimationType getAnimationType(int ordinal) const;
+    float getCurrentEntryDuration() const;
 
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
@@ -96,8 +97,8 @@ private:
     void loadTopFrame();
     void loadBottomFrame();
 
-    void loadAnimatedCamera();
-    void loadCurrentEntry();
+    void loadCameraModel();
+    void loadCurrentEntry(bool start = false);
     void loadCurrentSpeaker();
     void loadReplies();
     void loadStartEntry();

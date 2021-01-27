@@ -29,7 +29,7 @@ namespace reone {
 namespace audio {
 
 void AudioStream::add(Frame &&frame) {
-    _duration += 1000.0f * (frame.samples.size() / static_cast<float>(frame.sampleRate));
+    _duration += frame.samples.size() / static_cast<float>(frame.sampleRate);
     _frames.push_back(move(frame));
 }
 

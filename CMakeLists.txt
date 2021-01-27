@@ -401,6 +401,7 @@ set(GAME_HEADERS
     src/game/enginetype/location.h
     src/game/enginetype/types.h
     src/game/game.h
+    src/game/gui/barkbubble.h
     src/game/gui/chargen/abilities.h
     src/game/gui/chargen/chargen.h
     src/game/gui/chargen/classselect.h
@@ -505,6 +506,7 @@ set(GAME_SOURCES
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp
+    src/game/gui/barkbubble.cpp
     src/game/gui/chargen/abilities.cpp
     src/game/gui/chargen/chargen.cpp
     src/game/gui/chargen/classselect.cpp
