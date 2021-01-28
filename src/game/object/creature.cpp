@@ -268,6 +268,9 @@ void Creature::playAnimation(const string &name, int flags, float speed, shared_
     doPlayAnimation(flags, [&]() {
         _animAction = actionToComplete;
         _model->playAnimation(name, flags, speed);
+        if (_headModel && (flags & AnimationFlags::propagateHead)) {
+            _headModel->playAnimation(name, flags & ~AnimationFlags::propagateHead, speed);
+        }
     });
 }
 
@@ -285,6 +288,9 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float
     doPlayAnimation(flags, [&]() {
         // TODO: scale should be computed from this creatures model and the animations model
         _model->playAnimation(anim, flags, speed, 1.0f);
+        if (_headModel && (flags & AnimationFlags::propagateHead)) {
+            _headModel->playAnimation(anim, flags & ~AnimationFlags::propagateHead, speed, 1.0f);
+        }
     });
 }
 

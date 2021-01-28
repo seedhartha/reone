@@ -25,6 +25,7 @@ struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int blend = 4; /**< blend previous animation into the next one */
     static constexpr int overlay = 8; /**< overlay next animation on top of the previous one */
+    static constexpr int propagateHead = 0x10; /**< propagate animation to the head model, if any */
 
     static constexpr int loopOverlay = loop | overlay;
     static constexpr int loopBlend = loop | blend;

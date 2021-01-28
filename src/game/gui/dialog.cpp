@@ -289,7 +289,7 @@ void DialogGUI::updateParticipantAnimations() {
             string animName(getStuntAnimationName(anim.animation));
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
-                participant.creature->playAnimation(animation);
+                participant.creature->playAnimation(animation, AnimationFlags::propagateHead);
             }
         } else {
             shared_ptr<Creature> participant;
@@ -304,7 +304,7 @@ void DialogGUI::updateParticipantAnimations() {
             }
             AnimationType animType = getStuntAnimationType(anim.animation);
             if (animType != AnimationType::Invalid) {
-                participant->playAnimation(animType);
+                participant->playAnimation(animType, AnimationFlags::propagateHead);
             }
         }
     }
