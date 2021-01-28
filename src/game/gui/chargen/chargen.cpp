@@ -212,7 +212,6 @@ void CharacterGeneration::setAttributesVisible(bool visible) {
 }
 
 void CharacterGeneration::startCustom() {
-    setAttributesVisible(true);
     _type = Type::Custom;
     _custom->setStep(0);
     openSteps();
@@ -263,6 +262,7 @@ void CharacterGeneration::openQuick() {
 }
 
 void CharacterGeneration::openCustom() {
+    setAttributesVisible(_custom->step() > 1);
     showControl("MODEL_LBL");
     changeScreen(CharGenScreen::Custom);
 }
