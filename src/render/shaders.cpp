@@ -199,6 +199,7 @@ const int BILLBOARD_RENDER_NORMAL = 1;
 const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
 const int BILLBOARD_RENDER_MOTION_BLUR = 3;
 const int BILLBOARD_RENDER_TO_LOCAL_Z = 4;
+const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 5;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
@@ -223,6 +224,9 @@ void main() {
 
     } else if (uBillboardRender == BILLBOARD_RENDER_MOTION_BLUR || uBillboardRender == BILLBOARD_RENDER_TO_LOCAL_Z) {
         position = uModel * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
+
+    } else if (uBillboardRender == BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR) {
+        position = uModel * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
 
     } else {
         vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);

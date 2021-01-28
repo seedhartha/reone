@@ -41,7 +41,8 @@ public:
         Normal = 1,
         BillboardToWorldZ = 2,
         MotionBlur = 3,
-        BillboardToLocalZ = 4
+        BillboardToLocalZ = 4,
+        AlignedToParticleDir = 5
     };
 
     enum class BlendType {

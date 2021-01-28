@@ -943,6 +943,8 @@ static Emitter::RenderType parseEmitterRender(const string &str) {
         result = Emitter::RenderType::MotionBlur;
     } else if (str == "Billboard_to_Local_Z") {
         result = Emitter::RenderType::BillboardToLocalZ;
+    } else if (str == "Aligned_to_Particle_Dir") {
+        result = Emitter::RenderType::AlignedToParticleDir;
     } else {
         warn("parseEmitterRender: unsupported value: " + str);
     }
