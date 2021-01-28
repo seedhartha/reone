@@ -48,6 +48,7 @@ public:
 
     void clearItems();
     void addItem(Item item);
+    void addTextLinesAsItems(const std::string &text);
 
     void clearSelection();
 

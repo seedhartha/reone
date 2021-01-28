@@ -21,6 +21,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/resources.h"
+
 #include "../../rp/classes.h"
 
 #include "../colorutil.h"
@@ -29,6 +32,7 @@
 
 using namespace std;
 
+using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -47,6 +51,28 @@ static const unordered_map<string, Skill> g_skillByAlias {
     { "TRE", Skill::TreatInjury }
 };
 
+static const unordered_map<string, Skill> g_skillByLabelTag {
+    { "COMPUTER_USE_LBL", Skill::ComputerUse },
+    { "DEMOLITIONS_LBL", Skill::Demolitions },
+    { "STEALTH_LBL", Skill::Stealth },
+    { "AWARENESS_LBL", Skill::Awareness },
+    { "PERSUADE_LBL", Skill::Persuade },
+    { "REPAIR_LBL", Skill::Repair },
+    { "SECURITY_LBL", Skill::Security },
+    { "TREAT_INJURY_LBL", Skill::TreatInjury }
+};
+
+static const unordered_map<Skill, int> g_descStrRefBySkill {
+    { Skill::ComputerUse, 244 },
+    { Skill::Demolitions, 246 },
+    { Skill::Stealth, 248  },
+    { Skill::Awareness, 250 },
+    { Skill::Persuade, 252 },
+    { Skill::Repair, 254 },
+    { Skill::Security, 256  },
+    { Skill::TreatInjury, 258 }
+};
+
 CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GameGUI(version, opts),
     _charGen(charGen) {
@@ -58,6 +84,16 @@ CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameVersion version, 
 
 void CharGenSkills::load() {
     GUI::load();
+
+    for (auto &skill : g_skillByLabelTag) {
+        configureControl(skill.first, [this](Control &control) {
+            control.setFocusable(true);
+            control.setHilightColor(getBaseColor(_version));
+        });
+    }
+
+    ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+    lbDesc.setProtoMatchContent(true);
 
     disableControl("COMPUTER_USE_POINTS_BTN");
     disableControl("DEMOLITIONS_POINTS_BTN");
@@ -153,13 +189,16 @@ void CharGenSkills::onClick(const string &control) {
         }
         _charGen->goToNextStep();
         _charGen->openSteps();
+
     } else if (control == "BTN_BACK") {
         _charGen->openSteps();
+
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
         Skill skill = getSkillByAlias(control.substr(0, 3));
         _skills.setRank(skill, _skills.getRank(skill) - 1);
         _points += getPointCost(skill);
         refreshControls();
+
     } else if (boost::ends_with(control, "_PLUS_BTN")) {
         Skill skill = getSkillByAlias(control.substr(0, 3));
         _points -= getPointCost(skill);
@@ -176,6 +215,19 @@ int CharGenSkills::getPointCost(Skill skill) const {
     ClassType clazz = _charGen->character().attributes().getEffectiveClass();
     shared_ptr<CreatureClass> creatureClass(Classes::instance().get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
+}
+
+void CharGenSkills::onFocusChanged(const string &control, bool focus) {
+    auto maybeSkill = g_skillByLabelTag.find(control);
+    if (maybeSkill != g_skillByLabelTag.end() && focus) {
+        auto maybeDescription = g_descStrRefBySkill.find(maybeSkill->second);
+        if (maybeDescription != g_descStrRefBySkill.end()) {
+            string description(Resources::instance().getString(maybeDescription->second));
+            ListBox &listBox = getControl<ListBox>("LB_DESC");
+            listBox.clearItems();
+            listBox.addTextLinesAsItems(description);
+        }
+    }
 }
 
 } // namespace game
