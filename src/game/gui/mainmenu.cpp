@@ -67,6 +67,7 @@ MainMenu::MainMenu(Game *game) :
             _backgroundType = BackgroundType::Menu;
             break;
     }
+
     _resolutionX = 800;
     _resolutionY = 600;
 }
