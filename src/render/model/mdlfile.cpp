@@ -941,6 +941,8 @@ static Emitter::RenderType parseEmitterRender(const string &str) {
         result = Emitter::RenderType::BillboardToWorldZ;
     } else if (str == "Motion_Blur") {
         result = Emitter::RenderType::MotionBlur;
+    } else if (str == "Billboard_to_Local_Z") {
+        result = Emitter::RenderType::BillboardToLocalZ;
     } else {
         warn("parseEmitterRender: unsupported value: " + str);
     }

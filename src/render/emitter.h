@@ -40,7 +40,8 @@ public:
         Invalid = 0,
         Normal = 1,
         BillboardToWorldZ = 2,
-        MotionBlur = 3
+        MotionBlur = 3,
+        BillboardToLocalZ = 4
     };
 
     enum class BlendType {
