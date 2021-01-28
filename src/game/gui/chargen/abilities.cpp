@@ -23,12 +23,16 @@
 
 #include "glm/common.hpp"
 
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/resources.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
 
 using namespace std;
 
+using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -49,6 +53,15 @@ static const unordered_map<string, Ability> g_abilityByAlias {
     { "CHA", Ability::Charisma }
 };
 
+static const unordered_map<Ability, int> g_descStrRefByAbility {
+    { Ability::Strength, 222 },
+    { Ability::Dexterity, 223 },
+    { Ability::Constitution, 224 },
+    { Ability::Intelligence, 226  },
+    { Ability::Wisdom, 225  },
+    { Ability::Charisma, 227 }
+};
+
 CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
     GameGUI(version, opts),
     _charGen(charGen) {
@@ -60,6 +73,17 @@ CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion ver
 
 void CharGenAbilities::load() {
     GUI::load();
+
+    static vector<string> labels { "STR_LBL", "DEX_LBL", "CON_LBL", "INT_LBL", "WIS_LBL", "CHA_LBL" };
+    for (auto &label : labels) {
+        configureControl(label, [this](Control &control) {
+            control.setFocusable(true);
+            control.setHilightColor(getBaseColor(_version));
+        });
+    }
+
+    ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+    lbDesc.setProtoMatchContent(true);
 
     disableControl("STR_POINTS_BTN");
     disableControl("DEX_POINTS_BTN");
@@ -149,6 +173,24 @@ void CharGenAbilities::onClick(const string &control) {
 
 void CharGenAbilities::updateCharacter() {
     _charGen->setAbilities(_abilities);
+}
+
+void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
+    ListBox &listBox = getControl<ListBox>("LB_DESC");
+    listBox.clearItems();
+
+    if (focus && control.size() == 7ll && boost::ends_with(control, "_LBL")) {
+        string alias(control.substr(0, 3));
+        auto maybeAbility = g_abilityByAlias.find(alias);
+        if (maybeAbility != g_abilityByAlias.end()) {
+            auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
+            if (maybeDescription != g_descStrRefByAbility.end()) {
+                ListBox::Item item;
+                item.text = Resources::instance().getString(maybeDescription->second);
+                listBox.addItem(move(item));
+            }
+        }
+    }
 }
 
 } // namespace game
