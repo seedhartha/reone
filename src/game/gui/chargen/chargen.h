@@ -127,6 +127,8 @@ private:
     gui::GUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
 
+    void setAttributesVisible(bool visible);
+
     // Loading
 
     void loadClassSelection();

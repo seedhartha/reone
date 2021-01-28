@@ -43,6 +43,13 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
+static const vector<string> g_attributesTags {
+    "LBL_VIT", "LBL_DEF",
+    "STR_AB_LBL", "DEX_AB_LBL", "CON_AB_LBL", "INT_AB_LBL", "WIS_AB_LBL", "CHA_AB_LBL",
+    "NEW_FORT_LBL" "NEW_REFL_LBL", "NEW_WILL_LBL",
+    "OLD_FORT_LBL", "OLD_REFL_LBL", "OLD_WILL_LBL"
+};
+
 CharacterGeneration::CharacterGeneration(Game *game) :
     GameGUI(game->version(), game->options().graphics),
     _game(game) {
@@ -56,6 +63,8 @@ CharacterGeneration::CharacterGeneration(Game *game) :
 void CharacterGeneration::load() {
     GUI::load();
 
+    hideControl("LBL_LEVEL");
+    hideControl("LBL_LEVEL_VAL");
     hideControl("VIT_ARROW_LBL");
     hideControl("DEF_ARROW_LBL");
     hideControl("FORT_ARROW_LBL");
@@ -65,7 +74,6 @@ void CharacterGeneration::load() {
     hideControl("NEW_LBL");
 
     setControlText("LBL_NAME", "");
-    setControlText("LBL_LEVEL_VAL", "1");
 
     loadClassSelection();
     loadQuickOrCustom();
@@ -192,17 +200,26 @@ void CharacterGeneration::changeScreen(CharGenScreen screen) {
 }
 
 void CharacterGeneration::openQuickOrCustom() {
+    setAttributesVisible(false);
     showControl("MODEL_LBL");
     changeScreen(CharGenScreen::QuickOrCustom);
 }
 
+void CharacterGeneration::setAttributesVisible(bool visible) {
+    for (auto &tag : g_attributesTags) {
+        setControlVisible(tag, visible);
+    }
+}
+
 void CharacterGeneration::startCustom() {
+    setAttributesVisible(true);
     _type = Type::Custom;
     _custom->setStep(0);
     openSteps();
 }
 
 void CharacterGeneration::startQuick() {
+    setAttributesVisible(true);
     _type = Type::Quick;
     _quick->setStep(0);
     openSteps();
