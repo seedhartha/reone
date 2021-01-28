@@ -17,43 +17,23 @@
 
 #pragma once
 
-#include <string>
-
-#include "../../scene/node/modelscenenode.h"
-#include "../../scene/scenegraph.h"
-
-#include "../types.h"
-
-#include "camera.h"
+#include "conversation.h"
 
 namespace reone {
 
 namespace game {
 
-const float kDefaultAnimCamFOV = 55.0f;
-
-class AnimatedCamera : public Camera {
+class ComputerGUI : public Conversation {
 public:
-    AnimatedCamera(scene::SceneGraph *sceneGraph, float aspect);
+    ComputerGUI(Game *game);
 
-    void update(float dt) override;
-
-    void playAnimation(int animNumber);
-
-    bool isAnimationFinished() const;
-
-    void setModel(const std::shared_ptr<render::Model> &model);
-    void setFieldOfView(float fovy);
+    void load() override;
 
 private:
-    scene::SceneGraph *_sceneGraph { nullptr };
-    float _aspect { 1.0f };
-    std::unique_ptr<scene::ModelSceneNode> _model;
-    float _fovy { kDefaultAnimCamFOV };
-    float _zNear { 0.1f };
-    float _zFar { 10000.0f };
+    void setMessage(std::string message) override;
 
-    void updateProjection();
+    void configureMessage();
+    void configureReplies();
 };
 
 } // namespace game

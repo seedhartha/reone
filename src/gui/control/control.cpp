@@ -515,11 +515,19 @@ void Control::render3D(const glm::ivec2 &offset) const {
     _pipeline->render(offset);
 }
 
-void Control::stretch(float x, float y) {
-    _extent.left = static_cast<int>(_extent.left * x);
-    _extent.top = static_cast<int>(_extent.top * y);
-    _extent.width = static_cast<int>(_extent.width * x);
-    _extent.height = static_cast<int>(_extent.height * y);
+void Control::stretch(float x, float y, int mask) {
+    if (mask & kStretchLeft) {
+        _extent.left = static_cast<int>(_extent.left * x);
+    }
+    if (mask & kStretchTop) {
+        _extent.top = static_cast<int>(_extent.top * y);
+    }
+    if (mask & kStretchWidth) {
+        _extent.width = static_cast<int>(_extent.width * x);
+    }
+    if (mask & kStretchHeight) {
+        _extent.height = static_cast<int>(_extent.height * y);
+    }
     updateTransform();
 }
 

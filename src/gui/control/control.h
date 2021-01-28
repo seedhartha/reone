@@ -36,7 +36,6 @@
 namespace reone {
 
 namespace gui {
-
 class GUI;
 
 /**
@@ -44,6 +43,12 @@ class GUI;
  */
 class Control {
 public:
+    static constexpr int kStretchLeft = 1;
+    static constexpr int kStretchTop = 2;
+    static constexpr int kStretchWidth = 4;
+    static constexpr int kStretchHeight = 8;
+    static constexpr int kStretchAll = kStretchLeft | kStretchTop | kStretchWidth | kStretchHeight;
+
     enum class TextAlign {
         LeftCenter = 9,
         CenterBottom = 10,
@@ -95,7 +100,13 @@ public:
 
     virtual void load(const resource::GffStruct &gffs);
     virtual void update(float dt);
-    virtual void stretch(float x, float y);
+
+    /**
+     * Stretches this control in both directions.
+     *
+     * @param mask bitmask, specifying which components to stretch
+     */
+    virtual void stretch(float x, float y, int mask = kStretchAll);
 
     bool isClickable() const;
     bool isDisabled() const;

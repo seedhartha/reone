@@ -67,10 +67,9 @@ public:
         std::vector<ParticipantAnimation> animations;
     };
 
-    Dialog() = default;
+    Dialog(const std::string &resRef);
 
-    void reset();
-    void load(const std::string &resRef, const resource::GffStruct &dlg);
+    void load(const resource::GffStruct &dlg);
 
     bool isSkippable() const;
     bool isAnimatedCutscene() const;
@@ -78,6 +77,7 @@ public:
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
 
+    const std::string &resRef() const { return _resRef; }
     const std::string &cameraModel() const;
     const std::vector<EntryReplyLink> &startEntries() const;
     const std::vector<Stunt> &stunts() const;
@@ -86,6 +86,7 @@ public:
     ComputerType computerType() const { return _computerType; }
 
 private:
+    std::string _resRef;
     bool _skippable { false };
     std::string _cameraModel;
     std::vector<EntryReplyLink> _startEntries;

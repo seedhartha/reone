@@ -72,12 +72,16 @@ bool AnimatedCamera::isAnimationFinished() const {
     return _model ? _model->isAnimationFinished() : false;
 }
 
-void AnimatedCamera::setModel(const string &resRef) {
-    if (_modelResRef == resRef) return;
+void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
+    if ((_model && _model->model() == model) ||
+        (!_model && !model)) return;
 
-    _modelResRef = resRef;
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(resRef));
-    _model->attach("camerahook", _sceneNode);
+    if (model) {
+        _model = make_unique<ModelSceneNode>(_sceneGraph, model);
+        _model->attach("camerahook", _sceneNode);
+    } else {
+        _model.reset();
+    }
 }
 
 void AnimatedCamera::setFieldOfView(float fovy) {
