@@ -171,6 +171,7 @@ set(RENDER_HEADERS
     src/render/texture.h
     src/render/textures.h
     src/render/textureutil.h
+    src/render/textutil.h
     src/render/types.h
     src/render/walkmesh.h
     src/render/walkmeshes.h
@@ -204,6 +205,7 @@ set(RENDER_SOURCES
     src/render/texture.cpp
     src/render/textures.cpp
     src/render/textureutil.cpp
+    src/render/textutil.cpp
     src/render/walkmesh.cpp
     src/render/walkmeshes.cpp
     src/render/window.cpp)

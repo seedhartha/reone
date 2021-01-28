@@ -52,6 +52,9 @@ void QuickOrCustom::load() {
     if (_version == GameVersion::KotOR) {
         setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
+
+    auto &lbDesc = getControl<ListBox>("LB_DESC");
+    lbDesc.setProtoMatchContent(true);
 }
 
 void QuickOrCustom::onClick(const string &control) {
@@ -79,7 +82,7 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
         ListBox::Item item;
         item.text = text;
 
-        ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+        auto &lbDesc = getControl<ListBox>("LB_DESC");
         lbDesc.clearItems();
         lbDesc.addItem(move(item));
     }

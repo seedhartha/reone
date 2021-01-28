@@ -284,10 +284,10 @@ void GUI::update(float dt) {
 
 void GUI::render() const {
     if (_background) drawBackground();
-    if (_rootControl) _rootControl->render(_rootOffset);
+    if (_rootControl) _rootControl->render(_rootOffset, _rootControl->textLines());
 
     for (auto &control : _controls) {
-        control->render(_controlOffset);
+        control->render(_controlOffset, control->textLines());
     }
 }
 

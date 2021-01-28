@@ -43,7 +43,7 @@ void ImageButton::load(const GffStruct &gffs) {
 
 void ImageButton::render(
     const glm::ivec2 &offset,
-    const string &textOverride,
+    const vector<string> &text,
     const string &iconText,
     const shared_ptr<Texture> &iconTexture,
     const shared_ptr<Texture> &iconFrame) const {
@@ -63,8 +63,7 @@ void ImageButton::render(
 
     drawIcon(offset, iconText, iconTexture, iconFrame);
 
-    if (!textOverride.empty() || !_text.text.empty()) {
-        string text(!textOverride.empty() ? textOverride : _text.text);
+    if (!text.empty()) {
         drawText(text, borderOffset, size);
     }
 }

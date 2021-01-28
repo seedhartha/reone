@@ -53,6 +53,8 @@ void ComputerGUI::load() {
 
 void ComputerGUI::configureMessage() {
     auto &message = getControl<ListBox>(kControlTagMessage);
+    message.setProtoMatchContent(true);
+
     Control &protoItem = message.protoItem();
     protoItem.setHilightColor(getHilightColor(_version));
     protoItem.setTextColor(getBaseColor(_version));
@@ -60,6 +62,8 @@ void ComputerGUI::configureMessage() {
 
 void ComputerGUI::configureReplies() {
     auto &replies = getControl<ListBox>(kControlTagReplies);
+    replies.setProtoMatchContent(true);
+
     Control &protoItem = replies.protoItem();
     protoItem.setHilightColor(getHilightColor(_version));
     protoItem.setTextColor(getBaseColor(_version));

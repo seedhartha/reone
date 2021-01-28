@@ -27,6 +27,7 @@
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
+#include "../../render/textutil.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -165,6 +166,15 @@ void Control::loadText(const GffStruct &gffs) {
 
     _text.color = gffs.getVector("COLOR");
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
+
+    updateTextLines();
+}
+
+void Control::updateTextLines() {
+    _textLines.clear();
+    if (_text.font && !_text.text.empty()) {
+        _textLines = breakText(_text.text, *_text.font, _extent.width);
+    }
 }
 
 void Control::loadHilight(const GffStruct &gffs) {
@@ -213,7 +223,7 @@ void Control::update(float dt) {
     }
 }
 
-void Control::render(const glm::ivec2 &offset, const string &textOverride) const {
+void Control::render(const glm::ivec2 &offset, const vector<string> &text) const {
     if (!_visible) return;
 
     glm::ivec2 size(_extent.width, _extent.height);
@@ -223,8 +233,7 @@ void Control::render(const glm::ivec2 &offset, const string &textOverride) const
     } else if (_border) {
         drawBorder(*_border, offset, size);
     }
-    if (!textOverride.empty() || !_text.text.empty()) {
-        string text(!textOverride.empty() ? textOverride : _text.text);
+    if (!text.empty()) {
         drawText(text, offset, size);
     }
 }
@@ -411,54 +420,20 @@ const glm::vec3 &Control::getBorderColor() const {
     return (_focus && _hilight) ? _hilight->color : _border->color;
 }
 
-void Control::drawText(const string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const {
+void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) const {
     glm::ivec2 position;
     TextGravity gravity;
-    glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
-
-    vector<string> lines(breakText(text, size.x));
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
 
+    glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
+
     for (auto &line : lines) {
-        glm::mat4 transform(glm::translate(glm::mat4(1.0f), glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f)));
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f));
+
         _text.font->render(line, transform, color, gravity);
         position.y += static_cast<int>(_text.font->height());
     }
-}
-
-vector<string> Control::breakText(const string &text, int maxWidth) const {
-    vector<string> fixedLines;
-    boost::split(fixedLines, text, boost::is_any_of("\n"));
-
-    vector<string> result;
-
-    for (auto &fixedLine : fixedLines) {
-        vector<string> tokens;
-        boost::split(tokens, fixedLine, boost::is_space(), boost::token_compress_on);
-
-        string buffer;
-        for (auto &token : tokens) {
-            string test(buffer);
-            if (!test.empty()) {
-                test += " ";
-            }
-            test += token;
-
-            if (_text.font->measure(test) < maxWidth) {
-                buffer = move(test);
-            } else {
-                result.push_back(buffer);
-                buffer = token;
-            }
-        }
-
-        if (!buffer.empty()) {
-            boost::trim_right(buffer);
-            result.push_back(move(buffer));
-        }
-    }
-
-    return move(result);
 }
 
 void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
@@ -571,6 +546,12 @@ void Control::setFocusable(bool focusable) {
     _focusable = focusable;
 }
 
+void Control::setHeight(int height) {
+    _extent.height = height;
+    updateTransform();
+    updateTextLines();
+}
+
 void Control::setVisible(bool visible) {
     _visible = visible;
 }
@@ -586,6 +567,7 @@ void Control::setFocus(bool focus) {
 void Control::setExtent(const Extent &extent) {
     _extent = extent;
     updateTransform();
+    updateTextLines();
 }
 
 void Control::setBorder(const Border &border) {
@@ -638,14 +620,17 @@ void Control::setHilightColor(const glm::vec3 &color) {
 
 void Control::setText(const Text &text) {
     _text = text;
+    updateTextLines();
 }
 
 void Control::setTextMessage(const string &text) {
     _text.text = text;
+    updateTextLines();
 }
 
 void Control::setTextFont(const shared_ptr<Font> &font) {
     _text.font = font;
+    updateTextLines();
 }
 
 void Control::setTextColor(const glm::vec3 &color) {
