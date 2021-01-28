@@ -415,6 +415,8 @@ set(GAME_HEADERS
     src/game/gui/chargen/skills.h
     src/game/gui/colorutil.h
     src/game/gui/container.h
+    src/game/gui/conversation.h
+    src/game/gui/computer.h
     src/game/gui/debugoverlay.h
     src/game/gui/dialog.h
     src/game/gui/gui.h
@@ -520,6 +522,8 @@ set(GAME_SOURCES
     src/game/gui/chargen/skills.cpp
     src/game/gui/colorutil.cpp
     src/game/gui/container.cpp
+    src/game/gui/conversation.cpp
+    src/game/gui/computer.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
     src/game/gui/gui.cpp

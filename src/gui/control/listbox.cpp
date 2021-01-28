@@ -157,18 +157,24 @@ void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const
     }
 
     if (_scrollBar) {
-        ScrollBar &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
+        auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setCanScrollUp(_itemOffset > 0);
         scrollBar.setCanScrollDown(_items.size() - _itemOffset > _slotCount);
         scrollBar.render(offset, textOverride);
     }
 }
 
-void ListBox::stretch(float x, float y) {
-    Control::stretch(x, y);
+void ListBox::stretch(float x, float y, int mask) {
+    Control::stretch(x, y, mask);
 
-    if (_protoItem) _protoItem->stretch(x, 1.0f);
-    if (_scrollBar) _scrollBar->stretch(1.0f, y);
+    if (_protoItem) {
+        // Do not change height of the proto item
+        _protoItem->stretch(x, y, mask & ~kStretchHeight);
+    }
+    if (_scrollBar) {
+        // Do not change width of the scroll bar
+        _scrollBar->stretch(x, y, mask & ~kStretchWidth);
+    }
 }
 
 void ListBox::setFocus(bool focus) {

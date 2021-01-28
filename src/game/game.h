@@ -33,6 +33,7 @@
 #include "console.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
+#include "gui/computer.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
@@ -186,7 +187,7 @@ private:
         CharacterGeneration,
         InGame,
         InGameMenu,
-        Dialog,
+        Conversation,
         Container,
         PartySelection,
         SaveLoad
@@ -211,6 +212,7 @@ private:
     int _runScriptVar { -1 };
     ScriptRunner _scriptRunner;
     bool _paused { false };
+    Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
 
     // Modules
 
@@ -229,6 +231,7 @@ private:
     std::unique_ptr<HUD> _hud;
     std::unique_ptr<InGameMenu> _inGame;
     std::unique_ptr<DialogGUI> _dialog;
+    std::unique_ptr<ComputerGUI> _computer;
     std::unique_ptr<Container> _container;
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
@@ -286,6 +289,7 @@ private:
     void loadCharacterGeneration();
     void loadContainer();
     void loadDialog();
+    void loadComputer();
     void loadHUD();
     void loadInGame();
     void loadLoadingScreen();

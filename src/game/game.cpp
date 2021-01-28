@@ -195,6 +195,9 @@ void Game::loadModule(const string &name, string entry) {
         if (!_dialog) {
             loadDialog();
         }
+        if (!_computer) {
+            loadComputer();
+        }
         if (!_container) {
             loadContainer();
         }
@@ -382,6 +385,11 @@ void Game::loadDialog() {
     _dialog->load();
 }
 
+void Game::loadComputer() {
+    _computer = make_unique<ComputerGUI>(this);
+    _computer->load();
+}
+
 void Game::loadContainer() {
     _container = make_unique<Container>(this);
     _container->load();
@@ -414,8 +422,8 @@ GUI *Game::getScreenGUI() const {
             return _hud.get();
         case GameScreen::InGameMenu:
             return _inGame.get();
-        case GameScreen::Dialog:
-            return _dialog.get();
+        case GameScreen::Conversation:
+            return _conversation;
         case GameScreen::Container:
             return _container.get();
         case GameScreen::PartySelection:
@@ -461,7 +469,7 @@ void Game::update() {
     }
     updateCamera(dt);
 
-    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
+    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule) {
         _module->update(dt);
     }
@@ -598,10 +606,22 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 }
 
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
+    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Dlg));
+    if (!dlg) {
+        warn("Game: conversation not found: " + resRef);
+        return;
+    }
+
     stopMovement();
     setCursorType(CursorType::Default);
-    changeScreen(GameScreen::Dialog);
-    _dialog->startDialog(owner, resRef);
+    changeScreen(GameScreen::Conversation);
+
+    auto dialog = make_shared<Dialog>(resRef);
+    dialog->load(*dlg);
+
+    bool computerConversation = dialog->conversationType() == ConversationType::Computer;
+    _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
+    _conversation->start(dialog, owner);
 }
 
 void Game::stopMovement() {
@@ -642,9 +662,9 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::updateCamera(float dt) {
     switch (_screen) {
-        case GameScreen::Dialog: {
+        case GameScreen::Conversation: {
             int cameraId;
-            CameraType cameraType = _dialog->getCamera(cameraId);
+            CameraType cameraType = _conversation->getCamera(cameraId);
             if (cameraType == CameraType::Static) {
                 _module->area()->setStaticCamera(cameraId);
             }

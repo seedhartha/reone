@@ -31,14 +31,10 @@ namespace reone {
 
 namespace game {
 
-void Dialog::reset() {
-    _entries.clear();
-    _replies.clear();
-    _startEntries.clear();
-    _endScript.clear();
+Dialog::Dialog(const string &resRef) : _resRef(resRef) {
 }
 
-void Dialog::load(const string &resRef, const GffStruct &dlg) {
+void Dialog::load(const GffStruct &dlg) {
     _skippable = dlg.getBool("Skippable");
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
