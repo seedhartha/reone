@@ -79,12 +79,9 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
         } else if (control == "CUST_CHAR_BTN") {
             text = Resources::instance().getString(kStrRefCustomHelpText);
         }
-        ListBox::Item item;
-        item.text = text;
-
         auto &lbDesc = getControl<ListBox>("LB_DESC");
         lbDesc.clearItems();
-        lbDesc.addItem(move(item));
+        lbDesc.addTextLinesAsItems(text);
     }
 }
 

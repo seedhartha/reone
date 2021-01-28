@@ -41,6 +41,7 @@ private:
     int _points { 0 };
 
     void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 
     void refreshControls();
     void updateCharacter();

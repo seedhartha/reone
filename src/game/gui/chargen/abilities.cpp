@@ -185,18 +185,16 @@ void CharGenAbilities::updateCharacter() {
 }
 
 void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
-    ListBox &listBox = getControl<ListBox>("LB_DESC");
-    listBox.clearItems();
-
     if (focus && control.size() == 7ll && boost::ends_with(control, "_LBL")) {
         string alias(control.substr(0, 3));
         auto maybeAbility = g_abilityByAlias.find(alias);
         if (maybeAbility != g_abilityByAlias.end()) {
             auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
             if (maybeDescription != g_descStrRefByAbility.end()) {
-                ListBox::Item item;
-                item.text = Resources::instance().getString(maybeDescription->second);
-                listBox.addItem(move(item));
+                string description(Resources::instance().getString(maybeDescription->second));
+                ListBox &listBox = getControl<ListBox>("LB_DESC");
+                listBox.clearItems();
+                listBox.addTextLinesAsItems(description);
             }
         }
     }

@@ -59,6 +59,20 @@ void ListBox::addItem(Item item) {
     updateItemSlots();
 }
 
+void ListBox::addTextLinesAsItems(const string &text) {
+    if (!_protoItem) return;
+
+    vector<string> lines(breakText(text, *_protoItem->text().font, _protoItem->extent().width));
+    for (auto &line : lines) {
+        Item item;
+        item.text = line;
+        item._textLines = vector<string> { line };
+        _items.push_back(move(item));
+    }
+
+    updateItemSlots();
+}
+
 void ListBox::clearSelection() {
     _hilightedIndex = -1;
 }
