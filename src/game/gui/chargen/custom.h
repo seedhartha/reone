@@ -33,6 +33,8 @@ public:
 
     void goToNextStep();
 
+    int step() const { return _step; }
+
     void setStep(int step);
 
 private:
