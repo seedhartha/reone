@@ -37,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kDefaultEntryDuration = 1000.0f;
+static constexpr float kDefaultEntryDuration = 1.0f;
 
 static bool g_allEntriesSkippable = false;
 
@@ -187,7 +187,7 @@ void Conversation::scheduleEndOfEntry() {
             duration = animation->length();
         }
     } else if (_currentEntry->delay != -1) {
-        duration = 1000.0f * _currentEntry->delay;
+        duration = _currentEntry->delay;
     } else if (_currentVoice) {
         duration = _currentVoice->duration();
     }
