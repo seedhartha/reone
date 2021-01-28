@@ -46,8 +46,8 @@ public:
     SceneBuilder &depth(float zNear, float zFar);
     SceneBuilder &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> &supplier);
     SceneBuilder &modelScale(float scale);
-    SceneBuilder &modelOffset(const glm::vec2 &offset);
     SceneBuilder &cameraTransform(const glm::mat4 &transform);
+    SceneBuilder &cameraFromModelNode(const std::string &nodeName);
     SceneBuilder &ambientLightColor(const glm::vec3 &color);
 
 private:
@@ -59,6 +59,7 @@ private:
     float _modelScale { 1.0f };
     glm::vec2 _modelOffset { 0.0f };
     glm::mat4 _cameraTransform { 1.0f };
+    std::string _cameraNodeName;
     glm::vec3 _ambientLightColor { 0.0f };
 };
 

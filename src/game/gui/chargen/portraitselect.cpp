@@ -18,27 +18,36 @@
 #include "portraitselect.h"
 
 #include "../../../common/random.h"
+#include "../../../gui/scenebuilder.h"
+#include "../../../render/models.h"
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
+#include "../../../scene/node/modelscenenode.h"
 
 #include "../../blueprint/creature.h"
+#include "../../game.h"
 
 #include "../colorutil.h"
 
 #include "chargen.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-PortraitSelection::PortraitSelection(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+static constexpr float kModelScale = 0.2f;
+
+PortraitSelection::PortraitSelection(Game *game, CharacterGeneration *charGen) :
+    GameGUI(game->version(), game->options().graphics),
+    _game(game),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
@@ -69,6 +78,60 @@ void PortraitSelection::setButtonColors(const string &tag) {
     control.setHilight(move(hilight));
 }
 
+void PortraitSelection::loadHeadModel() {
+    Control &control = getControl("LBL_HEAD");
+    float aspect = control.extent().width / static_cast<float>(control.extent().height);
+
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
+        .modelScale(kModelScale)
+        .cameraFromModelNode(_charGen->character().gender() == Gender::Male ? "camerahookm" : "camerahookf")
+        .ambientLightColor(glm::vec3(0.2f))
+        .build());
+
+    control.setScene3D(move(scene));
+}
+
+shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
+    auto root = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("cghead_light"));
+
+    // Create a creature from the current portrait
+
+    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
+    unique_ptr<Creature> creature(objectFactory->newCreature());
+
+    auto character = make_shared<StaticCreatureBlueprint>(_charGen->character());
+    character->setAppearance(getAppearanceFromCurrentPortrait());
+    creature->load(character);
+    creature->setFacing(-glm::half_pi<float>());
+
+    // Attach creature model to the root scene node
+
+    shared_ptr<ModelSceneNode> creatureModel(creature->model());
+    glm::vec3 headPosition;
+    if (creatureModel->getNodeAbsolutePosition("camerahook", headPosition)) {
+        creature->setPosition(glm::vec3(0.0f, 0.0f, -headPosition.z));
+    }
+    creature->updateModelAnimation();
+    root->attach("cghead_light", creatureModel);
+
+
+    return move(root);
+}
+
+int PortraitSelection::getAppearanceFromCurrentPortrait() const {
+    switch (_charGen->character().attributes().getEffectiveClass()) {
+        case ClassType::Scoundrel:
+            return _portraits[_currentPortrait].appearanceS;
+        case ClassType::Soldier:
+            return _portraits[_currentPortrait].appearanceL;
+        default:
+            return _portraits[_currentPortrait].appearanceNumber;
+    }
+}
+
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
 
@@ -95,6 +158,7 @@ void PortraitSelection::updatePortraits() {
             _portraits.push_back(move(portrait));
         }
     }
+
     resetCurrentPortrait();
 }
 
@@ -109,6 +173,7 @@ void PortraitSelection::resetCurrentPortrait() {
     if (maybePortrait != _portraits.end()) {
         _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
         loadCurrentPortrait();
+        loadHeadModel();
     } else {
         _currentPortrait = -1;
     }
@@ -134,26 +199,16 @@ void PortraitSelection::onClick(const string &control) {
             _currentPortrait = portraitCount - 1;
         }
         loadCurrentPortrait();
+        loadHeadModel();
 
     } else if (control == "BTN_ARRR") {
         _currentPortrait = (_currentPortrait + 1) % portraitCount;
         loadCurrentPortrait();
+        loadHeadModel();
 
     } else if (control == "BTN_ACCEPT") {
         StaticCreatureBlueprint character(_charGen->character());
-        int appearance;
-        switch (character.attributes().getEffectiveClass()) {
-            case ClassType::Scoundrel:
-                appearance = _portraits[_currentPortrait].appearanceS;
-                break;
-            case ClassType::Soldier:
-                appearance = _portraits[_currentPortrait].appearanceL;
-                break;
-            default:
-                appearance = _portraits[_currentPortrait].appearanceNumber;
-                break;
-        }
-        character.setAppearance(appearance);
+        character.setAppearance(getAppearanceFromCurrentPortrait());
         _charGen->setCharacter(character);
         _charGen->goToNextStep();
         _charGen->openSteps();

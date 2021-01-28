@@ -18,6 +18,7 @@
 #include "classselect.h"
 
 #include "../../../gui/scenebuilder.h"
+#include "../../../render/models.h"
 #include "../../../resource/resources.h"
 
 #include "../../characterutil.h"
@@ -40,8 +41,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kModelScale = 1.05f;
-static constexpr float kModelOffsetY = 0.9f;
+static constexpr float kModelScale = 1.1f;
 
 static map<Gender, int> g_genderStrRefs {
     { Gender::Male, 646 },
@@ -171,19 +171,13 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    glm::mat4 cameraTransform(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-
     unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].character, sceneGraph); })
         .modelScale(kModelScale)
-        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
-        .cameraTransform(cameraTransform)
-        .ambientLightColor(glm::vec3(1.0f))
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.2f))
         .build());
 
     Control &control = getControl("3D_MODEL" + to_string(index + 1));
@@ -192,13 +186,17 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
+    auto root = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("cgbody_light"));
 
+    // Attach character model to the root model
+    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(character);
+    creature->setFacing(-glm::half_pi<float>());
     creature->updateModelAnimation();
+    root->attach("cgbody_light", creature->model());
 
-    return creature->model();
+    return move(root);
 }
 
 void ClassSelection::onFocusChanged(const string &control, bool focus) {
