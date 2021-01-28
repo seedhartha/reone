@@ -78,14 +78,22 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
     }
 
     string token(tokenBuffer.str());
+    string test(line);
     if (!token.empty()) {
-        if (!line.empty()) {
-            line += " ";
+        if (!test.empty()) {
+            test += " ";
         }
-        line += token;
+        test += token;
     }
-    if (!line.empty()) {
-        result.push_back(move(line));
+    if (!test.empty()) {
+        if (font.measure(test) <= maxWidth) {
+            result.push_back(test);
+        } else {
+            result.push_back(line);
+            if (!token.empty()) {
+                result.push_back(token);
+            }
+        }
     }
 
     return move(result);
