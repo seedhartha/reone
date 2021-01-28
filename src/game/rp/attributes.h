@@ -51,7 +51,9 @@ public:
     int getAggregateHitDie() const;
 
     CreatureAbilities &abilities();
+    const CreatureAbilities &abilities() const { return _abilities; }
     CreatureSkills &skills();
+    const CreatureSkills &skills() const { return _skills; }
 
     void setAbilities(CreatureAbilities abilities);
     void setSkills(CreatureSkills skills);
