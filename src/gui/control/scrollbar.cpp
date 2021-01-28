@@ -45,7 +45,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     }
 }
 
-void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
+void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) const {
     if (!_dir.image) return;
 
     setActiveTextureUnit(0);

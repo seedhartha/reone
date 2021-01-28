@@ -145,6 +145,8 @@ void DialogGUI::configureMessage() {
 
 void DialogGUI::configureReplies() {
     auto &replies = getControl<ListBox>(kControlTagReplies);
+    replies.setProtoMatchContent(true);
+
     Control &protoItem = replies.protoItem();
     protoItem.setHilightColor(getHilightColor(_version));
     protoItem.setTextColor(getBaseColor(_version));

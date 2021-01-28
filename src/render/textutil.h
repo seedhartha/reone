@@ -17,36 +17,21 @@
 
 #pragma once
 
-#include "control.h"
+#include <string>
+#include <vector>
 
 namespace reone {
 
-namespace gui {
+namespace render {
 
-class ImageButton : public Control {
-public:
-    ImageButton(GUI *gui);
+class Font;
 
-    void load(const resource::GffStruct &gffs) override;
+/**
+ * Breaks the specified text into multiple strings to not exceed the maximum
+ * width, when rendering using the specified font.
+ */
+std::vector<std::string> breakText(const std::string &text, Font &font, int maxWidth);
 
-    void render(
-        const glm::ivec2 &offset,
-        const std::vector<std::string> &text,
-        const std::string &iconText,
-        const std::shared_ptr<render::Texture> &iconTexture,
-        const std::shared_ptr<render::Texture> &iconFrame) const;
-
-private:
-    std::shared_ptr<render::Texture> _iconFrame;
-    std::shared_ptr<render::Font> _iconFont;
-
-    void drawIcon(
-        const glm::ivec2 &offset,
-        const std::string &iconText,
-        const std::shared_ptr<render::Texture> &iconTexture,
-        const std::shared_ptr<render::Texture> &iconFrame) const;
-};
-
-} // namespace gui
+} // namespace render
 
 } // namespace reone

@@ -118,6 +118,7 @@ public:
     const Border &hilight() const;
     const std::string &tag() const;
     const Text &text() const;
+    const std::vector<std::string> &textLines() const { return _textLines; }
 
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
@@ -129,6 +130,7 @@ public:
     virtual void setExtent(const Extent &extent);
     virtual void setFocus(bool focus);
     void setFocusable(bool focusable);
+    void setHeight(int height);
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);
     void setPadding(int padding);
@@ -150,7 +152,7 @@ public:
 
     // Rendering
 
-    virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
+    virtual void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const;
     void render3D(const glm::ivec2 &offset) const;
 
     // END Rendering
@@ -176,11 +178,12 @@ protected:
     glm::vec3 _discardColor { false };
     glm::vec3 _borderColorOverride { 1.0f };
     bool _useBorderColorOverride { false };
+    std::vector<std::string> _textLines;
 
     Control(GUI *, ControlType type);
 
     void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
-    void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;
+    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) const;
 
     virtual const glm::vec3 &getBorderColor() const;
 
@@ -190,12 +193,13 @@ private:
     Control(const Control &) = delete;
     Control &operator=(const Control &) = delete;
 
-    void updateTransform();
     void loadExtent(const resource::GffStruct &gffs);
     void loadBorder(const resource::GffStruct &gffs);
     void loadText(const resource::GffStruct &gffs);
     void loadHilight(const resource::GffStruct &gffs);
-    std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
+
+    void updateTransform();
+    void updateTextLines();
 
     void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, render::TextGravity &gravity) const;
 };

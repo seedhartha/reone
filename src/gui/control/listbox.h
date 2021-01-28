@@ -40,6 +40,8 @@ public:
         std::string iconText;
         std::shared_ptr<render::Texture> iconTexture;
         std::shared_ptr<render::Texture> iconFrame;
+
+        std::vector<std::string> _textLines;
     };
 
     ListBox(GUI *gui);
@@ -53,13 +55,14 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void render(const glm::ivec2 &offset, const std::string &textOverride) const override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const override;
     void stretch(float x, float y, int mask) override;
 
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
     void setProtoItemType(ControlType type);
     void setSelectionMode(SelectionMode mode);
+    void setProtoMatchContent(bool match);
 
     const Item &getItemAt(int index) const;
 
@@ -78,8 +81,10 @@ private:
     int _itemOffset { 0 };
     int _hilightedIndex { -1 };
     int _itemMargin { 0 };
+    bool _protoMatchContent { false }; /**< proto item height must match its content */
 
-    void updateItems();
+    void updateItemSlots();
+
     int getItemIndex(int y) const;
 };
 

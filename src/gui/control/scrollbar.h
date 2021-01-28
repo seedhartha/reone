@@ -28,7 +28,7 @@ public:
     ScrollBar(GUI *gui);
 
     void load(const resource::GffStruct &gffs) override;
-    void render(const glm::ivec2 &offset, const std::string &textOverride) const override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const override;
 
     void setCanScrollUp(bool scroll);
     void setCanScrollDown(bool scroll);
