@@ -26,6 +26,8 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/resources.h"
 
+#include "../../rp/classes.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -91,8 +93,6 @@ void CharGenAbilities::load() {
     disableControl("INT_POINTS_BTN");
     disableControl("WIS_POINTS_BTN");
     disableControl("CHA_POINTS_BTN");
-
-    disableControl("BTN_RECOMMENDED");
 }
 
 void CharGenAbilities::reset(bool newGame) {
@@ -158,11 +158,20 @@ void CharGenAbilities::onClick(const string &control) {
         }
     } else if (control == "BTN_BACK") {
         _charGen->openSteps();
+
+    } else if (control == "BTN_RECOMMENDED") {
+        ClassType classType = _charGen->character().attributes().getEffectiveClass();
+        shared_ptr<CreatureClass> clazz(Classes::instance().get(classType));
+        _abilities = clazz->defaultAttributes().abilities();
+        _points = 0;
+        refreshControls();
+
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
         _abilities.setScore(ability, _abilities.getScore(ability) - 1);
         _points += getPointCost(ability);
         refreshControls();
+
     } else if (boost::ends_with(control, "_PLUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
         _points -= getPointCost(ability);
