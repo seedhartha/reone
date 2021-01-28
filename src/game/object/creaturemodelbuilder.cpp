@@ -39,7 +39,8 @@ namespace reone {
 
 namespace game {
 
-static string g_headHookNode("headhook");
+static const string g_headHookNode("headhook");
+static const string g_maskHookNode("gogglehook");
 
 CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creature) {
     if (!creature) {
@@ -64,15 +65,28 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
         model->setTextureOverride(texture);
     }
 
+    // Mask
+
+    shared_ptr<Model> maskModel;
+    string maskModelName(getMaskModelName());
+    if (!maskModelName.empty()) {
+        maskModel = Models::instance().get(maskModelName);
+    }
+
     // Head
 
     string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
-        model->attach(g_headHookNode, headModel);
+        if (headModel) {
+            shared_ptr<ModelSceneNode> headSceneNode(model->attach(g_headHookNode, headModel));
+            if (headSceneNode && maskModel) {
+                headSceneNode->attach(g_maskHookNode, maskModel);
+            }
+        }
     }
 
-    // Right weapon
+    // Left weapon
 
     string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
     if (!leftWeaponModelName.empty()) {
@@ -170,6 +184,17 @@ string CreatureModelBuilder::getHeadModelName() const {
     boost::to_lower(modelName);
 
     return move(modelName);
+}
+
+string CreatureModelBuilder::getMaskModelName() const {
+    shared_ptr<Item> headItem(_creature->getEquippedItem(kInventorySlotHead));
+    if (!headItem) return "";
+
+    string modelName(boost::to_lower_copy(headItem->itemClass()));
+    modelName += str(boost::format("_%03d") % headItem->modelVariation());
+
+    return move(modelName);
+
 }
 
 string CreatureModelBuilder::getWeaponModelName(InventorySlot slot) const {
