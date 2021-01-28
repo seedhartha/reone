@@ -64,6 +64,7 @@ static bool validateEmitter(const Emitter &emitter) {
         case Emitter::RenderType::Normal:
         case Emitter::RenderType::BillboardToWorldZ:
         case Emitter::RenderType::MotionBlur:
+        case Emitter::RenderType::BillboardToLocalZ:
             break;
         default:
             warn("validateEmitter: unsupported render type: " + to_string(static_cast<int>(emitter.renderType())));

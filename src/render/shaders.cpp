@@ -198,6 +198,7 @@ static constexpr GLchar kSourceVertexBillboard[] = R"END(
 const int BILLBOARD_RENDER_NORMAL = 1;
 const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
 const int BILLBOARD_RENDER_MOTION_BLUR = 3;
+const int BILLBOARD_RENDER_TO_LOCAL_Z = 4;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
@@ -220,7 +221,7 @@ void main() {
             FORWARD * aPosition.y * uBillboardSize.y,
             1.0);
 
-    } else if (uBillboardRender == BILLBOARD_RENDER_MOTION_BLUR) {
+    } else if (uBillboardRender == BILLBOARD_RENDER_MOTION_BLUR || uBillboardRender == BILLBOARD_RENDER_TO_LOCAL_Z) {
         position = uModel * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
 
     } else {
