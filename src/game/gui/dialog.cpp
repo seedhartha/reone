@@ -54,8 +54,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kDefaultEntryDuration = 1000.0f;
-
 static const char kControlTagTopFrame[] = "TOP";
 static const char kControlTagBottomFrame[] = "BOTTOM";
 static const char kControlTagMessage[] = "LBL_MESSAGE";
