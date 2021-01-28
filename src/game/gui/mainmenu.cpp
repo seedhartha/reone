@@ -44,8 +44,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kKotorModelSize = 1.3f;
-static constexpr float kKotorModelOffsetY = 1.25f;
+static constexpr float kKotorModelSize = 1.4f;
 
 static const char kBlueprintResRefCarth[] = "p_carth";
 static const char kBlueprintResRefBastila[] = "p_bastilla";
@@ -95,16 +94,12 @@ void MainMenu::load() {
         const Control::Extent &extent = control.extent();
         float aspect = extent.width / static_cast<float>(extent.height);
 
-        glm::mat4 cameraTransform(1.0f);
-        cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-
         unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
             .aspect(aspect)
-            .depth(0.1f, 2.0f)
+            .depth(0.1f, 10.0f)
             .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
             .modelScale(kKotorModelSize)
-            .modelOffset(glm::vec2(0.0f, kKotorModelOffsetY))
-            .cameraTransform(cameraTransform)
+            .cameraFromModelNode("camerahook")
             .ambientLightColor(glm::vec3(0.1f))
             .build());
 
