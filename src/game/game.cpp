@@ -630,6 +630,7 @@ void Game::stopMovement() {
 }
 
 void Game::openContainer(const shared_ptr<SpatialObject> &container) {
+    stopMovement();
     setCursorType(CursorType::Default);
     _container->open(container);
     changeScreen(GameScreen::Container);
