@@ -42,7 +42,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 static bool g_allEntriesSkippable = false;
 
 Conversation::Conversation(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 }
 

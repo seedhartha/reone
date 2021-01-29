@@ -33,7 +33,7 @@ namespace game {
 
 static const char kBarkTextTag[] = "LBL_BARKTEXT";
 
-BarkBubble::BarkBubble(Game *game) : GameGUI(game->version(), game->options().graphics) {
+BarkBubble::BarkBubble(Game *game) : GameGUI(game->gameId(), game->options().graphics) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;
 }

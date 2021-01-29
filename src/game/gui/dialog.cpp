@@ -138,7 +138,7 @@ void DialogGUI::configureMessage() {
     Control::Extent extent(message.extent());
     extent.top = -_rootControl->extent().top;
     message.setExtent(move(extent));
-    message.setTextColor(getBaseColor(_version));
+    message.setTextColor(getBaseColor(_gameId));
 }
 
 void DialogGUI::configureReplies() {
@@ -146,8 +146,8 @@ void DialogGUI::configureReplies() {
     replies.setProtoMatchContent(true);
 
     Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_version));
-    protoItem.setTextColor(getBaseColor(_version));
+    protoItem.setHilightColor(getHilightColor(_gameId));
+    protoItem.setTextColor(getBaseColor(_gameId));
 }
 
 void DialogGUI::onStart() {

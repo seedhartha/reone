@@ -23,8 +23,8 @@ namespace reone {
 
 namespace resource {
 
-void StringProcessor::process(string &str, GameVersion ver) const {
-    if (ver == GameVersion::TheSithLords) {
+void StringProcessor::process(string &str, GameID ver) const {
+    if (ver == GameID::TSL) {
         stripDeveloperNotes(str);
     }
 }

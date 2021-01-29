@@ -32,12 +32,12 @@ namespace reone {
 namespace game {
 
 LoadingScreen::LoadingScreen(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("loadscreen");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {

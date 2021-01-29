@@ -43,7 +43,7 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 int Program::run() {
     initOptions();
     loadOptions();
-    initGameVersion();
+    determineGameID();
 
     switch (_command) {
         case Command::List:
@@ -130,9 +130,9 @@ void Program::loadOptions() {
     }
 }
 
-void Program::initGameVersion() {
+void Program::determineGameID() {
     fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
-    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
+    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
 void Program::initFileTool() {
@@ -143,7 +143,7 @@ void Program::initFileTool() {
             if (!fs::exists(_target)) {
                 throw runtime_error("Input file does not exist: " + _target);
             }
-            _tool = getFileToolByPath(_version, _target);
+            _tool = getFileToolByPath(_gameId, _target);
             break;
         default:
             throw logic_error("Unsupported file tool command: " + to_string(static_cast<int>(_command)));

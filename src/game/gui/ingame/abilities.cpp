@@ -31,7 +31,7 @@ namespace reone {
 namespace game {
 
 AbilitiesMenu::AbilitiesMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("abilities");
@@ -56,7 +56,7 @@ void AbilitiesMenu::load() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_version != GameVersion::KotOR) return;
+    if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.leader());

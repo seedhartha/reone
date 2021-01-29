@@ -43,12 +43,12 @@ static unordered_map<InGameMenu::Tab, string> g_tabTags {
 };
 
 InGameMenu::InGameMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("top");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     }

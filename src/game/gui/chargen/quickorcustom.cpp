@@ -37,8 +37,8 @@ namespace game {
 static constexpr int kStrRefQuickHelpText = 241;
 static constexpr int kStrRefCustomHelpText = 242;
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
@@ -49,7 +49,7 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
 void QuickOrCustom::load() {
     GUI::load();
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 

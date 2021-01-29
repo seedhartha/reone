@@ -64,8 +64,8 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     { Ability::Charisma, 227 }
 };
 
-CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("abchrgen");
@@ -80,7 +80,7 @@ void CharGenAbilities::load() {
     for (auto &label : labels) {
         configureControl(label, [this](Control &control) {
             control.setFocusable(true);
-            control.setHilightColor(getBaseColor(_version));
+            control.setHilightColor(getBaseColor(_gameId));
         });
     }
 

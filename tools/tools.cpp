@@ -43,7 +43,7 @@ void FileTool::convert(const fs::path &path, const fs::path &destPath) const {
     throwNotImplemented();
 }
 
-unique_ptr<FileTool> getFileToolByPath(GameVersion version, const fs::path &path) {
+unique_ptr<FileTool> getFileToolByPath(GameID gameId, const fs::path &path) {
     if (fs::is_directory(path)) {
         throw invalid_argument("path must not point to a directory");
     }

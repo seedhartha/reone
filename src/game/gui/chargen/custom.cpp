@@ -33,8 +33,8 @@ namespace reone {
 
 namespace game {
 
-CustomCharacterGeneration::CustomCharacterGeneration(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+CustomCharacterGeneration::CustomCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("custpnl");
@@ -46,7 +46,7 @@ void CustomCharacterGeneration::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlDiscardColor("LBL_BG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }

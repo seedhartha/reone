@@ -81,7 +81,7 @@ enum class ControllerType {
     ColorStart = 392
 };
 
-MdlFile::MdlFile(GameVersion version) : BinaryFile(kSignatureSize, kSignature), _version(version) {
+MdlFile::MdlFile(GameID gameId) : BinaryFile(kSignatureSize, kSignature), _gameId(gameId) {
 }
 
 void MdlFile::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
@@ -690,7 +690,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
 
     ignore(10);
 
-    if (_version == GameVersion::TheSithLords) ignore(8);
+    if (_gameId == GameID::TSL) ignore(8);
 
     uint32_t mdxDataOffset = readUint32();
     uint32_t vertCoordsOffset = readUint32();

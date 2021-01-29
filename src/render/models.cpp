@@ -35,8 +35,8 @@ Models &Models::instance() {
     return instance;
 }
 
-void Models::init(GameVersion version) {
-    _version = version;
+void Models::init(GameID gameId) {
+    _gameId = gameId;
 }
 
 void Models::invalidateCache() {
@@ -59,7 +59,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        MdlFile mdl(_version);
+        MdlFile mdl(_gameId);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
         if (model) {

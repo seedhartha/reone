@@ -51,7 +51,7 @@ static const vector<string> g_attributesTags {
 };
 
 CharacterGeneration::CharacterGeneration(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("maincg");
@@ -93,17 +93,17 @@ void CharacterGeneration::loadClassSelection() {
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(this, _version, _gfxOpts);
+    _quickOrCustom = make_unique<QuickOrCustom>(this, _gameId, _gfxOpts);
     _quickOrCustom->load();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(this, _version, _gfxOpts);
+    _quick = make_unique<QuickCharacterGeneration>(this, _gameId, _gfxOpts);
     _quick->load();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(this, _version, _gfxOpts);
+    _custom = make_unique<CustomCharacterGeneration>(this, _gameId, _gfxOpts);
     _custom->load();
 }
 
@@ -113,27 +113,27 @@ void CharacterGeneration::loadPortraitSelection() {
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(this, _version, _gfxOpts);
+    _abilities = make_unique<CharGenAbilities>(this, _gameId, _gfxOpts);
     _abilities->load();
 }
 
 void CharacterGeneration::loadSkills() {
-    _skills = make_unique<CharGenSkills>(this, _version, _gfxOpts);
+    _skills = make_unique<CharGenSkills>(this, _gameId, _gfxOpts);
     _skills->load();
 }
 
 void CharacterGeneration::loadFeats() {
-    _feats = make_unique<CharGenFeats>(this, _version, _gfxOpts);
+    _feats = make_unique<CharGenFeats>(this, _gameId, _gfxOpts);
     _feats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(this, _version, _gfxOpts);
+    _nameEntry = make_unique<NameEntry>(this, _gameId, _gfxOpts);
     _nameEntry->load();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(this, _version, _gfxOpts);
+    _levelUp = make_unique<LevelUpMenu>(this, _gameId, _gfxOpts);
     _levelUp->load();
 }
 
@@ -315,7 +315,7 @@ void CharacterGeneration::finish() {
         _game->openInGame();
 
     } else {
-        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_gameId == GameID::KotOR ? "end_m01aa" : "001ebo");
 
         auto character = make_shared<StaticCreatureBlueprint>(*_character);
         character->clearEquipment();
@@ -419,7 +419,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
         setControlText("NEW_REFL_LBL", to_string(throws.reflex));
         setControlText("NEW_WILL_LBL", to_string(throws.will));

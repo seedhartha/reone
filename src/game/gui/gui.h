@@ -28,7 +28,7 @@ namespace game {
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(resource::GameVersion version, const render::GraphicsOptions &options);
+    GameGUI(resource::GameID gameId, const render::GraphicsOptions &options);
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;

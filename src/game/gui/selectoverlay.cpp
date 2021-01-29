@@ -340,7 +340,7 @@ glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
         return red;
     }
 
-    return getBaseColor(_game->version());
+    return getBaseColor(_game->gameId());
 }
 
 } // namespace game

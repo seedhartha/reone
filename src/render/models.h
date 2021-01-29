@@ -35,13 +35,13 @@ class Models {
 public:
     static Models &instance();
 
-    void init(resource::GameVersion version);
+    void init(resource::GameID gameId);
     void invalidateCache();
 
     std::shared_ptr<Model> get(const std::string &resRef);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 
     Models() = default;

@@ -25,9 +25,9 @@ namespace reone {
 
 namespace game {
 
-glm::vec3 getBaseColor(resource::GameVersion version);
-glm::vec3 getHilightColor(resource::GameVersion version);
-glm::vec3 getDisabledColor(resource::GameVersion version);
+glm::vec3 getBaseColor(resource::GameID gameId);
+glm::vec3 getHilightColor(resource::GameID gameId);
+glm::vec3 getDisabledColor(resource::GameID gameId);
 
 } // namespace game
 

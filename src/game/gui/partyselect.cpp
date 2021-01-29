@@ -55,10 +55,10 @@ static map<int, string> g_portraitByAppearance = {
 };
 
 PartySelection::PartySelection(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";

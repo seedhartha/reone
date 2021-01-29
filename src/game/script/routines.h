@@ -45,7 +45,7 @@ class Routines : public script::IRoutineProvider {
 public:
     static Routines &instance();
 
-    void init(resource::GameVersion version, Game *game);
+    void init(resource::GameID gameId, Game *game);
     void deinit();
 
     const script::Routine &get(int index) override;
