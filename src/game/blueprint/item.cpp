@@ -61,14 +61,14 @@ void ItemBlueprint::load(Item &item) {
 
     string iconResRef;
 
-    if (item.isEquippable(kInventorySlotBody)) {
+    if (item.isEquippable(InventorySlot::body)) {
         item._baseBodyVariation = boost::to_lower_copy(baseItems->getString(baseItem, "bodyvar"));
         item._bodyVariation = _uti->getInt("BodyVariation", 1);
         item._textureVariation = _uti->getInt("TextureVar", 1);
 
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._textureVariation);
 
-    } else if (item.isEquippable(kInventorySlotRightWeapon)) {
+    } else if (item.isEquippable(InventorySlot::rightWeapon)) {
         item._modelVariation = _uti->getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
 

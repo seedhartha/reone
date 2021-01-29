@@ -84,16 +84,16 @@ bool TextInput::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
-    if (isDigitKey(key) && !(_mask & kTextInputDigits)) return false;
-    if (isLetterKey(key) && !(_mask & kTextInputLetters)) return false;
-    if (key.sym == SDLK_SPACE && !(_mask & kTextInputWhitespace)) return false;
+    if (isDigitKey(key) && !(_mask & TextInputFlags::digits)) return false;
+    if (isLetterKey(key) && !(_mask & TextInputFlags::letters)) return false;
+    if (key.sym == SDLK_SPACE && !(_mask & TextInputFlags::whitespace)) return false;
 
     bool underscore = key.sym == SDLK_MINUS && isShiftPressed(key);
     if (underscore ||
         key.sym == SDLK_COMMA ||
         key.sym == SDLK_PERIOD) {
 
-        return (_mask & kTextInputPunctuation) != 0;
+        return (_mask & TextInputFlags::punctuation) != 0;
     }
 
     return true;

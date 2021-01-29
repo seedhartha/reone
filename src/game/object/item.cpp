@@ -42,7 +42,7 @@ bool Item::isEquippable() const {
     return _equipableSlots != 0;
 }
 
-bool Item::isEquippable(InventorySlot slot) const {
+bool Item::isEquippable(int slot) const {
     return (_equipableSlots >> slot) & 1;
 }
 

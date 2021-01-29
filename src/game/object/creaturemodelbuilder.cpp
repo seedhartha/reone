@@ -88,7 +88,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
 
     // Left weapon
 
-    string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
+    string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
         if (leftWeaponModel) {
@@ -98,7 +98,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
 
     // Right weapon
 
-    string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
+    string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
         if (rightWeaponModel) {
@@ -115,7 +115,7 @@ string CreatureModelBuilder::getBodyModelName() const {
     if (_creature->modelType() == Creature::ModelType::Character) {
         column = "model";
 
-        shared_ptr<Item> bodyItem(_creature->getEquippedItem(kInventorySlotBody));
+        shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
         if (bodyItem) {
             string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
@@ -137,7 +137,7 @@ string CreatureModelBuilder::getBodyModelName() const {
 
 string CreatureModelBuilder::getBodyTextureName() const {
     string column;
-    shared_ptr<Item> bodyItem(_creature->getEquippedItem(kInventorySlotBody));
+    shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
 
     if (_creature->modelType() == Creature::ModelType::Character) {
         column = "tex";
@@ -187,7 +187,7 @@ string CreatureModelBuilder::getHeadModelName() const {
 }
 
 string CreatureModelBuilder::getMaskModelName() const {
-    shared_ptr<Item> headItem(_creature->getEquippedItem(kInventorySlotHead));
+    shared_ptr<Item> headItem(_creature->getEquippedItem(InventorySlot::head));
     if (!headItem) return "";
 
     string modelName(boost::to_lower_copy(headItem->itemClass()));
@@ -197,7 +197,7 @@ string CreatureModelBuilder::getMaskModelName() const {
 
 }
 
-string CreatureModelBuilder::getWeaponModelName(InventorySlot slot) const {
+string CreatureModelBuilder::getWeaponModelName(int slot) const {
     shared_ptr<Item> bodyItem(_creature->getEquippedItem(slot));
     if (!bodyItem) return "";
 

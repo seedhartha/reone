@@ -191,7 +191,7 @@ string CreatureAnimationResolver::getPauseAnimation() const {
 }
 
 bool CreatureAnimationResolver::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    shared_ptr<Item> item(_creature->getEquippedItem(kInventorySlotRightWeapon));
+    shared_ptr<Item> item(_creature->getEquippedItem(InventorySlot::rightWeapon));
     if (item) {
         type = item->weaponType();
         wield = item->weaponWield();
@@ -206,11 +206,11 @@ int CreatureAnimationResolver::getWeaponWieldNumber(WeaponWield wield) const {
         case WeaponWield::StunBaton:
             return 1;
         case WeaponWield::SingleSword:
-            return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 4 : 2;
+            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
         case WeaponWield::DoubleBladedSword:
             return 3;
         case WeaponWield::BlasterPistol:
-            return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 6 : 5;
+            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
         case WeaponWield::BlasterRifle:
             return 7;
         case WeaponWield::HeavyWeapon:
@@ -236,7 +236,7 @@ string CreatureAnimationResolver::getRunAnimation() const {
 
         switch (wield) {
             case WeaponWield::SingleSword:
-                return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? "runds" : "runss";
+                return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
             case WeaponWield::DoubleBladedSword:
                 return "runst";
             case WeaponWield::BlasterRifle:

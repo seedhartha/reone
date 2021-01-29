@@ -37,7 +37,7 @@ namespace game {
 NameEntry::NameEntry(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
     GameGUI(gameId, opts),
     _charGen(charGen),
-    _input(kTextInputLetters | kTextInputWhitespace) {
+    _input(TextInputFlags::lettersWhitespace) {
 
     _resRef = getResRef("name");
 
