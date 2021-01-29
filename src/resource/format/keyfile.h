@@ -44,8 +44,8 @@ public:
     const std::string &getFilename(int idx) const;
     bool find(const std::string &resRef, ResourceType type, KeyEntry &key) const;
 
-    const std::vector<FileEntry> &files() const;
-    const std::vector<KeyEntry> &keys() const;
+    const std::vector<FileEntry> &files() const { return _files; }
+    const std::vector<KeyEntry> &keys() const { return _keys; }
 
 private:
     int _bifCount { 0 };

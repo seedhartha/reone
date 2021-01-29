@@ -41,7 +41,7 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
     if (object) {
         auto toRun = getEvent(args, 1);
         if (toRun) {
-            _game->scriptRunner().run(object->onUserDefined(), object->id(), kObjectInvalid, toRun->number());
+            _game->scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
         } else {
             warn("Routines: signalEvent: toRun is invalid");
         }

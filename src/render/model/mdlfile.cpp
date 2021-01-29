@@ -915,10 +915,6 @@ Model::Classification MdlFile::getClassification(int value) const {
     }
 }
 
-shared_ptr<Model> MdlFile::model() const {
-    return _model;
-}
-
 static Emitter::UpdateType parseEmitterUpdate(const string &str) {
     Emitter::UpdateType result = Emitter::UpdateType::Invalid;
     if (str == "Fountain") {

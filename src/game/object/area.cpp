@@ -480,7 +480,7 @@ void Area::landObject(SpatialObject &object) {
 void Area::loadParty(const glm::vec3 &position, float facing) {
     Party &party = _game->party();
 
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
         member->setPosition(position);
         member->setFacing(facing);
@@ -493,7 +493,7 @@ void Area::loadParty(const glm::vec3 &position, float facing) {
 void Area::unloadParty() {
     Party &party = _game->party();
 
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         doDestroyObject(party.getMember(i)->id());
     }
 }
@@ -541,7 +541,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
     ostringstream ss;
     ss << boost::format("tag='%s'") % object.tag();
     ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % object.model()->name();
+    ss << boost::format(",model='%s'") % object.model()->getName();
 
     debug("Selected object: " + ss.str());
 }
@@ -645,7 +645,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
         creature->setRoom(room);
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
-        if (creature == _game->party().leader()) {
+        if (creature == _game->party().getLeader()) {
             onPartyLeaderMoved();
         }
         checkTriggersIntersection(creature);
@@ -695,7 +695,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     glm::vec3 fromWorld(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
     RaycastProperties props;
     props.flags = kRaycastObjects | kRaycastAABB | kRaycastSelectable;
@@ -745,7 +745,7 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     _thirdPersonCamera->setFacing(partyLeader->facing());
@@ -760,7 +760,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
 }
 
 void Area::onPartyLeaderMoved() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     update3rdPersonCameraTarget();
@@ -768,7 +768,7 @@ void Area::onPartyLeaderMoved() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     glm::vec3 position;
@@ -782,7 +782,7 @@ void Area::update3rdPersonCameraTarget() {
 }
 
 void Area::updateVisibility() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -835,7 +835,7 @@ void Area::updateVisibility() {
 void Area::updateSounds() {
     glm::vec3 refPosition;
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (partyLeader) {
         refPosition = partyLeader->position();
     } else {
@@ -895,8 +895,8 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             _game->scheduleModuleTransition(trigger->linkedToModule(), trigger->linkedTo());
             return;
         }
-        if (!trigger->onEnter().empty()) {
-            _game->scriptRunner().run(trigger->onEnter(), trigger->id(), triggerrer->id());
+        if (!trigger->getOnEnter().empty()) {
+            _game->scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -907,7 +907,7 @@ void Area::updateHeartbeat(float dt) {
             _game->scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
-            string heartbeat(object->heartbeat());
+            string heartbeat(object->getHeartbeat());
             if (!heartbeat.empty()) {
                 _game->scriptRunner().run(heartbeat, object->id());
             }
@@ -915,42 +915,6 @@ void Area::updateHeartbeat(float dt) {
         _game->party().onHeartbeat();
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
-}
-
-const CameraStyle &Area::cameraStyle() const {
-    return _camStyleDefault;
-}
-
-const string &Area::music() const {
-    return _music;
-}
-
-const RoomMap &Area::rooms() const {
-    return _rooms;
-}
-
-Combat &Area::combat() {
-    return _combat;
-}
-
-Map &Area::map() {
-    return _map;
-}
-
-const ObjectList &Area::objects() const {
-    return _objects;
-}
-
-const CollisionDetector &Area::collisionDetector() const {
-    return _collisionDetector;
-}
-
-ObjectSelector &Area::objectSelector() {
-    return _objectSelector;
-}
-
-const Pathfinder &Area::pathfinder() const {
-    return _pathfinder;
 }
 
 Camera &Area::getCamera(CameraType type) {
@@ -991,22 +955,6 @@ void Area::setThirdPartyCameraStyle(CameraStyleType type) {
     }
 }
 
-bool Area::isStealthXPEnabled() const {
-    return _stealthXPEnabled;
-}
-
-int Area::maxStealthXP() const {
-    return _maxStealthXP;
-}
-
-int Area::currentStealthXP() const {
-    return _currentStealthXP;
-}
-
-int Area::stealthXPDecrement() const {
-    return _stealthXPDecrement;
-}
-
 void Area::setStealthXPEnabled(bool value) {
     _stealthXPEnabled = value;
 }
@@ -1021,10 +969,6 @@ void Area::setCurrentStealthXP(int value) {
 
 void Area::setStealthXPDecrement(int value) {
     _stealthXPDecrement = value;
-}
-
-bool Area::isUnescapable() const {
-    return _unescapable;
 }
 
 void Area::setUnescapable(bool value) {

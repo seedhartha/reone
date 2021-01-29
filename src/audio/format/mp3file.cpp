@@ -112,10 +112,6 @@ mad_flow Mp3File::outputFunc(void *playbuf, mad_header const *header, mad_pcm *p
     return MAD_FLOW_CONTINUE;
 }
 
-shared_ptr<AudioStream> Mp3File::stream() const {
-    return _stream;
-}
-
 } // namespace audio
 
 } // namespace reone

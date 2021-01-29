@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
     ScriptExecution execution(program, context);
     execution.run();
 
-    BOOST_TEST((execution.stackSize() == 1));
+    BOOST_TEST((execution.getStackSize() == 1));
     BOOST_TEST((execution.getStackVariable(0).intValue == 1));
 }
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_cptopbp) {
     ScriptExecution execution(program, context);
     execution.run();
 
-    BOOST_TEST((execution.stackSize() == 6));
+    BOOST_TEST((execution.getStackSize() == 6));
     BOOST_TEST((execution.getStackVariable(4).intValue == 1));
     BOOST_TEST((execution.getStackVariable(5).intValue == 2));
 }

@@ -51,7 +51,7 @@ public:
     void renderLines() const;
     void renderTriangles() const;
 
-    const AABB &aabb() const;
+    const AABB &aabb() const { return _aabb; }
 
 protected:
     bool _glInited { false };

@@ -24,10 +24,6 @@ namespace net {
 Command::Command(uint32_t id) : _id(id) {
 }
 
-uint32_t Command::id() const {
-    return _id;
-}
-
 } // namespace net
 
 } // namespace reone

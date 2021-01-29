@@ -116,7 +116,7 @@ void ActionExecutor::executeMoveToPoint(const shared_ptr<Object> &actor, MoveToP
 void ActionExecutor::executeMoveToObject(const shared_ptr<Object> &actor, MoveToObjectAction &action, float dt) {
     auto object = static_pointer_cast<SpatialObject>(action.object());
     glm::vec3 dest(object->position());
-    bool run = action.getRun();
+    bool run = action.isRun();
     float distance = action.distance();
 
     bool reached = navigateCreature(static_pointer_cast<Creature>(actor), dest, run, distance, dt);
@@ -153,7 +153,7 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
         navigateCreature(creatureActor, object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
-        bool isActorLeader = _game->party().leader() == actor;
+        bool isActorLeader = _game->party().getLeader() == actor;
         _game->module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actor), action.dialogResRef());
         action.complete();
     }

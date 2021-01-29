@@ -62,13 +62,13 @@ public:
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
-    Classification classification() const;
-    const std::string &name() const;
-    ModelNode &rootNode() const;
-    float animationScale() const;
-    std::shared_ptr<Model> superModel() const;
-    const AABB &aabb() const;
-    float radiusXY() const;
+    Classification classification() const { return _classification; }
+    const std::string &name() const { return _name; }
+    ModelNode &rootNode() const { return *_rootNode; }
+    float animationScale() const { return _animationScale; }
+    std::shared_ptr<Model> superModel() const { return _superModel; }
+    const AABB &aabb() const { return _aabb; }
+    float radiusXY() const { return _radiusXY; }
 
     void setClassification(Classification classification);
     void setAnimationScale(float scale);

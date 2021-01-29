@@ -39,7 +39,7 @@ public:
 
     void doLoad() override;
 
-    std::shared_ptr<ScriptProgram> program() const;
+    std::shared_ptr<ScriptProgram> program() const { return _program; }
 
 private:
     std::string _resRef;

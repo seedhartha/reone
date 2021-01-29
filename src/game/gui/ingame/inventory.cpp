@@ -61,7 +61,7 @@ void InventoryMenu::refreshPortraits() {
     if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
-    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 

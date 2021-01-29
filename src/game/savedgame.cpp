@@ -80,10 +80,6 @@ void SavedGame::load(Game *game) {
     game->scheduleModuleTransition(moduleName, "");
 }
 
-const string &SavedGame::name() const {
-    return _name;
-}
-
 } // namespace game
 
 } // namespace reone

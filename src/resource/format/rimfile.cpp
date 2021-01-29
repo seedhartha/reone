@@ -95,10 +95,6 @@ ByteArray RimFile::getResourceData(int idx) {
     return getResourceData(_resources[idx]);
 }
 
-const vector<RimFile::Resource> &RimFile::resources() const {
-    return _resources;
-}
-
 } // namespace resource
 
 } // namespace reone

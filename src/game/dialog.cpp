@@ -111,36 +111,12 @@ Dialog::ParticipantAnimation Dialog::getParticipantAnimation(const GffStruct &gf
     return move(anim);
 }
 
-bool Dialog::isSkippable() const {
-    return _skippable;
-}
-
-bool Dialog::isAnimatedCutscene() const {
-    return _animatedCutscene;
-}
-
-const string &Dialog::cameraModel() const {
-    return _cameraModel;
-}
-
-const vector<Dialog::EntryReplyLink> &Dialog::startEntries() const {
-    return _startEntries;
-}
-
 const Dialog::EntryReply &Dialog::getEntry(int index) const {
     return _entries[index];
 }
 
 const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
-}
-
-const vector<Dialog::Stunt> &Dialog::stunts() const {
-    return _stunts;
-}
-
-const string &Dialog::endScript() const {
-    return _endScript;
 }
 
 } // namespace resource

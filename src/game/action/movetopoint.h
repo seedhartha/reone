@@ -29,7 +29,7 @@ class MoveToPointAction : public Action {
 public:
     MoveToPointAction(const glm::vec3 &point);
 
-    const glm::vec3 &point() const;
+    const glm::vec3 &point() const { return _point; }
 
 private:
     glm::vec3 _point;

@@ -34,7 +34,7 @@ public:
 
     void load(Item &item);
 
-    const std::string &resRef() const;
+    const std::string &resRef() const { return _resRef; }
 
 private:
     std::string _resRef;

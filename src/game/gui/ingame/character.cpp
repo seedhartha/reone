@@ -93,7 +93,7 @@ void CharacterMenu::load() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_game->party().leader());
+    shared_ptr<Creature> leader(_game->party().getLeader());
     setControlVisible("BTN_LEVELUP", leader->isLevelUpPending());
     setControlVisible("BTN_AUTO", leader->isLevelUpPending());
 }

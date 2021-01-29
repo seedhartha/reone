@@ -119,10 +119,6 @@ ByteArray Command::getBytes() const {
     return move(data);
 }
 
-CommandType Command::type() const {
-    return _type;
-}
-
 } // namespace mp
 
 } // namespace reone

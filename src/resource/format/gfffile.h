@@ -57,9 +57,6 @@ public:
 
     GffField &operator=(GffField &&) = default;
 
-    GffFieldType type() const;
-    const std::string &label() const;
-    const std::vector<std::shared_ptr<GffStruct>> &children() const;
     bool asBool() const;
     int64_t asInt() const;
     uint64_t asUint() const;
@@ -71,6 +68,10 @@ public:
     const GffStruct &asStruct() const;
     glm::vec3 asVector() const;
     glm::quat asOrientation() const;
+
+    GffFieldType type() const { return _type; }
+    const std::string &label() const { return _label; }
+    const std::vector<std::shared_ptr<GffStruct>> &children() const { return _children; }
 
 private:
     GffFieldType _type { GffFieldType::Byte };
@@ -108,7 +109,7 @@ public:
     std::shared_ptr<GffStruct> getStruct(const std::string &name) const;
     std::vector<std::shared_ptr<GffStruct>> getList(const std::string &name) const;
 
-    const std::vector<GffField> &fields() const;
+    const std::vector<GffField> &fields() const { return _fields; }
 
 private:
     GffFieldType _type { GffFieldType::Byte };
@@ -125,7 +126,8 @@ private:
 class GffFile : public BinaryFile {
 public:
     GffFile();
-    std::shared_ptr<GffStruct> top() const;
+
+    std::shared_ptr<GffStruct> top() const { return _top; }
 
 private:
     struct LocString {

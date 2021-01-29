@@ -41,18 +41,18 @@ public:
     void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
 
-    bool isLockable() const;
-    bool isLocked() const;
-    bool isStatic() const;
-    bool isKeyRequired() const;
+    bool isLockable() const { return _lockable; }
+    bool isLocked() const { return _locked; }
+    bool isStatic() const { return _static; }
+    bool isKeyRequired() const { return _keyRequired; }
 
-    const std::string &getOnOpen() const;
-    const std::string &getOnFailToOpen() const;
+    const std::string &getOnOpen() const { return _onOpen; }
+    const std::string &getOnFailToOpen() const { return _onFailToOpen; }
 
-    int genericType() const;
-    const std::string &linkedToModule() const;
-    const std::string &linkedTo() const;
-    const std::string &transitionDestin() const;
+    int genericType() const { return _genericType; }
+    const std::string &linkedToModule() const { return _linkedToModule; }
+    const std::string &linkedTo() const { return _linkedTo; }
+    const std::string &transitionDestin() const { return _transitionDestin; }
 
     void setLocked(bool locked);
 

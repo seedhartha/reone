@@ -121,22 +121,6 @@ bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
     return maybeTenant != _tenants.end();
 }
 
-const string &Trigger::linkedToModule() const {
-    return _linkedToModule;
-}
-
-const string &Trigger::linkedTo() const {
-    return _linkedTo;
-}
-
-const string &Trigger::onEnter() const {
-    return _onEnter;
-}
-
-const string &Trigger::onExit() const {
-    return _onExit;
-}
-
 } // namespace game
 
 } // namespace reone

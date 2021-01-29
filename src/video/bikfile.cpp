@@ -338,10 +338,6 @@ void BikFile::load() {
 #endif // REONE_ENABLE_VIDEO
 }
 
-shared_ptr<Video> BikFile::video() const {
-    return _video;
-}
-
 } // namespace video
 
 } // namespace reone

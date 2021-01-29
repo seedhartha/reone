@@ -32,26 +32,6 @@ LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::
     _shadow(shadow) {
 }
 
-int LightSceneNode::priority() const {
-    return _priority;
-}
-
-const glm::vec3 &LightSceneNode::color() const {
-    return _color;
-}
-
-float LightSceneNode::radius() const {
-    return _radius;
-}
-
-float LightSceneNode::multiplier() const {
-    return _multiplier;
-}
-
-bool LightSceneNode::shadow() const {
-    return _shadow;
-}
-
 } // namespace scene
 
 } // namespace reone

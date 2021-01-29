@@ -70,10 +70,6 @@ void DoorBlueprint::loadScripts(Door &door) {
     door._onFailToOpen = _utd->getString("OnFailToOpen");
 }
 
-const string &DoorBlueprint::resRef() const {
-    return _resRef;
-}
-
 } // namespace game
 
 } // namespace reone

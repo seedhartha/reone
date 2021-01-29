@@ -57,10 +57,6 @@ void VisFile::processLine(const string &line) {
     }
 }
 
-const Visibility &VisFile::visibility() const {
-    return _visibility;
-}
-
 } // namespace resource
 
 } // namespace reone

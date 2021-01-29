@@ -29,9 +29,9 @@ class StartConversationAction : public ObjectAction {
 public:
     StartConversationAction(const std::shared_ptr<Object> &object, const std::string &dialogResRef, bool ignoreStartRange = false);
 
-    bool isStartRangeIgnored() const;
+    bool isStartRangeIgnored() const { return _ignoreStartRange; }
 
-    const std::string &dialogResRef() const;
+    const std::string &dialogResRef() const { return _dialogResRef; }
 
 private:
     std::string _dialogResRef;

@@ -33,7 +33,7 @@ public:
 
     virtual ByteArray getBytes() const = 0;
 
-    uint32_t id() const;
+    uint32_t id() const { return _id; }
 
 protected:
     uint32_t _id { 0 };

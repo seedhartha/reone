@@ -47,9 +47,9 @@ public:
 
     float distanceTo(const glm::vec3 &point) const override;
 
-    const ModelSceneNode *modelSceneNode() const;
-    render::ModelNode *modelNode() const;
-    const glm::mat4 &boneTransform() const;
+    const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
+    render::ModelNode *modelNode() const { return _modelNode; }
+    const glm::mat4 &boneTransform() const { return _boneTransform; }
 
     void setBoneTransform(const glm::mat4 &transform);
 

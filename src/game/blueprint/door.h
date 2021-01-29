@@ -34,7 +34,7 @@ public:
 
     void load(Door &door);
 
-    const std::string &resRef() const;
+    const std::string &resRef() const { return _resRef; }
 
 private:
     std::string _resRef;

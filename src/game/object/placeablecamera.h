@@ -37,8 +37,8 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
-    int cameraId() const;
-    float fieldOfView() const;
+    int cameraId() const { return _cameraId; }
+    float fieldOfView() const { return _fieldOfView; }
 
 private:
     int _cameraId { 0 };

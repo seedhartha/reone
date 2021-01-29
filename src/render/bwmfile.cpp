@@ -109,10 +109,6 @@ void BwmFile::makeWalkmesh() {
     _walkmesh->computeAABB();
 }
 
-shared_ptr<Walkmesh> BwmFile::walkmesh() const {
-    return _walkmesh;
-}
-
 } // namespace render
 
 } // namespace reone

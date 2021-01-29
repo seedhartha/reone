@@ -49,11 +49,11 @@ public:
      */
     const SavingThrows &getSavingThrows(int level) const;
 
-    const std::string &name() const;
-    const std::string &description() const;
-    int hitdie() const;
-    const CreatureAttributes &defaultAttributes() const;
-    int skillPointBase() const;
+    const std::string &name() const { return _name; }
+    const std::string &description() const { return _description; }
+    int hitdie() const { return _hitdie; }
+    const CreatureAttributes &defaultAttributes() const { return _defaultAttributes; }
+    int skillPointBase() const { return _skillPointBase; }
 
 private:
     ClassType _type;

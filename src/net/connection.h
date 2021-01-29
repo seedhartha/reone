@@ -44,7 +44,7 @@ public:
 
     void send(const std::shared_ptr<Command> &command);
 
-    const std::string &tag() const;
+    const std::string &tag() const { return _tag; }
 
     void setTag(const std::string &tag);
 

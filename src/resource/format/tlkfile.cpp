@@ -35,7 +35,7 @@ const TalkTableString &TalkTable::getString(int32_t ref) const {
     return _strings[ref];
 }
 
-int TalkTable::stringCount() const {
+int TalkTable::getStringCount() const {
     return static_cast<int>(_strings.size());
 }
 
@@ -76,10 +76,6 @@ void TlkFile::loadStrings() {
 
         _table->_strings.push_back(string);
     }
-}
-
-shared_ptr<TalkTable> TlkFile::table() const {
-    return _table;
 }
 
 } // namespace resource

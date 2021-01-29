@@ -227,7 +227,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     const CreatureAttributes &attributes = partyLeader->attributes();
     StaticCreatureBlueprint character;
     character.setAppearance(partyLeader->appearance());
@@ -310,7 +310,7 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
-        shared_ptr<Creature> partyLeader(_game->party().leader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         partyLeader->attributes() = _character->attributes();
         _game->openInGame();
 
@@ -442,10 +442,6 @@ void CharacterGeneration::goToNextStep() {
             _quick->goToNextStep();
             break;
     }
-}
-
-StaticCreatureBlueprint &CharacterGeneration::character() {
-    return *_character;
 }
 
 } // namespace game

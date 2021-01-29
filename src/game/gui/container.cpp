@@ -106,10 +106,6 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     return Textures::instance().get(resRef, TextureType::GUI);
 }
 
-SpatialObject &Container::container() const {
-    return *_container;
-}
-
 void Container::onClick(const string &control) {
     GameGUI::onClick(control);
 
@@ -127,7 +123,7 @@ void Container::transferItemsToPlayer() {
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {
-        string script(placeable->onInvDisturbed());
+        string script(placeable->getOnInvDisturbed());
         if (!script.empty()) {
             _game->scriptRunner().run(script, placeable->id(), player->id());
         }

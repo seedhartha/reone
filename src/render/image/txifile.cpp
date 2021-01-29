@@ -137,10 +137,6 @@ TextureBlending TxiFile::parseBlending(const string &s) const {
     return result;
 }
 
-const TextureFeatures &TxiFile::features() const {
-    return _features;
-}
-
 } // namespace render
 
 } // namespace reone

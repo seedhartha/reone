@@ -171,10 +171,6 @@ PixelFormat TpcFile::getPixelFormat() const {
     }
 }
 
-shared_ptr<Texture> TpcFile::texture() const {
-    return _texture;
-}
-
 } // namespace render
 
 } // namespace reone

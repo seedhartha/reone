@@ -42,8 +42,9 @@ public:
 
     void load(Creature &creature) override;
 
-    const std::string &resRef() const;
     int getAppearanceFromUtc() const;
+
+    const std::string &resRef() const { return _resRef; }
 
 private:
     std::string _resRef;
@@ -71,9 +72,9 @@ public:
     void clearEquipment();
     void addEquippedItem(const std::string &resRef);
 
-    Gender gender() const;
-    int appearance() const;
-    CreatureAttributes &attributes();
+    Gender gender() const { return _gender; }
+    int appearance() const { return _appearance; }
+    CreatureAttributes &attributes() { return _attributes; }
 
     void setGender(Gender gender);
     void setAppearance(int appearance);

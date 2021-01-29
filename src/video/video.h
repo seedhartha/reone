@@ -49,9 +49,9 @@ public:
 
     void finish();
 
-    bool isFinished() const;
+    bool isFinished() const { return _finished; }
 
-    std::shared_ptr<audio::AudioStream> audio() const;
+    std::shared_ptr<audio::AudioStream> audio() const { return _audio; }
 
     void setMediaStream(const std::shared_ptr<MediaStream<Frame>> &stream);
 

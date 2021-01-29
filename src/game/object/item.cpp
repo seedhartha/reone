@@ -46,70 +46,6 @@ bool Item::isEquippable(InventorySlot slot) const {
     return (_equipableSlots >> slot) & 1;
 }
 
-const string &Item::localizedName() const {
-    return _localizedName;
-}
-
-const string &Item::baseBodyVariation() const {
-    return _baseBodyVariation;
-}
-
-int Item::bodyVariation() const {
-    return _bodyVariation;
-}
-
-int Item::textureVariation() const {
-    return _textureVariation;
-}
-
-const string &Item::itemClass() const {
-    return _itemClass;
-}
-
-int Item::modelVariation() const {
-    return _modelVariation;
-}
-
-shared_ptr<Texture> Item::icon() const {
-    return _icon;
-}
-
-float Item::attackRange() const {
-    return static_cast<float>(_attackRange);
-}
-
-int Item::numDice() const {
-    return _numDice;
-}
-
-int Item::dieToRoll() const {
-    return _dieToRoll;
-}
-
-int Item::damageFlags() const {
-    return _damageFlags;
-}
-
-WeaponType Item::weaponType() const {
-    return _weaponType;
-}
-
-WeaponWield Item::weaponWield() const {
-    return _weaponWield;
-}
-
-int Item::stackSize() const {
-    return _stackSize;
-}
-
-shared_ptr<Item::AmmunitionType> Item::ammunitionType() const {
-    return _ammunitionType;
-}
-
-bool Item::isDropable() const {
-    return _dropable;
-}
-
 void Item::setDropable(bool dropable) {
     _dropable = dropable;
 }
@@ -118,16 +54,8 @@ void Item::setStackSize(int stackSize) {
     _stackSize = stackSize;
 }
 
-bool Item::isIdentified() const {
-    return _identified;
-}
-
 void Item::setIdentified(bool value) {
     _identified = value;
-}
-
-bool Item::isEquipped() const {
-    return _equipped;
 }
 
 void Item::setEquipped(bool equipped) {

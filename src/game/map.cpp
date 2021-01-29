@@ -89,7 +89,7 @@ void Map::render(Mode mode, const glm::vec4 &bounds) const {
 
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
     if (mode == Mode::Minimap) {
-        shared_ptr<Creature> partyLeader(_game->party().leader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         if (!partyLeader) return;
 
         glm::vec2 worldPos(partyLeader->position());
@@ -144,7 +144,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     glm::vec3 arrowPos(0.0f);

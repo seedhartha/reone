@@ -36,7 +36,7 @@ public:
 
     int run();
 
-    int stackSize() const;
+    int getStackSize() const;
     const Variable &getStackVariable(int index) const;
 
 private:

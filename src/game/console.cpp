@@ -109,7 +109,7 @@ void Console::cmdListAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("listanim: no object selected");
             return;
@@ -139,7 +139,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("playanim: no object selected");
             return;
@@ -167,7 +167,7 @@ void Console::cmdAddItem(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("additem: no object selected");
             return;
@@ -185,7 +185,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("givexp: no object selected");
             return;
@@ -327,10 +327,6 @@ void Console::drawLines() const {
         transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
         _font->render(line, transform, glm::vec3(1.0f), TextGravity::RightCenter);
     }
-}
-
-bool Console::isOpen() const {
-    return _open;
 }
 
 } // namespace game

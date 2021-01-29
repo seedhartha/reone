@@ -49,7 +49,7 @@ Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
 }
 
 bool Player::handle(const SDL_Event &event) {
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     if (!partyLeader) return false;
 
     switch (event.type) {
@@ -109,7 +109,7 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Player::update(float dt) {
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     if (!partyLeader || partyLeader->isMovementRestricted()) return;
 
     float facing = 0.0f;
@@ -148,7 +148,7 @@ void Player::stopMovement() {
     _moveBackward = false;
     _moveRight = false;
 
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     partyLeader->setMovementType(Creature::MovementType::None);
 }
 

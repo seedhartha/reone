@@ -44,8 +44,8 @@ public:
     void bindDepthBuffer() const;
     void unbindDepthBuffer() const;
 
-    int width() const;
-    int height() const;
+    int width() const { return _width; }
+    int height() const { return _height; }
 
 private:
     int _width { 0 };

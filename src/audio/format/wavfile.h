@@ -34,7 +34,7 @@ class WavFile : public resource::BinaryFile {
 public:
     WavFile();
 
-    std::shared_ptr<AudioStream> stream() const;
+    std::shared_ptr<AudioStream> stream() const { return _stream; }
 
 private:
     struct ChunkHeader {

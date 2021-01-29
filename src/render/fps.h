@@ -28,8 +28,9 @@ public:
     void reset();
     void update(float dt);
 
-    bool hasAverage() const;
-    float average() const;
+    bool hasAverage() const { return _hasAverage; }
+
+    float average() const { return _average; }
 
 private:
     uint32_t _startTicks { 0 };

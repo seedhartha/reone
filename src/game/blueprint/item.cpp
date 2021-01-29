@@ -97,10 +97,6 @@ void ItemBlueprint::loadAmmunitionType(int ordinal, Item &item) {
     item._ammunitionType->model = Models::instance().get(table->getString(ordinal, "model"));
 }
 
-const string &ItemBlueprint::resRef() const {
-    return _resRef;
-}
-
 } // namespace game
 
 } // namespace reone

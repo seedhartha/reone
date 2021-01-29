@@ -200,18 +200,6 @@ float ModelNodeSceneNode::distanceTo(const glm::vec3 &point) const {
     return glm::distance(origin, point);
 }
 
-const ModelSceneNode *ModelNodeSceneNode::modelSceneNode() const {
-    return _modelSceneNode;
-}
-
-ModelNode *ModelNodeSceneNode::modelNode() const {
-    return _modelNode;
-}
-
-const glm::mat4 &ModelNodeSceneNode::boneTransform() const {
-    return _boneTransform;
-}
-
 void ModelNodeSceneNode::setBoneTransform(const glm::mat4 &transform) {
     _boneTransform = transform;
 }

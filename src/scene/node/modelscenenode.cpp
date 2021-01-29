@@ -272,44 +272,8 @@ glm::vec3 ModelSceneNode::getCenterOfAABB() const {
     return _absoluteTransform * glm::vec4(_aabb.center(), 1.0f);
 }
 
-const string &ModelSceneNode::name() const {
+const string &ModelSceneNode::getName() const {
     return _model->name();
-}
-
-shared_ptr<Model> ModelSceneNode::model() const {
-    return _model;
-}
-
-bool ModelSceneNode::hasTextureOverride() const {
-    return static_cast<bool>(_textureOverride);
-}
-
-shared_ptr<Texture> ModelSceneNode::textureOverride() const {
-    return _textureOverride;
-}
-
-bool ModelSceneNode::isVisible() const {
-    return _visible;
-}
-
-bool ModelSceneNode::isOnScreen() const {
-    return _onScreen;
-}
-
-float ModelSceneNode::alpha() const {
-    return _alpha;
-}
-
-const AABB &ModelSceneNode::aabb() const {
-    return _aabb;
-}
-
-bool ModelSceneNode::isLightingEnabled() const {
-    return _lightingEnabled;
-}
-
-const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
-    return _lightsAffectedBy;
 }
 
 void ModelSceneNode::setTextureOverride(const shared_ptr<Texture> &texture) {

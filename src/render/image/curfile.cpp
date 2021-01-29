@@ -82,10 +82,6 @@ void CurFile::loadData() {
     _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
 }
 
-shared_ptr<Texture> CurFile::texture() {
-    return _texture;
-}
-
 } // namespace render
 
 } // namespace reone

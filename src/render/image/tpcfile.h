@@ -32,7 +32,7 @@ public:
      */
     TpcFile(const std::string &resRef, TextureType type, bool headless = false);
 
-    std::shared_ptr<Texture> texture() const;
+    std::shared_ptr<Texture> texture() const { return _texture; }
 
 private:
     enum class EncodingType {

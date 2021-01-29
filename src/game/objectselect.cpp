@@ -84,7 +84,7 @@ vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
     vector<shared_ptr<SpatialObject>> result;
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
-    shared_ptr<SpatialObject> partyLeader(_party->leader());
+    shared_ptr<SpatialObject> partyLeader(_party->getLeader());
     glm::vec3 origin(partyLeader->position());
 
     for (auto &object : _area->objects()) {
@@ -120,14 +120,6 @@ void ObjectSelector::hilight(const shared_ptr<SpatialObject> &object) {
 
 void ObjectSelector::select(const shared_ptr<SpatialObject> &object) {
     _selectedObject = object;
-}
-
-shared_ptr<SpatialObject> ObjectSelector::hilightedObject() const {
-    return _hilightedObject;
-}
-
-shared_ptr<SpatialObject> ObjectSelector::selectedObject() const {
-    return _selectedObject;
 }
 
 } // namespace game

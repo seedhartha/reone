@@ -50,9 +50,9 @@ public:
     */
     int getAggregateHitDie() const;
 
-    CreatureAbilities &abilities();
+    CreatureAbilities &abilities() { return _abilities; }
     const CreatureAbilities &abilities() const { return _abilities; }
-    CreatureSkills &skills();
+    CreatureSkills &skills() { return _skills; }
     const CreatureSkills &skills() const { return _skills; }
 
     void setAbilities(CreatureAbilities abilities);

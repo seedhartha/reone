@@ -68,14 +68,6 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     }
 }
 
-bool ModelMesh::shouldRender() const {
-    return _render;
-}
-
-bool ModelMesh::shouldCastShadows() const {
-    return _shadow;
-}
-
 bool ModelMesh::isTransparent() const {
     if (_transparency > 0) return true;
 
@@ -88,42 +80,6 @@ bool ModelMesh::isTransparent() const {
     if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
 
     return true;
-}
-
-bool ModelMesh::hasDiffuseTexture() const {
-    return static_cast<bool>(_diffuse);
-}
-
-bool ModelMesh::hasEnvmapTexture() const {
-    return static_cast<bool>(_envmap);
-}
-
-bool ModelMesh::hasLightmapTexture() const {
-    return static_cast<bool>(_lightmap);
-}
-
-bool ModelMesh::hasBumpyShinyTexture() const {
-    return static_cast<bool>(_bumpyShiny);
-}
-
-bool ModelMesh::hasBumpmapTexture() const {
-    return static_cast<bool>(_bumpmap);
-}
-
-int ModelMesh::transparency() const {
-    return _transparency;
-}
-
-const ModelMesh::UVAnimation &ModelMesh::uvAnimation() const {
-    return _uvAnimation;
-}
-
-const shared_ptr<Texture> &ModelMesh::diffuseTexture() const {
-    return _diffuse;
-}
-
-const shared_ptr<Texture> &ModelMesh::bumpmapTexture() const {
-    return _bumpmap;
 }
 
 } // namespace render

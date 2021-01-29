@@ -36,8 +36,8 @@ public:
 
     virtual void stopMovement();
 
-    float facing() const;
-    std::shared_ptr<scene::CameraSceneNode> sceneNode() const;
+    float facing() const { return _facing; }
+    std::shared_ptr<scene::CameraSceneNode> sceneNode() const { return _sceneNode; }
 
 protected:
     float _facing { 0.0f };

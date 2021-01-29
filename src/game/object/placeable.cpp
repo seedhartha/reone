@@ -89,18 +89,6 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
 }
 
-bool Placeable::hasInventory() const {
-    return _hasInventory;
-}
-
-bool Placeable::isUsable() const {
-    return _usable;
-}
-
-const string &Placeable::onInvDisturbed() const {
-    return _onInvDisturbed;
-}
-
 } // namespace game
 
 } // namespace reone

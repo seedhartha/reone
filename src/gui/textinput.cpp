@@ -99,10 +99,6 @@ bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
     return true;
 }
 
-const string &TextInput::text() const {
-    return _text;
-}
-
 void TextInput::setText(string text) {
     _text = move(text);
 }

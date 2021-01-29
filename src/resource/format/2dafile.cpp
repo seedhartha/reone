@@ -53,10 +53,6 @@ float TwoDaRow::getFloat(const string &column) const {
     return stof(getString(column));
 }
 
-const unordered_map<string, string> &TwoDaRow::values() const {
-    return _values;
-}
-
 const TwoDaRow *TwoDaTable::findRow(const function<bool(const TwoDaRow &)> &pred) const {
     auto row = find_if(_rows.begin(), _rows.end(), pred);
     return row != _rows.end() ? &*row : nullptr;
@@ -110,14 +106,6 @@ float TwoDaTable::getFloat(int row, const string &column, float defValue) const 
     if (value.empty()) return defValue;
 
     return stof(value);
-}
-
-const vector<string> &TwoDaTable::headers() const {
-    return _headers;
-}
-
-const vector<TwoDaRow> &TwoDaTable::rows() const {
-    return _rows;
 }
 
 TwoDaFile::TwoDaFile() : BinaryFile(kSignatureSize, kSignature), _table(make_shared<TwoDaTable>()) {
@@ -197,10 +185,6 @@ void TwoDaFile::loadRows() {
 
         _table->_rows.push_back(row);
     }
-}
-
-const shared_ptr<TwoDaTable> &TwoDaFile::table() const {
-    return _table;
 }
 
 } // namespace bioware

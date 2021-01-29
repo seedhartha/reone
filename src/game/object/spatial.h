@@ -61,20 +61,20 @@ public:
     bool contains(const glm::vec3 &point) const;
 
     virtual bool isSelectable() const;
-    bool isOpen() const;
+    bool isOpen() const { return _open; }
 
     virtual glm::vec3 getSelectablePosition() const;
 
-    ObjectFactory &objectFactory();
-    scene::SceneGraph &sceneGraph();
-    Room *room() const;
-    const glm::vec3 &position() const;
-    float facing() const;
-    const glm::mat4 &transform() const;
-    bool visible() const;
-    std::shared_ptr<scene::ModelSceneNode> model() const;
-    std::shared_ptr<render::Walkmesh> walkmesh() const;
-    float drawDistance() const;
+    ObjectFactory &objectFactory() { return *_objectFactory; }
+    scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
+    Room *room() const { return _room; }
+    const glm::vec3 &position() const { return _position; }
+    float facing() const { return _facing; }
+    const glm::mat4 &transform() const { return _transform; }
+    bool visible() const { return _visible; }
+    std::shared_ptr<scene::ModelSceneNode> model() const { return _model; }
+    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
+    float drawDistance() const { return _drawDistance; }
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
@@ -98,7 +98,7 @@ public:
     std::shared_ptr<Item> getNextItem();
     std::shared_ptr<Item> getItemByTag(const std::string &tag);
 
-    const std::vector<std::shared_ptr<Item>> &items() const;
+    const std::vector<std::shared_ptr<Item>> &items() const { return _items; }
 
     // END Inventory
 
@@ -111,7 +111,7 @@ public:
 
     // Stunt mode
 
-    bool isStuntMode() const;
+    bool isStuntMode() const { return _stunt; }
 
     /**
      * Places this object into the stunt mode. Objects in this mode have their

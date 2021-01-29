@@ -104,10 +104,6 @@ void TgaFile::loadTexture() {
     _texture->setPixels(move(layers), format);
 }
 
-shared_ptr<Texture> TgaFile::texture() const {
-    return _texture;
-}
-
 } // namespace render
 
 } // namespace reone

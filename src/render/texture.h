@@ -77,13 +77,13 @@ public:
     bool isAdditive() const;
     bool isGrayscale() const;
 
-    const std::string &name() const;
-    uint32_t textureId() const;
-    int width() const;
-    int height() const;
-    const std::vector<Layer> &layers() const;
-    PixelFormat pixelFormat() const;
-    const TextureFeatures &features() const;
+    const std::string &name() const { return _name; }
+    uint32_t textureId() const { return _textureId; }
+    int width() const { return _width; }
+    int height() const { return _height; }
+    const std::vector<Layer> &layers() const { return _layers; }
+    PixelFormat pixelFormat() const { return _pixelFormat; }
+    const TextureFeatures &features() const { return _features; }
 
     void setPixels(std::vector<Layer> layers, PixelFormat format);
     void setFeatures(TextureFeatures features);

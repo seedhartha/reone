@@ -161,7 +161,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                     cursor = CursorType::Pickup;
                 } else {
                     auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = getIsEnemy(*creature, *_game->party().leader());
+                    bool isEnemy = getIsEnemy(*creature, *_game->party().getLeader());
                     cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
                 }
                 break;
@@ -223,7 +223,7 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     ActionQueue &actions = partyLeader->actionQueue();
 
     if (creature->isDead()) {
@@ -249,7 +249,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_game->party().leader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();
         actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, door));
@@ -257,7 +257,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     ActionQueue &actions = partyLeader->actionQueue();
 
     if (placeable->hasInventory()) {
@@ -281,12 +281,12 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
     vector<ContextualAction> actions;
 
     auto door = dynamic_pointer_cast<Door>(object);
-    if (door && door->isLocked() && _game->party().leader()->attributes().skills().contains(Skill::Security)) {
+    if (door && door->isLocked() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
         actions.push_back(ContextualAction::Unlock);
     }
 
     auto hostile = dynamic_pointer_cast<Creature>(object);
-    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().leader()), *hostile)) {
+    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().getLeader()), *hostile)) {
         actions.push_back(ContextualAction::Attack);
     }
 
@@ -304,26 +304,6 @@ bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
         default:
             return false;
     }
-}
-
-const string &Module::name() const {
-    return _name;
-}
-
-const ModuleInfo &Module::info() const {
-    return _info;
-}
-
-shared_ptr<Area> Module::area() const {
-    return _area;
-}
-
-Player &Module::player() {
-    return *_player;
-}
-
-const Module::Time &Module::time() const {
-    return _time;
 }
 
 void Module::setTime(int hour, int minute, int second, int millisecond) {

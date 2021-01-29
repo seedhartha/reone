@@ -45,8 +45,8 @@ public:
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
     ByteArray getResourceData(int idx);
 
-    int entryCount() const;
-    const std::vector<Key> &keys() const;
+    int entryCount() const { return _entryCount; }
+    const std::vector<Key> &keys() const { return _keys; }
 
 private:
     int _entryCount { 0 };

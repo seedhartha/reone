@@ -112,14 +112,6 @@ void Framebuffer::unbindDepthBuffer() const {
     _depthBuffer->unbind();
 }
 
-int Framebuffer::width() const {
-    return _width;
-}
-
-int Framebuffer::height() const {
-    return _height;
-}
-
 } // namespace render
 
 } // namespace reone

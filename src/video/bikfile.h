@@ -38,7 +38,7 @@ public:
 
     void load();
 
-    std::shared_ptr<Video> video() const;
+    std::shared_ptr<Video> video() const { return _video; }
 
 private:
     boost::filesystem::path _path;

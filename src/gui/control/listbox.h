@@ -65,12 +65,12 @@ public:
     void setSelectionMode(SelectionMode mode);
     void setProtoMatchContent(bool match);
 
+    int getItemCount() const;
     const Item &getItemAt(int index) const;
 
-    Control &protoItem() const;
-    Control &scrollBar() const;
-    int itemCount() const;
-    int hilightedIndex() const;
+    Control &protoItem() const { return *_protoItem; }
+    Control &scrollBar() const { return *_scrollBar; }
+    int hilightedIndex() const { return _hilightedIndex; }
 
 private:
     SelectionMode _mode { SelectionMode::Propagate };

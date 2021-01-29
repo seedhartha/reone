@@ -31,7 +31,7 @@ class TgaFile : public resource::BinaryFile {
 public:
     TgaFile(const std::string &resRef, TextureType type);
 
-    std::shared_ptr<render::Texture> texture() const;
+    std::shared_ptr<render::Texture> texture() const { return _texture; }
 
 private:
     enum class ImageType {

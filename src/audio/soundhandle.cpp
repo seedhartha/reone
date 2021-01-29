@@ -42,18 +42,6 @@ bool SoundHandle::isStopped() const {
     return _state == State::Stopped;
 }
 
-int SoundHandle::duration() const {
-    return _duration;
-}
-
-glm::vec3 SoundHandle::position() const {
-    return _position;
-}
-
-bool SoundHandle::isPositionDirty() const {
-    return _positionDirty;
-}
-
 void SoundHandle::setState(State state) {
     _state = state;
 }

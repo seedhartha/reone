@@ -77,14 +77,6 @@ int CreatureAttributes::getAggregateLevel() const {
     return result;
 }
 
-CreatureAbilities &CreatureAttributes::abilities() {
-    return _abilities;
-}
-
-CreatureSkills &CreatureAttributes::skills() {
-    return _skills;
-}
-
 void CreatureAttributes::setAbilities(CreatureAbilities abilities) {
     _abilities = move(abilities);
 }

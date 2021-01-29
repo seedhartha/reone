@@ -74,7 +74,7 @@ public:
     /**
      * @return list of available module names
      */
-    const std::vector<std::string> &moduleNames() const;
+    const std::vector<std::string> &moduleNames() const { return _moduleNames; }
 
 private:
     GameID _gameId {GameID::KotOR };

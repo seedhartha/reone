@@ -29,7 +29,7 @@ class CurFile : public resource::BinaryFile {
 public:
     CurFile();
 
-    std::shared_ptr<Texture> texture();
+    std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
     uint16_t _bitCount { 0 };

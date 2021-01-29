@@ -40,7 +40,7 @@ public:
     void clear();
     bool handle(const SDL_Event &event);
 
-    const std::string &text() const;
+    const std::string &text() const { return _text; }
 
     void setText(std::string text);
 

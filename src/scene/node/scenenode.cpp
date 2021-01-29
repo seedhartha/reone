@@ -68,26 +68,6 @@ float SceneNode::distanceTo(const glm::vec3 &point) const {
     return glm::distance(glm::vec3(_absoluteTransform[3]), point);
 }
 
-const SceneNode *SceneNode::parent() const {
-    return _parent;
-}
-
-const glm::mat4 &SceneNode::localTransform() const {
-    return _localTransform;
-}
-
-const glm::mat4 &SceneNode::absoluteTransform() const {
-    return _absoluteTransform;
-}
-
-const glm::mat4 &SceneNode::absoluteTransformInverse() const {
-    return _absoluteTransformInv;
-}
-
-const vector<shared_ptr<SceneNode>> &SceneNode::children() const {
-    return _children;
-}
-
 void SceneNode::setParent(const SceneNode *parent) {
     _parent = parent;
     updateAbsoluteTransform();

@@ -49,7 +49,8 @@ public:
         TextGravity align = TextGravity::CenterCenter) const;
 
     float measure(const std::string &text) const;
-    float height() const;
+
+    float height() const { return _height; }
 
 private:
     bool _glInited { false };

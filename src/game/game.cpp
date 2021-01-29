@@ -274,7 +274,7 @@ void Game::drawWorld() {
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setReferenceNode(_party.leader()->model());
+    _sceneGraph.setReferenceNode(_party.getLeader()->model());
     _sceneGraph.prepareFrame();
 
     _worldPipeline.render();
@@ -283,7 +283,7 @@ void Game::drawWorld() {
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
         case CameraType::FirstPerson:
-            if (_party.leader()) {
+            if (_party.getLeader()) {
                 _cameraType = CameraType::ThirdPerson;
             }
             break;
@@ -764,42 +764,6 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
 
     return false;
-}
-
-GameID Game::gameId() const {
-    return _gameId;
-}
-
-const Options &Game::options() const {
-    return _options;
-}
-
-SceneGraph &Game::sceneGraph() {
-    return _sceneGraph;
-}
-
-ObjectFactory &Game::objectFactory() {
-    return *_objectFactory;
-}
-
-shared_ptr<Module> Game::module() const {
-    return _module;
-}
-
-Party &Game::party() {
-    return _party;
-}
-
-CharacterGeneration &Game::characterGeneration() {
-    return *_charGen;
-}
-
-CameraType Game::cameraType() const {
-    return _cameraType;
-}
-
-ScriptRunner &Game::scriptRunner() {
-    return _scriptRunner;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

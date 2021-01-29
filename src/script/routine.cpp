@@ -50,19 +50,11 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     return move(result);
 }
 
-const string &Routine::name() const {
-    return _name;
-}
-
-VariableType Routine::returnType() const {
-    return _returnType;
-}
-
-int Routine::argumentCount() const {
+int Routine::getArgumentCount() const {
     return static_cast<int>(_argumentTypes.size());
 }
 
-VariableType Routine::argumentType(int index) const {
+VariableType Routine::getArgumentType(int index) const {
     return _argumentTypes[index];
 }
 

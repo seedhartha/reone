@@ -129,10 +129,6 @@ void Mesh::render(uint32_t mode, int count, int offset) const {
     glBindVertexArray(0);
 }
 
-const AABB &Mesh::aabb() const {
-    return _aabb;
-}
-
 } // namespace render
 
 } // namespace reone

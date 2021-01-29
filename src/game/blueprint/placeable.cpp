@@ -76,10 +76,6 @@ void PlaceableBlueprint::loadScripts(Placeable &placeable) {
     placeable._onInvDisturbed = _utp->getString("OnInvDisturbed");
 }
 
-const string &PlaceableBlueprint::resRef() const {
-    return _resRef;
-}
-
 } // namespace game
 
 } // namespace reone

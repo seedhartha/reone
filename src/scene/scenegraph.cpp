@@ -249,14 +249,6 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
     }
 }
 
-const glm::vec3 &SceneGraph::ambientLightColor() const {
-    return _ambientLightColor;
-}
-
-shared_ptr<CameraSceneNode> SceneGraph::activeCamera() const {
-    return _activeCamera;
-}
-
 void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
     _activeCamera = camera;
 }
@@ -271,14 +263,6 @@ void SceneGraph::setUpdate(bool update) {
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
-}
-
-bool SceneGraph::isShadowLightPresent() const {
-    return _shadowLightPresent;
-}
-
-const glm::vec3 &SceneGraph::shadowLightPosition() const {
-    return _shadowLightPosition;
 }
 
 } // namespace scene

@@ -82,30 +82,28 @@ public:
     void clearAllActions() override;
     void die() override;
 
-    bool isSelectable() const override;
-
-    glm::vec3 getSelectablePosition() const override;
-
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
 
-    bool isMovementRestricted() const;
-    bool isInCombat() const;
+    bool isSelectable() const override;
+    bool isMovementRestricted() const { return _movementRestricted; }
+    bool isInCombat() const { return _inCombat; }
     bool isLevelUpPending() const;
 
+    glm::vec3 getSelectablePosition() const override;
     float getAttackRange() const;
 
-    Gender gender() const;
-    ModelType modelType() const;
-    int appearance() const;
-    std::shared_ptr<render::Texture> portrait() const;
-    float walkSpeed() const;
-    float runSpeed() const;
-    CreatureAttributes &attributes();
-    Faction faction() const;
-    int xp() const;
+    Gender gender() const { return _gender; }
+    ModelType modelType() const { return _modelType; }
+    int appearance() const { return _appearance; }
+    std::shared_ptr<render::Texture> portrait() const { return _portrait; }
+    float walkSpeed() const { return _walkSpeed; }
+    float runSpeed() const { return _runSpeed; }
+    CreatureAttributes &attributes() { return _attributes; }
+    Faction faction() const { return _faction; }
+    int xp() const { return _xp; }
 
     void setMovementType(MovementType type);
     void setTalking(bool talking);
@@ -138,7 +136,7 @@ public:
     std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
     CreatureWieldType getWieldType() const;
 
-    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const { return _equipment; }
 
     // END Equipment
 
@@ -147,7 +145,7 @@ public:
     void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
     void clearPath();
 
-    std::shared_ptr<Path> &path();
+    std::shared_ptr<Path> &path() { return _path; }
 
     // END Pathfinding
 

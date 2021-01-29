@@ -30,7 +30,8 @@ namespace render {
 class TxiFile {
 public:
     void load(const std::shared_ptr<std::istream> &in);
-    const TextureFeatures &features() const;
+
+    const TextureFeatures &features() const { return _features; }
 
 private:
     enum class State {

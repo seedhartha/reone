@@ -101,46 +101,6 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
     _open = false;
 }
 
-bool Door::isLockable() const {
-    return _lockable;
-}
-
-bool Door::isLocked() const {
-    return _locked;
-}
-
-bool Door::isStatic() const {
-    return _static;
-}
-
-bool Door::isKeyRequired() const {
-    return _keyRequired;
-}
-
-const string &Door::getOnOpen() const {
-    return _onOpen;
-}
-
-const string &Door::getOnFailToOpen() const {
-    return _onFailToOpen;
-}
-
-int Door::genericType() const {
-    return _genericType;
-}
-
-const string &Door::linkedToModule() const {
-    return _linkedToModule;
-}
-
-const string &Door::linkedTo() const {
-    return _linkedTo;
-}
-
-const string &Door::transitionDestin() const {
-    return _transitionDestin;
-}
-
 void Door::setLocked(bool locked) {
     _locked = locked;
 }

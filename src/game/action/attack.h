@@ -32,10 +32,7 @@ public:
         _range(range) {
     }
 
-    std::shared_ptr<SpatialObject> target() const {
-        return std::static_pointer_cast<SpatialObject>(_object);
-    }
-
+    std::shared_ptr<SpatialObject> target() const { return std::static_pointer_cast<SpatialObject>(_object); }
     float range() const { return _range; }
 
 private:

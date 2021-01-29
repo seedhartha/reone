@@ -58,7 +58,7 @@ public:
         AttackResultType result,
         int damage);
 
-    bool isActive() const;
+    bool isActive() const { return _active; }
 
 private:
     enum class RoundState {

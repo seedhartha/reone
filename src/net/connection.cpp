@@ -152,10 +152,6 @@ void Connection::handleWrite(uint32_t commandId, shared_ptr<boost::asio::streamb
     }
 }
 
-const string &Connection::tag() const {
-    return _tag;
-}
-
 void Connection::setTag(const string &tag) {
     _tag = tag;
 }

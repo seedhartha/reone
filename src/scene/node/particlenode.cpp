@@ -145,10 +145,6 @@ bool ParticleSceneNode::isExpired() const {
     return _emitter->lifeExpectancy() != -1 && _lifetime >= _emitter->lifeExpectancy();
 }
 
-int ParticleSceneNode::renderOrder() const {
-    return _renderOrder;
-}
-
 } // namespace scene
 
 } // namespace reone
