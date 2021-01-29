@@ -128,15 +128,15 @@ public:
     // Equipment
 
     bool equip(const std::string &resRef);
-    bool equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    bool equip(int slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
-    bool isSlotEquipped(InventorySlot slot) const;
+    bool isSlotEquipped(int slot) const;
 
-    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    std::shared_ptr<Item> getEquippedItem(int slot) const;
     CreatureWieldType getWieldType() const;
 
-    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const { return _equipment; }
+    const std::map<int, std::shared_ptr<Item>> &equipment() const { return _equipment; }
 
     // END Equipment
 
@@ -161,7 +161,7 @@ private:
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
-    std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
+    std::map<int, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };

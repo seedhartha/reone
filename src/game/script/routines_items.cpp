@@ -37,7 +37,7 @@ Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ct
 
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (creature) {
-        InventorySlot slot = static_cast<InventorySlot>(getInt(args, 0));
+        int slot = getInt(args, 0);
         result.object = creature->getEquippedItem(slot);
     } else {
         warn("Routines: getItemInSlot: creature is invalid");

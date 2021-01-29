@@ -111,7 +111,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
         glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
 
         RaycastProperties castProps;
-        castProps.flags = kRaycastRooms | kRaycastObjects | kRaycastAABB;
+        castProps.flags = RaycastFlags::roomsObjectsAABB;
         castProps.objectTypes = { ObjectType::Door };
         castProps.origin = adjustedCombatantPos;
         castProps.direction = glm::normalize(combatantToCreature);
@@ -366,7 +366,7 @@ void Combat::finishRound(Round &round) {
 void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
     if (!g_projectilesEnabled) return;
 
-    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::kInventorySlotRightWeapon));
+    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
     if (!weapon) return;
 
     shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());

@@ -180,7 +180,7 @@ static string getCameraAnimationName(int ordinal) {
 void Conversation::scheduleEndOfEntry() {
     float duration = kDefaultEntryDuration;
 
-    if (_cameraModel && (_currentEntry->waitFlags & kDialogWaitAnimFinish)) {
+    if (_cameraModel && (_currentEntry->waitFlags & DialogWaitFlags::waitAnimFinish)) {
         string animName(getCameraAnimationName(_currentEntry->cameraAnimation));
         shared_ptr<Animation> animation(_cameraModel->getAnimation(animName));
         if (animation) {

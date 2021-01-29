@@ -28,8 +28,8 @@ namespace reone {
 
 namespace game {
 
-enum DialogWaitFlags {
-    kDialogWaitAnimFinish = 1
+struct DialogWaitFlags {
+    static constexpr int waitAnimFinish = 1;
 };
 
 class Dialog {

@@ -35,24 +35,6 @@ enum class CursorType {
     RecoverMine
 };
 
-enum InventorySlot {
-    kInventorySlotHead = 0,
-    kInventorySlotBody = 1,
-    kInventorySlotHands = 3,
-    kInventorySlotRightWeapon = 4,
-    kInventorySlotLeftWeapon = 5,
-    kInventorySlotLeftArm = 7,
-    kInventorySlotRightArm = 8,
-    kInventorySlotImplant = 9,
-    kInventorySlotBelt = 10,
-    kInventorySlotCWeaponL = 14,
-    kInventorySlotCWeaponR = 15,
-    kInventorySlotCWeaponB = 16,
-    kInventorySlotCArmour = 17,
-    kInventorySlotRightWeapon2 = 18,
-    kInventorySlotLeftWeapon2 = 19
-};
-
 enum class ContextualAction {
     None,
     Unlock,
@@ -136,6 +118,24 @@ enum class ConversationType {
 enum class ComputerType {
     Normal = 0,
     Rakatan = 1
+};
+
+struct InventorySlot {
+    static constexpr int head = 0;
+    static constexpr int body = 1;
+    static constexpr int hands = 3;
+    static constexpr int rightWeapon = 4;
+    static constexpr int leftWeapon = 5;
+    static constexpr int leftArm = 7;
+    static constexpr int rightArm = 8;
+    static constexpr int implant = 9;
+    static constexpr int belt = 10;
+    static constexpr int cWeaponL = 14;
+    static constexpr int cWeaponR = 15;
+    static constexpr int cWeaponB = 16;
+    static constexpr int cArmour = 17;
+    static constexpr int rightWeapon2 = 18;
+    static constexpr int leftWeapon2 = 19;
 };
 
 } // namespace game

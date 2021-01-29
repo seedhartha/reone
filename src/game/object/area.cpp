@@ -327,7 +327,7 @@ bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = kRaycastRooms | kRaycastObjects;
+    props.flags = RaycastFlags::roomsObjects;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Door };
@@ -354,7 +354,7 @@ bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) 
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
+    props.flags = RaycastFlags::objectsAABBAlive;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Creature, ObjectType::Door };
@@ -554,19 +554,19 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
 
     RaycastResult result;
 
-    props.flags = kRaycastObjects;
+    props.flags = RaycastFlags::objects;
     props.objectTypes = { ObjectType::Placeable };
     props.except = nullptr;
 
     if (_collisionDetector.raycast(props, result)) return false;
 
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
+    props.flags = RaycastFlags::objectsAABBAlive;
     props.objectTypes = { ObjectType::Creature };
     props.except = except;
 
     if (_collisionDetector.raycast(props, result)) return false;
 
-    props.flags = kRaycastRooms | kRaycastWalkable;
+    props.flags = RaycastFlags::roomsWalkable;
     props.objectTypes.clear();
     props.except = nullptr;
 
@@ -698,7 +698,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastSelectable;
+    props.flags = RaycastFlags::objectsAABBSelectable;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
     props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };

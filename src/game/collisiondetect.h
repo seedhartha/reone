@@ -30,18 +30,24 @@ namespace game {
 
 static constexpr float kDefaultRaycastDistance = 8.0f;
 
-enum RaycastFlags {
-    kRaycastRooms = 1,
-    kRaycastObjects = 2,
-    kRaycastWalkable = 4,
-    kRaycastAABB = 8,
-    kRaycastSelectable = 0x10,
-    kRaycastAlive = 0x20
-};
-
 class Area;
 class Room;
 class SpatialObject;
+
+struct RaycastFlags {
+    static constexpr int rooms = 1;
+    static constexpr int objects = 2;
+    static constexpr int walkable = 4;
+    static constexpr int aabb = 8;
+    static constexpr int selectable = 0x10;
+    static constexpr int alive = 0x20;
+
+    static constexpr int roomsWalkable = rooms | walkable;
+    static constexpr int roomsObjects = rooms | objects;
+    static constexpr int roomsObjectsAABB = roomsObjects | aabb;
+    static constexpr int objectsAABBSelectable = objects | aabb | selectable;
+    static constexpr int objectsAABBAlive = objects | aabb | alive;
+};
 
 struct RaycastProperties {
     int flags { 0 };

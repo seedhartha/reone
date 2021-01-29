@@ -43,7 +43,7 @@ public:
     void load(const std::shared_ptr<ItemBlueprint> &blueprint);
 
     bool isEquippable() const;
-    bool isEquippable(InventorySlot slot) const;
+    bool isEquippable(int slot) const;
     bool isDropable() const { return _dropable; }
     bool isIdentified() const { return _identified; }
     bool isEquipped() const { return _equipped; }

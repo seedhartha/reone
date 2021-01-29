@@ -309,16 +309,16 @@ bool Creature::equip(const string &resRef) {
 
     bool equipped = false;
 
-    if (item->isEquippable(kInventorySlotBody)) {
-        equipped = equip(kInventorySlotBody, item);
-    } else if (item->isEquippable(kInventorySlotRightWeapon)) {
-        equipped = equip(kInventorySlotRightWeapon, item);
+    if (item->isEquippable(InventorySlot::body)) {
+        equipped = equip(InventorySlot::body, item);
+    } else if (item->isEquippable(InventorySlot::rightWeapon)) {
+        equipped = equip(InventorySlot::rightWeapon, item);
     }
 
     return equipped;
 }
 
-bool Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
+bool Creature::equip(int slot, const shared_ptr<Item> &item) {
     if (!item->isEquippable(slot)) return false;
 
     _equipment[slot] = item;
@@ -327,7 +327,7 @@ bool Creature::equip(InventorySlot slot, const shared_ptr<Item> &item) {
     if (_model) {
         updateModel();
 
-        if (slot == InventorySlot::kInventorySlotRightWeapon) {
+        if (slot == InventorySlot::rightWeapon) {
             shared_ptr<ModelSceneNode> weapon(_model->getAttachedModel("rhand"));
             if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
                 weapon->setDefaultAnimation("powered");
@@ -353,12 +353,12 @@ void Creature::unequip(const shared_ptr<Item> &item) {
     }
 }
 
-shared_ptr<Item> Creature::getEquippedItem(InventorySlot slot) const {
+shared_ptr<Item> Creature::getEquippedItem(int slot) const {
     auto equipped = _equipment.find(slot);
     return equipped != _equipment.end() ? equipped->second : nullptr;
 }
 
-bool Creature::isSlotEquipped(InventorySlot slot) const {
+bool Creature::isSlotEquipped(int slot) const {
     return _equipment.find(slot) != _equipment.end();
 }
 
@@ -428,7 +428,7 @@ glm::vec3 Creature::getSelectablePosition() const {
 float Creature::getAttackRange() const {
     float result = kDefaultAttackRange;
 
-    shared_ptr<Item> item(getEquippedItem(kInventorySlotRightWeapon));
+    shared_ptr<Item> item(getEquippedItem(InventorySlot::rightWeapon));
     if (item && item->attackRange() > kDefaultAttackRange) {
         result = item->attackRange();
     }
@@ -489,8 +489,8 @@ void Creature::runDeathScript() {
 }
 
 CreatureWieldType Creature::getWieldType() const {
-    auto rightWeapon = getEquippedItem(InventorySlot::kInventorySlotRightWeapon);
-    auto leftWeapon = getEquippedItem(InventorySlot::kInventorySlotLeftWeapon);
+    auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
+    auto leftWeapon = getEquippedItem(InventorySlot::leftWeapon);
 
     if (rightWeapon && leftWeapon) {
         return (rightWeapon->weaponWield() == WeaponWield::BlasterPistol) ? CreatureWieldType::DualPistols : CreatureWieldType::DualSwords;

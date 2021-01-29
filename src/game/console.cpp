@@ -51,7 +51,7 @@ static constexpr int kVisibleLineCount = 15;
 Console::Console(Game *game) :
     _game(game),
     _opts(game->options().graphics),
-    _input(kTextInputConsole) {
+    _input(TextInputFlags::console) {
 
     initCommands();
 }

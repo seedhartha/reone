@@ -111,30 +111,30 @@ void Equipment::configureItemsListBox() {
     protoItem.setHilightColor(getHilightColor(_gameId));
 }
 
-static InventorySlot getInventorySlot(Equipment::Slot slot) {
+static int getInventorySlot(Equipment::Slot slot) {
     switch (slot) {
         case Equipment::Slot::Implant:
-            return InventorySlot::kInventorySlotImplant;
+            return InventorySlot::implant;
         case Equipment::Slot::Head:
-            return InventorySlot::kInventorySlotHead;
+            return InventorySlot::head;
         case Equipment::Slot::Hands:
-            return InventorySlot::kInventorySlotHands;
+            return InventorySlot::hands;
         case Equipment::Slot::ArmL:
-            return InventorySlot::kInventorySlotLeftArm;
+            return InventorySlot::leftArm;
         case Equipment::Slot::Body:
-            return InventorySlot::kInventorySlotBody;
+            return InventorySlot::body;
         case Equipment::Slot::ArmR:
-            return InventorySlot::kInventorySlotRightArm;
+            return InventorySlot::rightArm;
         case Equipment::Slot::WeapL:
-            return InventorySlot::kInventorySlotLeftWeapon;
+            return InventorySlot::leftWeapon;
         case Equipment::Slot::Belt:
-            return InventorySlot::kInventorySlotBelt;
+            return InventorySlot::belt;
         case Equipment::Slot::WeapR:
-            return InventorySlot::kInventorySlotRightWeapon;
+            return InventorySlot::rightWeapon;
         case Equipment::Slot::WeapL2:
-            return InventorySlot::kInventorySlotLeftWeapon2;
+            return InventorySlot::leftWeapon2;
         case Equipment::Slot::WeapR2:
-            return InventorySlot::kInventorySlotRightWeapon2;
+            return InventorySlot::rightWeapon2;
         default:
             throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
     }
@@ -153,7 +153,7 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
             }
         }
     }
-    InventorySlot slot = getInventorySlot(_selectedSlot);
+    int slot = getInventorySlot(_selectedSlot);
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
@@ -325,7 +325,7 @@ void Equipment::updateEquipment() {
     for (auto &name : g_slotNames) {
         string tag("LBL_INV_" + name.second);
         configureControl(tag, [&name, &equipment](Control &control) {
-            InventorySlot slot = getInventorySlot(name.first);
+            int slot = getInventorySlot(name.first);
             Control::Border border(control.border());
 
             auto equipped = equipment.find(slot);
@@ -358,7 +358,7 @@ void Equipment::updateItems() {
         if (_selectedSlot == Slot::None) {
             if (!item->isEquippable()) continue;
         } else {
-            InventorySlot slot = getInventorySlot(_selectedSlot);
+            int slot = getInventorySlot(_selectedSlot);
             if (!item->isEquippable(slot)) continue;
         }
         ListBox::Item lbItem;
