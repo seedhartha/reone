@@ -36,14 +36,14 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(GameVersion version, const GraphicsOptions &opts) : _version(version), _gfxOpts(opts) {
+GUI::GUI(GameID gameId, const GraphicsOptions &opts) : _gameId(gameId), _gfxOpts(opts) {
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
 }
 
 string GUI::getResRef(const string &base) const {
-    return _version == GameVersion::TheSithLords ? base + "_p" : base;
+    return _gameId == GameID::TSL ? base + "_p" : base;
 }
 
 void GUI::load() {
@@ -85,7 +85,7 @@ void GUI::load() {
 void GUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         switch (type) {
             case BackgroundType::Computer0:
             case BackgroundType::Computer1:

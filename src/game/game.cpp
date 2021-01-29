@@ -64,14 +64,14 @@ Game::Game(const fs::path &path, const Options &opts) :
     _party(this),
     _scriptRunner(this) {
 
-    initGameVersion();
+    determineGameID();
 
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
 }
 
-void Game::initGameVersion() {
+void Game::determineGameID() {
     fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe", false));
-    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
+    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
 int Game::run() {
@@ -95,13 +95,13 @@ void Game::init() {
     _window.init();
     _worldPipeline.init();
 
-    Resources::instance().init(_version, _path);
-    Cursors::instance().init(_version);
-    Models::instance().init(_version);
-    Textures::instance().init(_version);
+    Resources::instance().init(_gameId, _path);
+    Cursors::instance().init(_gameId);
+    Models::instance().init(_gameId);
+    Textures::instance().init(_gameId);
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
-    Routines::instance().init(_version, this);
+    Routines::instance().init(_gameId, this);
 
     setCursorType(CursorType::Default);
 
@@ -159,8 +159,8 @@ void Game::changeScreen(GameScreen screen) {
 }
 
 string Game::getMainMenuMusic() const {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             return "mus_sion";
         default:
             return "mus_theme_cult";
@@ -545,7 +545,7 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    string imageResRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
+    string imageResRef(_gameId == GameID::TSL ? "load_default" : "load_chargen");
     withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
@@ -556,8 +556,8 @@ void Game::startCharacterGeneration() {
 }
 
 string Game::getCharacterGenerationMusic() const {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             return "mus_main";
         default:
             return "mus_theme_rep";
@@ -766,8 +766,8 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-GameVersion Game::version() const {
-    return _version;
+GameID Game::gameId() const {
+    return _gameId;
 }
 
 const Options &Game::options() const {

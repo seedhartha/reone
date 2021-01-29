@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class QuickOrCustom : public GameGUI {
 public:
-    QuickOrCustom(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    QuickOrCustom(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
 

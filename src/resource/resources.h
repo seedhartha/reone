@@ -48,7 +48,7 @@ class Resources {
 public:
     static Resources &instance();
 
-    void init(GameVersion version, const boost::filesystem::path &gamePath);
+    void init(GameID gameId, const boost::filesystem::path &gamePath);
     void deinit();
 
     void loadModule(const std::string &name);
@@ -77,7 +77,7 @@ public:
     const std::vector<std::string> &moduleNames() const;
 
 private:
-    GameVersion _version { GameVersion::KotOR };
+    GameID _gameId {GameID::KotOR };
     boost::filesystem::path _gamePath;
     std::vector<std::string> _moduleNames;
     StringProcessor _stringProcessor;

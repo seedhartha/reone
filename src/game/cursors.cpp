@@ -62,8 +62,8 @@ Cursors::~Cursors() {
     deinit();
 }
 
-void Cursors::init(GameVersion version) {
-    _version = version;
+void Cursors::init(GameID gameId) {
+    _gameId = gameId;
 }
 
 void Cursors::deinit() {
@@ -86,7 +86,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
 }
 
 const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type) {
-    auto &nameByResRef = (_version == GameVersion::TheSithLords) ? g_namesByResRefTsl : g_namesByResRefKotor;
+    auto &nameByResRef = (_gameId == GameID::TSL) ? g_namesByResRefTsl : g_namesByResRefKotor;
     return getCursorNames(type, nameByResRef);
 }
 

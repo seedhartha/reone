@@ -38,7 +38,7 @@ ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
     _scaling = ScalingMode::Stretch;
     _repliesControlTag = kControlTagReplies;
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -56,8 +56,8 @@ void ComputerGUI::configureMessage() {
     message.setProtoMatchContent(true);
 
     Control &protoItem = message.protoItem();
-    protoItem.setHilightColor(getHilightColor(_version));
-    protoItem.setTextColor(getBaseColor(_version));
+    protoItem.setHilightColor(getHilightColor(_gameId));
+    protoItem.setTextColor(getBaseColor(_gameId));
 }
 
 void ComputerGUI::configureReplies() {
@@ -65,8 +65,8 @@ void ComputerGUI::configureReplies() {
     replies.setProtoMatchContent(true);
 
     Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_version));
-    protoItem.setTextColor(getBaseColor(_version));
+    protoItem.setHilightColor(getHilightColor(_gameId));
+    protoItem.setTextColor(getBaseColor(_gameId));
 }
 
 void ComputerGUI::setMessage(string message) {

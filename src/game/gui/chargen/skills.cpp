@@ -73,8 +73,8 @@ static const unordered_map<Skill, int> g_descStrRefBySkill {
     { Skill::TreatInjury, 258 }
 };
 
-CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("skchrgen");
@@ -88,7 +88,7 @@ void CharGenSkills::load() {
     for (auto &skill : g_skillByLabelTag) {
         configureControl(skill.first, [this](Control &control) {
             control.setFocusable(true);
-            control.setHilightColor(getBaseColor(_version));
+            control.setHilightColor(getBaseColor(_gameId));
         });
     }
 

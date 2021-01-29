@@ -29,7 +29,7 @@ namespace resource {
 
 class StringProcessor {
 public:
-    void process(std::string &str, GameVersion ver) const;
+    void process(std::string &str, GameID ver) const;
 
 private:
     void stripDeveloperNotes(std::string &str) const;

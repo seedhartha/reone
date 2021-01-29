@@ -29,7 +29,7 @@ class CharacterGeneration;
 
 class CharGenAbilities : public GameGUI {
 public:
-    CharGenAbilities(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    CharGenAbilities(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
 

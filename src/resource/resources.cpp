@@ -59,8 +59,8 @@ Resources &Resources::instance() {
     return instance;
 }
 
-void Resources::init(GameVersion version, const fs::path &gamePath) {
-    _version = version;
+void Resources::init(GameID gameId, const fs::path &gamePath) {
+    _gameId = gameId;
     _gamePath = gamePath;
 
     indexKeyBifFiles();
@@ -80,7 +80,7 @@ void Resources::indexKeyBifFiles() {
 }
 
 void Resources::indexTexturePacks() {
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         fs::path patchPath(getPathIgnoreCase(_gamePath, kPatchFileName));
         indexErfFile(patchPath);
     }
@@ -108,8 +108,8 @@ void Resources::indexAudioFiles() {
     indexDirectory(musicPath);
     indexDirectory(soundsPath);
 
-    switch (_version) {
-        case GameVersion::TheSithLords: {
+    switch (_gameId) {
+        case GameID::TSL: {
             fs::path voicePath(getPathIgnoreCase(_gamePath, kVoiceDirectoryName));
             indexDirectory(voicePath);
             break;
@@ -144,7 +144,7 @@ void Resources::indexTalkTable() {
 }
 
 void Resources::indexExeFile() {
-    string filename(_version == GameVersion::TheSithLords ? kExeFileNameTsl : kExeFileNameKotor);
+    string filename(_gameId == GameID::TSL ? kExeFileNameTsl : kExeFileNameKotor);
     fs::path path(getPathIgnoreCase(_gamePath, filename));
 
     _exeFile.load(path);
@@ -199,7 +199,7 @@ void Resources::loadModule(const string &name) {
     indexTransientRimFile(rimPath);
     indexTransientRimFile(rimsPath);
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
         indexTransientErfFile(dlgPath);
     }
@@ -346,7 +346,7 @@ string Resources::getString(int strRef) const {
     }
 
     string text(table->getString(strRef).text);
-    _stringProcessor.process(text, _version);
+    _stringProcessor.process(text, _gameId);
 
     return move(text);
 }

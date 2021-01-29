@@ -54,11 +54,11 @@ static const char kBlueprintResRefKreia[] = "p_kreia";
 static bool g_warpEnabled = true;
 
 MainMenu::MainMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    switch (game->version()) {
-        case GameVersion::TheSithLords:
+    switch (game->gameId()) {
+        case GameID::TSL:
             _resRef = "mainmenu8x6_p";
             break;
         default:
@@ -89,7 +89,7 @@ void MainMenu::load() {
     }
     configureButtons();
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         Control &control = getControl("LBL_3DVIEW");
         const Control::Extent &extent = control.extent();
         float aspect = extent.width / static_cast<float>(extent.height);
@@ -114,7 +114,7 @@ void MainMenu::configureButtons() {
     setButtonColors("BTN_NEWGAME");
     setButtonColors("BTN_OPTIONS");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         setButtonColors("BTN_MUSIC");
     }
 }
@@ -123,11 +123,11 @@ void MainMenu::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
-    text.color = getBaseColor(_version);
+    text.color = getBaseColor(_gameId);
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_version);
+    hilight.color = getHilightColor(_gameId);
     control.setHilight(move(hilight));
 }
 
@@ -183,8 +183,8 @@ void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<CreatureBlueprint> playerBlueprint;
     shared_ptr<CreatureBlueprint> companionBlueprint;
 
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
             companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
             break;
@@ -208,8 +208,8 @@ void MainMenu::onModuleSelected(const string &name) {
     companion->setImmortal(true);
     party.addMember(0, companion);
 
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             player->equip("w_blaste_01");
             companion->equip("w_melee_06");
             break;

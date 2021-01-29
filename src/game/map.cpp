@@ -74,7 +74,7 @@ void Map::loadTexture(const string &area) {
 
 void Map::loadArrow() {
     string resRef("mm_barrow");
-    if (_game->version() == GameVersion::TheSithLords) {
+    if (_game->gameId() == GameID::TSL) {
         resRef += "_p";
     }
     _arrow = Textures::instance().get(resRef, TextureType::GUI);

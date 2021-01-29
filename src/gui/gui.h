@@ -70,7 +70,7 @@ protected:
         Stretch
     };
 
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     render::GraphicsOptions _gfxOpts;
     std::string _resRef;
     BackgroundType _backgroundType { BackgroundType::None };
@@ -90,7 +90,7 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
+    GUI(resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);

@@ -35,13 +35,13 @@ class Textures {
 public:
     static Textures &instance();
 
-    void init(resource::GameVersion version);
+    void init(resource::GameID gameId);
     void invalidateCache();
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureType type);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
     Textures() = default;

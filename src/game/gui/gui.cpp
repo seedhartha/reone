@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(GameVersion version, const GraphicsOptions &options) : GUI(version, options) {
+GameGUI::GameGUI(GameID gameId, const GraphicsOptions &options) : GUI(gameId, options) {
 }
 
 void GameGUI::onClick(const string &control) {
@@ -47,12 +47,12 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
 }
 
 void GameGUI::initForGame() {
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
         _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_version);
+        _defaultHilightColor = getHilightColor(_gameId);
     }
 }
 

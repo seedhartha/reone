@@ -48,12 +48,12 @@ static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
 SaveLoad::SaveLoad(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("saveload");
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         _backgroundType = BackgroundType::Menu;
     }
 
@@ -72,7 +72,7 @@ void SaveLoad::load() {
 
     Control &protoItem = lbGames.protoItem();
     protoItem.setUseBorderColorOverride(true);
-    protoItem.setBorderColorOverride(getBaseColor(_version));
+    protoItem.setBorderColorOverride(getBaseColor(_gameId));
     protoItem.setHilightColor(_defaultHilightColor);
 }
 

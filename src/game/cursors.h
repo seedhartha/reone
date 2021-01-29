@@ -42,13 +42,13 @@ public:
 
     ~Cursors();
 
-    void init(resource::GameVersion version);
+    void init(resource::GameID gameId);
     void deinit();
 
     std::shared_ptr<render::Cursor> get(CursorType type);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
 
     Cursors() = default;

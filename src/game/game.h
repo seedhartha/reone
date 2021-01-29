@@ -98,7 +98,7 @@ public:
     int getRunScriptVar() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    resource::GameVersion version() const;
+    resource::GameID gameId() const;
     const Options &options() const;
     scene::SceneGraph &sceneGraph();
     ObjectFactory &objectFactory();
@@ -198,7 +198,7 @@ private:
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
@@ -279,7 +279,7 @@ private:
 
     // Initialization
 
-    void initGameVersion();
+    void determineGameID();
     void deinit();
 
     // END Initialization

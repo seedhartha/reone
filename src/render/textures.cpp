@@ -41,8 +41,8 @@ Textures &Textures::instance() {
     return instance;
 }
 
-void Textures::init(GameVersion version) {
-    _version = version;
+void Textures::init(GameID gameId) {
+    _gameId = gameId;
 }
 
 void Textures::invalidateCache() {

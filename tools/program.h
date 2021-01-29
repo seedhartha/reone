@@ -49,7 +49,7 @@ private:
     boost::filesystem::path _destPath;
     std::string _target;
     boost::filesystem::path _keyPath;
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     Command _command { Command::None };
     std::unique_ptr<FileTool> _tool;
 
@@ -67,7 +67,7 @@ private:
 
     void initOptions();
     void loadOptions();
-    void initGameVersion();
+    void determineGameID();
     void initFileTool();
 };
 

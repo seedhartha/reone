@@ -26,9 +26,9 @@ namespace reone {
 
 namespace resource {
 
-enum class GameVersion {
+enum class GameID {
     KotOR,
-    TheSithLords
+    TSL
 };
 
 /**

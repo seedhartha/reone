@@ -32,7 +32,7 @@ namespace reone {
 namespace game {
 
 CharacterMenu::CharacterMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("character");
@@ -99,7 +99,7 @@ void CharacterMenu::update(float dt) {
 }
 
 void CharacterMenu::refreshPortraits() {
-    if (_version != GameVersion::KotOR) return;
+    if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyMember1(party.getMember(1));

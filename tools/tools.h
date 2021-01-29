@@ -55,7 +55,7 @@ private:
     void throwNotImplemented() const;
 };
 
-std::unique_ptr<FileTool> getFileToolByPath(resource::GameVersion version, const boost::filesystem::path &path);
+std::unique_ptr<FileTool> getFileToolByPath(resource::GameID gameId, const boost::filesystem::path &path);
 
 class KeyTool : public FileTool {
 public:

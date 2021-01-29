@@ -28,13 +28,13 @@ namespace render {
 
 class MdlFile : public resource::BinaryFile {
 public:
-    MdlFile(resource::GameVersion version);
+    MdlFile(resource::GameID gameId);
 
     void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
     std::shared_ptr<render::Model> model() const;
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId {resource::GameID::KotOR };
     std::shared_ptr<std::istream> _mdx;
     std::unique_ptr<StreamReader> _mdxReader;
     std::string _name;

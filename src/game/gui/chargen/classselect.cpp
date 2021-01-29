@@ -58,12 +58,12 @@ static map<ClassType, int> g_classDescStrRefs {
 };
 
 ClassSelection::ClassSelection(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("classsel");
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         _backgroundType = BackgroundType::Menu;
     }
 
@@ -85,32 +85,32 @@ void ClassSelection::configureClassButtons() {
     Control &button1 = getControl("BTN_SEL1");
     setButtonColors(button1);
     button1.extent().getCenter(x, y);
-    _classButtons.push_back({ &button1, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
+    _classButtons.push_back({ &button1, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     Control &button2 = getControl("BTN_SEL2");
     setButtonColors(button2);
     button2.extent().getCenter(x, y);
-    _classButtons.push_back({ &button2, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
+    _classButtons.push_back({ &button2, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button3 = getControl("BTN_SEL3");
     setButtonColors(button3);
     button3.extent().getCenter(x, y);
-    _classButtons.push_back({ &button3, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
+    _classButtons.push_back({ &button3, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button4 = getControl("BTN_SEL4");
     setButtonColors(button4);
     button4.extent().getCenter(x, y);
-    _classButtons.push_back({ &button4, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
+    _classButtons.push_back({ &button4, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button5 = getControl("BTN_SEL5");
     setButtonColors(button5);
     button5.extent().getCenter(x, y);
-    _classButtons.push_back({ &button5, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
+    _classButtons.push_back({ &button5, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button6 = getControl("BTN_SEL6");
     setButtonColors(button6);
     button6.extent().getCenter(x, y);
-    _classButtons.push_back({ &button6, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
+    _classButtons.push_back({ &button6, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     _enlargedButtonSize = glm::vec2(button1.extent().width, button1.extent().height);
     _defaultButtonSize = glm::vec2(button2.extent().width, button2.extent().height);
@@ -120,11 +120,11 @@ void ClassSelection::configureClassButtons() {
 
 void ClassSelection::setButtonColors(Control &control) {
     Control::Border border(control.border());
-    border.color = getBaseColor(_version);
+    border.color = getBaseColor(_gameId);
     control.setBorder(move(border));
 
     Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_version);
+    hilight.color = getHilightColor(_gameId);
     control.setHilight(move(hilight));
 }
 
@@ -142,8 +142,8 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
 }
 
 void ClassSelection::configureClassModels() {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             configureClassModel(0, Gender::Male, ClassType::JediConsular);
             configureClassModel(1, Gender::Male, ClassType::JediSentinel);
             configureClassModel(2, Gender::Male, ClassType::JediGuardian);
