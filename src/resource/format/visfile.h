@@ -29,8 +29,10 @@ namespace resource {
 class VisFile {
 public:
     VisFile() = default;
+
     void load(const std::shared_ptr<std::istream> &in);
-    const Visibility &visibility() const;
+
+    const Visibility &visibility() const { return _visibility; }
 
 private:
     Visibility _visibility;

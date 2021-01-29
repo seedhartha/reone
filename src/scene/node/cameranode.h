@@ -34,9 +34,9 @@ public:
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const AABB &aabb) const;
 
-    const glm::mat4 &projection() const;
-    const glm::mat4 &view() const;
-    float farPlane() const;
+    const glm::mat4 &projection() const { return _projection; }
+    const glm::mat4 &view() const { return _view; }
+    float farPlane() const { return _farPlane; }
 
     void setProjection(const glm::mat4 &projection);
     void setFarPlane(float far);

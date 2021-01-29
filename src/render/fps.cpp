@@ -47,14 +47,6 @@ void FpsCounter::update(float dt) {
     }
 }
 
-bool FpsCounter::hasAverage() const {
-    return _hasAverage;
-}
-
-float FpsCounter::average() const {
-    return _average;
-}
-
 } // namespace render
 
 } // namespace reone

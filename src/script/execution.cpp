@@ -208,13 +208,13 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     const Routine &routine = _context.routines->get(ins.routine);
 
-    if (ins.argCount > routine.argumentCount()) {
+    if (ins.argCount > routine.getArgumentCount()) {
         throw runtime_error("Script: too many routine arguments");
     }
     vector<Variable> args;
 
     for (int i = 0; i < ins.argCount; ++i) {
-        VariableType type = routine.argumentType(i);
+        VariableType type = routine.getArgumentType(i);
 
         switch (type) {
             case VariableType::Vector:
@@ -582,7 +582,7 @@ void ScriptExecution::executeStoreState(const Instruction &ins) {
     _savedState.insOffset = ins.offset + static_cast<int>(ins.type);
 }
 
-int ScriptExecution::stackSize() const {
+int ScriptExecution::getStackSize() const {
     return static_cast<int>(_stack.size());
 }
 

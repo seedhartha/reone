@@ -38,12 +38,12 @@ public:
     bool intersect(const AABB &other) const;
     bool intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const;
 
-    glm::vec3 size() const;
+    glm::vec3 getSize() const;
 
-    const glm::vec3 &min() const;
-    const glm::vec3 &max() const;
-    const glm::vec3 &center() const;
-    const glm::mat4 &transform() const;
+    const glm::vec3 &min() const { return _min; }
+    const glm::vec3 &max() const { return _max; }
+    const glm::vec3 &center() const { return _center; }
+    const glm::mat4 &transform() const { return _transform; }
 
 private:
     bool _empty { true };

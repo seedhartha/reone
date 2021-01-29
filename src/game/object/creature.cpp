@@ -413,42 +413,6 @@ void Creature::clearPath() {
     _path.reset();
 }
 
-Gender Creature::gender() const {
-    return _gender;
-}
-
-Creature::ModelType Creature::modelType() const {
-    return _modelType;
-}
-
-int Creature::appearance() const {
-    return _appearance;
-}
-
-shared_ptr<Texture> Creature::portrait() const {
-    return _portrait;
-}
-
-const map<InventorySlot, shared_ptr<Item>> &Creature::equipment() const {
-    return _equipment;
-}
-
-shared_ptr<Creature::Path> &Creature::path() {
-    return _path;
-}
-
-float Creature::walkSpeed() const {
-    return _walkSpeed;
-}
-
-float Creature::runSpeed() const {
-    return _runSpeed;
-}
-
-CreatureAttributes &Creature::attributes() {
-    return _attributes;
-}
-
 glm::vec3 Creature::getSelectablePosition() const {
     if (_dead) return _model->getCenterOfAABB();
 
@@ -459,14 +423,6 @@ glm::vec3 Creature::getSelectablePosition() const {
     }
 
     return _model->getCenterOfAABB();
-}
-
-Faction Creature::faction() const {
-    return _faction;
-}
-
-int Creature::xp() const {
-    return _xp;
 }
 
 float Creature::getAttackRange() const {
@@ -482,14 +438,6 @@ float Creature::getAttackRange() const {
 
 void Creature::setFaction(Faction faction) {
     _faction = faction;
-}
-
-bool Creature::isMovementRestricted() const {
-    return _movementRestricted;
-}
-
-bool Creature::isInCombat() const {
-    return _inCombat;
 }
 
 bool Creature::isLevelUpPending() const {

@@ -43,8 +43,8 @@ public:
 
     std::vector<std::shared_ptr<SpatialObject>> getSelectableObjects() const;
 
-    std::shared_ptr<SpatialObject> hilightedObject() const;
-    std::shared_ptr<SpatialObject> selectedObject() const;
+    std::shared_ptr<SpatialObject> hilightedObject() const { return _hilightedObject; }
+    std::shared_ptr<SpatialObject> selectedObject() const { return _selectedObject; }
 
 private:
     const Area *_area { nullptr };

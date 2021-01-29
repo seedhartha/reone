@@ -52,15 +52,15 @@ public:
     void build();
     void prepareFrame();
 
-    std::shared_ptr<CameraSceneNode> activeCamera() const;
+    std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setReferenceNode(const std::shared_ptr<SceneNode> &node);
     void setUpdate(bool update);
 
-    // Lights
+    // Lights and shadows
 
-    bool isShadowLightPresent() const;
+    bool isShadowLightPresent() const { return _shadowLightPresent; }
 
     void getLightsAt(
         const glm::vec3 &position,
@@ -68,12 +68,12 @@ public:
         int count = render::kMaxLightCount,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
-    const glm::vec3 &ambientLightColor() const;
-    const glm::vec3 &shadowLightPosition() const;
+    const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
+    const glm::vec3 &shadowLightPosition() const { return _shadowLightPosition; }
 
     void setAmbientLightColor(const glm::vec3 &color);
 
-    // END Lights
+    // END Lights and shadows
 
 private:
     render::GraphicsOptions _opts;

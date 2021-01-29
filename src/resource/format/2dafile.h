@@ -33,7 +33,7 @@ public:
     int getInt(const std::string &column) const;
     float getFloat(const std::string &column) const;
 
-    const std::unordered_map<std::string, std::string> &values() const;
+    const std::unordered_map<std::string, std::string> &values() const { return _values; }
 
 private:
     std::unordered_map<std::string, std::string> _values;
@@ -50,8 +50,8 @@ public:
     uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
     float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
 
-    const std::vector<std::string> &headers() const;
-    const std::vector<TwoDaRow> &rows() const;
+    const std::vector<std::string> &headers() const { return _headers; }
+    const std::vector<TwoDaRow> &rows() const { return _rows; }
 
 private:
     std::vector<std::string> _headers;
@@ -67,7 +67,7 @@ class TwoDaFile : public BinaryFile {
 public:
     TwoDaFile();
 
-    const std::shared_ptr<TwoDaTable> &table() const;
+    const std::shared_ptr<TwoDaTable> &table() const { return _table; }
 
 private:
     int _rowCount { 0 };

@@ -506,42 +506,6 @@ void Control::stretch(float x, float y, int mask) {
     updateTransform();
 }
 
-const string &Control::tag() const {
-    return _tag;
-}
-
-const Control::Extent &Control::extent() const {
-    return _extent;
-}
-
-Control::Border &Control::border() const {
-    return *_border;
-}
-
-const Control::Border &Control::hilight() const {
-    return *_hilight;
-}
-
-const Control::Text &Control::text() const {
-    return _text;
-}
-
-bool Control::isFocusable() const {
-    return _focusable;
-}
-
-bool Control::isClickable() const {
-    return _clickable;
-}
-
-bool Control::isVisible() const {
-    return _visible;
-}
-
-bool Control::isDisabled() const {
-    return _disabled;
-}
-
 void Control::setFocusable(bool focusable) {
     _focusable = focusable;
 }

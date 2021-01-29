@@ -46,17 +46,17 @@ public:
     void play();
     void stop();
 
-    bool isActive() const;
+    bool isActive() const { return _active; }
 
     glm::vec3 getPosition() const;
 
-    int priority() const;
-    float maxDistance() const;
-    float minDistance() const;
-    bool continuous() const;
-    float elevation() const;
-    bool looping() const;
-    bool positional() const;
+    int priority() const { return _priority; }
+    float maxDistance() const { return _maxDistance; }
+    float minDistance() const { return _minDistance; }
+    bool continuous() const { return _continuous; }
+    float elevation() const { return _elevation; }
+    bool looping() const { return _looping; }
+    bool positional() const { return _positional; }
 
     void setAudible(bool audible);
 

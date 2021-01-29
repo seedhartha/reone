@@ -108,16 +108,16 @@ public:
      */
     virtual void stretch(float x, float y, int mask = kStretchAll);
 
-    bool isClickable() const;
-    bool isDisabled() const;
-    bool isFocusable() const;
-    bool isVisible() const;
+    bool isClickable() const { return _clickable; }
+    bool isDisabled() const { return _disabled; }
+    bool isFocusable() const { return _focusable; }
+    bool isVisible() const { return _visible; }
 
-    Border &border() const;
-    const Extent &extent() const;
-    const Border &hilight() const;
-    const std::string &tag() const;
-    const Text &text() const;
+    Border &border() const { return *_border; }
+    const Extent &extent() const { return _extent; }
+    const Border &hilight() const { return *_hilight; }
+    const std::string &tag() const { return _tag; }
+    const Text &text() const { return _text; }
     const std::vector<std::string> &textLines() const { return _textLines; }
 
     void setBorder(const Border &border);

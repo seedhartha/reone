@@ -56,11 +56,7 @@ int AudioStream::getALAudioFormat(AudioFormat format) const {
     }
 }
 
-int AudioStream::duration() const {
-    return static_cast<int>(_duration);
-}
-
-int AudioStream::frameCount() const {
+int AudioStream::getFrameCount() const {
     return static_cast<int>(_frames.size());
 }
 

@@ -49,21 +49,21 @@ public:
     void refreshAABB();
     void detonate();
 
-    bool hasTextureOverride() const;
-    bool isVisible() const;
-    bool isOnScreen() const;
+    bool hasTextureOverride() const { return static_cast<bool>(_textureOverride); }
+    bool isVisible() const { return _visible; }
+    bool isOnScreen() const { return _onScreen; }
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
+    const std::string &getName() const;
 
-    const std::string &name() const;
-    std::shared_ptr<render::Model> model() const;
-    std::shared_ptr<render::Texture> textureOverride() const;
-    float alpha() const;
-    const AABB &aabb() const;
+    std::shared_ptr<render::Model> model() const { return _model; }
+    std::shared_ptr<render::Texture> textureOverride() const { return _textureOverride; }
+    float alpha() const { return _alpha; }
+    const AABB &aabb() const { return _aabb; }
 
     void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
     void setVisible(bool visible);
@@ -87,8 +87,8 @@ public:
     void updateLighting();
     void setLightingIsDirty();
 
-    bool isLightingEnabled() const;
-    const std::vector<LightSceneNode *> &lightsAffectedBy() const;
+    bool isLightingEnabled() const { return _lightingEnabled; }
+    const std::vector<LightSceneNode *> &lightsAffectedBy() const { return _lightsAffectedBy; }
 
     void setLightingEnabled(bool affected);
     void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);

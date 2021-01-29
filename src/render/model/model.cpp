@@ -41,7 +41,7 @@ Model::Model(
 
     init(_rootNode);
 
-    glm::vec3 aabbSize(_aabb.size());
+    glm::vec3 aabbSize(_aabb.getSize());
     _radiusXY = 0.5f * glm::max(aabbSize.x, aabbSize.y);
 }
 
@@ -100,34 +100,6 @@ shared_ptr<ModelNode> Model::findNodeByNumber(uint16_t number) const {
 shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
     auto it = _nodeByName.find(name);
     return it != _nodeByName.end() ? it->second : nullptr;
-}
-
-Model::Classification Model::classification() const {
-    return _classification;
-}
-
-const string &Model::name() const {
-    return _name;
-}
-
-ModelNode &Model::rootNode() const {
-    return *_rootNode;
-}
-
-float Model::animationScale() const {
-    return _animationScale;
-}
-
-shared_ptr<Model> Model::superModel() const {
-    return _superModel;
-}
-
-const AABB &Model::aabb() const {
-    return _aabb;
-}
-
-float Model::radiusXY() const {
-    return _radiusXY;
 }
 
 void Model::setClassification(Classification classification) {

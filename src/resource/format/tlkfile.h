@@ -35,7 +35,7 @@ public:
     TalkTable() = default;
 
     const TalkTableString &getString(int32_t ref) const;
-    int stringCount() const;
+    int getStringCount() const;
 
 private:
     std::vector<TalkTableString> _strings;
@@ -49,7 +49,8 @@ private:
 class TlkFile : public BinaryFile {
 public:
     TlkFile();
-    std::shared_ptr<TalkTable> table() const;
+
+    std::shared_ptr<TalkTable> table() const { return _table; }
 
 private:
     uint32_t _stringCount { 0 };

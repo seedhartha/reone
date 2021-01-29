@@ -257,34 +257,6 @@ bool Texture::isGrayscale() const {
     return _pixelFormat == PixelFormat::Grayscale;
 }
 
-const string &Texture::name() const {
-    return _name;
-}
-
-uint32_t Texture::textureId() const {
-    return _textureId;
-}
-
-int Texture::width() const {
-    return _width;
-}
-
-int Texture::height() const {
-    return _height;
-}
-
-const vector<Texture::Layer> &Texture::layers() const {
-    return _layers;
-}
-
-PixelFormat Texture::pixelFormat() const {
-    return _pixelFormat;
-}
-
-const TextureFeatures &Texture::features() const {
-    return _features;
-}
-
 void Texture::setPixels(vector<Layer> layers, PixelFormat format) {
     if (!_headless && !_inited) {
         throw logic_error("Texture has not been initialized: " + _name);

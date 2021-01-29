@@ -36,7 +36,7 @@ public:
 
     ByteArray getBytes() const override;
 
-    CommandType type() const;
+    CommandType type() const { return _type; }
 
 private:
     CommandType _type { CommandType::None };

@@ -138,14 +138,6 @@ ByteArray ErfFile::getResourceData(int idx) {
     return getResourceData(_resources[idx]);
 }
 
-int ErfFile::entryCount() const {
-    return _entryCount;
-}
-
-const vector<ErfFile::Key> &ErfFile::keys() const {
-    return _keys;
-}
-
 } // namespace resource
 
 } // namespace reone

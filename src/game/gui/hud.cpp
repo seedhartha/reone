@@ -200,7 +200,7 @@ void HUD::render() const {
     drawMinimap();
 
     Party &party = _game->party();
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
 
@@ -289,7 +289,7 @@ void HUD::hideCombatHud() {
 void HUD::refreshActionQueueItems() const {
     int i = 0;
 
-    for (auto &action : _game->party().leader()->actionQueue().actions()) {
+    for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
         if (action->type() != ActionType::AttackObject) continue;
 
         Control &item = getControl("LBL_QUEUE" + to_string(i));
@@ -319,9 +319,9 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_OPT") {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     } else if (control == "BTN_CLEARALL") {
-        _game->party().leader()->actionQueue().clear();
+        _game->party().getLeader()->actionQueue().clear();
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        for (auto &action : _game->party().leader()->actionQueue().actions()) {
+        for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;

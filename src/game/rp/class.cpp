@@ -104,26 +104,6 @@ const SavingThrows &CreatureClass::getSavingThrows(int level) const {
     return maybeThrows->second;
 }
 
-const string &CreatureClass::name() const {
-    return _name;
-}
-
-const string &CreatureClass::description() const {
-    return _description;
-}
-
-int CreatureClass::hitdie() const {
-    return _hitdie;
-}
-
-const CreatureAttributes &CreatureClass::defaultAttributes() const {
-    return _defaultAttributes;
-}
-
-int CreatureClass::skillPointBase() const {
-    return _skillPointBase;
-}
-
 } // namespace game
 
 } // namespace reone

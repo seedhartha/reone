@@ -55,7 +55,7 @@ public:
 
     void initGL();
 
-    bool isSelfIllumEnabled() const;
+    bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
 
     bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
@@ -63,25 +63,25 @@ public:
 
     const glm::vec3 &getCenterOfAABB() const;
 
-    int index() const;
-    const ModelNode *parent() const;
-    uint16_t nodeNumber() const;
-    const std::string &name() const;
-    const glm::vec3 &position() const;
-    const glm::quat &orientation() const;
-    const glm::mat4 &localTransform() const;
-    const glm::mat4 &absoluteTransform() const;
-    const glm::mat4 &absoluteTransformInverse() const;
-    const glm::vec3 &color() const;
-    const glm::vec3 &selfIllumColor() const;
-    float alpha() const;
-    float radius() const;
-    float multiplier() const;
-    std::shared_ptr<Light> light() const;
-    std::shared_ptr<ModelMesh> mesh() const;
-    std::shared_ptr<Skin> skin() const;
-    std::shared_ptr<Emitter> emitter() const;
-    const std::vector<std::shared_ptr<ModelNode>> &children() const;
+    int index() const { return _index; }
+    const ModelNode *parent() const { return _parent; }
+    uint16_t nodeNumber() const { return _nodeNumber; }
+    const std::string &name() const { return _name; }
+    const glm::vec3 &position() const { return _position; }
+    const glm::quat &orientation() const { return _orientation; }
+    const glm::mat4 &localTransform() const { return _localTransform; }
+    const glm::mat4 &absoluteTransform() const { return _absTransform; }
+    const glm::mat4 &absoluteTransformInverse() const { return _absTransformInv; }
+    const glm::vec3 &color() const { return _color; }
+    const glm::vec3 &selfIllumColor() const { return _selfIllumColor; }
+    float alpha() const { return _alpha; }
+    float radius() const { return _radius; }
+    float multiplier() const { return _multiplier; }
+    std::shared_ptr<Light> light() const { return _light; }
+    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
+    std::shared_ptr<Skin> skin() const { return _skin; }
+    std::shared_ptr<Emitter> emitter() const { return _emitter; }
+    const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
 private:
     struct PositionKeyframe {

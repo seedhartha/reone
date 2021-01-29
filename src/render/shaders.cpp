@@ -844,14 +844,6 @@ void Shaders::deactivate() {
     _activeOrdinal = 0;
 }
 
-shared_ptr<LightingUniforms> Shaders::lightingUniforms() const {
-    return _lightingUniforms;
-}
-
-shared_ptr<SkeletalUniforms> Shaders::skeletalUniforms() const {
-    return _skeletalUniforms;
-}
-
 void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
     uint32_t ordinal = _activeOrdinal;
 

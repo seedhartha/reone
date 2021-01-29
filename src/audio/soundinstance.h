@@ -41,7 +41,7 @@ public:
     void init();
     void update();
 
-    std::shared_ptr<SoundHandle> handle() const;
+    std::shared_ptr<SoundHandle> handle() const { return _handle; }
 
 private:
     std::shared_ptr<AudioStream> _stream;

@@ -226,10 +226,6 @@ int16_t WavFile::getIMASample(int channel, uint8_t nibble) {
     return sample;
 }
 
-shared_ptr<AudioStream> WavFile::stream() const {
-    return _stream;
-}
-
 } // namespace audio
 
 } // namespace reone

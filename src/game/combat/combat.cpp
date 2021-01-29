@@ -210,7 +210,7 @@ void Combat::updateRounds(float dt) {
 
         // Do not start a combat round, if attacker is a moving party leader
 
-        if (attacker->creature->id() == _game->party().leader()->id() && _game->module()->player().isMovementRequested()) continue;
+        if (attacker->creature->id() == _game->party().getLeader()->id() && _game->module()->player().isMovementRequested()) continue;
 
         // Check if attacker already participates in a combat round
 
@@ -449,7 +449,7 @@ void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const share
 }
 
 void Combat::updateActivation() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     bool active = partyLeader && _combatantById.count(partyLeader->id()) != 0;
     if (_active == active) return;
 
@@ -459,10 +459,6 @@ void Combat::updateActivation() {
         onExitCombatMode();
     }
     _active = active;
-}
-
-bool Combat::isActive() const {
-    return _active;
 }
 
 void Combat::onEnterCombatMode() {

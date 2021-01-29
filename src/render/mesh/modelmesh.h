@@ -49,25 +49,25 @@ public:
 
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
 
-    bool shouldRender() const;
-    bool shouldCastShadows() const;
+    bool shouldRender() const { return _render; }
+    bool shouldCastShadows() const { return _shadow; }
 
     bool isTransparent() const;
     bool isBackgroundGeometry() const { return _backgroundGeometry; }
 
-    bool hasDiffuseTexture() const;
-    bool hasEnvmapTexture() const;
-    bool hasLightmapTexture() const;
-    bool hasBumpyShinyTexture() const;
-    bool hasBumpmapTexture() const;
+    bool hasDiffuseTexture() const { return static_cast<bool>(_diffuse); }
+    bool hasEnvmapTexture() const { return static_cast<bool>(_envmap); }
+    bool hasLightmapTexture() const { return static_cast<bool>(_lightmap); }
+    bool hasBumpyShinyTexture() const { return static_cast<bool>(_bumpyShiny); }
+    bool hasBumpmapTexture() const { return static_cast<bool>(_bumpmap); }
 
-    int transparency() const;
+    int transparency() const { return _transparency; }
     const glm::vec3 &diffuseColor() const { return _diffuseColor; }
     const glm::vec3 &ambientColor() const { return _ambientColor; }
-    const UVAnimation &uvAnimation() const;
+    const UVAnimation &uvAnimation() const { return _uvAnimation; }
 
-    const std::shared_ptr<Texture> &diffuseTexture() const;
-    const std::shared_ptr<Texture> &bumpmapTexture() const;
+    const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
+    const std::shared_ptr<Texture> &bumpmapTexture() const { return _bumpmap; }
 
 private:
     bool _render { false };

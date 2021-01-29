@@ -166,10 +166,6 @@ float Font::measure(const string &text) const {
     return w;
 }
 
-float Font::height() const {
-    return _height;
-}
-
 } // namespace render
 
 } // namespace reone

@@ -35,14 +35,6 @@ void Camera::update(float dt) {
 void Camera::stopMovement() {
 }
 
-float Camera::facing() const {
-    return _facing;
-}
-
-shared_ptr<CameraSceneNode> Camera::sceneNode() const {
-    return _sceneNode;
-}
-
 } // namespace game
 
 } // namespace reone

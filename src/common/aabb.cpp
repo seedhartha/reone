@@ -146,24 +146,8 @@ bool AABB::intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &d
     return true;
 }
 
-glm::vec3 AABB::size() const {
+glm::vec3 AABB::getSize() const {
     return _max - _min;
-}
-
-const glm::vec3 &AABB::min() const {
-    return _min;
-}
-
-const glm::vec3 &AABB::max() const {
-    return _max;
-}
-
-const glm::vec3 &AABB::center() const {
-    return _center;
-}
-
-const glm::mat4 &AABB::transform() const {
-    return _transform;
 }
 
 } // namespace reone

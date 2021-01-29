@@ -44,7 +44,7 @@ public:
     bool handle(const SDL_Event &event);
     void render() const;
 
-    bool isOpen() const;
+    bool isOpen() const { return _open; }
 
 private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;

@@ -92,7 +92,7 @@ public:
 
     void goToNextStep();
 
-    StaticCreatureBlueprint &character();
+    StaticCreatureBlueprint &character() { return *_character; }
 
     void setCharacter(StaticCreatureBlueprint character);
     void setAbilities(CreatureAbilities abilities);

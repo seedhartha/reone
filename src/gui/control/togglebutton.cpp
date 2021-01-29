@@ -32,10 +32,6 @@ void ToggleButton::toggle() {
     _on = !_on;
 }
 
-bool ToggleButton::isOn() const {
-    return _on;
-}
-
 void ToggleButton::setOnColor(const glm::vec3 &color) {
     _onColor = color;
 }

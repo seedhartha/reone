@@ -134,9 +134,10 @@ public:
 
     void add(Instruction instr);
 
-    const std::string &name() const;
-    uint32_t length() const;
     const Instruction &getInstruction(uint32_t offset) const;
+
+    const std::string &name() const { return _name; }
+    uint32_t length() const { return _length; }
 
     void setLength(uint32_t length);
 

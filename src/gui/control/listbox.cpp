@@ -262,20 +262,8 @@ const ListBox::Item &ListBox::getItemAt(int index) const {
     return _items[index];
 }
 
-Control &ListBox::protoItem() const {
-    return *_protoItem;
-}
-
-Control &ListBox::scrollBar() const {
-    return *_scrollBar;
-}
-
-int ListBox::itemCount() const {
+int ListBox::getItemCount() const {
     return static_cast<int>(_items.size());
-}
-
-int ListBox::hilightedIndex() const {
-    return _hilightedIndex;
 }
 
 } // namespace gui

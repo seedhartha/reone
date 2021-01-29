@@ -29,7 +29,7 @@ class CommandAction : public Action {
 public:
     CommandAction(const script::ExecutionContext &ctx);
 
-    const script::ExecutionContext &context() const;
+    const script::ExecutionContext &context() const { return _context; }
 
 private:
     script::ExecutionContext _context;

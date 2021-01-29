@@ -29,14 +29,6 @@ MoveToObjectAction::MoveToObjectAction(const shared_ptr<Object> &object, bool ru
     _distance(distance) {
 }
 
-bool MoveToObjectAction::getRun() const {
-    return _run;
-}
-
-float MoveToObjectAction::distance() const {
-    return _distance;
-}
-
 } // namespace game
 
 } // namespace reone

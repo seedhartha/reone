@@ -100,8 +100,9 @@ public:
 
     void complete();
 
-    ActionType type() const;
-    bool isCompleted() const;
+    bool isCompleted() const { return _completed; }
+
+    ActionType type() const { return _type; }
 
 protected:
     ActionType _type { ActionType::QueueEmpty };

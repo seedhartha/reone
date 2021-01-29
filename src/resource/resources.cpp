@@ -341,7 +341,7 @@ string Resources::getString(int strRef) const {
     static string empty;
 
     shared_ptr<TalkTable> table(_tlkFile.table());
-    if (strRef == -1 || strRef >= table->stringCount()) {
+    if (strRef == -1 || strRef >= table->getStringCount()) {
         return empty;
     }
 
@@ -349,10 +349,6 @@ string Resources::getString(int strRef) const {
     _stringProcessor.process(text, _gameId);
 
     return move(text);
-}
-
-const vector<string> &Resources::moduleNames() const {
-    return _moduleNames;
 }
 
 } // namespace resource

@@ -150,8 +150,8 @@ public:
     void activate(ShaderProgram program, const LocalUniforms &uniforms);
     void deactivate();
 
-    std::shared_ptr<LightingUniforms> lightingUniforms() const;
-    std::shared_ptr<SkeletalUniforms> skeletalUniforms() const;
+    std::shared_ptr<LightingUniforms> lightingUniforms() const { return _lightingUniforms; }
+    std::shared_ptr<SkeletalUniforms> skeletalUniforms() const { return _skeletalUniforms; }
 
     void setGlobalUniforms(const GlobalUniforms &globals);
 

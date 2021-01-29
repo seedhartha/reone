@@ -71,17 +71,17 @@ public:
 
     void load(const resource::GffStruct &dlg);
 
-    bool isSkippable() const;
-    bool isAnimatedCutscene() const;
+    bool isSkippable() const { return _skippable; }
+    bool isAnimatedCutscene() const { return _animatedCutscene; }
 
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
 
     const std::string &resRef() const { return _resRef; }
-    const std::string &cameraModel() const;
-    const std::vector<EntryReplyLink> &startEntries() const;
-    const std::vector<Stunt> &stunts() const;
-    const std::string &endScript() const;
+    const std::string &cameraModel() const { return _cameraModel; }
+    const std::vector<EntryReplyLink> &startEntries() const { return _startEntries; }
+    const std::vector<Stunt> &stunts() const { return _stunts; }
+    const std::string &endScript() const { return _endScript; }
     ConversationType conversationType() const { return _conversationType; }
     ComputerType computerType() const { return _computerType; }
 

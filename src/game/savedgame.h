@@ -35,7 +35,7 @@ public:
     void peek();
     void load(Game *game);
 
-    const std::string &name() const;
+    const std::string &name() const { return _name; }
 
 private:
     boost::filesystem::path _path;

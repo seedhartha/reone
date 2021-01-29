@@ -37,12 +37,12 @@ GameGUI::GameGUI(GameID gameId, const GraphicsOptions &options) : GUI(gameId, op
 }
 
 void GameGUI::onClick(const string &control) {
-    AudioPlayer::instance().play(GUISounds::instance().onClick(), AudioType::Sound);
+    AudioPlayer::instance().play(GUISounds::instance().getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        AudioPlayer::instance().play(GUISounds::instance().onEnter(), AudioType::Sound);
+        AudioPlayer::instance().play(GUISounds::instance().getOnEnter(), AudioType::Sound);
     }
 }
 

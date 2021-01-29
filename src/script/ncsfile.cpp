@@ -158,10 +158,6 @@ void NcsFile::readInstruction(size_t &offset) {
     offset = pos;
 }
 
-shared_ptr<ScriptProgram> NcsFile::program() const {
-    return _program;
-}
-
 } // namespace script
 
 } // namespace reone

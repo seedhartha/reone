@@ -51,10 +51,6 @@ bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walka
     return false;
 }
 
-const AABB &Walkmesh::aabb() const {
-    return _aabb;
-}
-
 } // namespace render
 
 } // namespace reone

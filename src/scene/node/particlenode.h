@@ -35,7 +35,7 @@ public:
 
     bool isExpired() const;
 
-    int renderOrder() const;
+    int renderOrder() const { return _renderOrder; }
 
 private:
     glm::vec3 _position;

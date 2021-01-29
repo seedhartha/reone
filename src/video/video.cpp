@@ -108,14 +108,6 @@ void Video::finish() {
     _finished = true;
 }
 
-bool Video::isFinished() const {
-    return _finished;
-}
-
-shared_ptr<AudioStream> Video::audio() const {
-    return _audio;
-}
-
 void Video::setMediaStream(const shared_ptr<MediaStream<Frame>> &stream) {
     _stream = stream;
 }

@@ -28,10 +28,6 @@ FollowAction::FollowAction(const shared_ptr<Object> &object, float distance) :
     _distance(distance) {
 }
 
-float FollowAction::distance() const {
-    return _distance;
-}
-
 } // namespace game
 
 } // namespace reone

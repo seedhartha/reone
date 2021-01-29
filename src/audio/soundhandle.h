@@ -40,10 +40,10 @@ public:
 
     bool isNotInited() const;
     bool isStopped() const;
+    bool isPositionDirty() const { return _positionDirty; }
 
-    int duration() const;
-    glm::vec3 position() const;
-    bool isPositionDirty() const;
+    int duration() const { return _duration; }
+    glm::vec3 position() const { return _position; }
 
     void setState(State state);
     void setPosition(const glm::vec3 &position);

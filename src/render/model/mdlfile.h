@@ -31,7 +31,8 @@ public:
     MdlFile(resource::GameID gameId);
 
     void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
-    std::shared_ptr<render::Model> model() const;
+
+    std::shared_ptr<render::Model> model() const { return _model; }
 
 private:
     resource::GameID _gameId {resource::GameID::KotOR };

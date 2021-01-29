@@ -52,22 +52,6 @@ shared_ptr<ModelNode> Animation::findNode(const string &name) const {
     return it != _nodeByName.end() ? it->second : nullptr;
 }
 
-const string &Animation::name() const {
-    return _name;
-}
-
-float Animation::length() const {
-    return _length;
-}
-
-float Animation::transitionTime() const {
-    return _transitionTime;
-}
-
-shared_ptr<ModelNode> Animation::rootNode() const {
-    return _rootNode;
-}
-
 } // namespace render
 
 } // namespace reone

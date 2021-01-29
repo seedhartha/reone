@@ -27,11 +27,11 @@ class LightSceneNode : public SceneNode {
 public:
     LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, float multiplier, bool shadow);
 
-    int priority() const;
-    const glm::vec3 &color() const;
-    float radius() const;
-    float multiplier() const;
-    bool shadow() const;
+    int priority() const { return _priority; }
+    const glm::vec3 &color() const { return _color; }
+    float radius() const { return _radius; }
+    float multiplier() const { return _multiplier; }
+    bool shadow() const { return _shadow; }
 
 private:
     int _priority { 0 };

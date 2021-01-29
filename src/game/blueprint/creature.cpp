@@ -149,10 +149,6 @@ void CreatureBlueprint::loadSoundSet(Creature &creature) {
     creature._soundSet = Resources::instance().getSoundSet(soundSetResRef);
 }
 
-const string &CreatureBlueprint::resRef() const {
-    return _resRef;
-}
-
 void StaticCreatureBlueprint::load(Creature &creature) {
     creature._appearance = _appearance;
     creature._attributes = _attributes;
@@ -169,18 +165,6 @@ void StaticCreatureBlueprint::clearEquipment() {
 
 void StaticCreatureBlueprint::addEquippedItem(const string &resRef) {
     _equipment.push_back(resRef);
-}
-
-Gender StaticCreatureBlueprint::gender() const {
-    return _gender;
-}
-
-int StaticCreatureBlueprint::appearance() const {
-    return _appearance;
-}
-
-CreatureAttributes &StaticCreatureBlueprint::attributes() {
-    return _attributes;
 }
 
 void StaticCreatureBlueprint::setGender(Gender gender) {

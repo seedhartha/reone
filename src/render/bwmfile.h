@@ -28,7 +28,8 @@ namespace render {
 class BwmFile : public resource::BinaryFile {
 public:
     BwmFile();
-    std::shared_ptr<Walkmesh> walkmesh() const;
+
+    std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
 private:
     uint32_t _type { 0 };

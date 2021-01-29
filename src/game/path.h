@@ -39,7 +39,7 @@ public:
 
     void load(const resource::GffStruct &pth);
 
-    const std::vector<Point> &points() const;
+    const std::vector<Point> &points() const { return _points; }
 
 private:
     std::vector<Point> _points;

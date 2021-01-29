@@ -83,20 +83,20 @@ public:
     bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
     bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
 
-    bool isUnescapable() const;
+    bool isUnescapable() const { return _unescapable; }
 
     std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
-    const CameraStyle &cameraStyle() const;
-    const CollisionDetector &collisionDetector() const;
-    const std::string &music() const;
-    const ObjectList &objects() const;
-    ObjectSelector &objectSelector();
-    const Pathfinder &pathfinder() const;
-    const RoomMap &rooms() const;
-    Combat &combat();
-    Map &map();
+    const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
+    const CollisionDetector &collisionDetector() const { return _collisionDetector; }
+    const std::string &music() const { return _music; }
+    const ObjectList &objects() const { return _objects; }
+    ObjectSelector &objectSelector() { return _objectSelector; }
+    const Pathfinder &pathfinder() const { return _pathfinder; }
+    const RoomMap &rooms() const { return _rooms; }
+    Combat &combat() { return _combat; }
+    Map &map() { return _map; }
 
     void setUnescapable(bool value);
 
@@ -137,11 +137,11 @@ public:
 
     // Stealth
 
-    bool isStealthXPEnabled() const;
+    bool isStealthXPEnabled() const { return _stealthXPEnabled; }
 
-    int maxStealthXP() const;
-    int currentStealthXP() const;
-    int stealthXPDecrement() const;
+    int maxStealthXP() const { return _maxStealthXP; }
+    int currentStealthXP() const { return _currentStealthXP; }
+    int stealthXPDecrement() const { return _stealthXPDecrement; }
 
     void setStealthXPEnabled(bool value);
     void setMaxStealthXP(int value);

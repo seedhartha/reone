@@ -40,7 +40,7 @@ void TlkTool::convert(const fs::path &path, const fs::path &destPath) const {
     tlk.load(path);
 
     shared_ptr<TalkTable> table(tlk.table());
-    for (int i = 0; i < table->stringCount(); ++i) {
+    for (int i = 0; i < table->getStringCount(); ++i) {
         string s(table->getString(i).text);
 
         pt::ptree child;

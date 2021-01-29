@@ -110,14 +110,6 @@ bool KeyFile::find(const string &resRef, ResourceType type, KeyEntry &key) const
     return true;
 }
 
-const vector<KeyFile::FileEntry> &KeyFile::files() const {
-    return _files;
-}
-
-const vector<KeyFile::KeyEntry> &KeyFile::keys() const {
-    return _keys;
-}
-
 } // namespace resource
 
 } // namespace reone

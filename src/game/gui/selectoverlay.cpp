@@ -117,13 +117,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 
     switch (_actions[_selectedActionIdx]) {
         case ContextualAction::Unlock: {
-            ActionQueue &actions = _game->party().leader()->actionQueue();
+            ActionQueue &actions = _game->party().getLeader()->actionQueue();
             actions.add(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
         }
 
         case ContextualAction::Attack: {
-            shared_ptr<Creature> partyLeader(_game->party().leader());
+            shared_ptr<Creature> partyLeader(_game->party().getLeader());
             ActionQueue &actions = partyLeader->actionQueue();
             actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange()));
             break;
@@ -156,7 +156,7 @@ void SelectionOverlay::update() {
             _hilightedObject = hilightedObject;
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(hilightedObject));
-            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
+            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 
@@ -169,7 +169,7 @@ void SelectionOverlay::update() {
             _actions = module->getContextualActions(selectedObject);
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(selectedObject));
-            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
+            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 }

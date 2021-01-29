@@ -137,7 +137,7 @@ Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) 
 }
 
 Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->party().size();
+    return _game->party().getSize();
 }
 
 Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
@@ -147,7 +147,7 @@ Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContex
 }
 
 Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->party().leader());
+    return static_pointer_cast<ScriptObject>(_game->party().getLeader());
 }
 
 } // namespace game

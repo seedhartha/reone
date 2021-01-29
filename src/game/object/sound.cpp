@@ -125,42 +125,10 @@ void Sound::stop() {
     _active = false;
 }
 
-bool Sound::isActive() const {
-    return _active;
-}
-
 glm::vec3 Sound::getPosition() const {
     glm::vec3 position(_transform[3]);
     position.z += _elevation;
     return move(position);
-}
-
-int Sound::priority() const {
-    return _priority;
-}
-
-float Sound::maxDistance() const {
-    return _maxDistance;
-}
-
-float Sound::minDistance() const {
-    return _minDistance;
-}
-
-bool Sound::continuous() const {
-    return _continuous;
-}
-
-float Sound::elevation() const {
-    return _elevation;
-}
-
-bool Sound::looping() const {
-    return _looping;
-}
-
-bool Sound::positional() const {
-    return _positional;
 }
 
 void Sound::setAudible(bool audible) {

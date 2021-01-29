@@ -35,7 +35,7 @@ public:
     void load(const std::shared_ptr<std::istream> &stream);
     void load(ByteArray &&data);
 
-    std::shared_ptr<AudioStream> stream() const;
+    std::shared_ptr<AudioStream> stream() const { return _stream; }
 
 private:
     ByteArray _input;

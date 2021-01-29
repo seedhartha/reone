@@ -33,10 +33,10 @@ public:
 
     std::shared_ptr<ModelNode> findNode(const std::string &name) const;
 
-    const std::string &name() const;
-    float length() const;
-    float transitionTime() const;
-    std::shared_ptr<ModelNode> rootNode() const;
+    const std::string &name() const { return _name; }
+    float length() const { return _length; }
+    float transitionTime() const { return _transitionTime; }
+    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
 
 private:
     std::string _name;

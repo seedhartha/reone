@@ -64,7 +64,7 @@ bool CameraSceneNode::isInFrustum(const glm::vec3 &point) const {
 
 bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
     glm::vec3 center(aabb.center());
-    glm::vec3 halfSize(aabb.size() * 0.5f);
+    glm::vec3 halfSize(aabb.getSize() * 0.5f);
 
     for (int i = 0; i < kFrustumPlaneCount; ++i) {
         if (glm::dot(_frustum[i], glm::vec4(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z, 1.0f)) >= 0.0f) continue;
@@ -82,21 +82,9 @@ bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
     return true;
 }
 
-const glm::mat4 &CameraSceneNode::projection() const {
-    return _projection;
-}
-
-const glm::mat4 &CameraSceneNode::view() const {
-    return _view;
-}
-
 void CameraSceneNode::setProjection(const glm::mat4 &projection) {
     _projection = projection;
     updateFrustum();
-}
-
-float CameraSceneNode::farPlane() const {
-    return _farPlane;
 }
 
 void CameraSceneNode::setFarPlane(float far) {

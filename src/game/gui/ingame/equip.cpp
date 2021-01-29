@@ -154,7 +154,7 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
         }
     }
     InventorySlot slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -210,7 +210,7 @@ void Equipment::updatePortraits() {
     if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
-    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -319,7 +319,7 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {

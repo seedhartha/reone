@@ -98,16 +98,16 @@ public:
     int getRunScriptVar() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    resource::GameID gameId() const;
-    const Options &options() const;
-    scene::SceneGraph &sceneGraph();
-    ObjectFactory &objectFactory();
-    std::shared_ptr<Module> module() const;
+    resource::GameID gameId() const { return _gameId; }
+    const Options &options() const { return _options; }
+    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
+    ObjectFactory &objectFactory() { return *_objectFactory; }
+    std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
-    Party &party();
-    CharacterGeneration &characterGeneration();
-    CameraType cameraType() const;
-    ScriptRunner &scriptRunner();
+    Party &party() { return _party; }
+    CharacterGeneration &characterGeneration() { return *_charGen; }
+    CameraType cameraType() const { return _cameraType; }
+    ScriptRunner &scriptRunner() { return _scriptRunner; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -176,7 +176,11 @@ public:
 protected:
     Options _options;
 
+    /**
+     * Initializes the engine subsytems.
+     */
     virtual void init();
+
     virtual void update();
 
 private:
@@ -260,6 +264,13 @@ private:
     Game(const Game &) = delete;
     Game &operator=(const Game &) = delete;
 
+    /**
+    * Releases the engine subsystems.
+    */
+    void deinit();
+
+    void determineGameID();
+
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     void loadNextModule();
@@ -276,11 +287,6 @@ private:
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
-
-    // Initialization
-
-    void determineGameID();
-    void deinit();
 
     // END Initialization
 

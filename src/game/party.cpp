@@ -153,11 +153,11 @@ shared_ptr<Creature> Party::getMember(int index) const {
     return _members.size() > index ? _members[index].creature : nullptr;
 }
 
-bool Party::empty() const {
+bool Party::isEmpty() const {
     return _members.empty();
 }
 
-int Party::size() const {
+int Party::getSize() const {
     return static_cast<int>(_members.size());
 }
 
@@ -179,11 +179,7 @@ bool Party::isMember(const Object &object) const {
     return false;
 }
 
-shared_ptr<Creature> Party::player() const {
-    return _player;
-}
-
-shared_ptr<Creature> Party::leader() const {
+shared_ptr<Creature> Party::getLeader() const {
     return !_members.empty() ? _members[0].creature : nullptr;
 }
 

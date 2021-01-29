@@ -27,8 +27,9 @@ class MoveToObjectAction : public ObjectAction {
 public:
     MoveToObjectAction(const std::shared_ptr<Object> &object, bool run, float distance);
 
-    bool getRun() const;
-    float distance() const;
+    bool isRun() const { return _run; }
+
+    float distance() const { return _distance; }
 
 private:
     bool _run { false };

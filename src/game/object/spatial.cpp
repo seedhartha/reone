@@ -217,56 +217,8 @@ bool SpatialObject::isSelectable() const {
     return false;
 }
 
-bool SpatialObject::isOpen() const {
-    return _open;
-}
-
-ObjectFactory &SpatialObject::objectFactory() {
-    return *_objectFactory;
-}
-
-SceneGraph &SpatialObject::sceneGraph() {
-    return *_sceneGraph;
-}
-
-Room *SpatialObject::room() const {
-    return _room;
-}
-
-const glm::vec3 &SpatialObject::position() const {
-    return _position;
-}
-
-float SpatialObject::facing() const {
-    return _facing;
-}
-
-const glm::mat4 &SpatialObject::transform() const {
-    return _transform;
-}
-
-bool SpatialObject::visible() const {
-    return _visible;
-}
-
-shared_ptr<ModelSceneNode> SpatialObject::model() const {
-    return _model;
-}
-
-shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
-    return _walkmesh;
-}
-
-const vector<shared_ptr<Item>> &SpatialObject::items() const {
-    return _items;
-}
-
 glm::vec3 SpatialObject::getSelectablePosition() const {
     return _model->getCenterOfAABB();
-}
-
-float SpatialObject::drawDistance() const {
-    return _drawDistance;
 }
 
 void SpatialObject::setRoom(Room *room) {
@@ -337,10 +289,6 @@ void SpatialObject::clearAllEffects() {
 }
 
 void SpatialObject::die() {
-}
-
-bool SpatialObject::isStuntMode() const {
-    return _stunt;
 }
 
 void SpatialObject::startStuntMode() {

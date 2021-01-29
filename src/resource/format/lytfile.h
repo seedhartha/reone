@@ -43,8 +43,8 @@ public:
     void load(const std::shared_ptr<std::istream> &in);
     void load(const boost::filesystem::path &path);
 
-    const std::vector<Room> &rooms() const;
-    const std::vector<DoorHook> &doorHooks() const;
+    const std::vector<Room> &rooms() const { return _rooms; }
+    const std::vector<DoorHook> &doorHooks() const { return _doorHooks; }
 
 private:
     enum class State {

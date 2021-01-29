@@ -34,8 +34,8 @@ public:
     void init();
     void deinit();
 
-    std::shared_ptr<audio::AudioStream> onClick() const { return _onClick; }
-    std::shared_ptr<audio::AudioStream> onEnter() const { return _onEnter; }
+    std::shared_ptr<audio::AudioStream> getOnClick() const { return _onClick; }
+    std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
 
 private:
     GUISounds() = default;

@@ -34,18 +34,6 @@ static constexpr int kSignatureSize = 8;
 GffField::GffField(GffFieldType type, const string &label) : _type(type), _label(label) {
 }
 
-GffFieldType GffField::type() const {
-    return _type;
-}
-
-const string &GffField::label() const {
-    return _label;
-}
-
-const vector<shared_ptr<GffStruct>> &GffField::children() const {
-    return _children;
-}
-
 bool GffField::asBool() const {
     return _intValue != 0;
 }
@@ -129,10 +117,6 @@ glm::quat GffField::asOrientation() const {
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
 }
 
-const vector<GffField> &GffStruct::fields() const {
-    return _fields;
-}
-
 const GffField *GffStruct::find(const string &name) const {
     auto it = find_if(
         _fields.begin(),
@@ -200,10 +184,6 @@ void GffFile::doLoad() {
     _listIndicesCount = readUint32();
 
     _top = move(readStruct(0));
-}
-
-shared_ptr<GffStruct> GffFile::top() const {
-    return _top;
 }
 
 unique_ptr<GffStruct> GffFile::readStruct(int idx) {

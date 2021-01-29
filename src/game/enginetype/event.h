@@ -25,7 +25,8 @@ namespace game {
 
 class Event : public script::EngineType  {
 public:
-    Event(int number) : _number(number) { }
+    Event(int number) : _number(number) {
+    }
 
     int number() const { return _number; }
 

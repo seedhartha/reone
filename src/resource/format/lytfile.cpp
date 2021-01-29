@@ -123,14 +123,6 @@ LytFile::DoorHook LytFile::getDoorHook(const vector<string> &tokens) const {
     return move(door);
 }
 
-const vector<LytFile::Room> &LytFile::rooms() const {
-    return _rooms;
-}
-
-const vector<LytFile::DoorHook> &LytFile::doorHooks() const {
-    return _doorHooks;
-}
-
 } // namespace resource
 
 } // namespace reone

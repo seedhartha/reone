@@ -60,14 +60,6 @@ void PlaceableCamera::load(const GffStruct &gffs) {
     updateTransform();
 }
 
-int PlaceableCamera::cameraId() const {
-    return _cameraId;
-}
-
-float PlaceableCamera::fieldOfView() const {
-    return _fieldOfView;
-}
-
 } // namespace game
 
 } // namespace reone

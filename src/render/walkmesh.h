@@ -33,7 +33,7 @@ public:
 
     bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
 
-    const AABB &aabb() const;
+    const AABB &aabb() const { return _aabb; }
 
 private:
     struct Face {
