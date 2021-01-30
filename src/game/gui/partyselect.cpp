@@ -144,7 +144,9 @@ void PartySelection::onClick(const string &control) {
         onAcceptButtonClick();
 
     } else if (control == "BTN_DONE" || control == "BTN_BACK") {
-        changeParty();
+        if (control == "BTN_DONE") {
+            changeParty();
+        }
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {

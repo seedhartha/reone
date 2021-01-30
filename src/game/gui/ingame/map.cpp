@@ -50,7 +50,6 @@ MapMenu::MapMenu(Game *game) :
 void MapMenu::load() {
     GUI::load();
 
-    disableControl("BTN_PRTYSLCT");
     disableControl("BTN_RETURN");
 }
 
@@ -100,6 +99,8 @@ void MapMenu::onClick(const string &control) {
             _selectedNoteIdx = 0;
         }
         refreshSelectedNote();
+    } else if (control == "BTN_PRTYSLCT") {
+        _game->openPartySelection(PartySelection::Context());
     }
 }
 
