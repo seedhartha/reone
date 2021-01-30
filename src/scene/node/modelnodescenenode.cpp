@@ -130,10 +130,15 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
             locals.bumpmap.frame = _bumpmapFrame;
         }
-        bool receivesShadows = _modelSceneNode->model()->classification() == Model::Classification::Other;
+
+        bool receivesShadows =
+            _modelSceneNode->model()->classification() == Model::Classification::Other &&
+            !_modelNode->isSelfIllumEnabled();
+
         if (receivesShadows) {
             locals.general.shadowsEnabled = true;
         }
+
         shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
         if (skin) {
             locals.general.skeletalEnabled = true;
