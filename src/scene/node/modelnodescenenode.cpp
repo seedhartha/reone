@@ -66,7 +66,6 @@ void ModelNodeSceneNode::update(float dt) {
         if (bumpmap) {
             const TextureFeatures &features = bumpmap->features();
             if (features.procedureType == TextureProcedureType::Cycle) {
-                // TODO: only use the top row because each row is a different animation?
                 int frameCount = features.numX * features.numY;
                 float length = frameCount / static_cast<float>(features.fps);
                 _bumpmapTime = glm::min(_bumpmapTime + dt, length);
