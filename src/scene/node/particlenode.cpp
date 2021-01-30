@@ -29,6 +29,8 @@
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 
+#include "modelscenenode.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -37,12 +39,18 @@ namespace reone {
 
 namespace scene {
 
-ParticleSceneNode::ParticleSceneNode(glm::vec3 position, float velocity, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
+static constexpr float kMotionBlurStrength = 0.25f;
+
+ParticleSceneNode::ParticleSceneNode(const ModelSceneNode *modelSceneNode, glm::vec3 position, float velocity, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),
+    _modelSceneNode(modelSceneNode),
     _position(position),
     _velocity(velocity),
     _emitter(emitter) {
 
+    if (!modelSceneNode) {
+        throw invalid_argument("modelSceneNode must not be null");
+    }
     if (!emitter) {
         throw invalid_argument("emitter must not be null");
     }
@@ -115,7 +123,11 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
 
     glm::mat4 transform(1.0f);
     transform = _absoluteTransform;
-    transform = glm::scale(transform, glm::vec3(_size));
+    if (_emitter->renderType() == Emitter::RenderType::MotionBlur) {
+        transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * _size, _size, _size));
+    } else {
+        transform = glm::scale(transform, glm::vec3(_size));
+    }
 
     LocalUniforms locals;
     locals.general.model = move(transform);

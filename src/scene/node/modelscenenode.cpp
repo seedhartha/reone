@@ -112,7 +112,7 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<Emitter> emitter(child->emitter());
             if (emitter && validateEmitter(*emitter)) {
-                auto emitterNode = make_shared<EmitterSceneNode>(emitter, _sceneGraph);
+                auto emitterNode = make_shared<EmitterSceneNode>(this, emitter, _sceneGraph);
                 childNode->addChild(emitterNode);
                 _emitters.push_back(emitterNode);
             }
@@ -307,6 +307,10 @@ void ModelSceneNode::setAlpha(float alpha) {
     for (auto &attached : _attachedModels) {
         attached.second->setAlpha(alpha);
     }
+}
+
+void ModelSceneNode::setProjectileSpeed(float speed) {
+    _projectileSpeed = speed;
 }
 
 bool ModelSceneNode::isAnimationFinished() const {

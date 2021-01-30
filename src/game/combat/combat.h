@@ -91,7 +91,7 @@ private:
         int cutsceneDamage { -1 };
 
         std::shared_ptr<scene::ModelSceneNode> projectile;
-        glm::vec3 projectileTarget { 0.0f };
+        glm::vec3 projectileDir { 0.0f };
 
         void advance(float dt);
     };

@@ -23,6 +23,7 @@
 
 #include "../../common/random.h"
 
+#include "modelscenenode.h"
 #include "particlenode.h"
 
 using namespace std;
@@ -35,10 +36,14 @@ namespace scene {
 
 static constexpr int kMaxParticleCount = 24;
 
-EmitterSceneNode::EmitterSceneNode(const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
+EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),
+    _modelSceneNode(modelSceneNode),
     _emitter(emitter) {
 
+    if (!modelSceneNode) {
+        throw invalid_argument("modelSceneNode must not be null");
+    }
     if (!emitter) {
         throw invalid_argument("emitter must not be null");
     }
@@ -94,7 +99,7 @@ void EmitterSceneNode::doSpawnParticle() {
     }
     float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
 
-    auto particle = make_shared<ParticleSceneNode>(position, velocity, _emitter, _sceneGraph);
+    auto particle = make_shared<ParticleSceneNode>(_modelSceneNode, position, velocity, _emitter, _sceneGraph);
     _particles.push_back(particle);
     addChild(particle);
 }

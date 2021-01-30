@@ -64,11 +64,13 @@ public:
     std::shared_ptr<render::Texture> textureOverride() const { return _textureOverride; }
     float alpha() const { return _alpha; }
     const AABB &aabb() const { return _aabb; }
+    float projectileSpeed() const { return _projectileSpeed; }
 
     void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
     void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
+    void setProjectileSpeed(float speed);
 
     // Animation
 
@@ -110,6 +112,7 @@ private:
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
     AABB _aabb;
+    float _projectileSpeed;
 
     void initModelNodes();
     std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;

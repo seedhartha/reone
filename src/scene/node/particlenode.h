@@ -25,9 +25,16 @@ namespace reone {
 
 namespace scene {
 
+class ModelSceneNode;
+
 class ParticleSceneNode : public SceneNode {
 public:
-    ParticleSceneNode(glm::vec3 position, float velocity, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
+    ParticleSceneNode(
+        const ModelSceneNode *modelSceneNode,
+        glm::vec3 position,
+        float velocity,
+        const std::shared_ptr<render::Emitter> &emitter,
+        SceneGraph *sceneGraph);
 
     void update(float dt) override;
 
@@ -38,6 +45,7 @@ public:
     int renderOrder() const { return _renderOrder; }
 
 private:
+    const ModelSceneNode *_modelSceneNode;
     glm::vec3 _position;
     float _velocity;
     std::shared_ptr<render::Emitter> _emitter;
