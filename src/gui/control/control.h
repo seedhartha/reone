@@ -137,6 +137,8 @@ public:
     void setHeight(int height);
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);
+    void setHilightFill(const std::string &resRef);
+    void setHilightFill(const std::shared_ptr<render::Texture> &texture);
     void setPadding(int padding);
     void setScene3D(std::unique_ptr<Scene3D> scene);
     void setText(const Text &text);
