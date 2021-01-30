@@ -40,6 +40,8 @@ namespace game {
 
 static constexpr float kRoundDuration = 3.0f;
 
+static const char kModelEventDetonate[] = "detonate";
+
 static bool g_projectilesEnabled = true;
 
 static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
@@ -384,7 +386,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 
     round.projectile = make_shared<ModelSceneNode>(&_game->sceneGraph(), ammunitionType->model);
     round.projectile->setPosition(projectilePosition);
-    round.projectile->detonate();
+    round.projectile->signalEvent(kModelEventDetonate);
 
     shared_ptr<ModelSceneNode> targetModel(target->model());
     glm::vec3 projectileTarget, impactPosition;
