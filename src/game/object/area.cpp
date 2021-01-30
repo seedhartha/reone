@@ -310,7 +310,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _camStyleDefault);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_game, sceneGraph, _cameraAspect, _camStyleDefault);
     _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
