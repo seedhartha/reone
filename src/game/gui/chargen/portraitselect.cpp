@@ -181,11 +181,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     Control &control = getControl("LBL_PORTRAIT");
-
-    Control::Border border(control.border());
-    border.fill = _portraits[_currentPortrait].image;
-
-    control.setBorder(move(border));
+    control.setBorderFill(_portraits[_currentPortrait].image);
 }
 
 void PortraitSelection::onClick(const string &control) {

@@ -326,15 +326,16 @@ void Equipment::updateEquipment() {
         string tag("LBL_INV_" + name.second);
         configureControl(tag, [&name, &equipment](Control &control) {
             int slot = getInventorySlot(name.first);
-            Control::Border border(control.border());
+            shared_ptr<Texture> fill;
 
             auto equipped = equipment.find(slot);
             if (equipped != equipment.end()) {
-                border.fill = equipped->second->icon();
+                fill = equipped->second->icon();
             } else {
-                border.fill = getEmptySlotIcon(name.first);
+                fill = getEmptySlotIcon(name.first);
             }
-            control.setBorder(border);
+
+            control.setBorderFill(fill);
         });
     }
 }
