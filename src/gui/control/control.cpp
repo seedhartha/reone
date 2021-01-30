@@ -446,6 +446,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
             gravity = TextGravity::CenterBottom;
             break;
         case TextAlign::RightCenter:
+        case TextAlign::RightCenter2:
             gravity = TextGravity::LeftCenter;
             break;
         case TextAlign::LeftCenter:
@@ -471,6 +472,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
         case TextAlign::RightCenter:
         case TextAlign::LeftCenter:
         case TextAlign::CenterCenter:
+        case TextAlign::RightCenter2:
         default:
             position.y = _extent.top + size.y / 2 - static_cast<int>(0.5f * (lineCount - 1) * _text.font->height());
             break;
@@ -482,6 +484,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
             position.x = _extent.left;
             break;
         case TextAlign::RightCenter:
+        case TextAlign::RightCenter2:
             position.x = _extent.left + _extent.width;
             break;
         case TextAlign::CenterTop:

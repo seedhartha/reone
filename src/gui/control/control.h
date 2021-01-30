@@ -55,6 +55,7 @@ public:
         RightCenter = 12,
         LeftCenter = 17,
         CenterCenter = 18,
+        RightCenter2 = 20,
 
         CenterBottom = 0x1000
     };

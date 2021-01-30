@@ -200,7 +200,7 @@ void InGameMenu::openCharacter() {
 }
 
 void InGameMenu::openAbilities() {
-    _abilities->refreshPortraits();
+    _abilities->refreshControls();
     changeTab(Tab::Abilities);
 }
 

@@ -19,6 +19,8 @@
 
 #include "../gui.h"
 
+#include "../../rp/types.h"
+
 namespace reone {
 
 namespace game {
@@ -31,12 +33,26 @@ public:
 
     void load() override;
 
-    void refreshPortraits();
+    void refreshControls();
 
 private:
-    Game *_game { nullptr };
+    struct SkillInfo {
+        Skill skill;
+        std::string name;
+        std::string description;
+        std::shared_ptr<render::Texture> icon;
+    };
+
+    Game *_game;
+
+    std::unordered_map<Skill, SkillInfo> _skills;
 
     void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+
+    void loadSkills();
+
+    void refreshPortraits();
 };
 
 } // namespace game
