@@ -60,7 +60,7 @@ bool ThirdPersonCamera::handle(const SDL_Event &event) {
 bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_A:
-            if (!event.repeat && !_rightMouseButtonPressed) {
+            if (!event.repeat && !_mouseLookMode) {
                 _rotateCCW = true;
                 _rotateCW = false;
                 _rotationSpeed = kMinRotationSpeed;
@@ -68,7 +68,7 @@ bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
             }
             break;
         case SDL_SCANCODE_D:
-            if (!event.repeat && !_rightMouseButtonPressed) {
+            if (!event.repeat && !_mouseLookMode) {
                 _rotateCCW = false;
                 _rotateCW = true;
                 _rotationSpeed = kMinRotationSpeed;
@@ -85,13 +85,13 @@ bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
 bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_A:
-            if (!_rightMouseButtonPressed) {
+            if (!_mouseLookMode) {
                 _rotateCCW = false;
                 return true;
             }
             break;
         case SDL_SCANCODE_D:
-            if (!_rightMouseButtonPressed) {
+            if (!_mouseLookMode) {
                 _rotateCW = false;
                 return true;
             }
@@ -104,7 +104,7 @@ bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 bool ThirdPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
-    if (_rightMouseButtonPressed) {
+    if (_mouseLookMode) {
         _facing -= kMouseRotationSpeed * event.xrel;
         _facing = glm::mod(_facing, glm::two_pi<float>());
         updateSceneNode();
@@ -114,7 +114,7 @@ bool ThirdPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
 bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (event.button == SDL_BUTTON_RIGHT) {
-        _rightMouseButtonPressed = true;
+        _mouseLookMode = true;
         _rotateCCW = false;
         _rotateCW = false;
         _game->setRelativeMouseMode(true);
@@ -125,7 +125,7 @@ bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event)
 
 bool ThirdPersonCamera::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     if (event.button == SDL_BUTTON_RIGHT) {
-        _rightMouseButtonPressed = false;
+        _mouseLookMode = false;
         _game->setRelativeMouseMode(false);
         return true;
     }
@@ -171,7 +171,7 @@ void ThirdPersonCamera::updateSceneNode() {
 void ThirdPersonCamera::stopMovement() {
     _rotateCCW = false;
     _rotateCW = false;
-    _rightMouseButtonPressed = false;
+    _mouseLookMode = false;
 }
 
 void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {

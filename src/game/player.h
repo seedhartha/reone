@@ -44,20 +44,24 @@ public:
     bool isMovementRequested() const;
 
 private:
-    Module *_module { nullptr };
-    Area *_area { nullptr };
-    Camera *_camera { nullptr };
-    const Party *_party { nullptr };
+    Module *_module;
+    Area *_area;
+    Camera *_camera;
+    const Party *_party;
+
     bool _moveForward { false };
     bool _moveLeft { false };
     bool _moveBackward { false };
     bool _moveRight { false };
+    bool _leftPressedInMouseLook { false };
 
     Player(const Player &) = delete;
     Player &operator=(const Player &) = delete;
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
 };
 
 } // namespace game
