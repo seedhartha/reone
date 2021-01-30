@@ -604,6 +604,27 @@ void Control::setHilightColor(const glm::vec3 &color) {
     _hilight->color = color;
 }
 
+void Control::setHilightFill(const string &resRef) {
+    shared_ptr<Texture> texture;
+    if (!resRef.empty()) {
+        texture = Textures::instance().get(resRef, TextureType::GUI);
+    }
+    setHilightFill(texture);
+}
+
+void Control::setHilightFill(const shared_ptr<Texture> &texture) {
+    if (!texture && _hilight) {
+        _hilight->fill.reset();
+        return;
+    }
+    if (texture) {
+        if (!_hilight) {
+            _hilight = make_shared<Border>();
+        }
+        _hilight->fill = texture;
+    }
+}
+
 void Control::setText(const Text &text) {
     _text = text;
     updateTextLines();

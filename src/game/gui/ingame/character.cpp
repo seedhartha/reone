@@ -131,9 +131,11 @@ void CharacterMenu::refreshPortraits() {
 
     Control &btnChange1 = getControl("BTN_CHANGE1");
     btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    btnChange1.setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
     Control &btnChange2 = getControl("BTN_CHANGE2");
     btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    btnChange2.setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void CharacterMenu::onClick(const string &control) {
