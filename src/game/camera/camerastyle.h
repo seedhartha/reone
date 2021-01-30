@@ -17,11 +17,12 @@
 
 #pragma once
 
-
 namespace reone {
 
 namespace resource {
-    class TwoDaRow;
+
+class TwoDaRow;
+
 }
 
 namespace game {
