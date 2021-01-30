@@ -173,6 +173,8 @@ void Area::loadPTH() {
 }
 
 void Area::loadARE(const GffStruct &are) {
+    _localizedName = Resources::instance().getString(are.getInt("Name", -1));
+
     loadCameraStyle(are);
     loadAmbientColor(are);
     loadScripts(are);

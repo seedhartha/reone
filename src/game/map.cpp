@@ -32,6 +32,7 @@
 #include "../resource/types.h"
 
 #include "game.h"
+#include "gui/colorutil.h"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ namespace reone {
 namespace game {
 
 static constexpr int kArrowSize = 32;
+static constexpr int kMapNoteSize = 16;
+static constexpr float kSelectedMapNoteScale = 1.5f;
 
 Map::Map(Game *game) : _game(game) {
     if (!game) {
@@ -52,11 +55,7 @@ Map::Map(Game *game) : _game(game) {
 
 void Map::load(const string &area, const GffStruct &gffs) {
     loadProperties(gffs);
-    loadTexture(area);
-
-    if (!_arrow) {
-        loadArrow();
-    }
+    loadTextures(area);
 }
 
 void Map::loadProperties(const GffStruct &gffs) {
@@ -67,23 +66,29 @@ void Map::loadProperties(const GffStruct &gffs) {
     _mapPoint2 = glm::vec2(gffs.getFloat("MapPt2X"), gffs.getFloat("MapPt2Y"));
 }
 
-void Map::loadTexture(const string &area) {
+void Map::loadTextures(const string &area) {
     string resRef("lbl_map" + area);
-    _texture = Textures::instance().get(resRef, TextureType::GUI);
+    _areaTexture = Textures::instance().get(resRef, TextureType::GUI);
+
+    if (!_arrowTexture) {
+        string resRef("mm_barrow");
+        if (_game->gameId() == GameID::TSL) {
+            resRef += "_p";
+        }
+        _arrowTexture = Textures::instance().get(resRef, TextureType::GUI);
+    }
+
+    if (!_noteTexture) {
+        _noteTexture = Textures::instance().get("whitetarget", TextureType::GUI);
+    }
 }
 
-void Map::loadArrow() {
-    string resRef("mm_barrow");
-    if (_game->gameId() == GameID::TSL) {
-        resRef += "_p";
-    }
-    _arrow = Textures::instance().get(resRef, TextureType::GUI);
-}
 
 void Map::render(Mode mode, const glm::vec4 &bounds) const {
-    if (!_texture) return;
+    if (!_areaTexture) return;
 
     drawArea(mode, bounds);
+    drawNotes(mode, bounds);
     drawPartyLeader(mode, bounds);
 }
 
@@ -96,12 +101,12 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         glm::vec2 mapPos(getMapPosition(worldPos));
 
         glm::vec3 topLeft(0.0f);
-        topLeft.x = bounds[0] + 0.5f * bounds[2] - mapPos.x * 440.0f / static_cast<float>(_texture->width()) * _texture->width();
-        topLeft.y = bounds[1] + 0.5f * bounds[3] - mapPos.y * _texture->height();
+        topLeft.x = bounds[0] + 0.5f * bounds[2] - mapPos.x * 440.0f / static_cast<float>(_areaTexture->width()) * _areaTexture->width();
+        topLeft.y = bounds[1] + 0.5f * bounds[3] - mapPos.y * _areaTexture->height();
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, topLeft);
-        transform = glm::scale(transform, glm::vec3(_texture->width(), _texture->height(), 1.0f));
+        transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
         LocalUniforms locals;
         locals.general.model = transform;
@@ -109,7 +114,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
         setActiveTextureUnit(0);
-        _texture->bind();
+        _areaTexture->bind();
 
         float height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
@@ -126,10 +131,72 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
         setActiveTextureUnit(0);
-        _texture->bind();
+        _areaTexture->bind();
 
         Quad::getDefault().renderTriangles();
     }
+}
+
+void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
+    if (mode != Mode::Default) return;
+
+    for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+        auto waypoint = static_pointer_cast<Waypoint>(object);
+        if (!waypoint->isMapNoteEnabled() || waypoint->mapNote().empty()) continue;
+
+        glm::vec2 mapPos(getMapPosition(waypoint->position()));
+        mapPos.x *= bounds[2] / static_cast<float>(_areaTexture->width());
+        mapPos.y *= bounds[3] / static_cast<float>(_areaTexture->height());
+
+        glm::vec2 notePos;
+        notePos.x = bounds[0] + mapPos.x * bounds[2];
+        notePos.y = bounds[1] + mapPos.y * bounds[3];
+
+        bool selected = waypoint == _selectedNote;
+        float noteSize = (selected ? kSelectedMapNoteScale : 1.0f) * kMapNoteSize;
+
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
+        transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
+
+        LocalUniforms locals;
+        locals.general.model = transform;
+        locals.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
+
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
+        setActiveTextureUnit(0);
+        _noteTexture->bind();
+
+        Quad::getDefault().renderTriangles();
+    }
+}
+
+glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
+    float scaleX, scaleY;
+    glm::vec2 result(0.0f);
+
+    switch (_northAxis) {
+        case 0:
+        case 1:
+            scaleX = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.x - _worldPoint2.x);
+            scaleY = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.y - _worldPoint2.y);
+            result.x = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.x;
+            result.y = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.y;
+            break;
+        case 2:
+        case 3:
+            scaleX = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.x - _worldPoint2.x);
+            scaleY = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.y - _worldPoint2.y);
+            result.x = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.x;
+            result.y = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.y;
+            break;
+        default:
+            warn("Map: invalid north axis: " + to_string(_northAxis));
+            break;
+    }
+
+    return move(result);
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
@@ -142,8 +209,8 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
 
-        mapPos.x *= bounds[2] / static_cast<float>(_texture->width());
-        mapPos.y *= bounds[3] / static_cast<float>(_texture->height());
+        mapPos.x *= bounds[2] / static_cast<float>(_areaTexture->width());
+        mapPos.y *= bounds[3] / static_cast<float>(_areaTexture->height());
 
         arrowPos.x = bounds[0] + mapPos.x * bounds[2];
         arrowPos.y = bounds[1] + mapPos.y * bounds[3];
@@ -180,36 +247,13 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     setActiveTextureUnit(0);
-    _arrow->bind();
+    _arrowTexture->bind();
 
     Quad::getDefault().renderTriangles();
 }
 
-glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
-    float scaleX, scaleY;
-    glm::vec2 result(0.0f);
-
-    switch (_northAxis) {
-        case 0:
-        case 1:
-            scaleX = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.x - _worldPoint2.x);
-            scaleY = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.y - _worldPoint2.y);
-            result.x = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.x;
-            result.y = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.y;
-            break;
-        case 2:
-        case 3:
-            scaleX = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.x - _worldPoint2.x);
-            scaleY = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.y - _worldPoint2.y);
-            result.x = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.x;
-            result.y = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.y;
-            break;
-        default:
-            warn("Map: invalid north axis: " + to_string(_northAxis));
-            break;
-    }
-
-    return move(result);
+void Map::setSelectedNote(const shared_ptr<Waypoint> &waypoint) {
+    _selectedNote = waypoint;
 }
 
 } // namespace game

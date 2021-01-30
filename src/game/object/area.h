@@ -94,6 +94,7 @@ public:
     const ObjectList &objects() const { return _objects; }
     ObjectSelector &objectSelector() { return _objectSelector; }
     const Pathfinder &pathfinder() const { return _pathfinder; }
+    const std::string &localizedName() const { return _localizedName; }
     const RoomMap &rooms() const { return _rooms; }
     Combat &combat() { return _combat; }
     Map &map() { return _map; }
@@ -159,13 +160,14 @@ public:
     // END Scripts
 
 private:
-    Game *_game { nullptr };
+    Game *_game;
+
     CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Combat _combat;
     Pathfinder _pathfinder;
-    std::string _name;
+    std::string _localizedName;
     RoomMap _rooms;
     resource::Visibility _visibility;
     CameraStyle _camStyleDefault;

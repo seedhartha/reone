@@ -17,34 +17,29 @@
 
 #pragma once
 
-#include "../gui.h"
+#include <string>
+#include <memory>
+
+#include "../../resource/format/gfffile.h"
 
 namespace reone {
 
 namespace game {
 
-class Game;
-class Map;
 class Waypoint;
 
-class MapMenu : public GameGUI {
+class WaypointBlueprint {
 public:
-    MapMenu(Game *game);
+    WaypointBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utw);
 
-    void load() override;
-    void render() const override;
-
-    void refreshControls();
+    void load(Waypoint &waypoint);
 
 private:
-    Game *_game;
+    std::string _resRef;
+    std::shared_ptr<resource::GffStruct> _utw;
 
-    std::vector<std::shared_ptr<Waypoint>> _notes;
-    int _selectedNoteIdx { 0 };
-
-    void onClick(const std::string &control) override;
-
-    void refreshSelectedNote();
+    WaypointBlueprint(const WaypointBlueprint &) = delete;
+    WaypointBlueprint &operator=(const WaypointBlueprint &) = delete;
 };
 
 } // namespace game

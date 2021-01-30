@@ -21,6 +21,13 @@
 
 #include "glm/glm.hpp"
 
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
+
+#include "../blueprint/blueprints.h"
+
+using namespace std;
+
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -44,8 +51,13 @@ Waypoint::Waypoint(
 }
 
 void Waypoint::load(const GffStruct &gffs) {
-    _tag = gffs.getString("Tag");
-    boost::to_lower(_tag);
+    loadBlueprint(gffs);
+
+    _tag = boost::to_lower_copy(gffs.getString("Tag"));
+    _localizedName = Resources::instance().getString(gffs.getInt("LocalizedName", -1));
+    _description = Resources::instance().getString(gffs.getInt("Description", -1));
+    _mapNote = Resources::instance().getString(gffs.getInt("MapNote", -1));
+    _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
 
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
@@ -56,6 +68,12 @@ void Waypoint::load(const GffStruct &gffs) {
     _facing = -glm::atan(dirX, dirY);
 
     updateTransform();
+}
+
+void Waypoint::loadBlueprint(const GffStruct &gffs) {
+    string resRef(gffs.getString("TemplateResRef"));
+    shared_ptr<WaypointBlueprint> blueprint(Blueprints::instance().getWaypoint(resRef));
+    blueprint->load(*this);
 }
 
 } // namespace game

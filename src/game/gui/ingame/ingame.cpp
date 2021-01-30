@@ -213,6 +213,7 @@ void InGameMenu::openJournal() {
 }
 
 void InGameMenu::openMap() {
+    _map->refreshControls();
     changeTab(Tab::Map);
 }
 
