@@ -60,6 +60,7 @@ private:
 
     // END Command line arguments
 
+    boost::program_options::options_description _commonOpts;
     boost::program_options::options_description _cmdLineOpts { "Usage" };
 
     Program(const Program &) = delete;

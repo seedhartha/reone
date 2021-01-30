@@ -37,6 +37,8 @@ namespace reone {
 
 namespace tools {
 
+static const char kConfigFilename[] = "reone.cfg";
+
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
 
@@ -76,14 +78,16 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _cmdLineOpts.add_options()
+    _commonOpts.add_options()
+        ("game", po::value<string>(), "path to game directory")
+        ("dest", po::value<string>(), "path to destination directory");
+
+    _cmdLineOpts.add(_commonOpts).add_options()
         ("help", "print this message")
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("convert", "convert 2DA or GFF file to JSON")
         ("modprobe", "probe module and produce a JSON file describing it")
-        ("game", po::value<string>(), "path to game directory")
-        ("dest", po::value<string>(), "path to destination directory")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -110,6 +114,9 @@ void Program::loadOptions() {
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
+    if (fs::exists(kConfigFilename)) {
+        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts, true), vars);
+    }
     po::notify(vars);
 
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
