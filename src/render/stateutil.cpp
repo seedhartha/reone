@@ -57,6 +57,16 @@ void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     glViewport(oldViewport[0], oldViewport[1], oldViewport[2], oldViewport[3]);
 }
 
+void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    block();
+
+    glDisable(GL_SCISSOR_TEST);
+}
+
 void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
 }

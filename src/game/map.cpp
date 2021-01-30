@@ -111,20 +111,9 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         setActiveTextureUnit(0);
         _texture->bind();
 
-        // TODO: use librender abstraction
-
-        glEnable(GL_SCISSOR_TEST);
-
         float height = _game->options().graphics.height;
-        glScissor(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        Quad::getDefault().renderTriangles();
-
-        glDisable(GL_SCISSOR_TEST);
-
-        // END TODO
+        glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
+        withScissorTest(scissorBounds, []() { Quad::getDefault().renderTriangles(); });
 
     } else {
         glm::mat4 transform(1.0f);
