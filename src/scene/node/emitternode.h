@@ -30,11 +30,12 @@ namespace reone {
 
 namespace scene {
 
+class ModelSceneNode;
 class ParticleSceneNode;
 
 class EmitterSceneNode : public SceneNode {
 public:
-    EmitterSceneNode(const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
+    EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt) override;
 
@@ -43,6 +44,7 @@ public:
     std::shared_ptr<render::Emitter> emitter() const { return _emitter; }
 
 private:
+    const ModelSceneNode *_modelSceneNode;
     std::shared_ptr<render::Emitter> _emitter;
 
     float _birthInterval { 0.0f };

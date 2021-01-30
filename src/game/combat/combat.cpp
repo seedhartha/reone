@@ -39,6 +39,7 @@ namespace reone {
 namespace game {
 
 static constexpr float kRoundDuration = 3.0f;
+static constexpr float kProjectileSpeed = 16.0f;
 
 static const char kModelEventDetonate[] = "detonate";
 
@@ -284,8 +285,6 @@ void Combat::updateRound(Round &round, float dt) {
             attacker->setMovementRestricted(true);
             attacker->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
 
-            fireProjectile(attacker, round.target, round);
-
             if (duel) {
                 auto targetCreature = static_pointer_cast<Creature>(round.target);
                 targetCreature->face(*attacker);
@@ -318,13 +317,14 @@ void Combat::updateRound(Round &round, float dt) {
 
                     attacker->face(*round.target);
                     attacker->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
-
-                    fireProjectile(targetCreature, attacker, round);
                 }
                 round.state = RoundState::SecondTurn;
                 debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
 
-            } else {
+            } else if (round.time >= 0.5f) {
+                if (!round.projectile) {
+                    fireProjectile(attacker, round.target, round);
+                }
                 updateProjectile(round, dt);
             }
             break;
@@ -339,7 +339,10 @@ void Combat::updateRound(Round &round, float dt) {
                     applyAttackResult(static_pointer_cast<Creature>(round.target), attacker, round.attackResult);
                 }
                 finishRound(round);
-            } else {
+            } else if (duel && round.time >= 0.5 + 0.5f * kRoundDuration) {
+                if (!round.projectile) {
+                    fireProjectile(static_pointer_cast<Creature>(round.target), attacker, round);
+                }
                 updateProjectile(round, dt);
             }
             break;
@@ -395,7 +398,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     } else {
         projectileTarget = targetModel->absoluteTransform()[3];
     }
-    round.projectileTarget = projectileTarget;
+    round.projectileDir = glm::normalize(projectileTarget - projectilePosition);
 
     _game->sceneGraph().addRoot(round.projectile);
 }
@@ -404,21 +407,15 @@ void Combat::updateProjectile(Round &round, float dt) {
     if (!round.projectile) return;
 
     glm::vec3 projectilePosition(round.projectile->absoluteTransform()[3]);
-    glm::vec3 targetToProjectile(round.projectileTarget - projectilePosition);
+    projectilePosition += kProjectileSpeed * round.projectileDir * dt;
 
-    float distance = glm::length(targetToProjectile);
-    float roundTimeLeft = (round.state == RoundState::FirstTurn ? 0.5f * kRoundDuration : kRoundDuration) - round.time;
-    float speed = distance / roundTimeLeft;
-
-    projectilePosition += speed * glm::normalize(targetToProjectile) * dt;
-
-    glm::vec3 dir(glm::normalize(targetToProjectile));
-    float facing = glm::half_pi<float>() - glm::atan(dir.x, dir.y);
+    float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, projectilePosition);
     transform *= glm::eulerAngleZ(facing);
 
+    round.projectile->setProjectileSpeed(kProjectileSpeed);
     round.projectile->setLocalTransform(transform);
 }
 
