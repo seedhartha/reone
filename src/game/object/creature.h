@@ -20,6 +20,7 @@
 #include <atomic>
 #include <functional>
 
+#include "../../audio/stream.h"
 #include "../../resource/format/2dafile.h"
 #include "../../resource/format/gfffile.h"
 #include "../../resource/types.h"
@@ -86,6 +87,8 @@ public:
     void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
+
+    void playSound(SoundSetEntry entry, bool positional = true);
 
     bool isSelectable() const override;
     bool isMovementRestricted() const { return _movementRestricted; }
@@ -180,7 +183,7 @@ private:
     bool _immortal { false };
     int _xp { 0 };
     std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
-    std::shared_ptr<resource::SoundSet> _soundSet;
+    std::shared_ptr<SoundSet> _soundSet;
 
     // Scripts
 

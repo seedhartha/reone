@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../audio/player.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
@@ -40,7 +41,7 @@
 
 using namespace std;
 
-using namespace reone::net;
+using namespace reone::audio;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -475,6 +476,16 @@ void Creature::giveXP(int amount) {
     _xp += amount;
 }
 
+void Creature::playSound(SoundSetEntry entry, bool positional) {
+    if (!_soundSet) return;
+
+    auto maybeSound = _soundSet->find(entry);
+    if (maybeSound != _soundSet->end()) {
+        glm::vec3 position(_position + 1.7f);
+        AudioPlayer::instance().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    }
+}
+
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
@@ -482,6 +493,7 @@ void Creature::die() {
 
     debug(boost::format("Creature: '%s' is dead") % _tag, 2);
 
+    playSound(SoundSetEntry::Dead);
     playAnimation(_animResolver.getDieAnimation());
     runDeathScript();
 }

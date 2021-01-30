@@ -17,12 +17,17 @@
 
 #pragma once
 
+#include <memory>
+#include <unordered_map>
+
+#include "../audio/stream.h"
+
 namespace reone {
 
 namespace game {
 
-const int kNpcPlayer = -1;
-const int kEngineTypeInvalid = -1;
+constexpr int kNpcPlayer = -1;
+constexpr int kEngineTypeInvalid = -1;
 
 enum class CursorType {
     None,
@@ -120,6 +125,37 @@ enum class ComputerType {
     Rakatan = 1
 };
 
+enum class SoundSetEntry {
+    BattleCry1 = 0,
+    BattleCry2 = 1,
+    BattleCry3 = 2,
+    BattleCry4 = 3,
+    BattleCry5 = 4,
+    BattleCry6 = 5,
+    Select1 = 6,
+    Select2 = 7,
+    Select3 = 8,
+    AttackGrunt1 = 9,
+    AttackGrunt2 = 10,
+    AttackGrunt3 = 11,
+    PainGrunt1 = 12,
+    PainGrunt2 = 13,
+    LowHealth = 14,
+    Dead = 15,
+    CriticalHit = 16,
+    TargetImmune = 17,
+    LayMine = 18,
+    DisarmMine = 19,
+    BeginStealth = 20,
+    BeginSearch = 21,
+    BeginUnlock = 22,
+    UnlockFailed = 23,
+    UnlockSuccess = 24,
+    SeparatedFromParty = 25,
+    RejoinParty = 26,
+    Poisoned = 27
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;
@@ -137,6 +173,8 @@ struct InventorySlot {
     static constexpr int rightWeapon2 = 18;
     static constexpr int leftWeapon2 = 19;
 };
+
+typedef std::unordered_map<SoundSetEntry, std::shared_ptr<audio::AudioStream>> SoundSet;
 
 } // namespace game
 

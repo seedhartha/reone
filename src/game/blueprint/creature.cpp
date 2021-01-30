@@ -27,6 +27,7 @@
 
 #include "../object/creature.h"
 #include "../portraitutil.h"
+#include "../soundsets.h"
 
 using namespace std;
 
@@ -146,7 +147,7 @@ void CreatureBlueprint::loadSoundSet(Creature &creature) {
     string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
     if (soundSetResRef.empty()) return;
 
-    creature._soundSet = Resources::instance().getSoundSet(soundSetResRef);
+    creature._soundSet = SoundSets::instance().get(soundSetResRef);
 }
 
 void StaticCreatureBlueprint::load(Creature &creature) {

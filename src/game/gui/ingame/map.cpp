@@ -74,7 +74,7 @@ void MapMenu::refreshControls() {
     _notes.clear();
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
-        auto &waypoint = static_pointer_cast<Waypoint>(object);
+        auto waypoint = static_pointer_cast<Waypoint>(object);
         if (waypoint->isMapNoteEnabled() && !waypoint->mapNote().empty()) {
             _notes.push_back(waypoint);
         }

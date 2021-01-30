@@ -395,6 +395,7 @@ set(GAME_HEADERS
     src/game/console.h
     src/game/combat/attackresolver.h
     src/game/combat/attackresult.h
+    src/game/combat/attackutil.h
     src/game/combat/combat.h
     src/game/combat/damageresolver.h
     src/game/cursors.h
@@ -476,6 +477,7 @@ set(GAME_HEADERS
     src/game/savedgame.h
     src/game/script/routines.h
     src/game/script/runner.h
+    src/game/soundsets.h
     src/game/types.h)
 
 set(GAME_SOURCES
@@ -592,7 +594,8 @@ set(GAME_SOURCES
     src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
-    src/game/script/runner.cpp)
+    src/game/script/runner.cpp
+    src/game/soundsets.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

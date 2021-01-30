@@ -836,17 +836,10 @@ void Area::updateVisibility() {
 
 void Area::updateSounds() {
     glm::vec3 refPosition;
-
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    if (partyLeader) {
-        refPosition = partyLeader->position();
+    if (_game->cameraType() == CameraType::ThirdPerson) {
+        refPosition = _game->party().getLeader()->position();
     } else {
-        Camera *camera = _game->getActiveCamera();
-        if (camera) {
-            refPosition = camera->sceneNode()->absoluteTransform()[3];
-        } else {
-            return;
-        }
+        refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];
     }
 
     vector<pair<Sound *, float>> soundDistances;

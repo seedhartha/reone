@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../common/log.h"
+#include "../common/random.h"
 
 #include "action/follow.h"
 #include "blueprint/creature.h"
@@ -122,9 +123,13 @@ void Party::switchLeader() {
 }
 
 void Party::onLeaderChanged() {
+    auto entry = static_cast<SoundSetEntry>(static_cast<int>(SoundSetEntry::Select1) + random(0, 2));
+    _members[0].creature->playSound(entry, false);
+
     for (auto &member : _members) {
         member.creature->actionQueue().clear();
     }
+
     _game->module()->area()->onPartyLeaderMoved();
 }
 
