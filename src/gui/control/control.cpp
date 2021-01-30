@@ -534,6 +534,16 @@ void Control::setExtent(const Extent &extent) {
     updateTextLines();
 }
 
+void Control::setExtentHeight(int height) {
+    _extent.height = height;
+    updateTransform();
+}
+
+void Control::setExtentTop(int top) {
+    _extent.top = top;
+    updateTransform();
+}
+
 void Control::setBorder(const Border &border) {
     _border = make_shared<Border>(border);
 }

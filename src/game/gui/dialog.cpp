@@ -135,9 +135,7 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 
 void DialogGUI::configureMessage() {
     auto &message = getControl(kControlTagMessage);
-    Control::Extent extent(message.extent());
-    extent.top = -_rootControl->extent().top;
-    message.setExtent(move(extent));
+    message.setExtentTop(-_rootControl->extent().top);
     message.setTextColor(getBaseColor(_gameId));
 }
 
@@ -330,20 +328,19 @@ AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
 
 void DialogGUI::repositionMessage() {
     Control &message = getControl(kControlTagMessage);
-    Control::Extent extent(message.extent());
     Control::Text text(message.text());
+    int top;
 
     if (_entryEnded) {
         text.align = Control::TextAlign::CenterBottom;
-        extent.top = -_rootControl->extent().top;
+        top = -_rootControl->extent().top;
     } else {
         text.align = Control::TextAlign::CenterTop;
-        Control &replies = getControl(kControlTagReplies);
-        extent.top = replies.extent().top;
+        top = getControl(kControlTagReplies).extent().top;
     }
 
     message.setText(move(text));
-    message.setExtent(move(extent));
+    message.setExtentTop(top);
 }
 
 void DialogGUI::onFinish() {

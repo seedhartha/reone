@@ -61,6 +61,7 @@ public:
 
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
+    void setExtentHeight(int height) override;
     void setProtoItemType(ControlType type);
     void setSelectionMode(SelectionMode mode);
     void setProtoMatchContent(bool match);
