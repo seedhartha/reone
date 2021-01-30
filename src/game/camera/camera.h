@@ -38,10 +38,12 @@ public:
 
     float facing() const { return _facing; }
     std::shared_ptr<scene::CameraSceneNode> sceneNode() const { return _sceneNode; }
+    bool isMouseLookMode() const { return _mouseLookMode; }
 
 protected:
     float _facing { 0.0f };
     std::shared_ptr<scene::CameraSceneNode> _sceneNode;
+    bool _mouseLookMode { false };
 
     Camera() = default;
 };

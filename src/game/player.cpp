@@ -57,6 +57,10 @@ bool Player::handle(const SDL_Event &event) {
             return handleKeyDown(event.key);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
+        case SDL_MOUSEBUTTONDOWN:
+            return handleMouseButtonDown(event.button);
+        case SDL_MOUSEBUTTONUP:
+            return handleMouseButtonUp(event.button);
         default:
             return false;
     }
@@ -106,6 +110,26 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
         default:
             return false;
     }
+}
+
+bool Player::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (_camera->isMouseLookMode() && event.button == SDL_BUTTON_LEFT) {
+        _moveForward = true;
+        _leftPressedInMouseLook = true;
+        return true;
+    }
+
+    return false;
+}
+
+bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+    if (_leftPressedInMouseLook && event.button == SDL_BUTTON_LEFT) {
+        _moveForward = false;
+        _leftPressedInMouseLook = false;
+        return true;
+    }
+
+    return false;
 }
 
 void Player::update(float dt) {
