@@ -83,33 +83,41 @@ void ImageButton::drawIcon(
         color = _border->color;
     }
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
-
-    LocalUniforms locals;
-    locals.general.model = transform;
-    locals.general.color = glm::vec4(color, 1.0f);
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
     if (iconFrame) {
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
+
+        LocalUniforms locals;
+        locals.general.model = transform;
+        locals.general.color = glm::vec4(color, 1.0f);
+
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
         setActiveTextureUnit(0);
         iconFrame->bind();
+
         Quad::getDefault().renderTriangles();
     }
-
-    locals.general.color = glm::vec4(1.0f);
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     if (iconTexture) {
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + (_extent.height - iconTexture->width()) / 2, offset.y + _extent.top + (_extent.height - iconTexture->height()) / 2, 0.0f));
+        transform = glm::scale(transform, glm::vec3(iconTexture->width(), iconTexture->height(), 1.0f));
+
+        LocalUniforms locals;
+        locals.general.model = transform;
+        locals.general.color = glm::vec4(1.0f);
+        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+
         setActiveTextureUnit(0);
         iconTexture->bind();
+
         Quad::getDefault().renderTriangles();
     }
+
     if (!iconText.empty()) {
-        transform = glm::mat4(1.0f);
+        glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
         _iconFont->render(iconText, transform, color, TextGravity::LeftCenter);
     }
