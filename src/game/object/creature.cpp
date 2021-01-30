@@ -257,11 +257,13 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(AnimationType anim, float speed, shared_ptr<Action> actionToComplete) {
+void Creature::playAnimation(AnimationType anim, int flags, float speed, shared_ptr<Action> actionToComplete) {
     string animName(_animResolver.getAnimationName(anim));
     if (animName.empty()) return;
 
-    int flags = isAnimationLooping(anim) ? AnimationFlags::loop : 0;
+    if (isAnimationLooping(anim)) {
+        flags |= AnimationFlags::loop;
+    }
     playAnimation(animName, flags, speed, actionToComplete);
 }
 
