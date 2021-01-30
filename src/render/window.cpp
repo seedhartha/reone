@@ -87,9 +87,6 @@ void RenderWindow::init() {
 }
 
 void RenderWindow::deinit() {
-    if (_fpsGlobal.hasAverage()) {
-        debug("Average FPS: " + to_string(static_cast<int>(_fpsGlobal.average())));
-    }
     Quad::getDefault().deinitGL();
     Quad::getXFlipped().deinitGL();
     Quad::getYFlipped().deinitGL();
@@ -147,12 +144,11 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
 }
 
 void RenderWindow::update(float dt) {
-    _fpsLocal.update(dt);
-    _fpsGlobal.update(dt);
+    _fps.update(dt);
 
-    if (_fpsLocal.hasAverage()) {
-        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fpsLocal.average())).c_str());
-        _fpsLocal.reset();
+    if (_fps.hasAverage()) {
+        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fps.average())).c_str());
+        _fps.reset();
     }
 }
 
