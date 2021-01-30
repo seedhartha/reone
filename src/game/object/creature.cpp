@@ -441,8 +441,12 @@ void Creature::setFaction(Faction faction) {
 }
 
 bool Creature::isLevelUpPending() const {
+    return _xp >= getNeededXP();
+}
+
+int Creature::getNeededXP() const {
     int level = _attributes.getAggregateLevel();
-    return _xp >= level * (level + 1) * 500;
+    return level * (level + 1) * 500;
 }
 
 void Creature::setMovementRestricted(bool restricted) {

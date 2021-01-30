@@ -94,6 +94,7 @@ public:
 
     glm::vec3 getSelectablePosition() const override;
     float getAttackRange() const;
+    int getNeededXP() const;
 
     Gender gender() const { return _gender; }
     ModelType modelType() const { return _modelType; }

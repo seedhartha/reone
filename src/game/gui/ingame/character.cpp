@@ -17,6 +17,8 @@
 
 #include "character.h"
 
+#include <boost/format.hpp>
+
 #include "../../game.h"
 #include "../../rp/classes.h"
 
@@ -80,6 +82,10 @@ static string toStringOrEmptyIfZero(int value) {
     return value != 0 ? to_string(value) : "";
 }
 
+static string describeAbilityModifier(int value) {
+    return value > 0 ? "+" + to_string(value) : (value < 0 ? to_string(value) : "");
+}
+
 void CharacterMenu::refreshControls() {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
@@ -89,29 +95,29 @@ void CharacterMenu::refreshControls() {
     setControlText("LBL_LEVEL1", toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
     setControlText("LBL_LEVEL2", toStringOrEmptyIfZero(attributes.getLevelByPosition(2)));
 
-    setControlText("LBL_VITALITY_STAT", "");
+    setControlText("LBL_VITALITY_STAT", str(boost::format("%d/%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
     setControlText("LBL_DEFENSE_STAT", "");
     setControlText("LBL_FORCE_STAT", "");
 
-    setControlText("LBL_STR", "");
-    setControlText("LBL_STR_MOD", "");
-    setControlText("LBL_DEX", "");
-    setControlText("LBL_DEX_MOD", "");
-    setControlText("LBL_CON", "");
-    setControlText("LBL_CON_MOD", "");
-    setControlText("LBL_INT", "");
-    setControlText("LBL_INT_MOD", "");
-    setControlText("LBL_WIS", "");
-    setControlText("LBL_WIS_MOD", "");
-    setControlText("LBL_CHA", "");
-    setControlText("LBL_CHA_MOD", "");
+    setControlText("LBL_STR", to_string(attributes.abilities().strength()));
+    setControlText("LBL_STR_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Strength)));
+    setControlText("LBL_DEX", to_string(attributes.abilities().dexterity()));
+    setControlText("LBL_DEX_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Dexterity)));
+    setControlText("LBL_CON", to_string(attributes.abilities().constitution()));
+    setControlText("LBL_CON_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Constitution)));
+    setControlText("LBL_INT", to_string(attributes.abilities().intelligence()));
+    setControlText("LBL_INT_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Intelligence)));
+    setControlText("LBL_WIS", to_string(attributes.abilities().wisdom()));
+    setControlText("LBL_WIS_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Wisdom)));
+    setControlText("LBL_CHA", to_string(attributes.abilities().charisma()));
+    setControlText("LBL_CHA_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Charisma)));
 
     setControlText("LBL_FORTITUDE_STAT", "");
     setControlText("LBL_REFLEX_STAT", "");
     setControlText("LBL_WILL_STAT", "");
 
-    setControlText("LBL_EXPERIENCE_STAT", "");
-    setControlText("LBL_NEEDED_XP", "");
+    setControlText("LBL_EXPERIENCE_STAT", to_string(partyLeader->xp()));
+    setControlText("LBL_NEEDED_XP", to_string(partyLeader->getNeededXP()));
 
     refreshPortraits();
 }
