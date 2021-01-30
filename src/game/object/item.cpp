@@ -19,8 +19,11 @@
 
 #include <stdexcept>
 
+#include "../../audio/player.h"
+
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -36,6 +39,22 @@ void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
         throw invalid_argument("blueprint must not be null");
     }
     blueprint->load(*this);
+}
+
+void Item::playShotSound(int variant, glm::vec3 position) {
+    if (_ammunitionType) {
+        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
+        if (sound) {
+            AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        }
+    }
+}
+
+void Item::playImpactSound(int variant, glm::vec3 position) {
+    if (_ammunitionType) {
+        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+        AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+    }
 }
 
 bool Item::isEquippable() const {

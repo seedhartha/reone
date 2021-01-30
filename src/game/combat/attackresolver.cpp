@@ -21,6 +21,8 @@
 
 #include "../object/creature.h"
 
+#include "attackutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -32,17 +34,6 @@ static bool isMeleeWieldType(CreatureWieldType type) {
         case CreatureWieldType::SingleSword:
         case CreatureWieldType::DoubleBladedSword:
         case CreatureWieldType::DualSwords:
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool isAttackSuccessful(AttackResultType type) {
-    switch (type) {
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
-        case AttackResultType::AutomaticHit:
             return true;
         default:
             return false;

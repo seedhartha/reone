@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include "../../audio/files.h"
 #include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
@@ -30,6 +31,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -94,7 +96,11 @@ void ItemBlueprint::load(Item &item) {
 void ItemBlueprint::loadAmmunitionType(int ordinal, Item &item) {
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("ammunitiontypes"));
     item._ammunitionType = make_shared<Item::AmmunitionType>();
-    item._ammunitionType->model = Models::instance().get(table->getString(ordinal, "model"));
+    item._ammunitionType->model = Models::instance().get(boost::to_lower_copy(table->getString(ordinal, "model")));
+    item._ammunitionType->shotSound1 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "shotsound0")));
+    item._ammunitionType->shotSound2 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "shotsound1")));
+    item._ammunitionType->impactSound1 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "impactsound0")));
+    item._ammunitionType->impactSound2 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "impactsound1")));
 }
 
 } // namespace game

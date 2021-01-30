@@ -37,6 +37,7 @@
 #include "cursors.h"
 #include "gui/sounds.h"
 #include "script/routines.h"
+#include "soundsets.h"
 
 using namespace std;
 
@@ -214,6 +215,7 @@ void Game::loadModule(const string &name, string entry) {
         AudioFiles::instance().invalidateCache();
         Scripts::instance().invalidateCache();
         Blueprints::instance().invalidateCache();
+        SoundSets::instance().invalidateCache();
         Resources::instance().loadModule(name);
 
         if (_module) {
@@ -689,8 +691,14 @@ void Game::updateCamera(float dt) {
     Camera *camera = getActiveCamera();
     if (camera) {
         camera->update(dt);
-        glm::vec3 position(camera->sceneNode()->absoluteTransform()[3]);
-        AudioPlayer::instance().setListenerPosition(position);
+
+        glm::vec3 listenerPosition;
+        if (_cameraType == CameraType::ThirdPerson) {
+            listenerPosition = _party.getLeader()->position() + 1.7f; // TODO: height based on appearance
+        } else {
+            listenerPosition = camera->sceneNode()->absoluteTransform()[3];
+        }
+        AudioPlayer::instance().setListenerPosition(listenerPosition);
     }
 }
 

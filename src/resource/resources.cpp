@@ -26,7 +26,6 @@
 #include "format/biffile.h"
 #include "format/erffile.h"
 #include "format/rimfile.h"
-#include "format/ssffile.h"
 #include "folder.h"
 #include "typeutil.h"
 
@@ -318,21 +317,6 @@ shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
     });
 }
 
-shared_ptr<SoundSet> Resources::getSoundSet(const string &resRef) {
-    return findResource<SoundSet>(resRef, _soundSetCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(get(resRef, ResourceType::Ssf));
-        shared_ptr<SoundSet> soundSet;
-
-        if (data) {
-            SsfFile ssf;
-            ssf.load(wrap(data));
-            soundSet = make_shared<SoundSet>(ssf.soundSet());
-        }
-
-        return move(soundSet);
-    });
-}
-
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
     return _exeFile.find(name, type);
 }
@@ -349,6 +333,13 @@ string Resources::getString(int strRef) const {
     _stringProcessor.process(text, _gameId);
 
     return move(text);
+}
+
+string Resources::getSoundByStrRef(int strRef) const {
+    shared_ptr<TalkTable> table(_tlkFile.table());
+    if (strRef == -1 || strRef >= table->getStringCount()) return "";
+
+    return table->getString(strRef).soundResRef;
 }
 
 } // namespace resource

@@ -106,7 +106,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
         if (!getIsEnemy(combatant, *creature)) continue;
 
         glm::vec3 adjustedCombatantPos(combatant.position());
-        adjustedCombatantPos.z += 1.8f; // TODO: height based on appearance
+        adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
 
         glm::vec3 adjustedCreaturePos(creature->position());
         adjustedCreaturePos.z += creature->model()->aabb().center().z;
@@ -386,6 +386,8 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     } else {
         projectilePosition = weaponModel->absoluteTransform()[3];
     }
+
+    weapon->playShotSound(0, projectilePosition);
 
     round.projectile = make_shared<ModelSceneNode>(&_game->sceneGraph(), ammunitionType->model);
     round.projectile->setPosition(projectilePosition);

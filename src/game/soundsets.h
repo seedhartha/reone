@@ -17,24 +17,32 @@
 
 #pragma once
 
-#include "binfile.h"
+#include <string>
+#include <memory>
+#include <unordered_map>
+
+#include "types.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
-class SsfFile : public BinaryFile {
+class SoundSets {
 public:
-    SsfFile();
+    static SoundSets &instance();
 
-    const std::vector<uint32_t> &soundSet() const { return _soundSet; }
+    void invalidateCache();
+
+    std::shared_ptr<SoundSet> get(const std::string &resRef);
 
 private:
-    std::vector<uint32_t> _soundSet;
+    std::unordered_map<std::string, std::shared_ptr<SoundSet>> _cache;
 
-    void doLoad() override;
+    SoundSets() = default;
+    SoundSets(const SoundSets &) = delete;
+    SoundSets &operator=(const SoundSets &) = delete;
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

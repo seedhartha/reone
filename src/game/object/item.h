@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include "../../audio/stream.h"
 #include "../../render/model/model.h"
 #include "../../render/texture.h"
 #include "../../resource/format/gfffile.h"
@@ -36,11 +37,18 @@ class Item : public Object {
 public:
     struct AmmunitionType {
         std::shared_ptr<render::Model> model;
+        std::shared_ptr<audio::AudioStream> shotSound1;
+        std::shared_ptr<audio::AudioStream> shotSound2;
+        std::shared_ptr<audio::AudioStream> impactSound1;
+        std::shared_ptr<audio::AudioStream> impactSound2;
     };
 
     Item(uint32_t id);
 
     void load(const std::shared_ptr<ItemBlueprint> &blueprint);
+
+    void playShotSound(int variant, glm::vec3 position);
+    void playImpactSound(int variant, glm::vec3 position);
 
     bool isEquippable() const;
     bool isEquippable(int slot) const;

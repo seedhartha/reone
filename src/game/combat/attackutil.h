@@ -17,24 +17,23 @@
 
 #pragma once
 
-#include "binfile.h"
+#include "../types.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
-class SsfFile : public BinaryFile {
-public:
-    SsfFile();
+bool isAttackSuccessful(AttackResultType result) {
+    switch (result) {
+        case AttackResultType::HitSuccessful:
+        case AttackResultType::CriticalHit:
+        case AttackResultType::AutomaticHit:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    const std::vector<uint32_t> &soundSet() const { return _soundSet; }
-
-private:
-    std::vector<uint32_t> _soundSet;
-
-    void doLoad() override;
-};
-
-} // namespace resource
+} // namespace game
 
 } // namespace reone
