@@ -550,21 +550,21 @@ void MdlFile::readSizeEndController(uint16_t dataIndex, const vector<float> &dat
 }
 
 void MdlFile::readColorStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.start.r = data[dataIndex + 0];
-    node._emitter->_color.start.g = data[dataIndex + 1];
-    node._emitter->_color.start.b = data[dataIndex + 2];
+    node._emitter->_color.start.r = data[dataIndex + 0ll];
+    node._emitter->_color.start.g = data[dataIndex + 1ll];
+    node._emitter->_color.start.b = data[dataIndex + 2ll];
 }
 
 void MdlFile::readColorMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.mid.r = data[dataIndex + 0];
-    node._emitter->_color.mid.g = data[dataIndex + 1];
-    node._emitter->_color.mid.b = data[dataIndex + 2];
+    node._emitter->_color.mid.r = data[dataIndex + 0ll];
+    node._emitter->_color.mid.g = data[dataIndex + 1ll];
+    node._emitter->_color.mid.b = data[dataIndex + 2ll];
 }
 
 void MdlFile::readColorEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.end.r = data[dataIndex + 0];
-    node._emitter->_color.end.g = data[dataIndex + 1];
-    node._emitter->_color.end.b = data[dataIndex + 2];
+    node._emitter->_color.end.r = data[dataIndex + 0ll];
+    node._emitter->_color.end.g = data[dataIndex + 1ll];
+    node._emitter->_color.end.b = data[dataIndex + 2ll];
 }
 
 void MdlFile::readAlphaStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
@@ -886,12 +886,26 @@ unique_ptr<Animation> MdlFile::readAnimation(uint32_t offset) {
     float length = readFloat();
     float transitionTime = readFloat();
 
-    ignore(48);
+    ignore(32);
+
+    vector<Animation::Event> events;
+    int eventsOffset = readInt32();
+    int eventsCount = readInt32();
+    if (eventsCount > 0) {
+        seek(kMdlDataOffset + eventsOffset);
+        for (int i = 0; i < eventsCount; ++i) {
+            Animation::Event event;
+            event.time = readFloat();
+            event.name = boost::to_lower_copy(readCString(32));
+            events.push_back(move(event));
+        }
+        sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });
+    }
 
     _nodeIndex = 0;
     unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
 
-    return make_unique<Animation>(name, length, transitionTime, move(rootNode));
+    return make_unique<Animation>(name, length, transitionTime, move(events), move(rootNode));
 }
 
 Model::Classification MdlFile::getClassification(int value) const {

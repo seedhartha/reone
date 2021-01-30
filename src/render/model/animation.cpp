@@ -25,12 +25,23 @@ namespace reone {
 
 namespace render {
 
-Animation::Animation(const string &name, float length, float transitionTime, const shared_ptr<ModelNode> &rootNode) :
+Animation::Animation(
+    const string &name,
+    float length,
+    float transitionTime,
+    vector<Event> &&events,
+    const shared_ptr<ModelNode> &rootNode
+) :
     _name(name),
     _length(length),
     _transitionTime(transitionTime),
+    _events(move(events)),
     _rootNode(rootNode) {
 
+    initNodeByName();
+}
+
+void Animation::initNodeByName() {
     queue<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 

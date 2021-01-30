@@ -205,18 +205,27 @@ void SceneNodeAnimator::applyAnimationTransforms(ModelNode &modelNode) {
 void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
     if (channel.freeze) return;
 
-    float length = channel.animation->length();
-    channel.time += channel.speed * dt;
-
     bool loop = channel.flags & AnimationFlags::loop;
+    float newTime = channel.time + channel.speed * dt;
+    float length = channel.animation->length();
+
     if (loop) {
-        channel.time = glm::mod(channel.time, length);
+        newTime = glm::mod(newTime, length);
     } else {
-        channel.time = glm::min(channel.time, length);
-        if (channel.time == length) {
+        newTime = glm::min(newTime, length);
+        if (newTime == length) {
             channel.finished = true;
         }
     }
+
+    // Signal events between the previous animation time and the current time
+    for (auto &event : channel.animation->events()) {
+        if (event.time < channel.time || event.time > newTime) break;
+
+        _modelSceneNode->signalEvent(event.name);
+    }
+
+    channel.time = newTime;
 }
 
 void SceneNodeAnimator::playDefaultAnimation() {
