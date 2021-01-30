@@ -119,13 +119,8 @@ void ClassSelection::configureClassButtons() {
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    Control::Border border(control.border());
-    border.color = getBaseColor(_gameId);
-    control.setBorder(move(border));
-
-    Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_gameId);
-    control.setHilight(move(hilight));
+    control.setBorderColor(getBaseColor(_gameId));
+    control.setHilightColor(getHilightColor(_gameId));
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
