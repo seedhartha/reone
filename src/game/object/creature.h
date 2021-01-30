@@ -121,7 +121,7 @@ public:
 
     // END Animation
 
-    void playAnimation(AnimationType anim, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
+    void playAnimation(AnimationType anim, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
     void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);

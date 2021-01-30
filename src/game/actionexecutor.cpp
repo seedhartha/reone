@@ -22,6 +22,7 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../common/log.h"
+#include "../scene/types.h"
 #include "../script/execution.h"
 
 #include "enginetype/location.h"
@@ -33,6 +34,7 @@
 
 using namespace std;
 
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {
@@ -347,7 +349,7 @@ void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, Loca
 
 void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const shared_ptr<PlayAnimationAction> &action, float dt) {
     auto spatialActor = static_pointer_cast<SpatialObject>(actor);
-    spatialActor->playAnimation(action->animation(), action->speed(), action);
+    spatialActor->playAnimation(action->animation(), AnimationFlags::propagateHead, action->speed(), action);
 }
 
 } // namespace game
