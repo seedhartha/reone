@@ -67,6 +67,12 @@ void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glDisable(GL_SCISSOR_TEST);
 }
 
+void withWireframes(const function<void()> &block) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    block();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
 }

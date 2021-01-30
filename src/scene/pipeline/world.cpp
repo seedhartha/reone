@@ -39,6 +39,7 @@ namespace scene {
 static constexpr int kShadowResolution = 2048;
 static constexpr float kShadowFarPlane = 10000.0f;
 
+static bool g_wireframesEnabled = false;
 static bool g_debugShadows = false;
 
 WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
@@ -136,7 +137,13 @@ void WorldRenderPipeline::drawGeometry() const {
         _shadows.bindDepthBuffer();
     }
 
-    withDepthTest([this]() { _scene->render(); });
+    if (g_wireframesEnabled) {
+        withWireframes([this]() {
+            withDepthTest([this]() { _scene->render(); });
+        });
+    } else {
+        withDepthTest([this]() { _scene->render(); });
+    }
 
     if (_scene->isShadowLightPresent()) {
         setActiveTextureUnit(TextureUnits::shadowmap);
