@@ -18,6 +18,7 @@
 #include "character.h"
 
 #include "../../game.h"
+#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
@@ -59,35 +60,6 @@ void CharacterMenu::load() {
     hideControl("LBL_GOOD10");
     hideControl("LBL_MORE");
 
-    hideControl("LBL_CLASS1");
-    hideControl("LBL_CLASS2");
-    hideControl("LBL_LEVEL1");
-    hideControl("LBL_LEVEL2");
-
-    hideControl("LBL_VITALITY_STAT");
-    hideControl("LBL_DEFENSE_STAT");
-    hideControl("LBL_FORCE_STAT");
-
-    hideControl("LBL_STR");
-    hideControl("LBL_STR_MOD");
-    hideControl("LBL_DEX");
-    hideControl("LBL_DEX_MOD");
-    hideControl("LBL_CON");
-    hideControl("LBL_CON_MOD");
-    hideControl("LBL_INT");
-    hideControl("LBL_INT_MOD");
-    hideControl("LBL_WIS");
-    hideControl("LBL_WIS_MOD");
-    hideControl("LBL_CHA");
-    hideControl("LBL_CHA_MOD");
-
-    hideControl("LBL_FORTITUDE_STAT");
-    hideControl("LBL_REFLEX_STAT");
-    hideControl("LBL_WILL_STAT");
-
-    hideControl("LBL_EXPERIENCE_STAT");
-    hideControl("LBL_NEEDED_XP");
-
     disableControl("BTN_AUTO");
     disableControl("BTN_SCRIPTS");
 }
@@ -96,6 +68,52 @@ void CharacterMenu::update(float dt) {
     shared_ptr<Creature> leader(_game->party().getLeader());
     setControlVisible("BTN_LEVELUP", leader->isLevelUpPending());
     setControlVisible("BTN_AUTO", leader->isLevelUpPending());
+}
+
+static string describeClass(ClassType clazz) {
+    if (clazz == ClassType::Invalid) return "";
+
+    return Classes::instance().get(clazz)->name();
+}
+
+static string toStringOrEmptyIfZero(int value) {
+    return value != 0 ? to_string(value) : "";
+}
+
+void CharacterMenu::refreshControls() {
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    CreatureAttributes &attributes = partyLeader->attributes();
+
+    setControlText("LBL_CLASS1", describeClass(attributes.getClassByPosition(1)));
+    setControlText("LBL_CLASS2", describeClass(attributes.getClassByPosition(2)));
+    setControlText("LBL_LEVEL1", toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
+    setControlText("LBL_LEVEL2", toStringOrEmptyIfZero(attributes.getLevelByPosition(2)));
+
+    setControlText("LBL_VITALITY_STAT", "");
+    setControlText("LBL_DEFENSE_STAT", "");
+    setControlText("LBL_FORCE_STAT", "");
+
+    setControlText("LBL_STR", "");
+    setControlText("LBL_STR_MOD", "");
+    setControlText("LBL_DEX", "");
+    setControlText("LBL_DEX_MOD", "");
+    setControlText("LBL_CON", "");
+    setControlText("LBL_CON_MOD", "");
+    setControlText("LBL_INT", "");
+    setControlText("LBL_INT_MOD", "");
+    setControlText("LBL_WIS", "");
+    setControlText("LBL_WIS_MOD", "");
+    setControlText("LBL_CHA", "");
+    setControlText("LBL_CHA_MOD", "");
+
+    setControlText("LBL_FORTITUDE_STAT", "");
+    setControlText("LBL_REFLEX_STAT", "");
+    setControlText("LBL_WILL_STAT", "");
+
+    setControlText("LBL_EXPERIENCE_STAT", "");
+    setControlText("LBL_NEEDED_XP", "");
+
+    refreshPortraits();
 }
 
 void CharacterMenu::refreshPortraits() {

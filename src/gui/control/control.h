@@ -50,12 +50,13 @@ public:
     static constexpr int kStretchAll = kStretchLeft | kStretchTop | kStretchWidth | kStretchHeight;
 
     enum class TextAlign {
-        LeftCenter = 9,
-        CenterBottom = 10,
-        LeftCenter2 = 17,
+        LeftTop = 9,
+        CenterTop = 10,
+        RightCenter = 12,
+        LeftCenter = 17,
         CenterCenter = 18,
 
-        CenterTop = 0x1000
+        CenterBottom = 0x1000
     };
 
     struct Extent {

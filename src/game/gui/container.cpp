@@ -69,7 +69,7 @@ void Container::configureItemsListBox() {
     ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
 
     Control::Text text(protoItem.text());
-    text.align = Control::TextAlign::LeftCenter;
+    text.align = Control::TextAlign::LeftTop;
 
     protoItem.setText(text);
 }

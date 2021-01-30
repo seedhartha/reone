@@ -122,14 +122,20 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
         case TextGravity::LeftCenter:
             textOffset = glm::vec3(-textWidth, -0.5f * _height, 0.0f);
             break;
-        case TextGravity::CenterTop:
-            textOffset = glm::vec3(-0.5f * textWidth, -_height, 0.0f);
-            break;
         case TextGravity::CenterBottom:
             textOffset = glm::vec3(-0.5f * textWidth, 0.0f, 0.0f);
             break;
+        case TextGravity::CenterTop:
+            textOffset = glm::vec3(-0.5f * textWidth, -_height, 0.0f);
+            break;
+        case TextGravity::RightBottom:
+            textOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+            break;
         case TextGravity::RightCenter:
             textOffset = glm::vec3(0.0f, -0.5f * _height, 0.0f);
+            break;
+        case TextGravity::RightTop:
+            textOffset = glm::vec3(0.0f, -_height, 0.0f);
             break;
         case TextGravity::CenterCenter:
         default:
