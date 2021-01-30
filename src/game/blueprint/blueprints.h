@@ -29,6 +29,7 @@
 #include "placeable.h"
 #include "sound.h"
 #include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 
@@ -46,6 +47,7 @@ public:
     std::shared_ptr<PlaceableBlueprint> getPlaceable(const std::string &resRef);
     std::shared_ptr<SoundBlueprint> getSound(const std::string &resRef);
     std::shared_ptr<TriggerBlueprint> getTrigger(const std::string &resRef);
+    std::shared_ptr<WaypointBlueprint> getWaypoint(const std::string &resRef);
 
 private:
     std::unordered_map<std::string, std::shared_ptr<CreatureBlueprint>> _creatureCache;
@@ -54,6 +56,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<PlaceableBlueprint>> _placeableCache;
     std::unordered_map<std::string, std::shared_ptr<SoundBlueprint>> _soundCache;
     std::unordered_map<std::string, std::shared_ptr<TriggerBlueprint>> _triggerCache;
+    std::unordered_map<std::string, std::shared_ptr<WaypointBlueprint>> _waypointCache;
 
     Blueprints() = default;
     Blueprints(const Blueprints &) = delete;

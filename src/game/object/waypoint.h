@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class WaypointBlueprint;
-
 class Waypoint : public SpatialObject {
 public:
     Waypoint(
@@ -37,8 +35,19 @@ public:
 
     void load(const resource::GffStruct &gffs);
 
+    bool isMapNoteEnabled() const { return _mapNoteEnabled; }
+
+    const std::string &localizedName() const { return _localizedName; }
+    const std::string &description() const { return _description; }
+    const std::string &mapNote() const { return _mapNote; }
+
 private:
-    std::shared_ptr<WaypointBlueprint> _blueprint;
+    std::string _localizedName;
+    std::string _description;
+    std::string _mapNote;
+    bool _mapNoteEnabled { false };
+
+    void loadBlueprint(const resource::GffStruct &gffs);
 };
 
 } // namespace game

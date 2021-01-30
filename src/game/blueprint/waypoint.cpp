@@ -15,38 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "waypoint.h"
 
-#include "../gui.h"
+#include <stdexcept>
+
+#include <boost/algorithm/string.hpp>
+
+#include "../object/waypoint.h"
+
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-class Game;
-class Map;
-class Waypoint;
+WaypointBlueprint::WaypointBlueprint(const string &resRef, const shared_ptr<GffStruct> &utw) :
+    _resRef(resRef),
+    _utw(utw) {
 
-class MapMenu : public GameGUI {
-public:
-    MapMenu(Game *game);
+    if (!utw) {
+        throw invalid_argument("utw must not be null");
+    }
+}
 
-    void load() override;
-    void render() const override;
+void WaypointBlueprint::load(Waypoint &waypoint) {
+}
 
-    void refreshControls();
-
-private:
-    Game *_game;
-
-    std::vector<std::shared_ptr<Waypoint>> _notes;
-    int _selectedNoteIdx { 0 };
-
-    void onClick(const std::string &control) override;
-
-    void refreshSelectedNote();
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

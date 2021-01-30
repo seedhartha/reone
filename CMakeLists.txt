@@ -381,6 +381,7 @@ set(GAME_HEADERS
     src/game/blueprint/placeable.h
     src/game/blueprint/sound.h
     src/game/blueprint/trigger.h
+    src/game/blueprint/waypoint.h
     src/game/camera/animatedcamera.h
     src/game/camera/camera.h
     src/game/camera/camerastyle.h
@@ -494,6 +495,7 @@ set(GAME_SOURCES
     src/game/blueprint/placeable.cpp
     src/game/blueprint/sound.cpp
     src/game/blueprint/trigger.cpp
+    src/game/blueprint/waypoint.cpp
     src/game/camera/animatedcamera.cpp
     src/game/camera/camera.cpp
     src/game/camera/camerastyle.cpp
