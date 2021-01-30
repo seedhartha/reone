@@ -41,7 +41,7 @@ public:
     std::shared_ptr<Texture> get(const std::string &resRef, TextureType type);
 
 private:
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
     Textures() = default;

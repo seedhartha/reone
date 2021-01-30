@@ -202,7 +202,7 @@ private:
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
