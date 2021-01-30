@@ -84,6 +84,11 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
             _moveRight = true;
             return true;
 
+        case SDL_SCANCODE_X: {
+            shared_ptr<Creature> partyLeader(_party->getLeader());
+            partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
+            return true;
+        }
         default:
             return false;
     }
