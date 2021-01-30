@@ -102,8 +102,8 @@ void ImageButton::drawIcon(
 
     if (iconTexture) {
         glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + (_extent.height - iconTexture->width()) / 2, offset.y + _extent.top + (_extent.height - iconTexture->height()) / 2, 0.0f));
-        transform = glm::scale(transform, glm::vec3(iconTexture->width(), iconTexture->height(), 1.0f));
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         LocalUniforms locals;
         locals.general.model = transform;
