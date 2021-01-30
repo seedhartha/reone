@@ -439,31 +439,37 @@ void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, co
 void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
     // Gravity
     switch (_text.align) {
+        case TextAlign::LeftTop:
+            gravity = TextGravity::RightBottom;
+            break;
+        case TextAlign::CenterTop:
+            gravity = TextGravity::CenterBottom;
+            break;
+        case TextAlign::RightCenter:
+            gravity = TextGravity::LeftCenter;
+            break;
         case TextAlign::LeftCenter:
-        case TextAlign::LeftCenter2:
             gravity = TextGravity::RightCenter;
             break;
         case TextAlign::CenterBottom:
             gravity = TextGravity::CenterTop;
             break;
         case TextAlign::CenterCenter:
-            gravity = TextGravity::CenterCenter;
-            break;
-        case TextAlign::CenterTop:
         default:
-            gravity = TextGravity::CenterBottom;
+            gravity = TextGravity::CenterCenter;
             break;
     }
     // Vertical alignment
     switch (_text.align) {
-        case TextAlign::CenterBottom:
-            position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
-            break;
+        case TextAlign::LeftTop:
         case TextAlign::CenterTop:
             position.y = _extent.top;
             break;
+        case TextAlign::CenterBottom:
+            position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
+            break;
+        case TextAlign::RightCenter:
         case TextAlign::LeftCenter:
-        case TextAlign::LeftCenter2:
         case TextAlign::CenterCenter:
         default:
             position.y = _extent.top + size.y / 2 - static_cast<int>(0.5f * (lineCount - 1) * _text.font->height());
@@ -471,13 +477,16 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
     }
     // Horizontal alignment
     switch (_text.align) {
+        case TextAlign::LeftTop:
         case TextAlign::LeftCenter:
-        case TextAlign::LeftCenter2:
             position.x = _extent.left;
             break;
-        case TextAlign::CenterBottom:
-        case TextAlign::CenterCenter:
+        case TextAlign::RightCenter:
+            position.x = _extent.left + _extent.width;
+            break;
         case TextAlign::CenterTop:
+        case TextAlign::CenterCenter:
+        case TextAlign::CenterBottom:
         default:
             position.x = _extent.left + size.x / 2;
             break;

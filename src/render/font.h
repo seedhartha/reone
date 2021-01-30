@@ -29,10 +29,12 @@ namespace render {
 
 enum class TextGravity {
     LeftCenter,
-    CenterTop,
-    CenterCenter,
     CenterBottom,
-    RightCenter
+    CenterCenter,
+    CenterTop,
+    RightBottom,
+    RightCenter,
+    RightTop
 };
 
 class Font {

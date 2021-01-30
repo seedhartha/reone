@@ -195,7 +195,7 @@ void InGameMenu::openInventory() {
 }
 
 void InGameMenu::openCharacter() {
-    _character->refreshPortraits();
+    _character->refreshControls();
     changeTab(Tab::Character);
 }
 
