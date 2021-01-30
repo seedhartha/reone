@@ -113,6 +113,7 @@ public:
     void setLoadFromSaveGame(bool load);
     void setRunScriptVar(int var);
     void setPaused(bool paused);
+    void setRelativeMouseMode(bool relative);
 
     // Module Loading
 

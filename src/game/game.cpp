@@ -290,8 +290,8 @@ void Game::toggleInGameCameraType() {
         case CameraType::ThirdPerson: {
             _module->player().stopMovement();
             shared_ptr<Area> area(_module->area());
-            FirstPersonCamera &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
-            ThirdPersonCamera &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
+            auto &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
+            auto &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
             firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
             firstPerson.setFacing(thirdPerson.facing());
             _cameraType = CameraType::FirstPerson;
@@ -300,7 +300,8 @@ void Game::toggleInGameCameraType() {
         default:
             break;
     }
-    _window.setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
+
+    setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
 }
 
 Camera *Game::getActiveCamera() const {
@@ -613,6 +614,7 @@ void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &res
     }
 
     stopMovement();
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
@@ -631,6 +633,7 @@ void Game::stopMovement() {
 
 void Game::openContainer(const shared_ptr<SpatialObject> &container) {
     stopMovement();
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _container->open(container);
     changeScreen(GameScreen::Container);
@@ -638,12 +641,14 @@ void Game::openContainer(const shared_ptr<SpatialObject> &container) {
 
 void Game::openPartySelection(const PartySelection::Context &ctx) {
     stopMovement();
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
     changeScreen(GameScreen::PartySelection);
 }
 
 void Game::openSaveLoad(SaveLoad::Mode mode) {
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
     _saveLoad->refresh();
@@ -651,6 +656,7 @@ void Game::openSaveLoad(SaveLoad::Mode mode) {
 }
 
 void Game::openLevelUp() {
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _charGen->startLevelUp();
     changeScreen(GameScreen::CharacterGeneration);
@@ -836,6 +842,10 @@ void Game::setRunScriptVar(int var) {
 
 void Game::setPaused(bool paused) {
     _paused = paused;
+}
+
+void Game::setRelativeMouseMode(bool relative) {
+    _window.setRelativeMouseMode(relative);
 }
 
 } // namespace game
