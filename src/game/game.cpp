@@ -572,6 +572,7 @@ void Game::quit() {
 }
 
 void Game::openInGame() {
+    _sceneGraph.setUpdate(!_paused);
     changeScreen(GameScreen::InGame);
 }
 
@@ -635,6 +636,7 @@ void Game::stopMovement() {
 
 void Game::openContainer(const shared_ptr<SpatialObject> &container) {
     stopMovement();
+    _sceneGraph.setUpdate(false);
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _container->open(container);
