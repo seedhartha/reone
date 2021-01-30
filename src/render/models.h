@@ -41,7 +41,7 @@ public:
     std::shared_ptr<Model> get(const std::string &resRef);
 
 private:
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 
     Models() = default;

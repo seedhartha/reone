@@ -77,7 +77,7 @@ public:
     const std::vector<std::string> &moduleNames() const { return _moduleNames; }
 
 private:
-    GameID _gameId {GameID::KotOR };
+    GameID _gameId { GameID::KotOR };
     boost::filesystem::path _gamePath;
     std::vector<std::string> _moduleNames;
     StringProcessor _stringProcessor;

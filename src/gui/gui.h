@@ -70,7 +70,7 @@ protected:
         Stretch
     };
 
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     render::GraphicsOptions _gfxOpts;
     std::string _resRef;
     BackgroundType _backgroundType { BackgroundType::None };

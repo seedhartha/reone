@@ -48,7 +48,7 @@ public:
     std::shared_ptr<render::Cursor> get(CursorType type);
 
 private:
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
 
     Cursors() = default;

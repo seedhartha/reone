@@ -35,7 +35,7 @@ public:
     std::shared_ptr<render::Model> model() const { return _model; }
 
 private:
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::shared_ptr<std::istream> _mdx;
     std::unique_ptr<StreamReader> _mdxReader;
     std::string _name;

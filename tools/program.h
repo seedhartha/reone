@@ -49,7 +49,7 @@ private:
     boost::filesystem::path _destPath;
     std::string _target;
     boost::filesystem::path _keyPath;
-    resource::GameID _gameId {resource::GameID::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     Command _command { Command::None };
     std::unique_ptr<FileTool> _tool;
 
