@@ -246,6 +246,11 @@ void ListBox::setExtent(const Extent &extent) {
     updateItemSlots();
 }
 
+void ListBox::setExtentHeight(int height) {
+    Control::setExtentHeight(height);
+    updateItemSlots();
+}
+
 void ListBox::setProtoItemType(ControlType type) {
     _protoItemType = type;
 }

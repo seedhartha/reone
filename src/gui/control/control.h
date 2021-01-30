@@ -128,6 +128,8 @@ public:
     void setDisabled(bool disabled);
     void setDiscardColor(const glm::vec3 &color);
     virtual void setExtent(const Extent &extent);
+    virtual void setExtentHeight(int height);
+    void setExtentTop(int top);
     virtual void setFocus(bool focus);
     void setFocusable(bool focusable);
     void setHeight(int height);

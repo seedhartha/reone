@@ -66,14 +66,10 @@ void BarkBubble::setBarkText(const string &text, float duration) {
         float rootHeight = lineCount * lblBarkText.text().font->height() + 2 * padding;
         float labelHeight = lineCount * lblBarkText.text().font->height();
 
-        Control::Extent rootExtent(_rootControl->extent());
-        rootExtent.height = rootHeight;
         _rootControl->setVisible(true);
-        _rootControl->setExtent(rootExtent);
+        _rootControl->setExtentHeight(rootHeight);
 
-        Control::Extent lblBarkTextExtent(lblBarkText.extent());
-        lblBarkTextExtent.height = labelHeight;
-        lblBarkText.setExtent(lblBarkTextExtent);
+        lblBarkText.setExtentHeight(labelHeight);
         lblBarkText.setTextMessage(text);
         lblBarkText.setVisible(true);
     }
