@@ -278,7 +278,7 @@ void Game::drawWorld() {
     if (!camera) return;
 
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setReferenceNode(_party.getLeader()->model());
+    _sceneGraph.setReferenceNode(_party.getLeader()->getModelSceneNode());
     _sceneGraph.prepareFrame();
 
     _worldPipeline.render();

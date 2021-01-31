@@ -43,7 +43,7 @@ public:
     bool shouldRender() const;
     bool shouldCastShadows() const;
 
-    bool isTransparent() const;
+    bool isTransparent() const override;
 
     float distanceTo(const glm::vec3 &point) const override;
 

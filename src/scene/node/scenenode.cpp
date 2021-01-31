@@ -92,6 +92,14 @@ void SceneNode::setPosition(glm::vec3 position) {
     setLocalTransform(glm::translate(glm::mat4(1.0f), position));
 }
 
+void SceneNode::setVisible(bool visible) {
+    _visible = visible;
+}
+
+void SceneNode::setTransparent(bool transparent) {
+    _transparent = transparent;
+}
+
 } // namespace scene
 
 } // namespace reone

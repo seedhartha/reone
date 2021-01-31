@@ -109,7 +109,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
         adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
 
         glm::vec3 adjustedCreaturePos(creature->position());
-        adjustedCreaturePos.z += creature->model()->aabb().center().z;
+        adjustedCreaturePos.z += creature->getModelSceneNode()->aabb().center().z;
 
         glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
 
@@ -377,7 +377,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
     if (!ammunitionType) return;
 
-    shared_ptr<ModelSceneNode> weaponModel(attacker->model()->getAttachedModel("rhand"));
+    shared_ptr<ModelSceneNode> weaponModel(attacker->getModelSceneNode()->getAttachedModel("rhand"));
     if (!weaponModel) return;
 
     glm::vec3 projectilePosition, bulletHookPosition;
@@ -393,7 +393,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectile->setPosition(projectilePosition);
     round.projectile->signalEvent(kModelEventDetonate);
 
-    shared_ptr<ModelSceneNode> targetModel(target->model());
+    shared_ptr<ModelSceneNode> targetModel(target->getModelSceneNode());
     glm::vec3 projectileTarget, impactPosition;
     if (targetModel->getNodeAbsolutePosition("impact", impactPosition)) {
         projectileTarget = targetModel->absoluteTransform() * glm::vec4(impactPosition, 1.0f);

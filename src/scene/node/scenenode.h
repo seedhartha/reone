@@ -40,6 +40,9 @@ public:
 
     virtual float distanceTo(const glm::vec3 &point) const;
 
+    bool isVisible() const { return _visible; }
+    virtual bool isTransparent() const { return _transparent; }
+
     const SceneNode *parent() const { return _parent; }
     const glm::mat4 &localTransform() const { return _localTransform; }
     const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
@@ -49,14 +52,19 @@ public:
     void setParent(const SceneNode *parent);
     virtual void setLocalTransform(const glm::mat4 &transform);
     void setPosition(glm::vec3 position);
+    virtual void setVisible(bool visible);
+    void setTransparent(bool transparent);
 
 protected:
-    SceneGraph *_sceneGraph { nullptr };
+    SceneGraph *_sceneGraph;
+
     const SceneNode *_parent { nullptr };
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     glm::mat4 _absoluteTransformInv { 1.0f };
     std::vector<std::shared_ptr<SceneNode>> _children;
+    bool _visible { true };
+    bool _transparent { false };
 
     SceneNode(SceneGraph *sceneGraph);
 

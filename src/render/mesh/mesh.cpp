@@ -23,9 +23,18 @@
 
 #include "glm/ext.hpp"
 
+using namespace std;
+
 namespace reone {
 
 namespace render {
+
+Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexOffsets offsets) :
+    _vertexCount(vertexCount),
+    _vertices(move(vertices)),
+    _indices(move(indices)),
+    _offsets(move(offsets)) {
+}
 
 void Mesh::computeAABB() {
     _aabb.reset();

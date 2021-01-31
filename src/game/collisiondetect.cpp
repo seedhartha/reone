@@ -81,7 +81,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         dir = invTransform * glm::vec4(props.direction, 0.0f);
 
         if (props.flags & RaycastFlags::aabb) {
-            shared_ptr<ModelSceneNode> model(object->model());
+            shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
             if (!model) continue;
             if (model->aabb().contains(origin)) continue;
 

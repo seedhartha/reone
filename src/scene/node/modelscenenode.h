@@ -50,7 +50,6 @@ public:
     void signalEvent(const std::string &name);
 
     bool hasTextureOverride() const { return static_cast<bool>(_textureOverride); }
-    bool isVisible() const { return _visible; }
     bool isOnScreen() const { return _onScreen; }
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
@@ -66,8 +65,9 @@ public:
     const AABB &aabb() const { return _aabb; }
     float projectileSpeed() const { return _projectileSpeed; }
 
+    void setVisible(bool visible) override;
+
     void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
-    void setVisible(bool visible);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);

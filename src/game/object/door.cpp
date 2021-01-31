@@ -80,23 +80,25 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("genericdoors"));
 
     string modelName(boost::to_lower_copy(table->getString(_genericType, "modelname")));
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
+    _sceneNode = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
 
     _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {
-    if (_model) {
-        _model->setDefaultAnimation("opened1");
-        _model->playAnimation("opening1");
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (model) {
+        model->setDefaultAnimation("opened1");
+        model->playAnimation("opening1");
     }
     _open = true;
 }
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
-    if (_model) {
-        _model->setDefaultAnimation("closed");
-        _model->playAnimation("closing1");
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (model) {
+        model->setDefaultAnimation("closed");
+        model->playAnimation("closing1");
     }
     _open = false;
 }

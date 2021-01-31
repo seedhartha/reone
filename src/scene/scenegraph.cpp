@@ -196,20 +196,38 @@ void SceneGraph::render() const {
 
 void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
     if (shadowPass) {
+        // Render shadow meshes
         for (auto &mesh : _shadowMeshes) {
             mesh->renderSingle(true);
         }
         return;
     }
+
+    // Render opaque roots
     for (auto &root : _roots) {
-        root->render();
+        if (!root->isTransparent()) {
+            root->render();
+        }
     }
+
+    // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->renderSingle(false);
     }
+
+    // Render transparent roots
+    for (auto &root : _roots) {
+        if (root->isTransparent()) {
+            root->render();
+        }
+    }
+
+    // Render transparent meshes
     for (auto &mesh : _transparentMeshes) {
         mesh->renderSingle(false);
     }
+
+    // Render particles
     for (auto &particle : _particles) {
         particle->renderSingle(false);
     }

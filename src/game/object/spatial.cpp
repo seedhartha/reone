@@ -114,9 +114,10 @@ float SpatialObject::distanceTo(const SpatialObject &other) const {
 }
 
 bool SpatialObject::contains(const glm::vec3 &point) const {
-    if (!_model) return false;
+    auto model = getModelSceneNode();
+    if (!model) return false;
 
-    const AABB &aabb = _model->model()->aabb();
+    const AABB &aabb = model->model()->aabb();
 
     return (aabb * _transform).contains(point);
 }
@@ -218,7 +219,8 @@ bool SpatialObject::isSelectable() const {
 }
 
 glm::vec3 SpatialObject::getSelectablePosition() const {
-    return _model->getCenterOfAABB();
+    auto model = getModelSceneNode();
+    return model ? model->getCenterOfAABB() : _position;
 }
 
 void SpatialObject::setRoom(Room *room) {
@@ -244,8 +246,8 @@ void SpatialObject::updateTransform() {
     if (_facing != 0.0f) {
         _transform *= glm::eulerAngleZ(_facing);
     }
-    if (_model && !_stunt) {
-        _model->setLocalTransform(_transform);
+    if (_sceneNode && !_stunt) {
+        _sceneNode->setLocalTransform(_transform);
     }
 }
 
@@ -259,8 +261,8 @@ void SpatialObject::setVisible(bool visible) {
 
     _visible = visible;
 
-    if (_model) {
-        _model->setVisible(visible);
+    if (_sceneNode) {
+        _sceneNode->setVisible(visible);
     }
 }
 
@@ -292,8 +294,8 @@ void SpatialObject::die() {
 }
 
 void SpatialObject::startStuntMode() {
-    if (_model) {
-        _model->setLocalTransform(glm::mat4(1.0f));
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(glm::mat4(1.0f));
     }
     _stunt = true;
 }
@@ -301,8 +303,8 @@ void SpatialObject::startStuntMode() {
 void SpatialObject::stopStuntMode() {
     if (!_stunt) return;
 
-    if (_model) {
-        _model->setLocalTransform(_transform);
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(_transform);
     }
     _stunt = false;
 }

@@ -46,6 +46,10 @@ public:
         int stride { 0 };
     };
 
+    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexOffsets offsets);
+
+    virtual ~Mesh();
+
     void initGL();
     void deinitGL();
     void renderLines() const;
@@ -63,7 +67,6 @@ protected:
     uint32_t _vertexArrayId { 0 };
 
     Mesh() = default;
-    virtual ~Mesh();
 
     void computeAABB();
     void render(uint32_t mode, int count, int offset) const;
