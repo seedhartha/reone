@@ -55,6 +55,8 @@ namespace reone {
 
 namespace game {
 
+static bool g_conversationsEnabled = false;
+
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _options(opts),
@@ -610,6 +612,8 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 }
 
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
+    if (!g_conversationsEnabled) return;
+
     shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
