@@ -55,7 +55,7 @@ namespace reone {
 
 namespace game {
 
-static bool g_conversationsEnabled = false;
+static bool g_conversationsEnabled = true;
 
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
