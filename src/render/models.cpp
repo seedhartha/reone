@@ -20,6 +20,7 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
+#include "model/gr2file.h"
 #include "model/mdlfile.h"
 
 using namespace std;
@@ -54,17 +55,26 @@ shared_ptr<Model> Models::get(const string &resRef) {
 }
 
 shared_ptr<Model> Models::doGet(const string &resRef) {
-    shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
 
-    if (mdlData && mdxData) {
-        MdlFile mdl(_gameId);
-        mdl.load(wrap(mdlData), wrap(mdxData));
-        model = mdl.model();
-        if (model) {
-            model->initGL();
+    // Try GR2 models first. This is a hook to get SWTOR models working.
+    shared_ptr<ByteArray> gr2Data(Resources::instance().get(resRef, ResourceType::Gr2));
+    if (gr2Data) {
+        Gr2File gr2;
+        gr2.load(wrap(gr2Data));
+        model = gr2.model();
+
+    } else {
+        shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
+        shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
+        if (mdlData && mdxData) {
+            MdlFile mdl(_gameId);
+            mdl.load(wrap(mdlData), wrap(mdxData));
+            model = mdl.model();
         }
+    }
+    if (model) {
+        model->initGL();
     }
 
     return move(model);

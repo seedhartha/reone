@@ -87,7 +87,9 @@ enum class ResourceType : uint16_t {
     Lip = 3004,
     Tpc = 3007,
     Mdx = 3008,
-    Mp3 = 4000,
+
+    Mp3 = 0x1000,
+    Gr2 = 0x1001,
 
     Invalid = 0xffff
 };
