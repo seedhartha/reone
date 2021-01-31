@@ -136,19 +136,19 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 }
 
 void Creature::updateModel() {
-    if (_model) {
-        _sceneGraph->removeRoot(_model);
+    if (_sceneNode) {
+        _sceneGraph->removeRoot(_sceneNode);
     }
-    _model = _modelBuilder.build();
-
-    if (_model) {
-        _headModel = _model->getAttachedModel(g_headHookNode);
+    shared_ptr<ModelSceneNode> model(_modelBuilder.build());
+    if (model) {
+        _headModel = model->getAttachedModel(g_headHookNode);
         if (!_stunt) {
-            _model->setLocalTransform(_transform);
+            model->setLocalTransform(_transform);
         }
-        _sceneGraph->addRoot(_model);
+        _sceneGraph->addRoot(model);
         _animDirty = true;
     }
+    _sceneNode = model;
 }
 
 void Creature::loadPortrait(int appearance) {
@@ -178,10 +178,11 @@ void Creature::update(float dt) {
 }
 
 void Creature::updateModelAnimation() {
-    if (!_model) return;
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (!model) return;
 
     if (_animFireForget) {
-        if (!_model->isAnimationFinished()) return;
+        if (!model->isAnimationFinished()) return;
 
         _animFireForget = false;
         _animDirty = true;
@@ -194,51 +195,51 @@ void Creature::updateModelAnimation() {
     }
     switch (_movementType) {
         case MovementType::Run: {
-            shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getRunAnimation()));
+            shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getRunAnimation()));
             if (anim) {
-                _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                 if (_headModel) {
-                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                 }
             }
             break;
         }
         case MovementType::Walk: {
-            shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getWalkAnimation()));
+            shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getWalkAnimation()));
             if (anim) {
-                _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                 if (_headModel) {
-                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                 }
             }
             break;
         }
         default:
             if (_dead) {
-                shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getDeadAnimation()));
+                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getDeadAnimation()));
                 if (anim) {
-                    _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                    model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                     if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                     }
                 }
             } else if (_talking) {
-                shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getTalkNormalAnimation()));
+                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getTalkNormalAnimation()));
                 if (anim) {
-                    _model->playAnimation(anim, AnimationFlags::loop, 1.0f, _model->model()->animationScale());
+                    model->playAnimation(anim, AnimationFlags::loop, 1.0f, model->model()->animationScale());
                     if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loop, 1.0f, _model->model()->animationScale());
+                        _headModel->playAnimation(anim, AnimationFlags::loop, 1.0f, model->model()->animationScale());
                         _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
                     } else {
-                        _model->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
+                        model->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
                     }
                 }
             } else {
-                shared_ptr<Animation> anim(_model->model()->getAnimation(_animResolver.getPauseAnimation()));
+                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getPauseAnimation()));
                 if (anim) {
-                    _model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                    model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                     if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, _model->model()->animationScale());
+                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                     }
                 }
             }
@@ -270,9 +271,12 @@ void Creature::playAnimation(AnimationType anim, int flags, float speed, shared_
 }
 
 void Creature::playAnimation(const string &name, int flags, float speed, shared_ptr<Action> actionToComplete) {
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (!model) return;
+
     doPlayAnimation(flags, [&]() {
         _animAction = actionToComplete;
-        _model->playAnimation(name, flags, speed);
+        model->playAnimation(name, flags, speed);
         if (_headModel && (flags & AnimationFlags::propagateHead)) {
             _headModel->playAnimation(name, flags & ~AnimationFlags::propagateHead, speed);
         }
@@ -280,7 +284,7 @@ void Creature::playAnimation(const string &name, int flags, float speed, shared_
 }
 
 void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
-    if (!_model || _movementType != MovementType::None) return;
+    if (!_sceneNode || _movementType != MovementType::None) return;
 
     callback();
 
@@ -290,9 +294,12 @@ void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
 }
 
 void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed) {
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (!model) return;
+
     doPlayAnimation(flags, [&]() {
         // TODO: scale should be computed from this creatures model and the animations model
-        _model->playAnimation(anim, flags, speed, 1.0f);
+        model->playAnimation(anim, flags, speed, 1.0f);
         if (_headModel && (flags & AnimationFlags::propagateHead)) {
             _headModel->playAnimation(anim, flags & ~AnimationFlags::propagateHead, speed, 1.0f);
         }
@@ -329,14 +336,17 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
     _equipment[slot] = item;
     item->setEquipped(true);
 
-    if (_model) {
+    if (_sceneNode) {
         updateModel();
 
-        if (slot == InventorySlot::rightWeapon) {
-            shared_ptr<ModelSceneNode> weapon(_model->getAttachedModel("rhand"));
-            if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
-                weapon->setDefaultAnimation("powered");
-                weapon->playAnimation("powerup");
+        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        if (model) {
+            if (slot == InventorySlot::rightWeapon) {
+                shared_ptr<ModelSceneNode> weapon(model->getAttachedModel("rhand"));
+                if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
+                    weapon->setDefaultAnimation("powered");
+                    weapon->playAnimation("powerup");
+                }
             }
         }
     }
@@ -350,7 +360,7 @@ void Creature::unequip(const shared_ptr<Item> &item) {
             item->setEquipped(false);
             _equipment.erase(equipped.first);
 
-            if (_model) {
+            if (_sceneNode) {
                 updateModel();
             }
             break;
@@ -419,15 +429,18 @@ void Creature::clearPath() {
 }
 
 glm::vec3 Creature::getSelectablePosition() const {
-    if (_dead) return _model->getCenterOfAABB();
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (!model) return _position;
+
+    if (_dead) return model->getCenterOfAABB();
 
     glm::vec3 position;
 
-    if (_model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
-        return _model->absoluteTransform() * glm::vec4(position, 1.0f);
+    if (model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
+        return model->absoluteTransform() * glm::vec4(position, 1.0f);
     }
 
-    return _model->getCenterOfAABB();
+    return model->getCenterOfAABB();
 }
 
 float Creature::getAttackRange() const {

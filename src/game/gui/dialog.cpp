@@ -249,7 +249,7 @@ void DialogGUI::updateCamera() {
 }
 
 glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
-    shared_ptr<ModelSceneNode> model(object.model());
+    shared_ptr<ModelSceneNode> model(object.getModelSceneNode());
     if (model) {
         glm::vec3 hookPosition(0.0f);
         if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {

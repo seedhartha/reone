@@ -406,7 +406,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
     {
-        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        shared_ptr<ModelSceneNode> sceneNode(object->getModelSceneNode());
         if (sceneNode) {
             _game->sceneGraph().removeRoot(sceneNode);
         }
@@ -543,7 +543,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
     ostringstream ss;
     ss << boost::format("tag='%s'") % object.tag();
     ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % object.model()->getName();
+    ss << boost::format(",model='%s'") % object.getModelSceneNode()->getName();
 
     debug("Selected object: " + ss.str());
 }
@@ -730,7 +730,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         }
     }
     for (auto &object : _objects) {
-        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
@@ -775,7 +775,7 @@ void Area::update3rdPersonCameraTarget() {
 
     glm::vec3 position;
 
-    if (partyLeader->model()->getNodeAbsolutePosition("camerahook", position)) {
+    if (partyLeader->getModelSceneNode()->getNodeAbsolutePosition("camerahook", position)) {
         position += partyLeader->position();
     } else {
         position = partyLeader->position();
@@ -821,7 +821,7 @@ void Area::updateVisibility() {
     for (auto &object : _objects) {
         if (!object->visible()) continue;
 
-        shared_ptr<ModelSceneNode> model(object->model());
+        shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
         if (!model) continue;
 
         AABB aabb(model->aabb() * model->absoluteTransform());
@@ -1009,7 +1009,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     auto spatial = dynamic_pointer_cast<SpatialObject>(object);
     if (spatial) {
         add(spatial);
-        auto model = spatial->model();
+        auto model = spatial->getModelSceneNode();
         if (model) {
             _game->sceneGraph().addRoot(model);
         }

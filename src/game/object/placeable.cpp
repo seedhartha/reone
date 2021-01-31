@@ -83,8 +83,9 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("placeables"));
     string modelName(boost::to_lower_copy(table->getString(_appearance, "modelname")));
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
-    _model->setLightingEnabled(true);
+    auto model = make_shared<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
+    model->setLightingEnabled(true);
+    _sceneNode = model;
 
     _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
 }

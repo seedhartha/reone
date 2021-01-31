@@ -66,6 +66,7 @@ private:
     // END Scripts
 
     void loadBlueprint(const resource::GffStruct &gffs);
+    void loadAppearance();
 
     friend class TriggerBlueprint;
 };

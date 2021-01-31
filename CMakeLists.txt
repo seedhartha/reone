@@ -269,6 +269,7 @@ set(SCENE_HEADERS
     src/scene/node/cubenode.h
     src/scene/node/emitternode.h
     src/scene/node/lightnode.h
+    src/scene/node/meshnode.h
     src/scene/node/modelnodescenenode.h
     src/scene/node/modelscenenode.h
     src/scene/node/particlenode.h
@@ -284,6 +285,7 @@ set(SCENE_SOURCES
     src/scene/node/cubenode.cpp
     src/scene/node/emitternode.cpp
     src/scene/node/lightnode.cpp
+    src/scene/node/meshnode.cpp
     src/scene/node/modelnodescenenode.cpp
     src/scene/node/modelscenenode.cpp
     src/scene/node/particlenode.cpp

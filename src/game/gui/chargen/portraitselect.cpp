@@ -109,7 +109,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
 
     // Attach creature model to the root scene node
 
-    shared_ptr<ModelSceneNode> creatureModel(creature->model());
+    shared_ptr<ModelSceneNode> creatureModel(creature->getModelSceneNode());
     glm::vec3 headPosition;
     if (creatureModel->getNodeAbsolutePosition("camerahook", headPosition)) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -headPosition.z));

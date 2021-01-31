@@ -121,7 +121,7 @@ void Console::cmdListAnim(vector<string> tokens) {
         substr = tokens[1];
     }
 
-    vector<string> anims(object->model()->model()->getAnimationNames());
+    vector<string> anims(object->getModelSceneNode()->model()->getAnimationNames());
     sort(anims.begin(), anims.end());
 
     for (auto &anim : anims) {
@@ -145,7 +145,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
             return;
         }
     }
-    object->model()->playAnimation(tokens[1], AnimationFlags::loop);
+    object->getModelSceneNode()->playAnimation(tokens[1], AnimationFlags::loop);
 }
 
 void Console::cmdKill(vector<string> tokens) {

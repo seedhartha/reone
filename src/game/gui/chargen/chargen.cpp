@@ -393,7 +393,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->load(_character);
     creature->setFacing(-glm::half_pi<float>());
     creature->updateModelAnimation();
-    root->attach("cgbody_light", creature->model());
+    root->attach("cgbody_light", creature->getModelSceneNode());
 
     return move(root);
 }
