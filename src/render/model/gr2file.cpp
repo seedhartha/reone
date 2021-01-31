@@ -32,92 +32,99 @@ namespace reone {
 
 namespace render {
 
-static constexpr int kMaxMeshNameLength = 64;
-
 Gr2File::Gr2File() : BinaryFile(4, "GAWB") {
 }
 
 void Gr2File::doLoad() {
-    // Adapted from https://forum.xentax.com/viewtopic.php?f=16&t=9703&start=30#p94880
+    // Adapted from multiple sources:
+    //
+    // https://github.com/SWTOR-Extractors-Modders-Dataminers/Granny2-Plug-In-Blender-2.8x/blob/v1.0.0.1/io_scene_gr2/import_gr2.py
+    // https://forum.xentax.com/viewtopic.php?f=16&t=9703&start=30#p94880
+    // https://forum.xentax.com/viewtopic.php?f=16&t=11317&start=15#p128702
 
     seek(0x10);
 
     uint32_t num50Offsets = readUint32();
     uint32_t gr2Type = readUint32();
+
     _numMeshes = readUint16();
-    uint16_t numTextures = readUint16();
-    uint16_t numBones = readUint16();
-    uint16_t numAttachs = readUint16();
+    _numMaterials = readUint16();
+    _numBones = readUint16();
+
+    uint16_t numAttachments = readUint16();
 
     seek(0x50);
 
     uint32_t offset50Offset = readUint32();
-    uint32_t offsetMeshHeader = readUint32();
-    uint32_t offsetMaterialNameOffsets = readUint32();
-    uint32_t offsetBoneStructure = readUint32();
+
+    _offsetMeshHeader = readUint32();
+    _offsetMaterialHeader = readUint32();
+    _offsetBoneStructure = readUint32();
+
     uint32_t offsetAttachments = readUint32();
 
-    loadMeshHeaders();
-    loadMeshNames();
-    loadMeshPieces();
+    loadMeshes();
+    loadMaterials();
+    loadSkeletonBones();
 
     // TODO: load attachments
-    // TODO: load materials
 
-    loadMeshes();
     loadModel();
 }
 
-void Gr2File::loadMeshHeaders() {
-    seek(0x70);
-
+void Gr2File::loadMeshes() {
     for (uint16_t i = 0; i < _numMeshes; ++i) {
-        MeshHeader header;
-        header.nameOffset = readUint32();
-
-        ignore(4);
-
-        header.numPieces = readUint16();
-        header.numUsedBones = readUint16();
-        header.verticesMask = readUint16();
-        header.numVertexBytes = readUint16();
-        header.numVertices = readUint32();
-        header.numFaces = readUint32();
-        header.verticesOffset = readUint32();
-        header.piecesOffset = readUint32();
-        header.facesOffset = readUint32();
-        header.bonesOffset = readUint32();
-
-        _meshHeaders.push_back(move(header));
+        seek(_offsetMeshHeader + i * 0x28);
+        _meshes.push_back(readMesh());
     }
 }
 
-void Gr2File::loadMeshNames() {
-    for (uint16_t i = 0; i < _numMeshes; ++i) {
-        seek(_meshHeaders[i].nameOffset);
-        _meshNames.push_back(readCString(kMaxMeshNameLength));
+unique_ptr<Gr2File::Gr2Mesh> Gr2File::readMesh() {
+    uint32_t offsetName = readUint32();
+    string name(readCStringAt(offsetName));
+    if (boost::contains(name, "collision")) return nullptr;
+
+    auto mesh = make_unique<Gr2Mesh>();
+    mesh->header.name = name;
+
+    ignore(4);
+
+    mesh->header.numPieces = readUint16();
+    mesh->header.numUsedBones = readUint16();
+    mesh->header.vertexMask = readUint16();
+    mesh->header.vertexSize = readUint16();
+    mesh->header.numVertices = readUint32();
+    mesh->header.numIndices = readUint32();
+    mesh->header.offsetVertices = readUint32();
+    mesh->header.offsetPieces = readUint32();
+    mesh->header.offsetIndices = readUint32();
+    mesh->header.offsetBones = readUint32();
+
+    for (uint16_t i = 0; i < mesh->header.numPieces; ++i) {
+        seek(mesh->header.offsetPieces + i * 0x30);
+        mesh->pieces.push_back(readMeshPiece());
     }
+
+    mesh->mesh = readModelMesh(*mesh);
+
+    for (uint16_t i = 0; i < mesh->header.numUsedBones; ++i) {
+        seek(mesh->header.offsetBones + i * 0x1c);
+        mesh->bones.push_back(readMeshBone());
+    }
+
+    return move(mesh);
 }
 
-void Gr2File::loadMeshPieces() {
-    for (uint16_t i = 0; i < _numMeshes; ++i) {
-        vector<MeshPiece> pieces;
-        pieces.reserve(_meshHeaders[i].numPieces);
+unique_ptr<Gr2File::MeshPiece> Gr2File::readMeshPiece() {
+    auto piece = make_unique<MeshPiece>();
+    piece->startFaceIdx = readUint32();
+    piece->numFaces = readUint32();
+    piece->materialIndex = readUint32();
+    piece->pieceIndex = readUint32();
 
-        seek(_meshHeaders[i].piecesOffset);
-        for (uint16_t j = 0; j < _meshHeaders[i].numPieces; ++j) {
-            MeshPiece piece;
-            piece.materialFacesIdx = readUint32();
-            piece.numMaterialFaces = readUint32();
-            piece.textureId = readUint32();
+    ignore(0x24); // bounding box
 
-            ignore(24);
-
-            pieces.push_back(move(piece));
-        }
-
-        _meshPieces.push_back(move(pieces));
-    }
+    return move(piece);
 }
 
 static float convertByteToFloat(uint8_t value) {
@@ -137,124 +144,158 @@ static glm::vec3 computeBitangent(const glm::vec3 &normal, const glm::vec3 &tang
     return glm::cross(tangent, normal);
 }
 
-void Gr2File::loadMeshes() {
-    for (uint16_t i = 0; i < _numMeshes; ++i) {
-        if (boost::contains(_meshNames[i], "collision")) continue;
-
-        int unkFlags = _meshHeaders[i].verticesMask & ~0x1f2;
-        if (unkFlags != 0) {
-            warn(boost::format("GR2: unrecognized vertices flags: 0x%x") % unkFlags);
-        }
-
-        Mesh::VertexOffsets offsets;
-
-        vector<float> vertices;
-        seek(_meshHeaders[i].verticesOffset);
-        vector<uint8_t> gr2Vertices(readArray<uint8_t>(static_cast<size_t>(_meshHeaders[i].numVertices) * _meshHeaders[i].numVertexBytes));
-        const uint8_t *gr2VerticesPtr = &gr2Vertices[0];
-        for (uint32_t j = 0; j < _meshHeaders[i].numVertices; ++j) {
-            int stride = 0;
-            int gr2Stride = 0;
-
-            // Vertex coordinates
-            vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 0));
-            vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 4));
-            vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 8));
-            stride += 3 * sizeof(float);
-            gr2Stride += 3 * sizeof(float);
-
-            // Bone weights and indices
-            if (_meshHeaders[i].verticesMask & 0x100) {
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 0)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 1)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 2)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 3)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 4)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 5)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 6)));
-                vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 7)));
-                offsets.boneWeights = stride;
-                offsets.boneIndices = stride + 4 * sizeof(float);
-                stride += 8 * sizeof(float);
-                gr2Stride += 8;
-            }
-
-            // Normal and tangent space (?)
-            if (_meshHeaders[i].verticesMask & 0x2) {
-                glm::vec3 normal;
-                normal.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 0));
-                normal.y = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 1));
-                normal.z = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 2));
-                vertices.push_back(normal.x);
-                vertices.push_back(normal.y);
-                vertices.push_back(normal.z);
-
-                glm::vec3 tangent;
-                tangent.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 4));
-                tangent.y = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 5));
-                tangent.z = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 6));
-                vertices.push_back(tangent.x);
-                vertices.push_back(tangent.y);
-                vertices.push_back(tangent.z);
-
-                glm::vec3 bitangent(computeBitangent(normal, tangent));
-                vertices.push_back(bitangent.x);
-                vertices.push_back(bitangent.y);
-                vertices.push_back(bitangent.z);
-
-                offsets.normals = stride;
-                offsets.tangents = stride + 3 * sizeof(float);
-                offsets.bitangents = stride + 6 * sizeof(float);
-                stride += 9 * sizeof(float);
-                gr2Stride += 8;
-            }
-
-            // Color
-            if (_meshHeaders[i].verticesMask & 0x10) {
-                gr2Stride += 4;
-            }
-
-            // Texture 1 coordinates
-            if (_meshHeaders[i].verticesMask & 0x20) {
-                vertices.push_back(convertHalfFloatToFloat(*reinterpret_cast<const uint16_t *>(gr2VerticesPtr + gr2Stride + 0)));
-                vertices.push_back(-1.0f * convertHalfFloatToFloat(*reinterpret_cast<const uint16_t *>(gr2VerticesPtr + gr2Stride + 2)));
-                offsets.texCoords1 = stride;
-                stride += 2 * sizeof(float);
-                gr2Stride += 2 * sizeof(uint16_t);
-            }
-
-            // Texture 2 coordinates
-            if (_meshHeaders[i].verticesMask & 0x40) {
-                gr2Stride += 4;
-            }
-
-            // Texture 3 coordinates
-            if (_meshHeaders[i].verticesMask & 0x80) {
-                gr2Stride += 4;
-            }
-
-            gr2VerticesPtr += _meshHeaders[i].numVertexBytes;
-            offsets.stride = stride;
-        }
-
-        vector<uint16_t> indices;
-        seek(_meshHeaders[i].facesOffset);
-        for (uint16_t j = 0; j < _meshHeaders[i].numPieces; ++j) {
-            vector<uint16_t> pieceIndices(readArray<uint16_t>(3 * _meshPieces[i][j].numMaterialFaces));
-            indices.insert(indices.end(), pieceIndices.begin(), pieceIndices.end());
-        }
-
-        auto mesh = make_shared<ModelMesh>(true, 0, true);
-        mesh->_vertexCount = _meshHeaders[i].numVertices;
-        mesh->_vertices = move(vertices);
-        mesh->_offsets = move(offsets);
-        mesh->_indices = move(indices);
-        mesh->_diffuseColor = glm::vec3(0.8f);
-        mesh->_ambientColor = glm::vec3(0.2f);
-        mesh->_diffuse = Textures::instance().get("acklay", TextureType::Diffuse);
-        mesh->computeAABB();
-        _meshes.push_back(move(mesh));
+unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
+    int unkFlags = mesh.header.vertexMask & ~0x1f2;
+    if (unkFlags != 0) {
+        warn(boost::format("GR2: unrecognized vertex flags: 0x%x") % unkFlags);
     }
+
+    Mesh::VertexOffsets offsets;
+
+    vector<float> vertices;
+    seek(mesh.header.offsetVertices);
+    vector<uint8_t> gr2Vertices(readArray<uint8_t>(static_cast<size_t>(mesh.header.numVertices) * mesh.header.vertexSize));
+    const uint8_t *gr2VerticesPtr = &gr2Vertices[0];
+    for (uint32_t i = 0; i < mesh.header.numVertices; ++i) {
+        int stride = 0;
+        int gr2Stride = 0;
+
+        // Vertex coordinates
+        vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 0));
+        vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 4));
+        vertices.push_back(*reinterpret_cast<const float *>(gr2VerticesPtr + gr2Stride + 8));
+        stride += 3 * sizeof(float);
+        gr2Stride += 3 * sizeof(float);
+
+        // Bone weights and indices
+        if (mesh.header.vertexMask & 0x100) {
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 0)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 1)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 2)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 3)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 4)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 5)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 6)));
+            vertices.push_back(static_cast<float>(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 7)));
+            offsets.boneWeights = stride;
+            offsets.boneIndices = stride + 4 * sizeof(float);
+            stride += 8 * sizeof(float);
+            gr2Stride += 8;
+        }
+
+        // Normal and tangent space (?)
+        if (mesh.header.vertexMask & 0x2) {
+            glm::vec3 normal;
+            normal.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 0));
+            normal.y = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 1));
+            normal.z = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 2));
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
+
+            glm::vec3 tangent;
+            tangent.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 4));
+            tangent.y = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 5));
+            tangent.z = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 6));
+            vertices.push_back(tangent.x);
+            vertices.push_back(tangent.y);
+            vertices.push_back(tangent.z);
+
+            glm::vec3 bitangent(computeBitangent(normal, tangent));
+            vertices.push_back(bitangent.x);
+            vertices.push_back(bitangent.y);
+            vertices.push_back(bitangent.z);
+
+            offsets.normals = stride;
+            offsets.tangents = stride + 3 * sizeof(float);
+            offsets.bitangents = stride + 6 * sizeof(float);
+            stride += 9 * sizeof(float);
+            gr2Stride += 8;
+        }
+
+        // Color
+        if (mesh.header.vertexMask & 0x10) {
+            gr2Stride += 4;
+        }
+
+        // Texture 1 coordinates
+        if (mesh.header.vertexMask & 0x20) {
+            vertices.push_back(convertHalfFloatToFloat(*reinterpret_cast<const uint16_t *>(gr2VerticesPtr + gr2Stride + 0)));
+            vertices.push_back(-1.0f * convertHalfFloatToFloat(*reinterpret_cast<const uint16_t *>(gr2VerticesPtr + gr2Stride + 2)));
+            offsets.texCoords1 = stride;
+            stride += 2 * sizeof(float);
+            gr2Stride += 2 * sizeof(uint16_t);
+        }
+
+        // Texture 2 coordinates
+        if (mesh.header.vertexMask & 0x40) {
+            gr2Stride += 4;
+        }
+
+        // Texture 3 coordinates
+        if (mesh.header.vertexMask & 0x80) {
+            gr2Stride += 4;
+        }
+
+        gr2VerticesPtr += mesh.header.vertexSize;
+        offsets.stride = stride;
+    }
+
+    vector<uint16_t> indices;
+    seek(mesh.header.offsetIndices);
+    for (uint16_t i = 0; i < mesh.header.numPieces; ++i) {
+        vector<uint16_t> pieceIndices(readArray<uint16_t>(3 * mesh.pieces[i]->numFaces));
+        indices.insert(indices.end(), pieceIndices.begin(), pieceIndices.end());
+    }
+
+    auto modelMesh = make_unique<ModelMesh>(true, 0, true);
+    modelMesh->_vertexCount = mesh.header.numVertices;
+    modelMesh->_vertices = move(vertices);
+    modelMesh->_offsets = move(offsets);
+    modelMesh->_indices = move(indices);
+    modelMesh->_diffuseColor = glm::vec3(0.8f);
+    modelMesh->_ambientColor = glm::vec3(0.2f);
+
+    // TODO: load textures from model
+    modelMesh->_diffuse = Textures::instance().get("acklay", TextureType::Diffuse);
+
+    modelMesh->computeAABB();
+
+    return move(modelMesh);
+}
+
+unique_ptr<Gr2File::MeshBone> Gr2File::readMeshBone() {
+    uint32_t offsetName = readUint32();
+
+    auto bone = make_unique<MeshBone>();
+    bone->name = readCStringAt(offsetName);
+    bone->bounds = readArray<float>(6);
+
+    return move(bone);
+}
+
+void Gr2File::loadMaterials() {
+}
+
+void Gr2File::loadSkeletonBones() {
+    for (uint16_t i = 0; i < _numBones; ++i) {
+        seek(_offsetBoneStructure + i * 0x88);
+        _bones.push_back(readSkeletonBone());
+    }
+}
+
+unique_ptr<Gr2File::SkeletonBone> Gr2File::readSkeletonBone() {
+    uint32_t offsetName = readUint32();
+
+    auto bone = make_unique<SkeletonBone>();
+    bone->name = readCStringAt(offsetName);
+    bone->parentIndex = readUint32();
+
+    ignore(0x40);
+
+    bone->rootToBone = readArray<float>(16);
+
+    return move(bone);
 }
 
 void Gr2File::loadModel() {
@@ -274,8 +315,8 @@ void Gr2File::loadModel() {
     for (uint16_t i = 0; i < _numMeshes; ++i) {
         auto node = make_shared<ModelNode>(index);
         node->_nodeNumber = index;
-        node->_name = _meshNames[i];
-        node->_mesh = _meshes[i];
+        node->_name = _meshes[i]->header.name;
+        node->_mesh = _meshes[i]->mesh;
         node->_absTransform = rootNode->_absTransform;
         node->_absTransformInv = glm::inverse(node->_absTransform);
         rootNode->_children.push_back(move(node));

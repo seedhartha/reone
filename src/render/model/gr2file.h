@@ -36,40 +36,67 @@ public:
 
 private:
     struct MeshHeader {
-        uint32_t nameOffset { 0 };
+        std::string name;
         uint16_t numPieces { 0 };
         uint16_t numUsedBones { 0 };
-        uint16_t verticesMask { 0 };
-        uint16_t numVertexBytes { 0 };
+        uint16_t vertexMask { 0 };
+        uint16_t vertexSize { 0 };
         uint32_t numVertices { 0 };
-        uint32_t numFaces { 0 };
-        uint32_t verticesOffset { 0 };
-        uint32_t piecesOffset { 0 };
-        uint32_t facesOffset { 0 };
-        uint32_t bonesOffset { 0 };
+        uint32_t numIndices { 0 };
+        uint32_t offsetVertices { 0 };
+        uint32_t offsetPieces { 0 };
+        uint32_t offsetIndices { 0 };
+        uint32_t offsetBones { 0 };
     };
 
     struct MeshPiece {
-        uint32_t materialFacesIdx { 0 };
-        uint32_t numMaterialFaces { 0 };
-        uint32_t textureId { 0 };
+        uint32_t startFaceIdx { 0 };
+        uint32_t numFaces { 0 };
+        uint32_t materialIndex { 0 };
+        uint32_t pieceIndex { 0 };
+    };
+
+    struct MeshBone {
+        std::string name;
+        std::vector<float> bounds;
+    };
+
+    struct Gr2Mesh {
+        MeshHeader header;
+        std::vector<std::shared_ptr<MeshPiece>> pieces;
+        std::shared_ptr<ModelMesh> mesh;
+        std::vector<std::shared_ptr<MeshBone>> bones;
+    };
+
+    struct SkeletonBone {
+        std::string name;
+        uint32_t parentIndex { 0 };
+        std::vector<float> rootToBone;
     };
 
     uint16_t _numMeshes { 0 };
-    std::vector<MeshHeader> _meshHeaders;
-    std::vector<std::string> _meshNames;
-    std::vector<std::vector<MeshPiece>> _meshPieces;
-    std::vector<std::shared_ptr<render::ModelMesh>> _meshes;
+    uint16_t _numMaterials { 0 };
+    uint16_t _numBones { 0 };
+    uint32_t _offsetMeshHeader { 0 };
+    uint32_t _offsetMaterialHeader { 0 };
+    uint32_t _offsetBoneStructure { 0 };
+
+    std::vector<std::shared_ptr<Gr2Mesh>> _meshes;
+    std::vector<std::shared_ptr<SkeletonBone>> _bones;
+    std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
 
-    void loadMeshHeaders();
-    void loadMeshNames();
-    void loadMeshPieces();
     void loadMeshes();
+    void loadMaterials();
+    void loadSkeletonBones();
     void loadModel();
 
-    std::shared_ptr<render::Model> _model;
+    std::unique_ptr<Gr2Mesh> readMesh();
+    std::unique_ptr<MeshPiece> readMeshPiece();
+    std::unique_ptr<ModelMesh> readModelMesh(const Gr2Mesh &mesh);
+    std::unique_ptr<MeshBone> readMeshBone();
+    std::unique_ptr<SkeletonBone> readSkeletonBone();
 };
 
 } // namespace render
