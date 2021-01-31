@@ -111,6 +111,7 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
         glm::vec3 position(modelNode->position());
         glm::quat orientation(modelNode->orientation());
         float scale = 1.0f;
+        bool hasTransform = false;
 
         bool skip = _skipNodes.count(modelNode->name()) > 0;
         if (!skip) {
@@ -118,22 +119,27 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
             glm::vec3 animPosition(0.0f);
             if (animNode.getPosition(time, animPosition, channel.scale)) {
                 position += animPosition;
+                hasTransform = true;
             }
             glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);
             if (animNode.getOrientation(time, animOrientation)) {
                 orientation = animOrientation;
+                hasTransform = true;
             }
             float animScale;
             if (animNode.getScale(time, animScale)) {
                 scale = animScale;
+                hasTransform = true;
             }
         }
 
-        glm::mat4 transform(1.0f);
-        transform = glm::scale(transform, glm::vec3(scale));
-        transform = glm::translate(transform, position);
-        transform *= glm::mat4_cast(orientation);
-        channel.localTransforms.insert(make_pair(modelNode->nodeNumber(), transform));
+        if (hasTransform) {
+            glm::mat4 transform(1.0f);
+            transform = glm::scale(transform, glm::vec3(scale));
+            transform = glm::translate(transform, position);
+            transform *= glm::mat4_cast(orientation);
+            channel.localTransforms.insert(make_pair(modelNode->nodeNumber(), transform));
+        }
     }
 
     for (auto &child : animNode.children()) {
