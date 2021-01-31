@@ -15,41 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "lipfile.h"
 
-#include "../resource/format/binfile.h"
-
-#include "walkmesh.h"
+using namespace std;
 
 namespace reone {
 
 namespace render {
 
-class BwmFile : public resource::BinaryFile {
-public:
-    BwmFile();
+LipFile::LipFile() : BinaryFile(8, "LIP V1.0") {
+}
 
-    std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
+void LipFile::doLoad() {
+    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
 
-private:
-    uint32_t _type { 0 };
-    uint32_t _vertexCount { 0 };
-    uint32_t _vertexOffset { 0 };
-    uint32_t _faceCount { 0 };
-    uint32_t _faceOffset { 0 };
-    uint32_t _faceTypeOffset { 0 };
-    std::vector<float> _vertices;
-    std::vector<uint32_t> _indices;
-    std::vector<uint32_t> _faceTypes;
-    std::shared_ptr<Walkmesh> _walkmesh;
+    float length = readFloat();
+    uint32_t entryCount = readUint32();
 
-    void doLoad() override;
-
-    void loadVertices();
-    void loadFaces();
-    void loadFaceTypes();
-    void makeWalkmesh();
-};
+    for (uint32_t i = 0; i < entryCount; ++i) {
+        Keyframe keyframe;
+        keyframe.time = readFloat();
+        keyframe.shape = readByte();
+        _keyframes.push_back(move(keyframe));
+    }
+}
 
 } // namespace render
 
