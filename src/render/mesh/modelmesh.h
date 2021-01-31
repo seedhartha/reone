@@ -27,6 +27,7 @@ namespace reone {
 
 namespace render {
 
+class Gr2File;
 class MdlFile;
 
 /**
@@ -70,11 +71,12 @@ public:
     const std::shared_ptr<Texture> &bumpmapTexture() const { return _bumpmap; }
 
 private:
-    bool _render { false };
-    int _transparency { 0 };
-    bool _shadow { false };
+    bool _render;
+    int _transparency;
+    bool _shadow;
+
     bool _backgroundGeometry { false };
-    glm::vec3 _diffuseColor { 0.0f };
+    glm::vec3 _diffuseColor { 1.0f };
     glm::vec3 _ambientColor { 0.0f };
     UVAnimation _uvAnimation;
 
@@ -89,6 +91,7 @@ private:
     // END Textures
 
     friend class MdlFile;
+    friend class Gr2File;
 };
 
 } // namespace render

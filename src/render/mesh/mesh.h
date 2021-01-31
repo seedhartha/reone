@@ -52,6 +52,7 @@ public:
 
     void initGL();
     void deinitGL();
+
     void renderLines() const;
     void renderTriangles() const;
 

@@ -52,17 +52,18 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
     if (modelName.empty()) return nullptr;
 
-    auto model = make_unique<ModelSceneNode>(&_creature->sceneGraph(), Models::instance().get(modelName));
+    shared_ptr<Model> model(Models::instance().get(modelName));
     if (!model) return nullptr;
 
-    model->setLightingEnabled(true);
+    auto modelSceneNode = make_unique<ModelSceneNode>(&_creature->sceneGraph(), model);
+    modelSceneNode->setLightingEnabled(true);
 
     // Body texture
 
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
         shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureType::Diffuse));
-        model->setTextureOverride(texture);
+        modelSceneNode->setTextureOverride(texture);
     }
 
     // Mask
@@ -79,7 +80,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
         if (headModel) {
-            shared_ptr<ModelSceneNode> headSceneNode(model->attach(g_headHookNode, headModel));
+            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel));
             if (headSceneNode && maskModel) {
                 headSceneNode->attach(g_maskHookNode, maskModel);
             }
@@ -92,7 +93,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
         if (leftWeaponModel) {
-            model->attach("lhand", leftWeaponModel);
+            modelSceneNode->attach("lhand", leftWeaponModel);
         }
     }
 
@@ -102,11 +103,11 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
         if (rightWeaponModel) {
-            model->attach("rhand", rightWeaponModel);
+            modelSceneNode->attach("rhand", rightWeaponModel);
         }
     }
 
-    return move(model);
+    return move(modelSceneNode);
 }
 
 string CreatureModelBuilder::getBodyModelName() const {

@@ -128,6 +128,7 @@ private:
     ModelNode &operator=(const ModelNode &) = delete;
 
     friend class MdlFile;
+    friend class Gr2File;
 };
 
 } // namespace render

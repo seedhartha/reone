@@ -17,6 +17,8 @@
 
 #include "mesh.h"
 
+#include <map>
+
 #include "GL/glew.h"
 
 #include "SDL2/SDL_opengl.h"
