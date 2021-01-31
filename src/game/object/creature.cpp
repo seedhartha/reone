@@ -229,6 +229,8 @@ void Creature::updateModelAnimation() {
                     if (_headModel) {
                         _headModel->playAnimation(anim, AnimationFlags::loop, 1.0f, _model->model()->animationScale());
                         _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
+                    } else {
+                        _model->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
                     }
                 }
             } else {
