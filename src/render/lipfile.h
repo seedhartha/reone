@@ -19,36 +19,25 @@
 
 #include "../resource/format/binfile.h"
 
-#include "walkmesh.h"
-
 namespace reone {
 
 namespace render {
 
-class BwmFile : public resource::BinaryFile {
+class LipFile : public resource::BinaryFile {
 public:
-    BwmFile();
+    struct Keyframe {
+        float time { 0.0f };
+        uint8_t shape { 0 };
+    };
 
-    std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
+    LipFile();
+
+    const std::vector<Keyframe> &keyframes() const { return _keyframes; }
 
 private:
-    uint32_t _type { 0 };
-    uint32_t _vertexCount { 0 };
-    uint32_t _vertexOffset { 0 };
-    uint32_t _faceCount { 0 };
-    uint32_t _faceOffset { 0 };
-    uint32_t _faceTypeOffset { 0 };
-    std::vector<float> _vertices;
-    std::vector<uint32_t> _indices;
-    std::vector<uint32_t> _faceTypes;
-    std::shared_ptr<Walkmesh> _walkmesh;
+    std::vector<Keyframe> _keyframes;
 
     void doLoad() override;
-
-    void loadVertices();
-    void loadFaces();
-    void loadFaceTypes();
-    void makeWalkmesh();
 };
 
 } // namespace render

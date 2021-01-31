@@ -710,8 +710,6 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     vector<uint16_t> indices;
 
     if (nodeFlags & kNodeHasSaber) {
-        static int referenceIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
-
         // Lightsaber blade is a special case. It consists of four to eight
         // planes. Some of these planes are normal meshes, but some differ in
         // that their geometry is stored in the MDL, not MDX.
@@ -719,6 +717,8 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
         // Values stored in the MDL are vertex coordinates, texture coordinates
         // and normals. However, most of the vertex coordinates seem to be
         // procedurally generated based on vertices 0-7 and 88-95.
+
+        static int referenceIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
 
         uint32_t saberCoordsOffset = readUint32();
         uint32_t texCoordsOffset = readUint32();

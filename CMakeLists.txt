@@ -155,6 +155,7 @@ set(RENDER_HEADERS
     src/render/image/tgafile.h
     src/render/image/tpcfile.h
     src/render/image/txifile.h
+    src/render/lipfile.h
     src/render/mesh/aabb.h
     src/render/mesh/billboard.h
     src/render/mesh/cube.h
@@ -189,6 +190,7 @@ set(RENDER_SOURCES
     src/render/image/tgafile.cpp
     src/render/image/tpcfile.cpp
     src/render/image/txifile.cpp
+    src/render/lipfile.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/billboard.cpp
     src/render/mesh/cube.cpp
