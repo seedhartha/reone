@@ -30,6 +30,12 @@ namespace render {
  */
 class Gr2File : public resource::BinaryFile {
 public:
+    enum class FileType {
+        Geometry = 0,
+        GeometryWithCollision = 1,
+        Skeleton = 2
+    };
+
     Gr2File();
 
     std::shared_ptr<render::Model> model() const { return _model; }
@@ -74,6 +80,7 @@ private:
         std::vector<float> rootToBone;
     };
 
+    FileType _fileType { FileType::Geometry };
     uint16_t _numMeshes { 0 };
     uint16_t _numMaterials { 0 };
     uint16_t _numBones { 0 };

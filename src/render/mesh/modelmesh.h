@@ -55,6 +55,7 @@ public:
 
     bool isTransparent() const;
     bool isBackgroundGeometry() const { return _backgroundGeometry; }
+    bool isBumpmapFromTOR() const { return _bumpmapFromTOR; }
 
     bool hasDiffuseTexture() const { return static_cast<bool>(_diffuse); }
     bool hasEnvmapTexture() const { return static_cast<bool>(_envmap); }
@@ -79,6 +80,7 @@ private:
     glm::vec3 _diffuseColor { 1.0f };
     glm::vec3 _ambientColor { 0.0f };
     UVAnimation _uvAnimation;
+    bool _bumpmapFromTOR { false }; /**< SWTOR normal maps require special handling by the shader */
 
     // Textures
 
