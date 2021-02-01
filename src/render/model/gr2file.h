@@ -77,7 +77,13 @@ private:
     struct SkeletonBone {
         std::string name;
         uint32_t parentIndex { 0 };
-        std::vector<float> rootToBone;
+        glm::mat4 rootToBone { 1.0f };
+    };
+
+    struct Attachment {
+        std::string name;
+        std::string boneName;
+        glm::mat4 transform { 1.0f };
     };
 
     std::string _resRef;
@@ -86,13 +92,16 @@ private:
     uint16_t _numMeshes { 0 };
     uint16_t _numMaterials { 0 };
     uint16_t _numBones { 0 };
+    uint16_t _numAttachments { 0 };
     uint32_t _offsetMeshHeader { 0 };
     uint32_t _offsetMaterialHeader { 0 };
     uint32_t _offsetBoneStructure { 0 };
+    uint32_t _offsetAttachments { 0 };
 
     std::vector<std::shared_ptr<Gr2Mesh>> _meshes;
     std::vector<std::shared_ptr<SkeletonBone>> _bones;
     std::vector<std::string> _materials;
+    std::vector<std::shared_ptr<Attachment>> _attachments;
     std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
@@ -100,6 +109,7 @@ private:
     void loadMeshes();
     void loadMaterials();
     void loadSkeletonBones();
+    void loadAttachments();
     void loadModel();
 
     std::unique_ptr<Gr2Mesh> readMesh();
@@ -107,6 +117,7 @@ private:
     std::unique_ptr<ModelMesh> readModelMesh(const Gr2Mesh &mesh);
     std::unique_ptr<MeshBone> readMeshBone();
     std::unique_ptr<SkeletonBone> readSkeletonBone();
+    std::unique_ptr<Attachment> readAttachment();
 };
 
 } // namespace render
