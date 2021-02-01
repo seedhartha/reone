@@ -263,34 +263,35 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
 
     // Fill mesh textures from materials
     if (!_materials.empty()) {
-        if (_materials[0] == "default") {
-            // TODO: support different material versions
-            shared_ptr<ByteArray> matData(Resources::instance().get(_resRef + "_v01", ResourceType::Mat));
-            if (matData) {
-                pt::ptree tree;
-                pt::read_xml(*wrap(matData), tree);
+        // TODO: add support for multiple materials
+        string materialResRef(_materials[0]);
+        if (materialResRef == "default") {
+            materialResRef = _resRef + "_v01";
+        }
+        shared_ptr<ByteArray> matData(Resources::instance().get(materialResRef, ResourceType::Mat));
+        if (matData) {
+            pt::ptree tree;
+            pt::read_xml(*wrap(matData), tree);
 
-                for (auto &material : tree.get_child("Material")) {
-                    if (material.first != "input") continue;
+            for (auto &material : tree.get_child("Material")) {
+                if (material.first != "input") continue;
 
-                    string semantic(material.second.get("semantic", ""));
-                    string type(material.second.get("type", ""));
+                string semantic(material.second.get("semantic", ""));
+                string type(material.second.get("type", ""));
 
-                    if (type != "texture") continue;
+                if (type != "texture") continue;
 
-                    string value(material.second.get("value", ""));
-                    int lastSlashIdx = value.find_last_of('\\');
-                    if (lastSlashIdx != -1) {
-                        value = value.substr(lastSlashIdx + 1ll);
-                    }
-                    if (semantic == "DiffuseMap") {
-                        modelMesh->_diffuse = Textures::instance().get(value, TextureType::Diffuse);
-                    } else if (semantic == "RotationMap1") {
-                        modelMesh->_bumpmap = Textures::instance().get(value, TextureType::Bumpmap);
-                        modelMesh->_bumpmapFromTOR = true;
-                    }
+                string value(material.second.get("value", ""));
+                int lastSlashIdx = value.find_last_of('\\');
+                if (lastSlashIdx != -1) {
+                    value = value.substr(lastSlashIdx + 1ll);
                 }
-
+                if (semantic == "DiffuseMap") {
+                    modelMesh->_diffuse = Textures::instance().get(value, TextureType::Diffuse);
+                } else if (semantic == "RotationMap1") {
+                    modelMesh->_bumpmap = Textures::instance().get(value, TextureType::Bumpmap);
+                    modelMesh->_bumpmapFromTOR = true;
+                }
             }
         }
     }
@@ -347,12 +348,6 @@ unique_ptr<Gr2File::SkeletonBone> Gr2File::readSkeletonBone() {
     return move(bone);
 }
 
-static Model::Classification determineModelClassificaiton(Gr2File::FileType fileType) {
-    return fileType == Gr2File::FileType::Geometry ?
-        Model::Classification::Character :
-        Model::Classification::Other;
-};
-
 void Gr2File::loadModel() {
     if (_meshes.empty()) return;
 
@@ -368,6 +363,8 @@ void Gr2File::loadModel() {
     rootNode->_absTransformInv = glm::inverse(rootNode->_absTransform);
 
     for (uint16_t i = 0; i < _numMeshes; ++i) {
+        if (boost::contains(_meshes[i]->header.name, "collision")) continue; // do not add collision meshes to the model
+
         auto node = make_shared<ModelNode>(index);
         node->_nodeNumber = index;
         node->_name = _meshes[i]->header.name;
@@ -381,7 +378,7 @@ void Gr2File::loadModel() {
 
     vector<unique_ptr<Animation>> anims;
     _model = make_shared<Model>("", rootNode, anims);
-    _model->_classification = determineModelClassificaiton(_fileType);
+    _model->_classification = Model::Classification::Character; // this prevents self-shadowing
     _model->initGL();
 }
 
