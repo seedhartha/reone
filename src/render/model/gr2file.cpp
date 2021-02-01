@@ -22,6 +22,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include "glm/gtc/type_ptr.hpp"
+
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../render/textures.h"
@@ -55,8 +57,7 @@ void Gr2File::doLoad() {
     _numMeshes = readUint16();
     _numMaterials = readUint16();
     _numBones = readUint16();
-
-    uint16_t numAttachments = readUint16();
+    _numAttachments = readUint16();
 
     seek(0x50);
 
@@ -65,15 +66,12 @@ void Gr2File::doLoad() {
     _offsetMeshHeader = readUint32();
     _offsetMaterialHeader = readUint32();
     _offsetBoneStructure = readUint32();
-
-    uint32_t offsetAttachments = readUint32();
+    _offsetAttachments = readUint32();
 
     loadMaterials();
     loadMeshes();
     loadSkeletonBones();
-
-    // TODO: load attachments
-
+    loadAttachments();
     loadModel();
 }
 
@@ -336,16 +334,34 @@ void Gr2File::loadSkeletonBones() {
 
 unique_ptr<Gr2File::SkeletonBone> Gr2File::readSkeletonBone() {
     uint32_t offsetName = readUint32();
-
-    auto bone = make_unique<SkeletonBone>();
-    bone->name = readCStringAt(offsetName);
-    bone->parentIndex = readUint32();
+    uint32_t parentIndex = readUint32();
 
     ignore(0x40);
 
-    bone->rootToBone = readArray<float>(16);
+    vector<float> rootToBoneValues(readArray<float>(16));
+
+    auto bone = make_unique<SkeletonBone>();
+    bone->name = readCStringAt(offsetName);
+    bone->parentIndex = parentIndex;
+    bone->rootToBone = glm::make_mat4(&rootToBoneValues[0]);
 
     return move(bone);
+}
+
+void Gr2File::loadAttachments() {
+    for (uint16_t i = 0; i < _numAttachments; ++i) {
+        seek(_offsetAttachments + i * 0x48);
+
+        uint32_t offsetName = readUint32();
+        uint32_t offsetBoneName = readUint32();
+        vector<float> transformValues(readArray<float>(16));
+
+        auto attachment = make_unique<Attachment>();
+        attachment->name = readCStringAt(offsetName);
+        attachment->boneName = readCStringAt(offsetBoneName);
+        attachment->transform = glm::make_mat4(&transformValues[0]);
+        _attachments.push_back(move(attachment));
+    }
 }
 
 void Gr2File::loadModel() {
