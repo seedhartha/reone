@@ -45,8 +45,8 @@ void Gr2File::doLoad() {
     seek(0x10);
 
     uint32_t num50Offsets = readUint32();
-    uint32_t gr2Type = readUint32();
 
+    _fileType = static_cast<FileType>(readUint32());
     _numMeshes = readUint16();
     _numMaterials = readUint16();
     _numBones = readUint16();
@@ -81,11 +81,9 @@ void Gr2File::loadMeshes() {
 
 unique_ptr<Gr2File::Gr2Mesh> Gr2File::readMesh() {
     uint32_t offsetName = readUint32();
-    string name(readCStringAt(offsetName));
-    if (boost::contains(name, "collision")) return nullptr;
 
     auto mesh = make_unique<Gr2Mesh>();
-    mesh->header.name = name;
+    mesh->header.name = readCStringAt(offsetName);
 
     ignore(4);
 
@@ -140,8 +138,8 @@ static float convertHalfFloatToFloat(uint16_t value) {
     return result;
 }
 
-static glm::vec3 computeBitangent(const glm::vec3 &normal, const glm::vec3 &tangent) {
-    return glm::cross(tangent, normal);
+static glm::vec3 computeBitangent(float sign, const glm::vec3 &normal, const glm::vec3 &tangent) {
+    return sign * glm::cross(tangent, normal);
 }
 
 unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
@@ -183,7 +181,7 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
             gr2Stride += 8;
         }
 
-        // Normal and tangent space (?)
+        // Normal and tangent space
         if (mesh.header.vertexMask & 0x2) {
             glm::vec3 normal;
             normal.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 0));
@@ -197,11 +195,12 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
             tangent.x = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 4));
             tangent.y = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 5));
             tangent.z = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 6));
+            float sign = convertByteToFloat(*reinterpret_cast<const uint8_t *>(gr2VerticesPtr + gr2Stride + 7));
             vertices.push_back(tangent.x);
             vertices.push_back(tangent.y);
             vertices.push_back(tangent.z);
 
-            glm::vec3 bitangent(computeBitangent(normal, tangent));
+            glm::vec3 bitangent(computeBitangent(1.0f, normal, tangent));
             vertices.push_back(bitangent.x);
             vertices.push_back(bitangent.y);
             vertices.push_back(bitangent.z);
@@ -258,6 +257,8 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
 
     // TODO: load textures from model
     modelMesh->_diffuse = Textures::instance().get("acklay", TextureType::Diffuse);
+    modelMesh->_bumpmap = Textures::instance().get("acklay_b", TextureType::Bumpmap);
+    modelMesh->_bumpmapFromTOR = true;
 
     modelMesh->computeAABB();
 
@@ -298,6 +299,12 @@ unique_ptr<Gr2File::SkeletonBone> Gr2File::readSkeletonBone() {
     return move(bone);
 }
 
+static Model::Classification determineModelClassificaiton(Gr2File::FileType fileType) {
+    return fileType == Gr2File::FileType::Geometry ?
+        Model::Classification::Character :
+        Model::Classification::Other;
+};
+
 void Gr2File::loadModel() {
     if (_meshes.empty()) return;
 
@@ -326,7 +333,7 @@ void Gr2File::loadModel() {
 
     vector<unique_ptr<Animation>> anims;
     _model = make_shared<Model>("", rootNode, anims);
-    _model->_classification = Model::Classification::Character; // prevent shading
+    _model->_classification = determineModelClassificaiton(_fileType);
     _model->initGL();
 }
 
