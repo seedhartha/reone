@@ -20,19 +20,24 @@
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "../../common/log.h"
+#include "../../common/streamutil.h"
 #include "../../render/textures.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
 using namespace reone::resource;
 
+namespace pt = boost::property_tree;
+
 namespace reone {
 
 namespace render {
 
-Gr2File::Gr2File() : BinaryFile(4, "GAWB") {
+Gr2File::Gr2File(string resRef) : BinaryFile(4, "GAWB"), _resRef(move(resRef)) {
 }
 
 void Gr2File::doLoad() {
@@ -63,8 +68,8 @@ void Gr2File::doLoad() {
 
     uint32_t offsetAttachments = readUint32();
 
-    loadMeshes();
     loadMaterials();
+    loadMeshes();
     loadSkeletonBones();
 
     // TODO: load attachments
@@ -254,13 +259,41 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
     modelMesh->_indices = move(indices);
     modelMesh->_diffuseColor = glm::vec3(0.8f);
     modelMesh->_ambientColor = glm::vec3(0.2f);
-
-    // TODO: load textures from model
-    modelMesh->_diffuse = Textures::instance().get("acklay", TextureType::Diffuse);
-    modelMesh->_bumpmap = Textures::instance().get("acklay_b", TextureType::Bumpmap);
-    modelMesh->_bumpmapFromTOR = true;
-
     modelMesh->computeAABB();
+
+    // Fill mesh textures from materials
+    if (!_materials.empty()) {
+        if (_materials[0] == "default") {
+            // TODO: support different material versions
+            shared_ptr<ByteArray> matData(Resources::instance().get(_resRef + "_v01", ResourceType::Mat));
+            if (matData) {
+                pt::ptree tree;
+                pt::read_xml(*wrap(matData), tree);
+
+                for (auto &material : tree.get_child("Material")) {
+                    if (material.first != "input") continue;
+
+                    string semantic(material.second.get("semantic", ""));
+                    string type(material.second.get("type", ""));
+
+                    if (type != "texture") continue;
+
+                    string value(material.second.get("value", ""));
+                    int lastSlashIdx = value.find_last_of('\\');
+                    if (lastSlashIdx != -1) {
+                        value = value.substr(lastSlashIdx + 1ll);
+                    }
+                    if (semantic == "DiffuseMap") {
+                        modelMesh->_diffuse = Textures::instance().get(value, TextureType::Diffuse);
+                    } else if (semantic == "RotationMap1") {
+                        modelMesh->_bumpmap = Textures::instance().get(value, TextureType::Bumpmap);
+                        modelMesh->_bumpmapFromTOR = true;
+                    }
+                }
+
+            }
+        }
+    }
 
     return move(modelMesh);
 }
@@ -276,6 +309,21 @@ unique_ptr<Gr2File::MeshBone> Gr2File::readMeshBone() {
 }
 
 void Gr2File::loadMaterials() {
+    if (_numMaterials == 0) {
+        for (auto &mesh : _meshes) {
+            if (mesh->header.vertexMask & 0x20) {
+                for (uint16_t i = 0; i < mesh->header.numPieces; ++i) {
+                    _materials.push_back(str(boost::format("%s.%03d") % mesh->header.name % i));
+                }
+            }
+        }
+        return;
+    }
+    seek(_offsetMaterialHeader);
+    for (uint16_t i = 0; i < _numMaterials; ++i) {
+        uint32_t offsetName = readUint32();
+        _materials.push_back(readCStringAt(offsetName));
+    }
 }
 
 void Gr2File::loadSkeletonBones() {
