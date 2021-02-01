@@ -89,7 +89,8 @@ enum class ResourceType : uint16_t {
     Mdx = 3008,
 
     Mp3 = 0x1000,
-    Gr2 = 0x1001,
+    Gr2 = 0x1001, // SWTOR model
+    Mat = 0x1002, // SWTOR material
 
     Invalid = 0xffff
 };

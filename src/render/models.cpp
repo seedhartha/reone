@@ -60,7 +60,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
     // Try GR2 models first. This is a hook to get SWTOR models working.
     shared_ptr<ByteArray> gr2Data(Resources::instance().get(resRef, ResourceType::Gr2));
     if (gr2Data) {
-        Gr2File gr2;
+        Gr2File gr2(resRef);
         gr2.load(wrap(gr2Data));
         model = gr2.model();
 

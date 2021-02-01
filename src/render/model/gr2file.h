@@ -36,7 +36,7 @@ public:
         Skeleton = 2
     };
 
-    Gr2File();
+    Gr2File(std::string resRef);
 
     std::shared_ptr<render::Model> model() const { return _model; }
 
@@ -80,6 +80,8 @@ private:
         std::vector<float> rootToBone;
     };
 
+    std::string _resRef;
+
     FileType _fileType { FileType::Geometry };
     uint16_t _numMeshes { 0 };
     uint16_t _numMaterials { 0 };
@@ -90,6 +92,7 @@ private:
 
     std::vector<std::shared_ptr<Gr2Mesh>> _meshes;
     std::vector<std::shared_ptr<SkeletonBone>> _bones;
+    std::vector<std::string> _materials;
     std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
