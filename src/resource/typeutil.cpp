@@ -84,7 +84,8 @@ static unordered_map<ResourceType, string> g_extByType {
     { ResourceType::Mdx, "mdx" },
     { ResourceType::Mp3, "mp3" },
     { ResourceType::Gr2, "gr2" },
-    { ResourceType::Mat, "mat" }
+    { ResourceType::Mat, "mat" },
+    { ResourceType::Jba, "jba" }
 };
 
 static unordered_map<string, ResourceType> g_typeByExt;

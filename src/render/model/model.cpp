@@ -28,7 +28,7 @@ namespace render {
 Model::Model(
     const string &name,
     const shared_ptr<ModelNode> &rootNode,
-    vector<unique_ptr<Animation>> &anims,
+    vector<shared_ptr<Animation>> &anims,
     const shared_ptr<Model> &superModel
 ) :
     _name(name),
@@ -40,14 +40,12 @@ Model::Model(
     }
 
     init(_rootNode);
-
-    glm::vec3 aabbSize(_aabb.getSize());
-    _radiusXY = 0.5f * glm::max(aabbSize.x, aabbSize.y);
 }
 
 void Model::init(const shared_ptr<ModelNode> &node) {
     _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
     _nodeByName.insert(make_pair(node->name(), node));
+    _maxNodeIndex = glm::max(_maxNodeIndex, node->index());
 
     shared_ptr<ModelMesh> mesh(node->mesh());
     if (mesh) {

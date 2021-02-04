@@ -28,6 +28,7 @@ namespace reone {
 
 namespace render {
 
+class JbaFile;
 class Model;
 
 /**
@@ -54,6 +55,19 @@ public:
     ModelNode(int index, const ModelNode *parent = nullptr);
 
     void initGL();
+
+    /**
+     * Recursively computes the local transform, position and orientation of
+     * this node and its children. Absolute transform must be set prior to
+     * calling this method.
+     */
+    void computeLocalTransforms();
+
+    /**
+     * Recursively computes the absolute transform of this node and its
+     * children. Local transform must be set prior to calling this method.
+     */
+    void computeAbsoluteTransforms();
 
     bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
 
@@ -129,6 +143,7 @@ private:
 
     friend class MdlFile;
     friend class Gr2File;
+    friend class JbaFile;
 };
 
 } // namespace render

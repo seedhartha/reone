@@ -17,6 +17,10 @@
 
 #include "modelnode.h"
 
+#include "glm/gtx/matrix_decompose.hpp"
+
+#include "../../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -32,6 +36,38 @@ void ModelNode::initGL() {
     }
     for (auto &child : _children) {
         child->initGL();
+    }
+}
+
+void ModelNode::computeLocalTransforms() {
+    if (_parent) {
+        _localTransform = glm::inverse(_parent->_absTransform) * _absTransform;
+        _absTransform = _parent->_absTransform * _localTransform;
+        _absTransformInv = glm::inverse(_absTransform);
+
+        // Extract position and orientation for use in animations.
+        glm::vec3 scale, skew;
+        glm::vec4 perspective;
+        glm::decompose(_localTransform, scale, _orientation, _position, skew, perspective);
+
+    } else {
+        _localTransform = _absTransform;
+    }
+
+    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
+    _absTransformInv = glm::inverse(_absTransform);
+
+    for (auto &child : _children) {
+        child->computeLocalTransforms();
+    }
+}
+
+void ModelNode::computeAbsoluteTransforms() {
+    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
+    _absTransformInv = glm::inverse(_absTransform);
+
+    for (auto &child : _children) {
+        child->computeAbsoluteTransforms();
     }
 }
 

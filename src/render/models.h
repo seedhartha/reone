@@ -38,7 +38,11 @@ public:
     void init(resource::GameID gameId);
     void invalidateCache();
 
-    std::shared_ptr<Model> get(const std::string &resRef);
+    /**
+     * @param resRef ResRef of the model
+     * @param gr2 true if model is from SWTOR, false otherwise
+     */
+    std::shared_ptr<Model> get(const std::string &resRef, bool gr2 = false);
 
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
@@ -48,7 +52,7 @@ private:
     Models(const Models &) = delete;
     Models &operator=(const Models &) = delete;
 
-    std::shared_ptr<Model> doGet(const std::string &resRef);
+    std::shared_ptr<Model> doGet(const std::string &resRef, bool gr2);
 };
 
 } // namespace render

@@ -139,7 +139,9 @@ void MdlFile::doLoad() {
     readNodeNames(nameOffsets);
 
     unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
-    vector<unique_ptr<Animation>> anims(readAnimations(animOffsets));
+    rootNode->computeAbsoluteTransforms();
+
+    vector<shared_ptr<Animation>> anims(readAnimations(animOffsets));
     shared_ptr<Model> superModel;
 
     if (!superModelName.empty() && superModelName != "null") {
@@ -210,9 +212,6 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     transform = glm::translate(transform, position);
     transform *= glm::mat4_cast(orientation);
 
-    glm::mat4 absTransform(parent ? parent->_absTransform : glm::mat4(1.0f));
-    absTransform *= transform;
-
     uint32_t childOffOffset, childCount;
     readArrayDefinition(childOffOffset, childCount);
     vector<uint32_t> childOffsets(readArray<uint32_t>(kMdlDataOffset + childOffOffset, childCount));
@@ -231,8 +230,6 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     node->_position = position;
     node->_orientation = orientation;
     node->_localTransform = transform;
-    node->_absTransform = absTransform;
-    node->_absTransformInv = glm::inverse(absTransform);
 
     if (flags & kNodeHasEmitter) {
         node->_emitter = make_shared<Emitter>();
@@ -861,8 +858,8 @@ void MdlFile::readSkin(ModelNode &node) {
     node._skin->nodeIdxByBoneIdx = move(nodeIdxByBoneIdx);
 }
 
-vector<unique_ptr<Animation>> MdlFile::readAnimations(const vector<uint32_t> &offsets) {
-    vector<unique_ptr<Animation>> anims;
+vector<shared_ptr<Animation>> MdlFile::readAnimations(const vector<uint32_t> &offsets) {
+    vector<shared_ptr<Animation>> anims;
     anims.reserve(offsets.size());
 
     for (uint32_t offset : offsets) {
