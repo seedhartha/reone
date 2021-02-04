@@ -49,7 +49,7 @@ private:
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
     std::unique_ptr<render::ModelMesh> readMesh(const std::string &nodeName, int nodeFlags);
     std::unique_ptr<render::ModelNode> readNode(uint32_t offset, render::ModelNode *parent);
-    std::vector<std::unique_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
+    std::vector<std::shared_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     void readArrayDefinition(uint32_t &offset, uint32_t &count);
     void readControllers(uint32_t keyCount, uint32_t keyOffset, const std::vector<float> &data, render::ModelNode &node);
     void readEmitter(render::ModelNode &node);

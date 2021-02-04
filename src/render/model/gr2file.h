@@ -36,7 +36,11 @@ public:
         Skeleton = 2
     };
 
-    Gr2File(std::string resRef);
+    /**
+     * @param resRef ResRef of the model
+     * @param skeleton skeleton file to use when constructing this model (optional)
+     */
+    Gr2File(std::string resRef, std::shared_ptr<Gr2File> skeleton = nullptr);
 
     std::shared_ptr<render::Model> model() const { return _model; }
 
@@ -87,6 +91,7 @@ private:
     };
 
     std::string _resRef;
+    std::shared_ptr<Gr2File> _skeleton;
 
     FileType _fileType { FileType::Geometry };
     uint16_t _numMeshes { 0 };
@@ -110,7 +115,8 @@ private:
     void loadMaterials();
     void loadSkeletonBones();
     void loadAttachments();
-    void loadModel();
+    void loadSkeletonModel();
+    void loadGeometryModel();
 
     std::unique_ptr<Gr2Mesh> readMesh();
     std::unique_ptr<MeshPiece> readMeshPiece();

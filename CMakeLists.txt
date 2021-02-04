@@ -164,6 +164,7 @@ set(RENDER_HEADERS
     src/render/mesh/modelmesh.h
     src/render/model/animation.h
     src/render/model/gr2file.h
+    src/render/model/jbafile.h
     src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelnode.h
@@ -200,6 +201,7 @@ set(RENDER_SOURCES
     src/render/mesh/modelmesh.cpp
     src/render/model/animation.cpp
     src/render/model/gr2file.cpp
+    src/render/model/jbafile.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
     src/render/model/modelnode.cpp

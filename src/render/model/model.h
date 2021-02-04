@@ -52,7 +52,7 @@ public:
     Model(
         const std::string &name,
         const std::shared_ptr<ModelNode> &rootNode,
-        std::vector<std::unique_ptr<Animation>> &anims,
+        std::vector<std::shared_ptr<Animation>> &anims,
         const std::shared_ptr<Model> &superModel = nullptr);
 
     void initGL();
@@ -68,7 +68,6 @@ public:
     float animationScale() const { return _animationScale; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
-    float radiusXY() const { return _radiusXY; }
 
     void setClassification(Classification classification);
     void setAnimationScale(float scale);
@@ -82,8 +81,8 @@ private:
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
-    float _radiusXY { 0.0f };
     float _animationScale { 1.0f };
+    int _maxNodeIndex { 0 }; /**< the maximum node index in this model, used to stitch multiple models together */
 
     Model(const Model &) = delete;
     Model &operator=(const Model &) = delete;

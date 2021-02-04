@@ -22,6 +22,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include "../../common/streamutil.h"
+#include "../../render/model/gr2file.h"
+#include "../../render/model/jbafile.h"
 #include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
@@ -39,6 +42,11 @@ namespace reone {
 
 namespace game {
 
+// This is a hook to replace vanilla models with SWTOR models
+static const unordered_map<string, string> g_modelOverrides {
+    // { "p_bastilabb", "bfn_satele_a02" }
+};
+
 static const string g_headHookNode("headhook");
 static const string g_maskHookNode("gogglehook");
 
@@ -52,11 +60,20 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
     if (modelName.empty()) return nullptr;
 
-    shared_ptr<Model> model(Models::instance().get(modelName));
+    bool gr2Model = false;
+    auto maybeOverride = g_modelOverrides.find(modelName);
+    if (maybeOverride != g_modelOverrides.end()) {
+        modelName = maybeOverride->second;
+        gr2Model = true;
+    }
+
+    shared_ptr<Model> model(Models::instance().get(modelName, gr2Model));
     if (!model) return nullptr;
 
     auto modelSceneNode = make_unique<ModelSceneNode>(&_creature->sceneGraph(), model);
     modelSceneNode->setLightingEnabled(true);
+
+    if (gr2Model) return move(modelSceneNode);
 
     // Body texture
 
