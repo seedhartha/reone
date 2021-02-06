@@ -46,7 +46,7 @@ void JbaFile::doLoad() {
     loadPartHeaders();
     loadBoneData();
     loadPartData();
-    loadTimestamps();
+    loadKeyframes();
     loadBones();
     loadAnimation();
 }
@@ -68,9 +68,9 @@ void JbaFile::loadHeader() {
 void JbaFile::loadPartHeaders() {
     for (uint32_t i = 0; i < _numParts; ++i) {
         JbaPart part;
-        part.timestampIndex = readUint32();
+        part.keyframeIdx = readUint32();
         part.dataSize = readUint32();
-        debug(boost::format("JBA: part %d header: %u %u") % i % part.timestampIndex % part.dataSize);
+        debug(boost::format("JBA: part %d header: %u %u") % i % part.keyframeIdx % part.dataSize);
         _parts.push_back(move(part));
     }
     ignore(4 * _numParts);
@@ -94,21 +94,17 @@ void JbaFile::loadBoneData() {
     const float *dataPtr = reinterpret_cast<float *>(&data[0]);
 
     for (uint32_t i = 0; i < _numBones; ++i) {
-        glm::vec3 minpos(glm::make_vec3(dataPtr + 0));
-        glm::vec3 maxpos(glm::make_vec3(dataPtr + 3));
-        glm::vec3 minrot(glm::make_vec3(dataPtr + 6));
-        glm::vec3 maxrot(glm::make_vec3(dataPtr + 9));
+        JbaBone bone;
+        bone.minTranslation = glm::make_vec3(dataPtr + 0);
+        bone.maxTranslation = glm::make_vec3(dataPtr + 3);
+        bone.minOrientation = glm::make_vec3(dataPtr + 6);
+        bone.maxOrientation = glm::make_vec3(dataPtr + 9);
 
         debug(boost::format("JBA: bone %d data: %s, %s, %s, %s")
             % i
-            % describeVector(minpos) % describeVector(maxpos)
-            % describeVector(minrot) % describeVector(maxrot), 2);
+            % describeVector(bone.minTranslation) % describeVector(bone.maxTranslation)
+            % describeVector(bone.minOrientation) % describeVector(bone.maxOrientation), 2);
 
-        JbaBone bone;
-        bone.data.minPosition = move(minpos);
-        bone.data.maxPosition = move(maxpos);
-        bone.data.minRotation = move(minrot);
-        bone.data.maxRotation = move(maxrot);
         _bones.push_back(move(bone));
 
         dataPtr += 12;
@@ -126,31 +122,19 @@ void JbaFile::loadPartData() {
     }
 }
 
-glm::vec3 JbaFile::decompressPosition(int boneIdx, uint32_t value) const {
-    float x = (value & 0x3ff) / 1023.0f;
-    float y = ((value >> 10) & 0xffe) / 4094.0f;
-    float z = ((value >> 21) & 0xffe) / 4094.0f;
-    return glm::vec3(x, y, z);
+static glm::vec3 decompressPosition(uint32_t value, const glm::vec3 &min, const glm::vec3 &max) {
+    float nx = (value & 0x3ff) / 1023.0f;
+    float ny = ((value >> 10) & 0x7ff) / 2047.0f;
+    float nz = ((value >> 21) & 0x7ff) / 2047.0f;
+    return min + max * glm::vec3(nx, ny, nz);
 }
 
-glm::quat JbaFile::decompressOrientation(int boneIdx, uint16_t *values) const {
-    float nx = values[0] / 65535.0f;
-    float ny = values[1] / 65535.0f;
-    float nz = values[2] / 65535.0f;
-
-    const BoneData &boneData = _bones[boneIdx].data;
-    glm::vec3 v(glm::mix(boneData.minRotation, boneData.maxRotation, glm::vec3(nx, ny, nz)));
-    float w;
-
-    float dot = glm::dot(v, v);
-    if (dot >= 1.0f) {
-        float len = glm::sqrt(dot);
-        v /= len;
-        w = 0.0f;
-    } else {
-        w = -glm::sqrt(1.0f - dot);
-    }
-
+static glm::quat decompressOrientation(const uint16_t *values, const glm::vec3 &min, const glm::vec3 &max) {
+    float nx = (values[0] & 0x7fff) / 32767.0f;
+    float ny = (values[1] & 0xffff) / 65535.0f;
+    float nz = (values[2] & 0xffff) / 65535.0f;
+    glm::vec3 v(min + max * glm::vec3(nx, ny, nz));
+    float w = glm::sqrt(1.0f - glm::dot(v, v));
     return glm::quat(w, v);
 }
 
@@ -182,14 +166,14 @@ unique_ptr<JbaFile::PartData> JbaFile::readPartData() {
         // Decompress 48-bit orientation poses
         for (uint32_t j = 0; j < keyframeLayoutPtr[0]; ++j) {
             vector<uint16_t> values(readArray<uint16_t>(3));
-            keyframes[j].orientation = decompressOrientation(i, &values[0]);
+            keyframes[j].orientation = decompressOrientation(&values[0], _bones[i].minOrientation, _bones[i].maxOrientation);
             debug(boost::format("JBA: bone %u: keyframe %u: orientation: %04X %04X %04X -> %s") % i % j % values[0] % values[1] % values[2] % describeQuaternion(keyframes[j].orientation), 2);
         }
         // Decompress 32-bit translation poses, if any
         for (uint32_t j = 0; j < keyframeLayoutPtr[2]; ++j) {
             uint32_t value = readUint32();
-            keyframes[j].position = decompressPosition(i, value);
-            debug(boost::format("JBA: bone %u: keyframe %u: translation: %08X -> %s") % i % j % value % describeVector(keyframes[j].position), 2);
+            keyframes[j].translation = decompressPosition(value, _bones[i].minTranslation, _bones[i].maxTranslation);
+            debug(boost::format("JBA: bone %u: keyframe %u: translation: %08X -> %s") % i % j % value % describeVector(keyframes[j].translation), 2);
         }
 
         partData->keyframes.push_back(move(keyframes));
@@ -200,36 +184,44 @@ unique_ptr<JbaFile::PartData> JbaFile::readPartData() {
     return move(partData);
 }
 
-void JbaFile::loadTimestamps() {
+void JbaFile::loadKeyframes() {
     uint32_t pos = alignAt80(tell());
     seek(pos);
 
     ignore(8);
 
     vector<float> valuesAt08(readArray<float>(12));
-    debug(boost::format("JBA: timestamps: %.06f %.06f %.06f %.06f %.06f %.06f %.06f %.06f %.06f %.06f %.06f %.06f")
-        % valuesAt08[0] % valuesAt08[1] % valuesAt08[2] % valuesAt08[3]
-        % valuesAt08[4] % valuesAt08[5] % valuesAt08[6] % valuesAt08[7]
-        % valuesAt08[8] % valuesAt08[9] % valuesAt08[10] % valuesAt08[11]);
+    _maxTranslation = glm::make_vec3(&valuesAt08[0]);
+    _minTranslation = glm::make_vec3(&valuesAt08[3]);
+    _maxOrientation = glm::make_vec3(&valuesAt08[6]);
+    _minOrientation = glm::make_vec3(&valuesAt08[9]);
+    debug(boost::format("JBA: maxTranslation=%s minTranslation=%s maxOrientation=%s minOrientation=%s") %
+        describeVector(_maxTranslation) % describeVector(_minTranslation) %
+        describeVector(_maxOrientation) % describeVector(_minOrientation));
 
-    _numTimestamps = readUint32();
-    debug("JBA: numTimestamps=" + to_string(_numTimestamps));
+    _numKeyframes = readUint32();
+    debug("JBA: numKeyframes=" + to_string(_numKeyframes));
 
-    ignore(12);
+    ignore(3 * sizeof(uint32_t));
 
-    vector<uint16_t> valuesAt48(readArray<uint16_t>(3 * _numTimestamps));
+    vector<uint16_t> valuesAt48(readArray<uint16_t>(3 * _numKeyframes));
     const uint16_t *valuesAt48Ptr = &valuesAt48[0];
-    for (uint32_t i = 0; i < _numTimestamps; ++i) {
-        debug(boost::format("JBA: timestamp %d: %X %X %X") % i % valuesAt48Ptr[0] % valuesAt48Ptr[1] % valuesAt48Ptr[2], 2);
+    for (uint32_t i = 0; i < _numKeyframes; ++i) {
+        glm::quat orientation(decompressOrientation(valuesAt48Ptr, _minOrientation, _maxOrientation));
+        debug(boost::format("JBA: keyframe %d orientation: %04X %04X %04X -> %s") % i %
+            valuesAt48Ptr[0] % valuesAt48Ptr[1] % valuesAt48Ptr[2] %
+            describeQuaternion(orientation), 2);
+
         valuesAt48Ptr += 3;
     }
-    if (_numTimestamps % 2 != 0) {
+    if (_numKeyframes % 2 != 0) {
         ignore(2);
     }
 
-    vector<uint16_t> keyframeValues(readArray<uint16_t>(2 * _numTimestamps));
-    for (uint32_t i = 0; i < _numTimestamps; ++i) {
-        debug(boost::format("JBA: timestamp %d: %X %X") % i % keyframeValues[2ll * i + 0] % keyframeValues[2ll * i + 1], 2);
+    vector<uint32_t> keyframeValues(readArray<uint32_t>(_numKeyframes));
+    for (uint32_t i = 0; i < _numKeyframes; ++i) {
+        glm::vec3 translation(decompressPosition(keyframeValues[i], _minTranslation, _maxTranslation));
+        debug(boost::format("JBA: keyframe %d translation: %08X -> %s") % i % keyframeValues[i] % describeVector(translation), 2);
     }
 }
 
@@ -252,14 +244,8 @@ void JbaFile::loadBones() {
 void JbaFile::loadAnimation() {
     if (_numParts == 0) return;
 
-    if (_numParts > 1) {
-        warn("JBA: animations with more than one part are not supported");
-        return;
-    }
-
     int index = 0;
     auto rootNode = make_shared<ModelNode>(index++);
-    float step = _length / static_cast<float>(_numTimestamps - 1);
 
     stack<ModelNode *> modelNodes;
     modelNodes.push(&_skeleton->rootNode());
@@ -278,16 +264,25 @@ void JbaFile::loadAnimation() {
             animNode->_name = modelNode->_name;
 
             uint32_t boneIdx = maybeBone->index;
-            const vector<JbaKeyframe> &keyframes = _parts[0].data->keyframes[boneIdx];
 
-            for (size_t i = 0; i < _numTimestamps + 2ll; ++i) {
-                const JbaKeyframe &keyframe = keyframes[i];
+            for (size_t i = 0; i < _numKeyframes; ++i) {
+                int partIdx = getPartByKeyframe(i);
+                if (partIdx == -1) break;
+
+                const vector<JbaKeyframe> &keyframes = _parts[partIdx].data->keyframes[boneIdx];
+                const JbaKeyframe &keyframe = keyframes[i - _parts[partIdx].keyframeIdx];
+                float step = _length / static_cast<float>(keyframes.size() - 1);
                 float time = i * step;
 
-                ModelNode::OrientationKeyframe orient;
-                orient.time = time;
-                orient.orientation = modelNode->_orientation * keyframe.orientation;
-                animNode->_orientationFrames.push_back(move(orient));
+                ModelNode::PositionKeyframe pos;
+                pos.time = time;
+                pos.position = keyframe.translation;
+                animNode->_positionFrames.push_back(move(pos));
+
+                //ModelNode::OrientationKeyframe orient;
+                //orient.time = time;
+                //orient.orientation = modelNode->_orientation * keyframe.orientation;
+                //animNode->_orientationFrames.push_back(move(orient));
             }
 
             rootNode->_children.push_back(move(animNode));
@@ -299,6 +294,13 @@ void JbaFile::loadAnimation() {
     }
 
     _animation = make_shared<Animation>("pause1" /* _resRef */, _length, 0.5f * _length, vector<Animation::Event>(), rootNode);
+}
+
+int JbaFile::getPartByKeyframe(int keyframeIdx) const {
+    for (uint32_t i = 0; i < _numParts; ++i) {
+        if (keyframeIdx >= _parts[i].keyframeIdx) return i;
+    }
+    return -1;
 }
 
 } // namespace render
