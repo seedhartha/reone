@@ -35,8 +35,8 @@ public:
 
 private:
     struct JbaKeyframe {
-        glm::vec3 position { 0.0f };
-        glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+        glm::vec3 translation { 0.0f };
+        glm::quat orientation { 1.0f, 0.0f, 0.0, 0.0f };
     };
 
     struct PartData {
@@ -44,20 +44,16 @@ private:
     };
 
     struct JbaPart {
-        uint32_t timestampIndex { 0 };
+        uint32_t keyframeIdx { 0 };
         uint32_t dataSize;
         std::unique_ptr<PartData> data;
     };
 
-    struct BoneData {
-        glm::vec3 minPosition;
-        glm::vec3 maxPosition;
-        glm::vec3 minRotation;
-        glm::vec3 maxRotation;
-    };
-
     struct JbaBone {
-        BoneData data;
+        glm::vec3 minTranslation { 0.0f };
+        glm::vec3 maxTranslation { 0.0f };
+        glm::vec3 minOrientation { 0.0f };
+        glm::vec3 maxOrientation { 0.0f };
         uint32_t index { 0 };
         std::string name;
     };
@@ -68,9 +64,17 @@ private:
     float _length { 0.0f };
     float _fps { 0 };
     uint32_t _numParts { 0 };
-    uint32_t _numTimestamps { 0 };
+    uint32_t _numKeyframes { 0 };
     uint32_t _numBones { 0 };
+
+    glm::vec3 _maxTranslation { 0.0f };
+    glm::vec3 _minTranslation { 0.0f };
+    glm::vec3 _maxOrientation { 0.0f };
+    glm::vec3 _minOrientation { 0.0f };
+
     std::vector<JbaPart> _parts;
+    std::vector<glm::quat> _orientationFrames;
+    std::vector<glm::vec3> _positionFrames;
     std::vector<JbaBone> _bones;
     std::shared_ptr<Animation> _animation;
 
@@ -80,14 +84,13 @@ private:
     void loadPartHeaders();
     void loadBoneData();
     void loadPartData();
-    void loadTimestamps();
+    void loadKeyframes();
     void loadBones();
     void loadAnimation();
 
     std::unique_ptr<PartData> readPartData();
 
-    glm::vec3 decompressPosition(int boneIdx, uint32_t value) const;
-    glm::quat decompressOrientation(int boneIdx, uint16_t *values) const;
+    int getPartByKeyframe(int keyframeIdx) const;
 };
 
 } // namespace render
