@@ -21,6 +21,7 @@
 #include "../../resource/types.h"
 
 #include "../model/model.h"
+#include "../model/modelloader.h"
 
 namespace reone {
 
@@ -90,6 +91,11 @@ private:
     void readVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
 
     // END Controllers
+};
+
+class MdlModelLoader : public IModelLoader {
+public:
+    std::shared_ptr<Model> loadModel(resource::GameID gameId, const std::string &resRef) override;
 };
 
 } // namespace render

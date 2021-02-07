@@ -165,6 +165,7 @@ set(RENDER_HEADERS
     src/render/model/animation.h
     src/render/model/mdlfile.h
     src/render/model/model.h
+    src/render/model/modelloader.h
     src/render/model/modelnode.h
     src/render/model/models.h
     src/render/shaders.h
@@ -200,6 +201,7 @@ set(RENDER_SOURCES
     src/render/model/animation.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
+    src/render/model/modelloader.cpp
     src/render/model/modelnode.cpp
     src/render/model/models.cpp
     src/render/shaders.cpp

@@ -25,6 +25,8 @@
 
 #include "../types.h"
 
+#include "modelloader.h"
+
 namespace reone {
 
 namespace render {
@@ -38,17 +40,23 @@ public:
     void init(resource::GameID gameId);
     void invalidateCache();
 
-    std::shared_ptr<Model> get(const std::string &resRef);
+    /**
+     * Associates the specified model loader with the specified ResType.
+     */
+    void registerLoader(resource::ResourceType type, std::shared_ptr<IModelLoader> loader);
+
+    std::shared_ptr<Model> get(const std::string &resRef, resource::ResourceType type = resource::ResourceType::Mdl);
 
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
+    std::unordered_map<resource::ResourceType, std::shared_ptr<IModelLoader>> _loaders;
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 
     Models() = default;
     Models(const Models &) = delete;
     Models &operator=(const Models &) = delete;
 
-    std::shared_ptr<Model> doGet(const std::string &resRef);
+    std::shared_ptr<Model> doGet(const std::string &resRef, resource::ResourceType type);
 };
 
 } // namespace render

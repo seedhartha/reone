@@ -40,6 +40,11 @@ namespace reone {
 
 namespace game {
 
+// This is a hook to replace MDL models with GR2 models (SWTOR).
+static const unordered_map<string, string> g_gr2Models {
+    { "c_rancors", "rancor_rancor_a01" }
+};
+
 static const string g_headHookNode("headhook");
 static const string g_maskHookNode("gogglehook");
 
@@ -53,11 +58,20 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
     if (modelName.empty()) return nullptr;
 
-    shared_ptr<Model> model(Models::instance().get(modelName));
+    bool gr2Model = false;
+    auto maybeGr2Model = g_gr2Models.find(modelName);
+    if (maybeGr2Model != g_gr2Models.end()) {
+        modelName = maybeGr2Model->second;
+        gr2Model = true;
+    }
+
+    shared_ptr<Model> model(Models::instance().get(modelName, gr2Model ? ResourceType::Gr2 : ResourceType::Mdl));
     if (!model) return nullptr;
 
     auto modelSceneNode = make_unique<ModelSceneNode>(&_creature->sceneGraph(), model);
     modelSceneNode->setLightingEnabled(true);
+
+    if (gr2Model) return move(modelSceneNode);
 
     // Body texture
 

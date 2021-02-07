@@ -49,6 +49,8 @@ public:
     std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     const std::vector<Event> &events() const { return _events; }
 
+    void setName(std::string name);
+
 private:
     std::string _name;
     float _length { 0.0f };
