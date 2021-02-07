@@ -20,18 +20,15 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/model/animation.h"
-#include "../../resource/format/binfile.h"
+#include "../resource/format/binfile.h"
 
 namespace reone {
 
-namespace render {
+namespace tor {
 
 class JbaFile : public resource::BinaryFile {
 public:
-    JbaFile(const std::string &resRef, const std::shared_ptr<Model> &skeleton);
-
-    std::shared_ptr<Animation> animation() const { return _animation; }
+    JbaFile(const std::string &resRef);
 
 private:
     struct JbaKeyframe {
@@ -39,27 +36,22 @@ private:
         glm::quat orientation { 1.0f, 0.0f, 0.0, 0.0f };
     };
 
-    struct PartData {
-        std::vector<std::vector<JbaKeyframe>> keyframes;
-    };
-
     struct JbaPart {
         uint32_t keyframeIdx { 0 };
-        uint32_t dataSize;
-        std::unique_ptr<PartData> data;
+        uint32_t keyframesSize;
+        std::vector<std::vector<JbaKeyframe>> keyframes;
     };
 
     struct JbaBone {
         glm::vec3 minTranslation { 0.0f };
         glm::vec3 maxTranslation { 0.0f };
-        glm::vec3 minOrientation { 0.0f };
-        glm::vec3 maxOrientation { 0.0f };
+        glm::quat minOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
+        glm::quat maxOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
         uint32_t index { 0 };
         std::string name;
     };
 
     std::string _resRef;
-    std::shared_ptr<render::Model> _skeleton;
 
     float _length { 0.0f };
     float _fps { 0 };
@@ -69,14 +61,12 @@ private:
 
     glm::vec3 _maxTranslation { 0.0f };
     glm::vec3 _minTranslation { 0.0f };
-    glm::vec3 _maxOrientation { 0.0f };
-    glm::vec3 _minOrientation { 0.0f };
+    glm::quat _maxOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::quat _minOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
 
     std::vector<JbaPart> _parts;
-    std::vector<glm::quat> _orientationFrames;
-    std::vector<glm::vec3> _positionFrames;
+    std::vector<JbaKeyframe> _keyframes;
     std::vector<JbaBone> _bones;
-    std::shared_ptr<Animation> _animation;
 
     void doLoad();
 
@@ -86,13 +76,12 @@ private:
     void loadPartData();
     void loadKeyframes();
     void loadBones();
-    void loadAnimation();
 
-    std::unique_ptr<PartData> readPartData();
+    std::vector<std::vector<JbaKeyframe>> readPartKeyframes();
 
     int getPartByKeyframe(int keyframeIdx) const;
 };
 
-} // namespace render
+} // namespace tor
 
 } // namespace reone

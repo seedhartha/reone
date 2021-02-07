@@ -148,8 +148,7 @@ void MdlFile::doLoad() {
         superModel = Models::instance().get(superModelName);
     }
 
-    _model = make_unique<Model>(_name, move(rootNode), anims, superModel);
-    _model->setClassification(getClassification(classification));
+    _model = make_unique<Model>(_name, getClassification(classification), move(rootNode), anims, superModel);
     _model->setAnimationScale(scale);
 }
 
@@ -793,43 +792,41 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
 
     seek(endPos);
 
-    auto mesh = make_unique<ModelMesh>(render, transparency, shadow);
-    mesh->_vertexCount = vertexCount;
-    mesh->_vertices = move(vertices);
-    mesh->_offsets = move(offsets);
-    mesh->_indices = move(indices);
-    mesh->_backgroundGeometry = backgroundGeometry != 0;
-    mesh->_diffuseColor = glm::make_vec3(&diffuseColor[0]);
-    mesh->_ambientColor = glm::make_vec3(&ambientColor[0]);
+    auto mesh = make_unique<Mesh>(vertexCount, move(vertices), move(indices), move(offsets));
     mesh->computeAABB();
 
+    auto modelMesh = make_unique<ModelMesh>(move(mesh), render, transparency, shadow);
+    modelMesh->_backgroundGeometry = backgroundGeometry != 0;
+    modelMesh->_diffuseColor = glm::make_vec3(&diffuseColor[0]);
+    modelMesh->_ambientColor = glm::make_vec3(&ambientColor[0]);
+
     if (!diffuse.empty() && diffuse != "null") {
-        mesh->_diffuse = Textures::instance().get(diffuse, TextureType::Diffuse);
-        if (mesh->_diffuse) {
-            const TextureFeatures &features = mesh->_diffuse->features();
+        modelMesh->_diffuse = Textures::instance().get(diffuse, TextureType::Diffuse);
+        if (modelMesh->_diffuse) {
+            const TextureFeatures &features = modelMesh->_diffuse->features();
             if (!features.envMapTexture.empty()) {
-                mesh->_envmap = Textures::instance().get(features.envMapTexture, TextureType::EnvironmentMap);
+                modelMesh->_envmap = Textures::instance().get(features.envMapTexture, TextureType::EnvironmentMap);
             }
             if (!features.bumpyShinyTexture.empty()) {
-                mesh->_bumpyShiny = Textures::instance().get(features.bumpyShinyTexture, TextureType::EnvironmentMap);
+                modelMesh->_bumpyShiny = Textures::instance().get(features.bumpyShinyTexture, TextureType::EnvironmentMap);
             }
             if (!features.bumpMapTexture.empty()) {
-                mesh->_bumpmap = Textures::instance().get(features.bumpMapTexture, TextureType::Bumpmap);
+                modelMesh->_bumpmap = Textures::instance().get(features.bumpMapTexture, TextureType::Bumpmap);
             }
         }
     }
     if (!lightmap.empty()) {
-        mesh->_lightmap = Textures::instance().get(lightmap, TextureType::Lightmap);
+        modelMesh->_lightmap = Textures::instance().get(lightmap, TextureType::Lightmap);
     }
     if (animateUv) {
-        mesh->_uvAnimation.animated = true;
-        mesh->_uvAnimation.directionX = uvDirectionX;
-        mesh->_uvAnimation.directionY = uvDirectionY;
-        mesh->_uvAnimation.jitter = uvJitter;
-        mesh->_uvAnimation.jitterSpeed = uvJitterSpeed;
+        modelMesh->_uvAnimation.animated = true;
+        modelMesh->_uvAnimation.directionX = uvDirectionX;
+        modelMesh->_uvAnimation.directionY = uvDirectionY;
+        modelMesh->_uvAnimation.jitter = uvJitter;
+        modelMesh->_uvAnimation.jitterSpeed = uvJitterSpeed;
     }
 
-    return move(mesh);
+    return move(modelMesh);
 }
 
 void MdlFile::readSkin(ModelNode &node) {
@@ -840,8 +837,8 @@ void MdlFile::readSkin(ModelNode &node) {
     uint32_t bonesOffset = readUint32();
     uint32_t boneCount = readUint32();
 
-    node._mesh->_offsets.boneWeights = boneWeightsOffset;
-    node._mesh->_offsets.boneIndices = boneIndicesOffset;
+    node._mesh->_mesh->_offsets.boneWeights = boneWeightsOffset;
+    node._mesh->_mesh->_offsets.boneIndices = boneIndicesOffset;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + bonesOffset);

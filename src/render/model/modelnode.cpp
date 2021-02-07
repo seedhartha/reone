@@ -150,7 +150,11 @@ bool ModelNode::getScale(float time, float &scale) const {
 }
 
 const glm::vec3 &ModelNode::getCenterOfAABB() const {
-    return _mesh->aabb().center();
+    return _mesh->mesh()->aabb().center();
+}
+
+void ModelNode::setName(string name) {
+    _name = move(name);
 }
 
 } // namespace render

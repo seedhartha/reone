@@ -24,27 +24,28 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../../common/log.h"
-#include "../../common/streamutil.h"
-#include "../../render/model/jbafile.h"
-#include "../../render/models.h"
-#include "../../render/textures.h"
-#include "../../resource/resources.h"
+#include "../common/log.h"
+#include "../common/streamutil.h"
+#include "../render/models.h"
+#include "../render/textures.h"
+#include "../resource/resources.h"
+
+#include "jbafile.h"
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resource;
 
 namespace pt = boost::property_tree;
 
 namespace reone {
 
-namespace render {
+namespace tor {
 
-Gr2File::Gr2File(string resRef, shared_ptr<Gr2File> skeleton) :
+Gr2File::Gr2File(string resRef) :
     BinaryFile(4, "GAWB"),
-    _resRef(move(resRef)),
-    _skeleton(move(skeleton)) {
+    _resRef(move(resRef)) {
 }
 
 void Gr2File::doLoad() {
@@ -75,12 +76,6 @@ void Gr2File::doLoad() {
     loadMeshes();
     loadSkeletonBones();
     loadAttachments();
-
-    if (_fileType == FileType::Skeleton) {
-        loadSkeletonModel();
-    } else {
-        loadGeometryModel();
-    }
 }
 
 void Gr2File::loadMeshes() {
@@ -258,14 +253,12 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
         indices.insert(indices.end(), pieceIndices.begin(), pieceIndices.end());
     }
 
-    auto modelMesh = make_unique<ModelMesh>(true, 0, true);
-    modelMesh->_vertexCount = mesh.header.numVertices;
-    modelMesh->_vertices = move(vertices);
-    modelMesh->_offsets = move(offsets);
-    modelMesh->_indices = move(indices);
-    modelMesh->_diffuseColor = glm::vec3(0.8f);
-    modelMesh->_ambientColor = glm::vec3(0.2f);
-    modelMesh->computeAABB();
+    auto simpleMesh = make_unique<Mesh>(mesh.header.numVertices, move(vertices), move(indices), move(offsets));
+    simpleMesh->computeAABB();
+
+    auto modelMesh = make_unique<ModelMesh>(move(simpleMesh), true, 0, true);
+    modelMesh->setDiffuseColor(glm::vec3(0.8f));
+    modelMesh->setAmbientColor(glm::vec3(0.2f));
 
     // Fill mesh textures from materials
     if (!_materials.empty()) {
@@ -293,10 +286,9 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
                     value = value.substr(lastSlashIdx + 1ll);
                 }
                 if (semantic == "DiffuseMap") {
-                    modelMesh->_diffuse = Textures::instance().get(value, TextureType::Diffuse);
+                    modelMesh->setDiffuseTexture(Textures::instance().get(value, TextureType::Diffuse));
                 } else if (semantic == "RotationMap1") {
-                    modelMesh->_bumpmap = Textures::instance().get(value, TextureType::Bumpmap);
-                    modelMesh->_bumpmapFromTOR = true;
+                    modelMesh->setBumpmapTexture(Textures::instance().get(value, TextureType::Bumpmap), true);
                 }
             }
         }
@@ -376,172 +368,6 @@ unique_ptr<Gr2File::Attachment> Gr2File::readAttachment() {
     return move(attachment);
 }
 
-void Gr2File::loadSkeletonModel() {
-    vector<float> vertices {
-        -0.001f, -0.001f, -0.001f,
-        -0.001f, -0.001f,  0.001f,
-        -0.001f,  0.001f,  0.001f,
-        -0.001f,  0.001f, -0.001f,
-         0.001f,  0.001f,  0.001f,
-         0.001f,  0.001f, -0.001f,
-         0.001f, -0.001f, -0.001f,
-         0.001f, -0.001f,  0.001f
-    };
-    vector<uint16_t> indices {
-        0, 1, 2, 2, 3, 0,
-        2, 4, 5, 5, 3, 2,
-        1, 7, 4, 4, 2, 1,
-        0, 6, 7, 7, 1, 0,
-        7, 6, 5, 5, 4, 7,
-        6, 0, 3, 3, 5, 6
-    };
-    Mesh::VertexOffsets offsets { 0, -1, -1, -1, -1, -1, -1, -1, 3 * sizeof(float) };
-
-    auto mesh = make_shared<ModelMesh>(true, 0, false);
-    mesh->_vertexCount = 8;
-    mesh->_vertices = move(vertices);
-    mesh->_offsets = move(offsets);
-    mesh->_indices = move(indices);
-    mesh->_diffuse = Textures::instance().get("redfill", TextureType::GUI);
-    mesh->_diffuseColor = glm::vec3(0.0f);
-    mesh->_ambientColor = glm::vec3(1.0f);
-    mesh->computeAABB();
-
-    glm::mat4 transform(1.0f);
-    transform *= glm::mat4_cast(glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    transform *= glm::mat4_cast(glm::angleAxis(glm::half_pi<float>(), glm::vec3(1.0f, 0.0, 0.0f)));
-    transform = glm::scale(transform, glm::vec3(10.0f));
-
-    int index = 0;
-    auto rootNode = make_shared<ModelNode>(index++);
-    rootNode->_absTransform = transform;
-    rootNode->_absTransformInv = glm::inverse(rootNode->_absTransform);
-
-    vector<shared_ptr<ModelNode>> nodes;
-
-    // Convert bones into model nodes
-    for (uint16_t i = 0; i < _numBones; ++i) {
-        auto node = make_shared<ModelNode>(index);
-        node->_nodeNumber = index;
-        node->_name = _bones[i]->name;
-        node->_mesh = mesh;
-        node->_absTransform = rootNode->_absTransform * glm::inverse(_bones[i]->rootToBone);
-        node->_absTransformInv = glm::inverse(node->_absTransform);
-        nodes.push_back(move(node));
-
-        ++index;
-    }
-
-    // Reparent model nodes
-    for (uint16_t i = 0; i < _numBones; ++i) {
-        int parentIdx = _bones[i]->parentIndex;
-        if (parentIdx == 0xffffffff) {
-            nodes[i]->_parent = rootNode.get();
-            rootNode->_children.push_back(nodes[i]);
-        } else {
-            nodes[i]->_parent = nodes[parentIdx].get();
-            nodes[parentIdx]->_children.push_back(nodes[i]);
-        }
-    }
-
-    rootNode->computeLocalTransforms();
-
-    vector<shared_ptr<Animation>> anims;
-    _model = make_shared<Model>("", rootNode, anims);
-    _model->_classification = Model::Classification::Character;
-    _model->initGL();
-}
-
-static string getSkeletonResRef(const string &modelResRef) {
-    return boost::starts_with(modelResRef, "bfn_") ? "bfnnew_skeleton" : "";
-}
-
-static vector<string> getSkeletonAnimations(const string &skeletonResRef) {
-    vector<string> result;
-    if (skeletonResRef == "bfnnew_skeleton") {
-        result.push_back("mv_run_forward");
-    }
-    return move(result);
-}
-
-void Gr2File::loadGeometryModel() {
-    if (_meshes.empty()) return;
-
-    // In SWTOR, geometry, skeletons and animations are all separate files
-    shared_ptr<Model> skeletonModel;
-    string skeletonResRef(getSkeletonResRef(_resRef));
-    if (!skeletonResRef.empty()) {
-        skeletonModel = Models::instance().get(skeletonResRef, true);
-    }
-
-    shared_ptr<ModelNode> rootNode;
-    int index = 0;
-
-    if (skeletonModel) {
-        rootNode = skeletonModel->_rootNode;
-        index = skeletonModel->_maxNodeIndex + 1;
-
-    } else {
-        // Create our own root node, if skeleton model is not found
-
-        glm::mat4 transform(1.0f);
-        transform *= glm::mat4_cast(glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-        transform *= glm::mat4_cast(glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0, 0.0f)));
-        transform = glm::scale(transform, glm::vec3(10.0f));
-
-        rootNode = make_shared<ModelNode>(index++);
-        rootNode->_localTransform = transform;
-        rootNode->_absTransform = rootNode->_localTransform;
-        rootNode->_absTransformInv = glm::inverse(rootNode->_absTransform);
-    }
-
-    for (uint16_t i = 0; i < _numMeshes; ++i) {
-        if (boost::contains(_meshes[i]->header.name, "collision")) continue; // do not add collision meshes to the model
-
-        auto node = make_shared<ModelNode>(index);
-        node->_nodeNumber = index;
-        node->_name = _meshes[i]->header.name;
-        node->_mesh = _meshes[i]->mesh;
-        node->_absTransform = rootNode->_absTransform;
-        node->_absTransformInv = glm::inverse(node->_absTransform);
-
-        if (skeletonModel) {
-            node->_skin = make_shared<ModelNode::Skin>();
-            for (uint16_t j = 0; j < _meshes[i]->header.numUsedBones; ++j) {
-                shared_ptr<ModelNode> boneNode(skeletonModel->findNodeByName(_meshes[i]->bones[j]->name));
-                if (boneNode) {
-                    node->_skin->nodeIdxByBoneIdx.insert(make_pair(j, boneNode->index()));
-                }
-            }
-        }
-
-        rootNode->_children.push_back(move(node));
-
-        ++index;
-    }
-
-    vector<shared_ptr<Animation>> anims;
-    if (skeletonModel) {
-        vector<string> animResRefs(getSkeletonAnimations(skeletonResRef));
-        for (auto &resRef : animResRefs) {
-            shared_ptr<Animation> animation;
-            shared_ptr<ByteArray> jbaData(Resources::instance().get(resRef, ResourceType::Jba));
-            if (jbaData) {
-                JbaFile jbaFile(resRef, skeletonModel);
-                jbaFile.load(wrap(jbaData));
-                animation = jbaFile.animation();
-            }
-            if (animation) {
-                anims.push_back(move(animation));
-            }
-        }
-    }
-
-    _model = make_shared<Model>("", rootNode, anims);
-    _model->_classification = Model::Classification::Character; // this prevents self-shadowing
-    _model->initGL();
-}
-
-} // namespace render
+} // namespace tor
 
 } // namespace reone

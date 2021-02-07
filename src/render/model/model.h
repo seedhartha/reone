@@ -51,6 +51,7 @@ public:
 
     Model(
         const std::string &name,
+        Classification classification,
         const std::shared_ptr<ModelNode> &rootNode,
         std::vector<std::shared_ptr<Animation>> &anims,
         const std::shared_ptr<Model> &superModel = nullptr);
@@ -69,15 +70,15 @@ public:
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
 
-    void setClassification(Classification classification);
     void setAnimationScale(float scale);
 
 private:
-    Classification _classification { Classification::Other };
     std::string _name;
+    Classification _classification;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
+
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
@@ -90,7 +91,6 @@ private:
     void init(const std::shared_ptr<ModelNode> &node);
 
     friend class MdlFile;
-    friend class Gr2File;
 };
 
 } // namespace render

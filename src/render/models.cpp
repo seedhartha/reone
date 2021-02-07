@@ -20,7 +20,6 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "model/gr2file.h"
 #include "model/mdlfile.h"
 
 using namespace std;
@@ -44,34 +43,25 @@ void Models::invalidateCache() {
     _cache.clear();
 }
 
-shared_ptr<Model> Models::get(const string &resRef, bool gr2) {
+shared_ptr<Model> Models::get(const string &resRef) {
     auto maybeModel = _cache.find(resRef);
     if (maybeModel != _cache.end()) {
         return maybeModel->second;
     }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, gr2)));
+    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
 
     return inserted.first->second;
 }
 
-shared_ptr<Model> Models::doGet(const string &resRef, bool gr2) {
+shared_ptr<Model> Models::doGet(const string &resRef) {
+    shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
+    shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
 
-    if (gr2) {
-        shared_ptr<ByteArray> gr2Data(Resources::instance().get(resRef, ResourceType::Gr2));
-        if (gr2Data) {
-            Gr2File gr2(resRef);
-            gr2.load(wrap(gr2Data));
-            model = gr2.model();
-        }
-    } else {
-        shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
-        shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
-        if (mdlData && mdxData) {
-            MdlFile mdl(_gameId);
-            mdl.load(wrap(mdlData), wrap(mdxData));
-            model = mdl.model();
-        }
+    if (mdlData && mdxData) {
+        MdlFile mdl(_gameId);
+        mdl.load(wrap(mdlData), wrap(mdxData));
+        model = mdl.model();
     }
     if (model) {
         model->initGL();

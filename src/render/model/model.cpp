@@ -17,6 +17,8 @@
 
 #include "model.h"
 
+#include <stdexcept>
+
 #include "../../common/log.h"
 
 using namespace std;
@@ -27,14 +29,19 @@ namespace render {
 
 Model::Model(
     const string &name,
+    Classification classification,
     const shared_ptr<ModelNode> &rootNode,
     vector<shared_ptr<Animation>> &anims,
     const shared_ptr<Model> &superModel
 ) :
     _name(name),
+    _classification(classification),
     _rootNode(rootNode),
     _superModel(superModel) {
 
+    if (!rootNode) {
+        throw invalid_argument("rootNode must not be null");
+    }
     for (auto &anim : anims) {
         _animations.insert(make_pair(anim->name(), move(anim)));
     }
@@ -49,7 +56,7 @@ void Model::init(const shared_ptr<ModelNode> &node) {
 
     shared_ptr<ModelMesh> mesh(node->mesh());
     if (mesh) {
-        _aabb.expand(mesh->aabb() * node->absoluteTransform());
+        _aabb.expand(mesh->mesh()->aabb() * node->absoluteTransform());
     }
 
     for (auto &child : node->children()) {
@@ -98,10 +105,6 @@ shared_ptr<ModelNode> Model::findNodeByNumber(uint16_t number) const {
 shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
     auto it = _nodeByName.find(name);
     return it != _nodeByName.end() ? it->second : nullptr;
-}
-
-void Model::setClassification(Classification classification) {
-    _classification = classification;
 }
 
 void Model::setAnimationScale(float scale) {

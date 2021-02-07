@@ -348,9 +348,9 @@ void ModelSceneNode::refreshAABB() {
 
         auto modelNodeSceneNode = dynamic_cast<ModelNodeSceneNode *>(node);
         if (modelNodeSceneNode) {
-            shared_ptr<Mesh> mesh(modelNodeSceneNode->modelNode()->mesh());
+            shared_ptr<ModelMesh> mesh(modelNodeSceneNode->modelNode()->mesh());
             if (mesh) {
-                _aabb.expand(mesh->aabb() * node->localTransform());
+                _aabb.expand(mesh->mesh()->aabb() * node->localTransform());
             }
         }
 

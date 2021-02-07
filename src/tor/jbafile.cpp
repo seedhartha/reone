@@ -22,21 +22,23 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../../common/log.h"
-#include "../../render/model/model.h"
+#include "../common/log.h"
+#include "../render/model/model.h"
 
 using namespace std;
 
+using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace render {
+namespace tor {
 
-JbaFile::JbaFile(const string &resRef, const shared_ptr<Model> &skeleton) :
+static const glm::vec3 g_translationModifier { -0.001f, 0.001f, -0.001f };
+
+JbaFile::JbaFile(const string &resRef) :
     BinaryFile(4, "\0\0\0\0"),
-    _resRef(resRef),
-    _skeleton(skeleton) {
+    _resRef(resRef) {
 }
 
 void JbaFile::doLoad() {
@@ -48,7 +50,6 @@ void JbaFile::doLoad() {
     loadPartData();
     loadKeyframes();
     loadBones();
-    loadAnimation();
 }
 
 void JbaFile::loadHeader() {
@@ -69,8 +70,8 @@ void JbaFile::loadPartHeaders() {
     for (uint32_t i = 0; i < _numParts; ++i) {
         JbaPart part;
         part.keyframeIdx = readUint32();
-        part.dataSize = readUint32();
-        debug(boost::format("JBA: part %d header: %u %u") % i % part.keyframeIdx % part.dataSize);
+        part.keyframesSize = readUint32();
+        debug(boost::format("JBA: part %d header: %u %u") % i % part.keyframeIdx % part.keyframesSize);
         _parts.push_back(move(part));
     }
     ignore(4 * _numParts);
@@ -88,6 +89,15 @@ static string describeVector(const glm::vec3 &vec) {
     return str(boost::format("(%.06f, %.06f, %.06f)") % vec.x % vec.y % vec.z);
 }
 
+static string describeQuaternion(const glm::quat &q) {
+    return str(boost::format("(%.06f, %.06f, %.06f, %.06f)") % q.x % q.y % q.z % q.w);
+}
+
+static glm::quat getUnitQuaternion(const glm::vec3 &axis) {
+    float w = glm::sqrt(1.0f - glm::dot(axis, axis));
+    return glm::normalize(glm::quat(w, axis));
+}
+
 void JbaFile::loadBoneData() {
     seek(alignAt80(tell()));
     vector<uint8_t> data(readArray<uint8_t>(48ll * _numBones));
@@ -95,15 +105,15 @@ void JbaFile::loadBoneData() {
 
     for (uint32_t i = 0; i < _numBones; ++i) {
         JbaBone bone;
-        bone.minTranslation = glm::make_vec3(dataPtr + 0);
-        bone.maxTranslation = glm::make_vec3(dataPtr + 3);
-        bone.minOrientation = glm::make_vec3(dataPtr + 6);
-        bone.maxOrientation = glm::make_vec3(dataPtr + 9);
+        bone.minTranslation = glm::make_vec3(dataPtr + 0) * g_translationModifier;
+        bone.maxTranslation = glm::make_vec3(dataPtr + 3) * g_translationModifier;
+        bone.minOrientation = getUnitQuaternion(glm::make_vec3(dataPtr + 6));
+        bone.maxOrientation = getUnitQuaternion(glm::make_vec3(dataPtr + 9));
 
         debug(boost::format("JBA: bone %d data: %s, %s, %s, %s")
             % i
             % describeVector(bone.minTranslation) % describeVector(bone.maxTranslation)
-            % describeVector(bone.minOrientation) % describeVector(bone.maxOrientation), 2);
+            % describeQuaternion(bone.minOrientation) % describeQuaternion(bone.maxOrientation), 2);
 
         _bones.push_back(move(bone));
 
@@ -116,34 +126,52 @@ void JbaFile::loadPartData() {
         uint32_t start = alignAt80(tell());
         seek(start);
 
-        _parts[i].data = readPartData();
+        _parts[i].keyframes = readPartKeyframes();
 
-        seek(start + _parts[i].dataSize);
+        seek(start + _parts[i].keyframesSize);
     }
 }
 
 static glm::vec3 decompressPosition(uint32_t value, const glm::vec3 &min, const glm::vec3 &max) {
-    float nx = (value & 0x3ff) / 1023.0f;
-    float ny = ((value >> 10) & 0x7ff) / 2047.0f;
-    float nz = ((value >> 21) & 0x7ff) / 2047.0f;
-    return min + max * glm::vec3(nx, ny, nz);
+    uint32_t z = (value & 0x3ff);
+    uint32_t y = ((value >> 10) & 0x7ff);
+    uint32_t x = ((value >> 21) & 0x7ff);
+
+    float nx = (x & 0x1ff) / 511.0f;
+    float ny = (y & 0x3ff) / 1023.0f;
+    float nz = (z & 0x3ff) / 1023.0f;
+
+    bool sx = (x & !0x3ff) != 0;
+    bool sy = (y & !0x3ff) != 0;
+    bool sz = (z & !0x1ff) != 0;
+
+    glm::vec3 result(min);
+    result.x += (sx ? -1.0f : 1.0f) * nx * max.x;
+    result.y += (sy ? -1.0f : 1.0f) * ny * max.y;
+    result.z += (sz ? -1.0f : 1.0f) * nz * max.z;
+
+    return move(result);
 }
 
-static glm::quat decompressOrientation(const uint16_t *values, const glm::vec3 &min, const glm::vec3 &max) {
+static glm::quat decompressOrientation(const uint16_t *values, const glm::quat &min, const glm::quat &max) {
     float nx = (values[0] & 0x7fff) / 32767.0f;
-    float ny = (values[1] & 0xffff) / 65535.0f;
-    float nz = (values[2] & 0xffff) / 65535.0f;
-    glm::vec3 v(min + max * glm::vec3(nx, ny, nz));
-    float w = glm::sqrt(1.0f - glm::dot(v, v));
-    return glm::quat(w, v);
+    float ny = (values[1] & 0x7fff) / 32767.0f;
+    float nz = (values[2] & 0x7fff) / 32767.0f;
+
+    bool sx = (values[0] & 0x8000) != 0;
+    bool sy = (values[1] & 0x8000) != 0;
+    bool sz = (values[2] & 0x8000) != 0;
+
+    glm::vec3 axis(min.x, min.y, min.z);
+    axis.x += (sx ? -1.0f : 1.0f) * nx * max.x;
+    axis.y += (sy ? -1.0f : 1.0f) * ny * max.y;
+    axis.z += (sz ? -1.0f : 1.0f) * nz * max.z;
+
+    return getUnitQuaternion(axis);
 }
 
-static string describeQuaternion(const glm::quat &q) {
-    return str(boost::format("(%.06f, %.06f, %.06f, %.06f)") % q.x % q.y % q.z % q.w);
-}
-
-unique_ptr<JbaFile::PartData> JbaFile::readPartData() {
-    auto partData = make_unique<JbaFile::PartData>();
+vector<vector<JbaFile::JbaKeyframe>> JbaFile::readPartKeyframes() {
+    vector<vector<JbaKeyframe>> keyframes;
 
     ignore(8); // number of bones again
 
@@ -160,28 +188,28 @@ unique_ptr<JbaFile::PartData> JbaFile::readPartData() {
 
     const uint32_t *keyframeLayoutPtr = &keyframeLayout[0];
     for (uint32_t i = 0; i < _numBones; ++i) {
-        vector<JbaKeyframe> keyframes;
-        keyframes.resize(keyframeLayoutPtr[0]);
+        vector<JbaKeyframe> boneKeyframes;
+        boneKeyframes.resize(keyframeLayoutPtr[0]);
 
         // Decompress 48-bit orientation poses
         for (uint32_t j = 0; j < keyframeLayoutPtr[0]; ++j) {
             vector<uint16_t> values(readArray<uint16_t>(3));
-            keyframes[j].orientation = decompressOrientation(&values[0], _bones[i].minOrientation, _bones[i].maxOrientation);
-            debug(boost::format("JBA: bone %u: keyframe %u: orientation: %04X %04X %04X -> %s") % i % j % values[0] % values[1] % values[2] % describeQuaternion(keyframes[j].orientation), 2);
+            boneKeyframes[j].orientation = decompressOrientation(&values[0], _bones[i].minOrientation, _bones[i].maxOrientation);
+            debug(boost::format("JBA: bone %u: keyframe %u: orientation: %04X %04X %04X -> %s") % i % j % values[0] % values[1] % values[2] % describeQuaternion(boneKeyframes[j].orientation), 2);
         }
         // Decompress 32-bit translation poses, if any
         for (uint32_t j = 0; j < keyframeLayoutPtr[2]; ++j) {
             uint32_t value = readUint32();
-            keyframes[j].translation = decompressPosition(value, _bones[i].minTranslation, _bones[i].maxTranslation);
-            debug(boost::format("JBA: bone %u: keyframe %u: translation: %08X -> %s") % i % j % value % describeVector(keyframes[j].translation), 2);
+            boneKeyframes[j].translation = decompressPosition(value, _bones[i].minTranslation, _bones[i].maxTranslation);
+            debug(boost::format("JBA: bone %u: keyframe %u: translation: %08X -> %s") % i % j % value % describeVector(boneKeyframes[j].translation), 2);
         }
 
-        partData->keyframes.push_back(move(keyframes));
+        keyframes.push_back(move(boneKeyframes));
 
         keyframeLayoutPtr += 4;
     }
 
-    return move(partData);
+    return move(keyframes);
 }
 
 void JbaFile::loadKeyframes() {
@@ -191,16 +219,17 @@ void JbaFile::loadKeyframes() {
     ignore(8);
 
     vector<float> valuesAt08(readArray<float>(12));
-    _maxTranslation = glm::make_vec3(&valuesAt08[0]);
-    _minTranslation = glm::make_vec3(&valuesAt08[3]);
-    _maxOrientation = glm::make_vec3(&valuesAt08[6]);
-    _minOrientation = glm::make_vec3(&valuesAt08[9]);
+    _maxTranslation = glm::make_vec3(&valuesAt08[0]) * g_translationModifier;
+    _minTranslation = glm::make_vec3(&valuesAt08[3]) * g_translationModifier;
+    _maxOrientation = getUnitQuaternion(glm::make_vec3(&valuesAt08[6]));
+    _minOrientation = getUnitQuaternion(glm::make_vec3(&valuesAt08[9]));
     debug(boost::format("JBA: maxTranslation=%s minTranslation=%s maxOrientation=%s minOrientation=%s") %
         describeVector(_maxTranslation) % describeVector(_minTranslation) %
-        describeVector(_maxOrientation) % describeVector(_minOrientation));
+        describeQuaternion(_maxOrientation) % describeQuaternion(_minOrientation));
 
     _numKeyframes = readUint32();
     debug("JBA: numKeyframes=" + to_string(_numKeyframes));
+    _keyframes.resize(_numKeyframes);
 
     ignore(3 * sizeof(uint32_t));
 
@@ -212,6 +241,7 @@ void JbaFile::loadKeyframes() {
             valuesAt48Ptr[0] % valuesAt48Ptr[1] % valuesAt48Ptr[2] %
             describeQuaternion(orientation), 2);
 
+        _keyframes[i].orientation = move(orientation);
         valuesAt48Ptr += 3;
     }
     if (_numKeyframes % 2 != 0) {
@@ -222,6 +252,7 @@ void JbaFile::loadKeyframes() {
     for (uint32_t i = 0; i < _numKeyframes; ++i) {
         glm::vec3 translation(decompressPosition(keyframeValues[i], _minTranslation, _maxTranslation));
         debug(boost::format("JBA: keyframe %d translation: %08X -> %s") % i % keyframeValues[i] % describeVector(translation), 2);
+        _keyframes[i].translation = move(translation);
     }
 }
 
@@ -241,68 +272,6 @@ void JbaFile::loadBones() {
     }
 }
 
-void JbaFile::loadAnimation() {
-    if (_numParts == 0) return;
-
-    int index = 0;
-    auto rootNode = make_shared<ModelNode>(index++);
-
-    stack<ModelNode *> modelNodes;
-    modelNodes.push(&_skeleton->rootNode());
-
-    while (!modelNodes.empty()) {
-        ModelNode *modelNode = modelNodes.top();
-        modelNodes.pop();
-
-        // Match a skeleton model node to a bone
-        auto maybeBone = find_if(_bones.begin(), _bones.end(), [this, &modelNode](auto &bone) {
-            return bone.name == modelNode->_name;
-        });
-        if (maybeBone != _bones.end()) {
-            // Convert a skeleton model node to an animation model node
-            auto animNode = make_shared<ModelNode>(index++);
-            animNode->_name = modelNode->_name;
-
-            uint32_t boneIdx = maybeBone->index;
-
-            for (size_t i = 0; i < _numKeyframes; ++i) {
-                int partIdx = getPartByKeyframe(i);
-                if (partIdx == -1) break;
-
-                const vector<JbaKeyframe> &keyframes = _parts[partIdx].data->keyframes[boneIdx];
-                const JbaKeyframe &keyframe = keyframes[i - _parts[partIdx].keyframeIdx];
-                float step = _length / static_cast<float>(keyframes.size() - 1);
-                float time = i * step;
-
-                ModelNode::PositionKeyframe pos;
-                pos.time = time;
-                pos.position = keyframe.translation;
-                animNode->_positionFrames.push_back(move(pos));
-
-                //ModelNode::OrientationKeyframe orient;
-                //orient.time = time;
-                //orient.orientation = modelNode->_orientation * keyframe.orientation;
-                //animNode->_orientationFrames.push_back(move(orient));
-            }
-
-            rootNode->_children.push_back(move(animNode));
-        }
-
-        for (auto &child : modelNode->_children) {
-            modelNodes.push(child.get());
-        }
-    }
-
-    _animation = make_shared<Animation>("pause1" /* _resRef */, _length, 0.5f * _length, vector<Animation::Event>(), rootNode);
-}
-
-int JbaFile::getPartByKeyframe(int keyframeIdx) const {
-    for (uint32_t i = 0; i < _numParts; ++i) {
-        if (keyframeIdx >= _parts[i].keyframeIdx) return i;
-    }
-    return -1;
-}
-
-} // namespace render
+} // namespace tor
 
 } // namespace reone

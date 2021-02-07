@@ -130,7 +130,7 @@ struct BumpmapUniforms {
     float scaling { 0.0f };
     glm::vec2 gridSize { 1.0f };
     int frame { 0 };
-    int fromTOR { 0 };
+    int swizzled { 0 };
     char padding[8];
 };
 

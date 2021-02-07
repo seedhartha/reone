@@ -28,7 +28,6 @@ namespace reone {
 
 namespace render {
 
-class JbaFile;
 class Model;
 
 /**
@@ -41,6 +40,21 @@ class Model;
  */
 class ModelNode {
 public:
+    struct PositionKeyframe {
+        float time { 0.0f };
+        glm::vec3 position { 0.0f };
+    };
+
+    struct OrientationKeyframe {
+        float time { 0.0f };
+        glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+    };
+
+    struct ScaleKeyframe {
+        float time { 0.0f };
+        float scale { 0.0f };
+    };
+
     struct Light {
         int priority { 1 };
         bool ambientOnly { false };
@@ -97,22 +111,9 @@ public:
     std::shared_ptr<Emitter> emitter() const { return _emitter; }
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
+    void setName(std::string name);
+
 private:
-    struct PositionKeyframe {
-        float time { 0.0f };
-        glm::vec3 position { 0.0f };
-    };
-
-    struct OrientationKeyframe {
-        float time { 0.0f };
-        glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    };
-
-    struct ScaleKeyframe {
-        float time { 0.0f };
-        float scale { 0.0f };
-    };
-
     int _index { 0 };
     const ModelNode *_parent { nullptr };
     uint16_t _flags { 0 };
@@ -142,8 +143,6 @@ private:
     ModelNode &operator=(const ModelNode &) = delete;
 
     friend class MdlFile;
-    friend class Gr2File;
-    friend class JbaFile;
 };
 
 } // namespace render

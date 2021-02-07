@@ -17,16 +17,15 @@
 
 #pragma once
 
-#include "../../render/model/model.h"
-#include "../../resource/format/binfile.h"
+#include "../render/model/model.h"
+#include "../resource/format/binfile.h"
 
 namespace reone {
 
-namespace render {
+namespace tor {
 
 /**
- * Encapsulates reading GR2 model files, used by Star Wars: The Old Republic.
- * This is highly experimental.
+ * Encapsulates loading GR2 model files, used by Star Wars: The Old Republic.
  */
 class Gr2File : public resource::BinaryFile {
 public:
@@ -36,13 +35,7 @@ public:
         Skeleton = 2
     };
 
-    /**
-     * @param resRef ResRef of the model
-     * @param skeleton skeleton file to use when constructing this model (optional)
-     */
-    Gr2File(std::string resRef, std::shared_ptr<Gr2File> skeleton = nullptr);
-
-    std::shared_ptr<render::Model> model() const { return _model; }
+    Gr2File(std::string resRef);
 
 private:
     struct MeshHeader {
@@ -74,7 +67,7 @@ private:
     struct Gr2Mesh {
         MeshHeader header;
         std::vector<std::shared_ptr<MeshPiece>> pieces;
-        std::shared_ptr<ModelMesh> mesh;
+        std::shared_ptr<render::ModelMesh> mesh;
         std::vector<std::shared_ptr<MeshBone>> bones;
     };
 
@@ -91,7 +84,6 @@ private:
     };
 
     std::string _resRef;
-    std::shared_ptr<Gr2File> _skeleton;
 
     FileType _fileType { FileType::Geometry };
     uint16_t _numMeshes { 0 };
@@ -107,7 +99,6 @@ private:
     std::vector<std::shared_ptr<SkeletonBone>> _bones;
     std::vector<std::string> _materials;
     std::vector<std::shared_ptr<Attachment>> _attachments;
-    std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
 
@@ -115,17 +106,15 @@ private:
     void loadMaterials();
     void loadSkeletonBones();
     void loadAttachments();
-    void loadSkeletonModel();
-    void loadGeometryModel();
 
     std::unique_ptr<Gr2Mesh> readMesh();
     std::unique_ptr<MeshPiece> readMeshPiece();
-    std::unique_ptr<ModelMesh> readModelMesh(const Gr2Mesh &mesh);
+    std::unique_ptr<render::ModelMesh> readModelMesh(const Gr2Mesh &mesh);
     std::unique_ptr<MeshBone> readMeshBone();
     std::unique_ptr<SkeletonBone> readSkeletonBone();
     std::unique_ptr<Attachment> readAttachment();
 };
 
-} // namespace render
+} // namespace tor
 
 } // namespace reone
