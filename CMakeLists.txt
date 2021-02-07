@@ -166,7 +166,7 @@ set(RENDER_HEADERS
     src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelnode.h
-    src/render/models.h
+    src/render/model/models.h
     src/render/shaders.h
     src/render/stateutil.h
     src/render/texture.h
@@ -201,7 +201,7 @@ set(RENDER_SOURCES
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
     src/render/model/modelnode.cpp
-    src/render/models.cpp
+    src/render/model/models.cpp
     src/render/shaders.cpp
     src/render/stateutil.cpp
     src/render/texture.cpp

@@ -25,7 +25,7 @@
 #include "../common/jobs.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../render/models.h"
+#include "../render/model/models.h"
 #include "../render/textures.h"
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"

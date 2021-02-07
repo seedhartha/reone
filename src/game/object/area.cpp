@@ -28,7 +28,7 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../render/walkmeshes.h"
 #include "../../resource/format/lytfile.h"
 #include "../../resource/format/visfile.h"

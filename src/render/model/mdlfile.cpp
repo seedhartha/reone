@@ -24,7 +24,7 @@
 #include "../../common/log.h"
 #include "../../resource/resources.h"
 
-#include "../models.h"
+#include "../model/models.h"
 #include "../textures.h"
 
 using namespace std;

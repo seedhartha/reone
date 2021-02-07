@@ -21,9 +21,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../resource/types.h"
+#include "../../resource/types.h"
 
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 

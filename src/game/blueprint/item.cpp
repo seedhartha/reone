@@ -23,7 +23,7 @@
 #include <boost/format.hpp>
 
 #include "../../audio/files.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 

@@ -19,7 +19,7 @@
 
 #include "../../../common/random.h"
 #include "../../../gui/scenebuilder.h"
-#include "../../../render/models.h"
+#include "../../../render/model/models.h"
 #include "../../../render/textures.h"
 #include "../../../resource/resources.h"
 #include "../../../scene/node/modelscenenode.h"

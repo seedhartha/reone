@@ -21,7 +21,7 @@
 #include "../../audio/player.h"
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
