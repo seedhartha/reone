@@ -19,8 +19,9 @@
 
 #include <mutex>
 
-#include "../game/game.h"
-#include "../game/options.h"
+#include "../../game/game.h"
+#include "../../game/options.h"
+
 #include "../net/client.h"
 #include "../net/server.h"
 

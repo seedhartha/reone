@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-#include "../common/types.h"
+#include "../../common/types.h"
 
 namespace reone {
 

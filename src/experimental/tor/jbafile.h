@@ -20,7 +20,7 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
 
-#include "../resource/format/binfile.h"
+#include "../../resource/format/binfile.h"
 
 namespace reone {
 

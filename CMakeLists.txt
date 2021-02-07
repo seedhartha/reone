@@ -220,12 +220,12 @@ set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 ## libtor static library
 
 set(TOR_HEADERS
-    src/tor/gr2file.h
-    src/tor/jbafile.h)
+    src/experimental/tor/gr2file.h
+    src/experimental/tor/jbafile.h)
 
 set(TOR_SOURCES
-    src/tor/gr2file.cpp
-    src/tor/jbafile.cpp)
+    src/experimental/tor/gr2file.cpp
+    src/experimental/tor/jbafile.cpp)
 
 add_library(libtor STATIC ${TOR_HEADERS} ${TOR_SOURCES})
 set_target_properties(libtor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -624,17 +624,17 @@ set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY
 ## libnet static library
 
 set(NET_HEADERS
-    src/net/client.h
-    src/net/connection.h
-    src/net/command.h
-    src/net/server.h
-    src/net/types.h)
+    src/experimental/net/client.h
+    src/experimental/net/connection.h
+    src/experimental/net/command.h
+    src/experimental/net/server.h
+    src/experimental/net/types.h)
 
 set(NET_SOURCES
-    src/net/client.cpp
-    src/net/connection.cpp
-    src/net/command.cpp
-    src/net/server.cpp)
+    src/experimental/net/client.cpp
+    src/experimental/net/connection.cpp
+    src/experimental/net/command.cpp
+    src/experimental/net/server.cpp)
 
 add_library(libnet STATIC ${NET_HEADERS} ${NET_SOURCES})
 set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -644,15 +644,15 @@ set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 ## libmp static library
 
 set(MP_HEADERS
-    src/mp/command.h
-    src/mp/commandutil.h
-    src/mp/game.h
-    src/mp/types.h)
+    src/experimental/mp/command.h
+    src/experimental/mp/commandutil.h
+    src/experimental/mp/game.h
+    src/experimental/mp/types.h)
 
 set(MP_SOURCES
-    src/mp/command.cpp
-    src/mp/commandutil.cpp
-    src/mp/game.cpp)
+    src/experimental/mp/command.cpp
+    src/experimental/mp/commandutil.cpp
+    src/experimental/mp/game.cpp)
 
 add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})
 set_target_properties(libmp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
