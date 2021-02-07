@@ -163,8 +163,6 @@ set(RENDER_HEADERS
     src/render/mesh/mesh.h
     src/render/mesh/modelmesh.h
     src/render/model/animation.h
-    src/render/model/gr2file.h
-    src/render/model/jbafile.h
     src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelnode.h
@@ -200,8 +198,6 @@ set(RENDER_SOURCES
     src/render/mesh/mesh.cpp
     src/render/mesh/modelmesh.cpp
     src/render/model/animation.cpp
-    src/render/model/gr2file.cpp
-    src/render/model/jbafile.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
     src/render/model/modelnode.cpp
@@ -220,6 +216,21 @@ add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})
 set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 ## END librender static library
+
+## libtor static library
+
+set(TOR_HEADERS
+    src/tor/gr2file.h
+    src/tor/jbafile.h)
+
+set(TOR_SOURCES
+    src/tor/gr2file.cpp
+    src/tor/jbafile.cpp)
+
+add_library(libtor STATIC ${TOR_HEADERS} ${TOR_SOURCES})
+set_target_properties(libtor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+## END libtor static library
 
 ## libaudio static library
 
@@ -665,7 +676,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libmp libnet libgame libscript libgui libscene libvideo librender libaudio libresource libcommon
+    libmp libnet libgame libscript libgui libscene libvideo libaudio libtor librender libresource libcommon
     libs3tc
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW

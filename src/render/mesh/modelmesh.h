@@ -27,7 +27,6 @@ namespace reone {
 
 namespace render {
 
-class Gr2File;
 class MdlFile;
 
 /**
@@ -36,7 +35,7 @@ class MdlFile;
  * @see reone::render::ModelNode
  * @see reone::render::Texture
  */
-class ModelMesh : public Mesh {
+class ModelMesh {
 public:
     struct UVAnimation {
         bool animated { false };
@@ -46,7 +45,10 @@ public:
         float jitterSpeed { 0.0f };
     };
 
-    ModelMesh(bool render, int transparency, bool shadow);
+    ModelMesh(const std::shared_ptr<Mesh> &mesh, bool render, int transparency, bool shadow);
+
+    void initGL();
+    void deinitGL();
 
     void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
 
@@ -55,7 +57,7 @@ public:
 
     bool isTransparent() const;
     bool isBackgroundGeometry() const { return _backgroundGeometry; }
-    bool isBumpmapFromTOR() const { return _bumpmapFromTOR; }
+    bool isBumpmapSwizzled() const { return _bumpmapSwizzled; }
 
     bool hasDiffuseTexture() const { return static_cast<bool>(_diffuse); }
     bool hasEnvmapTexture() const { return static_cast<bool>(_envmap); }
@@ -63,6 +65,7 @@ public:
     bool hasBumpyShinyTexture() const { return static_cast<bool>(_bumpyShiny); }
     bool hasBumpmapTexture() const { return static_cast<bool>(_bumpmap); }
 
+    std::shared_ptr<Mesh> mesh() const { return _mesh; }
     int transparency() const { return _transparency; }
     const glm::vec3 &diffuseColor() const { return _diffuseColor; }
     const glm::vec3 &ambientColor() const { return _ambientColor; }
@@ -71,7 +74,13 @@ public:
     const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
     const std::shared_ptr<Texture> &bumpmapTexture() const { return _bumpmap; }
 
+    void setDiffuseTexture(const std::shared_ptr<Texture> &texture);
+    void setBumpmapTexture(const std::shared_ptr<Texture> &texture, bool swizzled = false);
+    void setDiffuseColor(glm::vec3 color);
+    void setAmbientColor(glm::vec3 color);
+
 private:
+    std::shared_ptr<Mesh> _mesh;
     bool _render;
     int _transparency;
     bool _shadow;
@@ -80,7 +89,7 @@ private:
     glm::vec3 _diffuseColor { 1.0f };
     glm::vec3 _ambientColor { 0.0f };
     UVAnimation _uvAnimation;
-    bool _bumpmapFromTOR { false }; /**< SWTOR normal maps require special handling by the shader */
+    bool _bumpmapSwizzled { false };
 
     // Textures
 
@@ -93,7 +102,6 @@ private:
     // END Textures
 
     friend class MdlFile;
-    friend class Gr2File;
 };
 
 } // namespace render

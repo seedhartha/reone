@@ -76,11 +76,7 @@ Quad &Quad::getXYFlipped() {
     return quad;
 }
 
-Quad::Quad(vector<float> &&vertices) {
-    _vertexCount = 4;
-    _vertices = move(vertices);
-    _indices = g_indices;
-    _offsets = g_offsets;
+Quad::Quad(vector<float> &&vertices) : Mesh(4, move(vertices), g_indices, g_offsets) {
 }
 
 } // namespace render

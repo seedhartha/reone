@@ -56,11 +56,7 @@ AABBMesh &AABBMesh::instance() {
     return mesh;
 }
 
-AABBMesh::AABBMesh() {
-    _vertexCount = 8;
-    _vertices = g_vertices;
-    _indices = g_indices;
-    _offsets = g_offsets;
+AABBMesh::AABBMesh() : Mesh(8, move(g_vertices), move(g_indices), move(g_offsets)) {
 }
 
 void AABBMesh::render(const AABB &aabb, const glm::mat4 &transform) const {

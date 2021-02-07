@@ -41,11 +41,7 @@ BillboardMesh &BillboardMesh::instance() {
     return mesh;
 }
 
-BillboardMesh::BillboardMesh() {
-    _vertexCount = 4;
-    _vertices = move(g_vertices);
-    _indices = move(g_indices);
-    _offsets = move(g_offsets);
+BillboardMesh::BillboardMesh() : Mesh(4, move(g_vertices), move(g_indices), move(g_offsets)) {
 }
 
 } // namespace render

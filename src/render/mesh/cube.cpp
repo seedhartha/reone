@@ -54,11 +54,7 @@ CubeMesh &CubeMesh::instance() {
     return mesh;
 }
 
-CubeMesh::CubeMesh() {
-    _vertexCount = 8;
-    _vertices = move(g_vertices);
-    _indices = move(g_indices);
-    _offsets = move(g_offsets);
+CubeMesh::CubeMesh() : Mesh(8, move(g_vertices), move(g_indices), move(g_offsets)) {
 }
 
 void CubeMesh::render(const glm::mat4 &transform) const {

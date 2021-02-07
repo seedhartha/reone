@@ -129,7 +129,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             locals.bumpmap.scaling = bumpmapTexture->features().bumpMapScaling;
             locals.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
             locals.bumpmap.frame = _bumpmapFrame;
-            locals.bumpmap.fromTOR = mesh->isBumpmapFromTOR();
+            locals.bumpmap.swizzled = mesh->isBumpmapSwizzled();
         }
 
         bool receivesShadows =

@@ -53,6 +53,8 @@ public:
     void initGL();
     void deinitGL();
 
+    void computeAABB();
+
     void renderLines() const;
     void renderTriangles() const;
 
@@ -67,9 +69,6 @@ protected:
     uint32_t _indexBufferId { 0 };
     uint32_t _vertexArrayId { 0 };
 
-    Mesh() = default;
-
-    void computeAABB();
     void render(uint32_t mode, int count, int offset) const;
 
 private:

@@ -17,6 +17,8 @@
 
 #include "modelmesh.h"
 
+#include <stdexcept>
+
 #include "GL/glew.h"
 
 #include "SDL2/SDL_opengl.h"
@@ -29,10 +31,23 @@ namespace reone {
 
 namespace render {
 
-ModelMesh::ModelMesh(bool render, int transparency, bool shadow) :
+ModelMesh::ModelMesh(const shared_ptr<Mesh> &mesh, bool render, int transparency, bool shadow) :
+    _mesh(mesh),
     _render(render),
     _transparency(transparency),
     _shadow(shadow) {
+
+    if (!mesh) {
+        throw invalid_argument("mesh must not be null");
+    }
+}
+
+void ModelMesh::initGL() {
+    _mesh->initGL();
+}
+
+void ModelMesh::deinitGL() {
+    _mesh->deinitGL();
 }
 
 void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
@@ -62,9 +77,9 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
     }
 
     if (additive) {
-        withAdditiveBlending([this]() { Mesh::renderTriangles(); });
+        withAdditiveBlending([this]() { _mesh->renderTriangles(); });
     } else {
-        Mesh::renderTriangles();
+        _mesh->renderTriangles();
     }
 }
 
@@ -80,6 +95,23 @@ bool ModelMesh::isTransparent() const {
     if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
 
     return true;
+}
+
+void ModelMesh::setDiffuseTexture(const shared_ptr<Texture> &texture) {
+    _diffuse = texture;
+}
+
+void ModelMesh::setBumpmapTexture(const shared_ptr<Texture> &texture, bool swizzled) {
+    _bumpmap = texture;
+    _bumpmapSwizzled = swizzled;
+}
+
+void ModelMesh::setDiffuseColor(glm::vec3 color) {
+    _diffuseColor = move(color);
+}
+
+void ModelMesh::setAmbientColor(glm::vec3 color) {
+    _ambientColor = move(color);
 }
 
 } // namespace render

@@ -108,7 +108,7 @@ layout(std140) uniform Bumpmap {
     uniform float uBumpmapScaling;
     uniform vec2 uBumpmapGridSize;
     uniform int uBumpmapFrame;
-    uniform bool uBumpmapFromTOR;
+    uniform bool uBumpmapSwizzled;
 };
 )END";
 
@@ -371,7 +371,7 @@ void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
 
     } else {
         vec4 bumpmapSample = texture(uBumpmap, uv);
-        if (uBumpmapFromTOR) {
+        if (uBumpmapSwizzled) {
             normal = vec3(bumpmapSample.a, bumpmapSample.g, 1.0);
         } else {
             normal = vec3(bumpmapSample.r, bumpmapSample.g, bumpmapSample.b);
