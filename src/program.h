@@ -20,8 +20,8 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include "experimental/mp/types.h"
 #include "game/options.h"
-#include "mp/types.h"
 
 namespace reone {
 

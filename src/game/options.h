@@ -20,7 +20,7 @@
 #include <string>
 
 #include "../audio/types.h"
-#include "../net/types.h"
+#include "../experimental/net/types.h"
 #include "../render/types.h"
 
 namespace reone {

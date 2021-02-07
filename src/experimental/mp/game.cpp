@@ -17,7 +17,7 @@
 
 #include "game.h"
 
-#include "../common/log.h"
+#include "../../common/log.h"
 
 #include "commandutil.h"
 

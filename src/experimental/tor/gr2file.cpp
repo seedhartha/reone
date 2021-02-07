@@ -24,11 +24,10 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../common/log.h"
-#include "../common/streamutil.h"
-#include "../render/models.h"
-#include "../render/textures.h"
-#include "../resource/resources.h"
+#include "../../common/log.h"
+#include "../../common/streamutil.h"
+#include "../../render/textures.h"
+#include "../../resource/resources.h"
 
 #include "jbafile.h"
 

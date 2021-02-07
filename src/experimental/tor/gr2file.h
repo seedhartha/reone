@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../render/model/model.h"
-#include "../resource/format/binfile.h"
+#include "../../render/model/model.h"
+#include "../../resource/format/binfile.h"
 
 namespace reone {
 

@@ -26,7 +26,7 @@
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
-#include "../../net/types.h"
+#include "../../experimental/net/types.h"
 #include "../../render/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"

@@ -17,13 +17,10 @@
 
 #include "jbafile.h"
 
-#include <algorithm>
-#include <stack>
-
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../common/log.h"
-#include "../render/model/model.h"
+#include "../../common/log.h"
+#include "../../render/model/model.h"
 
 using namespace std;
 
