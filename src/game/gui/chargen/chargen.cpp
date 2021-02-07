@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 #include "../../../gui/scenebuilder.h"
-#include "../../../render/models.h"
+#include "../../../render/model/models.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"

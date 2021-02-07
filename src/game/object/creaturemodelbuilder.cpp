@@ -23,7 +23,7 @@
 #include <boost/format.hpp>
 
 #include "../../common/streamutil.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"

@@ -27,7 +27,7 @@
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
 #include "../../experimental/net/types.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"

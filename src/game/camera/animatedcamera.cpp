@@ -21,7 +21,7 @@
 
 #include <boost/format.hpp>
 
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
 
 using namespace std;

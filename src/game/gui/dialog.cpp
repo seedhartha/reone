@@ -31,7 +31,7 @@
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 #include "../../script/execution.h"

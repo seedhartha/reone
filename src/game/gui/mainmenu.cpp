@@ -23,7 +23,7 @@
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
 
 #include "../blueprint/blueprints.h"

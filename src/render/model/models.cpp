@@ -17,10 +17,10 @@
 
 #include "models.h"
 
-#include "../common/streamutil.h"
-#include "../resource/resources.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
-#include "model/mdlfile.h"
+#include "../model/mdlfile.h"
 
 using namespace std;
 
