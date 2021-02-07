@@ -42,9 +42,11 @@ namespace reone {
 
 namespace tor {
 
-Gr2File::Gr2File(string resRef) :
+Gr2File::Gr2File(string resRef, vector<shared_ptr<Animation>> animations, shared_ptr<Model> skeleton) :
     BinaryFile(4, "GAWB"),
-    _resRef(move(resRef)) {
+    _resRef(move(resRef)),
+    _animations(move(animations)),
+    _skeleton(move(skeleton)) {
 }
 
 void Gr2File::doLoad() {
@@ -75,6 +77,7 @@ void Gr2File::doLoad() {
     loadMeshes();
     loadSkeletonBones();
     loadAttachments();
+    loadModel();
 }
 
 void Gr2File::loadMeshes() {
@@ -365,6 +368,136 @@ unique_ptr<Gr2File::Attachment> Gr2File::readAttachment() {
     attachment->transform = glm::make_mat4(&transformValues[0]);
 
     return move(attachment);
+}
+
+static glm::mat4 getModelMatrix() {
+    glm::mat4 transform(1.0f);
+    transform *= glm::mat4_cast(glm::angleAxis(glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f)));
+    transform *= glm::mat4_cast(glm::angleAxis(glm::half_pi<float>(), glm::vec3(1.0f, 0.0, 0.0f)));
+    transform = glm::scale(transform, glm::vec3(10.0f));
+    return move(transform);
+}
+
+void Gr2File::loadModel() {
+    shared_ptr<ModelNode> rootNode;
+    int nodeIndex = 0;
+
+    if (_fileType == FileType::Skeleton) {
+        rootNode = make_shared<ModelNode>(nodeIndex++);
+        rootNode->setName(_resRef + "_root");
+        rootNode->setAbsoluteTransform(getModelMatrix());
+
+        // Convert bones to model nodes
+        vector<shared_ptr<ModelNode>> nodes;
+        for (uint16_t i = 0; i < _numBones; ++i) {
+            auto node = make_shared<ModelNode>(nodeIndex);
+            node->setNodeNumber(nodeIndex);
+            node->setName(_bones[i]->name);
+            node->setAbsoluteTransform(rootNode->absoluteTransform() * glm::inverse(_bones[i]->rootToBone));
+            nodes.push_back(move(node));
+            ++nodeIndex;
+        }
+
+        // Reparent model nodes
+        for (uint16_t i = 0; i < _numBones; ++i) {
+            if (_bones[i]->parentIndex == 0xffffffff) {
+                rootNode->addChild(nodes[i]);
+            } else {
+                nodes[_bones[i]->parentIndex]->addChild(nodes[i]);
+            }
+        }
+
+    } else {
+        // If skeleton is present, use it as the base
+        if (_skeleton) {
+            rootNode = _skeleton->rootNode();
+            nodeIndex = _skeleton->maxNodeIndex() + 1;
+        } else {
+            rootNode = make_shared<ModelNode>(nodeIndex++);
+            rootNode->setName(_resRef + "_root");
+            rootNode->setAbsoluteTransform(getModelMatrix());
+        }
+
+        // Convert meshes to model nodes
+        for (uint16_t i = 0; i < _numMeshes; ++i) {
+            auto node = make_shared<ModelNode>(nodeIndex);
+            node->setNodeNumber(nodeIndex);
+            node->setName(_meshes[i]->header.name);
+            node->setMesh(_meshes[i]->mesh);
+
+            // If skeleton is present configure the model node skin
+            if (_skeleton) {
+                auto skin = make_shared<ModelNode::Skin>();
+                for (uint16_t j = 0; j < _meshes[i]->header.numUsedBones; ++j) {
+                    auto boneNode = _skeleton->findNodeByName(_meshes[i]->bones[j]->name);
+                    skin->nodeIdxByBoneIdx.insert(make_pair(j, boneNode->index()));
+                }
+                node->setSkin(move(skin));
+            }
+
+            node->setAbsoluteTransform(rootNode->absoluteTransform());
+            rootNode->addChild(move(node));
+            ++nodeIndex;
+        }
+    }
+
+    rootNode->computeLocalTransforms();
+
+    _model = make_shared<Model>(_resRef, Model::Classification::Character, move(rootNode), _animations);
+}
+
+static string getSkeletonByModel(const string &modelResRef) {
+    if (boost::starts_with(modelResRef, "rancor_rancor_")) return "rancor_skeleton";
+
+    return "";
+}
+
+static vector<string> getAnimationsBySkeleton(const string &skeletonResRef) {
+    vector<string> result;
+    if (skeletonResRef == "rancor_skeleton") {
+        result.push_back("dl_roar");
+    }
+    return move(result);
+}
+
+shared_ptr<Model> Gr2ModelLoader::loadModel(GameID gameId, const string &resRef) {
+    shared_ptr<Model> skeletonModel;
+    vector<shared_ptr<Animation>> animations;
+
+    string skeletonResRef(getSkeletonByModel(resRef));
+    if (!skeletonResRef.empty()) {
+        shared_ptr<ByteArray> skeletonData(Resources::instance().get(skeletonResRef, ResourceType::Gr2));
+        if (skeletonData) {
+            Gr2File skeleton(skeletonResRef, vector<shared_ptr<Animation>>());
+            skeleton.load(wrap(skeletonData));
+            skeletonModel = skeleton.model();
+        }
+
+        vector<string> animationResRefs(getAnimationsBySkeleton(skeletonResRef));
+        for (auto &animResRef : animationResRefs) {
+            shared_ptr<ByteArray> jbaData(Resources::instance().get(animResRef, ResourceType::Jba));
+            if (jbaData) {
+                JbaFile jba(animResRef, skeletonModel);
+                jba.load(wrap(jbaData));
+                shared_ptr<Animation> animation(jba.animation());
+                if (animation) {
+                    // DEBUG: currently we only add a single animation and rename it to "cpause1"
+                    animation->setName("cpause1");
+                    animations.push_back(move(animation));
+                    break;
+                }
+            }
+        }
+    }
+
+    shared_ptr<ByteArray> geometryData(Resources::instance().get(resRef, ResourceType::Gr2));
+    if (geometryData) {
+        Gr2File geometry(resRef, move(animations), move(skeletonModel));
+        geometry.load(wrap(geometryData));
+        return geometry.model();
+    }
+
+    return nullptr;
 }
 
 } // namespace tor

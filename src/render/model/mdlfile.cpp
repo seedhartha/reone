@@ -22,6 +22,7 @@
 #include "glm/ext.hpp"
 
 #include "../../common/log.h"
+#include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
 #include "../model/models.h"
@@ -988,6 +989,17 @@ void MdlFile::readEmitter(ModelNode &node) {
     node._emitter->_renderOrder = readUint16();
 
     ignore(30);
+}
+
+shared_ptr<Model> MdlModelLoader::loadModel(GameID gameId, const string &resRef) {
+    shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
+    shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
+    if (mdlData && mdxData) {
+        MdlFile mdl(gameId);
+        mdl.load(wrap(mdlData), wrap(mdxData));
+        return mdl.model();
+    }
+    return nullptr;
 }
 
 } // namespace render

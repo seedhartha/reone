@@ -284,12 +284,11 @@ private:
     void changeScreen(GameScreen screen);
     void updateVideo(float dt);
     void updateMusic();
+    void registerModelLoaders();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
-
-    // END Initialization
 
     // Loading
 

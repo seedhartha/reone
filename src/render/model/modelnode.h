@@ -71,6 +71,12 @@ public:
     void initGL();
 
     /**
+     * Adds the specified node to the list of this nodes children. Also sets the
+     * specified nodes parent pointer to this node.
+     */
+    void addChild(std::shared_ptr<ModelNode> node);
+
+    /**
      * Recursively computes the local transform, position and orientation of
      * this node and its children. Absolute transform must be set prior to
      * calling this method.
@@ -82,6 +88,9 @@ public:
      * children. Local transform must be set prior to calling this method.
      */
     void computeAbsoluteTransforms();
+
+    void addPositionKeyframe(PositionKeyframe keyframe);
+    void addOrientationKeyframe(OrientationKeyframe keyframe);
 
     bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
 
@@ -112,6 +121,10 @@ public:
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
     void setName(std::string name);
+    void setNodeNumber(uint16_t nodeNumber);
+    void setAbsoluteTransform(glm::mat4 transform);
+    void setMesh(std::shared_ptr<ModelMesh> mesh);
+    void setSkin(std::shared_ptr<Skin> skin);
 
 private:
     int _index { 0 };

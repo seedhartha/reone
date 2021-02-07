@@ -39,6 +39,11 @@ void ModelNode::initGL() {
     }
 }
 
+void ModelNode::addChild(shared_ptr<ModelNode> child) {
+    child->_parent = this;
+    _children.push_back(move(child));
+}
+
 void ModelNode::computeLocalTransforms() {
     if (_parent) {
         _localTransform = glm::inverse(_parent->_absTransform) * _absTransform;
@@ -69,6 +74,14 @@ void ModelNode::computeAbsoluteTransforms() {
     for (auto &child : _children) {
         child->computeAbsoluteTransforms();
     }
+}
+
+void ModelNode::addPositionKeyframe(PositionKeyframe keyframe) {
+    _positionFrames.push_back(move(keyframe));
+}
+
+void ModelNode::addOrientationKeyframe(OrientationKeyframe keyframe) {
+    _orientationFrames.push_back(move(keyframe));
 }
 
 bool ModelNode::getPosition(float time, glm::vec3 &position, float scale) const {
@@ -155,6 +168,23 @@ const glm::vec3 &ModelNode::getCenterOfAABB() const {
 
 void ModelNode::setName(string name) {
     _name = move(name);
+}
+
+void ModelNode::setNodeNumber(uint16_t nodeNumber) {
+    _nodeNumber = nodeNumber;
+}
+
+void ModelNode::setAbsoluteTransform(glm::mat4 transform) {
+    _absTransform = move(transform);
+    _absTransformInv = glm::inverse(_absTransform);
+}
+
+void ModelNode::setMesh(shared_ptr<ModelMesh> mesh) {
+    _mesh = move(mesh);
+}
+
+void ModelNode::setSkin(shared_ptr<Skin> skin) {
+    _skin = move(skin);
 }
 
 } // namespace render

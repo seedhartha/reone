@@ -65,10 +65,11 @@ public:
 
     Classification classification() const { return _classification; }
     const std::string &name() const { return _name; }
-    ModelNode &rootNode() const { return *_rootNode; }
+    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     float animationScale() const { return _animationScale; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
+    int maxNodeIndex() { return _maxNodeIndex; }
 
     void setAnimationScale(float scale);
 

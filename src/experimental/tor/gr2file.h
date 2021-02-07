@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../render/model/model.h"
+#include "../../render/model/modelloader.h"
 #include "../../resource/format/binfile.h"
 
 namespace reone {
@@ -35,7 +36,17 @@ public:
         Skeleton = 2
     };
 
-    Gr2File(std::string resRef);
+    /**
+     * @param resRef ResRef of the model
+     * @param animations list of animations to pass to the loaded model
+     * @param skeleton the skeleton model to append to the loaded model
+     */
+    Gr2File(
+        std::string resRef,
+        std::vector<std::shared_ptr<render::Animation>> animations,
+        std::shared_ptr<render::Model> skeleton = nullptr);
+
+    std::shared_ptr<render::Model> model() const { return _model; }
 
 private:
     struct MeshHeader {
@@ -84,6 +95,8 @@ private:
     };
 
     std::string _resRef;
+    std::vector<std::shared_ptr<render::Animation>> _animations;
+    std::shared_ptr<render::Model> _skeleton;
 
     FileType _fileType { FileType::Geometry };
     uint16_t _numMeshes { 0 };
@@ -99,6 +112,7 @@ private:
     std::vector<std::shared_ptr<SkeletonBone>> _bones;
     std::vector<std::string> _materials;
     std::vector<std::shared_ptr<Attachment>> _attachments;
+    std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
 
@@ -106,6 +120,7 @@ private:
     void loadMaterials();
     void loadSkeletonBones();
     void loadAttachments();
+    void loadModel();
 
     std::unique_ptr<Gr2Mesh> readMesh();
     std::unique_ptr<MeshPiece> readMeshPiece();
@@ -113,6 +128,11 @@ private:
     std::unique_ptr<MeshBone> readMeshBone();
     std::unique_ptr<SkeletonBone> readSkeletonBone();
     std::unique_ptr<Attachment> readAttachment();
+};
+
+class Gr2ModelLoader : public render::IModelLoader {
+public:
+    std::shared_ptr<render::Model> loadModel(resource::GameID gameId, const std::string &resRef) override;
 };
 
 } // namespace tor

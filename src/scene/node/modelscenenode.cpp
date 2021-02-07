@@ -85,7 +85,7 @@ static bool validateEmitter(const Emitter &emitter) {
 }
 
 void ModelSceneNode::initModelNodes() {
-    shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(_model->rootNode()));
+    shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(*_model->rootNode()));
     addChild(rootNode);
 
     stack<ModelNodeSceneNode *> nodes;

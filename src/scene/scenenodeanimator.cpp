@@ -91,8 +91,8 @@ void SceneNodeAnimator::update(float dt) {
 
     // Apply animation transforms to the managed scene node
     _absTransforms.clear();
-    updateAbsoluteTransforms(_modelSceneNode->model()->rootNode());
-    applyAnimationTransforms(_modelSceneNode->model()->rootNode());
+    updateAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
+    applyAnimationTransforms(*_modelSceneNode->model()->rootNode());
 }
 
 void SceneNodeAnimator::updateChannel(int channel, float dt) {

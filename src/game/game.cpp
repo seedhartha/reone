@@ -25,6 +25,8 @@
 #include "../common/jobs.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
+#include "../experimental/tor/gr2file.h"
+#include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
 #include "../render/textures.h"
 #include "../render/walkmeshes.h"
@@ -47,6 +49,7 @@ using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+using namespace reone::tor;
 using namespace reone::video;
 
 namespace fs = boost::filesystem;
@@ -100,7 +103,10 @@ void Game::init() {
 
     Resources::instance().init(_gameId, _path);
     Cursors::instance().init(_gameId);
+
     Models::instance().init(_gameId);
+    registerModelLoaders();
+
     Textures::instance().init(_gameId);
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
@@ -109,6 +115,11 @@ void Game::init() {
     setCursorType(CursorType::Default);
 
     _console.load();
+}
+
+void Game::registerModelLoaders() {
+    Models::instance().registerLoader(ResourceType::Mdl, make_shared<MdlModelLoader>());
+    Models::instance().registerLoader(ResourceType::Gr2, make_shared<Gr2ModelLoader>());
 }
 
 void Game::setCursorType(CursorType type) {

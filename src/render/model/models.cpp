@@ -17,6 +17,7 @@
 
 #include "models.h"
 
+#include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
@@ -43,30 +44,30 @@ void Models::invalidateCache() {
     _cache.clear();
 }
 
-shared_ptr<Model> Models::get(const string &resRef) {
+void Models::registerLoader(ResourceType type, shared_ptr<IModelLoader> loader) {
+    _loaders.insert(make_pair(type, move(loader)));
+}
+
+shared_ptr<Model> Models::get(const string &resRef, ResourceType type) {
     auto maybeModel = _cache.find(resRef);
     if (maybeModel != _cache.end()) {
         return maybeModel->second;
     }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
+    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, type)));
 
     return inserted.first->second;
 }
 
-shared_ptr<Model> Models::doGet(const string &resRef) {
-    shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
-    shared_ptr<Model> model;
-
-    if (mdlData && mdxData) {
-        MdlFile mdl(_gameId);
-        mdl.load(wrap(mdlData), wrap(mdxData));
-        model = mdl.model();
+shared_ptr<Model> Models::doGet(const string &resRef, ResourceType type) {
+    auto maybeLoader = _loaders.find(type);
+    if (maybeLoader == _loaders.end()) {
+        warn("Models: model loader not found by ResType: " + to_string(static_cast<int>(type)));
+        return nullptr;
     }
+    shared_ptr<Model> model(maybeLoader->second->loadModel(_gameId, resRef));
     if (model) {
         model->initGL();
     }
-
     return move(model);
 }
 

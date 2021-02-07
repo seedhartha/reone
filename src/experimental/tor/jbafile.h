@@ -20,6 +20,8 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
 
+#include "../../render/model/animation.h"
+#include "../../render/model/model.h"
 #include "../../resource/format/binfile.h"
 
 namespace reone {
@@ -28,7 +30,9 @@ namespace tor {
 
 class JbaFile : public resource::BinaryFile {
 public:
-    JbaFile(const std::string &resRef);
+    JbaFile(const std::string &resRef, std::shared_ptr<render::Model> skeleton);
+
+    std::shared_ptr<render::Animation> animation() const { return _animation; }
 
 private:
     struct JbaKeyframe {
@@ -43,15 +47,16 @@ private:
     };
 
     struct JbaBone {
-        glm::vec3 minTranslation { 0.0f };
-        glm::vec3 maxTranslation { 0.0f };
-        glm::quat minOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
-        glm::quat maxOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
+        glm::vec3 translationStride { 0.0f };
+        glm::vec3 translationBase { 0.0f };
+        glm::vec3 orientationStride { 0.0f };
+        glm::vec3 orientationBase { 0.0f };
         uint32_t index { 0 };
         std::string name;
     };
 
     std::string _resRef;
+    std::shared_ptr<render::Model> _skeleton;
 
     float _length { 0.0f };
     float _fps { 0 };
@@ -59,14 +64,15 @@ private:
     uint32_t _numKeyframes { 0 };
     uint32_t _numBones { 0 };
 
-    glm::vec3 _maxTranslation { 0.0f };
-    glm::vec3 _minTranslation { 0.0f };
-    glm::quat _maxOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    glm::quat _minOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::vec3 _translationStride { 0.0f };
+    glm::vec3 _translationBase { 0.0f };
+    glm::vec3 _orientationStride { 0.0f };
+    glm::vec3 _orientationBase { 0.0f };
 
     std::vector<JbaPart> _parts;
     std::vector<JbaKeyframe> _keyframes;
     std::vector<JbaBone> _bones;
+    std::shared_ptr<render::Animation> _animation;
 
     void doLoad();
 
@@ -76,10 +82,9 @@ private:
     void loadPartData();
     void loadKeyframes();
     void loadBones();
+    void loadAnimation();
 
     std::vector<std::vector<JbaKeyframe>> readPartKeyframes();
-
-    int getPartByKeyframe(int keyframeIdx) const;
 };
 
 } // namespace tor

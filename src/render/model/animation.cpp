@@ -63,6 +63,10 @@ shared_ptr<ModelNode> Animation::findNode(const string &name) const {
     return it != _nodeByName.end() ? it->second : nullptr;
 }
 
+void Animation::setName(string name) {
+    _name = move(name);
+}
+
 } // namespace render
 
 } // namespace reone

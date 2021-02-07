@@ -237,7 +237,7 @@ void Creature::updateModelAnimation() {
             } else {
                 shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getPauseAnimation()));
                 if (anim) {
-                    model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
+                    model->playAnimation(anim, AnimationFlags::loop /* AnimationFlags::loopBlend */, 1.0f, model->model()->animationScale());
                     if (_headModel) {
                         _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
                     }
