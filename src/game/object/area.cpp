@@ -734,7 +734,6 @@ void Area::fill(SceneGraph &sceneGraph) {
             sceneGraph.addRoot(sceneNode);
         }
     }
-    sceneGraph.build();
 }
 
 glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {

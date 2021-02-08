@@ -200,9 +200,8 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     mesh->render(diffuseTexture);
 }
 
-float ModelNodeSceneNode::distanceTo(const glm::vec3 &point) const {
-    glm::vec3 origin(_absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f));
-    return glm::distance(origin, point);
+glm::vec3 ModelNodeSceneNode::getOrigin() const {
+    return _absoluteTransform * glm::vec4(_modelNode->getCenterOfAABB(), 1.0f);
 }
 
 void ModelNodeSceneNode::setBoneTransform(const glm::mat4 &transform) {

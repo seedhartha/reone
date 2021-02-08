@@ -18,7 +18,6 @@
 #pragma once
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <vector>
 
@@ -45,11 +44,14 @@ public:
     void renderNoGlobalUniforms(bool shadowPass) const;
 
     void clear();
-
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
-    void build();
+    /**
+     * Prepares this scene graph for rendering the next frame. Meshes, lights
+     * and particles are extracted from the root scene nodes and sorted by
+     * distance to camera. Lighting sources are selected for each model.
+     */
     void prepareFrame();
 
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
@@ -77,6 +79,7 @@ public:
 
 private:
     render::GraphicsOptions _opts;
+
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
@@ -95,6 +98,7 @@ private:
     SceneGraph &operator=(const SceneGraph &) = delete;
 
     void refreshNodeLists();
+    void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
     void refreshShadowLight();
 };
 

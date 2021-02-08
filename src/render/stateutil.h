@@ -29,10 +29,10 @@ namespace reone {
 
 namespace render {
 
-void withDepthTest(const std::function<void()> &block);
-void withAdditiveBlending(const std::function<void()> &block);
 void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
 void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+void withDepthTest(const std::function<void()> &block);
+void withAdditiveBlending(const std::function<void()> &block);
 void withWireframes(const std::function<void()> &block);
 
 void setActiveTextureUnit(int n);

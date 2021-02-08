@@ -38,7 +38,8 @@ public:
     virtual void render() const;
     virtual void renderSingle(bool shadowPass) const;
 
-    virtual float distanceTo(const glm::vec3 &point) const;
+    virtual glm::vec3 getOrigin() const;
+    float distanceTo(const glm::vec3 &point) const;
 
     bool isVisible() const { return _visible; }
     virtual bool isTransparent() const { return _transparent; }
