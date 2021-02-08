@@ -31,12 +31,7 @@ namespace reone {
 
 namespace render {
 
-ModelMesh::ModelMesh(const shared_ptr<Mesh> &mesh, bool render, int transparency, bool shadow) :
-    _mesh(mesh),
-    _render(render),
-    _transparency(transparency),
-    _shadow(shadow) {
-
+ModelMesh::ModelMesh(const shared_ptr<Mesh> &mesh) : _mesh(mesh) {
     if (!mesh) {
         throw invalid_argument("mesh must not be null");
     }
@@ -95,6 +90,22 @@ bool ModelMesh::isTransparent() const {
     if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
 
     return true;
+}
+
+void ModelMesh::setRender(bool render) {
+    _render = render;
+}
+
+void ModelMesh::setTransparency(int transparency) {
+    _transparency = transparency;
+}
+
+void ModelMesh::setShadow(bool shadow) {
+    _shadow = shadow;
+}
+
+void ModelMesh::setBackgroundGeometry(bool background) {
+    _backgroundGeometry = background;
 }
 
 void ModelMesh::setDiffuseTexture(const shared_ptr<Texture> &texture) {

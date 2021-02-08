@@ -42,7 +42,7 @@ namespace game {
 
 // This is a hook to replace MDL models with GR2 models (SWTOR).
 static const unordered_map<string, string> g_gr2Models {
-    { "c_rancors", "rancor_rancor_a01" }
+    //{ "c_rancors", "rancor_rancor_a01" }
 };
 
 static const string g_headHookNode("headhook");

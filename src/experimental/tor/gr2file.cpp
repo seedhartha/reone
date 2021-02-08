@@ -42,6 +42,8 @@ namespace reone {
 
 namespace tor {
 
+static bool g_debugSkeleton = false;
+
 Gr2File::Gr2File(string resRef, vector<shared_ptr<Animation>> animations, shared_ptr<Model> skeleton) :
     BinaryFile(4, "GAWB"),
     _resRef(move(resRef)),
@@ -258,7 +260,9 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
     auto simpleMesh = make_unique<Mesh>(mesh.header.numVertices, move(vertices), move(indices), move(offsets));
     simpleMesh->computeAABB();
 
-    auto modelMesh = make_unique<ModelMesh>(move(simpleMesh), true, 0, true);
+    auto modelMesh = make_unique<ModelMesh>(move(simpleMesh));
+    modelMesh->setRender(true);
+    modelMesh->setShadow(true);
     modelMesh->setDiffuseColor(glm::vec3(0.8f));
     modelMesh->setAmbientColor(glm::vec3(0.2f));
 
@@ -378,7 +382,33 @@ static glm::mat4 getModelMatrix() {
     return move(transform);
 }
 
+static shared_ptr<Mesh> getBoneMesh() {
+    vector<float> vertices {
+        -0.005f, -0.005f, -0.005f,
+        -0.005f, -0.005f,  0.005f,
+        -0.005f,  0.005f,  0.005f,
+        -0.005f,  0.005f, -0.005f,
+         0.005f,  0.005f,  0.005f,
+         0.005f,  0.005f, -0.005f,
+         0.005f, -0.005f, -0.005f,
+         0.005f, -0.005f,  0.005f
+    };
+    vector<uint16_t> indices {
+        0, 1, 2, 2, 3, 0,
+        2, 4, 5, 5, 3, 2,
+        1, 7, 4, 4, 2, 1,
+        0, 6, 7, 7, 1, 0,
+        7, 6, 5, 5, 4, 7,
+        6, 0, 3, 3, 5, 6
+    };
+    Mesh::VertexOffsets offsets { 0, -1, -1, -1, -1, -1, -1, -1, 3 * sizeof(float) };
+
+    return make_shared<Mesh>(8, move(vertices), move(indices), move(offsets));
+}
+
 void Gr2File::loadModel() {
+    static shared_ptr<Mesh> boneMesh(getBoneMesh());
+
     shared_ptr<ModelNode> rootNode;
     int nodeIndex = 0;
 
@@ -387,12 +417,22 @@ void Gr2File::loadModel() {
         rootNode->setName(_resRef + "_root");
         rootNode->setAbsoluteTransform(getModelMatrix());
 
+        shared_ptr<ModelMesh> modelMesh;
+        if (g_debugSkeleton) {
+            modelMesh = make_shared<ModelMesh>(boneMesh);
+            modelMesh->setRender(true);
+            modelMesh->setAmbientColor(glm::vec3(1.0f));
+            modelMesh->setDiffuseColor(glm::vec3(0.0f));
+            modelMesh->setDiffuseTexture(Textures::instance().get("redfill", TextureType::GUI));
+        }
+
         // Convert bones to model nodes
         vector<shared_ptr<ModelNode>> nodes;
         for (uint16_t i = 0; i < _numBones; ++i) {
             auto node = make_shared<ModelNode>(nodeIndex);
             node->setNodeNumber(nodeIndex);
             node->setName(_bones[i]->name);
+            node->setMesh(modelMesh);
             node->setAbsoluteTransform(rootNode->absoluteTransform() * glm::inverse(_bones[i]->rootToBone));
             nodes.push_back(move(node));
             ++nodeIndex;

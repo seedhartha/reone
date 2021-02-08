@@ -45,7 +45,7 @@ public:
         float jitterSpeed { 0.0f };
     };
 
-    ModelMesh(const std::shared_ptr<Mesh> &mesh, bool render, int transparency, bool shadow);
+    ModelMesh(const std::shared_ptr<Mesh> &mesh);
 
     void initGL();
     void deinitGL();
@@ -74,6 +74,10 @@ public:
     const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
     const std::shared_ptr<Texture> &bumpmapTexture() const { return _bumpmap; }
 
+    void setRender(bool render);
+    void setTransparency(int transparency);
+    void setShadow(bool shadow);
+    void setBackgroundGeometry(bool background);
     void setDiffuseTexture(const std::shared_ptr<Texture> &texture);
     void setBumpmapTexture(const std::shared_ptr<Texture> &texture, bool swizzled = false);
     void setDiffuseColor(glm::vec3 color);
@@ -81,10 +85,10 @@ public:
 
 private:
     std::shared_ptr<Mesh> _mesh;
-    bool _render;
-    int _transparency;
-    bool _shadow;
 
+    bool _render { false };
+    int _transparency { 0 };
+    bool _shadow { false };
     bool _backgroundGeometry { false };
     glm::vec3 _diffuseColor { 1.0f };
     glm::vec3 _ambientColor { 0.0f };

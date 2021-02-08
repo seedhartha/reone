@@ -796,10 +796,13 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     auto mesh = make_unique<Mesh>(vertexCount, move(vertices), move(indices), move(offsets));
     mesh->computeAABB();
 
-    auto modelMesh = make_unique<ModelMesh>(move(mesh), render, transparency, shadow);
-    modelMesh->_backgroundGeometry = backgroundGeometry != 0;
-    modelMesh->_diffuseColor = glm::make_vec3(&diffuseColor[0]);
-    modelMesh->_ambientColor = glm::make_vec3(&ambientColor[0]);
+    auto modelMesh = make_unique<ModelMesh>(move(mesh));
+    modelMesh->setRender(render);
+    modelMesh->setTransparency(transparency);
+    modelMesh->setShadow(shadow);
+    modelMesh->setBackgroundGeometry(backgroundGeometry != 0);
+    modelMesh->setDiffuseColor(glm::make_vec3(&diffuseColor[0]));
+    modelMesh->setAmbientColor(glm::make_vec3(&ambientColor[0]));
 
     if (!diffuse.empty() && diffuse != "null") {
         modelMesh->_diffuse = Textures::instance().get(diffuse, TextureType::Diffuse);
