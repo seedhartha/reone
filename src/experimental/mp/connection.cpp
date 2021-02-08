@@ -28,7 +28,7 @@ using boost::asio::ip::tcp;
 
 namespace reone {
 
-namespace net {
+namespace mp {
 
 Connection::Connection(shared_ptr<tcp::socket> &socket) : _socket(move(socket)) {
 }
@@ -164,6 +164,6 @@ void Connection::setOnCommandReceived(const function<void(const ByteArray &)> &f
     _onCommandReceived = fn;
 }
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone

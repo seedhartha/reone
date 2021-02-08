@@ -17,28 +17,45 @@
 
 #pragma once
 
-#include <cstdint>
+#include <string>
+#include <thread>
+
+#include <boost/asio/io_service.hpp>
 
 #include "../../common/types.h"
 
+#include "connection.h"
+#include "command.h"
+
 namespace reone {
 
-namespace net {
+namespace mp {
 
-class Command {
+class Client {
 public:
-    Command() = default;
-    Command(uint32_t id);
-    virtual ~Command() = default;
+    Client() = default;
+    ~Client();
 
-    virtual ByteArray getBytes() const = 0;
+    void start(const std::string &address, int port);
+    void stop();
 
-    uint32_t id() const { return _id; }
+    void send(const std::shared_ptr<Command> &command);
 
-protected:
-    uint32_t _id { 0 };
+    void setOnCommandReceived(const std::function<void(const ByteArray &)> &fn);
+
+private:
+    boost::asio::io_service _service;
+    std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
+    std::thread _thread;
+    std::shared_ptr<Connection> _connection;
+    std::function<void(const ByteArray &)> _onCommandReceived;
+
+    Client(const Client &) = delete;
+    Client &operator=(const Client &) = delete;
+
+    void handleConnect(const boost::system::error_code &ec);
 };
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone

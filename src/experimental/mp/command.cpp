@@ -90,7 +90,7 @@ static float getFloat(const ByteArray &arr, int &offset) {
     return val;
 }
 
-Command::Command(uint32_t id, CommandType type) : net::Command(id), _type(type) {
+Command::Command(uint32_t id, CommandType type) : _id(id), _type(type) {
 }
 
 void Command::load(const ByteArray &data) {

@@ -25,7 +25,6 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::game;
-using namespace reone::net;
 using namespace reone::resource;
 
 namespace fs = boost::filesystem;
@@ -87,15 +86,15 @@ void MultiplayerGame::processCommands() {
     }
 }
 
-unique_ptr<net::Command> MultiplayerGame::newCommand(CommandType type) {
+unique_ptr<Command> MultiplayerGame::newCommand(CommandType type) {
     return make_unique<Command>(_cmdCounter++, type);
 }
 
-void MultiplayerGame::send(const string &client, const shared_ptr<net::Command> &command) {
+void MultiplayerGame::send(const string &client, const shared_ptr<Command> &command) {
     _server->send(client, command);
 }
 
-void MultiplayerGame::send(const shared_ptr<net::Command> &command) {
+void MultiplayerGame::send(const shared_ptr<Command> &command) {
     switch (_mode) {
         case MultiplayerMode::Server:
             _server->sendToAll(command);

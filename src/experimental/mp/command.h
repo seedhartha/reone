@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "../net/command.h"
+#include <cstdint>
+
+#include "../../common/types.h"
 
 namespace reone {
 
@@ -27,18 +29,20 @@ enum class CommandType {
     None
 };
 
-class Command : public net::Command {
+class Command {
 public:
     Command() = default;
     Command(uint32_t id, CommandType type);
 
     void load(const ByteArray &data);
 
-    ByteArray getBytes() const override;
+    virtual ByteArray getBytes() const;
 
+    uint32_t id() const { return _id; }
     CommandType type() const { return _type; }
 
 private:
+    uint32_t _id { 0 };
     CommandType _type { CommandType::None };
 };
 

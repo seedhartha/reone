@@ -27,6 +27,11 @@ enum class MultiplayerMode {
     Client
 };
 
+struct NetworkOptions {
+    std::string host;
+    int port { 0 };
+};
+
 } // namespace mp
 
 } // namespace reone

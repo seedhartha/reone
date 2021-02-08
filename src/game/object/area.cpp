@@ -50,7 +50,6 @@ using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
