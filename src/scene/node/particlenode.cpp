@@ -149,7 +149,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     if (lighten) {
         withAdditiveBlending([]() { BillboardMesh::instance().renderTriangles(); });
     } else {
-        BillboardMesh::instance().renderTriangles();
+        withSrcAlphaOneBlending([]() { BillboardMesh::instance().renderTriangles(); });
     }
 }
 

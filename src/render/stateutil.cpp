@@ -54,19 +54,6 @@ void withDepthTest(const function<void()> &block) {
     glDisable(GL_DEPTH_TEST);
 }
 
-void withAdditiveBlending(const function<void()> &block) {
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
-    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-    glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-    glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    block();
-
-    glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
-}
-
 void withWireframes(const function<void()> &block) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     block();
@@ -75,6 +62,27 @@ void withWireframes(const function<void()> &block) {
 
 void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
+}
+
+static void withBlending(GLenum sfactor, GLenum dfactor, const function<void()> &block) {
+    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
+    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
+    glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
+    glBlendFunc(sfactor, dfactor);
+
+    block();
+
+    glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+}
+
+void withAdditiveBlending(const function<void()> &block) {
+    withBlending(GL_ONE, GL_ONE, block);
+}
+
+void withSrcAlphaOneBlending(const function<void()> &block) {
+    withBlending(GL_SRC_ALPHA, GL_ONE, block);
 }
 
 } // namespace render
