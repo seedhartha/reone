@@ -30,7 +30,7 @@
 
 namespace reone {
 
-namespace net {
+namespace mp {
 
 typedef std::map<std::string, std::unique_ptr<Connection>> ServerClients;
 
@@ -76,6 +76,6 @@ private:
     void stopClient(const std::string &tag);
 };
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone

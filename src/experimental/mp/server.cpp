@@ -30,7 +30,7 @@ using boost::asio::ip::tcp;
 
 namespace reone {
 
-namespace net {
+namespace mp {
 
 void Server::start(int port) {
     info("Starting TCP server on port: " + to_string(port));
@@ -140,6 +140,6 @@ void Server::setOnCommandReceived(const function<void(const string &, const Byte
     _onCommandReceived = fn;
 }
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone

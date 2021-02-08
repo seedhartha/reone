@@ -623,38 +623,25 @@ set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY
 
 ## END libgame static library
 
-## libnet static library
-
-set(NET_HEADERS
-    src/experimental/net/client.h
-    src/experimental/net/connection.h
-    src/experimental/net/command.h
-    src/experimental/net/server.h
-    src/experimental/net/types.h)
-
-set(NET_SOURCES
-    src/experimental/net/client.cpp
-    src/experimental/net/connection.cpp
-    src/experimental/net/command.cpp
-    src/experimental/net/server.cpp)
-
-add_library(libnet STATIC ${NET_HEADERS} ${NET_SOURCES})
-set_target_properties(libnet PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-## END libnet static library
-
 ## libmp static library
 
 set(MP_HEADERS
+    src/experimental/mp/client.h
     src/experimental/mp/command.h
     src/experimental/mp/commandutil.h
+    src/experimental/mp/connection.h
     src/experimental/mp/game.h
+    src/experimental/mp/server.h
     src/experimental/mp/types.h)
 
 set(MP_SOURCES
+    src/experimental/mp/client.cpp
+    src/experimental/mp/command.cpp
     src/experimental/mp/command.cpp
     src/experimental/mp/commandutil.cpp
-    src/experimental/mp/game.cpp)
+    src/experimental/mp/connection.cpp
+    src/experimental/mp/game.cpp
+    src/experimental/mp/server.cpp)
 
 add_library(libmp STATIC ${MP_HEADERS} ${MP_SOURCES})
 set_target_properties(libmp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -678,7 +665,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libmp libnet libgame libscript libgui libscene libvideo libaudio libtor librender libresource libcommon
+    libmp libgame libscript libgui libscene libvideo libaudio libtor librender libresource libcommon
     libs3tc
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW

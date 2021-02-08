@@ -22,10 +22,9 @@
 #include "../../game/game.h"
 #include "../../game/options.h"
 
-#include "../net/client.h"
-#include "../net/server.h"
-
+#include "client.h"
 #include "command.h"
+#include "server.h"
 #include "types.h"
 
 namespace reone {
@@ -41,8 +40,8 @@ public:
 
 private:
     MultiplayerMode _mode { MultiplayerMode::Server };
-    std::unique_ptr<net::Server> _server;
-    std::unique_ptr<net::Client> _client;
+    std::unique_ptr<Server> _server;
+    std::unique_ptr<Client> _client;
     uint32_t _cmdCounter { 0 };
 
     // Commands
@@ -56,9 +55,9 @@ private:
     void update() override;
 
     void processCommands();
-    std::unique_ptr<net::Command> newCommand(CommandType type);
-    void send(const std::shared_ptr<net::Command> &command);
-    void send(const std::string &client, const std::shared_ptr<net::Command> &command);
+    std::unique_ptr<Command> newCommand(CommandType type);
+    void send(const std::shared_ptr<Command> &command);
+    void send(const std::string &client, const std::shared_ptr<Command> &command);
 
     // Event handlers
 

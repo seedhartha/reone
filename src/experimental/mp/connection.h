@@ -32,7 +32,7 @@
 
 namespace reone {
 
-namespace net {
+namespace mp {
 
 class Connection {
 public:
@@ -78,6 +78,6 @@ private:
     void handleWrite(uint32_t commandId, std::shared_ptr<boost::asio::streambuf> &buffer, const boost::system::error_code &ec);
 };
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone

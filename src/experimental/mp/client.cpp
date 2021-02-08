@@ -30,7 +30,7 @@ using boost::asio::ip::tcp;
 
 namespace reone {
 
-namespace net {
+namespace mp {
 
 void Client::start(const string &address, int port) {
     tcp::endpoint endpoint(ip::make_address(address), port);
@@ -85,6 +85,6 @@ void Client::setOnCommandReceived(const function<void(const ByteArray &)> &fn) {
     _onCommandReceived = fn;
 }
 
-} // namespace net
+} // namespace mp
 
 } // namespace reone
