@@ -174,7 +174,7 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
             glCompressedTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, size, pixels);
             break;
         case PixelFormat::Depth:
-            glTexImage2D(target, level, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+            glTexImage2D(target, level, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, pixels);
             break;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
