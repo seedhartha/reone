@@ -64,8 +64,12 @@ void SceneNode::render() const {
 void SceneNode::renderSingle(bool shadowPass) const {
 }
 
+glm::vec3 SceneNode::getOrigin() const {
+    return glm::vec3(_absoluteTransform[3]);
+}
+
 float SceneNode::distanceTo(const glm::vec3 &point) const {
-    return glm::distance(glm::vec3(_absoluteTransform[3]), point);
+    return glm::distance(getOrigin(), point);
 }
 
 void SceneNode::setParent(const SceneNode *parent) {

@@ -43,9 +43,9 @@ public:
     bool shouldRender() const;
     bool shouldCastShadows() const;
 
-    bool isTransparent() const override;
+    glm::vec3 getOrigin() const override;
 
-    float distanceTo(const glm::vec3 &point) const override;
+    bool isTransparent() const override;
 
     const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
     render::ModelNode *modelNode() const { return _modelNode; }

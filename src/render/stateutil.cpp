@@ -27,25 +27,6 @@ namespace reone {
 
 namespace render {
 
-void withDepthTest(const function<void()> &block) {
-    glEnable(GL_DEPTH_TEST);
-    block();
-    glDisable(GL_DEPTH_TEST);
-}
-
-void withAdditiveBlending(const function<void()> &block) {
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
-    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-    glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-    glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    block();
-
-    glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
-}
-
 void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     int oldViewport[4];
     glGetIntegerv(GL_VIEWPORT, &oldViewport[0]);
@@ -65,6 +46,25 @@ void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     block();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void withDepthTest(const function<void()> &block) {
+    glEnable(GL_DEPTH_TEST);
+    block();
+    glDisable(GL_DEPTH_TEST);
+}
+
+void withAdditiveBlending(const function<void()> &block) {
+    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
+    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
+    glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    block();
+
+    glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
 }
 
 void withWireframes(const function<void()> &block) {

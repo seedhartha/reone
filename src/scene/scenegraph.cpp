@@ -18,7 +18,6 @@
 #include "scenegraph.h"
 
 #include <algorithm>
-#include <stack>
 
 #include "../render/mesh/quad.h"
 
@@ -50,13 +49,10 @@ void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
-    auto maybeRoot = find_if(_roots.begin(), _roots.end(), [&node](auto &n) { return n.get() == node.get(); });
+    auto maybeRoot = find(_roots.begin(), _roots.end(), node);
     if (maybeRoot != _roots.end()) {
         _roots.erase(maybeRoot);
     }
-}
-
-void SceneGraph::build() {
 }
 
 void SceneGraph::prepareFrame() {
@@ -113,46 +109,46 @@ void SceneGraph::refreshNodeLists() {
     _particles.clear();
 
     for (auto &root : _roots) {
-        stack<SceneNode *> nodes;
-        nodes.push(root.get());
+        refreshFromSceneNode(root);
+    }
+}
 
-        while (!nodes.empty()) {
-            SceneNode *node = nodes.top();
-            nodes.pop();
+void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
+    auto model = dynamic_pointer_cast<ModelSceneNode>(node);
+    if (model) {
+        // Skip the model and its children if it is not currently visible
+        if (!model->isVisible() || !model->isOnScreen()) return;
 
-            ModelSceneNode *model = dynamic_cast<ModelSceneNode *>(node);
-            if (model) {
-                if (!model->isVisible() || !model->isOnScreen()) continue;
-
-            } else {
-                ModelNodeSceneNode *modelNode = dynamic_cast<ModelNodeSceneNode *>(node);
-                if (modelNode) {
-                    if (modelNode->shouldRender()) {
-                        if (modelNode->isTransparent()) {
-                            _transparentMeshes.push_back(modelNode);
-                        } else {
-                            _opaqueMeshes.push_back(modelNode);
-                        }
-                    }
-                    if (modelNode->shouldCastShadows()) {
-                        _shadowMeshes.push_back(modelNode);
-                    }
+    } else {
+        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(node);
+        if (modelNode) {
+            // For model nodes, determine whether they should be rendered and cast shadows
+            if (modelNode->shouldRender()) {
+                // Sort model nodes into transparent and opaque
+                if (modelNode->isTransparent()) {
+                    _transparentMeshes.push_back(modelNode.get());
                 } else {
-                    LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
-                    if (light) {
-                        _lights.push_back(light);
-                    } else if (g_emittersEnabled) {
-                        auto particle = dynamic_cast<ParticleSceneNode *>(node);
-                        if (particle && _activeCamera->isInFrustum(particle->absoluteTransform()[3])) {
-                            _particles.push_back(particle);
-                        }
-                    }
+                    _opaqueMeshes.push_back(modelNode.get());
                 }
             }
-            for (auto &child : node->children()) {
-                nodes.push(child.get());
+            if (modelNode->shouldCastShadows()) {
+                _shadowMeshes.push_back(modelNode.get());
+            }
+        } else {
+            auto light = dynamic_pointer_cast<LightSceneNode>(node);
+            if (light) {
+                _lights.push_back(light.get());
+            } else if (g_emittersEnabled) {
+                auto particle = dynamic_pointer_cast<ParticleSceneNode>(node);
+                if (particle && _activeCamera->isInFrustum(particle->absoluteTransform()[3])) {
+                    _particles.push_back(particle.get());
+                }
             }
         }
+    }
+
+    for (auto &child : node->children()) {
+        refreshFromSceneNode(child);
     }
 }
 
