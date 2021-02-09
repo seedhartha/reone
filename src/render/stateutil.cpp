@@ -27,10 +27,15 @@ namespace reone {
 
 namespace render {
 
+void withWireframes(const function<void()> &block) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    block();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     int oldViewport[4];
     glGetIntegerv(GL_VIEWPORT, &oldViewport[0]);
-
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
     block();
@@ -54,16 +59,6 @@ void withDepthTest(const function<void()> &block) {
     glDisable(GL_DEPTH_TEST);
 }
 
-void withWireframes(const function<void()> &block) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    block();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-void setActiveTextureUnit(int n) {
-    glActiveTexture(GL_TEXTURE0 + n);
-}
-
 static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
@@ -79,6 +74,10 @@ static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlp
 
 void withAdditiveBlending(const function<void()> &block) {
     withBlending(GL_ONE, GL_ONE, GL_ONE, GL_ONE, block);
+}
+
+void setActiveTextureUnit(int n) {
+    glActiveTexture(GL_TEXTURE0 + n);
 }
 
 } // namespace render
