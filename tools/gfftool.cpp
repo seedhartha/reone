@@ -35,7 +35,7 @@ namespace reone {
 
 namespace tools {
 
-void GffTool::convert(const fs::path &path, const fs::path &destPath) const {
+void GffTool::toJson(const fs::path &path, const fs::path &destPath) const {
     GffFile gff;
     gff.load(path);
 

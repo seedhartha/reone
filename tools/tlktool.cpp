@@ -32,7 +32,7 @@ namespace reone {
 
 namespace tools {
 
-void TlkTool::convert(const fs::path &path, const fs::path &destPath) const {
+void TlkTool::toJson(const fs::path &path, const fs::path &destPath) const {
     pt::ptree tree;
     pt::ptree children;
 

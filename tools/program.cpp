@@ -50,7 +50,8 @@ int Program::run() {
     switch (_command) {
         case Command::List:
         case Command::Extract:
-        case Command::Convert:
+        case Command::ToJson:
+        case Command::ToTga:
             initFileTool();
             switch (_command) {
                 case Command::List:
@@ -59,8 +60,11 @@ int Program::run() {
                 case Command::Extract:
                     _tool->extract(_target, _keyPath, _destPath);
                     break;
-                case Command::Convert:
-                    _tool->convert(_target, _destPath);
+                case Command::ToJson:
+                    _tool->toJson(_target, _destPath);
+                    break;
+                case Command::ToTga:
+                    _tool->toTga(_target, _destPath);
                     break;
                 default:
                     break;
@@ -86,7 +90,8 @@ void Program::initOptions() {
         ("help", "print this message")
         ("list", "list file contents")
         ("extract", "extract file contents")
-        ("convert", "convert 2DA or GFF file to JSON")
+        ("to-json", "convert 2DA, GFF or TLK file to JSON")
+        ("to-tga", "convert TPC image to TGA")
         ("modprobe", "probe module and produce a JSON file describing it")
         ("target", po::value<string>(), "target name or path to input file");
 }
@@ -130,8 +135,10 @@ void Program::loadOptions() {
         _command = Command::List;
     } else if (vars.count("extract")) {
         _command = Command::Extract;
-    } else if (vars.count("convert")) {
-        _command = Command::Convert;
+    } else if (vars.count("to-json")) {
+        _command = Command::ToJson;
+    } else if (vars.count("to-tga")) {
+        _command = Command::ToTga;
     } else if (vars.count("modprobe")) {
         _command = Command::ModuleProbe;
     }
@@ -146,7 +153,8 @@ void Program::initFileTool() {
     switch (_command) {
         case Command::List:
         case Command::Extract:
-        case Command::Convert:
+        case Command::ToJson:
+        case Command::ToTga:
             if (!fs::exists(_target)) {
                 throw runtime_error("Input file does not exist: " + _target);
             }

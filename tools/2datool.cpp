@@ -32,7 +32,7 @@ namespace reone {
 
 namespace tools {
 
-void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
+void TwoDaTool::toJson(const fs::path &path, const fs::path &destPath) const {
     TwoDaFile twoDa;
     twoDa.load(path);
 

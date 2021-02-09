@@ -41,15 +41,17 @@ namespace tools {
  * particular file format.
  *
  * Operations:
- * - list — list file contents
- * - extract — extract file contents
- * - convert — convert file to a more practical format, e.g. JSON, TGA
+ * - list - list file contents
+ * - extract - extract file contents
+ * - to-json - convert file to JSON
+ * - to-tga - convert image to TGA
  */
 class FileTool {
 public:
     virtual void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const;
     virtual void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const;
-    virtual void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
+    virtual void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
+    virtual void toTga(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
 
 private:
     void throwNotImplemented() const;
@@ -85,17 +87,17 @@ public:
 
 class TwoDaTool : public FileTool {
 public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
 class TlkTool : public FileTool {
 public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
 class GffTool : public FileTool {
 public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 
 private:
     boost::property_tree::ptree getPropertyTree(const resource::GffStruct &gffs) const;
@@ -103,7 +105,7 @@ private:
 
 class TpcTool : public FileTool {
 public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    void toTga(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
 } // namespace tools
