@@ -305,8 +305,8 @@ void Game::toggleInGameCameraType() {
         case CameraType::ThirdPerson: {
             _module->player().stopMovement();
             shared_ptr<Area> area(_module->area());
-            auto &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
-            auto &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
+            auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
+            auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
             firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
             firstPerson.setFacing(thirdPerson.facing());
             _cameraType = CameraType::FirstPerson;
@@ -776,19 +776,19 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
     switch (event.keysym.sym) {
         case SDLK_MINUS:
-            if (_gameSpeed > 1.0f) {
+            if (_options.developer && _gameSpeed > 1.0f) {
                 _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
             }
             return true;
 
         case SDLK_EQUALS:
-            if (_gameSpeed < 8.0f) {
+            if (_options.developer && _gameSpeed < 8.0f) {
                 _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
             }
             return true;
 
         case SDLK_v:
-            if (_screen == GameScreen::InGame) {
+            if (_options.developer && _screen == GameScreen::InGame) {
                 toggleInGameCameraType();
             }
             return true;
