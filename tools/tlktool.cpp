@@ -32,7 +32,13 @@ namespace reone {
 
 namespace tools {
 
-void TlkTool::toJson(const fs::path &path, const fs::path &destPath) const {
+void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToJSON) {
+        toJSON(target, destPath);
+    }
+}
+
+void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::ptree children;
 
@@ -56,6 +62,13 @@ void TlkTool::toJson(const fs::path &path, const fs::path &destPath) const {
 
     fs::ofstream json(jsonPath);
     pt::write_json(json, tree);
+}
+
+bool TlkTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        target.extension() == ".tlk" &&
+        operation == Operation::ToJSON;
 }
 
 } // namespace tools

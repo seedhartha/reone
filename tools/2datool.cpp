@@ -17,9 +17,8 @@
 
 #include "tools.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
-#include "../src/resource/format/2dafile.h"
 
 using namespace std;
 
@@ -32,7 +31,15 @@ namespace reone {
 
 namespace tools {
 
-void TwoDaTool::toJson(const fs::path &path, const fs::path &destPath) const {
+void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToJSON) {
+        toJSON(target, destPath);
+    } else {
+        to2DA(target, destPath);
+    }
+}
+
+void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
     TwoDaFile twoDa;
     twoDa.load(path);
 
@@ -42,7 +49,7 @@ void TwoDaTool::toJson(const fs::path &path, const fs::path &destPath) const {
     auto &headers = table->headers();
     auto &rows = table->rows();
 
-    for (int i = 0; i < static_cast<int>(rows.size()); ++i) {
+    for (size_t i = 0; i < rows.size(); ++i) {
         pt::ptree child;
         child.put("_id", i);
 
@@ -58,6 +65,40 @@ void TwoDaTool::toJson(const fs::path &path, const fs::path &destPath) const {
 
     fs::ofstream json(jsonPath);
     pt::write_json(json, tree);
+}
+
+void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
+    pt::ptree tree;
+    pt::read_json(path.string(), tree);
+
+    auto table = make_unique<TwoDaTable>();
+
+    for (auto &jsonRow : tree.get_child("rows")) {
+        TwoDaRow row;
+        for (auto &column : jsonRow.second) {
+            // Columns starting with an underscore we consider meta and skip
+            if (boost::starts_with(column.first, "_")) continue;
+
+            row.add(column.first, column.second.data());
+        }
+        table->add(move(row));
+    }
+
+    vector<string> tokens;
+    boost::split(tokens, path.filename().string(), boost::is_any_of("."), boost::token_compress_on);
+
+    fs::path twoDaPath(destPath);
+    twoDaPath.append(tokens[0] + ".2da");
+
+    TwoDaWriter writer(move(table));
+    writer.save(twoDaPath);
+}
+
+bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        (target.extension() == ".2da" || target.extension() == ".json") &&
+        (operation == Operation::ToJSON || operation == Operation::To2DA);
 }
 
 } // namespace tools

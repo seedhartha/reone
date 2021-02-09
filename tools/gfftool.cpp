@@ -17,9 +17,6 @@
 
 #include "tools.h"
 
-#include <iomanip>
-#include <iostream>
-
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../src/resource/format/gfffile.h"
@@ -35,21 +32,13 @@ namespace reone {
 
 namespace tools {
 
-void GffTool::toJson(const fs::path &path, const fs::path &destPath) const {
-    GffFile gff;
-    gff.load(path);
-
-    shared_ptr<GffStruct> gffs(gff.top());
-    pt::ptree tree(getPropertyTree(*gffs));
-
-    fs::path jsonPath(destPath);
-    jsonPath.append(path.filename().string() + ".json");
-
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+void GffTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToJSON) {
+        toJSON(target, destPath);
+    }
 }
 
-pt::ptree GffTool::getPropertyTree(const GffStruct &gffs) const {
+static pt::ptree getPropertyTree(const GffStruct &gffs) {
     pt::ptree tree;
     pt::ptree child;
     pt::ptree children;
@@ -99,6 +88,24 @@ pt::ptree GffTool::getPropertyTree(const GffStruct &gffs) const {
     }
 
     return tree;
+}
+
+void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
+    GffFile gff;
+    gff.load(path);
+
+    shared_ptr<GffStruct> gffs(gff.top());
+    pt::ptree tree(getPropertyTree(*gffs));
+
+    fs::path jsonPath(destPath);
+    jsonPath.append(path.filename().string() + ".json");
+
+    fs::ofstream json(jsonPath);
+    pt::write_json(json, tree);
+}
+
+bool GffTool::supports(Operation operation, const fs::path &target) const {
+    return !fs::is_directory(target) && operation == Operation::ToJSON;
 }
 
 } // namespace tools

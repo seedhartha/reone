@@ -30,7 +30,7 @@ class RimFile : public BinaryFile, public IResourceProvider {
 public:
     struct Resource {
         std::string resRef;
-        ResourceType type { ResourceType::Invalid };
+        ResourceType resType { ResourceType::Invalid };
         uint32_t offset { 0 };
         uint32_t size { 0 };
     };
@@ -38,7 +38,7 @@ public:
     RimFile();
 
     bool supports(ResourceType type) const override;
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType resType) override;
     ByteArray getResourceData(int idx);
 
     const std::vector<Resource> &resources() const { return _resources; }

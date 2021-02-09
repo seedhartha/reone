@@ -40,6 +40,12 @@ namespace reone {
 
 namespace tools {
 
+void TpcTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToTGA) {
+        toTGA(target, destPath);
+    }
+}
+
 static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &data) {
     int layerCount = static_cast<int>(texture.layers().size());
     if (layerCount == 0) {
@@ -124,7 +130,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
     data.flags = TGA_IMAGE_DATA | TGA_RGB;
 }
 
-void TpcTool::toTga(const fs::path &path, const fs::path &destPath) const {
+void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Read TPC
 
     TpcFile tpc("", TextureType::GUI, true);
@@ -159,6 +165,13 @@ void TpcTool::toTga(const fs::path &path, const fs::path &destPath) const {
     // Cleanup
 
     TGAClose(tga);
+}
+
+bool TpcTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        target.extension() == ".tpc" &&
+        operation == Operation::ToTGA;
 }
 
 } // namespace tools
