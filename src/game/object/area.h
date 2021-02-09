@@ -126,6 +126,11 @@ public:
     void setStaticCamera(int cameraId);
     void setThirdPartyCameraStyle(CameraStyleType type);
 
+    template <class T>
+    T &getCamera(CameraType type) {
+        return static_cast<T &>(getCamera(type));
+    };
+
     // END Cameras
 
     // Party

@@ -152,7 +152,7 @@ void DialogGUI::onStart() {
     _currentSpeaker = _owner;
     loadStuntParticipants();
 
-    auto &camera = static_cast<AnimatedCamera &>(_game->module()->area()->getCamera(CameraType::Animated));
+    auto &camera = _game->module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
     camera.setModel(_cameraModel);
 }
 
@@ -237,12 +237,12 @@ void DialogGUI::updateCamera() {
         shared_ptr<Creature> player(_game->party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
-        auto &camera = static_cast<DialogCamera &>(area->getCamera(CameraType::Dialog));
+        auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setListenerPosition(listenerPosition);
         camera.setSpeakerPosition(speakerPosition);
         camera.setVariant(getRandomCameraVariant());
     } else {
-        auto &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
+        auto &camera = area->getCamera<AnimatedCamera>(CameraType::Animated);
         camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
         camera.playAnimation(_currentEntry->cameraAnimation);
     }
@@ -378,7 +378,7 @@ void DialogGUI::update(float dt) {
 
     // Dialog camera follows the current speaker, if any
     if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
-        auto &camera = static_cast<DialogCamera &>(_game->module()->area()->getCamera(CameraType::Dialog));
+        auto &camera = _game->module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
     }
 }
