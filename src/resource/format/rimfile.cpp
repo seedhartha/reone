@@ -60,7 +60,7 @@ RimFile::Resource RimFile::readResource() {
 
     Resource res;
     res.resRef = boost::to_lower_copy(resRef);
-    res.type = static_cast<ResourceType>(type);
+    res.resType = static_cast<ResourceType>(type);
     res.offset = offset;
     res.size = size;
 
@@ -77,7 +77,7 @@ shared_ptr<ByteArray> RimFile::find(const string &resRef, ResourceType type) {
     auto it = find_if(
         _resources.begin(),
         _resources.end(),
-        [&](const Resource &res) { return res.resRef == lcResRef && res.type == type; });
+        [&](const Resource &res) { return res.resRef == lcResRef && res.resType == type; });
 
     if (it == _resources.end()) return nullptr;
 

@@ -17,14 +17,17 @@
 
 #include "program.h"
 
+#include <algorithm>
 #include <iostream>
+#include <unordered_map>
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "../src/common/pathutil.h"
 
-#include "moduleprobe.h"
+#include "tools.h"
+#include "types.h"
 
 using namespace std;
 
@@ -39,6 +42,16 @@ namespace tools {
 
 static const char kConfigFilename[] = "reone-tools.cfg";
 
+static const unordered_map<string, Operation> g_operations {
+    { "list", Operation::List },
+    { "extract", Operation::Extract },
+    { "to-json", Operation::ToJSON },
+    { "to-tga", Operation::ToTGA },
+    { "to-2da", Operation::To2DA },
+    { "to-gff", Operation::ToGFF },
+    { "to-tlk", Operation::ToTLK }
+};
+
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
 
@@ -46,44 +59,21 @@ int Program::run() {
     initOptions();
     loadOptions();
     determineGameID();
+    loadTools();
 
-    switch (_command) {
-        case Command::List:
-        case Command::Extract:
-        case Command::ToJson:
-        case Command::ToTga:
-        case Command::ToTwoDa:
-        case Command::ToGFF:
-            initFileTool();
-            switch (_command) {
-                case Command::List:
-                    _tool->list(_target, _keyPath);
-                    break;
-                case Command::Extract:
-                    _tool->extract(_target, _keyPath, _destPath);
-                    break;
-                case Command::ToJson:
-                    _tool->toJson(_target, _destPath);
-                    break;
-                case Command::ToTga:
-                    _tool->toTga(_target, _destPath);
-                    break;
-                case Command::ToTwoDa:
-                    _tool->to2DA(_target, _destPath);
-                    break;
-                case Command::ToGFF:
-                    _tool->toGFF(_target, _destPath);
-                    break;
-                default:
-                    break;
-            }
-            break;
-        case Command::ModuleProbe:
-            ModuleProbe().probe(_target, _gamePath, _destPath);
-            break;
-        default:
+    switch (_operation) {
+        case Operation::None:
             cout << _cmdLineOpts << endl;
             break;
+        default: {
+            auto tool = getTool();
+            if (tool) {
+                tool->invoke(_operation, _target, _gamePath, _destPath);
+            } else {
+                cout << "Unable to choose a tool for the specified operation" << endl;
+            }
+            break;
+        }
     }
 
     return 0;
@@ -95,14 +85,13 @@ void Program::initOptions() {
         ("dest", po::value<string>(), "path to destination directory");
 
     _cmdLineOpts.add(_commonOpts).add_options()
-        ("help", "print this message")
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("to-json", "convert 2DA, GFF or TLK file to JSON")
         ("to-tga", "convert TPC image to TGA")
         ("to-2da", "convert JSON to 2DA")
         ("to-gff", "convert JSON to GFF")
-        ("modprobe", "probe module and produce a JSON file describing it")
+        ("to-tlk", "convert JSON to TLK")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -137,24 +126,13 @@ void Program::loadOptions() {
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
     _destPath = getDestination(vars);
     _target = vars.count("target") > 0 ? vars["target"].as<string>() : "";
-    _keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
 
-    if (vars.count("help")) {
-        _command = Command::Help;
-    } else if (vars.count("list")) {
-        _command = Command::List;
-    } else if (vars.count("extract")) {
-        _command = Command::Extract;
-    } else if (vars.count("to-json")) {
-        _command = Command::ToJson;
-    } else if (vars.count("to-tga")) {
-        _command = Command::ToTga;
-    } else if (vars.count("to-2da")) {
-        _command = Command::ToTwoDa;
-    } else if (vars.count("to-gff")) {
-        _command = Command::ToGFF;
-    } else if (vars.count("modprobe")) {
-        _command = Command::ModuleProbe;
+    // Determine operation from program options
+    for (auto &operation : g_operations) {
+        if (vars.count(operation.first)) {
+            _operation = operation.second;
+            break;
+        }
     }
 }
 
@@ -163,22 +141,21 @@ void Program::determineGameID() {
     _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
-void Program::initFileTool() {
-    switch (_command) {
-        case Command::List:
-        case Command::Extract:
-        case Command::ToJson:
-        case Command::ToTga:
-        case Command::ToTwoDa:
-        case Command::ToGFF:
-            if (!fs::exists(_target)) {
-                throw runtime_error("Input file does not exist: " + _target);
-            }
-            _tool = getFileToolByPath(_gameId, _target);
-            break;
-        default:
-            throw logic_error("Unsupported file tool command: " + to_string(static_cast<int>(_command)));
+void Program::loadTools() {
+    _tools.push_back(make_shared<KeyBifTool>());
+    _tools.push_back(make_shared<ErfTool>());
+    _tools.push_back(make_shared<RimTool>());
+    _tools.push_back(make_shared<TwoDaTool>());
+    _tools.push_back(make_shared<TlkTool>());
+    _tools.push_back(make_shared<GffTool>());
+    _tools.push_back(make_shared<TpcTool>());
+}
+
+shared_ptr<ITool> Program::getTool() const {
+    for (auto &tool : _tools) {
+        if (tool->supports(_operation, _target)) return tool;
     }
+    return nullptr;
 }
 
 } // namespace tools

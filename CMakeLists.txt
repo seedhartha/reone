@@ -688,23 +688,19 @@ endif()
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
-        tools/moduleprobe.h
         tools/program.h
-        tools/tools.h)
+        tools/tools.h
+        tools/types.h)
 
     set(TOOLS_SOURCES
-        tools/main.cpp
         tools/2datool.cpp
-        tools/biftool.cpp
         tools/erftool.cpp
         tools/gfftool.cpp
-        tools/jsontool.cpp
-        tools/keytool.cpp
-        tools/moduleprobe.cpp
+        tools/keybiftool.cpp
+        tools/main.cpp
         tools/program.cpp
         tools/rimtool.cpp
         tools/tlktool.cpp
-        tools/tools.cpp
         tools/tpctool.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})

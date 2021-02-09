@@ -15,28 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
-
-#include <boost/format.hpp>
-
-#include "../src/common/log.h"
-
-using namespace reone::resource;
-
-namespace fs = boost::filesystem;
+#pragma once
 
 namespace reone {
 
 namespace tools {
 
-void KeyTool::list(const fs::path &path, const fs::path &keyPath) const {
-    KeyFile key;
-    key.load(path);
-
-    for (auto &file : key.files()) {
-        info(file.filename);
-    }
-}
+enum class Operation {
+    None,
+    List,
+    Extract,
+    ToJSON,
+    ToTGA,
+    To2DA,
+    ToGFF,
+    ToTLK
+};
 
 } // namespace tools
 

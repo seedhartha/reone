@@ -23,7 +23,10 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include "../src/resource/types.h"
+
 #include "tools.h"
+#include "types.h"
 
 namespace reone {
 
@@ -36,35 +39,18 @@ public:
     int run();
 
 private:
-    enum class Command {
-        None,
-        Help,
-        List,
-        Extract,
-        ToJson,
-        ToTga,
-        ToTwoDa,
-        ToGFF,
-        ModuleProbe
-    };
+    int _argc;
+    char **_argv;
+
+    boost::program_options::options_description _commonOpts;
+    boost::program_options::options_description _cmdLineOpts { "Usage" };
 
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     std::string _target;
-    boost::filesystem::path _keyPath;
+    Operation _operation { Operation::None };
     resource::GameID _gameId { resource::GameID::KotOR };
-    Command _command { Command::None };
-    std::unique_ptr<FileTool> _tool;
-
-    // Command line arguments
-
-    int _argc { 0 };
-    char **_argv { nullptr };
-
-    // END Command line arguments
-
-    boost::program_options::options_description _commonOpts;
-    boost::program_options::options_description _cmdLineOpts { "Usage" };
+    std::vector<std::shared_ptr<ITool>> _tools;
 
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
@@ -72,7 +58,9 @@ private:
     void initOptions();
     void loadOptions();
     void determineGameID();
-    void initFileTool();
+    void loadTools();
+
+    std::shared_ptr<ITool> getTool() const;
 };
 
 } // namespace tools
