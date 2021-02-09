@@ -49,7 +49,6 @@ public:
     void refreshAABB();
     void signalEvent(const std::string &name);
 
-    bool hasTextureOverride() const { return static_cast<bool>(_textureOverride); }
     bool isOnScreen() const { return _onScreen; }
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;

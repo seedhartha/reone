@@ -45,8 +45,7 @@ void ModelMesh::deinitGL() {
     _mesh->deinitGL();
 }
 
-void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
-    const shared_ptr<Texture> &diffuse = diffuseOverride ? diffuseOverride : _diffuse;
+void ModelMesh::render(shared_ptr<Texture> diffuse) const {
     bool additive = false;
 
     if (diffuse) {
@@ -79,6 +78,7 @@ void ModelMesh::render(const shared_ptr<Texture> &diffuseOverride) const {
 }
 
 bool ModelMesh::isTransparent() const {
+    if (!_diffuse) return false;
     if (_transparency > 0) return true;
 
     TextureFeatures features = _diffuse->features();

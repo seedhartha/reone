@@ -30,10 +30,9 @@ namespace render {
 class MdlFile;
 
 /**
- * Textured mesh, part of a 3D model.
+ * Textured mesh, part of a 3D model node.
  *
  * @see reone::render::ModelNode
- * @see reone::render::Texture
  */
 class ModelMesh {
 public:
@@ -50,7 +49,7 @@ public:
     void initGL();
     void deinitGL();
 
-    void render(const std::shared_ptr<Texture> &diffuseOverride = nullptr) const;
+    void render(std::shared_ptr<Texture> diffuse = nullptr) const;
 
     bool shouldRender() const { return _render; }
     bool shouldCastShadows() const { return _shadow; }
