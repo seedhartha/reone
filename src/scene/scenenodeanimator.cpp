@@ -116,9 +116,9 @@ void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNo
         bool skip = _skipNodes.count(modelNode->name()) > 0;
         if (!skip) {
             float time = isInTransition() ? channel.animation->transitionTime() : channel.time;
-            glm::vec3 animPosition(0.0f);
-            if (animNode.getPosition(time, animPosition, channel.scale)) {
-                position += animPosition;
+            glm::vec3 translation(0.0f);
+            if (animNode.getTranslation(time, translation, channel.scale)) {
+                position += translation;
                 hasTransform = true;
             }
             glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);

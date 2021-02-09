@@ -28,21 +28,22 @@ namespace reone {
 
 namespace render {
 
-class Model;
-
 /**
- * Part of a 3D model, which is a tree-like data structure. Contains
- * position and orientation keyframes, which are used in animation.
- * May have a mesh associated with it.
+ * Node of a 3D model or an animation, which are tree-like data structures.
+ * Model nodes have spatial properties and can have an arbitary number of
+ * children. When part of an animation, model nodes contain translation,
+ * orientation and scale keyframes.
+ *
+ * Model nodes can be specialized to represent meshes, lights, emitters, etc.
  *
  * @see reone::render::Model
- * @see reone::render::ModelMesh
+ * @see reone::render::Animation
  */
 class ModelNode {
 public:
-    struct PositionKeyframe {
+    struct TranslationKeyframe {
         float time { 0.0f };
-        glm::vec3 position { 0.0f };
+        glm::vec3 translation { 0.0f };
     };
 
     struct OrientationKeyframe {
@@ -89,12 +90,12 @@ public:
      */
     void computeAbsoluteTransforms();
 
-    void addPositionKeyframe(PositionKeyframe keyframe);
+    void addTranslationKeyframe(TranslationKeyframe keyframe);
     void addOrientationKeyframe(OrientationKeyframe keyframe);
 
     bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
 
-    bool getPosition(float time, glm::vec3 &position, float scale = 1.0f) const;
+    bool getTranslation(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
     bool getScale(float time, float &scale) const;
 
@@ -132,14 +133,6 @@ private:
     uint16_t _flags { 0 };
     uint16_t _nodeNumber { 0 };
     std::string _name;
-    glm::vec3 _position { 0.0f };
-    glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    glm::mat4 _localTransform { 1.0f };
-    glm::mat4 _absTransform { 1.0f };
-    glm::mat4 _absTransformInv { 1.0f };
-    std::vector<PositionKeyframe> _positionFrames;
-    std::vector<OrientationKeyframe> _orientationFrames;
-    std::vector<ScaleKeyframe> _scaleFrames;
     glm::vec3 _color { 0.0f };
     bool _selfIllumEnabled { false };
     glm::vec3 _selfIllumColor { 0.0f };
@@ -151,6 +144,24 @@ private:
     std::shared_ptr<Skin> _skin;
     std::shared_ptr<Emitter> _emitter;
     std::vector<std::shared_ptr<ModelNode>> _children;
+
+    // Spatial properties
+
+    glm::vec3 _position { 0.0f };
+    glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::mat4 _localTransform { 1.0f };
+    glm::mat4 _absTransform { 1.0f };
+    glm::mat4 _absTransformInv { 1.0f };
+
+    // END Spatial properties
+
+    // Keyframes
+
+    std::vector<TranslationKeyframe> _translationFrames;
+    std::vector<OrientationKeyframe> _orientationFrames;
+    std::vector<ScaleKeyframe> _scaleFrames;
+
+    // END Keyframes
 
     ModelNode(const ModelNode &) = delete;
     ModelNode &operator=(const ModelNode &) = delete;
