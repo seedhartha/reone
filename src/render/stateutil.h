@@ -33,15 +33,9 @@ void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block
 void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 void withDepthTest(const std::function<void()> &block);
 void withWireframes(const std::function<void()> &block);
+void withAdditiveBlending(const std::function<void()> &block);
 
 void setActiveTextureUnit(int n);
-
-// Blending
-
-void withAdditiveBlending(const std::function<void()> &block);
-void withSrcAlphaOneBlending(const std::function<void()> &block);
-
-// END Blending
 
 } // namespace render
 
