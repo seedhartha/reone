@@ -435,7 +435,7 @@ GUI *Game::getScreenGUI() const {
         case GameScreen::CharacterGeneration:
             return _charGen.get();
         case GameScreen::InGame:
-            return _hud.get();
+            return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
         case GameScreen::InGameMenu:
             return _inGame.get();
         case GameScreen::Conversation:
