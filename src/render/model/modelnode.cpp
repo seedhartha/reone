@@ -76,36 +76,36 @@ void ModelNode::computeAbsoluteTransforms() {
     }
 }
 
-void ModelNode::addPositionKeyframe(PositionKeyframe keyframe) {
-    _positionFrames.push_back(move(keyframe));
+void ModelNode::addTranslationKeyframe(TranslationKeyframe keyframe) {
+    _translationFrames.push_back(move(keyframe));
 }
 
 void ModelNode::addOrientationKeyframe(OrientationKeyframe keyframe) {
     _orientationFrames.push_back(move(keyframe));
 }
 
-bool ModelNode::getPosition(float time, glm::vec3 &position, float scale) const {
-    if (_positionFrames.empty()) return false;
+bool ModelNode::getTranslation(float time, glm::vec3 &translation, float scale) const {
+    if (_translationFrames.empty()) return false;
 
-    const PositionKeyframe *left = &_positionFrames.front();
-    const PositionKeyframe *right = left;
+    const TranslationKeyframe *left = &_translationFrames.front();
+    const TranslationKeyframe *right = left;
 
-    for (auto it = _positionFrames.begin(); it != _positionFrames.end(); ++it) {
+    for (auto it = _translationFrames.begin(); it != _translationFrames.end(); ++it) {
         if (it->time >= time) {
             right = &*it;
-            if (it != _positionFrames.begin()) left = &*(it - 1);
+            if (it != _translationFrames.begin()) left = &*(it - 1);
             break;
         }
     }
 
     if (left == right) {
-        position = left->position * scale;
+        translation = left->translation * scale;
         return true;
     }
 
     float factor = (time - left->time) / (right->time - left->time);
 
-    position = glm::mix(left->position, right->position, factor) * scale;
+    translation = glm::mix(left->translation, right->translation, factor) * scale;
 
     return true;
 }

@@ -415,7 +415,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
 
 void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
     bool bezier = columnCount & 16;
-    node._positionFrames.reserve(rowCount);
+    node._translationFrames.reserve(rowCount);
 
     switch (columnCount) {
         case 3:
@@ -424,11 +424,11 @@ void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uin
                 int rowTimeIdx = timeIndex + i;
                 int rowDataIdx = dataIndex + i * (bezier ? 9 : 3);
 
-                ModelNode::PositionKeyframe frame;
+                ModelNode::TranslationKeyframe frame;
                 frame.time = data[rowTimeIdx];
-                frame.position = glm::make_vec3(&data[rowDataIdx]);
+                frame.translation = glm::make_vec3(&data[rowDataIdx]);
 
-                node._positionFrames.push_back(move(frame));
+                node._translationFrames.push_back(move(frame));
             }
             break;
         default:
