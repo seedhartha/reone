@@ -38,14 +38,35 @@ void StreamWriter::putByte(uint8_t val) {
     _stream->put(val);
 }
 
+void StreamWriter::putChar(char val) {
+    _stream->put(val);
+}
+
+void StreamWriter::putUint16(uint16_t val) {
+    put(val);
+}
+
+void StreamWriter::putUint32(uint32_t val) {
+    put(val);
+}
+
 void StreamWriter::putInt64(int64_t val) {
     put(val);
+}
+
+void StreamWriter::putString(const string &str) {
+    int len = strnlen(&str[0], str.length());
+    _stream->write(&str[0], len);
 }
 
 void StreamWriter::putCString(const string &str) {
     int len = strnlen(&str[0], str.length());
     _stream->write(&str[0], len);
     _stream->put('\0');
+}
+
+size_t StreamWriter::tell() const {
+    return _stream->tellp();
 }
 
 } // namespace reone

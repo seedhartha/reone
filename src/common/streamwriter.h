@@ -33,8 +33,14 @@ public:
     StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
 
     void putByte(uint8_t val);
+    void putChar(char val);
+    void putUint16(uint16_t val);
+    void putUint32(uint32_t val);
     void putInt64(int64_t val);
+    void putString(const std::string &str);
     void putCString(const std::string &str);
+
+    size_t tell() const;
 
 private:
     std::shared_ptr<std::ostream> _stream;

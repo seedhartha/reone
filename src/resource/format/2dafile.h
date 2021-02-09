@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "binfile.h"
-
 #include <unordered_map>
+
+#include "../../common/streamwriter.h"
+
+#include "binfile.h"
 
 namespace reone {
 
@@ -33,19 +35,21 @@ public:
     int getInt(const std::string &column) const;
     float getFloat(const std::string &column) const;
 
-    const std::unordered_map<std::string, std::string> &values() const { return _values; }
+    const std::vector<std::pair<std::string, std::string>> &values() const { return _values; }
 
 private:
-    std::unordered_map<std::string, std::string> _values;
+    std::vector<std::pair<std::string, std::string>> _values;
 };
 
 class TwoDaTable {
 public:
     TwoDaTable() = default;
 
-    const TwoDaRow *findRow(const std::function<bool(const TwoDaRow &)> &pred) const;
-    const TwoDaRow *findRowByColumnValue(const std::string &columnName, const std::string &columnValue) const;
-    std::string getString(int row, const std::string &column, std::string defValue = "") const;
+    void add(TwoDaRow row);
+
+    const TwoDaRow *get(const std::function<bool(const TwoDaRow &)> &pred) const;
+    const TwoDaRow *getByColumnValue(const std::string &columnName, const std::string &columnValue) const;
+    const std::string &getString(int row, const std::string &column) const;
     int getInt(int row, const std::string &column, int defValue = 0) const;
     uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
     float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
@@ -79,6 +83,20 @@ private:
     bool readToken(std::string &token);
     void loadLabels();
     void loadRows();
+};
+
+class TwoDaWriter {
+public:
+    TwoDaWriter(const std::shared_ptr<TwoDaTable> &table);
+
+    void save(const boost::filesystem::path &path);
+
+private:
+    std::shared_ptr<TwoDaTable> _table;
+
+    void writeHeaders(StreamWriter &writer);
+    void writeLabels(StreamWriter &writer);
+    void writeData(StreamWriter &writer);
 };
 
 } // namespace resource

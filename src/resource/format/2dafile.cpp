@@ -17,7 +17,9 @@
 
 #include "2dafile.h"
 
+#include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -36,12 +38,16 @@ static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
 void TwoDaRow::add(const string &column, const string &value) {
-    _values.insert(make_pair(column, value));
+    _values.push_back(make_pair(column, value));
 }
 
 const string &TwoDaRow::getString(const string &column) const {
-    auto val = _values.find(column);
-    return val->second;
+    static string empty;
+
+    auto maybeValue = find_if(_values.begin(), _values.end(), [this, &column](auto &pair) {
+        return pair.first == column;
+    });
+    return maybeValue != _values.end() ? maybeValue->second : empty;
 }
 
 int TwoDaRow::getInt(const string &column) const {
@@ -53,12 +59,22 @@ float TwoDaRow::getFloat(const string &column) const {
     return stof(getString(column));
 }
 
-const TwoDaRow *TwoDaTable::findRow(const function<bool(const TwoDaRow &)> &pred) const {
+void TwoDaTable::add(TwoDaRow row) {
+    // If headers are not initialized, initialize them from this row
+    if (_headers.empty()) {
+        for (auto &column : row.values()) {
+            _headers.push_back(column.first);
+        }
+    }
+    _rows.push_back(move(row));
+}
+
+const TwoDaRow *TwoDaTable::get(const function<bool(const TwoDaRow &)> &pred) const {
     auto row = find_if(_rows.begin(), _rows.end(), pred);
     return row != _rows.end() ? &*row : nullptr;
 }
 
-const TwoDaRow *TwoDaTable::findRowByColumnValue(const string &columnName, const string &columnValue) const {
+const TwoDaRow *TwoDaTable::getByColumnValue(const string &columnName, const string &columnValue) const {
     if (find(_headers.begin(), _headers.end(), columnName) == _headers.end()) {
         throw logic_error("2DA: column not found: " + columnName);
     }
@@ -72,7 +88,7 @@ const TwoDaRow *TwoDaTable::findRowByColumnValue(const string &columnName, const
     return nullptr;
 }
 
-string TwoDaTable::getString(int row, const string &column, string defValue) const {
+const string &TwoDaTable::getString(int row, const string &column) const {
     static string empty;
 
     if (row < 0 || row >= _rows.size()) {
@@ -164,7 +180,6 @@ void TwoDaFile::loadRows() {
     int columnCount = static_cast<int>(_table->_headers.size());
     int cellCount = _rowCount * columnCount;
     vector<uint16_t> offsets(cellCount);
-
     for (int i = 0; i < cellCount; ++i) {
         offsets[i] = readUint16();
     }
@@ -174,16 +189,79 @@ void TwoDaFile::loadRows() {
 
     for (int i = 0; i < _rowCount; ++i) {
         TwoDaRow row;
-
         for (int j = 0; j < columnCount; ++j) {
             const string &name = _table->_headers[j];
             int cellIdx = i * columnCount + j;
             size_t off = pos + offsets[cellIdx];
-
             row.add(name, readCStringAt(off));
         }
-
         _table->_rows.push_back(row);
+    }
+}
+
+TwoDaWriter::TwoDaWriter(const shared_ptr<TwoDaTable> &table) : _table(table) {
+    if (!table) {
+        throw invalid_argument("table must not be null");
+    }
+}
+
+void TwoDaWriter::save(const fs::path &path) {
+    auto stream = make_shared<fs::ofstream>(path, ios::binary);
+
+    StreamWriter writer(stream);
+    writer.putString(kSignature);
+    writer.putChar('\n');
+
+    writeHeaders(writer);
+
+    size_t rowCount = _table->rows().size();
+    writer.putUint32(rowCount);
+
+    writeLabels(writer);
+    writeData(writer);
+}
+
+void TwoDaWriter::writeHeaders(StreamWriter &writer) {
+    for (auto &header : _table->headers()) {
+        writer.putString(header);
+        writer.putChar('\t');
+    }
+    writer.putChar('\0');
+}
+
+void TwoDaWriter::writeLabels(StreamWriter &writer) {
+    for (size_t i = 0; i < _table->rows().size(); ++i) {
+        writer.putString(to_string(i));
+        writer.putChar('\t');
+    }
+}
+
+void TwoDaWriter::writeData(StreamWriter &writer) {
+    vector<pair<string, int>> data;
+    int dataSize = 0;
+
+    size_t columnCount = _table->headers().size();
+    size_t cellCount = columnCount * _table->rows().size();
+
+    for (size_t i = 0; i < _table->rows().size(); ++i) {
+        for (size_t j = 0; j < columnCount; ++j) {
+            string value(_table->rows()[i].values()[j].second);
+            auto maybeData = find_if(data.begin(), data.end(), [&](auto &pair) { return pair.first == value; });
+            if (maybeData != data.end()) {
+                writer.putUint16(maybeData->second);
+            } else {
+                data.push_back(make_pair(value, dataSize));
+                writer.putUint16(dataSize);
+                int len = strnlen(&value[0], value.length());
+                dataSize += len + 1ll;
+            }
+        }
+    }
+
+    writer.putUint16(dataSize);
+
+    for (auto &pair : data) {
+        writer.putCString(pair.first);
     }
 }
 

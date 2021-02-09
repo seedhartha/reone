@@ -36,7 +36,7 @@ GUISounds &GUISounds::instance() {
 }
 
 static void loadSound(const TwoDaTable &table, const string &label, shared_ptr<AudioStream> &sound) {
-    const TwoDaRow *maybeRow = table.findRowByColumnValue("label", label);
+    const TwoDaRow *maybeRow = table.getByColumnValue("label", label);
     if (maybeRow) {
         sound = AudioFiles::instance().get(maybeRow->getString("soundresref"));
     }

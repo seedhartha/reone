@@ -52,6 +52,8 @@ int Program::run() {
         case Command::Extract:
         case Command::ToJson:
         case Command::ToTga:
+        case Command::ToTwoDa:
+        case Command::ToGFF:
             initFileTool();
             switch (_command) {
                 case Command::List:
@@ -65,6 +67,12 @@ int Program::run() {
                     break;
                 case Command::ToTga:
                     _tool->toTga(_target, _destPath);
+                    break;
+                case Command::ToTwoDa:
+                    _tool->to2DA(_target, _destPath);
+                    break;
+                case Command::ToGFF:
+                    _tool->toGFF(_target, _destPath);
                     break;
                 default:
                     break;
@@ -92,6 +100,8 @@ void Program::initOptions() {
         ("extract", "extract file contents")
         ("to-json", "convert 2DA, GFF or TLK file to JSON")
         ("to-tga", "convert TPC image to TGA")
+        ("to-2da", "convert JSON to 2DA")
+        ("to-gff", "convert JSON to GFF")
         ("modprobe", "probe module and produce a JSON file describing it")
         ("target", po::value<string>(), "target name or path to input file");
 }
@@ -139,6 +149,10 @@ void Program::loadOptions() {
         _command = Command::ToJson;
     } else if (vars.count("to-tga")) {
         _command = Command::ToTga;
+    } else if (vars.count("to-2da")) {
+        _command = Command::ToTwoDa;
+    } else if (vars.count("to-gff")) {
+        _command = Command::ToGFF;
     } else if (vars.count("modprobe")) {
         _command = Command::ModuleProbe;
     }
@@ -155,6 +169,8 @@ void Program::initFileTool() {
         case Command::Extract:
         case Command::ToJson:
         case Command::ToTga:
+        case Command::ToTwoDa:
+        case Command::ToGFF:
             if (!fs::exists(_target)) {
                 throw runtime_error("Input file does not exist: " + _target);
             }

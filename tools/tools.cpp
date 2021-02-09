@@ -47,6 +47,14 @@ void FileTool::toTga(const fs::path &path, const fs::path &destPath) const {
     throwNotImplemented();
 }
 
+void FileTool::to2DA(const fs::path &path, const fs::path &destPath) const {
+    throwNotImplemented();
+}
+
+void FileTool::toGFF(const fs::path &path, const fs::path &destPath) const {
+    throwNotImplemented();
+}
+
 unique_ptr<FileTool> getFileToolByPath(GameID gameId, const fs::path &path) {
     if (fs::is_directory(path)) {
         throw invalid_argument("path must not point to a directory");
@@ -68,6 +76,8 @@ unique_ptr<FileTool> getFileToolByPath(GameID gameId, const fs::path &path) {
         result =  make_unique<TlkTool>();
     } else if (ext == ".tpc") {
         result = make_unique<TpcTool>();
+    } else if (ext == ".json") {
+        result = make_unique<JsonTool>();
     } else {
         result = make_unique<GffTool>();
     }

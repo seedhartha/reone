@@ -45,6 +45,8 @@ namespace tools {
  * - extract - extract file contents
  * - to-json - convert file to JSON
  * - to-tga - convert image to TGA
+ * - to-2da - convert file to 2DA
+ * - to-gff - convert file to GFF
  */
 class FileTool {
 public:
@@ -52,6 +54,8 @@ public:
     virtual void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const;
     virtual void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
     virtual void toTga(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
+    virtual void to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
+    virtual void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
 
 private:
     void throwNotImplemented() const;
@@ -93,6 +97,12 @@ public:
 class TlkTool : public FileTool {
 public:
     void toJson(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+};
+
+class JsonTool : public FileTool {
+public:
+    void to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
 };
 
 class GffTool : public FileTool {
