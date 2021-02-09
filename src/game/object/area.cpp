@@ -186,7 +186,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
     shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
     _camStyleDefault.load(styleTable->rows().at(styleIdx));
 
-    auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
+    auto combatStyleRow = styleTable->getByColumnValue("name", "Combat");
     if (combatStyleRow) {
         _camStyleCombat.load(*combatStyleRow);
     }

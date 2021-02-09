@@ -35,7 +35,7 @@ string getPortrait(int id) {
 string getPortraitByAppearance(int appearance) {
     shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
 
-    const TwoDaRow *row = table->findRow([&appearance](const TwoDaRow &row) {
+    const TwoDaRow *row = table->get([&appearance](const TwoDaRow &row) {
         int appearanceNumber = row.getInt("appearancenumber");
         int appearanceS = row.getInt("appearance_s");
         int appearanceL = row.getInt("appearance_l");

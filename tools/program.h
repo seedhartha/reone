@@ -43,6 +43,8 @@ private:
         Extract,
         ToJson,
         ToTga,
+        ToTwoDa,
+        ToGFF,
         ModuleProbe
     };
 

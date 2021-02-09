@@ -698,6 +698,7 @@ if(BUILD_TOOLS)
         tools/biftool.cpp
         tools/erftool.cpp
         tools/gfftool.cpp
+        tools/jsontool.cpp
         tools/keytool.cpp
         tools/moduleprobe.cpp
         tools/program.cpp

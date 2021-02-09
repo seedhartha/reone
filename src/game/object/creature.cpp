@@ -155,7 +155,7 @@ void Creature::loadPortrait(int appearance) {
     shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
     string appearanceString(to_string(appearance));
 
-    const TwoDaRow *row = portraits->findRow([&appearanceString](const TwoDaRow &r) {
+    const TwoDaRow *row = portraits->get([&appearanceString](const TwoDaRow &r) {
         return
             r.getString("appearancenumber") == appearanceString ||
             r.getString("appearance_s") == appearanceString ||
