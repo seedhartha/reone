@@ -36,7 +36,6 @@ public:
     MainMenu(Game *game);
 
     void load() override;
-
     void onClick(const std::string &control) override;
 
     void onModuleSelected(const std::string &name);
@@ -47,9 +46,12 @@ private:
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     void configureButtons();
+    void setup3DView();
     void setButtonColors(const std::string &tag);
-    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
     void startModuleSelection();
+    void loadModuleNames();
+
+    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
 };
 
 } // namespace game
