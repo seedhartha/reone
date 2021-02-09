@@ -65,10 +65,10 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
             case GffFieldType::Orientation:
                 values = field.asFloatArray();
                 child.clear();
-                child.put("A", values[0]);
-                child.put("B", values[1]);
-                child.put("C", values[2]);
-                child.put("D", values[3]);
+                child.put("W", values[0]);
+                child.put("X", values[1]);
+                child.put("Y", values[2]);
+                child.put("Z", values[3]);
                 tree.add_child(field.label(), child);
                 break;
 
@@ -100,12 +100,13 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
     fs::path jsonPath(destPath);
     jsonPath.append(path.filename().string() + ".json");
 
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+    pt::write_json(jsonPath.string(), tree);
 }
 
 bool GffTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) && operation == Operation::ToJSON;
+    return
+        !fs::is_directory(target) &&
+        operation == Operation::ToJSON;
 }
 
 } // namespace tools

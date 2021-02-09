@@ -47,9 +47,7 @@ static const unordered_map<string, Operation> g_operations {
     { "extract", Operation::Extract },
     { "to-json", Operation::ToJSON },
     { "to-tga", Operation::ToTGA },
-    { "to-2da", Operation::To2DA },
-    { "to-gff", Operation::ToGFF },
-    { "to-tlk", Operation::ToTLK }
+    { "to-2da", Operation::To2DA }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -91,7 +89,6 @@ void Program::initOptions() {
         ("to-tga", "convert TPC image to TGA")
         ("to-2da", "convert JSON to 2DA")
         ("to-gff", "convert JSON to GFF")
-        ("to-tlk", "convert JSON to TLK")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -142,6 +139,10 @@ void Program::determineGameID() {
 }
 
 void Program::loadTools() {
+    // Tools are queried in the order of addition, whether they support a
+    // particular operation on a particular file, or not. The first tool
+    // to return true gets chosen.
+
     _tools.push_back(make_shared<KeyBifTool>());
     _tools.push_back(make_shared<ErfTool>());
     _tools.push_back(make_shared<RimTool>());

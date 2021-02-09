@@ -63,8 +63,7 @@ void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
     fs::path jsonPath(destPath);
     jsonPath.append(path.filename().string() + ".json");
 
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+    pt::write_json(jsonPath.string(), tree);
 }
 
 void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
@@ -97,8 +96,7 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
 bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
     return
         !fs::is_directory(target) &&
-        (target.extension() == ".2da" || target.extension() == ".json") &&
-        (operation == Operation::ToJSON || operation == Operation::To2DA);
+        ((target.extension() == ".2da" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::To2DA));
 }
 
 } // namespace tools
