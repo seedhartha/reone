@@ -88,7 +88,7 @@ void SceneGraph::prepareFrame() {
     });
 
     // Sort particles
-    unordered_map<SceneNode *, float> particlesZ;
+    unordered_map<ParticleSceneNode *, float> particlesZ;
     for (auto &particle : _particles) {
         glm::vec4 screen(_activeCamera->projection() * _activeCamera->view() * particle->absoluteTransform()[3]);
         screen /= screen.w;

@@ -37,7 +37,7 @@ namespace reone {
 
 namespace tools {
 
-static const char kConfigFilename[] = "reone.cfg";
+static const char kConfigFilename[] = "reone-tools.cfg";
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
@@ -115,7 +115,7 @@ void Program::loadOptions() {
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
     if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts, true), vars);
+        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts), vars);
     }
     po::notify(vars);
 
