@@ -252,6 +252,9 @@ unique_ptr<ModelNode> MdlFile::readNode(uint32_t offset, ModelNode *parent) {
     if (flags & kNodeHasSkin) {
         readSkin(*node);
     }
+    if (flags & kNodeHasSaber) {
+        node->_saber = true;
+    }
 
     for (auto offset : childOffsets) {
         unique_ptr<ModelNode> child(readNode(kMdlDataOffset + offset, node.get()));

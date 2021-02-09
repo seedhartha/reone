@@ -94,6 +94,7 @@ public:
     void addOrientationKeyframe(OrientationKeyframe keyframe);
 
     bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
+    bool isSaber() const { return _saber; }
 
     bool getTranslation(float time, glm::vec3 &position, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
@@ -139,10 +140,13 @@ private:
     float _alpha { 1.0f };
     float _radius { 0.0f };
     float _multiplier { 1.0f };
-    std::shared_ptr<Light> _light;
+    bool _saber { false };
+
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
+    std::shared_ptr<Light> _light;
     std::shared_ptr<Emitter> _emitter;
+
     std::vector<std::shared_ptr<ModelNode>> _children;
 
     // Spatial properties
