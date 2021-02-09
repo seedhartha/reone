@@ -64,13 +64,13 @@ void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
 }
 
-static void withBlending(GLenum sfactor, GLenum dfactor, const function<void()> &block) {
+static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
     glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
     glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
     glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-    glBlendFunc(sfactor, dfactor);
+    glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
 
     block();
 
@@ -78,11 +78,7 @@ static void withBlending(GLenum sfactor, GLenum dfactor, const function<void()> 
 }
 
 void withAdditiveBlending(const function<void()> &block) {
-    withBlending(GL_ONE, GL_ONE, block);
-}
-
-void withSrcAlphaOneBlending(const function<void()> &block) {
-    withBlending(GL_SRC_ALPHA, GL_ONE, block);
+    withBlending(GL_ONE, GL_ONE, GL_ONE, GL_ONE, block);
 }
 
 } // namespace render
