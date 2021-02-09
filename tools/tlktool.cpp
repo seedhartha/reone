@@ -60,8 +60,7 @@ void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
     fs::path jsonPath(destPath);
     jsonPath.append(path.filename().string() + ".json");
 
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+    pt::write_json(jsonPath.string(), tree);
 }
 
 bool TlkTool::supports(Operation operation, const fs::path &target) const {
