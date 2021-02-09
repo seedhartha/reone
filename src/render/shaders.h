@@ -67,6 +67,7 @@ struct GlobalUniforms {
 };
 
 struct GeneralUniforms {
+    int diffuseEnabled { false };
     int lightmapEnabled { false };
     int envmapEnabled { false };
     int bumpyShinyEnabled { false };
@@ -79,6 +80,7 @@ struct GeneralUniforms {
     int discardEnabled { false };
     int shadowsEnabled { false };
     int billboardEnabled { false };
+    char padding[12];
 
     glm::mat4 model { 1.0f };
     glm::vec4 color { 1.0f };

@@ -56,6 +56,7 @@ struct Light {
 };
 
 layout(std140) uniform General {
+    bool uDiffuseEnabled;
     bool uLightmapEnabled;
     bool uEnvmapEnabled;
     bool uBumpyShinyEnabled;
@@ -450,23 +451,29 @@ float getShadowValue() {
 
 void main() {
     vec2 uv = fragTexCoords + uUvOffset;
-    vec4 diffuseSample = texture(uDiffuse, uv);
-    vec3 surfaceColor = diffuseSample.rgb;
     vec3 normal = normalize(fragNormal);
+    vec4 diffuseSample;
+    vec3 surfaceColor;
 
-    if (uBumpmapEnabled) {
-        applyBumpmapToNormal(normal, uv);
+    if (uDiffuseEnabled) {
+        diffuseSample = texture(uDiffuse, uv);
+        surfaceColor = diffuseSample.rgb;
+        if (uBumpmapEnabled) {
+            applyBumpmapToNormal(normal, uv);
+        }
+    } else {
+        surfaceColor = vec3(1.0);
     }
-
     if (uLightmapEnabled) {
         applyLightmap(surfaceColor, uWater ? 0.2 : 1.0);
     }
-
-    float envmapAlpha = 1.0;
-    if (uEnvmapEnabled) {
-        applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
-    } else if (uBumpyShinyEnabled) {
-        applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
+    if (uDiffuseEnabled) {
+        float envmapAlpha = 1.0;
+        if (uEnvmapEnabled) {
+            applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
+        } else if (uBumpyShinyEnabled) {
+            applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
+        }
     }
 
     float shadow = 0.0;
@@ -480,15 +487,16 @@ void main() {
     }
 
     float finalAlpha = uAlpha;
-    if (!uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
+    if (uDiffuseEnabled && !uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
     }
+
     fragColor = vec4(surfaceColor, finalAlpha);
     if (uWater) {
         fragColor *= uWaterAlpha;
     }
 
-    if (uSelfIllumEnabled) {
+    if (uDiffuseEnabled && uSelfIllumEnabled) {
         vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
         fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
     } else {

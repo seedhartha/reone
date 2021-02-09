@@ -638,12 +638,8 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     vector<float> diffuseColor(readArray<float>(3));
     vector<float> ambientColor(readArray<float>(3));
     uint32_t transparency = readUint32();
-
-    string diffuse(readCString(32));
-    boost::to_lower(diffuse);
-
-    string lightmap(readCString(32));
-    boost::to_lower(lightmap);
+    string diffuse(boost::to_lower_copy(readCString(32)));
+    string lightmap(boost::to_lower_copy(readCString(32)));
 
     ignore(36);
 
@@ -800,7 +796,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     mesh->computeAABB();
 
     auto modelMesh = make_unique<ModelMesh>(move(mesh));
-    modelMesh->setRender(render);
+    modelMesh->setRender(render && !diffuse.empty() && diffuse != "null");
     modelMesh->setTransparency(transparency);
     modelMesh->setShadow(shadow);
     modelMesh->setBackgroundGeometry(backgroundGeometry != 0);

@@ -423,7 +423,6 @@ void Gr2File::loadModel() {
             modelMesh->setRender(true);
             modelMesh->setAmbientColor(glm::vec3(1.0f));
             modelMesh->setDiffuseColor(glm::vec3(0.0f));
-            modelMesh->setDiffuseTexture(Textures::instance().get("redfill", TextureType::GUI));
         }
 
         // Convert bones to model nodes

@@ -81,7 +81,7 @@ void ModelNodeSceneNode::update(float dt) {
 
 bool ModelNodeSceneNode::shouldRender() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return mesh && mesh->shouldRender() && (mesh->hasDiffuseTexture() || _modelSceneNode->hasTextureOverride());
+    return mesh && mesh->shouldRender();
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
@@ -100,10 +100,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
-    shared_ptr<Texture> diffuseTexture;
-    if (_modelSceneNode->hasTextureOverride()) {
-        diffuseTexture = _modelSceneNode->textureOverride();
-    }
+    shared_ptr<Texture> diffuseTexture(_modelSceneNode->textureOverride());
     if (!diffuseTexture) {
         diffuseTexture = mesh->diffuseTexture();
     }
@@ -113,6 +110,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
     if (!shadowPass) {
+        if (diffuseTexture) {
+            locals.general.diffuseEnabled = true;
+        }
         if (mesh->hasEnvmapTexture()) {
             locals.general.envmapEnabled = true;
         }
