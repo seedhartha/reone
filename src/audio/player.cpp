@@ -42,7 +42,7 @@ AudioPlayer &AudioPlayer::instance() {
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
 
-    if (_opts.musicVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
+    if (_opts.musicVolume == 0 && _opts.voiceVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
         info("AudioPlayer: audio is disabled");
         return;
     }
@@ -132,6 +132,9 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     switch (type) {
         case AudioType::Music:
             volume = _opts.musicVolume;
+            break;
+        case AudioType::Voice:
+            volume = _opts.voiceVolume;
             break;
         case AudioType::Sound:
             volume = _opts.soundVolume;

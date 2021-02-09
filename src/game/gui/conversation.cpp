@@ -169,7 +169,7 @@ void Conversation::loadVoiceOver() {
         voice = AudioFiles::instance().get(_currentEntry->voResRef);
     }
     if (voice) {
-        _currentVoice = AudioPlayer::instance().play(voice, AudioType::Sound);
+        _currentVoice = AudioPlayer::instance().play(voice, AudioType::Voice);
     }
 }
 

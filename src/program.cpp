@@ -38,6 +38,7 @@ namespace reone {
 static const char kConfigFilename[] = "reone.cfg";
 
 static constexpr int kDefaultMusicVolume = 85;
+static constexpr int kDefaultVoiceVolume = 85;
 static constexpr int kDefaultSoundVolume = 85;
 static constexpr int kDefaultMovieVolume = 85;
 static constexpr int kDefaultMultiplayerPort = 2003;
@@ -68,6 +69,7 @@ void Program::initOptions() {
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
+        ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
@@ -99,6 +101,7 @@ void Program::loadOptions() {
     _gameOpts.graphics.height = vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();
     _gameOpts.audio.musicVolume = vars["musicvol"].as<int>();
+    _gameOpts.audio.voiceVolume = vars["voicevol"].as<int>();
     _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
     _gameOpts.audio.movieVolume = vars["movievol"].as<int>();
     _gameOpts.network.host = vars.count("join") > 0 ? vars["join"].as<string>() : "";
