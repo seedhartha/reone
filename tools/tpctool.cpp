@@ -124,7 +124,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
     data.flags = TGA_IMAGE_DATA | TGA_RGB;
 }
 
-void TpcTool::convert(const fs::path &path, const fs::path &destPath) const {
+void TpcTool::toTga(const fs::path &path, const fs::path &destPath) const {
     // Read TPC
 
     TpcFile tpc("", TextureType::GUI, true);

@@ -39,7 +39,11 @@ void FileTool::extract(const fs::path &path, const fs::path &keyPath, const fs::
     throwNotImplemented();
 }
 
-void FileTool::convert(const fs::path &path, const fs::path &destPath) const {
+void FileTool::toJson(const fs::path &path, const fs::path &destPath) const {
+    throwNotImplemented();
+}
+
+void FileTool::toTga(const fs::path &path, const fs::path &destPath) const {
     throwNotImplemented();
 }
 

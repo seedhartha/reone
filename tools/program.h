@@ -41,7 +41,8 @@ private:
         Help,
         List,
         Extract,
-        Convert,
+        ToJson,
+        ToTga,
         ModuleProbe
     };
 
