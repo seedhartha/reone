@@ -51,8 +51,6 @@ static const char kBlueprintResRefBastila[] = "p_bastilla";
 static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
-static bool g_warpEnabled = true;
-
 MainMenu::MainMenu(Game *game) :
     GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
@@ -84,27 +82,13 @@ void MainMenu::load() {
     setControlDisabled("BTN_MOVIES", true);
     setControlDisabled("BTN_OPTIONS", true);
 
-    if (!g_warpEnabled) {
+    // Hide warp button in developer mode
+    if (!_game->options().developer) {
         hideControl("BTN_WARP");
     }
+
+    setup3DView();
     configureButtons();
-
-    if (_gameId == GameID::KotOR) {
-        Control &control = getControl("LBL_3DVIEW");
-        const Control::Extent &extent = control.extent();
-        float aspect = extent.width / static_cast<float>(extent.height);
-
-        unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
-            .aspect(aspect)
-            .depth(0.1f, 10.0f)
-            .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
-            .modelScale(kKotorModelSize)
-            .cameraFromModelNode("camerahook")
-            .ambientLightColor(glm::vec3(0.1f))
-            .build());
-
-        control.setScene3D(move(scene));
-    }
 }
 
 void MainMenu::configureButtons() {
@@ -121,14 +105,27 @@ void MainMenu::configureButtons() {
 
 void MainMenu::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
+    control.setTextColor(getBaseColor(_gameId));
+    control.setHilightColor(getHilightColor(_gameId));
+}
 
-    Control::Text text(control.text());
-    text.color = getBaseColor(_gameId);
-    control.setText(move(text));
+void MainMenu::setup3DView() {
+    if (_gameId != GameID::KotOR) return;
 
-    Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_gameId);
-    control.setHilight(move(hilight));
+    Control &control = getControl("LBL_3DVIEW");
+    const Control::Extent &extent = control.extent();
+    float aspect = extent.width / static_cast<float>(extent.height);
+
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+        .modelScale(kKotorModelSize)
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.1f))
+        .build());
+
+    control.setScene3D(move(scene));
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
@@ -136,7 +133,6 @@ shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
     model->setDefaultAnimation("default");
     model->playDefaultAnimation();
     model->setLightingEnabled(true);
-
     return move(model);
 }
 
@@ -167,16 +163,23 @@ void MainMenu::startModuleSelection() {
     hideControl("LBL_GAMELOGO");
     hideControl("LBL_MENUBG");
 
-    ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
+    loadModuleNames();
+}
+
+void MainMenu::loadModuleNames() {
+    auto &modules = getControl<ListBox>("LB_MODULES");
     for (auto &module : Resources::instance().moduleNames()) {
-        modules.addItem({ module, module });
+        ListBox::Item item;
+        item.tag = module;
+        item.text = module;
+        modules.addItem(move(item));
     }
 }
 
 void MainMenu::onListBoxItemClick(const string &control, const string &item) {
-    if (control != "LB_MODULES") return;
-
-    onModuleSelected(item);
+    if (control == "LB_MODULES") {
+        onModuleSelected(item);
+    }
 }
 
 void MainMenu::onModuleSelected(const string &name) {

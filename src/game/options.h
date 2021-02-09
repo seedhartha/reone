@@ -28,6 +28,7 @@ namespace reone {
 namespace game {
 
 struct Options {
+    bool developer { false };
     std::string module;
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
