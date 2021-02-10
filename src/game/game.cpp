@@ -26,6 +26,7 @@
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
+#include "../render/lip/lips.h"
 #include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
 #include "../render/textures.h"
@@ -229,6 +230,8 @@ void Game::loadModule(const string &name, string entry) {
         Scripts::instance().invalidateCache();
         Blueprints::instance().invalidateCache();
         SoundSets::instance().invalidateCache();
+        Lips::instance().invalidateCache();
+
         Resources::instance().loadModule(name);
 
         if (_module) {

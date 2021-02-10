@@ -19,6 +19,7 @@
 
 #include "../../audio/soundhandle.h"
 #include "../../common/timer.h"
+#include "../../render/lip/lipanimation.h"
 #include "../../render/model/model.h"
 
 #include "../camera/types.h"
@@ -83,6 +84,7 @@ protected:
 
 private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
+    std::shared_ptr<render::LipAnimation> _lipAnimation;
     Timer _endEntryTimer;
     float _entryDuration { 0.0f };
     std::vector<const Dialog::EntryReply *> _replies;

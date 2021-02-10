@@ -112,16 +112,19 @@ private:
 
     Resources &operator=(const Resources &) = delete;
 
-    void indexAudioFiles();
-    void indexDirectory(const boost::filesystem::path &path);
-    void indexErfFile(const boost::filesystem::path &path);
-    void indexExeFile();
     void indexKeyBifFiles();
-    void indexOverrideDirectory();
-    void indexTalkTable();
     void indexTexturePacks();
+    void indexTalkTable();
+    void indexAudioFiles();
+    void indexLipModFiles();
+    void indexExeFile();
+    void indexOverrideDirectory();
+
+    void indexErfFile(const boost::filesystem::path &path);
     void indexTransientErfFile(const boost::filesystem::path &path);
+    void indexRimFile(const boost::filesystem::path &path);
     void indexTransientRimFile(const boost::filesystem::path &path);
+    void indexDirectory(const boost::filesystem::path &path);
 
     void invalidateCache();
     void loadModuleNames();

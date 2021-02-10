@@ -21,6 +21,7 @@
 #include "../../audio/player.h"
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
+#include "../../render/lip/lips.h"
 #include "../../render/model/models.h"
 #include "../../resource/resources.h"
 
@@ -161,15 +162,16 @@ void Conversation::loadVoiceOver() {
     }
 
     // Play current voice over either from Sound or from VO_ResRef
-    shared_ptr<AudioStream> voice;
+    string voiceResRef;
     if (!_currentEntry->sound.empty()) {
-        voice = AudioFiles::instance().get(_currentEntry->sound);
+        voiceResRef = _currentEntry->sound;
     }
-    if (!voice && !_currentEntry->voResRef.empty()) {
-        voice = AudioFiles::instance().get(_currentEntry->voResRef);
+    if (voiceResRef.empty() && !_currentEntry->voResRef.empty()) {
+        voiceResRef = _currentEntry->voResRef;
     }
-    if (voice) {
-        _currentVoice = AudioPlayer::instance().play(voice, AudioType::Voice);
+    if (!voiceResRef.empty()) {
+        _currentVoice = AudioPlayer::instance().play(voiceResRef, AudioType::Voice);
+        _lipAnimation = Lips::instance().get(voiceResRef);
     }
 }
 

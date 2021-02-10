@@ -15,30 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "lipfile.h"
 
-#include "../resource/format/binfile.h"
+using namespace std;
 
 namespace reone {
 
 namespace render {
 
-class LipFile : public resource::BinaryFile {
-public:
-    struct Keyframe {
-        float time { 0.0f };
-        uint8_t shape { 0 };
-    };
+LipFile::LipFile() : BinaryFile(8, "LIP V1.0") {
+}
 
-    LipFile();
+void LipFile::doLoad() {
+    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
 
-    const std::vector<Keyframe> &keyframes() const { return _keyframes; }
+    float length = readFloat();
+    uint32_t entryCount = readUint32();
 
-private:
-    std::vector<Keyframe> _keyframes;
+    vector<LipAnimation::Keyframe> keyframes;
+    for (uint32_t i = 0; i < entryCount; ++i) {
+        LipAnimation::Keyframe keyframe;
+        keyframe.time = readFloat();
+        keyframe.shape = readByte();
+        keyframes.push_back(move(keyframe));
+    }
 
-    void doLoad() override;
-};
+    _animation = make_shared<LipAnimation>(move(keyframes));
+}
 
 } // namespace render
 

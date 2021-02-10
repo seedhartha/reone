@@ -49,6 +49,7 @@ static const char kSoundsDirectoryName[] = "streamsounds";
 static const char kVoiceDirectoryName[] = "streamvoice";
 static const char kWavesDirectoryName[] = "streamwaves";
 static const char kTexturePackDirectoryName[] = "texturepacks";
+static const char kLipsDirectoryName[] = "lips";
 
 static const char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
 static const char kTexturePackFilename[] = "swpc_tex_tpa.erf";
@@ -64,10 +65,12 @@ void Resources::init(GameID gameId, const fs::path &gamePath) {
 
     indexKeyBifFiles();
     indexTexturePacks();
-    indexAudioFiles();
-    indexOverrideDirectory();
     indexTalkTable();
+    indexAudioFiles();
+    indexLipModFiles();
     indexExeFile();
+    indexOverrideDirectory();
+
     loadModuleNames();
 }
 
@@ -119,6 +122,28 @@ void Resources::indexAudioFiles() {
             break;
         }
     }
+}
+
+void Resources::indexLipModFiles() {
+    static vector<string> kotorMods { "global", "localization" };
+    static vector<string> tslMods { "localization" };
+
+    const vector<string> &mods = _gameId == GameID::KotOR ? kotorMods : tslMods;
+    fs::path lipsPath(getPathIgnoreCase(_gamePath, "lips"));
+
+    for (auto &mod : mods) {
+        fs::path modPath(getPathIgnoreCase(lipsPath, mod + ".mod"));
+        indexErfFile(modPath);
+    }
+}
+
+void Resources::indexRimFile(const fs::path &path) {
+    auto rim = make_unique<RimFile>();
+    rim->load(path);
+
+    _providers.push_back(move(rim));
+
+    debug(boost::format("Resources: indexed: %s") % path);
 }
 
 void Resources::indexDirectory(const fs::path &path) {
@@ -192,11 +217,15 @@ void Resources::loadModule(const string &name) {
     _transientProviders.clear();
 
     fs::path modulesPath(getPathIgnoreCase(_gamePath, kModulesDirectoryName));
-    fs::path rimPath(getPathIgnoreCase(modulesPath, name + ".rim"));
-    fs::path rimsPath(getPathIgnoreCase(modulesPath, name + "_s.rim"));
+    fs::path moduleRimPath(getPathIgnoreCase(modulesPath, name + ".rim"));
+    fs::path moduleRimSPath(getPathIgnoreCase(modulesPath, name + "_s.rim"));
 
-    indexTransientRimFile(rimPath);
-    indexTransientRimFile(rimsPath);
+    fs::path lipsPath(getPathIgnoreCase(_gamePath, kLipsDirectoryName));
+    fs::path lipModPath(getPathIgnoreCase(lipsPath, name + "_loc.mod"));
+
+    indexTransientRimFile(moduleRimPath);
+    indexTransientRimFile(moduleRimSPath);
+    indexTransientErfFile(lipModPath);
 
     if (_gameId == GameID::TSL) {
         fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
