@@ -17,6 +17,8 @@
 
 #include "binfile.h"
 
+#include <boost/format.hpp>
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -61,7 +63,7 @@ void BinaryFile::checkSignature() {
     char buf[16];
     _in->read(buf, _signSize);
     if (!equal(_sign.begin(), _sign.end(), buf)) {
-        throw runtime_error("Invalid binary file signature");
+        throw runtime_error(str(boost::format("Invalid binary file signature: %s") % string(buf, _signSize)));
     }
 }
 

@@ -104,9 +104,7 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
 }
 
 bool GffTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        operation == Operation::ToJSON;
+    return !fs::is_directory(target) && operation == Operation::ToJSON;
 }
 
 } // namespace tools

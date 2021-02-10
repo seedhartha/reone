@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -15,29 +16,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "lips.h"
+
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
+
 #include "lipfile.h"
 
 using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace render {
 
-LipFile::LipFile() : BinaryFile(8, "LIP V1.0") {
+Lips &Lips::instance() {
+    static Lips instance;
+    return instance;
 }
 
-void LipFile::doLoad() {
-    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
+void Lips::invalidateCache() {
+    _cache.clear();
+}
 
-    float length = readFloat();
-    uint32_t entryCount = readUint32();
+shared_ptr<LipAnimation> Lips::get(const string &resRef) {
+    auto maybeAnimation = _cache.find(resRef);
+    if (maybeAnimation != _cache.end()) return maybeAnimation->second;
 
-    for (uint32_t i = 0; i < entryCount; ++i) {
-        Keyframe keyframe;
-        keyframe.time = readFloat();
-        keyframe.shape = readByte();
-        _keyframes.push_back(move(keyframe));
+    shared_ptr<LipAnimation> animation;
+    shared_ptr<ByteArray> lipData(Resources::instance().get(resRef, ResourceType::Lip));
+    if (lipData) {
+        LipFile lip;
+        lip.load(wrap(lipData));
+        animation = lip.animation();
     }
+
+    return _cache.insert(make_pair(resRef, move(animation))).first->second;
 }
 
 } // namespace render
