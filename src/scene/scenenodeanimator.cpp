@@ -151,7 +151,7 @@ void SceneNodeAnimator::playAnimation(const string &name, AnimationProperties pr
     }
 }
 
-void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationProperties properties) {
+void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationProperties properties, shared_ptr<LipAnimation> lipAnim) {
     _compositionMode = determineCompositionMode(properties.flags);
 
     // Clear composition flags
@@ -164,19 +164,19 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
 
     switch (_compositionMode) {
         case CompositionMode::Mono:
-            if (!_channels[0].isSameAnimation(*anim, properties)) {
+            if (!_channels[0].isSameAnimation(*anim, properties, lipAnim)) {
                 // Play the specified animation on the first channel and stop animation on other channels
-                _channels[0].reset(anim, properties);
+                _channels[0].reset(anim, properties, lipAnim);
                 for (int i = 1; i < kChannelCount; ++i) {
                     _channels[i].reset();
                 }
             }
             break;
         case CompositionMode::Blend:
-            if (!_channels[0].isSameAnimation(*anim, properties)) {
+            if (!_channels[0].isSameAnimation(*anim, properties, lipAnim)) {
                 // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed
                 _channels[1] = _channels[0];
-                _channels[0].reset(anim, properties);
+                _channels[0].reset(anim, properties, lipAnim);
                 _channels[0].setTime(glm::max(0.0f, anim->transitionTime() - kTransitionDuration));
                 _channels[1].freeze();
                 _transition = true;
@@ -186,7 +186,7 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
             // Play the specified animation on the first vacant channel, if any
             for (int i = 0; i < kChannelCount; ++i) {
                 if (!_channels[i].isActive()) {
-                    _channels[i].reset(anim, properties);
+                    _channels[i].reset(anim, properties, lipAnim);
                     break;
                 }
             }

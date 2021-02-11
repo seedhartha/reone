@@ -21,6 +21,9 @@ namespace reone {
 
 namespace scene {
 
+/**
+ * @see AnimationFlags
+ */
 struct AnimationProperties {
     int flags { 0 };
     float speed { 1.0f };

@@ -29,14 +29,32 @@ LipAnimation::LipAnimation(float length, vector<Keyframe> keyframes) :
     _length(length), _keyframes(move(keyframes)) {
 }
 
-const LipAnimation::Keyframe &LipAnimation::getKeyframe(float time) const {
-    if (_keyframes.empty()) {
-        throw logic_error("keyframes is empty");
-    }
+bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &interpolant) const {
+    if (_keyframes.empty()) return false;
+
+    const Keyframe *left = &_keyframes[0];
+    const Keyframe *right = &_keyframes[0];
+
     for (auto &frame : _keyframes) {
-        if (time <= frame.time) return frame;
+        if (time > frame.time) {
+            left = &frame;
+        }
+        if (time <= frame.time) {
+            right = &frame;
+            break;
+        }
     }
-    return _keyframes.back();
+
+    leftShape = left->shape;
+    rightShape = right->shape;
+
+    if (&left == &right) {
+        interpolant = 0.0f;
+    } else {
+        interpolant = (time - left->time) / (right->time - left->time);
+    }
+
+    return true;
 }
 
 } // namespace render

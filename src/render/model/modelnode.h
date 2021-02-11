@@ -100,6 +100,10 @@ public:
     bool getOrientation(float time, glm::quat &orientation) const;
     bool getScale(float time, float &scale) const;
 
+    bool getTranslation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::vec3 &translation, float scale = 1.0f) const;
+    bool getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const;
+    bool getScale(int leftFrameIx, int rightFrameIdx, float interpolant, float &scale) const;
+
     const glm::vec3 &getCenterOfAABB() const;
 
     int index() const { return _index; }
