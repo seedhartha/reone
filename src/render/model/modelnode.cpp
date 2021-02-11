@@ -162,6 +162,54 @@ bool ModelNode::getScale(float time, float &scale) const {
     return true;
 }
 
+bool ModelNode::getTranslation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::vec3 &translation, float scale) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_translationFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_translationFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        translation = scale * _translationFrames[leftFrameIdx].translation;
+    } else {
+        translation = scale * glm::mix(
+            _translationFrames[leftFrameIdx].translation,
+            _translationFrames[rightFrameIdx].translation,
+            interpolant);
+    }
+
+    return true;
+}
+
+bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientationFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientationFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        orientation = _orientationFrames[leftFrameIdx].orientation;
+    } else {
+        orientation = glm::mix(
+            _orientationFrames[leftFrameIdx].orientation,
+            _orientationFrames[rightFrameIdx].orientation,
+            interpolant);
+    }
+
+    return true;
+}
+
+bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float interpolant, float &scale) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scaleFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scaleFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        scale = _scaleFrames[leftFrameIdx].scale;
+    } else {
+        scale = glm::mix(
+            _scaleFrames[leftFrameIdx].scale,
+            _scaleFrames[rightFrameIdx].scale,
+            interpolant);
+    }
+
+    return true;
+}
+
 const glm::vec3 &ModelNode::getCenterOfAABB() const {
     return _mesh->mesh()->aabb().center();
 }

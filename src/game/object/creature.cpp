@@ -195,7 +195,7 @@ void Creature::updateModelAnimation() {
     }
 
     shared_ptr<Animation> anim;
-    shared_ptr<Animation> headAnim;
+    shared_ptr<Animation> talkAnim;
 
     switch (_movementType) {
         case MovementType::Run:
@@ -209,21 +209,22 @@ void Creature::updateModelAnimation() {
                 anim = model->model()->getAnimation(_animResolver.getDeadAnimation());
             } else if (_talking) {
                 anim = model->model()->getAnimation(_animResolver.getTalkNormalAnimation());
-                headAnim = model->model()->getAnimation(_animResolver.getHeadTalkAnimation());
+                talkAnim = model->model()->getAnimation(_animResolver.getHeadTalkAnimation());
             } else {
                 anim = model->model()->getAnimation(_animResolver.getPauseAnimation());
             }
             break;
     }
 
-    if (headAnim) {
+    if (talkAnim) {
+        int addFlags = _lipAnimation ? AnimationFlags::syncLipAnim : 0;
         if (_headModel) {
             model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
-            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
-            _headModel->animator().playAnimation(headAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+            _headModel->animator().playAnimation(talkAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | addFlags), _lipAnimation);
         } else {
-            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
-            model->animator().playAnimation(headAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+            model->animator().playAnimation(talkAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | addFlags), _lipAnimation);
         }
     } else {
         model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
@@ -544,18 +545,16 @@ CreatureWieldType Creature::getWieldType() const {
 }
 
 void Creature::startTalking(const shared_ptr<LipAnimation> &animation) {
-    _lipAnimation = animation;
-
-    if (!_talking) {
+    if (!_talking || _lipAnimation != animation) {
+        _lipAnimation = animation;
         _talking = true;
         _animDirty = true;
     }
 }
 
 void Creature::stopTalking() {
-    _lipAnimation.reset();
-
-    if (_talking) {
+    if (_talking || _lipAnimation) {
+        _lipAnimation.reset();
         _talking = false;
         _animDirty = true;
     }

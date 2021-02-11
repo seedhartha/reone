@@ -53,7 +53,7 @@ public:
     void update(float dt);
 
     void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
-    void playAnimation(std::shared_ptr<render::Animation> anim, AnimationProperties properties = AnimationProperties());
+    void playAnimation(std::shared_ptr<render::Animation> anim, AnimationProperties properties = AnimationProperties(), std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
     void playDefaultAnimation();
 
     bool isAnimationFinished() const;

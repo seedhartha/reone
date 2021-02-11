@@ -23,6 +23,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "../render/lip/lipanimation.h"
 #include "../render/model/animation.h"
 #include "../render/model/model.h"
 #include "../render/model/modelnode.h"
@@ -50,11 +51,11 @@ public:
     AnimationChannel(ModelSceneNode *modelSceneNode, std::set<std::string> ignoreNodes);
 
     void reset();
-    void reset(std::shared_ptr<render::Animation> anim, AnimationProperties properties);
+    void reset(std::shared_ptr<render::Animation> anim, AnimationProperties properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
     void update(float dt);
     void freeze();
 
-    bool isSameAnimation(const render::Animation &anim, const AnimationProperties &properties) const;
+    bool isSameAnimation(const render::Animation &anim, const AnimationProperties &properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr) const;
 
     /**
      * @return true if this animation channel contains an animation that is not finished, false otherwise
@@ -82,8 +83,9 @@ private:
     ModelSceneNode *_modelSceneNode;
     std::set<std::string> _ignoreNodes;
 
-    AnimationProperties _properties;
     std::shared_ptr<render::Animation> _animation;
+    AnimationProperties _properties;
+    std::shared_ptr<render::LipAnimation> _lipAnimation;
     float _time { 0.0f };
     bool _freeze { false };
     bool _finished { false };
