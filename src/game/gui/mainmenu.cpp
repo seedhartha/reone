@@ -25,6 +25,7 @@
 #include "../../gui/scenebuilder.h"
 #include "../../render/model/models.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../game.h"
@@ -130,9 +131,8 @@ void MainMenu::setup3DView() {
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
     auto model = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("mainmenu"));
-    model->setDefaultAnimation("default");
-    model->playDefaultAnimation();
     model->setLightingEnabled(true);
+    model->animator().playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
 

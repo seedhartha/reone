@@ -38,7 +38,10 @@ class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
-    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
+    ModelSceneNode(
+        SceneGraph *sceneGraph,
+        const std::shared_ptr<render::Model> &model,
+        std::set<std::string> ignoreNodes = std::set<std::string>());
 
     void update(float dt) override;
     void render() const override;
@@ -63,6 +66,7 @@ public:
     float alpha() const { return _alpha; }
     const AABB &aabb() const { return _aabb; }
     float projectileSpeed() const { return _projectileSpeed; }
+    SceneNodeAnimator &animator() { return _animator; }
 
     void setVisible(bool visible) override;
 
@@ -70,18 +74,6 @@ public:
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
-
-    // Animation
-
-    void playDefaultAnimation();
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
-
-    bool isAnimationFinished() const;
-
-    void setDefaultAnimation(const std::string &name);
-
-    // END Animation
 
     // Dynamic lighting
 

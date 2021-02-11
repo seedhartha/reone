@@ -145,7 +145,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
             return;
         }
     }
-    object->getModelSceneNode()->playAnimation(tokens[1], AnimationFlags::loop);
+    object->getModelSceneNode()->animator().playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
 void Console::cmdKill(vector<string> tokens) {

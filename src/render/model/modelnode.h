@@ -96,7 +96,7 @@ public:
     bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
     bool isSaber() const { return _saber; }
 
-    bool getTranslation(float time, glm::vec3 &position, float scale = 1.0f) const;
+    bool getTranslation(float time, glm::vec3 &translation, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
     bool getScale(float time, float &scale) const;
 

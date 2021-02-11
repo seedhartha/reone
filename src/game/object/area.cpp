@@ -120,7 +120,7 @@ void Area::loadLYT() {
 
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
-                sceneNode->playAnimation(anim, AnimationFlags::loopOverlay);
+                sceneNode->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
             }
         }
 

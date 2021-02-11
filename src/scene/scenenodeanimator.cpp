@@ -17,7 +17,6 @@
 
 #include "scenenodeanimator.h"
 
-#include <stack>
 #include <stdexcept>
 
 #include "node/modelnodescenenode.h"
@@ -34,245 +33,160 @@ namespace scene {
 
 static constexpr float kTransitionDuration = 0.25f;
 
-bool SceneNodeAnimator::AnimationChannel::isActive() const {
-    return animation && !finished;
-}
-
-bool SceneNodeAnimator::AnimationChannel::isSameAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) const {
-    return
-        this->animation == anim &&
-        this->flags == flags &&
-        this->speed == speed &&
-        this->scale == scale;
-}
-
-void SceneNodeAnimator::AnimationChannel::stopAnimation() {
-    animation = nullptr;
-}
-
-void SceneNodeAnimator::AnimationChannel::setAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
-    this->animation = anim;
-    this->flags = flags;
-    this->speed = speed;
-    this->scale = scale;
-    this->time = 0.0f;
-    this->finished = false;
-    this->freeze = false;
-}
-
-SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, const set<string> &skipNodes) :
+SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, set<string> ignoreNodes) :
     _modelSceneNode(modelSceneNode),
-    _skipNodes(skipNodes) {
+    _ignoreNodes(ignoreNodes) {
 
     if (!modelSceneNode) {
         throw invalid_argument("modelSceneNode must not be null");
     }
+    for (int i = 0; i < kChannelCount; ++i) {
+        _channels.push_back(AnimationChannel(modelSceneNode, ignoreNodes));
+    }
 }
 
 void SceneNodeAnimator::update(float dt) {
-    // Regardless of the mode, when the animation in the first channel finishes
-    // playing, start the default animation
+    // Regardless of the composition mode, when there is not active animation on
+    // the first channel, start the default animation
     if (!_channels[0].isActive()) {
         playDefaultAnimation();
         return;
     }
 
-    // In the Blend mode, if the animation in the first channel is past
-    // transition time, stop animation in the second channel
-    if (isInTransition() && _channels[0].time >= _channels[0].animation->transitionTime()) {
-        _channels[1].stopAnimation();
+    // In the Blend mode, if the animation on the first channel is past
+    // transition time, stop animation on the second channel
+    if (isInTransition() && _channels[0].isPastTransitionTime()) {
+        _channels[1].reset();
         _transition = false;
     }
 
     // Update animation channels
-    for (int i = 0; i < kChannelCount; ++i) {
-        updateChannel(i, dt);
+    for (auto &channel : _channels) {
+        channel.update(dt);
     }
 
-    // Apply animation transforms to the managed scene node
-    _absTransforms.clear();
-    updateAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
-    applyAnimationTransforms(*_modelSceneNode->model()->rootNode());
+    // Compute and apply absolute transforms to the managed model scene node
+    _transformByNodeNumber.clear();
+    computeAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
+    applyAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
 }
 
-void SceneNodeAnimator::updateChannel(int channel, float dt) {
-    AnimationChannel &animChannel = _channels[channel];
-    if (animChannel.isActive()) {
-        animChannel.localTransforms.clear();
-        updateLocalTransforms(animChannel, *animChannel.animation->rootNode());
-        advanceTime(animChannel, dt);
+void SceneNodeAnimator::playDefaultAnimation() {
+    if (!_defaultAnimName.empty()) {
+        playAnimation(_defaultAnimName, _defaultAnimProperties);
     }
 }
 
-void SceneNodeAnimator::updateLocalTransforms(AnimationChannel &channel, ModelNode &animNode) {
-    ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNode(animNode.name());
-    if (sceneNode) {
-        ModelNode *modelNode = sceneNode->modelNode();
-        glm::vec3 position(modelNode->position());
-        glm::quat orientation(modelNode->orientation());
-        float scale = 1.0f;
-        bool hasTransform = false;
-
-        bool skip = _skipNodes.count(modelNode->name()) > 0;
-        if (!skip) {
-            float time = isInTransition() ? channel.animation->transitionTime() : channel.time;
-            glm::vec3 translation(0.0f);
-            if (animNode.getTranslation(time, translation, channel.scale)) {
-                position += translation;
-                hasTransform = true;
-            }
-            glm::quat animOrientation(0.0f, 0.0f, 0.0f, 1.0f);
-            if (animNode.getOrientation(time, animOrientation)) {
-                orientation = animOrientation;
-                hasTransform = true;
-            }
-            float animScale;
-            if (animNode.getScale(time, animScale)) {
-                scale = animScale;
-                hasTransform = true;
-            }
-        }
-
-        if (hasTransform) {
-            glm::mat4 transform(1.0f);
-            transform = glm::scale(transform, glm::vec3(scale));
-            transform = glm::translate(transform, position);
-            transform *= glm::mat4_cast(orientation);
-            channel.localTransforms.insert(make_pair(modelNode->nodeNumber(), transform));
-        }
-    }
-
-    for (auto &child : animNode.children()) {
-        updateLocalTransforms(channel, *child);
-    }
+bool SceneNodeAnimator::isInTransition() const {
+    return _compositionMode == CompositionMode::Blend && _transition;
 }
 
-void SceneNodeAnimator::updateAbsoluteTransforms(ModelNode &modelNode, const glm::mat4 &parentTransform) {
+void SceneNodeAnimator::computeAbsoluteTransforms(ModelNode &modelNode, glm::mat4 parentTransform) {
     if (modelNode.skin()) return;
 
     glm::mat4 localTransform(modelNode.localTransform());
 
     if (isInTransition()) {
-        auto maybeTransform0 = _channels[0].localTransforms.find(modelNode.nodeNumber());
-        bool hasTransform0 = maybeTransform0 != _channels[0].localTransforms.end();
-        auto maybeTransform1 = _channels[1].localTransforms.find(modelNode.nodeNumber());
-        bool hasTransform1 = maybeTransform1 != _channels[1].localTransforms.end();
-        if (hasTransform0 && hasTransform1) {
-            float delta = 1.0f - (_channels[0].animation->transitionTime() - _channels[0].time) / _channels[0].animation->transitionTime();
-            glm::quat orientation0(glm::toQuat(maybeTransform0->second));
-            glm::quat orientation1(glm::toQuat(maybeTransform1->second));
-            localTransform = glm::translate(glm::mat4(1.0f), glm::vec3(maybeTransform0->second[3]));
+        // In the Blend mode, blend animations on the first two channels
+        glm::mat4 transform1, transform2;
+        bool hasTransform1 = _channels[0].getTransformByNodeNumber(modelNode.nodeNumber(), transform1);
+        bool hasTransform2 = _channels[1].getTransformByNodeNumber(modelNode.nodeNumber(), transform2);
+        if (hasTransform1 && hasTransform2) {
+            float delta = 1.0f - (_channels[0].getTransitionTime() - _channels[0].time()) / _channels[0].getTransitionTime();
+            glm::quat orientation0(glm::toQuat(transform1));
+            glm::quat orientation1(glm::toQuat(transform2));
+            localTransform = glm::translate(glm::mat4(1.0f), glm::vec3(transform1[3]));
             localTransform *= glm::mat4_cast(glm::slerp(orientation1, orientation0, delta));
-        } else if (hasTransform0) {
-            localTransform = maybeTransform0->second;
         } else if (hasTransform1) {
-            localTransform = maybeTransform1->second;
+            localTransform = move(transform1);
+        } else if (hasTransform2) {
+            localTransform = move(transform2);
         }
-    } else if (_mode == Mode::Overlay) {
-        // In the Overlay mode, select first animation channel to have a local transform for the given node
+    } else if (_compositionMode == CompositionMode::Overlay) {
+        // In the Overlay mode, select the first animation channel to have a local transform for the given node
         for (int i = kChannelCount - 1; i >= 0; --i) {
-            if (_channels[i].isActive()) {
-                auto maybeTransform = _channels[i].localTransforms.find(modelNode.nodeNumber());
-                if (maybeTransform != _channels[i].localTransforms.end()) {
-                    localTransform = maybeTransform->second;
-                    break;
-                }
+            glm::mat4 transform;
+            if (_channels[i].isActive() && _channels[i].getTransformByNodeNumber(modelNode.nodeNumber(), transform)) {
+                localTransform = move(transform);
+                break;
             }
         }
     } else {
-        auto maybeTransform = _channels[0].localTransforms.find(modelNode.nodeNumber());
-        if (maybeTransform != _channels[0].localTransforms.end()) {
-            localTransform = maybeTransform->second;
+        // Otherwise, select animation on the first channel
+        glm::mat4 transform;
+        if (_channels[0].getTransformByNodeNumber(modelNode.nodeNumber(), transform)) {
+            localTransform = move(transform);
         }
     }
 
     glm::mat4 absTransform(parentTransform * localTransform);
-    _absTransforms.insert(make_pair(modelNode.nodeNumber(), absTransform));
+    _transformByNodeNumber.insert(make_pair(modelNode.nodeNumber(), absTransform));
 
     for (auto &child : modelNode.children()) {
-        updateAbsoluteTransforms(*child, absTransform);
+        computeAbsoluteTransforms(*child, absTransform);
     }
 }
 
-void SceneNodeAnimator::applyAnimationTransforms(ModelNode &modelNode) {
+void SceneNodeAnimator::applyAbsoluteTransforms(ModelNode &modelNode) {
+    // Do not apply transforms to skinned model nodes
     if (modelNode.skin()) return;
 
-    glm::mat4 transform(_absTransforms.find(modelNode.nodeNumber())->second);
-
-    ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
-    sceneNode->setLocalTransform(transform);
-    sceneNode->setBoneTransform(transform * modelNode.absoluteTransformInverse());
+    auto maybeTransform = _transformByNodeNumber.find(modelNode.nodeNumber());
+    if (maybeTransform != _transformByNodeNumber.end()) {
+        ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
+        sceneNode->setLocalTransform(maybeTransform->second);
+        sceneNode->setBoneTransform(maybeTransform->second * modelNode.absoluteTransformInverse());
+    }
 
     for (auto &child : modelNode.children()) {
-        applyAnimationTransforms(*child);
+        applyAbsoluteTransforms(*child);
     }
 }
 
-void SceneNodeAnimator::advanceTime(AnimationChannel &channel, float dt) {
-    if (channel.freeze) return;
-
-    bool loop = channel.flags & AnimationFlags::loop;
-    float newTime = channel.time + channel.speed * dt;
-    float length = channel.animation->length();
-
-    if (loop) {
-        newTime = glm::mod(newTime, length);
-    } else {
-        newTime = glm::min(newTime, length);
-        if (newTime == length) {
-            channel.finished = true;
-        }
-    }
-
-    // Signal events between the previous animation time and the current time
-    for (auto &event : channel.animation->events()) {
-        if (event.time < channel.time || event.time > newTime) break;
-
-        _modelSceneNode->signalEvent(event.name);
-    }
-
-    channel.time = newTime;
-}
-
-void SceneNodeAnimator::playDefaultAnimation() {
-    if (_defaultAnim) {
-        playAnimation(_defaultAnim, _defaultAnimFlags, _defaultAnimSpeed);
+void SceneNodeAnimator::playAnimation(const string &name, AnimationProperties properties) {
+    shared_ptr<Model> model(_modelSceneNode->model());
+    shared_ptr<Animation> anim(model->getAnimation(name));
+    if (anim) {
+        playAnimation(move(anim), move(properties));
     }
 }
 
-void SceneNodeAnimator::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
-    Mode mode = getMode(flags);
+void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationProperties properties) {
+    _compositionMode = determineCompositionMode(properties.flags);
 
-    // Clear animation flags
-    flags &= ~(AnimationFlags::blend | AnimationFlags::overlay);
+    // Clear composition flags
+    properties.flags &= ~(AnimationFlags::blend | AnimationFlags::overlay);
 
-    _mode = mode;
+    // If scale is 0.0, replace it with models scale
+    if (properties.scale == 0.0f) {
+        properties.scale = _modelSceneNode->model()->animationScale();
+    }
 
-    switch (mode) {
-        case Mode::Mono:
-            if (!_channels[0].isSameAnimation(anim, flags, speed, scale)) {
-                // Play the specified animation on the first channel - stop animation on other channels
-                _channels[0].setAnimation(anim, flags, speed, scale);
+    switch (_compositionMode) {
+        case CompositionMode::Mono:
+            if (!_channels[0].isSameAnimation(*anim, properties)) {
+                // Play the specified animation on the first channel and stop animation on other channels
+                _channels[0].reset(anim, properties);
                 for (int i = 1; i < kChannelCount; ++i) {
-                    _channels[i].stopAnimation();
+                    _channels[i].reset();
                 }
             }
             break;
-        case Mode::Blend:
-            if (!_channels[0].isSameAnimation(anim, flags, speed, scale)) {
-                // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed.
+        case CompositionMode::Blend:
+            if (!_channels[0].isSameAnimation(*anim, properties)) {
+                // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed
                 _channels[1] = _channels[0];
-                _channels[0].setAnimation(anim, flags, speed, scale);
-                _channels[0].time = glm::max(0.0f, anim->transitionTime() - kTransitionDuration);
-                _channels[1].freeze = true;
+                _channels[0].reset(anim, properties);
+                _channels[0].setTime(glm::max(0.0f, anim->transitionTime() - kTransitionDuration));
+                _channels[1].freeze();
                 _transition = true;
             }
             break;
-        case Mode::Overlay:
+        case CompositionMode::Overlay:
             // Play the specified animation on the first vacant channel, if any
             for (int i = 0; i < kChannelCount; ++i) {
                 if (!_channels[i].isActive()) {
-                    _channels[i].setAnimation(anim, flags, speed, scale);
+                    _channels[i].reset(anim, properties);
                     break;
                 }
             }
@@ -282,24 +196,19 @@ void SceneNodeAnimator::playAnimation(const shared_ptr<Animation> &anim, int fla
     }
 }
 
+SceneNodeAnimator::CompositionMode SceneNodeAnimator::determineCompositionMode(int flags) const {
+    return (flags & AnimationFlags::blend) ?
+        CompositionMode::Blend :
+        ((flags & AnimationFlags::overlay) ? CompositionMode::Overlay : CompositionMode::Mono);
+}
+
 bool SceneNodeAnimator::isAnimationFinished() const {
-    return !_channels[0].isActive();
+    return _channels[0].isFinished();
 }
 
-void SceneNodeAnimator::setDefaultAnimation(const shared_ptr<Animation> &anim, int flags, float speed) {
-    _defaultAnim = anim;
-    _defaultAnimFlags = flags;
-    _defaultAnimSpeed = speed;
-}
-
-bool SceneNodeAnimator::isInTransition() const {
-    return _mode == Mode::Blend && _transition;
-}
-
-SceneNodeAnimator::Mode SceneNodeAnimator::getMode(int animFlags) const {
-    return (animFlags & AnimationFlags::blend) ?
-        Mode::Blend :
-        ((animFlags & AnimationFlags::overlay) ? Mode::Overlay : Mode::Mono);
+void SceneNodeAnimator::setDefaultAnimation(string name, AnimationProperties properties) {
+    _defaultAnimName = move(name);
+    _defaultAnimProperties = move(properties);
 }
 
 } // namespace scene

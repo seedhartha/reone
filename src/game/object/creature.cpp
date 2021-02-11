@@ -182,7 +182,7 @@ void Creature::updateModelAnimation() {
     if (!model) return;
 
     if (_animFireForget) {
-        if (!model->isAnimationFinished()) return;
+        if (!model->animator().isAnimationFinished()) return;
 
         _animFireForget = false;
         _animDirty = true;
@@ -193,57 +193,43 @@ void Creature::updateModelAnimation() {
         _animAction->complete();
         _animAction.reset();
     }
+
+    shared_ptr<Animation> anim;
+    shared_ptr<Animation> headAnim;
+
     switch (_movementType) {
-        case MovementType::Run: {
-            shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getRunAnimation()));
-            if (anim) {
-                model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                if (_headModel) {
-                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                }
-            }
+        case MovementType::Run:
+            anim = model->model()->getAnimation(_animResolver.getRunAnimation());
             break;
-        }
-        case MovementType::Walk: {
-            shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getWalkAnimation()));
-            if (anim) {
-                model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                if (_headModel) {
-                    _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                }
-            }
+        case MovementType::Walk:
+            anim = model->model()->getAnimation(_animResolver.getWalkAnimation());
             break;
-        }
         default:
             if (_dead) {
-                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getDeadAnimation()));
-                if (anim) {
-                    model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                    if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                    }
-                }
+                anim = model->model()->getAnimation(_animResolver.getDeadAnimation());
             } else if (_talking) {
-                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getTalkNormalAnimation()));
-                if (anim) {
-                    model->playAnimation(anim, AnimationFlags::loop, 1.0f, model->model()->animationScale());
-                    if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loop, 1.0f, model->model()->animationScale());
-                        _headModel->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
-                    } else {
-                        model->playAnimation(_animResolver.getHeadTalkAnimation(), AnimationFlags::loopOverlay, 0.25f);
-                    }
-                }
+                anim = model->model()->getAnimation(_animResolver.getTalkNormalAnimation());
+                headAnim = model->model()->getAnimation(_animResolver.getHeadTalkAnimation());
             } else {
-                shared_ptr<Animation> anim(model->model()->getAnimation(_animResolver.getPauseAnimation()));
-                if (anim) {
-                    model->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                    if (_headModel) {
-                        _headModel->playAnimation(anim, AnimationFlags::loopBlend, 1.0f, model->model()->animationScale());
-                    }
-                }
+                anim = model->model()->getAnimation(_animResolver.getPauseAnimation());
             }
             break;
+    }
+
+    if (headAnim) {
+        if (_headModel) {
+            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+            _headModel->animator().playAnimation(headAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+        } else {
+            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+            model->animator().playAnimation(headAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+        }
+    } else {
+        model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
+        if (_headModel) {
+            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
+        }
     }
 
     _animDirty = false;
@@ -260,48 +246,64 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(AnimationType anim, int flags, float speed, shared_ptr<Action> actionToComplete) {
-    string animName(_animResolver.getAnimationName(anim));
+void Creature::playAnimation(AnimationType type, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
+    string animName(_animResolver.getAnimationName(type));
     if (animName.empty()) return;
 
-    if (isAnimationLooping(anim)) {
-        flags |= AnimationFlags::loop;
+    // If animation is looping by type, set flags accordingly
+    if (isAnimationLooping(type)) {
+        properties.flags |= AnimationFlags::loop;
     }
-    playAnimation(animName, flags, speed, actionToComplete);
+
+    playAnimation(animName, move(properties), move(actionToComplete));
 }
 
-void Creature::playAnimation(const string &name, int flags, float speed, shared_ptr<Action> actionToComplete) {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
-    if (!model) return;
+void Creature::playAnimation(const string &name, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
+    bool fireForget = !(properties.flags & AnimationFlags::loop);
 
-    doPlayAnimation(flags, [&]() {
+    doPlayAnimation(fireForget, [&]() {
+        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        if (!model) return;
+
         _animAction = actionToComplete;
-        model->playAnimation(name, flags, speed);
-        if (_headModel && (flags & AnimationFlags::propagateHead)) {
-            _headModel->playAnimation(name, flags & ~AnimationFlags::propagateHead, speed);
+
+        // Extract propagate to head model flag
+        bool propagateHead = properties.flags & AnimationFlags::propagateHead;
+        properties.flags &= ~AnimationFlags::propagateHead;
+
+        model->animator().playAnimation(name, properties);
+        
+        if (propagateHead && _headModel) {
+            _headModel->animator().playAnimation(name, move(properties));
         }
     });
 }
 
-void Creature::doPlayAnimation(int flags, const function<void()> &callback) {
+void Creature::doPlayAnimation(bool fireForget, const function<void()> &callback) {
     if (!_sceneNode || _movementType != MovementType::None) return;
 
     callback();
 
-    if (!(flags & AnimationFlags::loop)) {
+    if (fireForget) {
         _animFireForget = true;
     }
 }
 
-void Creature::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed) {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
-    if (!model) return;
+void Creature::playAnimation(const shared_ptr<Animation> &anim, AnimationProperties properties) {
+    bool fireForget = !(properties.flags & AnimationFlags::loop);
 
-    doPlayAnimation(flags, [&]() {
-        // TODO: scale should be computed from this creatures model and the animations model
-        model->playAnimation(anim, flags, speed, 1.0f);
-        if (_headModel && (flags & AnimationFlags::propagateHead)) {
-            _headModel->playAnimation(anim, flags & ~AnimationFlags::propagateHead, speed, 1.0f);
+    doPlayAnimation(fireForget, [&]() {
+        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        if (!model) return;
+
+        // Extract propagate to head model flag
+        bool propagateHead = properties.flags & AnimationFlags::propagateHead;
+        properties.flags &= ~AnimationFlags::propagateHead;
+
+        model->animator().playAnimation(anim, properties);
+
+        if (propagateHead && _headModel) {
+            _headModel->animator().playAnimation(anim, move(properties));
         }
     });
 }
@@ -344,8 +346,8 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
             if (slot == InventorySlot::rightWeapon) {
                 shared_ptr<ModelSceneNode> weapon(model->getAttachedModel("rhand"));
                 if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
-                    weapon->setDefaultAnimation("powered");
-                    weapon->playAnimation("powerup");
+                    weapon->animator().setDefaultAnimation("powered", AnimationProperties::fromFlags(AnimationFlags::loop));
+                    weapon->animator().playAnimation("powerup");
                 }
             }
         }
@@ -383,13 +385,6 @@ void Creature::setMovementType(MovementType type) {
     _movementType = type;
     _animDirty = true;
     _animFireForget = false;
-}
-
-void Creature::setTalking(bool talking) {
-    if (_talking == talking) return;
-
-    _talking = talking;
-    _animDirty = true;
 }
 
 void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32_t timeFound) {
@@ -546,6 +541,24 @@ CreatureWieldType Creature::getWieldType() const {
     }
 
     return CreatureWieldType::HandToHand;
+}
+
+void Creature::startTalking(const shared_ptr<LipAnimation> &animation) {
+    _lipAnimation = animation;
+
+    if (!_talking) {
+        _talking = true;
+        _animDirty = true;
+    }
+}
+
+void Creature::stopTalking() {
+    _lipAnimation.reset();
+
+    if (_talking) {
+        _talking = false;
+        _animDirty = true;
+    }
 }
 
 } // namespace game
