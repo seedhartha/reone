@@ -37,6 +37,7 @@ enum class TextureType {
     Diffuse,
     Lightmap,
     EnvironmentMap,
+    IrradianceMap,
     Bumpmap,
     GUI,
     Cursor,
@@ -71,9 +72,9 @@ struct GraphicsOptions {
 };
 
 struct TextureFeatures {
-    std::string envMapTexture;
+    std::string envmapTexture;
     std::string bumpyShinyTexture;
-    std::string bumpMapTexture;
+    std::string bumpmapTexture;
     float bumpMapScaling { 0.0f };
     TextureBlending blending { TextureBlending::None };
     int numChars { 0 };

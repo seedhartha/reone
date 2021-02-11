@@ -807,14 +807,13 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
         modelMesh->_diffuse = Textures::instance().get(diffuse, TextureType::Diffuse);
         if (modelMesh->_diffuse) {
             const TextureFeatures &features = modelMesh->_diffuse->features();
-            if (!features.envMapTexture.empty()) {
-                modelMesh->_envmap = Textures::instance().get(features.envMapTexture, TextureType::EnvironmentMap);
+            if (!features.envmapTexture.empty()) {
+                modelMesh->_envmap = Textures::instance().get(features.envmapTexture, TextureType::EnvironmentMap);
+            } else if (!features.bumpyShinyTexture.empty()) {
+                modelMesh->_envmap = Textures::instance().get(features.bumpyShinyTexture, TextureType::EnvironmentMap);
             }
-            if (!features.bumpyShinyTexture.empty()) {
-                modelMesh->_bumpyShiny = Textures::instance().get(features.bumpyShinyTexture, TextureType::EnvironmentMap);
-            }
-            if (!features.bumpMapTexture.empty()) {
-                modelMesh->_bumpmap = Textures::instance().get(features.bumpMapTexture, TextureType::Bumpmap);
+            if (!features.bumpmapTexture.empty()) {
+                modelMesh->_bumpmap = Textures::instance().get(features.bumpmapTexture, TextureType::Bumpmap);
             }
         }
     }

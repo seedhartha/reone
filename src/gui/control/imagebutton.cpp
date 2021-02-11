@@ -94,7 +94,7 @@ void ImageButton::drawIcon(
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
 
         Quad::getDefault().renderTriangles();
@@ -110,7 +110,7 @@ void ImageButton::drawIcon(
         locals.general.color = glm::vec4(1.0f);
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();
 
         Quad::getDefault().renderTriangles();

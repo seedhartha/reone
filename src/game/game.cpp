@@ -26,6 +26,7 @@
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
+#include "../render/irradiancemaps.h"
 #include "../render/lip/lips.h"
 #include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
@@ -59,7 +60,7 @@ namespace reone {
 
 namespace game {
 
-static bool g_conversationsEnabled = true;
+static bool g_conversationsEnabled = false;
 
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
@@ -109,6 +110,7 @@ void Game::init() {
     registerModelLoaders();
 
     Textures::instance().init(_gameId);
+    IrradianceMaps::instance().init();
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
     Routines::instance().init(_gameId, this);
@@ -274,6 +276,9 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
 }
 
 void Game::drawAll() {
+    // Compute queued irradiance maps, if any
+    IrradianceMaps::instance().refresh();
+
     _window.clear();
 
     if (_video) {

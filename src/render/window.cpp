@@ -33,6 +33,7 @@
 #include "mesh/aabb.h"
 #include "mesh/billboard.h"
 #include "mesh/cube.h"
+#include "mesh/cubemap.h"
 #include "mesh/quad.h"
 #include "shaders.h"
 
@@ -75,6 +76,7 @@ void RenderWindow::init() {
 
     Shaders::instance().initGL();
     CubeMesh::instance().initGL();
+    CubeMapMesh::instance().initGL();
     BillboardMesh::instance().initGL();
     AABBMesh::instance().initGL();
     Quad::getDefault().initGL();
@@ -93,6 +95,7 @@ void RenderWindow::deinit() {
     Quad::getXYFlipped().deinitGL();
     AABBMesh::instance().deinitGL();
     BillboardMesh::instance().deinitGL();
+    CubeMapMesh::instance().deinitGL();
     CubeMesh::instance().deinitGL();
     Shaders::instance().deinitGL();
 

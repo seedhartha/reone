@@ -202,7 +202,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
 
     Quad::getDefault().renderTriangles();
@@ -229,7 +229,7 @@ void SelectionOverlay::drawTitleBar() const {
         locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.general.alpha = 0.5f;
 
-        Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+        Shaders::instance().activate(ShaderProgram::GUIColor, locals);
 
         Quad::getDefault().renderTriangles();
     }
@@ -264,7 +264,7 @@ void SelectionOverlay::drawHealthBar() const {
     locals.general.model = move(transform);
     locals.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+    Shaders::instance().activate(ShaderProgram::GUIColor, locals);
 
     Quad::getDefault().renderTriangles();
 }
@@ -293,7 +293,7 @@ void SelectionOverlay::drawActionBar() const {
         } else {
             frameTexture = _friendlyScroll;
         }
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         frameTexture->bind();
 
         Quad::getDefault().renderTriangles();
@@ -314,7 +314,7 @@ void SelectionOverlay::drawActionBar() const {
 
                 Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-                setActiveTextureUnit(0);
+                setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();
 
                 Quad::getDefault().renderTriangles();

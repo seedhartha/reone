@@ -61,7 +61,6 @@ public:
     bool hasDiffuseTexture() const { return static_cast<bool>(_diffuse); }
     bool hasEnvmapTexture() const { return static_cast<bool>(_envmap); }
     bool hasLightmapTexture() const { return static_cast<bool>(_lightmap); }
-    bool hasBumpyShinyTexture() const { return static_cast<bool>(_bumpyShiny); }
     bool hasBumpmapTexture() const { return static_cast<bool>(_bumpmap); }
 
     std::shared_ptr<Mesh> mesh() const { return _mesh; }
@@ -71,6 +70,7 @@ public:
     const UVAnimation &uvAnimation() const { return _uvAnimation; }
 
     const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
+    const std::shared_ptr<Texture> &envmapTexture() const { return _envmap; }
     const std::shared_ptr<Texture> &bumpmapTexture() const { return _bumpmap; }
 
     void setRender(bool render);
@@ -99,7 +99,6 @@ private:
     std::shared_ptr<Texture> _diffuse;
     std::shared_ptr<Texture> _envmap;
     std::shared_ptr<Texture> _lightmap;
-    std::shared_ptr<Texture> _bumpyShiny;
     std::shared_ptr<Texture> _bumpmap;
 
     // END Textures

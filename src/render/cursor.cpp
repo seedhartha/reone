@@ -54,7 +54,7 @@ void Cursor::render() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
 
     Quad::getDefault().renderTriangles();

@@ -80,7 +80,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _geometry.bindColorBuffer(0);
 
     Quad::getDefault().renderTriangles();

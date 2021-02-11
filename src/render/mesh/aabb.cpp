@@ -65,7 +65,7 @@ void AABBMesh::render(const AABB &aabb, const glm::mat4 &transform) const {
     LocalUniforms locals;
     locals.general.model = finalTransform;
 
-    Shaders::instance().activate(ShaderProgram::ModelWhite, locals);
+    Shaders::instance().activate(ShaderProgram::ModelColor, locals);
     Mesh::renderLines();
 }
 

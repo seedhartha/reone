@@ -142,7 +142,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
 
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
 
     bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
