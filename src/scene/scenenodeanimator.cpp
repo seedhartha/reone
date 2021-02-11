@@ -152,6 +152,8 @@ void SceneNodeAnimator::playAnimation(const string &name, AnimationProperties pr
 }
 
 void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationProperties properties, shared_ptr<LipAnimation> lipAnim) {
+    if (!anim) return;
+
     _compositionMode = determineCompositionMode(properties.flags);
 
     // Clear composition flags
