@@ -109,7 +109,7 @@ void Font::initGL() {
 void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
     if (text.empty()) return;
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
     glBindVertexArray(_vertexArrayId);

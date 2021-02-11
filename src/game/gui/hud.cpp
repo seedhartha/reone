@@ -244,7 +244,7 @@ void HUD::drawHealth(int memberIndex) const {
     locals.general.model = move(transform);
     locals.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+    Shaders::instance().activate(ShaderProgram::GUIColor, locals);
 
     Quad::getDefault().renderTriangles();
 }

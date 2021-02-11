@@ -36,24 +36,26 @@ static constexpr int kMaxBoneCount = 128;
 
 enum class ShaderProgram {
     None,
+    GUIColor,
     GUIGUI,
     GUIBlur,
     GUIBloom,
-    GUIWhite,
+    GUIIrradiance,
     GUIDebugShadows,
-    ModelWhite,
+    ModelColor,
     ModelModel,
     BillboardBillboard,
     DepthDepth
 };
 
 struct TextureUnits {
-    static constexpr int envmap { 1 };
-    static constexpr int lightmap { 2 };
-    static constexpr int bumpyShiny { 3 };
-    static constexpr int bumpmap { 4 };
+    static constexpr int diffuse { 0 };
+    static constexpr int lightmap { 1 };
+    static constexpr int envmap { 2 };
+    static constexpr int bumpmap { 3 };
     static constexpr int bloom { 5 };
-    static constexpr int shadowmap { 6 };
+    static constexpr int irradianceMap { 6 };
+    static constexpr int shadowMap { 7 };
 };
 
 struct GlobalUniforms {
@@ -70,7 +72,7 @@ struct GeneralUniforms {
     int diffuseEnabled { false };
     int lightmapEnabled { false };
     int envmapEnabled { false };
-    int bumpyShinyEnabled { false };
+    int irradianceMapEnabled { false };
     int bumpmapEnabled { false };
     int skeletalEnabled { false };
     int lightingEnabled { false };
@@ -102,7 +104,7 @@ struct SkeletalUniforms {
 };
 
 struct ShaderLight {
-    glm::vec4 position { 0.0f };
+    glm::vec4 position { 0.0f }; /**< w = 0.0 indicates a directional light, while w = 1.0 indicates a point light */
     glm::vec4 color { 1.0f };
     float radius { 1.0f };
     float multiplier { 1.0f };
@@ -160,19 +162,20 @@ public:
 
 private:
     enum class ShaderName {
-        GeometryDepth,
         VertexGUI,
         VertexModel,
-        VertexDepth,
         VertexBillboard,
-        FragmentWhite,
+        VertexDepth,
+        GeometryDepth,
+        FragmentColor,
         FragmentGUI,
         FragmentModel,
+        FragmentBillboard,
         FragmentBlur,
         FragmentBloom,
         FragmentDepth,
-        FragmentDebugShadows,
-        FragmentBillboard
+        FragmentIrradiance,
+        FragmentDebugShadows
     };
 
     std::unordered_map<ShaderName, uint32_t> _shaders;
@@ -198,8 +201,8 @@ private:
 
     Shaders &operator=(const Shaders &) = delete;
 
-    void initShader(ShaderName name, unsigned int type, const char *source);
-    void initProgram(ShaderProgram program, int shaderCount, ...);
+    void initShader(ShaderName name, unsigned int type, std::vector<char *> sources);
+    void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
     unsigned int getOrdinal(ShaderProgram program) const;
     void setLocalUniforms(const LocalUniforms &locals);
     void setUniform(const std::string &name, int value);

@@ -21,6 +21,7 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
+#include "../../render/irradiancemaps.h"
 
 #include "../scenegraph.h"
 
@@ -96,6 +97,11 @@ bool ModelNodeSceneNode::isTransparent() const {
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 
+static bool isLightDirectional(const LightSceneNode &light) {
+    // Consider all lights with a radius of 100.0 and more directional
+    return light.radius() > 100.0f;
+}
+
 void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
@@ -115,12 +121,14 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         }
         if (mesh->hasEnvmapTexture()) {
             locals.general.envmapEnabled = true;
+
+            auto irradianceMap = IrradianceMaps::instance().get(mesh->envmapTexture().get());
+            if (irradianceMap) {
+                locals.general.irradianceMapEnabled = true;
+            }
         }
         if (mesh->hasLightmapTexture()) {
             locals.general.lightmapEnabled = true;
-        }
-        if (mesh->hasBumpyShinyTexture()) {
-            locals.general.bumpyShinyEnabled = true;
         }
         shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
         if (bumpmapTexture) {
@@ -180,7 +188,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
             for (int i = 0; i < locals.lighting->lightCount; ++i) {
                 ShaderLight &shaderLight = locals.lighting->lights[i];
-                shaderLight.position = lights[i]->absoluteTransform()[3];
+                shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), isLightDirectional(*lights[i]) ? 0.0f : 1.0f);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.radius = lights[i]->radius();
                 shaderLight.multiplier = lights[i]->multiplier();

@@ -23,6 +23,7 @@
 
 #include "GL/glew.h"
 
+#include "../../render/irradiancemaps.h"
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
@@ -133,7 +134,7 @@ void WorldRenderPipeline::drawGeometry() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (_scene->isShadowLightPresent()) {
-        setActiveTextureUnit(TextureUnits::shadowmap);
+        setActiveTextureUnit(TextureUnits::shadowMap);
         _shadows.bindDepthBuffer();
     }
 
@@ -146,7 +147,7 @@ void WorldRenderPipeline::drawGeometry() const {
     }
 
     if (_scene->isShadowLightPresent()) {
-        setActiveTextureUnit(TextureUnits::shadowmap);
+        setActiveTextureUnit(TextureUnits::shadowMap);
         _shadows.unbindDepthBuffer();
     }
 
@@ -172,7 +173,7 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
 
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _geometry.bindColorBuffer(1);
 
     withDepthTest([]() {
@@ -202,7 +203,7 @@ void WorldRenderPipeline::applyVerticalBlur() const {
 
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _horizontalBlur.bindColorBuffer(0);
 
     withDepthTest([]() {
@@ -226,12 +227,18 @@ void WorldRenderPipeline::drawResult() const {
 
         Shaders::instance().activate(ShaderProgram::GUIDebugShadows, locals);
 
-        setActiveTextureUnit(TextureUnits::shadowmap);
-        _shadows.bindDepthBuffer();
+        auto envmap = Textures::instance().get("cm_baremetal", TextureType::EnvironmentMap);
+        auto irradianceMap = IrradianceMaps::instance().get(envmap.get());
 
-        Quad::getDefault().renderTriangles();
+        if (irradianceMap) {
+            setActiveTextureUnit(TextureUnits::shadowMap);
+            //_shadows.bindDepthBuffer();
+            irradianceMap->bind();
 
-        _shadows.unbindDepthBuffer();
+            Quad::getDefault().renderTriangles();
+
+            //_shadows.unbindDepthBuffer();
+        }
 
     } else {
         LocalUniforms locals;
@@ -240,7 +247,7 @@ void WorldRenderPipeline::drawResult() const {
 
         Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         _geometry.bindColorBuffer(0);
 
         setActiveTextureUnit(TextureUnits::bloom);
@@ -251,7 +258,7 @@ void WorldRenderPipeline::drawResult() const {
         setActiveTextureUnit(TextureUnits::bloom);
         _verticalBlur.unbindColorBuffer(0);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         _geometry.unbindColorBuffer(0);
     }
 }

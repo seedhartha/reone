@@ -66,9 +66,13 @@ void Framebuffer::init() {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, _depthBuffer->textureId(), 0);
     }
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw runtime_error("Framebuffer is not complete");
+    // Only check for completeness if this framebuffer has color buffers
+    if (_numColorBuffers > 0) {
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            throw runtime_error("Framebuffer is not complete");
+        }
     }
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     _inited = true;

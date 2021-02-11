@@ -41,11 +41,12 @@ static constexpr int kSkeletalBindingPointIndex = 4;
 static constexpr int kBillboardBindingPointIndex = 5;
 static constexpr int kBumpmapBindingPointIndex = 6;
 
-static constexpr GLchar kCommonShaderHeader[] = R"END(
+static constexpr GLchar *kShaderBaseHeader = R"END(
 #version 330
 
-const int MAX_LIGHTS = 4;
+const float PI = 3.14159265359;
 const int MAX_BONES = 128;
+const int MAX_LIGHTS = 4;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 struct Light {
@@ -59,7 +60,7 @@ layout(std140) uniform General {
     bool uDiffuseEnabled;
     bool uLightmapEnabled;
     bool uEnvmapEnabled;
-    bool uBumpyShinyEnabled;
+    bool uIrradianceMapEnabled;
     bool uBumpmapEnabled;
     bool uSkeletalEnabled;
     bool uLightingEnabled;
@@ -113,22 +114,67 @@ layout(std140) uniform Bumpmap {
 };
 )END";
 
-static constexpr GLchar kSourceVertexGUI[] = R"END(
+static constexpr GLchar *kShaderBasePBR = R"END(
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float nom = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+
+    float nom = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+)END";
+
+static constexpr GLchar *kShaderVertexGUI = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
+out vec3 fragPosition;
 out vec2 fragTexCoords;
 
 void main() {
-    gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
+    fragPosition = vec3(uModel * vec4(aPosition, 1.0));
     fragTexCoords = aTexCoords;
+
+    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
 }
 )END";
 
-static constexpr GLchar kSourceVertexModel[] = R"END(
+static constexpr GLchar *kShaderVertexModel = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -173,7 +219,6 @@ void main() {
     }
     vec4 newPosition4 = vec4(newPosition, 1.0);
 
-    gl_Position = uProjection * uView * uModel * newPosition4;
     fragPosition = vec3(uModel * newPosition4);
     fragNormal = mat3(transpose(inverse(uModel))) * aNormal;
     fragTexCoords = aTexCoords;
@@ -185,18 +230,12 @@ void main() {
         vec3 N = normalize(vec3(uModel * vec4(aNormal, 0.0)));
         fragTanSpace = mat3(T, B, N);
     }
+
+    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
 }
 )END";
 
-static constexpr GLchar kSourceVertexDepth[] = R"END(
-layout(location = 0) in vec3 aPosition;
-
-void main() {
-    gl_Position = uModel * vec4(aPosition, 1.0);
-}
-)END";
-
-static constexpr GLchar kSourceVertexBillboard[] = R"END(
+static constexpr GLchar *kShaderVertexBillboard = R"END(
 const int BILLBOARD_RENDER_NORMAL = 1;
 const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
 const int BILLBOARD_RENDER_MOTION_BLUR = 3;
@@ -246,7 +285,15 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kSourceGeometryDepth[] = R"END(
+static constexpr GLchar *kShaderVertexDepth = R"END(
+layout(location = 0) in vec3 aPosition;
+
+void main() {
+    gl_Position = uModel * vec4(aPosition, 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderGeometryDepth = R"END(
 const int NUM_CUBE_FACES = 6;
 
 layout(triangles) in;
@@ -269,7 +316,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kSourceFragmentWhite[] = R"END(
+static constexpr GLchar *kShaderFragmentColor = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -279,8 +326,8 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kSourceFragmentGUI[] = R"END(
-uniform sampler2D uTexture;
+static constexpr GLchar *kShaderFragmentGUI = R"END(
+uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
 
@@ -288,7 +335,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    vec4 textureSample = texture(uTexture, fragTexCoords);
+    vec4 textureSample = texture(uDiffuse, fragTexCoords);
     vec3 finalColor = uColor.rgb * textureSample.rgb;
 
     if (uDiscardEnabled && length(uDiscardColor.rgb - finalColor) < 0.01) {
@@ -299,18 +346,13 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kSourceFragmentModel[] = R"END(
-const vec3 RGB_TO_LUMINOSITY = vec3(0.2126, 0.7152, 0.0722);
-
-const float SPECULAR_STRENGTH = 0.2;
-const float SHININESS = 8.0;
-
+static constexpr GLchar *kShaderFragmentModel = R"END(
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
 uniform samplerCube uEnvmap;
-uniform samplerCube uBumpyShiny;
-uniform samplerCube uShadowmap;
+uniform samplerCube uIrradianceMap;
+uniform samplerCube uShadowMap;
 
 uniform vec3 uCameraPosition;
 uniform bool uShadowLightPresent;
@@ -324,11 +366,6 @@ in mat3 fragTanSpace;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
-
-void applyLightmap(inout vec3 color, float strength) {
-    vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-    color = mix(color, color * lightmapSample.rgb, strength);
-}
 
 vec2 normalizeUV(vec2 uv) {
     vec2 result = uv;
@@ -383,45 +420,6 @@ void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
     normal = normalize(fragTanSpace * normal);
 }
 
-void applyEnvmap(samplerCube image, vec3 normal, float strength, inout vec3 color, out float alpha) {
-    vec3 I = normalize(fragPosition - uCameraPosition);
-    vec3 R = reflect(I, normal);
-    vec4 sample = texture(image, R);
-    color += strength * sample.rgb;
-    alpha = sample.a;
-}
-
-void applyLighting(vec3 normal, float shadow, inout vec3 color) {
-    vec3 ambient = uAmbientLightColor.rgb * uMeshAmbientColor.rgb * color;
-
-    if (uLightCount == 0) {
-        color = ambient;
-        return;
-    }
-
-    vec3 result = vec3(0.0);
-    vec3 viewDir = normalize(uCameraPosition - fragPosition);
-
-    for (int i = 0; i < uLightCount; ++i) {
-        vec3 lightDir = normalize(uLights[i].position.xyz - fragPosition);
-        float diff = max(dot(lightDir, normal), 0.0);
-
-        vec3 halfwayDir = normalize(lightDir + viewDir);
-        float spec = SPECULAR_STRENGTH * pow(max(dot(normal, halfwayDir), 0.0), SHININESS);
-
-        float distance = length(uLights[i].position.xyz - fragPosition);
-        float attenuation = clamp(1.0 - distance / uLights[i].radius, 0.0, 1.0);
-        attenuation *= attenuation;
-
-        vec3 diffuse = diff * uLights[i].color.rgb * uMeshDiffuseColor.rgb * color * attenuation;
-        vec3 specular = spec * uLights[i].color.rgb * color * attenuation;
-
-        result += (1.0 - 0.5 * shadow) * (diffuse + specular);
-    }
-
-    color = ambient + result;
-}
-
 float getShadowValue() {
     if (!uShadowLightPresent) return 0.0;
 
@@ -436,7 +434,7 @@ float getShadowValue() {
     for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
         for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
             for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                float closestDepth = texture(uShadowmap, fragToLight + vec3(x, y, z)).r;
+                float closestDepth = texture(uShadowMap, fragToLight + vec3(x, y, z)).r;
                 closestDepth *= SHADOW_FAR_PLANE;
 
                 if (currentDepth - bias > closestDepth) {
@@ -451,53 +449,130 @@ float getShadowValue() {
 
 void main() {
     vec2 uv = fragTexCoords + uUvOffset;
-    vec3 normal = normalize(fragNormal);
-    vec4 diffuseSample;
-    vec3 surfaceColor;
-
-    if (uDiffuseEnabled) {
-        diffuseSample = texture(uDiffuse, uv);
-        surfaceColor = diffuseSample.rgb;
-        if (uBumpmapEnabled) {
-            applyBumpmapToNormal(normal, uv);
-        }
-    } else {
-        surfaceColor = vec3(1.0);
+    vec3 N = normalize(fragNormal);
+    if (uBumpmapEnabled) {
+        applyBumpmapToNormal(N, uv);
     }
+
+    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec3 albedo = pow(diffuseSample.rgb, vec3(2.2));
+    float metallic;
+    float roughness;
+    float ao = 1.0;
+
+    if (uEnvmapEnabled) {
+        metallic = 1.0 - diffuseSample.a;
+        roughness = diffuseSample.a;
+    } else {
+        metallic = 0.0;
+        roughness = 1.0;
+    }
+
+    vec3 V = normalize(uCameraPosition - fragPosition);
+
+    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
+    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
+
+    vec3 color;
+
     if (uLightmapEnabled) {
-        applyLightmap(surfaceColor, uWater ? 0.2 : 1.0);
-    }
-    if (uDiffuseEnabled) {
-        float envmapAlpha = 1.0;
-        if (uEnvmapEnabled) {
-            applyEnvmap(uEnvmap, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
-        } else if (uBumpyShinyEnabled) {
-            applyEnvmap(uBumpyShiny, normal, 1.0 - diffuseSample.a, surfaceColor, envmapAlpha);
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        color = (uWater ? 0.2 : 1.0) * lightmapSample.rgb * albedo;
+
+        vec3 I = normalize(fragPosition - uCameraPosition);
+        vec3 R = reflect(I, N);
+        vec4 envmapSample = texture(uEnvmap, R);
+        color += (1.0 - diffuseSample.a) * envmapSample.rgb;
+
+    } else if (uLightingEnabled) {
+        // reflectance equation
+        vec3 Lo = vec3(0.0);
+        for (int i = 0; i < uLightCount; ++i) {
+            // calculate per-light radiance
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+            vec3 H = normalize(V + L);
+            vec3 radiance;
+            if (uLights[i].position.w == 0.0) {
+                radiance = uLights[i].color.rgb;
+            } else {
+                float distance = length(uLights[i].position.xyz - fragPosition);
+                float attenuation = 1.0 / (distance * distance);
+                radiance = uLights[i].color.rgb * attenuation;
+            }
+
+            // Cook-Torrance BRDF
+            float NDF = DistributionGGX(N, H, roughness);
+            float G = GeometrySmith(N, V, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+            vec3 nominator = NDF * G * F;
+            float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+            vec3 specular = nominator / denominator;
+
+            // kS is equal to Fresnel
+            vec3 kS = F;
+            // for energy conservation, the diffuse and specular light can't
+            // be above 1.0 (unless the surface emits light); to preserve this
+            // relationship the diffuse component (kD) should equal 1.0 - kS.
+            vec3 kD = vec3(1.0) - kS;
+            // multiply kD by the inverse metalness such that only non-metals
+            // have diffuse lighting, or a linear blend if partly metal (pure metals
+            // have no diffuse light).
+            kD *= 1.0 - metallic;
+
+            // scale light by NdotL
+            float NdotL = max(dot(N, L), 0.0);
+
+            // add to outgoing radiance Lo
+            Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         }
+
+        // ambient lighting
+        vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
+        if (uIrradianceMapEnabled) {
+            vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+            vec3 kD = 1.0 - kS;
+            vec3 irradiance = texture(uIrradianceMap, N).rgb;
+            vec3 diffuse = irradiance * albedo;
+            ambient = mix(ambient, (kD * diffuse) * ao, diffuseSample.a);
+        }
+
+        color = ambient + Lo;
+
+    } else if (uEnvmapEnabled) {
+        vec3 I = normalize(fragPosition - uCameraPosition);
+        vec3 R = reflect(I, N);
+        vec4 envmapSample = texture(uEnvmap, R);
+        color = albedo + (1.0 - diffuseSample.a) * envmapSample.rgb;
+
+    } else {
+        color = albedo;
     }
 
-    float shadow = 0.0;
     if (uShadowsEnabled) {
-        shadow = getShadowValue();
-    }
-    if (uLightingEnabled) {
-        applyLighting(normal, shadow, surfaceColor);
-    } else {
-        surfaceColor *= 1.0 - 0.5 * shadow;
+        float shadow = getShadowValue();
+        color *= 1.0 - 0.5 * shadow;
     }
 
     float finalAlpha = uAlpha;
-    if (uDiffuseEnabled && !uEnvmapEnabled && !uBumpyShinyEnabled && !uBumpmapEnabled) {
+    if (uDiffuseEnabled && !uEnvmapEnabled && !uBumpmapEnabled) {
         finalAlpha *= diffuseSample.a;
     }
 
-    fragColor = vec4(surfaceColor, finalAlpha);
+    // HDR tonemapping
+    color = color / (color + vec3(1.0));
+    // gamma correct
+    color = pow(color, vec3(1.0 / 2.2));
+
+    fragColor = vec4(color, finalAlpha);
     if (uWater) {
         fragColor *= uWaterAlpha;
     }
 
     if (uDiffuseEnabled && uSelfIllumEnabled) {
-        vec3 color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
+        color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
         fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
     } else {
         fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
@@ -505,56 +580,8 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kSourceFragmentBlur[] = R"END(
-uniform sampler2D uTexture;
-
-out vec4 fragColor;
-
-void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
-    vec4 color = vec4(0.0);
-    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
-    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color += texture2D(uTexture, uv) * 0.2270270270;
-    color += texture2D(uTexture, uv + (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture2D(uTexture, uv - (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture2D(uTexture, uv + (off2 / uBlurResolution)) * 0.0702702703;
-    color += texture2D(uTexture, uv - (off2 / uBlurResolution)) * 0.0702702703;
-
-    fragColor = color;
-}
-)END";
-
-static constexpr GLchar kSourceFragmentBloom[] = R"END(
-uniform sampler2D uGeometry;
-uniform sampler2D uBloom;
-
-in vec2 fragTexCoords;
-
-out vec4 fragColor;
-
-void main() {
-    vec3 geometryColor = texture(uGeometry, fragTexCoords).rgb;
-    vec3 bloomColor = texture(uBloom, fragTexCoords).rgb;
-
-    fragColor = vec4(geometryColor + bloomColor, 1.0);
-}
-)END";
-
-static constexpr GLchar kSourceFragmentDepth[] = R"END(
-uniform vec3 uShadowLightPosition;
-
-in vec4 fragPosition;
-
-void main() {
-    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
-    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
-    gl_FragDepth = lightDistance;
-}
-)END";
-
-static constexpr GLchar kSourceFragmentBillboard[] = R"END(
-uniform sampler2D uTexture;
+static constexpr GLchar *kShaderFragmentBillboard = R"END(
+uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
 
@@ -573,13 +600,93 @@ void main() {
         texCoords.x += oneOverGridX * (uBillboardFrame % int(uBillboardGridSize.x));
     }
 
-    vec4 textureSample = texture(uTexture, texCoords);
+    vec4 textureSample = texture(uDiffuse, texCoords);
     fragColor = vec4(uColor.rgb * textureSample.rgb, uAlpha * textureSample.a);
 }
 )END";
 
-static constexpr GLchar kSourceFragmentDebugShadows[] = R"END(
-uniform samplerCube uShadowmap;
+static constexpr GLchar *kShaderFragmentBlur = R"END(
+uniform sampler2D uDiffuse;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
+    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
+    color += texture2D(uDiffuse, uv) * 0.2270270270;
+    color += texture2D(uDiffuse, uv + (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture2D(uDiffuse, uv - (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture2D(uDiffuse, uv + (off2 / uBlurResolution)) * 0.0702702703;
+    color += texture2D(uDiffuse, uv - (off2 / uBlurResolution)) * 0.0702702703;
+
+    fragColor = color;
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentBloom = R"END(
+uniform sampler2D uDiffuse;
+uniform sampler2D uBloom;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 geometryColor = texture(uDiffuse, fragTexCoords).rgb;
+    vec3 bloomColor = texture(uBloom, fragTexCoords).rgb;
+
+    fragColor = vec4(geometryColor + bloomColor, 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentDepth = R"END(
+uniform vec3 uShadowLightPosition;
+
+in vec4 fragPosition;
+
+void main() {
+    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
+    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
+    gl_FragDepth = lightDistance;
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentIrradiance = R"END(
+uniform samplerCube uEnvmap;
+
+in vec3 fragPosition;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 N = normalize(fragPosition);
+    vec3 irradiance = vec3(0.0);
+
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    vec3 right = cross(up, N);
+    up = cross(N, right);
+
+    float sampleDelta = 0.025;
+    float numSamples = 0.0;
+    for (float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {
+        for (float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta) {
+            vec3 tangentSample = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+            vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
+
+            irradiance += texture(uEnvmap, sampleVec).rgb * cos(theta) * sin(theta);
+            ++numSamples;
+        }
+    }
+    irradiance = PI * irradiance * (1.0 / float(numSamples));
+
+    fragColor = vec4(irradiance, 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentDebugShadows = R"END(
+uniform samplerCube uShadowMap;
 
 in vec2 fragTexCoords;
 
@@ -587,8 +694,9 @@ out vec4 fragColor;
 
 void main() {
     vec2 cubeMapCoords = 2.0 * fragTexCoords - 1.0;
-    float value = texture(uShadowmap, vec3(cubeMapCoords, -1.0)).r;
-    fragColor = vec4(vec3(value), 1.0);
+    vec4 shadowmapSample = texture(uShadowMap, vec3(cubeMapCoords.x, -1.0, -cubeMapCoords.y));
+    float value = shadowmapSample.r;
+    fragColor = vec4(shadowmapSample.rgb, 1.0);
 }
 )END";
 
@@ -603,29 +711,31 @@ Shaders::Shaders() {
 }
 
 void Shaders::initGL() {
-    initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, kSourceVertexGUI);
-    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, kSourceVertexModel);
-    initShader(ShaderName::VertexDepth, GL_VERTEX_SHADER, kSourceVertexDepth);
-    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, kSourceVertexBillboard);
-    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, kSourceGeometryDepth);
-    initShader(ShaderName::FragmentWhite, GL_FRAGMENT_SHADER, kSourceFragmentWhite);
-    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, kSourceFragmentGUI);
-    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, kSourceFragmentModel);
-    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, kSourceFragmentBlur);
-    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, kSourceFragmentBloom);
-    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, kSourceFragmentDepth);
-    initShader(ShaderName::FragmentBillboard, GL_FRAGMENT_SHADER, kSourceFragmentBillboard);
-    initShader(ShaderName::FragmentDebugShadows, GL_FRAGMENT_SHADER, kSourceFragmentDebugShadows);
+    initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexGUI });
+    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
+    initShader(ShaderName::VertexDepth, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexDepth });
+    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexBillboard });
+    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
+    initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
+    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentGUI });
+    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderFragmentModel });
+    initShader(ShaderName::FragmentBillboard, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBillboard });
+    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBlur });
+    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBloom });
+    initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentIrradiance });
+    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
+    initShader(ShaderName::FragmentDebugShadows, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDebugShadows });
 
-    initProgram(ShaderProgram::GUIGUI, 2, ShaderName::VertexGUI, ShaderName::FragmentGUI);
-    initProgram(ShaderProgram::GUIBlur, 2, ShaderName::VertexGUI, ShaderName::FragmentBlur);
-    initProgram(ShaderProgram::GUIBloom, 2, ShaderName::VertexGUI, ShaderName::FragmentBloom);
-    initProgram(ShaderProgram::GUIWhite, 2, ShaderName::VertexGUI, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::GUIDebugShadows, 2, ShaderName::VertexGUI, ShaderName::FragmentDebugShadows);
-    initProgram(ShaderProgram::ModelWhite, 2, ShaderName::VertexModel, ShaderName::FragmentWhite);
-    initProgram(ShaderProgram::ModelModel, 2, ShaderName::VertexModel, ShaderName::FragmentModel);
-    initProgram(ShaderProgram::BillboardBillboard, 2, ShaderName::VertexBillboard, ShaderName::FragmentBillboard);
-    initProgram(ShaderProgram::DepthDepth, 3, ShaderName::VertexDepth, ShaderName::GeometryDepth, ShaderName::FragmentDepth);
+    initProgram(ShaderProgram::GUIColor, { ShaderName::VertexGUI, ShaderName::FragmentColor });
+    initProgram(ShaderProgram::GUIGUI, { ShaderName::VertexGUI, ShaderName::FragmentGUI });
+    initProgram(ShaderProgram::GUIBlur, { ShaderName::VertexGUI, ShaderName::FragmentBlur });
+    initProgram(ShaderProgram::GUIBloom, { ShaderName::VertexGUI, ShaderName::FragmentBloom });
+    initProgram(ShaderProgram::GUIIrradiance, { ShaderName::VertexGUI, ShaderName::FragmentIrradiance });
+    initProgram(ShaderProgram::GUIDebugShadows, { ShaderName::VertexGUI, ShaderName::FragmentDebugShadows });
+    initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
+    initProgram(ShaderProgram::ModelModel, { ShaderName::VertexModel, ShaderName::FragmentModel });
+    initProgram(ShaderProgram::BillboardBillboard, { ShaderName::VertexBillboard, ShaderName::FragmentBillboard });
+    initProgram(ShaderProgram::DepthDepth, { ShaderName::VertexDepth, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
 
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
@@ -660,26 +770,26 @@ void Shaders::initGL() {
             glUniformBlockBinding(_activeOrdinal, bumpmapBlockIdx, kBumpmapBindingPointIndex);
         }
 
-        setUniform("uEnvmap", TextureUnits::envmap);
+        setUniform("uDiffuse", TextureUnits::diffuse);
         setUniform("uLightmap", TextureUnits::lightmap);
-        setUniform("uBumpyShiny", TextureUnits::bumpyShiny);
+        setUniform("uEnvmap", TextureUnits::envmap);
         setUniform("uBumpmap", TextureUnits::bumpmap);
         setUniform("uBloom", TextureUnits::bloom);
-        setUniform("uShadowmap", TextureUnits::shadowmap);
+        setUniform("uIrradianceMap", TextureUnits::irradianceMap);
+        setUniform("uShadowMap", TextureUnits::shadowMap);
 
         _activeOrdinal = 0;
         glUseProgram(0);
     }
 }
 
-void Shaders::initShader(ShaderName name, unsigned int type, const char *source) {
+void Shaders::initShader(ShaderName name, unsigned int type, vector<char *> sources) {
     GLuint shader = glCreateShader(type);
     GLint success;
     char log[512];
     GLsizei logSize;
 
-    const GLchar *sources[] = { kCommonShaderHeader, source };
-    glShaderSource(shader, 2, sources, nullptr);
+    glShaderSource(shader, sources.size(), &sources[0], nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
@@ -691,18 +801,12 @@ void Shaders::initShader(ShaderName name, unsigned int type, const char *source)
     _shaders.insert(make_pair(name, shader));
 }
 
-void Shaders::initProgram(ShaderProgram program, int shaderCount, ...) {
+void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
     GLuint ordinal = glCreateProgram();
 
-    va_list args;
-    va_start(args, shaderCount);
-    for (int i = 0; i < shaderCount; ++i) {
-        ShaderName name = va_arg(args, ShaderName);
-        unsigned int shaderOrdinal = _shaders.find(name)->second;
-        glAttachShader(ordinal, shaderOrdinal);
+    for (auto &shader : shaders) {
+        glAttachShader(ordinal, _shaders.find(shader)->second);
     }
-    va_end(args);
-
     glLinkProgram(ordinal);
 
     GLint success;

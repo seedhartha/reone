@@ -67,11 +67,11 @@ void TxiFile::processLine(const vector<string> &tokens) {
         case State::None:
             key = boost::to_lower_copy(tokens[0]);
             if (key == "envmaptexture") {
-                _features.envMapTexture = tokens[1];
+                _features.envmapTexture = tokens[1];
             } else if (key == "bumpyshinytexture") {
                 _features.bumpyShinyTexture = tokens[1];
             } else if (key == "bumpmaptexture") {
-                _features.bumpMapTexture = tokens[1];
+                _features.bumpmapTexture = tokens[1];
             } else if (key == "bumpmapscaling") {
                 _features.bumpMapScaling = stof(tokens[1]);
             } else if (key == "blending") {

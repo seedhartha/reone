@@ -307,7 +307,7 @@ void GUI::drawBackground() const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
     Quad::getDefault().renderTriangles();

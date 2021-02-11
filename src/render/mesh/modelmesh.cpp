@@ -23,6 +23,8 @@
 
 #include "SDL2/SDL_opengl.h"
 
+#include "../irradiancemaps.h"
+#include "../shaders.h"
 #include "../stateutil.h"
 
 using namespace std;
@@ -49,24 +51,26 @@ void ModelMesh::render(shared_ptr<Texture> diffuse) const {
     bool additive = false;
 
     if (diffuse) {
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         diffuse->bind();
         additive = diffuse->isAdditive();
     }
-    if (_envmap) {
-        setActiveTextureUnit(1);
-        _envmap->bind();
-    }
     if (_lightmap) {
-        setActiveTextureUnit(2);
+        setActiveTextureUnit(TextureUnits::lightmap);
         _lightmap->bind();
     }
-    if (_bumpyShiny) {
-        setActiveTextureUnit(3);
-        _bumpyShiny->bind();
+    if (_envmap) {
+        setActiveTextureUnit(TextureUnits::envmap);
+        _envmap->bind();
+
+        auto irradianceMap = IrradianceMaps::instance().get(_envmap.get());
+        if (irradianceMap) {
+            setActiveTextureUnit(TextureUnits::irradianceMap);
+            irradianceMap->bind();
+        }
     }
     if (_bumpmap) {
-        setActiveTextureUnit(4);
+        setActiveTextureUnit(TextureUnits::bumpmap);
         _bumpmap->bind();
     }
 
@@ -84,7 +88,7 @@ bool ModelMesh::isTransparent() const {
     TextureFeatures features = _diffuse->features();
     if (features.blending == TextureBlending::Additive) return true;
 
-    if (_envmap || _bumpyShiny || _bumpmap) return false;
+    if (_envmap || _bumpmap) return false;
 
     PixelFormat format = _diffuse->pixelFormat();
     if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;

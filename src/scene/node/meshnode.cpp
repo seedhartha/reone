@@ -43,7 +43,7 @@ void MeshSceneNode::render() const {
     locals.general.color = glm::vec4(_color, 1.0f);
     locals.general.alpha = _alpha;
 
-    Shaders::instance().activate(ShaderProgram::ModelWhite, locals);
+    Shaders::instance().activate(ShaderProgram::ModelColor, locals);
 
     _mesh->renderTriangles();
 

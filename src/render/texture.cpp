@@ -48,7 +48,10 @@ void Texture::init() {
 }
 
 bool Texture::isCubeMap() const {
-    return _type == TextureType::EnvironmentMap || _type == TextureType::CubeMapDepthBuffer;
+    return
+        _type == TextureType::EnvironmentMap ||
+        _type == TextureType::IrradianceMap ||
+        _type == TextureType::CubeMapDepthBuffer;
 }
 
 void Texture::configureCubeMap() {
@@ -104,7 +107,8 @@ bool Texture::hasMipMaps() const {
         _type != TextureType::Cursor &&
         _type != TextureType::ColorBuffer &&
         _type != TextureType::DepthBuffer &&
-        _type != TextureType::EnvironmentMap;
+        _type != TextureType::EnvironmentMap &&
+        _type != TextureType::IrradianceMap;
 }
 
 bool Texture::isDepthBuffer() const {

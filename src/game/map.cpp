@@ -113,7 +113,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
 
         float height = _game->options().graphics.height;
@@ -130,7 +130,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
 
         Quad::getDefault().renderTriangles();
@@ -165,7 +165,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
 
         Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         _noteTexture->bind();
 
         Quad::getDefault().renderTriangles();
@@ -246,7 +246,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
 
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _arrowTexture->bind();
 
     Quad::getDefault().renderTriangles();
