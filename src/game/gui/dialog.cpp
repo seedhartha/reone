@@ -212,7 +212,7 @@ void DialogGUI::loadCurrentSpeaker() {
     if (_currentSpeaker && _currentSpeaker != speaker) {
         auto prevSpeakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (prevSpeakerCreature) {
-            prevSpeakerCreature->setTalking(false);
+            prevSpeakerCreature->stopTalking();
         }
     }
     _currentSpeaker = speaker;
@@ -224,7 +224,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
         auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
-            speakerCreature->setTalking(true);
+            speakerCreature->startTalking(_lipAnimation);
             speakerCreature->face(*player);
         }
     }
@@ -285,7 +285,10 @@ void DialogGUI::updateParticipantAnimations() {
             string animName(getStuntAnimationName(anim.animation));
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
-                participant.creature->playAnimation(animation, AnimationFlags::propagateHead);
+                AnimationProperties properties;
+                properties.flags = AnimationFlags::propagateHead;
+                properties.scale = 1.0f;
+                participant.creature->playAnimation(animation, move(properties));
             }
         } else {
             shared_ptr<Creature> participant;
@@ -300,7 +303,7 @@ void DialogGUI::updateParticipantAnimations() {
             }
             AnimationType animType = getStuntAnimationType(anim.animation);
             if (animType != AnimationType::Invalid) {
-                participant->playAnimation(animType, AnimationFlags::propagateHead);
+                participant->playAnimation(animType, AnimationProperties::fromFlags(AnimationFlags::propagateHead));
             }
         }
     }
@@ -352,7 +355,7 @@ void DialogGUI::onFinish() {
     if (_currentSpeaker) {
         auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
-            speakerCreature->setTalking(false);
+            speakerCreature->stopTalking();
         }
     }
 }

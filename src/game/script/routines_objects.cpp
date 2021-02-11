@@ -27,6 +27,7 @@
 
 using namespace std;
 
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {
@@ -347,10 +348,12 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
 Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (caller) {
-        AnimationType animation = static_cast<AnimationType>(getInt(args, 0));
+        auto animType = static_cast<AnimationType>(getInt(args, 0));
         float speed = getFloat(args, 1, 1.0f);
         float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
-        caller->playAnimation(animation, speed);
+        AnimationProperties properties;
+        properties.speed = speed;
+        caller->playAnimation(animType, move(properties));
     } else {
         warn("Routines: playAnimation: caller is invalid");
     }

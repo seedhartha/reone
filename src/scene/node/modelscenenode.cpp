@@ -41,10 +41,10 @@ namespace scene {
 
 static bool g_drawAABB = false;
 
-ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, const set<string> &skipNodes) :
+ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
     _model(model),
-    _animator(this, skipNodes) {
+    _animator(this, ignoreNodes) {
 
     initModelNodes();
 }
@@ -142,25 +142,6 @@ void ModelSceneNode::render() const {
     }
 }
 
-void ModelSceneNode::playDefaultAnimation() {
-    _animator.playDefaultAnimation();
-
-    for (auto &attached : _attachedModels) {
-        attached.second->playDefaultAnimation();
-    }
-}
-
-void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
-    shared_ptr<Animation> animation(_model->getAnimation(name));
-    if (animation) {
-        playAnimation(animation, flags, speed, _model->animationScale());
-    }
-}
-
-void ModelSceneNode::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
-    _animator.playAnimation(anim, flags, speed, scale);
-}
-
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
     if (!parentNode) return nullptr;
@@ -174,16 +155,15 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
         _attachedModels.erase(maybeAttached);
     }
     if (model) {
-        set<string> skipNodes;
+        set<string> ignoreNodes;
         for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
-            skipNodes.insert(node->name());
+            ignoreNodes.insert(node->name());
         }
-        auto modelNode = make_shared<ModelSceneNode>(_sceneGraph, model, skipNodes);
+        auto modelNode = make_shared<ModelSceneNode>(_sceneGraph, model, ignoreNodes);
         modelNode->setLightingEnabled(_lightingEnabled);
         parentNode->addChild(modelNode);
 
-        auto inserted = _attachedModels.insert(make_pair(parentNumber, move(modelNode)));
-        return inserted.first->second;
+        return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
     }
 
     return nullptr;
@@ -311,21 +291,6 @@ void ModelSceneNode::setAlpha(float alpha) {
 
 void ModelSceneNode::setProjectileSpeed(float speed) {
     _projectileSpeed = speed;
-}
-
-bool ModelSceneNode::isAnimationFinished() const {
-    return _model ? _animator.isAnimationFinished() : false;
-}
-
-void ModelSceneNode::setDefaultAnimation(const string &name) {
-    shared_ptr<Animation> animation(_model->getAnimation(name));
-    if (!animation) return;
-
-    _animator.setDefaultAnimation(animation, AnimationFlags::loopBlend);
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setDefaultAnimation(name);
-    }
 }
 
 void ModelSceneNode::setLightingEnabled(bool enabled) {

@@ -28,6 +28,9 @@
 #include "../render/model/animation.h"
 #include "../render/model/modelnode.h"
 
+#include "animationchannel.h"
+#include "animationproperties.h"
+
 namespace reone {
 
 namespace scene {
@@ -35,84 +38,57 @@ namespace scene {
 class ModelSceneNode;
 
 /**
- * Class, responsible for applying model animations to scene nodes. Manages
- * up to 8 animation channels, which are either overlayed or blended together.
+ * Responsible for applying animations to model scene nodes. Manages up to
+ * kChannelCount animation channels, which it either blends or overlays depending
+ * on the composition mode.
  */
 class SceneNodeAnimator {
 public:
     /**
      * @param modelSceneNode scene node to apply animations to
-     * @param skipNodes names of model nodes, to which animations will not be applied
+     * @param skipNodes names of model nodes to ignore
      */
-    SceneNodeAnimator(ModelSceneNode *modelSceneNode, const std::set<std::string> &skipNodes);
+    SceneNodeAnimator(ModelSceneNode *modelSceneNode, std::set<std::string> ignoreNodes);
 
     void update(float dt);
 
+    void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
+    void playAnimation(std::shared_ptr<render::Animation> anim, AnimationProperties properties = AnimationProperties());
     void playDefaultAnimation();
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
 
     bool isAnimationFinished() const;
 
-    /**
-     * Sets animation to play when current animations finish playing.
-     */
-    void setDefaultAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
+    void setDefaultAnimation(std::string name, AnimationProperties properties = AnimationProperties());
 
 private:
     static constexpr int kChannelCount = 8;
 
-    enum class Mode {
+    enum class CompositionMode {
         Mono, /**< only animation on the first channel is being played */
         Overlay, /**< animations on all channels play simultaneously  */
         Blend /**< animation on the second channel is transitioned into animation on the first channel */
     };
 
-    struct AnimationChannel {
-        std::shared_ptr<render::Animation> animation;
-        int flags { 0 };
-        float speed { 1.0f };
-        float scale { 1.0f };
-        float time { 0.0f };
-        bool finished { false };
-        bool freeze { false }; /**< if true, animation on this channel should not advance */
-        std::unordered_map<uint16_t, glm::mat4> localTransforms;
-
-        bool isActive() const;
-        bool isSameAnimation(const std::shared_ptr<render::Animation> &anim, int flags, float speed, float scale) const;
-
-        void stopAnimation();
-
-        void setAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
-    };
-
     ModelSceneNode *_modelSceneNode;
-    std::set<std::string> _skipNodes;
+    std::set<std::string> _ignoreNodes;
+    std::vector<AnimationChannel> _channels;
 
-    Mode _mode { Mode::Overlay };
+    CompositionMode _compositionMode { CompositionMode::Overlay };
     bool _transition { false }; /**< is there an animation transition going on? */
-    AnimationChannel _channels[kChannelCount];
-    std::unordered_map<uint16_t, glm::mat4> _absTransforms;
+    std::unordered_map<uint16_t, glm::mat4> _transformByNodeNumber;
 
-    // Default animation
+    std::string _defaultAnimName;
+    AnimationProperties _defaultAnimProperties;
 
-    std::shared_ptr<render::Animation> _defaultAnim;
-    int _defaultAnimFlags { 0 };
-    float _defaultAnimSpeed { 1.0f };
-
-    // END Default animation
-
-    void updateChannel(int channel, float dt);
-    void advanceTime(AnimationChannel &channel, float dt);
-    void updateLocalTransforms(AnimationChannel &channel, render::ModelNode &animNode);
-    void updateAbsoluteTransforms(render::ModelNode &modelNode, const glm::mat4 &parentTransform = glm::mat4(1.0f));
-    void applyAnimationTransforms(render::ModelNode &modelNode);
+    void computeAbsoluteTransforms(render::ModelNode &modelNode, glm::mat4 parentTransform = glm::mat4(1.0f));
+    void applyAbsoluteTransforms(render::ModelNode &modelNode);
 
     bool isInTransition() const;
 
     /**
-     * Determines the animation mode by animation flags.
+     * Determines the composition mode by animation flags.
      */
-    Mode getMode(int animFlags) const;
+    CompositionMode determineCompositionMode(int flags) const;
 };
 
 } // namespace scene

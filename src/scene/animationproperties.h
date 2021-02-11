@@ -15,34 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lipfile.h"
-
-using namespace std;
+#pragma once
 
 namespace reone {
 
-namespace render {
+namespace scene {
 
-LipFile::LipFile() : BinaryFile(8, "LIP V1.0") {
-}
+struct AnimationProperties {
+    int flags { 0 };
+    float speed { 1.0f };
+    float scale { 0.0f }; /**< animation scale; 0.0 to use the models scale */
 
-void LipFile::doLoad() {
-    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
-
-    float length = readFloat();
-    uint32_t entryCount = readUint32();
-
-    vector<LipAnimation::Keyframe> keyframes;
-    for (uint32_t i = 0; i < entryCount; ++i) {
-        LipAnimation::Keyframe keyframe;
-        keyframe.time = readFloat();
-        keyframe.shape = readByte();
-        keyframes.push_back(move(keyframe));
+    bool operator==(const AnimationProperties &other) const {
+        return
+            flags == other.flags &&
+            speed == other.speed &&
+            scale == other.scale;
     }
 
-    _animation = make_shared<LipAnimation>(length, move(keyframes));
-}
+    static AnimationProperties fromFlags(int flags) {
+        AnimationProperties properties;
+        properties.flags = flags;
+        return std::move(properties);
+    }
+};
 
-} // namespace render
+} // namespace scene
 
 } // namespace reone

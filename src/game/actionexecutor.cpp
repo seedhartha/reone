@@ -340,16 +340,20 @@ void ActionExecutor::executeJumpToObject(const shared_ptr<Object> &actor, Object
 }
 
 void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, LocationAction &action, float dt) {
-    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
-    spatialActor->setPosition(action.location()->position());
-    spatialActor->setFacing(action.location()->facing());
+    auto spatial = static_pointer_cast<SpatialObject>(actor);
+    spatial->setPosition(action.location()->position());
+    spatial->setFacing(action.location()->facing());
 
     action.complete();
 }
 
 void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const shared_ptr<PlayAnimationAction> &action, float dt) {
-    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
-    spatialActor->playAnimation(action->animation(), AnimationFlags::propagateHead, action->speed(), action);
+    AnimationProperties properties;
+    properties.flags = AnimationFlags::propagateHead;
+    properties.speed = action->speed();
+
+    auto spatial = static_pointer_cast<SpatialObject>(actor);
+    spatial->playAnimation(action->animation(), move(properties), action);
 }
 
 } // namespace game

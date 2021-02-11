@@ -24,6 +24,7 @@
 #include "../../render/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
+#include "../../scene/types.h"
 #include "../../script/scripts.h"
 
 #include "../blueprint/blueprints.h"
@@ -88,8 +89,8 @@ void Door::loadBlueprint(const GffStruct &gffs) {
 void Door::open(const shared_ptr<Object> &triggerrer) {
     shared_ptr<ModelSceneNode> model(getModelSceneNode());
     if (model) {
-        model->setDefaultAnimation("opened1");
-        model->playAnimation("opening1");
+        model->animator().setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->animator().playAnimation("opening1");
     }
     _open = true;
 }
@@ -97,8 +98,8 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
 void Door::close(const shared_ptr<Object> &triggerrer) {
     shared_ptr<ModelSceneNode> model(getModelSceneNode());
     if (model) {
-        model->setDefaultAnimation("closed");
-        model->playAnimation("closing1");
+        model->animator().setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->animator().playAnimation("closing1");
     }
     _open = false;
 }

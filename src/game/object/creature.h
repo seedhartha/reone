@@ -21,6 +21,7 @@
 #include <functional>
 
 #include "../../audio/stream.h"
+#include "../../render/lip/lipanimation.h"
 #include "../../resource/format/2dafile.h"
 #include "../../resource/format/gfffile.h"
 #include "../../resource/types.h"
@@ -90,6 +91,9 @@ public:
 
     void playSound(SoundSetEntry entry, bool positional = true);
 
+    void startTalking(const std::shared_ptr<render::LipAnimation> &animation);
+    void stopTalking();
+
     bool isSelectable() const override;
     bool isMovementRestricted() const { return _movementRestricted; }
     bool isInCombat() const { return _inCombat; }
@@ -110,7 +114,6 @@ public:
     int xp() const { return _xp; }
 
     void setMovementType(MovementType type);
-    void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
     void setInCombat(bool inCombat);
@@ -121,11 +124,11 @@ public:
 
     // END Animation
 
-    void playAnimation(AnimationType anim, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
+    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
 
@@ -172,18 +175,24 @@ private:
     MovementType _movementType { MovementType::None };
     bool _talking { false };
     CreatureAttributes _attributes;
-    bool _animDirty { true };
-    bool _animFireForget { false };
     Faction _faction { Faction::Invalid };
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
-    CreatureAnimationResolver _animResolver;
     CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
-    std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
     std::shared_ptr<SoundSet> _soundSet;
+
+    // Animation
+
+    CreatureAnimationResolver _animResolver;
+    bool _animDirty { true };
+    bool _animFireForget { false };
+    std::shared_ptr<Action> _animAction; /**< action to complete when animation is finished */
+    std::shared_ptr<render::LipAnimation> _lipAnimation;
+
+    // END Animation
 
     // Scripts
 
@@ -210,7 +219,7 @@ private:
 
     // Animation
 
-    void doPlayAnimation(int flags, const std::function<void()> &callback);
+    void doPlayAnimation(bool fireForget, const std::function<void()> &callback);
 
     // END Animation
 

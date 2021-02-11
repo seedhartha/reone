@@ -31,11 +31,14 @@ public:
         uint8_t shape { 0 }; /**< an index into the keyframes of the "talk" animation  */
     };
 
-    LipAnimation(std::vector<Keyframe> keyframes);
+    LipAnimation(float length, std::vector<Keyframe> keyframes);
 
     const Keyframe &getKeyframe(float time) const;
 
+    float length() const { return _length; }
+
 private:
+    float _length { 0.0f };
     std::vector<Keyframe> _keyframes;
 };
 

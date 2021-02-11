@@ -64,12 +64,12 @@ static const string &getAnimationName(int animNumber) {
 
 void AnimatedCamera::playAnimation(int animNumber) {
     if (_model) {
-        _model->playAnimation(getAnimationName(animNumber));
+        _model->animator().playAnimation(getAnimationName(animNumber));
     }
 }
 
 bool AnimatedCamera::isAnimationFinished() const {
-    return _model ? _model->isAnimationFinished() : false;
+    return _model ? _model->animator().isAnimationFinished() : false;
 }
 
 void AnimatedCamera::setModel(const shared_ptr<Model> &model) {

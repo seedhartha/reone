@@ -68,6 +68,7 @@ protected:
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<SpatialObject> _owner;
     std::shared_ptr<render::Model> _cameraModel;
+    std::shared_ptr<render::LipAnimation> _lipAnimation;
     const Dialog::EntryReply *_currentEntry { nullptr };
     bool _entryEnded { false };
 
@@ -84,7 +85,6 @@ protected:
 
 private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
-    std::shared_ptr<render::LipAnimation> _lipAnimation;
     Timer _endEntryTimer;
     float _entryDuration { 0.0f };
     std::vector<const Dialog::EntryReply *> _replies;

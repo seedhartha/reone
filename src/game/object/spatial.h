@@ -85,7 +85,7 @@ public:
 
     // Animation
 
-    virtual void playAnimation(AnimationType animation, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
 
     // END Animation
 

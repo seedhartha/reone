@@ -203,7 +203,7 @@ void SpatialObject::updateEffects(float dt) {
     }
 }
 
-void SpatialObject::playAnimation(AnimationType animation, int flags, float speed, shared_ptr<Action> actionToComplete) {
+void SpatialObject::playAnimation(AnimationType animation, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
 }
 
 bool SpatialObject::isAnimationLooping(AnimationType animation) const {

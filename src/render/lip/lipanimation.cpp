@@ -25,7 +25,8 @@ namespace reone {
 
 namespace render {
 
-LipAnimation::LipAnimation(vector<Keyframe> keyframes) : _keyframes(move(keyframes)) {
+LipAnimation::LipAnimation(float length, vector<Keyframe> keyframes) :
+    _length(length), _keyframes(move(keyframes)) {
 }
 
 const LipAnimation::Keyframe &LipAnimation::getKeyframe(float time) const {

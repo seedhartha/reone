@@ -159,6 +159,7 @@ void Conversation::loadVoiceOver() {
     if (_currentVoice) {
         _currentVoice->stop();
         _currentVoice.reset();
+        _lipAnimation.reset();
     }
 
     // Play current voice over either from Sound or from VO_ResRef
