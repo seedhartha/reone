@@ -29,7 +29,7 @@ namespace render {
 
 class TgaFile : public resource::BinaryFile {
 public:
-    TgaFile(const std::string &resRef, TextureType type);
+    TgaFile(const std::string &resRef, TextureUsage usage);
 
     std::shared_ptr<render::Texture> texture() const { return _texture; }
 
@@ -40,7 +40,7 @@ private:
     };
 
     std::string _resRef;
-    TextureType _texType;
+    TextureUsage _usage;
 
     ImageType _imageType { ImageType::RGBA };
     int _width { 0 };

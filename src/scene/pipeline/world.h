@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "glm/mat4x4.hpp"
 
 #include "../../render/framebuffer.h"
 #include "../../render/types.h"
@@ -38,10 +37,28 @@ public:
 private:
     SceneGraph *_scene { nullptr };
     render::GraphicsOptions _opts;
+
+    // Framebuffers
+
     render::Framebuffer _geometry;
     render::Framebuffer _verticalBlur;
     render::Framebuffer _horizontalBlur;
     render::Framebuffer _shadows;
+
+    // END Framebuffers
+
+    // Framebuffer targets
+
+    std::unique_ptr<render::Texture> _geometryColor1;
+    std::unique_ptr<render::Texture> _geometryColor2;
+    std::unique_ptr<render::Texture> _geometryDepth;
+    std::unique_ptr<render::Texture> _verticalBlurColor;
+    std::unique_ptr<render::Texture> _verticalBlurDepth;
+    std::unique_ptr<render::Texture> _horizontalBlurColor;
+    std::unique_ptr<render::Texture> _horizontalBlurDepth;
+    std::unique_ptr<render::Texture> _shadowsDepth;
+
+    // END Framebuffers targets
 
     WorldRenderPipeline(const WorldRenderPipeline &) = delete;
     WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
@@ -52,7 +69,7 @@ private:
     void applyVerticalBlur() const;
     void drawResult() const;
 
-    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapSide side) const;
+    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapFace side) const;
 };
 
 } // namespace scene

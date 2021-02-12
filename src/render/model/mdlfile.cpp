@@ -805,21 +805,21 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     modelMesh->setAmbientColor(glm::make_vec3(&ambientColor[0]));
 
     if (!diffuse.empty() && diffuse != "null") {
-        modelMesh->_diffuse = Textures::instance().get(diffuse, TextureType::Diffuse);
+        modelMesh->_diffuse = Textures::instance().get(diffuse, TextureUsage::Diffuse);
         if (modelMesh->_diffuse) {
-            const TextureFeatures &features = modelMesh->_diffuse->features();
+            const Texture::Features &features = modelMesh->_diffuse->features();
             if (!features.envmapTexture.empty()) {
-                modelMesh->_envmap = Textures::instance().get(features.envmapTexture, TextureType::EnvironmentMap);
+                modelMesh->_envmap = Textures::instance().get(features.envmapTexture, TextureUsage::EnvironmentMap);
             } else if (!features.bumpyShinyTexture.empty()) {
-                modelMesh->_envmap = Textures::instance().get(features.bumpyShinyTexture, TextureType::EnvironmentMap);
+                modelMesh->_envmap = Textures::instance().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
             }
             if (!features.bumpmapTexture.empty()) {
-                modelMesh->_bumpmap = Textures::instance().get(features.bumpmapTexture, TextureType::Bumpmap);
+                modelMesh->_bumpmap = Textures::instance().get(features.bumpmapTexture, TextureUsage::Bumpmap);
             }
         }
     }
     if (!lightmap.empty()) {
-        modelMesh->_lightmap = Textures::instance().get(lightmap, TextureType::Lightmap);
+        modelMesh->_lightmap = Textures::instance().get(lightmap, TextureUsage::Lightmap);
     }
     if (animateUv) {
         modelMesh->_uvAnimation.animated = true;
@@ -983,7 +983,7 @@ void MdlFile::readEmitter(ModelNode &node) {
     node._emitter->_updateType = parseEmitterUpdate(readCString(32));
     node._emitter->_renderType = parseEmitterRender(readCString(32));
     node._emitter->_blendType = parseEmitterBlend(readCString(32));
-    node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureType::Diffuse);
+    node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureUsage::Diffuse);
 
     ignore(20);
 

@@ -23,11 +23,12 @@
 
 #include "GL/glew.h"
 
-#include "../../render/irradiancemaps.h"
 #include "../../render/mesh/quad.h"
+#include "../../render/pbribl.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
+#include "../../render/textureutil.h"
 
 using namespace std;
 
@@ -41,22 +42,99 @@ static constexpr int kShadowResolution = 2048;
 static constexpr float kShadowFarPlane = 10000.0f;
 
 static bool g_wireframesEnabled = false;
-static bool g_debugShadows = false;
+static bool g_debugCubeMap = false;
 
 WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
-    _scene(scene),
-    _opts(opts),
-    _geometry(opts.width, opts.height, 2),
-    _verticalBlur(opts.width, opts.height),
-    _horizontalBlur(opts.width, opts.height),
-    _shadows(kShadowResolution, kShadowResolution, 0, true) {
+    _scene(scene), _opts(opts) {
 }
 
 void WorldRenderPipeline::init() {
+    // Geometry framebuffer
+
+    _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    _geometryColor1->init();
+    _geometryColor1->bind();
+    _geometryColor1->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _geometryColor1->unbind();
+
+    _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _geometryColor2->init();
+    _geometryColor2->bind();
+    _geometryColor2->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _geometryColor2->unbind();
+
+    _geometryDepth = make_unique<Texture>("geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _geometryDepth->init();
+    _geometryDepth->bind();
+    _geometryDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
+    _geometryDepth->unbind();
+
     _geometry.init();
+    _geometry.bind();
+    _geometry.attachColor(*_geometryColor1, 0);
+    _geometry.attachColor(*_geometryColor2, 1);
+    _geometry.attachDepth(*_geometryDepth);
+    _geometry.checkCompleteness();
+    _geometry.unbind();
+
+
+    // Vertical blur framebuffer
+
+    _verticalBlurColor = make_unique<Texture>("verticalblur_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _verticalBlurColor->init();
+    _verticalBlurColor->bind();
+    _verticalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _verticalBlurColor->unbind();
+
+    _verticalBlurDepth = make_unique<Texture>("verticalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _verticalBlurDepth->init();
+    _verticalBlurDepth->bind();
+    _verticalBlurDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
+    _verticalBlurDepth->unbind();
+
     _verticalBlur.init();
+    _verticalBlur.bind();
+    _verticalBlur.attachColor(*_verticalBlurColor);
+    _verticalBlur.attachDepth(*_verticalBlurDepth);
+    _verticalBlur.checkCompleteness();
+    _verticalBlur.unbind();
+
+
+    // Horizontal blur framebuffer
+
+    _horizontalBlurColor = make_unique<Texture>("horizontalblur_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _horizontalBlurColor->init();
+    _horizontalBlurColor->bind();
+    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _horizontalBlurColor->unbind();
+
+    _horizontalBlurDepth = make_unique<Texture>("horizontalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _horizontalBlurDepth->init();
+    _horizontalBlurDepth->bind();
+    _horizontalBlurDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
+    _horizontalBlurDepth->unbind();
+
     _horizontalBlur.init();
+    _horizontalBlur.bind();
+    _horizontalBlur.attachColor(*_horizontalBlurColor);
+    _horizontalBlur.attachDepth(*_horizontalBlurDepth);
+    _horizontalBlur.checkCompleteness();
+    _horizontalBlur.unbind();
+
+
+    // Shadows framebuffer
+
+    _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
+    _shadowsDepth->init();
+    _shadowsDepth->bind();
+    _shadowsDepth->clearPixels(kShadowResolution, kShadowResolution, Texture::PixelFormat::Depth);
+    _shadowsDepth->unbind();
+
     _shadows.init();
+    _shadows.bind();
+    _shadows.attachDepth(*_shadowsDepth);
+    _shadows.checkCompleteness();
+    _shadows.unbind();
 }
 
 void WorldRenderPipeline::render() const {
@@ -93,7 +171,7 @@ void WorldRenderPipeline::drawShadows() const {
         globals.shadowLightPosition = lightPosition;
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
-            auto side = static_cast<CubeMapSide>(i);
+            auto side = static_cast<CubeMapFace>(i);
             globals.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
         }
 
@@ -106,19 +184,19 @@ void WorldRenderPipeline::drawShadows() const {
     });
 }
 
-glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapSide side) const {
+glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapFace side) const {
     switch (side) {
-        case CubeMapSide::PositiveX:
+        case CubeMapFace::PositiveX:
             return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapSide::NegativeX:
+        case CubeMapFace::NegativeX:
             return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapSide::PositiveY:
+        case CubeMapFace::PositiveY:
             return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-        case CubeMapSide::NegativeY:
+        case CubeMapFace::NegativeY:
             return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-        case CubeMapSide::PositiveZ:
+        case CubeMapFace::PositiveZ:
             return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapSide::NegativeZ:
+        case CubeMapFace::NegativeZ:
             return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
         default:
             throw invalid_argument("side is invalid");
@@ -135,7 +213,7 @@ void WorldRenderPipeline::drawGeometry() const {
 
     if (_scene->isShadowLightPresent()) {
         setActiveTextureUnit(TextureUnits::shadowMap);
-        _shadows.bindDepthBuffer();
+        _shadowsDepth->bind();
     }
 
     if (g_wireframesEnabled) {
@@ -144,11 +222,6 @@ void WorldRenderPipeline::drawGeometry() const {
         });
     } else {
         withDepthTest([this]() { _scene->render(); });
-    }
-
-    if (_scene->isShadowLightPresent()) {
-        setActiveTextureUnit(TextureUnits::shadowMap);
-        _shadows.unbindDepthBuffer();
     }
 
     _geometry.unbind();
@@ -174,13 +247,12 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
-    _geometry.bindColorBuffer(1);
+    _geometryColor2->bind();
 
     withDepthTest([]() {
         Quad::getDefault().renderTriangles();
     });
 
-    _geometry.unbindColorBuffer(1);
     _horizontalBlur.unbind();
 }
 
@@ -204,13 +276,12 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
-    _horizontalBlur.bindColorBuffer(0);
+    _horizontalBlurColor->bind();
 
     withDepthTest([]() {
         Quad::getDefault().renderTriangles();
     });
 
-    _horizontalBlur.unbindColorBuffer(0);
     _verticalBlur.unbind();
 }
 
@@ -221,24 +292,26 @@ void WorldRenderPipeline::drawResult() const {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    if (g_debugShadows) {
+    if (g_debugCubeMap) {
         LocalUniforms locals;
         locals.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::GUIDebugCubeMap, locals);
 
-        Shaders::instance().activate(ShaderProgram::GUIDebugShadows, locals);
+        setActiveTextureUnit(TextureUnits::diffuse);
 
-        auto envmap = Textures::instance().get("cm_baremetal", TextureType::EnvironmentMap);
-        auto irradianceMap = IrradianceMaps::instance().get(envmap.get());
-
-        if (irradianceMap) {
-            setActiveTextureUnit(TextureUnits::shadowMap);
-            //_shadows.bindDepthBuffer();
-            irradianceMap->bind();
-
-            Quad::getDefault().renderTriangles();
-
-            //_shadows.unbindDepthBuffer();
+        /*
+        auto envmap = Textures::instance().get("cm_endar", TextureUsage::EnvironmentMap);
+        PBRIBL::Derived derived;
+        if (PBRIBL::instance().getDerived(envmap.get(), derived)) {
+            derived.brdfLookup->bind();
+        } else {
+            envmap->bind();
         }
+        */
+
+        _shadowsDepth->bind();
+
+        Quad::getDefault().renderTriangles();
 
     } else {
         LocalUniforms locals;
@@ -248,18 +321,12 @@ void WorldRenderPipeline::drawResult() const {
         Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
-        _geometry.bindColorBuffer(0);
+        _geometryColor1->bind();
 
         setActiveTextureUnit(TextureUnits::bloom);
-        _verticalBlur.bindColorBuffer(0);
+        _verticalBlurColor->bind();
 
         Quad::getDefault().renderTriangles();
-
-        setActiveTextureUnit(TextureUnits::bloom);
-        _verticalBlur.unbindColorBuffer(0);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        _geometry.unbindColorBuffer(0);
     }
 }
 

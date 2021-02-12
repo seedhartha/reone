@@ -29,32 +29,57 @@ namespace reone {
 
 namespace render {
 
-class IrradianceMaps {
+/**
+ * Computes and caches PBR IBL textures, i.e. irradiance maps, prefiltered
+ * environment maps and BRDF lookup textures.
+ */
+class PBRIBL {
 public:
-    static IrradianceMaps &instance();
+    struct Derived {
+        std::shared_ptr<Texture> irradianceMap;
+        std::shared_ptr<Texture> prefilterMap;
+        std::shared_ptr<Texture> brdfLookup;
+    };
 
-    ~IrradianceMaps();
+    static PBRIBL &instance();
+
+    ~PBRIBL();
 
     void init();
     void deinit();
 
     /**
-     * Computes all queued irradiance maps.
+     * Computes derived textures for all queued environment maps.
      */
     void refresh();
 
-    std::shared_ptr<Texture> get(const Texture *envmap);
+    bool contains(const Texture *envmap);
+
+    /**
+     * Retrieves derived textures for the specified environment map.
+     *
+     * @return true if derived textures were found in the cache, false otherwise
+     */
+    bool getDerived(const Texture *envmap, Derived &derived);
 
 private:
-    Framebuffer _framebuffer;
-
     bool _inited { false };
-    std::unordered_map<const Texture *, std::shared_ptr<Texture>> _irradianceByEnvmap;
-    std::set<const Texture *> _computeQueue;
+    std::set<const Texture *> _envmapQueue;
+    std::unordered_map<const Texture *, Derived> _derivedByEnvmap;
 
-    IrradianceMaps();
+    // Framebuffers
+
+    Framebuffer _irradianceFB;
+    Framebuffer _prefilterFB;
+    Framebuffer _brdfLookupFB;
+
+    // END Framebuffers
+
+    PBRIBL() = default;
 
     std::shared_ptr<Texture> computeIrradianceMap(const Texture *envmap);
+    std::shared_ptr<Texture> computePrefilterMap(const Texture *envmap);
+    std::shared_ptr<Texture> computeBRDFLookup(const Texture *envmap);
 };
 
 } // namespace render

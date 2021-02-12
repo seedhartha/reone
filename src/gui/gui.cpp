@@ -122,7 +122,7 @@ void GUI::loadBackground(BackgroundType type) {
         }
     }
 
-    _background = Textures::instance().get(resRef, TextureType::Diffuse);
+    _background = Textures::instance().get(resRef, TextureUsage::Diffuse);
 }
 
 void GUI::stretchControl(Control &control) {

@@ -57,7 +57,7 @@ shared_ptr<Font> Fonts::get(const string &resRef) {
 shared_ptr<Font> Fonts::doGet(const string &resRef) {
     auto maybeOverride = g_fontOverride.find(resRef);
     string finalResRef(maybeOverride != g_fontOverride.end() ? maybeOverride->second : resRef);
-    shared_ptr<Texture> texture(Textures::instance().get(finalResRef, TextureType::GUI));
+    shared_ptr<Texture> texture(Textures::instance().get(finalResRef, TextureUsage::GUI));
     shared_ptr<Font> font;
 
     if (texture) {

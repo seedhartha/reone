@@ -24,32 +24,39 @@ namespace reone {
 
 namespace render {
 
-static vector<float> g_defaultVertices = {
+static vector<float> g_defaultVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f, 0.0f
 };
 
-static vector<float> g_flipXVertices = {
+static vector<float> g_flipXVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 1.0f, 0.0f
 };
 
-static vector<float> g_flipYVertices = {
+static vector<float> g_flipYVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     0.0f, 1.0f, 0.0f, 0.0f, 1.0f
 };
 
-static vector<float> g_flipXYVertices = {
+static vector<float> g_flipXYVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
     0.0f, 1.0f, 0.0f, 1.0f, 1.0f
+};
+
+static vector<float> g_ndcVertices {
+    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 };
 
 static vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };
@@ -73,6 +80,11 @@ Quad &Quad::getYFlipped() {
 
 Quad &Quad::getXYFlipped() {
     static Quad quad(move(g_flipXYVertices));
+    return quad;
+}
+
+Quad &Quad::getNDC() {
+    static Quad quad(move(g_ndcVertices));
     return quad;
 }
 

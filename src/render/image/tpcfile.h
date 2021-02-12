@@ -30,7 +30,7 @@ public:
     /**
      * @param headless true if texture will not be used for rendering
      */
-    TpcFile(const std::string &resRef, TextureType type, bool headless = false);
+    TpcFile(const std::string &resRef, TextureUsage usage, bool headless = false);
 
     std::shared_ptr<Texture> texture() const { return _texture; }
 
@@ -42,7 +42,7 @@ private:
     };
 
     std::string _resRef;
-    TextureType _type;
+    TextureUsage _usage;
     bool _headless;
 
     uint32_t _dataSize { 0 };
@@ -58,7 +58,7 @@ private:
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
     void loadTexture();
-    PixelFormat getPixelFormat() const;
+    Texture::PixelFormat getPixelFormat() const;
 };
 
 } // namespace render

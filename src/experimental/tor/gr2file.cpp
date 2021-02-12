@@ -292,9 +292,9 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
                     value = value.substr(lastSlashIdx + 1ll);
                 }
                 if (semantic == "DiffuseMap") {
-                    modelMesh->setDiffuseTexture(Textures::instance().get(value, TextureType::Diffuse));
+                    modelMesh->setDiffuseTexture(Textures::instance().get(value, TextureUsage::Diffuse));
                 } else if (semantic == "RotationMap1") {
-                    modelMesh->setBumpmapTexture(Textures::instance().get(value, TextureType::Bumpmap), true);
+                    modelMesh->setBumpmapTexture(Textures::instance().get(value, TextureUsage::Bumpmap), true);
                 }
             }
         }

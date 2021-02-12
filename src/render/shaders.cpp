@@ -60,7 +60,7 @@ layout(std140) uniform General {
     bool uDiffuseEnabled;
     bool uLightmapEnabled;
     bool uEnvmapEnabled;
-    bool uIrradianceMapEnabled;
+    bool uPBRIBLEnabled;
     bool uBumpmapEnabled;
     bool uSkeletalEnabled;
     bool uLightingEnabled;
@@ -81,6 +81,7 @@ layout(std140) uniform General {
     uniform vec2 uUvOffset;
     uniform bool uWater;
     uniform float uWaterAlpha;
+    uniform float uRoughness;
 };
 
 layout(std140) uniform Lighting {
@@ -150,9 +151,92 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
+)END";
+
+static constexpr GLchar *kShaderBasePBRIBL = R"END(
+float RadicalInverse_VdC(uint bits) {
+     bits = (bits << 16u) | (bits >> 16u);
+     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+     bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+     bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+     bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+
+vec2 Hammersley(uint i, uint N) {
+    return vec2(float(i) / float(N), RadicalInverse_VdC(i));
+}
+
+vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
+    float a = roughness * roughness;
+
+    float phi = 2.0 * PI * Xi.x;
+    float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+    // from spherical coordinates to cartesian coordinates - halfway vector
+    vec3 H;
+    H.x = cos(phi) * sinTheta;
+    H.y = sin(phi) * sinTheta;
+    H.z = cosTheta;
+
+    // from tangent-space H vector to world-space sample vector
+    vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+    vec3 tangent = normalize(cross(up, N));
+    vec3 bitangent = cross(N, tangent);
+
+    vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
+    return normalize(sampleVec);
+}
+
+vec2 IntegrateBRDF(float NdotV, float roughness) {
+    vec3 V;
+    V.x = sqrt(1.0 - NdotV * NdotV);
+    V.y = 0.0;
+    V.z = NdotV;
+
+    float A = 0.0;
+    float B = 0.0;
+
+    vec3 N = vec3(0.0, 0.0, 1.0);
+
+    const uint SAMPLE_COUNT = 1024u;
+    for(uint i = 0u; i < SAMPLE_COUNT; ++i) {
+        // generates a sample vector that's biased towards the
+        // preferred alignment direction (importance sampling).
+        vec2 Xi = Hammersley(i, SAMPLE_COUNT);
+        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
+        vec3 L = normalize(2.0 * dot(V, H) * H - V);
+
+        float NdotL = max(L.z, 0.0);
+        float NdotH = max(H.z, 0.0);
+        float VdotH = max(dot(V, H), 0.0);
+
+        if (NdotL > 0.0)
+        {
+            float G = GeometrySmith(N, V, L, roughness);
+            float G_Vis = (G * VdotH) / (NdotH * NdotV);
+            float Fc = pow(1.0 - VdotH, 5.0);
+
+            A += (1.0 - Fc) * G_Vis;
+            B += Fc * G_Vis;
+        }
+    }
+    A /= float(SAMPLE_COUNT);
+    B /= float(SAMPLE_COUNT);
+    return vec2(A, B);
+}
 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+)END";
+
+static constexpr GLchar *kShaderVertexSimple = R"END(
+layout(location = 0) in vec3 aPosition;
+
+void main() {
+    gl_Position = uModel * vec4(aPosition, 1.0);
 }
 )END";
 
@@ -285,14 +369,6 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderVertexDepth = R"END(
-layout(location = 0) in vec3 aPosition;
-
-void main() {
-    gl_Position = uModel * vec4(aPosition, 1.0);
-}
-)END";
-
 static constexpr GLchar *kShaderGeometryDepth = R"END(
 const int NUM_CUBE_FACES = 6;
 
@@ -350,8 +426,10 @@ static constexpr GLchar *kShaderFragmentModel = R"END(
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
+uniform sampler2D uBRDFLookup;
 uniform samplerCube uEnvmap;
 uniform samplerCube uIrradianceMap;
+uniform samplerCube uPrefilterMap;
 uniform samplerCube uShadowMap;
 
 uniform vec3 uCameraPosition;
@@ -449,10 +527,12 @@ float getShadowValue() {
 
 void main() {
     vec2 uv = fragTexCoords + uUvOffset;
+    vec3 V = normalize(uCameraPosition - fragPosition);
     vec3 N = normalize(fragNormal);
     if (uBumpmapEnabled) {
         applyBumpmapToNormal(N, uv);
     }
+    vec3 R = reflect(-V, N);
 
     vec4 diffuseSample;
     vec3 albedo;
@@ -473,8 +553,6 @@ void main() {
     } else {
         albedo = pow(vec3(1.0), vec3(2.2));
     }
-
-    vec3 V = normalize(uCameraPosition - fragPosition);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
@@ -537,14 +615,30 @@ void main() {
         }
 
         // ambient lighting
-        vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
-        if (uDiffuseEnabled && uIrradianceMapEnabled) {
-            vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+        vec3 ambient;
+
+        if (uDiffuseEnabled && uPBRIBLEnabled) {
+            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+            vec3 kS = F;
             vec3 kD = 1.0 - kS;
+            kD *= 1.0 - metallic;
+
             vec3 irradiance = texture(uIrradianceMap, N).rgb;
             vec3 diffuse = irradiance * albedo;
-            ambient = mix(ambient, (kD * diffuse) * ao, diffuseSample.a);
+
+            const float MAX_REFLECTION_LOD = 4.0;
+            vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+            vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+            ambient = mix(vec3(0.03) * albedo * ao, (kD * diffuse + specular) * ao, 1.0 - diffuseSample.a);
+
+        } else {
+            ambient = vec3(0.03) * albedo * ao;
         }
+
 
         color = ambient + Lo;
 
@@ -560,7 +654,7 @@ void main() {
 
     if (uShadowsEnabled) {
         float shadow = getShadowValue();
-        color *= 1.0 - 0.5 * shadow;
+        color *= 1.0 - 0.75 * shadow;
     }
 
     float finalAlpha = uAlpha;
@@ -692,8 +786,70 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentDebugShadows = R"END(
-uniform samplerCube uShadowMap;
+static constexpr GLchar *kShaderFragmentPrefilter = R"END(
+uniform samplerCube uEnvmap;
+
+in vec3 fragPosition;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 N = normalize(fragPosition);
+
+    // make the simplyfying assumption that V equals R equals the normal
+    vec3 R = N;
+    vec3 V = R;
+
+    const uint SAMPLE_COUNT = 1024u;
+    vec3 prefilteredColor = vec3(0.0);
+    float totalWeight = 0.0;
+
+    for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
+        // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).
+        vec2 Xi = Hammersley(i, SAMPLE_COUNT);
+        vec3 H = ImportanceSampleGGX(Xi, N, uRoughness);
+        vec3 L = normalize(2.0 * dot(V, H) * H - V);
+
+        float NdotL = max(dot(N, L), 0.0);
+        if (NdotL > 0.0) {
+            // sample from the environment's mip level based on roughness/pdf
+            float D = DistributionGGX(N, H, uRoughness);
+            float NdotH = max(dot(N, H), 0.0);
+            float HdotV = max(dot(H, V), 0.0);
+            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001;
+
+            float resolution = 512.0; // resolution of source cubemap (per face)
+            float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
+            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
+
+            float mipLevel = uRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+
+            prefilteredColor += textureLod(uEnvmap, L, mipLevel).rgb * NdotL;
+            totalWeight += NdotL;
+        }
+    }
+
+    prefilteredColor = prefilteredColor / totalWeight;
+
+    fragColor = vec4(prefilteredColor, 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentBRDF = R"END(
+in vec2 fragTexCoords;
+
+out vec2 fragColor;
+
+void main() {
+    vec2 integratedBRDF = IntegrateBRDF(fragTexCoords.x, fragTexCoords.y);
+    fragColor = integratedBRDF;
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentDebugCubeMap = R"END(
+const bool RGB = false;
+
+uniform samplerCube uDiffuse;
 
 in vec2 fragTexCoords;
 
@@ -701,9 +857,13 @@ out vec4 fragColor;
 
 void main() {
     vec2 cubeMapCoords = 2.0 * fragTexCoords - 1.0;
-    vec4 shadowmapSample = texture(uShadowMap, vec3(cubeMapCoords.x, -1.0, -cubeMapCoords.y));
-    float value = shadowmapSample.r;
-    fragColor = vec4(shadowmapSample.rgb, 1.0);
+    vec4 diffuseSample = texture(uDiffuse, vec3(cubeMapCoords.x, -1.0, -cubeMapCoords.y));
+
+    if (RGB) {
+        fragColor = vec4(diffuseSample.rgb, 1.0);
+    } else {
+        fragColor = vec4(vec3(diffuseSample.r), 1.0);
+    }
 }
 )END";
 
@@ -718,31 +878,35 @@ Shaders::Shaders() {
 }
 
 void Shaders::initGL() {
+    initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
     initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexGUI });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
-    initShader(ShaderName::VertexDepth, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexDepth });
     initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexBillboard });
     initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
     initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
     initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentGUI });
-    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderFragmentModel });
+    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentModel });
     initShader(ShaderName::FragmentBillboard, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBillboard });
     initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBlur });
     initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBloom });
     initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentIrradiance });
+    initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentPrefilter });
+    initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentBRDF });
     initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
-    initShader(ShaderName::FragmentDebugShadows, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDebugShadows });
+    initShader(ShaderName::FragmentDebugCubeMap, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDebugCubeMap });
 
+    initProgram(ShaderProgram::SimpleBRDF, { ShaderName::VertexSimple, ShaderName::FragmentBRDF });
+    initProgram(ShaderProgram::SimpleDepth, { ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
     initProgram(ShaderProgram::GUIColor, { ShaderName::VertexGUI, ShaderName::FragmentColor });
     initProgram(ShaderProgram::GUIGUI, { ShaderName::VertexGUI, ShaderName::FragmentGUI });
     initProgram(ShaderProgram::GUIBlur, { ShaderName::VertexGUI, ShaderName::FragmentBlur });
     initProgram(ShaderProgram::GUIBloom, { ShaderName::VertexGUI, ShaderName::FragmentBloom });
     initProgram(ShaderProgram::GUIIrradiance, { ShaderName::VertexGUI, ShaderName::FragmentIrradiance });
-    initProgram(ShaderProgram::GUIDebugShadows, { ShaderName::VertexGUI, ShaderName::FragmentDebugShadows });
+    initProgram(ShaderProgram::GUIPrefilter, { ShaderName::VertexGUI, ShaderName::FragmentPrefilter });
+    initProgram(ShaderProgram::GUIDebugCubeMap, { ShaderName::VertexGUI, ShaderName::FragmentDebugCubeMap });
     initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
     initProgram(ShaderProgram::ModelModel, { ShaderName::VertexModel, ShaderName::FragmentModel });
     initProgram(ShaderProgram::BillboardBillboard, { ShaderName::VertexBillboard, ShaderName::FragmentBillboard });
-    initProgram(ShaderProgram::DepthDepth, { ShaderName::VertexDepth, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
 
     glGenBuffers(1, &_generalUbo);
     glGenBuffers(1, &_lightingUbo);
@@ -783,6 +947,8 @@ void Shaders::initGL() {
         setUniform("uBumpmap", TextureUnits::bumpmap);
         setUniform("uBloom", TextureUnits::bloom);
         setUniform("uIrradianceMap", TextureUnits::irradianceMap);
+        setUniform("uPrefilterMap", TextureUnits::prefilterMap);
+        setUniform("uBRDFLookup", TextureUnits::brdfLookup);
         setUniform("uShadowMap", TextureUnits::shadowMap);
 
         _activeOrdinal = 0;
@@ -855,7 +1021,7 @@ void Shaders::deinitGL() {
         glDeleteBuffers(1, &_generalUbo);
         _generalUbo = 0;
     }
-    for (auto &pair :_programs) {
+    for (auto &pair : _programs) {
         glDeleteProgram(pair.second);
     }
     _programs.clear();

@@ -68,18 +68,18 @@ void Map::loadProperties(const GffStruct &gffs) {
 
 void Map::loadTextures(const string &area) {
     string resRef("lbl_map" + area);
-    _areaTexture = Textures::instance().get(resRef, TextureType::GUI);
+    _areaTexture = Textures::instance().get(resRef, TextureUsage::GUI);
 
     if (!_arrowTexture) {
         string resRef("mm_barrow");
         if (_game->gameId() == GameID::TSL) {
             resRef += "_p";
         }
-        _arrowTexture = Textures::instance().get(resRef, TextureType::GUI);
+        _arrowTexture = Textures::instance().get(resRef, TextureUsage::GUI);
     }
 
     if (!_noteTexture) {
-        _noteTexture = Textures::instance().get("whitetarget", TextureType::GUI);
+        _noteTexture = Textures::instance().get("whitetarget", TextureUsage::GUI);
     }
 }
 

@@ -78,7 +78,7 @@ void ItemBlueprint::load(Item &item) {
         item._modelVariation = _uti->getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
     }
-    item._icon = Textures::instance().get(iconResRef, TextureType::GUI);
+    item._icon = Textures::instance().get(iconResRef, TextureUsage::GUI);
 
     item._attackRange = baseItems->getInt(baseItem, "maxattackrange");
     item._numDice = baseItems->getInt(baseItem, "numdice");

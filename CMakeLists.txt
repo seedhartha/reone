@@ -155,7 +155,6 @@ set(RENDER_HEADERS
     src/render/image/tgafile.h
     src/render/image/tpcfile.h
     src/render/image/txifile.h
-    src/render/irradiancemaps.h
     src/render/lip/lipanimation.h
     src/render/lip/lipfile.h
     src/render/lip/lips.h
@@ -172,6 +171,7 @@ set(RENDER_HEADERS
     src/render/model/modelloader.h
     src/render/model/modelnode.h
     src/render/model/models.h
+    src/render/pbribl.h
     src/render/shaders.h
     src/render/stateutil.h
     src/render/texture.h
@@ -195,7 +195,6 @@ set(RENDER_SOURCES
     src/render/image/tgafile.cpp
     src/render/image/tpcfile.cpp
     src/render/image/txifile.cpp
-    src/render/irradiancemaps.cpp
     src/render/lip/lipanimation.cpp
     src/render/lip/lipfile.cpp
     src/render/lip/lips.cpp
@@ -212,6 +211,7 @@ set(RENDER_SOURCES
     src/render/model/modelloader.cpp
     src/render/model/modelnode.cpp
     src/render/model/models.cpp
+    src/render/pbribl.cpp
     src/render/shaders.cpp
     src/render/stateutil.cpp
     src/render/texture.cpp

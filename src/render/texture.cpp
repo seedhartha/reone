@@ -18,9 +18,9 @@
 #include "texture.h"
 
 #include <stdexcept>
+#include <string>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 using namespace std;
@@ -29,94 +29,91 @@ namespace reone {
 
 namespace render {
 
-Texture::Texture(string name, TextureType type, int w, int h, bool headless) :
-    _name(move(name)), _type(type), _width(w), _height(h), _headless(headless) {
+Texture::Texture(string name, Properties properties) :
+    _name(move(name)),
+    _properties(move(properties)) {
 }
 
 void Texture::init() {
-    if (_inited) return;
+    if (!_inited) {
+        glGenTextures(1, &_textureId);
+        bind();
 
-    glGenTextures(1, &_textureId);
+        if (isCubeMap()) {
+            configureCubeMap();
+        } else {
+            configure2D();
+        }
 
-    if (isCubeMap()) {
-        configureCubeMap();
-    } else {
-        configure2D();
+        unbind();
+        _inited = true;
     }
-
-    _inited = true;
 }
 
 bool Texture::isCubeMap() const {
-    return
-        _type == TextureType::EnvironmentMap ||
-        _type == TextureType::IrradianceMap ||
-        _type == TextureType::CubeMapDepthBuffer;
+    return _properties.cubemap;
 }
 
 void Texture::configureCubeMap() {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, getMinFilter());
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getMagFilter());
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
-    if (_type == TextureType::CubeMapDepthBuffer) {
-        static float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-        glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor);
-    } else {
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    switch (_properties.wrap) {
+        case Wrapping::ClampToBorder:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+            break;
+        case Wrapping::ClampToEdge:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+            break;
+        case Wrapping::Repeat:
+        default:
+            // Wrap is GL_REPEAT by default in OpenGL
+            break;
+    }
+}
+
+uint32_t Texture::getFilterGL(Filtering filter) const {
+    switch (filter) {
+        case Filtering::Nearest:
+            return GL_NEAREST;
+        case Filtering::NearestMipmapNearest:
+            return GL_NEAREST_MIPMAP_NEAREST;
+        case Filtering::LinearMipmapNearest:
+            return GL_LINEAR_MIPMAP_NEAREST;
+        case Filtering::NearestMipmapLinear:
+            return GL_NEAREST_MIPMAP_LINEAR;
+        case Filtering::LinearMipmapLinear:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        case Filtering::Linear:
+        default:
+            return GL_LINEAR;
     }
 }
 
 void Texture::configure2D() {
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getMagFilter());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
-    switch (_type) {
-        case TextureType::GUI:
-        case TextureType::ColorBuffer:
+    switch (_properties.wrap) {
+        case Wrapping::ClampToBorder:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+            break;
+        case Wrapping::ClampToEdge:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             break;
-        case TextureType::DepthBuffer: {
-            static float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-            break;
-        }
+        case Wrapping::Repeat:
         default:
+            // Wrap is GL_REPEAT by default in OpenGL
             break;
     }
-}
-
-int Texture::getMinFilter() const {
-    if (isDepthBuffer()) return GL_NEAREST;
-
-    return hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
-}
-
-bool Texture::hasMipMaps() const {
-    return
-        _type != TextureType::GUI &&
-        _type != TextureType::Cursor &&
-        _type != TextureType::ColorBuffer &&
-        _type != TextureType::DepthBuffer &&
-        _type != TextureType::EnvironmentMap &&
-        _type != TextureType::IrradianceMap;
-}
-
-bool Texture::isDepthBuffer() const {
-    return _type == TextureType::DepthBuffer || _type == TextureType::CubeMapDepthBuffer;
-}
-
-int Texture::getMagFilter() const {
-    return isDepthBuffer() ? GL_NEAREST : GL_LINEAR;
 }
 
 Texture::~Texture() {
@@ -124,21 +121,22 @@ Texture::~Texture() {
 }
 
 void Texture::deinit() {
-    if (!_inited) return;
-
-    glDeleteTextures(1, &_textureId);
-
-    _inited = false;
+    if (_inited) {
+        glDeleteTextures(1, &_textureId);
+        _inited = false;
+    }
 }
 
-void Texture::clearPixels(PixelFormat format) {
-    if (!_headless && !_inited) {
+void Texture::clearPixels(int w, int h, PixelFormat format) {
+    if (!_properties.headless && !_inited) {
         throw logic_error("Texture has not been initialized: " + _name);
     }
-    _layers.clear();
+    _width = w;
+    _height = h;
     _pixelFormat = format;
+    _layers.clear();
 
-    if (!_headless) {
+    if (!_properties.headless) {
         refresh();
     }
 }
@@ -152,8 +150,6 @@ void Texture::refresh() {
 }
 
 void Texture::refreshCubeMap() {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, _textureId);
-
     for (int i = 0; i < kNumCubeFaces; ++i) {
         if (i < _layers.size()) {
             const MipMap &mipMap = _layers[i].mipMaps.front();
@@ -162,30 +158,35 @@ void Texture::refreshCubeMap() {
             fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
         }
     }
+
+    // Generate mip maps, if required
+    if (isMipmapFilter(_properties.minFilter)) {
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
 }
 
 void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
     switch (_pixelFormat) {
+        case PixelFormat::DXT1:
+        case PixelFormat::DXT5:
+            glCompressedTexImage2D(target, level, getPixelInternalFormatGL(), width, height, 0, size, pixels);
+            break;
         case PixelFormat::Grayscale:
         case PixelFormat::RGB:
         case PixelFormat::RGBA:
         case PixelFormat::BGR:
         case PixelFormat::BGRA:
-            glTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, getPixelFormat(), GL_UNSIGNED_BYTE, pixels);
-            break;
-        case PixelFormat::DXT1:
-        case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, level, getInternalPixelFormat(), width, height, 0, size, pixels);
-            break;
         case PixelFormat::Depth:
-            glTexImage2D(target, level, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, pixels);
+        case PixelFormat::RG16F:
+        case PixelFormat::RGB16F:
+            glTexImage2D(target, level, getPixelInternalFormatGL(), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
             break;
         default:
-            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+            break;
     }
 }
 
-int Texture::getInternalPixelFormat() const {
+int Texture::getPixelInternalFormatGL() const {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
             return GL_RED;
@@ -199,16 +200,23 @@ int Texture::getInternalPixelFormat() const {
             return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
         case PixelFormat::DXT5:
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        case PixelFormat::Depth:
+            return GL_DEPTH_COMPONENT;
+        case PixelFormat::RG16F:
+            return GL_RG16F;
+        case PixelFormat::RGB16F:
+            return GL_RGB16F;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
-uint32_t Texture::getPixelFormat() const {
+uint32_t Texture::getPixelFormatGL() const {
     switch (_pixelFormat) {
         case PixelFormat::Grayscale:
             return GL_RED;
         case PixelFormat::RGB:
+        case PixelFormat::RGB16F:
             return GL_RGB;
         case PixelFormat::RGBA:
         case PixelFormat::DXT1:
@@ -218,30 +226,63 @@ uint32_t Texture::getPixelFormat() const {
             return GL_BGR;
         case PixelFormat::BGRA:
             return GL_BGRA;
+        case PixelFormat::Depth:
+            return GL_DEPTH_COMPONENT;
+        case PixelFormat::RG16F:
+            return GL_RG;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
+uint32_t Texture::getPixelTypeGL() const {
+    switch (_pixelFormat) {
+        case PixelFormat::Grayscale:
+        case PixelFormat::RGB:
+        case PixelFormat::RGBA:
+        case PixelFormat::BGR:
+        case PixelFormat::BGRA:
+            return GL_UNSIGNED_BYTE;
+        case PixelFormat::Depth:
+        case PixelFormat::RG16F:
+        case PixelFormat::RGB16F:
+            return GL_FLOAT;
+        default:
+            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+    }
+}
+
+bool Texture::isMipmapFilter(Filtering filter) const {
+    switch (filter) {
+        case Filtering::NearestMipmapNearest:
+        case Filtering::LinearMipmapNearest:
+        case Filtering::NearestMipmapLinear:
+        case Filtering::LinearMipmapLinear:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void Texture::refresh2D() {
-    glBindTexture(GL_TEXTURE_2D, _textureId);
+    int numMipMaps = 0;
 
     if (!_layers.empty()) {
-        const Layer &layer = _layers.front();
-        int mipMapCount = layer.mipMaps.size();
-        if (mipMapCount > 1) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);
-        }
-        for (int i = 0; i < layer.mipMaps.size(); ++i) {
-            const MipMap &mipMap = layer.mipMaps[i];
+        numMipMaps = _layers[0].mipMaps.size();
+        for (int i = 0; i < numMipMaps; ++i) {
+            const MipMap &mipMap = _layers[0].mipMaps[i];
             fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, &mipMap.data[0], mipMap.data.size());
-        }
-        if (mipMapCount == 1 && hasMipMaps()) {
-            glGenerateMipmap(GL_TEXTURE_2D);
         }
     } else {
         fillTarget(GL_TEXTURE_2D, 0, _width, _height);
+    }
+
+    if (numMipMaps > 1) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
+
+    } else if (isMipmapFilter(_properties.minFilter)) {
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
 }
 
@@ -254,29 +295,31 @@ void Texture::unbind() const {
 }
 
 bool Texture::isAdditive() const {
-    return _features.blending == TextureBlending::Additive;
+    return _features.blending == Blending::Additive;
 }
 
 bool Texture::isGrayscale() const {
     return _pixelFormat == PixelFormat::Grayscale;
 }
 
-void Texture::setPixels(vector<Layer> layers, PixelFormat format) {
-    if (!_headless && !_inited) {
+void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) {
+    if (!_properties.headless && !_inited) {
         throw logic_error("Texture has not been initialized: " + _name);
     }
     if (layers.empty()) {
         throw invalid_argument("layers is empty");
     }
-    _layers = move(layers);
+    _width = w;
+    _height = h;
     _pixelFormat = format;
+    _layers = move(layers);
 
-    if (!_headless) {
+    if (!_properties.headless) {
         refresh();
     }
 }
 
-void Texture::setFeatures(TextureFeatures features) {
+void Texture::setFeatures(Features features) {
     _features = move(features);
 }
 

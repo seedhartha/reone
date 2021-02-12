@@ -49,23 +49,23 @@ void Textures::invalidateCache() {
     _cache.clear();
 }
 
-shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
+shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
     auto maybeTexture = _cache.find(resRef);
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;
     }
     string lcResRef(boost::to_lower_copy(resRef));
-    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, type)));
+    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, usage)));
 
     return inserted.first->second;
 }
 
-shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
+shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
     shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
     if (tgaData) {
-        TgaFile tga(resRef, type);
+        TgaFile tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
@@ -80,7 +80,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
     if (!texture) {
         shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Tpc, false));
         if (tpcData) {
-            TpcFile tpc(resRef, type);
+            TpcFile tpc(resRef, usage);
             tpc.load(wrap(tpcData));
             texture = tpc.texture();
         }

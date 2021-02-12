@@ -33,8 +33,8 @@ namespace reone {
 
 namespace render {
 
-TpcFile::TpcFile(const string &resRef, TextureType type, bool headless) :
-    BinaryFile(0), _resRef(resRef), _type(type), _headless(headless) {
+TpcFile::TpcFile(const string &resRef, TextureUsage usage, bool headless) :
+    BinaryFile(0), _resRef(resRef), _usage(usage), _headless(headless) {
 }
 
 void TpcFile::doLoad() {
@@ -124,7 +124,7 @@ void TpcFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    TextureFeatures features;
+    Texture::Features features;
     size_t pos = tell();
 
     if (pos < _size) {
@@ -136,36 +136,37 @@ void TpcFile::loadTexture() {
         features = txi.features();
     }
 
-    PixelFormat format = getPixelFormat();
+    Texture::PixelFormat format = getPixelFormat();
     if (_cubeMap) {
         prepareCubeMap(layers, format, format);
     }
 
-    _texture = make_shared<Texture>(_resRef, _type, _width, _height, _headless);
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage, _headless));
     if (!_headless) {
         _texture->init();
+        _texture->bind();
     }
-    _texture->setPixels(move(layers), format);
+    _texture->setPixels(_width, _height, format, move(layers));
     _texture->setFeatures(move(features));
 }
 
-PixelFormat TpcFile::getPixelFormat() const {
+Texture::PixelFormat TpcFile::getPixelFormat() const {
     if (!_compressed) {
         switch (_encoding) {
             case EncodingType::Grayscale:
-                return PixelFormat::Grayscale;
+                return Texture::PixelFormat::Grayscale;
             case EncodingType::RGB:
-                return PixelFormat::RGB;
+                return Texture::PixelFormat::RGB;
             case EncodingType::RGBA:
-                return PixelFormat::RGBA;
+                return Texture::PixelFormat::RGBA;
             default:
                 throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
         }
     } else switch (_encoding) {
         case EncodingType::RGB:
-            return PixelFormat::DXT1;
+            return Texture::PixelFormat::DXT1;
         case EncodingType::RGBA:
-            return PixelFormat::DXT5;
+            return Texture::PixelFormat::DXT5;
         default:
             throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
     }

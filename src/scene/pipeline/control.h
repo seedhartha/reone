@@ -36,9 +36,12 @@ public:
     void render(const glm::ivec2 &offset) const;
 
 private:
-    SceneGraph *_scene { nullptr };
-    glm::vec4 _extent { 0.0f };
+    SceneGraph *_scene;
+    glm::vec4 _extent;
+
     render::Framebuffer _geometry;
+    std::unique_ptr<render::Texture> _geometryColor;
+    std::unique_ptr<render::Texture> _geometryDepth;
 
     ControlRenderPipeline(const ControlRenderPipeline &) = delete;
     ControlRenderPipeline &operator=(const ControlRenderPipeline &) = delete;

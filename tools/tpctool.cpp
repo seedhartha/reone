@@ -53,7 +53,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
     }
     int w = texture.width();
     int h = texture.height();
-    bool alpha = texture.pixelFormat() == PixelFormat::RGBA || texture.pixelFormat() == PixelFormat::DXT5;
+    bool alpha = texture.pixelFormat() == Texture::PixelFormat::RGBA || texture.pixelFormat() == Texture::PixelFormat::DXT5;
 
     int totalHeight = layerCount * w;
     int pixelsSize = (alpha ? 4ll : 3ll) * w * totalHeight;
@@ -65,7 +65,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
         const uint8_t *mipMapPtr = reinterpret_cast<const uint8_t *>(&mipMap.data[0]);
 
         switch (texture.pixelFormat()) {
-            case PixelFormat::Grayscale:
+            case Texture::PixelFormat::Grayscale:
                 for (int i = 0; i < w * h; ++i) {
                     uint8_t val = *(mipMapPtr++);
                     *(pixelsPtr++) = val;
@@ -73,14 +73,14 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
                     *(pixelsPtr++) = val;
                 }
                 break;
-            case PixelFormat::RGB:
+            case Texture::PixelFormat::RGB:
                 for (int i = 0; i < w * h; ++i) {
                     *(pixelsPtr++) = *(mipMapPtr++);
                     *(pixelsPtr++) = *(mipMapPtr++);
                     *(pixelsPtr++) = *(mipMapPtr++);
                 }
                 break;
-            case PixelFormat::RGBA:
+            case Texture::PixelFormat::RGBA:
                 for (int i = 0; i < w * h; ++i) {
                     *(pixelsPtr++) = *(mipMapPtr++);
                     *(pixelsPtr++) = *(mipMapPtr++);
@@ -88,7 +88,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
                     *(pixelsPtr++) = *(mipMapPtr++);
                 }
                 break;
-            case PixelFormat::DXT1: {
+            case Texture::PixelFormat::DXT1: {
                 vector<unsigned long> pixelValues(static_cast<size_t>(w) * h);
                 BlockDecompressImageDXT1(mipMap.width, mipMap.height, mipMapPtr, &pixelValues[0]);
                 unsigned long *pixelValuesPtr = &pixelValues[0];
@@ -100,7 +100,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
                 }
                 break;
             }
-            case PixelFormat::DXT5: {
+            case Texture::PixelFormat::DXT5: {
                 vector<unsigned long> pixelValues(static_cast<size_t>(w) * h);
                 BlockDecompressImageDXT5(mipMap.width, mipMap.height, mipMapPtr, &pixelValues[0]);
                 unsigned long *pixelValuesPtr = &pixelValues[0];
@@ -133,7 +133,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
 void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Read TPC
 
-    TpcFile tpc("", TextureType::GUI, true);
+    TpcFile tpc("", TextureUsage::GUI, true);
     tpc.load(path);
 
     // Convert TPC to TGA

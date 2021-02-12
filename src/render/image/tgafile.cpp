@@ -25,7 +25,7 @@ namespace reone {
 
 namespace render {
 
-TgaFile::TgaFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _texType(type) {
+TgaFile::TgaFile(const string &resRef, TextureUsage usage) : BinaryFile(0), _resRef(resRef), _usage(usage) {
 }
 
 void TgaFile::doLoad() {
@@ -91,17 +91,18 @@ void TgaFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    PixelFormat format = _imageType == ImageType::Grayscale ?
-        PixelFormat::Grayscale :
-        (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+    Texture::PixelFormat format = _imageType == ImageType::Grayscale ?
+        Texture::PixelFormat::Grayscale :
+        (_alpha ? Texture::PixelFormat::BGRA : Texture::PixelFormat::BGR);
 
     if (cubeMap) {
         prepareCubeMap(layers, format, format);
     }
 
-    _texture = make_shared<Texture>(_resRef, _texType, _width, _height);
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->init();
-    _texture->setPixels(move(layers), format);
+    _texture->bind();
+    _texture->setPixels(_width, _height, format, move(layers));
 }
 
 } // namespace render

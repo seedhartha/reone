@@ -43,7 +43,7 @@ void Font::load(const shared_ptr<Texture> &texture) {
     }
     _texture = texture;
 
-    const TextureFeatures &features = _texture->features();
+    const Texture::Features &features = _texture->features();
 
     _glyphCount = features.numChars;
     _height = features.fontHeight * 100.0f;

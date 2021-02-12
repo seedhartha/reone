@@ -312,7 +312,7 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
             return nullptr;
     }
 
-    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureType::GUI));
+    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -348,7 +348,7 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
         lbItem.text = Resources::instance().getString(kStrRefNone);
-        lbItem.iconTexture = Textures::instance().get("inone", TextureType::GUI);
+        lbItem.iconTexture = Textures::instance().get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         lbItems.addItem(move(lbItem));
@@ -382,7 +382,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureType::GUI);
+    return Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

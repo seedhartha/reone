@@ -38,7 +38,7 @@ public:
     void init(resource::GameID gameId);
     void invalidateCache();
 
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureType type);
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
@@ -48,7 +48,7 @@ private:
     Textures(const Textures &) = delete;
     Textures &operator=(const Textures &) = delete;
 
-    std::shared_ptr<Texture> doGet(const std::string &resRef, TextureType type);
+    std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };
 
 } // namespace render

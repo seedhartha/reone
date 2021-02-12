@@ -145,13 +145,13 @@ void Control::loadBorder(const GffStruct &gffs) {
     _border = make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _border->corner = Textures::instance().get(corner, TextureType::GUI);
+        _border->corner = Textures::instance().get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _border->edge = Textures::instance().get(edge, TextureType::GUI);
+        _border->edge = Textures::instance().get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _border->fill = Textures::instance().get(fill, TextureType::GUI);
+        _border->fill = Textures::instance().get(fill, TextureUsage::GUI);
     }
 
     _border->dimension = gffs.getInt("DIMENSION", 0);
@@ -185,13 +185,13 @@ void Control::loadHilight(const GffStruct &gffs) {
     _hilight = make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _hilight->corner = Textures::instance().get(corner, TextureType::GUI);
+        _hilight->corner = Textures::instance().get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _hilight->edge = Textures::instance().get(edge, TextureType::GUI);
+        _hilight->edge = Textures::instance().get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _hilight->fill = Textures::instance().get(fill, TextureType::GUI);
+        _hilight->fill = Textures::instance().get(fill, TextureUsage::GUI);
     }
 
     _hilight->dimension = gffs.getInt("DIMENSION", 0);
@@ -563,7 +563,7 @@ void Control::setBorder(const Border &border) {
 void Control::setBorderFill(const string &resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = Textures::instance().get(resRef, TextureType::GUI);
+        texture = Textures::instance().get(resRef, TextureUsage::GUI);
     }
     setBorderFill(texture);
 }
@@ -607,7 +607,7 @@ void Control::setHilightColor(const glm::vec3 &color) {
 void Control::setHilightFill(const string &resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = Textures::instance().get(resRef, TextureType::GUI);
+        texture = Textures::instance().get(resRef, TextureUsage::GUI);
     }
     setHilightFill(texture);
 }

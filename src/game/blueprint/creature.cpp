@@ -57,7 +57,7 @@ void CreatureBlueprint::load(Creature &creature) {
     }
 
     string portrait(getPortrait(_utc->getInt("PortraitId", -1)));
-    creature._portrait = Textures::instance().get(portrait, TextureType::GUI);
+    creature._portrait = Textures::instance().get(portrait, TextureUsage::GUI);
 
     creature._faction = static_cast<Faction>(_utc->getInt("FactionID", -1));
     creature._conversation = boost::to_lower_copy(_utc->getString("Conversation"));
