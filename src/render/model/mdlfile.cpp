@@ -112,7 +112,8 @@ void MdlFile::doLoad() {
 
     ignore(3);
 
-    uint8_t classification = readByte();
+    uint8_t classificationVal = readByte();
+    _classification = getClassification(classificationVal);
 
     ignore(2);
 
@@ -149,7 +150,7 @@ void MdlFile::doLoad() {
         superModel = Models::instance().get(superModelName);
     }
 
-    _model = make_unique<Model>(_name, getClassification(classification), move(rootNode), anims, superModel);
+    _model = make_unique<Model>(_name, _classification, move(rootNode), anims, superModel);
     _model->setAnimationScale(scale);
 }
 
@@ -796,7 +797,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     mesh->computeAABB();
 
     auto modelMesh = make_unique<ModelMesh>(move(mesh));
-    modelMesh->setRender(render && !diffuse.empty() && diffuse != "null");
+    modelMesh->setRender(render && (_classification == Model::Classification::Character || (!diffuse.empty() && diffuse != "null")));
     modelMesh->setTransparency(transparency);
     modelMesh->setShadow(shadow);
     modelMesh->setBackgroundGeometry(backgroundGeometry != 0);
