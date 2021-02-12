@@ -46,7 +46,7 @@ static constexpr GLchar *kShaderBaseHeader = R"END(
 
 const float PI = 3.14159265359;
 const int MAX_BONES = 128;
-const int MAX_LIGHTS = 4;
+const int MAX_LIGHTS = 8;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 struct Light {

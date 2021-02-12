@@ -24,7 +24,7 @@ namespace reone {
 namespace render {
 
 static constexpr int kNumCubeFaces = 6;
-static constexpr int kMaxLightCount = 4;
+static constexpr int kMaxLightCount = 8;
 
 /**
  * This is a hint to the engine when configuring texture properties.
