@@ -98,8 +98,8 @@ bool ModelNodeSceneNode::isTransparent() const {
 }
 
 static bool isLightDirectional(const LightSceneNode &light) {
-    // Consider all lights with a radius of 100.0 and more directional
-    return light.radius() > 100.0f;
+    // Consider all lights with a radius of 50.0 and more directional
+    return light.radius() >= 50.0f;
 }
 
 void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
