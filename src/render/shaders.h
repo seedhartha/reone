@@ -121,6 +121,10 @@ struct LightingUniforms {
     glm::vec4 meshDiffuseColor { 1.0f };
     glm::vec4 meshAmbientColor { 1.0f };
     glm::vec4 ambientLightColor { 1.0f };
+    float diffuseMetallic { 0.0f };
+    float diffuseRoughness { 0.0f };
+    float envmapMetallic { 0.0f };
+    float envmapRoughness { 0.0f };
     int lightCount { 0 };
     char padding[12];
     ShaderLight lights[kMaxLightCount];

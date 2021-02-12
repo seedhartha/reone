@@ -44,6 +44,13 @@ public:
         float jitterSpeed { 0.0f };
     };
 
+    struct Materials {
+        float diffuseMetallic { 0.0f };
+        float diffuseRoughness { 0.8f };
+        float envmapMetallic { 1.0f };
+        float envmapRoughness { 0.2f };
+    };
+
     ModelMesh(const std::shared_ptr<Mesh> &mesh);
 
     void initGL();
@@ -68,6 +75,7 @@ public:
     const glm::vec3 &diffuseColor() const { return _diffuseColor; }
     const glm::vec3 &ambientColor() const { return _ambientColor; }
     const UVAnimation &uvAnimation() const { return _uvAnimation; }
+    const Materials &materials() const { return _materials; }
 
     const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
     const std::shared_ptr<Texture> &envmapTexture() const { return _envmap; }
@@ -93,6 +101,7 @@ private:
     glm::vec3 _ambientColor { 0.0f };
     UVAnimation _uvAnimation;
     bool _bumpmapSwizzled { false };
+    Materials _materials;
 
     // Textures
 

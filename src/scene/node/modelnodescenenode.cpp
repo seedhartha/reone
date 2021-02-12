@@ -181,6 +181,10 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
             locals.general.lightingEnabled = true;
             locals.lighting = Shaders::instance().lightingUniforms();
+            locals.lighting->diffuseMetallic = mesh->materials().diffuseMetallic;
+            locals.lighting->diffuseRoughness = mesh->materials().diffuseRoughness;
+            locals.lighting->envmapMetallic = mesh->materials().envmapMetallic;
+            locals.lighting->envmapRoughness = mesh->materials().envmapRoughness;
             locals.lighting->meshDiffuseColor = glm::vec4(mesh->diffuseColor(), 1.0f);
             locals.lighting->meshAmbientColor = glm::vec4(mesh->ambientColor(), 1.0f);
             locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);

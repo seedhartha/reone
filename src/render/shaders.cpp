@@ -88,6 +88,10 @@ layout(std140) uniform Lighting {
     vec4 uMeshDiffuseColor;
     vec4 uMeshAmbientColor;
     vec4 uAmbientLightColor;
+    float uDiffuseMetallic;
+    float uDiffuseRoughness;
+    float uEnvmapMetallic;
+    float uEnvmapRoughness;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
 };
@@ -544,14 +548,16 @@ void main() {
         diffuseSample = texture(uDiffuse, uv);
         albedo = pow(diffuseSample.rgb, vec3(2.2));
         if (uEnvmapEnabled) {
-            metallic = 1.0 - diffuseSample.a;
-            roughness = diffuseSample.a;
+            metallic = mix(uDiffuseMetallic, uEnvmapMetallic, 1.0 - diffuseSample.a);
+            roughness = mix(uDiffuseRoughness, uEnvmapRoughness, 1.0 - diffuseSample.a);
         } else {
-            metallic = 0.0;
-            roughness = 1.0;
+            metallic = uDiffuseMetallic;
+            roughness = uDiffuseRoughness;
         }
     } else {
         albedo = pow(vec3(1.0), vec3(2.2));
+        metallic = 0.0;
+        roughness = 1.0;
     }
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
