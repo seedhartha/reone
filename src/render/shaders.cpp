@@ -454,18 +454,24 @@ void main() {
         applyBumpmapToNormal(N, uv);
     }
 
-    vec4 diffuseSample = texture(uDiffuse, uv);
-    vec3 albedo = pow(diffuseSample.rgb, vec3(2.2));
+    vec4 diffuseSample;
+    vec3 albedo;
     float metallic;
     float roughness;
     float ao = 1.0;
 
-    if (uEnvmapEnabled) {
-        metallic = 1.0 - diffuseSample.a;
-        roughness = diffuseSample.a;
+    if (uDiffuseEnabled) {
+        diffuseSample = texture(uDiffuse, uv);
+        albedo = pow(diffuseSample.rgb, vec3(2.2));
+        if (uEnvmapEnabled) {
+            metallic = 1.0 - diffuseSample.a;
+            roughness = diffuseSample.a;
+        } else {
+            metallic = 0.0;
+            roughness = 1.0;
+        }
     } else {
-        metallic = 0.0;
-        roughness = 1.0;
+        albedo = pow(vec3(1.0), vec3(2.2));
     }
 
     vec3 V = normalize(uCameraPosition - fragPosition);
@@ -481,11 +487,12 @@ void main() {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
         color = (uWater ? 0.2 : 1.0) * lightmapSample.rgb * albedo;
 
-        vec3 I = normalize(fragPosition - uCameraPosition);
-        vec3 R = reflect(I, N);
-        vec4 envmapSample = texture(uEnvmap, R);
-        color += (1.0 - diffuseSample.a) * envmapSample.rgb;
-
+        if (uDiffuseEnabled && uEnvmapEnabled) {
+            vec3 I = normalize(fragPosition - uCameraPosition);
+            vec3 R = reflect(I, N);
+            vec4 envmapSample = texture(uEnvmap, R);
+            color += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        }
     } else if (uLightingEnabled) {
         // reflectance equation
         vec3 Lo = vec3(0.0);
@@ -531,7 +538,7 @@ void main() {
 
         // ambient lighting
         vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
-        if (uIrradianceMapEnabled) {
+        if (uDiffuseEnabled && uIrradianceMapEnabled) {
             vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
             vec3 kD = 1.0 - kS;
             vec3 irradiance = texture(uIrradianceMap, N).rgb;
@@ -541,7 +548,7 @@ void main() {
 
         color = ambient + Lo;
 
-    } else if (uEnvmapEnabled) {
+    } else if (uDiffuseEnabled && uEnvmapEnabled) {
         vec3 I = normalize(fragPosition - uCameraPosition);
         vec3 R = reflect(I, N);
         vec4 envmapSample = texture(uEnvmap, R);
