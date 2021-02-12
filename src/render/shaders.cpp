@@ -567,17 +567,7 @@ void main() {
 
     vec3 color;
 
-    if (uLightmapEnabled) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        color = (uWater ? 0.2 : 1.0) * lightmapSample.rgb * albedo;
-
-        if (uDiffuseEnabled && uEnvmapEnabled) {
-            vec3 I = normalize(fragPosition - uCameraPosition);
-            vec3 R = reflect(I, N);
-            vec4 envmapSample = texture(uEnvmap, R);
-            color += (1.0 - diffuseSample.a) * envmapSample.rgb;
-        }
-    } else if (uLightingEnabled) {
+    if (uLightingEnabled) {
         // reflectance equation
         vec3 Lo = vec3(0.0);
         for (int i = 0; i < uLightCount; ++i) {
@@ -586,11 +576,11 @@ void main() {
             vec3 H = normalize(V + L);
             vec3 radiance;
             if (uLights[i].position.w == 0.0) {
-                radiance = uLights[i].multiplier * uLights[i].color.rgb;
+                radiance = uLights[i].color.rgb;
             } else {
                 float distance = length(uLights[i].position.xyz - fragPosition);
                 float attenuation = 1.0 / (distance * distance);
-                radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
+                radiance = uLights[i].color.rgb * attenuation;
             }
 
             // Cook-Torrance BRDF
@@ -648,14 +638,22 @@ void main() {
 
         color = ambient + Lo;
 
-    } else if (uDiffuseEnabled && uEnvmapEnabled) {
-        vec3 I = normalize(fragPosition - uCameraPosition);
-        vec3 R = reflect(I, N);
-        vec4 envmapSample = texture(uEnvmap, R);
-        color = albedo + (1.0 - diffuseSample.a) * envmapSample.rgb;
-
+        if (uLightmapEnabled) {
+            vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+            color *= (uWater ? 0.2 : 1.0) * lightmapSample.rgb;
+        }
     } else {
         color = albedo;
+        if (uLightmapEnabled) {
+            vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+            color *= (uWater ? 0.2 : 1.0) * lightmapSample.rgb;
+        }
+        if (uDiffuseEnabled && uEnvmapEnabled) {
+            vec3 I = normalize(fragPosition - uCameraPosition);
+            vec3 R = reflect(I, N);
+            vec4 envmapSample = texture(uEnvmap, R);
+            color += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        }
     }
 
     if (uShadowsEnabled) {
