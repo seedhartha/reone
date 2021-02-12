@@ -25,6 +25,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
+#include "../materialutil.h"
 #include "../model/models.h"
 #include "../textures.h"
 
@@ -815,6 +816,17 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
             }
             if (!features.bumpmapTexture.empty()) {
                 modelMesh->_bumpmap = Textures::instance().get(features.bumpmapTexture, TextureUsage::Bumpmap);
+            }
+
+            // Load materials
+            float metallic, roughness;
+            if (getMaterialByTextureName(modelMesh->_diffuse->name(), metallic, roughness)) {
+                modelMesh->_materials.diffuseMetallic = metallic;
+                modelMesh->_materials.diffuseRoughness = roughness;
+            }
+            if (modelMesh->_envmap && getMaterialByTextureName(modelMesh->_envmap->name(), metallic, roughness)) {
+                modelMesh->_materials.envmapMetallic = metallic;
+                modelMesh->_materials.envmapRoughness = roughness;
             }
         }
     }
