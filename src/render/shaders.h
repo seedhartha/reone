@@ -36,16 +36,18 @@ static constexpr int kMaxBoneCount = 128;
 
 enum class ShaderProgram {
     None,
+    SimpleDepth,
+    SimpleBRDF,
     GUIColor,
     GUIGUI,
     GUIBlur,
     GUIBloom,
     GUIIrradiance,
-    GUIDebugShadows,
+    GUIPrefilter,
+    GUIDebugCubeMap,
     ModelColor,
     ModelModel,
-    BillboardBillboard,
-    DepthDepth
+    BillboardBillboard
 };
 
 struct TextureUnits {
@@ -55,7 +57,9 @@ struct TextureUnits {
     static constexpr int bumpmap { 3 };
     static constexpr int bloom { 5 };
     static constexpr int irradianceMap { 6 };
-    static constexpr int shadowMap { 7 };
+    static constexpr int prefilterMap { 7 };
+    static constexpr int brdfLookup { 8 };
+    static constexpr int shadowMap { 9 };
 };
 
 struct GlobalUniforms {
@@ -72,7 +76,7 @@ struct GeneralUniforms {
     int diffuseEnabled { false };
     int lightmapEnabled { false };
     int envmapEnabled { false };
-    int irradianceMapEnabled { false };
+    int pbrIblEnabled { false };
     int bumpmapEnabled { false };
     int skeletalEnabled { false };
     int lightingEnabled { false };
@@ -95,6 +99,8 @@ struct GeneralUniforms {
     glm::vec2 uvOffset { 0.0f };
     int water { 0 };
     float waterAlpha { 1.0f };
+    float roughness { 1.0f };
+    char padding3[12];
 };
 
 struct SkeletalUniforms {
@@ -162,10 +168,10 @@ public:
 
 private:
     enum class ShaderName {
+        VertexSimple,
         VertexGUI,
         VertexModel,
         VertexBillboard,
-        VertexDepth,
         GeometryDepth,
         FragmentColor,
         FragmentGUI,
@@ -175,7 +181,9 @@ private:
         FragmentBloom,
         FragmentDepth,
         FragmentIrradiance,
-        FragmentDebugShadows
+        FragmentPrefilter,
+        FragmentBRDF,
+        FragmentDebugCubeMap
     };
 
     std::unordered_map<ShaderName, uint32_t> _shaders;

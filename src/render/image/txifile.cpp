@@ -49,10 +49,10 @@ void TxiFile::load(const shared_ptr<istream> &in) {
     } while (!in->eof());
 }
 
-static TextureProcedureType parseProcedureType(const string &str) {
-    TextureProcedureType result = TextureProcedureType::Invalid;
+static Texture::ProcedureType parseProcedureType(const string &str) {
+    Texture::ProcedureType result = Texture::ProcedureType::Invalid;
     if (str == "cycle") {
-        result = TextureProcedureType::Cycle;
+        result = Texture::ProcedureType::Cycle;
     } else {
         warn("TXI: invalid procedure type: " + str);
     }
@@ -127,10 +127,10 @@ void TxiFile::processLine(const vector<string> &tokens) {
     }
 }
 
-TextureBlending TxiFile::parseBlending(const string &s) const {
-    TextureBlending result = TextureBlending::None;
+Texture::Blending TxiFile::parseBlending(const string &s) const {
+    auto result = Texture::Blending::None;
     if (s == "additive") {
-        result = TextureBlending::Additive;
+        result = Texture::Blending::Additive;
     } else {
         warn("TXI: unsupported blending mode: " + s);
     }

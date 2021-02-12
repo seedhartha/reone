@@ -113,7 +113,7 @@ void PartySelection::prepare(const Context &ctx) {
                 portrait = getPortraitByAppearance(blueprint->getAppearanceFromUtc());
             }
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(Textures::instance().get(portrait, TextureType::GUI));
+            lblChar.setBorderFill(Textures::instance().get(portrait, TextureUsage::GUI));
             lblNa.setVisible(false);
 
         } else {

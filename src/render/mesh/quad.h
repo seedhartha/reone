@@ -29,6 +29,7 @@ public:
     static Quad &getXFlipped();
     static Quad &getYFlipped();
     static Quad &getXYFlipped();
+    static Quad &getNDC();
 
 private:
     Quad(std::vector<float> &&vertices);

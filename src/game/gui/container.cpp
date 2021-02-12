@@ -103,7 +103,7 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureType::GUI);
+    return Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void Container::onClick(const string &control) {

@@ -168,7 +168,7 @@ void Creature::loadPortrait(int appearance) {
     string resRef(row->getString("baseresref"));
     boost::to_lower(resRef);
 
-    _portrait = Textures::instance().get(resRef, TextureType::GUI);
+    _portrait = Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void Creature::update(float dt) {

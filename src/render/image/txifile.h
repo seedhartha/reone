@@ -19,9 +19,8 @@
 
 #include <istream>
 #include <memory>
-#include <vector>
 
-#include "../types.h"
+#include "../texture.h"
 
 namespace reone {
 
@@ -31,7 +30,7 @@ class TxiFile {
 public:
     void load(const std::shared_ptr<std::istream> &in);
 
-    const TextureFeatures &features() const { return _features; }
+    const Texture::Features &features() const { return _features; }
 
 private:
     enum class State {
@@ -40,13 +39,13 @@ private:
         LowerRightCoords
     };
 
-    TextureFeatures _features;
+    Texture::Features _features;
     State _state { State::None };
     int _upperLeftCoordCount { 0 };
     int _lowerRightCoordCount { 0 };
 
     void processLine(const std::vector<std::string> &tokens);
-    TextureBlending parseBlending(const std::string &s) const;
+    Texture::Blending parseBlending(const std::string &s) const;
 };
 
 } // namespace render

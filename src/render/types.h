@@ -17,41 +17,34 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "SDL2/SDL_events.h"
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
 
 namespace reone {
 
 namespace render {
 
-static constexpr int kMaxLightCount = 4;
 static constexpr int kNumCubeFaces = 6;
+static constexpr int kMaxLightCount = 4;
 
-enum class TextureType {
+/**
+ * This is a hint to the engine when configuring texture properties.
+ */
+enum class TextureUsage {
+    Default,
+    GUI,
     Diffuse,
     Lightmap,
     EnvironmentMap,
     IrradianceMap,
+    PrefilterMap,
+    BRDFLookup,
     Bumpmap,
-    GUI,
-    Cursor,
     ColorBuffer,
     DepthBuffer,
     CubeMapDepthBuffer
 };
 
-enum class TextureBlending {
-    None,
-    Additive
-};
-
-enum class CubeMapSide {
+enum class CubeMapFace {
     PositiveX = 0,
     NegativeX = 1,
     PositiveY = 2,
@@ -60,32 +53,10 @@ enum class CubeMapSide {
     NegativeZ = 5
 };
 
-enum class TextureProcedureType {
-    Invalid,
-    Cycle
-};
-
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
     bool fullscreen { false };
-};
-
-struct TextureFeatures {
-    std::string envmapTexture;
-    std::string bumpyShinyTexture;
-    std::string bumpmapTexture;
-    float bumpMapScaling { 0.0f };
-    TextureBlending blending { TextureBlending::None };
-    int numChars { 0 };
-    float fontHeight { 0.0f };
-    std::vector<glm::vec3> upperLeftCoords;
-    std::vector<glm::vec3> lowerRightCoords;
-    float waterAlpha { -1.0f };
-    TextureProcedureType procedureType { TextureProcedureType::Invalid };
-    int numX { 0 };
-    int numY { 0 };
-    int fps { 0 };
 };
 
 class IEventHandler {

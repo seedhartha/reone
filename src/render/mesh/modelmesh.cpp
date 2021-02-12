@@ -23,7 +23,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "../irradiancemaps.h"
+#include "../pbribl.h"
 #include "../shaders.h"
 #include "../stateutil.h"
 
@@ -63,10 +63,14 @@ void ModelMesh::render(shared_ptr<Texture> diffuse) const {
         setActiveTextureUnit(TextureUnits::envmap);
         _envmap->bind();
 
-        auto irradianceMap = IrradianceMaps::instance().get(_envmap.get());
-        if (irradianceMap) {
+        PBRIBL::Derived derived;
+        if (PBRIBL::instance().getDerived(_envmap.get(), derived)) {
             setActiveTextureUnit(TextureUnits::irradianceMap);
-            irradianceMap->bind();
+            derived.irradianceMap->bind();
+            setActiveTextureUnit(TextureUnits::prefilterMap);
+            derived.prefilterMap->bind();
+            setActiveTextureUnit(TextureUnits::brdfLookup);
+            derived.brdfLookup->bind();
         }
     }
     if (_bumpmap) {
@@ -84,14 +88,11 @@ void ModelMesh::render(shared_ptr<Texture> diffuse) const {
 bool ModelMesh::isTransparent() const {
     if (!_diffuse) return false;
     if (_transparency > 0) return true;
-
-    TextureFeatures features = _diffuse->features();
-    if (features.blending == TextureBlending::Additive) return true;
-
+    if (_diffuse->isAdditive()) return true;
     if (_envmap || _bumpmap) return false;
 
-    PixelFormat format = _diffuse->pixelFormat();
-    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
+    Texture::PixelFormat format = _diffuse->pixelFormat();
+    if (format == Texture::PixelFormat::RGB || format == Texture::PixelFormat::BGR || format == Texture::PixelFormat::DXT1) return false;
 
     return true;
 }

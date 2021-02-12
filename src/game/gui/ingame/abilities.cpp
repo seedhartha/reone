@@ -82,7 +82,7 @@ static shared_ptr<Texture> getFrameTexture(GameID gameId) {
     } else {
         resRef = "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureType::GUI);
+    return Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::loadSkills() {
@@ -95,7 +95,7 @@ void AbilitiesMenu::loadSkills() {
         skillInfo.skill = skill;
         skillInfo.name = Resources::instance().getString(row.getInt("name"));
         skillInfo.description = Resources::instance().getString(row.getInt("description"));
-        skillInfo.icon = Textures::instance().get(row.getString("icon"), TextureType::GUI);
+        skillInfo.icon = Textures::instance().get(row.getString("icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }

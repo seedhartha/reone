@@ -26,10 +26,10 @@
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
-#include "../render/irradiancemaps.h"
 #include "../render/lip/lips.h"
 #include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
+#include "../render/pbribl.h"
 #include "../render/textures.h"
 #include "../render/walkmeshes.h"
 #include "../resource/resources.h"
@@ -110,7 +110,7 @@ void Game::init() {
     registerModelLoaders();
 
     Textures::instance().init(_gameId);
-    IrradianceMaps::instance().init();
+    PBRIBL::instance().init();
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
     Routines::instance().init(_gameId, this);
@@ -276,8 +276,8 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
 }
 
 void Game::drawAll() {
-    // Compute queued irradiance maps, if any
-    IrradianceMaps::instance().refresh();
+    // Compute derived PBR IBL textures from queued environment maps
+    PBRIBL::instance().refresh();
 
     _window.clear();
 

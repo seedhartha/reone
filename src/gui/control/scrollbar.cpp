@@ -41,7 +41,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     shared_ptr<GffStruct> dir(gffs.getStruct("DIR"));
     if (dir) {
         string image(dir->getString("IMAGE"));
-        _dir.image = Textures::instance().get(image, TextureType::Diffuse);
+        _dir.image = Textures::instance().get(image, TextureUsage::Diffuse);
     }
 }
 

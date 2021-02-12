@@ -17,6 +17,8 @@
 
 #include "curfile.h"
 
+#include "../textureutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -77,9 +79,10 @@ void CurFile::loadData() {
     Texture::Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    _texture = make_shared<Texture>("", TextureType::Cursor, _width, _width);
+    _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
     _texture->init();
-    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
+    _texture->bind();
+    _texture->setPixels(_width, _width, Texture::PixelFormat::BGRA, vector<Texture::Layer> { layer });
 }
 
 } // namespace render

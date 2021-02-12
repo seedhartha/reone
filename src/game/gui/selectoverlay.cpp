@@ -60,13 +60,13 @@ SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
 
 void SelectionOverlay::load() {
     _font = Fonts::instance().get("dialogfont16x16");
-    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureType::GUI);
-    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
-    _hostileReticle = Textures::instance().get("hostilereticle", TextureType::GUI);
-    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureType::GUI);
-    _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureType::GUI);
-    _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureType::GUI);
-    _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureType::GUI);
+    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = Textures::instance().get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
@@ -74,7 +74,7 @@ void SelectionOverlay::load() {
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
-    _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureType::GUI)));
+    _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureUsage::GUI)));
 }
 
 bool SelectionOverlay::handle(const SDL_Event &event) {

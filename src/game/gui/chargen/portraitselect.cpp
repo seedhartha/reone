@@ -146,7 +146,7 @@ void PortraitSelection::updatePortraits() {
             int appearanceS = row.getInt("appearance_s");
             int appearanceL = row.getInt("appearance_l");
 
-            shared_ptr<Texture> image(Textures::instance().get(resRef, TextureType::GUI));
+            shared_ptr<Texture> image(Textures::instance().get(resRef, TextureUsage::GUI));
 
             Portrait portrait;
             portrait.resRef = move(resRef);

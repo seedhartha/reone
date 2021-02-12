@@ -21,7 +21,7 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
-#include "../../render/irradiancemaps.h"
+#include "../../render/pbribl.h"
 
 #include "../scenegraph.h"
 
@@ -65,8 +65,8 @@ void ModelNodeSceneNode::update(float dt) {
         // Bumpmap UV animation
         shared_ptr<Texture> bumpmap(mesh->bumpmapTexture());
         if (bumpmap) {
-            const TextureFeatures &features = bumpmap->features();
-            if (features.procedureType == TextureProcedureType::Cycle) {
+            const Texture::Features &features = bumpmap->features();
+            if (features.procedureType == Texture::ProcedureType::Cycle) {
                 int frameCount = features.numX * features.numY;
                 float length = frameCount / static_cast<float>(features.fps);
                 _bumpmapTime = glm::min(_bumpmapTime + dt, length);
@@ -122,9 +122,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         if (mesh->hasEnvmapTexture()) {
             locals.general.envmapEnabled = true;
 
-            auto irradianceMap = IrradianceMaps::instance().get(mesh->envmapTexture().get());
-            if (irradianceMap) {
-                locals.general.irradianceMapEnabled = true;
+            bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
+            if (derived) {
+                locals.general.pbrIblEnabled = true;
             }
         }
         if (mesh->hasLightmapTexture()) {
@@ -202,7 +202,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         }
     }
 
-    ShaderProgram program = shadowPass ? ShaderProgram::DepthDepth : ShaderProgram::ModelModel;
+    ShaderProgram program = shadowPass ? ShaderProgram::SimpleDepth : ShaderProgram::ModelModel;
     Shaders::instance().activate(program, locals);
 
     mesh->render(diffuseTexture);

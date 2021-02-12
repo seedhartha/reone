@@ -77,7 +77,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
 
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureType::Diffuse));
+        shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureUsage::Diffuse));
         modelSceneNode->setTextureOverride(texture);
     }
 

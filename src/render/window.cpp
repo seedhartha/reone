@@ -83,9 +83,12 @@ void RenderWindow::init() {
     Quad::getXFlipped().initGL();
     Quad::getYFlipped().initGL();
     Quad::getXYFlipped().initGL();
+    Quad::getNDC().initGL();
 
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
 void RenderWindow::deinit() {
@@ -93,6 +96,7 @@ void RenderWindow::deinit() {
     Quad::getXFlipped().deinitGL();
     Quad::getYFlipped().deinitGL();
     Quad::getXYFlipped().deinitGL();
+    Quad::getNDC().deinitGL();
     AABBMesh::instance().deinitGL();
     BillboardMesh::instance().deinitGL();
     CubeMapMesh::instance().deinitGL();

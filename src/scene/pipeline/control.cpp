@@ -24,6 +24,7 @@
 #include "../../render/mesh/quad.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
+#include "../../render/textureutil.h"
 
 using namespace std;
 
@@ -34,13 +35,28 @@ namespace reone {
 namespace scene {
 
 ControlRenderPipeline::ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent) :
-    _scene(scene),
-    _extent(extent),
-    _geometry(_extent[2], _extent[3]) {
+    _scene(scene), _extent(extent) {
 }
 
 void ControlRenderPipeline::init() {
+    _geometryColor = make_unique<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _geometryColor->init();
+    _geometryColor->bind();
+    _geometryColor->clearPixels(_extent[2], _extent[3], Texture::PixelFormat::RGBA);
+    _geometryColor->unbind();
+
+    _geometryDepth = make_unique<Texture>("geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _geometryDepth->init();
+    _geometryDepth->bind();
+    _geometryDepth->clearPixels(_extent[2], _extent[3], Texture::PixelFormat::Depth);
+    _geometryDepth->unbind();
+
     _geometry.init();
+    _geometry.bind();
+    _geometry.attachColor(*_geometryColor);
+    _geometry.attachDepth(*_geometryDepth);
+    _geometry.checkCompleteness();
+    _geometry.unbind();
 }
 
 void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
@@ -81,11 +97,9 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
     Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
-    _geometry.bindColorBuffer(0);
+    _geometryColor->bind();
 
     Quad::getDefault().renderTriangles();
-
-    _geometry.unbindColorBuffer(0);
 }
 
 } // namespace scene

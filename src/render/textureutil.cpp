@@ -18,6 +18,9 @@
 #include "textureutil.h"
 
 #include <stdexcept>
+#include <string>
+
+#include "glm/vec4.hpp"
 
 #include "s3tc.h"
 
@@ -27,26 +30,55 @@ namespace reone {
 
 namespace render {
 
-static bool isCompressed(PixelFormat format) {
-    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
+Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
+    Texture::Properties properties;
+    properties.headless = headless;
+
+    if (usage == TextureUsage::GUI || usage == TextureUsage::ColorBuffer || usage == TextureUsage::IrradianceMap || usage == TextureUsage::BRDFLookup) {
+        properties.minFilter = Texture::Filtering::Linear;
+        properties.wrap = Texture::Wrapping::ClampToEdge;
+
+    } else if (usage == TextureUsage::EnvironmentMap || usage == TextureUsage::PrefilterMap) {
+        properties.wrap = Texture::Wrapping::ClampToEdge;
+
+    } else if (usage == TextureUsage::DepthBuffer || usage == TextureUsage::CubeMapDepthBuffer) {
+        properties.minFilter = Texture::Filtering::Nearest;
+        properties.maxFilter = Texture::Filtering::Nearest;
+        properties.wrap = Texture::Wrapping::ClampToBorder;
+        properties.borderColor = glm::vec4(1.0f);
+    }
+
+    if (usage == TextureUsage::EnvironmentMap ||
+        usage == TextureUsage::IrradianceMap ||
+        usage == TextureUsage::PrefilterMap ||
+        usage == TextureUsage::CubeMapDepthBuffer) {
+
+        properties.cubemap = true;
+    }
+
+    return move(properties);
 }
 
-static int getBitsPerPixel(PixelFormat format) {
+static bool isCompressed(Texture::PixelFormat format) {
+    return format == Texture::PixelFormat::DXT1 || format == Texture::PixelFormat::DXT5;
+}
+
+static int getBitsPerPixel(Texture::PixelFormat format) {
     switch (format) {
-        case PixelFormat::Grayscale:
+        case Texture::PixelFormat::Grayscale:
             return 1;
-        case PixelFormat::RGB:
-        case PixelFormat::BGR:
+        case Texture::PixelFormat::RGB:
+        case Texture::PixelFormat::BGR:
             return 3;
-        case PixelFormat::RGBA:
-        case PixelFormat::BGRA:
+        case Texture::PixelFormat::RGBA:
+        case Texture::PixelFormat::BGRA:
             return 4;
         default:
             throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
 }
 
-void prepareCubeMap(vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat) {
+void prepareCubeMap(vector<Texture::Layer> &layers, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat) {
     static int rotations[] = { 1, 3, 0, 2, 2, 0 };
 
     int layerCount = static_cast<int>(layers.size());
@@ -78,7 +110,7 @@ void prepareCubeMap(vector<Texture::Layer> &layers, PixelFormat srcFormat, Pixel
     }
 }
 
-void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelFormat &destFormat) {
+void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat) {
     if (!isCompressed(srcFormat)) {
         throw invalid_argument("format must be either DXT1 or DXT5");
     }
@@ -89,7 +121,7 @@ void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelForma
     unsigned long *pixelsPtr = &pixels[0];
     bool alpha;
 
-    if (srcFormat == PixelFormat::DXT5) {
+    if (srcFormat == Texture::PixelFormat::DXT5) {
         BlockDecompressImageDXT5(mipMap.width, mipMap.height, srcMipMapData, pixelsPtr);
         alpha = true;
     } else {
@@ -111,7 +143,7 @@ void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelForma
         }
     }
 
-    destFormat = alpha ? PixelFormat::RGBA : PixelFormat::RGB;
+    destFormat = alpha ? Texture::PixelFormat::RGBA : Texture::PixelFormat::RGB;
 }
 
 void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {
