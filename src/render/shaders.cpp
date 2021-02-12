@@ -580,11 +580,11 @@ void main() {
             vec3 H = normalize(V + L);
             vec3 radiance;
             if (uLights[i].position.w == 0.0) {
-                radiance = uLights[i].color.rgb;
+                radiance = uLights[i].multiplier * uLights[i].color.rgb;
             } else {
                 float distance = length(uLights[i].position.xyz - fragPosition);
                 float attenuation = 1.0 / (distance * distance);
-                radiance = uLights[i].color.rgb * attenuation;
+                radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
             }
 
             // Cook-Torrance BRDF
