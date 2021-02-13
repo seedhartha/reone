@@ -21,13 +21,15 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
+
 #include "types.h"
 
 namespace reone {
 
 namespace game {
 
-class SoundSets {
+class SoundSets : public Singleton {
 public:
     static SoundSets &instance();
 
@@ -37,10 +39,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<SoundSet>> _cache;
-
-    SoundSets() = default;
-    SoundSets(const SoundSets &) = delete;
-    SoundSets &operator=(const SoundSets &) = delete;
 };
 
 } // namespace game

@@ -17,35 +17,18 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
-#include <unordered_map>
-
-#include "../common/singleton.h"
-#include "../resource/types.h"
-
-#include "types.h"
-
 namespace reone {
 
-namespace render {
-
-class Walkmesh;
-
-class Walkmeshes : public Singleton {
-public:
-    static Walkmeshes &instance();
-
-    void invalidateCache();
-
-    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type);
+/**
+ * Base class for singletons.
+ */
+class Singleton {
+protected:
+    Singleton() = default;
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
-
-    std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResourceType type);
+    Singleton(const Singleton &) = delete;
+    Singleton &operator=(const Singleton &) = delete;
 };
-
-} // namespace render
 
 } // namespace reone

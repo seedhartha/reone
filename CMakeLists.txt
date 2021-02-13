@@ -63,12 +63,14 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 set(COMMON_HEADERS
     src/common/aabb.h
+    src/common/cache.h
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
     src/common/mediastream.h
     src/common/pathutil.h
     src/common/random.h
+    src/common/singleton.h
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h

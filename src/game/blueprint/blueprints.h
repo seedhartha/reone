@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../../common/singleton.h"
 #include "../../resource/types.h"
 
 #include "creature.h"
@@ -35,7 +36,7 @@ namespace reone {
 
 namespace game {
 
-class Blueprints {
+class Blueprints : public Singleton {
 public:
     static Blueprints &instance();
 
@@ -57,10 +58,6 @@ private:
     std::unordered_map<std::string, std::shared_ptr<SoundBlueprint>> _soundCache;
     std::unordered_map<std::string, std::shared_ptr<TriggerBlueprint>> _triggerCache;
     std::unordered_map<std::string, std::shared_ptr<WaypointBlueprint>> _waypointCache;
-
-    Blueprints() = default;
-    Blueprints(const Blueprints &) = delete;
-    Blueprints &operator=(const Blueprints &) = delete;
 };
 
 } // namespace game

@@ -26,6 +26,8 @@
 
 #include "glm/glm.hpp"
 
+#include "../common/singleton.h"
+
 #include "types.h"
 
 namespace reone {
@@ -157,7 +159,7 @@ struct LocalUniforms {
     std::shared_ptr<LightingUniforms> lighting;
 };
 
-class Shaders {
+class Shaders : public Singleton {
 public:
     static Shaders &instance();
 
@@ -209,10 +211,7 @@ private:
     // END Uniform buffer objects
 
     Shaders();
-    Shaders(const Shaders &) = delete;
     ~Shaders();
-
-    Shaders &operator=(const Shaders &) = delete;
 
     void initShader(ShaderName name, unsigned int type, std::vector<char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);

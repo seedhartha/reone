@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
 #include "../resource/types.h"
 
 #include "types.h"
@@ -31,7 +32,7 @@ namespace render {
 
 class Font;
 
-class Fonts {
+class Fonts : public Singleton {
 public:
     static Fonts &instance();
 
@@ -41,10 +42,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<Font>> _cache;
-
-    Fonts() = default;
-    Fonts(const Fonts &) = delete;
-    Fonts &operator=(const Fonts &) = delete;
 
     std::shared_ptr<Font> doGet(const std::string &resRef);
 };

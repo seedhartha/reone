@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
 #include "../resource/types.h"
 
 namespace reone {
@@ -29,7 +30,7 @@ namespace audio {
 
 class AudioStream;
 
-class AudioFiles {
+class AudioFiles : public Singleton {
 public:
     static AudioFiles &instance();
 
@@ -39,10 +40,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<AudioStream>> _cache;
-
-    AudioFiles() = default;
-    AudioFiles(const AudioFiles &) = delete;
-    AudioFiles &operator=(const AudioFiles &) = delete;
 
     std::shared_ptr<AudioStream> doGet(const std::string &resRef);
 };

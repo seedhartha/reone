@@ -20,6 +20,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../../common/singleton.h"
+
 #include "class.h"
 #include "types.h"
 
@@ -27,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-class Classes {
+class Classes : public Singleton {
 public:
     static Classes &instance();
 
@@ -35,11 +37,6 @@ public:
 
 private:
     std::unordered_map<ClassType, std::shared_ptr<CreatureClass>> _classes;
-
-    Classes() = default;
-
-    Classes(const Classes &) = delete;
-    Classes &operator=(const Classes &) = delete;
 
     std::shared_ptr<CreatureClass> doGet(ClassType type);
 };

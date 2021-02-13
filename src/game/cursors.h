@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
 #include "../resource/types.h"
 
 #include "types.h"
@@ -36,7 +37,7 @@ class Texture;
 
 namespace game {
 
-class Cursors {
+class Cursors : public Singleton {
 public:
     static Cursors &instance();
 
@@ -50,11 +51,6 @@ public:
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
-
-    Cursors() = default;
-    Cursors(const Cursors &) = delete;
-
-    Cursors &operator=(const Cursors &) = delete;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type, const std::unordered_map<CursorType, std::pair<uint32_t, uint32_t>> &nameByResRef);

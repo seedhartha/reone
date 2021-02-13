@@ -22,6 +22,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "../common/singleton.h"
+
 #include "framebuffer.h"
 #include "texture.h"
 
@@ -33,7 +35,7 @@ namespace render {
  * Computes and caches PBR IBL textures, i.e. irradiance maps, prefiltered
  * environment maps and BRDF lookup textures.
  */
-class PBRIBL {
+class PBRIBL : public Singleton {
 public:
     struct Derived {
         std::shared_ptr<Texture> irradianceMap;
@@ -74,8 +76,6 @@ private:
     Framebuffer _brdfLookupFB;
 
     // END Framebuffers
-
-    PBRIBL() = default;
 
     std::shared_ptr<Texture> computeIrradianceMap(const Texture *envmap);
     std::shared_ptr<Texture> computePrefilterMap(const Texture *envmap);

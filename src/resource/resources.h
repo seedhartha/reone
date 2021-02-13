@@ -25,6 +25,8 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include "../common/singleton.h"
+
 #include "format/2dafile.h"
 #include "format/gfffile.h"
 #include "format/keyfile.h"
@@ -44,7 +46,7 @@ namespace resource {
  * resource providers, that it queries for resources by ResRef and ResType.
  * Caches found resources.
  */
-class Resources {
+class Resources : public Singleton {
 public:
     static Resources &instance();
 
@@ -106,11 +108,7 @@ private:
 
     // END Resource caches
 
-    Resources() = default;
-    Resources(const Resources &) = delete;
     ~Resources();
-
-    Resources &operator=(const Resources &) = delete;
 
     void indexKeyBifFiles();
     void indexTexturePacks();

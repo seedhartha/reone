@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../../common/singleton.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -33,7 +34,7 @@ namespace render {
 
 class Model;
 
-class Models {
+class Models : public Singleton {
 public:
     static Models &instance();
 
@@ -51,10 +52,6 @@ private:
     resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<resource::ResourceType, std::shared_ptr<IModelLoader>> _loaders;
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
-
-    Models() = default;
-    Models(const Models &) = delete;
-    Models &operator=(const Models &) = delete;
 
     std::shared_ptr<Model> doGet(const std::string &resRef, resource::ResourceType type);
 };

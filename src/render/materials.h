@@ -21,13 +21,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "../common/singleton.h"
+
 #include "material.h"
 
 namespace reone {
 
 namespace render {
 
-class Materials {
+class Materials : public Singleton {
 public:
     static Materials &instance();
 
@@ -44,11 +46,6 @@ public:
 private:
     bool _inited { false };
     std::unordered_map<std::string, std::shared_ptr<Material>> _materials;
-
-    Materials() = default;
-
-    Materials(const Materials &) = delete;
-    Materials &operator=(const Materials &) = delete;
 };
 
 } // namespace render
