@@ -19,7 +19,7 @@
 #include <stdexcept>
 
 #include "../../common/log.h"
-#include "../../render/mesh/aabb.h"
+#include "../../render/mesh/meshes.h"
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"
@@ -146,7 +146,13 @@ void ModelSceneNode::update(float dt) {
 
 void ModelSceneNode::render() const {
     if (g_drawAABB) {
-        AABBMesh::instance().render(_aabb, _absoluteTransform);
+        glm::mat4 transform(_absoluteTransform * _aabb.transform());
+
+        LocalUniforms locals;
+        locals.general.model = move(transform);
+
+        Shaders::instance().activate(ShaderProgram::ModelColor, locals);
+        Meshes::instance().getAABB().render();
     }
 }
 

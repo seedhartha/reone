@@ -17,10 +17,7 @@
 
 #include "mesh.h"
 
-#include <map>
-
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 #include "glm/ext.hpp"
@@ -31,45 +28,30 @@ namespace reone {
 
 namespace render {
 
-Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexOffsets offsets) :
+Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexOffsets offsets, DrawMode mode) :
     _vertexCount(vertexCount),
     _vertices(move(vertices)),
     _indices(move(indices)),
-    _offsets(move(offsets)) {
+    _offsets(move(offsets)),
+    _mode(mode) {
 }
 
-void Mesh::computeAABB() {
-    _aabb.reset();
+void Mesh::init() {
+    if (_inited) return;
 
-    const uint8_t *vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _offsets.vertexCoords;
-
-    int stride = _offsets.stride;
-    if (stride == 0) {
-        stride = 3 * sizeof(float);
-    }
-
-    for (size_t i = 0; i < _vertexCount; ++i) {
-        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
-        vertCoords += stride;
-    }
-}
-
-void Mesh::initGL() {
-    if (_glInited) return;
-
-    glGenBuffers(1, &_vertexBufferId);
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
+    glGenBuffers(1, &_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glGenBuffers(1, &_indexBufferId);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
+    glGenBuffers(1, &_ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glGenVertexArrays(1, &_vertexArrayId);
-    glBindVertexArray(_vertexArrayId);
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
+    glGenVertexArrays(1, &_vao);
+    glBindVertexArray(_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.vertexCoords));
@@ -105,39 +87,56 @@ void Mesh::initGL() {
 
     glBindVertexArray(0);
 
-    _glInited = true;
+    _inited = true;
 }
 
 Mesh::~Mesh() {
-    deinitGL();
+    deinit();
 }
 
-void Mesh::deinitGL() {
-    if (!_glInited) return;
-
-    glDeleteVertexArrays(1, &_vertexArrayId);
-    glDeleteBuffers(1, &_indexBufferId);
-    glDeleteBuffers(1, &_vertexBufferId);
-
-    _glInited = false;
+void Mesh::deinit() {
+    if (_inited) {
+        glDeleteVertexArrays(1, &_vao);
+        glDeleteBuffers(1, &_ibo);
+        glDeleteBuffers(1, &_vbo);
+        _inited = false;
+    }
 }
 
-void Mesh::renderLines() const {
-    render(GL_LINES, static_cast<int>(_indices.size()), 0);
+static GLenum getGLMode(Mesh::DrawMode mode) {
+    return mode == Mesh::DrawMode::Lines ? GL_LINES : GL_TRIANGLES;
 }
 
-void Mesh::renderTriangles() const {
-    render(GL_TRIANGLES, static_cast<int>(_indices.size()), 0);
+void Mesh::render() const {
+    if (_inited) {
+        render(getGLMode(_mode), _indices.size(), 0);
+    }
 }
 
 void Mesh::render(uint32_t mode, int count, int offset) const {
-    glBindVertexArray(_vertexArrayId);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
+    glBindVertexArray(_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
     glDrawElements(mode, count, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(offset));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::computeAABB() {
+    _aabb.reset();
+
+    const uint8_t *vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _offsets.vertexCoords;
+
+    int stride = _offsets.stride;
+    if (stride == 0) {
+        stride = 3 * sizeof(float);
+    }
+
+    for (size_t i = 0; i < _vertexCount; ++i) {
+        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
+        vertCoords += stride;
+    }
 }
 
 } // namespace render

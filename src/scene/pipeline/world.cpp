@@ -23,7 +23,7 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/pbribl.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
@@ -250,7 +250,7 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     _geometryColor2->bind();
 
     withDepthTest([]() {
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     });
 
     _horizontalBlur.unbind();
@@ -279,7 +279,7 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     _horizontalBlurColor->bind();
 
     withDepthTest([]() {
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     });
 
     _verticalBlur.unbind();
@@ -309,7 +309,7 @@ void WorldRenderPipeline::drawResult() const {
 
         //_shadowsDepth->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
 
     } else {
         LocalUniforms locals;
@@ -324,7 +324,7 @@ void WorldRenderPipeline::drawResult() const {
         setActiveTextureUnit(TextureUnits::bloom);
         _verticalBlurColor->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
 }
 

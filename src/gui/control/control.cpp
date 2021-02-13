@@ -23,7 +23,7 @@
 
 #include "../../common/log.h"
 #include "../../render/fonts.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
@@ -266,10 +266,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         bool additive = border.fill->isAdditive();
         if (additive) {
             withAdditiveBlending([]() {
-                Quad::getDefault().renderTriangles();
+                Meshes::instance().getQuad().render();
             });
         } else {
-            Quad::getDefault().renderTriangles();
+            Meshes::instance().getQuad().render();
         }
     }
     if (border.edge) {
@@ -297,7 +297,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
-            Quad::getDefault().renderTriangles();
+            Meshes::instance().getQuad().render();
 
             // Right edge
             {
@@ -312,7 +312,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
-            Quad::getXFlipped().renderTriangles();
+            Meshes::instance().getQuadFlipX().render();
         }
 
         if (width > 0.0f) {
@@ -331,7 +331,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
-            Quad::getDefault().renderTriangles();
+            Meshes::instance().getQuad().render();
 
             // Bottom edge
             {
@@ -345,7 +345,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
-            Quad::getYFlipped().renderTriangles();
+            Meshes::instance().getQuadFlipY().render();
         }
     }
     if (border.corner) {
@@ -367,7 +367,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
 
         // Bottom left corner
         {
@@ -381,7 +381,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
-        Quad::getYFlipped().renderTriangles();
+        Meshes::instance().getQuadFlipY().render();
 
         // Top right corner
         {
@@ -395,7 +395,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
-        Quad::getXFlipped().renderTriangles();
+        Meshes::instance().getQuadFlipX().render();
 
         // Bottom right corner
         {
@@ -409,7 +409,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
-        Quad::getXYFlipped().renderTriangles();
+        Meshes::instance().getQuadFlipXY().render();
     }
 }
 

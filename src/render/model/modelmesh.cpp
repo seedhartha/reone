@@ -20,7 +20,6 @@
 #include <stdexcept>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 #include "../pbribl.h"
@@ -40,11 +39,11 @@ ModelMesh::ModelMesh(const shared_ptr<Mesh> &mesh) : _mesh(mesh) {
 }
 
 void ModelMesh::initGL() {
-    _mesh->initGL();
+    _mesh->init();
 }
 
 void ModelMesh::deinitGL() {
-    _mesh->deinitGL();
+    _mesh->deinit();
 }
 
 void ModelMesh::render(shared_ptr<Texture> diffuse) const {
@@ -79,9 +78,9 @@ void ModelMesh::render(shared_ptr<Texture> diffuse) const {
     }
 
     if (additive) {
-        withAdditiveBlending([this]() { _mesh->renderTriangles(); });
+        withAdditiveBlending([this]() { _mesh->render(); });
     } else {
-        _mesh->renderTriangles();
+        _mesh->render();
     }
 }
 

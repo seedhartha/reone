@@ -924,7 +924,7 @@ Shaders::Shaders() {
     _skeletalUniforms = make_shared<SkeletalUniforms>();
 }
 
-void Shaders::initGL() {
+void Shaders::init() {
     initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
     initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexBillboard });
@@ -1045,10 +1045,10 @@ void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
 }
 
 Shaders::~Shaders() {
-    deinitGL();
+    deinit();
 }
 
-void Shaders::deinitGL() {
+void Shaders::deinit() {
     if (_bumpmapUbo) {
         glDeleteBuffers(1, &_bumpmapUbo);
         _bumpmapUbo = 0;

@@ -28,6 +28,7 @@
 #include "../experimental/tor/gr2file.h"
 #include "../render/lip/lips.h"
 #include "../render/materials.h"
+#include "../render/mesh/meshes.h"
 #include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
 #include "../render/pbribl.h"
@@ -102,23 +103,24 @@ int Game::run() {
 
 void Game::init() {
     _window.init();
-    _worldPipeline.init();
 
     Resources::instance().init(_gameId, _path);
-    Cursors::instance().init(_gameId);
-
-    Models::instance().init(_gameId);
-    registerModelLoaders();
-
+    Meshes::instance().init();
     Textures::instance().init(_gameId);
     Materials::instance().init();
     PBRIBL::instance().init();
+    Shaders::instance().init();
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
     Routines::instance().init(_gameId, this);
 
+    Models::instance().init(_gameId);
+    registerModelLoaders();
+
+    Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);
 
+    _worldPipeline.init();
     _console.load();
 }
 
@@ -562,12 +564,7 @@ void Game::loadCharacterGeneration() {
 
 void Game::deinit() {
     JobExecutor::instance().deinit();
-    Routines::instance().deinit();
     AudioPlayer::instance().deinit();
-    PBRIBL::instance().deinit();
-    Materials::instance().deinit();
-    Cursors::instance().deinit();
-    Resources::instance().deinit();
 
     _window.deinit();
 }

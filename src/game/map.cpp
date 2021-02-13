@@ -26,7 +26,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../common/log.h"
-#include "../render/mesh/quad.h"
+#include "../render/mesh/meshes.h"
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../resource/types.h"
@@ -118,7 +118,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
 
         float height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        withScissorTest(scissorBounds, []() { Quad::getDefault().renderTriangles(); });
+        withScissorTest(scissorBounds, []() { Meshes::instance().getQuad().render(); });
 
     } else {
         glm::mat4 transform(1.0f);
@@ -133,7 +133,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
 }
 
@@ -168,7 +168,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
         setActiveTextureUnit(TextureUnits::diffuse);
         _noteTexture->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
 }
 
@@ -249,7 +249,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     setActiveTextureUnit(TextureUnits::diffuse);
     _arrowTexture->bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void Map::setSelectedNote(const shared_ptr<Waypoint> &waypoint) {

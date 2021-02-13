@@ -17,7 +17,7 @@
 
 #include "scrollbar.h"
 
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
@@ -64,7 +64,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
     locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
@@ -77,7 +77,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
     locals.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void ScrollBar::setCanScrollUp(bool scroll) {

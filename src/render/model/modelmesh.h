@@ -20,9 +20,8 @@
 #include <memory>
 
 #include "../material.h"
+#include "../mesh/mesh.h"
 #include "../texture.h"
-
-#include "mesh.h"
 
 namespace reone {
 

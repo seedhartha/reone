@@ -162,17 +162,13 @@ set(RENDER_HEADERS
     src/render/lip/lips.h
     src/render/material.h
     src/render/materials.h
-    src/render/mesh/aabb.h
-    src/render/mesh/billboard.h
-    src/render/mesh/cube.h
-    src/render/mesh/cubemap.h
-    src/render/mesh/quad.h
     src/render/mesh/mesh.h
-    src/render/mesh/modelmesh.h
+    src/render/mesh/meshes.h
     src/render/model/animation.h
     src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelloader.h
+    src/render/model/modelmesh.h
     src/render/model/modelnode.h
     src/render/model/models.h
     src/render/pbribl.h
@@ -203,17 +199,13 @@ set(RENDER_SOURCES
     src/render/lip/lipfile.cpp
     src/render/lip/lips.cpp
     src/render/materials.cpp
-    src/render/mesh/aabb.cpp
-    src/render/mesh/billboard.cpp
-    src/render/mesh/cube.cpp
-    src/render/mesh/cubemap.cpp
-    src/render/mesh/quad.cpp
     src/render/mesh/mesh.cpp
-    src/render/mesh/modelmesh.cpp
+    src/render/mesh/meshes.cpp
     src/render/model/animation.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
     src/render/model/modelloader.cpp
+    src/render/model/modelmesh.cpp
     src/render/model/modelnode.cpp
     src/render/model/models.cpp
     src/render/pbribl.cpp
