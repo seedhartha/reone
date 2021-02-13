@@ -54,9 +54,9 @@ static vector<float> g_flipXYVertices {
 
 static vector<float> g_ndcVertices {
     -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
      1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 0.0f
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f
 };
 
 static vector<uint16_t> g_indices = { 0, 1, 2, 2, 3, 0 };

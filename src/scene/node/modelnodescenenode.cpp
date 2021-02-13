@@ -36,6 +36,8 @@ namespace reone {
 
 namespace scene {
 
+static bool g_pbrEnabled = false;
+
 static constexpr float kUvAnimationSpeed = 250.0f;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
@@ -115,21 +117,33 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
     locals.general.model = _absoluteTransform;
     locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
-    if (!shadowPass) {
+    ShaderProgram program;
+
+    if (shadowPass) {
+        program = ShaderProgram::SimpleDepth;
+
+    } else {
+        program = g_pbrEnabled ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong;
+
         if (diffuseTexture) {
             locals.general.diffuseEnabled = true;
         }
+
         if (mesh->hasEnvmapTexture()) {
             locals.general.envmapEnabled = true;
 
-            bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
-            if (derived) {
-                locals.general.pbrIblEnabled = true;
+            if (g_pbrEnabled) {
+                bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
+                if (derived) {
+                    locals.general.pbrIblEnabled = true;
+                }
             }
         }
+
         if (mesh->hasLightmapTexture()) {
             locals.general.lightmapEnabled = true;
         }
+
         shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
         if (bumpmapTexture) {
             locals.general.bumpmapEnabled = true;
@@ -168,26 +182,28 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 }
             }
         }
+
         if (_modelNode->isSelfIllumEnabled()) {
             locals.general.selfIllumEnabled = true;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (_modelSceneNode->isLightingEnabled() &&
-            !mesh->hasLightmapTexture() &&
+        if (
+            _modelSceneNode->isLightingEnabled() &&
             !_modelNode->isSelfIllumEnabled() &&
+            !mesh->hasLightmapTexture() &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.lightingEnabled = true;
             locals.lighting = Shaders::instance().lightingUniforms();
-            locals.lighting->diffuseMetallic = mesh->materials().diffuseMetallic;
-            locals.lighting->diffuseRoughness = mesh->materials().diffuseRoughness;
-            locals.lighting->envmapMetallic = mesh->materials().envmapMetallic;
-            locals.lighting->envmapRoughness = mesh->materials().envmapRoughness;
-            locals.lighting->meshDiffuseColor = glm::vec4(mesh->diffuseColor(), 1.0f);
-            locals.lighting->meshAmbientColor = glm::vec4(mesh->ambientColor(), 1.0f);
             locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+            locals.lighting->materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
+            locals.lighting->materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
+            locals.lighting->materialSpecular = mesh->material().specular;
+            locals.lighting->materialShininess = mesh->material().shininess;
+            locals.lighting->materialMetallic = mesh->material().metallic;
+            locals.lighting->materialRoughness = mesh->material().roughness;
             locals.lighting->lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < locals.lighting->lightCount; ++i) {
@@ -198,6 +214,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
                 shaderLight.multiplier = lights[i]->multiplier();
             }
         }
+
         if (diffuseTexture) {
             float waterAlpha = diffuseTexture->features().waterAlpha;
             locals.general.uvOffset = _uvOffset;
@@ -206,7 +223,6 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         }
     }
 
-    ShaderProgram program = shadowPass ? ShaderProgram::SimpleDepth : ShaderProgram::ModelModel;
     Shaders::instance().activate(program, locals);
 
     mesh->render(diffuseTexture);

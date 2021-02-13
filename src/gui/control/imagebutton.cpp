@@ -92,7 +92,7 @@ void ImageButton::drawIcon(
         locals.general.model = transform;
         locals.general.color = glm::vec4(color, 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
@@ -108,7 +108,7 @@ void ImageButton::drawIcon(
         LocalUniforms locals;
         locals.general.model = transform;
         locals.general.color = glm::vec4(1.0f);
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();

@@ -27,6 +27,7 @@
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
 #include "../render/lip/lips.h"
+#include "../render/materials.h"
 #include "../render/model/mdlfile.h"
 #include "../render/model/models.h"
 #include "../render/pbribl.h"
@@ -110,6 +111,7 @@ void Game::init() {
     registerModelLoaders();
 
     Textures::instance().init(_gameId);
+    Materials::instance().init();
     PBRIBL::instance().init();
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
@@ -562,6 +564,8 @@ void Game::deinit() {
     JobExecutor::instance().deinit();
     Routines::instance().deinit();
     AudioPlayer::instance().deinit();
+    PBRIBL::instance().deinit();
+    Materials::instance().deinit();
     Cursors::instance().deinit();
     Resources::instance().deinit();
 

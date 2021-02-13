@@ -257,7 +257,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.general.model = move(transform);
             locals.general.discardColor = glm::vec4(_discardColor, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
 
         setActiveTextureUnit(TextureUnits::diffuse);
@@ -295,7 +295,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.general.model = move(transform);
                 locals.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
             Quad::getDefault().renderTriangles();
 
@@ -310,7 +310,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.general.model = move(transform);
                 locals.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
             Quad::getXFlipped().renderTriangles();
         }
@@ -329,7 +329,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.general.model = move(transform);
                 locals.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
             Quad::getDefault().renderTriangles();
 
@@ -343,7 +343,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 locals.general.model = move(transform);
                 locals.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
             }
             Quad::getYFlipped().renderTriangles();
         }
@@ -365,7 +365,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.general.model = move(transform);
             locals.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
         Quad::getDefault().renderTriangles();
 
@@ -379,7 +379,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.general.model = move(transform);
             locals.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
         Quad::getYFlipped().renderTriangles();
 
@@ -393,7 +393,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.general.model = move(transform);
             locals.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
         Quad::getXFlipped().renderTriangles();
 
@@ -407,7 +407,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             locals.general.model = move(transform);
             locals.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
         }
         Quad::getXYFlipped().renderTriangles();
     }

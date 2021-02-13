@@ -94,7 +94,7 @@ void Video::render() {
     Shaders::instance().setGlobalUniforms(globals);
 
     LocalUniforms locals;
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _textureId);

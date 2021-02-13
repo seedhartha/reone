@@ -54,13 +54,13 @@ void WorldRenderPipeline::init() {
     _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor1->init();
     _geometryColor1->bind();
-    _geometryColor1->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _geometryColor1->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _geometryColor1->unbind();
 
     _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor2->init();
     _geometryColor2->bind();
-    _geometryColor2->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _geometryColor2->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _geometryColor2->unbind();
 
     _geometryDepth = make_unique<Texture>("geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
@@ -80,10 +80,10 @@ void WorldRenderPipeline::init() {
 
     // Vertical blur framebuffer
 
-    _verticalBlurColor = make_unique<Texture>("verticalblur_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _verticalBlurColor->init();
     _verticalBlurColor->bind();
-    _verticalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _verticalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _verticalBlurColor->unbind();
 
     _verticalBlurDepth = make_unique<Texture>("verticalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
@@ -102,10 +102,10 @@ void WorldRenderPipeline::init() {
 
     // Horizontal blur framebuffer
 
-    _horizontalBlurColor = make_unique<Texture>("horizontalblur_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _horizontalBlurColor->init();
     _horizontalBlurColor->bind();
-    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGBA);
+    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _horizontalBlurColor->unbind();
 
     _horizontalBlurDepth = make_unique<Texture>("horizontalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
@@ -244,7 +244,7 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     locals.general.blurResolution = glm::vec2(w, h);
     locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
-    Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor2->bind();
@@ -273,7 +273,7 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
     locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::GUIBlur, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _horizontalBlurColor->bind();
@@ -295,21 +295,19 @@ void WorldRenderPipeline::drawResult() const {
     if (g_debugCubeMap) {
         LocalUniforms locals;
         locals.general.model = move(transform);
-        Shaders::instance().activate(ShaderProgram::GUIDebugCubeMap, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
 
-        /*
-        auto envmap = Textures::instance().get("cm_endar", TextureUsage::EnvironmentMap);
+        auto envmap = Textures::instance().get("cm_baremetal", TextureUsage::EnvironmentMap);
         PBRIBL::Derived derived;
         if (PBRIBL::instance().getDerived(envmap.get(), derived)) {
             derived.brdfLookup->bind();
         } else {
             envmap->bind();
         }
-        */
 
-        _shadowsDepth->bind();
+        //_shadowsDepth->bind();
 
         Quad::getDefault().renderTriangles();
 
@@ -318,7 +316,7 @@ void WorldRenderPipeline::drawResult() const {
         locals.general.bloomEnabled = true;
         locals.general.model = move(transform);
 
-        Shaders::instance().activate(ShaderProgram::GUIBloom, locals);
+        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _geometryColor1->bind();

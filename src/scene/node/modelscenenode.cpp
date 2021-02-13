@@ -40,6 +40,7 @@ namespace reone {
 namespace scene {
 
 static bool g_drawAABB = false;
+static bool g_convertSelfIllumToLight = false;
 
 ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
@@ -103,6 +104,13 @@ void ModelSceneNode::initModelNodes() {
             shared_ptr<ModelNodeSceneNode> childNode(getModelNodeSceneNode(*child));
             addChild(childNode);
             nodes.push(childNode.get());
+
+            if (g_convertSelfIllumToLight) {
+                if (childNode->modelNode()->isSelfIllumEnabled()) {
+                    auto lightNode = make_shared<LightSceneNode>(_sceneGraph, 2, child->selfIllumColor(), 10.0f, 1.0f, false);
+                    childNode->addChild(lightNode);
+                }
+            }
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {

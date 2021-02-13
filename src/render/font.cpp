@@ -150,7 +150,7 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
         locals.general.model = textTransform;
         locals.general.color = glm::vec4(color, 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
         glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));

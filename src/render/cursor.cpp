@@ -52,7 +52,7 @@ void Cursor::render() const {
     LocalUniforms locals;
     locals.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
