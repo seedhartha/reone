@@ -25,7 +25,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "../materialutil.h"
+#include "../materials.h"
 #include "../model/models.h"
 #include "../textures.h"
 
@@ -808,6 +808,10 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     if (!diffuse.empty() && diffuse != "null") {
         modelMesh->_diffuse = Textures::instance().get(diffuse, TextureUsage::Diffuse);
         if (modelMesh->_diffuse) {
+            shared_ptr<Material> material(Materials::instance().get(diffuse));
+            if (material) {
+                modelMesh->_material = *material;
+            }
             const Texture::Features &features = modelMesh->_diffuse->features();
             if (!features.envmapTexture.empty()) {
                 modelMesh->_envmap = Textures::instance().get(features.envmapTexture, TextureUsage::EnvironmentMap);
@@ -816,17 +820,6 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
             }
             if (!features.bumpmapTexture.empty()) {
                 modelMesh->_bumpmap = Textures::instance().get(features.bumpmapTexture, TextureUsage::Bumpmap);
-            }
-
-            // Load materials
-            float metallic, roughness;
-            if (getMaterialByTextureName(modelMesh->_diffuse->name(), metallic, roughness)) {
-                modelMesh->_materials.diffuseMetallic = metallic;
-                modelMesh->_materials.diffuseRoughness = roughness;
-            }
-            if (modelMesh->_envmap && getMaterialByTextureName(modelMesh->_envmap->name(), metallic, roughness)) {
-                modelMesh->_materials.envmapMetallic = metallic;
-                modelMesh->_materials.envmapRoughness = roughness;
             }
         }
     }

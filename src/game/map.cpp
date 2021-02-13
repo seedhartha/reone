@@ -111,7 +111,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         LocalUniforms locals;
         locals.general.model = transform;
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
@@ -128,7 +128,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         LocalUniforms locals;
         locals.general.model = transform;
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
@@ -163,7 +163,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
         locals.general.model = transform;
         locals.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _noteTexture->bind();
@@ -244,7 +244,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     LocalUniforms locals;
     locals.general.model = transform;
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _arrowTexture->bind();

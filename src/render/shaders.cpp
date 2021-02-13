@@ -45,6 +45,7 @@ static constexpr GLchar *kShaderBaseHeader = R"END(
 #version 330
 
 const float PI = 3.14159265359;
+const float GAMMA = 2.2;
 const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
 const float SHADOW_FAR_PLANE = 10000.0;
@@ -85,13 +86,13 @@ layout(std140) uniform General {
 };
 
 layout(std140) uniform Lighting {
-    vec4 uMeshDiffuseColor;
-    vec4 uMeshAmbientColor;
     vec4 uAmbientLightColor;
-    float uDiffuseMetallic;
-    float uDiffuseRoughness;
-    float uEnvmapMetallic;
-    float uEnvmapRoughness;
+    vec4 uMaterialAmbient;
+    vec4 uMaterialDiffuse;
+    float uMaterialSpecular;
+    float uMaterialShininess;
+    float uMaterialMetallic;
+    float uMaterialRoughness;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
 };
@@ -117,6 +118,111 @@ layout(std140) uniform Bumpmap {
     uniform int uBumpmapFrame;
     uniform bool uBumpmapSwizzled;
 };
+)END";
+
+static constexpr GLchar *kShaderBaseModel = R"END(
+uniform sampler2D uDiffuse;
+uniform sampler2D uLightmap;
+uniform sampler2D uBumpmap;
+uniform samplerCube uEnvmap;
+uniform samplerCube uShadowMap;
+
+uniform vec3 uCameraPosition;
+uniform bool uShadowLightPresent;
+uniform vec3 uShadowLightPosition;
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec2 fragTexCoords;
+in vec2 fragLightmapCoords;
+in mat3 fragTanSpace;
+
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
+
+vec2 normalizeUV(vec2 uv) {
+    vec2 result = uv;
+    if (abs(result.x) > 1.0) {
+        result.x -= int(result.x);
+    }
+    if (abs(result.y) > 1.0) {
+        result.y -= int(result.y);
+    }
+    if (result.x < 0.0) {
+        result.x = 1.0 + result.x;
+    }
+    if (result.y < 0.0) {
+        result.y = 1.0 + result.y;
+    }
+    return result;
+}
+
+vec3 getNormalFromBumpmap(vec2 uv) {
+    vec3 result;
+
+    if (uGrayscaleBumpmap) {
+        float oneOverGridX = 1.0 / uBumpmapGridSize.x;
+        float oneOverGridY = 1.0 / uBumpmapGridSize.y;
+
+        vec2 dSTdx = dFdx(uv) * oneOverGridX;
+        vec2 dSTdy = dFdy(uv) * oneOverGridY;
+
+        vec2 bumpmapUv = normalizeUV(uv);
+        bumpmapUv.x *= oneOverGridX;
+        bumpmapUv.y *= oneOverGridY;
+
+        if (uBumpmapFrame > 0) {
+            bumpmapUv.y += oneOverGridY * (uBumpmapFrame / int(uBumpmapGridSize.x));
+            bumpmapUv.x += oneOverGridX * (uBumpmapFrame % int(uBumpmapGridSize.x));
+        }
+
+        float Hll = texture(uBumpmap, bumpmapUv).r;
+        float dBx = texture(uBumpmap, bumpmapUv + dSTdx).r - Hll;
+        float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
+
+        result = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
+
+    } else {
+        vec4 bumpmapSample = texture(uBumpmap, uv);
+        if (uBumpmapSwizzled) {
+            result = vec3(bumpmapSample.a, bumpmapSample.g, 1.0);
+        } else {
+            result = vec3(bumpmapSample.r, bumpmapSample.g, bumpmapSample.b);
+        }
+    }
+
+    result = normalize(result * 2.0 - 1.0);
+    result = normalize(fragTanSpace * result);
+
+    return result;
+}
+
+float getShadow() {
+    if (!uShadowLightPresent) return 0.0;
+
+    vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
+    float currentDepth = length(fragToLight);
+
+    float shadow = 0.0;
+    float bias = 0.05;
+    float samples = 4.0;
+    float offset = 0.1;
+
+    for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
+        for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
+            for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
+                float closestDepth = texture(uShadowMap, fragToLight + vec3(x, y, z)).r;
+                closestDepth *= SHADOW_FAR_PLANE;
+
+                if (currentDepth - bias > closestDepth) {
+                    shadow += 1.0;
+                }
+            }
+        }
+    }
+
+    return shadow / (samples * samples * samples);
+}
 )END";
 
 static constexpr GLchar *kShaderBasePBR = R"END(
@@ -237,14 +343,6 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 )END";
 
 static constexpr GLchar *kShaderVertexSimple = R"END(
-layout(location = 0) in vec3 aPosition;
-
-void main() {
-    gl_Position = uModel * vec4(aPosition, 1.0);
-}
-)END";
-
-static constexpr GLchar *kShaderVertexGUI = R"END(
 uniform mat4 uProjection;
 uniform mat4 uView;
 
@@ -402,7 +500,19 @@ layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     fragColor = vec4(uColor.rgb, uAlpha);
-    fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
+    fragColorBright = vec4(vec3(0.0), 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentDepth = R"END(
+uniform vec3 uShadowLightPosition;
+
+in vec4 fragPosition;
+
+void main() {
+    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
+    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
+    gl_FragDepth = lightDistance;
 }
 )END";
 
@@ -415,206 +525,132 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    vec4 textureSample = texture(uDiffuse, fragTexCoords);
-    vec3 finalColor = uColor.rgb * textureSample.rgb;
+    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
+    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
 
-    if (uDiscardEnabled && length(uDiscardColor.rgb - finalColor) < 0.01) {
-        discard;
-    }
-    fragColor = vec4(finalColor, uAlpha * textureSample.a);
-    fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
+    if (uDiscardEnabled && length(uDiscardColor.rgb - objectColor) < 0.01) discard;
+
+    fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
+    fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentModel = R"END(
-uniform sampler2D uDiffuse;
-uniform sampler2D uLightmap;
-uniform sampler2D uBumpmap;
-uniform sampler2D uBRDFLookup;
-uniform samplerCube uEnvmap;
-uniform samplerCube uIrradianceMap;
-uniform samplerCube uPrefilterMap;
-uniform samplerCube uShadowMap;
-
-uniform vec3 uCameraPosition;
-uniform bool uShadowLightPresent;
-uniform vec3 uShadowLightPosition;
-
-in vec3 fragPosition;
-in vec3 fragNormal;
-in vec2 fragTexCoords;
-in vec2 fragLightmapCoords;
-in mat3 fragTanSpace;
-
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
-
-vec2 normalizeUV(vec2 uv) {
-    vec2 result = uv;
-    if (abs(result.x) > 1.0) {
-        result.x -= int(result.x);
-    }
-    if (abs(result.y) > 1.0) {
-        result.y -= int(result.y);
-    }
-    if (result.x < 0.0) {
-        result.x = 1.0 + result.x;
-    }
-    if (result.y < 0.0) {
-        result.y = 1.0 + result.y;
-    }
-    return result;
-}
-
-void applyBumpmapToNormal(inout vec3 normal, vec2 uv) {
-    if (uGrayscaleBumpmap) {
-        float oneOverGridX = 1.0 / uBumpmapGridSize.x;
-        float oneOverGridY = 1.0 / uBumpmapGridSize.y;
-
-        vec2 dSTdx = dFdx(uv) * oneOverGridX;
-        vec2 dSTdy = dFdy(uv) * oneOverGridY;
-
-        vec2 bumpmapUv = normalizeUV(uv);
-        bumpmapUv.x *= oneOverGridX;
-        bumpmapUv.y *= oneOverGridY;
-
-        if (uBumpmapFrame > 0) {
-            bumpmapUv.y += oneOverGridY * (uBumpmapFrame / int(uBumpmapGridSize.x));
-            bumpmapUv.x += oneOverGridX * (uBumpmapFrame % int(uBumpmapGridSize.x));
-        }
-
-        float Hll = texture(uBumpmap, bumpmapUv).r;
-        float dBx = texture(uBumpmap, bumpmapUv + dSTdx).r - Hll;
-        float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
-
-        normal = vec3(0.5 - (dBx * uBumpmapScaling), 0.5 - (dBy * uBumpmapScaling), 1.0);
-
-    } else {
-        vec4 bumpmapSample = texture(uBumpmap, uv);
-        if (uBumpmapSwizzled) {
-            normal = vec3(bumpmapSample.a, bumpmapSample.g, 1.0);
-        } else {
-            normal = vec3(bumpmapSample.r, bumpmapSample.g, bumpmapSample.b);
-        }
-    }
-
-    normal = normalize(normal * 2.0 - 1.0);
-    normal = normalize(fragTanSpace * normal);
-}
-
-float getShadowValue() {
-    if (!uShadowLightPresent) return 0.0;
-
-    vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
-    float currentDepth = length(fragToLight);
-
-    float shadow = 0.0;
-    float bias = 0.05;
-    float samples = 4.0;
-    float offset = 0.1;
-
-    for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
-        for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
-            for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                float closestDepth = texture(uShadowMap, fragToLight + vec3(x, y, z)).r;
-                closestDepth *= SHADOW_FAR_PLANE;
-
-                if (currentDepth - bias > closestDepth) {
-                    shadow += 1.0;
-                }
-            }
-        }
-    }
-
-    return shadow / (samples * samples * samples);
-}
-
+static constexpr GLchar *kShaderFragmentBlinnPhong = R"END(
 void main() {
-    vec2 uv = fragTexCoords + uUvOffset;
-    vec3 V = normalize(uCameraPosition - fragPosition);
-    vec3 N = normalize(fragNormal);
-    if (uBumpmapEnabled) {
-        applyBumpmapToNormal(N, uv);
-    }
-    vec3 R = reflect(-V, N);
+    vec2 texCoords = fragTexCoords + uUvOffset;
 
     vec4 diffuseSample;
-    vec3 albedo;
-    float metallic;
-    float roughness;
-    float ao = 1.0;
-
     if (uDiffuseEnabled) {
-        diffuseSample = texture(uDiffuse, uv);
-        albedo = pow(diffuseSample.rgb, vec3(2.2));
-        if (uEnvmapEnabled) {
-            metallic = mix(uDiffuseMetallic, uEnvmapMetallic, 1.0 - diffuseSample.a);
-            roughness = mix(uDiffuseRoughness, uEnvmapRoughness, 1.0 - diffuseSample.a);
-        } else {
-            metallic = uDiffuseMetallic;
-            roughness = uDiffuseRoughness;
-        }
+        diffuseSample = texture(uDiffuse, texCoords);
     } else {
-        albedo = pow(vec3(1.0), vec3(2.2));
-        metallic = 0.0;
-        roughness = 1.0;
+        diffuseSample = vec4(vec3(0.5), 1.0);
     }
 
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
+    vec3 V = normalize(uCameraPosition - fragPosition);
+
+    vec3 N;
+    if (uBumpmapEnabled) {
+        N = getNormalFromBumpmap(texCoords);
+    } else {
+        N = normalize(fragNormal);
+    }
+
+    vec3 objectColor;
+
+    if (uLightingEnabled) {
+        objectColor = uAmbientLightColor.rgb * uMaterialAmbient.rgb * diffuseSample.rgb;
+
+        for (int i = 0; i < uLightCount; ++i) {
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+            vec3 H = normalize(V + L);
+
+            float diff = max(dot(L, N), 0.0);
+            vec3 diffuse = uLights[i].color.rgb * diff * uMaterialDiffuse.rgb * diffuseSample.rgb;
+
+            float spec = pow(max(dot(N, H), 0.0), uMaterialShininess);
+            vec3 specular = uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
+
+            if (uLights[i].position.w == 1.0) {
+                float distance = length(uLights[i].position.xyz - fragPosition);
+                float attenuation = 1.0 / (distance * distance);
+                diffuse *= attenuation;
+                specular *= attenuation;
+            }
+
+            objectColor += diffuse + specular;
+        }
+    } else {
+        objectColor = diffuseSample.rgb;
+    }
+
+    float objectAlpha = uAlpha;
+    if (!uEnvmapEnabled && !uBumpmapEnabled) {
+        objectAlpha *= diffuseSample.a;
+    }
+    if (uSelfIllumEnabled) {
+        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    }
+    if (uEnvmapEnabled) {
+        vec3 R = reflect(-V, N);
+        vec4 envmapSample = texture(uEnvmap, R);
+        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+    }
+    if (uLightmapEnabled) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, uWater ? 0.2 : 1.0);
+    }
+    if (uShadowsEnabled) {
+        objectColor *= 1.0 - 0.5 * getShadow();
+    }
+    if (uWater) {
+        objectColor *= uWaterAlpha;
+        objectAlpha *= uWaterAlpha;
+    }
+
+    fragColor = vec4(objectColor, objectAlpha);
+    fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentPBR = R"END(
+uniform sampler2D uBRDFLookup;
+uniform samplerCube uIrradianceMap;
+uniform samplerCube uPrefilterMap;
+
+void main() {
+    vec2 texCoords = fragTexCoords + uUvOffset;
+
+    vec4 diffuseSample;
+    if (uDiffuseEnabled) {
+        diffuseSample = texture(uDiffuse, texCoords);
+    } else {
+        diffuseSample = vec4(vec3(0.5), 1.0);
+    }
+
+    vec3 N;
+    if (uBumpmapEnabled) {
+        N = getNormalFromBumpmap(texCoords);
+    } else {
+        N = normalize(fragNormal);
+    }
+
+    vec3 V = normalize(uCameraPosition - fragPosition);
+    vec3 R = reflect(-V, N);
+
+    vec3 albedo = diffuseSample.rgb;
+    float metallic = uMaterialMetallic;
+    float roughness = uMaterialRoughness;
+    float ao = 1.0;
+
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    vec3 color;
+    vec3 objectColor;
 
     if (uLightingEnabled) {
-        // reflectance equation
-        vec3 Lo = vec3(0.0);
-        for (int i = 0; i < uLightCount; ++i) {
-            // calculate per-light radiance
-            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
-            vec3 H = normalize(V + L);
-            vec3 radiance;
-            if (uLights[i].position.w == 0.0) {
-                radiance = uLights[i].color.rgb;
-            } else {
-                float distance = length(uLights[i].position.xyz - fragPosition);
-                float attenuation = 1.0 / (distance * distance);
-                radiance = uLights[i].color.rgb * attenuation;
-            }
+        vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
 
-            // Cook-Torrance BRDF
-            float NDF = DistributionGGX(N, H, roughness);
-            float G = GeometrySmith(N, V, L, roughness);
-            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-            vec3 nominator = NDF * G * F;
-            float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
-            vec3 specular = nominator / denominator;
-
-            // kS is equal to Fresnel
-            vec3 kS = F;
-            // for energy conservation, the diffuse and specular light can't
-            // be above 1.0 (unless the surface emits light); to preserve this
-            // relationship the diffuse component (kD) should equal 1.0 - kS.
-            vec3 kD = vec3(1.0) - kS;
-            // multiply kD by the inverse metalness such that only non-metals
-            // have diffuse lighting, or a linear blend if partly metal (pure metals
-            // have no diffuse light).
-            kD *= 1.0 - metallic;
-
-            // scale light by NdotL
-            float NdotL = max(dot(N, L), 0.0);
-
-            // add to outgoing radiance Lo
-            Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        }
-
-        // ambient lighting
-
-        vec3 ambient;
-
-        if (uDiffuseEnabled && uPBRIBLEnabled) {
+        if (uPBRIBLEnabled) {
             vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
             vec3 kS = F;
@@ -629,59 +665,72 @@ void main() {
             vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-            ambient = mix(vec3(0.03) * albedo * ao, (kD * diffuse + specular) * ao, 1.0 - diffuseSample.a);
-
-        } else {
-            ambient = vec3(0.03) * albedo * ao;
+            ambient += (1.0 - diffuseSample.a) * (kD * diffuse + specular) * ao;
         }
 
 
-        color = ambient + Lo;
+        vec3 Lo = vec3(0.0);
 
-        if (uLightmapEnabled) {
-            vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-            color *= (uWater ? 0.2 : 1.0) * lightmapSample.rgb;
+        for (int i = 0; i < uLightCount; ++i) {
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+            vec3 H = normalize(V + L);
+
+            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb;
+            if (uLights[i].position.w == 1.0) {
+                float distance = length(uLights[i].position.xyz - fragPosition);
+                float attenuation = 1.0 / (distance * distance);
+                radiance *= attenuation;
+            }
+
+            float NDF = DistributionGGX(N, H, roughness);
+            float G = GeometrySmith(N, V, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+            vec3 nominator = NDF * G * F;
+            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+            vec3 specular = nominator / denominator;
+
+            vec3 kS = F;
+            vec3 kD = vec3(1.0) - kS;
+            kD *= 1.0 - metallic;
+
+            float NdotL = max(dot(N, L), 0.0);
+
+            Lo += (kD * albedo / PI + specular) * radiance * NdotL;
         }
+
+
+        objectColor = ambient + Lo;
+
     } else {
-        color = albedo;
-        if (uLightmapEnabled) {
-            vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-            color *= (uWater ? 0.2 : 1.0) * lightmapSample.rgb;
-        }
-        if (uDiffuseEnabled && uEnvmapEnabled) {
-            vec3 I = normalize(fragPosition - uCameraPosition);
-            vec3 R = reflect(I, N);
-            vec4 envmapSample = texture(uEnvmap, R);
-            color += (1.0 - diffuseSample.a) * envmapSample.rgb;
-        }
+        objectColor = albedo;
     }
 
+    float objectAlpha = uAlpha;
+    if (!uEnvmapEnabled && !uBumpmapEnabled) {
+        objectAlpha *= diffuseSample.a;
+    }
+    if (uSelfIllumEnabled) {
+        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    }
+    if (!uLightingEnabled && uEnvmapEnabled) {
+        vec4 envmapSample = texture(uEnvmap, R);
+        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+    }
+    if (uLightmapEnabled) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, uWater ? 0.2 : 1.0);
+    }
     if (uShadowsEnabled) {
-        float shadow = getShadowValue();
-        color *= 1.0 - 0.75 * shadow;
+        objectColor *= 1.0 - 0.5 * getShadow();
     }
-
-    float finalAlpha = uAlpha;
-    if (uDiffuseEnabled && !uEnvmapEnabled && !uBumpmapEnabled) {
-        finalAlpha *= diffuseSample.a;
-    }
-
-    // HDR tonemapping
-    color = color / (color + vec3(1.0));
-    // gamma correct
-    color = pow(color, vec3(1.0 / 2.2));
-
-    fragColor = vec4(color, finalAlpha);
     if (uWater) {
-        fragColor *= uWaterAlpha;
+        objectColor *= uWaterAlpha;
+        objectAlpha *= uWaterAlpha;
     }
 
-    if (uDiffuseEnabled && uSelfIllumEnabled) {
-        color = uSelfIllumColor.rgb * diffuseSample.rgb * finalAlpha;
-        fragColorBright = vec4(smoothstep(0.75, 1.0, color), 1.0);
-    } else {
-        fragColorBright = vec4(0.0, 0.0, 0.0, 1.0);
-    }
+    fragColor = vec4(objectColor, objectAlpha);
+    fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);
 }
 )END";
 
@@ -690,7 +739,8 @@ uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     float oneOverGridX = 1.0 / uBillboardGridSize.x;
@@ -705,56 +755,10 @@ void main() {
         texCoords.x += oneOverGridX * (uBillboardFrame % int(uBillboardGridSize.x));
     }
 
-    vec4 textureSample = texture(uDiffuse, texCoords);
-    fragColor = vec4(uColor.rgb * textureSample.rgb, uAlpha * textureSample.a);
-}
-)END";
+    vec4 diffuseSample = texture(uDiffuse, texCoords);
 
-static constexpr GLchar *kShaderFragmentBlur = R"END(
-uniform sampler2D uDiffuse;
-
-out vec4 fragColor;
-
-void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
-    vec4 color = vec4(0.0);
-    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
-    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color += texture2D(uDiffuse, uv) * 0.2270270270;
-    color += texture2D(uDiffuse, uv + (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture2D(uDiffuse, uv - (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture2D(uDiffuse, uv + (off2 / uBlurResolution)) * 0.0702702703;
-    color += texture2D(uDiffuse, uv - (off2 / uBlurResolution)) * 0.0702702703;
-
-    fragColor = color;
-}
-)END";
-
-static constexpr GLchar *kShaderFragmentBloom = R"END(
-uniform sampler2D uDiffuse;
-uniform sampler2D uBloom;
-
-in vec2 fragTexCoords;
-
-out vec4 fragColor;
-
-void main() {
-    vec3 geometryColor = texture(uDiffuse, fragTexCoords).rgb;
-    vec3 bloomColor = texture(uBloom, fragTexCoords).rgb;
-
-    fragColor = vec4(geometryColor + bloomColor, 1.0);
-}
-)END";
-
-static constexpr GLchar *kShaderFragmentDepth = R"END(
-uniform vec3 uShadowLightPosition;
-
-in vec4 fragPosition;
-
-void main() {
-    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
-    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
-    gl_FragDepth = lightDistance;
+    fragColor = vec4(uColor.rgb * diffuseSample.rgb, uAlpha * diffuseSample.a);
+    fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
 
@@ -842,17 +846,55 @@ void main() {
 static constexpr GLchar *kShaderFragmentBRDF = R"END(
 in vec2 fragTexCoords;
 
-out vec2 fragColor;
+out vec4 fragColor;
 
 void main() {
     vec2 integratedBRDF = IntegrateBRDF(fragTexCoords.x, fragTexCoords.y);
-    fragColor = integratedBRDF;
+    fragColor = vec4(integratedBRDF, 0.0, 1.0);
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentBlur = R"END(
+uniform sampler2D uDiffuse;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
+    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
+    color += texture(uDiffuse, uv) * 0.2270270270;
+    color += texture(uDiffuse, uv + (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture(uDiffuse, uv - (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture(uDiffuse, uv + (off2 / uBlurResolution)) * 0.0702702703;
+    color += texture(uDiffuse, uv - (off2 / uBlurResolution)) * 0.0702702703;
+
+    fragColor = color;
+}
+)END";
+
+static constexpr GLchar *kShaderFragmentPresentWorld = R"END(
+uniform sampler2D uDiffuse;
+uniform sampler2D uBloom;
+
+in vec2 fragTexCoords;
+
+out vec4 fragColor;
+
+void main() {
+    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
+    vec4 bloomSample = texture(uBloom, fragTexCoords);
+    vec3 color = diffuseSample.rgb + bloomSample.rgb;
+
+    fragColor = vec4(color, 1.0);
 }
 )END";
 
 static constexpr GLchar *kShaderFragmentDebugCubeMap = R"END(
-const bool RGB = false;
+const bool RGB = true;
 
+//uniform sampler2D uDiffuse;
 uniform samplerCube uDiffuse;
 
 in vec2 fragTexCoords;
@@ -862,6 +904,7 @@ out vec4 fragColor;
 void main() {
     vec2 cubeMapCoords = 2.0 * fragTexCoords - 1.0;
     vec4 diffuseSample = texture(uDiffuse, vec3(cubeMapCoords.x, -1.0, -cubeMapCoords.y));
+    //vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
 
     if (RGB) {
         fragColor = vec4(diffuseSample.rgb, 1.0);
@@ -883,33 +926,34 @@ Shaders::Shaders() {
 
 void Shaders::initGL() {
     initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
-    initShader(ShaderName::VertexGUI, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexGUI });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
     initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexBillboard });
     initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
     initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
+    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
     initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentGUI });
-    initShader(ShaderName::FragmentModel, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentModel });
+    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBaseModel, kShaderFragmentBlinnPhong });
+    initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderBaseModel, kShaderFragmentPBR });
     initShader(ShaderName::FragmentBillboard, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBillboard });
-    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBlur });
-    initShader(ShaderName::FragmentBloom, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBloom });
     initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentIrradiance });
     initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentPrefilter });
     initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentBRDF });
-    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
+    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBlur });
+    initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentPresentWorld });
     initShader(ShaderName::FragmentDebugCubeMap, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDebugCubeMap });
 
-    initProgram(ShaderProgram::SimpleBRDF, { ShaderName::VertexSimple, ShaderName::FragmentBRDF });
+    initProgram(ShaderProgram::SimpleColor, { ShaderName::VertexSimple, ShaderName::FragmentColor });
     initProgram(ShaderProgram::SimpleDepth, { ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
-    initProgram(ShaderProgram::GUIColor, { ShaderName::VertexGUI, ShaderName::FragmentColor });
-    initProgram(ShaderProgram::GUIGUI, { ShaderName::VertexGUI, ShaderName::FragmentGUI });
-    initProgram(ShaderProgram::GUIBlur, { ShaderName::VertexGUI, ShaderName::FragmentBlur });
-    initProgram(ShaderProgram::GUIBloom, { ShaderName::VertexGUI, ShaderName::FragmentBloom });
-    initProgram(ShaderProgram::GUIIrradiance, { ShaderName::VertexGUI, ShaderName::FragmentIrradiance });
-    initProgram(ShaderProgram::GUIPrefilter, { ShaderName::VertexGUI, ShaderName::FragmentPrefilter });
-    initProgram(ShaderProgram::GUIDebugCubeMap, { ShaderName::VertexGUI, ShaderName::FragmentDebugCubeMap });
+    initProgram(ShaderProgram::SimpleGUI, { ShaderName::VertexSimple, ShaderName::FragmentGUI });
+    initProgram(ShaderProgram::SimpleIrradiance, { ShaderName::VertexSimple, ShaderName::FragmentIrradiance });
+    initProgram(ShaderProgram::SimplePrefilter, { ShaderName::VertexSimple, ShaderName::FragmentPrefilter });
+    initProgram(ShaderProgram::SimpleBRDF, { ShaderName::VertexSimple, ShaderName::FragmentBRDF });
+    initProgram(ShaderProgram::SimpleBlur, { ShaderName::VertexSimple, ShaderName::FragmentBlur });
+    initProgram(ShaderProgram::SimplePresentWorld, { ShaderName::VertexSimple, ShaderName::FragmentPresentWorld });
+    initProgram(ShaderProgram::SimpleDebugCubeMap, { ShaderName::VertexSimple, ShaderName::FragmentDebugCubeMap });
     initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
-    initProgram(ShaderProgram::ModelModel, { ShaderName::VertexModel, ShaderName::FragmentModel });
+    initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
+    initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });
     initProgram(ShaderProgram::BillboardBillboard, { ShaderName::VertexBillboard, ShaderName::FragmentBillboard });
 
     glGenBuffers(1, &_generalUbo);

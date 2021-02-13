@@ -17,6 +17,8 @@
 
 #include "tgafile.h"
 
+#include "../../common/log.h"
+
 #include "../textureutil.h"
 
 using namespace std;
@@ -39,7 +41,8 @@ void TgaFile::doLoad() {
         case ImageType::RGBA:
             break;
         default:
-            throw runtime_error("Unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            warn("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            return;
     }
 
     ignore(9);

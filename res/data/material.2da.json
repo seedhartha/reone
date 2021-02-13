@@ -1,0 +1,11 @@
+{
+    "rows": [
+        {
+            "tex": "DEFAULT",
+            "specular": "0.1",
+            "shininess": "8.0",
+            "metallic": "0.0",
+            "roughness": "0.8"
+        }
+    ]
+}

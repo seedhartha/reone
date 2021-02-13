@@ -304,7 +304,7 @@ void Console::drawBackground() const {
     locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     locals.general.alpha = 0.5f;
 
-    Shaders::instance().activate(ShaderProgram::GUIColor, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
 
     Quad::getDefault().renderTriangles();
 }

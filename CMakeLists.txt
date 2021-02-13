@@ -158,7 +158,8 @@ set(RENDER_HEADERS
     src/render/lip/lipanimation.h
     src/render/lip/lipfile.h
     src/render/lip/lips.h
-    src/render/materialutil.h
+    src/render/material.h
+    src/render/materials.h
     src/render/mesh/aabb.h
     src/render/mesh/billboard.h
     src/render/mesh/cube.h
@@ -199,7 +200,7 @@ set(RENDER_SOURCES
     src/render/lip/lipanimation.cpp
     src/render/lip/lipfile.cpp
     src/render/lip/lips.cpp
-    src/render/materialutil.cpp
+    src/render/materials.cpp
     src/render/mesh/aabb.cpp
     src/render/mesh/billboard.cpp
     src/render/mesh/cube.cpp

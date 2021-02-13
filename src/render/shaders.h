@@ -36,17 +36,18 @@ static constexpr int kMaxBoneCount = 128;
 
 enum class ShaderProgram {
     None,
+    SimpleColor,
     SimpleDepth,
+    SimpleGUI,
+    SimpleIrradiance,
+    SimplePrefilter,
     SimpleBRDF,
-    GUIColor,
-    GUIGUI,
-    GUIBlur,
-    GUIBloom,
-    GUIIrradiance,
-    GUIPrefilter,
-    GUIDebugCubeMap,
+    SimpleBlur,
+    SimplePresentWorld,
+    SimpleDebugCubeMap,
     ModelColor,
-    ModelModel,
+    ModelBlinnPhong,
+    ModelPBR,
     BillboardBillboard
 };
 
@@ -118,13 +119,13 @@ struct ShaderLight {
 };
 
 struct LightingUniforms {
-    glm::vec4 meshDiffuseColor { 1.0f };
-    glm::vec4 meshAmbientColor { 1.0f };
     glm::vec4 ambientLightColor { 1.0f };
-    float diffuseMetallic { 0.0f };
-    float diffuseRoughness { 0.0f };
-    float envmapMetallic { 0.0f };
-    float envmapRoughness { 0.0f };
+    glm::vec4 materialAmbient { 1.0f };
+    glm::vec4 materialDiffuse { 0.0f };
+    float materialSpecular { 0.0f };
+    float materialShininess { 0.0f };
+    float materialMetallic { 0.0f };
+    float materialRoughness { 1.0f };
     int lightCount { 0 };
     char padding[12];
     ShaderLight lights[kMaxLightCount];
@@ -173,20 +174,20 @@ public:
 private:
     enum class ShaderName {
         VertexSimple,
-        VertexGUI,
         VertexModel,
         VertexBillboard,
         GeometryDepth,
         FragmentColor,
-        FragmentGUI,
-        FragmentModel,
-        FragmentBillboard,
-        FragmentBlur,
-        FragmentBloom,
         FragmentDepth,
+        FragmentGUI,
+        FragmentBlinnPhong,
+        FragmentPBR,
+        FragmentBillboard,
         FragmentIrradiance,
         FragmentPrefilter,
         FragmentBRDF,
+        FragmentBlur,
+        FragmentPresentWorld,
         FragmentDebugCubeMap
     };
 

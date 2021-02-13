@@ -69,11 +69,13 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
-        shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
-        if (txiData) {
-            TxiFile txi;
-            txi.load(wrap(txiData));
-            texture->setFeatures(txi.features());
+        if (texture) {
+            shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
+            if (txiData) {
+                TxiFile txi;
+                txi.load(wrap(txiData));
+                texture->setFeatures(txi.features());
+            }
         }
     }
 

@@ -45,18 +45,24 @@ const string &TwoDaRow::getString(const string &column) const {
     static string empty;
 
     auto maybeValue = find_if(_values.begin(), _values.end(), [this, &column](auto &pair) {
-        return pair.first == column;
+        return pair.first == column && pair.second != "****";
     });
     return maybeValue != _values.end() ? maybeValue->second : empty;
 }
 
-int TwoDaRow::getInt(const string &column) const {
-    string value(getString(column));
-    return !value.empty() ? stoi(value) : -1;
+int TwoDaRow::getInt(const string &column, int defValue) const {
+    const string &value = getString(column);
+    return !value.empty() ? stoi(value) : defValue;
 }
 
-float TwoDaRow::getFloat(const string &column) const {
-    return stof(getString(column));
+float TwoDaRow::getFloat(const string &column, float defValue) const {
+    const string &value = getString(column);
+    return !value.empty() ? stof(value) : defValue;
+}
+
+bool TwoDaRow::getBool(const string &column, bool defValue) const {
+    const string &value = getString(column);
+    return !value.empty() ? (stoi(value) != 0) : defValue;
 }
 
 void TwoDaTable::add(TwoDaRow row) {
@@ -100,7 +106,10 @@ const string &TwoDaTable::getString(int row, const string &column) const {
         return empty;
     }
 
-    return _rows[row].getString(column);
+    const string &value = _rows[row].getString(column);
+    if (value == "****") return empty;
+
+    return value;
 }
 
 int TwoDaTable::getInt(int row, const string &column, int defValue) const {
@@ -122,6 +131,13 @@ float TwoDaTable::getFloat(int row, const string &column, float defValue) const 
     if (value.empty()) return defValue;
 
     return stof(value);
+}
+
+bool TwoDaTable::getBool(int row, const string &column, bool defValue) const {
+    const string &value = getString(row, column);
+    if (value.empty()) return defValue;
+
+    return stoi(value) != 0;
 }
 
 TwoDaFile::TwoDaFile() : BinaryFile(kSignatureSize, kSignature), _table(make_shared<TwoDaTable>()) {

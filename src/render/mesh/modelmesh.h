@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include "../material.h"
 #include "../texture.h"
 
 #include "mesh.h"
@@ -44,13 +45,6 @@ public:
         float jitterSpeed { 0.0f };
     };
 
-    struct Materials {
-        float diffuseMetallic { 0.0f };
-        float diffuseRoughness { 0.8f };
-        float envmapMetallic { 1.0f };
-        float envmapRoughness { 0.2f };
-    };
-
     ModelMesh(const std::shared_ptr<Mesh> &mesh);
 
     void initGL();
@@ -71,11 +65,11 @@ public:
     bool hasBumpmapTexture() const { return static_cast<bool>(_bumpmap); }
 
     std::shared_ptr<Mesh> mesh() const { return _mesh; }
+    const Material &material() const { return _material; }
     int transparency() const { return _transparency; }
-    const glm::vec3 &diffuseColor() const { return _diffuseColor; }
     const glm::vec3 &ambientColor() const { return _ambientColor; }
+    const glm::vec3 &diffuseColor() const { return _diffuseColor; }
     const UVAnimation &uvAnimation() const { return _uvAnimation; }
-    const Materials &materials() const { return _materials; }
 
     const std::shared_ptr<Texture> &diffuseTexture() const { return _diffuse; }
     const std::shared_ptr<Texture> &envmapTexture() const { return _envmap; }
@@ -92,16 +86,17 @@ public:
 
 private:
     std::shared_ptr<Mesh> _mesh;
+    Material _material;
+    UVAnimation _uvAnimation;
+
+    int _transparency { 0 };
+    glm::vec3 _ambientColor { 1.0f };
+    glm::vec3 _diffuseColor { 0.0f };
 
     bool _render { false };
-    int _transparency { 0 };
     bool _shadow { false };
     bool _backgroundGeometry { false };
-    glm::vec3 _diffuseColor { 1.0f };
-    glm::vec3 _ambientColor { 0.0f };
-    UVAnimation _uvAnimation;
     bool _bumpmapSwizzled { false };
-    Materials _materials;
 
     // Textures
 

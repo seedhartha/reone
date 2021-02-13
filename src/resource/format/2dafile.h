@@ -32,8 +32,9 @@ public:
     void add(const std::string &column, const std::string &value);
 
     const std::string &getString(const std::string &column) const;
-    int getInt(const std::string &column) const;
-    float getFloat(const std::string &column) const;
+    int getInt(const std::string &column, int defValue = 0) const;
+    float getFloat(const std::string &column, float defValue = 0.0f) const;
+    bool getBool(const std::string &column, bool defValue = false) const;
 
     const std::vector<std::pair<std::string, std::string>> &values() const { return _values; }
 
@@ -53,6 +54,7 @@ public:
     int getInt(int row, const std::string &column, int defValue = 0) const;
     uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
     float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
+    bool getBool(int row, const std::string &column, bool defValue = false) const;
 
     const std::vector<std::string> &headers() const { return _headers; }
     const std::vector<TwoDaRow> &rows() const { return _rows; }

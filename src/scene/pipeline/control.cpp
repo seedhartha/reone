@@ -94,7 +94,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
     LocalUniforms locals;
     locals.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor->bind();

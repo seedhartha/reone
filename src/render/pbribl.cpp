@@ -102,7 +102,7 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
     auto irradianceColor = make_shared<Texture>(envmap->name() + "_irradiance_color", getTextureProperties(TextureUsage::IrradianceMap));
     irradianceColor->init();
     irradianceColor->bind();
-    irradianceColor->clearPixels(32, 32, Texture::PixelFormat::RGB16F);
+    irradianceColor->clearPixels(32, 32, Texture::PixelFormat::RGB);
 
     auto irradianceDepth = make_shared<Texture>(envmap->name() + "_irradiance_depth", getTextureProperties(TextureUsage::DepthBuffer));
     irradianceDepth->init();
@@ -125,7 +125,7 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
             globals.projection = g_captureProjection;
             globals.view = g_captureViews[i];
             Shaders::instance().setGlobalUniforms(globals);
-            Shaders::instance().activate(ShaderProgram::GUIIrradiance, LocalUniforms());
+            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, LocalUniforms());
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             CubeMapMesh::instance().renderTriangles();
@@ -141,7 +141,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     auto prefilterColor = make_shared<Texture>(envmap->name() + "_prefilter_color", getTextureProperties(TextureUsage::PrefilterMap));
     prefilterColor->init();
     prefilterColor->bind();
-    prefilterColor->clearPixels(128, 128, Texture::PixelFormat::RGB16F);
+    prefilterColor->clearPixels(128, 128, Texture::PixelFormat::RGB);
 
     auto prefilterDepth = make_shared<Texture>(envmap->name() + "_prefilter_depth", getTextureProperties(TextureUsage::DepthBuffer));
     prefilterDepth->init();
@@ -169,7 +169,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
 
                 LocalUniforms locals;
                 locals.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
-                Shaders::instance().activate(ShaderProgram::GUIPrefilter, locals);
+                Shaders::instance().activate(ShaderProgram::SimplePrefilter, locals);
 
                 setActiveTextureUnit(TextureUnits::envmap);
                 envmap->bind();
@@ -191,7 +191,7 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     auto brdfLookupColor = make_shared<Texture>(envmap->name() + "_brdf_color", getTextureProperties(TextureUsage::BRDFLookup));
     brdfLookupColor->init();
     brdfLookupColor->bind();
-    brdfLookupColor->clearPixels(512, 512, Texture::PixelFormat::RG16F);
+    brdfLookupColor->clearPixels(512, 512, Texture::PixelFormat::RGB);
 
     auto brdfLookupDepth = make_shared<Texture>(envmap->name() + "_brdf_depth", getTextureProperties(TextureUsage::DepthBuffer));
     brdfLookupDepth->init();
@@ -204,7 +204,9 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     _brdfLookupFB.checkCompleteness();
 
     withViewport(viewport, [&]() {
+        Shaders::instance().setGlobalUniforms(GlobalUniforms());
         Shaders::instance().activate(ShaderProgram::SimpleBRDF, LocalUniforms());
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Quad::getNDC().renderTriangles();
     });
