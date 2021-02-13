@@ -23,6 +23,7 @@
 #include "ncsfile.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::resource;
 
@@ -35,31 +36,17 @@ Scripts &Scripts::instance() {
     return instance;
 }
 
-void Scripts::invalidateCache() {
-    _cache.clear();
+Scripts::Scripts() : MemoryCache(bind(&Scripts::doGet, this, _1)) {
 }
 
-shared_ptr<ScriptProgram> Scripts::get(const string &resRef) {
-    auto maybeModel = _cache.find(resRef);
-    if (maybeModel != _cache.end()) {
-        return maybeModel->second;
-    }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
-
-    return inserted.first->second;
-}
-
-shared_ptr<ScriptProgram> Scripts::doGet(const string &resRef) {
+shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
     shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ncs));
-    shared_ptr<ScriptProgram> program;
+    if (!data) return nullptr;
 
-    if (data) {
-        NcsFile ncs(resRef);
-        ncs.load(wrap(data));
-        program = ncs.program();
-    }
+    NcsFile ncs(resRef);
+    ncs.load(wrap(data));
 
-    return move(program);
+    return ncs.program();
 }
 
 } // namespace script

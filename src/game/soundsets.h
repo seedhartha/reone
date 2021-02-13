@@ -18,10 +18,8 @@
 #pragma once
 
 #include <string>
-#include <memory>
-#include <unordered_map>
 
-#include "../common/singleton.h"
+#include "../common/cache.h"
 
 #include "types.h"
 
@@ -29,16 +27,14 @@ namespace reone {
 
 namespace game {
 
-class SoundSets : public Singleton {
+class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
     static SoundSets &instance();
 
-    void invalidateCache();
-
-    std::shared_ptr<SoundSet> get(const std::string &resRef);
-
 private:
-    std::unordered_map<std::string, std::shared_ptr<SoundSet>> _cache;
+    SoundSets();
+
+    std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
 
 } // namespace game

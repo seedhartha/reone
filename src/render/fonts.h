@@ -18,32 +18,25 @@
 #pragma once
 
 #include <string>
-#include <memory>
-#include <unordered_map>
 
-#include "../common/singleton.h"
+#include "../common/cache.h"
 #include "../resource/types.h"
 
+#include "font.h"
 #include "types.h"
 
 namespace reone {
 
 namespace render {
 
-class Font;
-
-class Fonts : public Singleton {
+class Fonts : public MemoryCache<std::string, Font> {
 public:
     static Fonts &instance();
 
-    void invalidateCache();
-
-    std::shared_ptr<Font> get(const std::string &resRef);
-
 private:
-    std::unordered_map<std::string, std::shared_ptr<Font>> _cache;
+    Fonts();
 
-    std::shared_ptr<Font> doGet(const std::string &resRef);
+    std::shared_ptr<Font> doGet(std::string resRef);
 };
 
 } // namespace render
