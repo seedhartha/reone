@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "../../common/singleton.h"
 #include "../../common/aabb.h"
 
 namespace reone {
@@ -32,8 +33,13 @@ class MdlFile;
  * Polygonal mesh, containing vertex and index data. Renders itself,
  * but does not manage textures and shaders.
  */
-class Mesh {
+class Mesh : public Singleton {
 public:
+    enum class DrawMode {
+        Lines,
+        Triangles
+    };
+
     struct VertexOffsets {
         int vertexCoords { 0 };
         int normals { -1 };
@@ -46,37 +52,33 @@ public:
         int stride { 0 };
     };
 
-    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexOffsets offsets);
+    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexOffsets offsets, DrawMode mode = DrawMode::Triangles);
 
     virtual ~Mesh();
 
-    void initGL();
-    void deinitGL();
+    void init();
+    void deinit();
+
+    void render() const;
 
     void computeAABB();
-
-    void renderLines() const;
-    void renderTriangles() const;
 
     const AABB &aabb() const { return _aabb; }
 
 protected:
-    bool _glInited { false };
-    int _vertexCount { 0 };
+    int _vertexCount;
     std::vector<float> _vertices;
     std::vector<uint16_t> _indices;
     VertexOffsets _offsets;
-    uint32_t _indexBufferId { 0 };
-    uint32_t _vertexArrayId { 0 };
+    DrawMode _mode;
 
-    void render(uint32_t mode, int count, int offset) const;
-
-private:
-    uint32_t _vertexBufferId { 0 };
+    bool _inited { false };
+    uint32_t _vbo { 0 };
+    uint32_t _ibo { 0 };
+    uint32_t _vao { 0 };
     AABB _aabb;
 
-    Mesh(const Mesh &) = delete;
-    Mesh &operator=(const Mesh &) = delete;
+    void render(uint32_t mode, int count, int offset) const;
 
     friend class MdlFile;
 };

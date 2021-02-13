@@ -110,7 +110,7 @@ void Trigger::loadAppearance() {
     offsets.stride = 3 * sizeof(float);
 
     auto mesh = make_shared<Mesh>(static_cast<int>(_geometry.size()), move(vertices), move(indices), move(offsets));
-    mesh->initGL();
+    mesh->init();
 
     auto sceneNode = make_shared<MeshSceneNode>(_sceneGraph, mesh);
     sceneNode->setTransparent(true);

@@ -25,7 +25,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../render/mesh/quad.h"
+#include "../render/mesh/meshes.h"
 #include "../render/shaders.h"
 
 using namespace std;
@@ -99,7 +99,7 @@ void Video::render() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _textureId);
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }

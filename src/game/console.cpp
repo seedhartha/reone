@@ -27,7 +27,7 @@
 #include "../common/log.h"
 #include "../render/font.h"
 #include "../render/fonts.h"
-#include "../render/mesh/quad.h"
+#include "../render/mesh/meshes.h"
 #include "../render/shaders.h"
 #include "../resource/resources.h"
 #include "../scene/types.h"
@@ -306,7 +306,7 @@ void Console::drawBackground() const {
 
     Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void Console::drawLines() const {

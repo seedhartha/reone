@@ -21,7 +21,7 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textureutil.h"
@@ -99,7 +99,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
     setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor->bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 } // namespace scene

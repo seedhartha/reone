@@ -22,7 +22,6 @@
 #include <boost/format.hpp>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL.h"
 
 #include "glm/ext.hpp"
@@ -30,12 +29,6 @@
 #include "../common/log.h"
 
 #include "cursor.h"
-#include "mesh/aabb.h"
-#include "mesh/billboard.h"
-#include "mesh/cube.h"
-#include "mesh/cubemap.h"
-#include "mesh/quad.h"
-#include "shaders.h"
 
 using namespace std;
 
@@ -74,17 +67,6 @@ void RenderWindow::init() {
     SDL_GL_SetSwapInterval(0);
     glewInit();
 
-    Shaders::instance().initGL();
-    CubeMesh::instance().initGL();
-    CubeMapMesh::instance().initGL();
-    BillboardMesh::instance().initGL();
-    AABBMesh::instance().initGL();
-    Quad::getDefault().initGL();
-    Quad::getXFlipped().initGL();
-    Quad::getYFlipped().initGL();
-    Quad::getXYFlipped().initGL();
-    Quad::getNDC().initGL();
-
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 
@@ -92,17 +74,6 @@ void RenderWindow::init() {
 }
 
 void RenderWindow::deinit() {
-    Quad::getDefault().deinitGL();
-    Quad::getXFlipped().deinitGL();
-    Quad::getYFlipped().deinitGL();
-    Quad::getXYFlipped().deinitGL();
-    Quad::getNDC().deinitGL();
-    AABBMesh::instance().deinitGL();
-    BillboardMesh::instance().deinitGL();
-    CubeMapMesh::instance().deinitGL();
-    CubeMesh::instance().deinitGL();
-    Shaders::instance().deinitGL();
-
     SDL_GL_DeleteContext(_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();

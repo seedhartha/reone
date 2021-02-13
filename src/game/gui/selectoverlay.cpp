@@ -21,7 +21,7 @@
 
 #include "../../render/font.h"
 #include "../../render/fonts.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/texture.h"
@@ -205,7 +205,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void SelectionOverlay::drawTitleBar() const {
@@ -231,7 +231,7 @@ void SelectionOverlay::drawTitleBar() const {
 
         Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -266,7 +266,7 @@ void SelectionOverlay::drawHealthBar() const {
 
     Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void SelectionOverlay::drawActionBar() const {
@@ -296,7 +296,7 @@ void SelectionOverlay::drawActionBar() const {
         setActiveTextureUnit(TextureUnits::diffuse);
         frameTexture->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
 
         if (i < static_cast<int>(_actions.size())) {
             ContextualAction action = _actions[i];
@@ -317,7 +317,7 @@ void SelectionOverlay::drawActionBar() const {
                 setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();
 
-                Quad::getDefault().renderTriangles();
+                Meshes::instance().getQuad().render();
             }
         }
     }

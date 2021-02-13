@@ -45,7 +45,7 @@ void MeshSceneNode::render() const {
 
     Shaders::instance().activate(ShaderProgram::ModelColor, locals);
 
-    _mesh->renderTriangles();
+    _mesh->render();
 
     SceneNode::render();
 }

@@ -22,7 +22,8 @@
 #include "glm/gtx/quaternion.hpp"
 
 #include "../emitter.h"
-#include "../mesh/modelmesh.h"
+
+#include "modelmesh.h"
 
 namespace reone {
 

@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include "../render/mesh/quad.h"
+#include "../render/mesh/meshes.h"
 
 #include "node/cameranode.h"
 #include "node/lightnode.h"

@@ -18,7 +18,7 @@
 #include "imagebutton.h"
 
 #include "../../render/fonts.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/stateutil.h"
 
 using namespace std;
@@ -97,7 +97,7 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
 
     if (iconTexture) {
@@ -113,7 +113,7 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad().render();
     }
 
     if (!iconText.empty()) {

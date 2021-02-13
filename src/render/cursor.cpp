@@ -22,7 +22,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include "mesh/quad.h"
+#include "mesh/meshes.h"
 #include "shaders.h"
 #include "stateutil.h"
 #include "texture.h"
@@ -57,7 +57,7 @@ void Cursor::render() const {
     setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

@@ -23,8 +23,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "mesh/cubemap.h"
-#include "mesh/quad.h"
+#include "mesh/meshes.h"
 #include "shaders.h"
 #include "stateutil.h"
 #include "textureutil.h"
@@ -128,7 +127,7 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
             Shaders::instance().activate(ShaderProgram::SimpleIrradiance, LocalUniforms());
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            CubeMapMesh::instance().renderTriangles();
+            Meshes::instance().getCubemap().render();
         }
     });
 
@@ -175,7 +174,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 envmap->bind();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                CubeMapMesh::instance().renderTriangles();
+                Meshes::instance().getCubemap().render();
             });
         }
     }
@@ -208,7 +207,7 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
         Shaders::instance().activate(ShaderProgram::SimpleBRDF, LocalUniforms());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad::getNDC().renderTriangles();
+        Meshes::instance().getQuadNDC().render();
     });
 
     _brdfLookupFB.unbind();

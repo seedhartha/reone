@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 #include "../common/log.h"
-#include "../render/mesh/quad.h"
+#include "../render/mesh/meshes.h"
 #include "../render/shaders.h"
 #include "../render/stateutil.h"
 #include "../render/textures.h"
@@ -310,7 +310,7 @@ void GUI::drawBackground() const {
     setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void GUI::resetFocus() {

@@ -19,7 +19,7 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/mesh/meshes.h"
 
 #include "../game.h"
 
@@ -246,7 +246,7 @@ void HUD::drawHealth(int memberIndex) const {
 
     Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad().render();
 }
 
 void HUD::showCombatHud() {

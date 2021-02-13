@@ -163,8 +163,8 @@ class Shaders : public Singleton {
 public:
     static Shaders &instance();
 
-    void initGL();
-    void deinitGL();
+    void init();
+    void deinit();
     void activate(ShaderProgram program, const LocalUniforms &uniforms);
     void deactivate();
 

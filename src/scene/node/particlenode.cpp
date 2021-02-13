@@ -25,7 +25,7 @@
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
-#include "../../render/mesh/billboard.h"
+#include "../../render/mesh/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 
@@ -147,9 +147,9 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
 
     bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
     if (lighten) {
-        withAdditiveBlending([]() { BillboardMesh::instance().renderTriangles(); });
+        withAdditiveBlending([]() { Meshes::instance().getBillboard().render(); });
     } else {
-        BillboardMesh::instance().renderTriangles();
+        Meshes::instance().getBillboard().render();
     }
 }
 
