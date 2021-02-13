@@ -20,12 +20,13 @@
 #include <memory>
 
 #include "../../audio/stream.h"
+#include "../../common/singleton.h"
 
 namespace reone {
 
 namespace game {
 
-class GUISounds {
+class GUISounds : public Singleton {
 public:
     static GUISounds &instance();
 
@@ -38,8 +39,6 @@ public:
     std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
 
 private:
-    GUISounds() = default;
-
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;
 };

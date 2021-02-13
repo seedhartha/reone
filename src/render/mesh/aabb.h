@@ -17,13 +17,15 @@
 
 #pragma once
 
+#include "../../common/singleton.h"
+
 #include "mesh.h"
 
 namespace reone {
 
 namespace render {
 
-class AABBMesh : public Mesh {
+class AABBMesh : public Mesh, public Singleton {
 public:
     static AABBMesh &instance();
     void render(const AABB &aabb, const glm::mat4 &transform) const;

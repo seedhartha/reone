@@ -19,9 +19,11 @@
 
 #include <boost/asio/thread_pool.hpp>
 
+#include "../common/singleton.h"
+
 namespace reone {
 
-class JobExecutor {
+class JobExecutor : public Singleton {
 public:
     static JobExecutor &instance();
 
@@ -36,8 +38,6 @@ private:
     boost::asio::thread_pool _pool;
     std::atomic_bool _cancel { false };
     std::atomic_int _jobsActive { 0 };
-
-    JobExecutor() = default;
 };
 
 } // namespace reone

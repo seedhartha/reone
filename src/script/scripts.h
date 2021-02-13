@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
 #include "../resource/types.h"
 
 namespace reone {
@@ -29,7 +30,7 @@ namespace script {
 
 class ScriptProgram;
 
-class Scripts {
+class Scripts : public Singleton {
 public:
     static Scripts &instance();
 
@@ -39,10 +40,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<ScriptProgram>> _cache;
-
-    Scripts() = default;
-    Scripts(const Scripts &) = delete;
-    Scripts &operator=(const Scripts &) = delete;
 
     std::shared_ptr<ScriptProgram> doGet(const std::string &resRef);
 };

@@ -21,13 +21,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "../../common/singleton.h"
+
 #include "lipanimation.h"
 
 namespace reone {
 
 namespace render {
 
-class Lips {
+class Lips : public Singleton {
 public:
     static Lips &instance();
 
@@ -37,8 +39,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<LipAnimation>> _cache;
-
-    Lips() = default;
 };
 
 } // namespace render

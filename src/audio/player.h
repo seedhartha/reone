@@ -29,6 +29,8 @@
 
 #include "glm/vec3.hpp"
 
+#include "../common/singleton.h"
+
 #include "soundinstance.h"
 
 namespace reone {
@@ -37,7 +39,7 @@ namespace audio {
 
 class SoundHandle;
 
-class AudioPlayer {
+class AudioPlayer : public Singleton {
 public:
     static AudioPlayer &instance();
 
@@ -60,11 +62,7 @@ private:
     std::atomic<glm::vec3> _listenerPosition;
     std::atomic_bool _listenerPositionDirty { false };
 
-    AudioPlayer() = default;
-    AudioPlayer(const AudioPlayer &) = delete;
     ~AudioPlayer();
-
-    AudioPlayer &operator=(const AudioPlayer &) = delete;
 
     void threadStart();
 

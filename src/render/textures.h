@@ -21,6 +21,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "../common/singleton.h"
 #include "../resource/types.h"
 
 #include "types.h"
@@ -31,7 +32,7 @@ namespace render {
 
 class Texture;
 
-class Textures {
+class Textures : public Singleton {
 public:
     static Textures &instance();
 
@@ -43,10 +44,6 @@ public:
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
-
-    Textures() = default;
-    Textures(const Textures &) = delete;
-    Textures &operator=(const Textures &) = delete;
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };
