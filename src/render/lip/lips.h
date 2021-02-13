@@ -17,11 +17,9 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 
-#include "../../common/singleton.h"
+#include "../../common/cache.h"
 
 #include "lipanimation.h"
 
@@ -29,16 +27,14 @@ namespace reone {
 
 namespace render {
 
-class Lips : public Singleton {
+class Lips : public MemoryCache<std::string, LipAnimation> {
 public:
     static Lips &instance();
 
-    void invalidateCache();
-
-    std::shared_ptr<LipAnimation> get(const std::string &resRef);
-
 private:
-    std::unordered_map<std::string, std::shared_ptr<LipAnimation>> _cache;
+    Lips();
+
+    std::shared_ptr<LipAnimation> doGet(std::string resRef);
 };
 
 } // namespace render

@@ -24,6 +24,7 @@
 #include "lipfile.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::resource;
 
@@ -36,23 +37,17 @@ Lips &Lips::instance() {
     return instance;
 }
 
-void Lips::invalidateCache() {
-    _cache.clear();
+Lips::Lips() : MemoryCache(bind(&Lips::doGet, this, _1)) {
 }
 
-shared_ptr<LipAnimation> Lips::get(const string &resRef) {
-    auto maybeAnimation = _cache.find(resRef);
-    if (maybeAnimation != _cache.end()) return maybeAnimation->second;
-
-    shared_ptr<LipAnimation> animation;
+shared_ptr<LipAnimation> Lips::doGet(string resRef) {
     shared_ptr<ByteArray> lipData(Resources::instance().get(resRef, ResourceType::Lip));
-    if (lipData) {
-        LipFile lip;
-        lip.load(wrap(lipData));
-        animation = lip.animation();
-    }
+    if (!lipData) return nullptr;
 
-    return _cache.insert(make_pair(resRef, move(animation))).first->second;
+    LipFile lip;
+    lip.load(wrap(lipData));
+
+    return lip.animation();
 }
 
 } // namespace render

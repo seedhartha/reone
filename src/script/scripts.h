@@ -18,30 +18,24 @@
 #pragma once
 
 #include <string>
-#include <memory>
-#include <unordered_map>
 
-#include "../common/singleton.h"
+#include "../common/cache.h"
 #include "../resource/types.h"
+
+#include "program.h"
 
 namespace reone {
 
 namespace script {
 
-class ScriptProgram;
-
-class Scripts : public Singleton {
+class Scripts : public MemoryCache<std::string, ScriptProgram> {
 public:
     static Scripts &instance();
 
-    void invalidateCache();
-
-    std::shared_ptr<ScriptProgram> get(const std::string &resRef);
-
 private:
-    std::unordered_map<std::string, std::shared_ptr<ScriptProgram>> _cache;
+    Scripts();
 
-    std::shared_ptr<ScriptProgram> doGet(const std::string &resRef);
+    std::shared_ptr<ScriptProgram> doGet(std::string resRef);
 };
 
 } // namespace script

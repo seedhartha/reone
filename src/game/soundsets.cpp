@@ -25,6 +25,7 @@
 #include "../resource/resources.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::resource;
@@ -38,35 +39,28 @@ SoundSets &SoundSets::instance() {
     return instance;
 }
 
-void SoundSets::invalidateCache() {
-    _cache.clear();
+SoundSets::SoundSets() : MemoryCache(bind(&SoundSets::doGet, this, _1)) {
 }
 
-shared_ptr<SoundSet> SoundSets::get(const string &resRef) {
-    auto maybeSoundSet = _cache.find(resRef);
-    if (maybeSoundSet != _cache.end()) return maybeSoundSet->second;
-
-    shared_ptr<SoundSet> result;
-
+shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     auto data = Resources::instance().get(resRef, ResourceType::Ssf);
-    if (data) {
-        result = make_shared<SoundSet>();
+    if (!data) return nullptr;
 
-        SsfFile ssf;
-        ssf.load(wrap(data));
+    auto result = make_shared<SoundSet>();
 
-        vector<uint32_t> sounds(ssf.soundSet());
-        for (size_t i = 0; i < sounds.size(); ++i) {
-            string soundResRef(boost::to_lower_copy(Resources::instance().getSoundByStrRef(sounds[i])));
-            shared_ptr<AudioStream> sound(AudioFiles::instance().get(soundResRef));
-            if (sound) {
-                result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));
-            }
+    SsfFile ssf;
+    ssf.load(wrap(data));
+
+    vector<uint32_t> sounds(ssf.soundSet());
+    for (size_t i = 0; i < sounds.size(); ++i) {
+        string soundResRef(boost::to_lower_copy(Resources::instance().getSoundByStrRef(sounds[i])));
+        shared_ptr<AudioStream> sound(AudioFiles::instance().get(soundResRef));
+        if (sound) {
+            result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));
         }
     }
 
-    auto inserted = _cache.insert(make_pair(resRef, result));
-    return inserted.first->second;
+    return move(result);
 }
 
 } // namespace game

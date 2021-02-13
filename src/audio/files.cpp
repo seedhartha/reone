@@ -24,6 +24,7 @@
 #include "format/wavfile.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::resource;
 
@@ -36,39 +37,28 @@ AudioFiles &AudioFiles::instance() {
     return instance;
 }
 
-void AudioFiles::invalidateCache() {
-    _cache.clear();
+AudioFiles::AudioFiles() : MemoryCache(bind(&AudioFiles::doGet, this, _1)) {
 }
 
-shared_ptr<AudioStream> AudioFiles::get(const string &resRef) {
-    auto maybeAudio = _cache.find(resRef);
-    if (maybeAudio != _cache.end()) {
-        return maybeAudio->second;
-    }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
+shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
+    shared_ptr<AudioStream> result;
 
-    return inserted.first->second;
-}
-
-shared_ptr<AudioStream> AudioFiles::doGet(const string &resRef) {
     shared_ptr<ByteArray> mp3Data(Resources::instance().get(resRef, ResourceType::Mp3, false));
-    shared_ptr<AudioStream> stream;
-
     if (mp3Data) {
         Mp3File mp3;
         mp3.load(wrap(mp3Data));
-        stream = mp3.stream();
-
-    } else {
+        result = mp3.stream();
+    }
+    if (!result) {
         shared_ptr<ByteArray> wavData(Resources::instance().get(resRef, ResourceType::Wav));
         if (wavData) {
             WavFile wav;
             wav.load(wrap(wavData));
-            stream = wav.stream();
+            result = wav.stream();
         }
     }
 
-    return move(stream);
+    return move(result);
 }
 
 } // namespace audio

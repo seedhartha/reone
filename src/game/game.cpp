@@ -230,11 +230,11 @@ void Game::loadModule(const string &name, string entry) {
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
         Textures::instance().invalidateCache();
-        AudioFiles::instance().invalidateCache();
-        Scripts::instance().invalidateCache();
+        AudioFiles::instance().invalidate();
+        Scripts::instance().invalidate();
         Blueprints::instance().invalidateCache();
-        SoundSets::instance().invalidateCache();
-        Lips::instance().invalidateCache();
+        SoundSets::instance().invalidate();
+        Lips::instance().invalidate();
 
         Resources::instance().loadModule(name);
 
