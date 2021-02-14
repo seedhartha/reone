@@ -178,7 +178,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
                 ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
                 if (bone) {
-                    locals.skeletal->bones[boneIdx] = bone->boneTransform();
+                    locals.skeletal->bones[boneIdx] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
                 }
             }
         }
