@@ -297,8 +297,8 @@ set(SCENE_HEADERS
     src/scene/node/meshnode.h
     src/scene/node/modelnodescenenode.h
     src/scene/node/modelscenenode.h
-    src/scene/node/particlenode.h
     src/scene/node/scenenode.h
+    src/scene/particle.h
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
     src/scene/scenegraph.h
@@ -313,8 +313,8 @@ set(SCENE_SOURCES
     src/scene/node/meshnode.cpp
     src/scene/node/modelnodescenenode.cpp
     src/scene/node/modelscenenode.cpp
-    src/scene/node/particlenode.cpp
     src/scene/node/scenenode.cpp
+    src/scene/particle.cpp
     src/scene/pipeline/control.cpp
     src/scene/pipeline/world.cpp
     src/scene/scenegraph.cpp)

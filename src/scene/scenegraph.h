@@ -32,9 +32,9 @@ namespace reone {
 namespace scene {
 
 class CameraSceneNode;
+class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
-class ParticleSceneNode;
 class SceneNode;
 
 class SceneGraph : boost::noncopyable {
@@ -87,7 +87,7 @@ private:
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
-    std::vector<ParticleSceneNode *> _particles;
+    std::vector<EmitterSceneNode *> _emitters;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

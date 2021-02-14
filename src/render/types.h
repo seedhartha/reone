@@ -24,7 +24,9 @@ namespace reone {
 namespace render {
 
 static constexpr int kNumCubeFaces = 6;
+static constexpr int kMaxBoneCount = 128;
 static constexpr int kMaxLightCount = 8;
+static constexpr int kMaxParticleCount = 32;
 
 enum class PixelFormat {
     Grayscale,

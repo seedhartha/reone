@@ -61,6 +61,7 @@ public:
     void deinit();
 
     void render() const;
+    void renderInstanced(int count) const;
 
     void computeAABB();
 
@@ -78,8 +79,6 @@ protected:
     uint32_t _ibo { 0 };
     uint32_t _vao { 0 };
     AABB _aabb;
-
-    void render(uint32_t mode, int count, int offset) const;
 
     friend class MdlFile;
 };

@@ -17,38 +17,30 @@
 
 #pragma once
 
-#include "scenenode.h"
-
-#include "../../render/model/emitter.h"
+#include "../render/model/emitter.h"
 
 namespace reone {
 
 namespace scene {
 
-class ModelSceneNode;
-
-class ParticleSceneNode : public SceneNode {
+class Particle {
 public:
-    ParticleSceneNode(
-        const ModelSceneNode *modelSceneNode,
-        glm::vec3 position,
-        float velocity,
-        const std::shared_ptr<render::Emitter> &emitter,
-        SceneGraph *sceneGraph);
+    Particle(glm::vec3 position, float velocity, const render::Emitter *emitter);
 
-    void update(float dt) override;
-
-    void renderSingle(bool shadowPass) const override;
+    void update(float dt);
 
     bool isExpired() const;
 
-    int renderOrder() const { return _renderOrder; }
+    const glm::vec3 &position() const { return _position; }
+    float size() const { return _size; }
+    int frame() const { return _frame; }
+    const glm::vec3 &color() const { return _color; }
+    float alpha() const { return _alpha; }
 
 private:
-    const ModelSceneNode *_modelSceneNode;
     glm::vec3 _position;
     float _velocity;
-    std::shared_ptr<render::Emitter> _emitter;
+    const render::Emitter *_emitter;
 
     float _animLength { 0.0f };
     int _renderOrder { 0 };
@@ -60,7 +52,6 @@ private:
 
     void init();
     void updateAnimation(float dt);
-    void updateLocalTransform();
 };
 
 } // namespace scene

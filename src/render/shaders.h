@@ -34,8 +34,6 @@ namespace reone {
 
 namespace render {
 
-static constexpr int kMaxBoneCount = 128;
-
 enum class ShaderProgram {
     None,
     SimpleColor,
@@ -133,13 +131,20 @@ struct LightingUniforms {
     ShaderLight lights[kMaxLightCount];
 };
 
+struct ShaderParticle {
+    glm::mat4 transform { 1.0f };
+    glm::vec4 position { 0.0f };
+    glm::vec4 color { 1.0f };
+    glm::vec2 size { 0.0f };
+    float alpha { 1.0f };
+    int frame { 0 };
+};
+
 struct BillboardUniforms {
     glm::vec2 gridSize { 0.0f };
-    glm::vec2 size { 0.0f };
-    glm::vec4 particleCenter { 0.0f };
-    int frame { 0 };
     int render { 0 };
-    char padding[8];
+    char padding[4];
+    ShaderParticle particles[kMaxParticleCount];
 };
 
 struct BumpmapUniforms {
@@ -155,8 +160,8 @@ struct LocalUniforms {
     GeneralUniforms general;
     BillboardUniforms billboard;
     BumpmapUniforms bumpmap;
-    std::shared_ptr<SkeletalUniforms> skeletal;
-    std::shared_ptr<LightingUniforms> lighting;
+    SkeletalUniforms skeletal;
+    LightingUniforms lighting;
 };
 
 class Shaders : boost::noncopyable {
@@ -167,9 +172,6 @@ public:
     void deinit();
     void activate(ShaderProgram program, const LocalUniforms &uniforms);
     void deactivate();
-
-    std::shared_ptr<LightingUniforms> lightingUniforms() const { return _lightingUniforms; }
-    std::shared_ptr<SkeletalUniforms> skeletalUniforms() const { return _skeletalUniforms; }
 
     void setGlobalUniforms(const GlobalUniforms &globals);
 
@@ -197,8 +199,6 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
-    std::shared_ptr<LightingUniforms> _lightingUniforms;
-    std::shared_ptr<SkeletalUniforms> _skeletalUniforms;
 
     // Uniform buffer objects
 
@@ -210,7 +210,6 @@ private:
 
     // END Uniform buffer objects
 
-    Shaders();
     ~Shaders();
 
     void initShader(ShaderName name, unsigned int type, std::vector<char *> sources);

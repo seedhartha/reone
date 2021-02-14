@@ -22,10 +22,10 @@
 #include "../render/meshes.h"
 
 #include "node/cameranode.h"
+#include "node/emitternode.h"
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
-#include "node/particlenode.h"
 
 using namespace std;
 
@@ -34,8 +34,6 @@ using namespace reone::render;
 namespace reone {
 
 namespace scene {
-
-static bool g_emittersEnabled = true;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -86,19 +84,6 @@ void SceneGraph::prepareFrame() {
 
         return leftDistance > rightDistance;
     });
-
-    // Sort particles
-    unordered_map<ParticleSceneNode *, float> particlesZ;
-    for (auto &particle : _particles) {
-        glm::vec4 screen(_activeCamera->projection() * _activeCamera->view() * particle->absoluteTransform()[3]);
-        screen /= screen.w;
-        particlesZ.insert(make_pair(particle, screen.z));
-    }
-    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
-        float leftZ = particlesZ.find(left)->second;
-        float rightZ = particlesZ.find(right)->second;
-        return leftZ > rightZ;
-    });
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -106,7 +91,7 @@ void SceneGraph::refreshNodeLists() {
     _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
-    _particles.clear();
+    _emitters.clear();
 
     for (auto &root : _roots) {
         refreshFromSceneNode(root);
@@ -138,10 +123,10 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
             auto light = dynamic_pointer_cast<LightSceneNode>(node);
             if (light) {
                 _lights.push_back(light.get());
-            } else if (g_emittersEnabled) {
-                auto particle = dynamic_pointer_cast<ParticleSceneNode>(node);
-                if (particle && _activeCamera->isInFrustum(particle->absoluteTransform()[3])) {
-                    _particles.push_back(particle.get());
+            } else {
+                auto emitter = dynamic_pointer_cast<EmitterSceneNode>(node);
+                if (emitter) {
+                    _emitters.push_back(emitter.get());
                 }
             }
         }
@@ -223,9 +208,9 @@ void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
         mesh->renderSingle(false);
     }
 
-    // Render particles
-    for (auto &particle : _particles) {
-        particle->renderSingle(false);
+    // Render emitter particles
+    for (auto &emitter : _emitters) {
+        emitter->renderSingle(false);
     }
 }
 
