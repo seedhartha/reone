@@ -102,12 +102,12 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
     auto irradianceColor = make_shared<Texture>(envmap->name() + "_irradiance_color", getTextureProperties(TextureUsage::IrradianceMap));
     irradianceColor->init();
     irradianceColor->bind();
-    irradianceColor->clearPixels(32, 32, Texture::PixelFormat::RGB);
+    irradianceColor->clearPixels(32, 32, PixelFormat::RGB);
 
     auto irradianceDepth = make_shared<Renderbuffer>();
     irradianceDepth->init();
     irradianceDepth->bind();
-    irradianceDepth->configure(32, 32, Renderbuffer::PixelFormat::Depth);
+    irradianceDepth->configure(32, 32, PixelFormat::Depth);
 
     _irradianceFB.bind();
 
@@ -141,12 +141,12 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     auto prefilterColor = make_shared<Texture>(envmap->name() + "_prefilter_color", getTextureProperties(TextureUsage::PrefilterMap));
     prefilterColor->init();
     prefilterColor->bind();
-    prefilterColor->clearPixels(128, 128, Texture::PixelFormat::RGB);
+    prefilterColor->clearPixels(128, 128, PixelFormat::RGB);
 
     auto prefilterDepth = make_shared<Renderbuffer>();
     prefilterDepth->init();
     prefilterDepth->bind();
-    prefilterDepth->configure(128, 128, Renderbuffer::PixelFormat::Depth);
+    prefilterDepth->configure(128, 128, PixelFormat::Depth);
 
     _prefilterFB.bind();
 
@@ -191,12 +191,12 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     auto brdfLookupColor = make_shared<Texture>(envmap->name() + "_brdf_color", getTextureProperties(TextureUsage::BRDFLookup));
     brdfLookupColor->init();
     brdfLookupColor->bind();
-    brdfLookupColor->clearPixels(512, 512, Texture::PixelFormat::RGB);
+    brdfLookupColor->clearPixels(512, 512, PixelFormat::RGB);
 
     auto brdfLookupDepth = make_shared<Renderbuffer>();
     brdfLookupDepth->init();
     brdfLookupDepth->bind();
-    brdfLookupDepth->configure(512, 512, Renderbuffer::PixelFormat::Depth);
+    brdfLookupDepth->configure(512, 512, PixelFormat::Depth);
 
     _brdfLookupFB.bind();
     _brdfLookupFB.attachColor(*brdfLookupColor);

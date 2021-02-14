@@ -20,6 +20,8 @@
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
+#include "pixelutil.h"
+
 namespace reone {
 
 namespace render {
@@ -52,20 +54,8 @@ void Renderbuffer::unbind() const {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-static GLenum getInternalFormatGL(Renderbuffer::PixelFormat format) {
-    switch (format) {
-        case Renderbuffer::PixelFormat::Depth:
-            return GL_DEPTH_COMPONENT;
-        case Renderbuffer::PixelFormat::RGB:
-            return GL_RGB8;
-        case Renderbuffer::PixelFormat::RGBA:
-        default:
-            return GL_RGBA8;
-    }
-}
-
 void Renderbuffer::configure(int w, int h, PixelFormat format) {
-    glRenderbufferStorage(GL_RENDERBUFFER, getInternalFormatGL(format), w, h);
+    glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(format), w, h);
 }
 
 } // namespace render

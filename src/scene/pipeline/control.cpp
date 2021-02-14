@@ -42,13 +42,13 @@ void ControlRenderPipeline::init() {
     _geometryColor = make_unique<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor->init();
     _geometryColor->bind();
-    _geometryColor->clearPixels(_extent[2], _extent[3], Texture::PixelFormat::RGBA);
+    _geometryColor->clearPixels(_extent[2], _extent[3], PixelFormat::RGBA);
     _geometryColor->unbind();
 
     _geometryDepth = make_unique<Renderbuffer>();
     _geometryDepth->init();
     _geometryDepth->bind();
-    _geometryDepth->configure(_extent[2], _extent[3], Renderbuffer::PixelFormat::Depth);
+    _geometryDepth->configure(_extent[2], _extent[3], PixelFormat::Depth);
     _geometryDepth->unbind();
 
     _geometry.init();

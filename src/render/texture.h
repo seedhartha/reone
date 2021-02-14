@@ -35,20 +35,6 @@ namespace render {
  */
 class Texture {
 public:
-    enum class PixelFormat {
-        Grayscale,
-        RGB,
-        RGBA,
-        BGR,
-        BGRA,
-        DXT1,
-        DXT5,
-        Depth,
-
-        RG16F,
-        RGB16F
-    };
-
     enum class Filtering {
         Nearest,
         Linear,
@@ -184,7 +170,6 @@ private:
     bool isMipmapFilter(Filtering filter) const;
 
     uint32_t getFilterGL(Filtering filter) const;
-    int getPixelInternalFormatGL() const;
     uint32_t getPixelFormatGL() const;
     uint32_t getPixelTypeGL() const;
 };

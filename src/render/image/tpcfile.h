@@ -55,10 +55,11 @@ private:
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
+    void loadTexture();
+
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
-    void loadTexture();
-    Texture::PixelFormat getPixelFormat() const;
+    PixelFormat getPixelFormat() const;
 };
 
 } // namespace render

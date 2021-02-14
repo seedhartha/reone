@@ -26,6 +26,20 @@ namespace render {
 static constexpr int kNumCubeFaces = 6;
 static constexpr int kMaxLightCount = 8;
 
+enum class PixelFormat {
+    Grayscale,
+    RGB,
+    RGBA,
+    BGR,
+    BGRA,
+    DXT1,
+    DXT5,
+    Depth,
+
+    RG16F,
+    RGB16F
+};
+
 /**
  * This is a hint to the engine when configuring texture properties.
  */

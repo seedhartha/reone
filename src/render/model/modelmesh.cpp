@@ -90,8 +90,8 @@ bool ModelMesh::isTransparent() const {
     if (_diffuse->isAdditive()) return true;
     if (_envmap || _bumpmap) return false;
 
-    Texture::PixelFormat format = _diffuse->pixelFormat();
-    if (format == Texture::PixelFormat::RGB || format == Texture::PixelFormat::BGR || format == Texture::PixelFormat::DXT1) return false;
+    PixelFormat format = _diffuse->pixelFormat();
+    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
 
     return true;
 }
