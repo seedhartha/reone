@@ -62,7 +62,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
 
     for (int i = 0; i < layerCount; ++i) {
         const Texture::MipMap &mipMap = texture.layers()[i].mipMaps.front();
-        const uint8_t *mipMapPtr = reinterpret_cast<const uint8_t *>(&mipMap.data[0]);
+        const uint8_t *mipMapPtr = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
 
         switch (texture.pixelFormat()) {
             case Texture::PixelFormat::Grayscale:

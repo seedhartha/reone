@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "glm/vec3.hpp"
@@ -105,7 +106,7 @@ public:
     struct MipMap {
         int width { 0 };
         int height { 0 };
-        ByteArray data;
+        std::shared_ptr<ByteArray> pixels;
     };
 
     struct Layer {
@@ -144,8 +145,13 @@ public:
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
     /**
-     * Sets this texture pixels. Texture must be bound, unless it is headless.
-     */
+    * Sets this texture pixels from a single image. Texture must be bound, unless it is headless.
+    */
+    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
+
+    /**
+    * Sets this texture pixels from multiple images. Texture must be bound, unless it is headless.
+    */
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);
 
     void setFeatures(Features features);

@@ -20,16 +20,12 @@
 #include <cstdint>
 #include <memory>
 
+#include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"
+#include "../render/texture.h"
 
 namespace reone {
-
-namespace audio {
-
-class AudioStream;
-
-}
 
 namespace video {
 
@@ -38,7 +34,7 @@ class BikFile;
 class Video {
 public:
     struct Frame {
-        ByteArray data;
+        std::shared_ptr<ByteArray> pixels;
     };
 
     void init();
@@ -59,12 +55,14 @@ private:
     int _width { 0 };
     int _height { 0 };
     float _fps { 0.0f };
-    std::shared_ptr<Frame> _frame;
-    bool _inited { false };
-    uint32_t _textureId { 0 };
-    float _time { 0.0f };
-    bool _finished { false };
     std::shared_ptr<MediaStream<Frame>> _stream;
+
+    bool _inited { false };
+    float _time { 0.0f };
+    std::shared_ptr<Frame> _frame;
+    bool _finished { false };
+
+    std::shared_ptr<render::Texture> _texture;
     std::shared_ptr<audio::AudioStream> _audio;
 
     void updateFrame(float dt);

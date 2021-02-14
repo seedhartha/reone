@@ -34,7 +34,12 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
     Texture::Properties properties;
     properties.headless = headless;
 
-    if (usage == TextureUsage::GUI || usage == TextureUsage::ColorBuffer || usage == TextureUsage::IrradianceMap || usage == TextureUsage::BRDFLookup) {
+    if (usage == TextureUsage::GUI ||
+        usage == TextureUsage::ColorBuffer ||
+        usage == TextureUsage::IrradianceMap ||
+        usage == TextureUsage::BRDFLookup ||
+        usage == TextureUsage::Video) {
+
         properties.minFilter = Texture::Filtering::Linear;
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
@@ -115,34 +120,35 @@ void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, T
         throw invalid_argument("format must be either DXT1 or DXT5");
     }
 
-    const uint8_t *srcMipMapData = reinterpret_cast<const uint8_t *>(&mipMap.data[0]);
     size_t pixelCount = static_cast<size_t>(mipMap.width) * mipMap.height;
-    vector<unsigned long> pixels(pixelCount);
-    unsigned long *pixelsPtr = &pixels[0];
+    const uint8_t *srcPixels = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
+    vector<unsigned long> decompPixels(pixelCount);
+    unsigned long *decompPixelsPtr = &decompPixels[0];
     bool alpha;
 
     if (srcFormat == Texture::PixelFormat::DXT5) {
-        BlockDecompressImageDXT5(mipMap.width, mipMap.height, srcMipMapData, pixelsPtr);
+        BlockDecompressImageDXT5(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
         alpha = true;
     } else {
-        BlockDecompressImageDXT1(mipMap.width, mipMap.height, srcMipMapData, pixelsPtr);
+        BlockDecompressImageDXT1(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
         alpha = false;
     }
 
-    mipMap.data.resize((alpha ? 4ll : 3ll) * pixelCount);
-    pixelsPtr = &pixels[0];
-    uint8_t *destMipMapData = reinterpret_cast<uint8_t *>(&mipMap.data[0]);
+    auto destPixels = make_shared<ByteArray>((alpha ? 4ll : 3ll) * pixelCount);
+    uint8_t *destPixelsPtr = reinterpret_cast<uint8_t *>(destPixels->data());
+    decompPixelsPtr = &decompPixels[0];
 
     for (int i = 0; i < mipMap.width * mipMap.height; ++i) {
-        unsigned long pixel = *(pixelsPtr++);
-        *(destMipMapData++) = (pixel >> 24) & 0xff;
-        *(destMipMapData++) = (pixel >> 16) & 0xff;
-        *(destMipMapData++) = (pixel >> 8) & 0xff;
+        unsigned long pixel = *(decompPixelsPtr++);
+        *(destPixelsPtr++) = (pixel >> 24) & 0xff;
+        *(destPixelsPtr++) = (pixel >> 16) & 0xff;
+        *(destPixelsPtr++) = (pixel >> 8) & 0xff;
         if (alpha) {
-            *(destMipMapData++) = pixel & 0xff;
+            *(destPixelsPtr++) = pixel & 0xff;
         }
     }
 
+    mipMap.pixels = move(destPixels);
     destFormat = alpha ? Texture::PixelFormat::RGBA : Texture::PixelFormat::RGB;
 }
 
@@ -153,7 +159,7 @@ void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {
     size_t n = mipMap.width;
     size_t w = n / 2;
     size_t h = (n + 1) / 2;
-    uint8_t *mipMapData = reinterpret_cast<uint8_t *>(&mipMap.data[0]);
+    uint8_t *pixels = reinterpret_cast<uint8_t *>(mipMap.pixels->data());
 
     for (size_t x = 0; x < w; ++x) {
         for (size_t y = 0; y < h; ++y) {
@@ -163,11 +169,11 @@ void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {
             const size_t d3 = ( x          * n + (n - 1 - y)) * bpp;
 
             for (size_t p = 0; p < static_cast<size_t>(bpp); ++p) {
-                uint8_t tmp = mipMapData[d0 + p];
-                mipMapData[d0 + p] = mipMapData[d1 + p];
-                mipMapData[d1 + p] = mipMapData[d2 + p];
-                mipMapData[d2 + p] = mipMapData[d3 + p];
-                mipMapData[d3 + p] = tmp;
+                uint8_t tmp = pixels[d0 + p];
+                pixels[d0 + p] = pixels[d1 + p];
+                pixels[d1 + p] = pixels[d2 + p];
+                pixels[d2 + p] = pixels[d3 + p];
+                pixels[d3 + p] = tmp;
             }
         }
     }

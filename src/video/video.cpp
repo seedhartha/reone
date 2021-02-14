@@ -20,13 +20,14 @@
 #include <utility>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 #include "glm/ext.hpp"
 
 #include "../render/meshes.h"
 #include "../render/shaders.h"
+#include "../render/stateutil.h"
+#include "../render/textureutil.h"
 
 using namespace std;
 
@@ -38,33 +39,25 @@ namespace reone {
 namespace video {
 
 void Video::init() {
-    if (_inited) return;
-
-    glGenTextures(1, &_textureId);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    _inited = true;
+    if (!_inited) {
+        _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
+        _texture->init();
+        _inited = true;
+    }
 }
 
 void Video::deinit() {
-    if (!_inited) return;
-
-    glDeleteTextures(1, &_textureId);
-
-    _inited = false;
+    if (_inited) {
+        _texture.reset();
+        _inited = false;
+    }
 }
 
 void Video::update(float dt) {
-    if (_finished) return;
-
-    updateFrame(dt);
-    updateFrameTexture();
+    if (!_finished) {
+        updateFrame(dt);
+        updateFrameTexture();
+    }
 }
 
 void Video::updateFrame(float dt) {
@@ -81,9 +74,9 @@ void Video::updateFrame(float dt) {
 void Video::updateFrameTexture() {
     if (!_frame) return;
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, &_frame->data[0]);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _texture->bind();
+    _texture->setPixels(_width, _height, Texture::PixelFormat::RGB, _frame->pixels);
 }
 
 void Video::render() {
@@ -96,12 +89,10 @@ void Video::render() {
     LocalUniforms locals;
     Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _textureId);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _texture->bind();
 
     Meshes::instance().getQuad().render();
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Video::finish() {
