@@ -287,7 +287,6 @@ set(SCENE_HEADERS
     src/scene/animationchannel.h
     src/scene/animationproperties.h
     src/scene/node/cameranode.h
-    src/scene/node/cubenode.h
     src/scene/node/emitternode.h
     src/scene/node/lightnode.h
     src/scene/node/meshnode.h
@@ -304,7 +303,6 @@ set(SCENE_HEADERS
 set(SCENE_SOURCES
     src/scene/animationchannel.cpp
     src/scene/node/cameranode.cpp
-    src/scene/node/cubenode.cpp
     src/scene/node/emitternode.cpp
     src/scene/node/lightnode.cpp
     src/scene/node/meshnode.cpp
