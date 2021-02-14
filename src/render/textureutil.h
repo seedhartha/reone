@@ -33,7 +33,7 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless = fal
  * @param srcFormat source pixel format
  * @param destFormat resulting pixel format (output parameter)
  */
-void prepareCubeMap(std::vector<Texture::Layer> &layers, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat);
+void prepareCubeMap(std::vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat);
 
 /**
  * Decompresses the mip map.
@@ -42,7 +42,7 @@ void prepareCubeMap(std::vector<Texture::Layer> &layers, Texture::PixelFormat sr
  * @param srcFormat source pixel format - must be either DXT1 or DXT5
  * @param destFormat pixel format of a decompressed mip map (output parameter)
  */
-void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat);
+void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelFormat &destFormat);
 
 /**
  * Rotates the mip map by 90 degrees.

@@ -64,26 +64,26 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
     return move(properties);
 }
 
-static bool isCompressed(Texture::PixelFormat format) {
-    return format == Texture::PixelFormat::DXT1 || format == Texture::PixelFormat::DXT5;
+static bool isCompressed(PixelFormat format) {
+    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
 }
 
-static int getBitsPerPixel(Texture::PixelFormat format) {
+static int getBitsPerPixel(PixelFormat format) {
     switch (format) {
-        case Texture::PixelFormat::Grayscale:
+        case PixelFormat::Grayscale:
             return 1;
-        case Texture::PixelFormat::RGB:
-        case Texture::PixelFormat::BGR:
+        case PixelFormat::RGB:
+        case PixelFormat::BGR:
             return 3;
-        case Texture::PixelFormat::RGBA:
-        case Texture::PixelFormat::BGRA:
+        case PixelFormat::RGBA:
+        case PixelFormat::BGRA:
             return 4;
         default:
             throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
 }
 
-void prepareCubeMap(vector<Texture::Layer> &layers, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat) {
+void prepareCubeMap(vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat) {
     static int rotations[] = { 1, 3, 0, 2, 2, 0 };
 
     int layerCount = static_cast<int>(layers.size());
@@ -115,7 +115,7 @@ void prepareCubeMap(vector<Texture::Layer> &layers, Texture::PixelFormat srcForm
     }
 }
 
-void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, Texture::PixelFormat &destFormat) {
+void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelFormat &destFormat) {
     if (!isCompressed(srcFormat)) {
         throw invalid_argument("format must be either DXT1 or DXT5");
     }
@@ -126,7 +126,7 @@ void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, T
     unsigned long *decompPixelsPtr = &decompPixels[0];
     bool alpha;
 
-    if (srcFormat == Texture::PixelFormat::DXT5) {
+    if (srcFormat == PixelFormat::DXT5) {
         BlockDecompressImageDXT5(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
         alpha = true;
     } else {
@@ -149,7 +149,7 @@ void decompressMipMap(Texture::MipMap &mipMap, Texture::PixelFormat srcFormat, T
     }
 
     mipMap.pixels = move(destPixels);
-    destFormat = alpha ? Texture::PixelFormat::RGBA : Texture::PixelFormat::RGB;
+    destFormat = alpha ? PixelFormat::RGBA : PixelFormat::RGB;
 }
 
 void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {

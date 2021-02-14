@@ -54,7 +54,7 @@ void WorldRenderPipeline::init() {
     _depthRenderbuffer = make_unique<Renderbuffer>();
     _depthRenderbuffer->init();
     _depthRenderbuffer->bind();
-    _depthRenderbuffer->configure(_opts.width, _opts.height, Renderbuffer::PixelFormat::Depth);
+    _depthRenderbuffer->configure(_opts.width, _opts.height, PixelFormat::Depth);
     _depthRenderbuffer->unbind();
 
 
@@ -63,13 +63,13 @@ void WorldRenderPipeline::init() {
     _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor1->init();
     _geometryColor1->bind();
-    _geometryColor1->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
+    _geometryColor1->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
     _geometryColor1->unbind();
 
     _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor2->init();
     _geometryColor2->bind();
-    _geometryColor2->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
+    _geometryColor2->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
     _geometryColor2->unbind();
 
     _geometry.init();
@@ -86,7 +86,7 @@ void WorldRenderPipeline::init() {
     _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _verticalBlurColor->init();
     _verticalBlurColor->bind();
-    _verticalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
+    _verticalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
     _verticalBlurColor->unbind();
 
     _verticalBlur.init();
@@ -102,7 +102,7 @@ void WorldRenderPipeline::init() {
     _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _horizontalBlurColor->init();
     _horizontalBlurColor->bind();
-    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
+    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
     _horizontalBlurColor->unbind();
 
     _horizontalBlur.init();
@@ -118,7 +118,7 @@ void WorldRenderPipeline::init() {
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
-    _shadowsDepth->clearPixels(kShadowResolution, kShadowResolution, Texture::PixelFormat::Depth);
+    _shadowsDepth->clearPixels(kShadowResolution, kShadowResolution, PixelFormat::Depth);
     _shadowsDepth->unbind();
 
     _shadows.init();

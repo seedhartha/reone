@@ -136,7 +136,7 @@ void TpcFile::loadTexture() {
         features = txi.features();
     }
 
-    Texture::PixelFormat format = getPixelFormat();
+    PixelFormat format = getPixelFormat();
     if (_cubeMap) {
         prepareCubeMap(layers, format, format);
     }
@@ -150,23 +150,23 @@ void TpcFile::loadTexture() {
     _texture->setFeatures(move(features));
 }
 
-Texture::PixelFormat TpcFile::getPixelFormat() const {
+PixelFormat TpcFile::getPixelFormat() const {
     if (!_compressed) {
         switch (_encoding) {
             case EncodingType::Grayscale:
-                return Texture::PixelFormat::Grayscale;
+                return PixelFormat::Grayscale;
             case EncodingType::RGB:
-                return Texture::PixelFormat::RGB;
+                return PixelFormat::RGB;
             case EncodingType::RGBA:
-                return Texture::PixelFormat::RGBA;
+                return PixelFormat::RGBA;
             default:
                 throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
         }
     } else switch (_encoding) {
         case EncodingType::RGB:
-            return Texture::PixelFormat::DXT1;
+            return PixelFormat::DXT1;
         case EncodingType::RGBA:
-            return Texture::PixelFormat::DXT5;
+            return PixelFormat::DXT5;
         default:
             throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
     }

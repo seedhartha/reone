@@ -94,9 +94,9 @@ void TgaFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    Texture::PixelFormat format = _imageType == ImageType::Grayscale ?
-        Texture::PixelFormat::Grayscale :
-        (_alpha ? Texture::PixelFormat::BGRA : Texture::PixelFormat::BGR);
+    PixelFormat format = _imageType == ImageType::Grayscale ?
+        PixelFormat::Grayscale :
+        (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
 
     if (cubeMap) {
         prepareCubeMap(layers, format, format);

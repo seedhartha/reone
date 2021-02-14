@@ -76,7 +76,7 @@ void Video::updateFrameTexture() {
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
-    _texture->setPixels(_width, _height, Texture::PixelFormat::RGB, _frame->pixels);
+    _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
 
 void Video::render() {

@@ -23,6 +23,8 @@
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
+#include "pixelutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -169,7 +171,7 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     switch (_pixelFormat) {
         case PixelFormat::DXT1:
         case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, level, getPixelInternalFormatGL(), width, height, 0, size, pixels);
+            glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
             break;
         case PixelFormat::Grayscale:
         case PixelFormat::RGB:
@@ -179,35 +181,10 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
         case PixelFormat::Depth:
         case PixelFormat::RG16F:
         case PixelFormat::RGB16F:
-            glTexImage2D(target, level, getPixelInternalFormatGL(), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
+            glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
             break;
         default:
             break;
-    }
-}
-
-int Texture::getPixelInternalFormatGL() const {
-    switch (_pixelFormat) {
-        case PixelFormat::Grayscale:
-            return GL_RED;
-        case PixelFormat::RGB:
-        case PixelFormat::BGR:
-            return GL_RGB8;
-        case PixelFormat::RGBA:
-        case PixelFormat::BGRA:
-            return GL_RGBA8;
-        case PixelFormat::DXT1:
-            return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-        case PixelFormat::DXT5:
-            return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-        case PixelFormat::Depth:
-            return GL_DEPTH_COMPONENT;
-        case PixelFormat::RG16F:
-            return GL_RG16F;
-        case PixelFormat::RGB16F:
-            return GL_RGB16F;
-        default:
-            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 

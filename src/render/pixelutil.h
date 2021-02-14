@@ -19,39 +19,13 @@
 
 #include <cstdint>
 
-#include <boost/noncopyable.hpp>
-
 #include "types.h"
 
 namespace reone {
 
 namespace render {
 
-/**
- * Abstraction over the OpenGL renderbuffer.
- */
-class Renderbuffer : boost::noncopyable {
-public:
-    Renderbuffer() = default;
-    ~Renderbuffer();
-
-    void init();
-    void deinit();
-
-    void bind() const;
-    void unbind() const;
-
-    /**
-     * Configures this renderbuffers size and internal format. Renderbuffer must be bound.
-     */
-    void configure(int w, int h, PixelFormat format);
-
-    uint32_t id() const { return _id; }
-
-private:
-    bool _inited { false };
-    uint32_t _id { 0 };
-};
+uint32_t getInternalPixelFormatGL(PixelFormat format);
 
 } // namespace render
 
