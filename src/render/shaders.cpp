@@ -49,6 +49,7 @@ const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
 const int MAX_PARTICLES = 32;
 const float SHADOW_FAR_PLANE = 10000.0;
+const vec3 LUMINANCE = vec3(0.2126, 0.7152, 0.0722);
 
 const int FEATURE_DIFFUSE = 1;
 const int FEATURE_LIGHTMAP = 2;
@@ -66,8 +67,8 @@ const int FEATURE_WATER = 0x800;
 struct Light {
     vec4 position;
     vec4 color;
-    float radius;
     float multiplier;
+    float radius;
 };
 
 struct Particle {
@@ -87,6 +88,7 @@ layout(std140) uniform General {
     vec4 uCameraPosition;
     vec4 uShadowLightPosition;
     vec4 uColor;
+    vec4 uAmbientColor;
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
     vec2 uUvOffset;
@@ -97,10 +99,10 @@ layout(std140) uniform General {
     int uFeatureMask;
     bool uShadowLightPresent;
     float uRoughness;
+    float uExposure;
 };
 
 layout(std140) uniform Lighting {
-    vec4 uAmbientLightColor;
     vec4 uMaterialAmbient;
     vec4 uMaterialDiffuse;
     float uMaterialSpecular;
@@ -553,10 +555,17 @@ void main() {
         N = normalize(fragNormal);
     }
 
+    float shadow;
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
+        shadow = getShadow();
+    } else {
+        shadow = 0.0;
+    }
+
     vec3 objectColor;
 
     if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        objectColor = uAmbientLightColor.rgb * uMaterialAmbient.rgb * diffuseSample.rgb;
+        objectColor = uAmbientColor.rgb * uMaterialAmbient.rgb * diffuseSample.rgb;
 
         for (int i = 0; i < uLightCount; ++i) {
             vec3 L = normalize(uLights[i].position.xyz - fragPosition);
@@ -569,14 +578,23 @@ void main() {
             vec3 specular = uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
 
             if (uLights[i].position.w == 1.0) {
-                float distance = length(uLights[i].position.xyz - fragPosition);
-                float attenuation = 1.0 / (distance * distance);
+                float D = length(uLights[i].position.xyz - fragPosition);
+                D *= D;
+                float R = uLights[i].radius;
+                R *= R;
+                float attenuation = uLights[i].multiplier * (R / (R + D));
                 diffuse *= attenuation;
                 specular *= attenuation;
             }
 
-            objectColor += diffuse + specular;
+            objectColor += (1.0 - shadow) * (diffuse + specular);
         }
+    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        float S = max(0.0, 1.0 - (shadow - dot(uAmbientColor.rgb, LUMINANCE)));
+        objectColor = diffuseSample.rgb;
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb * S, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+
     } else {
         objectColor = diffuseSample.rgb;
     }
@@ -592,13 +610,6 @@ void main() {
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
-    }
-    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
-    }
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        objectColor *= 1.0 - 0.5 * getShadow();
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
@@ -635,18 +646,25 @@ void main() {
     vec3 V = normalize(uCameraPosition.xyz - fragPosition);
     vec3 R = reflect(-V, N);
 
-    vec3 albedo = diffuseSample.rgb;
+    float shadow;
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
+        shadow = getShadow();
+    } else {
+        shadow = 0.0;
+    }
+
+    vec3 albedo = pow(diffuseSample.rgb, vec3(GAMMA));
     float metallic = uMaterialMetallic;
     float roughness = uMaterialRoughness;
     float ao = 1.0;
 
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
-
     vec3 objectColor;
 
     if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
+        vec3 F0 = vec3(0.04);
+        F0 = mix(F0, albedo, metallic);
+
+        vec3 ambient = uAmbientColor.rgb * albedo * ao;
 
         if (isFeatureEnabled(FEATURE_PBRIBL)) {
             vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
@@ -666,17 +684,19 @@ void main() {
             ambient += (1.0 - diffuseSample.a) * (kD * diffuse + specular) * ao;
         }
 
-
         vec3 Lo = vec3(0.0);
 
         for (int i = 0; i < uLightCount; ++i) {
             vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 
-            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb;
+            vec3 radiance = uLights[i].color.rgb;
             if (uLights[i].position.w == 1.0) {
-                float distance = length(uLights[i].position.xyz - fragPosition);
-                float attenuation = 1.0 / (distance * distance);
+                float D = length(uLights[i].position.xyz - fragPosition);
+                D *= D;
+                float R = uLights[i].radius;
+                R *= R;
+                float attenuation = uLights[i].multiplier * (R / (R + D));
                 radiance *= attenuation;
             }
 
@@ -694,9 +714,8 @@ void main() {
 
             float NdotL = max(dot(N, L), 0.0);
 
-            Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+            Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
         }
-
 
         objectColor = ambient + Lo;
 
@@ -709,23 +728,21 @@ void main() {
         objectAlpha *= diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * albedo * objectAlpha);
     }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
-        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
-    }
-    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
-    }
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        objectColor *= 1.0 - 0.5 * getShadow();
+        objectColor += (1.0 - diffuseSample.a) * pow(envmapSample.rgb, vec3(GAMMA));
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
+
+    // HDR tonemapping
+    objectColor = vec3(1.0) - exp(-objectColor * uExposure);
+    // gamma correct
+    objectColor = pow(objectColor, vec3(1.0 / GAMMA));
 
     fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);

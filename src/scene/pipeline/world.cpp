@@ -152,7 +152,7 @@ void WorldRenderPipeline::drawShadows() {
             uniforms.general.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
         }
 
-        _scene->setBaseUniforms(move(uniforms));
+        _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
         withDepthTest([this]() { _scene->render(true); });
@@ -190,7 +190,7 @@ void WorldRenderPipeline::drawGeometry() {
     uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
     uniforms.general.shadowLightPresent = _scene->isShadowLightPresent();
     uniforms.general.shadowLightPosition = glm::vec4(_scene->shadowLightPosition(), 1.0f);
-    _scene->setBaseUniforms(move(uniforms));
+    _scene->setUniformsPrototype(move(uniforms));
 
     if (_scene->isShadowLightPresent()) {
         setActiveTextureUnit(TextureUnits::shadowMap);

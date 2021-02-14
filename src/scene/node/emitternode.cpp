@@ -148,7 +148,7 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
 
     glm::mat4 transform(_absoluteTransform);
 
-    ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.general.featureMask |= UniformFeatureFlags::billboard;
     uniforms.general.model = _absoluteTransform;
     uniforms.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());

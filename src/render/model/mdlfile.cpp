@@ -620,9 +620,7 @@ void MdlFile::readLight(ModelNode &node) {
 
     node._light->priority = readUint32();
     node._light->ambientOnly = static_cast<bool>(readUint32());
-
-    ignore(4);
-
+    node._light->dynamicType = readUint32();
     node._light->affectDynamic = static_cast<bool>(readUint32());
     node._light->shadow = static_cast<bool>(readUint32());
 
