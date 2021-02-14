@@ -19,17 +19,29 @@
 
 #include "../scenegraph.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, float multiplier, bool shadow) :
+LightSceneNode::LightSceneNode(LightType type, glm::vec3 color, int priority, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),
-    _priority(priority),
-    _color(color),
-    _radius(radius),
-    _multiplier(multiplier),
-    _shadow(shadow) {
+    _type(type),
+    _color(move(color)),
+    _priority(priority) {
+}
+
+void LightSceneNode::setMultiplier(float multiplier) {
+    _multiplier = multiplier;
+}
+
+void LightSceneNode::setRadius(float radius) {
+    _radius = radius;
+}
+
+void LightSceneNode::setShadow(bool shadow) {
+    _shadow = shadow;
 }
 
 } // namespace scene

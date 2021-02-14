@@ -159,11 +159,11 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 void SceneGraph::refreshShadowLight() {
     _shadowLightPresent = false;
 
-    if (!_refNode) return;
+    if (!_shadowReference) return;
 
-    glm::vec3 refNodePos(_refNode->absoluteTransform()[3]);
+    glm::vec3 referencePos(_shadowReference->absoluteTransform()[3]);
     vector<LightSceneNode *> lights;
-    getLightsAt(refNodePos, lights, 1, [](auto &light) { return light.shadow(); });
+    getLightsAt(referencePos, lights, 1, [](auto &light) { return light.isShadow(); });
 
     if (!lights.empty()) {
         _shadowLightPresent = true;
@@ -228,20 +228,16 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
         if (!predicate(*light)) continue;
 
         float distance = light->distanceTo(position);
-
-        float radius = light->radius();
-        if (distance > radius) continue;
-
-        distances.insert(make_pair(light, distance));
-        lights.push_back(light);
+        if (distance <= 2.0f * light->radius()) {
+            distances.insert(make_pair(light, distance));
+            lights.push_back(light);
+        }
     }
 
+    // Sort lights by priority and radius
     sort(lights.begin(), lights.end(), [&distances](LightSceneNode *left, LightSceneNode *right) {
-        int leftPriority = left->priority();
-        int rightPriority = right->priority();
-
-        if (leftPriority < rightPriority) return true;
-        if (leftPriority > rightPriority) return false;
+        if (left->priority() < right->priority()) return true;
+        if (left->priority() > right->priority()) return false;
 
         float leftDistance = distances.find(left)->second;
         float rightDistance = distances.find(right)->second;
@@ -258,8 +254,8 @@ void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
     _activeCamera = camera;
 }
 
-void SceneGraph::setShadowReference(const shared_ptr<SceneNode> &node) {
-    _refNode = node;
+void SceneGraph::setShadowReference(const shared_ptr<SceneNode> &reference) {
+    _shadowReference = reference;
 }
 
 void SceneGraph::setUpdate(bool update) {
@@ -270,8 +266,8 @@ void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
 }
 
-void SceneGraph::setBaseUniforms(ShaderUniforms uniforms) {
-    _baseUniforms = move(uniforms);
+void SceneGraph::setUniformsPrototype(ShaderUniforms uniforms) {
+    _uniformsPrototype = move(uniforms);
 }
 
 } // namespace scene

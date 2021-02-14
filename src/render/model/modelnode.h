@@ -59,7 +59,9 @@ public:
     };
 
     struct Light {
-        int priority { 1 };
+        int priority { 0 };
+        float multiplier { 1.0f };
+        int dynamicType { 0 };
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };

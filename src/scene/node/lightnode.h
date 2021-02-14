@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../types.h"
+
 #include "scenenode.h"
 
 namespace reone {
@@ -25,19 +27,27 @@ namespace scene {
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(SceneGraph *sceneGraph, int priority, const glm::vec3 &color, float radius, float multiplier, bool shadow);
+    LightSceneNode(LightType type, glm::vec3 color, int priority, SceneGraph *sceneGraph);
 
-    int priority() const { return _priority; }
+    bool isDirectional() const { return _type == LightType::Directional; }
+    bool isShadow() const { return _shadow; }
+
     const glm::vec3 &color() const { return _color; }
-    float radius() const { return _radius; }
+    int priority() const { return _priority; }
     float multiplier() const { return _multiplier; }
-    bool shadow() const { return _shadow; }
+    float radius() const { return _radius; }
+
+    void setMultiplier(float multiplier);
+    void setRadius(float radius);
+    void setShadow(bool shadow);
 
 private:
-    int _priority { 0 };
-    glm::vec3 _color { 1.0f };
-    float _radius { 1.0f };
+    LightType _type;
+    glm::vec3 _color;
+    int _priority;
+
     float _multiplier { 1.0f };
+    float _radius { 1.0f };
     bool _shadow { false };
 };
 

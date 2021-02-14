@@ -108,14 +108,18 @@ void ModelSceneNode::initModelNodes() {
 
             if (g_convertSelfIllumToLight) {
                 if (childNode->modelNode()->isSelfIllumEnabled()) {
-                    auto lightNode = make_shared<LightSceneNode>(_sceneGraph, 2, child->selfIllumColor(), 10.0f, 1.0f, false);
+                    auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->selfIllumColor(), 1, _sceneGraph);
+                    lightNode->setRadius(10.0f);
                     childNode->addChild(lightNode);
                 }
             }
 
             shared_ptr<ModelNode::Light> light(child->light());
-            if (light) {
-                auto lightNode = make_shared<LightSceneNode>(_sceneGraph, light->priority, child->color(), child->radius(), child->multiplier(), light->shadow);
+            if (light && !light->ambientOnly) {
+                auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->color(), light->priority, _sceneGraph);
+                lightNode->setMultiplier(child->multiplier());
+                lightNode->setRadius(child->radius());
+                lightNode->setShadow(light->shadow);
                 childNode->addChild(lightNode);
             }
 
@@ -149,7 +153,7 @@ void ModelSceneNode::render() {
     if (g_drawAABB) {
         glm::mat4 transform(_absoluteTransform * _aabb.transform());
 
-        ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+        ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
         uniforms.general.model = move(transform);
         Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 

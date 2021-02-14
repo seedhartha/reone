@@ -57,12 +57,12 @@ public:
     void prepareFrame();
 
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
-    render::ShaderUniforms baseUniforms() const { return _baseUniforms; }
+    render::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
-    void setShadowReference(const std::shared_ptr<SceneNode> &node);
+    void setShadowReference(const std::shared_ptr<SceneNode> &reference);
     void setUpdate(bool update);
-    void setBaseUniforms(render::ShaderUniforms uniforms);
+    void setUniformsPrototype(render::ShaderUniforms uniforms);
 
     // Lights and shadows
 
@@ -95,9 +95,9 @@ private:
     uint32_t _textureId { 0 };
     bool _shadowLightPresent { false };
     glm::vec3 _shadowLightPosition { 0.0f };
-    std::shared_ptr<SceneNode> _refNode;
+    std::shared_ptr<SceneNode> _shadowReference;
     bool _update { true };
-    render::ShaderUniforms _baseUniforms;
+    render::ShaderUniforms _uniformsPrototype;
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

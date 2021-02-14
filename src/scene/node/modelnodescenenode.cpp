@@ -100,11 +100,6 @@ bool ModelNodeSceneNode::isTransparent() const {
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 
-static bool isLightDirectional(const LightSceneNode &light) {
-    // Consider all lights with a radius of 50.0 and more directional
-    return light.radius() >= 50.0f;
-}
-
 void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
@@ -114,9 +109,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         diffuseTexture = mesh->diffuseTexture();
     }
 
-    ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.general.model = _absoluteTransform;
     uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
+    uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+    uniforms.general.exposure = 3.0f;
 
     ShaderProgram program;
 
@@ -141,7 +138,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (mesh->hasLightmapTexture()) {
+        if (!g_pbrEnabled && mesh->hasLightmapTexture()) {
             uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -185,16 +182,14 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.general.featureMask |= UniformFeatureFlags::selfIllum;
             uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (
-            _modelSceneNode->isLightingEnabled() &&
+        if (_modelSceneNode->isLightingEnabled() &&
+            (g_pbrEnabled || !mesh->hasLightmapTexture()) &&
             !_modelNode->isSelfIllumEnabled() &&
-            !mesh->hasLightmapTexture() &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             uniforms.general.featureMask |= UniformFeatureFlags::lighting;
-            uniforms.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
             uniforms.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
             uniforms.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
             uniforms.lighting.materialSpecular = mesh->material().specular;
@@ -205,10 +200,10 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
 
             for (int i = 0; i < uniforms.lighting.lightCount; ++i) {
                 ShaderLight &shaderLight = uniforms.lighting.lights[i];
-                shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), isLightDirectional(*lights[i]) ? 0.0f : 1.0f);
+                shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), lights[i]->isDirectional() ? 0.0f : 1.0f);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-                shaderLight.radius = lights[i]->radius();
                 shaderLight.multiplier = lights[i]->multiplier();
+                shaderLight.radius = lights[i]->radius();
             }
         }
 

@@ -86,6 +86,7 @@ struct GeneralUniforms {
     glm::vec4 cameraPosition { 0.0f };
     glm::vec4 shadowLightPosition { 0.0f };
     glm::vec4 color { 1.0f };
+    glm::vec4 ambientColor { 1.0f };
     glm::vec4 selfIllumColor { 1.0f };
     glm::vec4 discardColor { 0.0f };
     glm::vec2 uvOffset { 0.0f };
@@ -96,6 +97,7 @@ struct GeneralUniforms {
     int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
     int shadowLightPresent { false };
     float roughness { 0.0f };
+    float exposure { 1.0f };
 };
 
 struct SkeletalUniforms {
@@ -103,15 +105,14 @@ struct SkeletalUniforms {
 };
 
 struct ShaderLight {
-    glm::vec4 position { 0.0f }; /**< w = 0.0 indicates a directional light, while w = 1.0 indicates a point light */
+    glm::vec4 position { 0.0f }; /**< w = 0.0 indicates a directional light, and w = 1.0 indicates a point light */
     glm::vec4 color { 1.0f };
-    float radius { 1.0f };
     float multiplier { 1.0f };
+    float radius { 1.0f };
     char padding[8];
 };
 
 struct LightingUniforms {
-    glm::vec4 ambientLightColor { 1.0f };
     glm::vec4 materialAmbient { 1.0f };
     glm::vec4 materialDiffuse { 0.0f };
     float materialSpecular { 0.0f };

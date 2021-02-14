@@ -21,6 +21,11 @@ namespace reone {
 
 namespace scene {
 
+enum class LightType {
+    Directional,
+    Point
+};
+
 struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int blend = 4; /**< blend previous animation into the next one */
