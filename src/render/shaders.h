@@ -84,12 +84,10 @@ struct UniformFeatureFlags {
     static constexpr int skeletal = 0x20;
     static constexpr int lighting = 0x40;
     static constexpr int selfIllum = 0x80;
-    static constexpr int blur = 0x100;
-    static constexpr int bloom = 0x200;
-    static constexpr int discard = 0x400;
-    static constexpr int shadows = 0x800;
-    static constexpr int billboard = 0x1000;
-    static constexpr int water = 0x2000;
+    static constexpr int discard = 0x100;
+    static constexpr int shadows = 0x200;
+    static constexpr int billboard = 0x400;
+    static constexpr int water = 0x800;
 };
 
 struct GeneralUniforms {

@@ -230,7 +230,6 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     LocalUniforms locals;
-    locals.general.featureMask |= UniformFeatureFlags::blur;
     locals.general.model = move(transform);
     locals.general.blurResolution = glm::vec2(w, h);
     locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
@@ -259,7 +258,6 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     LocalUniforms locals;
-    locals.general.featureMask |= UniformFeatureFlags::blur;
     locals.general.model = move(transform);
     locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
     locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
@@ -304,7 +302,6 @@ void WorldRenderPipeline::drawResult() const {
 
     } else {
         LocalUniforms locals;
-        locals.general.featureMask |= UniformFeatureFlags::bloom;
         locals.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::SimplePresentWorld, locals);

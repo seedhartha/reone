@@ -57,12 +57,10 @@ const int FEATURE_BUMPMAP = 0x10;
 const int FEATURE_SKELETAL = 0x20;
 const int FEATURE_LIGHTING = 0x40;
 const int FEATURE_SELFILLUM = 0x80;
-const int FEATURE_BLUR = 0x100;
-const int FEATURE_BLOOM = 0x200;
-const int FEATURE_DISCARD = 0x400;
-const int FEATURE_SHADOWS = 0x800;
-const int FEATURE_BILLBOARD = 0x1000;
-const int FEATURE_WATER = 0x2000;
+const int FEATURE_DISCARD = 0x100;
+const int FEATURE_SHADOWS = 0x200;
+const int FEATURE_BILLBOARD = 0x400;
+const int FEATURE_WATER = 0x800;
 
 struct Light {
     vec4 position;
