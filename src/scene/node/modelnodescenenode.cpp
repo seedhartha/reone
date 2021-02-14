@@ -165,12 +165,11 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
         if (skin) {
             locals.general.featureMask |= UniformFeatureFlags::skeletal;
-            locals.skeletal = Shaders::instance().skeletalUniforms();
-            locals.skeletal->absTransform = _modelNode->absoluteTransform();
-            locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
+            locals.skeletal.absTransform = _modelNode->absoluteTransform();
+            locals.skeletal.absTransformInv = _modelNode->absoluteTransformInverse();
 
             for (int i = 0; i < kMaxBoneCount; ++i) {
-                locals.skeletal->bones[i] = glm::mat4(1.0f);
+                locals.skeletal.bones[i] = glm::mat4(1.0f);
             }
             for (auto &pair : skin->nodeIdxByBoneIdx) {
                 uint16_t boneIdx = pair.first;
@@ -178,7 +177,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
                 ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
                 if (bone) {
-                    locals.skeletal->bones[boneIdx] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+                    locals.skeletal.bones[boneIdx] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
                 }
             }
         }
@@ -196,18 +195,17 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             locals.general.featureMask |= UniformFeatureFlags::lighting;
-            locals.lighting = Shaders::instance().lightingUniforms();
-            locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-            locals.lighting->materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
-            locals.lighting->materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
-            locals.lighting->materialSpecular = mesh->material().specular;
-            locals.lighting->materialShininess = mesh->material().shininess;
-            locals.lighting->materialMetallic = mesh->material().metallic;
-            locals.lighting->materialRoughness = mesh->material().roughness;
-            locals.lighting->lightCount = static_cast<int>(lights.size());
+            locals.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+            locals.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
+            locals.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
+            locals.lighting.materialSpecular = mesh->material().specular;
+            locals.lighting.materialShininess = mesh->material().shininess;
+            locals.lighting.materialMetallic = mesh->material().metallic;
+            locals.lighting.materialRoughness = mesh->material().roughness;
+            locals.lighting.lightCount = static_cast<int>(lights.size());
 
-            for (int i = 0; i < locals.lighting->lightCount; ++i) {
-                ShaderLight &shaderLight = locals.lighting->lights[i];
+            for (int i = 0; i < locals.lighting.lightCount; ++i) {
+                ShaderLight &shaderLight = locals.lighting.lights[i];
                 shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), isLightDirectional(*lights[i]) ? 0.0f : 1.0f);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.radius = lights[i]->radius();

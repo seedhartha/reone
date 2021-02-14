@@ -47,6 +47,7 @@ const float PI = 3.14159265359;
 const float GAMMA = 2.2;
 const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
+const int MAX_PARTICLES = 32;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 const int FEATURE_DIFFUSE = 1;
@@ -69,18 +70,27 @@ struct Light {
     float multiplier;
 };
 
+struct Particle {
+    mat4 transform;
+    vec4 position;
+    vec4 color;
+    vec2 size;
+    float alpha;
+    int frame;
+};
+
 layout(std140) uniform General {
-    uniform int uFeatureMask;
-    uniform mat4 uModel;
-    uniform vec4 uColor;
-    uniform float uAlpha;
-    uniform vec4 uSelfIllumColor;
-    uniform vec4 uDiscardColor;
-    uniform vec2 uBlurResolution;
-    uniform vec2 uBlurDirection;
-    uniform vec2 uUvOffset;
-    uniform float uWaterAlpha;
-    uniform float uRoughness;
+    int uFeatureMask;
+    mat4 uModel;
+    vec4 uColor;
+    float uAlpha;
+    vec4 uSelfIllumColor;
+    vec4 uDiscardColor;
+    vec2 uBlurResolution;
+    vec2 uBlurDirection;
+    vec2 uUvOffset;
+    float uWaterAlpha;
+    float uRoughness;
 };
 
 layout(std140) uniform Lighting {
@@ -96,25 +106,23 @@ layout(std140) uniform Lighting {
 };
 
 layout(std140) uniform Skeletal {
-    uniform mat4 uAbsTransform;
-    uniform mat4 uAbsTransformInv;
-    uniform mat4 uBones[MAX_BONES];
+    mat4 uAbsTransform;
+    mat4 uAbsTransformInv;
+    mat4 uBones[MAX_BONES];
 };
 
 layout(std140) uniform Billboard {
-    uniform vec2 uBillboardGridSize;
-    uniform vec2 uBillboardSize;
-    uniform vec4 uParticleCenter;
-    uniform int uBillboardFrame;
-    uniform int uBillboardRender;
+    vec2 uBillboardGridSize;
+    int uBillboardRender;
+    Particle uParticles[MAX_PARTICLES];
 };
 
 layout(std140) uniform Bumpmap {
-    uniform bool uGrayscaleBumpmap;
-    uniform float uBumpmapScaling;
-    uniform vec2 uBumpmapGridSize;
-    uniform int uBumpmapFrame;
-    uniform bool uBumpmapSwizzled;
+    bool uGrayscaleBumpmap;
+    float uBumpmapScaling;
+    vec2 uBumpmapGridSize;
+    int uBumpmapFrame;
+    bool uBumpmapSwizzled;
 };
 
 bool isFeatureEnabled(int flag) {
@@ -441,36 +449,38 @@ layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
 out vec2 fragTexCoords;
+flat out int fragInstanceID;
 
 void main() {
-    vec4 position;
+    vec4 P;
 
     if (uBillboardRender == BILLBOARD_RENDER_TO_WORLD_Z) {
-        position = vec4(
-            uParticleCenter.xyz +
-            RIGHT * aPosition.x * uBillboardSize.x +
-            FORWARD * aPosition.y * uBillboardSize.y,
+        P = vec4(
+            uParticles[gl_InstanceID].position.xyz +
+                RIGHT * aPosition.x * uParticles[gl_InstanceID].size.x +
+                FORWARD * aPosition.y * uParticles[gl_InstanceID].size.y,
             1.0);
 
     } else if (uBillboardRender == BILLBOARD_RENDER_MOTION_BLUR || uBillboardRender == BILLBOARD_RENDER_TO_LOCAL_Z) {
-        position = uModel * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
+        P = uParticles[gl_InstanceID].transform * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
 
     } else if (uBillboardRender == BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR) {
-        position = uModel * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
+        P = uParticles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
 
     } else {
         vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
         vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
 
-        position = vec4(
-            uParticleCenter.xyz +
-            cameraRight * aPosition.x * uBillboardSize.x +
-            cameraUp * aPosition.y * uBillboardSize.y,
+        P = vec4(
+            uParticles[gl_InstanceID].position.xyz +
+                cameraRight * aPosition.x * uParticles[gl_InstanceID].size.x +
+                cameraUp * aPosition.y * uParticles[gl_InstanceID].size.y,
             1.0);
     }
 
-    gl_Position = uProjection * uView * position;
+    gl_Position = uProjection * uView * uModel * P;
     fragTexCoords = aTexCoords;
+    fragInstanceID = gl_InstanceID;
 }
 )END";
 
@@ -741,6 +751,7 @@ static constexpr GLchar *kShaderFragmentBillboard = R"END(
 uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
+flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
@@ -753,14 +764,14 @@ void main() {
     texCoords.x *= oneOverGridX;
     texCoords.y *= oneOverGridY;
 
-    if (uBillboardFrame > 0) {
-        texCoords.y += oneOverGridY * (uBillboardFrame / int(uBillboardGridSize.x));
-        texCoords.x += oneOverGridX * (uBillboardFrame % int(uBillboardGridSize.x));
+    if (uParticles[fragInstanceID].frame > 0) {
+        texCoords.y += oneOverGridY * (uParticles[fragInstanceID].frame / int(uBillboardGridSize.x));
+        texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % int(uBillboardGridSize.x));
     }
 
     vec4 diffuseSample = texture(uDiffuse, texCoords);
 
-    fragColor = vec4(uColor.rgb * diffuseSample.rgb, uAlpha * diffuseSample.a);
+    fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].alpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
@@ -920,11 +931,6 @@ void main() {
 Shaders &Shaders::instance() {
     static Shaders instance;
     return instance;
-}
-
-Shaders::Shaders() {
-    _lightingUniforms = make_shared<LightingUniforms>();
-    _skeletalUniforms = make_shared<SkeletalUniforms>();
 }
 
 void Shaders::init() {
@@ -1108,11 +1114,11 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
 
     if (locals.general.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), locals.skeletal.get(), GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &locals.skeletal, GL_STATIC_DRAW);
     }
     if (locals.general.featureMask & UniformFeatureFlags::lighting) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), &locals.lighting, GL_STATIC_DRAW);
     }
     if (locals.general.featureMask & UniformFeatureFlags::billboard) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);

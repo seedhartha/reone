@@ -26,18 +26,20 @@
 #include "../../common/timer.h"
 #include "../../render/model/emitter.h"
 
+#include "../particle.h"
+
 namespace reone {
 
 namespace scene {
 
 class ModelSceneNode;
-class ParticleSceneNode;
 
 class EmitterSceneNode : public SceneNode {
 public:
     EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt) override;
+    void renderSingle(bool shadowPass) const override;
 
     void detonate();
 
@@ -49,14 +51,13 @@ private:
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
-    std::vector<std::shared_ptr<ParticleSceneNode>> _particles;
+    std::vector<std::shared_ptr<Particle>> _particles;
     bool _spawned { false };
 
     void init();
 
     void spawnParticles(float dt);
     void removeExpiredParticles(float dt);
-
     void doSpawnParticle();
 };
 

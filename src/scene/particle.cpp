@@ -15,21 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "particlenode.h"
+#include "particle.h"
 
 #include <stdexcept>
 
 #include "glm/common.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-
-#include "modelscenenode.h"
 
 using namespace std;
 
@@ -39,18 +29,11 @@ namespace reone {
 
 namespace scene {
 
-static constexpr float kMotionBlurStrength = 0.25f;
-
-ParticleSceneNode::ParticleSceneNode(const ModelSceneNode *modelSceneNode, glm::vec3 position, float velocity, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
-    SceneNode(sceneGraph),
-    _modelSceneNode(modelSceneNode),
+Particle::Particle(glm::vec3 position, float velocity, const Emitter *emitter) :
     _position(position),
     _velocity(velocity),
     _emitter(emitter) {
 
-    if (!modelSceneNode) {
-        throw invalid_argument("modelSceneNode must not be null");
-    }
     if (!emitter) {
         throw invalid_argument("emitter must not be null");
     }
@@ -58,21 +41,15 @@ ParticleSceneNode::ParticleSceneNode(const ModelSceneNode *modelSceneNode, glm::
     init();
 }
 
-void ParticleSceneNode::init() {
+void Particle::init() {
     if (_emitter->fps() > 0) {
         _animLength = (_emitter->frameEnd() - _emitter->frameStart() + 1) / static_cast<float>(_emitter->fps());
     }
     _renderOrder = _emitter->renderOrder();
     _frame = _emitter->frameStart();
-
-    updateLocalTransform();
 }
 
-void ParticleSceneNode::updateLocalTransform() {
-    setLocalTransform(glm::translate(glm::mat4(1.0f), _position));
-}
-
-void ParticleSceneNode::update(float dt) {
+void Particle::update(float dt) {
     if (_emitter->lifeExpectancy() != -1) {
         _lifetime = glm::min(_lifetime + dt, static_cast<float>(_emitter->lifeExpectancy()));
     } else if (_lifetime == _animLength) {
@@ -82,7 +59,6 @@ void ParticleSceneNode::update(float dt) {
     }
     if (!isExpired()) {
         _position.z += _velocity * dt;
-        updateLocalTransform();
         updateAnimation(dt);
     }
 }
@@ -100,7 +76,7 @@ static T interpolateConstraints(const Emitter::Constraints<T> &constraints, floa
     return result;
 }
 
-void ParticleSceneNode::updateAnimation(float dt) {
+void Particle::updateAnimation(float dt) {
     float maturity;
     if (_emitter->lifeExpectancy() != -1) {
         maturity = _lifetime / static_cast<float>(_emitter->lifeExpectancy());
@@ -115,45 +91,7 @@ void ParticleSceneNode::updateAnimation(float dt) {
     _alpha = interpolateConstraints(_emitter->alpha(), maturity);
 }
 
-void ParticleSceneNode::renderSingle(bool shadowPass) const {
-    if (shadowPass) return;
-
-    shared_ptr<Texture> texture(_emitter->texture());
-    if (!texture) return;
-
-    glm::mat4 transform(1.0f);
-    transform = _absoluteTransform;
-    if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
-        transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * _size, _size, _size));
-    } else {
-        transform = glm::scale(transform, glm::vec3(_size));
-    }
-
-    LocalUniforms locals;
-    locals.general.featureMask |= UniformFeatureFlags::billboard;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(_color, 1.0f);
-    locals.general.alpha = _alpha;
-    locals.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
-    locals.billboard.size = glm::vec2(_size);
-    locals.billboard.particleCenter = _absoluteTransform[3];
-    locals.billboard.frame = _frame;
-    locals.billboard.render = static_cast<int>(_emitter->renderMode());
-
-    Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
-
-    setActiveTextureUnit(TextureUnits::diffuse);
-    texture->bind();
-
-    bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
-    if (lighten) {
-        withAdditiveBlending([]() { Meshes::instance().getBillboard().render(); });
-    } else {
-        Meshes::instance().getBillboard().render();
-    }
-}
-
-bool ParticleSceneNode::isExpired() const {
+bool Particle::isExpired() const {
     return _emitter->lifeExpectancy() != -1 && _lifetime >= _emitter->lifeExpectancy();
 }
 

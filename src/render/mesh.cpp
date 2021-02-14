@@ -103,20 +103,24 @@ void Mesh::deinit() {
     }
 }
 
-static GLenum getGLMode(Mesh::DrawMode mode) {
+static GLenum getModeGL(Mesh::DrawMode mode) {
     return mode == Mesh::DrawMode::Lines ? GL_LINES : GL_TRIANGLES;
 }
 
 void Mesh::render() const {
     if (_inited) {
-        render(getGLMode(_mode), _indices.size(), 0);
+        glBindVertexArray(_vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+        glDrawElements(getModeGL(_mode), _indices.size(), GL_UNSIGNED_SHORT, nullptr);
     }
 }
 
-void Mesh::render(uint32_t mode, int count, int offset) const {
-    glBindVertexArray(_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glDrawElements(mode, count, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(offset));
+void Mesh::renderInstanced(int count) const {
+    if (_inited) {
+        glBindVertexArray(_vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+        glDrawElementsInstanced(getModeGL(_mode), _indices.size(), GL_UNSIGNED_SHORT, nullptr, count);
+    }
 }
 
 void Mesh::computeAABB() {

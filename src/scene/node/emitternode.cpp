@@ -17,14 +17,21 @@
 
 #include "emitternode.h"
 
+#include <algorithm>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "glm/gtc/constants.hpp"
 
 #include "../../common/random.h"
+#include "../../render/meshes.h"
+#include "../../render/shaders.h"
+#include "../../render/stateutil.h"
 
+#include "../scenegraph.h"
+
+#include "cameranode.h"
 #include "modelscenenode.h"
-#include "particlenode.h"
 
 using namespace std;
 
@@ -34,7 +41,7 @@ namespace reone {
 
 namespace scene {
 
-static constexpr int kMaxParticleCount = 24;
+static constexpr float kMotionBlurStrength = 0.25f;
 
 EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(sceneGraph),
@@ -58,9 +65,39 @@ void EmitterSceneNode::init() {
 }
 
 void EmitterSceneNode::update(float dt) {
+    shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
+    if (!camera) return;
+
     removeExpiredParticles(dt);
     spawnParticles(dt);
-    SceneNode::update(dt);
+
+    for (auto &particle : _particles) {
+        particle->update(dt);
+    }
+
+    // Sort particles by depth
+    unordered_map<Particle *, float> particlesZ;
+    for (auto &particle : _particles) {
+        glm::vec4 screen(camera->projection() * camera->view() * _absoluteTransform * glm::vec4(particle->position(), 1.0f));
+        screen /= screen.w;
+        particlesZ.insert(make_pair(particle.get(), screen.z));
+    }
+    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
+        float leftZ = particlesZ.find(left.get())->second;
+        float rightZ = particlesZ.find(right.get())->second;
+        return leftZ > rightZ;
+    });
+}
+
+void EmitterSceneNode::removeExpiredParticles(float dt) {
+    for (auto it = _particles.begin(); it != _particles.end(); ) {
+        auto &particle = (*it);
+        if (particle->isExpired()) {
+            it = _particles.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
@@ -99,20 +136,53 @@ void EmitterSceneNode::doSpawnParticle() {
     }
     float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
 
-    auto particle = make_shared<ParticleSceneNode>(_modelSceneNode, position, velocity, _emitter, _sceneGraph);
+    auto particle = make_shared<Particle>(position, velocity, _emitter.get());
     _particles.push_back(particle);
-    addChild(particle);
 }
 
-void EmitterSceneNode::removeExpiredParticles(float dt) {
-    for (auto it = _particles.begin(); it != _particles.end(); ) {
-        auto &particle = (*it);
-        if (particle->isExpired()) {
-            removeChild(*particle);
-            it = _particles.erase(it);
+void EmitterSceneNode::renderSingle(bool shadowPass) const {
+    if (shadowPass || _particles.empty()) return;
+
+    shared_ptr<Texture> texture(_emitter->texture());
+    if (!texture) return;
+
+    glm::mat4 transform(_absoluteTransform);
+
+    LocalUniforms locals;
+    locals.general.featureMask |= UniformFeatureFlags::billboard;
+    locals.general.model = _absoluteTransform;
+    locals.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
+    locals.billboard.render = static_cast<int>(_emitter->renderMode());
+
+    for (size_t i = 0; i < _particles.size(); ++i) {
+        const Particle &particle = *_particles[i];
+
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, _particles[i]->position());
+        if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
+            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * particle.size(), particle.size(), particle.size()));
         } else {
-            ++it;
+            transform = glm::scale(transform, glm::vec3(particle.size()));
         }
+
+        locals.billboard.particles[i].transform = move(transform);
+        locals.billboard.particles[i].position = glm::vec4(particle.position(), 1.0f);
+        locals.billboard.particles[i].color = glm::vec4(particle.color(), 1.0f);
+        locals.billboard.particles[i].size = glm::vec2(particle.size());
+        locals.billboard.particles[i].alpha = particle.alpha();
+        locals.billboard.particles[i].frame = particle.frame();
+    }
+
+    Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
+
+    setActiveTextureUnit(TextureUnits::diffuse);
+    texture->bind();
+
+    bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
+    if (lighten) {
+        withAdditiveBlending([this]() { Meshes::instance().getBillboard().renderInstanced(_particles.size()); });
+    } else {
+        Meshes::instance().getBillboard().renderInstanced(_particles.size());
     }
 }
 
