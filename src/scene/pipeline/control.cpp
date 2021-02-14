@@ -17,9 +17,9 @@
 
 #include "control.h"
 
-#include "glm/ext.hpp"
-
 #include "GL/glew.h"
+
+#include "glm/ext.hpp"
 
 #include "../../render/meshes.h"
 #include "../../render/shaders.h"
@@ -45,10 +45,10 @@ void ControlRenderPipeline::init() {
     _geometryColor->clearPixels(_extent[2], _extent[3], Texture::PixelFormat::RGBA);
     _geometryColor->unbind();
 
-    _geometryDepth = make_unique<Texture>("geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _geometryDepth = make_unique<Renderbuffer>();
     _geometryDepth->init();
     _geometryDepth->bind();
-    _geometryDepth->clearPixels(_extent[2], _extent[3], Texture::PixelFormat::Depth);
+    _geometryDepth->configure(_extent[2], _extent[3], Renderbuffer::PixelFormat::Depth);
     _geometryDepth->unbind();
 
     _geometry.init();

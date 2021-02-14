@@ -76,6 +76,10 @@ void Framebuffer::attachDepth(const Texture &texture) const {
     }
 }
 
+void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id());
+}
+
 void Framebuffer::checkCompleteness() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         throw logic_error("Framebuffer is not complete");

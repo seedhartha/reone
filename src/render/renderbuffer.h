@@ -17,37 +17,46 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <boost/noncopyable.hpp>
-
-#include "glm/vec2.hpp"
-#include "glm/vec4.hpp"
-
-#include "../../render/framebuffer.h"
-#include "../../render/renderbuffer.h"
-#include "../../render/texture.h"
-
-#include "../scenegraph.h"
 
 namespace reone {
 
-namespace scene {
+namespace render {
 
-class ControlRenderPipeline : boost::noncopyable {
+/**
+ * Abstraction over the OpenGL renderbuffer.
+ */
+class Renderbuffer : boost::noncopyable {
 public:
-    ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent);
+    enum class PixelFormat {
+        Depth,
+        RGB,
+        RGBA
+    };
+
+    Renderbuffer() = default;
+    ~Renderbuffer();
 
     void init();
-    void render(const glm::ivec2 &offset) const;
+    void deinit();
+
+    void bind() const;
+    void unbind() const;
+
+    /**
+     * Configures this renderbuffers size and internal format. Renderbuffer must be bound.
+     */
+    void configure(int w, int h, PixelFormat format);
+
+    uint32_t id() const { return _id; }
 
 private:
-    SceneGraph *_scene;
-    glm::vec4 _extent;
-
-    render::Framebuffer _geometry;
-    std::unique_ptr<render::Texture> _geometryColor;
-    std::unique_ptr<render::Renderbuffer> _geometryDepth;
+    bool _inited { false };
+    uint32_t _id { 0 };
 };
 
-} // namespace scene
+} // namespace render
 
 } // namespace reone
