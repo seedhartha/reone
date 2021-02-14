@@ -17,9 +17,13 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/mat4x4.hpp"
 
 #include "../../render/framebuffer.h"
+#include "../../render/renderbuffer.h"
+#include "../../render/texture.h"
 #include "../../render/types.h"
 #include "../../scene/scenegraph.h"
 
@@ -27,7 +31,7 @@ namespace reone {
 
 namespace scene {
 
-class WorldRenderPipeline {
+class WorldRenderPipeline : boost::noncopyable {
 public:
     WorldRenderPipeline(SceneGraph *scene, const render::GraphicsOptions &opts);
 
@@ -49,19 +53,14 @@ private:
 
     // Framebuffer targets
 
+    std::unique_ptr<render::Renderbuffer> _depthRenderbuffer;
     std::unique_ptr<render::Texture> _geometryColor1;
     std::unique_ptr<render::Texture> _geometryColor2;
-    std::unique_ptr<render::Texture> _geometryDepth;
     std::unique_ptr<render::Texture> _verticalBlurColor;
-    std::unique_ptr<render::Texture> _verticalBlurDepth;
     std::unique_ptr<render::Texture> _horizontalBlurColor;
-    std::unique_ptr<render::Texture> _horizontalBlurDepth;
     std::unique_ptr<render::Texture> _shadowsDepth;
 
     // END Framebuffers targets
-
-    WorldRenderPipeline(const WorldRenderPipeline &) = delete;
-    WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
 
     void drawShadows() const;
     void drawGeometry() const;

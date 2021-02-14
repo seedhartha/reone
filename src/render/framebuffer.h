@@ -17,6 +17,11 @@
 
 #pragma once
 
+#include <cstdint>
+
+#include <boost/noncopyable.hpp>
+
+#include "renderbuffer.h"
 #include "texture.h"
 
 namespace reone {
@@ -26,7 +31,7 @@ namespace render {
 /**
  * Abstraction over the OpenGL framebuffer used for off-screen rendering.
  */
-class Framebuffer {
+class Framebuffer : boost::noncopyable {
 public:
     Framebuffer() = default;
     ~Framebuffer();
@@ -53,6 +58,8 @@ public:
      */
     void attachDepth(const Texture &texture) const;
 
+    void attachDepth(const Renderbuffer &renderbuffer) const;
+
     /**
      * Throws logic_error if this framebuffer is not complete. Framebuffer must be bound.
      */
@@ -61,9 +68,6 @@ public:
 private:
     bool _inited { false };
     uint32_t _framebuffer { 0 };
-
-    Framebuffer(const Framebuffer &) = delete;
-    Framebuffer &operator=(const Framebuffer &) = delete;
 };
 
 } // namespace render

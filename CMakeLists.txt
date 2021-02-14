@@ -169,6 +169,7 @@ set(RENDER_HEADERS
     src/render/model/modelnode.h
     src/render/model/models.h
     src/render/pbribl.h
+    src/render/renderbuffer.h
     src/render/shaders.h
     src/render/stateutil.h
     src/render/texture.h
@@ -205,6 +206,7 @@ set(RENDER_SOURCES
     src/render/model/modelnode.cpp
     src/render/model/models.cpp
     src/render/pbribl.cpp
+    src/render/renderbuffer.cpp
     src/render/shaders.cpp
     src/render/stateutil.cpp
     src/render/texture.cpp

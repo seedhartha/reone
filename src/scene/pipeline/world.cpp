@@ -49,6 +49,15 @@ WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOption
 }
 
 void WorldRenderPipeline::init() {
+    // Reusable depth renderbuffer
+
+    _depthRenderbuffer = make_unique<Renderbuffer>();
+    _depthRenderbuffer->init();
+    _depthRenderbuffer->bind();
+    _depthRenderbuffer->configure(_opts.width, _opts.height, Renderbuffer::PixelFormat::Depth);
+    _depthRenderbuffer->unbind();
+
+
     // Geometry framebuffer
 
     _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
@@ -63,17 +72,11 @@ void WorldRenderPipeline::init() {
     _geometryColor2->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _geometryColor2->unbind();
 
-    _geometryDepth = make_unique<Texture>("geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _geometryDepth->init();
-    _geometryDepth->bind();
-    _geometryDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
-    _geometryDepth->unbind();
-
     _geometry.init();
     _geometry.bind();
     _geometry.attachColor(*_geometryColor1, 0);
     _geometry.attachColor(*_geometryColor2, 1);
-    _geometry.attachDepth(*_geometryDepth);
+    _geometry.attachDepth(*_depthRenderbuffer);
     _geometry.checkCompleteness();
     _geometry.unbind();
 
@@ -86,16 +89,10 @@ void WorldRenderPipeline::init() {
     _verticalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _verticalBlurColor->unbind();
 
-    _verticalBlurDepth = make_unique<Texture>("verticalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _verticalBlurDepth->init();
-    _verticalBlurDepth->bind();
-    _verticalBlurDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
-    _verticalBlurDepth->unbind();
-
     _verticalBlur.init();
     _verticalBlur.bind();
     _verticalBlur.attachColor(*_verticalBlurColor);
-    _verticalBlur.attachDepth(*_verticalBlurDepth);
+    _verticalBlur.attachDepth(*_depthRenderbuffer);
     _verticalBlur.checkCompleteness();
     _verticalBlur.unbind();
 
@@ -108,16 +105,10 @@ void WorldRenderPipeline::init() {
     _horizontalBlurColor->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::RGB);
     _horizontalBlurColor->unbind();
 
-    _horizontalBlurDepth = make_unique<Texture>("horizontalblur_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _horizontalBlurDepth->init();
-    _horizontalBlurDepth->bind();
-    _horizontalBlurDepth->clearPixels(_opts.width, _opts.height, Texture::PixelFormat::Depth);
-    _horizontalBlurDepth->unbind();
-
     _horizontalBlur.init();
     _horizontalBlur.bind();
     _horizontalBlur.attachColor(*_horizontalBlurColor);
-    _horizontalBlur.attachDepth(*_horizontalBlurDepth);
+    _horizontalBlur.attachDepth(*_depthRenderbuffer);
     _horizontalBlur.checkCompleteness();
     _horizontalBlur.unbind();
 

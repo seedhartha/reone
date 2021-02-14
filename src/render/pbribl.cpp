@@ -17,15 +17,16 @@
 
 #include "pbribl.h"
 
-#include "glm/ext.hpp"
-
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
+#include "glm/ext.hpp"
+
 #include "meshes.h"
+#include "renderbuffer.h"
 #include "shaders.h"
 #include "stateutil.h"
+#include "texture.h"
 #include "textureutil.h"
 
 using namespace std;
@@ -103,10 +104,10 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
     irradianceColor->bind();
     irradianceColor->clearPixels(32, 32, Texture::PixelFormat::RGB);
 
-    auto irradianceDepth = make_shared<Texture>(envmap->name() + "_irradiance_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    auto irradianceDepth = make_shared<Renderbuffer>();
     irradianceDepth->init();
     irradianceDepth->bind();
-    irradianceDepth->clearPixels(32, 32, Texture::PixelFormat::Depth);
+    irradianceDepth->configure(32, 32, Renderbuffer::PixelFormat::Depth);
 
     _irradianceFB.bind();
 
@@ -142,10 +143,10 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     prefilterColor->bind();
     prefilterColor->clearPixels(128, 128, Texture::PixelFormat::RGB);
 
-    auto prefilterDepth = make_shared<Texture>(envmap->name() + "_prefilter_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    auto prefilterDepth = make_shared<Renderbuffer>();
     prefilterDepth->init();
     prefilterDepth->bind();
-    prefilterDepth->clearPixels(128, 128, Texture::PixelFormat::Depth);
+    prefilterDepth->configure(128, 128, Renderbuffer::PixelFormat::Depth);
 
     _prefilterFB.bind();
 
@@ -192,10 +193,10 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     brdfLookupColor->bind();
     brdfLookupColor->clearPixels(512, 512, Texture::PixelFormat::RGB);
 
-    auto brdfLookupDepth = make_shared<Texture>(envmap->name() + "_brdf_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    auto brdfLookupDepth = make_shared<Renderbuffer>();
     brdfLookupDepth->init();
     brdfLookupDepth->bind();
-    brdfLookupDepth->clearPixels(512, 512, Texture::PixelFormat::Depth);
+    brdfLookupDepth->configure(512, 512, Renderbuffer::PixelFormat::Depth);
 
     _brdfLookupFB.bind();
     _brdfLookupFB.attachColor(*brdfLookupColor);
