@@ -29,6 +29,8 @@ namespace reone {
 
 namespace render {
 
+static constexpr char kDefaultMaterialTex[] = "_default";
+
 Materials &Materials::instance() {
     static Materials instance;
     return instance;
@@ -78,7 +80,12 @@ void Materials::deinit() {
 
 shared_ptr<Material> Materials::get(const string &texResRef) const {
     auto maybeMaterial = _materials.find(texResRef);
-    return maybeMaterial != _materials.end() ? maybeMaterial->second : nullptr;
+    if (maybeMaterial != _materials.end()) return maybeMaterial->second;
+
+    auto maybeDefault = _materials.find(kDefaultMaterialTex);
+    if (maybeDefault != _materials.end()) return maybeDefault->second;
+
+    return nullptr;
 }
 
 } // namespace render
