@@ -384,7 +384,7 @@ out vec2 fragLightmapCoords;
 out mat3 fragTanSpace;
 
 void main() {
-    vec3 newPosition = vec3(0.0);
+    vec4 P = vec4(0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
         float weight0 = aBoneWeights.x;
@@ -397,19 +397,20 @@ void main() {
         int index2 = int(aBoneIndices.z);
         int index3 = int(aBoneIndices.w);
 
-        vec4 position4 = vec4(aPosition, 1.0);
+        vec4 position = vec4(aPosition, 1.0);
 
-        newPosition += weight0 * (uAbsTransformInv * uBones[index0] * uAbsTransform * position4).xyz;
-        newPosition += weight1 * (uAbsTransformInv * uBones[index1] * uAbsTransform * position4).xyz;
-        newPosition += weight2 * (uAbsTransformInv * uBones[index2] * uAbsTransform * position4).xyz;
-        newPosition += weight3 * (uAbsTransformInv * uBones[index3] * uAbsTransform * position4).xyz;
+        P += weight0 * uBones[index0] * position;
+        P += weight1 * uBones[index1] * position;
+        P += weight2 * uBones[index2] * position;
+        P += weight3 * uBones[index3] * position;
+
+        P = vec4(P.xyz, 1.0);
 
     } else {
-        newPosition = aPosition;
+        P = vec4(aPosition, 1.0);
     }
-    vec4 newPosition4 = vec4(newPosition, 1.0);
 
-    fragPosition = vec3(uModel * newPosition4);
+    fragPosition = vec3(uModel * P);
     fragNormal = mat3(transpose(inverse(uModel))) * aNormal;
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
