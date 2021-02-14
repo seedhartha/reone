@@ -116,11 +116,7 @@ void Mesh::render() const {
 void Mesh::render(uint32_t mode, int count, int offset) const {
     glBindVertexArray(_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-
     glDrawElements(mode, count, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(offset));
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 void Mesh::computeAABB() {
