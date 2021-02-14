@@ -145,6 +145,7 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 set(RENDER_HEADERS
     src/render/aabb.h
     src/render/cursor.h
+    src/render/features.h
     src/render/font.h
     src/render/fonts.h
     src/render/fps.h
@@ -186,6 +187,7 @@ set(RENDER_HEADERS
 set(RENDER_SOURCES
     src/render/aabb.cpp
     src/render/cursor.cpp
+    src/render/features.cpp
     src/render/font.cpp
     src/render/fonts.cpp
     src/render/fps.cpp

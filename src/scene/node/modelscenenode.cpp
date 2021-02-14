@@ -19,6 +19,7 @@
 #include <stdexcept>
 
 #include "../../common/log.h"
+#include "../../render/features.h"
 #include "../../render/meshes.h"
 #include "../../resource/resources.h"
 
@@ -40,8 +41,9 @@ namespace reone {
 
 namespace scene {
 
+static constexpr int kSelfIlluminatedPriority = 5;
+
 static bool g_drawAABB = false;
-static bool g_convertSelfIllumToLight = false;
 
 ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
@@ -106,12 +108,19 @@ void ModelSceneNode::initModelNodes() {
             addChild(childNode);
             nodes.push(childNode.get());
 
-            if (g_convertSelfIllumToLight) {
-                if (childNode->modelNode()->isSelfIllumEnabled()) {
-                    auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->selfIllumColor(), 1, _sceneGraph);
-                    lightNode->setRadius(10.0f);
-                    childNode->addChild(lightNode);
+            // Convert self-illuminated model nodes to light sources if PBR is enabled
+            if (isFeatureEnabled(Feature::PBR) && child->isSelfIllumEnabled()) {
+                float radius;
+                shared_ptr<ModelMesh> mesh(child->mesh());
+                if (mesh) {
+                    glm::vec3 size(mesh->mesh()->aabb().getSize());
+                    radius = glm::dot(size, size);
+                } else {
+                    radius = 1.0f;
                 }
+                auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->selfIllumColor(), kSelfIlluminatedPriority, _sceneGraph);
+                lightNode->setRadius(radius);
+                childNode->addChild(lightNode);
             }
 
             shared_ptr<ModelNode::Light> light(child->light());
