@@ -25,7 +25,7 @@
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
-#include "../../render/mesh/meshes.h"
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 
@@ -123,7 +123,7 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
 
     glm::mat4 transform(1.0f);
     transform = _absoluteTransform;
-    if (_emitter->renderType() == Emitter::RenderType::MotionBlur) {
+    if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
         transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * _size, _size, _size));
     } else {
         transform = glm::scale(transform, glm::vec3(_size));
@@ -138,14 +138,14 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     locals.billboard.size = glm::vec2(_size);
     locals.billboard.particleCenter = _absoluteTransform[3];
     locals.billboard.frame = _frame;
-    locals.billboard.render = static_cast<int>(_emitter->renderType());
+    locals.billboard.render = static_cast<int>(_emitter->renderMode());
 
     Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
 
-    bool lighten = _emitter->blendType() == Emitter::BlendType::Lighten;
+    bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
     if (lighten) {
         withAdditiveBlending([]() { Meshes::instance().getBillboard().render(); });
     } else {

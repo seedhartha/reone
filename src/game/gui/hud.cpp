@@ -19,7 +19,7 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
-#include "../../render/mesh/meshes.h"
+#include "../../render/meshes.h"
 
 #include "../game.h"
 

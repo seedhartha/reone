@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../render/mesh/mesh.h"
+#include "../../render/mesh.h"
 
 namespace reone {
 

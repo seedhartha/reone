@@ -21,7 +21,7 @@
 
 #include "../../common/streamutil.h"
 #include "../../render/model/models.h"
-#include "../../render/walkmeshes.h"
+#include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/types.h"

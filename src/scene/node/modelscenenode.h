@@ -20,7 +20,7 @@
 #include <set>
 #include <unordered_map>
 
-#include "../../common/aabb.h"
+#include "../../render/aabb.h"
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
 

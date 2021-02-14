@@ -21,7 +21,7 @@
 
 #include "glm/vec2.hpp"
 
-#include "texture.h"
+#include "../texture.h"
 
 namespace reone {
 
@@ -29,14 +29,14 @@ namespace render {
 
 class Emitter {
 public:
-    enum class UpdateType {
+    enum class UpdateMode {
         Invalid,
         Fountain,
         Single,
         Explosion
     };
 
-    enum class RenderType {
+    enum class RenderMode {
         Invalid = 0,
         Normal = 1,
         BillboardToWorldZ = 2,
@@ -45,7 +45,7 @@ public:
         AlignedToParticleDir = 5
     };
 
-    enum class BlendType {
+    enum class BlendMode {
         Invalid,
         Normal,
         Punch,
@@ -59,9 +59,9 @@ public:
         T end;
     };
 
-    UpdateType updateType() const { return _updateType; }
-    RenderType renderType() const { return _renderType; }
-    BlendType blendType() const { return _blendType; }
+    UpdateMode updateMode() const { return _updateMode; }
+    RenderMode renderMode() const { return _renderMode; }
+    BlendMode blendMode() const { return _blendMode; }
     int renderOrder() const { return _renderOrder; }
 
     std::shared_ptr<Texture> texture() const { return _texture; }
@@ -83,9 +83,9 @@ public:
     int fps() const { return _fps; }
 
 private:
-    UpdateType _updateType { UpdateType::Invalid };
-    RenderType _renderType { RenderType::Invalid };
-    BlendType _blendType { BlendType::Invalid };
+    UpdateMode _updateMode { UpdateMode::Invalid };
+    RenderMode _renderMode { RenderMode::Invalid };
+    BlendMode _blendMode { BlendMode::Invalid };
     int _renderOrder { 0 };
 
     std::shared_ptr<Texture> _texture;

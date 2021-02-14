@@ -17,8 +17,8 @@
 
 #include "walkmeshes.h"
 
-#include "../common/streamutil.h"
-#include "../resource/resources.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
 #include "bwmfile.h"
 

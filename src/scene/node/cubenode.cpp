@@ -19,7 +19,8 @@
 
 #include <glm/ext.hpp>
 
-#include "../../render/mesh/cube.h"
+#include "../../render/meshes.h"
+#include "../../render/shaders.h"
 
 using namespace reone::render;
 
@@ -31,7 +32,10 @@ CubeSceneNode::CubeSceneNode(SceneGraph *sceneGraph, float size) : SceneNode(sce
 }
 
 void CubeSceneNode::render() const {
-    CubeMesh::instance().render(glm::scale(_absoluteTransform, glm::vec3(_size)));
+    LocalUniforms locals;
+    locals.general.model = glm::scale(_absoluteTransform, glm::vec3(_size));
+    Shaders::instance().activate(ShaderProgram::ModelColor, locals);
+    Meshes::instance().getCube().render();
 }
 
 } // namespace render

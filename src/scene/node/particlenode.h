@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../render/emitter.h"
+#include "../../render/model/emitter.h"
 
 namespace reone {
 

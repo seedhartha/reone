@@ -22,7 +22,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../../common/aabb.h"
+#include "aabb.h"
 
 namespace reone {
 

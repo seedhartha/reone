@@ -22,7 +22,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include "mesh/meshes.h"
+#include "meshes.h"
 #include "shaders.h"
 #include "stateutil.h"
 #include "texture.h"
