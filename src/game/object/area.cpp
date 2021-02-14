@@ -33,7 +33,6 @@
 #include "../../resource/format/lytfile.h"
 #include "../../resource/format/visfile.h"
 #include "../../resource/resources.h"
-#include "../../scene/node/cubenode.h"
 #include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
