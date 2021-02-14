@@ -23,12 +23,12 @@
 #include <string>
 #include <unordered_map>
 
-#include "../render/lip/lipanimation.h"
-#include "../render/model/animation.h"
-#include "../render/model/model.h"
-#include "../render/model/modelnode.h"
+#include "../../render/lip/lipanimation.h"
+#include "../../render/model/animation.h"
+#include "../../render/model/model.h"
+#include "../../render/model/modelnode.h"
 
-#include "animationproperties.h"
+#include "properties.h"
 
 namespace reone {
 

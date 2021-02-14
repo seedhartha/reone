@@ -24,7 +24,7 @@
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
 
-#include "../scenenodeanimator.h"
+#include "../animation/scenenodeanimator.h"
 
 #include "scenenode.h"
 

@@ -284,8 +284,9 @@ endif()
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/scene/animationchannel.h
-    src/scene/animationproperties.h
+    src/scene/animation/channel.h
+    src/scene/animation/properties.h
+    src/scene/animation/scenenodeanimator.h
     src/scene/node/cameranode.h
     src/scene/node/emitternode.h
     src/scene/node/lightnode.h
@@ -297,11 +298,11 @@ set(SCENE_HEADERS
     src/scene/pipeline/control.h
     src/scene/pipeline/world.h
     src/scene/scenegraph.h
-    src/scene/scenenodeanimator.h
     src/scene/types.h)
 
 set(SCENE_SOURCES
-    src/scene/animationchannel.cpp
+    src/scene/animation/channel.cpp
+    src/scene/animation/scenenodeanimator.cpp
     src/scene/node/cameranode.cpp
     src/scene/node/emitternode.cpp
     src/scene/node/lightnode.cpp
@@ -312,8 +313,7 @@ set(SCENE_SOURCES
     src/scene/node/scenenode.cpp
     src/scene/pipeline/control.cpp
     src/scene/pipeline/world.cpp
-    src/scene/scenegraph.cpp
-    src/scene/scenenodeanimator.cpp)
+    src/scene/scenegraph.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
 set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

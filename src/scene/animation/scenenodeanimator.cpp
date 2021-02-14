@@ -19,9 +19,9 @@
 
 #include <stdexcept>
 
-#include "node/modelnodescenenode.h"
-#include "node/modelscenenode.h"
-#include "types.h"
+#include "../node/modelnodescenenode.h"
+#include "../node/modelscenenode.h"
+#include "../types.h"
 
 using namespace std;
 
