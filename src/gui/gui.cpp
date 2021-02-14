@@ -24,6 +24,7 @@
 #include "../render/shaders.h"
 #include "../render/stateutil.h"
 #include "../render/textures.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -282,7 +283,7 @@ void GUI::update(float dt) {
     }
 }
 
-void GUI::render() const {
+void GUI::render() {
     if (_background) drawBackground();
     if (_rootControl) _rootControl->render(_rootOffset, _rootControl->textLines());
 
@@ -291,21 +292,21 @@ void GUI::render() const {
     }
 }
 
-void GUI::render3D() const {
+void GUI::render3D() {
     for (auto &control : _controls) {
         control->render3D(_controlOffset);
     }
 }
 
-void GUI::drawBackground() const {
+void GUI::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();

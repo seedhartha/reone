@@ -56,7 +56,7 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
     void stretch(float x, float y, int mask) override;
 
     void setFocus(bool focus) override;

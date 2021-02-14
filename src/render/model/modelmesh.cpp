@@ -46,7 +46,7 @@ void ModelMesh::deinitGL() {
     _mesh->deinit();
 }
 
-void ModelMesh::render(shared_ptr<Texture> diffuse) const {
+void ModelMesh::render(shared_ptr<Texture> diffuse) {
     bool additive = false;
 
     if (diffuse) {

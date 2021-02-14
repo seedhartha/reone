@@ -50,7 +50,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update();
-    void render() const;
+    void render();
 
 private:
     Game *_game { nullptr };
@@ -78,10 +78,10 @@ private:
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
 
-    void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords) const;
-    void drawTitleBar() const;
-    void drawHealthBar() const;
-    void drawActionBar() const;
+    void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords);
+    void drawTitleBar();
+    void drawHealthBar();
+    void drawActionBar();
 
     bool getActionScreenCoords(int index, float &x, float &y) const;
     glm::vec3 getColorFromSelectedObject() const;

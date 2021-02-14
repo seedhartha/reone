@@ -21,6 +21,7 @@
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
+#include "../../render/window.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -45,7 +46,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     }
 }
 
-void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) const {
+void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_dir.image) return;
 
     setActiveTextureUnit(TextureUnits::diffuse);
@@ -55,28 +56,30 @@ void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) con
     if (_canScrollDown) drawDownArrow(offset);
 }
 
-void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
+void ScrollBar::drawUpArrow(const glm::vec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
     Meshes::instance().getQuad().render();
 }
 
-void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
+void ScrollBar::drawDownArrow(const glm::vec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
     Meshes::instance().getQuad().render();
 }
 

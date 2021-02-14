@@ -25,6 +25,7 @@
 #include "../scenegraph.h"
 #include "../types.h"
 
+#include "cameranode.h"
 #include "emitternode.h"
 #include "lightnode.h"
 #include "modelnodescenenode.h"
@@ -144,14 +145,14 @@ void ModelSceneNode::update(float dt) {
     SceneNode::update(dt);
 }
 
-void ModelSceneNode::render() const {
+void ModelSceneNode::render() {
     if (g_drawAABB) {
         glm::mat4 transform(_absoluteTransform * _aabb.transform());
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
+        ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
-        Shaders::instance().activate(ShaderProgram::ModelColor, locals);
         Meshes::instance().getAABB().render();
     }
 }

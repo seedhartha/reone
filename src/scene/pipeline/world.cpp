@@ -29,6 +29,10 @@
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
 #include "../../render/textureutil.h"
+#include "../../render/window.h"
+
+#include "../node/cameranode.h"
+#include "../scenegraph.h"
 
 using namespace std;
 
@@ -64,13 +68,11 @@ void WorldRenderPipeline::init() {
     _geometryColor1->init();
     _geometryColor1->bind();
     _geometryColor1->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
-    _geometryColor1->unbind();
 
     _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor2->init();
     _geometryColor2->bind();
     _geometryColor2->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
-    _geometryColor2->unbind();
 
     _geometry.init();
     _geometry.bind();
@@ -78,7 +80,6 @@ void WorldRenderPipeline::init() {
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
     _geometry.checkCompleteness();
-    _geometry.unbind();
 
 
     // Vertical blur framebuffer
@@ -87,14 +88,12 @@ void WorldRenderPipeline::init() {
     _verticalBlurColor->init();
     _verticalBlurColor->bind();
     _verticalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
-    _verticalBlurColor->unbind();
 
     _verticalBlur.init();
     _verticalBlur.bind();
     _verticalBlur.attachColor(*_verticalBlurColor);
     _verticalBlur.attachDepth(*_depthRenderbuffer);
     _verticalBlur.checkCompleteness();
-    _verticalBlur.unbind();
 
 
     // Horizontal blur framebuffer
@@ -103,14 +102,12 @@ void WorldRenderPipeline::init() {
     _horizontalBlurColor->init();
     _horizontalBlurColor->bind();
     _horizontalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
-    _horizontalBlurColor->unbind();
 
     _horizontalBlur.init();
     _horizontalBlur.bind();
     _horizontalBlur.attachColor(*_horizontalBlurColor);
     _horizontalBlur.attachDepth(*_depthRenderbuffer);
     _horizontalBlur.checkCompleteness();
-    _horizontalBlur.unbind();
 
 
     // Shadows framebuffer
@@ -119,33 +116,22 @@ void WorldRenderPipeline::init() {
     _shadowsDepth->init();
     _shadowsDepth->bind();
     _shadowsDepth->clearPixels(kShadowResolution, kShadowResolution, PixelFormat::Depth);
-    _shadowsDepth->unbind();
 
     _shadows.init();
     _shadows.bind();
     _shadows.attachDepth(*_shadowsDepth);
     _shadows.checkCompleteness();
-    _shadows.unbind();
 }
 
-void WorldRenderPipeline::render() const {
+void WorldRenderPipeline::render() {
     drawShadows();
     drawGeometry();
-
-    float w = static_cast<float>(_opts.width);
-    float h = static_cast<float>(_opts.height);
-
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, w, h, 0.0f);
-
-    Shaders::instance().setGlobalUniforms(globals);
-
     applyHorizontalBlur();
     applyVerticalBlur();
     drawResult();
 }
 
-void WorldRenderPipeline::drawShadows() const {
+void WorldRenderPipeline::drawShadows() {
     if (!_scene->isShadowLightPresent()) return;
 
     withViewport(glm::ivec4(0, 0, kShadowResolution, kShadowResolution), [this]() {
@@ -157,21 +143,19 @@ void WorldRenderPipeline::drawShadows() const {
         glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
         glm::vec3 lightPosition(_scene->shadowLightPosition());
 
-        GlobalUniforms globals;
-        globals.shadowLightPresent = true;
-        globals.shadowLightPosition = lightPosition;
+        ShaderUniforms uniforms;
+        uniforms.general.shadowLightPresent = true;
+        uniforms.general.shadowLightPosition = glm::vec4(lightPosition, 1.0f);
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             auto side = static_cast<CubeMapFace>(i);
-            globals.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
+            uniforms.general.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
         }
 
-        Shaders::instance().setGlobalUniforms(globals);
+        _scene->setBaseUniforms(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->renderNoGlobalUniforms(true); });
-
-        _shadows.unbind();
+        withDepthTest([this]() { _scene->render(true); });
     });
 }
 
@@ -194,18 +178,26 @@ glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapF
     }
 }
 
-void WorldRenderPipeline::drawGeometry() const {
+void WorldRenderPipeline::drawGeometry() {
     _geometry.bind();
 
     static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, buffers);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = _scene->activeCamera()->projection();
+    uniforms.general.view = _scene->activeCamera()->view();
+    uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+    uniforms.general.shadowLightPresent = _scene->isShadowLightPresent();
+    uniforms.general.shadowLightPosition = glm::vec4(_scene->shadowLightPosition(), 1.0f);
+    _scene->setBaseUniforms(move(uniforms));
 
     if (_scene->isShadowLightPresent()) {
         setActiveTextureUnit(TextureUnits::shadowMap);
         _shadowsDepth->bind();
     }
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (g_wireframesEnabled) {
         withWireframes([this]() {
@@ -214,11 +206,9 @@ void WorldRenderPipeline::drawGeometry() const {
     } else {
         withDepthTest([this]() { _scene->render(); });
     }
-
-    _geometry.unbind();
 }
 
-void WorldRenderPipeline::applyHorizontalBlur() const {
+void WorldRenderPipeline::applyHorizontalBlur() {
     float w = static_cast<float>(_opts.width);
     float h = static_cast<float>(_opts.height);
 
@@ -229,12 +219,12 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.blurResolution = glm::vec2(w, h);
-    locals.general.blurDirection = glm::vec2(1.0f, 0.0f);
-
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.blurResolution = glm::vec2(w, h);
+    uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor2->bind();
@@ -242,11 +232,9 @@ void WorldRenderPipeline::applyHorizontalBlur() const {
     withDepthTest([]() {
         Meshes::instance().getQuad().render();
     });
-
-    _horizontalBlur.unbind();
 }
 
-void WorldRenderPipeline::applyVerticalBlur() const {
+void WorldRenderPipeline::applyVerticalBlur() {
     float w = static_cast<float>(_opts.width);
     float h = static_cast<float>(_opts.height);
 
@@ -257,12 +245,12 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.blurResolution = glm::vec2(_opts.width, _opts.height);
-    locals.general.blurDirection = glm::vec2(0.0f, 1.0f);
-
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.blurResolution = glm::vec2(_opts.width, _opts.height);
+    uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _horizontalBlurColor->bind();
@@ -274,7 +262,7 @@ void WorldRenderPipeline::applyVerticalBlur() const {
     _verticalBlur.unbind();
 }
 
-void WorldRenderPipeline::drawResult() const {
+void WorldRenderPipeline::drawResult() {
     float w = static_cast<float>(_opts.width);
     float h = static_cast<float>(_opts.height);
 
@@ -282,12 +270,12 @@ void WorldRenderPipeline::drawResult() const {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     if (g_debugCubeMap) {
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
-
         auto envmap = Textures::instance().get("cm_baremetal", TextureUsage::EnvironmentMap);
         PBRIBL::Derived derived;
         if (PBRIBL::instance().getDerived(envmap.get(), derived)) {
@@ -295,16 +283,15 @@ void WorldRenderPipeline::drawResult() const {
         } else {
             envmap->bind();
         }
-
         //_shadowsDepth->bind();
 
         Meshes::instance().getQuad().render();
 
     } else {
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _geometryColor1->bind();

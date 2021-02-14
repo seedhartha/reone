@@ -160,8 +160,8 @@ public:
 
     // Rendering
 
-    virtual void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const;
-    void render3D(const glm::ivec2 &offset) const;
+    virtual void render(const glm::ivec2 &offset, const std::vector<std::string> &text);
+    void render3D(const glm::ivec2 &offset);
 
     // END Rendering
 
@@ -190,8 +190,8 @@ protected:
 
     Control(GUI *, ControlType type);
 
-    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
-    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) const;
+    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
 
     virtual const glm::vec3 &getBorderColor() const;
 

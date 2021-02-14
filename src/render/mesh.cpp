@@ -107,7 +107,7 @@ static GLenum getModeGL(Mesh::DrawMode mode) {
     return mode == Mesh::DrawMode::Lines ? GL_LINES : GL_TRIANGLES;
 }
 
-void Mesh::render() const {
+void Mesh::render() {
     if (_inited) {
         glBindVertexArray(_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
@@ -115,7 +115,7 @@ void Mesh::render() const {
     }
 }
 
-void Mesh::renderInstanced(int count) const {
+void Mesh::renderInstanced(int count) {
     if (_inited) {
         glBindVertexArray(_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);

@@ -25,6 +25,7 @@
 
 #include "glm/vec3.hpp"
 
+#include "../render/shaders.h"
 #include "../render/types.h"
 
 namespace reone {
@@ -42,8 +43,7 @@ public:
     SceneGraph(const render::GraphicsOptions &opts);
 
     void update(float dt);
-    void render() const;
-    void renderNoGlobalUniforms(bool shadowPass) const;
+    void render(bool shadowPass = false);
 
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);
@@ -57,10 +57,12 @@ public:
     void prepareFrame();
 
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
+    render::ShaderUniforms baseUniforms() const { return _baseUniforms; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
-    void setReferenceNode(const std::shared_ptr<SceneNode> &node);
+    void setShadowReference(const std::shared_ptr<SceneNode> &node);
     void setUpdate(bool update);
+    void setBaseUniforms(render::ShaderUniforms uniforms);
 
     // Lights and shadows
 
@@ -95,6 +97,7 @@ private:
     glm::vec3 _shadowLightPosition { 0.0f };
     std::shared_ptr<SceneNode> _refNode;
     bool _update { true };
+    render::ShaderUniforms _baseUniforms;
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

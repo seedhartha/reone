@@ -20,6 +20,7 @@
 #include "../../render/fonts.h"
 #include "../../render/meshes.h"
 #include "../../render/stateutil.h"
+#include "../../render/window.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ void ImageButton::render(
     const vector<string> &text,
     const string &iconText,
     const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) const {
+    const shared_ptr<Texture> &iconFrame) {
 
     if (!_visible) return;
 
@@ -72,7 +73,7 @@ void ImageButton::drawIcon(
     const glm::ivec2 &offset,
     const string &iconText,
     const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) const {
+    const shared_ptr<Texture> &iconFrame) {
 
     if (!iconFrame && !iconTexture) return;
 
@@ -88,11 +89,11 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-        locals.general.color = glm::vec4(color, 1.0f);
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(color, 1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
@@ -105,10 +106,11 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-        locals.general.color = glm::vec4(1.0f);
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();

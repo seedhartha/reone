@@ -33,18 +33,18 @@ namespace reone {
 
 namespace render {
 
-static constexpr int kFeaturesBindingPointIndex = 1;
-static constexpr int kGeneralBindingPointIndex = 2;
-static constexpr int kLightingBindingPointIndex = 3;
-static constexpr int kSkeletalBindingPointIndex = 4;
-static constexpr int kBillboardBindingPointIndex = 5;
-static constexpr int kBumpmapBindingPointIndex = 6;
+static constexpr int kGeneralBindingPointIndex = 1;
+static constexpr int kLightingBindingPointIndex = 2;
+static constexpr int kSkeletalBindingPointIndex = 3;
+static constexpr int kBillboardBindingPointIndex = 4;
+static constexpr int kBumpmapBindingPointIndex = 5;
 
 static constexpr GLchar *kShaderBaseHeader = R"END(
 #version 330
 
 const float PI = 3.14159265359;
 const float GAMMA = 2.2;
+const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
 const int MAX_PARTICLES = 32;
@@ -80,16 +80,22 @@ struct Particle {
 };
 
 layout(std140) uniform General {
-    int uFeatureMask;
+    mat4 uProjection;
+    mat4 uView;
     mat4 uModel;
+    mat4 uShadowMatrices[NUM_CUBE_FACES];
+    vec4 uCameraPosition;
+    vec4 uShadowLightPosition;
     vec4 uColor;
-    float uAlpha;
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
+    vec2 uUvOffset;
     vec2 uBlurResolution;
     vec2 uBlurDirection;
-    vec2 uUvOffset;
+    float uAlpha;
     float uWaterAlpha;
+    int uFeatureMask;
+    bool uShadowLightPresent;
     float uRoughness;
 };
 
@@ -106,8 +112,6 @@ layout(std140) uniform Lighting {
 };
 
 layout(std140) uniform Skeletal {
-    mat4 uAbsTransform;
-    mat4 uAbsTransformInv;
     mat4 uBones[MAX_BONES];
 };
 
@@ -136,10 +140,6 @@ uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
 uniform samplerCube uEnvmap;
 uniform samplerCube uShadowMap;
-
-uniform vec3 uCameraPosition;
-uniform bool uShadowLightPresent;
-uniform vec3 uShadowLightPosition;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -353,9 +353,6 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 )END";
 
 static constexpr GLchar *kShaderVertexSimple = R"END(
-uniform mat4 uProjection;
-uniform mat4 uView;
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -371,9 +368,6 @@ void main() {
 )END";
 
 static constexpr GLchar *kShaderVertexModel = R"END(
-uniform mat4 uProjection;
-uniform mat4 uView;
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoords;
@@ -442,9 +436,6 @@ const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 5;
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
-uniform mat4 uProjection;
-uniform mat4 uView;
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -485,12 +476,8 @@ void main() {
 )END";
 
 static constexpr GLchar *kShaderGeometryDepth = R"END(
-const int NUM_CUBE_FACES = 6;
-
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
-
-uniform mat4 uShadowMatrices[NUM_CUBE_FACES];
 
 out vec4 fragPosition;
 
@@ -518,12 +505,10 @@ void main() {
 )END";
 
 static constexpr GLchar *kShaderFragmentDepth = R"END(
-uniform vec3 uShadowLightPosition;
-
 in vec4 fragPosition;
 
 void main() {
-    float lightDistance = length(fragPosition.xyz - uShadowLightPosition);
+    float lightDistance = length(fragPosition.xyz - uShadowLightPosition.xyz);
     lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
     gl_FragDepth = lightDistance;
 }
@@ -559,7 +544,7 @@ void main() {
         diffuseSample = vec4(vec3(0.5), 1.0);
     }
 
-    vec3 V = normalize(uCameraPosition - fragPosition);
+    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
 
     vec3 N;
     if (isFeatureEnabled(FEATURE_BUMPMAP)) {
@@ -647,7 +632,7 @@ void main() {
         N = normalize(fragNormal);
     }
 
-    vec3 V = normalize(uCameraPosition - fragPosition);
+    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
     vec3 R = reflect(-V, N);
 
     vec3 albedo = diffuseSample.rgb;
@@ -1089,7 +1074,7 @@ void Shaders::deinit() {
     _shaders.clear();
 }
 
-void Shaders::activate(ShaderProgram program, const LocalUniforms &locals) {
+void Shaders::activate(ShaderProgram program, const ShaderUniforms &uniforms) {
     if (_activeProgram != program) {
         unsigned int ordinal = getOrdinal(program);
         glUseProgram(ordinal);
@@ -1097,7 +1082,7 @@ void Shaders::activate(ShaderProgram program, const LocalUniforms &locals) {
         _activeProgram = program;
         _activeOrdinal = ordinal;
     }
-    setLocalUniforms(locals);
+    setUniforms(uniforms);
 }
 
 unsigned int Shaders::getOrdinal(ShaderProgram program) const {
@@ -1108,25 +1093,25 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
     return it->second;
 }
 
-void Shaders::setLocalUniforms(const LocalUniforms &locals) {
+void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     glBindBufferBase(GL_UNIFORM_BUFFER, kGeneralBindingPointIndex, _generalUbo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &locals.general, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &uniforms.general, GL_STATIC_DRAW);
 
-    if (locals.general.featureMask & UniformFeatureFlags::skeletal) {
+    if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &locals.skeletal, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &uniforms.skeletal, GL_STATIC_DRAW);
     }
-    if (locals.general.featureMask & UniformFeatureFlags::lighting) {
+    if (uniforms.general.featureMask & UniformFeatureFlags::lighting) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), &locals.lighting, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), &uniforms.lighting, GL_STATIC_DRAW);
     }
-    if (locals.general.featureMask & UniformFeatureFlags::billboard) {
+    if (uniforms.general.featureMask & UniformFeatureFlags::billboard) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniforms), &locals.billboard, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniforms), &uniforms.billboard, GL_STATIC_DRAW);
     }
-    if (locals.general.featureMask & UniformFeatureFlags::bumpmap) {
+    if (uniforms.general.featureMask & UniformFeatureFlags::bumpmap) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBumpmapBindingPointIndex, _bumpmapUbo);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(BumpmapUniforms), &locals.bumpmap, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BumpmapUniforms), &uniforms.bumpmap, GL_STATIC_DRAW);
     }
 }
 
@@ -1190,30 +1175,6 @@ void Shaders::deactivate() {
     glUseProgram(0);
     _activeProgram = ShaderProgram::None;
     _activeOrdinal = 0;
-}
-
-void Shaders::setGlobalUniforms(const GlobalUniforms &globals) {
-    uint32_t ordinal = _activeOrdinal;
-
-    for (auto &program : _programs) {
-        glUseProgram(program.second);
-        _activeOrdinal = program.second;
-
-        setUniform("uProjection", globals.projection);
-        setUniform("uView", globals.view);
-        setUniform("uCameraPosition", globals.cameraPosition);
-        setUniform("uShadowLightPresent", globals.shadowLightPresent);
-
-        if (globals.shadowLightPresent) {
-            setUniform("uShadowLightPosition", globals.shadowLightPosition);
-
-            for (int i = 0; i < kNumCubeFaces; ++i) {
-                setUniform(str(boost::format("uShadowMatrices[%d]") % i), globals.shadowMatrices[i]);
-            }
-        }
-    }
-    glUseProgram(ordinal);
-    _activeOrdinal = ordinal;
 }
 
 } // namespace render

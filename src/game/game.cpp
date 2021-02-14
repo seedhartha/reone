@@ -34,6 +34,7 @@
 #include "../render/pbribl.h"
 #include "../render/textures.h"
 #include "../render/walkmesh/walkmeshes.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
 #include "../video/bikfile.h"
@@ -67,7 +68,6 @@ static bool g_conversationsEnabled = true;
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _options(opts),
-    _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
@@ -93,7 +93,7 @@ int Game::run() {
     } else {
         playVideo("legal");
     }
-    _window.show();
+    RenderWindow::instance().show();
 
     runMainLoop();
     deinit();
@@ -102,8 +102,7 @@ int Game::run() {
 }
 
 void Game::init() {
-    _window.init();
-
+    RenderWindow::instance().init(_options.graphics, this);
     Resources::instance().init(_gameId, _path);
     Meshes::instance().init();
     Textures::instance().init(_gameId);
@@ -130,16 +129,14 @@ void Game::registerModelLoaders() {
 }
 
 void Game::setCursorType(CursorType type) {
-    if (_cursorType == type) return;
-
-    _cursorType = type;
-
-    if (type == CursorType::None) {
-        _window.setCursor(nullptr);
-        return;
+    if (_cursorType != type) {
+        if (type == CursorType::None) {
+            RenderWindow::instance().setCursor(nullptr);
+        } else {
+            RenderWindow::instance().setCursor(Cursors::instance().get(type));
+        }
+        _cursorType = type;
     }
-    shared_ptr<Cursor> cursor(Cursors::instance().get(type));
-    _window.setCursor(cursor);
 }
 
 void Game::playVideo(const string &name) {
@@ -283,25 +280,34 @@ void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
     PBRIBL::instance().refresh();
 
-    _window.clear();
+    RenderWindow::instance().clear();
 
     if (_video) {
         _video->render();
     } else {
         drawWorld();
         drawGUI();
-        drawCursor();
+        RenderWindow::instance().drawCursor();
     }
 
-    _window.swapBuffers();
+    RenderWindow::instance().swapBuffers();
 }
 
 void Game::drawWorld() {
     const Camera *camera = getActiveCamera();
     if (!camera) return;
 
+    shared_ptr<SceneNode> shadowReference;
+
+    shared_ptr<Creature> partyLeader(_party.getLeader());
+    if (partyLeader && _cameraType == CameraType::ThirdPerson) {
+        shadowReference = partyLeader->getModelSceneNode();
+    } else {
+        shadowReference = camera->sceneNode();
+    }
+
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setReferenceNode(_party.getLeader()->getModelSceneNode());
+    _sceneGraph.setShadowReference(shadowReference);
     _sceneGraph.prepareFrame();
 
     _worldPipeline.render();
@@ -332,11 +338,7 @@ void Game::toggleInGameCameraType() {
 }
 
 Camera *Game::getActiveCamera() const {
-    if (!_module) return nullptr;
-
-    shared_ptr<Area> area(_module->area());
-
-    return &area->getCamera(_cameraType);
+    return _module ? &(_module->area()->getCamera(_cameraType)) : nullptr;
 }
 
 int Game::getRunScriptVar() const {
@@ -362,16 +364,6 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
 }
 
 void Game::drawGUI() {
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(
-        0.0f,
-        static_cast<float>(_options.graphics.width),
-        static_cast<float>(_options.graphics.height),
-        0.0f,
-        -100.0f, 100.0f);
-
-    Shaders::instance().setGlobalUniforms(globals);
-
     switch (_screen) {
         case GameScreen::InGame:
             if (_cameraType == CameraType::ThirdPerson) {
@@ -391,16 +383,6 @@ void Game::drawGUI() {
             break;
         }
     }
-}
-
-void Game::drawCursor() {
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
-    globals.view = glm::mat4(1.0f);
-
-    Shaders::instance().setGlobalUniforms(globals);
-
-    _window.drawCursor();
 }
 
 void Game::loadHUD() {
@@ -475,7 +457,7 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        _window.processEvents(_quit);
+        RenderWindow::instance().processEvents(_quit);
 
         update();
         drawAll();
@@ -507,7 +489,7 @@ void Game::update() {
         gui->update(dt);
     }
 
-    _window.update(dt);
+    RenderWindow::instance().update(dt);
 
     if (!_paused) {
         _sceneGraph.update(dt);
@@ -565,8 +547,7 @@ void Game::loadCharacterGeneration() {
 void Game::deinit() {
     JobExecutor::instance().deinit();
     AudioPlayer::instance().deinit();
-
-    _window.deinit();
+    RenderWindow::instance().deinit();
 }
 
 void Game::startCharacterGeneration() {
@@ -879,7 +860,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _window.setRelativeMouseMode(relative);
+    RenderWindow::instance().setRelativeMouseMode(relative);
 }
 
 } // namespace game

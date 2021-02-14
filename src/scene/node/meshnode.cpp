@@ -23,6 +23,10 @@
 
 #include "../../render/shaders.h"
 
+#include "../scenegraph.h"
+
+#include "cameranode.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -37,13 +41,12 @@ MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mes
     }
 }
 
-void MeshSceneNode::render() const {
-    LocalUniforms locals;
-    locals.general.model = _absoluteTransform;
-    locals.general.color = glm::vec4(_color, 1.0f);
-    locals.general.alpha = _alpha;
-
-    Shaders::instance().activate(ShaderProgram::ModelColor, locals);
+void MeshSceneNode::render() {
+    ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+    uniforms.general.model = _absoluteTransform;
+    uniforms.general.color = glm::vec4(_color, 1.0f);
+    uniforms.general.alpha = _alpha;
+    Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
     _mesh->render();
 

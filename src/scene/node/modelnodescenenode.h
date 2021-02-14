@@ -38,7 +38,7 @@ public:
 
     void update(float dt) override;
 
-    void renderSingle(bool shadowPass) const override;
+    void renderSingle(bool shadowPass) override;
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

@@ -38,7 +38,7 @@ public:
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() const override;
+    void render() override;
 
     void onClick(const std::string &control) override;
 
@@ -54,8 +54,8 @@ private:
     void hideCombatHud();
     void refreshActionQueueItems() const;
 
-    void drawHealth(int memberIndex) const;
-    void drawMinimap() const;
+    void drawHealth(int memberIndex);
+    void drawMinimap();
 };
 
 } // namespace game

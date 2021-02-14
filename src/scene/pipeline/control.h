@@ -37,7 +37,7 @@ public:
     ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent);
 
     void init();
-    void render(const glm::ivec2 &offset) const;
+    void render(const glm::ivec2 &offset);
 
 private:
     SceneGraph *_scene;

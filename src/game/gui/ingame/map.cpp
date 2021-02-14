@@ -53,7 +53,7 @@ void MapMenu::load() {
     disableControl("BTN_RETURN");
 }
 
-void MapMenu::render() const {
+void MapMenu::render() {
     GUI::render();
 
     Control &label = getControl("LBL_Map");

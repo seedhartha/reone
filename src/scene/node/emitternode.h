@@ -39,7 +39,7 @@ public:
     EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt) override;
-    void renderSingle(bool shadowPass) const override;
+    void renderSingle(bool shadowPass) override;
 
     void detonate();
 

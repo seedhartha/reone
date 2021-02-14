@@ -82,12 +82,9 @@ void Video::updateFrameTexture() {
 void Video::render() {
     if (!_inited) return;
 
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
-    Shaders::instance().setGlobalUniforms(globals);
-
-    LocalUniforms locals;
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
