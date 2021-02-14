@@ -41,7 +41,8 @@ enum class TextureUsage {
     Bumpmap,
     ColorBuffer,
     DepthBuffer,
-    CubeMapDepthBuffer
+    CubeMapDepthBuffer,
+    Video
 };
 
 enum class CubeMapFace {
