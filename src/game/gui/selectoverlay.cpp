@@ -26,6 +26,7 @@
 #include "../../render/stateutil.h"
 #include "../../render/texture.h"
 #include "../../render/textures.h"
+#include "../../render/window.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -174,7 +175,7 @@ void SelectionOverlay::update() {
     }
 }
 
-void SelectionOverlay::render() const {
+void SelectionOverlay::render() {
     if (_hilightedObject) {
         drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
     }
@@ -188,7 +189,7 @@ void SelectionOverlay::render() const {
     }
 }
 
-void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) const {
+void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
     const GraphicsOptions &opts = _game->options().graphics;
     int width = texture.width();
     int height = texture.height();
@@ -197,10 +198,10 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
@@ -208,7 +209,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     Meshes::instance().getQuad().render();
 }
 
-void SelectionOverlay::drawTitleBar() const {
+void SelectionOverlay::drawTitleBar() {
     if (_selectedObject->name().empty()) return;
 
     const GraphicsOptions &opts = _game->options().graphics;
@@ -224,12 +225,13 @@ void SelectionOverlay::drawTitleBar() const {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-        locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        locals.general.alpha = 0.5f;
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        uniforms.general.alpha = 0.5f;
 
-        Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
         Meshes::instance().getQuad().render();
     }
@@ -247,7 +249,7 @@ void SelectionOverlay::drawTitleBar() const {
     }
 }
 
-void SelectionOverlay::drawHealthBar() const {
+void SelectionOverlay::drawHealthBar() {
     const GraphicsOptions &opts = _game->options().graphics;
     float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kHealthBarHeight - kOffsetToReticle;
@@ -260,16 +262,16 @@ void SelectionOverlay::drawHealthBar() const {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
-
-    Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
     Meshes::instance().getQuad().render();
 }
 
-void SelectionOverlay::drawActionBar() const {
+void SelectionOverlay::drawActionBar() {
     const GraphicsOptions &opts = _game->options().graphics;
 
     for (int i = 0; i < kActionCount; ++i) {
@@ -280,10 +282,10 @@ void SelectionOverlay::drawActionBar() const {
         transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
         transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         shared_ptr<Texture> frameTexture;
         if (i == _selectedActionIdx) {
@@ -309,10 +311,10 @@ void SelectionOverlay::drawActionBar() const {
                 transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
-
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.general.model = move(transform);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
                 setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();

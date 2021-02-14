@@ -44,7 +44,7 @@ public:
 
     void load();
     bool handle(const SDL_Event &event);
-    void render() const;
+    void render();
 
     bool isOpen() const { return _open; }
 
@@ -68,8 +68,8 @@ private:
     void print(const std::string &text);
     void trimOutput();
 
-    void drawBackground() const;
-    void drawLines() const;
+    void drawBackground();
+    void drawLines();
 
     // Commands
 

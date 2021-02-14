@@ -140,7 +140,7 @@ void EmitterSceneNode::doSpawnParticle() {
     _particles.push_back(particle);
 }
 
-void EmitterSceneNode::renderSingle(bool shadowPass) const {
+void EmitterSceneNode::renderSingle(bool shadowPass) {
     if (shadowPass || _particles.empty()) return;
 
     shared_ptr<Texture> texture(_emitter->texture());
@@ -148,11 +148,11 @@ void EmitterSceneNode::renderSingle(bool shadowPass) const {
 
     glm::mat4 transform(_absoluteTransform);
 
-    LocalUniforms locals;
-    locals.general.featureMask |= UniformFeatureFlags::billboard;
-    locals.general.model = _absoluteTransform;
-    locals.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
-    locals.billboard.render = static_cast<int>(_emitter->renderMode());
+    ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+    uniforms.general.featureMask |= UniformFeatureFlags::billboard;
+    uniforms.general.model = _absoluteTransform;
+    uniforms.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
+    uniforms.billboard.render = static_cast<int>(_emitter->renderMode());
 
     for (size_t i = 0; i < _particles.size(); ++i) {
         const Particle &particle = *_particles[i];
@@ -165,15 +165,15 @@ void EmitterSceneNode::renderSingle(bool shadowPass) const {
             transform = glm::scale(transform, glm::vec3(particle.size()));
         }
 
-        locals.billboard.particles[i].transform = move(transform);
-        locals.billboard.particles[i].position = glm::vec4(particle.position(), 1.0f);
-        locals.billboard.particles[i].color = glm::vec4(particle.color(), 1.0f);
-        locals.billboard.particles[i].size = glm::vec2(particle.size());
-        locals.billboard.particles[i].alpha = particle.alpha();
-        locals.billboard.particles[i].frame = particle.frame();
+        uniforms.billboard.particles[i].transform = move(transform);
+        uniforms.billboard.particles[i].position = glm::vec4(particle.position(), 1.0f);
+        uniforms.billboard.particles[i].color = glm::vec4(particle.color(), 1.0f);
+        uniforms.billboard.particles[i].size = glm::vec2(particle.size());
+        uniforms.billboard.particles[i].alpha = particle.alpha();
+        uniforms.billboard.particles[i].frame = particle.frame();
     }
 
-    Shaders::instance().activate(ShaderProgram::BillboardBillboard, locals);
+    Shaders::instance().activate(ShaderProgram::BillboardBillboard, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();

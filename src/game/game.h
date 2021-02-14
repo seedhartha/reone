@@ -26,7 +26,6 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../render/window.h"
 #include "../resource/types.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
@@ -200,7 +199,6 @@ private:
     };
 
     boost::filesystem::path _path;
-    render::RenderWindow _window;
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
@@ -308,7 +306,6 @@ private:
     void drawAll();
     void drawWorld();
     void drawGUI();
-    void drawCursor();
 
     // END Rendering
 

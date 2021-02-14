@@ -60,8 +60,8 @@ public:
     void init();
     void deinit();
 
-    void render() const;
-    void renderInstanced(int count) const;
+    void render();
+    void renderInstanced(int count);
 
     void computeAABB();
 

@@ -28,6 +28,7 @@
 #include "../../render/stateutil.h"
 #include "../../render/textures.h"
 #include "../../render/textutil.h"
+#include "../../render/window.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -223,7 +224,7 @@ void Control::update(float dt) {
     }
 }
 
-void Control::render(const glm::ivec2 &offset, const vector<string> &text) const {
+void Control::render(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible) return;
 
     glm::ivec2 size(_extent.width, _extent.height);
@@ -238,7 +239,7 @@ void Control::render(const glm::ivec2 &offset, const vector<string> &text) const
     }
 }
 
-void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const {
+void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
     glm::vec3 color(getBorderColor());
 
     if (border.fill) {
@@ -252,12 +253,12 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-            LocalUniforms locals;
-            locals.general.featureMask |= _discardEnabled ? UniformFeatureFlags::discard : 0;
-            locals.general.model = move(transform);
-            locals.general.discardColor = glm::vec4(_discardColor, 1.0f);
-
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+            ShaderUniforms uniforms;
+            uniforms.general.featureMask |= _discardEnabled ? UniformFeatureFlags::discard : 0;
+            uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.discardColor = glm::vec4(_discardColor, 1.0f);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
 
         setActiveTextureUnit(TextureUnits::diffuse);
@@ -291,11 +292,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
                 transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
-                locals.general.color = glm::vec4(color, 1.0f);
-
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
             Meshes::instance().getQuad().render();
 
@@ -306,11 +307,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
                 transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
-                locals.general.color = glm::vec4(color, 1.0f);
-
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
             Meshes::instance().getQuadFlipX().render();
         }
@@ -325,11 +326,12 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
-                locals.general.color = glm::vec4(color, 1.0f);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
 
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
             Meshes::instance().getQuad().render();
 
@@ -339,11 +341,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
-                locals.general.color = glm::vec4(color, 1.0f);
-
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
             Meshes::instance().getQuadFlipY().render();
         }
@@ -361,11 +363,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            LocalUniforms locals;
-            locals.general.model = move(transform);
-            locals.general.color = glm::vec4(color, 1.0f);
-
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+            ShaderUniforms uniforms;
+            uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
         Meshes::instance().getQuad().render();
 
@@ -375,11 +377,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            LocalUniforms locals;
-            locals.general.model = move(transform);
-            locals.general.color = glm::vec4(color, 1.0f);
-
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+            ShaderUniforms uniforms;
+            uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
         Meshes::instance().getQuadFlipY().render();
 
@@ -389,11 +391,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            LocalUniforms locals;
-            locals.general.model = move(transform);
-            locals.general.color = glm::vec4(color, 1.0f);
-
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+            ShaderUniforms uniforms;
+            uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
         Meshes::instance().getQuadFlipX().render();
 
@@ -403,11 +405,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            LocalUniforms locals;
-            locals.general.model = move(transform);
-            locals.general.color = glm::vec4(color, 1.0f);
-
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+            ShaderUniforms uniforms;
+            uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
+            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
         Meshes::instance().getQuadFlipXY().render();
     }
@@ -420,7 +422,7 @@ const glm::vec3 &Control::getBorderColor() const {
     return (_focus && _hilight) ? _hilight->color : _border->color;
 }
 
-void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) const {
+void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
     glm::ivec2 position;
     TextGravity gravity;
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
@@ -496,7 +498,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
     }
 }
 
-void Control::render3D(const glm::ivec2 &offset) const {
+void Control::render3D(const glm::ivec2 &offset) {
     if (!_visible || !_scene3d) return;
 
     _pipeline->render(offset);

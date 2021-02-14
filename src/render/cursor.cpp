@@ -26,6 +26,7 @@
 #include "shaders.h"
 #include "stateutil.h"
 #include "texture.h"
+#include "window.h"
 
 using namespace std;
 
@@ -42,20 +43,19 @@ Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) :
     }
 }
 
-void Cursor::render() const {
+void Cursor::render() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    texture->bind();
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
-
-    setActiveTextureUnit(TextureUnits::diffuse);
-    texture->bind();
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     Meshes::instance().getQuad().render();
 }

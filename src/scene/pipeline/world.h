@@ -36,7 +36,7 @@ public:
     WorldRenderPipeline(SceneGraph *scene, const render::GraphicsOptions &opts);
 
     void init();
-    void render() const;
+    void render();
 
 private:
     SceneGraph *_scene { nullptr };
@@ -62,11 +62,11 @@ private:
 
     // END Framebuffers targets
 
-    void drawShadows() const;
-    void drawGeometry() const;
-    void applyHorizontalBlur() const;
-    void applyVerticalBlur() const;
-    void drawResult() const;
+    void drawShadows();
+    void drawGeometry();
+    void applyHorizontalBlur();
+    void applyVerticalBlur();
+    void drawResult();
 
     glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapFace side) const;
 };

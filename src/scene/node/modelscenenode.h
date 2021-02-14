@@ -44,7 +44,7 @@ public:
         std::set<std::string> ignoreNodes = std::set<std::string>());
 
     void update(float dt) override;
-    void render() const override;
+    void render() override;
 
     std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);

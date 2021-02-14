@@ -53,7 +53,7 @@ public:
     void load() override;
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() const override;
+    void render() override;
 
     void onClick(const std::string &control) override;
 

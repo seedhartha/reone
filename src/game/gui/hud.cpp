@@ -20,6 +20,7 @@
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
 #include "../../render/meshes.h"
+#include "../../render/window.h"
 
 #include "../game.h"
 
@@ -194,7 +195,7 @@ void HUD::update(float dt) {
     _barkBubble->update(dt);
 }
 
-void HUD::render() const {
+void HUD::render() {
     GUI::render();
 
     drawMinimap();
@@ -209,7 +210,7 @@ void HUD::render() const {
     _debug.render();
 }
 
-void HUD::drawMinimap() const {
+void HUD::drawMinimap() {
     Control &label = getControl("LBL_MAPVIEW");
     const Control::Extent &extent = label.extent();
 
@@ -223,7 +224,7 @@ void HUD::drawMinimap() const {
     area->map().render(Map::Mode::Minimap, bounds);
 }
 
-void HUD::drawHealth(int memberIndex) const {
+void HUD::drawHealth(int memberIndex) {
     if (_gameId == GameID::TSL) return;
 
     Party &party = _game->party();
@@ -240,11 +241,11 @@ void HUD::drawHealth(int memberIndex) const {
     transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-    Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
     Meshes::instance().getQuad().render();
 }

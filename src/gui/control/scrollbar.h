@@ -28,7 +28,7 @@ public:
     ScrollBar(GUI *gui);
 
     void load(const resource::GffStruct &gffs) override;
-    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) const override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
     void setCanScrollUp(bool scroll);
     void setCanScrollDown(bool scroll);
@@ -42,8 +42,8 @@ private:
     bool _canScrollUp { false };
     bool _canScrollDown { false };
 
-    void drawUpArrow(const glm::vec2 &offset) const;
-    void drawDownArrow(const glm::vec2 &offset) const;
+    void drawUpArrow(const glm::vec2 &offset);
+    void drawDownArrow(const glm::vec2 &offset);
 };
 
 } // namespace gui

@@ -25,6 +25,7 @@
 
 #include "../scenegraph.h"
 
+#include "cameranode.h"
 #include "lightnode.h"
 #include "modelscenenode.h"
 
@@ -104,7 +105,7 @@ static bool isLightDirectional(const LightSceneNode &light) {
     return light.radius() >= 50.0f;
 }
 
-void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
+void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
@@ -113,9 +114,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         diffuseTexture = mesh->diffuseTexture();
     }
 
-    LocalUniforms locals;
-    locals.general.model = _absoluteTransform;
-    locals.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
+    ShaderUniforms uniforms(_sceneGraph->baseUniforms());
+    uniforms.general.model = _absoluteTransform;
+    uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
 
     ShaderProgram program;
 
@@ -126,32 +127,32 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         program = g_pbrEnabled ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong;
 
         if (diffuseTexture) {
-            locals.general.featureMask |= UniformFeatureFlags::diffuse;
+            uniforms.general.featureMask |= UniformFeatureFlags::diffuse;
         }
 
         if (mesh->hasEnvmapTexture()) {
-            locals.general.featureMask |= UniformFeatureFlags::envmap;
+            uniforms.general.featureMask |= UniformFeatureFlags::envmap;
 
             if (g_pbrEnabled) {
                 bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
                 if (derived) {
-                    locals.general.featureMask |= UniformFeatureFlags::pbrIbl;
+                    uniforms.general.featureMask |= UniformFeatureFlags::pbrIbl;
                 }
             }
         }
 
         if (mesh->hasLightmapTexture()) {
-            locals.general.featureMask |= UniformFeatureFlags::lightmap;
+            uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
         shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
         if (bumpmapTexture) {
-            locals.general.featureMask |= UniformFeatureFlags::bumpmap;
-            locals.bumpmap.grayscale = bumpmapTexture->isGrayscale();
-            locals.bumpmap.scaling = bumpmapTexture->features().bumpMapScaling;
-            locals.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
-            locals.bumpmap.frame = _bumpmapFrame;
-            locals.bumpmap.swizzled = mesh->isBumpmapSwizzled();
+            uniforms.general.featureMask |= UniformFeatureFlags::bumpmap;
+            uniforms.bumpmap.grayscale = bumpmapTexture->isGrayscale();
+            uniforms.bumpmap.scaling = bumpmapTexture->features().bumpMapScaling;
+            uniforms.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
+            uniforms.bumpmap.frame = _bumpmapFrame;
+            uniforms.bumpmap.swizzled = mesh->isBumpmapSwizzled();
         }
 
         bool receivesShadows =
@@ -159,17 +160,15 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             !_modelNode->isSelfIllumEnabled();
 
         if (receivesShadows) {
-            locals.general.featureMask |= UniformFeatureFlags::shadows;
+            uniforms.general.featureMask |= UniformFeatureFlags::shadows;
         }
 
         shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
         if (skin) {
-            locals.general.featureMask |= UniformFeatureFlags::skeletal;
-            locals.skeletal.absTransform = _modelNode->absoluteTransform();
-            locals.skeletal.absTransformInv = _modelNode->absoluteTransformInverse();
+            uniforms.general.featureMask |= UniformFeatureFlags::skeletal;
 
             for (int i = 0; i < kMaxBoneCount; ++i) {
-                locals.skeletal.bones[i] = glm::mat4(1.0f);
+                uniforms.skeletal.bones[i] = glm::mat4(1.0f);
             }
             for (auto &pair : skin->nodeIdxByBoneIdx) {
                 uint16_t boneIdx = pair.first;
@@ -177,14 +176,14 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
                 ModelNodeSceneNode *bone = _modelSceneNode->getModelNodeByIndex(nodeIdx);
                 if (bone) {
-                    locals.skeletal.bones[boneIdx] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+                    uniforms.skeletal.bones[boneIdx] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
                 }
             }
         }
 
         if (_modelNode->isSelfIllumEnabled()) {
-            locals.general.featureMask |= UniformFeatureFlags::selfIllum;
-            locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
+            uniforms.general.featureMask |= UniformFeatureFlags::selfIllum;
+            uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
         if (
             _modelSceneNode->isLightingEnabled() &&
@@ -194,18 +193,18 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
-            locals.general.featureMask |= UniformFeatureFlags::lighting;
-            locals.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-            locals.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
-            locals.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
-            locals.lighting.materialSpecular = mesh->material().specular;
-            locals.lighting.materialShininess = mesh->material().shininess;
-            locals.lighting.materialMetallic = mesh->material().metallic;
-            locals.lighting.materialRoughness = mesh->material().roughness;
-            locals.lighting.lightCount = static_cast<int>(lights.size());
+            uniforms.general.featureMask |= UniformFeatureFlags::lighting;
+            uniforms.lighting.ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
+            uniforms.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
+            uniforms.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
+            uniforms.lighting.materialSpecular = mesh->material().specular;
+            uniforms.lighting.materialShininess = mesh->material().shininess;
+            uniforms.lighting.materialMetallic = mesh->material().metallic;
+            uniforms.lighting.materialRoughness = mesh->material().roughness;
+            uniforms.lighting.lightCount = static_cast<int>(lights.size());
 
-            for (int i = 0; i < locals.lighting.lightCount; ++i) {
-                ShaderLight &shaderLight = locals.lighting.lights[i];
+            for (int i = 0; i < uniforms.lighting.lightCount; ++i) {
+                ShaderLight &shaderLight = uniforms.lighting.lights[i];
                 shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), isLightDirectional(*lights[i]) ? 0.0f : 1.0f);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.radius = lights[i]->radius();
@@ -214,16 +213,17 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         }
 
         if (diffuseTexture) {
+            uniforms.general.uvOffset = _uvOffset;
+
             float waterAlpha = diffuseTexture->features().waterAlpha;
-            locals.general.uvOffset = _uvOffset;
             if (waterAlpha != -1.0f) {
-                locals.general.featureMask |= UniformFeatureFlags::water;
+                uniforms.general.featureMask |= UniformFeatureFlags::water;
+                uniforms.general.waterAlpha = waterAlpha;
             }
-            locals.general.waterAlpha = waterAlpha;
         }
     }
 
-    Shaders::instance().activate(program, locals);
+    Shaders::instance().activate(program, uniforms);
 
     mesh->render(diffuseTexture);
 }

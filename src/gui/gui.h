@@ -44,8 +44,8 @@ public:
 
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
-    virtual void render() const;
-    virtual void render3D() const;
+    virtual void render();
+    virtual void render3D();
 
     void configureRootContol(const std::function<void(Control &)> &fn);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
@@ -122,7 +122,7 @@ private:
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
 
-    void drawBackground() const;
+    void drawBackground();
 
     Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
 };

@@ -25,6 +25,8 @@
 
 #include "glm/ext.hpp"
 
+#include "../render/window.h"
+
 #include "shaders.h"
 #include "stateutil.h"
 
@@ -106,7 +108,7 @@ void Font::initGL() {
     _glInited = true;
 }
 
-void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
+void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) return;
 
     setActiveTextureUnit(TextureUnits::diffuse);
@@ -146,11 +148,11 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     glm::mat4 textTransform(glm::translate(transform, textOffset));
 
     for (auto &glyph : text) {
-        LocalUniforms locals;
-        locals.general.model = textTransform;
-        locals.general.color = glm::vec4(color, 1.0f);
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = textTransform;
+        uniforms.general.color = glm::vec4(color, 1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
         glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));

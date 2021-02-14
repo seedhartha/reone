@@ -48,7 +48,7 @@ public:
         const std::string &text,
         const glm::mat4 &transform,
         const glm::vec3 &color = glm::vec3(1.0f, 1.0f, 1.0f),
-        TextGravity align = TextGravity::CenterCenter) const;
+        TextGravity align = TextGravity::CenterCenter);
 
     float measure(const std::string &text) const;
 

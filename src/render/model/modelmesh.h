@@ -49,7 +49,7 @@ public:
     void initGL();
     void deinitGL();
 
-    void render(std::shared_ptr<Texture> diffuse = nullptr) const;
+    void render(std::shared_ptr<Texture> diffuse = nullptr);
 
     bool shouldRender() const { return _render; }
     bool shouldCastShadows() const { return _shadow; }

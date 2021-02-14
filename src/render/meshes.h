@@ -39,15 +39,15 @@ public:
     void init();
     void deinit();
 
-    const Mesh &getQuad() const { return *_quad; }
-    const Mesh &getQuadFlipX() const { return *_quadFlipX; }
-    const Mesh &getQuadFlipY() const { return *_quadFlipY; }
-    const Mesh &getQuadFlipXY() const { return *_quadFlipXY; }
-    const Mesh &getQuadNDC() const { return *_quadNDC; }
-    const Mesh &getBillboard() const { return *_billboard; }
-    const Mesh &getCube() const { return *_cube; }
-    const Mesh &getCubemap() const { return *_cubemap; }
-    const Mesh &getAABB() const { return *_aabb; }
+    Mesh &getQuad() const { return *_quad; }
+    Mesh &getQuadFlipX() const { return *_quadFlipX; }
+    Mesh &getQuadFlipY() const { return *_quadFlipY; }
+    Mesh &getQuadFlipXY() const { return *_quadFlipXY; }
+    Mesh &getQuadNDC() const { return *_quadNDC; }
+    Mesh &getBillboard() const { return *_billboard; }
+    Mesh &getCube() const { return *_cube; }
+    Mesh &getCubemap() const { return *_cubemap; }
+    Mesh &getAABB() const { return *_aabb; }
 
 private:
     bool _inited { false };

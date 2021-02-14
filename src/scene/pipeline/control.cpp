@@ -26,6 +26,9 @@
 #include "../../render/stateutil.h"
 #include "../../render/textureutil.h"
 
+#include "../node/cameranode.h"
+#include "../scenegraph.h"
+
 using namespace std;
 
 using namespace reone::render;
@@ -59,11 +62,19 @@ void ControlRenderPipeline::init() {
     _geometry.unbind();
 }
 
-void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
+void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     // Render to framebuffer
 
     withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
+
+        ShaderUniforms uniforms;
+        uniforms.general.projection = _scene->activeCamera()->projection();
+        uniforms.general.view = _scene->activeCamera()->view();
+        uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+        uniforms.general.shadowLightPresent = _scene->isShadowLightPresent();
+        uniforms.general.shadowLightPosition = glm::vec4(_scene->shadowLightPosition(), 1.0f);
+        _scene->setBaseUniforms(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         withDepthTest([this]() { _scene->render(); });
@@ -74,30 +85,26 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
 
     // Render control
 
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _geometryColor->bind();
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 100.0f));
     transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
 
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+
+    ShaderUniforms uniforms;
+    uniforms.general.projection = glm::ortho(
         0.0f,
         static_cast<float>(viewport[2]),
         static_cast<float>(viewport[3]),
         0.0f,
         -100.0f, 100.0f);
 
-    Shaders::instance().setGlobalUniforms(globals);
-
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
-
-    setActiveTextureUnit(TextureUnits::diffuse);
-    _geometryColor->bind();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     Meshes::instance().getQuad().render();
 }

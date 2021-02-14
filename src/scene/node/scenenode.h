@@ -37,8 +37,8 @@ public:
 
     virtual void update(float dt);
 
-    virtual void render() const;
-    virtual void renderSingle(bool shadowPass) const;
+    virtual void render();
+    virtual void renderSingle(bool shadowPass);
 
     virtual glm::vec3 getOrigin() const;
     float distanceTo(const glm::vec3 &point) const;

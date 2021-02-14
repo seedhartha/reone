@@ -20,6 +20,11 @@
 #include <functional>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
+#include "glm/mat4x4.hpp"
+
+#include "cursor.h"
 #include "fps.h"
 #include "texture.h"
 #include "types.h"
@@ -28,40 +33,46 @@ namespace reone {
 
 namespace render {
 
-class Cursor;
-
-class RenderWindow {
+class RenderWindow : boost::noncopyable {
 public:
-    RenderWindow(const GraphicsOptions &opts, IEventHandler *eventHandler = nullptr);
+    static RenderWindow &instance();
 
-    void init();
+    ~RenderWindow();
+
+    void init(GraphicsOptions options, IEventHandler *eventHandler = nullptr);
     void deinit();
 
-    void show();
     void processEvents(bool &quit);
     void update(float dt);
 
-    void setRelativeMouseMode(bool enabled);
-    void setCursor(const std::shared_ptr<Cursor> &cursor);
-
-    // Rendering
-
+    void show();
     void clear() const;
     void drawCursor() const;
     void swapBuffers() const;
 
-    // END Rendering
+    glm::mat4 getOrthoProjection(float near = -100.0f, float far = 100.0f) const;
+
+    int width() const { return _width; }
+    int height() const { return _height; }
+
+    void setRelativeMouseMode(bool enabled);
+    void setCursor(const std::shared_ptr<Cursor> &cursor);
 
 private:
-    GraphicsOptions _opts;
+    bool _inited { false };
+    int _width { 0 };
+    int _height { 0 };
+    GraphicsOptions _options;
     IEventHandler *_eventHandler { nullptr };
     SDL_Window *_window { nullptr };
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };
     std::shared_ptr<Cursor> _cursor;
     FpsCounter _fps;
-    std::function<void()> _onRenderWorld;
-    std::function<void()> _onRenderGUI;
+
+    RenderWindow() = default;
+
+    void configureGL();
 
     bool handleEvent(const SDL_Event &event, bool &quit);
     bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);

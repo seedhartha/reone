@@ -180,7 +180,7 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) const {
+void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible) return;
 
     Control::render(offset, text);

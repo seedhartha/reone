@@ -43,7 +43,7 @@ public:
     Map(Game *game);
 
     void load(const std::string &area, const resource::GffStruct &gffs);
-    void render(Mode mode, const glm::vec4 &bounds) const;
+    void render(Mode mode, const glm::vec4 &bounds);
 
     void setSelectedNote(const std::shared_ptr<Waypoint> &waypoint);
 
@@ -65,9 +65,9 @@ private:
     void loadProperties(const resource::GffStruct &gffs);
     void loadTextures(const std::string &area);
 
-    void drawArea(Mode mode, const glm::vec4 &bounds) const;
-    void drawPartyLeader(Mode mode, const glm::vec4 &bounds) const;
-    void drawNotes(Mode mode, const glm::vec4 &bounds) const;
+    void drawArea(Mode mode, const glm::vec4 &bounds);
+    void drawPartyLeader(Mode mode, const glm::vec4 &bounds);
+    void drawNotes(Mode mode, const glm::vec4 &bounds);
 
     glm::vec2 getMapPosition(const glm::vec2 &world) const;
 };

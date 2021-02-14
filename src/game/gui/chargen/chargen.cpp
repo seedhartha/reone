@@ -176,12 +176,12 @@ void CharacterGeneration::update(float dt) {
     getSubGUI()->update(dt);
 }
 
-void CharacterGeneration::render() const {
+void CharacterGeneration::render() {
     GUI::render();
     getSubGUI()->render();
 }
 
-void CharacterGeneration::render3D() const {
+void CharacterGeneration::render3D() {
     GUI::render3D();
     getSubGUI()->render3D();
 }

@@ -29,6 +29,7 @@
 #include "../render/fonts.h"
 #include "../render/meshes.h"
 #include "../render/shaders.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
 #include "../scene/types.h"
 
@@ -288,28 +289,28 @@ void Console::executeInputText() {
     }
 }
 
-void Console::render() const {
+void Console::render() {
     drawBackground();
     drawLines();
 }
 
-void Console::drawBackground() const {
+void Console::drawBackground() {
     float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    locals.general.alpha = 0.5f;
-
-    Shaders::instance().activate(ShaderProgram::SimpleColor, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.general.alpha = 0.5f;
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
     Meshes::instance().getQuad().render();
 }
 
-void Console::drawLines() const {
+void Console::drawLines() {
     float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);

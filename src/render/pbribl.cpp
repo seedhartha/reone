@@ -120,12 +120,10 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
             _irradianceFB.attachDepth(*irradianceDepth);
             _irradianceFB.checkCompleteness();
 
-            // TODO: set view matrix as part of local uniforms
-            GlobalUniforms globals;
-            globals.projection = g_captureProjection;
-            globals.view = g_captureViews[i];
-            Shaders::instance().setGlobalUniforms(globals);
-            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, LocalUniforms());
+            ShaderUniforms uniforms;
+            uniforms.general.projection = g_captureProjection;
+            uniforms.general.view = g_captureViews[i];
+            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, uniforms);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             Meshes::instance().getCubemap().render();
@@ -161,15 +159,11 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 _prefilterFB.attachDepth(*prefilterDepth);
                 _prefilterFB.checkCompleteness();
 
-                // TODO: set view matrix as part of local uniforms
-                GlobalUniforms globals;
-                globals.projection = g_captureProjection;
-                globals.view = g_captureViews[face];
-                Shaders::instance().setGlobalUniforms(globals);
-
-                LocalUniforms locals;
-                locals.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
-                Shaders::instance().activate(ShaderProgram::SimplePrefilter, locals);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = g_captureProjection;
+                uniforms.general.view = g_captureViews[face];
+                uniforms.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
+                Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 setActiveTextureUnit(TextureUnits::envmap);
                 envmap->bind();
@@ -204,10 +198,8 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     _brdfLookupFB.checkCompleteness();
 
     withViewport(viewport, [&]() {
-        Shaders::instance().setGlobalUniforms(GlobalUniforms());
-        Shaders::instance().activate(ShaderProgram::SimpleBRDF, LocalUniforms());
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Shaders::instance().activate(ShaderProgram::SimpleBRDF, ShaderUniforms());
         Meshes::instance().getQuadNDC().render();
     });
 

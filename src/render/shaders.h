@@ -63,16 +63,6 @@ struct TextureUnits {
     static constexpr int shadowMap { 9 };
 };
 
-struct GlobalUniforms {
-    glm::mat4 projection { 1.0f };
-    glm::mat4 view { 1.0f };
-    glm::vec3 cameraPosition { 0.0f };
-    float farPlane { 1.0f };
-    bool shadowLightPresent { false };
-    glm::vec3 shadowLightPosition { 0.0f };
-    glm::mat4 shadowMatrices[kNumCubeFaces];
-};
-
 struct UniformFeatureFlags {
     static constexpr int diffuse = 1;
     static constexpr int lightmap = 2;
@@ -89,24 +79,26 @@ struct UniformFeatureFlags {
 };
 
 struct GeneralUniforms {
-    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
-    char padding[12];
+    glm::mat4 projection { 1.0f };
+    glm::mat4 view { 1.0f };
     glm::mat4 model { 1.0f };
+    glm::mat4 shadowMatrices[kNumCubeFaces];
+    glm::vec4 cameraPosition { 0.0f };
+    glm::vec4 shadowLightPosition { 0.0f };
     glm::vec4 color { 1.0f };
-    float alpha { 1.0f };
-    char padding2[12];
     glm::vec4 selfIllumColor { 1.0f };
     glm::vec4 discardColor { 0.0f };
+    glm::vec2 uvOffset { 0.0f };
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
-    glm::vec2 uvOffset { 0.0f };
+    float alpha { 1.0f };
     float waterAlpha { 1.0f };
+    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
+    int shadowLightPresent { false };
     float roughness { 0.0f };
 };
 
 struct SkeletalUniforms {
-    glm::mat4 absTransform { 1.0f };
-    glm::mat4 absTransformInv { 1.0f };
     glm::mat4 bones[kMaxBoneCount];
 };
 
@@ -156,7 +148,7 @@ struct BumpmapUniforms {
     char padding[8];
 };
 
-struct LocalUniforms {
+struct ShaderUniforms {
     GeneralUniforms general;
     BillboardUniforms billboard;
     BumpmapUniforms bumpmap;
@@ -170,10 +162,9 @@ public:
 
     void init();
     void deinit();
-    void activate(ShaderProgram program, const LocalUniforms &uniforms);
-    void deactivate();
 
-    void setGlobalUniforms(const GlobalUniforms &globals);
+    void activate(ShaderProgram program, const ShaderUniforms &uniforms);
+    void deactivate();
 
 private:
     enum class ShaderName {
@@ -214,8 +205,8 @@ private:
 
     void initShader(ShaderName name, unsigned int type, std::vector<char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
-    unsigned int getOrdinal(ShaderProgram program) const;
-    void setLocalUniforms(const LocalUniforms &locals);
+
+    void setUniforms(const ShaderUniforms &locals);
     void setUniform(const std::string &name, int value);
     void setUniform(const std::string &name, const std::function<void(int)> &setter);
     void setUniform(const std::string &name, float value);
@@ -223,6 +214,8 @@ private:
     void setUniform(const std::string &name, const glm::vec3 &v);
     void setUniform(const std::string &name, const glm::mat4 &m);
     void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
+
+    unsigned int getOrdinal(ShaderProgram program) const;
 };
 
 } // namespace render

@@ -40,7 +40,7 @@ void DebugOverlay::load() {
     _font = Fonts::instance().get(kFontResRef);
 }
 
-void DebugOverlay::render() const {
+void DebugOverlay::render() {
     glm::mat4 transform;
     glm::vec3 red(1.0f, 0.0f, 0.0f);
 

@@ -161,7 +161,7 @@ void InGameMenu::update(float dt) {
     }
 }
 
-void InGameMenu::render() const {
+void InGameMenu::render() {
     GUI *tabGui = getActiveTabGUI();
     if (tabGui) {
         tabGui->render();

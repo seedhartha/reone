@@ -29,6 +29,7 @@
 #include "../render/meshes.h"
 #include "../render/stateutil.h"
 #include "../render/textures.h"
+#include "../render/window.h"
 #include "../resource/types.h"
 
 #include "game.h"
@@ -84,7 +85,7 @@ void Map::loadTextures(const string &area) {
 }
 
 
-void Map::render(Mode mode, const glm::vec4 &bounds) const {
+void Map::render(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) return;
 
     drawArea(mode, bounds);
@@ -92,7 +93,7 @@ void Map::render(Mode mode, const glm::vec4 &bounds) const {
     drawPartyLeader(mode, bounds);
 }
 
-void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
+void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
     if (mode == Mode::Minimap) {
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
         if (!partyLeader) return;
@@ -108,10 +109,10 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = transform;
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
@@ -125,10 +126,10 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
@@ -137,7 +138,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) const {
     }
 }
 
-void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
+void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) return;
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
@@ -159,11 +160,11 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) const {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = transform;
-        locals.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = transform;
+        uniforms.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         setActiveTextureUnit(TextureUnits::diffuse);
         _noteTexture->bind();
@@ -199,7 +200,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
     return move(result);
 }
 
-void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
+void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
@@ -241,10 +242,10 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) const {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = transform;
-
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = transform;
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
     _arrowTexture->bind();
