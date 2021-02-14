@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "singleton.h"
+#include <boost/noncopyable.hpp>
 
 namespace reone {
 
@@ -30,7 +30,7 @@ namespace reone {
  * Utility class for caching objects. Requires a function which computes an object by key.
  */
 template <class K, class V>
-class MemoryCache : public Singleton {
+class MemoryCache : boost::noncopyable {
 public:
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) : _compute(compute) {
         if (!compute) {

@@ -21,7 +21,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../../common/singleton.h"
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -34,7 +35,7 @@ namespace render {
 
 class Model;
 
-class Models : public Singleton {
+class Models : boost::noncopyable {
 public:
     static Models &instance();
 

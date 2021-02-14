@@ -21,7 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "../../common/singleton.h"
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/types.h"
 #include "../../script/routine.h"
 #include "../../script/types.h"
@@ -42,7 +43,7 @@ class Object;
 class Sound;
 class SpatialObject;
 
-class Routines : public script::IRoutineProvider, Singleton {
+class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
     static Routines &instance();
 

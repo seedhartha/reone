@@ -20,7 +20,8 @@
 #include <cstdint>
 #include <vector>
 
-#include "../../common/singleton.h"
+#include <boost/noncopyable.hpp>
+
 #include "../../common/aabb.h"
 
 namespace reone {
@@ -33,7 +34,7 @@ class MdlFile;
  * Polygonal mesh, containing vertex and index data. Renders itself,
  * but does not manage textures and shaders.
  */
-class Mesh : public Singleton {
+class Mesh : boost::noncopyable {
 public:
     enum class DrawMode {
         Lines,

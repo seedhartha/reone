@@ -24,9 +24,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "glm/glm.hpp"
+#include <boost/noncopyable.hpp>
 
-#include "../common/singleton.h"
+#include "glm/glm.hpp"
 
 #include "types.h"
 
@@ -159,7 +159,7 @@ struct LocalUniforms {
     std::shared_ptr<LightingUniforms> lighting;
 };
 
-class Shaders : public Singleton {
+class Shaders : boost::noncopyable {
 public:
     static Shaders &instance();
 

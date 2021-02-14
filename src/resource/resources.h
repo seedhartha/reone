@@ -24,8 +24,7 @@
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
-
-#include "../common/singleton.h"
+#include <boost/noncopyable.hpp>
 
 #include "format/2dafile.h"
 #include "format/gfffile.h"
@@ -46,7 +45,7 @@ namespace resource {
  * resource providers, that it queries for resources by ResRef and ResType.
  * Caches found resources.
  */
-class Resources : public Singleton {
+class Resources : boost::noncopyable {
 public:
     static Resources &instance();
 

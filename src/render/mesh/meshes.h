@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "../../common/singleton.h"
+#include <boost/noncopyable.hpp>
 
 #include "mesh.h"
 
@@ -30,7 +30,7 @@ namespace render {
 /**
  * Registry of common reusable meshes.
  */
-class Meshes : public Singleton {
+class Meshes : boost::noncopyable {
 public:
     static Meshes &instance();
 
