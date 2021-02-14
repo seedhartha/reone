@@ -21,6 +21,7 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
+#include "../../render/features.h"
 #include "../../render/pbribl.h"
 
 #include "../scenegraph.h"
@@ -36,8 +37,6 @@ using namespace reone::render;
 namespace reone {
 
 namespace scene {
-
-static bool g_pbrEnabled = false;
 
 static constexpr float kUvAnimationSpeed = 250.0f;
 
@@ -113,7 +112,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     uniforms.general.model = _absoluteTransform;
     uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
     uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-    uniforms.general.exposure = 3.0f;
+    uniforms.general.exposure = 1.0f;
 
     ShaderProgram program;
 
@@ -121,7 +120,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         program = ShaderProgram::SimpleDepth;
 
     } else {
-        program = g_pbrEnabled ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong;
+        program = isFeatureEnabled(Feature::PBR) ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong;
 
         if (diffuseTexture) {
             uniforms.general.featureMask |= UniformFeatureFlags::diffuse;
@@ -130,7 +129,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         if (mesh->hasEnvmapTexture()) {
             uniforms.general.featureMask |= UniformFeatureFlags::envmap;
 
-            if (g_pbrEnabled) {
+            if (isFeatureEnabled(Feature::PBR)) {
                 bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
                 if (derived) {
                     uniforms.general.featureMask |= UniformFeatureFlags::pbrIbl;
@@ -138,7 +137,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (!g_pbrEnabled && mesh->hasLightmapTexture()) {
+        if (!isFeatureEnabled(Feature::PBR) && mesh->hasLightmapTexture()) {
             uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -183,7 +182,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
         if (_modelSceneNode->isLightingEnabled() &&
-            (g_pbrEnabled || !mesh->hasLightmapTexture()) &&
+            (isFeatureEnabled(Feature::PBR) || !mesh->hasLightmapTexture()) &&
             !_modelNode->isSelfIllumEnabled() &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 
