@@ -126,27 +126,27 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         program = g_pbrEnabled ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong;
 
         if (diffuseTexture) {
-            locals.general.diffuseEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::diffuse;
         }
 
         if (mesh->hasEnvmapTexture()) {
-            locals.general.envmapEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::envmap;
 
             if (g_pbrEnabled) {
                 bool derived = PBRIBL::instance().contains(mesh->envmapTexture().get());
                 if (derived) {
-                    locals.general.pbrIblEnabled = true;
+                    locals.general.featureMask |= UniformFeatureFlags::pbrIbl;
                 }
             }
         }
 
         if (mesh->hasLightmapTexture()) {
-            locals.general.lightmapEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
         shared_ptr<Texture> bumpmapTexture(mesh->bumpmapTexture());
         if (bumpmapTexture) {
-            locals.general.bumpmapEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::bumpmap;
             locals.bumpmap.grayscale = bumpmapTexture->isGrayscale();
             locals.bumpmap.scaling = bumpmapTexture->features().bumpMapScaling;
             locals.bumpmap.gridSize = glm::vec2(bumpmapTexture->features().numX, bumpmapTexture->features().numY);
@@ -159,12 +159,12 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
             !_modelNode->isSelfIllumEnabled();
 
         if (receivesShadows) {
-            locals.general.shadowsEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::shadows;
         }
 
         shared_ptr<ModelNode::Skin> skin(_modelNode->skin());
         if (skin) {
-            locals.general.skeletalEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::skeletal;
             locals.skeletal = Shaders::instance().skeletalUniforms();
             locals.skeletal->absTransform = _modelNode->absoluteTransform();
             locals.skeletal->absTransformInv = _modelNode->absoluteTransformInverse();
@@ -184,7 +184,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         }
 
         if (_modelNode->isSelfIllumEnabled()) {
-            locals.general.selfIllumEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::selfIllum;
             locals.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
         if (
@@ -195,7 +195,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
 
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
-            locals.general.lightingEnabled = true;
+            locals.general.featureMask |= UniformFeatureFlags::lighting;
             locals.lighting = Shaders::instance().lightingUniforms();
             locals.lighting->ambientLightColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
             locals.lighting->materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
@@ -218,7 +218,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) const {
         if (diffuseTexture) {
             float waterAlpha = diffuseTexture->features().waterAlpha;
             locals.general.uvOffset = _uvOffset;
-            locals.general.water = waterAlpha == -1.0f ? 0 : 1;
+            if (waterAlpha != -1.0f) {
+                locals.general.featureMask |= UniformFeatureFlags::water;
+            }
             locals.general.waterAlpha = waterAlpha;
         }
     }

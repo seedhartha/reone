@@ -253,7 +253,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             LocalUniforms locals;
-            locals.general.discardEnabled = _discardEnabled;
+            locals.general.featureMask |= _discardEnabled ? UniformFeatureFlags::discard : 0;
             locals.general.model = move(transform);
             locals.general.discardColor = glm::vec4(_discardColor, 1.0f);
 

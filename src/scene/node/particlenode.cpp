@@ -130,10 +130,10 @@ void ParticleSceneNode::renderSingle(bool shadowPass) const {
     }
 
     LocalUniforms locals;
+    locals.general.featureMask |= UniformFeatureFlags::billboard;
     locals.general.model = move(transform);
     locals.general.color = glm::vec4(_color, 1.0f);
     locals.general.alpha = _alpha;
-    locals.general.billboardEnabled = true;
     locals.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
     locals.billboard.size = glm::vec2(_size);
     locals.billboard.particleCenter = _absoluteTransform[3];
