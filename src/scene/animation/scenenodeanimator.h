@@ -25,11 +25,11 @@
 
 #include "glm/mat4x4.hpp"
 
-#include "../render/model/animation.h"
-#include "../render/model/modelnode.h"
+#include "../../render/model/animation.h"
+#include "../../render/model/modelnode.h"
 
-#include "animationchannel.h"
-#include "animationproperties.h"
+#include "channel.h"
+#include "properties.h"
 
 namespace reone {
 

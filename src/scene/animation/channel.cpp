@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "animationchannel.h"
+#include "channel.h"
 
 #include <stdexcept>
 
 #include "glm/common.hpp"
 
-#include "node/modelnodescenenode.h"
-#include "node/modelscenenode.h"
-#include "types.h"
+#include "../node/modelnodescenenode.h"
+#include "../node/modelscenenode.h"
+#include "../types.h"
 
 using namespace std;
 
