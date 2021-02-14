@@ -75,22 +75,26 @@ struct GlobalUniforms {
     glm::mat4 shadowMatrices[kNumCubeFaces];
 };
 
-struct GeneralUniforms {
-    int diffuseEnabled { false };
-    int lightmapEnabled { false };
-    int envmapEnabled { false };
-    int pbrIblEnabled { false };
-    int bumpmapEnabled { false };
-    int skeletalEnabled { false };
-    int lightingEnabled { false };
-    int selfIllumEnabled { false };
-    int blurEnabled { false };
-    int bloomEnabled { false };
-    int discardEnabled { false };
-    int shadowsEnabled { false };
-    int billboardEnabled { false };
-    char padding[12];
+struct UniformFeatureFlags {
+    static constexpr int diffuse = 1;
+    static constexpr int lightmap = 2;
+    static constexpr int envmap = 4;
+    static constexpr int pbrIbl = 8;
+    static constexpr int bumpmap = 0x10;
+    static constexpr int skeletal = 0x20;
+    static constexpr int lighting = 0x40;
+    static constexpr int selfIllum = 0x80;
+    static constexpr int blur = 0x100;
+    static constexpr int bloom = 0x200;
+    static constexpr int discard = 0x400;
+    static constexpr int shadows = 0x800;
+    static constexpr int billboard = 0x1000;
+    static constexpr int water = 0x2000;
+};
 
+struct GeneralUniforms {
+    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
+    char padding[12];
     glm::mat4 model { 1.0f };
     glm::vec4 color { 1.0f };
     float alpha { 1.0f };
@@ -100,10 +104,8 @@ struct GeneralUniforms {
     glm::vec2 blurResolution { 0.0f };
     glm::vec2 blurDirection { 0.0f };
     glm::vec2 uvOffset { 0.0f };
-    int water { 0 };
     float waterAlpha { 1.0f };
-    float roughness { 1.0f };
-    char padding3[12];
+    float roughness { 0.0f };
 };
 
 struct SkeletalUniforms {

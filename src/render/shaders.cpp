@@ -23,7 +23,6 @@
 #include <boost/format.hpp>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 #include "glm/ext.hpp"
@@ -50,6 +49,21 @@ const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
 const float SHADOW_FAR_PLANE = 10000.0;
 
+const int FEATURE_DIFFUSE = 1;
+const int FEATURE_LIGHTMAP = 2;
+const int FEATURE_ENVMAP = 4;
+const int FEATURE_PBRIBL = 8;
+const int FEATURE_BUMPMAP = 0x10;
+const int FEATURE_SKELETAL = 0x20;
+const int FEATURE_LIGHTING = 0x40;
+const int FEATURE_SELFILLUM = 0x80;
+const int FEATURE_BLUR = 0x100;
+const int FEATURE_BLOOM = 0x200;
+const int FEATURE_DISCARD = 0x400;
+const int FEATURE_SHADOWS = 0x800;
+const int FEATURE_BILLBOARD = 0x1000;
+const int FEATURE_WATER = 0x2000;
+
 struct Light {
     vec4 position;
     vec4 color;
@@ -58,20 +72,7 @@ struct Light {
 };
 
 layout(std140) uniform General {
-    bool uDiffuseEnabled;
-    bool uLightmapEnabled;
-    bool uEnvmapEnabled;
-    bool uPBRIBLEnabled;
-    bool uBumpmapEnabled;
-    bool uSkeletalEnabled;
-    bool uLightingEnabled;
-    bool uSelfIllumEnabled;
-    bool uBlurEnabled;
-    bool uBloomEnabled;
-    bool uDiscardEnabled;
-    bool uShadowsEnabled;
-    bool uBillboardEnabled;
-
+    uniform int uFeatureMask;
     uniform mat4 uModel;
     uniform vec4 uColor;
     uniform float uAlpha;
@@ -80,7 +81,6 @@ layout(std140) uniform General {
     uniform vec2 uBlurResolution;
     uniform vec2 uBlurDirection;
     uniform vec2 uUvOffset;
-    uniform bool uWater;
     uniform float uWaterAlpha;
     uniform float uRoughness;
 };
@@ -118,6 +118,10 @@ layout(std140) uniform Bumpmap {
     uniform int uBumpmapFrame;
     uniform bool uBumpmapSwizzled;
 };
+
+bool isFeatureEnabled(int flag) {
+    return (uFeatureMask & flag) != 0;
+}
 )END";
 
 static constexpr GLchar *kShaderBaseModel = R"END(
@@ -382,7 +386,7 @@ out mat3 fragTanSpace;
 void main() {
     vec3 newPosition = vec3(0.0);
 
-    if (uSkeletalEnabled) {
+    if (isFeatureEnabled(FEATURE_SKELETAL)) {
         float weight0 = aBoneWeights.x;
         float weight1 = aBoneWeights.y;
         float weight2 = aBoneWeights.z;
@@ -410,7 +414,7 @@ void main() {
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
-    if (uBumpmapEnabled) {
+    if (isFeatureEnabled(FEATURE_BUMPMAP)) {
         vec3 T = normalize(vec3(uModel * vec4(aTangent, 0.0)));
         vec3 B = normalize(vec3(uModel * vec4(aBitangent, 0.0)));
         vec3 N = normalize(vec3(uModel * vec4(aNormal, 0.0)));
@@ -528,7 +532,7 @@ void main() {
     vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
     vec3 objectColor = uColor.rgb * diffuseSample.rgb;
 
-    if (uDiscardEnabled && length(uDiscardColor.rgb - objectColor) < 0.01) discard;
+    if (isFeatureEnabled(FEATURE_DISCARD) && length(uDiscardColor.rgb - objectColor) < 0.01) discard;
 
     fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
@@ -540,7 +544,7 @@ void main() {
     vec2 texCoords = fragTexCoords + uUvOffset;
 
     vec4 diffuseSample;
-    if (uDiffuseEnabled) {
+    if (isFeatureEnabled(FEATURE_DIFFUSE)) {
         diffuseSample = texture(uDiffuse, texCoords);
     } else {
         diffuseSample = vec4(vec3(0.5), 1.0);
@@ -549,7 +553,7 @@ void main() {
     vec3 V = normalize(uCameraPosition - fragPosition);
 
     vec3 N;
-    if (uBumpmapEnabled) {
+    if (isFeatureEnabled(FEATURE_BUMPMAP)) {
         N = getNormalFromBumpmap(texCoords);
     } else {
         N = normalize(fragNormal);
@@ -557,7 +561,7 @@ void main() {
 
     vec3 objectColor;
 
-    if (uLightingEnabled) {
+    if (isFeatureEnabled(FEATURE_LIGHTING)) {
         objectColor = uAmbientLightColor.rgb * uMaterialAmbient.rgb * diffuseSample.rgb;
 
         for (int i = 0; i < uLightCount; ++i) {
@@ -584,25 +588,25 @@ void main() {
     }
 
     float objectAlpha = uAlpha;
-    if (!uEnvmapEnabled && !uBumpmapEnabled) {
+    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
         objectAlpha *= diffuseSample.a;
     }
-    if (uSelfIllumEnabled) {
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
     }
-    if (uEnvmapEnabled) {
+    if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
-    if (uLightmapEnabled) {
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, uWater ? 0.2 : 1.0);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
     }
-    if (uShadowsEnabled) {
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
         objectColor *= 1.0 - 0.5 * getShadow();
     }
-    if (uWater) {
+    if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
@@ -621,14 +625,14 @@ void main() {
     vec2 texCoords = fragTexCoords + uUvOffset;
 
     vec4 diffuseSample;
-    if (uDiffuseEnabled) {
+    if (isFeatureEnabled(FEATURE_DIFFUSE)) {
         diffuseSample = texture(uDiffuse, texCoords);
     } else {
         diffuseSample = vec4(vec3(0.5), 1.0);
     }
 
     vec3 N;
-    if (uBumpmapEnabled) {
+    if (isFeatureEnabled(FEATURE_BUMPMAP)) {
         N = getNormalFromBumpmap(texCoords);
     } else {
         N = normalize(fragNormal);
@@ -647,10 +651,10 @@ void main() {
 
     vec3 objectColor;
 
-    if (uLightingEnabled) {
+    if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 ambient = uAmbientLightColor.rgb * albedo * ao;
 
-        if (uPBRIBLEnabled) {
+        if (isFeatureEnabled(FEATURE_PBRIBL)) {
             vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
             vec3 kS = F;
@@ -707,24 +711,24 @@ void main() {
     }
 
     float objectAlpha = uAlpha;
-    if (!uEnvmapEnabled && !uBumpmapEnabled) {
+    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
         objectAlpha *= diffuseSample.a;
     }
-    if (uSelfIllumEnabled) {
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
     }
-    if (!uLightingEnabled && uEnvmapEnabled) {
+    if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
-    if (uLightmapEnabled) {
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, uWater ? 0.2 : 1.0);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
     }
-    if (uShadowsEnabled) {
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
         objectColor *= 1.0 - 0.5 * getShadow();
     }
-    if (uWater) {
+    if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
@@ -1103,19 +1107,19 @@ void Shaders::setLocalUniforms(const LocalUniforms &locals) {
     glBindBufferBase(GL_UNIFORM_BUFFER, kGeneralBindingPointIndex, _generalUbo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &locals.general, GL_STATIC_DRAW);
 
-    if (locals.general.skeletalEnabled) {
+    if (locals.general.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), locals.skeletal.get(), GL_STATIC_DRAW);
     }
-    if (locals.general.lightingEnabled) {
+    if (locals.general.featureMask & UniformFeatureFlags::lighting) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), locals.lighting.get(), GL_STATIC_DRAW);
     }
-    if (locals.general.billboardEnabled) {
+    if (locals.general.featureMask & UniformFeatureFlags::billboard) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniforms), &locals.billboard, GL_STATIC_DRAW);
     }
-    if (locals.general.bumpmapEnabled) {
+    if (locals.general.featureMask & UniformFeatureFlags::bumpmap) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBumpmapBindingPointIndex, _bumpmapUbo);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(BumpmapUniforms), &locals.bumpmap, GL_STATIC_DRAW);
     }
