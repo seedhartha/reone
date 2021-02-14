@@ -1,7 +1,7 @@
 {
     "rows": [
         {
-            "tex": "DEFAULT",
+            "tex": "_default",
             "specular": "0.1",
             "shininess": "8.0",
             "metallic": "0.0",
