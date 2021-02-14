@@ -21,7 +21,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../../common/singleton.h"
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/types.h"
 
 #include "creature.h"
@@ -36,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-class Blueprints : public Singleton {
+class Blueprints : boost::noncopyable {
 public:
     static Blueprints &instance();
 

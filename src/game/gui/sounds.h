@@ -19,14 +19,15 @@
 
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../audio/stream.h"
-#include "../../common/singleton.h"
 
 namespace reone {
 
 namespace game {
 
-class GUISounds : public Singleton {
+class GUISounds : boost::noncopyable {
 public:
     static GUISounds &instance();
 

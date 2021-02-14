@@ -25,11 +25,11 @@
 #include <thread>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "AL/alc.h"
 
 #include "glm/vec3.hpp"
-
-#include "../common/singleton.h"
 
 #include "soundinstance.h"
 
@@ -39,7 +39,7 @@ namespace audio {
 
 class SoundHandle;
 
-class AudioPlayer : public Singleton {
+class AudioPlayer : boost::noncopyable {
 public:
     static AudioPlayer &instance();
 

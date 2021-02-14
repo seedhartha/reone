@@ -70,7 +70,6 @@ set(COMMON_HEADERS
     src/common/mediastream.h
     src/common/pathutil.h
     src/common/random.h
-    src/common/singleton.h
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
@@ -204,7 +203,6 @@ set(RENDER_SOURCES
     src/render/model/animation.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
-    src/render/model/modelloader.cpp
     src/render/model/modelmesh.cpp
     src/render/model/modelnode.cpp
     src/render/model/models.cpp

@@ -19,11 +19,11 @@
 
 #include <boost/asio/thread_pool.hpp>
 
-#include "../common/singleton.h"
+#include <boost/noncopyable.hpp>
 
 namespace reone {
 
-class JobExecutor : public Singleton {
+class JobExecutor : boost::noncopyable {
 public:
     static JobExecutor &instance();
 

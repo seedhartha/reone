@@ -22,7 +22,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../common/singleton.h"
+#include <boost/noncopyable.hpp>
 
 #include "framebuffer.h"
 #include "texture.h"
@@ -35,7 +35,7 @@ namespace render {
  * Computes and caches PBR IBL textures, i.e. irradiance maps, prefiltered
  * environment maps and BRDF lookup textures.
  */
-class PBRIBL : public Singleton {
+class PBRIBL : boost::noncopyable {
 public:
     struct Derived {
         std::shared_ptr<Texture> irradianceMap;

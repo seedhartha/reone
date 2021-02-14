@@ -21,7 +21,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../common/singleton.h"
+#include <boost/noncopyable.hpp>
 
 #include "material.h"
 
@@ -29,7 +29,7 @@ namespace reone {
 
 namespace render {
 
-class Materials : public Singleton {
+class Materials : boost::noncopyable {
 public:
     static Materials &instance();
 

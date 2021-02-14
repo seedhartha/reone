@@ -21,7 +21,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../common/singleton.h"
+#include <boost/noncopyable.hpp>
+
 #include "../resource/types.h"
 
 #include "types.h"
@@ -37,7 +38,7 @@ class Texture;
 
 namespace game {
 
-class Cursors : public Singleton {
+class Cursors : boost::noncopyable {
 public:
     static Cursors &instance();
 
