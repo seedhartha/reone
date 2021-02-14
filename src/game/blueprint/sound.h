@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/format/gfffile.h"
 
 namespace reone {
@@ -28,7 +30,7 @@ namespace game {
 
 class Sound;
 
-class SoundBlueprint {
+class SoundBlueprint : boost::noncopyable {
 public:
     SoundBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &uts);
 
@@ -37,9 +39,6 @@ public:
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _uts;
-
-    SoundBlueprint(const SoundBlueprint &) = delete;
-    SoundBlueprint &operator=(const SoundBlueprint &) = delete;
 };
 
 } // namespace game

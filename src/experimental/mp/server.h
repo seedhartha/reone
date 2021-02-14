@@ -23,6 +23,7 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "connection.h"
 #include "command.h"
@@ -34,9 +35,8 @@ namespace mp {
 
 typedef std::map<std::string, std::unique_ptr<Connection>> ServerClients;
 
-class Server {
+class Server : boost::noncopyable {
 public:
-    Server() = default;
     ~Server();
 
     void start(int port);
@@ -68,9 +68,6 @@ private:
     std::function<void(const std::string &, const ByteArray &)> _onCommandReceived;
 
     // END Callbacks
-
-    Server(const Server &) = delete;
-    Server &operator=(const Server &) = delete;
 
     void handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> &socket, const boost::system::error_code &ec);
     void stopClient(const std::string &tag);

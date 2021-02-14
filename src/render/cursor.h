@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec2.hpp"
 
 namespace reone {
@@ -27,7 +29,7 @@ namespace render {
 
 class Texture;
 
-class Cursor {
+class Cursor : boost::noncopyable {
 public:
     Cursor(const std::shared_ptr<Texture> &up, const std::shared_ptr<Texture> &down);
 
@@ -37,9 +39,6 @@ public:
     void setPressed(bool pressed);
 
 private:
-    Cursor(const Cursor &) = delete;
-    Cursor &operator=(const Cursor &) = delete;
-
     glm::ivec2 _position { 0 };
     bool _pressed { false };
     std::shared_ptr<Texture> _up;

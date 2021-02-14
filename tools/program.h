@@ -21,6 +21,7 @@
 #include <memory>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
 #include "../src/resource/types.h"
@@ -32,7 +33,7 @@ namespace reone {
 
 namespace tools {
 
-class Program {
+class Program : boost::noncopyable {
 public:
     Program(int argc, char **argv);
 
@@ -51,9 +52,6 @@ private:
     Operation _operation { Operation::None };
     resource::GameID _gameId { resource::GameID::KotOR };
     std::vector<std::shared_ptr<ITool>> _tools;
-
-    Program(const Program &) = delete;
-    Program &operator=(const Program &) = delete;
 
     void initOptions();
     void loadOptions();

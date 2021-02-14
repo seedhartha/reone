@@ -21,6 +21,8 @@
 #include <memory>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../script/types.h"
 
 namespace reone {
@@ -34,7 +36,7 @@ class Object;
  * An interface for game objects to run their scripts. This is needed because
  * runScript accepts smart pointers to game objects.
  */
-class ScriptRunner {
+class ScriptRunner : boost::noncopyable {
 public:
     ScriptRunner(Game *game);
 
@@ -46,9 +48,6 @@ public:
 
 private:
     Game *_game;
-
-    ScriptRunner(const ScriptRunner &) = delete;
-    ScriptRunner &operator=(const ScriptRunner &) = delete;
 };
 
 } // namespace game

@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../resource/format/gfffile.h"
 
 #include "types.h"
@@ -32,7 +34,7 @@ struct DialogWaitFlags {
     static constexpr int waitAnimFinish = 1;
 };
 
-class Dialog {
+class Dialog : boost::noncopyable {
 public:
     struct Stunt {
         std::string participant;
@@ -98,9 +100,6 @@ private:
     std::vector<Stunt> _stunts;
     ConversationType _conversationType { ConversationType::Cinematic };
     ComputerType _computerType { ComputerType::Normal };
-
-    Dialog(const Dialog &) = delete;
-    Dialog &operator=(const Dialog &) = delete;
 
     EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
     EntryReply getEntryReply(const resource::GffStruct &gffs) const;

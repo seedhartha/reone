@@ -20,6 +20,8 @@
 #include <memory>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "../common/types.h"
@@ -33,7 +35,7 @@ namespace render {
 /**
  * Abstraction over the OpenGL texture object.
  */
-class Texture {
+class Texture : boost::noncopyable {
 public:
     enum class Filtering {
         Nearest,
@@ -154,9 +156,6 @@ private:
     PixelFormat _pixelFormat { PixelFormat::BGR };
     std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
     Features _features;
-
-    Texture(const Texture &) = delete;
-    Texture &operator=(const Texture &) = delete;
 
     void configure2D();
     void configureCubeMap();

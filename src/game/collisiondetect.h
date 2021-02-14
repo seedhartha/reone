@@ -20,6 +20,8 @@
 #include <memory>
 #include <set>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "object/types.h"
@@ -65,7 +67,7 @@ struct RaycastResult {
     float distance { 0.0f };
 };
 
-class CollisionDetector {
+class CollisionDetector : boost::noncopyable {
 public:
     CollisionDetector(Area *area);
 
@@ -75,10 +77,7 @@ public:
     bool raycast(const RaycastProperties &props, RaycastResult &result) const;
 
 private:
-    Area *_area { nullptr };
-
-    CollisionDetector(const CollisionDetector &) = delete;
-    CollisionDetector &operator=(const CollisionDetector &) = delete;
+    Area *_area;
 
     bool rayTestObjects(const RaycastProperties &props, RaycastResult &result) const;
     bool rayTestRooms(const RaycastProperties &props, RaycastResult &result) const;

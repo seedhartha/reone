@@ -24,6 +24,8 @@
 #include <queue>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "SDL2/SDL_events.h"
 
 #include "../gui/textinput.h"
@@ -36,7 +38,7 @@ namespace game {
 
 class Game;
 
-class Console {
+class Console : boost::noncopyable {
 public:
     Console(Game *game);
 
@@ -58,9 +60,6 @@ private:
     int _outputOffset { 0 };
     std::unordered_map<std::string, CommandHandler> _commands;
     std::stack<std::string> _history;
-
-    Console(const Console &) = delete;
-    Console &operator=(const Console &) = delete;
 
     bool handleMouseWheel(const SDL_MouseWheelEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);

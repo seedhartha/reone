@@ -23,10 +23,12 @@
 #include <utility>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 template <class Frame>
-class MediaStream {
+class MediaStream : boost::noncopyable {
 public:
     static constexpr int kBufferSize = 8;
 
@@ -57,8 +59,6 @@ public:
     }
 
 protected:
-    MediaStream() = default;
-
     virtual void ignoreFrames(int count) = 0;
     virtual void fetchFrames(int count) = 0;
 
@@ -66,9 +66,6 @@ protected:
     bool _ended { false };
 
 private:
-    MediaStream(const MediaStream &) = delete;
-    MediaStream &operator=(const MediaStream &) = delete;
-
     int _frameOffset { 0 };
 };
 

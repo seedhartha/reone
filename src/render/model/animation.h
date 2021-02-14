@@ -19,6 +19,8 @@
 
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "modelnode.h"
 
 namespace reone {
@@ -27,7 +29,7 @@ namespace render {
 
 class MdlFile;
 
-class Animation {
+class Animation : boost::noncopyable {
 public:
     struct Event {
         float time { 0.0f };
@@ -59,9 +61,6 @@ private:
     std::shared_ptr<ModelNode> _rootNode;
 
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
-
-    Animation(const Animation &) = delete;
-    Animation &operator=(const Animation &) = delete;
 
     void initNodeByName();
 

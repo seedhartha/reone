@@ -22,6 +22,7 @@
 #include <map>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "SDL2/SDL_events.h"
 
@@ -72,7 +73,7 @@ namespace game {
  * @see game::Module
  * @see gui::GUI
  */
-class Game : public render::IEventHandler {
+class Game : public render::IEventHandler, boost::noncopyable {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
     virtual ~Game() = default;
@@ -261,9 +262,6 @@ private:
     std::map<uint32_t, std::map<int, int>> _localNumbers;
 
     // END Globals/locals
-
-    Game(const Game &) = delete;
-    Game &operator=(const Game &) = delete;
 
     /**
     * Releases the engine subsystems.

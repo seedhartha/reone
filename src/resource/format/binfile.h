@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "../../common/streamreader.h"
 #include "../../common/types.h"
@@ -36,7 +37,7 @@ namespace resource {
  * expected to specify the file signature through the constructor and override
  * the doLoad function.
  */
-class BinaryFile {
+class BinaryFile : boost::noncopyable {
 public:
     void load(const std::shared_ptr<std::istream> &in);
     void load(const boost::filesystem::path &path);
@@ -88,9 +89,6 @@ protected:
 private:
     int _signSize { 0 };
     ByteArray _sign;
-
-    BinaryFile(const BinaryFile &) = delete;
-    BinaryFile &operator=(const BinaryFile &) = delete;
 
     void load();
     void querySize();

@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/format/gfffile.h"
 
 namespace reone {
@@ -28,7 +30,7 @@ namespace game {
 
 class Waypoint;
 
-class WaypointBlueprint {
+class WaypointBlueprint : boost::noncopyable {
 public:
     WaypointBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utw);
 
@@ -37,9 +39,6 @@ public:
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _utw;
-
-    WaypointBlueprint(const WaypointBlueprint &) = delete;
-    WaypointBlueprint &operator=(const WaypointBlueprint &) = delete;
 };
 
 } // namespace game

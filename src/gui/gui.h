@@ -21,6 +21,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
@@ -36,7 +38,7 @@ namespace gui {
 static constexpr int kDefaultResolutionX = 640;
 static constexpr int kDefaultResolutionY = 480;
 
-class GUI {
+class GUI : boost::noncopyable {
 public:
     virtual void load();
 
@@ -115,9 +117,6 @@ protected:
 
 private:
     bool _leftMouseDown { false };
-
-    GUI(const GUI &) = delete;
-    GUI &operator=(const GUI &) = delete;
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);

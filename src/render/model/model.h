@@ -21,6 +21,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../aabb.h"
 
 #include "animation.h"
@@ -36,7 +38,7 @@ namespace render {
  * @see reone::render::ModelNode
  * @see reone::render::Animation
  */
-class Model {
+class Model : boost::noncopyable {
 public:
     enum class Classification {
         Other,
@@ -85,9 +87,6 @@ private:
     AABB _aabb;
     float _animationScale { 1.0f };
     int _maxNodeIndex { 0 }; /**< the maximum node index in this model, used to stitch multiple models together */
-
-    Model(const Model &) = delete;
-    Model &operator=(const Model &) = delete;
 
     void init(const std::shared_ptr<ModelNode> &node);
 

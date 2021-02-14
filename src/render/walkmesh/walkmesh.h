@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../aabb.h"
 
 namespace reone {
@@ -27,10 +29,8 @@ namespace render {
 
 class BwmFile;
 
-class Walkmesh {
+class Walkmesh : boost::noncopyable {
 public:
-    Walkmesh() = default;
-
     bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
 
     const AABB &aabb() const { return _aabb; }
@@ -45,9 +45,6 @@ private:
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;
     AABB _aabb;
-
-    Walkmesh(const Walkmesh &) = delete;
-    Walkmesh &operator=(const Walkmesh &) = delete;
 
     void computeAABB();
 

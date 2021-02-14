@@ -117,52 +117,52 @@ glm::quat GffField::asOrientation() const {
 GffStruct::GffStruct(GffFieldType type) : _type(type) {
 }
 
-const GffField *GffStruct::find(const string &name) const {
+shared_ptr<GffField> GffStruct::find(const string &name) const {
     auto it = find_if(
         _fields.begin(),
         _fields.end(),
-        [&](const GffField &f) { return f.label() == name; });
+        [&](auto &f) { return f->label() == name; });
 
-    return it != _fields.end() ? &*it : nullptr;
+    return it != _fields.end() ? *it : nullptr;
 }
 
 bool GffStruct::getBool(const string &name, bool defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->asBool() : defaultValue;
 }
 
 int GffStruct::getInt(const string &name, int defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? static_cast<int>(field->asInt()) : defaultValue;
 }
 
 float GffStruct::getFloat(const string &name, float defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->asFloat() : defaultValue;
 }
 
 string GffStruct::getString(const string &name, const char *defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->asString() : defaultValue;
 }
 
 glm::vec3 GffStruct::getVector(const string &name, glm::vec3 defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->asVector() : move(defaultValue);
 }
 
 glm::quat GffStruct::getOrientation(const string &name, glm::quat defaultValue) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->asOrientation() : move(defaultValue);
 }
 
 shared_ptr<GffStruct> GffStruct::getStruct(const string &name) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->children()[0] : nullptr;
 }
 
 vector<shared_ptr<GffStruct>> GffStruct::getList(const string &name) const {
-    const GffField *field = find(name);
+    shared_ptr<GffField> field(find(name));
     return field ? field->children() : vector<shared_ptr<GffStruct>>();
 }
 
@@ -207,7 +207,7 @@ unique_ptr<GffStruct> GffFile::readStruct(int idx) {
     return move(gffs);
 }
 
-GffField GffFile::readField(int idx) {
+unique_ptr<GffField> GffFile::readField(int idx) {
     seek(_fieldOffset + 12 * idx);
 
     uint32_t type = readUint32();
@@ -215,11 +215,11 @@ GffField GffFile::readField(int idx) {
     uint32_t dataOrDataOffset = readUint32();
 
     string label(readLabel(labelIndex));
-    GffField field(static_cast<GffFieldType>(type), label);
+    auto field = make_unique<GffField>(static_cast<GffFieldType>(type), label);
     LocString locString;
     vector<uint32_t> list;
 
-    switch (field._type) {
+    switch (field->_type) {
         case GffFieldType::Byte:
         case GffFieldType::Char:
         case GffFieldType::Word:
@@ -227,53 +227,53 @@ GffField GffFile::readField(int idx) {
         case GffFieldType::Dword:
         case GffFieldType::Int:
         case GffFieldType::Float:
-            field._uintValue = dataOrDataOffset;
+            field->_uintValue = dataOrDataOffset;
             break;
 
         case GffFieldType::Dword64:
         case GffFieldType::Int64:
         case GffFieldType::Double:
-            field._uintValue = readQWordFieldData(dataOrDataOffset);
+            field->_uintValue = readQWordFieldData(dataOrDataOffset);
             break;
 
         case GffFieldType::CExoString:
-            field._strValue = readStringFieldData(dataOrDataOffset);
+            field->_strValue = readStringFieldData(dataOrDataOffset);
             break;
 
         case GffFieldType::ResRef:
-            field._strValue = readResRefFieldData(dataOrDataOffset);
+            field->_strValue = readResRefFieldData(dataOrDataOffset);
             break;
 
         case GffFieldType::CExoLocString:
             locString = readCExoLocStringFieldData(dataOrDataOffset);
-            field._intValue = locString.strRef;
-            field._strValue = locString.subString;
+            field->_intValue = locString.strRef;
+            field->_strValue = locString.subString;
             break;
 
         case GffFieldType::StrRef:
-            field._intValue = readStrRefFieldData(dataOrDataOffset);
+            field->_intValue = readStrRefFieldData(dataOrDataOffset);
             break;
 
         case GffFieldType::Void:
-            field._data = readByteArrayFieldData(dataOrDataOffset);
+            field->_data = readByteArrayFieldData(dataOrDataOffset);
             break;
 
         case GffFieldType::Orientation:
-            field._data = readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float));
+            field->_data = readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float));
             break;
 
         case GffFieldType::Vector:
-            field._data = readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float));
+            field->_data = readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float));
             break;
 
         case GffFieldType::Struct:
-            field._children.push_back(readStruct(dataOrDataOffset));
+            field->_children.push_back(readStruct(dataOrDataOffset));
             break;
 
         case GffFieldType::List:
             list = readList(dataOrDataOffset);
             for (auto &item : list) {
-                field._children.push_back(readStruct(item));
+                field->_children.push_back(readStruct(item));
             }
             break;
 

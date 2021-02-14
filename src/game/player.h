@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include "SDL2/SDL_events.h"
 
 namespace reone {
@@ -32,7 +34,7 @@ class Party;
 /**
  * Encapsulates third-person player controls.
  */
-class Player {
+class Player : boost::noncopyable {
 public:
     Player(Module *module, Area *area, Camera *camera, const Party *party);
 
@@ -54,9 +56,6 @@ private:
     bool _moveBackward { false };
     bool _moveRight { false };
     bool _leftPressedInMouseLook { false };
-
-    Player(const Player &) = delete;
-    Player &operator=(const Player &) = delete;
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);

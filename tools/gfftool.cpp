@@ -45,12 +45,12 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
     vector<float> values;
 
     for (auto &field : gffs.fields()) {
-        auto &fieldChildren = field.children();
+        auto &fieldChildren = field->children();
 
-        switch (field.type()) {
+        switch (field->type()) {
             case GffFieldType::Struct:
-                child = getPropertyTree(*field.children()[0]);
-                tree.add_child(field.label(), child);
+                child = getPropertyTree(*field->children()[0]);
+                tree.add_child(field->label(), child);
                 break;
 
             case GffFieldType::List:
@@ -59,30 +59,30 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
                     child = getPropertyTree(*childGffs);
                     children.push_back(make_pair("", child));
                 }
-                tree.add_child(field.label(), children);
+                tree.add_child(field->label(), children);
                 break;
 
             case GffFieldType::Orientation:
-                values = field.asFloatArray();
+                values = field->asFloatArray();
                 child.clear();
                 child.put("W", values[0]);
                 child.put("X", values[1]);
                 child.put("Y", values[2]);
                 child.put("Z", values[3]);
-                tree.add_child(field.label(), child);
+                tree.add_child(field->label(), child);
                 break;
 
             case GffFieldType::Vector:
-                values = field.asFloatArray();
+                values = field->asFloatArray();
                 child.clear();
                 child.put("X", values[0]);
                 child.put("Y", values[1]);
                 child.put("Z", values[2]);
-                tree.add_child(field.label(), child);
+                tree.add_child(field->label(), child);
                 break;
 
             default:
-                tree.put(field.label(), field.asString());
+                tree.put(field->label(), field->asString());
                 break;
         }
     }
