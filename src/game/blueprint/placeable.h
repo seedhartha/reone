@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/format/gfffile.h"
 
 namespace reone {
@@ -31,7 +33,7 @@ namespace game {
 class ObjectFactory;
 class Placeable;
 
-class PlaceableBlueprint {
+class PlaceableBlueprint : boost::noncopyable {
 public:
     PlaceableBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utp);
 
@@ -42,9 +44,6 @@ public:
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _utp;
-
-    PlaceableBlueprint(const PlaceableBlueprint &) = delete;
-    PlaceableBlueprint &operator=(const PlaceableBlueprint &) = delete;
 
     void loadItems(Placeable &placeable);
     void loadScripts(Placeable &placeable);

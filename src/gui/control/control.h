@@ -21,6 +21,8 @@
 #include <functional>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
@@ -41,7 +43,7 @@ class GUI;
 /**
  * GUI control. Can render itself and handle events.
  */
-class Control {
+class Control : boost::noncopyable {
 public:
     static constexpr int kStretchLeft = 1;
     static constexpr int kStretchTop = 2;
@@ -195,9 +197,6 @@ protected:
 
 private:
     std::unique_ptr<scene::ControlRenderPipeline> _pipeline;
-
-    Control(const Control &) = delete;
-    Control &operator=(const Control &) = delete;
 
     void loadExtent(const resource::GffStruct &gffs);
     void loadBorder(const resource::GffStruct &gffs);

@@ -20,6 +20,8 @@
 #include <istream>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "mad.h"
 
 #include "../stream.h"
@@ -28,10 +30,8 @@ namespace reone {
 
 namespace audio {
 
-class Mp3File {
+class Mp3File : boost::noncopyable {
 public:
-    Mp3File() = default;
-
     void load(const std::shared_ptr<std::istream> &stream);
     void load(ByteArray &&data);
 
@@ -41,9 +41,6 @@ private:
     ByteArray _input;
     std::shared_ptr<AudioStream> _stream;
     bool _done { false };
-
-    Mp3File(const Mp3File &) = delete;
-    Mp3File &operator=(const Mp3File &) = delete;
 
     static mad_flow inputFunc(void *playbuf, mad_stream *stream);
     static mad_flow headerFunc(void *playbuf, mad_header const *header);

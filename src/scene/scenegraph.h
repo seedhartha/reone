@@ -21,6 +21,8 @@
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "../render/types.h"
@@ -35,7 +37,7 @@ class ModelNodeSceneNode;
 class ParticleSceneNode;
 class SceneNode;
 
-class SceneGraph {
+class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(const render::GraphicsOptions &opts);
 
@@ -93,9 +95,6 @@ private:
     glm::vec3 _shadowLightPosition { 0.0f };
     std::shared_ptr<SceneNode> _refNode;
     bool _update { true };
-
-    SceneGraph(const SceneGraph &) = delete;
-    SceneGraph &operator=(const SceneGraph &) = delete;
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

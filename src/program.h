@@ -18,6 +18,7 @@
 #pragma once
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
 #include "experimental/mp/types.h"
@@ -30,7 +31,7 @@ namespace reone {
  *
  * @see game::Game
  */
-class Program {
+class Program : boost::noncopyable {
 public:
     Program(int argc, char **argv);
 
@@ -52,9 +53,6 @@ private:
     boost::filesystem::path _gamePath;
     game::Options _gameOpts;
     mp::MultiplayerMode _multiplayerMode { mp::MultiplayerMode::None };
-
-    Program(const Program &) = delete;
-    Program &operator=(const Program &) = delete;
 
     void initOptions();
     void loadOptions();

@@ -23,6 +23,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/system/error_code.hpp>
 
 #include "../../common/types.h"
@@ -34,7 +35,7 @@ namespace reone {
 
 namespace mp {
 
-class Connection {
+class Connection : boost::noncopyable {
 public:
     Connection(std::shared_ptr<boost::asio::ip::tcp::socket> &socket);
     ~Connection();
@@ -69,9 +70,6 @@ private:
     std::function<void(const ByteArray &)> _onCommandReceived;
 
     // END Callbacks
-
-    Connection(const Connection &) = delete;
-    Connection &operator=(const Connection &) = delete;
 
     void doSend(const Command &command);
     void handleRead(size_t bytesRead, const boost::system::error_code &ec);

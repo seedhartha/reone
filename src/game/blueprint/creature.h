@@ -21,6 +21,8 @@
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/format/gfffile.h"
 
 #include "../rp/attributes.h"
@@ -36,7 +38,7 @@ class Creature;
 /**
  * Creature blueprint that loads data from a UTC file.
  */
-class CreatureBlueprint : public Blueprint<Creature> {
+class CreatureBlueprint : public Blueprint<Creature>, boost::noncopyable {
 public:
     CreatureBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utc);
 
@@ -49,9 +51,6 @@ public:
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _utc;
-
-    CreatureBlueprint(const CreatureBlueprint &) = delete;
-    CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 
     void loadName(Creature &creature);
     void loadAttributes(Creature &creature);

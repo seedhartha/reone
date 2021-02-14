@@ -19,6 +19,8 @@
 
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../common/streamwriter.h"
 
 #include "binfile.h"
@@ -42,10 +44,8 @@ private:
     std::vector<std::pair<std::string, std::string>> _values;
 };
 
-class TwoDaTable {
+class TwoDaTable : boost::noncopyable {
 public:
-    TwoDaTable() = default;
-
     void add(TwoDaRow row);
 
     const TwoDaRow *get(const std::function<bool(const TwoDaRow &)> &pred) const;
@@ -62,9 +62,6 @@ public:
 private:
     std::vector<std::string> _headers;
     std::vector<TwoDaRow> _rows;
-
-    TwoDaTable(const TwoDaTable &) = delete;
-    TwoDaTable &operator=(const TwoDaTable &) = delete;
 
     friend class TwoDaFile;
 };

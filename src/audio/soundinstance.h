@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "stream.h"
@@ -54,9 +56,6 @@ private:
     uint32_t _source { 0 };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
-
-    SoundInstance(SoundInstance &) = delete;
-    SoundInstance &operator=(SoundInstance &) = delete;
 
     void deinit();
 };

@@ -20,16 +20,16 @@
 #include <istream>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "../types.h"
 
 namespace reone {
 
 namespace resource {
 
-class VisFile {
+class VisFile : boost::noncopyable {
 public:
-    VisFile() = default;
-
     void load(const std::shared_ptr<std::istream> &in);
 
     const Visibility &visibility() const { return _visibility; }
@@ -37,9 +37,6 @@ public:
 private:
     Visibility _visibility;
     std::string _roomFrom;
-
-    VisFile(const VisFile &) = delete;
-    VisFile &operator=(const VisFile &) = delete;
 
     void processLine(const std::string &line);
 };

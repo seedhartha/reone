@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include "binfile.h"
 
 namespace reone {
@@ -30,18 +32,13 @@ struct TalkTableString {
 
 class TlkFile;
 
-struct TalkTable {
+struct TalkTable : boost::noncopyable {
 public:
-    TalkTable() = default;
-
     const TalkTableString &getString(int32_t ref) const;
     int getStringCount() const;
 
 private:
     std::vector<TalkTableString> _strings;
-
-    TalkTable(const TalkTable &) = delete;
-    TalkTable &operator=(const TalkTable &) = delete;
 
     friend class TlkFile;
 };

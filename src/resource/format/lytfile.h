@@ -18,6 +18,7 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "glm/vec3.hpp"
 
@@ -25,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-class LytFile {
+class LytFile : boost::noncopyable {
 public:
     struct Room {
         std::string name;
@@ -37,8 +38,6 @@ public:
         std::string name;
         glm::vec3 position;
     };
-
-    LytFile() = default;
 
     void load(const std::shared_ptr<std::istream> &in);
     void load(const boost::filesystem::path &path);
@@ -61,9 +60,6 @@ private:
     int _doorHookCount { 0 };
     std::vector<Room> _rooms;
     std::vector<DoorHook> _doorHooks;
-
-    LytFile(const LytFile &) = delete;
-    LytFile &operator=(const LytFile &) = delete;
 
     void load();
     void processLine(const std::string &line);

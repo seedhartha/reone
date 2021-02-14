@@ -20,6 +20,8 @@
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/mat4x4.hpp"
 
 namespace reone {
@@ -28,7 +30,7 @@ namespace scene {
 
 class SceneGraph;
 
-class SceneNode {
+class SceneNode : boost::noncopyable {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
     void removeChild(SceneNode &node);
@@ -70,10 +72,6 @@ protected:
     SceneNode(SceneGraph *sceneGraph);
 
     virtual void updateAbsoluteTransform();
-
-private:
-    SceneNode(const SceneNode &) = delete;
-    SceneNode &operator=(const SceneNode &) = delete;
 };
 
 } // namespace scene

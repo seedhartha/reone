@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include <glm/vec2.hpp>
 
 #include "../resource/format/gfffile.h"
@@ -27,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-class Path {
+class Path : boost::noncopyable {
 public:
     struct Point {
         float x { 0.0f };
@@ -43,9 +45,6 @@ public:
 
 private:
     std::vector<Point> _points;
-
-    Path(const Path &) = delete;
-    Path &operator=(const Path &) = delete;
 };
 
 } // namespace game

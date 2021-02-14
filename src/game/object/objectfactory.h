@@ -20,6 +20,8 @@
 #include <cstdint>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../scene/scenegraph.h"
 #include "../../render/types.h"
 #include "../../resource/types.h"
@@ -58,12 +60,10 @@ public:
     std::unique_ptr<PlaceableCamera> newCamera();
 
 private:
-    Game *_game { nullptr };
-    scene::SceneGraph *_sceneGraph { nullptr };
-    uint32_t _counter { 2 }; // ids 0 and 1 are reserved
+    Game *_game;
+    scene::SceneGraph *_sceneGraph;
 
-    ObjectFactory(const ObjectFactory &) = delete;
-    ObjectFactory &operator=(const ObjectFactory &) = delete;
+    uint32_t _counter { 2 }; // ids 0 and 1 are reserved
 };
 
 } // namespace game

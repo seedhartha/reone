@@ -20,6 +20,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 namespace script {
@@ -128,7 +130,7 @@ struct Instruction {
     };
 };
 
-class ScriptProgram {
+class ScriptProgram : boost::noncopyable {
 public:
     ScriptProgram(const std::string &name);
 
@@ -145,9 +147,6 @@ private:
     std::string _name;
     uint32_t _length { 0 };
     std::unordered_map<uint32_t, Instruction> _instructions;
-
-    ScriptProgram(const ScriptProgram &) = delete;
-    ScriptProgram &operator=(const ScriptProgram &) = delete;
 
     friend class NcsFile;
 };

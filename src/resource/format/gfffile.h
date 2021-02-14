@@ -19,6 +19,8 @@
 
 #include "binfile.h"
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
 
@@ -50,7 +52,7 @@ enum class GffFieldType {
 
 class GffStruct;
 
-class GffField {
+class GffField : boost::noncopyable {
 public:
     GffField(GffFieldType type, const std::string &label);
     GffField(GffField &&) = default;
@@ -87,13 +89,10 @@ private:
         double _doubleValue;
     };
 
-    GffField(const GffField &) = delete;
-    GffField &operator=(const GffField &) = delete;
-
     friend class GffFile;
 };
 
-class GffStruct {
+class GffStruct : boost::noncopyable {
 public:
     GffStruct(GffFieldType type);
     GffStruct(GffStruct &&) = default;
@@ -109,16 +108,13 @@ public:
     std::shared_ptr<GffStruct> getStruct(const std::string &name) const;
     std::vector<std::shared_ptr<GffStruct>> getList(const std::string &name) const;
 
-    const std::vector<GffField> &fields() const { return _fields; }
+    const std::vector<std::shared_ptr<GffField>> &fields() const { return _fields; }
 
 private:
     GffFieldType _type { GffFieldType::Byte };
-    std::vector<GffField> _fields;
+    std::vector<std::shared_ptr<GffField>> _fields;
 
-    GffStruct(const GffStruct &) = delete;
-    GffStruct &operator=(const GffStruct &) = delete;
-
-    const GffField *find(const std::string &name) const;
+    std::shared_ptr<GffField> find(const std::string &name) const;
 
     friend class GffFile;
 };
@@ -150,8 +146,9 @@ private:
     std::shared_ptr<GffStruct> _top;
 
     void doLoad() override;
+
     std::unique_ptr<GffStruct> readStruct(int idx);
-    GffField readField(int idx);
+    std::unique_ptr<GffField> readField(int idx);
     std::string readLabel(int idx);
     std::vector<uint32_t> readFieldIndices(uint32_t off, int count);
     uint64_t readQWordFieldData(uint32_t off);

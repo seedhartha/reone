@@ -20,6 +20,7 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace reone {
 
@@ -27,7 +28,7 @@ namespace game {
 
 class Game;
 
-class SavedGame {
+class SavedGame : boost::noncopyable {
 public:
     SavedGame(const boost::filesystem::path &path);
 
@@ -41,9 +42,6 @@ private:
     boost::filesystem::path _path;
     uint64_t _timestamp { 0 };
     std::string _name;
-
-    SavedGame(const SavedGame &) = delete;
-    SavedGame &operator=(const SavedGame &) = delete;
 };
 
 } // namespace game

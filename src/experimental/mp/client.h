@@ -21,6 +21,7 @@
 #include <thread>
 
 #include <boost/asio/io_service.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "../../common/types.h"
 
@@ -31,9 +32,8 @@ namespace reone {
 
 namespace mp {
 
-class Client {
+class Client : boost::noncopyable {
 public:
-    Client() = default;
     ~Client();
 
     void start(const std::string &address, int port);
@@ -49,9 +49,6 @@ private:
     std::thread _thread;
     std::shared_ptr<Connection> _connection;
     std::function<void(const ByteArray &)> _onCommandReceived;
-
-    Client(const Client &) = delete;
-    Client &operator=(const Client &) = delete;
 
     void handleConnect(const boost::system::error_code &ec);
 };

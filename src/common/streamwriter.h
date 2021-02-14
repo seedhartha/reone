@@ -23,12 +23,14 @@
 #include <ostream>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
 #include "endianutil.h"
 #include "types.h"
 
 namespace reone {
 
-class StreamWriter {
+class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
 
@@ -45,9 +47,6 @@ public:
 private:
     std::shared_ptr<std::ostream> _stream;
     Endianess _endianess;
-
-    StreamWriter(const StreamWriter &) = delete;
-    StreamWriter &operator=(const StreamWriter &) = delete;
 
     template <class T>
     void put(T val) {

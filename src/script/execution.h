@@ -22,6 +22,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "program.h"
 #include "types.h"
 #include "variable.h"
@@ -30,7 +32,7 @@ namespace reone {
 
 namespace script {
 
-class ScriptExecution {
+class ScriptExecution : boost::noncopyable {
 public:
     ScriptExecution(const std::shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx);
 
@@ -48,9 +50,6 @@ private:
     uint32_t _nextInstruction { 0 };
     int _globalCount { 0 };
     ExecutionState _savedState;
-
-    ScriptExecution(const ScriptExecution &) = delete;
-    ScriptExecution &operator=(const ScriptExecution &) = delete;
 
     template <class T>
     void registerHandler(ByteCode code, T handler) {

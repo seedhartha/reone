@@ -19,6 +19,8 @@
 
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/gtx/quaternion.hpp"
 
 #include "emitter.h"
@@ -39,7 +41,7 @@ namespace render {
  * @see reone::render::Model
  * @see reone::render::Animation
  */
-class ModelNode {
+class ModelNode : boost::noncopyable {
 public:
     struct TranslationKeyframe {
         float time { 0.0f };
@@ -170,9 +172,6 @@ private:
     std::vector<ScaleKeyframe> _scaleFrames;
 
     // END Keyframes
-
-    ModelNode(const ModelNode &) = delete;
-    ModelNode &operator=(const ModelNode &) = delete;
 
     friend class MdlFile;
 };

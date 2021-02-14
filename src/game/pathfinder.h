@@ -24,6 +24,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "path.h"
@@ -32,10 +34,8 @@ namespace reone {
 
 namespace game {
 
-class Pathfinder {
+class Pathfinder : boost::noncopyable {
 public:
-    Pathfinder() = default;
-
     void load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ);
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
@@ -56,9 +56,6 @@ private:
 
     std::vector<glm::vec3> _vertices;
     std::unordered_map<uint16_t, std::vector<Edge>> _edges;
-
-    Pathfinder(const Pathfinder &) = delete;
-    Pathfinder &operator=(const Pathfinder &) = delete;
 
     uint16_t getNearestVertex(const glm::vec3 &point) const;
     void visit(uint16_t index, FindPathContext &ctx) const;
