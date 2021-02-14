@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../resource/format/binfile.h"
+#include "../../resource/format/binfile.h"
 
 #include "walkmesh.h"
 

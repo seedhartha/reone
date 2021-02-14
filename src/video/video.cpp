@@ -25,7 +25,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../render/mesh/meshes.h"
+#include "../render/meshes.h"
 #include "../render/shaders.h"
 
 using namespace std;

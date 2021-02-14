@@ -64,8 +64,8 @@ void EmitterSceneNode::update(float dt) {
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
-    switch (_emitter->updateType()) {
-        case Emitter::UpdateType::Fountain:
+    switch (_emitter->updateMode()) {
+        case Emitter::UpdateMode::Fountain:
             if (_emitter->birthrate() != 0.0f) {
                 if (_birthTimer.advance(dt)) {
                     if (_particles.size() < kMaxParticleCount) {
@@ -75,7 +75,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
                 }
             }
             break;
-        case Emitter::UpdateType::Single:
+        case Emitter::UpdateMode::Single:
             if (!_spawned || (_particles.empty() && _emitter->loop())) {
                 doSpawnParticle();
                 _spawned = true;

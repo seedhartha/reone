@@ -19,7 +19,7 @@
 #include <stdexcept>
 
 #include "../../common/log.h"
-#include "../../render/mesh/meshes.h"
+#include "../../render/meshes.h"
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"
@@ -51,34 +51,34 @@ ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &
 }
 
 static bool validateEmitter(const Emitter &emitter) {
-    switch (emitter.updateType()) {
-        case Emitter::UpdateType::Fountain:
-        case Emitter::UpdateType::Single:
-        case Emitter::UpdateType::Explosion:
+    switch (emitter.updateMode()) {
+        case Emitter::UpdateMode::Fountain:
+        case Emitter::UpdateMode::Single:
+        case Emitter::UpdateMode::Explosion:
             break;
         default:
-            warn("validateEmitter: unsupported update type: " + to_string(static_cast<int>(emitter.updateType())));
+            warn("validateEmitter: unsupported update mode: " + to_string(static_cast<int>(emitter.updateMode())));
             return false;
     }
 
-    switch (emitter.renderType()) {
-        case Emitter::RenderType::Normal:
-        case Emitter::RenderType::BillboardToWorldZ:
-        case Emitter::RenderType::MotionBlur:
-        case Emitter::RenderType::BillboardToLocalZ:
-        case Emitter::RenderType::AlignedToParticleDir:
+    switch (emitter.renderMode()) {
+        case Emitter::RenderMode::Normal:
+        case Emitter::RenderMode::BillboardToWorldZ:
+        case Emitter::RenderMode::MotionBlur:
+        case Emitter::RenderMode::BillboardToLocalZ:
+        case Emitter::RenderMode::AlignedToParticleDir:
             break;
         default:
-            warn("validateEmitter: unsupported render type: " + to_string(static_cast<int>(emitter.renderType())));
+            warn("validateEmitter: unsupported render mode: " + to_string(static_cast<int>(emitter.renderMode())));
             return false;
     }
 
-    switch (emitter.blendType()) {
-        case Emitter::BlendType::Normal:
-        case Emitter::BlendType::Lighten:
+    switch (emitter.blendMode()) {
+        case Emitter::BlendMode::Normal:
+        case Emitter::BlendMode::Lighten:
             break;
         default:
-            warn("validateEmitter: unsupported blend type: " + to_string(static_cast<int>(emitter.blendType())));
+            warn("validateEmitter: unsupported blend mode: " + to_string(static_cast<int>(emitter.blendMode())));
             return false;
     }
 

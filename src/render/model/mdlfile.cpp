@@ -931,46 +931,46 @@ Model::Classification MdlFile::getClassification(int value) const {
     }
 }
 
-static Emitter::UpdateType parseEmitterUpdate(const string &str) {
-    Emitter::UpdateType result = Emitter::UpdateType::Invalid;
+static Emitter::UpdateMode parseEmitterUpdate(const string &str) {
+    auto result = Emitter::UpdateMode::Invalid;
     if (str == "Fountain") {
-        result = Emitter::UpdateType::Fountain;
+        result = Emitter::UpdateMode::Fountain;
     } else if (str == "Single") {
-        result = Emitter::UpdateType::Single;
+        result = Emitter::UpdateMode::Single;
     } else if (str == "Explosion") {
-        result = Emitter::UpdateType::Explosion;
+        result = Emitter::UpdateMode::Explosion;
     } else {
         warn("parseEmitterUpdate: unsupported value: " + str);
     }
     return result;
 }
 
-static Emitter::RenderType parseEmitterRender(const string &str) {
-    Emitter::RenderType result = Emitter::RenderType::Invalid;
+static Emitter::RenderMode parseEmitterRender(const string &str) {
+    auto result = Emitter::RenderMode::Invalid;
     if (str == "Normal") {
-        result = Emitter::RenderType::Normal;
+        result = Emitter::RenderMode::Normal;
     } else if (str == "Billboard_to_World_Z") {
-        result = Emitter::RenderType::BillboardToWorldZ;
+        result = Emitter::RenderMode::BillboardToWorldZ;
     } else if (str == "Motion_Blur") {
-        result = Emitter::RenderType::MotionBlur;
+        result = Emitter::RenderMode::MotionBlur;
     } else if (str == "Billboard_to_Local_Z") {
-        result = Emitter::RenderType::BillboardToLocalZ;
+        result = Emitter::RenderMode::BillboardToLocalZ;
     } else if (str == "Aligned_to_Particle_Dir") {
-        result = Emitter::RenderType::AlignedToParticleDir;
+        result = Emitter::RenderMode::AlignedToParticleDir;
     } else {
         warn("parseEmitterRender: unsupported value: " + str);
     }
     return result;
 }
 
-static Emitter::BlendType parseEmitterBlend(const string &str) {
-    Emitter::BlendType result = Emitter::BlendType::Invalid;
+static Emitter::BlendMode parseEmitterBlend(const string &str) {
+    auto result = Emitter::BlendMode::Invalid;
     if (str == "Normal") {
-        result = Emitter::BlendType::Normal;
+        result = Emitter::BlendMode::Normal;
     } else if (str == "Punch") {
-        result = Emitter::BlendType::Punch;
+        result = Emitter::BlendMode::Punch;
     } else if (str == "Lighten") {
-        result = Emitter::BlendType::Lighten;
+        result = Emitter::BlendMode::Lighten;
     } else {
         warn("parseEmitterBlend: unsupported value: " + str);
     }
@@ -985,9 +985,9 @@ void MdlFile::readEmitter(ModelNode &node) {
 
     ignore(4);
 
-    node._emitter->_updateType = parseEmitterUpdate(readCString(32));
-    node._emitter->_renderType = parseEmitterRender(readCString(32));
-    node._emitter->_blendType = parseEmitterBlend(readCString(32));
+    node._emitter->_updateMode = parseEmitterUpdate(readCString(32));
+    node._emitter->_renderMode = parseEmitterRender(readCString(32));
+    node._emitter->_blendMode = parseEmitterBlend(readCString(32));
     node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureUsage::Diffuse);
 
     ignore(20);

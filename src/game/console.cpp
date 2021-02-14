@@ -27,7 +27,7 @@
 #include "../common/log.h"
 #include "../render/font.h"
 #include "../render/fonts.h"
-#include "../render/mesh/meshes.h"
+#include "../render/meshes.h"
 #include "../render/shaders.h"
 #include "../resource/resources.h"
 #include "../scene/types.h"

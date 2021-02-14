@@ -22,7 +22,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../render/walkmesh.h"
+#include "../render/walkmesh/walkmesh.h"
 #include "../scene/node/modelscenenode.h"
 
 namespace reone {

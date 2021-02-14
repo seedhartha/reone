@@ -15,11 +15,44 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "emitter.h"
+#pragma once
+
+#include <vector>
+
+#include "../aabb.h"
 
 namespace reone {
 
 namespace render {
+
+class BwmFile;
+
+class Walkmesh {
+public:
+    Walkmesh() = default;
+
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
+
+    const AABB &aabb() const { return _aabb; }
+
+private:
+    struct Face {
+        uint32_t type { 0 };
+        std::vector<uint16_t> indices;
+    };
+
+    std::vector<glm::vec3> _vertices;
+    std::vector<Face> _walkableFaces;
+    std::vector<Face> _nonWalkableFaces;
+    AABB _aabb;
+
+    Walkmesh(const Walkmesh &) = delete;
+    Walkmesh &operator=(const Walkmesh &) = delete;
+
+    void computeAABB();
+
+    friend class BwmFile;
+};
 
 } // namespace render
 

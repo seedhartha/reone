@@ -26,7 +26,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../common/log.h"
-#include "../render/mesh/meshes.h"
+#include "../render/meshes.h"
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../resource/types.h"

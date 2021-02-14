@@ -23,7 +23,7 @@
 
 #include "SDL2/SDL_opengl.h"
 
-#include "mesh/meshes.h"
+#include "meshes.h"
 #include "shaders.h"
 #include "stateutil.h"
 #include "textureutil.h"

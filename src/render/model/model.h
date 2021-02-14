@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../common/aabb.h"
+#include "../aabb.h"
 
 #include "animation.h"
 

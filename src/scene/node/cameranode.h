@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../common/aabb.h"
+#include "../../render/aabb.h"
 
 namespace reone {
 

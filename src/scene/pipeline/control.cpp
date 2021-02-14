@@ -21,7 +21,7 @@
 
 #include "GL/glew.h"
 
-#include "../../render/mesh/meshes.h"
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 #include "../../render/textureutil.h"

@@ -62,7 +62,6 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 ## libcommon static library
 
 set(COMMON_HEADERS
-    src/common/aabb.h
     src/common/cache.h
     src/common/endianutil.h
     src/common/jobs.h
@@ -77,7 +76,6 @@ set(COMMON_HEADERS
     src/common/types.h)
 
 set(COMMON_SOURCES
-    src/common/aabb.cpp
     src/common/endianutil.cpp
     src/common/jobs.cpp
     src/common/log.cpp
@@ -145,9 +143,8 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 ## librender static library
 
 set(RENDER_HEADERS
-    src/render/bwmfile.h
+    src/render/aabb.h
     src/render/cursor.h
-    src/render/emitter.h
     src/render/font.h
     src/render/fonts.h
     src/render/fps.h
@@ -161,9 +158,10 @@ set(RENDER_HEADERS
     src/render/lip/lips.h
     src/render/material.h
     src/render/materials.h
-    src/render/mesh/mesh.h
-    src/render/mesh/meshes.h
+    src/render/mesh.h
+    src/render/meshes.h
     src/render/model/animation.h
+    src/render/model/emitter.h
     src/render/model/mdlfile.h
     src/render/model/model.h
     src/render/model/modelloader.h
@@ -178,14 +176,14 @@ set(RENDER_HEADERS
     src/render/textureutil.h
     src/render/textutil.h
     src/render/types.h
-    src/render/walkmesh.h
-    src/render/walkmeshes.h
+    src/render/walkmesh/bwmfile.h
+    src/render/walkmesh/walkmesh.h
+    src/render/walkmesh/walkmeshes.h
     src/render/window.h)
 
 set(RENDER_SOURCES
-    src/render/bwmfile.cpp
+    src/render/aabb.cpp
     src/render/cursor.cpp
-    src/render/emitter.cpp
     src/render/font.cpp
     src/render/fonts.cpp
     src/render/fps.cpp
@@ -198,8 +196,8 @@ set(RENDER_SOURCES
     src/render/lip/lipfile.cpp
     src/render/lip/lips.cpp
     src/render/materials.cpp
-    src/render/mesh/mesh.cpp
-    src/render/mesh/meshes.cpp
+    src/render/mesh.cpp
+    src/render/meshes.cpp
     src/render/model/animation.cpp
     src/render/model/mdlfile.cpp
     src/render/model/model.cpp
@@ -213,8 +211,9 @@ set(RENDER_SOURCES
     src/render/textures.cpp
     src/render/textureutil.cpp
     src/render/textutil.cpp
-    src/render/walkmesh.cpp
-    src/render/walkmeshes.cpp
+    src/render/walkmesh/bwmfile.cpp
+    src/render/walkmesh/walkmesh.cpp
+    src/render/walkmesh/walkmeshes.cpp
     src/render/window.cpp)
 
 add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})

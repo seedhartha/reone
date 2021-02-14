@@ -17,41 +17,34 @@
 
 #pragma once
 
-#include <vector>
+#include <string>
+#include <memory>
+#include <unordered_map>
 
-#include "../common/aabb.h"
+#include <boost/noncopyable.hpp>
+
+#include "../../resource/types.h"
+
+#include "../types.h"
 
 namespace reone {
 
 namespace render {
 
-class BwmFile;
+class Walkmesh;
 
-class Walkmesh {
+class Walkmeshes : boost::noncopyable {
 public:
-    Walkmesh() = default;
+    static Walkmeshes &instance();
 
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
+    void invalidateCache();
 
-    const AABB &aabb() const { return _aabb; }
+    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type);
 
 private:
-    struct Face {
-        uint32_t type { 0 };
-        std::vector<uint16_t> indices;
-    };
+    std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
 
-    std::vector<glm::vec3> _vertices;
-    std::vector<Face> _walkableFaces;
-    std::vector<Face> _nonWalkableFaces;
-    AABB _aabb;
-
-    Walkmesh(const Walkmesh &) = delete;
-    Walkmesh &operator=(const Walkmesh &) = delete;
-
-    void computeAABB();
-
-    friend class BwmFile;
+    std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResourceType type);
 };
 
 } // namespace render

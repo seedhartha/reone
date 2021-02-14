@@ -18,7 +18,7 @@
 #include "imagebutton.h"
 
 #include "../../render/fonts.h"
-#include "../../render/mesh/meshes.h"
+#include "../../render/meshes.h"
 #include "../../render/stateutil.h"
 
 using namespace std;

@@ -26,7 +26,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/walkmesh.h"
+#include "../../render/walkmesh/walkmesh.h"
 #include "../../scene/node/modelscenenode.h"
 
 #include "../enginetype/effect.h"
