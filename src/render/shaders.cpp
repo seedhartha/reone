@@ -735,7 +735,7 @@ void main() {
         objectAlpha *= diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * albedo * objectAlpha);
+        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
     }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
