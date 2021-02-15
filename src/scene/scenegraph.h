@@ -32,6 +32,8 @@ namespace reone {
 
 namespace scene {
 
+constexpr float kDefaultExposure = 1.0f;
+
 class CameraSceneNode;
 class EmitterSceneNode;
 class LightSceneNode;
@@ -59,11 +61,13 @@ public:
     const render::GraphicsOptions &options() const { return _opts; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     render::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
+    float exposure() const { return _exposure; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setShadowReference(const std::shared_ptr<SceneNode> &reference);
     void setUpdate(bool update);
     void setUniformsPrototype(render::ShaderUniforms uniforms);
+    void setExposure(float exposure);
 
     // Lights and shadows
 
@@ -99,6 +103,7 @@ private:
     std::shared_ptr<SceneNode> _shadowReference;
     bool _update { true };
     render::ShaderUniforms _uniformsPrototype;
+    float _exposure { kDefaultExposure };
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

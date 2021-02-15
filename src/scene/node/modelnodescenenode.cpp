@@ -39,7 +39,6 @@ namespace reone {
 namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
-static constexpr float kDefaultExposure = 1.0f;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
@@ -148,7 +147,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     uniforms.general.model = _absoluteTransform;
     uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
     uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-    uniforms.general.exposure = kDefaultExposure;
+    uniforms.general.exposure = _sceneGraph->exposure();
 
     ShaderProgram program;
 
