@@ -92,6 +92,10 @@ bool FirstPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
             _moveRight = true;
             return true;
 
+        case SDL_SCANCODE_LSHIFT:
+            _multiplier = 2.0f;
+            return true;
+
         default:
             return false;
     }
@@ -115,15 +119,19 @@ bool FirstPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
             _moveRight = false;
             return true;
 
+        case SDL_SCANCODE_LSHIFT:
+            _multiplier = 1.0f;
+            return true;
+
         default:
             return false;
     }
 }
 
 void FirstPersonCamera::update(float dt) {
-    float facingSin = glm::sin(_facing) * kMovementSpeed * dt;
-    float facingCos = glm::cos(_facing) * kMovementSpeed * dt;
-    float pitchSin = glm::sin(_pitch) * kMovementSpeed * dt;
+    float facingSin = glm::sin(_facing) * _multiplier * kMovementSpeed * dt;
+    float facingCos = glm::cos(_facing) * _multiplier * kMovementSpeed * dt;
+    float pitchSin = glm::sin(_pitch) * _multiplier * kMovementSpeed * dt;
     bool positionChanged = false;
 
     if (_moveForward) {
