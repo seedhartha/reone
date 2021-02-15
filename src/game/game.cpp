@@ -26,6 +26,7 @@
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
+#include "../render/featureutil.h"
 #include "../render/lip/lips.h"
 #include "../render/materials.h"
 #include "../render/meshes.h"
@@ -782,9 +783,34 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
                 toggleInGameCameraType();
             }
             return true;
-    }
 
-    return false;
+        case SDLK_F1:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::PBR, !isFeatureEnabled(Feature::PBR));
+            }
+            return true;
+
+        case SDLK_F2:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::HDR, !isFeatureEnabled(Feature::HDR));
+            }
+            return true;
+
+        case SDLK_F3:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::SelfIllumAsLights, !isFeatureEnabled(Feature::SelfIllumAsLights));
+            }
+            return true;
+
+        case SDLK_F4:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
+            }
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
