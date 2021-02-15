@@ -237,6 +237,10 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
                 shaderLight.multiplier = lights[i]->multiplier();
                 shaderLight.radius = lights[i]->radius();
             }
+
+            if (isFeatureEnabled(Feature::InverseSquareFalloff)) {
+                uniforms.general.featureMask |= UniformFeatureFlags::invSqrFalloff;
+            }
         }
 
         if (diffuseTexture) {
