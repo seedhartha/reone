@@ -719,6 +719,12 @@ void main() {
 
         objectColor = ambient + Lo;
 
+    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        float S = max(0.0, 1.0 - (shadow - dot(uAmbientColor.rgb, LUMINANCE)));
+        objectColor = albedo;
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb * S, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+
     } else {
         objectColor = albedo;
     }

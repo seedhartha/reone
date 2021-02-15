@@ -21,7 +21,7 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
-#include "../../render/features.h"
+#include "../../render/featureutil.h"
 #include "../../render/pbribl.h"
 
 #include "../scenegraph.h"
@@ -39,6 +39,7 @@ namespace reone {
 namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
+static constexpr float kDefaultExposure = 2.0f;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
@@ -112,7 +113,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     uniforms.general.model = _absoluteTransform;
     uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
     uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-    uniforms.general.exposure = 1.0f;
+    uniforms.general.exposure = kDefaultExposure;
 
     ShaderProgram program;
 
@@ -137,7 +138,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (!isFeatureEnabled(Feature::PBR) && mesh->hasLightmapTexture()) {
+        if (mesh->hasLightmapTexture()) {
             uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -182,7 +183,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
         if (_modelSceneNode->isLightingEnabled() &&
-            (isFeatureEnabled(Feature::PBR) || !mesh->hasLightmapTexture()) &&
+            !mesh->hasLightmapTexture() &&
             !_modelNode->isSelfIllumEnabled() &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 

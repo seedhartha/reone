@@ -28,6 +28,7 @@ namespace game {
 
 constexpr int kNpcPlayer = -1;
 constexpr int kEngineTypeInvalid = -1;
+constexpr float kDefaultFollowDistance = 2.0f;
 
 enum class CursorType {
     None,

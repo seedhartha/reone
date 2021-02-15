@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kDefaultRaycastDistance = 8.0f;
+constexpr float kDefaultRaycastDistance = 8.0f;
 
 class Area;
 class Room;

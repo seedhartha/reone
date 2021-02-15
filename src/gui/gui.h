@@ -35,8 +35,8 @@ namespace reone {
 
 namespace gui {
 
-static constexpr int kDefaultResolutionX = 640;
-static constexpr int kDefaultResolutionY = 480;
+constexpr int kDefaultResolutionX = 640;
+constexpr int kDefaultResolutionY = 480;
 
 class GUI : boost::noncopyable {
 public:

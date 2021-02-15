@@ -141,7 +141,7 @@ void Party::onHeartbeat() {
         ActionQueue &actions = member->actionQueue();
         shared_ptr<Action> action(actions.getCurrentAction());
         if (!action) {
-            actions.add(make_unique<FollowAction>(leader, 1.0f));
+            actions.add(make_unique<FollowAction>(leader, kDefaultFollowDistance));
         }
         if (member->distanceTo(*leader) > kTeleMemberDistance) {
             member->setPosition(leader->position());
