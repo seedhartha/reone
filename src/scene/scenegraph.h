@@ -56,6 +56,7 @@ public:
      */
     void prepareFrame();
 
+    const render::GraphicsOptions &options() const { return _opts; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     render::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
 
