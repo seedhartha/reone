@@ -817,11 +817,11 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDLK_LEFTBRACKET:
-            _sceneGraph.setExposure(glm::max(0.5f, _sceneGraph.exposure() - 0.5f));
+            _sceneGraph.setExposure(glm::max(0.25f, _sceneGraph.exposure() - 0.25f));
             return true;
 
         case SDLK_RIGHTBRACKET:
-            _sceneGraph.setExposure(glm::min(_sceneGraph.exposure() + 0.5f, 3.0f));
+            _sceneGraph.setExposure(glm::min(_sceneGraph.exposure() + 0.25f, 2.0f));
             return true;
 
         default:
