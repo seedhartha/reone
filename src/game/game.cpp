@@ -798,7 +798,11 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
         case SDLK_F3:
             if (_options.developer) {
-                setFeatureEnabled(Feature::InverseSquareFalloff, !isFeatureEnabled(Feature::InverseSquareFalloff));
+                int falloff = getFeatureParameter(Feature::Falloff) + 1;
+                if (falloff == kNumFalloffTypes) {
+                    falloff = 0;
+                }
+                setFeatureParameter(Feature::Falloff, falloff);
             }
             return true;
 

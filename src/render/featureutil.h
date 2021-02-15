@@ -24,14 +24,16 @@ namespace render {
 enum class Feature {
     PBR,
     HDR,
-    InverseSquareFalloff,
+    Falloff,
     DynamicRoomLighting,
     SelfIllumAsLights
 };
 
 bool isFeatureEnabled(Feature feature);
+int getFeatureParameter(Feature feature);
 
 void setFeatureEnabled(Feature feature, bool enabled);
+void setFeatureParameter(Feature feature, int value);
 
 } // namespace render
 

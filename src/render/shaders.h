@@ -77,7 +77,6 @@ struct UniformFeatureFlags {
     static constexpr int billboard = 0x400;
     static constexpr int water = 0x800;
     static constexpr int hdr = 0x1000;
-    static constexpr int invSqrFalloff = 0x2000;
 };
 
 struct GeneralUniforms {
@@ -121,8 +120,9 @@ struct LightingUniforms {
     float materialShininess { 0.0f };
     float materialMetallic { 0.0f };
     float materialRoughness { 1.0f };
+    int falloffType { 0 }; /**< value from the FalloffType enum */
     int lightCount { 0 };
-    char padding[12];
+    char padding[8];
     ShaderLight lights[kMaxLightCount];
 };
 

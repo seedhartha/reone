@@ -24,6 +24,7 @@ namespace reone {
 namespace render {
 
 constexpr int kNumCubeFaces = 6;
+constexpr int kNumFalloffTypes = 4;
 constexpr int kMaxBoneCount = 128;
 constexpr int kMaxLightCount = 8;
 constexpr int kMaxParticleCount = 32;
@@ -68,6 +69,13 @@ enum class CubeMapFace {
     NegativeY = 3,
     PositiveZ = 4,
     NegativeZ = 5
+};
+
+enum class FalloffType {
+    Linear = 0,
+    Quadratic = 1,
+    InverseLinear = 2,
+    InverseSquare = 3
 };
 
 struct GraphicsOptions {
