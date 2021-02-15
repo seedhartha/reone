@@ -42,7 +42,6 @@ namespace reone {
 
 namespace scene {
 
-static constexpr int kShadowResolution = 2048;
 static constexpr float kShadowFarPlane = 10000.0f;
 
 static bool g_wireframesEnabled = false;
@@ -115,7 +114,7 @@ void WorldRenderPipeline::init() {
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
-    _shadowsDepth->clearPixels(kShadowResolution, kShadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clearPixels(_opts.shadowResolution, _opts.shadowResolution, PixelFormat::Depth);
 
     _shadows.init();
     _shadows.bind();
@@ -134,7 +133,7 @@ void WorldRenderPipeline::render() {
 void WorldRenderPipeline::drawShadows() {
     if (!_scene->isShadowLightPresent()) return;
 
-    withViewport(glm::ivec4(0, 0, kShadowResolution, kShadowResolution), [this]() {
+    withViewport(glm::ivec4(0, 0, _opts.shadowResolution, _opts.shadowResolution), [this]() {
         _shadows.bind();
 
         glDrawBuffer(GL_NONE);
