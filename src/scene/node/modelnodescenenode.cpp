@@ -110,6 +110,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     }
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+    if (isFeatureEnabled(Feature::HDR)) {
+        uniforms.general.featureMask |= UniformFeatureFlags::hdr;
+    }
     uniforms.general.model = _absoluteTransform;
     uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
     uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);

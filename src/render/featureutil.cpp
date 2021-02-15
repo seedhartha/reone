@@ -26,7 +26,8 @@ namespace reone {
 namespace render {
 
 static unordered_map<Feature, bool> g_features {
-    { Feature::PBR, false },
+    { Feature::PBR, true },
+    { Feature::HDR, false },
     { Feature::SelfIllumAsLights, false }
 };
 
