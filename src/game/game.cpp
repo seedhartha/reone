@@ -798,7 +798,7 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
         case SDLK_F3:
             if (_options.developer) {
-                setFeatureEnabled(Feature::SelfIllumAsLights, !isFeatureEnabled(Feature::SelfIllumAsLights));
+                setFeatureEnabled(Feature::InverseSquareFalloff, !isFeatureEnabled(Feature::InverseSquareFalloff));
             }
             return true;
 

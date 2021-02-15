@@ -64,6 +64,7 @@ const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_BILLBOARD = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
+const int FEATURE_INVSQRFALLOFF = 0x2000;
 
 struct Light {
     vec4 position;
@@ -693,11 +694,17 @@ void main() {
 
             vec3 radiance = uLights[i].color.rgb;
             if (uLights[i].position.w == 1.0) {
-                float D = length(uLights[i].position.xyz - fragPosition);
-                D *= D;
-                float R = uLights[i].radius;
-                R *= R;
-                float attenuation = uLights[i].multiplier * (R / (R + D));
+                float attenuation;
+                if (isFeatureEnabled(FEATURE_INVSQRFALLOFF)) {
+                    float distance = length(uLights[i].position.xyz - fragPosition);
+                    attenuation = 1.0 / (distance * distance);
+                } else {
+                    float D = length(uLights[i].position.xyz - fragPosition);
+                    D *= D;
+                    float R = uLights[i].radius;
+                    R *= R;
+                    attenuation = uLights[i].multiplier * (R / (R + D));
+                }
                 radiance *= attenuation;
             }
 
