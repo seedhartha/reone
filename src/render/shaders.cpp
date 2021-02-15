@@ -63,6 +63,7 @@ const int FEATURE_DISCARD = 0x100;
 const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_BILLBOARD = 0x400;
 const int FEATURE_WATER = 0x800;
+const int FEATURE_HDR = 0x1000;
 
 struct Light {
     vec4 position;
@@ -653,7 +654,7 @@ void main() {
         shadow = 0.0;
     }
 
-    vec3 albedo = pow(diffuseSample.rgb, vec3(GAMMA));
+    vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
     float metallic = uMaterialMetallic;
     float roughness = uMaterialRoughness;
     float ao = 1.0;
@@ -738,17 +739,19 @@ void main() {
     }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
-        objectColor += (1.0 - diffuseSample.a) * pow(envmapSample.rgb, vec3(GAMMA));
+        objectColor += (1.0 - diffuseSample.a) * (isFeatureEnabled(FEATURE_HDR) ? pow(envmapSample.rgb, vec3(GAMMA)) : envmapSample.rgb);
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
 
-    // HDR tonemapping
-    objectColor = vec3(1.0) - exp(-objectColor * uExposure);
-    // gamma correct
-    objectColor = pow(objectColor, vec3(1.0 / GAMMA));
+    if (isFeatureEnabled(FEATURE_HDR)) {
+        // HDR tonemapping
+        objectColor = vec3(1.0) - exp(-objectColor * uExposure);
+        // gamma correct
+        objectColor = pow(objectColor, vec3(1.0 / GAMMA));
+    }
 
     fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);

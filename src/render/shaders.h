@@ -76,6 +76,7 @@ struct UniformFeatureFlags {
     static constexpr int shadows = 0x200;
     static constexpr int billboard = 0x400;
     static constexpr int water = 0x800;
+    static constexpr int hdr = 0x1000;
 };
 
 struct GeneralUniforms {
