@@ -228,7 +228,7 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
         if (!predicate(*light)) continue;
 
         float distance = light->distanceTo(position);
-        if (distance <= 2.0f * light->radius()) {
+        if (distance <= light->radius() * light->radius()) {
             distances.insert(make_pair(light, distance));
             lights.push_back(light);
         }

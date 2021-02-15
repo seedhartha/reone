@@ -26,7 +26,7 @@ namespace render {
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumFalloffTypes = 4;
 constexpr int kMaxBoneCount = 128;
-constexpr int kMaxLightCount = 8;
+constexpr int kMaxLightCount = 16;
 constexpr int kMaxParticleCount = 32;
 
 enum class PixelFormat {
@@ -82,6 +82,7 @@ struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
     bool fullscreen { false };
+    int numLights { 8 };
     int shadowResolution { 0 };
 };
 
