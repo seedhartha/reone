@@ -25,21 +25,29 @@ namespace reone {
 
 namespace render {
 
-static unordered_map<Feature, bool> g_features {
-    { Feature::PBR, false },
-    { Feature::HDR, false },
-    { Feature::InverseSquareFalloff, false },
-    { Feature::DynamicRoomLighting, false },
-    { Feature::SelfIllumAsLights, false }
+static unordered_map<Feature, int> g_features {
+    { Feature::PBR, 0 },
+    { Feature::HDR, 0 },
+    { Feature::Falloff, 0 },
+    { Feature::DynamicRoomLighting, 0 },
+    { Feature::SelfIllumAsLights, 0 }
 };
 
 bool isFeatureEnabled(Feature feature) {
+    return getFeatureParameter(feature) != 0;
+}
+
+int getFeatureParameter(Feature feature) {
     auto maybeFeature = g_features.find(feature);
-    return maybeFeature != g_features.end() ? maybeFeature->second : false;
+    return maybeFeature != g_features.end() ? maybeFeature->second : 0;
 }
 
 void setFeatureEnabled(Feature feature, bool enabled) {
-    g_features[feature] = enabled;
+    setFeatureParameter(feature, enabled ? 1 : 0);
+}
+
+void setFeatureParameter(Feature feature, int value) {
+    g_features[feature] = value;
 }
 
 } // namespace render

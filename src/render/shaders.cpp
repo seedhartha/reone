@@ -64,7 +64,11 @@ const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_BILLBOARD = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
-const int FEATURE_INVSQRFALLOFF = 0x2000;
+
+const int FALLOFF_LINEAR = 0;
+const int FALLOFF_QUADRATIC = 1;
+const int FALLOFF_INV_LINEAR = 2;
+const int FALLOFF_INV_SQUARE = 3;
 
 struct Light {
     vec4 position;
@@ -111,6 +115,7 @@ layout(std140) uniform Lighting {
     float uMaterialShininess;
     float uMaterialMetallic;
     float uMaterialRoughness;
+    int uFalloffType;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
 };
@@ -236,6 +241,34 @@ float getShadow() {
     }
 
     return shadow / (samples * samples * samples);
+}
+
+float getLightAttenuation(int light) {
+    float E = uLights[light].multiplier;
+    float D = uLights[light].radius;
+    float r = length(uLights[light].position.xyz - fragPosition);
+    float attenuation;
+
+    if (uFalloffType == FALLOFF_LINEAR) {
+        attenuation = E * (D / (D + r));
+
+    } else if (uFalloffType == FALLOFF_QUADRATIC) {
+        D *= D;
+        r *= r;
+        attenuation = E * (D / (D + r));
+
+    } else if (uFalloffType == FALLOFF_INV_LINEAR) {
+        attenuation = E * (1.0 / r);
+
+    } else if (uFalloffType == FALLOFF_INV_SQUARE) {
+        r *= r;
+        attenuation = E * (1.0 / r);
+
+    } else {
+        attenuation = 1.0;
+    }
+
+    return attenuation;
 }
 )END";
 
@@ -580,11 +613,7 @@ void main() {
             vec3 specular = uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
 
             if (uLights[i].position.w == 1.0) {
-                float D = length(uLights[i].position.xyz - fragPosition);
-                D *= D;
-                float R = uLights[i].radius;
-                R *= R;
-                float attenuation = uLights[i].multiplier * (R / (R + D));
+                float attenuation = getLightAttenuation(i);
                 diffuse *= attenuation;
                 specular *= attenuation;
             }
@@ -694,17 +723,7 @@ void main() {
 
             vec3 radiance = uLights[i].color.rgb;
             if (uLights[i].position.w == 1.0) {
-                float attenuation;
-                if (isFeatureEnabled(FEATURE_INVSQRFALLOFF)) {
-                    float distance = length(uLights[i].position.xyz - fragPosition);
-                    attenuation = 1.0 / (distance * distance);
-                } else {
-                    float D = length(uLights[i].position.xyz - fragPosition);
-                    D *= D;
-                    float R = uLights[i].radius;
-                    R *= R;
-                    attenuation = uLights[i].multiplier * (R / (R + D));
-                }
+                float attenuation = getLightAttenuation(i);
                 radiance *= attenuation;
             }
 

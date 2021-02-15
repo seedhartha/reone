@@ -228,6 +228,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.lighting.materialShininess = mesh->material().shininess;
             uniforms.lighting.materialMetallic = mesh->material().metallic;
             uniforms.lighting.materialRoughness = mesh->material().roughness;
+            uniforms.lighting.falloffType = getFeatureParameter(Feature::Falloff);
             uniforms.lighting.lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < uniforms.lighting.lightCount; ++i) {
@@ -236,10 +237,6 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.multiplier = lights[i]->multiplier();
                 shaderLight.radius = lights[i]->radius();
-            }
-
-            if (isFeatureEnabled(Feature::InverseSquareFalloff)) {
-                uniforms.general.featureMask |= UniformFeatureFlags::invSqrFalloff;
             }
         }
 
