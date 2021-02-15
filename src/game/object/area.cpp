@@ -113,9 +113,8 @@ void Area::loadLYT() {
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        auto sceneNode = make_shared<ModelSceneNode>(&_game->sceneGraph(), model);
+        auto sceneNode = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Room, model, &_game->sceneGraph());
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-        sceneNode->setLightingEnabled(true);
 
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {

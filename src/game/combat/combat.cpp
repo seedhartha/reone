@@ -389,7 +389,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 
     weapon->playShotSound(0, projectilePosition);
 
-    round.projectile = make_shared<ModelSceneNode>(&_game->sceneGraph(), ammunitionType->model);
+    round.projectile = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Projectile, ammunitionType->model, &_game->sceneGraph());
     round.projectile->setPosition(projectilePosition);
     round.projectile->signalEvent(kModelEventDetonate);
 

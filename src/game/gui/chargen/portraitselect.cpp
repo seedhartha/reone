@@ -95,7 +95,7 @@ void PortraitSelection::loadHeadModel() {
 }
 
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
-    auto root = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("cghead_light"));
+    auto root = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cghead_light"), &sceneGraph);
 
     // Create a creature from the current portrait
 
