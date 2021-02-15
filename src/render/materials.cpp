@@ -48,6 +48,9 @@ void Materials::init() {
                 float roughness = row.getFloat("roughness", -1.0f);
 
                 auto material = make_shared<Material>();
+                if (tex != kDefaultMaterialTex) {
+                    material->custom = true;
+                }
                 if (specular != -1.0f) {
                     material->specular = specular;
                 }

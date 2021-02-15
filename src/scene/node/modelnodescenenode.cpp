@@ -222,6 +222,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             uniforms.general.featureMask |= UniformFeatureFlags::lighting;
+            if (mesh->material().custom) {
+                uniforms.general.featureMask |= UniformFeatureFlags::customMat;
+            }
             uniforms.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
             uniforms.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
             uniforms.lighting.materialSpecular = mesh->material().specular;

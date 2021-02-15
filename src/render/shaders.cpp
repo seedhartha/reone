@@ -64,6 +64,7 @@ const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_BILLBOARD = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
+const int FEATURE_CUSTOMMAT = 0x2000;
 
 const int FALLOFF_LINEAR = 0;
 const int FALLOFF_QUADRATIC = 1;
@@ -685,9 +686,17 @@ void main() {
     }
 
     vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
-    float metallic = uMaterialMetallic;
-    float roughness = uMaterialRoughness;
+    float metallic;
+    float roughness;
     float ao = 1.0;
+
+    if (isFeatureEnabled(FEATURE_CUSTOMMAT) || !isFeatureEnabled(FEATURE_ENVMAP)) {
+        metallic = uMaterialMetallic;
+        roughness = uMaterialRoughness;
+    } else {
+        metallic = mix(uMaterialMetallic, 1.0, 1.0 - diffuseSample.a);
+        roughness = mix(uMaterialRoughness, 0.1, 1.0 - diffuseSample.a);
+    }
 
     vec3 objectColor;
 
