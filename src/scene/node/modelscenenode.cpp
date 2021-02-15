@@ -45,8 +45,9 @@ static constexpr int kSelfIlluminatedPriority = 5;
 
 static bool g_drawAABB = false;
 
-ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, set<string> ignoreNodes) :
+ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
+    _classification(classification),
     _model(model),
     _animator(this, ignoreNodes) {
 
@@ -114,7 +115,7 @@ void ModelSceneNode::initModelNodes() {
                 shared_ptr<ModelMesh> mesh(child->mesh());
                 if (mesh) {
                     glm::vec3 size(mesh->mesh()->aabb().getSize());
-                    radius = glm::dot(size, size);
+                    radius = glm::max(1.0f, glm::sqrt(glm::dot(size, size)));
                 } else {
                     radius = 1.0f;
                 }
@@ -170,7 +171,7 @@ void ModelSceneNode::render() {
     }
 }
 
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
     if (!parentNode) return nullptr;
 
@@ -187,8 +188,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
         for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
             ignoreNodes.insert(node->name());
         }
-        auto modelNode = make_shared<ModelSceneNode>(_sceneGraph, model, ignoreNodes);
-        modelNode->setLightingEnabled(_lightingEnabled);
+        auto modelNode = make_shared<ModelSceneNode>(classification, model, _sceneGraph, ignoreNodes);
         parentNode->addChild(modelNode);
 
         return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
@@ -244,7 +244,7 @@ void ModelSceneNode::updateAbsoluteTransform() {
 }
 
 void ModelSceneNode::updateLighting() {
-    if (!_lightingEnabled || !_lightingDirty) return;
+    if (!_lightingDirty) return;
 
     _lightsAffectedBy.clear();
     glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
@@ -319,10 +319,6 @@ void ModelSceneNode::setAlpha(float alpha) {
 
 void ModelSceneNode::setProjectileSpeed(float speed) {
     _projectileSpeed = speed;
-}
-
-void ModelSceneNode::setLightingEnabled(bool enabled) {
-    _lightingEnabled = enabled;
 }
 
 void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {

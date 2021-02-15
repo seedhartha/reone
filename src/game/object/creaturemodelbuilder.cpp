@@ -68,9 +68,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     shared_ptr<Model> model(Models::instance().get(modelName, gr2Model ? ResourceType::Gr2 : ResourceType::Mdl));
     if (!model) return nullptr;
 
-    auto modelSceneNode = make_unique<ModelSceneNode>(&_creature->sceneGraph(), model);
-    modelSceneNode->setLightingEnabled(true);
-
+    auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, &_creature->sceneGraph());
     if (gr2Model) return move(modelSceneNode);
 
     // Body texture
@@ -95,9 +93,9 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
         if (headModel) {
-            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel));
+            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel, ModelSceneNode::Classification::Creature));
             if (headSceneNode && maskModel) {
-                headSceneNode->attach(g_maskHookNode, maskModel);
+                headSceneNode->attach(g_maskHookNode, maskModel, ModelSceneNode::Classification::Equipment);
             }
         }
     }
@@ -108,7 +106,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
         if (leftWeaponModel) {
-            modelSceneNode->attach("lhand", leftWeaponModel);
+            modelSceneNode->attach("lhand", leftWeaponModel, ModelSceneNode::Classification::Equipment);
         }
     }
 
@@ -118,7 +116,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
         if (rightWeaponModel) {
-            modelSceneNode->attach("rhand", rightWeaponModel);
+            modelSceneNode->attach("rhand", rightWeaponModel, ModelSceneNode::Classification::Equipment);
         }
     }
 

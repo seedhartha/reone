@@ -38,15 +38,26 @@ class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
+    enum class Classification {
+        Room,
+        Creature,
+        Placeable,
+        Door,
+        Equipment,
+        Projectile,
+        Other
+    };
+
     ModelSceneNode(
-        SceneGraph *sceneGraph,
+        Classification classification,
         const std::shared_ptr<render::Model> &model,
+        SceneGraph *sceneGraph,
         std::set<std::string> ignoreNodes = std::set<std::string>());
 
     void update(float dt) override;
     void render() override;
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     void refreshAABB();
@@ -61,6 +72,7 @@ public:
     glm::vec3 getCenterOfAABB() const;
     const std::string &getName() const;
 
+    Classification classification() const { return _classification; }
     std::shared_ptr<render::Model> model() const { return _model; }
     std::shared_ptr<render::Texture> textureOverride() const { return _textureOverride; }
     float alpha() const { return _alpha; }
@@ -80,17 +92,17 @@ public:
     void updateLighting();
     void setLightingIsDirty();
 
-    bool isLightingEnabled() const { return _lightingEnabled; }
     const std::vector<LightSceneNode *> &lightsAffectedBy() const { return _lightsAffectedBy; }
 
-    void setLightingEnabled(bool affected);
     void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
 
     // END Dynamic lighting
 
 private:
+    Classification _classification;
     std::shared_ptr<render::Model> _model;
     SceneNodeAnimator _animator;
+
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
@@ -99,15 +111,15 @@ private:
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };
-    bool _lightingEnabled { false };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
     AABB _aabb;
     float _projectileSpeed;
 
     void initModelNodes();
-    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
     void updateAbsoluteTransform() override;
+
+    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
 };
 
 } // namespace scene

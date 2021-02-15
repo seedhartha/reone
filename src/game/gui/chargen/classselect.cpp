@@ -181,7 +181,7 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, SceneGraph &sceneGraph) {
-    auto root = make_shared<ModelSceneNode>(&sceneGraph, Models::instance().get("cgbody_light"));
+    auto root = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
 
     // Attach character model to the root model
     auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);

@@ -78,13 +78,11 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     shared_ptr<DoorBlueprint> blueprint(Blueprints::instance().getDoor(resRef));
     blueprint->load(*this);
 
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("genericdoors"));
+    shared_ptr<TwoDaTable> genericDoors(Resources::instance().get2DA("genericdoors"));
+    string modelName(boost::to_lower_copy(genericDoors->getString(_genericType, "modelname")));
+    auto model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Door, Models::instance().get(modelName), _sceneGraph);
 
-    string modelName(boost::to_lower_copy(table->getString(_genericType, "modelname")));
-    auto model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
-    model->setLightingEnabled(true);
     _sceneNode = move(model);
-
     _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
 }
 

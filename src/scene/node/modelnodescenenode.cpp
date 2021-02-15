@@ -90,7 +90,13 @@ bool ModelNodeSceneNode::shouldRender() const {
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return mesh && mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
+    if (!mesh) return false;
+
+    if (isFeatureEnabled(Feature::DynamicRoomLighting) && _modelSceneNode->classification() == ModelSceneNode::Classification::Room) {
+        return mesh->shouldRender();
+    }
+
+    return mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
 }
 
 bool ModelNodeSceneNode::isTransparent() const {
@@ -98,6 +104,32 @@ bool ModelNodeSceneNode::isTransparent() const {
     if (!mesh || _modelSceneNode->model()->classification() == Model::Classification::Character) return false;
 
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
+}
+
+static bool isLightingEnabled(ModelSceneNode::Classification clazz) {
+    switch (clazz) {
+        case ModelSceneNode::Classification::Room:
+            return isFeatureEnabled(Feature::DynamicRoomLighting);
+
+        case ModelSceneNode::Classification::Creature:
+        case ModelSceneNode::Classification::Door:
+        case ModelSceneNode::Classification::Placeable:
+        case ModelSceneNode::Classification::Other:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+static bool isReceivingShadows(ModelSceneNode::Classification clazz) {
+    switch (clazz) {
+        case ModelSceneNode::Classification::Room:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 void ModelNodeSceneNode::renderSingle(bool shadowPass) {
@@ -141,7 +173,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (mesh->hasLightmapTexture()) {
+        if (mesh->hasLightmapTexture() && !isFeatureEnabled(Feature::DynamicRoomLighting)) {
             uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -155,10 +187,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.bumpmap.swizzled = mesh->isBumpmapSwizzled();
         }
 
-        bool receivesShadows =
-            _modelSceneNode->model()->classification() == Model::Classification::Other &&
-            !_modelNode->isSelfIllumEnabled();
-
+        bool receivesShadows = isReceivingShadows(_modelSceneNode->classification()) && !_modelNode->isSelfIllumEnabled();
         if (receivesShadows) {
             uniforms.general.featureMask |= UniformFeatureFlags::shadows;
         }
@@ -185,8 +214,8 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.general.featureMask |= UniformFeatureFlags::selfIllum;
             uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (_modelSceneNode->isLightingEnabled() &&
-            !mesh->hasLightmapTexture() &&
+        if (isLightingEnabled(_modelSceneNode->classification()) &&
+            (!mesh->hasLightmapTexture() || isFeatureEnabled(Feature::DynamicRoomLighting)) &&
             !_modelNode->isSelfIllumEnabled() &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 
