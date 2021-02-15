@@ -37,7 +37,7 @@ namespace reone {
 
 static const char kConfigFilename[] = "reone.cfg";
 
-static constexpr int kDefaultShadowResolution = 2048;
+static constexpr int kDefaultShadowResolution = 2;
 static constexpr int kDefaultMusicVolume = 85;
 static constexpr int kDefaultVoiceVolume = 85;
 static constexpr int kDefaultSoundVolume = 85;

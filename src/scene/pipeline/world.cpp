@@ -114,7 +114,7 @@ void WorldRenderPipeline::init() {
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
-    _shadowsDepth->clearPixels(_opts.shadowResolution, _opts.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clearPixels(1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution, PixelFormat::Depth);
 
     _shadows.init();
     _shadows.bind();
@@ -131,9 +131,9 @@ void WorldRenderPipeline::render() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    if (!_scene->isShadowLightPresent()) return;
+    if (!_scene->isShadowLightPresent() || _opts.shadowResolution < 1) return;
 
-    withViewport(glm::ivec4(0, 0, _opts.shadowResolution, _opts.shadowResolution), [this]() {
+    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [this]() {
         _shadows.bind();
 
         glDrawBuffer(GL_NONE);
