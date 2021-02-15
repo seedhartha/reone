@@ -22,6 +22,8 @@ namespace reone {
 namespace render {
 
 struct Material {
+    bool custom { false };
+
     // Blinn-Phong
     float specular { 0.1f };
     float shininess { 8.0f };
