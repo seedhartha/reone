@@ -37,6 +37,7 @@ namespace reone {
 
 static const char kConfigFilename[] = "reone.cfg";
 
+static constexpr int kDefaultShadowResolution = 2048;
 static constexpr int kDefaultMusicVolume = 85;
 static constexpr int kDefaultVoiceVolume = 85;
 static constexpr int kDefaultSoundVolume = 85;
@@ -69,6 +70,7 @@ void Program::initOptions() {
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
+        ("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution")
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
         ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
@@ -102,6 +104,7 @@ void Program::loadOptions() {
     _gameOpts.graphics.width = vars["width"].as<int>();
     _gameOpts.graphics.height = vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();
+    _gameOpts.graphics.shadowResolution = vars["shadowres"].as<int>();
     _gameOpts.audio.musicVolume = vars["musicvol"].as<int>();
     _gameOpts.audio.voiceVolume = vars["voicevol"].as<int>();
     _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
