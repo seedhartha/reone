@@ -769,52 +769,66 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
         case SDLK_MINUS:
             if (_options.developer && _gameSpeed > 1.0f) {
                 _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_EQUALS:
             if (_options.developer && _gameSpeed < 8.0f) {
                 _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_v:
             if (_options.developer && _screen == GameScreen::InGame) {
                 toggleInGameCameraType();
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_F1:
             if (_options.developer) {
                 setFeatureEnabled(Feature::PBR, !isFeatureEnabled(Feature::PBR));
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_F2:
             if (_options.developer) {
                 setFeatureEnabled(Feature::HDR, !isFeatureEnabled(Feature::HDR));
+                return true;
             }
-            return true;
+            break;
 
-        case SDLK_F3:
+        case SDLK_F3: {
             if (_options.developer) {
                 int falloff = getFeatureParameter(Feature::Falloff) + 1;
                 if (falloff == kNumFalloffTypes) {
                     falloff = 0;
                 }
                 setFeatureParameter(Feature::Falloff, falloff);
+                return true;
             }
+            break;
+        }
+        case SDLK_F4:
+            setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
             return true;
 
-        case SDLK_F4:
-            if (_options.developer) {
-                setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
-            }
+        case SDLK_LEFTBRACKET:
+            _sceneGraph.setExposure(glm::max(0.5f, _sceneGraph.exposure() - 0.5f));
+            return true;
+
+        case SDLK_RIGHTBRACKET:
+            _sceneGraph.setExposure(glm::min(_sceneGraph.exposure() + 0.5f, 3.0f));
             return true;
 
         default:
-            return false;
+            break;
     }
+
+    return false;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

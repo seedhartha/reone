@@ -47,6 +47,7 @@ Developer mode controls:
 - Press V to switch the camera type
 - Use "+" and "-" keys to adjust the game speed
 - Press F1-F4 to toggle graphical features
+- Use "[" and "]" keys to adjust PBR HDR mode exposure
 
 ## Configuration
 

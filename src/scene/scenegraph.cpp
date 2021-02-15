@@ -270,6 +270,10 @@ void SceneGraph::setUniformsPrototype(ShaderUniforms uniforms) {
     _uniformsPrototype = move(uniforms);
 }
 
+void SceneGraph::setExposure(float exposure) {
+    _exposure = exposure;
+}
+
 } // namespace scene
 
 } // namespace reone
