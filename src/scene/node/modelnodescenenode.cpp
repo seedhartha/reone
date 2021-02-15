@@ -39,7 +39,7 @@ namespace reone {
 namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
-static constexpr float kDefaultExposure = 2.0f;
+static constexpr float kDefaultExposure = 1.0f;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
