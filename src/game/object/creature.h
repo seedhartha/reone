@@ -41,7 +41,7 @@ class Timer;
 
 namespace game {
 
-static constexpr float kDefaultAttackRange = 2.0f;
+constexpr float kDefaultAttackRange = 2.0f;
 
 class ObjectFactory;
 

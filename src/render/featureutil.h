@@ -15,28 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "features.h"
-
-#include <unordered_map>
-
-using namespace std;
+#pragma once
 
 namespace reone {
 
 namespace render {
 
-static unordered_map<Feature, bool> g_features {
-    { Feature::PBR, false }
+enum class Feature {
+    PBR,
+    SelfIllumAsLights
 };
 
-bool isFeatureEnabled(Feature feature) {
-    auto maybeFeature = g_features.find(feature);
-    return maybeFeature != g_features.end() ? maybeFeature->second : false;
-}
+bool isFeatureEnabled(Feature feature);
 
-void setFeatureEnabled(Feature feature, bool enabled) {
-    g_features[feature] = enabled;
-}
+void setFeatureEnabled(Feature feature, bool enabled);
 
 } // namespace render
 

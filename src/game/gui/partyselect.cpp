@@ -228,7 +228,7 @@ void PartySelection::changeParty() {
         creature->load(blueprint);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);
-        creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+        creature->actionQueue().add(make_unique<FollowAction>(player, kDefaultFollowDistance));
         party.addMember(i, creature);
     }
 

@@ -36,7 +36,7 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kDetectionRange = 20.0f;
+constexpr float kDetectionRange = 20.0f;
 
 class Game;
 

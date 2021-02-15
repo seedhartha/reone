@@ -19,7 +19,7 @@
 #include <stdexcept>
 
 #include "../../common/log.h"
-#include "../../render/features.h"
+#include "../../render/featureutil.h"
 #include "../../render/meshes.h"
 #include "../../resource/resources.h"
 
@@ -108,8 +108,8 @@ void ModelSceneNode::initModelNodes() {
             addChild(childNode);
             nodes.push(childNode.get());
 
-            // Convert self-illuminated model nodes to light sources if PBR is enabled
-            if (isFeatureEnabled(Feature::PBR) && child->isSelfIllumEnabled()) {
+            // Optionally convert self-illuminated model nodes to light sources
+            if (isFeatureEnabled(Feature::SelfIllumAsLights) && child->isSelfIllumEnabled()) {
                 float radius;
                 shared_ptr<ModelMesh> mesh(child->mesh());
                 if (mesh) {

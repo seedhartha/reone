@@ -27,8 +27,8 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kMovementSpeed = 5.0f;
-static constexpr float kMouseMultiplier = glm::pi<float>() / 2000.0f;
+static constexpr float kMovementSpeed = 4.0f;
+static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
 FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(fovy, aspect, zNear, zFar));

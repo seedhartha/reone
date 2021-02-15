@@ -32,7 +32,7 @@ namespace game {
 static constexpr float kMinRotationSpeed = 1.0f;
 static constexpr float kMaxRotationSpeed = 2.5f;
 static constexpr float kRotationAcceleration = 1.0f;
-static constexpr float kMouseRotationSpeed = 0.005f;
+static constexpr float kMouseRotationSpeed = 0.001f;
 
 ThirdPersonCamera::ThirdPersonCamera(Game *game, SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) : _game(game) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
