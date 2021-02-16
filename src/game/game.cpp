@@ -813,8 +813,11 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             break;
         }
         case SDLK_F4:
-            setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
-            return true;
+            if (_options.developer) {
+                setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
+                return true;
+            }
+            break;
 
         case SDLK_LEFTBRACKET:
             _sceneGraph.setExposure(glm::max(0.25f, _sceneGraph.exposure() - 0.25f));
