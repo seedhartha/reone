@@ -24,6 +24,8 @@
 
 #include "glm/mat4x4.hpp"
 
+#include "../../render/aabb.h"
+
 namespace reone {
 
 namespace scene {
@@ -40,16 +42,31 @@ public:
     virtual void render();
     virtual void renderSingle(bool shadowPass);
 
-    virtual glm::vec3 getOrigin() const;
-    float distanceTo(const glm::vec3 &point) const;
-
     bool isVisible() const { return _visible; }
     virtual bool isTransparent() const { return _transparent; }
+
+    /**
+     * @return true if this scene node has a bounding box, false if it is a point
+     */
+    bool isVolumetric() const { return _volumetric; }
+
+    virtual glm::vec3 getOrigin() const;
+
+    /**
+     * @return distance from the origin of this node to the point
+     */
+    float getDistanceTo(const glm::vec3 &point) const;
+
+    /**
+     * @return shortest distance from the origin of this node to the other node
+     */
+    float getDistanceTo(const SceneNode &other) const;
 
     const SceneNode *parent() const { return _parent; }
     const glm::mat4 &localTransform() const { return _localTransform; }
     const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
     const glm::mat4 &absoluteTransformInverse() const { return _absoluteTransformInv; }
+    const AABB &aabb() const { return _aabb; }
     const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
 
     void setParent(const SceneNode *parent);
@@ -62,12 +79,16 @@ protected:
     SceneGraph *_sceneGraph;
 
     const SceneNode *_parent { nullptr };
+    std::vector<std::shared_ptr<SceneNode>> _children;
+
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     glm::mat4 _absoluteTransformInv { 1.0f };
-    std::vector<std::shared_ptr<SceneNode>> _children;
+    AABB _aabb;
+
     bool _visible { true };
     bool _transparent { false };
+    bool _volumetric { false };
 
     SceneNode(SceneGraph *sceneGraph);
 

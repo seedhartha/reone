@@ -68,8 +68,18 @@ glm::vec3 SceneNode::getOrigin() const {
     return glm::vec3(_absoluteTransform[3]);
 }
 
-float SceneNode::distanceTo(const glm::vec3 &point) const {
+float SceneNode::getDistanceTo(const glm::vec3 &point) const {
     return glm::distance(getOrigin(), point);
+}
+
+float SceneNode::getDistanceTo(const SceneNode &other) const {
+    if (!other.isVolumetric()) {
+        return glm::distance(getOrigin(), other.getOrigin());
+    }
+    glm::vec3 aabbSpaceOrigin(other._absoluteTransformInv * glm::vec4(getOrigin(), 1.0f));
+
+    return other.aabb().getDistanceFromClosestPoint(aabbSpaceOrigin);
+
 }
 
 void SceneNode::setParent(const SceneNode *parent) {

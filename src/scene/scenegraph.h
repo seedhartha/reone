@@ -73,8 +73,12 @@ public:
 
     bool isShadowLightPresent() const { return _shadowLightPresent; }
 
+    /**
+     * Fills lights vector with up to count lights, sorted by priority and
+     * proximity to the reference node.
+     */
     void getLightsAt(
-        const glm::vec3 &position,
+        const SceneNode &reference,
         std::vector<LightSceneNode *> &lights,
         int count = render::kMaxLightCount,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;

@@ -122,13 +122,7 @@ static bool isLightingEnabled(ModelSceneNode::Classification clazz) {
 }
 
 static bool isReceivingShadows(ModelSceneNode::Classification clazz) {
-    switch (clazz) {
-        case ModelSceneNode::Classification::Room:
-            return true;
-
-        default:
-            return false;
-    }
+    return clazz == ModelSceneNode::Classification::Room;
 }
 
 void ModelNodeSceneNode::renderSingle(bool shadowPass) {

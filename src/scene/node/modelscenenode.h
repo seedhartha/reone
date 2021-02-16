@@ -20,7 +20,6 @@
 #include <set>
 #include <unordered_map>
 
-#include "../../render/aabb.h"
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
 
@@ -76,7 +75,6 @@ public:
     std::shared_ptr<render::Model> model() const { return _model; }
     std::shared_ptr<render::Texture> textureOverride() const { return _textureOverride; }
     float alpha() const { return _alpha; }
-    const AABB &aabb() const { return _aabb; }
     float projectileSpeed() const { return _projectileSpeed; }
     SceneNodeAnimator &animator() { return _animator; }
 
@@ -113,7 +111,6 @@ private:
     float _alpha { 1.0f };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
-    AABB _aabb;
     float _projectileSpeed;
 
     void initModelNodes();

@@ -40,6 +40,11 @@ public:
 
     glm::vec3 getSize() const;
 
+    /**
+     * @return distance from the closest point of this AABB to the specified point
+     */
+    float getDistanceFromClosestPoint(const glm::vec3 &point) const;
+
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
     const glm::vec3 &center() const { return _center; }
