@@ -180,9 +180,9 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
 
     bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
     if (lighten) {
-        withAdditiveBlending([this]() { Meshes::instance().getBillboard().renderInstanced(_particles.size()); });
+        withAdditiveBlending([this]() { Meshes::instance().getBillboard()->renderInstanced(_particles.size()); });
     } else {
-        Meshes::instance().getBillboard().renderInstanced(_particles.size());
+        Meshes::instance().getBillboard()->renderInstanced(_particles.size());
     }
 }
 

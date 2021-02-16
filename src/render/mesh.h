@@ -38,7 +38,8 @@ class Mesh : boost::noncopyable {
 public:
     enum class DrawMode {
         Lines,
-        Triangles
+        Triangles,
+        TriangleStrip
     };
 
     struct VertexOffsets {

@@ -169,7 +169,7 @@ void ModelSceneNode::render() {
         uniforms.general.model = move(transform);
         Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
-        Meshes::instance().getAABB().render();
+        Meshes::instance().getAABB()->render();
     }
 }
 

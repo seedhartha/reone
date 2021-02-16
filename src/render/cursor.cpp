@@ -57,7 +57,7 @@ void Cursor::render() {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

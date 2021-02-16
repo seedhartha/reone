@@ -311,7 +311,7 @@ void GUI::drawBackground() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void GUI::resetFocus() {

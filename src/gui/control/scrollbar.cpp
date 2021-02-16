@@ -66,7 +66,7 @@ void ScrollBar::drawUpArrow(const glm::vec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void ScrollBar::drawDownArrow(const glm::vec2 &offset) {
@@ -80,7 +80,7 @@ void ScrollBar::drawDownArrow(const glm::vec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void ScrollBar::setCanScrollUp(bool scroll) {

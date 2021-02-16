@@ -206,7 +206,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -233,7 +233,7 @@ void SelectionOverlay::drawTitleBar() {
 
         Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -268,7 +268,7 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -298,7 +298,7 @@ void SelectionOverlay::drawActionBar() {
         setActiveTextureUnit(TextureUnits::diffuse);
         frameTexture->bind();
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
 
         if (i < static_cast<int>(_actions.size())) {
             ContextualAction action = _actions[i];
@@ -319,7 +319,7 @@ void SelectionOverlay::drawActionBar() {
                 setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();
 
-                Meshes::instance().getQuad().render();
+                Meshes::instance().getQuad()->render();
             }
         }
     }

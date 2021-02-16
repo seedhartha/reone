@@ -106,7 +106,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 } // namespace scene

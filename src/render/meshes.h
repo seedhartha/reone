@@ -39,28 +39,30 @@ public:
     void init();
     void deinit();
 
-    Mesh &getQuad() const { return *_quad; }
-    Mesh &getQuadFlipX() const { return *_quadFlipX; }
-    Mesh &getQuadFlipY() const { return *_quadFlipY; }
-    Mesh &getQuadFlipXY() const { return *_quadFlipXY; }
-    Mesh &getQuadNDC() const { return *_quadNDC; }
-    Mesh &getBillboard() const { return *_billboard; }
-    Mesh &getCube() const { return *_cube; }
-    Mesh &getCubemap() const { return *_cubemap; }
-    Mesh &getAABB() const { return *_aabb; }
+    std::shared_ptr<Mesh> getQuad() const { return _quad; }
+    std::shared_ptr<Mesh> getQuadFlipX() const { return _quadFlipX; }
+    std::shared_ptr<Mesh> getQuadFlipY() const { return _quadFlipY; }
+    std::shared_ptr<Mesh> getQuadFlipXY() const { return _quadFlipXY; }
+    std::shared_ptr<Mesh> getQuadNDC() const { return _quadNDC; }
+    std::shared_ptr<Mesh> getBillboard() const { return _billboard; }
+    std::shared_ptr<Mesh> getCube() const { return _cube; }
+    std::shared_ptr<Mesh> getSphere() const { return _sphere; }
+    std::shared_ptr<Mesh> getCubemap() const { return _cubemap; }
+    std::shared_ptr<Mesh> getAABB() const { return _aabb; }
 
 private:
     bool _inited { false };
 
-    std::unique_ptr<Mesh> _quad;
-    std::unique_ptr<Mesh> _quadFlipX;
-    std::unique_ptr<Mesh> _quadFlipY;
-    std::unique_ptr<Mesh> _quadFlipXY;
-    std::unique_ptr<Mesh> _quadNDC;
-    std::unique_ptr<Mesh> _cube;
-    std::unique_ptr<Mesh> _billboard;
-    std::unique_ptr<Mesh> _cubemap;
-    std::unique_ptr<Mesh> _aabb;
+    std::shared_ptr<Mesh> _quad;
+    std::shared_ptr<Mesh> _quadFlipX;
+    std::shared_ptr<Mesh> _quadFlipY;
+    std::shared_ptr<Mesh> _quadFlipXY;
+    std::shared_ptr<Mesh> _quadNDC;
+    std::shared_ptr<Mesh> _cube;
+    std::shared_ptr<Mesh> _sphere;
+    std::shared_ptr<Mesh> _billboard;
+    std::shared_ptr<Mesh> _cubemap;
+    std::shared_ptr<Mesh> _aabb;
 };
 
 } // namespace render

@@ -229,7 +229,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     _geometryColor2->bind();
 
     withDepthTest([]() {
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     });
 }
 
@@ -255,7 +255,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
     _horizontalBlurColor->bind();
 
     withDepthTest([]() {
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     });
 
     _verticalBlur.unbind();
@@ -284,7 +284,7 @@ void WorldRenderPipeline::drawResult() {
         }
         //_shadowsDepth->bind();
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
 
     } else {
         ShaderUniforms uniforms;
@@ -298,7 +298,7 @@ void WorldRenderPipeline::drawResult() {
         setActiveTextureUnit(TextureUnits::bloom);
         _verticalBlurColor->bind();
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     }
 }
 
