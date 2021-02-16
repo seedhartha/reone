@@ -71,7 +71,7 @@ void SceneGraph::prepareFrame() {
     // Sort transparent meshes by transparency and distance to camera
     unordered_map<SceneNode *, float> meshToCamera;
     for (auto &mesh : _transparentMeshes) {
-        meshToCamera.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
+        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo(cameraPosition)));
     }
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
         int leftTransparency = left->modelNode()->mesh()->transparency();
@@ -89,7 +89,7 @@ void SceneGraph::prepareFrame() {
     // Sort emitters by render order and distance to camera
     unordered_map<SceneNode *, float> emitterToCamera;
     for (auto &emitter : _emitters) {
-        emitterToCamera.insert(make_pair(emitter, emitter->distanceTo(cameraPosition)));
+        emitterToCamera.insert(make_pair(emitter, emitter->getDistanceTo(cameraPosition)));
     }
     sort(_emitters.begin(), _emitters.end(), [&emitterToCamera](auto &left, auto &right) {
         int leftRenderOrder = left->emitter()->renderOrder();
@@ -161,9 +161,8 @@ void SceneGraph::refreshShadowLight() {
 
     if (!_shadowReference) return;
 
-    glm::vec3 referencePos(_shadowReference->absoluteTransform()[3]);
     vector<LightSceneNode *> lights;
-    getLightsAt(referencePos, lights, 1, [](auto &light) { return light.isShadow(); });
+    getLightsAt(*_shadowReference, lights, 1, [](auto &light) { return light.isShadow(); });
 
     if (!lights.empty()) {
         _shadowLightPresent = true;
@@ -220,18 +219,26 @@ void SceneGraph::render(bool shadowPass) {
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights, int count, function<bool(const LightSceneNode &)> predicate) const {
+void SceneGraph::getLightsAt(
+    const SceneNode &node,
+    vector<LightSceneNode *> &lights,
+    int count,
+    function<bool(const LightSceneNode &)> predicate) const {
+
     unordered_map<LightSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
         if (!predicate(*light)) continue;
 
-        float distance = light->distanceTo(position);
-        if (distance <= light->radius() * light->radius()) {
-            distances.insert(make_pair(light, distance));
-            lights.push_back(light);
-        }
+        // Only account for lights whose distance to the reference node is
+        // within 4x range of the light. This is an approximation based on the
+        // linear falloff formula: D / (D + r)
+        float distance = light->getDistanceTo(node);
+        if (distance > 4.0f * light->radius()) continue;
+
+        lights.push_back(light);
+        distances.insert(make_pair(light, distance));
     }
 
     // Sort lights by priority and radius

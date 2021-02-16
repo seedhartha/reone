@@ -150,4 +150,18 @@ glm::vec3 AABB::getSize() const {
     return _max - _min;
 }
 
+float AABB::getDistanceFromClosestPoint(const glm::vec3 &point) const {
+    glm::vec3 closest;
+    for (int i = 0; i < 3; ++i) {
+        if (point[i] > _max[i]) {
+            closest[i] = _max[i];
+        } else if (point[i] < _min[i]) {
+            closest[i] = _min[i];
+        } else {
+            closest[i] = point[i];
+        }
+    }
+    return glm::distance(closest, point);
+}
+
 } // namespace reone
