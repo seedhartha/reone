@@ -89,7 +89,7 @@ void Video::render() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
-    Meshes::instance().getQuad().render();
+    Meshes::instance().getQuad()->render();
 }
 
 void Video::finish() {

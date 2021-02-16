@@ -18,6 +18,8 @@
 
 #include "meshes.h"
 
+#include "glm/ext.hpp"
+
 using namespace std;
 
 namespace reone {
@@ -201,6 +203,58 @@ static unique_ptr<Mesh> getMesh(
     return move(mesh);
 }
 
+static unique_ptr<Mesh> getSphereMesh() {
+    static constexpr int kNumSegmentsX = 16;
+    static constexpr int kNumSegmentsY = 16;
+
+    vector<float> vertices;
+    vector<uint16_t> indices;
+    Mesh::VertexOffsets offsets { 0, 3 * sizeof(float), 5 * sizeof(float), -1, -1, -1, -1, -1, 8 * sizeof(float) };
+
+    for (int y = 0; y <= kNumSegmentsY; ++y) {
+        for (int x = 0; x <= kNumSegmentsX; ++x) {
+            float xSegment = static_cast<float>(x) / static_cast<float>(kNumSegmentsX);
+            float ySegment = static_cast<float>(y) / static_cast<float>(kNumSegmentsY);
+            float xPos = glm::cos(xSegment * 2.0f * glm::pi<float>()) * glm::sin(ySegment * glm::pi<float>());
+            float yPos = glm::cos(ySegment * glm::pi<float>());
+            float zPos = glm::sin(xSegment * 2.0f * glm::pi<float>()) * glm::sin(ySegment * glm::pi<float>());
+
+            vertices.push_back(xPos);
+            vertices.push_back(yPos);
+            vertices.push_back(zPos);
+
+            vertices.push_back(xSegment);
+            vertices.push_back(ySegment);
+
+            vertices.push_back(xPos);
+            vertices.push_back(yPos);
+            vertices.push_back(zPos);
+        }
+    }
+
+    bool oddRow = false;
+    for (int y = 0; y < kNumSegmentsY; ++y) {
+        if (!oddRow) { // even rows: y == 0, y == 2; and so on
+            for (int x = 0; x <= kNumSegmentsX; ++x) {
+                indices.push_back(y * (kNumSegmentsX + 1) + x);
+                indices.push_back((y + 1) * (kNumSegmentsX + 1) + x);
+            }
+        } else {
+            for (int x = kNumSegmentsX; x >= 0; --x)
+            {
+                indices.push_back((y + 1) * (kNumSegmentsX + 1) + x);
+                indices.push_back(y * (kNumSegmentsX + 1) + x);
+            }
+        }
+        oddRow = !oddRow;
+    }
+
+    auto mesh = make_unique<Mesh>(static_cast<int>(vertices.size()) / 8, move(vertices), move(indices), move(offsets), Mesh::DrawMode::TriangleStrip);
+    mesh->init();
+
+    return move(mesh);
+}
+
 void Meshes::init() {
     if (!_inited) {
         _quad = getMesh(4, g_quadVertices, g_quadIndices, g_quadOffsets);
@@ -209,6 +263,7 @@ void Meshes::init() {
         _quadFlipXY = getMesh(4, g_quadFlipXYVertices, g_quadIndices, g_quadOffsets);
         _quadNDC = getMesh(4, g_quadNDCVertices, g_quadIndices, g_quadOffsets);
         _cube = getMesh(8, g_cubeVertices, g_cubeIndices, g_cubeOffsets);
+        _sphere = getSphereMesh();
         _billboard = getMesh(4, g_billboardVertices, g_billboardIndices, g_billboardOffsets);
         _cubemap = getMesh(24, g_cubemapVertices, g_cubemapIndices, g_cubemapOffsets);
         _aabb = getMesh(8, g_aabbVertices, g_aabbIndices, g_aabbOffsets, Mesh::DrawMode::Lines);

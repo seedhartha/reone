@@ -104,7 +104,14 @@ void Mesh::deinit() {
 }
 
 static GLenum getModeGL(Mesh::DrawMode mode) {
-    return mode == Mesh::DrawMode::Lines ? GL_LINES : GL_TRIANGLES;
+    switch (mode) {
+        case Mesh::DrawMode::Lines:
+            return GL_LINES;
+        case Mesh::DrawMode::TriangleStrip:
+            return GL_TRIANGLE_STRIP;
+        default:
+            return GL_TRIANGLES;
+    }
 }
 
 void Mesh::render() {

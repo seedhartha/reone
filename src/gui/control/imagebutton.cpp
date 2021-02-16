@@ -98,7 +98,7 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     }
 
     if (iconTexture) {
@@ -115,7 +115,7 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();
 
-        Meshes::instance().getQuad().render();
+        Meshes::instance().getQuad()->render();
     }
 
     if (!iconText.empty()) {
