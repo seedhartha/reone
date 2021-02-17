@@ -209,7 +209,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         }
         if (isLightingEnabled(_modelSceneNode->classification()) &&
             (!mesh->hasLightmapTexture() || isFeatureEnabled(Feature::DynamicRoomLighting)) &&
-            !_modelNode->isSelfIllumEnabled() &&
+            (!_modelNode->isSelfIllumEnabled() || _modelSceneNode->classification() != ModelSceneNode::Classification::Room) &&
             (!diffuseTexture || !diffuseTexture->isAdditive())) {
 
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
