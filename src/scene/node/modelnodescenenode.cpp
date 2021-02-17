@@ -89,13 +89,7 @@ bool ModelNodeSceneNode::shouldRender() const {
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh) return false;
-
-    if (isFeatureEnabled(Feature::DynamicRoomLighting) && _modelSceneNode->classification() == ModelSceneNode::Classification::Room) {
-        return mesh->shouldRender() && !_modelNode->isSelfIllumEnabled();
-    }
-
-    return mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
+    return mesh && mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
 }
 
 bool ModelNodeSceneNode::isTransparent() const {
