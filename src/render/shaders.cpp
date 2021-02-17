@@ -725,9 +725,6 @@ void main() {
 
             const float MAX_REFLECTION_LOD = 4.0;
             vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-            if (isFeatureEnabled(FEATURE_HDR)) {
-                prefilteredColor = pow(prefilteredColor, vec3(GAMMA));
-            }
             vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
