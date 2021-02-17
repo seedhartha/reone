@@ -623,6 +623,9 @@ void main() {
 
             objectColor += (1.0 - shadow) * (diffuse + specular);
         }
+
+        objectColor = min(objectColor, diffuseSample.rgb);
+
     } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
         float S = max(0.0, 1.0 - (shadow - dot(uAmbientColor.rgb, LUMINANCE)));
