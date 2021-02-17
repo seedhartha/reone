@@ -229,7 +229,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
 
             for (int i = 0; i < uniforms.lighting.lightCount; ++i) {
                 ShaderLight &shaderLight = uniforms.lighting.lights[i];
-                shaderLight.position = glm::vec4(glm::vec3(lights[i]->absoluteTransform()[3]), lights[i]->isDirectional() ? 0.0f : 1.0f);
+                shaderLight.position = lights[i]->absoluteTransform()[3];
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.multiplier = lights[i]->multiplier();
                 shaderLight.radius = lights[i]->radius();

@@ -107,7 +107,7 @@ struct SkeletalUniforms {
 };
 
 struct ShaderLight {
-    glm::vec4 position { 0.0f }; /**< w = 0.0 indicates a directional light, and w = 1.0 indicates a point light */
+    glm::vec4 position { 0.0f };
     glm::vec4 color { 1.0f };
     float multiplier { 1.0f };
     float radius { 1.0f };
