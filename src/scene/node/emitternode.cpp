@@ -146,18 +146,15 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
     shared_ptr<Texture> texture(_emitter->texture());
     if (!texture) return;
 
-    glm::mat4 transform(_absoluteTransform);
-
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.general.featureMask |= UniformFeatureFlags::billboard;
-    uniforms.general.model = _absoluteTransform;
     uniforms.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
     uniforms.billboard.render = static_cast<int>(_emitter->renderMode());
 
     for (size_t i = 0; i < _particles.size(); ++i) {
         const Particle &particle = *_particles[i];
 
-        glm::mat4 transform(1.0f);
+        glm::mat4 transform(_absoluteTransform);
         transform = glm::translate(transform, _particles[i]->position());
         if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
             transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * particle.size(), particle.size(), particle.size()));
@@ -166,7 +163,7 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
         }
 
         uniforms.billboard.particles[i].transform = move(transform);
-        uniforms.billboard.particles[i].position = glm::vec4(particle.position(), 1.0f);
+        uniforms.billboard.particles[i].position = _absoluteTransform * glm::vec4(particle.position(), 1.0f);
         uniforms.billboard.particles[i].color = glm::vec4(particle.color(), 1.0f);
         uniforms.billboard.particles[i].size = glm::vec2(particle.size());
         uniforms.billboard.particles[i].alpha = particle.alpha();
