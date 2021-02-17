@@ -31,6 +31,7 @@ public:
 
     bool isDirectional() const { return _type == LightType::Directional; }
     bool isShadow() const { return _shadow; }
+    bool isAmbientOnly() const { return _ambientOnly; }
 
     const glm::vec3 &color() const { return _color; }
     int priority() const { return _priority; }
@@ -40,6 +41,7 @@ public:
     void setMultiplier(float multiplier);
     void setRadius(float radius);
     void setShadow(bool shadow);
+    void setAmbientOnly(bool ambientOnly);
 
 private:
     LightType _type;
@@ -49,6 +51,7 @@ private:
     float _multiplier { 1.0f };
     float _radius { 1.0f };
     bool _shadow { false };
+    bool _ambientOnly { false };
 };
 
 } // namespace scene

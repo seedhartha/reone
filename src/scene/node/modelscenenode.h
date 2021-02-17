@@ -116,6 +116,8 @@ private:
     void initModelNodes();
     void updateAbsoluteTransform() override;
 
+    bool isAffectableByLight(const LightSceneNode &light) const;
+
     std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
 };
 
