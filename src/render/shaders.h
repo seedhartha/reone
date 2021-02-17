@@ -121,9 +121,8 @@ struct LightingUniforms {
     float materialShininess { 0.0f };
     float materialMetallic { 0.0f };
     float materialRoughness { 1.0f };
-    int falloffType { 0 }; /**< value from the FalloffType enum */
     int lightCount { 0 };
-    char padding[8];
+    char padding[12];
     ShaderLight lights[kMaxLightCount];
 };
 

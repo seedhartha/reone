@@ -225,7 +225,6 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.lighting.materialShininess = mesh->material().shininess;
             uniforms.lighting.materialMetallic = mesh->material().metallic;
             uniforms.lighting.materialRoughness = mesh->material().roughness;
-            uniforms.lighting.falloffType = getFeatureParameter(Feature::Falloff);
             uniforms.lighting.lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < uniforms.lighting.lightCount; ++i) {
