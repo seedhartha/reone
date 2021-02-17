@@ -570,13 +570,6 @@ void main() {
         N = normalize(fragNormal);
     }
 
-    float shadow;
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        shadow = getShadow();
-    } else {
-        shadow = 0.0;
-    }
-
     vec3 objectColor;
 
     if (isFeatureEnabled(FEATURE_LIGHTING)) {
@@ -596,35 +589,39 @@ void main() {
             diffuse *= attenuation;
             specular *= attenuation;
 
-            objectColor += (1.0 - shadow) * (diffuse + specular);
+            objectColor += diffuse + specular;
         }
 
         objectColor = min(objectColor, diffuseSample.rgb);
 
     } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        float S = max(0.0, 1.0 - (shadow - dot(uAmbientColor.rgb, LUMINANCE)));
         objectColor = diffuseSample.rgb;
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb * S, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
 
     } else {
         objectColor = diffuseSample.rgb;
+    }
+
+    if (isFeatureEnabled(FEATURE_ENVMAP)) {
+        vec3 R = reflect(-V, N);
+        vec4 envmapSample = texture(uEnvmap, R);
+        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+    }
+
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
+        vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uAmbientColor.rgb);
+        objectColor *= S;
     }
 
     float objectAlpha = uAlpha;
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
         objectAlpha *= diffuseSample.a;
     }
-    if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 R = reflect(-V, N);
-        vec4 envmapSample = texture(uEnvmap, R);
-        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
-    }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
-
     fragColor = vec4(objectColor, objectAlpha);
 
     vec3 brightColor = vec3(0.0);
@@ -659,13 +656,6 @@ void main() {
 
     vec3 V = normalize(uCameraPosition.xyz - fragPosition);
     vec3 R = reflect(-V, N);
-
-    float shadow;
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        shadow = getShadow();
-    } else {
-        shadow = 0.0;
-    }
 
     vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
     float metallic;
@@ -730,28 +720,33 @@ void main() {
 
             float NdotL = max(dot(N, L), 0.0);
 
-            Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
+            Lo += (kD * albedo / PI + specular) * radiance * NdotL;
         }
 
         objectColor = ambient + Lo;
 
     } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        float S = max(0.0, 1.0 - (shadow - dot(uAmbientColor.rgb, LUMINANCE)));
         objectColor = albedo;
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb * S, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
 
     } else {
         objectColor = albedo;
     }
 
-    float objectAlpha = uAlpha;
-    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
-        objectAlpha *= diffuseSample.a;
-    }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * (isFeatureEnabled(FEATURE_HDR) ? pow(envmapSample.rgb, vec3(GAMMA)) : envmapSample.rgb);
+    }
+
+    if (isFeatureEnabled(FEATURE_SHADOWS)) {
+        vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uAmbientColor.rgb);
+        objectColor *= S;
+    }
+
+    float objectAlpha = uAlpha;
+    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
+        objectAlpha *= diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
