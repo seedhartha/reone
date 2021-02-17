@@ -801,18 +801,7 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             }
             break;
 
-        case SDLK_F3: {
-            if (_options.developer) {
-                int falloff = getFeatureParameter(Feature::Falloff) + 1;
-                if (falloff == kNumFalloffTypes) {
-                    falloff = 0;
-                }
-                setFeatureParameter(Feature::Falloff, falloff);
-                return true;
-            }
-            break;
-        }
-        case SDLK_F4:
+        case SDLK_F3:
             if (_options.developer) {
                 setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
                 return true;

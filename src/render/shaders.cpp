@@ -66,11 +66,6 @@ const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
 const int FEATURE_CUSTOMMAT = 0x2000;
 
-const int FALLOFF_LINEAR = 0;
-const int FALLOFF_QUADRATIC = 1;
-const int FALLOFF_INV_LINEAR = 2;
-const int FALLOFF_INV_SQUARE = 3;
-
 struct Light {
     vec4 position;
     vec4 color;
@@ -116,7 +111,6 @@ layout(std140) uniform Lighting {
     float uMaterialShininess;
     float uMaterialMetallic;
     float uMaterialRoughness;
-    int uFalloffType;
     int uLightCount;
     Light uLights[MAX_LIGHTS];
 };
@@ -247,31 +241,13 @@ float getShadow() {
 }
 
 float getLightAttenuation(int light) {
-    float E = uLights[light].multiplier;
     float D = uLights[light].radius;
+    D *= D;
+
     float r = length(uLights[light].position.xyz - fragPosition);
-    float attenuation;
+    r *= r;
 
-    if (uFalloffType == FALLOFF_LINEAR) {
-        attenuation = E * (D / (D + r));
-
-    } else if (uFalloffType == FALLOFF_QUADRATIC) {
-        D *= D;
-        r *= r;
-        attenuation = E * (D / (D + r));
-
-    } else if (uFalloffType == FALLOFF_INV_LINEAR) {
-        attenuation = E * (1.0 / r);
-
-    } else if (uFalloffType == FALLOFF_INV_SQUARE) {
-        r *= r;
-        attenuation = E * (1.0 / r);
-
-    } else {
-        attenuation = 1.0;
-    }
-
-    return attenuation;
+    return D / (D + r);
 }
 )END";
 
