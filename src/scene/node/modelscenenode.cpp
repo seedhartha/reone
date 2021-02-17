@@ -33,6 +33,7 @@
 #include "modelscenenode.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::render;
 using namespace reone::resource;
@@ -127,11 +128,12 @@ void ModelSceneNode::initModelNodes() {
             }
 
             shared_ptr<ModelNode::Light> light(child->light());
-            if (light && !light->ambientOnly) {
+            if (light) {
                 auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->color(), light->priority, _sceneGraph);
                 lightNode->setMultiplier(child->multiplier());
                 lightNode->setRadius(child->radius());
                 lightNode->setShadow(light->shadow);
+                lightNode->setAmbientOnly(light->ambientOnly);
                 childNode->addChild(lightNode);
             }
 
@@ -249,12 +251,19 @@ void ModelSceneNode::updateLighting() {
     if (!_lightingDirty) return;
 
     _lightsAffectedBy.clear();
-    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, _sceneGraph->options().numLights);
+    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, _sceneGraph->options().numLights, bind(&ModelSceneNode::isAffectableByLight, this, _1));
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {
         attached.second->setLightsAffectedBy(_lightsAffectedBy);
     }
+}
+
+bool ModelSceneNode::isAffectableByLight(const LightSceneNode &light) const {
+    if (light.isAmbientOnly()) {
+        return _classification == ModelSceneNode::Classification::Room;
+    }
+    return true;
 }
 
 void ModelSceneNode::setLightingIsDirty() {

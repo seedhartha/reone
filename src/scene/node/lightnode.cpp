@@ -44,6 +44,10 @@ void LightSceneNode::setShadow(bool shadow) {
     _shadow = shadow;
 }
 
+void LightSceneNode::setAmbientOnly(bool ambientOnly) {
+    _ambientOnly = ambientOnly;
+}
+
 } // namespace scene
 
 } // namespace reone
