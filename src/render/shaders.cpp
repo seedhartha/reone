@@ -594,21 +594,19 @@ void main() {
 
         objectColor = min(objectColor, diffuseSample.rgb);
 
-    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = diffuseSample.rgb;
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
-
     } else {
         objectColor = diffuseSample.rgb;
     }
 
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+    }
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
-
     if (isFeatureEnabled(FEATURE_SHADOWS)) {
         vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uAmbientColor.rgb);
         objectColor *= S;
@@ -725,20 +723,18 @@ void main() {
 
         objectColor = ambient + Lo;
 
-    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = albedo;
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
-
     } else {
         objectColor = albedo;
     }
 
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+    }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
-        objectColor += (1.0 - diffuseSample.a) * (isFeatureEnabled(FEATURE_HDR) ? pow(envmapSample.rgb, vec3(GAMMA)) : envmapSample.rgb);
+        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
-
     if (isFeatureEnabled(FEATURE_SHADOWS)) {
         vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uAmbientColor.rgb);
         objectColor *= S;

@@ -172,7 +172,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (mesh->hasLightmapTexture() && !isFeatureEnabled(Feature::DynamicRoomLighting)) {
+        if (mesh->hasLightmapTexture()) {
             uniforms.general.featureMask |= UniformFeatureFlags::lightmap;
         }
 
