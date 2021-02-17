@@ -157,16 +157,35 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::refreshShadowLight() {
-    _shadowLightPresent = false;
+    const LightSceneNode *nextShadowLight = nullptr;
 
-    if (!_shadowReference) return;
+    if (_shadowReference) {
+        vector<LightSceneNode *> lights;
+        getLightsAt(*_shadowReference, lights, 1, [](auto &light) { return light.isShadow(); });
 
-    vector<LightSceneNode *> lights;
-    getLightsAt(*_shadowReference, lights, 1, [](auto &light) { return light.isShadow(); });
+        if (!lights.empty()) {
+            nextShadowLight = lights.front();
+        }
+    }
 
-    if (!lights.empty()) {
-        _shadowLightPresent = true;
-        _shadowLightPosition = lights.front()->absoluteTransform()[3];
+    if (!nextShadowLight) {
+        _shadowLight = nullptr;
+        return;
+    }
+
+    if (!_shadowLight) {
+        _shadowLight = nextShadowLight;
+        _shadowFading = false;
+        return;
+    }
+
+    if (_shadowLight == nextShadowLight) return;
+
+    if (_shadowFading && _shadowStrength == 0.0f) {
+        _shadowLight = nextShadowLight;
+        _shadowFading = false;
+    } else {
+        _shadowFading = true;
     }
 }
 
@@ -175,6 +194,12 @@ void SceneGraph::update(float dt) {
 
     for (auto &root : _roots) {
         root->update(dt);
+    }
+
+    if (_shadowFading) {
+        _shadowStrength = glm::max(0.0f, _shadowStrength - dt);
+    } else {
+        _shadowStrength = glm::min(_shadowStrength + dt, 1.0f);
     }
 }
 

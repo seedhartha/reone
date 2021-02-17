@@ -98,6 +98,7 @@ struct GeneralUniforms {
     float waterAlpha { 1.0f };
     int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
     int shadowLightPresent { false };
+    float shadowStrength { 1.0f };
     float roughness { 0.0f };
     float exposure { 1.0f };
 };

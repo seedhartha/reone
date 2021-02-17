@@ -72,8 +72,6 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
         uniforms.general.projection = _scene->activeCamera()->projection();
         uniforms.general.view = _scene->activeCamera()->view();
         uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
-        uniforms.general.shadowLightPresent = _scene->isShadowLightPresent();
-        uniforms.general.shadowLightPosition = glm::vec4(_scene->shadowLightPosition(), 1.0f);
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

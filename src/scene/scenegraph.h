@@ -71,8 +71,6 @@ public:
 
     // Lights and shadows
 
-    bool isShadowLightPresent() const { return _shadowLightPresent; }
-
     /**
      * Fills lights vector with up to count lights, sorted by priority and
      * proximity to the reference node.
@@ -84,7 +82,8 @@ public:
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
-    const glm::vec3 &shadowLightPosition() const { return _shadowLightPosition; }
+    const LightSceneNode *shadowLight() const { return _shadowLight; }
+    float shadowStrength() const { return _shadowStrength; }
 
     void setAmbientLightColor(const glm::vec3 &color);
 
@@ -102,12 +101,18 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    bool _shadowLightPresent { false };
-    glm::vec3 _shadowLightPosition { 0.0f };
-    std::shared_ptr<SceneNode> _shadowReference;
     bool _update { true };
     render::ShaderUniforms _uniformsPrototype;
     float _exposure { kDefaultExposure };
+
+    // Shadows
+
+    const LightSceneNode *_shadowLight { nullptr };
+    std::shared_ptr<SceneNode> _shadowReference;
+    float _shadowStrength { 1.0f };
+    bool _shadowFading { false };
+
+    // END Shadows
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

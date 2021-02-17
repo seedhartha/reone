@@ -100,6 +100,7 @@ layout(std140) uniform General {
     float uWaterAlpha;
     int uFeatureMask;
     bool uShadowLightPresent;
+    float uShadowStrength;
     float uRoughness;
     float uExposure;
 };
@@ -237,7 +238,7 @@ float getShadow() {
         }
     }
 
-    return shadow / (samples * samples * samples);
+    return uShadowStrength * shadow / (samples * samples * samples);
 }
 
 float getLightAttenuation(int light) {

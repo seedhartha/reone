@@ -32,6 +32,7 @@
 #include "../../render/window.h"
 
 #include "../node/cameranode.h"
+#include "../node/lightnode.h"
 #include "../scenegraph.h"
 
 using namespace std;
@@ -131,19 +132,21 @@ void WorldRenderPipeline::render() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    if (!_scene->isShadowLightPresent() || _opts.shadowResolution < 1) return;
+    if (_opts.shadowResolution < 1) return;
 
-    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [this]() {
+    const LightSceneNode *shadowLight = _scene->shadowLight();
+    if (!shadowLight) return;
+
+    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
         _shadows.bind();
 
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
 
         glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
-        glm::vec3 lightPosition(_scene->shadowLightPosition());
+        glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
 
         ShaderUniforms uniforms;
-        uniforms.general.shadowLightPresent = true;
         uniforms.general.shadowLightPosition = glm::vec4(lightPosition, 1.0f);
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
@@ -183,15 +186,18 @@ void WorldRenderPipeline::drawGeometry() {
     static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, buffers);
 
+    const LightSceneNode *shadowLight = _scene->shadowLight();
+
     ShaderUniforms uniforms;
     uniforms.general.projection = _scene->activeCamera()->projection();
     uniforms.general.view = _scene->activeCamera()->view();
     uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
-    uniforms.general.shadowLightPresent = _scene->isShadowLightPresent();
-    uniforms.general.shadowLightPosition = glm::vec4(_scene->shadowLightPosition(), 1.0f);
+    uniforms.general.shadowLightPresent = static_cast<bool>(shadowLight);
+    uniforms.general.shadowLightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
+    uniforms.general.shadowStrength = _scene->shadowStrength();
     _scene->setUniformsPrototype(move(uniforms));
 
-    if (_scene->isShadowLightPresent()) {
+    if (shadowLight) {
         setActiveTextureUnit(TextureUnits::shadowMap);
         _shadowsDepth->bind();
     }
