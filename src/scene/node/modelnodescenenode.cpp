@@ -88,7 +88,10 @@ bool ModelNodeSceneNode::shouldRender() const {
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
+    if (_modelSceneNode->classification() == ModelSceneNode::Classification::Door) return false;
+
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+
     return mesh && mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
 }
 
