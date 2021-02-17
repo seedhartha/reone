@@ -580,10 +580,10 @@ void main() {
             vec3 H = normalize(V + L);
 
             float diff = max(dot(L, N), 0.0);
-            vec3 diffuse = uLights[i].color.rgb * diff * uMaterialDiffuse.rgb * diffuseSample.rgb;
+            vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff * uMaterialDiffuse.rgb * diffuseSample.rgb;
 
             float spec = pow(max(dot(N, H), 0.0), uMaterialShininess);
-            vec3 specular = uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
+            vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
 
             float attenuation = getLightAttenuation(i);
             diffuse *= attenuation;
@@ -688,6 +688,9 @@ void main() {
 
             const float MAX_REFLECTION_LOD = 4.0;
             vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+            if (isFeatureEnabled(FEATURE_HDR)) {
+                prefilteredColor = pow(prefilteredColor, vec3(GAMMA));
+            }
             vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
@@ -701,7 +704,7 @@ void main() {
             vec3 H = normalize(V + L);
 
             float attenuation = getLightAttenuation(i);
-            vec3 radiance = uLights[i].color.rgb;
+            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb;
             radiance *= attenuation;
 
             float NDF = DistributionGGX(N, H, roughness);
@@ -729,10 +732,16 @@ void main() {
 
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        if (isFeatureEnabled(FEATURE_HDR)) {
+            lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
+        }
         objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
     }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
+        if (isFeatureEnabled(FEATURE_HDR)) {
+            envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
+        }
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
     if (isFeatureEnabled(FEATURE_SHADOWS)) {
