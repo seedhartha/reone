@@ -111,8 +111,9 @@ static bool isLightingEnabled(ModelSceneNode::Classification clazz) {
             return isFeatureEnabled(Feature::DynamicRoomLighting);
 
         case ModelSceneNode::Classification::Creature:
-        case ModelSceneNode::Classification::Door:
         case ModelSceneNode::Classification::Placeable:
+        case ModelSceneNode::Classification::Door:
+        case ModelSceneNode::Classification::Equipment:
         case ModelSceneNode::Classification::Other:
             return true;
 
