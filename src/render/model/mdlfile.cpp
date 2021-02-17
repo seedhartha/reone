@@ -307,7 +307,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
             case ControllerType::SelfIllumColor:
                 if (node._flags & kNodeHasMesh) {
                     readSelfIllumColorController(dataIndex, data, node);
-                    node._selfIllumEnabled = glm::length(node._selfIllumColor) > 0.0f;
+                    node._selfIllumEnabled = glm::dot(node._selfIllumColor, node._selfIllumColor) > 0.0f;
                 }
                 break;
             case ControllerType::FPS:
