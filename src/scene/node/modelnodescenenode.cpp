@@ -105,25 +105,33 @@ bool ModelNodeSceneNode::isTransparent() const {
     return mesh->isTransparent() || _modelNode->alpha() < 1.0f;
 }
 
-static bool isLightingEnabled(ModelSceneNode::Classification clazz) {
-    switch (clazz) {
-        case ModelSceneNode::Classification::Room:
-            return isFeatureEnabled(Feature::DynamicRoomLighting);
-
-        case ModelSceneNode::Classification::Creature:
-        case ModelSceneNode::Classification::Placeable:
-        case ModelSceneNode::Classification::Door:
-        case ModelSceneNode::Classification::Equipment:
-        case ModelSceneNode::Classification::Other:
-            return true;
-
-        default:
-            return false;
+static bool isLightingEnabledByClassification(ModelSceneNode::Classification classification) {
+    if (classification == ModelSceneNode::Classification::Room) {
+        return isFeatureEnabled(Feature::DynamicRoomLighting);
     }
+    return classification != ModelSceneNode::Classification::Projectile;
 }
 
-static bool isReceivingShadows(ModelSceneNode::Classification clazz) {
-    return clazz == ModelSceneNode::Classification::Room;
+static bool isLightingEnabled(const ModelSceneNode &model, const ModelNode &modelNode, const shared_ptr<Texture> &diffuse) {
+    if (!isLightingEnabledByClassification(model.classification())) return false;
+
+    // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
+    if (modelNode.mesh()->hasLightmapTexture() && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;
+
+    // Lighting is disabled for self-illuminated room model nodes, e.g. the skybox
+    if (modelNode.isSelfIllumEnabled() && model.classification() == ModelSceneNode::Classification::Room) return false;
+
+    // Lighting is disabled when diffuse texture is additive
+    if (diffuse && diffuse->isAdditive()) return false;
+
+    return true;
+}
+
+static bool isReceivingShadows(const ModelSceneNode &modelSceneNode, const ModelNode &modelNode) {
+    // Only room models receive shadows, unless model node is self-illuminated
+    return
+        modelSceneNode.classification() == ModelSceneNode::Classification::Room &&
+        !modelNode.isSelfIllumEnabled();
 }
 
 void ModelNodeSceneNode::renderSingle(bool shadowPass) {
@@ -181,7 +189,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.bumpmap.swizzled = mesh->isBumpmapSwizzled();
         }
 
-        bool receivesShadows = isReceivingShadows(_modelSceneNode->classification()) && !_modelNode->isSelfIllumEnabled();
+        bool receivesShadows = isReceivingShadows(*_modelSceneNode, *_modelNode);
         if (receivesShadows) {
             uniforms.general.featureMask |= UniformFeatureFlags::shadows;
         }
@@ -208,11 +216,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.general.featureMask |= UniformFeatureFlags::selfIllum;
             uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
         }
-        if (isLightingEnabled(_modelSceneNode->classification()) &&
-            (!mesh->hasLightmapTexture() || isFeatureEnabled(Feature::DynamicRoomLighting)) &&
-            (!_modelNode->isSelfIllumEnabled() || _modelSceneNode->classification() != ModelSceneNode::Classification::Room) &&
-            (!diffuseTexture || !diffuseTexture->isAdditive())) {
-
+        if (isLightingEnabled(*_modelSceneNode, *_modelNode, diffuseTexture)) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
 
             uniforms.general.featureMask |= UniformFeatureFlags::lighting;
