@@ -145,6 +145,8 @@ bool isFeatureEnabled(int flag) {
 )END";
 
 static constexpr GLchar *kShaderBaseModel = R"END(
+const float SELFILLUM_THRESHOLD = 0.85;
+
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
@@ -635,9 +637,6 @@ void main() {
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
         objectAlpha *= diffuseSample.a;
     }
-    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
-    }
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(uEnvmap, R);
@@ -649,7 +648,12 @@ void main() {
     }
 
     fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);
+
+    vec3 brightColor = vec3(0.0);
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+        brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    }
+    fragColorBright = vec4(brightColor, 1.0);
 }
 )END";
 
@@ -772,9 +776,6 @@ void main() {
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAP)) {
         objectAlpha *= diffuseSample.a;
     }
-    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColor += smoothstep(0.75, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
-    }
     if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * (isFeatureEnabled(FEATURE_HDR) ? pow(envmapSample.rgb, vec3(GAMMA)) : envmapSample.rgb);
@@ -792,7 +793,12 @@ void main() {
     }
 
     fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(max(vec3(0.0), objectColor.rgb - vec3(1.0)), 1.0);
+
+    vec3 brightColor = vec3(0.0);
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+        brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    }
+    fragColorBright = vec4(brightColor, 1.0);
 }
 )END";
 
