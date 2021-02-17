@@ -221,7 +221,7 @@ float getShadow() {
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
-    float bias = 0.5;
+    float bias = 0.1;
     float samples = 4.0;
     float offset = 0.1;
 
