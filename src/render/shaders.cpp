@@ -615,11 +615,9 @@ void main() {
             float spec = pow(max(dot(N, H), 0.0), uMaterialShininess);
             vec3 specular = uLights[i].color.rgb * spec * vec3(uMaterialSpecular);
 
-            if (uLights[i].position.w == 1.0) {
-                float attenuation = getLightAttenuation(i);
-                diffuse *= attenuation;
-                specular *= attenuation;
-            }
+            float attenuation = getLightAttenuation(i);
+            diffuse *= attenuation;
+            specular *= attenuation;
 
             objectColor += (1.0 - shadow) * (diffuse + specular);
         }
@@ -737,11 +735,9 @@ void main() {
             vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 
+            float attenuation = getLightAttenuation(i);
             vec3 radiance = uLights[i].color.rgb;
-            if (uLights[i].position.w == 1.0) {
-                float attenuation = getLightAttenuation(i);
-                radiance *= attenuation;
-            }
+            radiance *= attenuation;
 
             float NDF = DistributionGGX(N, H, roughness);
             float G = GeometrySmith(N, V, L, roughness);

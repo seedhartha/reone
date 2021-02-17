@@ -122,14 +122,14 @@ void ModelSceneNode::initModelNodes() {
                 } else {
                     radius = 1.0f;
                 }
-                auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->selfIllumColor(), kSelfIlluminatedPriority, _sceneGraph);
+                auto lightNode = make_shared<LightSceneNode>(child->selfIllumColor(), kSelfIlluminatedPriority, _sceneGraph);
                 lightNode->setRadius(radius);
                 childNode->addChild(lightNode);
             }
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                auto lightNode = make_shared<LightSceneNode>(LightType::Point, child->color(), light->priority, _sceneGraph);
+                auto lightNode = make_shared<LightSceneNode>(child->color(), light->priority, _sceneGraph);
                 lightNode->setMultiplier(child->multiplier());
                 lightNode->setRadius(child->radius());
                 lightNode->setShadow(light->shadow);

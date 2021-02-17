@@ -27,9 +27,8 @@ namespace scene {
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(LightType type, glm::vec3 color, int priority, SceneGraph *sceneGraph);
+    LightSceneNode(glm::vec3 color, int priority, SceneGraph *sceneGraph);
 
-    bool isDirectional() const { return _type == LightType::Directional; }
     bool isShadow() const { return _shadow; }
     bool isAmbientOnly() const { return _ambientOnly; }
 
@@ -44,7 +43,6 @@ public:
     void setAmbientOnly(bool ambientOnly);
 
 private:
-    LightType _type;
     glm::vec3 _color;
     int _priority;
 
