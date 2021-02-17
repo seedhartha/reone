@@ -232,10 +232,9 @@ void SceneGraph::getLightsAt(
         if (!predicate(*light)) continue;
 
         // Only account for lights whose distance to the reference node is
-        // within 4x range of the light. This is an approximation based on the
-        // linear falloff formula: D / (D + r)
+        // within range of the light.
         float distance = light->getDistanceTo(node);
-        if (distance > 4.0f * light->radius()) continue;
+        if (distance > light->radius()) continue;
 
         lights.push_back(light);
         distances.insert(make_pair(light, distance));
