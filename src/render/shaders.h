@@ -101,6 +101,7 @@ struct GeneralUniforms {
     float shadowStrength { 1.0f };
     float roughness { 0.0f };
     float exposure { 1.0f };
+    char padding[12];
 };
 
 struct SkeletalUniforms {
