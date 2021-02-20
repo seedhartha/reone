@@ -39,7 +39,7 @@ static constexpr int kSkeletalBindingPointIndex = 3;
 static constexpr int kBillboardBindingPointIndex = 4;
 static constexpr int kBumpmapBindingPointIndex = 5;
 
-static constexpr GLchar *kShaderBaseHeader = R"END(
+static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
 
 const float PI = 3.14159265359;
@@ -139,7 +139,7 @@ bool isFeatureEnabled(int flag) {
 }
 )END";
 
-static constexpr GLchar *kShaderBaseModel = R"END(
+static constexpr GLchar kShaderBaseModel[] = R"END(
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D uDiffuse;
@@ -252,7 +252,7 @@ float getLightAttenuation(int light) {
 }
 )END";
 
-static constexpr GLchar *kShaderBasePBR = R"END(
+static constexpr GLchar kShaderBasePBR[] = R"END(
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness * roughness;
     float a2 = a * a;
@@ -290,7 +290,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 )END";
 
-static constexpr GLchar *kShaderBasePBRIBL = R"END(
+static constexpr GLchar kShaderBasePBRIBL[] = R"END(
 float RadicalInverse_VdC(uint bits) {
      bits = (bits << 16u) | (bits >> 16u);
      bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -369,7 +369,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 }
 )END";
 
-static constexpr GLchar *kShaderVertexSimple = R"END(
+static constexpr GLchar kShaderVertexSimple[] = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -384,7 +384,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderVertexModel = R"END(
+static constexpr GLchar kShaderVertexModel[] = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoords;
@@ -443,7 +443,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderVertexBillboard = R"END(
+static constexpr GLchar kShaderVertexBillboard[] = R"END(
 const int BILLBOARD_RENDER_NORMAL = 1;
 const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
 const int BILLBOARD_RENDER_MOTION_BLUR = 3;
@@ -492,7 +492,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderGeometryDepth = R"END(
+static constexpr GLchar kShaderGeometryDepth[] = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
 
@@ -511,7 +511,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentColor = R"END(
+static constexpr GLchar kShaderFragmentColor[] = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -521,7 +521,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentDepth = R"END(
+static constexpr GLchar kShaderFragmentDepth[] = R"END(
 in vec4 fragPosition;
 
 void main() {
@@ -531,7 +531,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentGUI = R"END(
+static constexpr GLchar kShaderFragmentGUI[] = R"END(
 uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
@@ -550,7 +550,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentBlinnPhong = R"END(
+static constexpr GLchar kShaderFragmentBlinnPhong[] = R"END(
 void main() {
     vec2 texCoords = fragTexCoords + uUvOffset;
 
@@ -630,7 +630,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentPBR = R"END(
+static constexpr GLchar kShaderFragmentPBR[] = R"END(
 uniform sampler2D uBRDFLookup;
 uniform samplerCube uIrradianceMap;
 uniform samplerCube uPrefilterMap;
@@ -775,7 +775,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentBillboard = R"END(
+static constexpr GLchar kShaderFragmentBillboard[] = R"END(
 uniform sampler2D uDiffuse;
 
 in vec2 fragTexCoords;
@@ -804,7 +804,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentIrradiance = R"END(
+static constexpr GLchar kShaderFragmentIrradiance[] = R"END(
 uniform samplerCube uEnvmap;
 
 in vec3 fragPosition;
@@ -836,7 +836,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentPrefilter = R"END(
+static constexpr GLchar kShaderFragmentPrefilter[] = R"END(
 uniform samplerCube uEnvmap;
 
 in vec3 fragPosition;
@@ -885,7 +885,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentBRDF = R"END(
+static constexpr GLchar kShaderFragmentBRDF[] = R"END(
 in vec2 fragTexCoords;
 
 out vec4 fragColor;
@@ -896,7 +896,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentBlur = R"END(
+static constexpr GLchar kShaderFragmentBlur[] = R"END(
 uniform sampler2D uDiffuse;
 
 out vec4 fragColor;
@@ -916,7 +916,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentPresentWorld = R"END(
+static constexpr GLchar kShaderFragmentPresentWorld[] = R"END(
 uniform sampler2D uDiffuse;
 uniform sampler2D uBloom;
 
@@ -933,7 +933,7 @@ void main() {
 }
 )END";
 
-static constexpr GLchar *kShaderFragmentDebugCubeMap = R"END(
+static constexpr GLchar kShaderFragmentDebugCubeMap[] = R"END(
 const bool RGB = true;
 
 //uniform sampler2D uDiffuse;
@@ -1041,7 +1041,7 @@ void Shaders::init() {
     }
 }
 
-void Shaders::initShader(ShaderName name, unsigned int type, vector<char *> sources) {
+void Shaders::initShader(ShaderName name, unsigned int type, vector<const char *> sources) {
     GLuint shader = glCreateShader(type);
     GLint success;
     char log[512];

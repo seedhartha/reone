@@ -207,7 +207,7 @@ private:
 
     ~Shaders();
 
-    void initShader(ShaderName name, unsigned int type, std::vector<char *> sources);
+    void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
 
     void setUniforms(const ShaderUniforms &locals);
