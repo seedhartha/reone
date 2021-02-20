@@ -156,7 +156,7 @@ static const vector<uint16_t> g_cubemapIndices {
     20, 21, 22, 21, 20, 23
 };
 
-static const Mesh::VertexOffsets g_cubemapOffsets { 0, 3 * sizeof(float), 5 * sizeof(float), -1, -1, -1, -1, -1, 8 * sizeof(float) };
+static const Mesh::VertexOffsets g_cubemapOffsets { 0, 3 * sizeof(float), 6 * sizeof(float), -1, -1, -1, -1, -1, 8 * sizeof(float) };
 
 // END Cubemap
 
