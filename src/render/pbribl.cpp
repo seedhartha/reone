@@ -111,10 +111,10 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
 
     _irradianceFB.bind();
 
-    withViewport(viewport, [&]() {
-        setActiveTextureUnit(TextureUnits::envmap);
-        envmap->bind();
+    setActiveTextureUnit(TextureUnits::envmap);
+    envmap->bind();
 
+    withViewport(viewport, [&]() {
         for (int i = 0; i < kNumCubeFaces; ++i) {
             _irradianceFB.attachCubeMapFaceAsColor(*irradianceColor, static_cast<CubeMapFace>(i));
             _irradianceFB.attachDepth(*irradianceDepth);
@@ -148,6 +148,9 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
 
     _prefilterFB.bind();
 
+    setActiveTextureUnit(TextureUnits::envmap);
+    envmap->bind();
+
     for (int mip = 0; mip < kNumPrefilterMipMaps; ++mip) {
         int mipWidth = static_cast<int>(128 * glm::pow(0.5, mip));
         int mipHeight = static_cast<int>(128 * glm::pow(0.5, mip));
@@ -164,9 +167,6 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 uniforms.general.view = g_captureViews[face];
                 uniforms.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
                 Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
-
-                setActiveTextureUnit(TextureUnits::envmap);
-                envmap->bind();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 Meshes::instance().getCubemap()->render();
