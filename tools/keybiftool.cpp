@@ -113,7 +113,7 @@ bool KeyBifTool::supports(Operation operation, const fs::path &target) const {
     } else if (bif) {
         return operation == Operation::List || operation == Operation::Extract;
     } else {
-        return nullptr;
+        return false;
     }
 }
 
