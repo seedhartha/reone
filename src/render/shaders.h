@@ -210,6 +210,8 @@ private:
 
     void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
+    void initUniformBlocks();
+    void initTextureUniforms();
 
     void setUniforms(const ShaderUniforms &locals);
     void setUniform(const std::string &name, int value);

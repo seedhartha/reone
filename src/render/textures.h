@@ -42,8 +42,11 @@ public:
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
+    std::shared_ptr<Texture> getDefault() const { return _default; }
+
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
+    std::shared_ptr<render::Texture> _default;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);

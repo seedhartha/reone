@@ -27,6 +27,7 @@
 #include "image/tgafile.h"
 #include "image/tpcfile.h"
 #include "image/txifile.h"
+#include "textureutil.h"
 
 using namespace std;
 
@@ -43,6 +44,12 @@ Textures &Textures::instance() {
 
 void Textures::init(GameID gameId) {
     _gameId = gameId;
+
+    // Initialize default texture
+    _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
+    _default->init();
+    _default->bind();
+    _default->clearPixels(1, 1, PixelFormat::RGB);
 }
 
 void Textures::invalidateCache() {

@@ -27,6 +27,10 @@
 
 #include "glm/ext.hpp"
 
+#include "stateutil.h"
+#include "texture.h"
+#include "textures.h"
+
 using namespace std;
 
 namespace reone {
@@ -1003,38 +1007,8 @@ void Shaders::init() {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
 
-        uint32_t generalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "General");
-        if (generalBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, generalBlockIdx, kGeneralBindingPointIndex);
-            //GLint blockSize;
-            //glGetActiveUniformBlockiv(_activeOrdinal, generalBlockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-        }
-        uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
-        if (lightingBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
-        }
-        uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
-        if (skeletalBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
-        }
-        uint32_t billboardBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Billboard");
-        if (billboardBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, billboardBlockIdx, kBillboardBindingPointIndex);
-        }
-        uint32_t bumpmapBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Bumpmap");
-        if (bumpmapBlockIdx != GL_INVALID_INDEX) {
-            glUniformBlockBinding(_activeOrdinal, bumpmapBlockIdx, kBumpmapBindingPointIndex);
-        }
-
-        setUniform("uDiffuse", TextureUnits::diffuse);
-        setUniform("uLightmap", TextureUnits::lightmap);
-        setUniform("uEnvmap", TextureUnits::envmap);
-        setUniform("uBumpmap", TextureUnits::bumpmap);
-        setUniform("uBloom", TextureUnits::bloom);
-        setUniform("uIrradianceMap", TextureUnits::irradianceMap);
-        setUniform("uPrefilterMap", TextureUnits::prefilterMap);
-        setUniform("uBRDFLookup", TextureUnits::brdfLookup);
-        setUniform("uShadowMap", TextureUnits::shadowMap);
+        initUniformBlocks();
+        initTextureUniforms();
 
         _activeOrdinal = 0;
         glUseProgram(0);
@@ -1079,6 +1053,87 @@ void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
     }
 
     _programs.insert(make_pair(program, ordinal));
+}
+
+void Shaders::initUniformBlocks() {
+    ShaderUniforms defaultUniforms;
+
+    uint32_t generalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "General");
+    if (generalBlockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, generalBlockIdx, kGeneralBindingPointIndex);
+        //GLint blockSize;
+        //glGetActiveUniformBlockiv(_activeOrdinal, generalBlockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kGeneralBindingPointIndex, _generalUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(GeneralUniforms), &defaultUniforms.general, GL_STATIC_DRAW);
+    }
+
+    uint32_t lightingBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Lighting");
+    if (lightingBlockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, lightingBlockIdx, kLightingBindingPointIndex);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kLightingBindingPointIndex, _lightingUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightingUniforms), &defaultUniforms.lighting, GL_STATIC_DRAW);
+    }
+
+    uint32_t skeletalBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
+    if (skeletalBlockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, skeletalBlockIdx, kSkeletalBindingPointIndex);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kSkeletalBindingPointIndex, _skeletalUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &defaultUniforms.skeletal, GL_STATIC_DRAW);
+    }
+
+    uint32_t billboardBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Billboard");
+    if (billboardBlockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, billboardBlockIdx, kBillboardBindingPointIndex);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBillboardBindingPointIndex, _billboardUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BillboardUniforms), &defaultUniforms.billboard, GL_STATIC_DRAW);
+    }
+
+    uint32_t bumpmapBlockIdx = glGetUniformBlockIndex(_activeOrdinal, "Bumpmap");
+    if (bumpmapBlockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, bumpmapBlockIdx, kBumpmapBindingPointIndex);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBumpmapBindingPointIndex, _bumpmapUbo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(BumpmapUniforms), &defaultUniforms.bumpmap, GL_STATIC_DRAW);
+    }
+}
+
+void Shaders::initTextureUniforms() {
+    shared_ptr<Texture> defaultTexture(Textures::instance().getDefault());
+
+    setUniform("uDiffuse", TextureUnits::diffuse);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    defaultTexture->bind();
+
+    setUniform("uLightmap", TextureUnits::lightmap);
+    setActiveTextureUnit(TextureUnits::lightmap);
+    defaultTexture->bind();
+
+    setUniform("uEnvmap", TextureUnits::envmap);
+    setActiveTextureUnit(TextureUnits::envmap);
+    defaultTexture->bind();
+
+    setUniform("uBumpmap", TextureUnits::bumpmap);
+    setActiveTextureUnit(TextureUnits::bumpmap);
+    defaultTexture->bind();
+
+    setUniform("uBloom", TextureUnits::bloom);
+    setActiveTextureUnit(TextureUnits::bloom);
+    defaultTexture->bind();
+
+    setUniform("uIrradianceMap", TextureUnits::irradianceMap);
+    setActiveTextureUnit(TextureUnits::irradianceMap);
+    defaultTexture->bind();
+
+    setUniform("uPrefilterMap", TextureUnits::prefilterMap);
+    setActiveTextureUnit(TextureUnits::prefilterMap);
+    defaultTexture->bind();
+
+    setUniform("uBRDFLookup", TextureUnits::brdfLookup);
+    setActiveTextureUnit(TextureUnits::brdfLookup);
+    defaultTexture->bind();
+
+    setUniform("uShadowMap", TextureUnits::shadowMap);
+    setActiveTextureUnit(TextureUnits::shadowMap);
+    defaultTexture->bind();
 }
 
 Shaders::~Shaders() {
