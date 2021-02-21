@@ -30,8 +30,7 @@
 #include "../../scene/node/modelscenenode.h"
 
 #include "../enginetype/effect.h"
-
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 

@@ -22,9 +22,10 @@
 
 #include "../../resource/format/2dafile.h"
 
+#include "../types.h"
+
 #include "attributes.h"
 #include "savingthrows.h"
-#include "types.h"
 
 namespace reone {
 

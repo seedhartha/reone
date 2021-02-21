@@ -19,7 +19,7 @@
 
 #include "../../../resource/types.h"
 
-#include "../../rp/types.h"
+#include "../../types.h"
 
 #include "../gui.h"
 

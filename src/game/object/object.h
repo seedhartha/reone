@@ -23,8 +23,7 @@
 #include "../../script/object.h"
 
 #include "../actionqueue.h"
-
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 

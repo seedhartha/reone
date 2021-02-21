@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../object/types.h"
 #include "../types.h"
 
 namespace reone {
