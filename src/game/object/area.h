@@ -35,13 +35,13 @@
 #include "../camera/firstperson.h"
 #include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
-#include "../camera/types.h"
 #include "../collisiondetect.h"
 #include "../combat/combat.h"
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
 #include "../script/runner.h"
+#include "../types.h"
 
 #include "object.h"
 

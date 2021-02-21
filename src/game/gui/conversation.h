@@ -22,9 +22,9 @@
 #include "../../render/lip/lipanimation.h"
 #include "../../render/model/model.h"
 
-#include "../camera/types.h"
 #include "../dialog.h"
 #include "../object/spatial.h"
+#include "../types.h"
 
 #include "gui.h"
 

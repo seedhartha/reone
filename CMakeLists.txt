@@ -419,7 +419,6 @@ set(GAME_HEADERS
     src/game/camera/firstperson.h
     src/game/camera/staticcamera.h
     src/game/camera/thirdperson.h
-    src/game/camera/types.h
     src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
@@ -433,7 +432,6 @@ set(GAME_HEADERS
     src/game/enginetype/effect.h
     src/game/enginetype/event.h
     src/game/enginetype/location.h
-    src/game/enginetype/types.h
     src/game/game.h
     src/game/gui/barkbubble.h
     src/game/gui/chargen/abilities.h
@@ -485,7 +483,6 @@ set(GAME_HEADERS
     src/game/object/sound.h
     src/game/object/spatial.h
     src/game/object/trigger.h
-    src/game/object/types.h
     src/game/object/waypoint.h
     src/game/objectselect.h
     src/game/options.h
@@ -503,7 +500,6 @@ set(GAME_HEADERS
     src/game/rp/factionutil.h
     src/game/rp/savingthrows.h
     src/game/rp/skills.h
-    src/game/rp/types.h
     src/game/savedgame.h
     src/game/script/routines.h
     src/game/script/runner.h

@@ -19,8 +19,9 @@
 
 #include "../../common/cache.h"
 
+#include "../types.h"
+
 #include "class.h"
-#include "types.h"
 
 namespace reone {
 

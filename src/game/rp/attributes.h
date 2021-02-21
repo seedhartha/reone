@@ -19,9 +19,10 @@
 
 #include <vector>
 
+#include "../types.h"
+
 #include "abilities.h"
 #include "skills.h"
-#include "types.h"
 
 namespace reone {
 

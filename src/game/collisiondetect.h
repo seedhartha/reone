@@ -24,7 +24,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "object/types.h"
+#include "types.h"
 
 namespace reone {
 
