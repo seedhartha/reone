@@ -71,6 +71,7 @@ void CreatureBlueprint::load(Creature &creature) {
     loadScripts(creature);
     loadItems(creature);
     loadSoundSet(creature);
+    loadBodyBag(creature);
 }
 
 int CreatureBlueprint::getAppearanceFromUtc() const {
@@ -143,11 +144,14 @@ void CreatureBlueprint::loadSoundSet(Creature &creature) {
     int soundSetIdx = _utc->getInt("SoundSetFile");
     if (soundSetIdx == 0xffff) return;
 
-    shared_ptr<TwoDaTable> soundSetTable(Resources::instance().get2DA("soundset"));
+    shared_ptr<TwoDA> soundSetTable(Resources::instance().get2DA("soundset"));
     string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
     if (soundSetResRef.empty()) return;
 
     creature._soundSet = SoundSets::instance().get(soundSetResRef);
+}
+
+void CreatureBlueprint::loadBodyBag(Creature &creature) {
 }
 
 void StaticCreatureBlueprint::load(Creature &creature) {

@@ -109,12 +109,12 @@ void Creature::load(const shared_ptr<Blueprint<Creature>> &blueprint) {
     }
     blueprint->load(*this);
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
     loadAppearance(*appearance, _appearance);
     loadPortrait(_appearance);
 }
 
-void Creature::loadAppearance(const TwoDaTable &table, int row) {
+void Creature::loadAppearance(const TwoDA &table, int row) {
     _appearance = row;
     _modelType = parseModelType(table.getString(row, "modeltype"));
     _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
@@ -152,22 +152,22 @@ void Creature::updateModel() {
 }
 
 void Creature::loadPortrait(int appearance) {
-    shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
+    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
     string appearanceString(to_string(appearance));
 
-    const TwoDaRow *row = portraits->get([&appearanceString](const TwoDaRow &r) {
-        return
-            r.getString("appearancenumber") == appearanceString ||
-            r.getString("appearance_s") == appearanceString ||
-            r.getString("appearance_l") == appearanceString;
-    });
-    if (!row) {
+    vector<pair<string, string>> columnValues {
+        { "appearancenumber", appearanceString },
+        { "appearance_s", appearanceString },
+        { "appearance_l", appearanceString }
+    };
+
+    int row = portraits->indexByCellValuesAny(columnValues);
+    if (row == -1) {
         warn("Creature: portrait not found: " + appearanceString);
         return;
     }
-    string resRef(row->getString("baseresref"));
-    boost::to_lower(resRef);
 
+    string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
     _portrait = Textures::instance().get(resRef, TextureUsage::GUI);
 }
 

@@ -15,21 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camerastyle.h"
+#pragma once
 
-#include "../../resource/resources.h"
+#include <memory>
+
+#include <boost/filesystem/path.hpp>
+
+#include "../../common/streamwriter.h"
+
+#include "../2da.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-void CameraStyle::load(const resource::TwoDA &twoDa, int row) {
-    distance = twoDa.getFloat(row, "distance");
-    pitch = twoDa.getFloat(row, "pitch");
-    viewAngle = twoDa.getFloat(row, "viewangle");
-    height = twoDa.getFloat(row, "height");
-}
+class TwoDaWriter {
+public:
+    TwoDaWriter(const std::shared_ptr<TwoDA> &twoDa);
 
-} // namespace game
+    void save(const boost::filesystem::path &path);
+
+private:
+    std::shared_ptr<TwoDA> _twoDa;
+
+    void writeHeaders(StreamWriter &writer);
+    void writeLabels(StreamWriter &writer);
+    void writeData(StreamWriter &writer);
+};
+
+} // namespace resource
 
 } // namespace reone

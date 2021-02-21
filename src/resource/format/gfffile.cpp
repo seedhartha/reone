@@ -17,9 +17,11 @@
 
 #include "gfffile.h"
 
+#include <boost/format.hpp>
+
 #include "glm/gtc/type_ptr.hpp"
 
-#include <boost/format.hpp>
+#include "../../common/log.h"
 
 using namespace std;
 
@@ -30,141 +32,6 @@ namespace reone {
 namespace resource {
 
 static constexpr int kSignatureSize = 8;
-
-GffField::GffField(GffFieldType type, const string &label) : _type(type), _label(label) {
-}
-
-bool GffField::asBool() const {
-    return _intValue != 0;
-}
-
-int64_t GffField::asInt() const {
-    return _intValue;
-}
-
-uint64_t GffField::asUint() const {
-    return _uintValue;
-}
-
-float GffField::asFloat() const {
-    return _floatValue;
-}
-
-double GffField::asDouble() const {
-    return _doubleValue;
-}
-
-string GffField::asString() const {
-    switch (_type) {
-        case GffFieldType::CExoString:
-        case GffFieldType::ResRef:
-            return _strValue;
-
-        case GffFieldType::Char:
-            return string(1, _strValue[0]);
-
-        case GffFieldType::Short:
-        case GffFieldType::Int:
-        case GffFieldType::Int64:
-        case GffFieldType::CExoLocString:
-        case GffFieldType::StrRef:
-            return to_string(_intValue);
-
-        case GffFieldType::Byte:
-        case GffFieldType::Word:
-        case GffFieldType::Dword:
-        case GffFieldType::Dword64:
-            return to_string(_uintValue);
-
-        case GffFieldType::Float:
-            return to_string(_floatValue);
-
-        case GffFieldType::Double:
-            return to_string(_doubleValue);
-
-        case GffFieldType::Void:
-            return boost::str(boost::format("[array of %d bytes]") % _data.size());
-
-        default:
-            throw logic_error("GFF: field type cannot be converted to string: " + to_string(static_cast<int>(_type)));
-    }
-}
-
-const ByteArray &GffField::asByteArray() const {
-    return _data;
-}
-
-vector<float> GffField::asFloatArray() const {
-    vector<float> values(_data.size() / sizeof(float));
-    memcpy(&values[0], &_data[0], values.size() * sizeof(float));
-    return move(values);
-}
-
-const GffStruct &GffField::asStruct() const {
-    return *_children[0];
-}
-
-glm::vec3 GffField::asVector() const {
-    const float *values = reinterpret_cast<const float *>(&_data[0]);
-    return glm::vec3(values[0], values[1], values[2]);
-}
-
-glm::quat GffField::asOrientation() const {
-    const float *values = reinterpret_cast<const float *>(&_data[0]);
-    return glm::quat(values[0], values[1], values[2], values[3]);
-}
-
-GffStruct::GffStruct(GffFieldType type) : _type(type) {
-}
-
-shared_ptr<GffField> GffStruct::find(const string &name) const {
-    auto it = find_if(
-        _fields.begin(),
-        _fields.end(),
-        [&](auto &f) { return f->label() == name; });
-
-    return it != _fields.end() ? *it : nullptr;
-}
-
-bool GffStruct::getBool(const string &name, bool defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->asBool() : defaultValue;
-}
-
-int GffStruct::getInt(const string &name, int defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? static_cast<int>(field->asInt()) : defaultValue;
-}
-
-float GffStruct::getFloat(const string &name, float defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->asFloat() : defaultValue;
-}
-
-string GffStruct::getString(const string &name, const char *defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->asString() : defaultValue;
-}
-
-glm::vec3 GffStruct::getVector(const string &name, glm::vec3 defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->asVector() : move(defaultValue);
-}
-
-glm::quat GffStruct::getOrientation(const string &name, glm::quat defaultValue) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->asOrientation() : move(defaultValue);
-}
-
-shared_ptr<GffStruct> GffStruct::getStruct(const string &name) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->children()[0] : nullptr;
-}
-
-vector<shared_ptr<GffStruct>> GffStruct::getList(const string &name) const {
-    shared_ptr<GffField> field(find(name));
-    return field ? field->children() : vector<shared_ptr<GffStruct>>();
-}
 
 GffFile::GffFile() : BinaryFile(kSignatureSize) {
 }
@@ -182,23 +49,22 @@ void GffFile::doLoad() {
     _fieldIncidesCount = readUint32();
     _listIndicesOffset = readUint32();
     _listIndicesCount = readUint32();
-
-    _top = move(readStruct(0));
+    _root = move(readStruct(0));
 }
 
 unique_ptr<GffStruct> GffFile::readStruct(int idx) {
-    seek(_structOffset + 12 * idx);
+    seek(_structOffset + 12ll * idx);
 
     uint32_t type = readUint32();
-    uint32_t dataOrDataOffset = readUint32();
+    uint32_t dataOffset = readUint32();
     uint32_t fieldCount = readUint32();
 
-    auto gffs = make_unique<GffStruct>(static_cast<GffFieldType>(type));
+    auto gffs = make_unique<GffStruct>();
 
     if (fieldCount == 1) {
-        gffs->_fields.push_back(readField(dataOrDataOffset));
+        gffs->_fields.push_back(readField(dataOffset));
     } else {
-        vector<uint32_t> indices(readFieldIndices(dataOrDataOffset, fieldCount));
+        vector<uint32_t> indices(readFieldIndices(dataOffset, fieldCount));
         for (auto &idx : indices) {
             gffs->_fields.push_back(readField(idx));
         }
@@ -207,76 +73,82 @@ unique_ptr<GffStruct> GffFile::readStruct(int idx) {
     return move(gffs);
 }
 
-unique_ptr<GffField> GffFile::readField(int idx) {
-    seek(_fieldOffset + 12 * idx);
+unique_ptr<GffStruct::Field> GffFile::readField(int idx) {
+    seek(_fieldOffset + 12ll * idx);
 
     uint32_t type = readUint32();
     uint32_t labelIndex = readUint32();
-    uint32_t dataOrDataOffset = readUint32();
+    uint32_t valueOrDataOffset = readUint32();
 
-    string label(readLabel(labelIndex));
-    auto field = make_unique<GffField>(static_cast<GffFieldType>(type), label);
-    LocString locString;
-    vector<uint32_t> list;
+    auto field = make_unique<GffStruct::Field>();
+    field->type = static_cast<GffStruct::FieldType>(type);
+    field->label = readLabel(labelIndex);
 
-    switch (field->_type) {
-        case GffFieldType::Byte:
-        case GffFieldType::Char:
-        case GffFieldType::Word:
-        case GffFieldType::Short:
-        case GffFieldType::Dword:
-        case GffFieldType::Int:
-        case GffFieldType::Float:
-            field->_uintValue = dataOrDataOffset;
+    switch (field->type) {
+        case GffStruct::FieldType::Byte:
+        case GffStruct::FieldType::Word:
+        case GffStruct::FieldType::Dword:
+            field->uintValue = valueOrDataOffset;
             break;
-
-        case GffFieldType::Dword64:
-        case GffFieldType::Int64:
-        case GffFieldType::Double:
-            field->_uintValue = readQWordFieldData(dataOrDataOffset);
+        case GffStruct::FieldType::Char:
+        case GffStruct::FieldType::Short:
+        case GffStruct::FieldType::Int:
+            field->intValue = *reinterpret_cast<int *>(&valueOrDataOffset);
             break;
-
-        case GffFieldType::CExoString:
-            field->_strValue = readStringFieldData(dataOrDataOffset);
+        case GffStruct::FieldType::Dword64:
+            field->uint64Value = readQWordFieldData(valueOrDataOffset);
             break;
-
-        case GffFieldType::ResRef:
-            field->_strValue = readResRefFieldData(dataOrDataOffset);
+        case GffStruct::FieldType::Int64: {
+            uint64_t tmp = readQWordFieldData(valueOrDataOffset);
+            field->int64Value = *reinterpret_cast<int64_t *>(&tmp);
             break;
-
-        case GffFieldType::CExoLocString:
-            locString = readCExoLocStringFieldData(dataOrDataOffset);
-            field->_intValue = locString.strRef;
-            field->_strValue = locString.subString;
+        }
+        case GffStruct::FieldType::Float:
+            field->floatValue = *reinterpret_cast<float *>(&valueOrDataOffset);
             break;
-
-        case GffFieldType::StrRef:
-            field->_intValue = readStrRefFieldData(dataOrDataOffset);
+        case GffStruct::FieldType::Double: {
+            uint64_t tmp = readQWordFieldData(valueOrDataOffset);
+            field->doubleValue = *reinterpret_cast<double *>(&tmp);
             break;
-
-        case GffFieldType::Void:
-            field->_data = readByteArrayFieldData(dataOrDataOffset);
+        }
+        case GffStruct::FieldType::CExoString:
+            field->strValue = readStringFieldData(valueOrDataOffset);
             break;
-
-        case GffFieldType::Orientation:
-            field->_data = readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float));
+        case GffStruct::FieldType::ResRef:
+            field->strValue = readResRefFieldData(valueOrDataOffset);
             break;
-
-        case GffFieldType::Vector:
-            field->_data = readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float));
+        case GffStruct::FieldType::CExoLocString: {
+            LocString locString(readCExoLocStringFieldData(valueOrDataOffset));
+            field->intValue = locString.strRef;
+            field->strValue = locString.subString;
             break;
-
-        case GffFieldType::Struct:
-            field->_children.push_back(readStruct(dataOrDataOffset));
+        }
+        case GffStruct::FieldType::Void:
+            field->data = readByteArrayFieldData(valueOrDataOffset);
             break;
-
-        case GffFieldType::List:
-            list = readList(dataOrDataOffset);
+        case GffStruct::FieldType::Struct:
+            field->children.push_back(readStruct(valueOrDataOffset));
+            break;
+        case GffStruct::FieldType::List: {
+            vector<uint32_t> list(readList(valueOrDataOffset));
             for (auto &item : list) {
-                field->_children.push_back(readStruct(item));
+                field->children.push_back(readStruct(item));
             }
             break;
-
+        }
+        case GffStruct::FieldType::Orientation: {
+            ByteArray data(readByteArrayFieldData(valueOrDataOffset, 4 * sizeof(float)));
+            field->quatValue = glm::make_quat(reinterpret_cast<float *>(&data[0]));
+            break;
+        }
+        case GffStruct::FieldType::Vector: {
+            ByteArray data(readByteArrayFieldData(valueOrDataOffset, 3 * sizeof(float)));
+            field->vecValue = glm::make_vec3((reinterpret_cast<float *>(&data[0])));
+            break;
+        }
+        case GffStruct::FieldType::StrRef:
+            field->intValue = readStrRefFieldData(valueOrDataOffset);
+            break;
         default:
             throw runtime_error("GFF: unsupported field type: " + to_string(type));
     }
@@ -339,6 +211,10 @@ GffFile::LocString GffFile::readCExoLocStringFieldData(uint32_t off) {
         int32_t type = readInt32();
         uint32_t ssSize = readUint32();
         loc.subString = readCString(ssSize);
+
+        if (count > 1) {
+            warn("GFF: more than one substring in CExoLocString, ignoring");
+        }
     }
 
     seek(pos);
@@ -351,7 +227,7 @@ int32_t GffFile::readStrRefFieldData(uint32_t off) {
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
-    int32_t ref = readUint32();
+    int32_t ref = readInt32();
 
     seek(pos);
 

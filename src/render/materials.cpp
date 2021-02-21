@@ -38,14 +38,14 @@ Materials &Materials::instance() {
 
 void Materials::init() {
     if (!_inited) {
-        shared_ptr<TwoDaTable> materials(Resources::instance().get2DA("material"));
+        shared_ptr<TwoDA> materials(Resources::instance().get2DA("material"));
         if (materials) {
-            for (auto &row : materials->rows()) {
-                string tex(boost::to_lower_copy(row.getString("tex")));
-                float specular = row.getFloat("specular", -1.0f);
-                float shininess = row.getFloat("shininess", -1.0f);
-                float metallic = row.getFloat("metallic", -1.0f);
-                float roughness = row.getFloat("roughness", -1.0f);
+            for (int row = 0; row < materials->getRowCount(); ++row) {
+                string tex(boost::to_lower_copy(materials->getString(row, "tex")));
+                float specular = materials->getFloat(row, "specular", -1.0f);
+                float shininess = materials->getFloat(row, "shininess", -1.0f);
+                float metallic = materials->getFloat(row, "metallic", -1.0f);
+                float roughness = materials->getFloat(row, "roughness", -1.0f);
 
                 auto material = make_shared<Material>();
                 if (tex != kDefaultMaterialTex) {

@@ -20,6 +20,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include "../src/resource/format/2dawriter.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -40,21 +42,19 @@ void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::pa
 }
 
 void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    TwoDaFile twoDa;
-    twoDa.load(path);
+    TwoDaFile twoDaFile;
+    twoDaFile.load(path);
 
     pt::ptree tree;
     pt::ptree children;
-    shared_ptr<TwoDaTable> table(twoDa.table());
-    auto &headers = table->headers();
-    auto &rows = table->rows();
+    shared_ptr<TwoDA> twoDa(twoDaFile.twoDa());
 
-    for (size_t i = 0; i < rows.size(); ++i) {
+    for (int row = 0; row < twoDa->getRowCount(); ++row) {
         pt::ptree child;
-        child.put("_id", i);
+        child.put("_id", row);
 
-        for (auto &value : table->rows()[i].values()) {
-            child.put(value.first, value.second);
+        for (int col = 0; col < twoDa->getColumnCount(); ++col) {
+            child.put(twoDa->columns()[col], twoDa->rows()[row].values[col]);
         }
         children.push_back(make_pair("", child));
     }
@@ -70,15 +70,15 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::read_json(path.string(), tree);
 
-    auto table = make_unique<TwoDaTable>();
+    auto table = make_unique<TwoDA>();
 
     for (auto &jsonRow : tree.get_child("rows")) {
-        TwoDaRow row;
+        TwoDA::Row row;
         for (auto &column : jsonRow.second) {
             // Columns starting with an underscore we consider meta and skip
             if (boost::starts_with(column.first, "_")) continue;
 
-            row.add(column.first, column.second.data());
+            row.values.push_back(column.second.data());
         }
         table->add(move(row));
     }

@@ -35,15 +35,15 @@ GUISounds &GUISounds::instance() {
     return instance;
 }
 
-static void loadSound(const TwoDaTable &table, const string &label, shared_ptr<AudioStream> &sound) {
-    const TwoDaRow *maybeRow = table.getByColumnValue("label", label);
-    if (maybeRow) {
-        sound = AudioFiles::instance().get(maybeRow->getString("soundresref"));
+static void loadSound(const TwoDA &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
+    int row = twoDa.indexByCellValue("label", label);
+    if (row != -1) {
+        sound = AudioFiles::instance().get(twoDa.getString(row, "soundresref"));
     }
 }
 
 void GUISounds::init() {
-    shared_ptr<TwoDaTable> sounds(Resources::instance().get2DA("guisounds"));
+    shared_ptr<TwoDA> sounds(Resources::instance().get2DA("guisounds"));
     loadSound(*sounds, "Clicked_Default", _onClick);
     loadSound(*sounds, "Entered_Default", _onEnter);
 }

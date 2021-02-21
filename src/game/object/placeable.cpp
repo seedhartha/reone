@@ -80,7 +80,7 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     }
     blueprint->load(*this);
 
-    shared_ptr<TwoDaTable> placeables(Resources::instance().get2DA("placeables"));
+    shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
     auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Placeable, Models::instance().get(modelName), _sceneGraph);
 

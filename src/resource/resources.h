@@ -26,11 +26,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "format/2dafile.h"
-#include "format/gfffile.h"
+#include "2da.h"
 #include "format/keyfile.h"
 #include "format/pefile.h"
 #include "format/tlkfile.h"
+#include "gffstruct.h"
 #include "keybifprovider.h"
 #include "resourceprovider.h"
 #include "stringprocessor.h"
@@ -54,7 +54,7 @@ public:
 
     void loadModule(const std::string &name);
 
-    std::shared_ptr<TwoDaTable> get2DA(const std::string &resRef);
+    std::shared_ptr<TwoDA> get2DA(const std::string &resRef);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
@@ -100,7 +100,7 @@ private:
 
     // Resource caches
 
-    std::unordered_map<std::string, std::shared_ptr<TwoDaTable>> _2daCache;
+    std::unordered_map<std::string, std::shared_ptr<TwoDA>> _2daCache;
     std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
     std::unordered_map<std::string, std::shared_ptr<ByteArray>> _resCache;
     std::unordered_map<std::string, std::shared_ptr<TalkTable>> _talkTableCache;

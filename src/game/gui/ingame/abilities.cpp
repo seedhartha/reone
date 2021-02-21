@@ -86,16 +86,15 @@ static shared_ptr<Texture> getFrameTexture(GameID gameId) {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDaTable> skills(Resources::instance().get2DA("skills"));
-    for (size_t i = 0; i < skills->rows().size(); ++i) {
-        const TwoDaRow &row = skills->rows()[i];
-        auto skill = static_cast<Skill>(i);
+    shared_ptr<TwoDA> skills(Resources::instance().get2DA("skills"));
+    for (int row = 0; row < skills->getRowCount(); ++row) {
+        auto skill = static_cast<Skill>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = Resources::instance().getString(row.getInt("name"));
-        skillInfo.description = Resources::instance().getString(row.getInt("description"));
-        skillInfo.icon = Textures::instance().get(row.getString("icon"), TextureUsage::GUI);
+        skillInfo.name = Resources::instance().getString(skills->getInt(row, "name"));
+        skillInfo.description = Resources::instance().getString(skills->getInt(row, "description"));
+        skillInfo.icon = Textures::instance().get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }

@@ -53,7 +53,7 @@ void ItemBlueprint::load(Item &item) {
     item._tag = boost::to_lower_copy(_uti->getString("Tag"));
     item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
 
-    shared_ptr<TwoDaTable> baseItems(Resources::instance().get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = _uti->getInt("BaseItem");
 
     item._equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
@@ -94,13 +94,13 @@ void ItemBlueprint::load(Item &item) {
 }
 
 void ItemBlueprint::loadAmmunitionType(int ordinal, Item &item) {
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("ammunitiontypes"));
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("ammunitiontypes"));
     item._ammunitionType = make_shared<Item::AmmunitionType>();
-    item._ammunitionType->model = Models::instance().get(boost::to_lower_copy(table->getString(ordinal, "model")));
-    item._ammunitionType->shotSound1 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "shotsound0")));
-    item._ammunitionType->shotSound2 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "shotsound1")));
-    item._ammunitionType->impactSound1 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "impactsound0")));
-    item._ammunitionType->impactSound2 = AudioFiles::instance().get(boost::to_lower_copy(table->getString(ordinal, "impactsound1")));
+    item._ammunitionType->model = Models::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "model")));
+    item._ammunitionType->shotSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "shotsound0")));
+    item._ammunitionType->shotSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "shotsound1")));
+    item._ammunitionType->impactSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "impactsound0")));
+    item._ammunitionType->impactSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "impactsound1")));
 }
 
 } // namespace game

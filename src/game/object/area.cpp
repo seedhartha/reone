@@ -180,16 +180,14 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    int styleIdx = are.getInt("CameraStyle");
-    shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
-    _camStyleDefault.load(styleTable->rows().at(styleIdx));
+    shared_ptr<TwoDA> cameraStyles(Resources::instance().get2DA("camerastyle"));
 
-    auto combatStyleRow = styleTable->getByColumnValue("name", "Combat");
-    if (combatStyleRow) {
-        _camStyleCombat.load(*combatStyleRow);
-    }
-    else {
-        throw logic_error("Combat camera style failed to load.");
+    int areaStyleIdx = are.getInt("CameraStyle");
+    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
+
+    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
+    if (combatStyleIdx != -1) {
+        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
     }
 }
 
@@ -237,7 +235,7 @@ void Area::loadProperties(const GffStruct &git) {
     shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDaTable> musicTable(Resources::instance().get2DA("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(Resources::instance().get2DA("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }

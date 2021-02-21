@@ -39,11 +39,10 @@ Classes::Classes() : MemoryCache(bind(&Classes::doGet, this, _1)) {
 }
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDaTable> classes(Resources::instance().get2DA(kClassesTableResRef));
-    const TwoDaRow &row = classes->rows()[static_cast<int>(type)];
+    shared_ptr<TwoDA> classes(Resources::instance().get2DA(kClassesTableResRef));
 
     auto clazz = make_shared<CreatureClass>(type);
-    clazz->load(row);
+    clazz->load(*classes, static_cast<int>(type));
 
     return move(clazz);
 }

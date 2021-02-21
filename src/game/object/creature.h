@@ -74,6 +74,12 @@ public:
         int pointIdx { 0 };
     };
 
+    struct BodyBag {
+        std::string name;
+        int appearance { 0 }; /**< index into placeables.2da */
+        bool corpse { false };
+    };
+
     Creature(
         uint32_t id,
         ObjectFactory *objectFactory,
@@ -183,6 +189,7 @@ private:
     bool _immortal { false };
     int _xp { 0 };
     std::shared_ptr<SoundSet> _soundSet;
+    BodyBag _bodyBag;
 
     // Animation
 
@@ -212,7 +219,7 @@ private:
 
     void loadTransform(const resource::GffStruct &gffs);
     void loadBlueprint(const resource::GffStruct &gffs);
-    void loadAppearance(const resource::TwoDaTable &table, int row);
+    void loadAppearance(const resource::TwoDA &twoDa, int row);
     void loadPortrait(int appearance);
 
     // END Loading
