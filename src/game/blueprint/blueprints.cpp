@@ -36,6 +36,7 @@ Blueprints &Blueprints::instance() {
 void Blueprints::invalidateCache() {
     _creatureCache.clear();
     _doorCache.clear();
+    _encounterCache.clear();
     _itemCache.clear();
     _placeableCache.clear();
     _soundCache.clear();
@@ -68,6 +69,10 @@ shared_ptr<CreatureBlueprint> Blueprints::getCreature(const string &resRef) {
 
 shared_ptr<DoorBlueprint> Blueprints::getDoor(const string &resRef) {
     return getBlueprint<DoorBlueprint>(resRef, ResourceType::Utd, _doorCache);
+}
+
+shared_ptr<EncounterBlueprint> Blueprints::getEncounter(const string &resRef) {
+    return getBlueprint<EncounterBlueprint>(resRef, ResourceType::Ute, _encounterCache);
 }
 
 shared_ptr<ItemBlueprint> Blueprints::getItem(const string &resRef) {

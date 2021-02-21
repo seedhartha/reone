@@ -27,6 +27,7 @@
 
 #include "creature.h"
 #include "door.h"
+#include "encounter.h"
 #include "item.h"
 #include "placeable.h"
 #include "sound.h"
@@ -45,6 +46,7 @@ public:
 
     std::shared_ptr<CreatureBlueprint> getCreature(const std::string &resRef);
     std::shared_ptr<DoorBlueprint> getDoor(const std::string &resRef);
+    std::shared_ptr<EncounterBlueprint> getEncounter(const std::string &resRef);
     std::shared_ptr<ItemBlueprint> getItem(const std::string &resRef);
     std::shared_ptr<PlaceableBlueprint> getPlaceable(const std::string &resRef);
     std::shared_ptr<SoundBlueprint> getSound(const std::string &resRef);
@@ -54,6 +56,7 @@ public:
 private:
     std::unordered_map<std::string, std::shared_ptr<CreatureBlueprint>> _creatureCache;
     std::unordered_map<std::string, std::shared_ptr<DoorBlueprint>> _doorCache;
+    std::unordered_map<std::string, std::shared_ptr<EncounterBlueprint>> _encounterCache;
     std::unordered_map<std::string, std::shared_ptr<ItemBlueprint>> _itemCache;
     std::unordered_map<std::string, std::shared_ptr<PlaceableBlueprint>> _placeableCache;
     std::unordered_map<std::string, std::shared_ptr<SoundBlueprint>> _soundCache;

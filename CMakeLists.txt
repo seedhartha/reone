@@ -407,6 +407,7 @@ set(GAME_HEADERS
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
     src/game/blueprint/door.h
+    src/game/blueprint/encounter.h
     src/game/blueprint/item.h
     src/game/blueprint/placeable.h
     src/game/blueprint/sound.h
@@ -474,6 +475,7 @@ set(GAME_HEADERS
     src/game/object/creatureanimresolver.h
     src/game/object/creaturemodelbuilder.h
     src/game/object/door.h
+    src/game/object/encounter.h
     src/game/object/item.h
     src/game/object/module.h
     src/game/object/object.h
@@ -519,6 +521,7 @@ set(GAME_SOURCES
     src/game/blueprint/blueprints.cpp
     src/game/blueprint/creature.cpp
     src/game/blueprint/door.cpp
+    src/game/blueprint/encounter.cpp
     src/game/blueprint/item.cpp
     src/game/blueprint/placeable.cpp
     src/game/blueprint/sound.cpp
@@ -581,6 +584,7 @@ set(GAME_SOURCES
     src/game/object/creatureanimresolver.cpp
     src/game/object/creaturemodelbuilder.cpp
     src/game/object/door.cpp
+    src/game/object/encounter.cpp
     src/game/object/item.cpp
     src/game/object/module.cpp
     src/game/object/object.cpp
