@@ -36,7 +36,8 @@ public:
 private:
     enum class ImageType {
         RGBA = 2,
-        Grayscale = 3
+        Grayscale = 3,
+        RGBA_RLE = 10
     };
 
     std::string _resRef;
@@ -49,7 +50,15 @@ private:
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
+
     void loadTexture();
+
+    ByteArray readPixels(int w, int h);
+    ByteArray readPixelsRLE(int w, int h);
+
+    bool isRGBA() const;
+    bool isGrayscale() const;
+    bool isRLE() const;
 };
 
 } // namespace render
