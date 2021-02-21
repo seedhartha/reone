@@ -63,6 +63,7 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 set(COMMON_HEADERS
     src/common/cache.h
+    src/common/collectionutil.h
     src/common/endianutil.h
     src/common/jobs.h
     src/common/log.h
@@ -94,8 +95,11 @@ set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 ## libresource static library
 
 set(RESOURCE_HEADERS
+    src/resource/2da.h
+    src/resource/gffstruct.h
     src/resource/folder.h
     src/resource/format/2dafile.h
+    src/resource/format/2dawriter.h
     src/resource/format/biffile.h
     src/resource/format/binfile.h
     src/resource/format/erffile.h
@@ -116,8 +120,11 @@ set(RESOURCE_HEADERS
     src/resource/typeutil.h)
 
 set(RESOURCE_SOURCES
+    src/resource/2da.cpp
+    src/resource/gffstruct.cpp
     src/resource/folder.cpp
     src/resource/format/2dafile.cpp
+    src/resource/format/2dawriter.cpp
     src/resource/format/biffile.cpp
     src/resource/format/binfile.cpp
     src/resource/format/erffile.cpp

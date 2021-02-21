@@ -59,6 +59,7 @@ private:
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
     void loadSoundSet(Creature &creature);
+    void loadBodyBag(Creature &creature);
 };
 
 /**

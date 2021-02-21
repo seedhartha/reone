@@ -314,16 +314,15 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDaTable> animations(Resources::instance().get2DA("dialoganimations"));
-    const vector<TwoDaRow> &rows = animations->rows();
+    shared_ptr<TwoDA> animations(Resources::instance().get2DA("dialoganimations"));
     int index = ordinal - 10000;
 
-    if (index < 0 || index >= static_cast<int>(rows.size())) {
+    if (index < 0 || index >= animations->getRowCount()) {
         warn("Dialog: animation index out of bounds: " + to_string(index));
         return AnimationType::Invalid;
     }
 
-    string name(boost::to_lower_copy(rows[index].getString("name")));
+    string name(boost::to_lower_copy(animations->getString(index, "name")));
     auto maybeAnimType = g_animTypeByName.find(name);
 
     return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;

@@ -47,7 +47,7 @@ void SoundBlueprint::load(Sound &sound) {
     sound._tag = boost::to_lower_copy(_uts->getString("Tag"));
     sound._active = _uts->getBool("Active");
 
-    shared_ptr<TwoDaTable> priorityGroups(Resources::instance().get2DA("prioritygroups"));
+    shared_ptr<TwoDA> priorityGroups(Resources::instance().get2DA("prioritygroups"));
     sound._priority = priorityGroups->getInt(_uts->getInt("Priority"), "priority");
 
     sound._maxDistance = _uts->getFloat("MaxDistance");

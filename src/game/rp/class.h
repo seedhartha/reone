@@ -35,7 +35,7 @@ class CreatureClass {
 public:
     CreatureClass(ClassType type);
 
-    void load(const resource::TwoDaRow &row);
+    void load(const resource::TwoDA &twoDa, int row);
 
     bool isClassSkill(Skill skill) const;
 

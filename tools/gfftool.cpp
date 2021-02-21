@@ -17,6 +17,8 @@
 
 #include "tools.h"
 
+#include <iostream>
+
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../src/resource/format/gfffile.h"
@@ -45,44 +47,71 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
     vector<float> values;
 
     for (auto &field : gffs.fields()) {
-        auto &fieldChildren = field->children();
+        auto &fieldChildren = field->children;
 
-        switch (field->type()) {
-            case GffFieldType::Struct:
-                child = getPropertyTree(*field->children()[0]);
-                tree.add_child(field->label(), child);
+        switch (field->type) {
+            case GffStruct::FieldType::Byte:
+            case GffStruct::FieldType::Word:
+            case GffStruct::FieldType::Dword:
+                tree.put(field->label, field->uintValue);
                 break;
-
-            case GffFieldType::List:
+            case GffStruct::FieldType::Char:
+            case GffStruct::FieldType::Short:
+            case GffStruct::FieldType::Int:
+            case GffStruct::FieldType::StrRef:
+                tree.put(field->label, field->intValue);
+                break;
+            case GffStruct::FieldType::Dword64:
+                tree.put(field->label, field->uint64Value);
+                break;
+            case GffStruct::FieldType::Int64:
+                tree.put(field->label, field->int64Value);
+                break;
+            case GffStruct::FieldType::Float:
+                tree.put(field->label, field->floatValue);
+                break;
+            case GffStruct::FieldType::Double:
+                tree.put(field->label, field->doubleValue);
+                break;
+            case GffStruct::FieldType::CExoString:
+            case GffStruct::FieldType::ResRef:
+                tree.put(field->label, field->strValue);
+                break;
+            case GffStruct::FieldType::CExoLocString:
+                child.clear();
+                child.put("StrRef", field->intValue);
+                child.put("Substring", field->strValue);
+                tree.add_child(field->label, child);
+                break;
+            case GffStruct::FieldType::Struct:
+                child = getPropertyTree(*field->children[0]);
+                tree.add_child(field->label, child);
+                break;
+            case GffStruct::FieldType::List:
                 children.clear();
                 for (auto &childGffs : fieldChildren) {
                     child = getPropertyTree(*childGffs);
                     children.push_back(make_pair("", child));
                 }
-                tree.add_child(field->label(), children);
+                tree.add_child(field->label, children);
                 break;
-
-            case GffFieldType::Orientation:
-                values = field->asFloatArray();
+            case GffStruct::FieldType::Orientation:
                 child.clear();
-                child.put("W", values[0]);
-                child.put("X", values[1]);
-                child.put("Y", values[2]);
-                child.put("Z", values[3]);
-                tree.add_child(field->label(), child);
+                child.put("W", field->quatValue[0]);
+                child.put("X", field->quatValue[1]);
+                child.put("Y", field->quatValue[2]);
+                child.put("Z", field->quatValue[3]);
+                tree.add_child(field->label, child);
                 break;
-
-            case GffFieldType::Vector:
-                values = field->asFloatArray();
+            case GffStruct::FieldType::Vector:
                 child.clear();
-                child.put("X", values[0]);
-                child.put("Y", values[1]);
-                child.put("Z", values[2]);
-                tree.add_child(field->label(), child);
+                child.put("X", field->vecValue[0]);
+                child.put("Y", field->vecValue[1]);
+                child.put("Z", field->vecValue[2]);
+                tree.add_child(field->label, child);
                 break;
-
             default:
-                tree.put(field->label(), field->asString());
+                cerr << "Unsupported GFF field type: " << to_string(static_cast<int>(field->type)) << endl;
                 break;
         }
     }
@@ -94,7 +123,7 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
     GffFile gff;
     gff.load(path);
 
-    shared_ptr<GffStruct> gffs(gff.top());
+    shared_ptr<GffStruct> gffs(gff.root());
     pt::ptree tree(getPropertyTree(*gffs));
 
     fs::path jsonPath(destPath);

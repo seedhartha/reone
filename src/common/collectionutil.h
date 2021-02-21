@@ -15,21 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camerastyle.h"
+#pragma once
 
-#include "../../resource/resources.h"
+#include <functional>
+#include <map>
+#include <vector>
 
 namespace reone {
 
-namespace game {
-
-void CameraStyle::load(const resource::TwoDA &twoDa, int row) {
-    distance = twoDa.getFloat(row, "distance");
-    pitch = twoDa.getFloat(row, "pitch");
-    viewAngle = twoDa.getFloat(row, "viewangle");
-    height = twoDa.getFloat(row, "height");
+template <class Src, class Dest>
+std::vector<Dest> transform(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
+    std::vector<Dest> result;
+    for (auto &item : source) {
+        result.push_back(fn(item));
+    }
+    return std::move(result);
 }
 
-} // namespace game
+template <class Src, class Dest>
+std::map<Src, Dest> associate(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
+    std::map<Src, Dest> result;
+    for (auto &item : source) {
+        result.insert(make_pair(item, fn(item)));
+    }
+    return move(result);
+}
 
 } // namespace reone

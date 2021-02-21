@@ -17,11 +17,7 @@
 
 #pragma once
 
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
-#include "../../common/streamwriter.h"
+#include "../2da.h"
 
 #include "binfile.h"
 
@@ -29,73 +25,24 @@ namespace reone {
 
 namespace resource {
 
-class TwoDaRow {
-public:
-    void add(const std::string &column, const std::string &value);
-
-    const std::string &getString(const std::string &column) const;
-    int getInt(const std::string &column, int defValue = 0) const;
-    float getFloat(const std::string &column, float defValue = 0.0f) const;
-    bool getBool(const std::string &column, bool defValue = false) const;
-
-    const std::vector<std::pair<std::string, std::string>> &values() const { return _values; }
-
-private:
-    std::vector<std::pair<std::string, std::string>> _values;
-};
-
-class TwoDaTable : boost::noncopyable {
-public:
-    void add(TwoDaRow row);
-
-    const TwoDaRow *get(const std::function<bool(const TwoDaRow &)> &pred) const;
-    const TwoDaRow *getByColumnValue(const std::string &columnName, const std::string &columnValue) const;
-    const std::string &getString(int row, const std::string &column) const;
-    int getInt(int row, const std::string &column, int defValue = 0) const;
-    uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
-    float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
-    bool getBool(int row, const std::string &column, bool defValue = false) const;
-
-    const std::vector<std::string> &headers() const { return _headers; }
-    const std::vector<TwoDaRow> &rows() const { return _rows; }
-
-private:
-    std::vector<std::string> _headers;
-    std::vector<TwoDaRow> _rows;
-
-    friend class TwoDaFile;
-};
-
 class TwoDaFile : public BinaryFile {
 public:
     TwoDaFile();
 
-    const std::shared_ptr<TwoDaTable> &table() const { return _table; }
+    const std::shared_ptr<TwoDA> &twoDa() const { return _twoDa; }
 
 private:
     int _rowCount { 0 };
     int _dataSize { 0 };
-    std::shared_ptr<TwoDaTable> _table;
+    std::shared_ptr<TwoDA> _twoDa;
 
     void doLoad() override;
+
     void loadHeaders();
-    bool readToken(std::string &token);
     void loadLabels();
     void loadRows();
-};
 
-class TwoDaWriter {
-public:
-    TwoDaWriter(const std::shared_ptr<TwoDaTable> &table);
-
-    void save(const boost::filesystem::path &path);
-
-private:
-    std::shared_ptr<TwoDaTable> _table;
-
-    void writeHeaders(StreamWriter &writer);
-    void writeLabels(StreamWriter &writer);
-    void writeData(StreamWriter &writer);
+    bool readToken(std::string &token);
 };
 
 } // namespace resource

@@ -141,7 +141,7 @@ string CreatureModelBuilder::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     string modelName(appearance->getString(_creature->appearance(), column));
     boost::to_lower(modelName);
@@ -166,7 +166,7 @@ string CreatureModelBuilder::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     string texName(appearance->getString(_creature->appearance(), column));
     boost::to_lower(texName);
@@ -187,12 +187,12 @@ string CreatureModelBuilder::getBodyTextureName() const {
 string CreatureModelBuilder::getHeadModelName() const {
     if (_creature->modelType() != Creature::ModelType::Character) return "";
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_creature->appearance(), "normalhead", -1);
     if (headIdx == -1) return "";
 
-    shared_ptr<TwoDaTable> heads(Resources::instance().get2DA("heads"));
+    shared_ptr<TwoDA> heads(Resources::instance().get2DA("heads"));
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);

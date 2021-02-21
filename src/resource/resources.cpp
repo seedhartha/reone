@@ -23,8 +23,10 @@
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
+#include "format/2dafile.h"
 #include "format/biffile.h"
 #include "format/erffile.h"
+#include "format/gfffile.h"
 #include "format/rimfile.h"
 #include "folder.h"
 #include "typeutil.h"
@@ -262,18 +264,18 @@ static shared_ptr<T> findResource(const string &key, unordered_map<string, share
     return inserted.first->second;
 }
 
-shared_ptr<TwoDaTable> Resources::get2DA(const string &resRef) {
-    return findResource<TwoDaTable>(resRef, _2daCache, [this, &resRef]() {
+shared_ptr<TwoDA> Resources::get2DA(const string &resRef) {
+    return findResource<TwoDA>(resRef, _2daCache, [this, &resRef]() {
         shared_ptr<ByteArray> data(get(resRef, ResourceType::TwoDa));
-        shared_ptr<TwoDaTable> table;
+        shared_ptr<TwoDA> twoDa;
 
         if (data) {
             TwoDaFile file;
             file.load(wrap(data));
-            table = file.table();
+            twoDa = file.twoDa();
         }
 
-        return move(table);
+        return move(twoDa);
     });
 }
 
@@ -324,7 +326,7 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
         if (data) {
             GffFile gff;
             gff.load(wrap(data));
-            gffs = gff.top();
+            gffs = gff.root();
         }
 
         return move(gffs);

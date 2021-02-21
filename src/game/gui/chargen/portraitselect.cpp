@@ -17,6 +17,7 @@
 
 #include "portraitselect.h"
 
+#include "../../../common/collectionutil.h"
 #include "../../../common/random.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
@@ -135,28 +136,31 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
 
-    shared_ptr<TwoDaTable> portraits(Resources::instance().get2DA("portraits"));
-    const StaticCreatureBlueprint &character = _charGen->character();
-    int sex = character.gender() == Gender::Female ? 1 : 0;
+    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
+    int sex = _charGen->character().gender() == Gender::Female ? 1 : 0;
 
-    for (auto &row : portraits->rows()) {
-        if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
-            string resRef(row.getString("baseresref"));
-            int appearanceNumber = row.getInt("appearancenumber");
-            int appearanceS = row.getInt("appearance_s");
-            int appearanceL = row.getInt("appearance_l");
+    for (int row = 0; row < portraits->getRowCount(); ++row) {
+        // Skip non-PC rows
+        if (!portraits->getBool(row, "forpc")) continue;
 
-            shared_ptr<Texture> image(Textures::instance().get(resRef, TextureUsage::GUI));
+        // Skip rows for different gender
+        if (portraits->getInt(row, "sex") != sex) continue;
 
-            Portrait portrait;
-            portrait.resRef = move(resRef);
-            portrait.image = move(image);
-            portrait.appearanceNumber = appearanceNumber;
-            portrait.appearanceS = appearanceS;
-            portrait.appearanceL = appearanceL;
+        string resRef(portraits->getString(row, "baseresref"));
+        int appearanceNumber = portraits->getInt(row, "appearancenumber");
+        int appearanceS = portraits->getInt(row, "appearance_s");
+        int appearanceL = portraits->getInt(row, "appearance_l");
 
-            _portraits.push_back(move(portrait));
-        }
+        shared_ptr<Texture> image(Textures::instance().get(resRef, TextureUsage::GUI));
+
+        Portrait portrait;
+        portrait.resRef = move(resRef);
+        portrait.image = move(image);
+        portrait.appearanceNumber = appearanceNumber;
+        portrait.appearanceS = appearanceS;
+        portrait.appearanceL = appearanceL;
+
+        _portraits.push_back(move(portrait));
     }
 
     resetCurrentPortrait();
