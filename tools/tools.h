@@ -115,6 +115,7 @@ public:
 
 private:
     void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 class TlkTool : public ITool {

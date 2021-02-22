@@ -64,7 +64,7 @@ private:
     WriteContext _context;
     std::unique_ptr<StreamWriter> _writer;
 
-    void visit(const GffStruct &gffs, int index);
+    void processTree();
 
     void writeHeader();
     void writeStructArray();

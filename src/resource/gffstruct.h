@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <memory>
 
@@ -65,7 +66,7 @@ public:
         std::vector<std::shared_ptr<GffStruct>> children;
 
         union {
-            int32_t intValue; /**< covers Char, Short, Int and StrRef */
+            int32_t intValue { 0 }; /**< covers Char, Short, Int and StrRef */
             uint32_t uintValue; /**< covers Byte, Word and Dword */
             int64_t int64Value;
             uint64_t uint64Value;
@@ -77,7 +78,9 @@ public:
         Field(FieldType type, std::string label);
     };
 
-    void add(std::shared_ptr<Field> field);
+    GffStruct(uint32_t type);
+
+    void add(Field field);
 
     bool getBool(const std::string &name, bool defValue = false) const;
     int getInt(const std::string &name, int defValue = 0) const;
@@ -89,12 +92,14 @@ public:
     std::shared_ptr<GffStruct> getStruct(const std::string &name) const;
     std::vector<std::shared_ptr<GffStruct>> getList(const std::string &name) const;
 
-    const std::vector<std::shared_ptr<Field>> &fields() const { return _fields; }
+    uint32_t type() const { return _type; }
+    const std::vector<Field> &fields() const { return _fields; }
 
 private:
-    std::vector<std::shared_ptr<Field>> _fields;
+    uint32_t _type { 0 };
+    std::vector<Field> _fields;
 
-    std::shared_ptr<Field> get(const std::string &name) const;
+    const Field *get(const std::string &name) const;
 
     friend class GffFile;
 };

@@ -27,7 +27,8 @@ enum class Operation {
     Extract,
     ToJSON,
     ToTGA,
-    To2DA
+    To2DA,
+    ToGFF
 };
 
 } // namespace tools

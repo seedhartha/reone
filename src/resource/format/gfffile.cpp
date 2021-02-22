@@ -59,7 +59,7 @@ unique_ptr<GffStruct> GffFile::readStruct(int idx) {
     uint32_t dataOffset = readUint32();
     uint32_t fieldCount = readUint32();
 
-    auto gffs = make_unique<GffStruct>();
+    auto gffs = make_unique<GffStruct>(type);
 
     if (fieldCount == 1) {
         gffs->_fields.push_back(readField(dataOffset));
@@ -73,84 +73,84 @@ unique_ptr<GffStruct> GffFile::readStruct(int idx) {
     return move(gffs);
 }
 
-unique_ptr<GffStruct::Field> GffFile::readField(int idx) {
+GffStruct::Field GffFile::readField(int idx) {
     seek(_fieldOffset + 12ll * idx);
 
     uint32_t type = readUint32();
     uint32_t labelIndex = readUint32();
     uint32_t dataOrDataOffset = readUint32();
 
-    auto field = make_unique<GffStruct::Field>();
-    field->type = static_cast<GffStruct::FieldType>(type);
-    field->label = readLabel(labelIndex);
+    GffStruct::Field field;
+    field.type = static_cast<GffStruct::FieldType>(type);
+    field.label = readLabel(labelIndex);
 
-    switch (field->type) {
+    switch (field.type) {
         case GffStruct::FieldType::Byte:
         case GffStruct::FieldType::Word:
         case GffStruct::FieldType::Dword:
-            field->uintValue = dataOrDataOffset;
+            field.uintValue = dataOrDataOffset;
             break;
         case GffStruct::FieldType::Char:
         case GffStruct::FieldType::Short:
         case GffStruct::FieldType::Int:
-            field->intValue = *reinterpret_cast<int *>(&dataOrDataOffset);
+            field.intValue = *reinterpret_cast<int *>(&dataOrDataOffset);
             break;
         case GffStruct::FieldType::Dword64:
-            field->uint64Value = readQWordFieldData(dataOrDataOffset);
+            field.uint64Value = readQWordFieldData(dataOrDataOffset);
             break;
         case GffStruct::FieldType::Int64: {
             uint64_t tmp = readQWordFieldData(dataOrDataOffset);
-            field->int64Value = *reinterpret_cast<int64_t *>(&tmp);
+            field.int64Value = *reinterpret_cast<int64_t *>(&tmp);
             break;
         }
         case GffStruct::FieldType::Float:
-            field->floatValue = *reinterpret_cast<float *>(&dataOrDataOffset);
+            field.floatValue = *reinterpret_cast<float *>(&dataOrDataOffset);
             break;
         case GffStruct::FieldType::Double: {
             uint64_t tmp = readQWordFieldData(dataOrDataOffset);
-            field->doubleValue = *reinterpret_cast<double *>(&tmp);
+            field.doubleValue = *reinterpret_cast<double *>(&tmp);
             break;
         }
         case GffStruct::FieldType::CExoString:
-            field->strValue = readStringFieldData(dataOrDataOffset);
+            field.strValue = readStringFieldData(dataOrDataOffset);
             break;
         case GffStruct::FieldType::ResRef:
-            field->strValue = readResRefFieldData(dataOrDataOffset);
+            field.strValue = readResRefFieldData(dataOrDataOffset);
             break;
         case GffStruct::FieldType::CExoLocString: {
             LocString locString(readCExoLocStringFieldData(dataOrDataOffset));
-            field->intValue = locString.strRef;
-            field->strValue = locString.subString;
+            field.intValue = locString.strRef;
+            field.strValue = locString.subString;
             break;
         }
         case GffStruct::FieldType::Void:
-            field->data = readByteArrayFieldData(dataOrDataOffset);
+            field.data = readByteArrayFieldData(dataOrDataOffset);
             break;
         case GffStruct::FieldType::Struct:
-            field->children.push_back(readStruct(dataOrDataOffset));
+            field.children.push_back(readStruct(dataOrDataOffset));
             break;
         case GffStruct::FieldType::List: {
             vector<uint32_t> list(readList(dataOrDataOffset));
             for (auto &item : list) {
-                field->children.push_back(readStruct(item));
+                field.children.push_back(readStruct(item));
             }
             break;
         }
         case GffStruct::FieldType::Orientation: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float)));
-            field->quatValue = glm::make_quat(reinterpret_cast<float *>(&data[0]));
+            field.quatValue = glm::make_quat(reinterpret_cast<float *>(&data[0]));
             break;
         }
         case GffStruct::FieldType::Vector: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float)));
-            field->vecValue = glm::make_vec3((reinterpret_cast<float *>(&data[0])));
+            field.vecValue = glm::make_vec3((reinterpret_cast<float *>(&data[0])));
             break;
         }
         case GffStruct::FieldType::StrRef:
-            field->intValue = readStrRefFieldData(dataOrDataOffset);
+            field.intValue = readStrRefFieldData(dataOrDataOffset);
             break;
         default:
-            throw runtime_error("GFF: unsupported field type: " + to_string(type));
+            throw runtime_error("Unsupported field type: " + to_string(type));
     }
 
     return move(field);
