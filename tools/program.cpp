@@ -47,7 +47,8 @@ static const unordered_map<string, Operation> g_operations {
     { "extract", Operation::Extract },
     { "to-json", Operation::ToJSON },
     { "to-tga", Operation::ToTGA },
-    { "to-2da", Operation::To2DA }
+    { "to-2da", Operation::To2DA },
+    { "to-gff", Operation::ToGFF }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {

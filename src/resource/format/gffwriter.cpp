@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <unordered_map>
+#include <queue>
 
 #include <boost/filesystem/fstream.hpp>
 
@@ -29,6 +30,13 @@ namespace fs = boost::filesystem;
 namespace reone {
 
 namespace resource {
+
+enum class FieldClassification {
+    Simple,
+    Complex,
+    Struct,
+    List
+};
 
 static const unordered_map<ResourceType, string> g_signatures {
     { ResourceType::Are, "ARE" },
@@ -60,9 +68,7 @@ void GffWriter::save(const fs::path &path) {
 }
 
 void GffWriter::save(const shared_ptr<ostream> &out) {
-    _context.structs.resize(1);
-
-    visit(*_root, 0);
+    processTree();
 
     _writer = make_unique<StreamWriter>(out);
 
@@ -75,162 +81,185 @@ void GffWriter::save(const shared_ptr<ostream> &out) {
     writeListIndices();
 }
 
-void GffWriter::visit(const GffStruct &gffs, int index) {
-    vector<uint32_t> fieldIndices;
-    vector<pair<GffStruct *, int>> toVisit;
+/**
+ * @param field field to process
+ * @param simple[out] field's data if it is of simple type
+ * @param complex[out] field's data if it is of complex type
+ * @return field classification
+ */
+static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t &simple, ByteArray &complex) {
+    switch (field.type) {
+        case GffStruct::FieldType::Byte:
+        case GffStruct::FieldType::Word:
+        case GffStruct::FieldType::Dword:
+            simple = field.uintValue;
+            return FieldClassification::Simple;
 
-    for (auto &field : gffs.fields()) {
-        fieldIndices.push_back(_context.fields.size());
+        case GffStruct::FieldType::Char:
+        case GffStruct::FieldType::Short:
+        case GffStruct::FieldType::Int:
+            simple = *reinterpret_cast<const uint32_t *>(&field.intValue);
+            return FieldClassification::Simple;
 
-        // Save field label
-        int labelIdx;
-        auto maybeLabel = find(_context.labels.begin(), _context.labels.end(), field->label);
-        if (maybeLabel != _context.labels.end()) {
-            labelIdx = distance(_context.labels.begin(), maybeLabel);
-        } else {
-            labelIdx = static_cast<int>(_context.labels.size());
-            _context.labels.push_back(field->label);
+        case GffStruct::FieldType::Dword64:
+            complex.resize(8);
+            memcpy(&complex[0], &field.uint64Value, 8);
+            return FieldClassification::Complex;
+
+        case GffStruct::FieldType::Int64:
+            complex.resize(8);
+            memcpy(&complex[0], &field.int64Value, 8);
+            return FieldClassification::Complex;
+
+        case GffStruct::FieldType::Float:
+            simple = *reinterpret_cast<const uint32_t *>(&field.floatValue);
+            return FieldClassification::Simple;
+
+        case GffStruct::FieldType::Double:
+            complex.resize(8);
+            memcpy(&complex[0], &field.doubleValue, sizeof(double));
+            return FieldClassification::Complex;
+
+        case GffStruct::FieldType::CExoString: {
+            uint32_t length = field.strValue.length();
+            complex.resize(4ll + length);
+            memcpy(&complex[0], &length, 4);
+            memcpy(&complex[4], &field.strValue[0], length);
+            return FieldClassification::Complex;
+        }
+        case GffStruct::FieldType::ResRef: {
+            uint32_t length = field.strValue.length();
+            complex.resize(1ll + length);
+            complex[0] = length;
+            memcpy(&complex[1], &field.strValue[0], length);
+            return FieldClassification::Complex;
+        }
+        case GffStruct::FieldType::CExoLocString: {
+            uint32_t numSubstrings = !field.strValue.empty() ? 1 : 0;
+            uint32_t totalSize = 8 + (numSubstrings > 0 ? (8 + field.strValue.length()) : 0);
+            complex.resize(4ll + totalSize);
+            memcpy(&complex[0], &totalSize, 4);
+            memcpy(&complex[4], &field.intValue, 4);
+            memcpy(&complex[8], &numSubstrings, 4);
+            if (numSubstrings > 0) {
+                uint32_t id = 0;
+                uint32_t length = field.strValue.length();
+                memcpy(&complex[12], &id, 4);
+                memcpy(&complex[16], &length, 4);
+                memcpy(&complex[20], &field.strValue[0], length);
+            }
+            return FieldClassification::Complex;
+        }
+        case GffStruct::FieldType::Void: {
+            uint32_t dataSize = field.data.size();
+            complex.resize(4ll + dataSize);
+            memcpy(&complex[0], &dataSize, 4);
+            memcpy(&complex[4], &field.data[0], dataSize);
+            return FieldClassification::Complex;
+        }
+        case GffStruct::FieldType::Struct:
+            return FieldClassification::Struct;
+
+        case GffStruct::FieldType::List: 
+            return FieldClassification::List;
+
+        case GffStruct::FieldType::Orientation:
+            complex.resize(16);
+            memcpy(&complex[0], &field.quatValue[0], 16);
+            return FieldClassification::Complex;
+
+        case GffStruct::FieldType::Vector:
+            complex.resize(12);
+            memcpy(&complex[0], &field.vecValue[0], 12);
+            return FieldClassification::Complex;
+
+        case GffStruct::FieldType::StrRef: {
+            uint32_t totalSize = 4;
+            complex.resize(8);
+            memcpy(&complex[0], &totalSize, 4);
+            memcpy(&complex[4], &field.intValue, 4);
+            return FieldClassification::Complex;
+        }
+        default:
+            throw logic_error("Unsupported field type: " + static_cast<int>(field.type));
+    }
+}
+
+void GffWriter::processTree() {
+    queue<const GffStruct *> aQueue;
+    aQueue.push(_root.get());
+
+    int structIdx = 0;
+    int numStructs = 0;
+
+    while (!aQueue.empty()) {
+        const GffStruct &aStruct = *aQueue.front();
+        aQueue.pop();
+
+        vector<uint32_t> fieldIndices;
+
+        for (auto &field : aStruct.fields()) {
+            // Current number of fields is a new field index
+            fieldIndices.push_back(_context.fields.size());
+
+            // Append or use existing field label
+            int labelIdx;
+            auto maybeLabel = find(_context.labels.begin(), _context.labels.end(), field.label);
+            if (maybeLabel != _context.labels.end()) {
+                labelIdx = distance(_context.labels.begin(), maybeLabel);
+            } else {
+                labelIdx = static_cast<int>(_context.labels.size());
+                _context.labels.push_back(field.label);
+            }
+
+            // Retrieve and save field data
+            uint32_t dataOrDataOffset;
+            ByteArray complexData;
+            FieldClassification fieldClass = getFieldData(field, dataOrDataOffset, complexData);
+            switch (fieldClass) {
+                case FieldClassification::Complex:
+                    dataOrDataOffset = _context.fieldData.size();
+                    copy(complexData.begin(), complexData.end(), back_inserter(_context.fieldData));
+                    break;
+                case FieldClassification::Struct:
+                    // Set data offset to the next struct index
+                    dataOrDataOffset = ++numStructs;
+                    aQueue.push(field.children[0].get());
+                    break;
+                case FieldClassification::List:
+                    // Set data offset to the current size of the list indices array
+                    dataOrDataOffset = 4 * _context.listIndices.size();
+                    _context.listIndices.push_back(field.children.size());
+                    for (size_t i = 0; i < field.children.size(); ++i) {
+                        _context.listIndices.push_back(++numStructs);
+                        aQueue.push(field.children[i].get());
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // Save field
+            WriteField writeField;
+            writeField.type = static_cast<uint32_t>(field.type);
+            writeField.labelIndex = labelIdx;
+            writeField.dataOrDataOffset = dataOrDataOffset;
+            _context.fields.push_back(move(writeField));
         }
 
-        // Save field data
         uint32_t dataOrDataOffset;
-        size_t numStructs = _context.structs.size();
-        size_t sizeListIndices = _context.listIndices.size();
-        size_t sizeFieldData = _context.fieldData.size();
-        ByteArray fieldData;
-        switch (field->type) {
-            case GffStruct::FieldType::Byte:
-            case GffStruct::FieldType::Word:
-            case GffStruct::FieldType::Dword:
-                dataOrDataOffset = field->uintValue;
-                break;
-            case GffStruct::FieldType::Char:
-            case GffStruct::FieldType::Short:
-            case GffStruct::FieldType::Int:
-                dataOrDataOffset = *reinterpret_cast<uint32_t *>(&field->intValue);
-                break;
-            case GffStruct::FieldType::Dword64:
-                fieldData.resize(8);
-                memcpy(&fieldData[0], &field->uint64Value, 8);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            case GffStruct::FieldType::Int64:
-                fieldData.resize(8);
-                memcpy(&fieldData[0], &field->int64Value, 8);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            case GffStruct::FieldType::Float:
-                dataOrDataOffset = *reinterpret_cast<uint32_t *>(&field->floatValue);
-                break;
-            case GffStruct::FieldType::Double:
-                fieldData.resize(8);
-                memcpy(&fieldData[0], &field->doubleValue, sizeof(double));
-                dataOrDataOffset = sizeFieldData;
-                break;
-            case GffStruct::FieldType::CExoString: {
-                uint32_t length = field->strValue.length();
-                fieldData.resize(4ll + length);
-                memcpy(&fieldData[0], &length, 4);
-                memcpy(&fieldData[4], &field->strValue[0], length);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            }
-            case GffStruct::FieldType::ResRef: {
-                uint32_t length = field->strValue.length();
-                fieldData.resize(1ll + length);
-                fieldData[0] = length;
-                memcpy(&fieldData[1], &field->strValue[0], length);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            }
-            case GffStruct::FieldType::CExoLocString: {
-                uint32_t numSubstrings = !field->strValue.empty() ? 1 : 0;
-                uint32_t totalSize = 8 + (numSubstrings > 0 ? (8 + field->strValue.length()) : 0);
-                fieldData.resize(4ll + totalSize);
-                memcpy(&fieldData[0], &totalSize, 4);
-                memcpy(&fieldData[4], &field->intValue, 4);
-                memcpy(&fieldData[8], &numSubstrings, 4);
-                if (numSubstrings > 0) {
-                    uint32_t id = 0;
-                    uint32_t length = field->strValue.length();
-                    memcpy(&fieldData[12], &id, 4);
-                    memcpy(&fieldData[16], &length, 4);
-                    memcpy(&fieldData[20], &field->strValue[0], length);
-                }
-                dataOrDataOffset = sizeFieldData;
-                break;
-            }
-            case GffStruct::FieldType::Void: {
-                uint32_t dataSize = field->data.size();
-                fieldData.resize(4ll + dataSize);
-                memcpy(&fieldData[0], &dataSize, 4);
-                memcpy(&fieldData[4], &field->data[0], dataSize);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            }
-            case GffStruct::FieldType::Struct:
-                dataOrDataOffset = numStructs;
-                _context.structs.resize(numStructs + 1);
-                toVisit.push_back(make_pair(field->children[0].get(), numStructs));
-                break;
-            case GffStruct::FieldType::List: {
-                uint32_t numChildren = field->children.size();
-                _context.structs.resize(numStructs + numChildren);
-                _context.listIndices.push_back(numChildren);
-                for (size_t i = 0; i < field->children.size(); ++i) {
-                    _context.listIndices.push_back(numStructs + i);
-                    toVisit.push_back(make_pair(field->children[i].get(), numStructs + i));
-                }
-                dataOrDataOffset = sizeListIndices / 4;
-                break;
-            }
-            case GffStruct::FieldType::Orientation:
-                fieldData.resize(16);
-                memcpy(&fieldData[0], &field->quatValue[0], 16);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            case GffStruct::FieldType::Vector:
-                fieldData.resize(12);
-                memcpy(&fieldData[0], &field->vecValue[0], 12);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            case GffStruct::FieldType::StrRef: {
-                uint32_t totalSize = 4;
-                fieldData.resize(8);
-                memcpy(&fieldData[0], &totalSize, 4);
-                memcpy(&fieldData[4], &field->intValue, 4);
-                dataOrDataOffset = sizeFieldData;
-                break;
-            }
-            default:
-                throw logic_error("Unsupported field type: " + static_cast<int>(field->type));
-        }
-        if (!fieldData.empty()) {
-            copy(fieldData.begin(), fieldData.end(), back_inserter(_context.fieldData));
+        if (fieldIndices.size() == 1ll) {
+            dataOrDataOffset = fieldIndices[0];
+        } else {
+            dataOrDataOffset = 4 * _context.fieldIndices.size();
+            copy(fieldIndices.begin(), fieldIndices.end(), back_inserter(_context.fieldIndices));
         }
 
-        // Save field
-        WriteField writeField;
-        writeField.type = static_cast<uint32_t>(field->type);
-        writeField.labelIndex = labelIdx;
-        writeField.dataOrDataOffset = dataOrDataOffset;
-        _context.fields.push_back(move(writeField));
-    }
-
-    uint32_t dataOrDataOffset;
-    if (fieldIndices.size() == 1ll) {
-        dataOrDataOffset = fieldIndices[0];
-    } else {
-        dataOrDataOffset = _context.fieldIndices.size() * sizeof(uint32_t);
-        copy(fieldIndices.begin(), fieldIndices.end(), back_inserter(_context.fieldIndices));
-    }
-
-    _context.structs[index].type = (index == 0) ? 0xffffffff : 0;
-    _context.structs[index].dataOrDataOffset = dataOrDataOffset;
-    _context.structs[index].fieldCount = gffs.fields().size();
-
-    for (auto &pair : toVisit) {
-        visit(*pair.first, pair.second);
+        WriteStruct writeStruct;
+        writeStruct.type = aStruct.type();
+        writeStruct.dataOrDataOffset = dataOrDataOffset;
+        writeStruct.fieldCount = aStruct.fields().size();
+        _context.structs.push_back(move(writeStruct));
     }
 }
 
