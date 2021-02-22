@@ -25,6 +25,13 @@ namespace reone {
 
 namespace resource {
 
+GffStruct::Field::Field(FieldType type, string label) : type(type), label(move(label)) {
+}
+
+void GffStruct::add(shared_ptr<Field> field) {
+    _fields.push_back(move(field));
+}
+
 bool GffStruct::getBool(const string &name, bool defValue) const {
     shared_ptr<Field> field(get(name));
     if (!field) return defValue;

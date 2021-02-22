@@ -104,6 +104,7 @@ set(RESOURCE_HEADERS
     src/resource/format/binfile.h
     src/resource/format/erffile.h
     src/resource/format/gfffile.h
+    src/resource/format/gffwriter.h
     src/resource/format/keyfile.h
     src/resource/format/ltrfile.h
     src/resource/format/lytfile.h
@@ -129,6 +130,7 @@ set(RESOURCE_SOURCES
     src/resource/format/binfile.cpp
     src/resource/format/erffile.cpp
     src/resource/format/gfffile.cpp
+    src/resource/format/gffwriter.cpp
     src/resource/format/keyfile.cpp
     src/resource/format/ltrfile.cpp
     src/resource/format/lytfile.cpp
@@ -746,7 +748,7 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libcommon ${Boost_FILESYSTEM_LIBRARY})
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY})
 
         if(WIN32)
             target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)

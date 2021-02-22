@@ -41,6 +41,7 @@ public:
     void putInt64(int64_t val);
     void putString(const std::string &str);
     void putCString(const std::string &str);
+    void putBytes(const ByteArray &bytes);
 
     size_t tell() const;
 
