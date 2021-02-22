@@ -55,14 +55,17 @@ void StreamWriter::putInt64(int64_t val) {
 }
 
 void StreamWriter::putString(const string &str) {
-    int len = strnlen(&str[0], str.length());
-    _stream->write(&str[0], len);
+    _stream->write(&str[0], str.length());
 }
 
 void StreamWriter::putCString(const string &str) {
     int len = strnlen(&str[0], str.length());
     _stream->write(&str[0], len);
     _stream->put('\0');
+}
+
+void StreamWriter::putBytes(const ByteArray &bytes) {
+    _stream->write(&bytes[0], bytes.size());
 }
 
 size_t StreamWriter::tell() const {

@@ -72,7 +72,12 @@ public:
             float floatValue;
             double doubleValue;
         };
+
+        Field() = default;
+        Field(FieldType type, std::string label);
     };
+
+    void add(std::shared_ptr<Field> field);
 
     bool getBool(const std::string &name, bool defValue = false) const;
     int getInt(const std::string &name, int defValue = 0) const;
