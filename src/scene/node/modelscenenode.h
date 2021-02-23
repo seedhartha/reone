@@ -73,14 +73,13 @@ public:
 
     Classification classification() const { return _classification; }
     std::shared_ptr<render::Model> model() const { return _model; }
-    std::shared_ptr<render::Texture> textureOverride() const { return _textureOverride; }
     float alpha() const { return _alpha; }
     float projectileSpeed() const { return _projectileSpeed; }
     SceneNodeAnimator &animator() { return _animator; }
 
     void setVisible(bool visible) override;
 
-    void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
+    void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
@@ -105,7 +104,6 @@ private:
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
-    std::shared_ptr<render::Texture> _textureOverride;
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };

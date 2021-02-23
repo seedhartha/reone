@@ -278,6 +278,9 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
             pt::ptree tree;
             pt::read_xml(*wrap(matData), tree);
 
+            string diffuseResRef;
+            string bumpmapResRef;
+
             for (auto &material : tree.get_child("Material")) {
                 if (material.first != "input") continue;
 
@@ -292,9 +295,17 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
                     value = value.substr(lastSlashIdx + 1ll);
                 }
                 if (semantic == "DiffuseMap") {
-                    modelMesh->setDiffuseTexture(Textures::instance().get(value, TextureUsage::Diffuse));
+                    diffuseResRef = value;
                 } else if (semantic == "RotationMap1") {
-                    modelMesh->setBumpmapTexture(Textures::instance().get(value, TextureUsage::Bumpmap), true);
+                    bumpmapResRef = value;
+                }
+            }
+
+            if (!diffuseResRef.empty()) {
+                modelMesh->setDiffuseTexture(Textures::instance().get(diffuseResRef, TextureUsage::Diffuse));
+                shared_ptr<Texture> diffuse();
+                if (!bumpmapResRef.empty()) {
+                    modelMesh->setBumpmapTexture(Textures::instance().get(bumpmapResRef, TextureUsage::Bumpmap), true);
                 }
             }
         }

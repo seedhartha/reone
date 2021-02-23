@@ -107,7 +107,7 @@ void AnimationChannel::computeLocalTransform(const ModelNode &animNode) {
     if (_ignoreNodes.count(animNode.name()) == 0) {
         ModelNodeSceneNode *modelNodeSceneNode = _modelSceneNode->getModelNode(animNode.name());
         if (modelNodeSceneNode) {
-            ModelNode *modelNode = modelNodeSceneNode->modelNode();
+            const ModelNode *modelNode = modelNodeSceneNode->modelNode();
             bool transformChanged = false;
             float scale = 1.0f;
             glm::vec3 translation(modelNode->position());
