@@ -22,6 +22,8 @@
 
 namespace reone {
 
+namespace render {
+
 class AABB {
 public:
     AABB() = default;
@@ -59,5 +61,7 @@ private:
 
     void updateTransform();
 };
+
+} // namespace render
 
 } // namespace reone
