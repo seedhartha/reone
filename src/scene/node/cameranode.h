@@ -32,7 +32,7 @@ public:
     CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection, float farPlane);
 
     bool isInFrustum(const glm::vec3 &point) const;
-    bool isInFrustum(const AABB &aabb) const;
+    bool isInFrustum(const render::AABB &aabb) const;
 
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }

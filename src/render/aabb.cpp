@@ -25,6 +25,8 @@
 
 namespace reone {
 
+namespace render {
+
 AABB::AABB(const glm::vec3 &min, const glm::vec3 &max) : _empty(false), _min(min), _max(max) {
     updateTransform();
 }
@@ -163,5 +165,7 @@ float AABB::getDistanceFromClosestPoint(const glm::vec3 &point) const {
     }
     return glm::distance(closest, point);
 }
+
+} // namespace render
 
 } // namespace reone
