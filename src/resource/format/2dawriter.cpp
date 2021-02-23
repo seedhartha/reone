@@ -39,35 +39,34 @@ TwoDaWriter::TwoDaWriter(const shared_ptr<TwoDA> &twoDa) : _twoDa(twoDa) {
 
 void TwoDaWriter::save(const fs::path &path) {
     auto stream = make_shared<fs::ofstream>(path, ios::binary);
+    _writer = make_unique<StreamWriter>(stream);
+    _writer->putString(kSignature);
+    _writer->putChar('\n');
 
-    StreamWriter writer(stream);
-    writer.putString(kSignature);
-    writer.putChar('\n');
+    writeHeaders();
 
-    writeHeaders(writer);
+    _writer->putUint32(_twoDa->getRowCount());
 
-    writer.putUint32(_twoDa->getRowCount());
-
-    writeLabels(writer);
-    writeData(writer);
+    writeLabels();
+    writeData();
 }
 
-void TwoDaWriter::writeHeaders(StreamWriter &writer) {
-    for (auto &header : _twoDa->columns()) {
-        writer.putString(header);
-        writer.putChar('\t');
+void TwoDaWriter::writeHeaders() {
+    for (auto &column : _twoDa->columns()) {
+        _writer->putString(column);
+        _writer->putChar('\t');
     }
-    writer.putChar('\0');
+    _writer->putChar('\0');
 }
 
-void TwoDaWriter::writeLabels(StreamWriter &writer) {
+void TwoDaWriter::writeLabels() {
     for (int i = 0; i < _twoDa->getRowCount(); ++i) {
-        writer.putString(to_string(i));
-        writer.putChar('\t');
+        _writer->putString(to_string(i));
+        _writer->putChar('\t');
     }
 }
 
-void TwoDaWriter::writeData(StreamWriter &writer) {
+void TwoDaWriter::writeData() {
     vector<pair<string, int>> data;
     int dataSize = 0;
 
@@ -79,20 +78,20 @@ void TwoDaWriter::writeData(StreamWriter &writer) {
             const string &value = _twoDa->rows()[i].values[j];
             auto maybeData = find_if(data.begin(), data.end(), [&](auto &pair) { return pair.first == value; });
             if (maybeData != data.end()) {
-                writer.putUint16(maybeData->second);
+                _writer->putUint16(maybeData->second);
             } else {
                 data.push_back(make_pair(value, dataSize));
-                writer.putUint16(dataSize);
+                _writer->putUint16(dataSize);
                 int len = strnlen(&value[0], value.length());
                 dataSize += len + 1ll;
             }
         }
     }
 
-    writer.putUint16(dataSize);
+    _writer->putUint16(dataSize);
 
     for (auto &pair : data) {
-        writer.putCString(pair.first);
+        _writer->putCString(pair.first);
     }
 }
 

@@ -70,17 +70,24 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::read_json(path.string(), tree);
 
-    auto table = make_unique<TwoDA>();
+    auto twoDa = make_unique<TwoDA>();
+    bool columnsInited = false;
 
     for (auto &jsonRow : tree.get_child("rows")) {
         TwoDA::Row row;
-        for (auto &column : jsonRow.second) {
-            // Columns starting with an underscore we consider meta and skip
-            if (boost::starts_with(column.first, "_")) continue;
 
-            row.values.push_back(column.second.data());
+        for (auto &prop : jsonRow.second) {
+            // Properties with a leading underscore are metadata
+            if (boost::starts_with(prop.first, "_")) continue;
+
+            if (!columnsInited) {
+                twoDa->addColumn(prop.first);
+            }
+            row.values.push_back(prop.second.data());
         }
-        table->add(move(row));
+
+        twoDa->add(move(row));
+        columnsInited = true;
     }
 
     vector<string> tokens;
@@ -89,7 +96,7 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     fs::path twoDaPath(destPath);
     twoDaPath.append(tokens[0] + ".2da");
 
-    TwoDaWriter writer(move(table));
+    TwoDaWriter writer(move(twoDa));
     writer.save(twoDaPath);
 }
 

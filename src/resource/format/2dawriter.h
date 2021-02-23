@@ -37,10 +37,11 @@ public:
 
 private:
     std::shared_ptr<TwoDA> _twoDa;
+    std::unique_ptr<StreamWriter> _writer;
 
-    void writeHeaders(StreamWriter &writer);
-    void writeLabels(StreamWriter &writer);
-    void writeData(StreamWriter &writer);
+    void writeHeaders();
+    void writeLabels();
+    void writeData();
 };
 
 } // namespace resource
