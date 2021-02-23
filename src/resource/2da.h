@@ -38,6 +38,7 @@ public:
         std::vector<std::string> values;
     };
 
+    void addColumn(std::string name);
     void add(Row row);
 
     /**

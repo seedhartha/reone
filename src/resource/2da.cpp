@@ -30,6 +30,10 @@ namespace resource {
 
 static constexpr char kCellValueDeleted[] = "****";
 
+void TwoDA::addColumn(string name) {
+    _columns.push_back(move(name));
+}
+
 void TwoDA::add(Row row) {
     _rows.push_back(move(row));
 }
