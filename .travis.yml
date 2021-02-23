@@ -18,13 +18,6 @@ os: linux
 dist: bionic
 compiler: clang
 
-env:
-  global:
-    - secure: "V88YFnmjHEY0oyXkO5OQE42tSJEGtLrr/tVwJITzxqn3q8WxOz5ANEJJQ9YRwyf4UzWb89txOjFofJ4FsCVNQ04SXOIkYiIxDttBVIW834Pdgt+cbaJY2QK5xk+iyNqn1q5yuI8juVmWboVpNURQcytnWJkvsdM4Z4UdVC0KcBGEeFz/eKGr7IXAGN3awUk1Dm7nrHQdsfWPd0V+EI+UEJU6vTbvFLUVZqeUYMAtb8EBEIf5g4mGpJ3/8dK7EJ4pU+f/pPjehkqSZe9avmHOdztuYYEX5e6VGt+AErjQyxYYUzVaMYezZJ6GrPYkoLY8sEFo9ln3bvZnv+/haZ7SGzc5CMqn+kbwE8FOzQm3sPXIRXmEMjR1lGDyvnc0jnaOpBbAF3CkK9vb7QIbVbdmDFyMHpvi3TPtAtKcAQ0BI2C0zJdFtS7AzVbgyw1kyRVcxQFMca4AjRaRDxAjZR2lkLOFNcwmlwY496uLp+5XyHb5wvJE91y6HdkYBpFLzAGPbw7dCQl8WFqn3qJyyOaQ8TtC8qSkZt++lFXuAx6NCLYzDM2EhCYj2SepQgVYEj7sMXk4s2DHG6zQtGAIMw3ANUIY4Reexs13HKhP7882OwOfvcOozSwulkDVmMHqWNHGB/77lruo5XNhVfUTGvGYLdq/mwgUlC2rbPc1a9TrqWE="
-
-before_install:
-  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-
 addons:
   apt:
     sources:
@@ -40,21 +33,11 @@ addons:
       - libavutil-dev
       - libswresample-dev
       - libswscale-dev
-  coverity_scan:
-    project:
-      name: "seedhartha/reone"
-      description: "Game engine, capable of running KotOR and TSL"
-    notification_email: vkremianskii@gmail.com
-    build_command_prepend: "mkdir build; cd build; cmake .. -DCMAKE_BUILD_TYPE=Release"
-    build_command: "make"
-    branch_pattern: coverity_scan
 
 script:
   - |
-    if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then
-      mkdir build;
-      cd build;
-      cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON;
-      make;
-      ctest -C Release;
-    fi
+    mkdir build;
+    cd build;
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON;
+    make;
+    ctest -C Release;
