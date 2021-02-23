@@ -103,7 +103,7 @@ void ModelSceneNode::initModelNodes() {
         ModelNodeSceneNode *sceneNode = nodes.top();
         nodes.pop();
 
-        ModelNode *modelNode = sceneNode->modelNode();
+        const ModelNode *modelNode = sceneNode->modelNode();
         _modelNodeByIndex.insert(make_pair(modelNode->index(), sceneNode));
         _modelNodeByNumber.insert(make_pair(modelNode->nodeNumber(), sceneNode));
 
@@ -179,7 +179,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
     ModelNodeSceneNode *parentNode = getModelNode(parent);
     if (!parentNode) return nullptr;
 
-    ModelNode *parentModelNode = parentNode->modelNode();
+    const ModelNode *parentModelNode = parentNode->modelNode();
     uint16_t parentNumber = parentModelNode->nodeNumber();
 
     auto maybeAttached = _attachedModels.find(parentNumber);
@@ -293,8 +293,13 @@ const string &ModelSceneNode::getName() const {
     return _model->name();
 }
 
-void ModelSceneNode::setTextureOverride(const shared_ptr<Texture> &texture) {
-    _textureOverride = texture;
+void ModelSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
+    for (auto &child : _children) {
+        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(child);
+        if (modelNode) {
+            modelNode->setDiffuseTexture(texture);
+        }
+    }
 }
 
 void ModelSceneNode::setVisible(bool visible) {

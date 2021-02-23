@@ -19,13 +19,6 @@
 
 #include <stdexcept>
 
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "../pbribl.h"
-#include "../shaders.h"
-#include "../stateutil.h"
-
 using namespace std;
 
 namespace reone {
@@ -46,54 +39,8 @@ void ModelMesh::deinitGL() {
     _mesh->deinit();
 }
 
-void ModelMesh::render(shared_ptr<Texture> diffuse) {
-    bool additive = false;
-
-    if (diffuse) {
-        setActiveTextureUnit(TextureUnits::diffuse);
-        diffuse->bind();
-        additive = diffuse->isAdditive();
-    }
-    if (_lightmap) {
-        setActiveTextureUnit(TextureUnits::lightmap);
-        _lightmap->bind();
-    }
-    if (_envmap) {
-        setActiveTextureUnit(TextureUnits::envmap);
-        _envmap->bind();
-
-        PBRIBL::Derived derived;
-        if (PBRIBL::instance().getDerived(_envmap.get(), derived)) {
-            setActiveTextureUnit(TextureUnits::irradianceMap);
-            derived.irradianceMap->bind();
-            setActiveTextureUnit(TextureUnits::prefilterMap);
-            derived.prefilterMap->bind();
-            setActiveTextureUnit(TextureUnits::brdfLookup);
-            derived.brdfLookup->bind();
-        }
-    }
-    if (_bumpmap) {
-        setActiveTextureUnit(TextureUnits::bumpmap);
-        _bumpmap->bind();
-    }
-
-    if (additive) {
-        withAdditiveBlending([this]() { _mesh->render(); });
-    } else {
-        _mesh->render();
-    }
-}
-
-bool ModelMesh::isTransparent() const {
-    if (!_diffuse) return false;
-    if (_transparency > 0) return true;
-    if (_diffuse->isAdditive()) return true;
-    if (_envmap || _bumpmap) return false;
-
-    PixelFormat format = _diffuse->pixelFormat();
-    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
-
-    return true;
+void ModelMesh::render() {
+    _mesh->render();
 }
 
 void ModelMesh::setRender(bool render) {
@@ -112,12 +59,12 @@ void ModelMesh::setBackgroundGeometry(bool background) {
     _backgroundGeometry = background;
 }
 
-void ModelMesh::setDiffuseTexture(const shared_ptr<Texture> &texture) {
-    _diffuse = texture;
+void ModelMesh::setDiffuseTexture(shared_ptr<Texture> texture) {
+    _diffuse = move(texture);
 }
 
-void ModelMesh::setBumpmapTexture(const shared_ptr<Texture> &texture, bool swizzled) {
-    _bumpmap = texture;
+void ModelMesh::setBumpmapTexture(shared_ptr<Texture> texture, bool swizzled) {
+    _bumpmap = move(texture);
     _bumpmapSwizzled = swizzled;
 }
 
