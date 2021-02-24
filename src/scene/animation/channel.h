@@ -29,6 +29,7 @@
 #include "../../render/model/modelnode.h"
 
 #include "properties.h"
+#include "scenenodestate.h"
 
 namespace reone {
 
@@ -72,8 +73,8 @@ public:
      */
     bool isFinished() const;
 
-    bool getTransformByNodeNumber(uint16_t nodeNumber, glm::mat4 &transform) const;
     float getTransitionTime() const;
+    bool getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeState &state) const;
 
     float time() const { return _time; }
 
@@ -89,10 +90,9 @@ private:
     float _time { 0.0f };
     bool _freeze { false };
     bool _finished { false };
-    std::unordered_map<uint16_t, glm::mat4> _transformByNodeNumber;
+    std::unordered_map<uint16_t, SceneNodeState> _stateByNumber;
 
-    void computeLocalTransforms();
-    void computeLocalTransform(const render::ModelNode &animNode);
+    void computeSceneNodeStates(const render::ModelNode &animNode);
 };
 
 } // namespace scene

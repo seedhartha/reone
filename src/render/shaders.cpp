@@ -624,12 +624,14 @@ void main() {
         objectColor *= uWaterAlpha;
         objectAlpha *= uWaterAlpha;
     }
-    fragColor = vec4(objectColor, objectAlpha);
 
     vec3 brightColor = vec3(0.0);
-    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+    if (isFeatureEnabled(FEATURE_SELFILLUM) && !isFeatureEnabled(FEATURE_WATER)) {
+        objectColor *= uSelfIllumColor.rgb;
         brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
     }
+
+    fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(brightColor, 1.0);
 }
 )END";
@@ -769,12 +771,13 @@ void main() {
         objectColor = pow(objectColor, vec3(1.0 / GAMMA));
     }
 
-    fragColor = vec4(objectColor, objectAlpha);
-
     vec3 brightColor = vec3(0.0);
-    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+    if (isFeatureEnabled(FEATURE_SELFILLUM) && !isFeatureEnabled(FEATURE_WATER)) {
+        objectColor *= uSelfIllumColor.rgb;
         brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
     }
+
+    fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(brightColor, 1.0);
 }
 )END";

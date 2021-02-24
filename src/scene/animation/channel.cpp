@@ -83,7 +83,8 @@ void AnimationChannel::update(float dt) {
         }
     }
 
-    computeLocalTransforms();
+    _stateByNumber.clear();
+    computeSceneNodeStates(*_animation->rootNode());
 
     _time = newTime;
 
@@ -98,12 +99,7 @@ void AnimationChannel::update(float dt) {
     }
 }
 
-void AnimationChannel::computeLocalTransforms() {
-    _transformByNodeNumber.clear();
-    computeLocalTransform(*_animation->rootNode());
-}
-
-void AnimationChannel::computeLocalTransform(const ModelNode &animNode) {
+void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
     if (_ignoreNodes.count(animNode.name()) == 0) {
         ModelNodeSceneNode *modelNodeSceneNode = _modelSceneNode->getModelNode(animNode.name());
         if (modelNodeSceneNode) {
@@ -151,18 +147,31 @@ void AnimationChannel::computeLocalTransform(const ModelNode &animNode) {
                 }
             }
 
+            SceneNodeState state;
+            float alpha;
+            if (animNode.getAlpha(_time, alpha)) {
+                state.flags |= SceneNodeStateFlags::alpha;
+                state.alpha = alpha;
+            }
+            glm::vec3 selfIllumColor;
+            if (animNode.getSelfIllumColor(_time, selfIllumColor)) {
+                state.flags |= SceneNodeStateFlags::selfIllum;
+                state.selfIllumColor = move(selfIllumColor);
+            }
             if (transformChanged) {
                 glm::mat4 transform(1.0f);
                 transform = glm::scale(transform, glm::vec3(scale));
                 transform = glm::translate(transform, translation);
                 transform *= glm::mat4_cast(orientation);
-                _transformByNodeNumber.insert(make_pair(modelNode->nodeNumber(), move(transform)));
+                state.flags |= SceneNodeStateFlags::transform;
+                state.transform = move(transform);
             }
+            _stateByNumber.insert(make_pair(modelNode->nodeNumber(), move(state)));
         }
     }
 
     for (auto &child : animNode.children()) {
-        computeLocalTransform(*child);
+        computeSceneNodeStates(*child);
     }
 }
 
@@ -186,16 +195,17 @@ bool AnimationChannel::isFinished() const {
     return _animation && _finished;
 }
 
-bool AnimationChannel::getTransformByNodeNumber(uint16_t nodeNumber, glm::mat4 &transform) const {
-    auto maybeTransform = _transformByNodeNumber.find(nodeNumber);
-    if (maybeTransform != _transformByNodeNumber.end()) {
-        transform = maybeTransform->second;
-    }
-    return maybeTransform != _transformByNodeNumber.end();
-}
-
 float AnimationChannel::getTransitionTime() const {
     return _animation ? _animation->transitionTime() : 0.0f;
+}
+
+bool AnimationChannel::getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeState &state) const {
+    auto maybeState = _stateByNumber.find(nodeNumber);
+    if (maybeState != _stateByNumber.end()) {
+        state = maybeState->second;
+        return true;
+    }
+    return false;
 }
 
 void AnimationChannel::setTime(float time) {
