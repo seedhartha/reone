@@ -33,8 +33,11 @@ namespace render {
 /**
  * Node of a 3D model or an animation, which are tree-like data structures.
  * Model nodes have spatial properties and can have an arbitary number of
- * children. When part of an animation, model nodes contain translation,
- * orientation and scale keyframes.
+ * children.
+ *
+ * When part of an animation, certain properties of a model node can be
+ * animated. These are position, orientation, scale, alpha and self-illumination
+ * color.
  *
  * Model nodes can be specialized to represent meshes, lights, emitters, etc.
  *
@@ -43,19 +46,15 @@ namespace render {
  */
 class ModelNode : boost::noncopyable {
 public:
-    struct TranslationKeyframe {
+    struct Keyframe {
         float time { 0.0f };
-        glm::vec3 translation { 0.0f };
-    };
-
-    struct OrientationKeyframe {
-        float time { 0.0f };
-        glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    };
-
-    struct ScaleKeyframe {
-        float time { 0.0f };
-        float scale { 0.0f };
+        union {
+            glm::quat orientation { 0.0f, 0.0f, 0.0f, 0.0f };
+            glm::vec3 translation;
+            float scale;
+            float alpha;
+            glm::vec3 selfIllumColor;
+        };
     };
 
     struct Light {
@@ -94,15 +93,16 @@ public:
      */
     void computeAbsoluteTransforms();
 
-    void addTranslationKeyframe(TranslationKeyframe keyframe);
-    void addOrientationKeyframe(OrientationKeyframe keyframe);
+    void addTranslationKeyframe(Keyframe keyframe);
+    void addOrientationKeyframe(Keyframe keyframe);
 
-    bool isSelfIllumEnabled() const { return _selfIllumEnabled; }
     bool isSaber() const { return _saber; }
 
     bool getTranslation(float time, glm::vec3 &translation, float scale = 1.0f) const;
     bool getOrientation(float time, glm::quat &orientation) const;
     bool getScale(float time, float &scale) const;
+    bool getAlpha(float time, float &alpha) const;
+    bool getSelfIllumColor(float time, glm::vec3 &color) const;
 
     bool getTranslation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::vec3 &translation, float scale = 1.0f) const;
     bool getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const;
@@ -143,7 +143,6 @@ private:
     uint16_t _nodeNumber { 0 };
     std::string _name;
     glm::vec3 _color { 0.0f };
-    bool _selfIllumEnabled { false };
     glm::vec3 _selfIllumColor { 0.0f };
     float _alpha { 1.0f };
     float _radius { 0.0f };
@@ -169,9 +168,11 @@ private:
 
     // Keyframes
 
-    std::vector<TranslationKeyframe> _translationFrames;
-    std::vector<OrientationKeyframe> _orientationFrames;
-    std::vector<ScaleKeyframe> _scaleFrames;
+    std::vector<Keyframe> _translationFrames;
+    std::vector<Keyframe> _orientationFrames;
+    std::vector<Keyframe> _scaleFrames;
+    std::vector<Keyframe> _alphaFrames;
+    std::vector<Keyframe> _selfIllumFrames;
 
     // END Keyframes
 

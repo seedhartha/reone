@@ -43,6 +43,7 @@ public:
     glm::vec3 getOrigin() const override;
 
     bool isTransparent() const override;
+    bool isSelfIlluminated() const;
 
     const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
     const render::ModelNode *modelNode() const { return _modelNode; }
@@ -50,6 +51,8 @@ public:
 
     void setBoneTransform(const glm::mat4 &transform);
     void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
+    void setAlpha(float alpha);
+    void setSelfIllumColor(glm::vec3 color);
 
 private:
     struct NodeTextures {
@@ -68,6 +71,8 @@ private:
     glm::vec2 _uvOffset { 0.0f };
     float _bumpmapTime { 0.0f };
     int _bumpmapFrame { 0 };
+    float _alpha { 1.0f };
+    glm::vec3 _selfIllumColor { 0.0f };
 
     void initTextures();
 

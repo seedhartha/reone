@@ -58,6 +58,10 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
     if (!modelNode) {
         throw invalid_argument("modelNode must not be null");
     }
+
+    _alpha = _modelNode->alpha();
+    _selfIllumColor = _modelNode->selfIllumColor();
+
     initTextures();
 }
 
@@ -145,7 +149,7 @@ bool ModelNodeSceneNode::isTransparent() const {
     if (_modelSceneNode->model()->classification() == Model::Classification::Character) return false;
 
     // Model nodes with alpha less than 1.0 are transparent
-    if (_modelNode->alpha() < 1.0f) return true;
+    if (_alpha < 1.0f) return true;
 
     // Model nodes without a diffuse texture are opaque
     if (!_textures.diffuse) return false;
@@ -173,11 +177,15 @@ static bool isLightingEnabledByClassification(ModelSceneNode::Classification cla
     return classification != ModelSceneNode::Classification::Projectile;
 }
 
-static bool isReceivingShadows(const ModelSceneNode &modelSceneNode, const ModelNode &modelNode) {
+bool ModelNodeSceneNode::isSelfIlluminated() const {
+    return glm::dot(_selfIllumColor, _selfIllumColor) > 0.0f;
+}
+
+static bool isReceivingShadows(const ModelSceneNode &model, const ModelNodeSceneNode &modelNode) {
     // Only room models receive shadows, unless model node is self-illuminated
     return
-        modelSceneNode.classification() == ModelSceneNode::Classification::Room &&
-        !modelNode.isSelfIllumEnabled();
+        model.classification() == ModelSceneNode::Classification::Room &&
+        !modelNode.isSelfIlluminated();
 }
 
 void ModelNodeSceneNode::renderSingle(bool shadowPass) {
@@ -191,7 +199,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         uniforms.general.featureMask |= UniformFeatureFlags::hdr;
     }
     uniforms.general.model = _absoluteTransform;
-    uniforms.general.alpha = _modelSceneNode->alpha() * _modelNode->alpha();
+    uniforms.general.alpha = _modelSceneNode->alpha() * _alpha;
     uniforms.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
     uniforms.general.exposure = _sceneGraph->exposure();
 
@@ -231,7 +239,7 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             uniforms.bumpmap.swizzled = mesh->isBumpmapSwizzled();
         }
 
-        bool receivesShadows = isReceivingShadows(*_modelSceneNode, *_modelNode);
+        bool receivesShadows = isReceivingShadows(*_modelSceneNode, *this);
         if (receivesShadows) {
             uniforms.general.featureMask |= UniformFeatureFlags::shadows;
         }
@@ -254,9 +262,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             }
         }
 
-        if (_modelNode->isSelfIllumEnabled()) {
+        if (isSelfIlluminated()) {
             uniforms.general.featureMask |= UniformFeatureFlags::selfIllum;
-            uniforms.general.selfIllumColor = glm::vec4(_modelNode->selfIllumColor(), 1.0f);
+            uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
         }
         if (isLightingEnabled()) {
             const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
@@ -343,8 +351,8 @@ bool ModelNodeSceneNode::isLightingEnabled() const {
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
     if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;
 
-    // Lighting is disabled for self-illuminated room model nodes, e.g. the skybox
-    if (_modelNode->isSelfIllumEnabled() && _modelSceneNode->classification() == ModelSceneNode::Classification::Room) return false;
+    // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
+    if (isSelfIlluminated()) return false;
 
     // Lighting is disabled when diffuse texture is additive
     if (_textures.diffuse && _textures.diffuse->isAdditive()) return false;
@@ -364,6 +372,14 @@ void ModelNodeSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
     _textures.diffuse = texture;
     refreshMaterial();
     refreshAdditionalTextures();
+}
+
+void ModelNodeSceneNode::setAlpha(float alpha) {
+    _alpha = alpha;
+}
+
+void ModelNodeSceneNode::setSelfIllumColor(glm::vec3 color) {
+    _selfIllumColor = move(color);
 }
 
 } // namespace scene

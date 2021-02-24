@@ -65,10 +65,10 @@ void SceneNodeAnimator::update(float dt) {
         channel.update(dt);
     }
 
-    // Compute and apply absolute transforms to the managed model scene node
-    _transformByNodeNumber.clear();
-    computeAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
-    applyAbsoluteTransforms(*_modelSceneNode->model()->rootNode());
+    // Compute and apply node states to the managed model
+    _stateByNumber.clear();
+    computeSceneNodeStates(*_modelSceneNode->model()->rootNode());
+    applySceneNodeStates(*_modelSceneNode->model()->rootNode());
 }
 
 void SceneNodeAnimator::playDefaultAnimation() {
@@ -81,65 +81,143 @@ bool SceneNodeAnimator::isInTransition() const {
     return _compositionMode == CompositionMode::Blend && _transition;
 }
 
-void SceneNodeAnimator::computeAbsoluteTransforms(ModelNode &modelNode, glm::mat4 parentTransform) {
+void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 parentTransform) {
     if (modelNode.skin()) return;
+
+    SceneNodeState state;
+    state.flags |= SceneNodeStateFlags::transform;
 
     glm::mat4 localTransform(modelNode.localTransform());
 
     if (isInTransition()) {
+        float delta = 1.0f - (_channels[0].getTransitionTime() - _channels[0].time()) / _channels[0].getTransitionTime();
+
         // In the Blend mode, blend animations on the first two channels
-        glm::mat4 transform1, transform2;
-        bool hasTransform1 = _channels[0].getTransformByNodeNumber(modelNode.nodeNumber(), transform1);
-        bool hasTransform2 = _channels[1].getTransformByNodeNumber(modelNode.nodeNumber(), transform2);
-        if (hasTransform1 && hasTransform2) {
-            float delta = 1.0f - (_channels[0].getTransitionTime() - _channels[0].time()) / _channels[0].getTransitionTime();
-            glm::quat orientation0(glm::toQuat(transform1));
-            glm::quat orientation1(glm::toQuat(transform2));
-            localTransform = glm::translate(glm::mat4(1.0f), glm::vec3(transform1[3]));
+        SceneNodeState channel0State, channel1State;
+        bool hasChannel0State = _channels[0].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel0State);
+        bool hasChannel1State = _channels[1].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel1State);
+        if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::transform) &&
+            hasChannel1State && (channel1State.flags & SceneNodeStateFlags::transform)) {
+
+            glm::quat orientation0(glm::toQuat(channel0State.transform));
+            glm::quat orientation1(glm::toQuat(channel1State.transform));
+            localTransform = glm::translate(glm::mat4(1.0f), glm::vec3(channel0State.transform[3]));
             localTransform *= glm::mat4_cast(glm::slerp(orientation1, orientation0, delta));
-        } else if (hasTransform1) {
-            localTransform = move(transform1);
-        } else if (hasTransform2) {
-            localTransform = move(transform2);
+
+        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::transform)) {
+            localTransform = move(channel0State.transform);
+
+        } else if (hasChannel1State && (channel1State.flags & SceneNodeStateFlags::transform)) {
+            localTransform = move(channel1State.transform);
+        }
+        if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha) &&
+            hasChannel1State && (channel1State.flags & SceneNodeStateFlags::alpha)) {
+
+            state.flags |= SceneNodeStateFlags::alpha;
+            state.alpha = glm::mix(channel1State.alpha, channel0State.alpha, delta);
+
+        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha)) {
+            state.flags |= SceneNodeStateFlags::alpha;
+            state.alpha = channel0State.alpha;
+
+        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha)) {
+            state.flags |= SceneNodeStateFlags::alpha;
+            state.alpha = channel1State.alpha;
+        }
+        if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum) &&
+            hasChannel1State && (channel1State.flags & SceneNodeStateFlags::selfIllum)) {
+
+            state.flags |= SceneNodeStateFlags::selfIllum;
+            state.selfIllumColor = glm::mix(channel1State.selfIllumColor, channel0State.selfIllumColor, delta);
+
+        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum)) {
+            state.flags |= SceneNodeStateFlags::selfIllum;
+            state.selfIllumColor = channel0State.selfIllumColor;
+
+        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum)) {
+            state.flags |= SceneNodeStateFlags::selfIllum;
+            state.selfIllumColor = channel1State.selfIllumColor;
         }
     } else if (_compositionMode == CompositionMode::Overlay) {
-        // In the Overlay mode, select the first animation channel to have a local transform for the given node
+        // In the Overlay mode, for each state component select the first animation channel to have state for the given node
         for (int i = kChannelCount - 1; i >= 0; --i) {
-            glm::mat4 transform;
-            if (_channels[i].isActive() && _channels[i].getTransformByNodeNumber(modelNode.nodeNumber(), transform)) {
-                localTransform = move(transform);
-                break;
+            SceneNodeState channelState;
+            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+                if (channelState.flags & SceneNodeStateFlags::transform) {
+                    localTransform = move(channelState.transform);
+                    break;
+                }
+            }
+        }
+        for (int i = kChannelCount - 1; i >= 0; --i) {
+            SceneNodeState channelState;
+            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+                if (channelState.flags & SceneNodeStateFlags::alpha) {
+                    state.flags |= SceneNodeStateFlags::alpha;
+                    state.alpha = channelState.alpha;
+                    break;
+                }
+            }
+        }
+        for (int i = kChannelCount - 1; i >= 0; --i) {
+            SceneNodeState channelState;
+            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+                if (channelState.flags & SceneNodeStateFlags::selfIllum) {
+                    state.flags |= SceneNodeStateFlags::selfIllum;
+                    state.selfIllumColor = move(channelState.selfIllumColor);
+                    break;
+                }
             }
         }
     } else {
         // Otherwise, select animation on the first channel
-        glm::mat4 transform;
-        if (_channels[0].getTransformByNodeNumber(modelNode.nodeNumber(), transform)) {
-            localTransform = move(transform);
+        SceneNodeState channelState;
+        if (_channels[0].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+            if (channelState.flags & SceneNodeStateFlags::transform) {
+                localTransform = move(channelState.transform);
+            }
+            if (channelState.flags & SceneNodeStateFlags::alpha) {
+                state.flags |= SceneNodeStateFlags::alpha;
+                state.alpha = channelState.alpha;
+            }
+            if (channelState.flags & SceneNodeStateFlags::selfIllum) {
+                state.flags |= SceneNodeStateFlags::selfIllum;
+                state.selfIllumColor = move(channelState.selfIllumColor);
+            }
         }
     }
 
     glm::mat4 absTransform(parentTransform * localTransform);
-    _transformByNodeNumber.insert(make_pair(modelNode.nodeNumber(), absTransform));
+    state.transform = absTransform;
+    _stateByNumber.insert(make_pair(modelNode.nodeNumber(), move(state)));
 
     for (auto &child : modelNode.children()) {
-        computeAbsoluteTransforms(*child, absTransform);
+        computeSceneNodeStates(*child, absTransform);
     }
 }
 
-void SceneNodeAnimator::applyAbsoluteTransforms(ModelNode &modelNode) {
+void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
     // Do not apply transforms to skinned model nodes
     if (modelNode.skin()) return;
 
-    auto maybeTransform = _transformByNodeNumber.find(modelNode.nodeNumber());
-    if (maybeTransform != _transformByNodeNumber.end()) {
+    auto maybeState = _stateByNumber.find(modelNode.nodeNumber());
+    if (maybeState != _stateByNumber.end()) {
+        const SceneNodeState &state = maybeState->second;
         ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
-        sceneNode->setLocalTransform(maybeTransform->second);
-        sceneNode->setBoneTransform(maybeTransform->second * modelNode.absoluteTransformInverse());
+        if (state.flags & SceneNodeStateFlags::transform) {
+            sceneNode->setLocalTransform(state.transform);
+            sceneNode->setBoneTransform(state.transform * modelNode.absoluteTransformInverse());
+        }
+        if (state.flags & SceneNodeStateFlags::alpha) {
+            sceneNode->setAlpha(state.alpha);
+        }
+        if (state.flags & SceneNodeStateFlags::selfIllum) {
+            sceneNode->setSelfIllumColor(state.selfIllumColor);
+        }
     }
 
     for (auto &child : modelNode.children()) {
-        applyAbsoluteTransforms(*child);
+        applySceneNodeStates(*child);
     }
 }
 

@@ -30,6 +30,7 @@
 
 #include "channel.h"
 #include "properties.h"
+#include "scenenodestate.h"
 
 namespace reone {
 
@@ -69,19 +70,25 @@ private:
         Blend /**< animation on the second channel is transitioned into animation on the first channel */
     };
 
+    struct NodeState {
+        glm::mat4 transform { 1.0f };
+        float alpha { 1.0f };
+        glm::vec3 selfIllumColor { 0.0f };
+    };
+
     ModelSceneNode *_modelSceneNode;
     std::set<std::string> _ignoreNodes;
     std::vector<AnimationChannel> _channels;
 
     CompositionMode _compositionMode { CompositionMode::Overlay };
     bool _transition { false }; /**< is there an animation transition going on? */
-    std::unordered_map<uint16_t, glm::mat4> _transformByNodeNumber;
+    std::unordered_map<uint16_t, SceneNodeState> _stateByNumber;
 
     std::string _defaultAnimName;
     AnimationProperties _defaultAnimProperties;
 
-    void computeAbsoluteTransforms(render::ModelNode &modelNode, glm::mat4 parentTransform = glm::mat4(1.0f));
-    void applyAbsoluteTransforms(render::ModelNode &modelNode);
+    void computeSceneNodeStates(render::ModelNode &modelNode, glm::mat4 parentTransform = glm::mat4(1.0f));
+    void applySceneNodeStates(render::ModelNode &modelNode);
 
     bool isInTransition() const;
 

@@ -64,7 +64,7 @@ private:
 
     // Controllers
 
-    void readAlphaController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readAlphaController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readAlphaEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readAlphaMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readAlphaStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
@@ -83,7 +83,7 @@ private:
     void readRadiusController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readRandomVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSelfIllumColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
+    void readSelfIllumColorController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
     void readSizeStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);

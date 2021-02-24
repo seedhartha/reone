@@ -113,18 +113,21 @@ void ModelSceneNode::initModelNodes() {
             nodes.push(childNode.get());
 
             // Optionally convert self-illuminated model nodes to light sources
-            if (isFeatureEnabled(Feature::SelfIllumAsLights) && child->isSelfIllumEnabled()) {
-                float radius;
-                shared_ptr<ModelMesh> mesh(child->mesh());
-                if (mesh) {
-                    glm::vec3 size(mesh->mesh()->aabb().getSize());
-                    radius = glm::max(1.0f, glm::sqrt(glm::dot(size, size)));
-                } else {
-                    radius = 1.0f;
+            if (isFeatureEnabled(Feature::SelfIllumAsLights)) {
+                glm::vec3 color;
+                if (child->getSelfIllumColor(0.0f, color) && glm::dot(color, color) > 0.0f) {
+                    float radius;
+                    shared_ptr<ModelMesh> mesh(child->mesh());
+                    if (mesh) {
+                        glm::vec3 size(mesh->mesh()->aabb().getSize());
+                        radius = glm::max(1.0f, glm::sqrt(glm::dot(size, size)));
+                    } else {
+                        radius = 1.0f;
+                    }
+                    auto lightNode = make_shared<LightSceneNode>(move(color), kSelfIlluminatedPriority, _sceneGraph);
+                    lightNode->setRadius(radius);
+                    childNode->addChild(lightNode);
                 }
-                auto lightNode = make_shared<LightSceneNode>(child->selfIllumColor(), kSelfIlluminatedPriority, _sceneGraph);
-                lightNode->setRadius(radius);
-                childNode->addChild(lightNode);
             }
 
             shared_ptr<ModelNode::Light> light(child->light());

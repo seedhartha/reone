@@ -304,9 +304,8 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 }
                 break;
             case ControllerType::SelfIllumColor:
-                if (node._flags & kNodeHasMesh) {
-                    readSelfIllumColorController(dataIndex, data, node);
-                    node._selfIllumEnabled = glm::dot(node._selfIllumColor, node._selfIllumColor) > 0.0f;
+                if (!(node._flags & kNodeHasLight) && !(node._flags & kNodeHasEmitter)) {
+                    readSelfIllumColorController(rowCount, timeIndex, dataIndex, data, node);
                 }
                 break;
             case ControllerType::FPS:
@@ -330,7 +329,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 }
                 break;
             case ControllerType::Alpha:
-                readAlphaController(dataIndex, data, node);
+                readAlphaController(rowCount, timeIndex, dataIndex, data, node);
                 break;
             case ControllerType::Multiplier_RandomVelocity:
                 if (node._flags & kNodeHasLight) {
@@ -428,7 +427,7 @@ void MdlFile::readPositionController(uint16_t rowCount, uint8_t columnCount, uin
                 int rowTimeIdx = timeIndex + i;
                 int rowDataIdx = dataIndex + i * (bezier ? 9 : 3);
 
-                ModelNode::TranslationKeyframe frame;
+                ModelNode::Keyframe frame;
                 frame.time = data[rowTimeIdx];
                 frame.translation = glm::make_vec3(&data[rowDataIdx]);
 
@@ -466,7 +465,7 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
                     w = -glm::sqrt(1.0f - dot);
                 }
 
-                ModelNode::OrientationKeyframe frame;
+                ModelNode::Keyframe frame;
                 frame.time = data[rowTimeIdx];
                 frame.orientation = glm::quat(w, x, y, z);
 
@@ -479,7 +478,7 @@ void MdlFile::readOrientationController(uint16_t rowCount, uint8_t columnCount, 
                 int rowTimeIdx = timeIndex + i;
                 int rowDataIdx = dataIndex + i * 4;
 
-                ModelNode::OrientationKeyframe frame;
+                ModelNode::Keyframe frame;
                 frame.time = data[rowTimeIdx];
                 frame.orientation.x = data[rowDataIdx + 0];
                 frame.orientation.y = data[rowDataIdx + 1];
@@ -498,7 +497,7 @@ void MdlFile::readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_
     node._scaleFrames.resize(rowCount);
 
     for (int i = 0; i < rowCount; ++i) {
-        ModelNode::ScaleKeyframe frame;
+        ModelNode::Keyframe frame;
         frame.time = data[timeIndex + i];
         frame.scale = data[dataIndex + i];
 
@@ -512,14 +511,38 @@ void MdlFile::readColorController(uint16_t dataIndex, const vector<float> &data,
     node._color.b = data[dataIndex + 2];
 }
 
-void MdlFile::readSelfIllumColorController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._selfIllumColor.r = data[dataIndex + 0];
-    node._selfIllumColor.g = data[dataIndex + 1];
-    node._selfIllumColor.b = data[dataIndex + 2];
+void MdlFile::readSelfIllumColorController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    if (rowCount == 1) {
+        node._selfIllumColor = glm::make_vec3(&data[dataIndex]);
+        return;
+    }
+
+    node._selfIllumFrames.resize(rowCount);
+
+    for (uint16_t i = 0; i < rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[timeIndex + i];
+        frame.selfIllumColor = glm::make_vec3(&data[dataIndex + 3 * i]);
+
+        node._selfIllumFrames[i] = move(frame);
+    }
 }
 
-void MdlFile::readAlphaController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._alpha = data[dataIndex];
+void MdlFile::readAlphaController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
+    if (rowCount == 1) {
+        node._alpha = data[dataIndex];
+        return;
+    }
+
+    node._alphaFrames.resize(rowCount);
+
+    for (uint16_t i = 0; i < rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[timeIndex + i];
+        frame.alpha = data[dataIndex + i];
+
+        node._alphaFrames[i] = move(frame);
+    }
 }
 
 void MdlFile::readRadiusController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {

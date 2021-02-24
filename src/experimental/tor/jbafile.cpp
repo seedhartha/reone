@@ -296,12 +296,12 @@ void JbaFile::loadAnimation() {
             for (size_t k = 0; k < boneKeyframes.size(); ++k) {
                 float time = k * step;
 
-                ModelNode::TranslationKeyframe position;
+                ModelNode::Keyframe position;
                 position.time = time;
                 position.translation = boneKeyframes[k].translation * _translationBase;
                 node->addTranslationKeyframe(move(position));
 
-                ModelNode::OrientationKeyframe orientation;
+                ModelNode::Keyframe orientation;
                 orientation.time = time;
                 orientation.orientation = skeletonNode->orientation() * boneKeyframes[k].orientation;
                 node->addOrientationKeyframe(move(orientation));
