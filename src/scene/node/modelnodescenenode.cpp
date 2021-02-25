@@ -118,7 +118,7 @@ void ModelNodeSceneNode::update(float dt) {
                 int frameCount = features.numX * features.numY;
                 float length = frameCount / static_cast<float>(features.fps);
                 _bumpmapTime = glm::min(_bumpmapTime + dt, length);
-                _bumpmapFrame = glm::round((frameCount - 1) * (_bumpmapTime / length));
+                _bumpmapFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapTime / length)));
                 if (_bumpmapTime == length) {
                     _bumpmapTime = 0.0f;
                 }

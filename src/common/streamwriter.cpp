@@ -59,7 +59,7 @@ void StreamWriter::putString(const string &str) {
 }
 
 void StreamWriter::putCString(const string &str) {
-    int len = strnlen(&str[0], str.length());
+    int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream->write(&str[0], len);
     _stream->put('\0');
 }

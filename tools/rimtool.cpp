@@ -55,7 +55,7 @@ void RimTool::extract(RimFile &rim, const fs::path &destPath) {
         const RimFile::Resource &resEntry = rim.resources()[i];
         string ext(getExtByResType(resEntry.resType));
         cout << "Extracting " << resEntry.resRef << " " << ext << endl;
-        ByteArray data(rim.getResourceData(i));
+        ByteArray data(rim.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
         resPath.append(resEntry.resRef + "." + ext);

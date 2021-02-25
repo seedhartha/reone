@@ -118,7 +118,7 @@ void Mesh::render() {
     if (_inited) {
         glBindVertexArray(_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-        glDrawElements(getModeGL(_mode), _indices.size(), GL_UNSIGNED_SHORT, nullptr);
+        glDrawElements(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr);
     }
 }
 
@@ -126,7 +126,7 @@ void Mesh::renderInstanced(int count) {
     if (_inited) {
         glBindVertexArray(_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-        glDrawElementsInstanced(getModeGL(_mode), _indices.size(), GL_UNSIGNED_SHORT, nullptr, count);
+        glDrawElementsInstanced(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr, count);
     }
 }
 

@@ -85,7 +85,7 @@ void Particle::updateAnimation(float dt) {
     } else {
         maturity = 0.0f;
     }
-    _frame =  glm::ceil(_emitter->frameStart() + maturity * (_emitter->frameEnd() - _emitter->frameStart()));
+    _frame = static_cast<int>(glm::ceil(_emitter->frameStart() + maturity * (_emitter->frameEnd() - _emitter->frameStart())));
     _size = interpolateConstraints(_emitter->particleSize(), maturity);
     _color = interpolateConstraints(_emitter->color(), maturity);
     _alpha = interpolateConstraints(_emitter->alpha(), maturity);

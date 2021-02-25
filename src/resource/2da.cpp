@@ -45,7 +45,7 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
         return -1;
     }
     for (size_t i = 0; i < _rows.size(); ++i) {
-        if (_rows[i].values[columnIdx] == value) return i;
+        if (_rows[i].values[columnIdx] == value) return static_cast<int>(i);
     }
     warn(boost::format("2DA: row not found by cell value: %s %s") % column % value);
 
@@ -54,7 +54,7 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
 
 int TwoDA::getColumnIndex(const string &column) const {
     for (size_t i = 0; i < _columns.size(); ++i) {
-        if (_columns[i] == column) return i;
+        if (_columns[i] == column) return static_cast<int>(i);
     }
     return -1;
 }
@@ -76,7 +76,7 @@ int TwoDA::indexByCellValues(const vector<pair<string, string>> &values) const {
                 break;
             }
         }
-        if (match) return i;
+        if (match) return static_cast<int>(i);
     }
 
     warn("2DA: row not found by cell values");
@@ -103,7 +103,7 @@ int TwoDA::indexByCellValuesAny(const vector<pair<string, string>> &values) cons
     for (size_t i = 0; i < _rows.size(); ++i) {
         for (size_t j = 0; j < values.size(); ++j) {
             int columnIdx = columnIndices[j];
-            if (_rows[i].values[columnIdx] == values[j].second) return i;
+            if (_rows[i].values[columnIdx] == values[j].second) return static_cast<int>(i);
         }
     }
 

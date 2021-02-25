@@ -550,7 +550,7 @@ void MdlFile::readRadiusController(uint16_t dataIndex, const vector<float> &data
 }
 
 void MdlFile::readBirthrateController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_birthrate = data[dataIndex];
+    node._emitter->_birthrate = static_cast<int>(data[dataIndex]);
 }
 
 void MdlFile::readMultiplierController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
@@ -558,7 +558,7 @@ void MdlFile::readMultiplierController(uint16_t dataIndex, const vector<float> &
 }
 
 void MdlFile::readLifeExpectancyController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_lifeExpectancy = data[dataIndex];
+    node._emitter->_lifeExpectancy = static_cast<int>(data[dataIndex]);
 }
 
 void MdlFile::readSizeStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
@@ -612,11 +612,11 @@ void MdlFile::readSizeYController(uint16_t dataIndex, const vector<float> &data,
 }
 
 void MdlFile::readFrameEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_frameEnd = data[dataIndex];
+    node._emitter->_frameEnd = static_cast<int>(data[dataIndex]);
 }
 
 void MdlFile::readFrameStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_frameStart = data[dataIndex];
+    node._emitter->_frameStart = static_cast<int>(data[dataIndex]);
 }
 
 void MdlFile::readRandomVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
@@ -632,7 +632,7 @@ void MdlFile::readSpreadController(uint16_t dataIndex, const vector<float> &data
 }
 
 void MdlFile::readFPSController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_fps = data[dataIndex];
+    node._emitter->_fps = static_cast<int>(data[dataIndex]);
 }
 
 void MdlFile::readLight(ModelNode &node) {

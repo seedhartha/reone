@@ -91,7 +91,7 @@ void MapMenu::onClick(const string &control) {
         _game->openInGame();
     } else if (control == "BTN_UP") {
         if (--_selectedNoteIdx == -1) {
-            _selectedNoteIdx = _notes.size() - 1;
+            _selectedNoteIdx = static_cast<int>(_notes.size() - 1);
         }
         refreshSelectedNote();
     } else if (control == "BTN_DOWN") {
