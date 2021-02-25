@@ -56,8 +56,8 @@ public:
      */
     int indexByCellValuesAny(const std::vector<std::pair<std::string, std::string>> &values) const;
 
-    int getColumnCount() const { return _columns.size(); }
-    int getRowCount() const { return _rows.size(); }
+    int getColumnCount() const { return static_cast<int>(_columns.size()); }
+    int getRowCount() const { return static_cast<int>(_rows.size()); }
 
     std::string getString(int row, const std::string &column, std::string defValue = "") const;
     int getInt(int row, const std::string &column, int defValue = 0) const;

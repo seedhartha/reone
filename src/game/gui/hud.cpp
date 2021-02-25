@@ -215,10 +215,10 @@ void HUD::drawMinimap() {
     const Control::Extent &extent = label.extent();
 
     glm::vec4 bounds;
-    bounds[0] = _controlOffset.x + extent.left;
-    bounds[1] = _controlOffset.y + extent.top;
-    bounds[2] = extent.width;
-    bounds[3] = extent.height;
+    bounds[0] = static_cast<float>(_controlOffset.x + extent.left);
+    bounds[1] = static_cast<float>(_controlOffset.y + extent.top);
+    bounds[2] = static_cast<float>(extent.width);
+    bounds[3] = static_cast<float>(extent.height);
 
     shared_ptr<Area> area(_game->module()->area());
     area->map().render(Map::Mode::Minimap, bounds);

@@ -117,7 +117,7 @@ void JbaFile::loadBoneData() {
 
 void JbaFile::loadPartData() {
     for (uint32_t i = 0; i < _numParts; ++i) {
-        uint32_t start = alignAt80(tell());
+        uint32_t start = static_cast<uint32_t>(alignAt80(tell()));
         seek(start);
 
         _parts[i].keyframes = readPartKeyframes();
@@ -127,9 +127,9 @@ void JbaFile::loadPartData() {
 }
 
 static glm::vec3 decompressPosition(uint32_t value, const glm::vec3 &base, const glm::vec3 &stride) {
-    float x = ((value >> 21) & 0x7ff);
-    float y = ((value >> 10) & 0x7ff);
-    float z = (value & 0x3ff);
+    float x = static_cast<float>((value >> 21) & 0x7ff);
+    float y = static_cast<float>((value >> 10) & 0x7ff);
+    float z = static_cast<float>(value & 0x3ff);
 
     return glm::vec3(base + stride * glm::vec3(x, y, z));
 }
@@ -137,9 +137,9 @@ static glm::vec3 decompressPosition(uint32_t value, const glm::vec3 &base, const
 static glm::quat decompressOrientation(const uint16_t *values, const glm::vec3 &base, const glm::vec3 &stride) {
     bool sign = (values[0] & 0x8000) != 0;
 
-    float x = (values[0] & 0x7fff);
-    float y = (values[1] & 0xffff);
-    float z = (values[2] & 0xffff);
+    float x = static_cast<float>(values[0] & 0x7fff);
+    float y = static_cast<float>(values[1] & 0xffff);
+    float z = static_cast<float>(values[2] & 0xffff);
 
     glm::vec3 axis(base + stride * glm::vec3(x, y, z));
     float w;
@@ -174,7 +174,7 @@ vector<vector<JbaFile::JbaKeyframe>> JbaFile::readPartKeyframes() {
         dataSize += 6 * keyframeLayout[i + 0] + 4 * keyframeLayout[i + 2ll];
     }
 
-    uint32_t pos = tell();
+    uint32_t pos = static_cast<uint32_t>(tell());
     debug(boost::format("JBA: part data: reading %d bytes from %X to %X") % dataSize % pos % (pos + dataSize - 1));
 
     const uint32_t *keyframeLayoutPtr = &keyframeLayout[0];
@@ -204,7 +204,7 @@ vector<vector<JbaFile::JbaKeyframe>> JbaFile::readPartKeyframes() {
 }
 
 void JbaFile::loadKeyframes() {
-    uint32_t pos = alignAt80(tell());
+    uint32_t pos = static_cast<uint32_t>(alignAt80(tell()));
     seek(pos);
 
     ignore(8);
@@ -270,7 +270,7 @@ void JbaFile::loadAnimation() {
 
     int numKeyframes = 0;
     for (uint32_t i = 0; i < _numParts; ++i) {
-        numKeyframes += _parts[i].keyframes[0].size();
+        numKeyframes += static_cast<int>(_parts[i].keyframes[0].size());
     }
     float step = _length / static_cast<float>(numKeyframes - 1);
 

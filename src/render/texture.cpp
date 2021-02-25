@@ -155,7 +155,7 @@ void Texture::refreshCubeMap() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
         if (i < _layers.size()) {
             const MipMap &mipMap = _layers[i].mipMaps.front();
-            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, mipMap.pixels->data(), mipMap.pixels->size());
+            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
         } else {
             fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
         }
@@ -245,10 +245,10 @@ void Texture::refresh2D() {
     int numMipMaps = 0;
 
     if (!_layers.empty()) {
-        numMipMaps = _layers[0].mipMaps.size();
+        numMipMaps = static_cast<int>(_layers[0].mipMaps.size());
         for (int i = 0; i < numMipMaps; ++i) {
             const MipMap &mipMap = _layers[0].mipMaps[i];
-            fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, mipMap.pixels->data(), mipMap.pixels->size());
+            fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
         }
     } else {
         fillTarget(GL_TEXTURE_2D, 0, _width, _height);

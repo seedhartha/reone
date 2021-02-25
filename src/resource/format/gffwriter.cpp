@@ -121,14 +121,14 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
             return FieldClassification::Complex;
 
         case GffStruct::FieldType::CExoString: {
-            uint32_t length = field.strValue.length();
+            uint32_t length = static_cast<uint32_t>(field.strValue.length());
             complex.resize(4ll + length);
             memcpy(&complex[0], &length, 4);
             memcpy(&complex[4], &field.strValue[0], length);
             return FieldClassification::Complex;
         }
         case GffStruct::FieldType::ResRef: {
-            uint32_t length = field.strValue.length();
+            uint32_t length = static_cast<uint32_t>(field.strValue.length());
             complex.resize(1ll + length);
             complex[0] = length;
             memcpy(&complex[1], &field.strValue[0], length);
@@ -136,14 +136,14 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
         }
         case GffStruct::FieldType::CExoLocString: {
             uint32_t numSubstrings = !field.strValue.empty() ? 1 : 0;
-            uint32_t totalSize = 8 + (numSubstrings > 0 ? (8 + field.strValue.length()) : 0);
+            uint32_t totalSize = static_cast<uint32_t>(8 + (numSubstrings > 0 ? (8 + field.strValue.length()) : 0));
             complex.resize(4ll + totalSize);
             memcpy(&complex[0], &totalSize, 4);
             memcpy(&complex[4], &field.intValue, 4);
             memcpy(&complex[8], &numSubstrings, 4);
             if (numSubstrings > 0) {
                 uint32_t id = 0;
-                uint32_t length = field.strValue.length();
+                uint32_t length = static_cast<uint32_t>(field.strValue.length());
                 memcpy(&complex[12], &id, 4);
                 memcpy(&complex[16], &length, 4);
                 memcpy(&complex[20], &field.strValue[0], length);
@@ -151,7 +151,7 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
             return FieldClassification::Complex;
         }
         case GffStruct::FieldType::Void: {
-            uint32_t dataSize = field.data.size();
+            uint32_t dataSize = static_cast<uint32_t>(field.data.size());
             complex.resize(4ll + dataSize);
             memcpy(&complex[0], &dataSize, 4);
             memcpy(&complex[4], &field.data[0], dataSize);
@@ -200,13 +200,13 @@ void GffWriter::processTree() {
 
         for (auto &field : aStruct.fields()) {
             // Current number of fields is a new field index
-            fieldIndices.push_back(_context.fields.size());
+            fieldIndices.push_back(static_cast<uint32_t>(_context.fields.size()));
 
             // Append or use existing field label
             int labelIdx;
             auto maybeLabel = find(_context.labels.begin(), _context.labels.end(), field.label);
             if (maybeLabel != _context.labels.end()) {
-                labelIdx = distance(_context.labels.begin(), maybeLabel);
+                labelIdx = static_cast<int>(distance(_context.labels.begin(), maybeLabel));
             } else {
                 labelIdx = static_cast<int>(_context.labels.size());
                 _context.labels.push_back(field.label);
@@ -218,7 +218,7 @@ void GffWriter::processTree() {
             FieldClassification fieldClass = getFieldData(field, dataOrDataOffset, complexData);
             switch (fieldClass) {
                 case FieldClassification::Complex:
-                    dataOrDataOffset = _context.fieldData.size();
+                    dataOrDataOffset = static_cast<uint32_t>(_context.fieldData.size());
                     copy(complexData.begin(), complexData.end(), back_inserter(_context.fieldData));
                     break;
                 case FieldClassification::Struct:
@@ -228,8 +228,8 @@ void GffWriter::processTree() {
                     break;
                 case FieldClassification::List:
                     // Set data offset to the current size of the list indices array
-                    dataOrDataOffset = 4 * _context.listIndices.size();
-                    _context.listIndices.push_back(field.children.size());
+                    dataOrDataOffset = static_cast<uint32_t>(4 * _context.listIndices.size());
+                    _context.listIndices.push_back(static_cast<uint32_t>(field.children.size()));
                     for (size_t i = 0; i < field.children.size(); ++i) {
                         _context.listIndices.push_back(++numStructs);
                         aQueue.push(field.children[i].get());
@@ -251,14 +251,14 @@ void GffWriter::processTree() {
         if (fieldIndices.size() == 1ll) {
             dataOrDataOffset = fieldIndices[0];
         } else {
-            dataOrDataOffset = 4 * _context.fieldIndices.size();
+            dataOrDataOffset = static_cast<uint32_t>(4 * _context.fieldIndices.size());
             copy(fieldIndices.begin(), fieldIndices.end(), back_inserter(_context.fieldIndices));
         }
 
         WriteStruct writeStruct;
         writeStruct.type = aStruct.type();
         writeStruct.dataOrDataOffset = dataOrDataOffset;
-        writeStruct.fieldCount = aStruct.fields().size();
+        writeStruct.fieldCount = static_cast<uint32_t>(aStruct.fields().size());
         _context.structs.push_back(move(writeStruct));
     }
 }
@@ -269,25 +269,25 @@ void GffWriter::writeHeader() {
         throw logic_error("Unsupported GFF resource type: " + to_string(static_cast<int>(_resType)));
     }
 
-    size_t numStructs = _context.structs.size();
-    size_t numFields = _context.fields.size();
-    size_t numLabels = _context.labels.size();
-    size_t numFieldIndices = _context.fieldIndices.size();
-    size_t numListIndices = _context.listIndices.size();
+    uint32_t numStructs = static_cast<int>(_context.structs.size());
+    uint32_t numFields = static_cast<int>(_context.fields.size());
+    uint32_t numLabels = static_cast<int>(_context.labels.size());
+    uint32_t numFieldIndices = static_cast<int>(_context.fieldIndices.size());
+    uint32_t numListIndices = static_cast<int>(_context.listIndices.size());
 
-    size_t sizeStructs = numStructs * 3 * sizeof(uint32_t);
-    size_t sizeFields = numFields * 3 * sizeof(uint32_t);
-    size_t sizeLabels = numLabels * 16;
-    size_t sizeFieldData = _context.fieldData.size();
-    size_t sizeFieldIndices = numFieldIndices * sizeof(uint32_t);
-    size_t sizeListIndices = numListIndices * sizeof(uint32_t);
+    uint32_t sizeStructs = numStructs * 3 * sizeof(uint32_t);
+    uint32_t sizeFields = numFields * 3 * sizeof(uint32_t);
+    uint32_t sizeLabels = numLabels * 16;
+    uint32_t sizeFieldData = static_cast<int>(_context.fieldData.size());
+    uint32_t sizeFieldIndices = numFieldIndices * sizeof(uint32_t);
+    uint32_t sizeListIndices = numListIndices * sizeof(uint32_t);
 
-    size_t offStructs = 0x38;
-    size_t offFields = offStructs + sizeStructs;
-    size_t offLabels = offFields + sizeFields;
-    size_t offFieldData = offLabels + sizeLabels;
-    size_t offFieldIndices = offFieldData + sizeFieldData;
-    size_t offListIndices = offFieldIndices + sizeFieldIndices;
+    uint32_t offStructs = 0x38;
+    uint32_t offFields = offStructs + sizeStructs;
+    uint32_t offLabels = offFields + sizeFields;
+    uint32_t offFieldData = offLabels + sizeLabels;
+    uint32_t offFieldIndices = offFieldData + sizeFieldData;
+    uint32_t offListIndices = offFieldIndices + sizeFieldIndices;
 
     _writer->putString(maybeSignature->second);
     _writer->putString(" V3.2");

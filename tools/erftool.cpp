@@ -55,7 +55,7 @@ void ErfTool::extract(ErfFile &erf, const fs::path &destPath) {
         const ErfFile::Key &key = erf.keys()[i];
         string ext(getExtByResType(key.resType));
         cout << "Extracting " << key.resRef << " " << ext << endl;
-        ByteArray data(erf.getResourceData(i));
+        ByteArray data(erf.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
         resPath.append(key.resRef + "." + ext);

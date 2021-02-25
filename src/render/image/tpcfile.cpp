@@ -128,7 +128,7 @@ void TpcFile::loadTexture() {
     size_t pos = tell();
 
     if (pos < _size) {
-        ByteArray data(_reader->getArray<char>(_size - pos));
+        ByteArray data(_reader->getArray<char>(static_cast<int>(_size - pos)));
 
         TxiFile txi;
         txi.load(wrap(data));

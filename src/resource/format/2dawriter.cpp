@@ -82,8 +82,8 @@ void TwoDaWriter::writeData() {
             } else {
                 data.push_back(make_pair(value, dataSize));
                 _writer->putUint16(dataSize);
-                int len = strnlen(&value[0], value.length());
-                dataSize += len + 1ll;
+                int len = static_cast<int>(strnlen(&value[0], value.length()));
+                dataSize += len + 1;
             }
         }
     }

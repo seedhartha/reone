@@ -44,7 +44,7 @@ public:
     bool isStopped() const;
     bool isPositionDirty() const { return _positionDirty; }
 
-    int duration() const { return _duration; }
+    float duration() const { return _duration; }
     glm::vec3 position() const { return _position; }
 
     void setState(State state);
@@ -52,7 +52,7 @@ public:
 
 private:
     std::atomic<State> _state { State::NotInited };
-    int _duration { 0 };
+    float _duration { 0.0f };
     std::atomic<glm::vec3> _position;
     std::atomic_bool _positionDirty { false };
 };

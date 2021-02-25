@@ -117,7 +117,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
 
-        float height = _game->options().graphics.height;
+        int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
         withScissorTest(scissorBounds, []() { Meshes::instance().getQuad()->render(); });
 

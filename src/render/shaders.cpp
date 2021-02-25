@@ -1024,7 +1024,7 @@ void Shaders::initShader(ShaderName name, unsigned int type, vector<const char *
     char log[512];
     GLsizei logSize;
 
-    glShaderSource(shader, sources.size(), &sources[0], nullptr);
+    glShaderSource(shader, static_cast<GLsizei>(sources.size()), &sources[0], nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 

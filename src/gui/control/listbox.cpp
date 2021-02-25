@@ -106,7 +106,7 @@ int ListBox::getItemIndex(int y) const {
     const Control::Extent &protoExtent = _protoItem->extent();
     if (protoExtent.height == 0) return -1;
 
-    float itemy = protoExtent.top;
+    float itemy = static_cast<float>(protoExtent.top);
     if (y < itemy) return -1;
 
     for (size_t i = _itemOffset; i < _items.size(); ++i) {
@@ -117,7 +117,7 @@ int ListBox::getItemIndex(int y) const {
             itemy += protoExtent.height;
         }
         itemy += _padding;
-        if (y < itemy) return i;
+        if (y < itemy) return static_cast<int>(i);
     }
 
     return -1;
@@ -195,7 +195,7 @@ void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
 
         const Item &item = _items[itemIdx];
         if (_protoMatchContent) {
-            _protoItem->setHeight(item._textLines.size() * (_protoItem->text().font->height() + _padding));
+            _protoItem->setHeight(static_cast<int>(item._textLines.size() * (_protoItem->text().font->height() + _padding)));
         }
         _protoItem->setFocus(_hilightedIndex == itemIdx);
     

@@ -96,7 +96,7 @@ void WavFile::loadFormat(ChunkHeader chunk) {
 void WavFile::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
         size_t pos = tell();
-        ByteArray data(_reader->getArray<char>(_size - pos));
+        ByteArray data(_reader->getArray<char>(static_cast<int>(_size - pos)));
 
         Mp3File mp3;
         mp3.load(move(data));

@@ -290,7 +290,7 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
                 if (type != "texture") continue;
 
                 string value(material.second.get("value", ""));
-                int lastSlashIdx = value.find_last_of('\\');
+                int lastSlashIdx = static_cast<int>(value.find_last_of('\\'));
                 if (lastSlashIdx != -1) {
                     value = value.substr(lastSlashIdx + 1ll);
                 }
@@ -303,7 +303,6 @@ unique_ptr<ModelMesh> Gr2File::readModelMesh(const Gr2Mesh &mesh) {
 
             if (!diffuseResRef.empty()) {
                 modelMesh->setDiffuseTexture(Textures::instance().get(diffuseResRef, TextureUsage::Diffuse));
-                shared_ptr<Texture> diffuse();
                 if (!bumpmapResRef.empty()) {
                     modelMesh->setBumpmapTexture(Textures::instance().get(bumpmapResRef, TextureUsage::Bumpmap), true);
                 }

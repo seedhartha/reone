@@ -190,7 +190,7 @@ void Conversation::scheduleEndOfEntry() {
             duration = animation->length();
         }
     } else if (_currentEntry->delay != -1) {
-        duration = _currentEntry->delay;
+        duration = static_cast<float>(_currentEntry->delay);
     } else if (_currentVoice) {
         duration = _currentVoice->duration();
     }
@@ -227,7 +227,7 @@ void Conversation::refreshReplies() {
     for (size_t i = 0; i < _replies.size(); ++i) {
         ListBox::Item item;
         item.tag = to_string(i);
-        item.text = getReplyText(*_replies[i], i);
+        item.text = getReplyText(*_replies[i], static_cast<int>(i));
         listBox.addItem(move(item));
     }
 }
