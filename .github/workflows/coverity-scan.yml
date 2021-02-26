@@ -40,6 +40,7 @@ jobs:
           cov-build --dir cov-int cmake --build . --config $BUILD_TYPE
 
       - name: Submit the result to Coverity Scan
+        working-directory: ${{github.workspace}}/build
         run: |
           tar czvf reone.tgz cov-int
           curl \
