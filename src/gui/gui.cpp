@@ -368,9 +368,11 @@ Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),
         _controls.end(),
-        [&tag](const unique_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
+        [&tag](auto &ctrl) { return ctrl->tag() == tag; });
 
-    return **it;
+    if (it != _controls.end()) return **it;
+
+    throw runtime_error("Control not found: " + tag);
 }
 
 void GUI::onClick(const string &control) {

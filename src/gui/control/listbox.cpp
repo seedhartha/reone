@@ -50,11 +50,11 @@ void ListBox::clearItems() {
     _hilightedIndex = -1;
 }
 
-void ListBox::addItem(Item item) {
+void ListBox::addItem(Item &&item) {
     if (!_protoItem) return;
 
     item._textLines = breakText(item.text, *_protoItem->text().font, _protoItem->extent().width);
-    _items.push_back(move(item));
+    _items.push_back(item);
 
     updateItemSlots();
 }

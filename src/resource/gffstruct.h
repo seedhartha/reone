@@ -60,8 +60,8 @@ public:
         FieldType type { FieldType::Int };
         std::string label;
         std::string strValue; /**< covers CExoString and ResRef */
-        glm::vec3 vecValue;
-        glm::quat quatValue;
+        glm::vec3 vecValue { 0.0f };
+        glm::quat quatValue { 1.0f, 0.0f, 0.0f, 0.0f };
         ByteArray data;
         std::vector<std::shared_ptr<GffStruct>> children;
 
@@ -80,7 +80,7 @@ public:
 
     GffStruct(uint32_t type);
 
-    void add(Field field);
+    void add(Field &&field);
 
     bool getBool(const std::string &name, bool defValue = false) const;
     int getInt(const std::string &name, int defValue = 0) const;

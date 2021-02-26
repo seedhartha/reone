@@ -209,7 +209,7 @@ void PortraitSelection::onClick(const string &control) {
     } else if (control == "BTN_ACCEPT") {
         StaticCreatureBlueprint character(_charGen->character());
         character.setAppearance(getAppearanceFromCurrentPortrait());
-        _charGen->setCharacter(character);
+        _charGen->setCharacter(move(character));
         _charGen->goToNextStep();
         _charGen->openSteps();
 

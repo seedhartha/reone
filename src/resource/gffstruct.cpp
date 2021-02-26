@@ -31,8 +31,8 @@ GffStruct::Field::Field(FieldType type, string label) : type(type), label(move(l
 GffStruct::GffStruct(uint32_t type) : _type(type) {
 }
 
-void GffStruct::add(Field field) {
-    _fields.push_back(move(field));
+void GffStruct::add(Field &&field) {
+    _fields.push_back(field);
 }
 
 bool GffStruct::getBool(const string &name, bool defValue) const {

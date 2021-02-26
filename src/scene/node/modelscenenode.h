@@ -109,7 +109,7 @@ private:
     float _alpha { 1.0f };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
-    float _projectileSpeed;
+    float _projectileSpeed { 0.0f };
 
     void initModelNodes();
     void updateAbsoluteTransform() override;
