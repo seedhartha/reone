@@ -146,13 +146,13 @@ public:
 
 private:
     std::string _name;
-    int _width;
-    int _height;
     Properties _properties;
 
     bool _inited { false };
     uint32_t _textureId { 0 };
 
+    int _width { 0 };
+    int _height { 0 };
     PixelFormat _pixelFormat { PixelFormat::BGR };
     std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
     Features _features;

@@ -66,7 +66,7 @@ public:
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setShadowReference(const std::shared_ptr<SceneNode> &reference);
     void setUpdate(bool update);
-    void setUniformsPrototype(render::ShaderUniforms uniforms);
+    void setUniformsPrototype(render::ShaderUniforms &&uniforms);
     void setExposure(float exposure);
 
     // Lights and shadows

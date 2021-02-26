@@ -297,8 +297,8 @@ void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
 }
 
-void SceneGraph::setUniformsPrototype(ShaderUniforms uniforms) {
-    _uniformsPrototype = move(uniforms);
+void SceneGraph::setUniformsPrototype(ShaderUniforms &&uniforms) {
+    _uniformsPrototype = uniforms;
 }
 
 void SceneGraph::setExposure(float exposure) {

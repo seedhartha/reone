@@ -41,7 +41,7 @@ private:
     std::shared_ptr<std::istream> _mdx;
     std::unique_ptr<StreamReader> _mdxReader;
     std::string _name;
-    Model::Classification _classification;
+    Model::Classification _classification { Model::Classification::Other };
     int _nodeIndex { 0 };
     std::vector<std::string> _nodeNames;
     std::shared_ptr<render::Model> _model;

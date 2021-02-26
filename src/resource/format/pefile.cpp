@@ -61,9 +61,11 @@ void PEFile::doLoad() {
         loadSection();
     }
 
-    auto resSection = find_if(_sections.begin(), _sections.end(), [](const Section &s) { return s.name == ".rsrc"; });
-    seek(resSection->offset);
-    loadResourceDir(*resSection, 0);
+    auto maybeSection = find_if(_sections.begin(), _sections.end(), [](auto &s) { return s.name == ".rsrc"; });
+    if (maybeSection != _sections.end()) {
+        seek(maybeSection->offset);
+        loadResourceDir(*maybeSection, 0);
+    }
 }
 
 void PEFile::loadHeader() {
