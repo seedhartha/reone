@@ -14,12 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-
-    - uses: mstachniuk/ci-skip@v1
-      with:
-        fail-fast: true
 
     - name: Install dependencies
       run: sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
