@@ -214,9 +214,12 @@ void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
     }
 
     if (_scrollBar) {
+        ScrollBar::ScrollState state;
+        state.count = static_cast<int>(_items.size());
+        state.numVisible = this->_slotCount;
+        state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
-        scrollBar.setCanScrollUp(_itemOffset > 0);
-        scrollBar.setCanScrollDown(_items.size() - _itemOffset > _slotCount);
+        scrollBar.setScrollState(move(state));
         scrollBar.render(offset, vector<string>());
     }
 }

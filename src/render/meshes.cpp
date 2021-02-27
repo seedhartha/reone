@@ -26,7 +26,7 @@ namespace reone {
 
 namespace render {
 
-// Quads
+// Quad
 
 static const vector<float> g_quadVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -67,7 +67,7 @@ static const vector<uint16_t> g_quadIndices = { 0, 1, 2, 2, 3, 0 };
 
 static const Mesh::VertexOffsets g_quadOffsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, -1, -1, 5 * sizeof(float) };
 
-// END Quads
+// END Quad
 
 // Cube
 
