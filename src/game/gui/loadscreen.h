@@ -32,6 +32,7 @@ public:
     void load() override;
 
     void setImage(const std::string &resRef);
+    void setProgress(int progress);
 
 private:
     Game *_game;

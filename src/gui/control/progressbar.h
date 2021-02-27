@@ -17,28 +17,28 @@
 
 #pragma once
 
+#include "control.h"
+
 namespace reone {
 
 namespace gui {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    ImageButton = 5,
-    Button = 6,
-    ToggleButton = 7,
-    ScrollBar = 9,
-    ProgressBar = 10,
-    ListBox = 11
-};
+class ProgressBar : public Control {
+public:
+    ProgressBar(GUI *gui);
 
-enum class BackgroundType {
-    None,
-    Menu,
-    Load,
-    Computer0,
-    Computer1
+    void load(const resource::GffStruct &gffs) override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+
+    void setValue(int value);
+
+private:
+    struct Progress {
+        std::shared_ptr<render::Texture> fill;
+    };
+
+    Progress _progress;
+    int _value { 0 };
 };
 
 } // namespace gui

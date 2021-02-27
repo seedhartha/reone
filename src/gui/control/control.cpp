@@ -38,6 +38,7 @@
 #include "label.h"
 #include "listbox.h"
 #include "panel.h"
+#include "progressbar.h"
 #include "scrollbar.h"
 #include "togglebutton.h"
 
@@ -81,11 +82,14 @@ unique_ptr<Control> Control::of(GUI *gui, ControlType type, const string &tag) {
         case ControlType::ToggleButton:
             control = make_unique<ToggleButton>(gui);
             break;
-        case ControlType::ListBox:
-            control = make_unique<ListBox>(gui);
-            break;
         case ControlType::ScrollBar:
             control = make_unique<ScrollBar>(gui);
+            break;
+        case ControlType::ProgressBar:
+            control = make_unique<ProgressBar>(gui);
+            break;
+        case ControlType::ListBox:
+            control = make_unique<ListBox>(gui);
             break;
         default:
             warn("GUI: unsupported control type: " + to_string(static_cast<int>(type)));

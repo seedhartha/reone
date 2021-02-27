@@ -345,6 +345,7 @@ set(GUI_HEADERS
     src/gui/control/label.h
     src/gui/control/listbox.h
     src/gui/control/panel.h
+    src/gui/control/progressbar.h
     src/gui/control/scrollbar.h
     src/gui/control/togglebutton.h
     src/gui/gui.h
@@ -359,6 +360,7 @@ set(GUI_SOURCES
     src/gui/control/label.cpp
     src/gui/control/listbox.cpp
     src/gui/control/panel.cpp
+    src/gui/control/progressbar.cpp
     src/gui/control/scrollbar.cpp
     src/gui/control/togglebutton.cpp
     src/gui/gui.cpp
