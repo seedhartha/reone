@@ -25,25 +25,37 @@ namespace gui {
 
 class ScrollBar : public Control {
 public:
+    struct ScrollState {
+        int count { 0 }; /**< total number of list items */
+        int numVisible { 0 }; /**< number of visible list items */
+        int offset { 0 }; /**< offset into the list of items  */
+    };
+
     ScrollBar(GUI *gui);
 
     void load(const resource::GffStruct &gffs) override;
     void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
-    void setCanScrollUp(bool scroll);
-    void setCanScrollDown(bool scroll);
+    void setScrollState(ScrollState state);
 
 private:
     struct Direction {
         std::shared_ptr<render::Texture> image;
     };
 
-    Direction _dir;
-    bool _canScrollUp { false };
-    bool _canScrollDown { false };
+    struct Thumb {
+        std::shared_ptr<render::Texture> image;
+    };
 
-    void drawUpArrow(const glm::vec2 &offset);
-    void drawDownArrow(const glm::vec2 &offset);
+    Direction _dir;
+    Thumb _thumb;
+    ScrollState _state;
+
+    void drawThumb(const glm::ivec2 &offset);
+    void drawArrows(const glm::ivec2 &offset);
+
+    void drawUpArrow(const glm::ivec2 &offset);
+    void drawDownArrow(const glm::ivec2 &offset);
 };
 
 } // namespace gui
