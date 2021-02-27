@@ -243,6 +243,9 @@ void Game::loadModule(const string &name, string entry) {
             _module->area()->unloadParty();
         }
 
+        _loadScreen->setProgress(50);
+        drawAll();
+
         auto maybeModule = _loadedModules.find(name);
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
@@ -258,6 +261,9 @@ void Game::loadModule(const string &name, string entry) {
         _module->loadParty(entry);
         _module->area()->fill(_sceneGraph);
 
+        _loadScreen->setProgress(100);
+        drawAll();
+
         string musicName(_module->area()->music());
         playMusic(musicName);
 
@@ -272,6 +278,7 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
         loadLoadingScreen();
     }
     _loadScreen->setImage(imageResRef);
+    _loadScreen->setProgress(0);
     changeScreen(GameScreen::Loading);
     drawAll();
     block();
@@ -557,6 +564,8 @@ void Game::startCharacterGeneration() {
         if (!_charGen) {
             loadCharacterGeneration();
         }
+        _loadScreen->setProgress(100);
+        drawAll();
         playMusic(getCharacterGenerationMusic());
         changeScreen(GameScreen::CharacterGeneration);
     });
