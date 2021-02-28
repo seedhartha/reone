@@ -39,9 +39,6 @@ class Area;
 
 namespace mp {
 
-constexpr uint32_t kServerMaxLen = 64;
-constexpr uint32_t kClientMaxLen = 3;  // may increase if too tight
-
 struct Snapshot {
     Snapshot(uint32_t seq, uint32_t tick) : seq(seq), tick(tick) {};
 
@@ -50,21 +47,13 @@ struct Snapshot {
     Snapshot &operator=(const Snapshot &) = delete;
     //Snapshot &operator=(Snapshot&&) = delete;
 
-    /* { id: resource_ref } */
-    std::map<uint32_t, std::string> objectAddition;
-    std::list<uint32_t> objectDeletion;
-
     /* { id: status } */
-    std::map<uint32_t, std::unique_ptr<BaseStatus>> objectStat;
-
-    /* { resource_ref: quantity }*/
-    std::map<std::string, uint32_t> inventoryAddition;
-    std::map<std::string, uint32_t> inventoryDeletion;
+    std::map<uint32_t, std::unique_ptr<BaseStatus>> activeObjects;
 
     /* id, animinfo */
-    std::map<uint32_t, std::unique_ptr<AnimInfo>> animCommands;
+    // std::map<uint32_t, std::unique_ptr<AnimInfo>> animCommands;
 
-    std::list<std::unique_ptr<Ballistic>> bullets;
+    // std::list<std::unique_ptr<Ballistic>> ballistics;
 
     uint32_t seq;
     uint32_t tick;
@@ -96,18 +85,12 @@ public:
     void freeze(uint32_t newTick);
 
     // Server functions
+
+    void scanArea();
     
-    void addObject(uint32_t id, std::string resRef);
-    void delObject(uint32_t id);
+    //void collectAnimCmds(); //server function
 
-    void updateObject(uint32_t id);
-
-    void addToInventory(std::string resRef, uint16_t quantity);
-    void remFrInventory(std::string resRef, uint16_t quantity);
-    
-    void collectAnimCmds(); //server function
-
-    void addBallistic(std::unique_ptr<Ballistic> &&bullet);
+    //void addBallistic(std::unique_ptr<Ballistic> &&bullet);
 
     /* 
     * Header:
@@ -152,15 +135,9 @@ private:
     uint32_t _maxLen;
 
     Snapshot &getCurrent(); // the one being built
-    Snapshot &getMaster();  // last frozen snapshot
+    Snapshot &getStable();  // last frozen snapshot
     Snapshot &getSnapshot(uint32_t seq);
 
-    BaseStatus *getStatus(uint32_t id); //only latest
-    BaseStatus *getStatus(uint32_t id, uint32_t seq);
-
-    /* { id : [ lastSeq1, lastSeq2, ... (from new to old) ] }*/
-    std::map<uint32_t, std::list<uint32_t>>         _activeObjects; // life cycle of obj up to getCurrent()
-    std::map<uint32_t, std::unique_ptr<BaseStatus>> _staleObjects; /* last known state */
 };
 
 } // namespace net

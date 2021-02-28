@@ -491,15 +491,6 @@ unique_ptr<BaseStatus> Creature::captureStatus() {
     stat->maxHitPoints = _maxHitPoints;
     stat->currentHitPoints = _currentHitPoints;
 
-    /* Outdated:
-    if (_animInfo) {
-        stat->animStates |= static_cast<uint8_t>(AnimationState::SetBodyAnim);
-        stat->animIndex = getAnimIndex(_animInfo->name);
-        stat->animSpeed = _animInfo->speed;
-        stat->animFlag = _animInfo->flag;
-        stat->animTimestamp = _animInfo->timestamp;
-    } */
-
     // casual animation
     if (_talking) 
         stat->animStates |= static_cast<uint8_t>(AnimationState::Talking);
