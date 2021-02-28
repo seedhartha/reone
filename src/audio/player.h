@@ -25,6 +25,8 @@
 #include <thread>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "AL/alc.h"
 
 #include "glm/vec3.hpp"
@@ -37,7 +39,7 @@ namespace audio {
 
 class SoundHandle;
 
-class AudioPlayer {
+class AudioPlayer : boost::noncopyable {
 public:
     static AudioPlayer &instance();
 
@@ -60,11 +62,7 @@ private:
     std::atomic<glm::vec3> _listenerPosition;
     std::atomic_bool _listenerPositionDirty { false };
 
-    AudioPlayer() = default;
-    AudioPlayer(const AudioPlayer &) = delete;
     ~AudioPlayer();
-
-    AudioPlayer &operator=(const AudioPlayer &) = delete;
 
     void threadStart();
 

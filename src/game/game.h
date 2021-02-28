@@ -22,10 +22,10 @@
 #include <map>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "SDL2/SDL_events.h"
 
-#include "../render/window.h"
 #include "../resource/types.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
@@ -33,6 +33,7 @@
 #include "console.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
+#include "gui/computer.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
@@ -71,7 +72,7 @@ namespace game {
  * @see game::Module
  * @see gui::GUI
  */
-class Game : public render::IEventHandler {
+class Game : public render::IEventHandler, boost::noncopyable {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
     virtual ~Game() = default;
@@ -91,24 +92,28 @@ public:
     void playVideo(const std::string &name);
 
     bool isLoadFromSaveGame() const;
+    bool isPaused() const { return _paused; }
 
     Camera *getActiveCamera() const;
     int getRunScriptVar() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    resource::GameVersion version() const;
-    const Options &options() const;
-    scene::SceneGraph &sceneGraph();
-    ObjectFactory &objectFactory();
-    std::shared_ptr<Module> module() const;
-    Party &party();
-    CharacterGeneration &characterGeneration();
-    CameraType cameraType() const;
-    ScriptRunner &scriptRunner();
+    resource::GameID gameId() const { return _gameId; }
+    const Options &options() const { return _options; }
+    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
+    ObjectFactory &objectFactory() { return *_objectFactory; }
+    std::shared_ptr<Module> module() const { return _module; }
+    HUD &hud() const { return *_hud; }
+    Party &party() { return _party; }
+    CharacterGeneration &characterGeneration() { return *_charGen; }
+    CameraType cameraType() const { return _cameraType; }
+    ScriptRunner &scriptRunner() { return _scriptRunner; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
     void setRunScriptVar(int var);
+    void setPaused(bool paused);
+    void setRelativeMouseMode(bool relative);
 
     // Module Loading
 
@@ -172,7 +177,11 @@ public:
 protected:
     Options _options;
 
+    /**
+     * Initializes the engine subsytems.
+     */
     virtual void init();
+
     virtual void update();
 
 private:
@@ -183,18 +192,17 @@ private:
         CharacterGeneration,
         InGame,
         InGameMenu,
-        Dialog,
+        Conversation,
         Container,
         PartySelection,
         SaveLoad
     };
 
     boost::filesystem::path _path;
-    render::RenderWindow _window;
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
@@ -207,6 +215,8 @@ private:
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
     ScriptRunner _scriptRunner;
+    bool _paused { false };
+    Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
 
     // Modules
 
@@ -225,6 +235,7 @@ private:
     std::unique_ptr<HUD> _hud;
     std::unique_ptr<InGameMenu> _inGame;
     std::unique_ptr<DialogGUI> _dialog;
+    std::unique_ptr<ComputerGUI> _computer;
     std::unique_ptr<Container> _container;
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
@@ -250,8 +261,12 @@ private:
 
     // END Globals/locals
 
-    Game(const Game &) = delete;
-    Game &operator=(const Game &) = delete;
+    /**
+    * Releases the engine subsystems.
+    */
+    void deinit();
+
+    void determineGameID();
 
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
@@ -265,23 +280,18 @@ private:
     void changeScreen(GameScreen screen);
     void updateVideo(float dt);
     void updateMusic();
+    void registerModelLoaders();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
-
-    // Initialization
-
-    void initGameVersion();
-    void deinit();
-
-    // END Initialization
 
     // Loading
 
     void loadCharacterGeneration();
     void loadContainer();
     void loadDialog();
+    void loadComputer();
     void loadHUD();
     void loadInGame();
     void loadLoadingScreen();
@@ -296,7 +306,6 @@ private:
     void drawAll();
     void drawWorld();
     void drawGUI();
-    void drawCursor();
 
     // END Rendering
 

@@ -1,6 +1,6 @@
 # reone
 
-[![Build Status](https://travis-ci.com/seedhartha/reone.svg?branch=master)](https://travis-ci.com/seedhartha/reone)
+[![Build Status](https://github.com/seedhartha/reone/actions/workflows/cmake.yml/badge.svg)](https://github.com/seedhartha/reone/actions/workflows/cmake.yml)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/21827/badge.svg)](https://scan.coverity.com/projects/seedhartha-reone)
 
 reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. We aim to provide an engine that is flexible and modern, and can be used to:
@@ -38,9 +38,16 @@ Controls:
 
 - Use WASD and ZC keys to move around
 - Left click to interact with an object
-- Press V to switch the camera type
-- Use "-" and "+" keys to adjust the game speed
+- Right click and move the mouse to rotate the camera
+- Press Space to pause the game
 - Press "~" to toggle the debug console
+
+Developer mode controls:
+
+- Press V to switch the camera type
+- Use "+" and "-" keys to adjust the game speed
+- Press F1-F3 to toggle graphical features
+- Use "[" and "]" keys to adjust PBR HDR mode exposure
 
 ## Configuration
 

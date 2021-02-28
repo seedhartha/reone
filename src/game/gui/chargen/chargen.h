@@ -68,8 +68,8 @@ public:
     void load() override;
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() const override;
-    void render3D() const override;
+    void render() override;
+    void render3D() override;
 
     void startQuick();
     void startCustom();
@@ -92,7 +92,7 @@ public:
 
     void goToNextStep();
 
-    StaticCreatureBlueprint &character();
+    StaticCreatureBlueprint &character() { return *_character; }
 
     void setCharacter(StaticCreatureBlueprint character);
     void setAbilities(CreatureAbilities abilities);
@@ -126,6 +126,8 @@ private:
 
     gui::GUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
+
+    void setAttributesVisible(bool visible);
 
     // Loading
 

@@ -20,9 +20,11 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
+#include "font.h"
 #include "textures.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::resource;
 
@@ -39,32 +41,21 @@ Fonts &Fonts::instance() {
     return instance;
 }
 
-void Fonts::invalidateCache() {
-    _cache.clear();
+Fonts::Fonts() : MemoryCache(bind(&Fonts::doGet, this, _1)) {
 }
 
-shared_ptr<Font> Fonts::get(const string &resRef) {
-    auto maybeTexture = _cache.find(resRef);
-    if (maybeTexture != _cache.end()) {
-        return maybeTexture->second;
-    }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
-
-    return inserted.first->second;
-}
-
-shared_ptr<Font> Fonts::doGet(const string &resRef) {
+shared_ptr<Font> Fonts::doGet(string resRef) {
     auto maybeOverride = g_fontOverride.find(resRef);
-    string finalResRef(maybeOverride != g_fontOverride.end() ? maybeOverride->second : resRef);
-    shared_ptr<Texture> texture(Textures::instance().get(finalResRef, TextureType::GUI));
-    shared_ptr<Font> font;
+    if (maybeOverride != g_fontOverride.end()) {
+        resRef = maybeOverride->second;
+    }
+    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
+    if (!texture) return nullptr;
 
-    if (texture) {
-        font.reset(new Font());
-        font->load(texture);
-        if (font) {
-            font->initGL();
-        }
+    auto font = make_shared<Font>();
+    font->load(texture);
+    if (font) {
+        font->initGL();
     }
 
     return move(font);

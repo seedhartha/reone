@@ -26,10 +26,6 @@ MoveToPointAction::MoveToPointAction(const glm::vec3 &point) :
     _point(point) {
 }
 
-const glm::vec3 &MoveToPointAction::point() const {
-    return _point;
-}
-
 } // namespace game
 
 } // namespace reone

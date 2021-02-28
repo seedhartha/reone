@@ -17,7 +17,12 @@
 
 #pragma once
 
-#include <cstdint>
+#include <memory>
+#include <string>
+
+#include <boost/noncopyable.hpp>
+
+#include "glm/vec3.hpp"
 
 #include "../common/types.h"
 
@@ -27,74 +32,130 @@ namespace reone {
 
 namespace render {
 
-enum class PixelFormat {
-    Grayscale,
-    RGB,
-    RGBA,
-    BGR,
-    BGRA,
-    DXT1,
-    DXT5,
-    Depth
-};
-
-class Texture {
+/**
+ * Abstraction over the OpenGL texture object.
+ */
+class Texture : boost::noncopyable {
 public:
+    enum class Filtering {
+        Nearest,
+        Linear,
+        NearestMipmapNearest,
+        LinearMipmapNearest,
+        NearestMipmapLinear,
+        LinearMipmapLinear
+    };
+
+    enum class Wrapping {
+        Repeat,
+        ClampToEdge,
+        ClampToBorder
+    };
+
+    enum class Blending {
+        None,
+        Additive
+    };
+
+    enum class ProcedureType {
+        Invalid,
+        Cycle
+    };
+
+    struct Properties {
+        Filtering minFilter { Filtering::LinearMipmapLinear };
+        Filtering maxFilter { Filtering::Linear };
+        Wrapping wrap { Wrapping::Repeat };
+        glm::vec3 borderColor { 1.0f };
+        bool cubemap { false }; /**< is this a cube map texture? */
+        bool headless { false }; /**< must an OpenGL texture be created? */
+    };
+
+    /**
+     * Container for properties found in TXI files.
+     */
+    struct Features {
+        std::string envmapTexture;
+        std::string bumpyShinyTexture;
+        std::string bumpmapTexture;
+        float bumpMapScaling { 0.0f };
+        Blending blending { Blending::None };
+        int numChars { 0 };
+        float fontHeight { 0.0f };
+        std::vector<glm::vec3> upperLeftCoords;
+        std::vector<glm::vec3> lowerRightCoords;
+        float waterAlpha { -1.0f };
+        ProcedureType procedureType { ProcedureType::Invalid };
+        int numX { 0 };
+        int numY { 0 };
+        int fps { 0 };
+    };
+
     struct MipMap {
         int width { 0 };
         int height { 0 };
-        ByteArray data;
+        std::shared_ptr<ByteArray> pixels;
     };
 
     struct Layer {
         std::vector<MipMap> mipMaps;
     };
 
-    Texture(std::string name, TextureType type, int w, int h);
+    Texture(std::string name, Properties properties);
+
     ~Texture();
 
-    /**
-     * Generates and configures an OpenGL texture.
-     */
     void init();
-
-    /**
-     * Deletes the OpenGL texture.
-     */
     void deinit();
-
-    void clearPixels(PixelFormat format);
 
     void bind() const;
     void unbind() const;
 
+    /**
+     * Clears this texture pixels. Texture must be bound, unless it is headless.
+     */
+    void clearPixels(int w, int h, PixelFormat format);
+
+    /**
+    * @return true if this is a cube map texture, false otherwise
+    */
+    bool isCubeMap() const;
+
     bool isAdditive() const;
+    bool isGrayscale() const;
 
-    const std::string &name() const;
-    uint32_t textureId() const;
-    int width() const;
-    int height() const;
-    PixelFormat pixelFormat() const;
-    const TextureFeatures &features() const;
+    const std::string &name() const { return _name; }
+    int width() const { return _width; }
+    int height() const { return _height; }
+    const std::vector<Layer> &layers() const { return _layers; }
+    const Features &features() const { return _features; }
+    uint32_t textureId() const { return _textureId; }
+    PixelFormat pixelFormat() const { return _pixelFormat; }
 
-    void setPixels(std::vector<Layer> layers, PixelFormat format);
-    void setFeatures(TextureFeatures features);
+    /**
+    * Sets this texture pixels from a single image. Texture must be bound, unless it is headless.
+    */
+    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
+
+    /**
+    * Sets this texture pixels from multiple images. Texture must be bound, unless it is headless.
+    */
+    void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);
+
+    void setFeatures(Features features);
 
 private:
     std::string _name;
-    TextureType _type;
-    int _width;
-    int _height;
+    Properties _properties;
 
     bool _inited { false };
     uint32_t _textureId { 0 };
 
-    std::vector<Layer> _layers;
+    int _width { 0 };
+    int _height { 0 };
     PixelFormat _pixelFormat { PixelFormat::BGR };
-    TextureFeatures _features;
-
-    Texture(const Texture &) = delete;
-    Texture &operator=(const Texture &) = delete;
+    std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
+    Features _features;
 
     void configure2D();
     void configureCubeMap();
@@ -105,22 +166,11 @@ private:
 
     void fillTarget(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
 
-    /**
-    * @return true if texture of this type is a cube map, false otherwise
-    */
-    bool isCubeMap() const;
+    bool isMipmapFilter(Filtering filter) const;
 
-    bool isDepthBuffer() const;
-
-    /**
-     * @return true if texture of this type should have mip maps, false otherwise
-     */
-    bool hasMipMaps() const;
-
-    int getInternalPixelFormat() const;
-    uint32_t getPixelFormat() const;
-    int getMinFilter() const;
-    int getMagFilter() const;
+    uint32_t getFilterGL(Filtering filter) const;
+    uint32_t getPixelFormatGL() const;
+    uint32_t getPixelTypeGL() const;
 };
 
 } // namespace render

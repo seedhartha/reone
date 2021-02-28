@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../../gui/textinput.h"
-#include "../../../resource/ltrfile.h"
+#include "../../../resource/format/ltrfile.h"
 
 #include "../gui.h"
 
@@ -30,7 +30,7 @@ class CharacterGeneration;
 
 class NameEntry : public GameGUI {
 public:
-    NameEntry(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    NameEntry(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

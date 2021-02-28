@@ -19,9 +19,11 @@
 
 #include <boost/asio/thread_pool.hpp>
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
-class JobExecutor {
+class JobExecutor : boost::noncopyable {
 public:
     static JobExecutor &instance();
 
@@ -36,8 +38,6 @@ private:
     boost::asio::thread_pool _pool;
     std::atomic_bool _cancel { false };
     std::atomic_int _jobsActive { 0 };
-
-    JobExecutor() = default;
 };
 
 } // namespace reone

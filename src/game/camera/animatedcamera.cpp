@@ -21,7 +21,7 @@
 
 #include <boost/format.hpp>
 
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -64,20 +64,24 @@ static const string &getAnimationName(int animNumber) {
 
 void AnimatedCamera::playAnimation(int animNumber) {
     if (_model) {
-        _model->playAnimation(getAnimationName(animNumber));
+        _model->animator().playAnimation(getAnimationName(animNumber));
     }
 }
 
 bool AnimatedCamera::isAnimationFinished() const {
-    return _model ? _model->isAnimationFinished() : false;
+    return _model ? _model->animator().isAnimationFinished() : false;
 }
 
-void AnimatedCamera::setModel(const string &resRef) {
-    if (_modelResRef == resRef) return;
+void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
+    if ((_model && _model->model() == model) ||
+        (!_model && !model)) return;
 
-    _modelResRef = resRef;
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(resRef));
-    _model->attach("camerahook", _sceneNode);
+    if (model) {
+        _model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Other, model, _sceneGraph);
+        _model->attach("camerahook", _sceneNode);
+    } else {
+        _model.reset();
+    }
 }
 
 void AnimatedCamera::setFieldOfView(float fovy) {

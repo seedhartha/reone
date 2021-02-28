@@ -19,7 +19,8 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/meshes.h"
+#include "../../render/window.h"
 
 #include "../game.h"
 
@@ -34,7 +35,7 @@ namespace reone {
 namespace game {
 
 HUD::HUD(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game),
     _debug(game->options().graphics),
     _select(game) {
@@ -56,8 +57,12 @@ HUD::HUD(Game *game) :
 
 void HUD::load() {
     GUI::load();
+
     _debug.load();
     _select.load();
+
+    _barkBubble = make_unique<BarkBubble>(_game);
+    _barkBubble->load();
 
     hideControl("BTN_CLEARALL");
     hideControl("BTN_SWAPWEAPONS");
@@ -187,38 +192,40 @@ void HUD::update(float dt) {
     }
 
     _select.update();
+    _barkBubble->update(dt);
 }
 
-void HUD::render() const {
+void HUD::render() {
     GUI::render();
-
-    _select.render();
-    _debug.render();
 
     drawMinimap();
 
     Party &party = _game->party();
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
+
+    _barkBubble->render();
+    _select.render();
+    _debug.render();
 }
 
-void HUD::drawMinimap() const {
+void HUD::drawMinimap() {
     Control &label = getControl("LBL_MAPVIEW");
     const Control::Extent &extent = label.extent();
 
     glm::vec4 bounds;
-    bounds[0] = _controlOffset.x + extent.left;
-    bounds[1] = _controlOffset.y + extent.top;
-    bounds[2] = extent.width;
-    bounds[3] = extent.height;
+    bounds[0] = static_cast<float>(_controlOffset.x + extent.left);
+    bounds[1] = static_cast<float>(_controlOffset.y + extent.top);
+    bounds[2] = static_cast<float>(extent.width);
+    bounds[3] = static_cast<float>(extent.height);
 
     shared_ptr<Area> area(_game->module()->area());
     area->map().render(Map::Mode::Minimap, bounds);
 }
 
-void HUD::drawHealth(int memberIndex) const {
-    if (_version == GameVersion::TheSithLords) return;
+void HUD::drawHealth(int memberIndex) {
+    if (_gameId == GameID::TSL) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
@@ -234,13 +241,13 @@ void HUD::drawHealth(int memberIndex) const {
     transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
-
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
 void HUD::showCombatHud() {
@@ -281,25 +288,21 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actionQueue = _game->party().leader()->actionQueue();
+    int i = 0;
 
-    auto it = actionQueue.begin();
-    for (int i = 0; i < 4; ++i) {
-        string fill;
+    for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
+        if (action->type() != ActionType::AttackObject) continue;
 
-        // TODO: if (isDisplayableAction(*it))
-        while (it != actionQueue.end() && (*it)->type() != ActionType::AttackObject)
-            ++it;
-        if (it != actionQueue.end()) {
-            fill = "i_attack";
-            ++it;
-        }
-        Control& item = getControl("LBL_QUEUE" + to_string(i));
-        item.setBorderFill(fill);
+        Control &item = getControl("LBL_QUEUE" + to_string(i));
+        item.setBorderFill("i_attack");
+
+        if (++i == 4) break;
     }
 }
 
 void HUD::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EQU") {
         _game->openInGameMenu(InGameMenu::Tab::Equipment);
     } else if (control == "BTN_INV") {
@@ -317,13 +320,9 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_OPT") {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     } else if (control == "BTN_CLEARALL") {
-        _game->party().leader()->actionQueue().clear();
+        _game->party().getLeader()->actionQueue().clear();
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        auto &actionQueue = _game->party().leader()->actionQueue();
-
-        for (auto &action : actionQueue) {
-
-            // TODO: if (isDisplayableAction(*it))
+        for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;

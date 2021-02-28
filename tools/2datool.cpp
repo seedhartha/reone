@@ -17,9 +17,10 @@
 
 #include "tools.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/2dafile.h"
+#include "../src/resource/format/2dawriter.h"
 
 using namespace std;
 
@@ -32,22 +33,28 @@ namespace reone {
 
 namespace tools {
 
-void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
-    TwoDaFile twoDa;
-    twoDa.load(path);
+void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToJSON) {
+        toJSON(target, destPath);
+    } else {
+        to2DA(target, destPath);
+    }
+}
+
+void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
+    TwoDaFile twoDaFile;
+    twoDaFile.load(path);
 
     pt::ptree tree;
     pt::ptree children;
-    shared_ptr<TwoDaTable> table(twoDa.table());
-    auto &headers = table->headers();
-    auto &rows = table->rows();
+    shared_ptr<TwoDA> twoDa(twoDaFile.twoDa());
 
-    for (int i = 0; i < static_cast<int>(rows.size()); ++i) {
+    for (int row = 0; row < twoDa->getRowCount(); ++row) {
         pt::ptree child;
-        child.put("_id", i);
+        child.put("_id", row);
 
-        for (auto &value : table->rows()[i].values()) {
-            child.put(value.first, value.second);
+        for (int col = 0; col < twoDa->getColumnCount(); ++col) {
+            child.put(twoDa->columns()[col], twoDa->rows()[row].values[col]);
         }
         children.push_back(make_pair("", child));
     }
@@ -56,8 +63,47 @@ void TwoDaTool::convert(const fs::path &path, const fs::path &destPath) const {
     fs::path jsonPath(destPath);
     jsonPath.append(path.filename().string() + ".json");
 
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+    pt::write_json(jsonPath.string(), tree);
+}
+
+void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
+    pt::ptree tree;
+    pt::read_json(path.string(), tree);
+
+    auto twoDa = make_unique<TwoDA>();
+    bool columnsInited = false;
+
+    for (auto &jsonRow : tree.get_child("rows")) {
+        TwoDA::Row row;
+
+        for (auto &prop : jsonRow.second) {
+            // Properties with a leading underscore are metadata
+            if (boost::starts_with(prop.first, "_")) continue;
+
+            if (!columnsInited) {
+                twoDa->addColumn(prop.first);
+            }
+            row.values.push_back(prop.second.data());
+        }
+
+        twoDa->add(move(row));
+        columnsInited = true;
+    }
+
+    vector<string> tokens;
+    boost::split(tokens, path.filename().string(), boost::is_any_of("."), boost::token_compress_on);
+
+    fs::path twoDaPath(destPath);
+    twoDaPath.append(tokens[0] + ".2da");
+
+    TwoDaWriter writer(move(twoDa));
+    writer.save(twoDaPath);
+}
+
+bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        ((target.extension() == ".2da" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::To2DA));
 }
 
 } // namespace tools

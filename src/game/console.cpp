@@ -27,9 +27,11 @@
 #include "../common/log.h"
 #include "../render/font.h"
 #include "../render/fonts.h"
-#include "../render/mesh/quad.h"
+#include "../render/meshes.h"
 #include "../render/shaders.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
+#include "../scene/types.h"
 
 #include "game.h"
 
@@ -44,13 +46,13 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxOutputLineCount = 100;
-constexpr int kVisibleLineCount = 15;
+static constexpr int kMaxOutputLineCount = 100;
+static constexpr int kVisibleLineCount = 15;
 
 Console::Console(Game *game) :
     _game(game),
     _opts(game->options().graphics),
-    _input(kTextInputConsole) {
+    _input(TextInputFlags::console) {
 
     initCommands();
 }
@@ -108,7 +110,7 @@ void Console::cmdListAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("listanim: no object selected");
             return;
@@ -120,7 +122,7 @@ void Console::cmdListAnim(vector<string> tokens) {
         substr = tokens[1];
     }
 
-    vector<string> anims(object->model()->model()->getAnimationNames());
+    vector<string> anims(object->getModelSceneNode()->model()->getAnimationNames());
     sort(anims.begin(), anims.end());
 
     for (auto &anim : anims) {
@@ -138,13 +140,13 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("playanim: no object selected");
             return;
         }
     }
-    object->model()->playAnimation(tokens[1], kAnimationLoop);
+    object->getModelSceneNode()->animator().playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
 void Console::cmdKill(vector<string> tokens) {
@@ -166,7 +168,7 @@ void Console::cmdAddItem(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = selector.selectedObject();
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("additem: no object selected");
             return;
@@ -184,7 +186,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
     ObjectSelector &selector = _game->module()->area()->objectSelector();
     auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
     if (!object) {
-        object = _game->party().leader();
+        object = _game->party().getLeader();
         if (!object) {
             print("givexp: no object selected");
             return;
@@ -287,28 +289,28 @@ void Console::executeInputText() {
     }
 }
 
-void Console::render() const {
+void Console::render() {
     drawBackground();
     drawLines();
 }
 
-void Console::drawBackground() const {
+void Console::drawBackground() {
     float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    locals.general.alpha = 0.5f;
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.general.alpha = 0.5f;
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
-
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
-void Console::drawLines() const {
+void Console::drawLines() {
     float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
@@ -317,19 +319,15 @@ void Console::drawLines() const {
     // Input
 
     string text("> " + _input.text());
-    _font->render(text, transform, glm::vec3(1.0f), TextGravity::Right);
+    _font->render(text, transform, glm::vec3(1.0f), TextGravity::RightCenter);
 
     // Output
 
     for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
         const string &line = _output[static_cast<size_t>(i) + _outputOffset];
         transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
-        _font->render(line, transform, glm::vec3(1.0f), TextGravity::Right);
+        _font->render(line, transform, glm::vec3(1.0f), TextGravity::RightCenter);
     }
-}
-
-bool Console::isOpen() const {
-    return _open;
 }
 
 } // namespace game

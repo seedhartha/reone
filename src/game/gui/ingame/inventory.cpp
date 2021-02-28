@@ -32,7 +32,7 @@ namespace reone {
 namespace game {
 
 InventoryMenu::InventoryMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("inventory");
@@ -58,10 +58,10 @@ void InventoryMenu::load() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (_version != GameVersion::KotOR) return;
+    if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
-    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -70,12 +70,16 @@ void InventoryMenu::refreshPortraits() {
 
     Control &btnChange1 = getControl("BTN_CHANGE1");
     btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    btnChange1.setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
     Control &btnChange2 = getControl("BTN_CHANGE2");
     btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    btnChange2.setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void InventoryMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EXIT") {
         _game->openInGame();
     }

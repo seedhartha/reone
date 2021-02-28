@@ -22,13 +22,20 @@
 #include "../audio/files.h"
 #include "../audio/player.h"
 #include "../audio/soundhandle.h"
-#include "../audio/util.h"
 #include "../common/jobs.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../render/models.h"
+#include "../experimental/tor/gr2file.h"
+#include "../render/featureutil.h"
+#include "../render/lip/lips.h"
+#include "../render/materials.h"
+#include "../render/meshes.h"
+#include "../render/model/mdlfile.h"
+#include "../render/model/models.h"
+#include "../render/pbribl.h"
 #include "../render/textures.h"
-#include "../render/walkmeshes.h"
+#include "../render/walkmesh/walkmeshes.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
 #include "../video/bikfile.h"
@@ -36,7 +43,9 @@
 
 #include "blueprint/blueprints.h"
 #include "cursors.h"
+#include "gui/sounds.h"
 #include "script/routines.h"
+#include "soundsets.h"
 
 using namespace std;
 
@@ -46,6 +55,7 @@ using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+using namespace reone::tor;
 using namespace reone::video;
 
 namespace fs = boost::filesystem;
@@ -54,24 +64,25 @@ namespace reone {
 
 namespace game {
 
+static bool g_conversationsEnabled = true;
+
 Game::Game(const fs::path &path, const Options &opts) :
     _path(path),
     _options(opts),
-    _window(opts.graphics, this),
     _sceneGraph(opts.graphics),
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
     _party(this),
     _scriptRunner(this) {
 
-    initGameVersion();
+    determineGameID();
 
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
 }
 
-void Game::initGameVersion() {
+void Game::determineGameID() {
     fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe", false));
-    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
+    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
 int Game::run() {
@@ -83,7 +94,7 @@ int Game::run() {
     } else {
         playVideo("legal");
     }
-    _window.show();
+    RenderWindow::instance().show();
 
     runMainLoop();
     deinit();
@@ -92,32 +103,41 @@ int Game::run() {
 }
 
 void Game::init() {
-    _window.init();
-    _worldPipeline.init();
-
-    Resources::instance().init(_version, _path);
-    Cursors::instance().init(_version);
-    Models::instance().init(_version);
-    Textures::instance().init(_version);
+    RenderWindow::instance().init(_options.graphics, this);
+    Resources::instance().init(_gameId, _path);
+    Meshes::instance().init();
+    Textures::instance().init(_gameId);
+    Materials::instance().init();
+    PBRIBL::instance().init();
+    Shaders::instance().init();
     AudioPlayer::instance().init(_options.audio);
-    Routines::instance().init(_version, this);
+    GUISounds::instance().init();
+    Routines::instance().init(_gameId, this);
 
+    Models::instance().init(_gameId);
+    registerModelLoaders();
+
+    Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);
 
+    _worldPipeline.init();
     _console.load();
 }
 
+void Game::registerModelLoaders() {
+    Models::instance().registerLoader(ResourceType::Mdl, make_shared<MdlModelLoader>());
+    Models::instance().registerLoader(ResourceType::Gr2, make_shared<Gr2ModelLoader>());
+}
+
 void Game::setCursorType(CursorType type) {
-    if (_cursorType == type) return;
-
-    _cursorType = type;
-
-    if (type == CursorType::None) {
-        _window.setCursor(nullptr);
-        return;
+    if (_cursorType != type) {
+        if (type == CursorType::None) {
+            RenderWindow::instance().setCursor(nullptr);
+        } else {
+            RenderWindow::instance().setCursor(Cursors::instance().get(type));
+        }
+        _cursorType = type;
     }
-    shared_ptr<Cursor> cursor(Cursors::instance().get(type));
-    _window.setCursor(cursor);
 }
 
 void Game::playVideo(const string &name) {
@@ -158,8 +178,8 @@ void Game::changeScreen(GameScreen screen) {
 }
 
 string Game::getMainMenuMusic() const {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             return "mus_sion";
         default:
             return "mus_theme_cult";
@@ -177,7 +197,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::loadMainMenu() {
-    _mainMenu.reset(new MainMenu(this));
+    _mainMenu = make_unique<MainMenu>(this);
     _mainMenu->load();
 }
 
@@ -194,6 +214,9 @@ void Game::loadModule(const string &name, string entry) {
         if (!_dialog) {
             loadDialog();
         }
+        if (!_computer) {
+            loadComputer();
+        }
         if (!_container) {
             loadContainer();
         }
@@ -207,9 +230,12 @@ void Game::loadModule(const string &name, string entry) {
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
         Textures::instance().invalidateCache();
-        AudioFiles::instance().invalidateCache();
-        Scripts::instance().invalidateCache();
+        AudioFiles::instance().invalidate();
+        Scripts::instance().invalidate();
         Blueprints::instance().invalidateCache();
+        SoundSets::instance().invalidate();
+        Lips::instance().invalidate();
+
         Resources::instance().loadModule(name);
 
         if (_module) {
@@ -217,11 +243,14 @@ void Game::loadModule(const string &name, string entry) {
             _module->area()->unloadParty();
         }
 
+        _loadScreen->setProgress(50);
+        drawAll();
+
         auto maybeModule = _loadedModules.find(name);
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::ModuleInfo));
+            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::Ifo));
 
             _module = _objectFactory->newModule();
             _module->load(name, *ifo);
@@ -231,6 +260,9 @@ void Game::loadModule(const string &name, string entry) {
 
         _module->loadParty(entry);
         _module->area()->fill(_sceneGraph);
+
+        _loadScreen->setProgress(100);
+        drawAll();
 
         string musicName(_module->area()->music());
         playMusic(musicName);
@@ -246,31 +278,44 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
         loadLoadingScreen();
     }
     _loadScreen->setImage(imageResRef);
+    _loadScreen->setProgress(0);
     changeScreen(GameScreen::Loading);
     drawAll();
     block();
 }
 
 void Game::drawAll() {
-    _window.clear();
+    // Compute derived PBR IBL textures from queued environment maps
+    PBRIBL::instance().refresh();
+
+    RenderWindow::instance().clear();
 
     if (_video) {
         _video->render();
     } else {
         drawWorld();
         drawGUI();
-        drawCursor();
+        RenderWindow::instance().drawCursor();
     }
 
-    _window.swapBuffers();
+    RenderWindow::instance().swapBuffers();
 }
 
 void Game::drawWorld() {
     const Camera *camera = getActiveCamera();
     if (!camera) return;
 
+    shared_ptr<SceneNode> shadowReference;
+
+    shared_ptr<Creature> partyLeader(_party.getLeader());
+    if (partyLeader && _cameraType == CameraType::ThirdPerson) {
+        shadowReference = partyLeader->getModelSceneNode();
+    } else {
+        shadowReference = camera->sceneNode();
+    }
+
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setReferenceNode(_party.leader()->model());
+    _sceneGraph.setShadowReference(shadowReference);
     _sceneGraph.prepareFrame();
 
     _worldPipeline.render();
@@ -279,15 +324,15 @@ void Game::drawWorld() {
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
         case CameraType::FirstPerson:
-            if (_party.leader()) {
+            if (_party.getLeader()) {
                 _cameraType = CameraType::ThirdPerson;
             }
             break;
         case CameraType::ThirdPerson: {
             _module->player().stopMovement();
             shared_ptr<Area> area(_module->area());
-            FirstPersonCamera &firstPerson = static_cast<FirstPersonCamera &>(area->getCamera(CameraType::FirstPerson));
-            ThirdPersonCamera &thirdPerson = static_cast<ThirdPersonCamera &>(area->getCamera(CameraType::ThirdPerson));
+            auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
+            auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
             firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
             firstPerson.setFacing(thirdPerson.facing());
             _cameraType = CameraType::FirstPerson;
@@ -296,15 +341,12 @@ void Game::toggleInGameCameraType() {
         default:
             break;
     }
-    _window.setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
+
+    setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
 }
 
 Camera *Game::getActiveCamera() const {
-    if (!_module) return nullptr;
-
-    shared_ptr<Area> area(_module->area());
-
-    return &area->getCamera(_cameraType);
+    return _module ? &(_module->area()->getCamera(_cameraType)) : nullptr;
 }
 
 int Game::getRunScriptVar() const {
@@ -330,16 +372,6 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
 }
 
 void Game::drawGUI() {
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(
-        0.0f,
-        static_cast<float>(_options.graphics.width),
-        static_cast<float>(_options.graphics.height),
-        0.0f,
-        -100.0f, 100.0f);
-
-    Shaders::instance().setGlobalUniforms(globals);
-
     switch (_screen) {
         case GameScreen::InGame:
             if (_cameraType == CameraType::ThirdPerson) {
@@ -361,43 +393,38 @@ void Game::drawGUI() {
     }
 }
 
-void Game::drawCursor() {
-    GlobalUniforms globals;
-    globals.projection = glm::ortho(0.0f, static_cast<float>(_options.graphics.width), static_cast<float>(_options.graphics.height), 0.0f);
-    globals.view = glm::mat4(1.0f);
-
-    Shaders::instance().setGlobalUniforms(globals);
-
-    _window.drawCursor();
-}
-
 void Game::loadHUD() {
-    _hud.reset(new HUD(this));
+    _hud = make_unique<HUD>(this);
     _hud->load();
 }
 
 void Game::loadDialog() {
-    _dialog.reset(new DialogGUI(this));
+    _dialog = make_unique<DialogGUI>(this);
     _dialog->load();
 }
 
+void Game::loadComputer() {
+    _computer = make_unique<ComputerGUI>(this);
+    _computer->load();
+}
+
 void Game::loadContainer() {
-    _container.reset(new Container(this));
+    _container = make_unique<Container>(this);
     _container->load();
 }
 
 void Game::loadPartySelection() {
-    _partySelect.reset(new PartySelection(this));
+    _partySelect = make_unique<PartySelection>(this);
     _partySelect->load();
 }
 
 void Game::loadSaveLoad() {
-    _saveLoad.reset(new SaveLoad(this));
+    _saveLoad = make_unique<SaveLoad>(this);
     _saveLoad->load();
 }
 
 void Game::loadInGame() {
-    _inGame.reset(new InGameMenu(this));
+    _inGame = make_unique<InGameMenu>(this);
     _inGame->load();
 }
 
@@ -410,11 +437,11 @@ GUI *Game::getScreenGUI() const {
         case GameScreen::CharacterGeneration:
             return _charGen.get();
         case GameScreen::InGame:
-            return _hud.get();
+            return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
         case GameScreen::InGameMenu:
             return _inGame.get();
-        case GameScreen::Dialog:
-            return _dialog.get();
+        case GameScreen::Conversation:
+            return _conversation;
         case GameScreen::Container:
             return _container.get();
         case GameScreen::PartySelection:
@@ -438,7 +465,7 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        _window.processEvents(_quit);
+        RenderWindow::instance().processEvents(_quit);
 
         update();
         drawAll();
@@ -460,7 +487,7 @@ void Game::update() {
     }
     updateCamera(dt);
 
-    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Dialog);
+    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule) {
         _module->update(dt);
     }
@@ -470,7 +497,11 @@ void Game::update() {
         gui->update(dt);
     }
 
-    _window.update(dt);
+    RenderWindow::instance().update(dt);
+
+    if (!_paused) {
+        _sceneGraph.update(dt);
+    }
 }
 
 void Game::updateVideo(float dt) {
@@ -512,39 +543,37 @@ float Game::measureFrameTime() {
 }
 
 void Game::loadLoadingScreen() {
-    _loadScreen.reset(new LoadingScreen(this));
+    _loadScreen = make_unique<LoadingScreen>(this);
     _loadScreen->load();
 }
 
 void Game::loadCharacterGeneration() {
-    _charGen.reset(new CharacterGeneration(this));
+    _charGen = make_unique<CharacterGeneration>(this);
     _charGen->load();
 }
 
 void Game::deinit() {
     JobExecutor::instance().deinit();
-    Routines::instance().deinit();
     AudioPlayer::instance().deinit();
-    Cursors::instance().deinit();
-    Resources::instance().deinit();
-
-    _window.deinit();
+    RenderWindow::instance().deinit();
 }
 
 void Game::startCharacterGeneration() {
-    string imageResRef(_version == GameVersion::TheSithLords ? "load_default" : "load_chargen");
+    string imageResRef(_gameId == GameID::TSL ? "load_default" : "load_chargen");
     withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
         }
+        _loadScreen->setProgress(100);
+        drawAll();
         playMusic(getCharacterGenerationMusic());
         changeScreen(GameScreen::CharacterGeneration);
     });
 }
 
 string Game::getCharacterGenerationMusic() const {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             return "mus_main";
         default:
             return "mus_theme_rep";
@@ -556,6 +585,7 @@ void Game::quit() {
 }
 
 void Game::openInGame() {
+    _sceneGraph.setUpdate(!_paused);
     changeScreen(GameScreen::InGame);
 }
 
@@ -593,10 +623,25 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 }
 
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
+    if (!g_conversationsEnabled) return;
+
+    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Dlg));
+    if (!dlg) {
+        warn("Game: conversation not found: " + resRef);
+        return;
+    }
+
     stopMovement();
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
-    changeScreen(GameScreen::Dialog);
-    _dialog->startDialog(owner, resRef);
+    changeScreen(GameScreen::Conversation);
+
+    auto dialog = make_shared<Dialog>(resRef);
+    dialog->load(*dlg);
+
+    bool computerConversation = dialog->conversationType() == ConversationType::Computer;
+    _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
+    _conversation->start(dialog, owner);
 }
 
 void Game::stopMovement() {
@@ -605,6 +650,9 @@ void Game::stopMovement() {
 }
 
 void Game::openContainer(const shared_ptr<SpatialObject> &container) {
+    stopMovement();
+    _sceneGraph.setUpdate(false);
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _container->open(container);
     changeScreen(GameScreen::Container);
@@ -612,12 +660,14 @@ void Game::openContainer(const shared_ptr<SpatialObject> &container) {
 
 void Game::openPartySelection(const PartySelection::Context &ctx) {
     stopMovement();
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
     changeScreen(GameScreen::PartySelection);
 }
 
 void Game::openSaveLoad(SaveLoad::Mode mode) {
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
     _saveLoad->refresh();
@@ -625,6 +675,7 @@ void Game::openSaveLoad(SaveLoad::Mode mode) {
 }
 
 void Game::openLevelUp() {
+    setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _charGen->startLevelUp();
     changeScreen(GameScreen::CharacterGeneration);
@@ -637,9 +688,9 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::updateCamera(float dt) {
     switch (_screen) {
-        case GameScreen::Dialog: {
+        case GameScreen::Conversation: {
             int cameraId;
-            CameraType cameraType = _dialog->getCamera(cameraId);
+            CameraType cameraType = _conversation->getCamera(cameraId);
             if (cameraType == CameraType::Static) {
                 _module->area()->setStaticCamera(cameraId);
             }
@@ -657,8 +708,14 @@ void Game::updateCamera(float dt) {
     Camera *camera = getActiveCamera();
     if (camera) {
         camera->update(dt);
-        glm::vec3 position(camera->sceneNode()->absoluteTransform()[3]);
-        AudioPlayer::instance().setListenerPosition(position);
+
+        glm::vec3 listenerPosition;
+        if (_cameraType == CameraType::ThirdPerson) {
+            listenerPosition = _party.getLeader()->position() + 1.7f; // TODO: height based on appearance
+        } else {
+            listenerPosition = camera->sceneNode()->absoluteTransform()[3];
+        }
+        AudioPlayer::instance().setListenerPosition(listenerPosition);
     }
 }
 
@@ -719,61 +776,60 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
     switch (event.keysym.sym) {
         case SDLK_MINUS:
-            if (_gameSpeed > 1.0f) {
+            if (_options.developer && _gameSpeed > 1.0f) {
                 _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_EQUALS:
-            if (_gameSpeed < 8.0f) {
+            if (_options.developer && _gameSpeed < 8.0f) {
                 _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
+                return true;
             }
-            return true;
+            break;
 
         case SDLK_v:
-            if (_screen == GameScreen::InGame) {
+            if (_options.developer && _screen == GameScreen::InGame) {
                 toggleInGameCameraType();
+                return true;
             }
+            break;
+
+        case SDLK_F1:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::PBR, !isFeatureEnabled(Feature::PBR));
+                return true;
+            }
+            break;
+
+        case SDLK_F2:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::HDR, !isFeatureEnabled(Feature::HDR));
+                return true;
+            }
+            break;
+
+        case SDLK_F3:
+            if (_options.developer) {
+                setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
+                return true;
+            }
+            break;
+
+        case SDLK_LEFTBRACKET:
+            _sceneGraph.setExposure(glm::max(0.25f, _sceneGraph.exposure() - 0.25f));
             return true;
+
+        case SDLK_RIGHTBRACKET:
+            _sceneGraph.setExposure(glm::min(_sceneGraph.exposure() + 0.25f, 2.0f));
+            return true;
+
+        default:
+            break;
     }
 
     return false;
-}
-
-GameVersion Game::version() const {
-    return _version;
-}
-
-const Options &Game::options() const {
-    return _options;
-}
-
-SceneGraph &Game::sceneGraph() {
-    return _sceneGraph;
-}
-
-ObjectFactory &Game::objectFactory() {
-    return *_objectFactory;
-}
-
-shared_ptr<Module> Game::module() const {
-    return _module;
-}
-
-Party &Game::party() {
-    return _party;
-}
-
-CharacterGeneration &Game::characterGeneration() {
-    return *_charGen;
-}
-
-CameraType Game::cameraType() const {
-    return _cameraType;
-}
-
-ScriptRunner &Game::scriptRunner() {
-    return _scriptRunner;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
@@ -842,6 +898,14 @@ void Game::setLocalNumber(uint32_t objectId, int index, int value) {
 
 void Game::setRunScriptVar(int var) {
     _runScriptVar = var;
+}
+
+void Game::setPaused(bool paused) {
+    _paused = paused;
+}
+
+void Game::setRelativeMouseMode(bool relative) {
+    RenderWindow::instance().setRelativeMouseMode(relative);
 }
 
 } // namespace game

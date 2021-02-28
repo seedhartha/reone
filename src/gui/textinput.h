@@ -25,12 +25,14 @@ namespace reone {
 
 namespace gui {
 
-enum TextInputFlags {
-    kTextInputDigits = 1,
-    kTextInputLetters = 2,
-    kTextInputWhitespace = 4,
-    kTextInputPunctuation = 8,
-    kTextInputConsole = kTextInputDigits | kTextInputLetters | kTextInputWhitespace | kTextInputPunctuation
+struct TextInputFlags {
+    static constexpr int digits = 1;
+    static constexpr int letters = 2;
+    static constexpr int whitespace = 4;
+    static constexpr int punctuation = 8;
+
+    static constexpr int lettersWhitespace = letters | whitespace;
+    static constexpr int console = digits | letters | whitespace | punctuation;
 };
 
 class TextInput {
@@ -40,7 +42,7 @@ public:
     void clear();
     bool handle(const SDL_Event &event);
 
-    const std::string &text() const;
+    const std::string &text() const { return _text; }
 
     void setText(std::string text);
 

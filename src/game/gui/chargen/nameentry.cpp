@@ -34,10 +34,10 @@ namespace reone {
 
 namespace game {
 
-NameEntry::NameEntry(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+NameEntry::NameEntry(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen),
-    _input(kTextInputLetters | kTextInputWhitespace) {
+    _input(TextInputFlags::lettersWhitespace) {
 
     _resRef = getResRef("name");
 
@@ -56,7 +56,7 @@ void NameEntry::load() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
-    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::LetterComboProbability));
+    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
 
@@ -69,6 +69,8 @@ bool NameEntry::handle(const SDL_Event &event) {
 }
 
 void NameEntry::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_RANDOM") {
         loadRandomName();
 

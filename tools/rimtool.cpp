@@ -1,27 +1,25 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+* Copyright (c) 2020-2021 The reone project contributors
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include "tools.h"
 
-#include <boost/format.hpp>
+#include <iostream>
 
-#include "../src/common/log.h"
-#include "../src/resource/rimfile.h"
-#include "../src/resource/util.h"
+#include "../src/resource/typeutil.h"
 
 using namespace std;
 
@@ -33,31 +31,45 @@ namespace reone {
 
 namespace tools {
 
-void RimTool::list(const fs::path &path, const fs::path &keyPath) const {
+void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     RimFile rim;
-    rim.load(path);
+    rim.load(target);
 
-    for (auto &res : rim.resources()) {
-        info(boost::format("%16s\t%4s") % res.resRef % getExtByResType(res.type));
+    if (operation == Operation::List) {
+        list(rim);
+    } else if (operation == Operation::Extract) {
+        extract(rim, destPath);
     }
 }
 
-void RimTool::extract(const fs::path &path, const fs::path &keyPath, const fs::path &destPath) const {
-    RimFile rim;
-    rim.load(path);
+void RimTool::list(const RimFile &rim) {
+    for (auto &res : rim.resources()) {
+        cout << res.resRef << " " << getExtByResType(res.resType) << endl;
+    }
+}
 
-    auto &resources = rim.resources();
-    for (int i = 0; i < resources.size(); ++i) {
-        const RimFile::Resource &resource = resources[i];
-        info(boost::format("Extracting %16s\t%4s") % resource.resRef % getExtByResType(resource.type));
+void RimTool::extract(RimFile &rim, const fs::path &destPath) {
+    if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
+
+    for (size_t i = 0; i < rim.resources().size(); ++i) {
+        const RimFile::Resource &resEntry = rim.resources()[i];
+        string ext(getExtByResType(resEntry.resType));
+        cout << "Extracting " << resEntry.resRef << " " << ext << endl;
+        ByteArray data(rim.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
-        resPath.append(resource.resRef + "." + getExtByResType(resource.type));
+        resPath.append(resEntry.resRef + "." + ext);
 
-        ByteArray data(rim.getResourceData(i));
         fs::ofstream res(resPath, ios::binary);
-        res.write(data.data(), data.size());
+        res.write(&data[0], data.size());
     }
+}
+
+bool RimTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        target.extension() == ".rim" &&
+        (operation == Operation::List || operation == Operation::Extract);
 }
 
 } // namespace tools

@@ -21,6 +21,7 @@
 #include <climits>
 
 #include "glm/common.hpp"
+#include "glm/gtx/euler_angles.hpp"
 
 #include "../../common/log.h"
 #include "../../common/random.h"
@@ -30,14 +31,22 @@
 
 using namespace std;
 
+using namespace reone::render;
+using namespace reone::scene;
+
 namespace reone {
 
 namespace game {
 
-constexpr float kRoundDuration = 3.0f;
+static constexpr float kRoundDuration = 3.0f;
+static constexpr float kProjectileSpeed = 16.0f;
+
+static const char kModelEventDetonate[] = "detonate";
+
+static bool g_projectilesEnabled = true;
 
 static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
-    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().currentAction());
+    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().getCurrentAction());
 }
 
 void Combat::Round::advance(float dt) {
@@ -51,12 +60,10 @@ Combat::Combat(Game *game) : _game(game) {
 }
 
 void Combat::update(float dt) {
-    _heartbeatTimer.update(dt);
-
-    if (_heartbeatTimer.hasTimedOut()) {
-        _heartbeatTimer.reset(kHeartbeatInterval);
+    if (_heartbeatTimer.advance(dt)) {
         updateCombatants();
         updateAI();
+        _heartbeatTimer.reset(kHeartbeatInterval);
     }
     updateRounds(dt);
     updateActivation();
@@ -99,15 +106,15 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
         if (!getIsEnemy(combatant, *creature)) continue;
 
         glm::vec3 adjustedCombatantPos(combatant.position());
-        adjustedCombatantPos.z += 1.8f; // TODO: height based on appearance
+        adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
 
         glm::vec3 adjustedCreaturePos(creature->position());
-        adjustedCreaturePos.z += creature->model()->aabb().center().z;
+        adjustedCreaturePos.z += creature->getModelSceneNode()->aabb().center().z;
 
         glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
 
         RaycastProperties castProps;
-        castProps.flags = kRaycastRooms | kRaycastObjects | kRaycastAABB;
+        castProps.flags = RaycastFlags::roomsObjectsAABB;
         castProps.objectTypes = { ObjectType::Door };
         castProps.origin = adjustedCombatantPos;
         castProps.direction = glm::normalize(combatantToCreature);
@@ -206,7 +213,7 @@ void Combat::updateRounds(float dt) {
 
         // Do not start a combat round, if attacker is a moving party leader
 
-        if (attacker->creature->id() == _game->party().leader()->id() && _game->module()->player().isMovementRequested()) continue;
+        if (attacker->creature->id() == _game->party().getLeader()->id() && _game->module()->player().isMovementRequested()) continue;
 
         // Check if attacker already participates in a combat round
 
@@ -270,7 +277,7 @@ void Combat::updateRound(Round &round, float dt) {
     bool duel = maybeTargetCombatant != _combatantById.end() && maybeTargetCombatant->second->target == attacker;
 
     switch (round.state) {
-        case RoundState::Started:
+        case RoundState::Started: {
             round.attackResult = _attackResolver.getAttackResult(attacker, round.target, duel, round.cutsceneAttackResult);
 
             attacker->face(*round.target);
@@ -289,9 +296,13 @@ void Combat::updateRound(Round &round, float dt) {
             round.state = RoundState::FirstTurn;
             debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
             break;
-
+        }
         case RoundState::FirstTurn:
             if (round.time >= 0.5f * kRoundDuration) {
+                if (round.projectile) {
+                    _game->sceneGraph().removeRoot(round.projectile);
+                    round.projectile.reset();
+                }
                 if (round.cutscene) {
                     applyAttackResult(attacker, round.target, round.attackResult, round.cutsceneDamage);
                 } else {
@@ -309,15 +320,30 @@ void Combat::updateRound(Round &round, float dt) {
                 }
                 round.state = RoundState::SecondTurn;
                 debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
+
+            } else if (round.time >= 0.5f) {
+                if (!round.projectile) {
+                    fireProjectile(attacker, round.target, round);
+                }
+                updateProjectile(round, dt);
             }
             break;
 
         case RoundState::SecondTurn:
             if (round.time == kRoundDuration) {
+                if (round.projectile) {
+                    _game->sceneGraph().removeRoot(round.projectile);
+                    round.projectile.reset();
+                }
                 if (duel) {
                     applyAttackResult(static_pointer_cast<Creature>(round.target), attacker, round.attackResult);
                 }
                 finishRound(round);
+            } else if (duel && round.time >= 0.5 + 0.5f * kRoundDuration) {
+                if (!round.projectile) {
+                    fireProjectile(static_pointer_cast<Creature>(round.target), attacker, round);
+                }
+                updateProjectile(round, dt);
             }
             break;
 
@@ -329,12 +355,70 @@ void Combat::updateRound(Round &round, float dt) {
 void Combat::finishRound(Round &round) {
     shared_ptr<Creature> attacker(round.attacker->creature);
     attacker->setMovementRestricted(false);
+
     if (round.target->type() == ObjectType::Creature) {
         auto targetCreature = static_pointer_cast<Creature>(round.target);
         targetCreature->setMovementRestricted(false);
     }
+
+    _game->sceneGraph().removeRoot(round.projectile);
+    round.projectile.reset();
+
     round.state = RoundState::Finished;
     debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
+}
+
+void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
+    if (!g_projectilesEnabled) return;
+
+    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
+    if (!weapon) return;
+
+    shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
+    if (!ammunitionType) return;
+
+    shared_ptr<ModelSceneNode> weaponModel(attacker->getModelSceneNode()->getAttachedModel("rhand"));
+    if (!weaponModel) return;
+
+    glm::vec3 projectilePosition, bulletHookPosition;
+    if (weaponModel->getNodeAbsolutePosition("bullethook", bulletHookPosition)) {
+        projectilePosition = weaponModel->absoluteTransform() * glm::vec4(bulletHookPosition, 1.0f);
+    } else {
+        projectilePosition = weaponModel->absoluteTransform()[3];
+    }
+
+    weapon->playShotSound(0, projectilePosition);
+
+    round.projectile = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Projectile, ammunitionType->model, &_game->sceneGraph());
+    round.projectile->setPosition(projectilePosition);
+    round.projectile->signalEvent(kModelEventDetonate);
+
+    shared_ptr<ModelSceneNode> targetModel(target->getModelSceneNode());
+    glm::vec3 projectileTarget, impactPosition;
+    if (targetModel->getNodeAbsolutePosition("impact", impactPosition)) {
+        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impactPosition, 1.0f);
+    } else {
+        projectileTarget = targetModel->absoluteTransform()[3];
+    }
+    round.projectileDir = glm::normalize(projectileTarget - projectilePosition);
+
+    _game->sceneGraph().addRoot(round.projectile);
+}
+
+void Combat::updateProjectile(Round &round, float dt) {
+    if (!round.projectile) return;
+
+    glm::vec3 projectilePosition(round.projectile->absoluteTransform()[3]);
+    projectilePosition += kProjectileSpeed * round.projectileDir * dt;
+
+    float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, projectilePosition);
+    transform *= glm::eulerAngleZ(facing);
+
+    round.projectile->setProjectileSpeed(kProjectileSpeed);
+    round.projectile->setLocalTransform(transform);
 }
 
 void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, AttackResult result, int damage) {
@@ -366,7 +450,7 @@ void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const share
 }
 
 void Combat::updateActivation() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     bool active = partyLeader && _combatantById.count(partyLeader->id()) != 0;
     if (_active == active) return;
 
@@ -376,10 +460,6 @@ void Combat::updateActivation() {
         onExitCombatMode();
     }
     _active = active;
-}
-
-bool Combat::isActive() const {
-    return _active;
 }
 
 void Combat::onEnterCombatMode() {

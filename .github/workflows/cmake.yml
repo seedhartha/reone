@@ -1,0 +1,37 @@
+name: CMake
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTS=ON
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: ctest -C $BUILD_TYPE

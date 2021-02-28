@@ -34,11 +34,11 @@ namespace reone {
 
 namespace game {
 
-constexpr int kStrRefQuickHelpText = 241;
-constexpr int kStrRefCustomHelpText = 242;
+static constexpr int kStrRefQuickHelpText = 241;
+static constexpr int kStrRefCustomHelpText = 242;
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
@@ -49,12 +49,17 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameVersion version, 
 void QuickOrCustom::load() {
     GUI::load();
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
+
+    auto &lbDesc = getControl<ListBox>("LB_DESC");
+    lbDesc.setProtoMatchContent(true);
 }
 
 void QuickOrCustom::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "QUICK_CHAR_BTN") {
         _charGen->startQuick();
     } else if (control == "CUST_CHAR_BTN") {
@@ -65,6 +70,8 @@ void QuickOrCustom::onClick(const string &control) {
 }
 
 void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
+    GameGUI::onFocusChanged(control, focus);
+
     if (focus) {
         string text;
         if (control == "QUICK_CHAR_BTN") {
@@ -72,12 +79,9 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
         } else if (control == "CUST_CHAR_BTN") {
             text = Resources::instance().getString(kStrRefCustomHelpText);
         }
-        ListBox::Item item;
-        item.text = text;
-
-        ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+        auto &lbDesc = getControl<ListBox>("LB_DESC");
         lbDesc.clearItems();
-        lbDesc.addItem(move(item));
+        lbDesc.addTextLinesAsItems(text);
     }
 }
 

@@ -191,7 +191,7 @@ string CreatureAnimationResolver::getPauseAnimation() const {
 }
 
 bool CreatureAnimationResolver::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    shared_ptr<Item> item(_creature->getEquippedItem(kInventorySlotRightWeapon));
+    shared_ptr<Item> item(_creature->getEquippedItem(InventorySlot::rightWeapon));
     if (item) {
         type = item->weaponType();
         wield = item->weaponWield();
@@ -206,11 +206,11 @@ int CreatureAnimationResolver::getWeaponWieldNumber(WeaponWield wield) const {
         case WeaponWield::StunBaton:
             return 1;
         case WeaponWield::SingleSword:
-            return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 4 : 2;
+            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
         case WeaponWield::DoubleBladedSword:
             return 3;
         case WeaponWield::BlasterPistol:
-            return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? 6 : 5;
+            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
         case WeaponWield::BlasterRifle:
             return 7;
         case WeaponWield::HeavyWeapon:
@@ -236,7 +236,7 @@ string CreatureAnimationResolver::getRunAnimation() const {
 
         switch (wield) {
             case WeaponWield::SingleSword:
-                return _creature->isSlotEquipped(kInventorySlotLeftWeapon) ? "runds" : "runss";
+                return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
             case WeaponWield::DoubleBladedSword:
                 return "runst";
             case WeaponWield::BlasterRifle:
@@ -282,13 +282,13 @@ string CreatureAnimationResolver::getAnimationName(CombatAnimation anim, Creatur
             return getFirstIfCreatureModel("cdamages", formatCombatAnimation("m%dd%d", wield, variant));
         case CombatAnimation::MeleeDodge:
             return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("m%dg%d", wield, variant));
-        case CombatAnimation::MeleeDuelAttack:
+        case CombatAnimation::CinematicMeleeAttack:
             return formatCombatAnimation("c%da%d", wield, variant);
-        case CombatAnimation::MeleeDuelDamage:
+        case CombatAnimation::CinematicMeleeDamage:
             return formatCombatAnimation("c%dd%d", wield, variant);
-        case CombatAnimation::MeleeDuelParry:
+        case CombatAnimation::CinematicMeleeParry:
             return formatCombatAnimation("c%dp%d", wield, variant);
-        case CombatAnimation::RangedAttack:
+        case CombatAnimation::BlasterAttack:
             return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
         default:
             return empty;

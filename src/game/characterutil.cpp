@@ -35,15 +35,15 @@ namespace game {
 
 unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz) {
     vector<Portrait> portraits;
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
 
-    for (auto &row : table->rows()) {
-        if (row.getInt("forpc") == 1 && row.getInt("sex") == sex) {
-            string resRef(row.getString("baseresref"));
-            int appearanceNumber = row.getInt("appearancenumber");
-            int appearanceS = row.getInt("appearance_s");
-            int appearanceL = row.getInt("appearance_l");
+    for (int row = 0; row < twoDa->getRowCount(); ++row) {
+        if (twoDa->getInt(row, "forpc") == 1 && twoDa->getInt(row, "sex") == sex) {
+            string resRef(twoDa->getString(row, "baseresref"));
+            int appearanceNumber = twoDa->getInt(row, "appearancenumber");
+            int appearanceS = twoDa->getInt(row, "appearance_s");
+            int appearanceL = twoDa->getInt(row, "appearance_l");
 
             Portrait portrait;
             portrait.resRef = move(resRef);

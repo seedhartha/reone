@@ -21,20 +21,24 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/types.h"
 
 #include "creature.h"
 #include "door.h"
+#include "encounter.h"
 #include "item.h"
 #include "placeable.h"
 #include "sound.h"
 #include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 
 namespace game {
 
-class Blueprints {
+class Blueprints : boost::noncopyable {
 public:
     static Blueprints &instance();
 
@@ -42,28 +46,22 @@ public:
 
     std::shared_ptr<CreatureBlueprint> getCreature(const std::string &resRef);
     std::shared_ptr<DoorBlueprint> getDoor(const std::string &resRef);
+    std::shared_ptr<EncounterBlueprint> getEncounter(const std::string &resRef);
     std::shared_ptr<ItemBlueprint> getItem(const std::string &resRef);
     std::shared_ptr<PlaceableBlueprint> getPlaceable(const std::string &resRef);
     std::shared_ptr<SoundBlueprint> getSound(const std::string &resRef);
     std::shared_ptr<TriggerBlueprint> getTrigger(const std::string &resRef);
+    std::shared_ptr<WaypointBlueprint> getWaypoint(const std::string &resRef);
 
 private:
     std::unordered_map<std::string, std::shared_ptr<CreatureBlueprint>> _creatureCache;
     std::unordered_map<std::string, std::shared_ptr<DoorBlueprint>> _doorCache;
+    std::unordered_map<std::string, std::shared_ptr<EncounterBlueprint>> _encounterCache;
     std::unordered_map<std::string, std::shared_ptr<ItemBlueprint>> _itemCache;
     std::unordered_map<std::string, std::shared_ptr<PlaceableBlueprint>> _placeableCache;
     std::unordered_map<std::string, std::shared_ptr<SoundBlueprint>> _soundCache;
     std::unordered_map<std::string, std::shared_ptr<TriggerBlueprint>> _triggerCache;
-
-    Blueprints() = default;
-    Blueprints(const Blueprints &) = delete;
-    Blueprints &operator=(const Blueprints &) = delete;
-
-    template <class T>
-    std::shared_ptr<T> get(const std::string &resRef, resource::ResourceType type, std::unordered_map<std::string, std::shared_ptr<T>> &cache);
-
-    template <class T>
-    std::shared_ptr<T> doGet(const std::string &resRef, resource::ResourceType type);
+    std::unordered_map<std::string, std::shared_ptr<WaypointBlueprint>> _waypointCache;
 };
 
 } // namespace game

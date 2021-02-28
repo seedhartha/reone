@@ -31,71 +31,11 @@ Object::Object(uint32_t id, ObjectType type) : ScriptObject(id), _type(type) {
 }
 
 void Object::update(float dt) {
-    _actionQueue.update();
+    _actionQueue.update(dt);
 }
 
 void Object::clearAllActions() {
     _actionQueue.clear();
-}
-
-bool Object::isMinOneHP() const {
-    return _minOneHP;
-}
-
-bool Object::isDead() const {
-    return _dead;
-}
-
-bool Object::isCommandable() const {
-    return _commandable;
-}
-
-ObjectType Object::type() const {
-    return _type;
-}
-
-const string &Object::tag() const {
-    return _tag;
-}
-
-const string &Object::blueprintResRef() const {
-    return _blueprintResRef;
-}
-
-const string &Object::name() const {
-    return _name;
-}
-
-const string &Object::conversation() const {
-    return _conversation;
-}
-
-ActionQueue &Object::actionQueue() {
-    return _actionQueue;
-}
-
-const string &Object::heartbeat() const {
-    return _heartbeat;
-}
-
-const string &Object::onUserDefined() const {
-    return _onUserDefined;
-}
-
-int Object::hitPoints() const {
-    return _hitPoints;
-}
-
-int Object::maxHitPoints() const {
-    return _maxHitPoints;
-}
-
-int Object::currentHitPoints() const {
-    return _currentHitPoints;
-}
-
-int Object::plotFlag() const {
-    return _plotFlag;
 }
 
 void Object::setTag(const string &tag) {

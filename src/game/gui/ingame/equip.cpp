@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-static const int kStrRefNone = 363;
+static constexpr int kStrRefNone = 363;
 
 static unordered_map<Equipment::Slot, string> g_slotNames = {
     { Equipment::Slot::Implant, "IMPLANT" },
@@ -73,7 +73,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
 };
 
 Equipment::Equipment(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("equip");
@@ -107,34 +107,34 @@ void Equipment::configureItemsListBox() {
     lbItems.setPadding(5);
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
-    protoItem.setBorderColor(getBaseColor(_version));
-    protoItem.setHilightColor(getHilightColor(_version));
+    protoItem.setBorderColor(getBaseColor(_gameId));
+    protoItem.setHilightColor(getHilightColor(_gameId));
 }
 
-static InventorySlot getInventorySlot(Equipment::Slot slot) {
+static int getInventorySlot(Equipment::Slot slot) {
     switch (slot) {
         case Equipment::Slot::Implant:
-            return InventorySlot::kInventorySlotImplant;
+            return InventorySlot::implant;
         case Equipment::Slot::Head:
-            return InventorySlot::kInventorySlotHead;
+            return InventorySlot::head;
         case Equipment::Slot::Hands:
-            return InventorySlot::kInventorySlotHands;
+            return InventorySlot::hands;
         case Equipment::Slot::ArmL:
-            return InventorySlot::kInventorySlotLeftArm;
+            return InventorySlot::leftArm;
         case Equipment::Slot::Body:
-            return InventorySlot::kInventorySlotBody;
+            return InventorySlot::body;
         case Equipment::Slot::ArmR:
-            return InventorySlot::kInventorySlotRightArm;
+            return InventorySlot::rightArm;
         case Equipment::Slot::WeapL:
-            return InventorySlot::kInventorySlotLeftWeapon;
+            return InventorySlot::leftWeapon;
         case Equipment::Slot::Belt:
-            return InventorySlot::kInventorySlotBelt;
+            return InventorySlot::belt;
         case Equipment::Slot::WeapR:
-            return InventorySlot::kInventorySlotRightWeapon;
+            return InventorySlot::rightWeapon;
         case Equipment::Slot::WeapL2:
-            return InventorySlot::kInventorySlotLeftWeapon2;
+            return InventorySlot::leftWeapon2;
         case Equipment::Slot::WeapR2:
-            return InventorySlot::kInventorySlotRightWeapon2;
+            return InventorySlot::rightWeapon2;
         default:
             throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
     }
@@ -153,8 +153,8 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
             }
         }
     }
-    InventorySlot slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    int slot = getInventorySlot(_selectedSlot);
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -207,10 +207,10 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_version != GameVersion::KotOR) return;
+    if (_gameId != GameID::KotOR) return;
 
     Party &party = _game->party();
-    shared_ptr<Creature> partyLeader(party.leader());
+    shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -231,6 +231,8 @@ void Equipment::preloadControl(Control &control) {
 }
 
 void Equipment::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EQUIP" || control == "BTN_BACK") {
         if (_selectedSlot == Slot::None) {
             _game->openInGame();
@@ -259,7 +261,7 @@ void Equipment::selectSlot(Slot slot) {
     setControlVisible("LB_DESC", !noneSelected);
     setControlVisible("LBL_SLOTNAME", noneSelected);
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlVisible("LBL_PORT_BORD", noneSelected);
         setControlVisible("LBL_PORTRAIT", noneSelected);
         setControlVisible("LBL_TXTBAR", noneSelected);
@@ -310,29 +312,30 @@ static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
             return nullptr;
     }
 
-    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureType::GUI));
+    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
         string tag("LBL_INV_" + name.second);
         configureControl(tag, [&name, &equipment](Control &control) {
-            InventorySlot slot = getInventorySlot(name.first);
-            Control::Border border(control.border());
+            int slot = getInventorySlot(name.first);
+            shared_ptr<Texture> fill;
 
             auto equipped = equipment.find(slot);
             if (equipped != equipment.end()) {
-                border.fill = equipped->second->icon();
+                fill = equipped->second->icon();
             } else {
-                border.fill = getEmptySlotIcon(name.first);
+                fill = getEmptySlotIcon(name.first);
             }
-            control.setBorder(border);
+
+            control.setBorderFill(fill);
         });
     }
 }
@@ -345,7 +348,7 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
         lbItem.text = Resources::instance().getString(kStrRefNone);
-        lbItem.iconTexture = Textures::instance().get("inone", TextureType::GUI);
+        lbItem.iconTexture = Textures::instance().get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         lbItems.addItem(move(lbItem));
@@ -356,7 +359,7 @@ void Equipment::updateItems() {
         if (_selectedSlot == Slot::None) {
             if (!item->isEquippable()) continue;
         } else {
-            InventorySlot slot = getInventorySlot(_selectedSlot);
+            int slot = getInventorySlot(_selectedSlot);
             if (!item->isEquippable(slot)) continue;
         }
         ListBox::Item lbItem;
@@ -374,12 +377,12 @@ void Equipment::updateItems() {
 
 shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureType::GUI);
+    return Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

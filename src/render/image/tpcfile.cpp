@@ -21,6 +21,8 @@
 
 #include "../../common/streamutil.h"
 
+#include "../textureutil.h"
+
 #include "txifile.h"
 
 using namespace std;
@@ -31,7 +33,8 @@ namespace reone {
 
 namespace render {
 
-TpcFile::TpcFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _type(type) {
+TpcFile::TpcFile(const string &resRef, TextureUsage usage, bool headless) :
+    BinaryFile(0), _resRef(resRef), _usage(usage), _headless(headless) {
 }
 
 void TpcFile::doLoad() {
@@ -111,8 +114,7 @@ void TpcFile::loadTexture() {
                 getMipMapSize(i, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
-            ByteArray data(_reader->getArray<char>(dataSize));
-            mipMap.data = move(data);
+            mipMap.pixels = make_shared<ByteArray>(_reader->getArray<char>(dataSize));
             mipMaps.push_back(move(mipMap));
         }
 
@@ -122,11 +124,11 @@ void TpcFile::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    TextureFeatures features;
+    Texture::Features features;
     size_t pos = tell();
 
     if (pos < _size) {
-        ByteArray data(_reader->getArray<char>(_size - pos));
+        ByteArray data(_reader->getArray<char>(static_cast<int>(_size - pos)));
 
         TxiFile txi;
         txi.load(wrap(data));
@@ -134,9 +136,17 @@ void TpcFile::loadTexture() {
         features = txi.features();
     }
 
-    _texture = make_shared<Texture>(_resRef, _type, _width, _height);
-    _texture->init();
-    _texture->setPixels(move(layers), getPixelFormat());
+    PixelFormat format = getPixelFormat();
+    if (_cubeMap) {
+        prepareCubeMap(layers, format, format);
+    }
+
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage, _headless));
+    if (!_headless) {
+        _texture->init();
+        _texture->bind();
+    }
+    _texture->setPixels(_width, _height, format, move(layers));
     _texture->setFeatures(move(features));
 }
 
@@ -160,10 +170,6 @@ PixelFormat TpcFile::getPixelFormat() const {
         default:
             throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
     }
-}
-
-shared_ptr<Texture> TpcFile::texture() const {
-    return _texture;
 }
 
 } // namespace render

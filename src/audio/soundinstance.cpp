@@ -32,18 +32,18 @@ namespace reone {
 
 namespace audio {
 
-static const int kMaxBufferCount = 8;
+static constexpr int kMaxBufferCount = 8;
 
 SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
     _positional(positional),
-    _handle(new SoundHandle(stream->duration(), move(position))) {
+    _handle(make_shared<SoundHandle>(stream->duration(), move(position))) {
 }
 
 void SoundInstance::init() {
-    int frameCount = _stream->frameCount();
+    int frameCount = _stream->getFrameCount();
     int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 
     _buffers.resize(bufferCount);
@@ -109,10 +109,10 @@ void SoundInstance::update() {
     alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
     while (processed-- > 0) {
         alSourceUnqueueBuffers(_source, 1, &_buffers[_nextBuffer]);
-        if (_loop && _nextFrame == _stream->frameCount()) {
+        if (_loop && _nextFrame == _stream->getFrameCount()) {
             _nextFrame = 0;
         }
-        if (_nextFrame < _stream->frameCount()) {
+        if (_nextFrame < _stream->getFrameCount()) {
             _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
             alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
         }
@@ -123,10 +123,6 @@ void SoundInstance::update() {
     if (queued == 0) {
         _handle->setState(SoundHandle::State::Stopped);
     }
-}
-
-shared_ptr<SoundHandle> SoundInstance::handle() const {
-    return _handle;
 }
 
 } // namespace audio

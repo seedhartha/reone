@@ -17,12 +17,17 @@
 
 #include "program.h"
 
+#include <algorithm>
 #include <iostream>
+#include <unordered_map>
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "../src/common/pathutil.h"
+
+#include "tools.h"
+#include "types.h"
 
 using namespace std;
 
@@ -35,47 +40,74 @@ namespace reone {
 
 namespace tools {
 
+static const char kConfigFilename[] = "reone-tools.cfg";
+
+static const unordered_map<string, Operation> g_operations {
+    { "list", Operation::List },
+    { "extract", Operation::Extract },
+    { "to-json", Operation::ToJSON },
+    { "to-tga", Operation::ToTGA },
+    { "to-2da", Operation::To2DA },
+    { "to-gff", Operation::ToGFF }
+};
+
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 }
 
 int Program::run() {
     initOptions();
     loadOptions();
-    initGameVersion();
-    initTool();
+    determineGameID();
+    loadTools();
 
-    switch (_command) {
-        case Command::List:
-            _tool->list(_inputFilePath, _keyPath);
-            break;
-        case Command::Extract:
-            _tool->extract(_inputFilePath, _keyPath, _destPath);
-            break;
-        case Command::Convert:
-            _tool->convert(_inputFilePath, _destPath);
-            break;
-        default:
+    switch (_operation) {
+        case Operation::None:
             cout << _cmdLineOpts << endl;
             break;
+        default: {
+            auto tool = getTool();
+            if (tool) {
+                tool->invoke(_operation, _target, _gamePath, _destPath);
+            } else {
+                cout << "Unable to choose a tool for the specified operation" << endl;
+            }
+            break;
+        }
     }
 
     return 0;
 }
 
 void Program::initOptions() {
-    _cmdLineOpts.add_options()
-        ("help", "print this message")
+    _commonOpts.add_options()
+        ("game", po::value<string>(), "path to game directory")
+        ("dest", po::value<string>(), "path to destination directory");
+
+    _cmdLineOpts.add(_commonOpts).add_options()
         ("list", "list file contents")
         ("extract", "extract file contents")
-        ("convert", "convert 2DA or GFF file to JSON")
-        ("game", po::value<string>(), "path to game directory")
-        ("dest", po::value<string>(), "path to destination directory")
-        ("input-file", po::value<string>(), "path to input file");
+        ("to-json", "convert 2DA, GFF or TLK file to JSON")
+        ("to-tga", "convert TPC image to TGA")
+        ("to-2da", "convert JSON to 2DA")
+        ("to-gff", "convert JSON to GFF")
+        ("target", po::value<string>(), "target name or path to input file");
+}
+
+static fs::path getDestination(const po::variables_map &vars) {
+    fs::path result;
+    if (vars.count("dest") > 0) {
+        result = vars["dest"].as<string>();
+    } else if (vars.count("target") > 0) {
+        result = fs::path(vars["target"].as<string>()).parent_path();
+    } else {
+        result = fs::current_path();
+    }
+    return move(result);
 }
 
 void Program::loadOptions() {
     po::positional_options_description positional;
-    positional.add("input-file", 1);
+    positional.add("target", 1);
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_cmdLineOpts)
@@ -84,42 +116,48 @@ void Program::loadOptions() {
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
+    if (fs::exists(kConfigFilename)) {
+        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts), vars);
+    }
     po::notify(vars);
 
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
-    _destPath = vars.count("dest") > 0 ? vars["dest"].as<string>() : fs::current_path();
-    _inputFilePath = vars.count("input-file") > 0 ? vars["input-file"].as<string>() : "";
-    _keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+    _destPath = getDestination(vars);
+    _target = vars.count("target") > 0 ? vars["target"].as<string>() : "";
 
-    if (vars.count("help")) {
-        _command = Command::Help;
-    } else if (vars.count("list")) {
-        _command = Command::List;
-    } else if (vars.count("extract")) {
-        _command = Command::Extract;
-    } else if (vars.count("convert")) {
-        _command = Command::Convert;
+    // Determine operation from program options
+    for (auto &operation : g_operations) {
+        if (vars.count(operation.first)) {
+            _operation = operation.second;
+            break;
+        }
     }
 }
 
-void Program::initGameVersion() {
+void Program::determineGameID() {
     fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
-    _version = exePath.empty() ? GameVersion::KotOR : GameVersion::TheSithLords;
+    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
-void Program::initTool() {
-    switch (_command) {
-        case Command::List:
-        case Command::Extract:
-        case Command::Convert:
-            if (!fs::exists(_inputFilePath)) {
-                throw runtime_error("Input file does not exist: " + _inputFilePath.string());
-            }
-            _tool = getToolByPath(_version, _inputFilePath);
-            break;
-        default:
-            break;
+void Program::loadTools() {
+    // Tools are queried in the order of addition, whether they support a
+    // particular operation on a particular file, or not. The first tool
+    // to return true gets chosen.
+
+    _tools.push_back(make_shared<KeyBifTool>());
+    _tools.push_back(make_shared<ErfTool>());
+    _tools.push_back(make_shared<RimTool>());
+    _tools.push_back(make_shared<TwoDaTool>());
+    _tools.push_back(make_shared<TlkTool>());
+    _tools.push_back(make_shared<GffTool>());
+    _tools.push_back(make_shared<TpcTool>());
+}
+
+shared_ptr<ITool> Program::getTool() const {
+    for (auto &tool : _tools) {
+        if (tool->supports(_operation, _target)) return tool;
     }
+    return nullptr;
 }
 
 } // namespace tools

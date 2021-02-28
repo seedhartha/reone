@@ -17,13 +17,19 @@
 
 #include "tgafile.h"
 
+#include "glm/common.hpp"
+
+#include "../../common/log.h"
+
+#include "../textureutil.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace render {
 
-TgaFile::TgaFile(const string &resRef, TextureType type) : BinaryFile(0), _resRef(resRef), _texType(type) {
+TgaFile::TgaFile(const string &resRef, TextureUsage usage) : BinaryFile(0), _resRef(resRef), _usage(usage) {
 }
 
 void TgaFile::doLoad() {
@@ -35,9 +41,11 @@ void TgaFile::doLoad() {
     switch (_imageType) {
         case ImageType::Grayscale:
         case ImageType::RGBA:
+        case ImageType::RGBA_RLE:
             break;
         default:
-            throw runtime_error("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            warn("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            return;
     }
 
     ignore(9);
@@ -46,55 +54,122 @@ void TgaFile::doLoad() {
     _height = readUint16();
 
     uint8_t bpp = readByte();
+    _alpha = isRGBA() && bpp == 32;
 
-    if ((_imageType == ImageType::RGBA && bpp != 32) ||
-        (_imageType == ImageType::Grayscale && bpp != 8)) {
+    if ((isRGBA() && bpp != 24 && bpp != 32) ||
+        (isGrayscale() && bpp != 8)) {
 
-        throw runtime_error("TGA: unsupported bits per pixel: " + to_string(bpp));
+        throw runtime_error("Unsupported bits per pixel: " + to_string(bpp));
     }
 
-    ignore(1);
+    uint8_t descriptor = readByte();
+
+    bool flipY = (descriptor & 0x10) != 0;
+    if (flipY) {
+        throw runtime_error("Vertically flipped images are not supported");
+    }
+
     ignore(idLength);
 
     loadTexture();
 }
 
-void TgaFile::loadTexture() {
-    Texture::MipMap mipMap;
-    mipMap.width = _width;
-    mipMap.height = _height;
-
-    int sizeRgba = 4 * _width * _height;
-
-    if (_imageType == ImageType::Grayscale) {
-        mipMap.data.resize(sizeRgba);
-        char *pi = &mipMap.data[0];
-
-        int size = _width * _height;
-        ByteArray buf(_reader->getArray<char>(size));
-
-        for (int i = 0; i < size; ++i) {
-            pi[0] = buf[i];
-            pi[1] = buf[i];
-            pi[2] = buf[i];
-            pi[3] = static_cast<char>(0xff);
-            pi += 4;
-        }
-    } else {
-        ByteArray data(_reader->getArray<char>(sizeRgba));
-        mipMap.data = move(data);
-    }
-
-    Texture::Layer layer;
-    layer.mipMaps.push_back(move(mipMap));
-
-    _texture = make_shared<Texture>(_resRef, _texType, _width, _height);
-    _texture->init();
-    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
+bool TgaFile::isRGBA() const {
+    return _imageType == ImageType::RGBA || _imageType == ImageType::RGBA_RLE;
 }
 
-shared_ptr<Texture> TgaFile::texture() const {
-    return _texture;
+bool TgaFile::isGrayscale() const {
+    return _imageType == ImageType::Grayscale;
+}
+
+void TgaFile::loadTexture() {
+    bool cubeMap = _height / _width == 6;
+    int layerCount = cubeMap ? 6 : 1;
+
+    vector<Texture::Layer> layers;
+    layers.reserve(layerCount);
+
+    for (int i = 0; i < layerCount; ++i) {
+        int w = _width;
+        int h = cubeMap ? _width : _height;
+
+        Texture::MipMap mipMap;
+        mipMap.width = w;
+        mipMap.height = h;
+        mipMap.pixels = make_shared<ByteArray>(readPixels(w, h));
+
+        Texture::Layer layer;
+        layer.mipMaps.push_back(move(mipMap));
+        layers.push_back(move(layer));
+    }
+
+    PixelFormat format = isGrayscale() ?
+        PixelFormat::Grayscale :
+        (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+
+    if (cubeMap) {
+        prepareCubeMap(layers, format, format);
+    }
+
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture->init();
+    _texture->bind();
+    _texture->setPixels(_width, _height, format, move(layers));
+}
+
+ByteArray TgaFile::readPixels(int w, int h) {
+    if (isRLE()) {
+        return readPixelsRLE(w, h);
+    }
+    int dataSize = (isRGBA() ? (_alpha ? 4 : 3) : 1) * w * h;
+
+    return _reader->getArray<char>(dataSize);
+}
+
+bool TgaFile::isRLE() const {
+    return _imageType == ImageType::RGBA_RLE;
+}
+
+ByteArray TgaFile::readPixelsRLE(int w, int h) {
+    ByteArray result;
+
+    int count = w * h;
+    while (count > 0) {
+        uint8_t code = readByte();
+        int length = glm::min((code & 0x7f) + 1, count);
+
+        count -= length;
+
+        if (code & 0x80) {
+            uint8_t a = _alpha ? readByte() : 0;
+            uint8_t b = readByte();
+            uint8_t g = readByte();
+            uint8_t r = readByte();
+            while (length--) {
+                result.push_back(b);
+                result.push_back(g);
+                result.push_back(r);
+                if (_alpha) {
+                    result.push_back(a);
+                }
+            }
+        } else {
+            while (length--) {
+                uint8_t a = _alpha ? readByte() : 0;
+                uint8_t b = readByte();
+                uint8_t g = readByte();
+                uint8_t r = readByte();
+                result.push_back(b);
+                result.push_back(g);
+                result.push_back(r);
+                if (_alpha) {
+                    result.push_back(a);
+                }
+            }
+        }
+    }
+
+    return move(result);
 }
 
 } // namespace render

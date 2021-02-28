@@ -17,6 +17,8 @@
 
 #include "curfile.h"
 
+#include "../textureutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -56,10 +58,7 @@ void CurFile::loadData() {
     ByteArray xorData(_reader->getArray<char>(pixelCount));
     ByteArray andData(_reader->getArray<char>(pixelCount / 8));
 
-    Texture::MipMap mipMap;
-    mipMap.width = _width;
-    mipMap.height = _width;
-    mipMap.data.resize(4 * pixelCount);
+    auto pixels = make_shared<ByteArray>(4 * pixelCount);
 
     for (int y = 0; y < _width; ++y) {
         for (int x = 0; x < _width; ++x) {
@@ -67,23 +66,25 @@ void CurFile::loadData() {
             int offMipMap = 4 * pixelIdx;
             int offPalette = 4 * static_cast<uint8_t>(xorData[pixelIdx]);
 
-            mipMap.data[offMipMap + 0] = palette[offPalette + 0];
-            mipMap.data[offMipMap + 1] = palette[offPalette + 1];
-            mipMap.data[offMipMap + 2] = palette[offPalette + 2];
-            mipMap.data[offMipMap + 3] = (andData[pixelIdx / 8] & (1 << (7 - x % 8))) ? 0 : 0xff;
+            *(pixels->data() + offMipMap + 0) = palette[offPalette + 0];
+            *(pixels->data() + offMipMap + 1) = palette[offPalette + 1];
+            *(pixels->data() + offMipMap + 2) = palette[offPalette + 2];
+            *(pixels->data() + offMipMap + 3) = (andData[pixelIdx / 8] & (1 << (7 - x % 8))) ? 0 : 0xff;
         }
     }
+
+    Texture::MipMap mipMap;
+    mipMap.width = _width;
+    mipMap.height = _width;
+    mipMap.pixels = move(pixels);
 
     Texture::Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    _texture = make_shared<Texture>("", TextureType::Cursor, _width, _width);
+    _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
     _texture->init();
-    _texture->setPixels(vector<Texture::Layer> { layer }, PixelFormat::BGRA);
-}
-
-shared_ptr<Texture> CurFile::texture() {
-    return _texture;
+    _texture->bind();
+    _texture->setPixels(_width, _width, PixelFormat::BGRA, vector<Texture::Layer> { layer });
 }
 
 } // namespace render

@@ -21,6 +21,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "../resource/types.h"
 
 #include "types.h"
@@ -36,25 +38,20 @@ class Texture;
 
 namespace game {
 
-class Cursors {
+class Cursors : boost::noncopyable {
 public:
     static Cursors &instance();
 
     ~Cursors();
 
-    void init(resource::GameVersion version);
+    void init(resource::GameID gameId);
     void deinit();
 
     std::shared_ptr<render::Cursor> get(CursorType type);
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
-
-    Cursors() = default;
-    Cursors(const Cursors &) = delete;
-
-    Cursors &operator=(const Cursors &) = delete;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type, const std::unordered_map<CursorType, std::pair<uint32_t, uint32_t>> &nameByResRef);

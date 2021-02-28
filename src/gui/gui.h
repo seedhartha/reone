@@ -21,10 +21,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
-#include "../resource/gfffile.h"
+#include "../resource/format/gfffile.h"
 #include "../resource/types.h"
 
 #include "control/control.h"
@@ -33,17 +35,17 @@ namespace reone {
 
 namespace gui {
 
-static const int kDefaultResolutionX = 640;
-static const int kDefaultResolutionY = 480;
+constexpr int kDefaultResolutionX = 640;
+constexpr int kDefaultResolutionY = 480;
 
-class GUI {
+class GUI : boost::noncopyable {
 public:
     virtual void load();
 
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
-    virtual void render() const;
-    virtual void render3D() const;
+    virtual void render();
+    virtual void render3D();
 
     void configureRootContol(const std::function<void(Control &)> &fn);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
@@ -70,7 +72,7 @@ protected:
         Stretch
     };
 
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
     render::GraphicsOptions _gfxOpts;
     std::string _resRef;
     BackgroundType _backgroundType { BackgroundType::None };
@@ -90,7 +92,7 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(resource::GameVersion version, const render::GraphicsOptions &opts);
+    GUI(resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
@@ -114,14 +116,13 @@ protected:
     // END User input
 
 private:
-    GUI(const GUI &) = delete;
-    GUI &operator=(const GUI &) = delete;
+    bool _leftMouseDown { false };
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
     void updateFocus(int x, int y);
 
-    void drawBackground() const;
+    void drawBackground();
 
     Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
 };

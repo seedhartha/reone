@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cstdint>
 #include "endianutil.h"
 
 namespace reone {
@@ -23,11 +22,6 @@ namespace reone {
 Endianess initEndianess() {
     uint16_t test = 0x1100;
     return static_cast<bool>(*(char*)&test) ? Endianess::Big : Endianess::Little;
-}
-
-Endianess getEndianess() {
-    static Endianess endianess = initEndianess();
-    return endianess;
 }
 
 } // namespace reone

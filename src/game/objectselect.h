@@ -21,6 +21,8 @@
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 namespace game {
@@ -31,7 +33,7 @@ class Area;
 class SpatialObject;
 class Party;
 
-class ObjectSelector {
+class ObjectSelector : boost::noncopyable {
 public:
     ObjectSelector(const Area *area, const Party *party);
 
@@ -43,17 +45,14 @@ public:
 
     std::vector<std::shared_ptr<SpatialObject>> getSelectableObjects() const;
 
-    std::shared_ptr<SpatialObject> hilightedObject() const;
-    std::shared_ptr<SpatialObject> selectedObject() const;
+    std::shared_ptr<SpatialObject> hilightedObject() const { return _hilightedObject; }
+    std::shared_ptr<SpatialObject> selectedObject() const { return _selectedObject; }
 
 private:
     const Area *_area { nullptr };
     const Party *_party { nullptr };
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
-
-    ObjectSelector(const ObjectSelector &) = delete;
-    ObjectSelector &operator=(const ObjectSelector &) = delete;
 };
 
 } // namespace game

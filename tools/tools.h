@@ -17,87 +17,133 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <boost/filesystem/path.hpp>
-#include <boost/property_tree/ptree.hpp>
 
-#include "../src/resource/keyfile.h"
+#include "../src/resource/format/2dafile.h"
+#include "../src/resource/format/biffile.h"
+#include "../src/resource/format/erffile.h"
+#include "../src/resource/format/keyfile.h"
+#include "../src/resource/format/rimfile.h"
+
+#include "types.h"
 
 namespace reone {
 
-namespace resource {
-
-class GffStruct;
-
-}
-
 namespace tools {
 
-/**
- * Abstract tool class. Each implementation covers a single file format.
- *
- * Operations:
- * - list — list file contents
- * - extract — extract file contents
- * - convert — convert file to JSON
- */
-class Tool {
+class ITool {
 public:
-    virtual void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const;
-    virtual void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const;
-    virtual void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const;
+    virtual void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) = 0;
+
+    virtual bool supports(Operation operation, const boost::filesystem::path &target) const = 0;
+};
+
+class KeyBifTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    void throwNotImplemented() const;
+    void listKEY(const resource::KeyFile &key);
+    void listBIF(const resource::KeyFile &key, const resource::BifFile &bif, int bifIdx);
+    void extractBIF(const resource::KeyFile &key, resource::BifFile &bif, int bifIdx, const boost::filesystem::path &destPath);
 };
 
-std::unique_ptr<Tool> getToolByPath(resource::GameVersion version, const boost::filesystem::path &path);
-
-class KeyTool : public Tool {
+class ErfTool : public ITool {
 public:
-    void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
-};
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
 
-class BifTool : public Tool {
-public:
-    void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
-    void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    int getFileIndexByFilename(const std::vector<resource::KeyFile::FileEntry> &files, const std::string &filename) const;
+    void list(const resource::ErfFile &erf);
+    void extract(resource::ErfFile &erf, const boost::filesystem::path &destPath);
 };
 
-class ErfTool : public Tool {
+class RimTool : public ITool {
 public:
-    void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
-    void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
-};
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
 
-class RimTool : public Tool {
-public:
-    void list(const boost::filesystem::path &path, const boost::filesystem::path &keyPath) const override;
-    void extract(const boost::filesystem::path &path, const boost::filesystem::path &keyPath, const boost::filesystem::path &destPath) const override;
-};
-
-class TwoDaTool : public Tool {
-public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
-};
-
-class TlkTool : public Tool {
-public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
-};
-
-class GffTool : public Tool {
-public:
-    void convert(const boost::filesystem::path &path, const boost::filesystem::path &destPath) const override;
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    boost::property_tree::ptree getPropertyTree(const resource::GffStruct &gffs) const;
+    void list(const resource::RimFile &rim);
+    void extract(resource::RimFile &rim, const boost::filesystem::path &destPath);
+};
+
+class TwoDaTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
+class GffTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
+class TlkTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
+class TpcTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace tools

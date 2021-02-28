@@ -31,8 +31,8 @@ namespace reone {
 
 namespace game {
 
-LevelUpMenu::LevelUpMenu(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &options) :
-    GameGUI(version, options),
+LevelUpMenu::LevelUpMenu(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &options) :
+    GameGUI(gameId, options),
     _charGen(charGen) {
 
     _resRef = getResRef("leveluppnl");
@@ -44,7 +44,7 @@ void LevelUpMenu::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
@@ -129,6 +129,8 @@ void LevelUpMenu::doSetStep(int step) {
 }
 
 void LevelUpMenu::onClick(const std::string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_BACK") {
         _charGen->cancel();
     } else if (boost::starts_with(control, "BTN_STEPNAME")) {

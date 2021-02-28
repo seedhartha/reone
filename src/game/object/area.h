@@ -26,7 +26,7 @@
 
 #include "../../common/timer.h"
 #include "../../render/types.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 #include "../../resource/types.h"
 
 #include "../actionexecutor.h"
@@ -35,13 +35,13 @@
 #include "../camera/firstperson.h"
 #include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
-#include "../camera/types.h"
 #include "../collisiondetect.h"
 #include "../combat/combat.h"
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
 #include "../script/runner.h"
+#include "../types.h"
 
 #include "object.h"
 
@@ -83,20 +83,21 @@ public:
     bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
     bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
 
-    bool isUnescapable() const;
+    bool isUnescapable() const { return _unescapable; }
 
     std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
-    const CameraStyle &cameraStyle() const;
-    const CollisionDetector &collisionDetector() const;
-    const std::string &music() const;
-    const ObjectList &objects() const;
-    ObjectSelector &objectSelector();
-    const Pathfinder &pathfinder() const;
-    const RoomMap &rooms() const;
-    Combat &combat();
-    Map &map();
+    const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
+    const CollisionDetector &collisionDetector() const { return _collisionDetector; }
+    const std::string &music() const { return _music; }
+    const ObjectList &objects() const { return _objects; }
+    ObjectSelector &objectSelector() { return _objectSelector; }
+    const Pathfinder &pathfinder() const { return _pathfinder; }
+    const std::string &localizedName() const { return _localizedName; }
+    const RoomMap &rooms() const { return _rooms; }
+    Combat &combat() { return _combat; }
+    Map &map() { return _map; }
 
     void setUnescapable(bool value);
 
@@ -125,6 +126,11 @@ public:
     void setStaticCamera(int cameraId);
     void setThirdPartyCameraStyle(CameraStyleType type);
 
+    template <class T>
+    T &getCamera(CameraType type) {
+        return static_cast<T &>(getCamera(type));
+    };
+
     // END Cameras
 
     // Party
@@ -137,11 +143,11 @@ public:
 
     // Stealth
 
-    bool isStealthXPEnabled() const;
+    bool isStealthXPEnabled() const { return _stealthXPEnabled; }
 
-    int maxStealthXP() const;
-    int currentStealthXP() const;
-    int stealthXPDecrement() const;
+    int maxStealthXP() const { return _maxStealthXP; }
+    int currentStealthXP() const { return _currentStealthXP; }
+    int stealthXPDecrement() const { return _stealthXPDecrement; }
 
     void setStealthXPEnabled(bool value);
     void setMaxStealthXP(int value);
@@ -159,13 +165,14 @@ public:
     // END Scripts
 
 private:
-    Game *_game { nullptr };
+    Game *_game;
+
     CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Combat _combat;
     Pathfinder _pathfinder;
-    std::string _name;
+    std::string _localizedName;
     RoomMap _rooms;
     resource::Visibility _visibility;
     CameraStyle _camStyleDefault;
@@ -212,6 +219,8 @@ private:
     int _stealthXPDecrement { 0 };
 
     // END Stealth
+
+    void init();
 
     void add(const std::shared_ptr<SpatialObject> &object);
     void doDestroyObject(uint32_t objectId);

@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "../../resource/types.h"
 #include "../../script/routine.h"
 #include "../../script/types.h"
@@ -41,11 +43,11 @@ class Object;
 class Sound;
 class SpatialObject;
 
-class Routines : public script::IRoutineProvider {
+class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
     static Routines &instance();
 
-    void init(resource::GameVersion version, Game *game);
+    void init(resource::GameID gameId, Game *game);
     void deinit();
 
     const script::Routine &get(int index) override;
@@ -57,11 +59,7 @@ private:
     Game *_game { nullptr };
     std::vector<script::Routine> _routines;
 
-    Routines() = default;
-    Routines(const Routines &) = delete;
     ~Routines();
-
-    Routines &operator=(const Routines &) = delete;
 
     void add(const std::string &name, script::VariableType retType, const VariableTypesList &argTypes);
 

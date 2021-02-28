@@ -24,7 +24,7 @@
 #include "SDL2/SDL_events.h"
 
 #include "../../render/types.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 #include "../../resource/types.h"
 
 #include "../player.h"
@@ -76,11 +76,11 @@ public:
 
     std::vector<ContextualAction> getContextualActions(const std::shared_ptr<Object> &object) const;
 
-    const std::string &name() const;
-    const ModuleInfo &info() const;
-    std::shared_ptr<Area> area() const;
-    Player &player();
-    const Time &time() const;
+    const std::string &name() const { return _name; }
+    const ModuleInfo &info() const { return _info; }
+    std::shared_ptr<Area> area() const { return _area; }
+    Player &player() { return *_player; }
+    const Time &time() const { return _time; }
 
     void setTime(int hour, int minute, int second, int millisecond);
 
@@ -111,6 +111,7 @@ private:
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
 
     // END User input
 };

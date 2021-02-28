@@ -17,6 +17,8 @@
 
 #include "textures.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../common/log.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
@@ -24,6 +26,8 @@
 #include "image/curfile.h"
 #include "image/tgafile.h"
 #include "image/tpcfile.h"
+#include "image/txifile.h"
+#include "textureutil.h"
 
 using namespace std;
 
@@ -38,43 +42,56 @@ Textures &Textures::instance() {
     return instance;
 }
 
-void Textures::init(GameVersion version) {
-    _version = version;
+void Textures::init(GameID gameId) {
+    _gameId = gameId;
+
+    // Initialize default texture
+    _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
+    _default->init();
+    _default->bind();
+    _default->clearPixels(1, 1, PixelFormat::RGB);
 }
 
 void Textures::invalidateCache() {
     _cache.clear();
 }
 
-shared_ptr<Texture> Textures::get(const string &resRef, TextureType type) {
+shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
     auto maybeTexture = _cache.find(resRef);
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;
     }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, type)));
+    string lcResRef(boost::to_lower_copy(resRef));
+    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, usage)));
 
     return inserted.first->second;
 }
 
-shared_ptr<Texture> Textures::doGet(const string &resRef, TextureType type) {
+shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
-    bool tryTpc = _version == GameVersion::TheSithLords || type != TextureType::Lightmap;
-    if (tryTpc) {
-        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Texture, false));
-        if (tpcData) {
-            TpcFile tpc(resRef, type);
-            tpc.load(wrap(tpcData));
-            texture = tpc.texture();
+    shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
+    if (tgaData) {
+        TgaFile tga(resRef, usage);
+        tga.load(wrap(tgaData));
+        texture = tga.texture();
+
+        if (texture) {
+            shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
+            if (txiData) {
+                TxiFile txi;
+                txi.load(wrap(txiData));
+                texture->setFeatures(txi.features());
+            }
         }
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
-        if (tgaData) {
-            TgaFile tga(resRef, type);
-            tga.load(wrap(tgaData));
-            texture = tga.texture();
+        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Tpc, false));
+        if (tpcData) {
+            TpcFile tpc(resRef, usage);
+            tpc.load(wrap(tpcData));
+            texture = tpc.texture();
         }
     }
 

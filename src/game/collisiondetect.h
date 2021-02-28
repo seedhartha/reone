@@ -20,28 +20,36 @@
 #include <memory>
 #include <set>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
-#include "object/types.h"
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-static const float kDefaultRaycastDistance = 8.0f;
-
-enum RaycastFlags {
-    kRaycastRooms = 1,
-    kRaycastObjects = 2,
-    kRaycastWalkable = 4,
-    kRaycastAABB = 8,
-    kRaycastSelectable = 0x10,
-    kRaycastAlive = 0x20
-};
+constexpr float kDefaultRaycastDistance = 8.0f;
 
 class Area;
 class Room;
 class SpatialObject;
+
+struct RaycastFlags {
+    static constexpr int rooms = 1;
+    static constexpr int objects = 2;
+    static constexpr int walkable = 4;
+    static constexpr int aabb = 8;
+    static constexpr int selectable = 0x10;
+    static constexpr int alive = 0x20;
+
+    static constexpr int roomsWalkable = rooms | walkable;
+    static constexpr int roomsObjects = rooms | objects;
+    static constexpr int roomsObjectsAABB = roomsObjects | aabb;
+    static constexpr int objectsAABBSelectable = objects | aabb | selectable;
+    static constexpr int objectsAABBAlive = objects | aabb | alive;
+};
 
 struct RaycastProperties {
     int flags { 0 };
@@ -59,7 +67,7 @@ struct RaycastResult {
     float distance { 0.0f };
 };
 
-class CollisionDetector {
+class CollisionDetector : boost::noncopyable {
 public:
     CollisionDetector(Area *area);
 
@@ -69,10 +77,7 @@ public:
     bool raycast(const RaycastProperties &props, RaycastResult &result) const;
 
 private:
-    Area *_area { nullptr };
-
-    CollisionDetector(const CollisionDetector &) = delete;
-    CollisionDetector &operator=(const CollisionDetector &) = delete;
+    Area *_area;
 
     bool rayTestObjects(const RaycastProperties &props, RaycastResult &result) const;
     bool rayTestRooms(const RaycastProperties &props, RaycastResult &result) const;

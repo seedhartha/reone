@@ -46,29 +46,6 @@ void Room::removeTenant(SpatialObject *object) {
 }
 
 void Room::update(float dt) {
-    if (_model) {
-        _model->update(dt);
-    }
-}
-
-bool Room::isVisible() const {
-    return _visible;
-}
-
-const string &Room::name() const {
-    return _name;
-}
-
-const glm::vec3 &Room::position() const {
-    return _position;
-}
-
-shared_ptr<ModelSceneNode> Room::model() const {
-    return _model;
-}
-
-const Walkmesh *Room::walkmesh() const {
-    return _walkmesh.get();
 }
 
 void Room::setVisible(bool visible) {

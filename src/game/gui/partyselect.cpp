@@ -42,7 +42,7 @@ namespace reone {
 
 namespace game {
 
-static const int kMaxFollowerCount = 2;
+static constexpr int kMaxFollowerCount = 2;
 
 static int g_strRefAdd = 38455;
 static int g_strRefRemove = 38456;
@@ -55,10 +55,10 @@ static map<int, string> g_portraitByAppearance = {
 };
 
 PartySelection::PartySelection(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";
@@ -113,7 +113,7 @@ void PartySelection::prepare(const Context &ctx) {
                 portrait = getPortraitByAppearance(blueprint->getAppearanceFromUtc());
             }
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(Textures::instance().get(portrait, TextureType::GUI));
+            lblChar.setBorderFill(Textures::instance().get(portrait, TextureUsage::GUI));
             lblNa.setVisible(false);
 
         } else {
@@ -138,11 +138,15 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
 }
 
 void PartySelection::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         onAcceptButtonClick();
 
     } else if (control == "BTN_DONE" || control == "BTN_BACK") {
-        changeParty();
+        if (control == "BTN_DONE") {
+            changeParty();
+        }
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
@@ -224,7 +228,7 @@ void PartySelection::changeParty() {
         creature->load(blueprint);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);
-        creature->actionQueue().add(make_unique<FollowAction>(player, 1.0f));
+        creature->actionQueue().add(make_unique<FollowAction>(player, kDefaultFollowDistance));
         party.addMember(i, creature);
     }
 

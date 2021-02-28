@@ -20,10 +20,11 @@
 #include <stdexcept>
 
 #include "../common/log.h"
-#include "../render/mesh/quad.h"
+#include "../render/meshes.h"
 #include "../render/shaders.h"
+#include "../render/stateutil.h"
 #include "../render/textures.h"
-#include "../render/util.h"
+#include "../render/window.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -36,14 +37,14 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(GameVersion version, const GraphicsOptions &opts) : _version(version), _gfxOpts(opts) {
+GUI::GUI(GameID gameId, const GraphicsOptions &opts) : _gameId(gameId), _gfxOpts(opts) {
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
 }
 
 string GUI::getResRef(const string &base) const {
-    return _version == GameVersion::TheSithLords ? base + "_p" : base;
+    return _gameId == GameID::TSL ? base + "_p" : base;
 }
 
 void GUI::load() {
@@ -85,26 +86,44 @@ void GUI::load() {
 void GUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
-        (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
-        (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
-        (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
-
-        resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
+    if (_gameId == GameID::TSL) {
+        switch (type) {
+            case BackgroundType::Computer0:
+            case BackgroundType::Computer1:
+                resRef = "pnl_computer_pc";
+                break;
+            default:
+                break;
+        }
     } else {
-        resRef = "1600x1200";
+        if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
+            (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
+            (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
+            (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
+
+            resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
+        } else {
+            resRef = "1600x1200";
+        }
+        switch (type) {
+            case BackgroundType::Menu:
+                resRef += "back";
+                break;
+            case BackgroundType::Load:
+                resRef += "load";
+                break;
+            case BackgroundType::Computer0:
+                resRef += "comp0";
+                break;
+            case BackgroundType::Computer1:
+                resRef += "comp1";
+                break;
+            default:
+                return;
+        }
     }
-    switch (type) {
-        case BackgroundType::Menu:
-            resRef += "back";
-            break;
-        case BackgroundType::Load:
-            resRef += "load";
-            break;
-        default:
-            return;
-    }
-    _background = Textures::instance().get(resRef, TextureType::Diffuse);
+
+    _background = Textures::instance().get(resRef, TextureUsage::Diffuse);
 }
 
 void GUI::stretchControl(Control &control) {
@@ -188,8 +207,14 @@ bool GUI::handle(const SDL_Event &event) {
             }
             break;
         }
-        case SDL_MOUSEBUTTONDOWN: {
+        case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
+                _leftMouseDown = true;
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
+                _leftMouseDown = false;
                 glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
                 if (control) {
@@ -198,7 +223,6 @@ bool GUI::handle(const SDL_Event &event) {
                 }
             }
             break;
-        }
 
         case SDL_MOUSEWHEEL:
             if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y)) return true;
@@ -217,13 +241,20 @@ bool GUI::handleKeyUp(SDL_Scancode key) {
 }
 
 void GUI::updateFocus(int x, int y) {
-    resetFocus();
-
     Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
+    if (control == _focus) return;
+
+    if (_focus) {
+        if (_focus->isFocusable()) {
+            _focus->setFocus(false);
+        }
+        onFocusChanged(_focus->tag(), false);
+    }
+    _focus = control;
+
     if (control) {
         control->setFocus(true);
-        _focus = control;
-        onFocusChanged(_focus->tag(), true);
+        onFocusChanged(control->tag(), true);
     }
 }
 
@@ -252,35 +283,35 @@ void GUI::update(float dt) {
     }
 }
 
-void GUI::render() const {
+void GUI::render() {
     if (_background) drawBackground();
-    if (_rootControl) _rootControl->render(_rootOffset);
+    if (_rootControl) _rootControl->render(_rootOffset, _rootControl->textLines());
 
     for (auto &control : _controls) {
-        control->render(_controlOffset);
+        control->render(_controlOffset, control->textLines());
     }
 }
 
-void GUI::render3D() const {
+void GUI::render3D() {
     for (auto &control : _controls) {
         control->render3D(_controlOffset);
     }
 }
 
-void GUI::drawBackground() const {
+void GUI::drawBackground() {
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -0.9));
+    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
 void GUI::resetFocus() {
@@ -337,9 +368,11 @@ Control &GUI::getControl(const string &tag) const {
     auto it = find_if(
         _controls.begin(),
         _controls.end(),
-        [&tag](const unique_ptr<Control> &ctrl) { return ctrl->tag() == tag; });
+        [&tag](auto &ctrl) { return ctrl->tag() == tag; });
 
-    return **it;
+    if (it != _controls.end()) return **it;
+
+    throw runtime_error("Control not found: " + tag);
 }
 
 void GUI::onClick(const string &control) {

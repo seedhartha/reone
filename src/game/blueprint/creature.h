@@ -21,7 +21,9 @@
 #include <memory>
 #include <vector>
 
-#include "../../resource/gfffile.h"
+#include <boost/noncopyable.hpp>
+
+#include "../../resource/format/gfffile.h"
 
 #include "../rp/attributes.h"
 
@@ -36,21 +38,19 @@ class Creature;
 /**
  * Creature blueprint that loads data from a UTC file.
  */
-class CreatureBlueprint : public Blueprint<Creature> {
+class CreatureBlueprint : public Blueprint<Creature>, boost::noncopyable {
 public:
     CreatureBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utc);
 
     void load(Creature &creature) override;
 
-    const std::string &resRef() const;
     int getAppearanceFromUtc() const;
+
+    const std::string &resRef() const { return _resRef; }
 
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _utc;
-
-    CreatureBlueprint(const CreatureBlueprint &) = delete;
-    CreatureBlueprint &operator=(const CreatureBlueprint &) = delete;
 
     void loadName(Creature &creature);
     void loadAttributes(Creature &creature);
@@ -58,6 +58,8 @@ private:
     void loadSkills(CreatureSkills &skills);
     void loadScripts(Creature &creature);
     void loadItems(Creature &creature);
+    void loadSoundSet(Creature &creature);
+    void loadBodyBag(Creature &creature);
 };
 
 /**
@@ -70,9 +72,9 @@ public:
     void clearEquipment();
     void addEquippedItem(const std::string &resRef);
 
-    Gender gender() const;
-    int appearance() const;
-    CreatureAttributes &attributes();
+    Gender gender() const { return _gender; }
+    int appearance() const { return _appearance; }
+    CreatureAttributes &attributes() { return _attributes; }
 
     void setGender(Gender gender);
     void setAppearance(int appearance);

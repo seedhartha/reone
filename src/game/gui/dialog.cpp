@@ -31,8 +31,9 @@
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 #include "../../script/execution.h"
 
 #include "../game.h"
@@ -53,9 +54,12 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultEntryDuration = 1000;
+static const char kControlTagTopFrame[] = "TOP";
+static const char kControlTagBottomFrame[] = "BOTTOM";
+static const char kControlTagMessage[] = "LBL_MESSAGE";
+static const char kControlTagReplies[] = "LB_REPLIES";
 
-static bool g_allEntriesSkippable = false;
+static const char kObjectTagOwner[] = "owner";
 
 static const unordered_map<string, AnimationType> g_animTypeByName {
     { "dead", AnimationType::LoopingDead },
@@ -91,34 +95,30 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     { "kneel_talk_sad", AnimationType::LoopingKneelTalkSad }
 };
 
-enum EndEntryFlags {
-    kEndEntryOnAnimFinish = 1,
-    kEndEntryOnAudioStop = 2
-};
-
-DialogGUI::DialogGUI(Game *game) :
-    GUI(game->version(), game->options().graphics),
-    _game(game) {
-
+DialogGUI::DialogGUI(Game *game) : Conversation(game) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
+    _repliesControlTag = kControlTagReplies;
 }
 
 void DialogGUI::load() {
-    GUI::load();
+    Conversation::load();
 
     configureMessage();
     configureReplies();
-    loadTopFrame();
-    loadBottomFrame();
+    loadFrames();
 }
 
-void DialogGUI::loadTopFrame() {
-    addFrame(-_rootControl->extent().top, getControl("LBL_MESSAGE").extent().height);
+void DialogGUI::loadFrames() {
+    int rootTop = _rootControl->extent().top;
+    int messageHeight = getControl(kControlTagMessage).extent().height;
+
+    addFrame(kControlTagTopFrame, -rootTop, messageHeight);
+    addFrame(kControlTagBottomFrame, 0, _gfxOpts.height - rootTop);
 }
 
-void DialogGUI::addFrame(int top, int height) {
-    unique_ptr<Panel> frame(new Panel(this));
+void DialogGUI::addFrame(string tag, int top, int height) {
+    auto frame = make_unique<Panel>(this);
 
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
@@ -129,285 +129,31 @@ void DialogGUI::addFrame(int top, int height) {
     frame->setExtent(move(extent));
     frame->setBorderFill("blackfill");
 
+    _controlByTag.insert(make_pair(tag, frame.get()));
     _controls.insert(_controls.begin(), move(frame));
 }
 
-void DialogGUI::loadBottomFrame() {
-    int rootTop = _rootControl->extent().top;
-    int height = _gfxOpts.height - rootTop;
-
-    addFrame(_gfxOpts.height - rootTop - height, height);
-}
-
 void DialogGUI::configureMessage() {
-    Control &message = getControl("LBL_MESSAGE");
-
-    Control::Extent extent(message.extent());
-    extent.top = -_rootControl->extent().top;
-
-    message.setExtent(move(extent));
-    message.setTextColor(getBaseColor(_version));
+    auto &message = getControl(kControlTagMessage);
+    message.setExtentTop(-_rootControl->extent().top);
+    message.setTextColor(getBaseColor(_gameId));
 }
 
 void DialogGUI::configureReplies() {
-    ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
+    auto &replies = getControl<ListBox>(kControlTagReplies);
+    replies.setProtoMatchContent(true);
 
     Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_version));
-    protoItem.setTextColor(getBaseColor(_version));
+    protoItem.setHilightColor(getHilightColor(_gameId));
+    protoItem.setTextColor(getBaseColor(_gameId));
 }
 
-void DialogGUI::onReplyClicked(int index) {
-    pickReply(index);
-}
-
-void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
-    if (control != "LB_REPLIES") return;
-
-    int replyIdx = stoi(item);
-    onReplyClicked(replyIdx);
-}
-
-void DialogGUI::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
-    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Conversation));
-    if (!dlg) {
-        _game->openInGame();
-        return;
-    }
-    _owner = owner;
+void DialogGUI::onStart() {
     _currentSpeaker = _owner;
-
-    _dialog.reset(new Dialog());
-    _dialog->load(resRef, *dlg);
-
-    debug("Dialog: start " + resRef);
-
-    loadAnimatedCamera();
     loadStuntParticipants();
-    loadStartEntry();
-}
 
-void DialogGUI::loadAnimatedCamera() {
-    string modelResRef(_dialog->cameraModel());
-    if (modelResRef.empty()) return;
-
-    AnimatedCamera &camera = static_cast<AnimatedCamera &>(_game->module()->area()->getCamera(CameraType::Animated));
-    camera.setModel(modelResRef);
-}
-
-void DialogGUI::loadStartEntry() {
-    int entryIdx = -1;
-    for (auto &link : _dialog->startEntries()) {
-        if (link.active.empty()) {
-            entryIdx = link.index;
-            break;
-        }
-        if (checkCondition(link.active)) {
-            entryIdx = link.index;
-            break;
-        }
-    }
-    debug("Dialog: entry selected: " + to_string(entryIdx), 2);
-
-    if (entryIdx == -1) {
-        _game->openInGame();
-        return;
-    }
-    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
-    loadCurrentEntry();
-}
-
-bool DialogGUI::checkCondition(const string &script) {
-    int result = _game->scriptRunner().run(script, _owner->id());
-    return result == -1 || result == 1;
-}
-
-void DialogGUI::loadCurrentEntry() {
-    if (!_currentEntry->script.empty()) {
-        _game->scriptRunner().run(_currentEntry->script, _owner->id());
-    }
-    Control &message = getControl("LBL_MESSAGE");
-    message.setTextMessage(_currentEntry->text);
-
-    loadReplies();
-    loadCurrentSpeaker();
-    playVoiceOver();
-    scheduleEndOfEntry();
-    updateCamera();
-    updateParticipantAnimations();
-    repositionMessage();
-}
-
-void DialogGUI::loadReplies() {
-    ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-    replies.clearItems();
-
-    vector<int> activeReplies;
-    for (auto &link : _currentEntry->replies) {
-        if (link.active.empty() || checkCondition(link.active)) {
-            activeReplies.push_back(link.index);
-        }
-    }
-
-    bool singleEmptyReply = false;
-    int replyNumber = 0;
-    for (auto &replyIdx : activeReplies) {
-        const Dialog::EntryReply &reply = _dialog->getReply(replyIdx);
-        string text(reply.text);
-        if (text.empty()) {
-            if (activeReplies.size() == 1) {
-                singleEmptyReply = true;
-                break;
-            } else {
-                text = "[empty]";
-            }
-        }
-        replies.addItem({ to_string(replyIdx), str(boost::format("%d. %s") % ++replyNumber % text) });
-    }
-    if (singleEmptyReply) {
-        _autoPickReplyIdx = activeReplies.front();
-    }
-
-    if (activeReplies.empty()) {
-        debug("Dialog: finish (no active replies)");
-        finish();
-    } else {
-        hideControl("LB_REPLIES");
-    }
-}
-
-void DialogGUI::finish() {
-    if (_dialog->isAnimatedCutscene()) {
-        releaseStuntParticipants();
-    }
-    if (!_dialog->endScript().empty()) {
-        _game->scriptRunner().run(_dialog->endScript(), _owner->id());
-    }
-    if (_currentSpeaker) {
-        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
-        if (speakerCreature) {
-            speakerCreature->setTalking(false);
-        }
-    }
-    _game->openInGame();
-}
-
-void DialogGUI::releaseStuntParticipants() {
-    for (auto &participant : _participantByTag) {
-        participant.second.creature->stopStuntMode();
-    }
-}
-
-void DialogGUI::loadCurrentSpeaker() {
-    shared_ptr<Area> area(_game->module()->area());
-    shared_ptr<SpatialObject> speaker;
-
-    if (!_currentEntry->speaker.empty()) {
-        speaker = area->getObjectByTag(_currentEntry->speaker);
-    }
-    if (!speaker) {
-        speaker = _owner;
-    }
-    if (_currentSpeaker && _currentSpeaker != speaker) {
-        auto prevSpeakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
-        if (prevSpeakerCreature) {
-            prevSpeakerCreature->setTalking(false);
-        }
-    }
-    _currentSpeaker = speaker;
-
-    shared_ptr<Creature> player(_game->party().player());
-
-    if (_currentSpeaker) {
-        player->face(*_currentSpeaker);
-
-        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
-        if (speakerCreature) {
-            speakerCreature->setTalking(true);
-            speakerCreature->face(*player);
-        }
-    }
-}
-
-void DialogGUI::updateCamera() {
-    shared_ptr<Area> area(_game->module()->area());
-
-    if (_dialog->cameraModel().empty()) {
-        shared_ptr<Creature> player(_game->party().player());
-        glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
-        glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
-        DialogCamera &camera = static_cast<DialogCamera &>(area->getCamera(CameraType::Dialog));
-        camera.setListenerPosition(listenerPosition);
-        camera.setSpeakerPosition(speakerPosition);
-        camera.setVariant(getRandomCameraVariant());
-    } else {
-        AnimatedCamera &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
-        camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
-        camera.playAnimation(_currentEntry->cameraAnimation);
-    }
-}
-
-glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
-    shared_ptr<ModelSceneNode> model(object.model());
-    if (model) {
-        glm::vec3 hookPosition(0.0f);
-        if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-            return object.position() + hookPosition;
-        }
-        return model->getCenterOfAABB();
-    }
-
-    return object.position();
-}
-
-DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
-    int r = random(0, 2);
-    switch (r) {
-        case 0:
-            return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
-        case 1:
-            return _entryEnded ? DialogCamera::Variant::ListenerFar : DialogCamera::Variant::SpeakerFar;
-        default:
-            return DialogCamera::Variant::Both;
-    }
-}
-
-void DialogGUI::playVoiceOver() {
-    if (_currentVoice) {
-        _currentVoice->stop();
-        _currentVoice.reset();
-    }
-    shared_ptr<AudioStream> voice;
-
-    if (!_currentEntry->sound.empty()) {
-        voice = AudioFiles::instance().get(_currentEntry->sound);
-    }
-    if (!voice && !_currentEntry->voResRef.empty()) {
-        voice = AudioFiles::instance().get(_currentEntry->voResRef);
-    }
-    if (voice) {
-        _currentVoice = AudioPlayer::instance().play(voice, AudioType::Sound);
-    }
-}
-
-void DialogGUI::scheduleEndOfEntry() {
-    _entryEnded = false;
-    _endEntryFlags = 0;
-
-    if (!_dialog->cameraModel().empty() && _currentEntry->waitFlags & kDialogWaitAnimFinish) {
-        _endEntryFlags = kEndEntryOnAnimFinish;
-        return;
-    }
-    if (_currentEntry->delay != -1) {
-        _endEntryTimeout = 1000.0f * _currentEntry->delay;
-        return;
-    }
-    if (_currentVoice) {
-        _endEntryFlags = kEndEntryOnAudioStop;
-        _endEntryTimeout = static_cast<float>(_currentVoice->duration());
-        return;
-    }
-    _endEntryTimeout = kDefaultEntryDuration;
+    auto &camera = _game->module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
+    camera.setModel(_cameraModel);
 }
 
 void DialogGUI::loadStuntParticipants() {
@@ -417,7 +163,7 @@ void DialogGUI::loadStuntParticipants() {
 
     for (auto &stunt : _dialog->stunts()) {
         shared_ptr<Creature> creature;
-        if (stunt.participant == "owner") {
+        if (stunt.participant == kObjectTagOwner) {
             creature = dynamic_pointer_cast<Creature>(_owner);
         } else {
             creature = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(stunt.participant));
@@ -443,6 +189,90 @@ void DialogGUI::loadStuntParticipants() {
     }
 }
 
+void DialogGUI::onLoadEntry() {
+    loadCurrentSpeaker();
+    updateCamera();
+    updateParticipantAnimations();
+    repositionMessage();
+    hideControl(kControlTagReplies);
+}
+
+void DialogGUI::loadCurrentSpeaker() {
+    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<SpatialObject> speaker;
+
+    if (!_currentEntry->speaker.empty()) {
+        speaker = area->getObjectByTag(_currentEntry->speaker);
+    }
+    if (!speaker) {
+        speaker = _owner;
+    }
+
+    // Make previous speaker stop talking, if any
+    if (_currentSpeaker && _currentSpeaker != speaker) {
+        auto prevSpeakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+        if (prevSpeakerCreature) {
+            prevSpeakerCreature->stopTalking();
+        }
+    }
+    _currentSpeaker = speaker;
+
+    // Make current speaker face the player, and vice versa
+    if (_currentSpeaker) {
+        shared_ptr<Creature> player(_game->party().player());
+        player->face(*_currentSpeaker);
+
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+        if (speakerCreature) {
+            speakerCreature->startTalking(_lipAnimation);
+            speakerCreature->face(*player);
+        }
+    }
+}
+
+void DialogGUI::updateCamera() {
+    shared_ptr<Area> area(_game->module()->area());
+
+    if (_dialog->cameraModel().empty()) {
+        shared_ptr<Creature> player(_game->party().player());
+        glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
+        glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
+        auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
+        camera.setListenerPosition(listenerPosition);
+        camera.setSpeakerPosition(speakerPosition);
+        camera.setVariant(getRandomCameraVariant());
+    } else {
+        auto &camera = area->getCamera<AnimatedCamera>(CameraType::Animated);
+        camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
+        camera.playAnimation(_currentEntry->cameraAnimation);
+    }
+}
+
+glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
+    shared_ptr<ModelSceneNode> model(object.getModelSceneNode());
+    if (model) {
+        glm::vec3 hookPosition(0.0f);
+        if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {
+            return object.position() + hookPosition;
+        }
+        return model->getCenterOfAABB();
+    }
+
+    return object.position();
+}
+
+DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
+    int r = random(0, 2);
+    switch (r) {
+        case 0:
+            return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
+        case 1:
+            return _entryEnded ? DialogCamera::Variant::ListenerFar : DialogCamera::Variant::SpeakerFar;
+        default:
+            return DialogCamera::Variant::Both;
+    }
+}
+
 void DialogGUI::updateParticipantAnimations() {
     for (auto &anim : _currentEntry->animations) {
         if (_dialog->isAnimatedCutscene()) {
@@ -455,7 +285,10 @@ void DialogGUI::updateParticipantAnimations() {
             string animName(getStuntAnimationName(anim.animation));
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
-                participant.creature->playAnimation(animation, kAnimationPropagate);
+                AnimationProperties properties;
+                properties.flags = AnimationFlags::propagateHead;
+                properties.scale = 1.0f;
+                participant.creature->playAnimation(animation, move(properties));
             }
         } else {
             shared_ptr<Creature> participant;
@@ -468,9 +301,9 @@ void DialogGUI::updateParticipantAnimations() {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);
                 continue;
             }
-            AnimationType animType = getAnimationType(anim.animation);
+            AnimationType animType = getStuntAnimationType(anim.animation);
             if (animType != AnimationType::Invalid) {
-                participant->playAnimation(animType);
+                participant->playAnimation(animType, AnimationProperties::fromFlags(AnimationFlags::propagateHead));
             }
         }
     }
@@ -480,166 +313,76 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
     return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
 }
 
-AnimationType DialogGUI::getAnimationType(int ordinal) const {
-    shared_ptr<TwoDaTable> animations(Resources::instance().get2DA("dialoganimations"));
-    const vector<TwoDaRow> &rows = animations->rows();
+AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
+    shared_ptr<TwoDA> animations(Resources::instance().get2DA("dialoganimations"));
     int index = ordinal - 10000;
 
-    if (index < 0 || index >= static_cast<int>(rows.size())) {
+    if (index < 0 || index >= animations->getRowCount()) {
         warn("Dialog: animation index out of bounds: " + to_string(index));
         return AnimationType::Invalid;
     }
 
-    string name(boost::to_lower_copy(rows[index].getString("name")));
+    string name(boost::to_lower_copy(animations->getString(index, "name")));
     auto maybeAnimType = g_animTypeByName.find(name);
 
     return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;
 }
 
 void DialogGUI::repositionMessage() {
-    Control &message = getControl("LBL_MESSAGE");
-    Control::Extent extent(message.extent());
+    Control &message = getControl(kControlTagMessage);
     Control::Text text(message.text());
+    int top;
 
     if (_entryEnded) {
-        extent.top = -_rootControl->extent().top;
         text.align = Control::TextAlign::CenterBottom;
+        top = -_rootControl->extent().top;
     } else {
-        Control &replies = getControl("LB_REPLIES");
-        extent.top = replies.extent().top;
         text.align = Control::TextAlign::CenterTop;
+        top = getControl(kControlTagReplies).extent().top;
     }
 
-    message.setExtent(move(extent));
     message.setText(move(text));
+    message.setExtentTop(top);
 }
 
-void DialogGUI::pickReply(uint32_t index) {
-    debug("Dialog: pick reply " + to_string(index), 2);
-    const Dialog::EntryReply &reply = _dialog->getReply(index);
-
-    if (!reply.script.empty()) {
-        _game->scriptRunner().run(reply.script, _owner->id());
+void DialogGUI::onFinish() {
+    if (_dialog->isAnimatedCutscene()) {
+        releaseStuntParticipants();
     }
-    if (reply.entries.empty()) {
-        debug("Dialog: finish (no entries)");
-        finish();
-        return;
-    }
-    int entryIdx = -1;
 
-    for (auto &link : reply.entries) {
-        if (link.active.empty()) {
-            entryIdx = link.index;
-            break;
-        }
-        if (checkCondition(link.active)) {
-            entryIdx = link.index;
-            break;
+    // Make current speaker stop talking, if any
+    if (_currentSpeaker) {
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+        if (speakerCreature) {
+            speakerCreature->stopTalking();
         }
     }
-    debug("Dialog: entry selected: " + to_string(entryIdx), 2);
-
-    if (entryIdx == -1) {
-        debug("Dialog: finish (no entry selected)");
-        finish();
-        return;
-    }
-    _currentEntry.reset(new Dialog::EntryReply(_dialog->getEntry(entryIdx)));
-    loadCurrentEntry();
 }
 
-bool DialogGUI::handle(const SDL_Event &event) {
-    if (!_entryEnded &&
-        (g_allEntriesSkippable || _dialog->isSkippable()) &&
-        event.type == SDL_MOUSEBUTTONDOWN) {
-
-        endCurrentEntry();
-        return true;
-    }
-
-    return GUI::handle(event);
-}
-
-void DialogGUI::endCurrentEntry() {
-    _entryEnded = true;
-
-    if (_currentVoice) {
-        _currentVoice->stop();
-        _currentVoice.reset();
-    }
-    if (_autoPickReplyIdx != -1) {
-        int replyIdx = _autoPickReplyIdx;
-        _autoPickReplyIdx = -1;
-        pickReply(replyIdx);
-    } else {
-        showControl("LB_REPLIES");
-        updateCamera();
-        repositionMessage();
+void DialogGUI::releaseStuntParticipants() {
+    for (auto &participant : _participantByTag) {
+        participant.second.creature->stopStuntMode();
     }
 }
 
-bool DialogGUI::handleKeyDown(SDL_Scancode key) {
-    return false;
+void DialogGUI::onEntryEnded() {
+    showControl(kControlTagReplies);
+    updateCamera();
+    repositionMessage();
 }
 
-bool DialogGUI::handleKeyUp(SDL_Scancode key) {
-    if (!_entryEnded) return false;
-
-    if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
-        ListBox &replies = static_cast<ListBox &>(getControl("LB_REPLIES"));
-        int itemIdx = key - SDL_SCANCODE_1;
-        if (itemIdx < replies.itemCount()) {
-            const ListBox::Item &item = replies.getItemAt(itemIdx);
-            onReplyClicked(stoi(item.tag));
-            return true;
-        }
-    }
-
-    return false;
+void DialogGUI::setMessage(string message) {
+    setControlText(kControlTagMessage, message);
 }
 
 void DialogGUI::update(float dt) {
-    GUI::update(dt);
+    Conversation::update(dt);
 
+    // Dialog camera follows the current speaker, if any
     if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
-        DialogCamera &camera = static_cast<DialogCamera &>(_game->module()->area()->getCamera(CameraType::Dialog));
+        auto &camera = _game->module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
     }
-    if (!_entryEnded) {
-        bool endOnAnimFinish = (_endEntryFlags & kEndEntryOnAnimFinish) != 0;
-        if (endOnAnimFinish) {
-            shared_ptr<Area> area(_game->module()->area());
-            AnimatedCamera &camera = static_cast<AnimatedCamera &>(area->getCamera(CameraType::Animated));
-            if (camera.isAnimationFinished()) {
-                endCurrentEntry();
-            }
-        } else {
-            _endEntryTimeout = glm::max(0.0f, _endEntryTimeout - dt);
-            if (_endEntryTimeout == 0.0f) {
-                endCurrentEntry();
-            } else {
-                bool endOnAudioStop = (_endEntryFlags & kEndEntryOnAudioStop) != 0;
-                bool stopped = _currentVoice && _currentVoice->isStopped();
-                if (endOnAudioStop && stopped) {
-                    endCurrentEntry();
-                }
-            }
-        }
-    }
-}
-
-CameraType DialogGUI::getCamera(int &cameraId) const {
-    string cameraModel(_dialog->cameraModel());
-    if (!cameraModel.empty()) {
-        return CameraType::Animated;
-    }
-    if (_currentEntry->cameraId != -1) {
-        cameraId = _currentEntry->cameraId;
-        return CameraType::Static;
-    }
-
-    return CameraType::Dialog;
 }
 
 } // namespace game

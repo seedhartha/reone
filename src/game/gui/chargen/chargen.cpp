@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../../../gui/scenebuilder.h"
+#include "../../../render/model/models.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
@@ -40,11 +41,17 @@ namespace reone {
 
 namespace game {
 
-static const float kModelScale = 1.05f;
-static const float kModelOffsetY = 0.9f;
+static constexpr float kModelScale = 1.1f;
+
+static const vector<string> g_attributesTags {
+    "LBL_VIT", "LBL_DEF",
+    "STR_AB_LBL", "DEX_AB_LBL", "CON_AB_LBL", "INT_AB_LBL", "WIS_AB_LBL", "CHA_AB_LBL",
+    "NEW_FORT_LBL" "NEW_REFL_LBL", "NEW_WILL_LBL",
+    "OLD_FORT_LBL", "OLD_REFL_LBL", "OLD_WILL_LBL"
+};
 
 CharacterGeneration::CharacterGeneration(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("maincg");
@@ -56,6 +63,8 @@ CharacterGeneration::CharacterGeneration(Game *game) :
 void CharacterGeneration::load() {
     GUI::load();
 
+    hideControl("LBL_LEVEL");
+    hideControl("LBL_LEVEL_VAL");
     hideControl("VIT_ARROW_LBL");
     hideControl("DEF_ARROW_LBL");
     hideControl("FORT_ARROW_LBL");
@@ -65,7 +74,6 @@ void CharacterGeneration::load() {
     hideControl("NEW_LBL");
 
     setControlText("LBL_NAME", "");
-    setControlText("LBL_LEVEL_VAL", "1");
 
     loadClassSelection();
     loadQuickOrCustom();
@@ -85,47 +93,47 @@ void CharacterGeneration::loadClassSelection() {
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(this, _version, _gfxOpts);
+    _quickOrCustom = make_unique<QuickOrCustom>(this, _gameId, _gfxOpts);
     _quickOrCustom->load();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(this, _version, _gfxOpts);
+    _quick = make_unique<QuickCharacterGeneration>(this, _gameId, _gfxOpts);
     _quick->load();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(this, _version, _gfxOpts);
+    _custom = make_unique<CustomCharacterGeneration>(this, _gameId, _gfxOpts);
     _custom->load();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(this, _version, _gfxOpts);
+    _portraitSelection = make_unique<PortraitSelection>(_game, this);
     _portraitSelection->load();
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(this, _version, _gfxOpts);
+    _abilities = make_unique<CharGenAbilities>(this, _gameId, _gfxOpts);
     _abilities->load();
 }
 
 void CharacterGeneration::loadSkills() {
-    _skills = make_unique<CharGenSkills>(this, _version, _gfxOpts);
+    _skills = make_unique<CharGenSkills>(this, _gameId, _gfxOpts);
     _skills->load();
 }
 
 void CharacterGeneration::loadFeats() {
-    _feats = make_unique<CharGenFeats>(this, _version, _gfxOpts);
+    _feats = make_unique<CharGenFeats>(this, _gameId, _gfxOpts);
     _feats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(this, _version, _gfxOpts);
+    _nameEntry = make_unique<NameEntry>(this, _gameId, _gfxOpts);
     _nameEntry->load();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(this, _version, _gfxOpts);
+    _levelUp = make_unique<LevelUpMenu>(this, _gameId, _gfxOpts);
     _levelUp->load();
 }
 
@@ -168,12 +176,12 @@ void CharacterGeneration::update(float dt) {
     getSubGUI()->update(dt);
 }
 
-void CharacterGeneration::render() const {
+void CharacterGeneration::render() {
     GUI::render();
     getSubGUI()->render();
 }
 
-void CharacterGeneration::render3D() const {
+void CharacterGeneration::render3D() {
     GUI::render3D();
     getSubGUI()->render3D();
 }
@@ -192,8 +200,15 @@ void CharacterGeneration::changeScreen(CharGenScreen screen) {
 }
 
 void CharacterGeneration::openQuickOrCustom() {
+    setAttributesVisible(false);
     showControl("MODEL_LBL");
     changeScreen(CharGenScreen::QuickOrCustom);
+}
+
+void CharacterGeneration::setAttributesVisible(bool visible) {
+    for (auto &tag : g_attributesTags) {
+        setControlVisible(tag, visible);
+    }
 }
 
 void CharacterGeneration::startCustom() {
@@ -203,6 +218,7 @@ void CharacterGeneration::startCustom() {
 }
 
 void CharacterGeneration::startQuick() {
+    setAttributesVisible(true);
     _type = Type::Quick;
     _quick->setStep(0);
     openSteps();
@@ -211,7 +227,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     const CreatureAttributes &attributes = partyLeader->attributes();
     StaticCreatureBlueprint character;
     character.setAppearance(partyLeader->appearance());
@@ -246,6 +262,7 @@ void CharacterGeneration::openQuick() {
 }
 
 void CharacterGeneration::openCustom() {
+    setAttributesVisible(_custom->step() > 1);
     showControl("MODEL_LBL");
     changeScreen(CharGenScreen::Custom);
 }
@@ -293,12 +310,12 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
-        shared_ptr<Creature> partyLeader(_game->party().leader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         partyLeader->attributes() = _character->attributes();
         _game->openInGame();
 
     } else {
-        string moduleName(_version == GameVersion::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_gameId == GameID::KotOR ? "end_m01aa" : "001ebo");
 
         auto character = make_shared<StaticCreatureBlueprint>(*_character);
         character->clearEquipment();
@@ -322,7 +339,7 @@ void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
     int currentAppearance = _character ? _character->appearance() : -1;
     Gender currentGender = _character ? _character->gender() : Gender::None;
 
-    _character = make_unique<StaticCreatureBlueprint>(character);
+    _character = make_unique<StaticCreatureBlueprint>(move(character));
 
     if (currentAppearance != character.appearance()) {
         loadCharacterModel();
@@ -349,19 +366,13 @@ void CharacterGeneration::loadCharacterModel() {
     const Control::Extent &extent = lblModel.extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    glm::mat4 cameraTransform(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-
     unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
         .modelScale(kModelScale)
-        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
-        .cameraTransform(cameraTransform)
-        .ambientLightColor(glm::vec3(1.0f))
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.2f))
         .build());
 
     lblModel.setScene3D(move(scene));
@@ -374,13 +385,17 @@ void CharacterGeneration::loadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
+    auto root = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
 
+    // Attach character model to the root model
+    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(_character);
+    creature->setFacing(-glm::half_pi<float>());
     creature->updateModelAnimation();
+    root->attach("cgbody_light", creature->getModelSceneNode());
 
-    return creature->model();
+    return move(root);
 }
 
 void CharacterGeneration::updateAttributes() {
@@ -404,7 +419,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
         setControlText("NEW_REFL_LBL", to_string(throws.reflex));
         setControlText("NEW_WILL_LBL", to_string(throws.will));
@@ -427,10 +442,6 @@ void CharacterGeneration::goToNextStep() {
             _quick->goToNextStep();
             break;
     }
-}
-
-StaticCreatureBlueprint &CharacterGeneration::character() {
-    return *_character;
 }
 
 } // namespace game

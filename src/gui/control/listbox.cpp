@@ -18,8 +18,9 @@
 #include "listbox.h"
 
 #include "../../common/log.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
+#include "../../render/textutil.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -37,32 +38,39 @@ namespace reone {
 
 namespace gui {
 
-static const int kItemPadding = 3;
+static constexpr int kItemPadding = 3;
 
 ListBox::ListBox(GUI *gui) : Control(gui, ControlType::ListBox) {
     _clickable = true;
-}
-
-void ListBox::updateItems() {
-    if (!_protoItem) return;
-
-    _slotCount = _extent.height / (_protoItem->extent().height + _padding);
-
-    if (_scrollBar) {
-        _scrollBar->setVisible(_items.size() > _slotCount);
-    }
 }
 
 void ListBox::clearItems() {
     _items.clear();
     _itemOffset = 0;
     _hilightedIndex = -1;
-    updateItems();
 }
 
-void ListBox::addItem(Item item) {
-    _items.push_back(move(item));
-    updateItems();
+void ListBox::addItem(Item &&item) {
+    if (!_protoItem) return;
+
+    item._textLines = breakText(item.text, *_protoItem->text().font, _protoItem->extent().width);
+    _items.push_back(item);
+
+    updateItemSlots();
+}
+
+void ListBox::addTextLinesAsItems(const string &text) {
+    if (!_protoItem) return;
+
+    vector<string> lines(breakText(text, *_protoItem->text().font, _protoItem->extent().width));
+    for (auto &line : lines) {
+        Item item;
+        item.text = line;
+        item._textLines = vector<string> { line };
+        _items.push_back(move(item));
+    }
+
+    updateItemSlots();
 }
 
 void ListBox::clearSelection() {
@@ -77,7 +85,6 @@ void ListBox::load(const GffStruct &gffs) {
         ControlType type = _protoItemType == ControlType::Invalid ? getType(*protoItem) : _protoItemType;
         _protoItem = of(_gui, type, getTag(*protoItem));
         _protoItem->load(*protoItem);
-        updateItems();
     }
     shared_ptr<GffStruct> scrollBar(gffs.getStruct("SCROLLBAR"));
     if (scrollBar) {
@@ -97,21 +104,64 @@ int ListBox::getItemIndex(int y) const {
     if (!_protoItem) return -1;
 
     const Control::Extent &protoExtent = _protoItem->extent();
-    int idx = (y - protoExtent.top) / (protoExtent.height + _padding) + _itemOffset;
+    if (protoExtent.height == 0) return -1;
 
-    return idx >= 0 && idx < _items.size() ? idx : -1;
+    float itemy = static_cast<float>(protoExtent.top);
+    if (y < itemy) return -1;
+
+    for (size_t i = _itemOffset; i < _items.size(); ++i) {
+        const Item &item = _items[i];
+        if (_protoMatchContent) {
+            itemy += item._textLines.size() * _protoItem->text().font->height();
+        } else {
+            itemy += protoExtent.height;
+        }
+        itemy += _padding;
+        if (y < itemy) return static_cast<int>(i);
+    }
+
+    return -1;
 }
 
 bool ListBox::handleMouseWheel(int x, int y) {
     if (y < 0) {
-        if (_items.size() - _itemOffset > _slotCount) _itemOffset++;
+        if (_items.size() - _itemOffset > _slotCount) {
+            _itemOffset++;
+            updateItemSlots();
+        }
         return true;
     } else if (y > 0) {
-        if (_itemOffset > 0) _itemOffset--;
+        if (_itemOffset > 0) {
+            _itemOffset--;
+            updateItemSlots();
+        }
         return true;
     }
 
     return false;
+}
+
+void ListBox::updateItemSlots() {
+    _slotCount = 0;
+
+    // Increase the number of slots until they no longer fit vertically
+    float y = 0.0f;
+    for (size_t i = _itemOffset; i < _items.size(); ++i) {
+        if (_protoMatchContent) {
+            y += _items[i]._textLines.size() * _protoItem->text().font->height();
+        } else {
+            y += _protoItem->extent().height;
+        }
+        y += _padding;
+
+        if (y > _extent.height) break;
+
+        ++_slotCount;
+    }
+
+    if (_scrollBar) {
+        _scrollBar->setVisible(_items.size() > _slotCount);
+    }
 }
 
 bool ListBox::handleClick(int x, int y) {
@@ -130,45 +180,61 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::render(const glm::ivec2 &offset, const string &textOverride) const {
+void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible) return;
 
-    Control::render(offset, textOverride);
+    Control::render(offset, text);
 
     if (!_protoItem) return;
 
     glm::vec2 itemOffset(offset);
-    const Control::Extent &protoExtent = _protoItem->extent();
 
     for (int i = 0; i < _slotCount; ++i) {
         int itemIdx = i + _itemOffset;
         if (itemIdx >= _items.size()) break;
 
+        const Item &item = _items[itemIdx];
+        if (_protoMatchContent) {
+            _protoItem->setHeight(static_cast<int>(item._textLines.size() * (_protoItem->text().font->height() + _padding)));
+        }
         _protoItem->setFocus(_hilightedIndex == itemIdx);
-
+    
         auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
-            imageButton->render(itemOffset, _items[itemIdx].text, _items[itemIdx].iconText, _items[itemIdx].iconTexture, _items[itemIdx].iconFrame);
+            imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
         } else {
-            _protoItem->render(itemOffset, _items[itemIdx].text);
+            _protoItem->render(itemOffset, item._textLines);
         }
 
-        itemOffset.y += protoExtent.height + _padding;
+        if (_protoMatchContent) {
+            itemOffset.y += item._textLines.size() * (_protoItem->text().font->height() + _padding);
+        } else {
+            itemOffset.y += _protoItem->extent().height + _padding;
+        }
     }
 
     if (_scrollBar) {
-        ScrollBar &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
-        scrollBar.setCanScrollUp(_itemOffset > 0);
-        scrollBar.setCanScrollDown(_items.size() - _itemOffset > _slotCount);
-        scrollBar.render(offset, textOverride);
+        ScrollBar::ScrollState state;
+        state.count = static_cast<int>(_items.size());
+        state.numVisible = this->_slotCount;
+        state.offset = _itemOffset;
+        auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
+        scrollBar.setScrollState(move(state));
+        scrollBar.render(offset, vector<string>());
     }
 }
 
-void ListBox::stretch(float x, float y) {
-    Control::stretch(x, y);
+void ListBox::stretch(float x, float y, int mask) {
+    Control::stretch(x, y, mask);
 
-    if (_protoItem) _protoItem->stretch(x, 1.0f);
-    if (_scrollBar) _scrollBar->stretch(1.0f, y);
+    if (_protoItem) {
+        // Do not change height of the proto item
+        _protoItem->stretch(x, y, mask & ~kStretchHeight);
+    }
+    if (_scrollBar) {
+        // Do not change width of the scroll bar
+        _scrollBar->stretch(x, y, mask & ~kStretchWidth);
+    }
 }
 
 void ListBox::setFocus(bool focus) {
@@ -180,7 +246,12 @@ void ListBox::setFocus(bool focus) {
 
 void ListBox::setExtent(const Extent &extent) {
     Control::setExtent(extent);
-    updateItems();
+    updateItemSlots();
+}
+
+void ListBox::setExtentHeight(int height) {
+    Control::setExtentHeight(height);
+    updateItemSlots();
 }
 
 void ListBox::setProtoItemType(ControlType type) {
@@ -191,24 +262,16 @@ void ListBox::setSelectionMode(SelectionMode mode) {
     _mode = mode;
 }
 
+void ListBox::setProtoMatchContent(bool match) {
+    _protoMatchContent = match;
+}
+
 const ListBox::Item &ListBox::getItemAt(int index) const {
     return _items[index];
 }
 
-Control &ListBox::protoItem() const {
-    return *_protoItem;
-}
-
-Control &ListBox::scrollBar() const {
-    return *_scrollBar;
-}
-
-int ListBox::itemCount() const {
+int ListBox::getItemCount() const {
     return static_cast<int>(_items.size());
-}
-
-int ListBox::hilightedIndex() const {
-    return _hilightedIndex;
 }
 
 } // namespace gui

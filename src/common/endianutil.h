@@ -17,24 +17,40 @@
 
 #pragma once
 
+#include <cstdint>
 #include <type_traits>
 
 #include "types.h"
 
 namespace reone {
 
-Endianess getEndianess();
+Endianess getSystemEndianess();
 
-/* only permits fundamental integral types or extended integral types */
+/**
+ * Inverts endianess of an integral or a floating point value.
+ *
+ * @param val value whose endianess to invert
+ */
 template <class T>
 std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value> swapBytes(T &val) {
-	char *c = reinterpret_cast<char*>(&val);
-	for (size_t i=0; i*2 < sizeof(T); ++i) std::swap(c[i], c[sizeof(T) - i - 1]);
+    uint8_t *b = reinterpret_cast<uint8_t *>(&val);
+    for (size_t i = 0; i * 2 < sizeof(T); ++i) {
+        std::swap(b[i], b[sizeof(T) - i - 1]);
+    }
 }
 
+/**
+ * Inverts endianess of an integral or a floating point value, if the specified
+ * endianess differs from the system endianess.
+ *
+ * @param val value whose endianess to invert
+ * @param other endianess to compare with the system endianess
+ */
 template <class T>
 void swapBytesIfNotSystemEndianess(T &val, Endianess other) {
-    if (other != getEndianess()) swapBytes(val);
+    if (other != getSystemEndianess()) {
+        swapBytes(val);
+    }
 }
 
 } // namespace reone

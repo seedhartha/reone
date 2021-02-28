@@ -29,13 +29,16 @@ enum class ControlType {
     Button = 6,
     ToggleButton = 7,
     ScrollBar = 9,
+    ProgressBar = 10,
     ListBox = 11
 };
 
 enum class BackgroundType {
     None,
     Menu,
-    Load
+    Load,
+    Computer0,
+    Computer1
 };
 
 } // namespace gui

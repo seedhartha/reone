@@ -24,33 +24,41 @@
 #include "glm/vec3.hpp"
 
 #include "../../common/timer.h"
-#include "../../render/emitter.h"
+#include "../../render/model/emitter.h"
+
+#include "../particle.h"
 
 namespace reone {
 
 namespace scene {
 
-class ParticleSceneNode;
+class ModelSceneNode;
 
 class EmitterSceneNode : public SceneNode {
 public:
-    EmitterSceneNode(const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
+    EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
-    void update(float dt);
+    void update(float dt) override;
+    void renderSingle(bool shadowPass) override;
+
+    void detonate();
 
     std::shared_ptr<render::Emitter> emitter() const { return _emitter; }
 
 private:
+    const ModelSceneNode *_modelSceneNode;
     std::shared_ptr<render::Emitter> _emitter;
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
-    std::vector<std::shared_ptr<ParticleSceneNode>> _particles;
+    std::vector<std::shared_ptr<Particle>> _particles;
+    bool _spawned { false };
 
     void init();
 
     void spawnParticles(float dt);
-    void updateParticles(float dt);
+    void removeExpiredParticles(float dt);
+    void doSpawnParticle();
 };
 
 } // namespace scene

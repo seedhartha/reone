@@ -20,9 +20,11 @@
 #include <set>
 
 #include <boost/filesystem.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "../common/types.h"
 
+#include "resourceprovider.h"
 #include "types.h"
 
 namespace reone {
@@ -31,7 +33,6 @@ namespace resource {
 
 class Folder : public IResourceProvider {
 public:
-    Folder() = default;
     void load(const boost::filesystem::path &path);
 
     bool supports(ResourceType type) const override;
@@ -45,9 +46,6 @@ private:
 
     boost::filesystem::path _path;
     std::multimap<std::string, Resource> _resources;
-
-    Folder(const Folder &) = delete;
-    Folder &operator=(const Folder &) = delete;
 
     void loadDirectory(const boost::filesystem::path &path);
 };

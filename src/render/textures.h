@@ -21,6 +21,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include "../resource/types.h"
 
 #include "types.h"
@@ -31,24 +33,23 @@ namespace render {
 
 class Texture;
 
-class Textures {
+class Textures : boost::noncopyable {
 public:
     static Textures &instance();
 
-    void init(resource::GameVersion version);
+    void init(resource::GameID gameId);
     void invalidateCache();
 
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureType type);
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
+
+    std::shared_ptr<Texture> getDefault() const { return _default; }
 
 private:
-    resource::GameVersion _version { resource::GameVersion::KotOR };
+    resource::GameID _gameId { resource::GameID::KotOR };
+    std::shared_ptr<render::Texture> _default;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
-    Textures() = default;
-    Textures(const Textures &) = delete;
-    Textures &operator=(const Textures &) = delete;
-
-    std::shared_ptr<Texture> doGet(const std::string &resRef, TextureType type);
+    std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };
 
 } // namespace render

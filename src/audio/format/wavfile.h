@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/binfile.h"
+#include "../../resource/format/binfile.h"
 
 #include "../stream.h"
 
@@ -34,7 +34,7 @@ class WavFile : public resource::BinaryFile {
 public:
     WavFile();
 
-    std::shared_ptr<AudioStream> stream() const;
+    std::shared_ptr<AudioStream> stream() const { return _stream; }
 
 private:
     struct ChunkHeader {

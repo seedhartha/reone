@@ -21,7 +21,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../common/aabb.h"
+#include <boost/noncopyable.hpp>
+
+#include "../aabb.h"
 
 #include "animation.h"
 
@@ -36,7 +38,7 @@ namespace render {
  * @see reone::render::ModelNode
  * @see reone::render::Animation
  */
-class Model {
+class Model : boost::noncopyable {
 public:
     enum class Classification {
         Other,
@@ -51,8 +53,9 @@ public:
 
     Model(
         const std::string &name,
+        Classification classification,
         const std::shared_ptr<ModelNode> &rootNode,
-        std::vector<std::unique_ptr<Animation>> &anims,
+        std::vector<std::shared_ptr<Animation>> &anims,
         const std::shared_ptr<Model> &superModel = nullptr);
 
     void initGL();
@@ -62,31 +65,28 @@ public:
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
-    Classification classification() const;
-    const std::string &name() const;
-    ModelNode &rootNode() const;
-    float animationScale() const;
-    std::shared_ptr<Model> superModel() const;
-    const AABB &aabb() const;
-    float radiusXY() const;
+    Classification classification() const { return _classification; }
+    const std::string &name() const { return _name; }
+    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
+    float animationScale() const { return _animationScale; }
+    std::shared_ptr<Model> superModel() const { return _superModel; }
+    const AABB &aabb() const { return _aabb; }
+    int maxNodeIndex() { return _maxNodeIndex; }
 
-    void setClassification(Classification classification);
     void setAnimationScale(float scale);
 
 private:
-    Classification _classification { Classification::Other };
     std::string _name;
+    Classification _classification;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
+
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
-    float _radiusXY { 0.0f };
     float _animationScale { 1.0f };
-
-    Model(const Model &) = delete;
-    Model &operator=(const Model &) = delete;
+    int _maxNodeIndex { 0 }; /**< the maximum node index in this model, used to stitch multiple models together */
 
     void init(const std::shared_ptr<ModelNode> &node);
 

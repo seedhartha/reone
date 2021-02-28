@@ -22,9 +22,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
-#include "../../render/models.h"
+#include "../../common/streamutil.h"
+#include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 
 #include "creature.h"
 
@@ -38,7 +40,13 @@ namespace reone {
 
 namespace game {
 
-static string g_headHookNode("headhook");
+// This is a hook to replace MDL models with GR2 models (SWTOR).
+static const unordered_map<string, string> g_gr2Models {
+    //{ "c_rancors", "rancor_rancor_a01" }
+};
+
+static const string g_headHookNode("headhook");
+static const string g_maskHookNode("gogglehook");
 
 CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creature) {
     if (!creature) {
@@ -48,17 +56,35 @@ CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creat
 
 shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
-    auto model = make_unique<ModelSceneNode>(&_creature->sceneGraph(), Models::instance().get(modelName));
+    if (modelName.empty()) return nullptr;
+
+    bool gr2Model = false;
+    auto maybeGr2Model = g_gr2Models.find(modelName);
+    if (maybeGr2Model != g_gr2Models.end()) {
+        modelName = maybeGr2Model->second;
+        gr2Model = true;
+    }
+
+    shared_ptr<Model> model(Models::instance().get(modelName, gr2Model ? ResourceType::Gr2 : ResourceType::Mdl));
     if (!model) return nullptr;
 
-    model->setLightingEnabled(true);
+    auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, &_creature->sceneGraph());
+    if (gr2Model) return move(modelSceneNode);
 
     // Body texture
 
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureType::Diffuse));
-        model->setTextureOverride(texture);
+        shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureUsage::Diffuse));
+        modelSceneNode->setDiffuseTexture(texture);
+    }
+
+    // Mask
+
+    shared_ptr<Model> maskModel;
+    string maskModelName(getMaskModelName());
+    if (!maskModelName.empty()) {
+        maskModel = Models::instance().get(maskModelName);
     }
 
     // Head
@@ -66,30 +92,35 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
-        model->attach(g_headHookNode, headModel);
+        if (headModel) {
+            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel, ModelSceneNode::Classification::Creature));
+            if (headSceneNode && maskModel) {
+                headSceneNode->attach(g_maskHookNode, maskModel, ModelSceneNode::Classification::Equipment);
+            }
+        }
     }
 
-    // Right weapon
+    // Left weapon
 
-    string leftWeaponModelName(getWeaponModelName(kInventorySlotLeftWeapon));
+    string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
         if (leftWeaponModel) {
-            model->attach("lhand", leftWeaponModel);
+            modelSceneNode->attach("lhand", leftWeaponModel, ModelSceneNode::Classification::Equipment);
         }
     }
 
     // Right weapon
 
-    string rightWeaponModelName(getWeaponModelName(kInventorySlotRightWeapon));
+    string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
         if (rightWeaponModel) {
-            model->attach("rhand", rightWeaponModel);
+            modelSceneNode->attach("rhand", rightWeaponModel, ModelSceneNode::Classification::Equipment);
         }
     }
 
-    return move(model);
+    return move(modelSceneNode);
 }
 
 string CreatureModelBuilder::getBodyModelName() const {
@@ -98,7 +129,7 @@ string CreatureModelBuilder::getBodyModelName() const {
     if (_creature->modelType() == Creature::ModelType::Character) {
         column = "model";
 
-        shared_ptr<Item> bodyItem(_creature->getEquippedItem(kInventorySlotBody));
+        shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
         if (bodyItem) {
             string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
@@ -110,7 +141,7 @@ string CreatureModelBuilder::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     string modelName(appearance->getString(_creature->appearance(), column));
     boost::to_lower(modelName);
@@ -120,7 +151,7 @@ string CreatureModelBuilder::getBodyModelName() const {
 
 string CreatureModelBuilder::getBodyTextureName() const {
     string column;
-    shared_ptr<Item> bodyItem(_creature->getEquippedItem(kInventorySlotBody));
+    shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
 
     if (_creature->modelType() == Creature::ModelType::Character) {
         column = "tex";
@@ -135,7 +166,7 @@ string CreatureModelBuilder::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     string texName(appearance->getString(_creature->appearance(), column));
     boost::to_lower(texName);
@@ -156,12 +187,12 @@ string CreatureModelBuilder::getBodyTextureName() const {
 string CreatureModelBuilder::getHeadModelName() const {
     if (_creature->modelType() != Creature::ModelType::Character) return "";
 
-    shared_ptr<TwoDaTable> appearance(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_creature->appearance(), "normalhead", -1);
     if (headIdx == -1) return "";
 
-    shared_ptr<TwoDaTable> heads(Resources::instance().get2DA("heads"));
+    shared_ptr<TwoDA> heads(Resources::instance().get2DA("heads"));
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
@@ -169,7 +200,18 @@ string CreatureModelBuilder::getHeadModelName() const {
     return move(modelName);
 }
 
-string CreatureModelBuilder::getWeaponModelName(InventorySlot slot) const {
+string CreatureModelBuilder::getMaskModelName() const {
+    shared_ptr<Item> headItem(_creature->getEquippedItem(InventorySlot::head));
+    if (!headItem) return "";
+
+    string modelName(boost::to_lower_copy(headItem->itemClass()));
+    modelName += str(boost::format("_%03d") % headItem->modelVariation());
+
+    return move(modelName);
+
+}
+
+string CreatureModelBuilder::getWeaponModelName(int slot) const {
     shared_ptr<Item> bodyItem(_creature->getEquippedItem(slot));
     if (!bodyItem) return "";
 

@@ -20,11 +20,10 @@
 #include <set>
 #include <unordered_map>
 
-#include "../../common/aabb.h"
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
 
-#include "../scenenodeanimator.h"
+#include "../animation/scenenodeanimator.h"
 
 #include "scenenode.h"
 
@@ -38,82 +37,86 @@ class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
-    ModelSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Model> &model, const std::set<std::string> &skipNodes = std::set<std::string>());
+    enum class Classification {
+        Room,
+        Creature,
+        Placeable,
+        Door,
+        Equipment,
+        Projectile,
+        Other
+    };
 
-    void update(float dt);
-    void render() const override;
+    ModelSceneNode(
+        Classification classification,
+        const std::shared_ptr<render::Model> &model,
+        SceneGraph *sceneGraph,
+        std::set<std::string> ignoreNodes = std::set<std::string>());
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model);
+    void update(float dt) override;
+    void render() override;
+
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     void refreshAABB();
+    void signalEvent(const std::string &name);
 
-    bool hasTextureOverride() const;
-    bool isVisible() const;
-    bool isOnScreen() const;
+    bool isOnScreen() const { return _onScreen; }
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
+    const std::string &getName() const;
 
-    const std::string &name() const;
-    std::shared_ptr<render::Model> model() const;
-    std::shared_ptr<render::Texture> textureOverride() const;
-    float alpha() const;
-    const AABB &aabb() const;
+    Classification classification() const { return _classification; }
+    std::shared_ptr<render::Model> model() const { return _model; }
+    float alpha() const { return _alpha; }
+    float projectileSpeed() const { return _projectileSpeed; }
+    SceneNodeAnimator &animator() { return _animator; }
 
-    void setTextureOverride(const std::shared_ptr<render::Texture> &texture);
-    void setVisible(bool visible);
+    void setVisible(bool visible) override;
+
+    void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
-
-    // Animation
-
-    void playDefaultAnimation();
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f);
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f, float scale = 1.0f);
-
-    bool isAnimationFinished() const;
-
-    void setDefaultAnimation(const std::string &name);
-    std::string getAnimName() { return _animator-> }
-
-    // END Animation
+    void setProjectileSpeed(float speed);
 
     // Dynamic lighting
 
     void updateLighting();
     void setLightingIsDirty();
 
-    bool isLightingEnabled() const;
-    const std::vector<LightSceneNode *> &lightsAffectedBy() const;
+    const std::vector<LightSceneNode *> &lightsAffectedBy() const { return _lightsAffectedBy; }
 
-    void setLightingEnabled(bool affected);
     void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
 
     // END Dynamic lighting
 
 private:
+    Classification _classification;
     std::shared_ptr<render::Model> _model;
     SceneNodeAnimator _animator;
+
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
-    std::shared_ptr<render::Texture> _textureOverride;
     bool _visible { true };
     bool _onScreen { true };
     float _alpha { 1.0f };
-    bool _lightingEnabled { false };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
-    AABB _aabb;
+    float _projectileSpeed { 0.0f };
 
     void initModelNodes();
-    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
     void updateAbsoluteTransform() override;
+
+    bool isAffectableByLight(const LightSceneNode &light) const;
+
+    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
 };
 
 } // namespace scene

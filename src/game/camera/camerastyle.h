@@ -17,12 +17,9 @@
 
 #pragma once
 
+#include "../../resource/2da.h"
 
 namespace reone {
-
-namespace resource {
-    class TwoDaRow;
-}
 
 namespace game {
 
@@ -32,7 +29,7 @@ struct CameraStyle {
     float height { 0.0f };
     float viewAngle { 0.0f };
 
-    void load(const resource::TwoDaRow &row);
+    void load(const resource::TwoDA &twoDa, int row);
 };
 
 } // namespace game

@@ -19,8 +19,6 @@
 
 #include <algorithm>
 
-#include "SDL2/SDL_timer.h"
-
 using namespace std;
 
 namespace reone {
@@ -40,58 +38,48 @@ void ActionQueue::add(unique_ptr<Action> action) {
 void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = move(action);
-    delayed.timestamp = SDL_GetTicks() + static_cast<int>(1000.0f * seconds);
+    delayed.timer.reset(seconds);
     _delayed.push_back(move(delayed));
 }
 
-void ActionQueue::update() {
+void ActionQueue::update(float dt) {
     removeCompletedActions();
-    updateDelayedActions();
-}
-
-ActionQueue::iterator ActionQueue::begin() {
-    return _actions.begin();
-}
-
-ActionQueue::iterator ActionQueue::end() {
-    return _actions.end();
+    updateDelayedActions(dt);
 }
 
 void ActionQueue::removeCompletedActions() {
     while (true) {
-        shared_ptr<Action> action(currentAction());
+        shared_ptr<Action> action(getCurrentAction());
         if (!action || !action->isCompleted()) return;
 
         _actions.pop_front();
     }
 }
 
-void ActionQueue::updateDelayedActions() {
-    uint32_t now = SDL_GetTicks();
-
+void ActionQueue::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
-        if (now >= delayed.timestamp) {
+        if (delayed.timer.advance(dt)) {
             _actions.push_back(move(delayed.action));
         }
     }
     auto delayedToRemove = remove_if(
         _delayed.begin(),
         _delayed.end(),
-        [&now](const DelayedAction &delayed) { return now >= delayed.timestamp; });
+        [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
 
     _delayed.erase(delayedToRemove, _delayed.end());
 }
 
-bool ActionQueue::empty() const {
+bool ActionQueue::isEmpty() const {
     return _actions.empty();
 }
 
-int ActionQueue::size() const {
+int ActionQueue::getSize() const {
     return static_cast<int>(_actions.size());
 }
 
-shared_ptr<Action> ActionQueue::currentAction() {
-   return _actions.empty() ? nullptr : _actions.front();
+shared_ptr<Action> ActionQueue::getCurrentAction() const {
+    return _actions.empty() ? nullptr : _actions.front();
 }
 
 } // namespace game

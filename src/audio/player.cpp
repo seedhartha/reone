@@ -42,7 +42,7 @@ AudioPlayer &AudioPlayer::instance() {
 void AudioPlayer::init(const AudioOptions &opts) {
     _opts = opts;
 
-    if (_opts.musicVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
+    if (_opts.musicVolume == 0 && _opts.voiceVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
         info("AudioPlayer: audio is disabled");
         return;
     }
@@ -122,7 +122,7 @@ shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, 
         warn("AudioPlayer: file not found: " + resRef);
         return nullptr;
     }
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
+    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
     return sound->handle();
 }
@@ -132,6 +132,9 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     switch (type) {
         case AudioType::Music:
             volume = _opts.musicVolume;
+            break;
+        case AudioType::Voice:
+            volume = _opts.voiceVolume;
             break;
         case AudioType::Sound:
             volume = _opts.soundVolume;
@@ -152,7 +155,7 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    shared_ptr<SoundInstance> sound(new SoundInstance(stream, loop, getGain(type, gain), positional, move(position)));
+    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
     return sound->handle();
 }

@@ -20,7 +20,9 @@
 #include <string>
 #include <memory>
 
-#include "../../resource/gfffile.h"
+#include <boost/noncopyable.hpp>
+
+#include "../../resource/format/gfffile.h"
 
 namespace reone {
 
@@ -28,20 +30,19 @@ namespace game {
 
 class Item;
 
-class ItemBlueprint {
+class ItemBlueprint : boost::noncopyable {
 public:
     ItemBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &uti);
 
     void load(Item &item);
 
-    const std::string &resRef() const;
+    const std::string &resRef() const { return _resRef; }
 
 private:
     std::string _resRef;
     std::shared_ptr<resource::GffStruct> _uti;
 
-    ItemBlueprint(const ItemBlueprint &) = delete;
-    ItemBlueprint &operator=(const ItemBlueprint &) = delete;
+    void loadAmmunitionType(int ordinal, Item &item);
 };
 
 } // namespace game

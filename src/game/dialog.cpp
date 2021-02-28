@@ -31,18 +31,16 @@ namespace reone {
 
 namespace game {
 
-void Dialog::reset() {
-    _entries.clear();
-    _replies.clear();
-    _startEntries.clear();
-    _endScript.clear();
+Dialog::Dialog(const string &resRef) : _resRef(resRef) {
 }
 
-void Dialog::load(const string &resRef, const GffStruct &dlg) {
+void Dialog::load(const GffStruct &dlg) {
     _skippable = dlg.getBool("Skippable");
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
     _animatedCutscene = dlg.getBool("AnimatedCut");
+    _conversationType = static_cast<ConversationType>(dlg.getInt("ConversationType"));
+    _computerType = static_cast<ComputerType>(dlg.getInt("ComputerType"));
 
     for (auto &entry : dlg.getList("EntryList")) {
         _entries.push_back(getEntryReply(*entry));
@@ -113,36 +111,12 @@ Dialog::ParticipantAnimation Dialog::getParticipantAnimation(const GffStruct &gf
     return move(anim);
 }
 
-bool Dialog::isSkippable() const {
-    return _skippable;
-}
-
-bool Dialog::isAnimatedCutscene() const {
-    return _animatedCutscene;
-}
-
-const string &Dialog::cameraModel() const {
-    return _cameraModel;
-}
-
-const vector<Dialog::EntryReplyLink> &Dialog::startEntries() const {
-    return _startEntries;
-}
-
 const Dialog::EntryReply &Dialog::getEntry(int index) const {
     return _entries[index];
 }
 
 const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
-}
-
-const vector<Dialog::Stunt> &Dialog::stunts() const {
-    return _stunts;
-}
-
-const string &Dialog::endScript() const {
-    return _endScript;
 }
 
 } // namespace resource

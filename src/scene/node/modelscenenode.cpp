@@ -19,17 +19,21 @@
 #include <stdexcept>
 
 #include "../../common/log.h"
-#include "../../render/mesh/aabb.h"
+#include "../../render/featureutil.h"
+#include "../../render/meshes.h"
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"
+#include "../types.h"
 
+#include "cameranode.h"
 #include "emitternode.h"
 #include "lightnode.h"
 #include "modelnodescenenode.h"
 #include "modelscenenode.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::render;
 using namespace reone::resource;
@@ -38,40 +42,50 @@ namespace reone {
 
 namespace scene {
 
+static constexpr int kSelfIlluminatedPriority = 5;
+
 static bool g_drawAABB = false;
 
-ModelSceneNode::ModelSceneNode(SceneGraph *sceneGraph, const shared_ptr<Model> &model, const set<string> &skipNodes) :
+ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
+    _classification(classification),
     _model(model),
-    _animator(this, skipNodes) {
+    _animator(this, ignoreNodes) {
 
     initModelNodes();
+
+    _volumetric = true;
 }
 
 static bool validateEmitter(const Emitter &emitter) {
-    switch (emitter.updateType()) {
-        case Emitter::UpdateType::Fountain:
+    switch (emitter.updateMode()) {
+        case Emitter::UpdateMode::Fountain:
+        case Emitter::UpdateMode::Single:
+        case Emitter::UpdateMode::Explosion:
             break;
         default:
-            warn("validateEmitter: unsupported update type: " + to_string(static_cast<int>(emitter.updateType())));
+            warn("validateEmitter: unsupported update mode: " + to_string(static_cast<int>(emitter.updateMode())));
             return false;
     }
 
-    switch (emitter.renderType()) {
-        case Emitter::RenderType::Normal:
-        case Emitter::RenderType::BillboardToWorldZ:
+    switch (emitter.renderMode()) {
+        case Emitter::RenderMode::Normal:
+        case Emitter::RenderMode::BillboardToWorldZ:
+        case Emitter::RenderMode::MotionBlur:
+        case Emitter::RenderMode::BillboardToLocalZ:
+        case Emitter::RenderMode::AlignedToParticleDir:
             break;
         default:
-            warn("validateEmitter: unsupported render type: " + to_string(static_cast<int>(emitter.renderType())));
+            warn("validateEmitter: unsupported render mode: " + to_string(static_cast<int>(emitter.renderMode())));
             return false;
     }
 
-    switch (emitter.blendType()) {
-        case Emitter::BlendType::Normal:
-        case Emitter::BlendType::Lighten:
+    switch (emitter.blendMode()) {
+        case Emitter::BlendMode::Normal:
+        case Emitter::BlendMode::Lighten:
             break;
         default:
-            warn("validateEmitter: unsupported blend type: " + to_string(static_cast<int>(emitter.blendType())));
+            warn("validateEmitter: unsupported blend mode: " + to_string(static_cast<int>(emitter.blendMode())));
             return false;
     }
 
@@ -79,7 +93,7 @@ static bool validateEmitter(const Emitter &emitter) {
 }
 
 void ModelSceneNode::initModelNodes() {
-    shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(_model->rootNode()));
+    shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(*_model->rootNode()));
     addChild(rootNode);
 
     stack<ModelNodeSceneNode *> nodes;
@@ -89,7 +103,7 @@ void ModelSceneNode::initModelNodes() {
         ModelNodeSceneNode *sceneNode = nodes.top();
         nodes.pop();
 
-        ModelNode *modelNode = sceneNode->modelNode();
+        const ModelNode *modelNode = sceneNode->modelNode();
         _modelNodeByIndex.insert(make_pair(modelNode->index(), sceneNode));
         _modelNodeByNumber.insert(make_pair(modelNode->nodeNumber(), sceneNode));
 
@@ -98,15 +112,37 @@ void ModelSceneNode::initModelNodes() {
             addChild(childNode);
             nodes.push(childNode.get());
 
+            // Optionally convert self-illuminated model nodes to light sources
+            if (isFeatureEnabled(Feature::SelfIllumAsLights)) {
+                glm::vec3 color;
+                if (child->getSelfIllumColor(0.0f, color) && glm::dot(color, color) > 0.0f) {
+                    float radius;
+                    shared_ptr<ModelMesh> mesh(child->mesh());
+                    if (mesh) {
+                        glm::vec3 size(mesh->mesh()->aabb().getSize());
+                        radius = glm::max(1.0f, glm::sqrt(glm::dot(size, size)));
+                    } else {
+                        radius = 1.0f;
+                    }
+                    auto lightNode = make_shared<LightSceneNode>(move(color), kSelfIlluminatedPriority, _sceneGraph);
+                    lightNode->setRadius(radius);
+                    childNode->addChild(lightNode);
+                }
+            }
+
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                auto lightNode = make_shared<LightSceneNode>(_sceneGraph, light->priority, child->color(), child->radius(), child->multiplier(), light->shadow);
+                auto lightNode = make_shared<LightSceneNode>(child->color(), light->priority, _sceneGraph);
+                lightNode->setMultiplier(child->multiplier());
+                lightNode->setRadius(child->radius());
+                lightNode->setShadow(light->shadow);
+                lightNode->setAmbientOnly(light->ambientOnly);
                 childNode->addChild(lightNode);
             }
 
             shared_ptr<Emitter> emitter(child->emitter());
             if (emitter && validateEmitter(*emitter)) {
-                auto emitterNode = make_shared<EmitterSceneNode>(emitter, _sceneGraph);
+                auto emitterNode = make_shared<EmitterSceneNode>(this, emitter, _sceneGraph);
                 childNode->addChild(emitterNode);
                 _emitters.push_back(emitterNode);
             }
@@ -117,7 +153,7 @@ void ModelSceneNode::initModelNodes() {
 }
 
 unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
-    unique_ptr<ModelNodeSceneNode> sceneNode(new ModelNodeSceneNode(_sceneGraph, this, &node));
+    auto sceneNode = make_unique<ModelNodeSceneNode>(_sceneGraph, this, &node);
     sceneNode->setLocalTransform(node.absoluteTransform());
     return move(sceneNode);
 }
@@ -127,50 +163,26 @@ void ModelSceneNode::update(float dt) {
 
     _animator.update(dt);
 
-    for (auto &emitter : _emitters) {
-        emitter->update(dt);
-    }
-    for (auto &attached : _attachedModels) {
-        attached.second->update(dt);
-    }
+    SceneNode::update(dt);
 }
 
-void ModelSceneNode::render() const {
+void ModelSceneNode::render() {
     if (g_drawAABB) {
-        AABBMesh::instance().render(_aabb, _absoluteTransform);
+        glm::mat4 transform(_absoluteTransform * _aabb.transform());
+
+        ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
+
+        Meshes::instance().getAABB()->render();
     }
 }
 
-void ModelSceneNode::playDefaultAnimation() {
-    _animator.playDefaultAnimation();
-
-    for (auto &attached : _attachedModels) {
-        attached.second->playDefaultAnimation();
-    }
-}
-
-void ModelSceneNode::playAnimation(const string &name, int flags, float speed) {
-    shared_ptr<Animation> animation(_model->getAnimation(name));
-    if (animation) {
-        playAnimation(animation, flags, speed, _model->animationScale());
-    }
-}
-
-void ModelSceneNode::playAnimation(const shared_ptr<Animation> &anim, int flags, float speed, float scale) {
-    _animator.playAnimation(anim, flags, speed, scale);
-
-    if (flags & kAnimationPropagate) {
-        for (auto &attached : _attachedModels) {
-            attached.second->playAnimation(anim, flags, speed, scale);
-        }
-    }
-}
-
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model) {
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
     if (!parentNode) return nullptr;
 
-    ModelNode *parentModelNode = parentNode->modelNode();
+    const ModelNode *parentModelNode = parentNode->modelNode();
     uint16_t parentNumber = parentModelNode->nodeNumber();
 
     auto maybeAttached = _attachedModels.find(parentNumber);
@@ -179,16 +191,14 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
         _attachedModels.erase(maybeAttached);
     }
     if (model) {
-        set<string> skipNodes;
+        set<string> ignoreNodes;
         for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
-            skipNodes.insert(node->name());
+            ignoreNodes.insert(node->name());
         }
-        shared_ptr<ModelSceneNode> modelNode(new ModelSceneNode(_sceneGraph, model, skipNodes));
-        modelNode->setLightingEnabled(_lightingEnabled && model->classification() != Model::Classification::Lightsaber);
+        auto modelNode = make_shared<ModelSceneNode>(classification, model, _sceneGraph, ignoreNodes);
         parentNode->addChild(modelNode);
 
-        auto inserted = _attachedModels.insert(make_pair(parentNumber, move(modelNode)));
-        return inserted.first->second;
+        return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
     }
 
     return nullptr;
@@ -241,17 +251,22 @@ void ModelSceneNode::updateAbsoluteTransform() {
 }
 
 void ModelSceneNode::updateLighting() {
-    if (!_lightingEnabled || !_lightingDirty) return;
+    if (!_lightingDirty) return;
 
     _lightsAffectedBy.clear();
-    glm::vec3 center(_absoluteTransform * glm::vec4(_model->aabb().center(), 1.0f));
-
-    _sceneGraph->getLightsAt(center, _lightsAffectedBy);
+    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, _sceneGraph->options().numLights, bind(&ModelSceneNode::isAffectableByLight, this, _1));
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {
         attached.second->setLightsAffectedBy(_lightsAffectedBy);
     }
+}
+
+bool ModelSceneNode::isAffectableByLight(const LightSceneNode &light) const {
+    if (light.isAmbientOnly()) {
+        return _classification == ModelSceneNode::Classification::Room;
+    }
+    return true;
 }
 
 void ModelSceneNode::setLightingIsDirty() {
@@ -277,48 +292,17 @@ glm::vec3 ModelSceneNode::getCenterOfAABB() const {
     return _absoluteTransform * glm::vec4(_aabb.center(), 1.0f);
 }
 
-const string &ModelSceneNode::name() const {
+const string &ModelSceneNode::getName() const {
     return _model->name();
 }
 
-shared_ptr<Model> ModelSceneNode::model() const {
-    return _model;
-}
-
-bool ModelSceneNode::hasTextureOverride() const {
-    return static_cast<bool>(_textureOverride);
-}
-
-shared_ptr<Texture> ModelSceneNode::textureOverride() const {
-    return _textureOverride;
-}
-
-bool ModelSceneNode::isVisible() const {
-    return _visible;
-}
-
-bool ModelSceneNode::isOnScreen() const {
-    return _onScreen;
-}
-
-float ModelSceneNode::alpha() const {
-    return _alpha;
-}
-
-const AABB &ModelSceneNode::aabb() const {
-    return _aabb;
-}
-
-bool ModelSceneNode::isLightingEnabled() const {
-    return _lightingEnabled;
-}
-
-const vector<LightSceneNode *> &ModelSceneNode::lightsAffectedBy() const {
-    return _lightsAffectedBy;
-}
-
-void ModelSceneNode::setTextureOverride(const shared_ptr<Texture> &texture) {
-    _textureOverride = texture;
+void ModelSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
+    for (auto &child : _children) {
+        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(child);
+        if (modelNode) {
+            modelNode->setDiffuseTexture(texture);
+        }
+    }
 }
 
 void ModelSceneNode::setVisible(bool visible) {
@@ -350,23 +334,8 @@ void ModelSceneNode::setAlpha(float alpha) {
     }
 }
 
-bool ModelSceneNode::isAnimationFinished() const {
-    return _model ? _animator.isAnimationFinished() : false;
-}
-
-void ModelSceneNode::setDefaultAnimation(const string &name) {
-    shared_ptr<Animation> animation(_model->getAnimation(name));
-    if (!animation) return;
-
-    _animator.setDefaultAnimation(animation);
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setDefaultAnimation(name);
-    }
-}
-
-void ModelSceneNode::setLightingEnabled(bool enabled) {
-    _lightingEnabled = enabled;
+void ModelSceneNode::setProjectileSpeed(float speed) {
+    _projectileSpeed = speed;
 }
 
 void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {
@@ -385,14 +354,24 @@ void ModelSceneNode::refreshAABB() {
 
         auto modelNodeSceneNode = dynamic_cast<ModelNodeSceneNode *>(node);
         if (modelNodeSceneNode) {
-            shared_ptr<Mesh> mesh(modelNodeSceneNode->modelNode()->mesh());
+            shared_ptr<ModelMesh> mesh(modelNodeSceneNode->modelNode()->mesh());
             if (mesh) {
-                _aabb.expand(mesh->aabb() * node->localTransform());
+                _aabb.expand(mesh->mesh()->aabb() * node->localTransform());
             }
         }
 
         for (auto &child : node->children()) {
             nodes.push(child.get());
+        }
+    }
+}
+
+void ModelSceneNode::signalEvent(const string &name) {
+    debug(boost::format("ModelSceneNode: event signalled: %s %s") % name % _model->name(), 2);
+
+    if (name == "detonate") {
+        for (auto &emitter : _emitters) {
+            emitter->detonate();
         }
     }
 }

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 namespace game {
@@ -93,23 +95,20 @@ enum class ActionType {
     QueueEmpty = 0xfffe
 };
 
-class Action {
+class Action : boost::noncopyable {
 public:
     Action(ActionType type);
     virtual ~Action() = default;
 
     void complete();
 
-    ActionType type() const;
-    bool isCompleted() const;
+    bool isCompleted() const { return _completed; }
+
+    ActionType type() const { return _type; }
 
 protected:
     ActionType _type { ActionType::QueueEmpty };
     bool _completed { false };
-
-private:
-    Action(const Action &) = delete;
-    Action &operator=(const Action &) = delete;
 };
 
 } // namespace game

@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+#include <boost/noncopyable.hpp>
+
 #include "../common/types.h"
 
 #include "types.h"
@@ -27,7 +29,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioStream {
+class AudioStream : boost::noncopyable {
 public:
     struct Frame {
         AudioFormat format { AudioFormat::Mono8 };
@@ -35,21 +37,17 @@ public:
         ByteArray samples;
     };
 
-    AudioStream() = default;
-
     void add(Frame &&frame);
     void fill(int frameIdx, uint32_t buffer);
 
-    int duration() const;
-    int frameCount() const;
+    int getFrameCount() const;
     const Frame &getFrame(int index) const;
+
+    float duration() const { return _duration; }
 
 private:
     float _duration { 0 };
     std::vector<Frame> _frames;
-
-    AudioStream(const AudioStream &) = delete;
-    AudioStream &operator=(const AudioStream &) = delete;
 
     int getALAudioFormat(AudioFormat format) const;
 };

@@ -42,13 +42,12 @@ public:
 
     bool isAnimationFinished() const;
 
-    void setModel(const std::string &resRef);
+    void setModel(const std::shared_ptr<render::Model> &model);
     void setFieldOfView(float fovy);
 
 private:
     scene::SceneGraph *_sceneGraph { nullptr };
     float _aspect { 1.0f };
-    std::string _modelResRef;
     std::unique_ptr<scene::ModelSceneNode> _model;
     float _fovy { kDefaultAnimCamFOV };
     float _zNear { 0.1f };

@@ -26,12 +26,11 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/walkmesh.h"
+#include "../../render/walkmesh/walkmesh.h"
 #include "../../scene/node/modelscenenode.h"
 
 #include "../enginetype/effect.h"
-
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -43,7 +42,7 @@ class BaseStatus;
 
 namespace game {
 
-static const float kDefaultDrawDistance = 1024.0f;
+constexpr float kDefaultDrawDistance = 1024.0f;
 
 class Item;
 class ObjectFactory;
@@ -67,20 +66,22 @@ public:
     bool contains(const glm::vec3 &point) const;
 
     virtual bool isSelectable() const;
-    bool isOpen() const;
+    bool isOpen() const { return _open; }
 
     virtual glm::vec3 getSelectablePosition() const;
 
-    ObjectFactory &objectFactory();
-    scene::SceneGraph &sceneGraph();
-    Room *room() const;
-    const glm::vec3 &position() const;
-    float facing() const;
-    const glm::mat4 &transform() const;
-    bool visible() const;
-    std::shared_ptr<scene::ModelSceneNode> model() const;
-    std::shared_ptr<render::Walkmesh> walkmesh() const;
-    float drawDistance() const;
+    std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const { return std::dynamic_pointer_cast<scene::ModelSceneNode>(_sceneNode); }
+
+    ObjectFactory &objectFactory() { return *_objectFactory; }
+    scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
+    Room *room() const { return _room; }
+    const glm::vec3 &position() const { return _position; }
+    float facing() const { return _facing; }
+    const glm::mat4 &transform() const { return _transform; }
+    bool visible() const { return _visible; }
+    std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
+    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
+    float drawDistance() const { return _drawDistance; }
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
@@ -89,7 +90,7 @@ public:
 
     // Animation
 
-    virtual void playAnimation(AnimationType animation, float speed, std::shared_ptr<Action> actionToComplete = nullptr);
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
 
     // END Animation
 
@@ -104,7 +105,7 @@ public:
     std::shared_ptr<Item> getNextItem();
     std::shared_ptr<Item> getItemByTag(const std::string &tag);
 
-    const std::vector<std::shared_ptr<Item>> &items() const;
+    const std::vector<std::shared_ptr<Item>> &items() const { return _items; }
 
     // END Inventory
 
@@ -124,7 +125,7 @@ public:
 
     // Stunt mode
 
-    bool isStuntMode() const;
+    bool isStuntMode() const { return _stunt; }
 
     /**
      * Places this object into the stunt mode. Objects in this mode have their
@@ -153,7 +154,7 @@ protected:
     float _facing { 0.0f };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
-    std::shared_ptr<scene::ModelSceneNode> _model;
+    std::shared_ptr<scene::SceneNode> _sceneNode;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };

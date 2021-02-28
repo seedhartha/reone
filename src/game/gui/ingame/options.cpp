@@ -31,7 +31,7 @@ namespace reone {
 namespace game {
 
 OptionsMenu::OptionsMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("optionsingame");
@@ -45,6 +45,8 @@ void OptionsMenu::load() {
 }
 
 void OptionsMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_LOADGAME") {
         _game->openSaveLoad(SaveLoad::Mode::LoadFromInGame);
     } else if (control == "BTN_SAVEGAME") {

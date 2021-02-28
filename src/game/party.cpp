@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../common/log.h"
+#include "../common/random.h"
 
 #include "action/follow.h"
 #include "blueprint/creature.h"
@@ -32,8 +33,8 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxMemberCount = 3;
-constexpr float kTeleMemberDistance = 32.0f;
+static constexpr int kMaxMemberCount = 3;
+static constexpr float kTeleMemberDistance = 32.0f;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {
@@ -122,9 +123,13 @@ void Party::switchLeader() {
 }
 
 void Party::onLeaderChanged() {
+    auto entry = static_cast<SoundSetEntry>(static_cast<int>(SoundSetEntry::Select1) + random(0, 2));
+    _members[0].creature->playSound(entry, false);
+
     for (auto &member : _members) {
         member.creature->actionQueue().clear();
     }
+
     _game->module()->area()->onPartyLeaderMoved();
 }
 
@@ -134,9 +139,9 @@ void Party::onHeartbeat() {
     for (int i = 1; i < _members.size(); ++i) {
         shared_ptr<Creature> member(_members[i].creature);
         ActionQueue &actions = member->actionQueue();
-        shared_ptr<Action> action(actions.currentAction());
+        shared_ptr<Action> action(actions.getCurrentAction());
         if (!action) {
-            actions.add(make_unique<FollowAction>(leader, 1.0f));
+            actions.add(make_unique<FollowAction>(leader, kDefaultFollowDistance));
         }
         if (member->distanceTo(*leader) > kTeleMemberDistance) {
             member->setPosition(leader->position());
@@ -153,11 +158,11 @@ shared_ptr<Creature> Party::getMember(int index) const {
     return _members.size() > index ? _members[index].creature : nullptr;
 }
 
-bool Party::empty() const {
+bool Party::isEmpty() const {
     return _members.empty();
 }
 
-int Party::size() const {
+int Party::getSize() const {
     return static_cast<int>(_members.size());
 }
 
@@ -179,11 +184,7 @@ bool Party::isMember(const Object &object) const {
     return false;
 }
 
-shared_ptr<Creature> Party::player() const {
-    return _player;
-}
-
-shared_ptr<Creature> Party::leader() const {
+shared_ptr<Creature> Party::getLeader() const {
     return !_members.empty() ? _members[0].creature : nullptr;
 }
 

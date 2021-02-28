@@ -43,12 +43,12 @@ static unordered_map<InGameMenu::Tab, string> g_tabTags {
 };
 
 InGameMenu::InGameMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("top");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -161,7 +161,7 @@ void InGameMenu::update(float dt) {
     }
 }
 
-void InGameMenu::render() const {
+void InGameMenu::render() {
     GUI *tabGui = getActiveTabGUI();
     if (tabGui) {
         tabGui->render();
@@ -195,12 +195,12 @@ void InGameMenu::openInventory() {
 }
 
 void InGameMenu::openCharacter() {
-    _character->refreshPortraits();
+    _character->refreshControls();
     changeTab(Tab::Character);
 }
 
 void InGameMenu::openAbilities() {
-    _abilities->refreshPortraits();
+    _abilities->refreshControls();
     changeTab(Tab::Abilities);
 }
 
@@ -213,6 +213,7 @@ void InGameMenu::openJournal() {
 }
 
 void InGameMenu::openMap() {
+    _map->refreshControls();
     changeTab(Tab::Map);
 }
 
@@ -221,6 +222,8 @@ void InGameMenu::openOptions() {
 }
 
 void InGameMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "LBLH_EQU") {
         openEquipment();
     } else if (control == "LBLH_INV") {

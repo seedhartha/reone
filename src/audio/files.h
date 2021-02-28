@@ -18,33 +18,24 @@
 #pragma once
 
 #include <string>
-#include <memory>
-#include <unordered_map>
 
+#include "../common/cache.h"
 #include "../resource/types.h"
+
+#include "stream.h"
 
 namespace reone {
 
 namespace audio {
 
-class AudioStream;
-
-class AudioFiles {
+class AudioFiles : public MemoryCache<std::string, AudioStream> {
 public:
     static AudioFiles &instance();
 
-    void invalidateCache();
-
-    std::shared_ptr<AudioStream> get(const std::string &resRef);
-
 private:
-    std::unordered_map<std::string, std::shared_ptr<AudioStream>> _cache;
+    AudioFiles();
 
-    AudioFiles() = default;
-    AudioFiles(const AudioFiles &) = delete;
-    AudioFiles &operator=(const AudioFiles &) = delete;
-
-    std::shared_ptr<AudioStream> doGet(const std::string &resRef);
+    std::shared_ptr<AudioStream> doGet(std::string resRef);
 };
 
 } // namespace audio

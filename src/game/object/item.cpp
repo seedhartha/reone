@@ -19,8 +19,11 @@
 
 #include <stdexcept>
 
+#include "../../audio/player.h"
+
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -38,72 +41,28 @@ void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
     blueprint->load(*this);
 }
 
+void Item::playShotSound(int variant, glm::vec3 position) {
+    if (_ammunitionType) {
+        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
+        if (sound) {
+            AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        }
+    }
+}
+
+void Item::playImpactSound(int variant, glm::vec3 position) {
+    if (_ammunitionType) {
+        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+        AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+    }
+}
+
 bool Item::isEquippable() const {
     return _equipableSlots != 0;
 }
 
-bool Item::isEquippable(InventorySlot slot) const {
+bool Item::isEquippable(int slot) const {
     return (_equipableSlots >> slot) & 1;
-}
-
-const string &Item::localizedName() const {
-    return _localizedName;
-}
-
-const string &Item::baseBodyVariation() const {
-    return _baseBodyVariation;
-}
-
-int Item::bodyVariation() const {
-    return _bodyVariation;
-}
-
-int Item::textureVariation() const {
-    return _textureVariation;
-}
-
-const string &Item::itemClass() const {
-    return _itemClass;
-}
-
-int Item::modelVariation() const {
-    return _modelVariation;
-}
-
-shared_ptr<Texture> Item::icon() const {
-    return _icon;
-}
-
-float Item::attackRange() const {
-    return static_cast<float>(_attackRange);
-}
-
-int Item::numDice() const {
-    return _numDice;
-}
-
-int Item::dieToRoll() const {
-    return _dieToRoll;
-}
-
-int Item::damageFlags() const {
-    return _damageFlags;
-}
-
-WeaponType Item::weaponType() const {
-    return _weaponType;
-}
-
-WeaponWield Item::weaponWield() const {
-    return _weaponWield;
-}
-
-int Item::stackSize() const {
-    return _stackSize;
-}
-
-bool Item::isDropable() const {
-    return _dropable;
 }
 
 void Item::setDropable(bool dropable) {
@@ -114,16 +73,8 @@ void Item::setStackSize(int stackSize) {
     _stackSize = stackSize;
 }
 
-bool Item::isIdentified() const {
-    return _identified;
-}
-
 void Item::setIdentified(bool value) {
     _identified = value;
-}
-
-bool Item::isEquipped() const {
-    return _equipped;
 }
 
 void Item::setEquipped(bool equipped) {

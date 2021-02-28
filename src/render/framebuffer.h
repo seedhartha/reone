@@ -18,18 +18,22 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
-#include <vector>
 
+#include <boost/noncopyable.hpp>
+
+#include "renderbuffer.h"
 #include "texture.h"
 
 namespace reone {
 
 namespace render {
 
-class Framebuffer {
+/**
+ * Abstraction over the OpenGL framebuffer used for off-screen rendering.
+ */
+class Framebuffer : boost::noncopyable {
 public:
-    Framebuffer(int w, int h, int colorBufferCount = 1, bool cubeMapDepthBuffer = false);
+    Framebuffer() = default;
     ~Framebuffer();
 
     void init();
@@ -38,28 +42,32 @@ public:
     void bind() const;
     void unbind() const;
 
-    void bindColorBuffer(int n) const;
-    void unbindColorBuffer(int n) const;
+    /**
+     * Attaches a texture as a color buffer of this framebuffer. Framebuffer must be bound.
+     *
+     * @param texture texture to attach
+     * @param index index of the color buffer
+     * @param mip mip level of the texture
+     */
+    void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
 
-    void bindDepthBuffer() const;
-    void unbindDepthBuffer() const;
+    void attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index = 0, int mip = 0) const;
 
-    int width() const;
-    int height() const;
+    /**
+     * Attaches a texture as a depth buffer of this framebuffer. Framebuffer must be bound.
+     */
+    void attachDepth(const Texture &texture) const;
+
+    void attachDepth(const Renderbuffer &renderbuffer) const;
+
+    /**
+     * Throws logic_error if this framebuffer is not complete. Framebuffer must be bound.
+     */
+    void checkCompleteness();
 
 private:
-    int _width { 0 };
-    int _height { 0 };
-    int _numColorBuffers { 0 };
-    bool _cubeMapDepthBuffer { false };
-
     bool _inited { false };
     uint32_t _framebuffer { 0 };
-    std::vector<std::unique_ptr<Texture>> _colorBuffers;
-    std::unique_ptr<Texture> _depthBuffer;
-
-    Framebuffer(const Framebuffer &) = delete;
-    Framebuffer &operator=(const Framebuffer &) = delete;
 };
 
 } // namespace render

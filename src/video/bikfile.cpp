@@ -264,15 +264,15 @@ private:
                 _frame->data, _frame->linesize, 0, _videoCodecCtx->height,
                 _frameRgb->data, _frameRgb->linesize);
 
-            ByteArray data(3ll * _videoCodecCtx->width * _videoCodecCtx->height);
+            auto pixels = make_shared<ByteArray>(3ll * _videoCodecCtx->width * _videoCodecCtx->height);
             for (int y = 0; y < _videoCodecCtx->height; ++y) {
                 int dstIdx = 3 * _videoCodecCtx->width * y;
                 uint8_t *src = _frameRgb->data[0] + static_cast<long long>(y) * _frameRgb->linesize[0];
-                memcpy(&data[dstIdx], src, 3ll * _videoCodecCtx->width);
+                memcpy(pixels->data() + dstIdx, src, 3ll * _videoCodecCtx->width);
             }
 
             auto frame = make_shared<Video::Frame>();
-            frame->data = move(data);
+            frame->pixels = move(pixels);
             _frames.push_back(move(frame));
         }
 
@@ -336,10 +336,6 @@ void BikFile::load() {
     _video->setMediaStream(decoder);
     _video->init();
 #endif // REONE_ENABLE_VIDEO
-}
-
-shared_ptr<Video> BikFile::video() const {
-    return _video;
 }
 
 } // namespace video

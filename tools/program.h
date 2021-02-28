@@ -17,56 +17,48 @@
 
 #pragma once
 
+#include <string>
 #include <memory>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include "../src/resource/types.h"
+
 #include "tools.h"
+#include "types.h"
 
 namespace reone {
 
 namespace tools {
 
-class Program {
+class Program : boost::noncopyable {
 public:
     Program(int argc, char **argv);
 
     int run();
 
 private:
-    enum class Command {
-        None,
-        Help,
-        List,
-        Extract,
-        Convert
-    };
+    int _argc;
+    char **_argv;
+
+    boost::program_options::options_description _commonOpts;
+    boost::program_options::options_description _cmdLineOpts { "Usage" };
 
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
-    boost::filesystem::path _inputFilePath;
-    boost::filesystem::path _keyPath;
-    resource::GameVersion _version { resource::GameVersion::KotOR };
-    Command _command { Command::None };
-    std::unique_ptr<Tool> _tool;
-
-    // Command line arguments
-
-    int _argc { 0 };
-    char **_argv { nullptr };
-
-    // END Command line arguments
-
-    boost::program_options::options_description _cmdLineOpts { "Usage" };
-
-    Program(const Program &) = delete;
-    Program &operator=(const Program &) = delete;
+    std::string _target;
+    Operation _operation { Operation::None };
+    resource::GameID _gameId { resource::GameID::KotOR };
+    std::vector<std::shared_ptr<ITool>> _tools;
 
     void initOptions();
     void loadOptions();
-    void initGameVersion();
-    void initTool();
+    void determineGameID();
+    void loadTools();
+
+    std::shared_ptr<ITool> getTool() const;
 };
 
 } // namespace tools

@@ -31,7 +31,7 @@ public:
 
     void toggle();
 
-    bool isOn() const;
+    bool isOn() const { return _on; }
 
     void setOnColor(const glm::vec3 &color);
 

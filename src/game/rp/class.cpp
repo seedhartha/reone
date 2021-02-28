@@ -29,52 +29,51 @@ namespace reone {
 
 namespace game {
 
-static const char kSkillsTableResRef[] = "skills";
+static const char kSkillsTwoDaResRef[] = "skills";
 
 CreatureClass::CreatureClass(ClassType type) : _type(type) {
     _defaultAttributes.addClassLevels(type, 1);
 }
 
-void CreatureClass::load(const TwoDaRow &row) {
-    _name = Resources::instance().getString(row.getInt("name"));
-    _description = Resources::instance().getString(row.getInt("description"));
-    _hitdie = row.getInt("hitdie");
-    _skillPointBase = row.getInt("skillpointbase");
+void CreatureClass::load(const TwoDA &twoDa, int row) {
+    _name = Resources::instance().getString(twoDa.getInt(row, "name"));
+    _description = Resources::instance().getString(twoDa.getInt(row, "description"));
+    _hitdie = twoDa.getInt(row, "hitdie");
+    _skillPointBase = twoDa.getInt(row, "skillpointbase");
 
     CreatureAbilities &abilities = _defaultAttributes.abilities();
-    abilities.setScore(Ability::Strength, row.getInt("str"));
-    abilities.setScore(Ability::Dexterity, row.getInt("dex"));
-    abilities.setScore(Ability::Constitution, row.getInt("con"));
-    abilities.setScore(Ability::Intelligence, row.getInt("int"));
-    abilities.setScore(Ability::Wisdom, row.getInt("wis"));
-    abilities.setScore(Ability::Charisma, row.getInt("cha"));
+    abilities.setScore(Ability::Strength, twoDa.getInt(row, "str"));
+    abilities.setScore(Ability::Dexterity, twoDa.getInt(row, "dex"));
+    abilities.setScore(Ability::Constitution, twoDa.getInt(row, "con"));
+    abilities.setScore(Ability::Intelligence, twoDa.getInt(row, "int"));
+    abilities.setScore(Ability::Wisdom, twoDa.getInt(row, "wis"));
+    abilities.setScore(Ability::Charisma, twoDa.getInt(row, "cha"));
 
-    string skillsTable(boost::to_lower_copy(row.getString("skillstable")));
+    string skillsTable(boost::to_lower_copy(twoDa.getString(row, "skillstable")));
     loadClassSkills(skillsTable);
 
-    string savingThrowTable(boost::to_lower_copy(row.getString("savingthrowtable")));
+    string savingThrowTable(boost::to_lower_copy(twoDa.getString(row, "savingthrowtable")));
     loadSavingThrows(savingThrowTable);
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
-    shared_ptr<TwoDaTable> skills(Resources::instance().get2DA(kSkillsTableResRef));
-    const vector<TwoDaRow> &rows = skills->rows();
-    for (int i = 0; i < static_cast<int>(rows.size()); ++i) {
-        if (rows[i].getInt(skillsTable + "_class") == 1) {
-            _classSkills.insert(static_cast<Skill>(i));
+    shared_ptr<TwoDA> skills(Resources::instance().get2DA(kSkillsTwoDaResRef));
+    for (int row = 0; row < skills->getRowCount(); ++row) {
+        if (skills->getInt(row, skillsTable + "_class") == 1) {
+            _classSkills.insert(static_cast<Skill>(row));
         }
     }
 }
 
-void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA(savingThrowTable));
-    for (auto &row : table->rows()) {
-        int level = row.getInt("level");
+void CreatureClass::loadSavingThrows(const string &twoDaResRef) {
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(twoDaResRef));
+    for (int row = 0; row < twoDa->getRowCount(); ++row) {
+        int level = twoDa->getInt(row, "level");
 
         SavingThrows throws;
-        throws.fortitude = row.getInt("fortsave");
-        throws.reflex = row.getInt("refsave");
-        throws.will = row.getInt("willsave");
+        throws.fortitude = twoDa->getInt(row, "fortsave");
+        throws.reflex = twoDa->getInt(row, "refsave");
+        throws.will = twoDa->getInt(row, "willsave");
 
         _savingThrowsByLevel.insert(make_pair(level, move(throws)));
     }
@@ -102,26 +101,6 @@ const SavingThrows &CreatureClass::getSavingThrows(int level) const {
         throw logic_error("Saving throws not found for level " + to_string(level));
     }
     return maybeThrows->second;
-}
-
-const string &CreatureClass::name() const {
-    return _name;
-}
-
-const string &CreatureClass::description() const {
-    return _description;
-}
-
-int CreatureClass::hitdie() const {
-    return _hitdie;
-}
-
-const CreatureAttributes &CreatureClass::defaultAttributes() const {
-    return _defaultAttributes;
-}
-
-int CreatureClass::skillPointBase() const {
-    return _skillPointBase;
 }
 
 } // namespace game

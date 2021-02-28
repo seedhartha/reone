@@ -19,6 +19,8 @@
 
 #include "glm/ext.hpp"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::scene;
@@ -27,11 +29,12 @@ namespace reone {
 
 namespace game {
 
-static const float kMinRotationSpeed = 1.0f;
-static const float kMaxRotationSpeed = 2.5f;
-static const float kRotationAcceleration = 1.0f;
+static constexpr float kMinRotationSpeed = 1.0f;
+static constexpr float kMaxRotationSpeed = 2.5f;
+static constexpr float kRotationAcceleration = 1.0f;
+static constexpr float kMouseRotationSpeed = 0.001f;
 
-ThirdPersonCamera::ThirdPersonCamera(SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) {
+ThirdPersonCamera::ThirdPersonCamera(Game *game, SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) : _game(game) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
     _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, zFar);
     _style = style;
@@ -43,6 +46,12 @@ bool ThirdPersonCamera::handle(const SDL_Event &event) {
             return handleKeyDown(event.key);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
+        case SDL_MOUSEBUTTONDOWN:
+            return handleMouseButtonDown(event.button);
+        case SDL_MOUSEBUTTONUP:
+            return handleMouseButtonUp(event.button);
+        case SDL_MOUSEMOTION:
+            return handleMouseMotion(event.motion);
         default:
             return false;
     }
@@ -51,39 +60,76 @@ bool ThirdPersonCamera::handle(const SDL_Event &event) {
 bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_A:
-            if (!event.repeat) {
+            if (!event.repeat && !_mouseLookMode) {
                 _rotateCCW = true;
                 _rotateCW = false;
                 _rotationSpeed = kMinRotationSpeed;
+                return true;
             }
-            return true;
-
+            break;
         case SDL_SCANCODE_D:
-            if (!event.repeat) {
+            if (!event.repeat && !_mouseLookMode) {
                 _rotateCCW = false;
                 _rotateCW = true;
                 _rotationSpeed = kMinRotationSpeed;
+                return true;
             }
-            return true;
-
+            break;
         default:
-            return false;
+            break;
     }
+
+    return false;
 }
 
 bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_A:
-            _rotateCCW = false;
-            return true;
-
+            if (!_mouseLookMode) {
+                _rotateCCW = false;
+                return true;
+            }
+            break;
         case SDL_SCANCODE_D:
-            _rotateCW = false;
-            return true;
-
+            if (!_mouseLookMode) {
+                _rotateCW = false;
+                return true;
+            }
+            break;
         default:
-            return false;
+            break;
     }
+
+    return false;
+}
+
+bool ThirdPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+    if (_mouseLookMode) {
+        _facing -= kMouseRotationSpeed * event.xrel;
+        _facing = glm::mod(_facing, glm::two_pi<float>());
+        updateSceneNode();
+    }
+    return false;
+}
+
+bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (event.button == SDL_BUTTON_RIGHT) {
+        _mouseLookMode = true;
+        _rotateCCW = false;
+        _rotateCW = false;
+        _game->setRelativeMouseMode(true);
+        return true;
+    }
+    return false;
+}
+
+bool ThirdPersonCamera::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+    if (event.button == SDL_BUTTON_RIGHT) {
+        _mouseLookMode = false;
+        _game->setRelativeMouseMode(false);
+        return true;
+    }
+    return false;
 }
 
 void ThirdPersonCamera::update(float dt) {
@@ -125,6 +171,7 @@ void ThirdPersonCamera::updateSceneNode() {
 void ThirdPersonCamera::stopMovement() {
     _rotateCCW = false;
     _rotateCW = false;
+    _mouseLookMode = false;
 }
 
 void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {

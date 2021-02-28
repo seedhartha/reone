@@ -23,7 +23,7 @@
 #include <boost/program_options.hpp>
 
 #include "common/log.h"
-#include "mp/game.h"
+#include "experimental/mp/game.h"
 
 using namespace std;
 
@@ -35,11 +35,15 @@ namespace po = boost::program_options;
 
 namespace reone {
 
-static const char *kConfigFilename = "reone.cfg";
-static const int kDefaultMusicVolume = 85;
-static const int kDefaultSoundVolume = 85;
-static const int kDefaultMovieVolume = 85;
-static const int kDefaultMultiplayerPort = 2003;
+static const char kConfigFilename[] = "reone.cfg";
+
+static constexpr int kDefaultNumLights = 8;
+static constexpr int kDefaultShadowResolution = 2;
+static constexpr int kDefaultMusicVolume = 85;
+static constexpr int kDefaultVoiceVolume = 85;
+static constexpr int kDefaultSoundVolume = 85;
+static constexpr int kDefaultMovieVolume = 85;
+static constexpr int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
     if (!argv) {
@@ -62,11 +66,15 @@ int Program::run() {
 void Program::initOptions() {
     _commonOpts.add_options()
         ("game", po::value<string>(), "path to game directory")
+        ("dev", po::value<bool>()->default_value(false), "enable developer mode")
         ("module", po::value<string>(), "name of a module to load")
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
+        ("numlights", po::value<int>()->default_value(kDefaultNumLights), "maximum number of lights")
+        ("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution")
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
+        ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
         ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
@@ -86,7 +94,6 @@ void Program::loadOptions() {
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
-
     if (fs::exists(kConfigFilename)) {
         po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts), vars);
     }
@@ -94,11 +101,15 @@ void Program::loadOptions() {
 
     _showHelp = vars.count("help") > 0;
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    _gameOpts.developer = vars["dev"].as<bool>();
     _gameOpts.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
     _gameOpts.graphics.width = vars["width"].as<int>();
     _gameOpts.graphics.height = vars["height"].as<int>();
     _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();
+    _gameOpts.graphics.numLights = vars["numlights"].as<int>();
+    _gameOpts.graphics.shadowResolution = vars["shadowres"].as<int>();
     _gameOpts.audio.musicVolume = vars["musicvol"].as<int>();
+    _gameOpts.audio.voiceVolume = vars["voicevol"].as<int>();
     _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
     _gameOpts.audio.movieVolume = vars["movievol"].as<int>();
     _gameOpts.network.host = vars.count("join") > 0 ? vars["join"].as<string>() : "";

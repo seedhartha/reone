@@ -17,11 +17,9 @@
 
 #include "tools.h"
 
-#include <boost/format.hpp>
+#include <iostream>
 
-#include "../src/common/log.h"
-#include "../src/resource/erffile.h"
-#include "../src/resource/util.h"
+#include "../src/resource/typeutil.h"
 
 using namespace std;
 
@@ -33,31 +31,47 @@ namespace reone {
 
 namespace tools {
 
-void ErfTool::list(const fs::path &path, const fs::path &keyPath) const {
+void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     ErfFile erf;
-    erf.load(path);
+    erf.load(target);
 
-    for (auto &key : erf.keys()) {
-        info(boost::format("%16s\t%4s") % key.resRef % getExtByResType(key.resType));
+    if (operation == Operation::List) {
+        list(erf);
+    } else if (operation == Operation::Extract) {
+        extract(erf, destPath);
     }
 }
 
-void ErfTool::extract(const fs::path &path, const fs::path &keyPath, const fs::path &destPath) const {
-    ErfFile erf;
-    erf.load(path);
+void ErfTool::list(const ErfFile &erf) {
+    for (auto &key : erf.keys()) {
+        cout << key.resRef << " " << getExtByResType(key.resType) << endl;
+    }
+}
 
-    auto &keys = erf.keys();
-    for (int i = 0; i < keys.size(); ++i) {
-        const ErfFile::Key &key = keys[i];
-        info(boost::format("Extracting %16s\t%4s") % key.resRef % getExtByResType(key.resType));
+void ErfTool::extract(ErfFile &erf, const fs::path &destPath) {
+    if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
+
+    for (size_t i = 0; i < erf.keys().size(); ++i) {
+        const ErfFile::Key &key = erf.keys()[i];
+        string ext(getExtByResType(key.resType));
+        cout << "Extracting " << key.resRef << " " << ext << endl;
+        ByteArray data(erf.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
-        resPath.append(key.resRef + "." + getExtByResType(key.resType));
+        resPath.append(key.resRef + "." + ext);
 
-        ByteArray data(erf.getResourceData(i));
         fs::ofstream res(resPath, ios::binary);
-        res.write(data.data(), data.size());
+        res.write(&data[0], data.size());
     }
+}
+
+bool ErfTool::supports(Operation operation, const fs::path &target) const {
+    if (fs::is_directory(target)) return false;
+
+    string ext(target.extension().string());
+    if (ext != ".erf" && ext != ".mod" && ext != ".sav") return false;
+
+    return operation == Operation::List || operation == Operation::Extract;
 }
 
 } // namespace tools

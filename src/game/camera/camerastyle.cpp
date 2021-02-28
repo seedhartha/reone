@@ -23,11 +23,11 @@ namespace reone {
 
 namespace game {
 
-void CameraStyle::load(const resource::TwoDaRow &row) {
-    distance = row.getFloat("distance");
-    pitch = row.getFloat("pitch");
-    viewAngle = row.getFloat("viewangle");
-    height = row.getFloat("height");
+void CameraStyle::load(const resource::TwoDA &twoDa, int row) {
+    distance = twoDa.getFloat(row, "distance");
+    pitch = twoDa.getFloat(row, "pitch");
+    viewAngle = twoDa.getFloat(row, "viewangle");
+    height = twoDa.getFloat(row, "height");
 }
 
 } // namespace game

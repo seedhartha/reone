@@ -21,6 +21,8 @@
 
 #include "../object/creature.h"
 
+#include "attackutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -32,17 +34,6 @@ static bool isMeleeWieldType(CreatureWieldType type) {
         case CreatureWieldType::SingleSword:
         case CreatureWieldType::DoubleBladedSword:
         case CreatureWieldType::DualSwords:
-            return true;
-        default:
-            return false;
-    }
-}
-
-static bool isAttackSuccessful(AttackResultType type) {
-    switch (type) {
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
-        case AttackResultType::AutomaticHit:
             return true;
         default:
             return false;
@@ -89,15 +80,15 @@ AttackResult AttackResolver::getAttackResult(const shared_ptr<Creature> &attacke
 
     if (duel) {
         if (isMeleeWieldType(attackerWield) && isMeleeWieldType(targetWield)) {
-            result.attackerAnimation = CombatAnimation::MeleeDuelAttack;
+            result.attackerAnimation = CombatAnimation::CinematicMeleeAttack;
             result.animationVariant = random(1, 5);
-            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDuelDamage : CombatAnimation::MeleeDuelParry;
+            result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::CinematicMeleeDamage : CombatAnimation::CinematicMeleeParry;
         } else if (isMeleeWieldType(attackerWield)) {
             result.attackerAnimation = CombatAnimation::MeleeAttack;
             result.animationVariant = random(1, 2);
             result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::MeleeDamage : CombatAnimation::MeleeDodge;
         } else if (isRangedWieldType(attackerWield)) {
-            result.attackerAnimation = CombatAnimation::RangedAttack;
+            result.attackerAnimation = CombatAnimation::BlasterAttack;
             result.targetAnimation = isAttackSuccessful(result.type) ? CombatAnimation::Damage : CombatAnimation::Dodge;
         } else {
             result.attackerAnimation = CombatAnimation::Attack;
@@ -106,7 +97,7 @@ AttackResult AttackResolver::getAttackResult(const shared_ptr<Creature> &attacke
         }
     } else {
         if (isRangedWieldType(attackerWield)) {
-            result.attackerAnimation = CombatAnimation::RangedAttack;
+            result.attackerAnimation = CombatAnimation::BlasterAttack;
         } else {
             result.attackerAnimation = CombatAnimation::Attack;
             result.animationVariant = random(1, 2);

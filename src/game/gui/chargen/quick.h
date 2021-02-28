@@ -27,11 +27,13 @@ class CharacterGeneration;
 
 class QuickCharacterGeneration : public GameGUI {
 public:
-    QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    QuickCharacterGeneration(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
 
     void goToNextStep();
+
+    int step() const { return _step; }
 
     void setStep(int step);
 

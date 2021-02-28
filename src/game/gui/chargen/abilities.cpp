@@ -23,12 +23,18 @@
 
 #include "glm/common.hpp"
 
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/resources.h"
+
+#include "../../rp/classes.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
 
 using namespace std;
 
+using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -36,9 +42,9 @@ namespace reone {
 
 namespace game {
 
-constexpr int kStartingPoints = 30;
-constexpr int kMinAbilityScore = 8;
-constexpr int kMaxAbilityScore = 18;
+static constexpr int kStartingPoints = 30;
+static constexpr int kMinAbilityScore = 8;
+static constexpr int kMaxAbilityScore = 18;
 
 static const unordered_map<string, Ability> g_abilityByAlias {
     { "STR", Ability::Strength },
@@ -49,8 +55,17 @@ static const unordered_map<string, Ability> g_abilityByAlias {
     { "CHA", Ability::Charisma }
 };
 
-CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+static const unordered_map<Ability, int> g_descStrRefByAbility {
+    { Ability::Strength, 222 },
+    { Ability::Dexterity, 223 },
+    { Ability::Constitution, 224 },
+    { Ability::Intelligence, 226  },
+    { Ability::Wisdom, 225  },
+    { Ability::Charisma, 227 }
+};
+
+CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("abchrgen");
@@ -61,14 +76,23 @@ CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameVersion ver
 void CharGenAbilities::load() {
     GUI::load();
 
+    static vector<string> labels { "STR_LBL", "DEX_LBL", "CON_LBL", "INT_LBL", "WIS_LBL", "CHA_LBL" };
+    for (auto &label : labels) {
+        configureControl(label, [this](Control &control) {
+            control.setFocusable(true);
+            control.setHilightColor(getBaseColor(_gameId));
+        });
+    }
+
+    ListBox &lbDesc = getControl<ListBox>("LB_DESC");
+    lbDesc.setProtoMatchContent(true);
+
     disableControl("STR_POINTS_BTN");
     disableControl("DEX_POINTS_BTN");
     disableControl("CON_POINTS_BTN");
     disableControl("INT_POINTS_BTN");
     disableControl("WIS_POINTS_BTN");
     disableControl("CHA_POINTS_BTN");
-
-    disableControl("BTN_RECOMMENDED");
 }
 
 void CharGenAbilities::reset(bool newGame) {
@@ -124,6 +148,8 @@ static Ability getAbilityByAlias(const string &alias) {
 }
 
 void CharGenAbilities::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_ACCEPT") {
         if (_points == 0) {
             updateCharacter();
@@ -132,11 +158,20 @@ void CharGenAbilities::onClick(const string &control) {
         }
     } else if (control == "BTN_BACK") {
         _charGen->openSteps();
+
+    } else if (control == "BTN_RECOMMENDED") {
+        ClassType classType = _charGen->character().attributes().getEffectiveClass();
+        shared_ptr<CreatureClass> clazz(Classes::instance().get(classType));
+        _abilities = clazz->defaultAttributes().abilities();
+        _points = 0;
+        refreshControls();
+
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
         _abilities.setScore(ability, _abilities.getScore(ability) - 1);
         _points += getPointCost(ability);
         refreshControls();
+
     } else if (boost::ends_with(control, "_PLUS_BTN")) {
         Ability ability = getAbilityByAlias(control.substr(0, 3));
         _points -= getPointCost(ability);
@@ -147,6 +182,22 @@ void CharGenAbilities::onClick(const string &control) {
 
 void CharGenAbilities::updateCharacter() {
     _charGen->setAbilities(_abilities);
+}
+
+void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
+    if (focus && control.size() == 7ll && boost::ends_with(control, "_LBL")) {
+        string alias(control.substr(0, 3));
+        auto maybeAbility = g_abilityByAlias.find(alias);
+        if (maybeAbility != g_abilityByAlias.end()) {
+            auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
+            if (maybeDescription != g_descStrRefByAbility.end()) {
+                string description(Resources::instance().getString(maybeDescription->second));
+                ListBox &listBox = getControl<ListBox>("LB_DESC");
+                listBox.clearItems();
+                listBox.addTextLinesAsItems(description);
+            }
+        }
+    }
 }
 
 } // namespace game

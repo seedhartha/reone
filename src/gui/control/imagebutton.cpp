@@ -18,8 +18,9 @@
 #include "imagebutton.h"
 
 #include "../../render/fonts.h"
-#include "../../render/mesh/quad.h"
-#include "../../render/util.h"
+#include "../../render/meshes.h"
+#include "../../render/stateutil.h"
+#include "../../render/window.h"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ namespace reone {
 
 namespace gui {
 
-constexpr char kIconFontResRef[] = "dialogfont10x10a";
+static const char kIconFontResRef[] = "dialogfont10x10a";
 
 ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
     _clickable = true;
@@ -43,10 +44,10 @@ void ImageButton::load(const GffStruct &gffs) {
 
 void ImageButton::render(
     const glm::ivec2 &offset,
-    const string &textOverride,
+    const vector<string> &text,
     const string &iconText,
     const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) const {
+    const shared_ptr<Texture> &iconFrame) {
 
     if (!_visible) return;
 
@@ -63,8 +64,7 @@ void ImageButton::render(
 
     drawIcon(offset, iconText, iconTexture, iconFrame);
 
-    if (!textOverride.empty() || !_text.text.empty()) {
-        string text(!textOverride.empty() ? textOverride : _text.text);
+    if (!text.empty()) {
         drawText(text, borderOffset, size);
     }
 }
@@ -73,7 +73,7 @@ void ImageButton::drawIcon(
     const glm::ivec2 &offset,
     const string &iconText,
     const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) const {
+    const shared_ptr<Texture> &iconFrame) {
 
     if (!iconFrame && !iconTexture) return;
 
@@ -84,35 +84,44 @@ void ImageButton::drawIcon(
         color = _border->color;
     }
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
-
-    LocalUniforms locals;
-    locals.general.model = transform;
-    locals.general.color = glm::vec4(color, 1.0f);
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
     if (iconFrame) {
-        setActiveTextureUnit(0);
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
+
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(color, 1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+
+        setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
-        Quad::getDefault().renderTriangles();
+
+        Meshes::instance().getQuad()->render();
     }
-
-    locals.general.color = glm::vec4(1.0f);
-
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
 
     if (iconTexture) {
-        setActiveTextureUnit(0);
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
+
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+
+        setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();
-        Quad::getDefault().renderTriangles();
+
+        Meshes::instance().getQuad()->render();
     }
+
     if (!iconText.empty()) {
-        transform = glm::mat4(1.0f);
+        glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
-        _iconFont->render(iconText, transform, color, TextGravity::Left);
+        _iconFont->render(iconText, transform, color, TextGravity::LeftCenter);
     }
 }
 

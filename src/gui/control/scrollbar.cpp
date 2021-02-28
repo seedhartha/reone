@@ -17,10 +17,11 @@
 
 #include "scrollbar.h"
 
-#include "../../render/mesh/quad.h"
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
+#include "../../render/stateutil.h"
 #include "../../render/textures.h"
-#include "../../render/util.h"
+#include "../../render/window.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -41,51 +42,115 @@ void ScrollBar::load(const GffStruct &gffs) {
     shared_ptr<GffStruct> dir(gffs.getStruct("DIR"));
     if (dir) {
         string image(dir->getString("IMAGE"));
-        _dir.image = Textures::instance().get(image, TextureType::Diffuse);
+        _dir.image = Textures::instance().get(image, TextureUsage::GUI);
+    }
+
+    shared_ptr<GffStruct> thumb(gffs.getStruct("THUMB"));
+    if (thumb) {
+        string image(thumb->getString("IMAGE"));
+        _thumb.image = Textures::instance().get(image, TextureUsage::GUI);
     }
 }
 
-void ScrollBar::render(const glm::ivec2 &offset, const string &textOverride) const {
-    if (!_dir.image) return;
-
-    setActiveTextureUnit(0);
-    _dir.image->bind();
-
-    if (_canScrollUp) drawUpArrow(offset);
-    if (_canScrollDown) drawDownArrow(offset);
+void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) {
+    drawThumb(offset);
+    drawArrows(offset);
 }
 
-void ScrollBar::drawUpArrow(const glm::vec2 &offset) const {
+void ScrollBar::drawThumb(const glm::ivec2 &offset) {
+    if (!_thumb.image || _state.numVisible >= _state.count) return;
+
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _thumb.image->bind();
+
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+
+    // Top edge
+    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
+    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->render();
+
+    // Left edge
+    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
+    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->render();
+
+    // Right edge
+    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
+    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->render();
+
+    // Bottom edge
+    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
+    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->render();
+
+    // Thumb
+
+    float frameHeight = _extent.height - 2.0f * _extent.width - 4.0f;
+    float thumbHeight = frameHeight * _state.numVisible / static_cast<float>(_state.count);
+    float y = glm::mix(0.0f, frameHeight - thumbHeight, _state.offset / static_cast<float>(_state.count - _state.numVisible));
+
+    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
+    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->render();
+
+    // END Thumb
+}
+
+void ScrollBar::drawArrows(const glm::ivec2 &offset) {
+    if (!_dir.image) return;
+
+    bool canScrollUp = _state.offset > 0;
+    bool canScrollDown = _state.count - _state.offset > _state.numVisible;
+    if (!canScrollUp && !canScrollDown) return;
+
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _dir.image->bind();
+
+    if (canScrollUp) {
+        drawUpArrow(offset);
+    }
+    if (canScrollDown) {
+        drawDownArrow(offset);
+    }
+}
+
+void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
-void ScrollBar::drawDownArrow(const glm::vec2 &offset) const {
+void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
-void ScrollBar::setCanScrollUp(bool scroll) {
-    _canScrollUp = scroll;
-}
-
-void ScrollBar::setCanScrollDown(bool scroll) {
-    _canScrollDown = scroll;
+void ScrollBar::setScrollState(ScrollState state) {
+    _state = move(state);
 }
 
 } // namespace gui

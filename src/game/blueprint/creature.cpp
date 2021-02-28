@@ -27,6 +27,7 @@
 
 #include "../object/creature.h"
 #include "../portraitutil.h"
+#include "../soundsets.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ void CreatureBlueprint::load(Creature &creature) {
     }
 
     string portrait(getPortrait(_utc->getInt("PortraitId", -1)));
-    creature._portrait = Textures::instance().get(portrait, TextureType::GUI);
+    creature._portrait = Textures::instance().get(portrait, TextureUsage::GUI);
 
     creature._faction = static_cast<Faction>(_utc->getInt("FactionID", -1));
     creature._conversation = boost::to_lower_copy(_utc->getString("Conversation"));
@@ -69,6 +70,8 @@ void CreatureBlueprint::load(Creature &creature) {
     loadAttributes(creature);
     loadScripts(creature);
     loadItems(creature);
+    loadSoundSet(creature);
+    loadBodyBag(creature);
 }
 
 int CreatureBlueprint::getAppearanceFromUtc() const {
@@ -137,8 +140,18 @@ void CreatureBlueprint::loadItems(Creature &creature) {
     }
 }
 
-const string &CreatureBlueprint::resRef() const {
-    return _resRef;
+void CreatureBlueprint::loadSoundSet(Creature &creature) {
+    int soundSetIdx = _utc->getInt("SoundSetFile");
+    if (soundSetIdx == 0xffff) return;
+
+    shared_ptr<TwoDA> soundSetTable(Resources::instance().get2DA("soundset"));
+    string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
+    if (soundSetResRef.empty()) return;
+
+    creature._soundSet = SoundSets::instance().get(soundSetResRef);
+}
+
+void CreatureBlueprint::loadBodyBag(Creature &creature) {
 }
 
 void StaticCreatureBlueprint::load(Creature &creature) {
@@ -157,18 +170,6 @@ void StaticCreatureBlueprint::clearEquipment() {
 
 void StaticCreatureBlueprint::addEquippedItem(const string &resRef) {
     _equipment.push_back(resRef);
-}
-
-Gender StaticCreatureBlueprint::gender() const {
-    return _gender;
-}
-
-int StaticCreatureBlueprint::appearance() const {
-    return _appearance;
-}
-
-CreatureAttributes &StaticCreatureBlueprint::attributes() {
-    return _attributes;
 }
 
 void StaticCreatureBlueprint::setGender(Gender gender) {

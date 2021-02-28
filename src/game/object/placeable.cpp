@@ -22,8 +22,8 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../common/streamutil.h"
-#include "../../render/models.h"
-#include "../../render/walkmeshes.h"
+#include "../../render/model/models.h"
+#include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
 
@@ -80,25 +80,12 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     }
     blueprint->load(*this);
 
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("placeables"));
-    string modelName(boost::to_lower_copy(table->getString(_appearance, "modelname")));
+    shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
+    string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
+    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Placeable, Models::instance().get(modelName), _sceneGraph);
 
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
-    _model->setLightingEnabled(true);
-
-    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::PlaceableWalkmesh);
-}
-
-bool Placeable::hasInventory() const {
-    return _hasInventory;
-}
-
-bool Placeable::isUsable() const {
-    return _usable;
-}
-
-const string &Placeable::onInvDisturbed() const {
-    return _onInvDisturbed;
+    _sceneNode = move(model);
+    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
 }
 
 } // namespace game

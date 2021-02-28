@@ -26,10 +26,6 @@ namespace game {
 CommandAction::CommandAction(const ExecutionContext &ctx) : Action(ActionType::DoCommand), _context(ctx) {
 }
 
-const ExecutionContext &CommandAction::context() const {
-    return _context;
-}
-
 } // namespace game
 
 } // namespace reone

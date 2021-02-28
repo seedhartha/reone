@@ -33,8 +33,8 @@ namespace reone {
 
 namespace game {
 
-QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, GameVersion version, const GraphicsOptions &opts) :
-    GameGUI(version, opts),
+QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
+    GameGUI(gameId, opts),
     _charGen(charGen) {
 
     _resRef = getResRef("quickpnl");
@@ -46,7 +46,7 @@ void QuickCharacterGeneration::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
@@ -92,6 +92,8 @@ void QuickCharacterGeneration::goToNextStep() {
 }
 
 void QuickCharacterGeneration::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_CANCEL") {
         setStep(0);
         _charGen->openQuickOrCustom();

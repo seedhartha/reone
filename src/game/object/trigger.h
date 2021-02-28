@@ -19,7 +19,7 @@
 
 #include <set>
 
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "spatial.h"
 
@@ -45,10 +45,11 @@ public:
     bool isIn(const glm::vec2 &point) const;
     bool isTenant(const std::shared_ptr<SpatialObject> &object) const;
 
-    const std::string &linkedToModule() const;
-    const std::string &linkedTo() const;
-    const std::string &onEnter() const;
-    const std::string &onExit() const;
+    const std::string &getOnEnter() const { return _onEnter; }
+    const std::string &getOnExit() const { return _onExit; }
+
+    const std::string &linkedToModule() const { return _linkedToModule; }
+    const std::string &linkedTo() const { return _linkedTo; }
 
 private:
     std::string _transitionDestin;
@@ -65,6 +66,7 @@ private:
     // END Scripts
 
     void loadBlueprint(const resource::GffStruct &gffs);
+    void loadAppearance();
 
     friend class TriggerBlueprint;
 };

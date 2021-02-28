@@ -23,8 +23,7 @@
 #include "../../script/object.h"
 
 #include "../actionqueue.h"
-
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -35,17 +34,17 @@ public:
     virtual void update(float dt);
     virtual void clearAllActions();
 
-    bool isMinOneHP() const;
-    bool isDead() const;
-    bool isCommandable() const;
+    bool isMinOneHP() const { return _minOneHP; }
+    bool isDead() const { return _dead; }
+    bool isCommandable() const { return _commandable; }
 
-    ObjectType type() const;
-    const std::string &blueprintResRef() const;
-    const std::string &tag() const;
-    const std::string &name() const;
-    const std::string &conversation() const;
-    ActionQueue &actionQueue();
-    int plotFlag() const;
+    ObjectType type() const { return _type; }
+    const std::string &blueprintResRef() const { return _blueprintResRef; }
+    const std::string &tag() const { return _tag; }
+    const std::string &name() const { return _name; }
+    const std::string &conversation() const { return _conversation; }
+    ActionQueue &actionQueue() { return _actionQueue; }
+    int plotFlag() const { return _plotFlag; }
 
     void setTag(const std::string &tag);
     void setPlotFlag(int flag);
@@ -54,13 +53,13 @@ public:
     // Hit Points
 
     // Base maximum hit points, not considering any bonuses.
-    int hitPoints() const;
+    int hitPoints() const { return _hitPoints; }
 
     // Maximum hit points, after considering all bonuses and penalties.
-    int maxHitPoints() const;
+    int maxHitPoints() const { return _maxHitPoints; }
 
     // Current hit points, not counting any bonuses.
-    int currentHitPoints() const;
+    int currentHitPoints() const { return _currentHitPoints; }
 
     void setMinOneHP(bool minOneHP);
     void setMaxHitPoints(int maxHitPoints);
@@ -69,8 +68,8 @@ public:
 
     // Scripts
 
-    const std::string &heartbeat() const;
-    const std::string &onUserDefined() const;
+    const std::string &getHeartbeat() const { return _heartbeat; }
+    const std::string &getOnUserDefined() const { return _onUserDefined; }
 
     // END Scripts
 

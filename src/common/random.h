@@ -19,7 +19,14 @@
 
 namespace reone {
 
+/**
+ * Generates a random integer between min and max (inclusive).
+ */
 int random(int min, int max);
+
+/**
+ * Generates a random floating point number between min and max (inclusive).
+ */
 float random(float min, float max);
 
 } // namespace reone

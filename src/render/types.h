@@ -17,40 +17,51 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "SDL2/SDL_events.h"
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
 
 namespace reone {
 
 namespace render {
 
-constexpr int kMaxShadowLightCount = 2;
 constexpr int kNumCubeFaces = 6;
+constexpr int kMaxBoneCount = 128;
+constexpr int kMaxLightCount = 16;
+constexpr int kMaxParticleCount = 32;
 
-enum class TextureType {
+enum class PixelFormat {
+    Grayscale,
+    RGB,
+    RGBA,
+    BGR,
+    BGRA,
+    DXT1,
+    DXT5,
+    Depth,
+
+    RG16F,
+    RGB16F
+};
+
+/**
+ * This is a hint to the engine when configuring texture properties.
+ */
+enum class TextureUsage {
+    Default,
+    GUI,
     Diffuse,
     Lightmap,
     EnvironmentMap,
+    IrradianceMap,
+    PrefilterMap,
+    BRDFLookup,
     Bumpmap,
-    GUI,
-    Cursor,
     ColorBuffer,
     DepthBuffer,
-    CubeMapDepthBuffer
+    CubeMapDepthBuffer,
+    Video
 };
 
-enum class TextureBlending {
-    None,
-    Additive
-};
-
-enum class CubeMapSide {
+enum class CubeMapFace {
     PositiveX = 0,
     NegativeX = 1,
     PositiveY = 2,
@@ -63,17 +74,8 @@ struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
     bool fullscreen { false };
-};
-
-struct TextureFeatures {
-    std::string envMapTexture;
-    std::string bumpyShinyTexture;
-    std::string bumpMapTexture;
-    TextureBlending blending { TextureBlending::None };
-    int numChars { 0 };
-    float fontHeight { 0.0f };
-    std::vector<glm::vec3> upperLeftCoords;
-    std::vector<glm::vec3> lowerRightCoords;
+    int numLights { 8 };
+    int shadowResolution { 0 };
 };
 
 class IEventHandler {

@@ -25,7 +25,7 @@ namespace reone {
 
 namespace gui {
 
-static const int kDefaultSlotCount = 6;
+constexpr int kDefaultSlotCount = 6;
 
 class ListBox : public Control {
 public:
@@ -40,12 +40,15 @@ public:
         std::string iconText;
         std::shared_ptr<render::Texture> iconTexture;
         std::shared_ptr<render::Texture> iconFrame;
+
+        std::vector<std::string> _textLines;
     };
 
     ListBox(GUI *gui);
 
     void clearItems();
-    void addItem(Item item);
+    void addItem(Item &&item);
+    void addTextLinesAsItems(const std::string &text);
 
     void clearSelection();
 
@@ -53,20 +56,22 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void render(const glm::ivec2 &offset, const std::string &textOverride) const override;
-    void stretch(float x, float y) override;
+    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void stretch(float x, float y, int mask) override;
 
     void setFocus(bool focus) override;
     void setExtent(const Extent &extent) override;
+    void setExtentHeight(int height) override;
     void setProtoItemType(ControlType type);
     void setSelectionMode(SelectionMode mode);
+    void setProtoMatchContent(bool match);
 
+    int getItemCount() const;
     const Item &getItemAt(int index) const;
 
-    Control &protoItem() const;
-    Control &scrollBar() const;
-    int itemCount() const;
-    int hilightedIndex() const;
+    Control &protoItem() const { return *_protoItem; }
+    Control &scrollBar() const { return *_scrollBar; }
+    int hilightedIndex() const { return _hilightedIndex; }
 
 private:
     SelectionMode _mode { SelectionMode::Propagate };
@@ -78,8 +83,10 @@ private:
     int _itemOffset { 0 };
     int _hilightedIndex { -1 };
     int _itemMargin { 0 };
+    bool _protoMatchContent { false }; /**< proto item height must match its content */
 
-    void updateItems();
+    void updateItemSlots();
+
     int getItemIndex(int y) const;
 };
 

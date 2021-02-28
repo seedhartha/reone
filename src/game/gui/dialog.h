@@ -17,37 +17,21 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-#include "../../resource/types.h"
-
 #include "../camera/dialogcamera.h"
-#include "../dialog.h"
 #include "../object/creature.h"
+
+#include "conversation.h"
 
 namespace reone {
 
-namespace audio {
-
-class SoundHandle;
-
-}
-
 namespace game {
 
-class Game;
-
-class DialogGUI : public gui::GUI {
+class DialogGUI : public Conversation {
 public:
     DialogGUI(Game *game);
 
     void load() override;
-    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
-    void pickReply(uint32_t index);
-
-    bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-
-    CameraType getCamera(int &cameraId) const;
 
 private:
     struct Participant {
@@ -55,52 +39,33 @@ private:
         std::shared_ptr<Creature> creature;
     };
 
-    Game *_game { nullptr };
-    std::shared_ptr<SpatialObject> _owner;
-    std::shared_ptr<Dialog> _dialog;
-    std::shared_ptr<Dialog::EntryReply> _currentEntry;
-    std::shared_ptr<audio::SoundHandle> _currentVoice;
     std::shared_ptr<SpatialObject> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
-    int _autoPickReplyIdx { -1 };
-    int _endEntryFlags { 0 };
-    float _endEntryTimeout { 0.0f };
-    bool _entryEnded { false };
 
-    bool checkCondition(const std::string &script);
-    void addFrame(int top, int height);
+    void onStart() override;
+    void onFinish() override;
+    void onLoadEntry() override;
+    void onEntryEnded() override;
+
+    void setMessage(std::string message) override;
+
+    void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();
-    void endCurrentEntry();
-    void finish();
-    void playVoiceOver();
-    void scheduleEndOfEntry();
-    void updateCamera();
-    void updateParticipantAnimations();
     void repositionMessage();
 
-    void onReplyClicked(int index);
-
-    bool handleKeyDown(SDL_Scancode key) override;
-    bool handleKeyUp(SDL_Scancode key) override;
+    void updateCamera();
+    void updateParticipantAnimations();
 
     glm::vec3 getTalkPosition(const SpatialObject &object) const;
     DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
-    AnimationType getAnimationType(int ordinal) const;
-
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+    AnimationType getStuntAnimationType(int ordinal) const;
 
     // Loading
 
-    void loadTopFrame();
-    void loadBottomFrame();
-
-    void loadAnimatedCamera();
-    void loadCurrentEntry();
+    void loadFrames();
     void loadCurrentSpeaker();
-    void loadReplies();
-    void loadStartEntry();
 
     // END Loading
 

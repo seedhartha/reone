@@ -22,6 +22,7 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../common/log.h"
+#include "../scene/types.h"
 #include "../script/execution.h"
 
 #include "enginetype/location.h"
@@ -33,16 +34,17 @@
 
 using namespace std;
 
+using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-static const float kKeepPathDuration = 1000.0f;
-static const float kDefaultMaxObjectDistance = 2.0f;
-static const float kMaxConversationDistance = 4.0f;
-static const float kDistanceWalk = 4.0f;
+static constexpr float kKeepPathDuration = 1000.0f;
+static constexpr float kDefaultMaxObjectDistance = 2.0f;
+static constexpr float kMaxConversationDistance = 4.0f;
+static constexpr float kDistanceWalk = 4.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
     if (!game) {
@@ -53,7 +55,7 @@ ActionExecutor::ActionExecutor(Game *game) : _game(game) {
 void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) {
     ActionQueue &actionQueue = object->actionQueue();
 
-    shared_ptr<Action> action(actionQueue.currentAction());
+    shared_ptr<Action> action(actionQueue.getCurrentAction());
     if (!action) return;
 
     ActionType type = action->type();
@@ -116,7 +118,7 @@ void ActionExecutor::executeMoveToPoint(const shared_ptr<Object> &actor, MoveToP
 void ActionExecutor::executeMoveToObject(const shared_ptr<Object> &actor, MoveToObjectAction &action, float dt) {
     auto object = static_pointer_cast<SpatialObject>(action.object());
     glm::vec3 dest(object->position());
-    bool run = action.getRun();
+    bool run = action.isRun();
     float distance = action.distance();
 
     bool reached = navigateCreature(static_pointer_cast<Creature>(actor), dest, run, distance, dt);
@@ -153,7 +155,7 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
         navigateCreature(creatureActor, object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
-        bool isActorLeader = _game->party().leader() == actor;
+        bool isActorLeader = _game->party().getLeader() == actor;
         _game->module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actor), action.dialogResRef());
         action.complete();
     }
@@ -309,13 +311,16 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
             creatureActor->face(*door);
             creatureActor->playAnimation(AnimationType::LoopingUnlockDoor);
 
-            door->setLocked(false);
-            door->open(actor);
+            if (!door->isKeyRequired()) {
+                door->setLocked(false);
+                door->open(actor);
 
-            string onOpen(door->getOnOpen());
-            if (!onOpen.empty()) {
-                _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                string onOpen(door->getOnOpen());
+                if (!onOpen.empty()) {
+                    _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                }
             }
+
             action.complete();
         }
     } else {
@@ -335,16 +340,20 @@ void ActionExecutor::executeJumpToObject(const shared_ptr<Object> &actor, Object
 }
 
 void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, LocationAction &action, float dt) {
-    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
-    spatialActor->setPosition(action.location()->position());
-    spatialActor->setFacing(action.location()->facing());
+    auto spatial = static_pointer_cast<SpatialObject>(actor);
+    spatial->setPosition(action.location()->position());
+    spatial->setFacing(action.location()->facing());
 
     action.complete();
 }
 
 void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const shared_ptr<PlayAnimationAction> &action, float dt) {
-    auto spatialActor = static_pointer_cast<SpatialObject>(actor);
-    spatialActor->playAnimation(action->animation(), action->speed(), action);
+    AnimationProperties properties;
+    properties.flags = AnimationFlags::propagateHead;
+    properties.speed = action->speed();
+
+    auto spatial = static_pointer_cast<SpatialObject>(actor);
+    spatial->playAnimation(action->animation(), move(properties), action);
 }
 
 } // namespace game

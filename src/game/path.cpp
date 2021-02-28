@@ -52,10 +52,6 @@ void Path::load(const GffStruct &pth) {
     }
 }
 
-const vector<Path::Point> &Path::points() const {
-    return _points;
-}
-
 } // namespace resource
 
 } // namespace reone

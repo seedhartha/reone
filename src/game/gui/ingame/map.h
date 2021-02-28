@@ -25,18 +25,26 @@ namespace game {
 
 class Game;
 class Map;
+class Waypoint;
 
 class MapMenu : public GameGUI {
 public:
     MapMenu(Game *game);
 
     void load() override;
-    void render() const override;
+    void render() override;
+
+    void refreshControls();
 
 private:
-    Game *_game { nullptr };
+    Game *_game;
+
+    std::vector<std::shared_ptr<Waypoint>> _notes;
+    int _selectedNoteIdx { 0 };
 
     void onClick(const std::string &control) override;
+
+    void refreshSelectedNote();
 };
 
 } // namespace game

@@ -19,8 +19,10 @@
 
 #include <memory>
 
+#include "../../audio/stream.h"
+#include "../../render/model/model.h"
 #include "../../render/texture.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "../blueprint/item.h"
 #include "../types.h"
@@ -33,30 +35,42 @@ namespace game {
 
 class Item : public Object {
 public:
+    struct AmmunitionType {
+        std::shared_ptr<render::Model> model;
+        std::shared_ptr<audio::AudioStream> shotSound1;
+        std::shared_ptr<audio::AudioStream> shotSound2;
+        std::shared_ptr<audio::AudioStream> impactSound1;
+        std::shared_ptr<audio::AudioStream> impactSound2;
+    };
+
     Item(uint32_t id);
 
     void load(const std::shared_ptr<ItemBlueprint> &blueprint);
 
-    bool isEquippable() const;
-    bool isEquippable(InventorySlot slot) const;
-    bool isDropable() const;
-    bool isIdentified() const;
-    bool isEquipped() const;
+    void playShotSound(int variant, glm::vec3 position);
+    void playImpactSound(int variant, glm::vec3 position);
 
-    const std::string &localizedName() const;
-    const std::string &baseBodyVariation() const;
-    int bodyVariation() const;
-    int textureVariation() const;
-    const std::string &itemClass() const;
-    int modelVariation() const;
-    std::shared_ptr<render::Texture> icon() const;
-    float attackRange() const;
-    int numDice() const;
-    int dieToRoll() const;
-    int damageFlags() const;
-    WeaponType weaponType() const;
-    WeaponWield weaponWield() const;
-    int stackSize() const;
+    bool isEquippable() const;
+    bool isEquippable(int slot) const;
+    bool isDropable() const { return _dropable; }
+    bool isIdentified() const { return _identified; }
+    bool isEquipped() const { return _equipped; }
+
+    const std::string &baseBodyVariation() const { return _baseBodyVariation; }
+    const std::string &itemClass() const { return _itemClass; }
+    const std::string &localizedName() const { return _localizedName; }
+    float attackRange() const { return static_cast<float>(_attackRange); }
+    int bodyVariation() const { return _bodyVariation; }
+    int damageFlags() const { return _damageFlags; }
+    int dieToRoll() const { return _dieToRoll; }
+    int modelVariation() const { return _modelVariation; }
+    int numDice() const { return _numDice; }
+    int stackSize() const { return _stackSize; }
+    int textureVariation() const { return _textureVariation; }
+    std::shared_ptr<AmmunitionType> ammunitionType() const { return _ammunitionType; }
+    std::shared_ptr<render::Texture> icon() const { return _icon; }
+    WeaponType weaponType() const { return _weaponType; }
+    WeaponWield weaponWield() const { return _weaponWield; }
 
     void setDropable(bool dropable);
     void setStackSize(int size);
@@ -82,6 +96,7 @@ private:
     int _stackSize { 1 };
     bool _identified { true };
     bool _equipped { false };
+    std::shared_ptr<AmmunitionType> _ammunitionType;
 
     friend class ItemBlueprint;
 };

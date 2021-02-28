@@ -46,7 +46,8 @@ private:
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;
     std::string getHeadModelName() const;
-    std::string getWeaponModelName(InventorySlot slot) const;
+    std::string getMaskModelName() const;
+    std::string getWeaponModelName(int slot) const;
 };
 
 } // namespace game

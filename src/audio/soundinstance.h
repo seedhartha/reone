@@ -20,6 +20,8 @@
 #include <string>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "stream.h"
@@ -41,7 +43,7 @@ public:
     void init();
     void update();
 
-    std::shared_ptr<SoundHandle> handle() const;
+    std::shared_ptr<SoundHandle> handle() const { return _handle; }
 
 private:
     std::shared_ptr<AudioStream> _stream;
@@ -54,9 +56,6 @@ private:
     uint32_t _source { 0 };
     int _nextFrame { 0 };
     int _nextBuffer { 0 };
-
-    SoundInstance(SoundInstance &) = delete;
-    SoundInstance &operator=(SoundInstance &) = delete;
 
     void deinit();
 };

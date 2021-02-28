@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 
 #include "../blueprint/placeable.h"
 
@@ -44,10 +44,11 @@ public:
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<PlaceableBlueprint> &blueprint);
 
-    bool hasInventory() const;
-    bool isUsable() const;
+    bool hasInventory() const { return _hasInventory; }
 
-    const std::string &onInvDisturbed() const;
+    bool isUsable() const { return _usable; }
+
+    const std::string &getOnInvDisturbed() const { return _onInvDisturbed; }
 
 private:
     int  _appearance { 0 };

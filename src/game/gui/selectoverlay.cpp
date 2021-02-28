@@ -21,11 +21,12 @@
 
 #include "../../render/font.h"
 #include "../../render/fonts.h"
-#include "../../render/mesh/quad.h"
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
+#include "../../render/stateutil.h"
 #include "../../render/texture.h"
 #include "../../render/textures.h"
-#include "../../render/util.h"
+#include "../../render/window.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -42,15 +43,15 @@ namespace reone {
 
 namespace game {
 
-static const int kOffsetToReticle = 8;
-static const int kTitleBarWidth = 250;
-static const int kTitleBarPadding = 6;
-static const int kHealthBarHeight = 6;
-static const int kActionCount = 3;
-static const int kActionBarMargin = 3;
-static const int kActionBarPadding = 3;
-static const int kActionWidth = 35;
-static const int kActionHeight = 59;
+static constexpr int kOffsetToReticle = 8;
+static constexpr int kTitleBarWidth = 250;
+static constexpr int kTitleBarPadding = 6;
+static constexpr int kHealthBarHeight = 6;
+static constexpr int kActionCount = 3;
+static constexpr int kActionBarMargin = 3;
+static constexpr int kActionBarPadding = 3;
+static constexpr int kActionWidth = 35;
+static constexpr int kActionHeight = 59;
 
 SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
     if (!game) {
@@ -60,13 +61,13 @@ SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
 
 void SelectionOverlay::load() {
     _font = Fonts::instance().get("dialogfont16x16");
-    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureType::GUI);
-    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureType::GUI);
-    _hostileReticle = Textures::instance().get("hostilereticle", TextureType::GUI);
-    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureType::GUI);
-    _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureType::GUI);
-    _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureType::GUI);
-    _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureType::GUI);
+    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = Textures::instance().get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
@@ -74,7 +75,7 @@ void SelectionOverlay::load() {
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
-    _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureType::GUI)));
+    _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureUsage::GUI)));
 }
 
 bool SelectionOverlay::handle(const SDL_Event &event) {
@@ -117,13 +118,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 
     switch (_actions[_selectedActionIdx]) {
         case ContextualAction::Unlock: {
-            ActionQueue &actions = _game->party().leader()->actionQueue();
+            ActionQueue &actions = _game->party().getLeader()->actionQueue();
             actions.add(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
         }
 
         case ContextualAction::Attack: {
-            shared_ptr<Creature> partyLeader(_game->party().leader());
+            shared_ptr<Creature> partyLeader(_game->party().getLeader());
             ActionQueue &actions = partyLeader->actionQueue();
             actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange()));
             break;
@@ -156,7 +157,7 @@ void SelectionOverlay::update() {
             _hilightedObject = hilightedObject;
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(hilightedObject));
-            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
+            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 
@@ -169,12 +170,12 @@ void SelectionOverlay::update() {
             _actions = module->getContextualActions(selectedObject);
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(selectedObject));
-            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().leader()), *target);
+            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 }
 
-void SelectionOverlay::render() const {
+void SelectionOverlay::render() {
     if (_hilightedObject) {
         drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
     }
@@ -188,7 +189,7 @@ void SelectionOverlay::render() const {
     }
 }
 
-void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) const {
+void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
     const GraphicsOptions &opts = _game->options().graphics;
     int width = texture.width();
     int height = texture.height();
@@ -197,18 +198,18 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
 
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
-void SelectionOverlay::drawTitleBar() const {
+void SelectionOverlay::drawTitleBar() {
     if (_selectedObject->name().empty()) return;
 
     const GraphicsOptions &opts = _game->options().graphics;
@@ -224,14 +225,15 @@ void SelectionOverlay::drawTitleBar() const {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-        locals.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        locals.general.alpha = 0.5f;
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        uniforms.general.alpha = 0.5f;
 
-        Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
+        Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad()->render();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -247,7 +249,7 @@ void SelectionOverlay::drawTitleBar() const {
     }
 }
 
-void SelectionOverlay::drawHealthBar() const {
+void SelectionOverlay::drawHealthBar() {
     const GraphicsOptions &opts = _game->options().graphics;
     float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kHealthBarHeight - kOffsetToReticle;
@@ -260,16 +262,16 @@ void SelectionOverlay::drawHealthBar() const {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
-    locals.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIWhite, locals);
-
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
-void SelectionOverlay::drawActionBar() const {
+void SelectionOverlay::drawActionBar() {
     const GraphicsOptions &opts = _game->options().graphics;
 
     for (int i = 0; i < kActionCount; ++i) {
@@ -280,10 +282,10 @@ void SelectionOverlay::drawActionBar() const {
         transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
         transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = move(transform);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         shared_ptr<Texture> frameTexture;
         if (i == _selectedActionIdx) {
@@ -293,10 +295,10 @@ void SelectionOverlay::drawActionBar() const {
         } else {
             frameTexture = _friendlyScroll;
         }
-        setActiveTextureUnit(0);
+        setActiveTextureUnit(TextureUnits::diffuse);
         frameTexture->bind();
 
-        Quad::getDefault().renderTriangles();
+        Meshes::instance().getQuad()->render();
 
         if (i < static_cast<int>(_actions.size())) {
             ContextualAction action = _actions[i];
@@ -309,15 +311,15 @@ void SelectionOverlay::drawActionBar() const {
                 transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-                LocalUniforms locals;
-                locals.general.model = move(transform);
+                ShaderUniforms uniforms;
+                uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.general.model = move(transform);
+                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-                Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-                setActiveTextureUnit(0);
+                setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();
 
-                Quad::getDefault().renderTriangles();
+                Meshes::instance().getQuad()->render();
             }
         }
     }
@@ -340,7 +342,7 @@ glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
         return red;
     }
 
-    return getBaseColor(_game->version());
+    return getBaseColor(_game->gameId());
 }
 
 } // namespace game

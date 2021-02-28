@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../object/types.h"
+#include "../types.h"
 
 #include "action.h"
 

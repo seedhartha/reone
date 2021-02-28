@@ -22,10 +22,11 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include "mesh/quad.h"
+#include "meshes.h"
 #include "shaders.h"
+#include "stateutil.h"
 #include "texture.h"
-#include "util.h"
+#include "window.h"
 
 using namespace std;
 
@@ -42,22 +43,21 @@ Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) :
     }
 }
 
-void Cursor::render() const {
+void Cursor::render() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    texture->bind();
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    LocalUniforms locals;
-    locals.general.model = move(transform);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
-
-    setActiveTextureUnit(0);
-    texture->bind();
-
-    Quad::getDefault().renderTriangles();
+    Meshes::instance().getQuad()->render();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

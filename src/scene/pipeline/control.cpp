@@ -17,13 +17,17 @@
 
 #include "control.h"
 
-#include "glm/ext.hpp"
-
 #include "GL/glew.h"
 
-#include "../../render/mesh/quad.h"
+#include "glm/ext.hpp"
+
+#include "../../render/meshes.h"
 #include "../../render/shaders.h"
-#include "../../render/util.h"
+#include "../../render/stateutil.h"
+#include "../../render/textureutil.h"
+
+#include "../node/cameranode.h"
+#include "../scenegraph.h"
 
 using namespace std;
 
@@ -34,61 +38,73 @@ namespace reone {
 namespace scene {
 
 ControlRenderPipeline::ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent) :
-    _scene(scene),
-    _extent(extent),
-    _geometry(_extent[2], _extent[3]) {
+    _scene(scene), _extent(extent) {
 }
 
 void ControlRenderPipeline::init() {
+    _geometryColor = make_unique<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _geometryColor->init();
+    _geometryColor->bind();
+    _geometryColor->clearPixels(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::RGBA);
+    _geometryColor->unbind();
+
+    _geometryDepth = make_unique<Renderbuffer>();
+    _geometryDepth->init();
+    _geometryDepth->bind();
+    _geometryDepth->configure(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::Depth);
+    _geometryDepth->unbind();
+
     _geometry.init();
+    _geometry.bind();
+    _geometry.attachColor(*_geometryColor);
+    _geometry.attachDepth(*_geometryDepth);
+    _geometry.checkCompleteness();
+    _geometry.unbind();
 }
 
-void ControlRenderPipeline::render(const glm::ivec2 &offset) const {
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
+void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     // Render to framebuffer
-    {
-        glViewport(0, 0, _extent[2], _extent[3]);
 
+    withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = _scene->activeCamera()->projection();
+        uniforms.general.view = _scene->activeCamera()->view();
+        uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+        _scene->setUniformsPrototype(move(uniforms));
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         withDepthTest([this]() { _scene->render(); });
 
         _geometry.unbind();
+    });
 
-        glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-    }
+
     // Render control
-    {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 100.0f));
-        transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
 
-        GlobalUniforms globals;
-        globals.projection = glm::ortho(
-            0.0f,
-            static_cast<float>(viewport[2]),
-            static_cast<float>(viewport[3]),
-            0.0f,
-            -100.0f, 100.0f);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _geometryColor->bind();
 
-        Shaders::instance().setGlobalUniforms(globals);
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 100.0f));
+    transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
 
-        LocalUniforms locals;
-        locals.general.model = move(transform);
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
 
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+    ShaderUniforms uniforms;
+    uniforms.general.projection = glm::ortho(
+        0.0f,
+        static_cast<float>(viewport[2]),
+        static_cast<float>(viewport[3]),
+        0.0f,
+        -100.0f, 100.0f);
 
-        setActiveTextureUnit(0);
-        _geometry.bindColorBuffer(0);
+    uniforms.general.model = move(transform);
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-        Quad::getDefault().renderTriangles();
-
-        _geometry.unbindColorBuffer(0);
-    }
+    Meshes::instance().getQuad()->render();
 }
 
 } // namespace scene

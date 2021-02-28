@@ -17,19 +17,23 @@
 
 #pragma once
 
-#include "../gui.h"
+#include "../../../scene/node/modelscenenode.h"
 
 #include "../../portrait.h"
+
+#include "../gui.h"
+
 
 namespace reone {
 
 namespace game {
 
+class Game;
 class CharacterGeneration;
 
 class PortraitSelection : public GameGUI {
 public:
-    PortraitSelection(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    PortraitSelection(Game *game, CharacterGeneration *charGen);
 
     void load() override;
 
@@ -37,13 +41,20 @@ public:
     void resetCurrentPortrait();
 
 private:
-    CharacterGeneration *_charGen { nullptr };
+    Game *_game;
+    CharacterGeneration *_charGen;
+
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };
 
     void onClick(const std::string &control) override;
 
     void loadCurrentPortrait();
+    void loadHeadModel();
+
+    int getAppearanceFromCurrentPortrait() const;
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
+
     void setButtonColors(const std::string &tag);
 };
 

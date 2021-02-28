@@ -18,15 +18,14 @@
 #include "scenegraph.h"
 
 #include <algorithm>
-#include <stack>
 
-#include "../render/mesh/quad.h"
+#include "../render/meshes.h"
 
 #include "node/cameranode.h"
+#include "node/emitternode.h"
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
-#include "node/particlenode.h"
 
 using namespace std;
 
@@ -35,8 +34,6 @@ using namespace reone::render;
 namespace reone {
 
 namespace scene {
-
-static bool g_emittersEnabled = true;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -50,13 +47,10 @@ void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
-    auto maybeRoot = find_if(_roots.begin(), _roots.end(), [&node](auto &n) { return n.get() == node.get(); });
+    auto maybeRoot = find(_roots.begin(), _roots.end(), node);
     if (maybeRoot != _roots.end()) {
         _roots.erase(maybeRoot);
     }
-}
-
-void SceneGraph::build() {
 }
 
 void SceneGraph::prepareFrame() {
@@ -72,36 +66,42 @@ void SceneGraph::prepareFrame() {
         }
     }
 
-    // Sort transparent meshes
-    unordered_map<SceneNode *, float> cameraDistances;
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
+
+    // Sort transparent meshes by transparency and distance to camera
+    unordered_map<SceneNode *, float> meshToCamera;
     for (auto &mesh : _transparentMeshes) {
-        cameraDistances.insert(make_pair(mesh, mesh->distanceTo(cameraPosition)));
+        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo(cameraPosition)));
     }
-    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&cameraDistances](auto &left, auto &right) {
+    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
         int leftTransparency = left->modelNode()->mesh()->transparency();
         int rightTransparency = right->modelNode()->mesh()->transparency();
 
         if (leftTransparency < rightTransparency) return true;
         if (leftTransparency > rightTransparency) return false;
 
-        float leftDistance = cameraDistances.find(left)->second;
-        float rightDistance = cameraDistances.find(right)->second;
+        float leftDistance = meshToCamera.find(left)->second;
+        float rightDistance = meshToCamera.find(right)->second;
 
         return leftDistance > rightDistance;
     });
 
-    // Sort particles
-    unordered_map<SceneNode *, float> particlesZ;
-    for (auto &particle : _particles) {
-        glm::vec4 screen(_activeCamera->projection() * _activeCamera->view() * particle->absoluteTransform()[3]);
-        screen /= screen.w;
-        particlesZ.insert(make_pair(particle, screen.z));
+    // Sort emitters by render order and distance to camera
+    unordered_map<SceneNode *, float> emitterToCamera;
+    for (auto &emitter : _emitters) {
+        emitterToCamera.insert(make_pair(emitter, emitter->getDistanceTo(cameraPosition)));
     }
-    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
-        float leftZ = particlesZ.find(left)->second;
-        float rightZ = particlesZ.find(right)->second;
-        return leftZ > rightZ;
+    sort(_emitters.begin(), _emitters.end(), [&emitterToCamera](auto &left, auto &right) {
+        int leftRenderOrder = left->emitter()->renderOrder();
+        int rightRenderOrder = right->emitter()->renderOrder();
+
+        if (leftRenderOrder > rightRenderOrder) return true;
+        if (leftRenderOrder < rightRenderOrder) return false;
+
+        float leftDistance = emitterToCamera.find(left)->second;
+        float rightDistance = emitterToCamera.find(right)->second;
+
+        return leftDistance > rightDistance;
     });
 }
 
@@ -110,125 +110,165 @@ void SceneGraph::refreshNodeLists() {
     _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
-    _particles.clear();
+    _emitters.clear();
 
     for (auto &root : _roots) {
-        stack<SceneNode *> nodes;
-        nodes.push(root.get());
+        refreshFromSceneNode(root);
+    }
+}
 
-        while (!nodes.empty()) {
-            SceneNode *node = nodes.top();
-            nodes.pop();
+void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
+    auto model = dynamic_pointer_cast<ModelSceneNode>(node);
+    if (model) {
+        // Skip the model and its children if it is not currently visible
+        if (!model->isVisible() || !model->isOnScreen()) return;
 
-            ModelSceneNode *model = dynamic_cast<ModelSceneNode *>(node);
-            if (model) {
-                if (!model->isVisible() || !model->isOnScreen()) continue;
-
-            } else {
-                ModelNodeSceneNode *modelNode = dynamic_cast<ModelNodeSceneNode *>(node);
-                if (modelNode) {
-                    if (modelNode->shouldRender()) {
-                        if (modelNode->isTransparent()) {
-                            _transparentMeshes.push_back(modelNode);
-                        } else {
-                            _opaqueMeshes.push_back(modelNode);
-                        }
-                    }
-                    if (modelNode->shouldCastShadows()) {
-                        _shadowMeshes.push_back(modelNode);
-                    }
+    } else {
+        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(node);
+        if (modelNode) {
+            // For model nodes, determine whether they should be rendered and cast shadows
+            if (modelNode->shouldRender()) {
+                // Sort model nodes into transparent and opaque
+                if (modelNode->isTransparent()) {
+                    _transparentMeshes.push_back(modelNode.get());
                 } else {
-                    LightSceneNode *light = dynamic_cast<LightSceneNode *>(node);
-                    if (light) {
-                        _lights.push_back(light);
-                    } else if (g_emittersEnabled) {
-                        auto particle = dynamic_cast<ParticleSceneNode *>(node);
-                        if (particle) {
-                            _particles.push_back(particle);
-                        }
-                    }
+                    _opaqueMeshes.push_back(modelNode.get());
                 }
             }
-            for (auto &child : node->children()) {
-                nodes.push(child.get());
+            if (modelNode->shouldCastShadows()) {
+                _shadowMeshes.push_back(modelNode.get());
+            }
+        } else {
+            auto light = dynamic_pointer_cast<LightSceneNode>(node);
+            if (light) {
+                _lights.push_back(light.get());
+            } else {
+                auto emitter = dynamic_pointer_cast<EmitterSceneNode>(node);
+                if (emitter) {
+                    _emitters.push_back(emitter.get());
+                }
             }
         }
+    }
+
+    for (auto &child : node->children()) {
+        refreshFromSceneNode(child);
     }
 }
 
 void SceneGraph::refreshShadowLight() {
-    _shadowLightPresent = false;
+    const LightSceneNode *nextShadowLight = nullptr;
 
-    if (!_refNode) return;
+    if (_shadowReference) {
+        vector<LightSceneNode *> lights;
+        getLightsAt(*_shadowReference, lights, 1, [](auto &light) { return light.isShadow(); });
 
-    glm::vec3 refNodePos(_refNode->absoluteTransform()[3]);
-    vector<LightSceneNode *> lights;
-    getLightsAt(refNodePos, lights);
-
-    for (auto &light : lights) {
-        if (light->shadow()) {
-            _shadowLightPresent = true;
-            _shadowLightPosition = light->absoluteTransform()[3];
-            return;
+        if (!lights.empty()) {
+            nextShadowLight = lights.front();
         }
+    }
+
+    if (!nextShadowLight) {
+        _shadowLight = nullptr;
+        return;
+    }
+
+    if (!_shadowLight) {
+        _shadowLight = nextShadowLight;
+        _shadowFading = false;
+        return;
+    }
+
+    if (_shadowLight == nextShadowLight) return;
+
+    if (_shadowFading && _shadowStrength == 0.0f) {
+        _shadowLight = nextShadowLight;
+        _shadowFading = false;
+    } else {
+        _shadowFading = true;
     }
 }
 
-void SceneGraph::render() const {
-    if (!_activeCamera) return;
+void SceneGraph::update(float dt) {
+    if (!_update) return;
 
-    GlobalUniforms globals;
-    globals.projection = _activeCamera->projection();
-    globals.view = _activeCamera->view();
-    globals.cameraPosition = _activeCamera->absoluteTransform()[3];
-    globals.shadowLightPresent = _shadowLightPresent;
-    globals.shadowLightPosition = _shadowLightPosition;
+    for (auto &root : _roots) {
+        root->update(dt);
+    }
 
-    Shaders::instance().setGlobalUniforms(globals);
-
-    renderNoGlobalUniforms(false);
+    if (_shadowFading) {
+        _shadowStrength = glm::max(0.0f, _shadowStrength - dt);
+    } else {
+        _shadowStrength = glm::min(_shadowStrength + dt, 1.0f);
+    }
 }
 
-void SceneGraph::renderNoGlobalUniforms(bool shadowPass) const {
+void SceneGraph::render(bool shadowPass) {
+    if (!_activeCamera) return;
+
     if (shadowPass) {
+        // Render shadow meshes
         for (auto &mesh : _shadowMeshes) {
             mesh->renderSingle(true);
         }
         return;
     }
+
+    // Render opaque roots
     for (auto &root : _roots) {
-        root->render();
+        if (!root->isTransparent()) {
+            root->render();
+        }
     }
+
+    // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->renderSingle(false);
     }
+
+    // Render transparent roots
+    for (auto &root : _roots) {
+        if (root->isTransparent()) {
+            root->render();
+        }
+    }
+
+    // Render transparent meshes
     for (auto &mesh : _transparentMeshes) {
         mesh->renderSingle(false);
     }
-    for (auto &particle : _particles) {
-        particle->renderSingle(false);
+
+    // Render emitter particles
+    for (auto &emitter : _emitters) {
+        emitter->renderSingle(false);
     }
 }
 
-void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *> &lights) const {
+void SceneGraph::getLightsAt(
+    const SceneNode &node,
+    vector<LightSceneNode *> &lights,
+    int count,
+    function<bool(const LightSceneNode &)> predicate) const {
+
     unordered_map<LightSceneNode *, float> distances;
     lights.clear();
 
     for (auto &light : _lights) {
-        float distance = light->distanceTo(position);
-        float radius = light->radius();
-        if (distance > radius) continue;
+        if (!predicate(*light)) continue;
 
-        distances.insert(make_pair(light, distance));
+        // Only account for lights whose distance to the reference node is
+        // within range of the light.
+        float distance = light->getDistanceTo(node);
+        if (distance > light->radius()) continue;
+
         lights.push_back(light);
+        distances.insert(make_pair(light, distance));
     }
 
+    // Sort lights by priority and radius
     sort(lights.begin(), lights.end(), [&distances](LightSceneNode *left, LightSceneNode *right) {
-        int leftPriority = left->priority();
-        int rightPriority = right->priority();
-
-        if (leftPriority < rightPriority) return true;
-        if (leftPriority > rightPriority) return false;
+        if (left->priority() < right->priority()) return true;
+        if (left->priority() > right->priority()) return false;
 
         float leftDistance = distances.find(left)->second;
         float rightDistance = distances.find(right)->second;
@@ -236,37 +276,33 @@ void SceneGraph::getLightsAt(const glm::vec3 &position, vector<LightSceneNode *>
         return leftDistance < rightDistance;
     });
 
-    if (lights.size() > kMaxLightCount) {
-        lights.erase(lights.begin() + kMaxLightCount, lights.end());
+    if (lights.size() > count) {
+        lights.erase(lights.begin() + count, lights.end());
     }
-}
-
-const glm::vec3 &SceneGraph::ambientLightColor() const {
-    return _ambientLightColor;
-}
-
-shared_ptr<CameraSceneNode> SceneGraph::activeCamera() const {
-    return _activeCamera;
 }
 
 void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
     _activeCamera = camera;
 }
 
-void SceneGraph::setReferenceNode(const shared_ptr<SceneNode> &node) {
-    _refNode = node;
+void SceneGraph::setShadowReference(const shared_ptr<SceneNode> &reference) {
+    _shadowReference = reference;
+}
+
+void SceneGraph::setUpdate(bool update) {
+    _update = update;
 }
 
 void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
     _ambientLightColor = color;
 }
 
-bool SceneGraph::isShadowLightPresent() const {
-    return _shadowLightPresent;
+void SceneGraph::setUniformsPrototype(ShaderUniforms &&uniforms) {
+    _uniformsPrototype = uniforms;
 }
 
-const glm::vec3 &SceneGraph::shadowLightPosition() const {
-    return _shadowLightPosition;
+void SceneGraph::setExposure(float exposure) {
+    _exposure = exposure;
 }
 
 } // namespace scene

@@ -28,25 +28,22 @@ namespace reone {
 namespace game {
 
 string getPortrait(int id) {
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
-    return table->getString(id, "baseresref");
+    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
+    return portraits->getString(id, "baseresref");
 }
 
 string getPortraitByAppearance(int appearance) {
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("portraits"));
+    vector<pair<string, string>> columnValues {
+        { "appearancenumber", to_string(appearance) },
+        { "appearance_s", to_string(appearance) },
+        { "appearance_l", to_string(appearance) }
+    };
+    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
 
-    const TwoDaRow *row = table->findRow([&appearance](const TwoDaRow &row) {
-        int appearanceNumber = row.getInt("appearancenumber");
-        int appearanceS = row.getInt("appearance_s");
-        int appearanceL = row.getInt("appearance_l");
+    int row = portraits->indexByCellValuesAny(columnValues);
+    if (row == -1) return "";
 
-        return
-            appearanceNumber == appearance ||
-            appearanceS == appearance ||
-            appearanceL == appearance;
-    });
-
-    return row ? row->getString("baseresref") : "";
+    return portraits->getString(row, "baseresref");
 }
 
 } // namespace game

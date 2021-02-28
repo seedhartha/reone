@@ -23,12 +23,14 @@
 #include <string>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "types.h"
 #include "endianutil.h"
 
 namespace reone {
 
-class StreamReader {
+class StreamReader : boost::noncopyable {
 public:
     StreamReader(const std::shared_ptr<std::istream> &stream, Endianess endianess = Endianess::Little);
 
@@ -71,9 +73,6 @@ public:
 private:
     std::shared_ptr<std::istream> _stream;
     Endianess _endianess;
-
-    StreamReader(const StreamReader &) = delete;
-    StreamReader &operator=(const StreamReader &) = delete;
 };
 
 } // namespace reone

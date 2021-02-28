@@ -31,7 +31,7 @@ class ObjectAction : public Action {
 public:
     ObjectAction(ActionType type, const std::shared_ptr<Object> &object);
 
-    std::shared_ptr<Object> object() const;
+    std::shared_ptr<Object> object() const { return _object; }
 
 protected:
     std::shared_ptr<Object> _object;

@@ -42,12 +42,12 @@ CollisionDetector::CollisionDetector(Area *area) : _area(area) {
 }
 
 bool CollisionDetector::raycast(const RaycastProperties &props, RaycastResult &result) const {
-    if (props.flags & kRaycastObjects) {
+    if (props.flags & RaycastFlags::objects) {
         if (rayTestObjects(props, result)) {
             return true;
         }
     }
-    if (props.flags & kRaycastRooms) {
+    if (props.flags & RaycastFlags::rooms) {
         if (rayTestRooms(props, result)) {
             return true;
         }
@@ -69,9 +69,9 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         ObjectType type = object->type();
         if (props.objectTypes.count(type) == 0) continue;
 
-        if ((props.flags & kRaycastAlive) && object->isDead()) continue;
+        if ((props.flags & RaycastFlags::alive) && object->isDead()) continue;
         if (type == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
-        if ((props.flags & kRaycastSelectable) && !object->isSelectable()) continue;
+        if ((props.flags & RaycastFlags::selectable) && !object->isSelectable()) continue;
 
         float dist = object->distanceTo(glm::vec2(props.origin));
         if (dist > props.maxDistance) continue;
@@ -80,8 +80,8 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         origin = invTransform * glm::vec4(props.origin, 1.0f);
         dir = invTransform * glm::vec4(props.direction, 0.0f);
 
-        if (props.flags & kRaycastAABB) {
-            shared_ptr<ModelSceneNode> model(object->model());
+        if (props.flags & RaycastFlags::aabb) {
+            shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
             if (!model) continue;
             if (model->aabb().contains(origin)) continue;
 
@@ -119,7 +119,7 @@ bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResu
         const Walkmesh *walkmesh = room.walkmesh();
         if (!walkmesh) continue;
 
-        if (walkmesh->raycast(props.origin, props.direction, props.flags & kRaycastWalkable, props.maxDistance, distance)) {
+        if (walkmesh->raycast(props.origin, props.direction, props.flags & RaycastFlags::walkable, props.maxDistance, distance)) {
             result.room = &room;
             result.intersection = props.origin + distance * props.direction;
             result.distance = distance;

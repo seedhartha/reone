@@ -34,10 +34,11 @@ public:
 
     Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) const;
 
-    const std::string &name() const;
-    VariableType returnType() const;
-    int argumentCount() const;
-    VariableType argumentType(int index) const;
+    int getArgumentCount() const;
+    VariableType getArgumentType(int index) const;
+
+    const std::string &name() const { return _name; }
+    VariableType returnType() const { return _returnType; }
 
 private:
     std::string _name;

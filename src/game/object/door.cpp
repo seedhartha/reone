@@ -20,10 +20,11 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../common/streamutil.h"
-#include "../../render/models.h"
-#include "../../render/walkmeshes.h"
+#include "../../render/model/models.h"
+#include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
+#include "../../scene/types.h"
 #include "../../script/scripts.h"
 
 #include "../blueprint/blueprints.h"
@@ -77,64 +78,30 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     shared_ptr<DoorBlueprint> blueprint(Blueprints::instance().getDoor(resRef));
     blueprint->load(*this);
 
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA("genericdoors"));
+    shared_ptr<TwoDA> genericDoors(Resources::instance().get2DA("genericdoors"));
+    string modelName(boost::to_lower_copy(genericDoors->getString(_genericType, "modelname")));
+    auto model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Door, Models::instance().get(modelName), _sceneGraph);
 
-    string modelName(boost::to_lower_copy(table->getString(_genericType, "modelname")));
-    _model = make_unique<ModelSceneNode>(_sceneGraph, Models::instance().get(modelName));
-
-    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::DoorWalkmesh);
+    _sceneNode = move(model);
+    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {
-    if (_model) {
-        _model->setDefaultAnimation("opened1");
-        _model->playAnimation("opening1");
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (model) {
+        model->animator().setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->animator().playAnimation("opening1");
     }
     _open = true;
 }
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
-    if (_model) {
-        _model->setDefaultAnimation("closed");
-        _model->playAnimation("closing1");
+    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    if (model) {
+        model->animator().setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->animator().playAnimation("closing1");
     }
     _open = false;
-}
-
-bool Door::isLockable() const {
-    return _lockable;
-}
-
-bool Door::isLocked() const {
-    return _locked;
-}
-
-bool Door::isStatic() const {
-    return _static;
-}
-
-const string &Door::getOnOpen() const {
-    return _onOpen;
-}
-
-const string &Door::getOnFailToOpen() const {
-    return _onFailToOpen;
-}
-
-int Door::genericType() const {
-    return _genericType;
-}
-
-const string &Door::linkedToModule() const {
-    return _linkedToModule;
-}
-
-const string &Door::linkedTo() const {
-    return _linkedTo;
-}
-
-const string &Door::transitionDestin() const {
-    return _transitionDestin;
 }
 
 void Door::setLocked(bool locked) {

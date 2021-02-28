@@ -27,8 +27,8 @@ namespace reone {
 
 namespace game {
 
-static const float kMovementSpeed = 5.0f;
-static const float kMouseMultiplier = glm::pi<float>() / 2000.0f;
+static constexpr float kMovementSpeed = 4.0f;
+static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
 FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(fovy, aspect, zNear, zFar));
@@ -92,6 +92,10 @@ bool FirstPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
             _moveRight = true;
             return true;
 
+        case SDL_SCANCODE_LSHIFT:
+            _multiplier = 2.0f;
+            return true;
+
         default:
             return false;
     }
@@ -115,15 +119,19 @@ bool FirstPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
             _moveRight = false;
             return true;
 
+        case SDL_SCANCODE_LSHIFT:
+            _multiplier = 1.0f;
+            return true;
+
         default:
             return false;
     }
 }
 
 void FirstPersonCamera::update(float dt) {
-    float facingSin = glm::sin(_facing) * kMovementSpeed * dt;
-    float facingCos = glm::cos(_facing) * kMovementSpeed * dt;
-    float pitchSin = glm::sin(_pitch) * kMovementSpeed * dt;
+    float facingSin = glm::sin(_facing) * _multiplier * kMovementSpeed * dt;
+    float facingCos = glm::cos(_facing) * _multiplier * kMovementSpeed * dt;
+    float pitchSin = glm::sin(_pitch) * _multiplier * kMovementSpeed * dt;
     bool positionChanged = false;
 
     if (_moveForward) {

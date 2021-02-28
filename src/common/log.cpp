@@ -42,7 +42,7 @@ static bool g_logToFile = false;
 
 static std::unique_ptr<fs::ofstream> g_logFile;
 
-inline static const char *describeLogLevel(LogLevel level) {
+static constexpr char *describeLogLevel(LogLevel level) {
     switch (level) {
         case LogLevel::Error:
             return "ERROR";

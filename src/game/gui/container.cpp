@@ -37,12 +37,12 @@ namespace reone {
 
 namespace game {
 
-static const int kSwitchToResRef = 47884;
-static const int kGiveItemResRef = 47885;
-static const int kInventoryResRef = 393;
+static constexpr int kSwitchToResRef = 47884;
+static constexpr int kGiveItemResRef = 47885;
+static constexpr int kInventoryResRef = 393;
 
 Container::Container(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("container");
@@ -69,7 +69,7 @@ void Container::configureItemsListBox() {
     ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
 
     Control::Text text(protoItem.text());
-    text.align = Control::TextAlign::LeftCenter;
+    text.align = Control::TextAlign::LeftTop;
 
     protoItem.setText(text);
 }
@@ -98,19 +98,17 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
 
 shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureType::GUI);
-}
-
-SpatialObject &Container::container() const {
-    return *_container;
+    return Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void Container::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_OK") {
         transferItemsToPlayer();
         _game->openInGame();
@@ -125,7 +123,7 @@ void Container::transferItemsToPlayer() {
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {
-        string script(placeable->onInvDisturbed());
+        string script(placeable->getOnInvDisturbed());
         if (!script.empty()) {
             _game->scriptRunner().run(script, placeable->id(), player->id());
         }

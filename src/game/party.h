@@ -46,10 +46,12 @@ public:
 
     void onHeartbeat();
 
-    bool empty() const;
-    int size() const;
-    std::shared_ptr<Creature> player() const;
-    std::shared_ptr<Creature> leader() const;
+    bool isEmpty() const;
+
+    int getSize() const;
+    std::shared_ptr<Creature> getLeader() const;
+
+    std::shared_ptr<Creature> player() const { return _player; }
 
     void setPartyLeader(int npc);
     void setPlayer(const std::shared_ptr<Creature> &player);

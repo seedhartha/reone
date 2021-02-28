@@ -17,10 +17,13 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include <boost/noncopyable.hpp>
+
+#include "glm/mat4x4.hpp"
 
 #include "../../render/framebuffer.h"
+#include "../../render/renderbuffer.h"
+#include "../../render/texture.h"
 #include "../../render/types.h"
 #include "../../scene/scenegraph.h"
 
@@ -28,31 +31,44 @@ namespace reone {
 
 namespace scene {
 
-class WorldRenderPipeline {
+class WorldRenderPipeline : boost::noncopyable {
 public:
     WorldRenderPipeline(SceneGraph *scene, const render::GraphicsOptions &opts);
 
     void init();
-    void render() const;
+    void render();
 
 private:
     SceneGraph *_scene { nullptr };
     render::GraphicsOptions _opts;
+
+    // Framebuffers
+
     render::Framebuffer _geometry;
     render::Framebuffer _verticalBlur;
     render::Framebuffer _horizontalBlur;
     render::Framebuffer _shadows;
 
-    WorldRenderPipeline(const WorldRenderPipeline &) = delete;
-    WorldRenderPipeline &operator=(const WorldRenderPipeline &) = delete;
+    // END Framebuffers
 
-    void drawShadows() const;
-    void drawGeometry() const;
-    void applyHorizontalBlur() const;
-    void applyVerticalBlur() const;
-    void drawResult() const;
+    // Framebuffer targets
 
-    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapSide side) const;
+    std::unique_ptr<render::Renderbuffer> _depthRenderbuffer;
+    std::unique_ptr<render::Texture> _geometryColor1;
+    std::unique_ptr<render::Texture> _geometryColor2;
+    std::unique_ptr<render::Texture> _verticalBlurColor;
+    std::unique_ptr<render::Texture> _horizontalBlurColor;
+    std::unique_ptr<render::Texture> _shadowsDepth;
+
+    // END Framebuffers targets
+
+    void drawShadows();
+    void drawGeometry();
+    void applyHorizontalBlur();
+    void applyVerticalBlur();
+    void drawResult();
+
+    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapFace side) const;
 };
 
 } // namespace scene

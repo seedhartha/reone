@@ -117,9 +117,10 @@ float SpatialObject::distanceTo(const SpatialObject &other) const {
 }
 
 bool SpatialObject::contains(const glm::vec3 &point) const {
-    if (!_model) return false;
+    auto model = getModelSceneNode();
+    if (!model) return false;
 
-    const AABB &aabb = _model->model()->aabb();
+    const AABB &aabb = model->model()->aabb();
 
     return (aabb * _transform).contains(point);
 }
@@ -186,9 +187,6 @@ void SpatialObject::applyInstantEffect(Effect &effect) {
 
 void SpatialObject::update(float dt) {
     Object::update(dt);
-    if (_model) {
-        _model->update(dt);
-    }
     updateEffects(dt);
 }
 
@@ -208,7 +206,7 @@ void SpatialObject::updateEffects(float dt) {
     }
 }
 
-void SpatialObject::playAnimation(AnimationType animation, float speed, shared_ptr<Action> actionToComplete) {
+void SpatialObject::playAnimation(AnimationType animation, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
 }
 
 bool SpatialObject::isAnimationLooping(AnimationType animation) const {
@@ -221,50 +219,6 @@ bool SpatialObject::isAnimationLooping(AnimationType animation) const {
 
 bool SpatialObject::isSelectable() const {
     return false;
-}
-
-bool SpatialObject::isOpen() const {
-    return _open;
-}
-
-ObjectFactory &SpatialObject::objectFactory() {
-    return *_objectFactory;
-}
-
-SceneGraph &SpatialObject::sceneGraph() {
-    return *_sceneGraph;
-}
-
-Room *SpatialObject::room() const {
-    return _room;
-}
-
-const glm::vec3 &SpatialObject::position() const {
-    return _position;
-}
-
-float SpatialObject::facing() const {
-    return _facing;
-}
-
-const glm::mat4 &SpatialObject::transform() const {
-    return _transform;
-}
-
-bool SpatialObject::visible() const {
-    return _visible;
-}
-
-shared_ptr<ModelSceneNode> SpatialObject::model() const {
-    return _model;
-}
-
-shared_ptr<Walkmesh> SpatialObject::walkmesh() const {
-    return _walkmesh;
-}
-
-const vector<shared_ptr<Item>> &SpatialObject::items() const {
-    return _items;
 }
 
 unique_ptr<BaseStatus> SpatialObject::captureStatus() {
@@ -292,11 +246,8 @@ void SpatialObject::loadStatus(unique_ptr<BaseStatus> &&stat) {
 }
 
 glm::vec3 SpatialObject::getSelectablePosition() const {
-    return _model->getCenterOfAABB();
-}
-
-float SpatialObject::drawDistance() const {
-    return _drawDistance;
+    auto model = getModelSceneNode();
+    return model ? model->getCenterOfAABB() : _position;
 }
 
 void SpatialObject::setRoom(Room *room) {
@@ -322,8 +273,8 @@ void SpatialObject::updateTransform() {
     if (_facing != 0.0f) {
         _transform *= glm::eulerAngleZ(_facing);
     }
-    if (_model && !_stunt) {
-        _model->setLocalTransform(_transform);
+    if (_sceneNode && !_stunt) {
+        _sceneNode->setLocalTransform(_transform);
     }
 }
 
@@ -337,8 +288,8 @@ void SpatialObject::setVisible(bool visible) {
 
     _visible = visible;
 
-    if (_model) {
-        _model->setVisible(visible);
+    if (_sceneNode) {
+        _sceneNode->setVisible(visible);
     }
 }
 
@@ -369,13 +320,9 @@ void SpatialObject::clearAllEffects() {
 void SpatialObject::die() {
 }
 
-bool SpatialObject::isStuntMode() const {
-    return _stunt;
-}
-
 void SpatialObject::startStuntMode() {
-    if (_model) {
-        _model->setLocalTransform(glm::mat4(1.0f));
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(glm::mat4(1.0f));
     }
     _stunt = true;
 }
@@ -383,8 +330,8 @@ void SpatialObject::startStuntMode() {
 void SpatialObject::stopStuntMode() {
     if (!_stunt) return;
 
-    if (_model) {
-        _model->setLocalTransform(_transform);
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(_transform);
     }
     _stunt = false;
 }

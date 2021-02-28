@@ -20,7 +20,11 @@
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/mat4x4.hpp"
+
+#include "../../render/aabb.h"
 
 namespace reone {
 
@@ -28,40 +32,67 @@ namespace scene {
 
 class SceneGraph;
 
-class SceneNode {
+class SceneNode : boost::noncopyable {
 public:
     void addChild(const std::shared_ptr<SceneNode> &node);
     void removeChild(SceneNode &node);
 
-    virtual void render() const;
-    virtual void renderSingle(bool shadowPass) const;
+    virtual void update(float dt);
 
-    float distanceTo(const glm::vec3 &point) const;
+    virtual void render();
+    virtual void renderSingle(bool shadowPass);
 
-    const SceneNode *parent() const;
-    const glm::mat4 &localTransform() const;
-    const glm::mat4 &absoluteTransform() const;
-    const glm::mat4 &absoluteTransformInverse() const;
-    const std::vector<std::shared_ptr<SceneNode>> &children() const;
+    bool isVisible() const { return _visible; }
+    virtual bool isTransparent() const { return _transparent; }
+
+    /**
+     * @return true if this scene node has a bounding box, false if it is a point
+     */
+    bool isVolumetric() const { return _volumetric; }
+
+    virtual glm::vec3 getOrigin() const;
+
+    /**
+     * @return distance from the origin of this node to the point
+     */
+    float getDistanceTo(const glm::vec3 &point) const;
+
+    /**
+     * @return shortest distance from the origin of this node to the other node
+     */
+    float getDistanceTo(const SceneNode &other) const;
+
+    const SceneNode *parent() const { return _parent; }
+    const glm::mat4 &localTransform() const { return _localTransform; }
+    const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
+    const glm::mat4 &absoluteTransformInverse() const { return _absoluteTransformInv; }
+    const render::AABB &aabb() const { return _aabb; }
+    const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
 
     void setParent(const SceneNode *parent);
     virtual void setLocalTransform(const glm::mat4 &transform);
+    void setPosition(glm::vec3 position);
+    virtual void setVisible(bool visible);
+    void setTransparent(bool transparent);
 
 protected:
-    SceneGraph *_sceneGraph { nullptr };
+    SceneGraph *_sceneGraph;
+
     const SceneNode *_parent { nullptr };
+    std::vector<std::shared_ptr<SceneNode>> _children;
+
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     glm::mat4 _absoluteTransformInv { 1.0f };
-    std::vector<std::shared_ptr<SceneNode>> _children;
+    render::AABB _aabb;
+
+    bool _visible { true };
+    bool _transparent { false };
+    bool _volumetric { false };
 
     SceneNode(SceneGraph *sceneGraph);
 
     virtual void updateAbsoluteTransform();
-
-private:
-    SceneNode(const SceneNode &) = delete;
-    SceneNode &operator=(const SceneNode &) = delete;
 };
 
 } // namespace scene

@@ -22,6 +22,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include "../../audio/files.h"
+#include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 
@@ -29,6 +31,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::render;
 using namespace reone::resource;
 
@@ -50,7 +53,7 @@ void ItemBlueprint::load(Item &item) {
     item._tag = boost::to_lower_copy(_uti->getString("Tag"));
     item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
 
-    shared_ptr<TwoDaTable> baseItems(Resources::instance().get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = _uti->getInt("BaseItem");
 
     item._equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
@@ -60,14 +63,14 @@ void ItemBlueprint::load(Item &item) {
 
     string iconResRef;
 
-    if (item.isEquippable(kInventorySlotBody)) {
+    if (item.isEquippable(InventorySlot::body)) {
         item._baseBodyVariation = boost::to_lower_copy(baseItems->getString(baseItem, "bodyvar"));
         item._bodyVariation = _uti->getInt("BodyVariation", 1);
         item._textureVariation = _uti->getInt("TextureVar", 1);
 
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._textureVariation);
 
-    } else if (item.isEquippable(kInventorySlotRightWeapon)) {
+    } else if (item.isEquippable(InventorySlot::rightWeapon)) {
         item._modelVariation = _uti->getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
 
@@ -75,7 +78,7 @@ void ItemBlueprint::load(Item &item) {
         item._modelVariation = _uti->getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % item._itemClass % item._modelVariation);
     }
-    item._icon = Textures::instance().get(iconResRef, TextureType::GUI);
+    item._icon = Textures::instance().get(iconResRef, TextureUsage::GUI);
 
     item._attackRange = baseItems->getInt(baseItem, "maxattackrange");
     item._numDice = baseItems->getInt(baseItem, "numdice");
@@ -83,10 +86,21 @@ void ItemBlueprint::load(Item &item) {
     item._damageFlags = baseItems->getInt(baseItem, "damageflags");
     item._weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
     item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
+
+    int ammunitionType = baseItems->getInt(baseItem, "ammunitiontype", -1);
+    if (ammunitionType != -1) {
+        loadAmmunitionType(ammunitionType, item);
+    }
 }
 
-const string &ItemBlueprint::resRef() const {
-    return _resRef;
+void ItemBlueprint::loadAmmunitionType(int ordinal, Item &item) {
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("ammunitiontypes"));
+    item._ammunitionType = make_shared<Item::AmmunitionType>();
+    item._ammunitionType->model = Models::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "model")));
+    item._ammunitionType->shotSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "shotsound0")));
+    item._ammunitionType->shotSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "shotsound1")));
+    item._ammunitionType->impactSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "impactsound0")));
+    item._ammunitionType->impactSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ordinal, "impactsound1")));
 }
 
 } // namespace game

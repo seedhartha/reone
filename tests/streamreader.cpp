@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_packet_readwrite) {
 }
 
 BOOST_AUTO_TEST_CASE(test_get_little_endian) {
-    shared_ptr<istringstream> stream(new istringstream(string("\x01" "\xe8\x03" "\xa0\x86\x01\x00" "\x00\xe4\x0b\x54\x02\x00\x00\x00" "\x60\x79\xfe\xff" "\x00\x00\x80\x3f" "abc\0defgh", 32)));
+    auto stream = make_shared<istringstream>(string("\x01" "\xe8\x03" "\xa0\x86\x01\x00" "\x00\xe4\x0b\x54\x02\x00\x00\x00" "\x60\x79\xfe\xff" "\x00\x00\x80\x3f" "abc\0defgh", 32));
     StreamReader reader(stream);
     BOOST_TEST((reader.getByte() == 0x01));
     BOOST_TEST((reader.getUint16() == 1000u));
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_get_little_endian) {
 }
 
 BOOST_AUTO_TEST_CASE(test_get_big_endian) {
-    shared_ptr<istringstream> stream(new istringstream(string("\x03\xe8" "\x00\x01\x86\xa0" "\x00\x00\x00\x02\x54\x0b\xe4\x00" "\xff\xfe\x79\x60" "\x3f\x80\x00\x00", 22)));
+    auto stream = make_shared<istringstream>(string("\x03\xe8" "\x00\x01\x86\xa0" "\x00\x00\x00\x02\x54\x0b\xe4\x00" "\xff\xfe\x79\x60" "\x3f\x80\x00\x00", 22));
     StreamReader reader(stream, Endianess::Big);
     BOOST_TEST((reader.getUint16() == 1000u));
     BOOST_TEST((reader.getUint32() == 100000u));

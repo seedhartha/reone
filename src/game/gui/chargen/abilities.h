@@ -29,7 +29,7 @@ class CharacterGeneration;
 
 class CharGenAbilities : public GameGUI {
 public:
-    CharGenAbilities(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    CharGenAbilities(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
 
@@ -41,6 +41,7 @@ private:
     int _points { 0 };
 
     void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 
     void refreshControls();
     void updateCharacter();

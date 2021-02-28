@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../scene/node/cameranode.h"
+#include "../scene/node/modelnodescenenode.h"
 #include "../scene/scenegraph.h"
 
 using namespace std;
@@ -36,12 +37,13 @@ SceneBuilder::SceneBuilder(const GraphicsOptions &opts) : _opts(opts) {
 }
 
 unique_ptr<Control::Scene3D> SceneBuilder::build() {
-    unique_ptr<SceneGraph> sceneGraph(new SceneGraph(_opts));
-    shared_ptr<ModelSceneNode> model(_modelSupplier(*sceneGraph));
+    auto sceneGraph = make_unique<SceneGraph>(_opts);
 
+    shared_ptr<ModelSceneNode> model(_modelSupplier(*sceneGraph));
     if (!model) {
         throw logic_error("model is null");
     }
+
     glm::mat4 projection(glm::ortho(
         -_aspect * _modelScale + _modelOffset.x,
         _aspect * _modelScale + _modelOffset.x,
@@ -49,15 +51,21 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    shared_ptr<CameraSceneNode> camera(new CameraSceneNode(sceneGraph.get(), projection, _zFar));
-    camera->setLocalTransform(_cameraTransform);
+    auto camera = make_shared<CameraSceneNode>(sceneGraph.get(), projection, _zFar);
+    if (_cameraNodeName.empty()) {
+        camera->setLocalTransform(_cameraTransform);
+    } else {
+        ModelNodeSceneNode *modelNode = model->getModelNode(_cameraNodeName);
+        if (modelNode) {
+            camera->setLocalTransform(modelNode->absoluteTransform());
+        }
+    }
 
     sceneGraph->addRoot(model);
-    sceneGraph->build();
     sceneGraph->setAmbientLightColor(_ambientLightColor);
     sceneGraph->setActiveCamera(camera);
 
-    unique_ptr<Control::Scene3D> scene3d(new Control::Scene3D());
+    auto scene3d = make_unique<Control::Scene3D>();
     scene3d->model = model;
     scene3d->sceneGraph = move(sceneGraph);
 
@@ -85,13 +93,13 @@ SceneBuilder &SceneBuilder::modelScale(float scale) {
     return *this;
 }
 
-SceneBuilder &SceneBuilder::modelOffset(const glm::vec2 &offset) {
-    _modelOffset = offset;
+SceneBuilder &SceneBuilder::cameraTransform(const glm::mat4 &transform) {
+    _cameraTransform = transform;
     return *this;
 }
 
-SceneBuilder &SceneBuilder::cameraTransform(const glm::mat4 &transform) {
-    _cameraTransform = transform;
+SceneBuilder &SceneBuilder::cameraFromModelNode(const std::string &nodeName) {
+    _cameraNodeName = nodeName;
     return *this;
 }
 

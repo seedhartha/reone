@@ -24,13 +24,14 @@
 #include "glm/vec4.hpp"
 
 #include "../render/texture.h"
-#include "../resource/gfffile.h"
+#include "../resource/format/gfffile.h"
 
 namespace reone {
 
 namespace game {
 
 class Game;
+class Waypoint;
 
 class Map {
 public:
@@ -42,25 +43,31 @@ public:
     Map(Game *game);
 
     void load(const std::string &area, const resource::GffStruct &gffs);
-    void render(Mode mode, const glm::vec4 &bounds) const;
+    void render(Mode mode, const glm::vec4 &bounds);
+
+    void setSelectedNote(const std::shared_ptr<Waypoint> &waypoint);
 
 private:
+    Game *_game;
+
     int _northAxis { 0 };
     glm::vec2 _worldPoint1 { 0.0f };
     glm::vec2 _worldPoint2 { 0.0f };
     glm::vec2 _mapPoint1 { 0.0f };
     glm::vec2 _mapPoint2 { 0.0f };
 
-    Game *_game { nullptr };
-    std::shared_ptr<render::Texture> _texture;
-    std::shared_ptr<render::Texture> _arrow;
+    std::shared_ptr<render::Texture> _areaTexture;
+    std::shared_ptr<render::Texture> _arrowTexture;
+    std::shared_ptr<render::Texture> _noteTexture;
+
+    std::shared_ptr<Waypoint> _selectedNote;
 
     void loadProperties(const resource::GffStruct &gffs);
-    void loadTexture(const std::string &area);
-    void loadArrow();
+    void loadTextures(const std::string &area);
 
-    void drawArea(Mode mode, const glm::vec4 &bounds) const;
-    void drawPartyLeader(Mode mode, const glm::vec4 &bounds) const;
+    void drawArea(Mode mode, const glm::vec4 &bounds);
+    void drawPartyLeader(Mode mode, const glm::vec4 &bounds);
+    void drawNotes(Mode mode, const glm::vec4 &bounds);
 
     glm::vec2 getMapPosition(const glm::vec2 &world) const;
 };

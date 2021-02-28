@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "GL/glew.h"
+#include "SDL2/SDL_opengl.h"
 
 using namespace std;
 
@@ -27,65 +28,22 @@ namespace reone {
 
 namespace render {
 
-Framebuffer::Framebuffer(int w, int h, int numColorBuffers, bool cubeMapDepthBuffer) :
-    _width(w), _height(h), _numColorBuffers(numColorBuffers), _cubeMapDepthBuffer(cubeMapDepthBuffer) {
+void Framebuffer::init() {
+    if (!_inited) {
+        glGenFramebuffers(1, &_framebuffer);
+        _inited = true;
+    }
 }
 
 Framebuffer::~Framebuffer() {
     deinit();
 }
 
-void Framebuffer::init() {
-    if (_inited) return;
-
-    if (_numColorBuffers > 0) {
-        for (int i = 0; i < _numColorBuffers; ++i) {
-            auto texture = make_unique<Texture>("color" + to_string(i), TextureType::ColorBuffer, _width, _height);
-            texture->init();
-            texture->clearPixels(PixelFormat::RGBA);
-
-            _colorBuffers.push_back(move(texture));
-        }
-    }
-
-    _depthBuffer = make_unique<Texture>("depth", _cubeMapDepthBuffer ? TextureType::CubeMapDepthBuffer : TextureType::DepthBuffer, _width, _height);
-    _depthBuffer->init();
-    _depthBuffer->clearPixels(PixelFormat::Depth);
-
-    glGenFramebuffers(1, &_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
-
-    if (_numColorBuffers > 0) {
-        for (int i = 0; i < _numColorBuffers; ++i) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _colorBuffers[i]->textureId(), 0);
-        }
-    }
-    if (_cubeMapDepthBuffer) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthBuffer->textureId(), 0);
-    } else {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthBuffer->textureId(), 0);
-    }
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw runtime_error("Framebuffer is not complete");
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    _inited = true;
-}
-
 void Framebuffer::deinit() {
-    if (!_inited) return;
-
-    glDeleteFramebuffers(1, &_framebuffer);
-
-    for (auto &buffer : _colorBuffers) {
-        buffer->deinit();
+    if (_inited) {
+        glDeleteFramebuffers(1, &_framebuffer);
+        _inited = false;
     }
-    _colorBuffers.clear();
-    _depthBuffer->deinit();
-
-    _inited = false;
 }
 
 void Framebuffer::bind() const {
@@ -96,28 +54,36 @@ void Framebuffer::unbind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::bindColorBuffer(int n) const {
-    _colorBuffers[n]->bind();
+void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
+    if (texture.isCubeMap()) {
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.textureId(), mip);
+    } else {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, texture.textureId(), mip);
+    }
 }
 
-void Framebuffer::bindDepthBuffer() const {
-    _depthBuffer->bind();
+void Framebuffer::attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index, int mip) const {
+    if (texture.isCubeMap()) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face), texture.textureId(), mip);
+    }
 }
 
-void Framebuffer::unbindColorBuffer(int n) const {
-    _colorBuffers[n]->unbind();
+void Framebuffer::attachDepth(const Texture &texture) const {
+    if (texture.isCubeMap()) {
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.textureId(), 0);
+    } else {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.textureId(), 0);
+    }
 }
 
-void Framebuffer::unbindDepthBuffer() const {
-    _depthBuffer->unbind();
+void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id());
 }
 
-int Framebuffer::width() const {
-    return _width;
-}
-
-int Framebuffer::height() const {
-    return _height;
+void Framebuffer::checkCompleteness() {
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        throw logic_error("Framebuffer is not complete");
+    }
 }
 
 } // namespace render

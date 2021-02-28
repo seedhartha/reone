@@ -22,19 +22,11 @@
 #include <boost/format.hpp>
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL.h"
 
 #include "glm/ext.hpp"
 
-#include "../common/log.h"
-
 #include "cursor.h"
-#include "mesh/aabb.h"
-#include "mesh/billboard.h"
-#include "mesh/cube.h"
-#include "mesh/quad.h"
-#include "shaders.h"
 
 using namespace std;
 
@@ -42,73 +34,83 @@ namespace reone {
 
 namespace render {
 
-RenderWindow::RenderWindow(const GraphicsOptions &opts, IEventHandler *eventHandler) : _eventHandler(eventHandler), _opts(opts) {
+RenderWindow &RenderWindow::instance() {
+    static RenderWindow instance;
+    return instance;
 }
 
-void RenderWindow::init() {
+void RenderWindow::init(GraphicsOptions options, IEventHandler *eventHandler) {
+    if (_inited) return;
+
+    if (!eventHandler) {
+        throw invalid_argument("eventHandler must not be null");
+    }
+
+    _width = options.width;
+    _height = options.height;
+    _options = move(options);
+    _eventHandler = eventHandler;
+
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
-    if (_opts.fullscreen) {
+    if (_options.fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
     _window = SDL_CreateWindow(
         "reone",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        _opts.width,
-        _opts.height,
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        _options.width, _options.height,
         flags);
 
     if (!_window) {
         throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
     }
-    _context = SDL_GL_CreateContext(_window);
 
+    _context = SDL_GL_CreateContext(_window);
     if (!_context) {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
+
     SDL_GL_SetSwapInterval(0);
+    configureGL();
+
+    _inited = true;
+}
+
+void RenderWindow::configureGL() {
     glewInit();
 
-    Shaders::instance().initGL();
-    CubeMesh::instance().initGL();
-    BillboardMesh::instance().initGL();
-    AABBMesh::instance().initGL();
-    Quad::getDefault().initGL();
-    Quad::getXFlipped().initGL();
-    Quad::getYFlipped().initGL();
-    Quad::getXYFlipped().initGL();
-
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
+
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
+RenderWindow::~RenderWindow() {
+    deinit();
 }
 
 void RenderWindow::deinit() {
-    if (_fpsGlobal.hasAverage()) {
-        debug("Average FPS: " + to_string(static_cast<int>(_fpsGlobal.average())));
+    if (_inited) {
+        SDL_GL_DeleteContext(_context);
+        SDL_DestroyWindow(_window);
+        SDL_Quit();
+        _inited = false;
     }
-    Quad::getDefault().deinitGL();
-    Quad::getXFlipped().deinitGL();
-    Quad::getYFlipped().deinitGL();
-    Quad::getXYFlipped().deinitGL();
-    AABBMesh::instance().deinitGL();
-    BillboardMesh::instance().deinitGL();
-    CubeMesh::instance().deinitGL();
-    Shaders::instance().deinitGL();
-
-    SDL_GL_DeleteContext(_context);
-    SDL_DestroyWindow(_window);
-    SDL_Quit();
 }
 
 void RenderWindow::show() {
-    SDL_ShowWindow(_window);
+    if (_inited) {
+        SDL_ShowWindow(_window);
+    }
 }
 
 void RenderWindow::processEvents(bool &quit) {
+    if (!_inited) return;
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (handleEvent(event, quit)) continue;
@@ -147,21 +149,24 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
 }
 
 void RenderWindow::update(float dt) {
-    _fpsLocal.update(dt);
-    _fpsGlobal.update(dt);
+    if (!_inited) return;
 
-    if (_fpsLocal.hasAverage()) {
-        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fpsLocal.average())).c_str());
-        _fpsLocal.reset();
+    _fps.update(dt);
+
+    if (_fps.hasAverage()) {
+        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fps.average())).c_str());
+        _fps.reset();
     }
 }
 
 void RenderWindow::clear() const {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (_inited) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 }
 
 void RenderWindow::drawCursor() const {
-    if (_relativeMouseMode) return;
+    if (!_inited || _relativeMouseMode) return;
 
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
@@ -173,17 +178,27 @@ void RenderWindow::drawCursor() const {
 }
 
 void RenderWindow::swapBuffers() const {
-    SDL_GL_SwapWindow(_window);
+    if (_inited) {
+        SDL_GL_SwapWindow(_window);
+    }
+}
+
+glm::mat4 RenderWindow::getOrthoProjection(float near, float far) const {
+    return glm::ortho(0.0f, static_cast<float>(_width), static_cast<float>(_height), 0.0f, near, far);
 }
 
 void RenderWindow::setRelativeMouseMode(bool enabled) {
-    SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
-    _relativeMouseMode = enabled;
+    if (_inited) {
+        SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
+        _relativeMouseMode = enabled;
+    }
 }
 
 void RenderWindow::setCursor(const shared_ptr<Cursor> &cursor) {
     _cursor = cursor;
-    SDL_ShowCursor(!static_cast<bool>(cursor));
+    if (_inited) {
+        SDL_ShowCursor(!static_cast<bool>(cursor));
+    }
 }
 
 } // namespace render

@@ -20,12 +20,12 @@
 #include "glm/glm.hpp"
 
 #include "../../audio/player.h"
-#include "../../audio/util.h"
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
-#include "../../render/models.h"
+#include "../../render/model/models.h"
 #include "../../resource/resources.h"
+#include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../game.h"
@@ -45,22 +45,19 @@ namespace reone {
 
 namespace game {
 
-constexpr float kKotorModelSize = 1.3f;
-constexpr float kKotorModelOffsetY = 1.25f;
+static constexpr float kKotorModelSize = 1.4f;
 
 static const char kBlueprintResRefCarth[] = "p_carth";
 static const char kBlueprintResRefBastila[] = "p_bastilla";
 static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
-static bool g_warpEnabled = true;
-
 MainMenu::MainMenu(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    switch (game->version()) {
-        case GameVersion::TheSithLords:
+    switch (game->gameId()) {
+        case GameID::TSL:
             _resRef = "mainmenu8x6_p";
             break;
         default:
@@ -68,6 +65,7 @@ MainMenu::MainMenu(Game *game) :
             _backgroundType = BackgroundType::Menu;
             break;
     }
+
     _resolutionX = 800;
     _resolutionY = 600;
 }
@@ -85,31 +83,13 @@ void MainMenu::load() {
     setControlDisabled("BTN_MOVIES", true);
     setControlDisabled("BTN_OPTIONS", true);
 
-    if (!g_warpEnabled) {
+    // Hide warp button in developer mode
+    if (!_game->options().developer) {
         hideControl("BTN_WARP");
     }
+
+    setup3DView();
     configureButtons();
-
-    if (_version == GameVersion::KotOR) {
-        Control &control = getControl("LBL_3DVIEW");
-        const Control::Extent &extent = control.extent();
-        float aspect = extent.width / static_cast<float>(extent.height);
-
-        glm::mat4 cameraTransform(1.0f);
-        cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
-            .aspect(aspect)
-            .depth(0.1f, 2.0f)
-            .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
-            .modelScale(kKotorModelSize)
-            .modelOffset(glm::vec2(0.0f, kKotorModelOffsetY))
-            .cameraTransform(cameraTransform)
-            .ambientLightColor(glm::vec3(0.1f))
-            .build());
-
-        control.setScene3D(move(scene));
-    }
 }
 
 void MainMenu::configureButtons() {
@@ -119,33 +99,46 @@ void MainMenu::configureButtons() {
     setButtonColors("BTN_NEWGAME");
     setButtonColors("BTN_OPTIONS");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         setButtonColors("BTN_MUSIC");
     }
 }
 
 void MainMenu::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
+    control.setTextColor(getBaseColor(_gameId));
+    control.setHilightColor(getHilightColor(_gameId));
+}
 
-    Control::Text text(control.text());
-    text.color = getBaseColor(_version);
-    control.setText(move(text));
+void MainMenu::setup3DView() {
+    if (_gameId != GameID::KotOR) return;
 
-    Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_version);
-    control.setHilight(move(hilight));
+    Control &control = getControl("LBL_3DVIEW");
+    const Control::Extent &extent = control.extent();
+    float aspect = extent.width / static_cast<float>(extent.height);
+
+    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+        .modelScale(kKotorModelSize)
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.1f))
+        .build());
+
+    control.setScene3D(move(scene));
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    shared_ptr<ModelSceneNode> model(new ModelSceneNode(&sceneGraph, Models::instance().get("mainmenu")));
-    model->setDefaultAnimation("default");
-    model->playDefaultAnimation();
-    model->setLightingEnabled(true);
+    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("mainmenu"), &sceneGraph);
+    model->animator().playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
 
     return move(model);
 }
 
 void MainMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_NEWGAME") {
         _game->startCharacterGeneration();
     } else if (control == "BTN_LOADGAME") {
@@ -170,24 +163,31 @@ void MainMenu::startModuleSelection() {
     hideControl("LBL_GAMELOGO");
     hideControl("LBL_MENUBG");
 
-    ListBox &modules = static_cast<ListBox &>(getControl("LB_MODULES"));
+    loadModuleNames();
+}
+
+void MainMenu::loadModuleNames() {
+    auto &modules = getControl<ListBox>("LB_MODULES");
     for (auto &module : Resources::instance().moduleNames()) {
-        modules.addItem({ module, module });
+        ListBox::Item item;
+        item.tag = module;
+        item.text = module;
+        modules.addItem(move(item));
     }
 }
 
 void MainMenu::onListBoxItemClick(const string &control, const string &item) {
-    if (control != "LB_MODULES") return;
-
-    onModuleSelected(item);
+    if (control == "LB_MODULES") {
+        onModuleSelected(item);
+    }
 }
 
 void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<CreatureBlueprint> playerBlueprint;
     shared_ptr<CreatureBlueprint> companionBlueprint;
 
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
             companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
             break;
@@ -211,8 +211,8 @@ void MainMenu::onModuleSelected(const string &name) {
     companion->setImmortal(true);
     party.addMember(0, companion);
 
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             player->equip("w_blaste_01");
             companion->equip("w_melee_06");
             break;

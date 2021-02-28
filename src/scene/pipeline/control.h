@@ -17,10 +17,14 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec2.hpp"
 #include "glm/vec4.hpp"
 
 #include "../../render/framebuffer.h"
+#include "../../render/renderbuffer.h"
+#include "../../render/texture.h"
 
 #include "../scenegraph.h"
 
@@ -28,20 +32,20 @@ namespace reone {
 
 namespace scene {
 
-class ControlRenderPipeline {
+class ControlRenderPipeline : boost::noncopyable {
 public:
     ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent);
 
     void init();
-    void render(const glm::ivec2 &offset) const;
+    void render(const glm::ivec2 &offset);
 
 private:
-    SceneGraph *_scene { nullptr };
-    glm::vec4 _extent { 0.0f };
-    render::Framebuffer _geometry;
+    SceneGraph *_scene;
+    glm::vec4 _extent;
 
-    ControlRenderPipeline(const ControlRenderPipeline &) = delete;
-    ControlRenderPipeline &operator=(const ControlRenderPipeline &) = delete;
+    render::Framebuffer _geometry;
+    std::unique_ptr<render::Texture> _geometryColor;
+    std::unique_ptr<render::Renderbuffer> _geometryDepth;
 };
 
 } // namespace scene

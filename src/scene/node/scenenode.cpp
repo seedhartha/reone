@@ -49,37 +49,37 @@ void SceneNode::removeChild(SceneNode &node) {
     }
 }
 
-void SceneNode::render() const {
+void SceneNode::update(float dt) {
+    for (auto &child : _children) {
+        child->update(dt);
+    }
+}
+
+void SceneNode::render() {
     for (auto &child : _children) {
         child->render();
     }
 }
 
-void SceneNode::renderSingle(bool shadowPass) const {
+void SceneNode::renderSingle(bool shadowPass) {
 }
 
-float SceneNode::distanceTo(const glm::vec3 &point) const {
-    return glm::distance(glm::vec3(_absoluteTransform[3]), point);
+glm::vec3 SceneNode::getOrigin() const {
+    return glm::vec3(_absoluteTransform[3]);
 }
 
-const SceneNode *SceneNode::parent() const {
-    return _parent;
+float SceneNode::getDistanceTo(const glm::vec3 &point) const {
+    return glm::distance(getOrigin(), point);
 }
 
-const glm::mat4 &SceneNode::localTransform() const {
-    return _localTransform;
-}
+float SceneNode::getDistanceTo(const SceneNode &other) const {
+    if (!other.isVolumetric()) {
+        return glm::distance(getOrigin(), other.getOrigin());
+    }
+    glm::vec3 aabbSpaceOrigin(other._absoluteTransformInv * glm::vec4(getOrigin(), 1.0f));
 
-const glm::mat4 &SceneNode::absoluteTransform() const {
-    return _absoluteTransform;
-}
+    return other.aabb().getDistanceFromClosestPoint(aabbSpaceOrigin);
 
-const glm::mat4 &SceneNode::absoluteTransformInverse() const {
-    return _absoluteTransformInv;
-}
-
-const vector<shared_ptr<SceneNode>> &SceneNode::children() const {
-    return _children;
 }
 
 void SceneNode::setParent(const SceneNode *parent) {
@@ -100,6 +100,18 @@ void SceneNode::updateAbsoluteTransform() {
 void SceneNode::setLocalTransform(const glm::mat4 &transform) {
     _localTransform = transform;
     updateAbsoluteTransform();
+}
+
+void SceneNode::setPosition(glm::vec3 position) {
+    setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+}
+
+void SceneNode::setVisible(bool visible) {
+    _visible = visible;
+}
+
+void SceneNode::setTransparent(bool transparent) {
+    _transparent = transparent;
 }
 
 } // namespace scene

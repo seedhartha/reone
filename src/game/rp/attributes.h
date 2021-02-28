@@ -19,9 +19,10 @@
 
 #include <vector>
 
+#include "../types.h"
+
 #include "abilities.h"
 #include "skills.h"
-#include "types.h"
 
 namespace reone {
 
@@ -35,10 +36,15 @@ class CreatureAttributes {
 public:
     void addClassLevels(ClassType clazz, int levels);
 
+    /**
+     * @return class type at the specified position (1-based)
+     */
     ClassType getClassByPosition(int position) const;
-    ClassType getEffectiveClass() const;
+
+    /**
+     * @return class level at the specified position (1-based)
+     */
     int getLevelByPosition(int position) const;
-    int getClassLevel(ClassType clazz) const;
 
     /**
      * @return the sum of all class levels, aka "hit dice"
@@ -46,12 +52,17 @@ public:
     int getAggregateLevel() const;
 
     /**
-    * @return the sum of (level * hitdie) of all classes
-    */
+     * @return the sum of (level * hitdie) of all classes
+     */
     int getAggregateHitDie() const;
 
-    CreatureAbilities &abilities();
-    CreatureSkills &skills();
+    ClassType getEffectiveClass() const;
+    int getClassLevel(ClassType clazz) const;
+
+    CreatureAbilities &abilities() { return _abilities; }
+    const CreatureAbilities &abilities() const { return _abilities; }
+    CreatureSkills &skills() { return _skills; }
+    const CreatureSkills &skills() const { return _skills; }
 
     void setAbilities(CreatureAbilities abilities);
     void setSkills(CreatureSkills skills);

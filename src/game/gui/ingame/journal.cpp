@@ -31,7 +31,7 @@ namespace reone {
 namespace game {
 
 JournalMenu::JournalMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("journal");
@@ -49,6 +49,8 @@ void JournalMenu::load() {
 }
 
 void JournalMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EXIT") {
         _game->openInGame();
     }

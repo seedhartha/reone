@@ -21,18 +21,19 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "glm/gtx/norm.hpp"
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
-#include "../../render/models.h"
-#include "../../render/walkmeshes.h"
-#include "../../resource/lytfile.h"
-#include "../../resource/visfile.h"
+#include "../../render/model/models.h"
+#include "../../render/walkmesh/walkmeshes.h"
+#include "../../resource/format/lytfile.h"
+#include "../../resource/format/visfile.h"
 #include "../../resource/resources.h"
-#include "../../scene/node/cubenode.h"
+#include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../blueprint/trigger.h"
@@ -48,7 +49,6 @@ using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -58,11 +58,11 @@ namespace reone {
 
 namespace game {
 
-static const float kDefaultFieldOfView = 75.0f;
-static const float kMaxDistanceToTestCollision = 8.0f;
-static const float kElevationTestZ = 1024.0f;
-static const float kCreatureObstacleTestZ = 0.1f;
-static const int kMaxSoundCount = 4;
+static constexpr float kDefaultFieldOfView = 75.0f;
+static constexpr float kMaxDistanceToTestCollision = 8.0f;
+static constexpr float kElevationTestZ = 1024.0f;
+static constexpr float kCreatureObstacleTestZ = 0.1f;
+static constexpr int kMaxSoundCount = 4;
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
@@ -74,8 +74,23 @@ Area::Area(uint32_t id, Game *game) :
     _map(game),
     _heartbeatTimer(kHeartbeatInterval) {
 
+    init();
+}
+
+void Area::init() {
     const GraphicsOptions &opts = _game->options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
+
+    _objectsByType.insert(make_pair(ObjectType::Creature, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Item, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Trigger, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Door, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::AreaOfEffect, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Waypoint, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Placeable, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Store, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Encounter, ObjectList()));
+    _objectsByType.insert(make_pair(ObjectType::Sound, ObjectList()));
 }
 
 void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
@@ -90,7 +105,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytFile lyt;
-    lyt.load(wrap(Resources::instance().get(_name, ResourceType::AreaLayout)));
+    lyt.load(wrap(Resources::instance().get(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(Models::instance().get(lytRoom.name));
@@ -98,12 +113,17 @@ void Area::loadLYT() {
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        shared_ptr<ModelSceneNode> sceneNode(new ModelSceneNode(&_game->sceneGraph(), model));
+        auto sceneNode = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Room, model, &_game->sceneGraph());
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-        sceneNode->playAnimation("animloop1", kAnimationLoop);
 
-        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Walkmesh));
-        unique_ptr<Room> room(new Room(lytRoom.name, position, sceneNode, walkmesh));
+        for (auto &anim : model->getAnimationNames()) {
+            if (boost::starts_with(anim, "animloop")) {
+                sceneNode->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+            }
+        }
+
+        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
+        auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
 
         _rooms.insert(make_pair(room->name(), move(room)));
     }
@@ -126,7 +146,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Path));
+    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Pth));
 
     Path path;
     path.load(*pth);
@@ -150,6 +170,8 @@ void Area::loadPTH() {
 }
 
 void Area::loadARE(const GffStruct &are) {
+    _localizedName = Resources::instance().getString(are.getInt("Name", -1));
+
     loadCameraStyle(are);
     loadAmbientColor(are);
     loadScripts(are);
@@ -158,16 +180,14 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    int styleIdx = are.getInt("CameraStyle");
-    shared_ptr<TwoDaTable> styleTable(Resources::instance().get2DA("camerastyle"));
-    _camStyleDefault.load(styleTable->rows().at(styleIdx));
+    shared_ptr<TwoDA> cameraStyles(Resources::instance().get2DA("camerastyle"));
 
-    auto combatStyleRow = styleTable->findRowByColumnValue("name", "Combat");
-    if (combatStyleRow) {
-        _camStyleCombat.load(*combatStyleRow);
-    }
-    else {
-        throw logic_error("Combat camera style failed to load.");
+    int areaStyleIdx = are.getInt("CameraStyle");
+    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
+
+    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
+    if (combatStyleIdx != -1) {
+        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
     }
 }
 
@@ -215,7 +235,7 @@ void Area::loadProperties(const GffStruct &git) {
     shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDaTable> musicTable(Resources::instance().get2DA("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(Resources::instance().get2DA("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
@@ -287,7 +307,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(sceneGraph, _cameraAspect, _camStyleDefault);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_game, sceneGraph, _cameraAspect, _camStyleDefault);
     _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
@@ -304,7 +324,7 @@ bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = kRaycastRooms | kRaycastObjects;
+    props.flags = RaycastFlags::roomsObjects;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Door };
@@ -331,7 +351,7 @@ bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) 
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
+    props.flags = RaycastFlags::objectsAABBAlive;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Creature, ObjectType::Door };
@@ -349,7 +369,7 @@ bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) 
 void Area::add(const shared_ptr<SpatialObject> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
-    _objectById.insert(make_pair(object->id(), object));
+    _objectById[object->id()] = object;
     _objectsByTag[object->tag()].push_back(object);
 
     determineObjectRoom(*object);
@@ -381,7 +401,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
     {
-        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        shared_ptr<ModelSceneNode> sceneNode(object->getModelSceneNode());
         if (sceneNode) {
             _game->sceneGraph().removeRoot(sceneNode);
         }
@@ -457,7 +477,7 @@ void Area::landObject(SpatialObject &object) {
 void Area::loadParty(const glm::vec3 &position, float facing) {
     Party &party = _game->party();
 
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
         member->setPosition(position);
         member->setFacing(facing);
@@ -470,7 +490,7 @@ void Area::loadParty(const glm::vec3 &position, float facing) {
 void Area::unloadParty() {
     Party &party = _game->party();
 
-    for (int i = 0; i < party.size(); ++i) {
+    for (int i = 0; i < party.getSize(); ++i) {
         doDestroyObject(party.getMember(i)->id());
     }
 }
@@ -518,7 +538,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
     ostringstream ss;
     ss << boost::format("tag='%s'") % object.tag();
     ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % object.model()->name();
+    ss << boost::format(",model='%s'") % object.getModelSceneNode()->getName();
 
     debug("Selected object: " + ss.str());
 }
@@ -531,19 +551,19 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
 
     RaycastResult result;
 
-    props.flags = kRaycastObjects;
+    props.flags = RaycastFlags::objects;
     props.objectTypes = { ObjectType::Placeable };
     props.except = nullptr;
 
     if (_collisionDetector.raycast(props, result)) return false;
 
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastAlive;
+    props.flags = RaycastFlags::objectsAABBAlive;
     props.objectTypes = { ObjectType::Creature };
     props.except = except;
 
     if (_collisionDetector.raycast(props, result)) return false;
 
-    props.flags = kRaycastRooms | kRaycastWalkable;
+    props.flags = RaycastFlags::roomsWalkable;
     props.objectTypes.clear();
     props.except = nullptr;
 
@@ -558,27 +578,32 @@ bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except
 
 void Area::update(float dt) {
     doDestroyObjects();
-
-    Object::update(dt);
-
-    _actionExecutor.executeActions(_game->module()->area(), dt);
-
-    for (auto &room : _rooms) {
-        room.second->update(dt);
-    }
     updateVisibility();
     updateSounds();
 
-    for (auto &object : _objects) {
-        object->update(dt);
-        if (object->isDead()) continue;
-
-        _actionExecutor.executeActions(object, dt);
-    }
     _objectSelector.update();
-    _combat.update(dt);
 
-    updateHeartbeat(dt);
+    if (!_game->isPaused()) {
+        Object::update(dt);
+
+        _actionExecutor.executeActions(_game->module()->area(), dt);
+
+        for (auto &room : _rooms) {
+            room.second->update(dt);
+        }
+
+        for (auto &object : _objects) {
+            object->update(dt);
+
+            if (!object->isDead()) {
+                _actionExecutor.executeActions(object, dt);
+            }
+        }
+
+        _combat.update(dt);
+
+        updateHeartbeat(dt);
+    }
 }
 
 bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
@@ -592,10 +617,10 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     dest.x += dir.x * speedDt;
     dest.y += dir.y * speedDt;
 
-    // If obstacle is found once, try taking to the right
+    // If obstacle is found once, try moving south east
     if (getCreatureObstacle(*creature, dest)) {
         // TODO: possibly use the intersected face normal?
-        facing -= glm::half_pi<float>();
+        facing -= 0.75f * glm::pi<float>();
         glm::vec2 right(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
 
         dest = creature->position();
@@ -617,7 +642,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
         creature->setRoom(room);
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
-        if (creature == _game->party().leader()) {
+        if (creature == _game->party().getLeader()) {
             onPartyLeaderMoved();
         }
         checkTriggersIntersection(creature);
@@ -667,10 +692,10 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     glm::vec3 fromWorld(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), sceneNode->view(), sceneNode->projection(), viewport));
     glm::vec3 toWorld(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), sceneNode->view(), sceneNode->projection(), viewport));
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
     RaycastProperties props;
-    props.flags = kRaycastObjects | kRaycastAABB | kRaycastSelectable;
+    props.flags = RaycastFlags::objectsAABBSelectable;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
     props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };
@@ -700,12 +725,11 @@ void Area::fill(SceneGraph &sceneGraph) {
         }
     }
     for (auto &object : _objects) {
-        shared_ptr<ModelSceneNode> sceneNode(object->model());
+        shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
     }
-    sceneGraph.build();
 }
 
 glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
@@ -717,7 +741,7 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     _thirdPersonCamera->setFacing(partyLeader->facing());
@@ -732,7 +756,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
 }
 
 void Area::onPartyLeaderMoved() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     update3rdPersonCameraTarget();
@@ -740,12 +764,12 @@ void Area::onPartyLeaderMoved() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().leader());
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
     glm::vec3 position;
 
-    if (partyLeader->model()->getNodeAbsolutePosition("camerahook", position)) {
+    if (partyLeader->getModelSceneNode()->getNodeAbsolutePosition("camerahook", position)) {
         position += partyLeader->position();
     } else {
         position = partyLeader->position();
@@ -754,7 +778,7 @@ void Area::update3rdPersonCameraTarget() {
 }
 
 void Area::updateVisibility() {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -791,7 +815,7 @@ void Area::updateVisibility() {
     for (auto &object : _objects) {
         if (!object->visible()) continue;
 
-        shared_ptr<ModelSceneNode> model(object->model());
+        shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
         if (!model) continue;
 
         AABB aabb(model->aabb() * model->absoluteTransform());
@@ -799,17 +823,20 @@ void Area::updateVisibility() {
         glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
         float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
         float drawDistance = object->drawDistance();
-        bool onScreen = distanceToCamera < drawDistance && (object->isStuntMode() || cameraNode->isInFrustum(aabb));
+        bool onScreen = object->isStuntMode() || (distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb));
         model->setOnScreen(onScreen);
     }
 }
 
 void Area::updateSounds() {
-    Camera *camera = _game->getActiveCamera();
-    if (!camera) return;
+    glm::vec3 refPosition;
+    if (_game->cameraType() == CameraType::ThirdPerson) {
+        refPosition = _game->party().getLeader()->position();
+    } else {
+        refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];
+    }
 
     vector<pair<Sound *, float>> soundDistances;
-    glm::vec3 cameraPosition(camera->sceneNode()->absoluteTransform()[3]);
 
     for (auto &sound : _objectsByType[ObjectType::Sound]) {
         Sound *soundPtr = static_cast<Sound *>(sound.get());
@@ -819,7 +846,7 @@ void Area::updateSounds() {
 
         float maxDist = soundPtr->maxDistance();
 
-        float dist = soundPtr->distanceTo(cameraPosition);
+        float dist = soundPtr->distanceTo(refPosition);
         if (dist > maxDist) continue;
 
         soundDistances.push_back(make_pair(soundPtr, dist));
@@ -857,65 +884,26 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             _game->scheduleModuleTransition(trigger->linkedToModule(), trigger->linkedTo());
             return;
         }
-        if (!trigger->onEnter().empty()) {
-            _game->scriptRunner().run(trigger->onEnter(), trigger->id(), triggerrer->id());
+        if (!trigger->getOnEnter().empty()) {
+            _game->scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
 
 void Area::updateHeartbeat(float dt) {
-    _heartbeatTimer.update(dt);
-
-    if (_heartbeatTimer.hasTimedOut()) {
+    if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
             _game->scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
-            string heartbeat(object->heartbeat());
+            string heartbeat(object->getHeartbeat());
             if (!heartbeat.empty()) {
                 _game->scriptRunner().run(heartbeat, object->id());
             }
         }
         _game->party().onHeartbeat();
-
         _heartbeatTimer.reset(kHeartbeatInterval);
     }
-}
-
-const CameraStyle &Area::cameraStyle() const {
-    return _camStyleDefault;
-}
-
-const string &Area::music() const {
-    return _music;
-}
-
-const RoomMap &Area::rooms() const {
-    return _rooms;
-}
-
-Combat &Area::combat() {
-    return _combat;
-}
-
-Map &Area::map() {
-    return _map;
-}
-
-const ObjectList &Area::objects() const {
-    return _objects;
-}
-
-const CollisionDetector &Area::collisionDetector() const {
-    return _collisionDetector;
-}
-
-ObjectSelector &Area::objectSelector() {
-    return _objectSelector;
-}
-
-const Pathfinder &Area::pathfinder() const {
-    return _pathfinder;
 }
 
 Camera &Area::getCamera(CameraType type) {
@@ -956,22 +944,6 @@ void Area::setThirdPartyCameraStyle(CameraStyleType type) {
     }
 }
 
-bool Area::isStealthXPEnabled() const {
-    return _stealthXPEnabled;
-}
-
-int Area::maxStealthXP() const {
-    return _maxStealthXP;
-}
-
-int Area::currentStealthXP() const {
-    return _currentStealthXP;
-}
-
-int Area::stealthXPDecrement() const {
-    return _stealthXPDecrement;
-}
-
 void Area::setStealthXPEnabled(bool value) {
     _stealthXPEnabled = value;
 }
@@ -986,10 +958,6 @@ void Area::setCurrentStealthXP(int value) {
 
 void Area::setStealthXPDecrement(int value) {
     _stealthXPDecrement = value;
-}
-
-bool Area::isUnescapable() const {
-    return _unescapable;
 }
 
 void Area::setUnescapable(bool value) {
@@ -1035,7 +1003,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     auto spatial = dynamic_pointer_cast<SpatialObject>(object);
     if (spatial) {
         add(spatial);
-        auto model = spatial->model();
+        auto model = spatial->getModelSceneNode();
         if (model) {
             _game->sceneGraph().addRoot(model);
         }

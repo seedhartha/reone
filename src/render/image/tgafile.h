@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "../../resource/binfile.h"
+#include "../../resource/format/binfile.h"
 
 #include "../texture.h"
 
@@ -29,24 +29,36 @@ namespace render {
 
 class TgaFile : public resource::BinaryFile {
 public:
-    TgaFile(const std::string &resRef, TextureType type);
-    std::shared_ptr<render::Texture> texture() const;
+    TgaFile(const std::string &resRef, TextureUsage usage);
+
+    std::shared_ptr<render::Texture> texture() const { return _texture; }
 
 private:
     enum class ImageType {
         RGBA = 2,
-        Grayscale = 3
+        Grayscale = 3,
+        RGBA_RLE = 10
     };
 
     std::string _resRef;
-    TextureType _texType { TextureType::Diffuse };
+    TextureUsage _usage;
+
     ImageType _imageType { ImageType::RGBA };
     int _width { 0 };
     int _height { 0 };
+    bool _alpha { false };
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
+
     void loadTexture();
+
+    ByteArray readPixels(int w, int h);
+    ByteArray readPixelsRLE(int w, int h);
+
+    bool isRGBA() const;
+    bool isGrayscale() const;
+    bool isRLE() const;
 };
 
 } // namespace render

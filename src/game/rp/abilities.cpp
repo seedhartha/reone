@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultAbilityScore = 8;
+static constexpr int kDefaultAbilityScore = 8;
 
 int CreatureAbilities::getScore(Ability ability) const {
     auto maybeScore = _scores.find(ability);

@@ -1,0 +1,52 @@
+name: Coverity Scan
+
+on:
+  push:
+    branches:
+      - coverity_scan
+
+env:
+  BUILD_TYPE: Release
+  TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+
+jobs:
+  latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Download Coverity Build Tool
+        working-directory: ${{github.workspace}}/build
+        run: |
+          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=seedhartha%2Freone" -O cov-analysis-linux64.tar.gz
+          mkdir cov-analysis-linux64
+          tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
+
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build with cov-build
+        working-directory: ${{github.workspace}}/build
+        run: |
+          export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
+          cov-build --dir cov-int cmake --build . --config $BUILD_TYPE
+
+      - name: Submit the result to Coverity Scan
+        working-directory: ${{github.workspace}}/build
+        run: |
+          tar czvf reone.tgz cov-int
+          curl \
+            --form token=$TOKEN \
+            --form email=vkremianskii@gmail.com \
+            --form file=@reone.tgz \
+            --form version="coverity_scan" \
+            --form description="Game engine, capable of running KotOR and TSL" \
+            https://scan.coverity.com/builds?project=seedhartha%2Freone

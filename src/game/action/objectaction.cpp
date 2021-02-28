@@ -31,10 +31,6 @@ ObjectAction::ObjectAction(ActionType type, const shared_ptr<Object> &object) : 
     }
 }
 
-shared_ptr<Object> ObjectAction::object() const {
-    return _object;
-}
-
 } // namespace game
 
 } // namespace reone

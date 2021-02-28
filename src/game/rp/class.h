@@ -20,11 +20,12 @@
 #include <string>
 #include <unordered_set>
 
-#include "../../resource/2dafile.h"
+#include "../../resource/format/2dafile.h"
+
+#include "../types.h"
 
 #include "attributes.h"
 #include "savingthrows.h"
-#include "types.h"
 
 namespace reone {
 
@@ -34,7 +35,7 @@ class CreatureClass {
 public:
     CreatureClass(ClassType type);
 
-    void load(const resource::TwoDaRow &row);
+    void load(const resource::TwoDA &twoDa, int row);
 
     bool isClassSkill(Skill skill) const;
 
@@ -49,11 +50,11 @@ public:
      */
     const SavingThrows &getSavingThrows(int level) const;
 
-    const std::string &name() const;
-    const std::string &description() const;
-    int hitdie() const;
-    const CreatureAttributes &defaultAttributes() const;
-    int skillPointBase() const;
+    const std::string &name() const { return _name; }
+    const std::string &description() const { return _description; }
+    int hitdie() const { return _hitdie; }
+    const CreatureAttributes &defaultAttributes() const { return _defaultAttributes; }
+    int skillPointBase() const { return _skillPointBase; }
 
 private:
     ClassType _type;

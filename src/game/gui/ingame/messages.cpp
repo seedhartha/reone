@@ -31,7 +31,7 @@ namespace reone {
 namespace game {
 
 MessagesMenu::MessagesMenu(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("messages");
@@ -47,6 +47,8 @@ void MessagesMenu::load() {
 }
 
 void MessagesMenu::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     if (control == "BTN_EXIT") {
         _game->openInGame();
     }

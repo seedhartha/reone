@@ -17,6 +17,10 @@
 
 #include "modelnode.h"
 
+#include "glm/gtx/matrix_decompose.hpp"
+
+#include "../../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -35,140 +39,213 @@ void ModelNode::initGL() {
     }
 }
 
-bool ModelNode::getPosition(float time, glm::vec3 &position, float scale) const {
-    if (_positionFrames.empty()) return false;
+void ModelNode::addChild(shared_ptr<ModelNode> child) {
+    child->_parent = this;
+    _children.push_back(move(child));
+}
 
-    const PositionKeyframe *left = &_positionFrames.front();
-    const PositionKeyframe *right = left;
+void ModelNode::computeLocalTransforms() {
+    if (_parent) {
+        _localTransform = glm::inverse(_parent->_absTransform) * _absTransform;
+        _absTransform = _parent->_absTransform * _localTransform;
+        _absTransformInv = glm::inverse(_absTransform);
 
-    for (auto it = _positionFrames.begin(); it != _positionFrames.end(); ++it) {
+        // Extract position and orientation for use in animations.
+        glm::vec3 scale, skew;
+        glm::vec4 perspective;
+        glm::decompose(_localTransform, scale, _orientation, _position, skew, perspective);
+
+    } else {
+        _localTransform = _absTransform;
+    }
+
+    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
+    _absTransformInv = glm::inverse(_absTransform);
+
+    for (auto &child : _children) {
+        child->computeLocalTransforms();
+    }
+}
+
+void ModelNode::computeAbsoluteTransforms() {
+    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
+    _absTransformInv = glm::inverse(_absTransform);
+
+    for (auto &child : _children) {
+        child->computeAbsoluteTransforms();
+    }
+}
+
+void ModelNode::addTranslationKeyframe(Keyframe keyframe) {
+    _translationFrames.push_back(move(keyframe));
+}
+
+void ModelNode::addOrientationKeyframe(Keyframe keyframe) {
+    _orientationFrames.push_back(move(keyframe));
+}
+
+/**
+ * @return false if keyframes vector is empty, true otherwise
+ */
+static bool getKeyframes(
+    const vector<ModelNode::Keyframe> &frames, float time,
+    const ModelNode::Keyframe *&frame1, const ModelNode::Keyframe *&frame2, float &factor) {
+
+    if (frames.empty()) return false;
+
+    frame1 = &frames[0];
+    frame2 = &frames[0];
+
+    for (auto it = frames.begin(); it != frames.end(); ++it) {
         if (it->time >= time) {
-            right = &*it;
-            if (it != _positionFrames.begin()) left = &*(it - 1);
+            frame2 = &*it;
+            if (it != frames.begin()) {
+                frame1 = &*(it - 1);
+            }
             break;
         }
     }
 
-    if (left == right) {
-        position = left->position * scale;
-        return true;
+    if (frame1 == frame2) {
+        factor = 0.0f;
+    } else {
+        factor = (time - frame1->time) / (frame2->time - frame1->time);
     }
-
-    float factor = (time - left->time) / (right->time - left->time);
-
-    position = glm::mix(left->position, right->position, factor) * scale;
 
     return true;
 }
 
-bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
-    if (_orientationFrames.empty()) return false;
+bool ModelNode::getTranslation(float time, glm::vec3 &translation, float scale) const {
+    const Keyframe *frame1, *frame2;
+    float factor;
 
-    const OrientationKeyframe *left = &_orientationFrames.front();
-    const OrientationKeyframe *right = left;
-
-    for (auto it = _orientationFrames.begin(); it != _orientationFrames.end(); ++it) {
-        if (it->time >= time) {
-            right = &*it;
-            if (it != _orientationFrames.begin()) left = &*(it - 1);
-            break;
-        }
-    }
-
-    if (left == right) {
-        orientation = left->orientation;
+    if (getKeyframes(_translationFrames, time, frame1, frame2, factor)) {
+        translation = glm::mix(frame1->translation, frame2->translation, factor) * scale;
         return true;
     }
 
-    float factor = (time - left->time) / (right->time - left->time);
+    return false;
+}
 
-    orientation = glm::slerp(left->orientation, right->orientation, factor);
+bool ModelNode::getOrientation(float time, glm::quat &orientation) const {
+    const Keyframe *frame1, *frame2;
+    float factor;
+
+    if (getKeyframes(_orientationFrames, time, frame1, frame2, factor)) {
+        orientation = glm::slerp(frame1->orientation, frame2->orientation, factor);
+        return true;
+    }
+
+    return false;
+}
+
+bool ModelNode::getScale(float time, float &scale) const {
+    const Keyframe *frame1, *frame2;
+    float factor;
+
+    if (getKeyframes(_scaleFrames, time, frame1, frame2, factor)) {
+        scale = glm::mix(frame1->scale, frame2->scale, factor);
+        return true;
+    }
+
+    return false;
+}
+
+bool ModelNode::getAlpha(float time, float &alpha) const {
+    const Keyframe *frame1, *frame2;
+    float factor;
+
+    if (getKeyframes(_alphaFrames, time, frame1, frame2, factor)) {
+        alpha = glm::mix(frame1->alpha, frame2->alpha, factor);
+        return true;
+    }
+
+    return false;
+}
+
+bool ModelNode::getSelfIllumColor(float time, glm::vec3 &color) const {
+    const Keyframe *frame1, *frame2;
+    float factor;
+
+    if (getKeyframes(_selfIllumFrames, time, frame1, frame2, factor)) {
+        color = glm::mix(frame1->selfIllumColor, frame2->selfIllumColor, factor);
+        return true;
+    }
+
+    return false;
+}
+
+bool ModelNode::getTranslation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::vec3 &translation, float scale) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_translationFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_translationFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        translation = scale * _translationFrames[leftFrameIdx].translation;
+    } else {
+        translation = scale * glm::mix(
+            _translationFrames[leftFrameIdx].translation,
+            _translationFrames[rightFrameIdx].translation,
+            interpolant);
+    }
+
+    return true;
+}
+
+bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientationFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientationFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        orientation = _orientationFrames[leftFrameIdx].orientation;
+    } else {
+        orientation = glm::mix(
+            _orientationFrames[leftFrameIdx].orientation,
+            _orientationFrames[rightFrameIdx].orientation,
+            interpolant);
+    }
+
+    return true;
+}
+
+bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float interpolant, float &scale) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scaleFrames.size()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scaleFrames.size())) return false;
+
+    if (leftFrameIdx == rightFrameIdx) {
+        scale = _scaleFrames[leftFrameIdx].scale;
+    } else {
+        scale = glm::mix(
+            _scaleFrames[leftFrameIdx].scale,
+            _scaleFrames[rightFrameIdx].scale,
+            interpolant);
+    }
 
     return true;
 }
 
 const glm::vec3 &ModelNode::getCenterOfAABB() const {
-    return _mesh->aabb().center();
+    return _mesh->mesh()->aabb().center();
 }
 
-int ModelNode::index() const {
-    return _index;
+void ModelNode::setName(string name) {
+    _name = move(name);
 }
 
-const ModelNode *ModelNode::parent() const {
-    return _parent;
+void ModelNode::setNodeNumber(uint16_t nodeNumber) {
+    _nodeNumber = nodeNumber;
 }
 
-uint16_t ModelNode::nodeNumber() const {
-    return _nodeNumber;
+void ModelNode::setAbsoluteTransform(glm::mat4 transform) {
+    _absTransform = move(transform);
+    _absTransformInv = glm::inverse(_absTransform);
 }
 
-const string &ModelNode::name() const {
-    return _name;
+void ModelNode::setMesh(shared_ptr<ModelMesh> mesh) {
+    _mesh = move(mesh);
 }
 
-const glm::vec3 &ModelNode::position() const {
-    return _position;
-}
-
-const glm::quat &ModelNode::orientation() const {
-    return _orientation;
-}
-
-const glm::mat4 &ModelNode::localTransform() const {
-    return _localTransform;
-}
-
-const glm::mat4 &ModelNode::absoluteTransform() const {
-    return _absTransform;
-}
-
-const glm::mat4 &ModelNode::absoluteTransformInverse() const {
-    return _absTransformInv;
-}
-
-const glm::vec3 &ModelNode::color() const {
-    return _color;
-}
-
-bool ModelNode::isSelfIllumEnabled() const {
-    return _selfIllumEnabled;
-}
-
-const glm::vec3 &ModelNode::selfIllumColor() const {
-    return _selfIllumColor;
-}
-
-float ModelNode::alpha() const {
-    return _alpha;
-}
-
-float ModelNode::radius() const {
-    return _radius;
-}
-
-float ModelNode::multiplier() const {
-    return _multiplier;
-}
-
-shared_ptr<ModelNode::Light> ModelNode::light() const {
-    return _light;
-}
-
-shared_ptr<ModelMesh> ModelNode::mesh() const {
-    return _mesh;
-}
-
-shared_ptr<ModelNode::Skin> ModelNode::skin() const {
-    return _skin;
-}
-
-shared_ptr<Emitter> ModelNode::emitter() const {
-    return _emitter;
-}
-
-const vector<shared_ptr<ModelNode>> &ModelNode::children() const {
-    return _children;
+void ModelNode::setSkin(shared_ptr<Skin> skin) {
+    _skin = move(skin);
 }
 
 } // namespace render

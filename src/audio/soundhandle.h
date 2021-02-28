@@ -19,13 +19,15 @@
 
 #include <atomic>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 namespace reone {
 
 namespace audio {
 
-class SoundHandle {
+class SoundHandle : boost::noncopyable {
 public:
     enum class State {
         NotInited,
@@ -40,22 +42,19 @@ public:
 
     bool isNotInited() const;
     bool isStopped() const;
+    bool isPositionDirty() const { return _positionDirty; }
 
-    int duration() const;
-    glm::vec3 position() const;
-    bool isPositionDirty() const;
+    float duration() const { return _duration; }
+    glm::vec3 position() const { return _position; }
 
     void setState(State state);
     void setPosition(const glm::vec3 &position);
 
 private:
     std::atomic<State> _state { State::NotInited };
-    int _duration { 0 };
+    float _duration { 0.0f };
     std::atomic<glm::vec3> _position;
     std::atomic_bool _positionDirty { false };
-
-    SoundHandle(const SoundHandle &) = delete;
-    SoundHandle &operator=(const SoundHandle &) = delete;
 };
 
 } // namespace audio

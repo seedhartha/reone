@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/scenegraph.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
+
+#include "gui.h"
 
 namespace reone {
 
@@ -30,28 +31,27 @@ namespace game {
 
 class Game;
 
-class MainMenu : public gui::GUI {
+class MainMenu : public GameGUI {
 public:
     MainMenu(Game *game);
 
     void load() override;
+    void onClick(const std::string &control) override;
 
     void onModuleSelected(const std::string &name);
 
 private:
     Game *_game { nullptr };
 
-    void configureButtons();
-    void setButtonColors(const std::string &tag);
-    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
-    void startModuleSelection();
-
-    // Event handlers
-
-    void onClick(const std::string &control) override;
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
-    // END Event handlers
+    void configureButtons();
+    void setup3DView();
+    void setButtonColors(const std::string &tag);
+    void startModuleSelection();
+    void loadModuleNames();
+
+    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
 };
 
 } // namespace game

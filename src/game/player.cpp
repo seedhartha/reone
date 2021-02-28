@@ -49,7 +49,7 @@ Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
 }
 
 bool Player::handle(const SDL_Event &event) {
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     if (!partyLeader) return false;
 
     switch (event.type) {
@@ -57,6 +57,10 @@ bool Player::handle(const SDL_Event &event) {
             return handleKeyDown(event.key);
         case SDL_KEYUP:
             return handleKeyUp(event.key);
+        case SDL_MOUSEBUTTONDOWN:
+            return handleMouseButtonDown(event.button);
+        case SDL_MOUSEBUTTONUP:
+            return handleMouseButtonUp(event.button);
         default:
             return false;
     }
@@ -80,6 +84,11 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
             _moveRight = true;
             return true;
 
+        case SDL_SCANCODE_X: {
+            shared_ptr<Creature> partyLeader(_party->getLeader());
+            partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
+            return true;
+        }
         default:
             return false;
     }
@@ -108,8 +117,28 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
     }
 }
 
+bool Player::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (_camera->isMouseLookMode() && event.button == SDL_BUTTON_LEFT) {
+        _moveForward = true;
+        _leftPressedInMouseLook = true;
+        return true;
+    }
+
+    return false;
+}
+
+bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+    if (_leftPressedInMouseLook && event.button == SDL_BUTTON_LEFT) {
+        _moveForward = false;
+        _leftPressedInMouseLook = false;
+        return true;
+    }
+
+    return false;
+}
+
 void Player::update(float dt) {
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     if (!partyLeader || partyLeader->isMovementRestricted()) return;
 
     float facing = 0.0f;
@@ -137,7 +166,7 @@ void Player::update(float dt) {
         if (_area->moveCreature(partyLeader, dir, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
         }
-    } else if (actions.empty()) {
+    } else if (actions.isEmpty()) {
         partyLeader->setMovementType(Creature::MovementType::None);
     }
 }
@@ -148,7 +177,7 @@ void Player::stopMovement() {
     _moveBackward = false;
     _moveRight = false;
 
-    shared_ptr<Creature> partyLeader(_party->leader());
+    shared_ptr<Creature> partyLeader(_party->getLeader());
     partyLeader->setMovementType(Creature::MovementType::None);
 }
 

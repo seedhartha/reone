@@ -17,20 +17,15 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 namespace script {
 
-class EngineType {
+class EngineType : boost::noncopyable {
 public:
     virtual ~EngineType() = default;
-
-protected:
-    EngineType() = default;
-
-private:
-    EngineType(const EngineType &) = delete;
-    EngineType &operator=(const EngineType &) = delete;
 };
 
 } // namespace script

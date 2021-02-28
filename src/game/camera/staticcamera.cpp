@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-constexpr float kFarPlane = 10000.0f;
+static constexpr float kFarPlane = 10000.0f;
 
 StaticCamera::StaticCamera(SceneGraph *sceneGraph, float aspect) : _aspect(aspect) {
     _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f), kFarPlane);

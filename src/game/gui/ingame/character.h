@@ -32,12 +32,14 @@ public:
     void load() override;
     void update(float dt) override;
 
-    void refreshPortraits();
+    void refreshControls();
 
 private:
     Game *_game { nullptr };
 
     void onClick(const std::string &control) override;
+
+    void refreshPortraits();
 };
 
 } // namespace game

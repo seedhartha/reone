@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "rp/types.h"
+#include "types.h"
 
 namespace reone {
 

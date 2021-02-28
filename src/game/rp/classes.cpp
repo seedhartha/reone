@@ -20,6 +20,7 @@
 #include "../../resource/resources.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::resource;
 
@@ -34,21 +35,14 @@ Classes &Classes::instance() {
     return classes;
 }
 
-shared_ptr<CreatureClass> Classes::get(ClassType type) {
-    auto maybeClass = _classes.find(type);
-    if (maybeClass != _classes.end()) return maybeClass->second;
-
-    auto inserted = _classes.insert(make_pair(type, doGet(type)));
-
-    return inserted.first->second;
+Classes::Classes() : MemoryCache(bind(&Classes::doGet, this, _1)) {
 }
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDaTable> table(Resources::instance().get2DA(kClassesTableResRef));
-    const TwoDaRow &row = table->rows()[static_cast<int>(type)];
+    shared_ptr<TwoDA> classes(Resources::instance().get2DA(kClassesTableResRef));
 
     auto clazz = make_shared<CreatureClass>(type);
-    clazz->load(row);
+    clazz->load(*classes, static_cast<int>(type));
 
     return move(clazz);
 }

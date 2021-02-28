@@ -21,13 +21,15 @@
 #include <functional>
 #include <memory>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
 #include "../../render/font.h"
 #include "../../render/framebuffer.h"
 #include "../../render/texture.h"
-#include "../../resource/gfffile.h"
+#include "../../resource/format/gfffile.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/pipeline/control.h"
 #include "../../scene/scenegraph.h"
@@ -36,20 +38,28 @@
 namespace reone {
 
 namespace gui {
-
 class GUI;
 
 /**
  * GUI control. Can render itself and handle events.
  */
-class Control {
+class Control : boost::noncopyable {
 public:
-    enum class TextAlign {
-        LeftCenter = 9,
-        CenterBottom = 10,
-        CenterCenter = 18,
+    static constexpr int kStretchLeft = 1;
+    static constexpr int kStretchTop = 2;
+    static constexpr int kStretchWidth = 4;
+    static constexpr int kStretchHeight = 8;
+    static constexpr int kStretchAll = kStretchLeft | kStretchTop | kStretchWidth | kStretchHeight;
 
-        CenterTop = 0x1000
+    enum class TextAlign {
+        LeftTop = 9,
+        CenterTop = 10,
+        RightCenter = 12,
+        LeftCenter = 17,
+        CenterCenter = 18,
+        RightCenter2 = 20,
+
+        CenterBottom = 0x1000
     };
 
     struct Extent {
@@ -94,18 +104,25 @@ public:
 
     virtual void load(const resource::GffStruct &gffs);
     virtual void update(float dt);
-    virtual void stretch(float x, float y);
 
-    bool isClickable() const;
-    bool isDisabled() const;
-    bool isFocusable() const;
-    bool isVisible() const;
+    /**
+     * Stretches this control in both directions.
+     *
+     * @param mask bitmask, specifying which components to stretch
+     */
+    virtual void stretch(float x, float y, int mask = kStretchAll);
 
-    Border &border() const;
-    const Extent &extent() const;
-    const Border &hilight() const;
-    const std::string &tag() const;
-    const Text &text() const;
+    bool isClickable() const { return _clickable; }
+    bool isDisabled() const { return _disabled; }
+    bool isFocusable() const { return _focusable; }
+    bool isVisible() const { return _visible; }
+
+    Border &border() const { return *_border; }
+    const Extent &extent() const { return _extent; }
+    const Border &hilight() const { return *_hilight; }
+    const std::string &tag() const { return _tag; }
+    const Text &text() const { return _text; }
+    const std::vector<std::string> &textLines() const { return _textLines; }
 
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
@@ -115,10 +132,15 @@ public:
     void setDisabled(bool disabled);
     void setDiscardColor(const glm::vec3 &color);
     virtual void setExtent(const Extent &extent);
+    virtual void setExtentHeight(int height);
+    void setExtentTop(int top);
     virtual void setFocus(bool focus);
     void setFocusable(bool focusable);
+    void setHeight(int height);
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);
+    void setHilightFill(const std::string &resRef);
+    void setHilightFill(const std::shared_ptr<render::Texture> &texture);
     void setPadding(int padding);
     void setScene3D(std::unique_ptr<Scene3D> scene);
     void setText(const Text &text);
@@ -138,8 +160,8 @@ public:
 
     // Rendering
 
-    virtual void render(const glm::ivec2 &offset, const std::string &textOverride = "") const;
-    void render3D(const glm::ivec2 &offset) const;
+    virtual void render(const glm::ivec2 &offset, const std::vector<std::string> &text);
+    void render3D(const glm::ivec2 &offset);
 
     // END Rendering
 
@@ -164,27 +186,27 @@ protected:
     glm::vec3 _discardColor { false };
     glm::vec3 _borderColorOverride { 1.0f };
     bool _useBorderColorOverride { false };
+    std::vector<std::string> _textLines;
 
     Control(GUI *, ControlType type);
 
-    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) const;
-    void drawText(const std::string &text, const glm::ivec2 &offset, const glm::ivec2 &size) const;
+    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
 
     virtual const glm::vec3 &getBorderColor() const;
 
 private:
     std::unique_ptr<scene::ControlRenderPipeline> _pipeline;
 
-    Control(const Control &) = delete;
-    Control &operator=(const Control &) = delete;
-
-    void updateTransform();
     void loadExtent(const resource::GffStruct &gffs);
     void loadBorder(const resource::GffStruct &gffs);
     void loadText(const resource::GffStruct &gffs);
     void loadHilight(const resource::GffStruct &gffs);
-    std::vector<std::string> breakText(const std::string &text, int maxWidth) const;
-    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size) const;
+
+    void updateTransform();
+    void updateTextLines();
+
+    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, render::TextGravity &gravity) const;
 };
 
 } // namespace gui

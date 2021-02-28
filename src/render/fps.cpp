@@ -23,7 +23,7 @@ namespace reone {
 
 namespace render {
 
-static const int kMeasurePeriodMillis = 500;
+static constexpr int kMeasurePeriodMillis = 500;
 
 void FpsCounter::reset() {
     _startTicks = SDL_GetTicks();
@@ -45,14 +45,6 @@ void FpsCounter::update(float dt) {
         _average = _frameCount / (delta / 1000.0f);
         _hasAverage = true;
     }
-}
-
-bool FpsCounter::hasAverage() const {
-    return _hasAverage;
-}
-
-float FpsCounter::average() const {
-    return _average;
 }
 
 } // namespace render

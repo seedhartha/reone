@@ -34,7 +34,7 @@ public:
     void load() override;
     void open(const std::shared_ptr<SpatialObject> &contanier);
 
-    SpatialObject &container() const;
+    SpatialObject &container() const { return *_container; }
 
 private:
     Game *_game { nullptr };

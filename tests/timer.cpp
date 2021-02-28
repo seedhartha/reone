@@ -28,11 +28,11 @@ using namespace reone;
 BOOST_AUTO_TEST_CASE(test_timer_times_out) {
     Timer timer(1.0f);
 
-    timer.update(0.5f);
+    timer.advance(0.5f);
 
-    BOOST_TEST(!timer.hasTimedOut());
+    BOOST_TEST(!timer.isTimedOut());
 
-    timer.update(0.6f);
+    timer.advance(0.6f);
 
-    BOOST_TEST(timer.hasTimedOut());
+    BOOST_TEST(timer.isTimedOut());
 }

@@ -18,6 +18,7 @@
 #include "classselect.h"
 
 #include "../../../gui/scenebuilder.h"
+#include "../../../render/model/models.h"
 #include "../../../resource/resources.h"
 
 #include "../../characterutil.h"
@@ -40,8 +41,7 @@ namespace reone {
 
 namespace game {
 
-static const float kModelScale = 1.05f;
-static const float kModelOffsetY = 0.9f;
+static constexpr float kModelScale = 1.1f;
 
 static map<Gender, int> g_genderStrRefs {
     { Gender::Male, 646 },
@@ -58,12 +58,12 @@ static map<ClassType, int> g_classDescStrRefs {
 };
 
 ClassSelection::ClassSelection(Game *game) :
-    GameGUI(game->version(), game->options().graphics),
+    GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("classsel");
 
-    if (_version == GameVersion::KotOR) {
+    if (_gameId == GameID::KotOR) {
         _backgroundType = BackgroundType::Menu;
     }
 
@@ -85,32 +85,32 @@ void ClassSelection::configureClassButtons() {
     Control &button1 = getControl("BTN_SEL1");
     setButtonColors(button1);
     button1.extent().getCenter(x, y);
-    _classButtons.push_back({ &button1, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
+    _classButtons.push_back({ &button1, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     Control &button2 = getControl("BTN_SEL2");
     setButtonColors(button2);
     button2.extent().getCenter(x, y);
-    _classButtons.push_back({ &button2, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
+    _classButtons.push_back({ &button2, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button3 = getControl("BTN_SEL3");
     setButtonColors(button3);
     button3.extent().getCenter(x, y);
-    _classButtons.push_back({ &button3, glm::vec2(x, y), randomCharacter(Gender::Male, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
+    _classButtons.push_back({ &button3, glm::vec2(x, y), randomCharacter(Gender::Male, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button4 = getControl("BTN_SEL4");
     setButtonColors(button4);
     button4.extent().getCenter(x, y);
-    _classButtons.push_back({ &button4, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
+    _classButtons.push_back({ &button4, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian) });
 
     Control &button5 = getControl("BTN_SEL5");
     setButtonColors(button5);
     button5.extent().getCenter(x, y);
-    _classButtons.push_back({ &button5, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
+    _classButtons.push_back({ &button5, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel) });
 
     Control &button6 = getControl("BTN_SEL6");
     setButtonColors(button6);
     button6.extent().getCenter(x, y);
-    _classButtons.push_back({ &button6, glm::vec2(x, y), randomCharacter(Gender::Female, _version == GameVersion::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
+    _classButtons.push_back({ &button6, glm::vec2(x, y), randomCharacter(Gender::Female, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular) });
 
     _enlargedButtonSize = glm::vec2(button1.extent().width, button1.extent().height);
     _defaultButtonSize = glm::vec2(button2.extent().width, button2.extent().height);
@@ -119,13 +119,8 @@ void ClassSelection::configureClassButtons() {
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    Control::Border border(control.border());
-    border.color = getBaseColor(_version);
-    control.setBorder(move(border));
-
-    Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_version);
-    control.setHilight(move(hilight));
+    control.setBorderColor(getBaseColor(_gameId));
+    control.setHilightColor(getHilightColor(_gameId));
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
@@ -142,8 +137,8 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
 }
 
 void ClassSelection::configureClassModels() {
-    switch (_version) {
-        case GameVersion::TheSithLords:
+    switch (_gameId) {
+        case GameID::TSL:
             configureClassModel(0, Gender::Male, ClassType::JediConsular);
             configureClassModel(1, Gender::Male, ClassType::JediSentinel);
             configureClassModel(2, Gender::Male, ClassType::JediGuardian);
@@ -171,19 +166,13 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    glm::mat4 cameraTransform(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform = glm::rotate(cameraTransform, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-
     unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier([this, &index](SceneGraph &sceneGraph) { return getCharacterModel(_classButtons[index].character, sceneGraph); })
         .modelScale(kModelScale)
-        .modelOffset(glm::vec2(0.0f, kModelOffsetY))
-        .cameraTransform(cameraTransform)
-        .ambientLightColor(glm::vec3(1.0f))
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.2f))
         .build());
 
     Control &control = getControl("3D_MODEL" + to_string(index + 1));
@@ -192,16 +181,22 @@ void ClassSelection::configureClassModel(int index, Gender gender, ClassType cla
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, SceneGraph &sceneGraph) {
-    unique_ptr<ObjectFactory> objectFactory(new ObjectFactory(_game, &sceneGraph));
+    auto root = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
 
+    // Attach character model to the root model
+    auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
     unique_ptr<Creature> creature(objectFactory->newCreature());
     creature->load(character);
+    creature->setFacing(-glm::half_pi<float>());
     creature->updateModelAnimation();
+    root->attach("cgbody_light", creature->getModelSceneNode());
 
-    return creature->model();
+    return move(root);
 }
 
 void ClassSelection::onFocusChanged(const string &control, bool focus) {
+    GameGUI::onFocusChanged(control, focus);
+
     int idx = getClassButtonIndexByTag(control);
     if (idx == -1) return;
 
@@ -234,6 +229,8 @@ int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
 }
 
 void ClassSelection::onClick(const string &control) {
+    GameGUI::onClick(control);
+
     CharacterGeneration &charGen = _game->characterGeneration();
     int idx = getClassButtonIndexByTag(control);
     if (idx != -1) {

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/binfile.h"
+#include "../../resource/format/binfile.h"
 
 #include "../texture.h"
 
@@ -27,8 +27,12 @@ namespace render {
 
 class TpcFile : public resource::BinaryFile {
 public:
-    TpcFile(const std::string &resRef, TextureType type);
-    std::shared_ptr<Texture> texture() const;
+    /**
+     * @param headless true if texture will not be used for rendering
+     */
+    TpcFile(const std::string &resRef, TextureUsage usage, bool headless = false);
+
+    std::shared_ptr<Texture> texture() const { return _texture; }
 
 private:
     enum class EncodingType {
@@ -38,7 +42,9 @@ private:
     };
 
     std::string _resRef;
-    TextureType _type;
+    TextureUsage _usage;
+    bool _headless;
+
     uint32_t _dataSize { 0 };
     bool _compressed { false };
     uint16_t _width { 0 };
@@ -49,9 +55,10 @@ private:
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
+    void loadTexture();
+
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
-    void loadTexture();
     PixelFormat getPixelFormat() const;
 };
 

@@ -17,76 +17,105 @@
 
 #pragma once
 
-#include <map>
+#include <functional>
 #include <memory>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
+#include "../render/shaders.h"
 #include "../render/types.h"
 
 namespace reone {
 
 namespace scene {
 
+constexpr float kDefaultExposure = 1.0f;
+
 class CameraSceneNode;
+class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
-class ParticleSceneNode;
 class SceneNode;
 
-class SceneGraph {
+class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(const render::GraphicsOptions &opts);
 
-    void render() const;
-    void renderNoGlobalUniforms(bool shadowPass) const;
+    void update(float dt);
+    void render(bool shadowPass = false);
 
     void clear();
-
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
-    void build();
+    /**
+     * Prepares this scene graph for rendering the next frame. Meshes, lights
+     * and particles are extracted from the root scene nodes and sorted by
+     * distance to camera. Lighting sources are selected for each model.
+     */
     void prepareFrame();
 
-    std::shared_ptr<CameraSceneNode> activeCamera() const;
+    const render::GraphicsOptions &options() const { return _opts; }
+    std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
+    render::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
+    float exposure() const { return _exposure; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
-    void setReferenceNode(const std::shared_ptr<SceneNode> &node);
+    void setShadowReference(const std::shared_ptr<SceneNode> &reference);
+    void setUpdate(bool update);
+    void setUniformsPrototype(render::ShaderUniforms &&uniforms);
+    void setExposure(float exposure);
 
-    // Lights
+    // Lights and shadows
 
-    bool isShadowLightPresent() const;
+    /**
+     * Fills lights vector with up to count lights, sorted by priority and
+     * proximity to the reference node.
+     */
+    void getLightsAt(
+        const SceneNode &reference,
+        std::vector<LightSceneNode *> &lights,
+        int count = render::kMaxLightCount,
+        std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
-    void getLightsAt(const glm::vec3 &position, std::vector<LightSceneNode *> &lights) const;
-
-    const glm::vec3 &ambientLightColor() const;
-    const glm::vec3 &shadowLightPosition() const;
+    const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
+    const LightSceneNode *shadowLight() const { return _shadowLight; }
+    float shadowStrength() const { return _shadowStrength; }
 
     void setAmbientLightColor(const glm::vec3 &color);
 
-    // END Lights
+    // END Lights and shadows
 
 private:
     render::GraphicsOptions _opts;
+
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
-    std::vector<ParticleSceneNode *> _particles;
+    std::vector<EmitterSceneNode *> _emitters;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    bool _shadowLightPresent { false };
-    glm::vec3 _shadowLightPosition { 0.0f };
-    std::shared_ptr<SceneNode> _refNode;
+    bool _update { true };
+    render::ShaderUniforms _uniformsPrototype;
+    float _exposure { kDefaultExposure };
 
-    SceneGraph(const SceneGraph &) = delete;
-    SceneGraph &operator=(const SceneGraph &) = delete;
+    // Shadows
+
+    const LightSceneNode *_shadowLight { nullptr };
+    std::shared_ptr<SceneNode> _shadowReference;
+    float _shadowStrength { 1.0f };
+    bool _shadowFading { false };
+
+    // END Shadows
 
     void refreshNodeLists();
+    void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
     void refreshShadowLight();
 };
 

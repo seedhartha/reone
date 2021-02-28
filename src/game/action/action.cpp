@@ -24,14 +24,6 @@ namespace game {
 Action::Action(ActionType type) : _type(type) {
 }
 
-ActionType Action::type() const {
-    return _type;
-}
-
-bool Action::isCompleted() const {
-    return _completed;
-}
-
 void Action::complete() {
     _completed = true;
 }

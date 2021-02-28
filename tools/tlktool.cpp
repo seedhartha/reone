@@ -19,7 +19,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/tlkfile.h"
+#include "../src/resource/format/tlkfile.h"
 
 using namespace std;
 
@@ -32,7 +32,13 @@ namespace reone {
 
 namespace tools {
 
-void TlkTool::convert(const fs::path &path, const fs::path &destPath) const {
+void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+    if (operation == Operation::ToJSON) {
+        toJSON(target, destPath);
+    }
+}
+
+void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::ptree children;
 
@@ -40,7 +46,7 @@ void TlkTool::convert(const fs::path &path, const fs::path &destPath) const {
     tlk.load(path);
 
     shared_ptr<TalkTable> table(tlk.table());
-    for (int i = 0; i < table->stringCount(); ++i) {
+    for (int i = 0; i < table->getStringCount(); ++i) {
         string s(table->getString(i).text);
 
         pt::ptree child;
@@ -54,8 +60,14 @@ void TlkTool::convert(const fs::path &path, const fs::path &destPath) const {
     fs::path jsonPath(destPath);
     jsonPath.append(path.filename().string() + ".json");
 
-    fs::ofstream json(jsonPath);
-    pt::write_json(json, tree);
+    pt::write_json(jsonPath.string(), tree);
+}
+
+bool TlkTool::supports(Operation operation, const fs::path &target) const {
+    return
+        !fs::is_directory(target) &&
+        target.extension() == ".tlk" &&
+        operation == Operation::ToJSON;
 }
 
 } // namespace tools

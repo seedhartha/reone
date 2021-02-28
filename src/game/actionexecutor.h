@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include "glm/vec3.hpp"
 
 #include "action/attack.h"
@@ -35,17 +37,14 @@ namespace game {
 
 class Game;
 
-class ActionExecutor {
+class ActionExecutor : boost::noncopyable {
 public:
     ActionExecutor(Game *game);
 
     void executeActions(const std::shared_ptr<Object> &object, float dt);
 
 private:
-    Game *_game { nullptr };
-
-    ActionExecutor(const ActionExecutor &) = delete;
-    ActionExecutor &operator=(const ActionExecutor &) = delete;
+    Game *_game;
 
     bool navigateCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest, bool run, float distance, float dt);
     void advanceCreatureOnPath(const std::shared_ptr<Creature> &creature, bool run, float dt);

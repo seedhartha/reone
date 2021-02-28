@@ -22,7 +22,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../render/walkmesh.h"
+#include "../render/walkmesh/walkmesh.h"
 #include "../scene/node/modelscenenode.h"
 
 namespace reone {
@@ -43,12 +43,12 @@ public:
     void removeTenant(SpatialObject *object);
     void update(float dt);
 
-    bool isVisible() const;
+    bool isVisible() const { return _visible; }
 
-    const std::string &name() const;
-    const glm::vec3 &position() const;
-    std::shared_ptr<scene::ModelSceneNode> model() const;
-    const render::Walkmesh *walkmesh() const;
+    const std::string &name() const { return _name; }
+    const glm::vec3 &position() const { return _position; }
+    std::shared_ptr<scene::ModelSceneNode> model() const { return _model; }
+    const render::Walkmesh *walkmesh() const { return _walkmesh.get(); }
 
     void setVisible(bool visible);
 

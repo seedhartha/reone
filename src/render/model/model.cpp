@@ -17,6 +17,8 @@
 
 #include "model.h"
 
+#include <stdexcept>
+
 #include "../../common/log.h"
 
 using namespace std;
@@ -27,31 +29,34 @@ namespace render {
 
 Model::Model(
     const string &name,
+    Classification classification,
     const shared_ptr<ModelNode> &rootNode,
-    vector<unique_ptr<Animation>> &anims,
+    vector<shared_ptr<Animation>> &anims,
     const shared_ptr<Model> &superModel
 ) :
     _name(name),
+    _classification(classification),
     _rootNode(rootNode),
     _superModel(superModel) {
 
+    if (!rootNode) {
+        throw invalid_argument("rootNode must not be null");
+    }
     for (auto &anim : anims) {
         _animations.insert(make_pair(anim->name(), move(anim)));
     }
 
     init(_rootNode);
-
-    glm::vec3 aabbSize(_aabb.size());
-    _radiusXY = 0.5f * glm::max(aabbSize.x, aabbSize.y);
 }
 
 void Model::init(const shared_ptr<ModelNode> &node) {
     _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
     _nodeByName.insert(make_pair(node->name(), node));
+    _maxNodeIndex = glm::max(_maxNodeIndex, node->index());
 
     shared_ptr<ModelMesh> mesh(node->mesh());
     if (mesh) {
-        _aabb.expand(mesh->aabb() * node->absoluteTransform());
+        _aabb.expand(mesh->mesh()->aabb() * node->absoluteTransform());
     }
 
     for (auto &child : node->children()) {
@@ -100,38 +105,6 @@ shared_ptr<ModelNode> Model::findNodeByNumber(uint16_t number) const {
 shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
     auto it = _nodeByName.find(name);
     return it != _nodeByName.end() ? it->second : nullptr;
-}
-
-Model::Classification Model::classification() const {
-    return _classification;
-}
-
-const string &Model::name() const {
-    return _name;
-}
-
-ModelNode &Model::rootNode() const {
-    return *_rootNode;
-}
-
-float Model::animationScale() const {
-    return _animationScale;
-}
-
-shared_ptr<Model> Model::superModel() const {
-    return _superModel;
-}
-
-const AABB &Model::aabb() const {
-    return _aabb;
-}
-
-float Model::radiusXY() const {
-    return _radiusXY;
-}
-
-void Model::setClassification(Classification classification) {
-    _classification = classification;
 }
 
 void Model::setAnimationScale(float scale) {

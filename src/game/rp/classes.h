@@ -17,29 +17,22 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
+#include "../../common/cache.h"
+
+#include "../types.h"
 
 #include "class.h"
-#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-class Classes {
+class Classes : public MemoryCache<ClassType, CreatureClass> {
 public:
     static Classes &instance();
 
-    std::shared_ptr<CreatureClass> get(ClassType type);
-
 private:
-    std::unordered_map<ClassType, std::shared_ptr<CreatureClass>> _classes;
-
-    Classes() = default;
-
-    Classes(const Classes &) = delete;
-    Classes &operator=(const Classes &) = delete;
+    Classes();
 
     std::shared_ptr<CreatureClass> doGet(ClassType type);
 };

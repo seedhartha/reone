@@ -37,6 +37,7 @@ public:
 private:
     glm::vec3 _position { 0.0f };
     float _pitch { 0.0f };
+    float _multiplier { 1.0f };
     bool _moveForward { false };
     bool _moveLeft { false };
     bool _moveBackward { false };

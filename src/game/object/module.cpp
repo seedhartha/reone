@@ -27,7 +27,6 @@
 
 using namespace std;
 
-using namespace reone::net;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -36,10 +35,10 @@ namespace reone {
 
 namespace game {
 
-constexpr int kMaxMillisecond = 1000;
-constexpr int kMaxSecond = 60;
-constexpr int kMaxMinute = 60;
-constexpr int kMaxHour = 24;
+static constexpr int kMaxMillisecond = 1000;
+static constexpr int kMaxSecond = 60;
+static constexpr int kMaxMinute = 60;
+static constexpr int kMaxHour = 24;
 
 Module::Module(uint32_t id, Game *game) :
     Object(id, ObjectType::Module),
@@ -91,8 +90,8 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo) {
     reone::info("Module: load area: " + _info.entryArea);
 
-    shared_ptr<GffStruct> are(Resources::instance().getGFF(_info.entryArea, ResourceType::Area));
-    shared_ptr<GffStruct> git(Resources::instance().getGFF(_info.entryArea, ResourceType::GameInstance));
+    shared_ptr<GffStruct> are(Resources::instance().getGFF(_info.entryArea, ResourceType::Are));
+    shared_ptr<GffStruct> git(Resources::instance().getGFF(_info.entryArea, ResourceType::Git));
 
     shared_ptr<Area> area(_game->objectFactory().newArea());
     area->load(_info.entryArea, *are, *git);
@@ -138,6 +137,9 @@ bool Module::handle(const SDL_Event &event) {
         case SDL_MOUSEBUTTONDOWN:
             if (handleMouseButtonDown(event.button)) return true;
             break;
+        case SDL_KEYDOWN:
+            if (handleKeyDown(event.key)) return true;
+            break;
         default:
             break;
     }
@@ -158,7 +160,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                     cursor = CursorType::Pickup;
                 } else {
                     auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = getIsEnemy(*creature, *_game->party().leader());
+                    bool isEnemy = getIsEnemy(*creature, *_game->party().getLeader());
                     cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
                 }
                 break;
@@ -220,7 +222,7 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     ActionQueue &actions = partyLeader->actionQueue();
 
     if (creature->isDead()) {
@@ -246,7 +248,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_game->party().leader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         ActionQueue &actions = partyLeader->actionQueue();
         actions.clear();
         actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, door));
@@ -254,7 +256,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_game->party().leader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     ActionQueue &actions = partyLeader->actionQueue();
 
     if (placeable->hasInventory()) {
@@ -268,7 +270,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 }
 
 void Module::update(float dt) {
-    if (_game->cameraType() == CameraType::ThirdPerson) {
+    if (!_game->isPaused() && _game->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     _area->update(dt);
@@ -278,36 +280,29 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
     vector<ContextualAction> actions;
 
     auto door = dynamic_pointer_cast<Door>(object);
-    if (door && door->isLocked() && _game->party().leader()->attributes().skills().contains(Skill::Security)) {
+    if (door && door->isLocked() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
         actions.push_back(ContextualAction::Unlock);
     }
 
     auto hostile = dynamic_pointer_cast<Creature>(object);
-    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().leader()), *hostile)) {
+    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().getLeader()), *hostile)) {
         actions.push_back(ContextualAction::Attack);
     }
 
     return move(actions);
 }
 
-const string &Module::name() const {
-    return _name;
-}
-
-const ModuleInfo &Module::info() const {
-    return _info;
-}
-
-shared_ptr<Area> Module::area() const {
-    return _area;
-}
-
-Player &Module::player() {
-    return *_player;
-}
-
-const Module::Time &Module::time() const {
-    return _time;
+bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
+    switch (event.keysym.sym) {
+        case SDLK_SPACE: {
+            bool paused = !_game->isPaused();
+            _game->setPaused(paused);
+            _game->sceneGraph().setUpdate(!paused);
+            return true;
+        }
+        default:
+            return false;
+    }
 }
 
 void Module::setTime(int hour, int minute, int second, int millisecond) {

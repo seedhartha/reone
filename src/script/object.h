@@ -19,11 +19,13 @@
 
 #include <cstdint>
 
+#include <boost/noncopyable.hpp>
+
 namespace reone {
 
 namespace script {
 
-class ScriptObject {
+class ScriptObject : boost::noncopyable {
 public:
     virtual ~ScriptObject() = default;
 
@@ -33,10 +35,6 @@ protected:
     uint32_t _id { 0 };
 
     ScriptObject(uint32_t id) : _id(id) { }
-
-private:
-    ScriptObject(const ScriptObject &) = delete;
-    ScriptObject &operator=(const ScriptObject &) = delete;
 };
 
 } // namespace script

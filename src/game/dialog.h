@@ -20,17 +20,21 @@
 #include <string>
 #include <vector>
 
-#include "../resource/gfffile.h"
+#include <boost/noncopyable.hpp>
+
+#include "../resource/format/gfffile.h"
+
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-enum DialogWaitFlags {
-    kDialogWaitAnimFinish = 1
+struct DialogWaitFlags {
+    static constexpr int waitAnimFinish = 1;
 };
 
-class Dialog {
+class Dialog : boost::noncopyable {
 public:
     struct Stunt {
         std::string participant;
@@ -65,23 +69,26 @@ public:
         std::vector<ParticipantAnimation> animations;
     };
 
-    Dialog() = default;
+    Dialog(const std::string &resRef);
 
-    void reset();
-    void load(const std::string &resRef, const resource::GffStruct &dlg);
+    void load(const resource::GffStruct &dlg);
 
-    bool isSkippable() const;
-    bool isAnimatedCutscene() const;
+    bool isSkippable() const { return _skippable; }
+    bool isAnimatedCutscene() const { return _animatedCutscene; }
 
     const EntryReply &getEntry(int index) const;
     const EntryReply &getReply(int index) const;
 
-    const std::string &cameraModel() const;
-    const std::vector<EntryReplyLink> &startEntries() const;
-    const std::vector<Stunt> &stunts() const;
-    const std::string &endScript() const;
+    const std::string &resRef() const { return _resRef; }
+    const std::string &cameraModel() const { return _cameraModel; }
+    const std::vector<EntryReplyLink> &startEntries() const { return _startEntries; }
+    const std::vector<Stunt> &stunts() const { return _stunts; }
+    const std::string &endScript() const { return _endScript; }
+    ConversationType conversationType() const { return _conversationType; }
+    ComputerType computerType() const { return _computerType; }
 
 private:
+    std::string _resRef;
     bool _skippable { false };
     std::string _cameraModel;
     std::vector<EntryReplyLink> _startEntries;
@@ -91,9 +98,8 @@ private:
     int _entryIndex { -1 };
     bool _animatedCutscene { false };
     std::vector<Stunt> _stunts;
-
-    Dialog(const Dialog &) = delete;
-    Dialog &operator=(const Dialog &) = delete;
+    ConversationType _conversationType { ConversationType::Cinematic };
+    ComputerType _computerType { ComputerType::Normal };
 
     EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
     EntryReply getEntryReply(const resource::GffStruct &gffs) const;

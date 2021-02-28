@@ -18,22 +18,33 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <ostream>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
+#include "endianutil.h"
 #include "types.h"
 #include "../common/endianutil.h"
 
 namespace reone {
 
-class StreamWriter {
+class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
 
     void putByte(uint8_t val);
+    void putChar(char val);
+    void putUint16(uint16_t val);
+    void putUint32(uint32_t val);
     void putInt64(int64_t val);
+    void putString(const std::string &str);
     void putCString(const std::string &str);
+    void putBytes(const ByteArray &bytes);
+
+    size_t tell() const;
 
     void write(char obj); // alias for putByte
     void write(const std::string &obj);
@@ -59,6 +70,14 @@ private:
 
     StreamWriter(const StreamWriter &) = delete;
     StreamWriter &operator=(const StreamWriter &) = delete;
+
+    template <class T>
+    void put(T val) {
+        swapBytesIfNotSystemEndianess(val, _endianess);
+        char buf[sizeof(T)];
+        memcpy(buf, &val, sizeof(T));
+        _stream->write(buf, sizeof(T));
+    }
 };
 
 } // namespace reone

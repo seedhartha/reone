@@ -96,7 +96,7 @@ void WavFile::loadFormat(ChunkHeader chunk) {
 void WavFile::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
         size_t pos = tell();
-        ByteArray data(_reader->getArray<char>(_size - pos));
+        ByteArray data(_reader->getArray<char>(static_cast<int>(_size - pos)));
 
         Mp3File mp3;
         mp3.load(move(data));
@@ -128,9 +128,9 @@ void WavFile::loadPCM(uint32_t chunkSize) {
     _stream->add(move(frame));
 }
 
-static const int kIMAIndexTable[] = { -1, -1, -1, -1, 2, 4, 6, 8 };
+static constexpr int kIMAIndexTable[] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
-static const int kIMAStepTable[] = {
+static constexpr int kIMAStepTable[] = {
     7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
     19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
     50, 55, 60, 66, 73, 80, 88, 97, 107, 118,
@@ -224,10 +224,6 @@ int16_t WavFile::getIMASample(int channel, uint8_t nibble) {
     _ima[channel].stepIndex = min(max(_ima[channel].stepIndex + kIMAIndexTable[nibble & 0x7], 0), 88);
 
     return sample;
-}
-
-shared_ptr<AudioStream> WavFile::stream() const {
-    return _stream;
 }
 
 } // namespace audio

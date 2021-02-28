@@ -38,14 +38,14 @@ Routines &Routines::instance() {
     return instance;
 }
 
-void Routines::init(GameVersion version, Game *game) {
+void Routines::init(GameID gameId, Game *game) {
     _game = game;
 
-    switch (version) {
-        case GameVersion::KotOR:
+    switch (gameId) {
+        case GameID::KotOR:
             addKotorRoutines();
             break;
-        case GameVersion::TheSithLords:
+        case GameID::TSL:
             addTslRoutines();
             break;
     }

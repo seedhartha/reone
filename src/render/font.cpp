@@ -25,8 +25,10 @@
 
 #include "glm/ext.hpp"
 
+#include "../render/window.h"
+
 #include "shaders.h"
-#include "util.h"
+#include "stateutil.h"
 
 using namespace std;
 
@@ -34,8 +36,8 @@ namespace reone {
 
 namespace render {
 
-static const int kVertexValuesPerGlyph = 20;
-static const int kIndicesPerGlyph = 6;
+static constexpr int kVertexValuesPerGlyph = 20;
+static constexpr int kIndicesPerGlyph = 6;
 
 void Font::load(const shared_ptr<Texture> &texture) {
     if (!texture) {
@@ -43,7 +45,7 @@ void Font::load(const shared_ptr<Texture> &texture) {
     }
     _texture = texture;
 
-    const TextureFeatures &features = _texture->features();
+    const Texture::Features &features = _texture->features();
 
     _glyphCount = features.numChars;
     _height = features.fontHeight * 100.0f;
@@ -106,10 +108,10 @@ void Font::initGL() {
     _glInited = true;
 }
 
-void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) const {
+void Font::render(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) return;
 
-    setActiveTextureUnit(0);
+    setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
     glBindVertexArray(_vertexArrayId);
@@ -119,25 +121,38 @@ void Font::render(const string &text, const glm::mat4 &transform, const glm::vec
     glm::vec3 textOffset;
 
     switch (gravity) {
-        case TextGravity::Left:
+        case TextGravity::LeftCenter:
             textOffset = glm::vec3(-textWidth, -0.5f * _height, 0.0f);
             break;
-        case TextGravity::Center:
-            textOffset = glm::vec3(-0.5f * textWidth, -0.5f * _height, 0.0f);
+        case TextGravity::CenterBottom:
+            textOffset = glm::vec3(-0.5f * textWidth, 0.0f, 0.0f);
             break;
-        case TextGravity::Right:
+        case TextGravity::CenterTop:
+            textOffset = glm::vec3(-0.5f * textWidth, -_height, 0.0f);
+            break;
+        case TextGravity::RightBottom:
+            textOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+            break;
+        case TextGravity::RightCenter:
             textOffset = glm::vec3(0.0f, -0.5f * _height, 0.0f);
+            break;
+        case TextGravity::RightTop:
+            textOffset = glm::vec3(0.0f, -_height, 0.0f);
+            break;
+        case TextGravity::CenterCenter:
+        default:
+            textOffset = glm::vec3(-0.5f * textWidth, -0.5f * _height, 0.0f);
             break;
     }
 
     glm::mat4 textTransform(glm::translate(transform, textOffset));
 
     for (auto &glyph : text) {
-        LocalUniforms locals;
-        locals.general.model = textTransform;
-        locals.general.color = glm::vec4(color, 1.0f);
-
-        Shaders::instance().activate(ShaderProgram::GUIGUI, locals);
+        ShaderUniforms uniforms;
+        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.general.model = textTransform;
+        uniforms.general.color = glm::vec4(color, 1.0f);
+        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
         int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
         glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));
@@ -157,10 +172,6 @@ float Font::measure(const string &text) const {
     }
 
     return w;
-}
-
-float Font::height() const {
-    return _height;
 }
 
 } // namespace render

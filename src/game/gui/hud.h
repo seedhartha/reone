@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
 #include "../../resource/types.h"
 
+#include "barkbubble.h"
 #include "debugoverlay.h"
+#include "gui.h"
 #include "selectoverlay.h"
 
 namespace reone {
@@ -29,7 +30,7 @@ namespace game {
 
 class Game;
 
-class HUD : public gui::GUI {
+class HUD : public GameGUI {
 public:
     HUD(Game *game);
 
@@ -37,21 +38,24 @@ public:
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() const override;
+    void render() override;
+
+    void onClick(const std::string &control) override;
+
+    BarkBubble &barkBubble() const { return *_barkBubble; }
 
 private:
     Game *_game { nullptr };
     SelectionOverlay _select;
     DebugOverlay _debug;
-
-    void onClick(const std::string &control) override;
+    std::unique_ptr<BarkBubble> _barkBubble;
 
     void showCombatHud();
     void hideCombatHud();
     void refreshActionQueueItems() const;
 
-    void drawHealth(int memberIndex) const;
-    void drawMinimap() const;
+    void drawHealth(int memberIndex);
+    void drawMinimap();
 };
 
 } // namespace game

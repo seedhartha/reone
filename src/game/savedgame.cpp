@@ -41,7 +41,7 @@ SavedGame::SavedGame(const fs::path &path) : _path(path) {
 }
 
 void SavedGame::save(const Game *game, const string &name) {
-    shared_ptr<ofstream> stream(new fs::ofstream(_path, ios::binary));
+    auto stream = make_shared<fs::ofstream>(_path, ios::binary);
     StreamWriter writer(stream);
 
     writer.putCString(kSignature);
@@ -51,7 +51,7 @@ void SavedGame::save(const Game *game, const string &name) {
 }
 
 void SavedGame::peek() {
-    shared_ptr<ifstream> stream(new fs::ifstream(_path, ios::binary));
+    auto stream = make_shared<fs::ifstream>(_path, ios::binary);
     StreamReader reader(stream);
 
     string sign(reader.getCString());
@@ -64,7 +64,7 @@ void SavedGame::peek() {
 }
 
 void SavedGame::load(Game *game) {
-    shared_ptr<ifstream> stream(new fs::ifstream(_path, ios::binary));
+    auto stream = make_shared<fs::ifstream>(_path, ios::binary);
     StreamReader reader(stream);
 
     string sign(reader.getCString());
@@ -78,10 +78,6 @@ void SavedGame::load(Game *game) {
 
     game->setLoadFromSaveGame(true);
     game->scheduleModuleTransition(moduleName, "");
-}
-
-const string &SavedGame::name() const {
-    return _name;
 }
 
 } // namespace game

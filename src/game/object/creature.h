@@ -20,8 +20,11 @@
 #include <atomic>
 #include <functional>
 
-#include "../../resource/2dafile.h"
-#include "../../resource/gfffile.h"
+#include "../../audio/stream.h"
+#include "../../render/lip/lipanimation.h"
+#include "../../resource/format/2dafile.h"
+#include "../../resource/format/gfffile.h"
+#include "../../resource/types.h"
 #include "../../script/types.h"
 
 #include "../blueprint/blueprint.h"
@@ -79,6 +82,12 @@ public:
         int pointIdx { 0 };
     };
 
+    struct BodyBag {
+        std::string name;
+        int appearance { 0 }; /**< index into placeables.2da */
+        bool corpse { false };
+    };
+
     Creature(
         uint32_t id,
         ObjectFactory *objectFactory,
@@ -89,33 +98,36 @@ public:
     void clearAllActions() override;
     void die() override;
 
-    bool isSelectable() const override;
-
-    glm::vec3 getSelectablePosition() const override;
-
     void load(const resource::GffStruct &gffs);
     void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
 
-    bool isMovementRestricted() const;
-    bool isInCombat() const;
+    void playSound(SoundSetEntry entry, bool positional = true);
+
+    void startTalking(const std::shared_ptr<render::LipAnimation> &animation);
+    void stopTalking();
+
+    bool isSelectable() const override;
+    bool isMovementRestricted() const { return _movementRestricted; }
+    bool isInCombat() const { return _inCombat; }
     bool isLevelUpPending() const;
 
+    glm::vec3 getSelectablePosition() const override;
     float getAttackRange() const;
+    int getNeededXP() const;
 
-    Gender gender() const;
-    ModelType modelType() const;
-    int appearance() const;
-    std::shared_ptr<render::Texture> portrait() const;
-    float walkSpeed() const;
-    float runSpeed() const;
-    CreatureAttributes &attributes();
-    Faction faction() const;
-    int xp() const;
+    Gender gender() const { return _gender; }
+    ModelType modelType() const { return _modelType; }
+    int appearance() const { return _appearance; }
+    std::shared_ptr<render::Texture> portrait() const { return _portrait; }
+    float walkSpeed() const { return _walkSpeed; }
+    float runSpeed() const { return _runSpeed; }
+    CreatureAttributes &attributes() { return _attributes; }
+    Faction faction() const { return _faction; }
+    int xp() const { return _xp; }
 
     void setMovementType(MovementType type);
-    void setTalking(bool talking);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
     void setInCombat(bool inCombat);
@@ -126,26 +138,26 @@ public:
 
     // END Animation
 
-    void playAnimation(AnimationType anim, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr) override;
+    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
-    void playAnimation(const std::string &name, int flags = 0, float speed = 1.0f, std::shared_ptr<Action> actionToComplete = nullptr);
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, int flags = 0, float speed = 1.0f);
+    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
+    void playAnimation(const std::shared_ptr<render::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
 
     // Equipment
 
     bool equip(const std::string &resRef);
-    bool equip(InventorySlot slot, const std::shared_ptr<Item> &item);
+    bool equip(int slot, const std::shared_ptr<Item> &item);
     void unequip(const std::shared_ptr<Item> &item);
 
-    bool isSlotEquipped(InventorySlot slot) const;
+    bool isSlotEquipped(int slot) const;
 
-    std::shared_ptr<Item> getEquippedItem(InventorySlot slot) const;
+    std::shared_ptr<Item> getEquippedItem(int slot) const;
     CreatureWieldType getWieldType() const;
 
-    const std::map<InventorySlot, std::shared_ptr<Item>> &equipment() const;
+    const std::map<int, std::shared_ptr<Item>> &equipment() const { return _equipment; }
 
     // END Equipment
 
@@ -154,7 +166,7 @@ public:
     void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
     void clearPath();
 
-    std::shared_ptr<Path> &path();
+    std::shared_ptr<Path> &path() { return _path; }
 
     // END Pathfinding
 
@@ -181,24 +193,32 @@ private:
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<render::Texture> _portrait;
-    std::map<InventorySlot, std::shared_ptr<Item>> _equipment;
+    std::map<int, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
     float _runSpeed { 0.0f };
     MovementType _movementType { MovementType::None };
     bool _talking { false };
     CreatureAttributes _attributes;
-    bool _animDirty { true };
-    bool _animFireForget { false };
     Faction _faction { Faction::Invalid };
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
-    CreatureAnimationResolver _animResolver;
     CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
-    std::shared_ptr<Action> _animAction; /**< action used to start the last animation */
+    std::shared_ptr<SoundSet> _soundSet;
+    BodyBag _bodyBag;
+
+    // Animation
+
+    CreatureAnimationResolver _animResolver;
+    bool _animDirty { true };
+    bool _animFireForget { false };
+    std::shared_ptr<Action> _animAction; /**< action to complete when animation is finished */
+    std::shared_ptr<render::LipAnimation> _lipAnimation;
+
+    // END Animation
 
     // Scripts
 
@@ -218,14 +238,14 @@ private:
 
     void loadTransform(const resource::GffStruct &gffs);
     void loadBlueprint(const resource::GffStruct &gffs);
-    void loadAppearance(const resource::TwoDaTable &table, int row);
+    void loadAppearance(const resource::TwoDA &twoDa, int row);
     void loadPortrait(int appearance);
 
     // END Loading
 
     // Animation
 
-    void doPlayAnimation(int flags, const std::function<void()> &callback);
+    void doPlayAnimation(bool fireForget, const std::function<void()> &callback);
 
     // END Animation
 

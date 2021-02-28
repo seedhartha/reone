@@ -17,6 +17,7 @@
 
 #include "loadscreen.h"
 
+#include "../../gui/control/progressbar.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -24,7 +25,6 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
 using namespace reone::resource;
 
 namespace reone {
@@ -32,12 +32,12 @@ namespace reone {
 namespace game {
 
 LoadingScreen::LoadingScreen(Game *game) :
-    GUI(game->version(), game->options().graphics),
+    GUI(game->gameId(), game->options().graphics),
     _game(game) {
 
     _resRef = getResRef("loadscreen");
 
-    if (_version == GameVersion::TheSithLords) {
+    if (_gameId == GameID::TSL) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
@@ -52,6 +52,11 @@ void LoadingScreen::load() {
 
 void LoadingScreen::setImage(const string &resRef) {
     configureRootContol([&resRef](Control &ctrl) { ctrl.setBorderFill(resRef); });
+}
+
+void LoadingScreen::setProgress(int progress) {
+    auto &progressBar = getControl<ProgressBar>("PB_PROGRESS");
+    progressBar.setValue(progress);
 }
 
 } // namespace game

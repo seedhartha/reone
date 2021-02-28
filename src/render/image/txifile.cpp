@@ -21,6 +21,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/log.h"
+
 using namespace std;
 
 namespace reone {
@@ -47,6 +49,16 @@ void TxiFile::load(const shared_ptr<istream> &in) {
     } while (!in->eof());
 }
 
+static Texture::ProcedureType parseProcedureType(const string &str) {
+    Texture::ProcedureType result = Texture::ProcedureType::Invalid;
+    if (str == "cycle") {
+        result = Texture::ProcedureType::Cycle;
+    } else {
+        warn("TXI: invalid procedure type: " + str);
+    }
+    return result;
+}
+
 void TxiFile::processLine(const vector<string> &tokens) {
     string key;
     glm::vec3 vec;
@@ -55,11 +67,13 @@ void TxiFile::processLine(const vector<string> &tokens) {
         case State::None:
             key = boost::to_lower_copy(tokens[0]);
             if (key == "envmaptexture") {
-                _features.envMapTexture = tokens[1];
+                _features.envmapTexture = tokens[1];
             } else if (key == "bumpyshinytexture") {
                 _features.bumpyShinyTexture = tokens[1];
             } else if (key == "bumpmaptexture") {
-                _features.bumpMapTexture = tokens[1];
+                _features.bumpmapTexture = tokens[1];
+            } else if (key == "bumpmapscaling") {
+                _features.bumpMapScaling = stof(tokens[1]);
             } else if (key == "blending") {
                 _features.blending = parseBlending(tokens[1]);
             } else if (key == "numchars") {
@@ -74,6 +88,16 @@ void TxiFile::processLine(const vector<string> &tokens) {
                 _lowerRightCoordCount = stoi(tokens[1]);
                 _features.lowerRightCoords.reserve(_lowerRightCoordCount);
                 _state = State::LowerRightCoords;
+            } else if (key == "wateralpha") {
+                _features.waterAlpha = stof(tokens[1]);
+            } else if (key == "proceduretype") {
+                _features.procedureType = parseProcedureType(tokens[1]);
+            } else if (key == "numx") {
+                _features.numX = stoi(tokens[1]);
+            } else if (key == "numy") {
+                _features.numY = stoi(tokens[1]);
+            } else if (key == "fps") {
+                _features.fps = stoi(tokens[1]);
             }
             break;
 
@@ -103,16 +127,14 @@ void TxiFile::processLine(const vector<string> &tokens) {
     }
 }
 
-TextureBlending TxiFile::parseBlending(const string &s) const {
+Texture::Blending TxiFile::parseBlending(const string &s) const {
+    auto result = Texture::Blending::None;
     if (s == "additive") {
-        return TextureBlending::Additive;
+        result = Texture::Blending::Additive;
+    } else {
+        warn("TXI: unsupported blending mode: " + s);
     }
-
-    return TextureBlending::None;
-}
-
-const TextureFeatures &TxiFile::features() const {
-    return _features;
+    return result;
 }
 
 } // namespace render

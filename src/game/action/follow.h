@@ -27,7 +27,7 @@ class FollowAction : public ObjectAction {
 public:
     FollowAction(const std::shared_ptr<Object> &object, float distance);
 
-    float distance() const;
+    float distance() const { return _distance; }
 
 private:
     float _distance { 0.0f };

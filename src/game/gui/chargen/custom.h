@@ -27,11 +27,13 @@ class CharacterGeneration;
 
 class CustomCharacterGeneration : public GameGUI {
 public:
-    CustomCharacterGeneration(CharacterGeneration *charGen, resource::GameVersion version, const render::GraphicsOptions &opts);
+    CustomCharacterGeneration(CharacterGeneration *charGen, resource::GameID gameId, const render::GraphicsOptions &opts);
 
     void load() override;
 
     void goToNextStep();
+
+    int step() const { return _step; }
 
     void setStep(int step);
 
