@@ -141,10 +141,10 @@ ByteArray TgaFile::readPixelsRLE(int w, int h) {
         count -= length;
 
         if (code & 0x80) {
-            uint8_t a = _alpha ? readByte() : 0;
             uint8_t b = readByte();
             uint8_t g = readByte();
             uint8_t r = readByte();
+            uint8_t a = _alpha ? readByte() : 0;
             while (length--) {
                 result.push_back(b);
                 result.push_back(g);
@@ -155,10 +155,10 @@ ByteArray TgaFile::readPixelsRLE(int w, int h) {
             }
         } else {
             while (length--) {
-                uint8_t a = _alpha ? readByte() : 0;
                 uint8_t b = readByte();
                 uint8_t g = readByte();
                 uint8_t r = readByte();
+                uint8_t a = _alpha ? readByte() : 0;
                 result.push_back(b);
                 result.push_back(g);
                 result.push_back(r);
