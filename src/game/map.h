@@ -45,6 +45,8 @@ public:
     void load(const std::string &area, const resource::GffStruct &gffs);
     void render(Mode mode, const glm::vec4 &bounds);
 
+    bool isLoaded() const { return static_cast<bool>(_areaTexture); }
+
     void setSelectedNote(const std::shared_ptr<Waypoint> &waypoint);
 
 private:
