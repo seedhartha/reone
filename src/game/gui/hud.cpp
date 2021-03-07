@@ -193,6 +193,9 @@ void HUD::update(float dt) {
 
     _select.update();
     _barkBubble->update(dt);
+
+    // Hide minimap when there is no image to display
+    setControlVisible("LBL_MAPBORDER", _game->module()->area()->map().isLoaded());
 }
 
 void HUD::render() {
