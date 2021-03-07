@@ -227,8 +227,10 @@ void Resources::loadModule(const string &name) {
 
     indexTransientRimFile(moduleRimPath);
     indexTransientRimFile(moduleRimSPath);
-    indexTransientErfFile(lipModPath);
 
+    if (fs::exists(lipModPath)) {
+        indexTransientErfFile(lipModPath);
+    }
     if (_gameId == GameID::TSL) {
         fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
         indexTransientErfFile(dlgPath);
