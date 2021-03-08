@@ -77,7 +77,7 @@ enum class WalkmeshMaterial {
     Stone = 4,
     Wood = 5,
     Water = 6,
-    Nonwalk = 7,
+    NonWalk = 7,
     Transparent = 8,
     Carpet = 9,
     Metal = 10,

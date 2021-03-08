@@ -25,17 +25,17 @@ namespace reone {
 
 namespace render {
 
-static const unordered_set<WalkmeshMaterial> g_walkableMaterials {
-    WalkmeshMaterial::Dirt,
-    WalkmeshMaterial::Grass,
-    WalkmeshMaterial::Sand,
-    WalkmeshMaterial::Wood,
-    WalkmeshMaterial::Carpet,
-    WalkmeshMaterial::Metal
+static const unordered_set<WalkmeshMaterial> g_nonWalkableMaterials {
+    WalkmeshMaterial::NonWalk,
+    WalkmeshMaterial::Obscuring,
+    WalkmeshMaterial::Snow,
+    WalkmeshMaterial::Transparent,
+    WalkmeshMaterial::DeepWater,
+    WalkmeshMaterial::Lava
 };
 
 bool isMaterialWalkable(WalkmeshMaterial material) {
-    return g_walkableMaterials.count(material) > 0;
+    return g_nonWalkableMaterials.count(material) == 0;
 }
 
 } // namespace render
