@@ -236,21 +236,6 @@ set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 ## END librender static library
 
-## libtor static library
-
-set(TOR_HEADERS
-    src/experimental/tor/gr2file.h
-    src/experimental/tor/jbafile.h)
-
-set(TOR_SOURCES
-    src/experimental/tor/gr2file.cpp
-    src/experimental/tor/jbafile.cpp)
-
-add_library(libtor STATIC ${TOR_HEADERS} ${TOR_SOURCES})
-set_target_properties(libtor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-## END libtor static library
-
 ## libaudio static library
 
 set(AUDIO_HEADERS
@@ -686,7 +671,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libmp libgame libscript libgui libscene libvideo libaudio libtor librender libresource libcommon
+    libmp libgame libscript libgui libscene libvideo libaudio librender libresource libcommon
     libs3tc
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
@@ -751,7 +736,7 @@ if(BUILD_TESTS)
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY})
+        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
         if(WIN32)
             target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)
