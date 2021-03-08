@@ -85,24 +85,6 @@ void SceneGraph::prepareFrame() {
 
         return leftDistance > rightDistance;
     });
-
-    // Sort emitters by render order and distance to camera
-    unordered_map<SceneNode *, float> emitterToCamera;
-    for (auto &emitter : _emitters) {
-        emitterToCamera.insert(make_pair(emitter, emitter->getDistanceTo(cameraPosition)));
-    }
-    sort(_emitters.begin(), _emitters.end(), [&emitterToCamera](auto &left, auto &right) {
-        int leftRenderOrder = left->emitter()->renderOrder();
-        int rightRenderOrder = right->emitter()->renderOrder();
-
-        if (leftRenderOrder > rightRenderOrder) return true;
-        if (leftRenderOrder < rightRenderOrder) return false;
-
-        float leftDistance = emitterToCamera.find(left)->second;
-        float rightDistance = emitterToCamera.find(right)->second;
-
-        return leftDistance > rightDistance;
-    });
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -238,7 +220,7 @@ void SceneGraph::render(bool shadowPass) {
         mesh->renderSingle(false);
     }
 
-    // Render emitter particles
+    // Render particles
     for (auto &emitter : _emitters) {
         emitter->renderSingle(false);
     }
