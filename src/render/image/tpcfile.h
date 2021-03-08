@@ -33,6 +33,7 @@ public:
     TpcFile(const std::string &resRef, TextureUsage usage, bool headless = false);
 
     std::shared_ptr<Texture> texture() const { return _texture; }
+    const ByteArray &txiData() const { return _txiData; }
 
 private:
     enum class EncodingType {
@@ -52,10 +53,18 @@ private:
     EncodingType _encoding { EncodingType::Grayscale };
     uint8_t _mipMapCount { 0 };
     bool _cubeMap { false };
+    std::vector<Texture::Layer> _pixels;
+    ByteArray _txiData;
+    Texture::Features _features;
+
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
-    void loadTexture();
+
+    void loadPixels();
+    void loadFeatures();
+
+    void makeTexture();
 
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;

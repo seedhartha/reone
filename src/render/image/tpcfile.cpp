@@ -59,7 +59,10 @@ void TpcFile::doLoad() {
         _dataSize = getMipMapDataSize(w, h);
     }
 
-    loadTexture();
+    loadPixels();
+    loadFeatures();
+
+    makeTexture();
 }
 
 void TpcFile::getMipMapSize(int index, int &width, int &height) const {
@@ -91,13 +94,11 @@ int TpcFile::getMipMapDataSize(int width, int height) const {
     throw logic_error("TPC: unable to compute mip map size");
 }
 
-void TpcFile::loadTexture() {
+void TpcFile::loadPixels() {
     seek(128);
 
     int layerCount = _cubeMap ? 6 : 1;
-
-    vector<Texture::Layer> layers;
-    layers.reserve(layerCount);
+    _pixels.reserve(layerCount);
 
     for (int i = 0; i < layerCount; ++i) {
         vector<Texture::MipMap> mipMaps;
@@ -121,33 +122,35 @@ void TpcFile::loadTexture() {
         Texture::Layer layer;
         layer.mipMaps = move(mipMaps);
 
-        layers.push_back(move(layer));
-    }
-
-    Texture::Features features;
-    size_t pos = tell();
-
-    if (pos < _size) {
-        ByteArray data(_reader->getArray<char>(static_cast<int>(_size - pos)));
-
-        TxiFile txi;
-        txi.load(wrap(data));
-
-        features = txi.features();
+        _pixels.push_back(move(layer));
     }
 
     PixelFormat format = getPixelFormat();
     if (_cubeMap) {
-        prepareCubeMap(layers, format, format);
+        prepareCubeMap(_pixels, format, format);
     }
+}
 
+void TpcFile::loadFeatures() {
+    size_t pos = tell();
+    if (pos < _size) {
+        _txiData = _reader->getArray<char>(static_cast<int>(_size - pos));
+
+        TxiFile txi;
+        txi.load(wrap(_txiData));
+
+        _features = txi.features();
+    }
+}
+
+void TpcFile::makeTexture() {
     _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage, _headless));
     if (!_headless) {
         _texture->init();
         _texture->bind();
     }
-    _texture->setPixels(_width, _height, format, move(layers));
-    _texture->setFeatures(move(features));
+    _texture->setPixels(_width, _height, getPixelFormat(), move(_pixels));
+    _texture->setFeatures(move(_features));
 }
 
 PixelFormat TpcFile::getPixelFormat() const {
