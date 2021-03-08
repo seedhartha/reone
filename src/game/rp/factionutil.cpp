@@ -55,7 +55,7 @@ static DispositionsMap initDispositions() {
 
     // Friendlies
 
-    setMutualFriends(Faction::Friendly1, Faction::Friendly2, result);
+    setMutualEnemies(Faction::Friendly1, Faction::Friendly2, result);
 
     setMutualEnemies(Faction::Friendly1, Faction::Hostile1, result);
     setMutualEnemies(Faction::Friendly1, Faction::Hostile2, result);
@@ -75,8 +75,6 @@ static DispositionsMap initDispositions() {
 
     // Hostiles
 
-    setMutualFriends(Faction::Hostile1, Faction::Hostile2, result);
-
     setMutualEnemies(Faction::Hostile1, Faction::EndarSpire, result);
     setMutualEnemies(Faction::Hostile1, Faction::Insane, result);
     setMutualEnemies(Faction::Hostile1, Faction::Predator, result);
@@ -90,8 +88,6 @@ static DispositionsMap initDispositions() {
 
     // END Hostiles
 
-    setMutualFriends(Faction::Surrender1, Faction::Surrender2, result);
-    setMutualFriends(Faction::Gizka1, Faction::Gizka2, result);
     setMutualEnemies(Faction::Predator, Faction::Prey, result);
 
     return move(result);
