@@ -128,6 +128,7 @@ void TpcFile::loadPixels() {
     PixelFormat format = getPixelFormat();
     if (_cubeMap) {
         prepareCubeMap(_pixels, format, format);
+        _compressed = false;
     }
 }
 

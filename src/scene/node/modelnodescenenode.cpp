@@ -304,7 +304,6 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
     Shaders::instance().activate(program, uniforms);
 
 
-
     bool additive = false;
 
     // Setup textures
