@@ -20,15 +20,15 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "common/log.h"
-#include "experimental/mp/game.h"
+#include "game/game.h"
 
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::mp;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -43,7 +43,6 @@ static constexpr int kDefaultMusicVolume = 85;
 static constexpr int kDefaultVoiceVolume = 85;
 static constexpr int kDefaultSoundVolume = 85;
 static constexpr int kDefaultMovieVolume = 85;
-static constexpr int kDefaultMultiplayerPort = 2003;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
     if (!argv) {
@@ -77,14 +76,11 @@ void Program::initOptions() {
         ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
-        ("port", po::value<int>()->default_value(kDefaultMultiplayerPort), "multiplayer port number")
         ("debug", po::value<int>()->default_value(0), "debug log level (0-3)")
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     _cmdLineOpts.add(_commonOpts).add_options()
-        ("help", "print this message")
-        ("serve", "start multiplayer game")
-        ("join", po::value<string>()->implicit_value("127.0.0.1"), "join multiplayer game at specified IP address");
+        ("help", "print this message");
 }
 
 void Program::loadOptions() {
@@ -112,32 +108,13 @@ void Program::loadOptions() {
     _gameOpts.audio.voiceVolume = vars["voicevol"].as<int>();
     _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
     _gameOpts.audio.movieVolume = vars["movievol"].as<int>();
-    _gameOpts.network.host = vars.count("join") > 0 ? vars["join"].as<string>() : "";
-    _gameOpts.network.port = vars["port"].as<int>();
 
     setDebugLogLevel(vars["debug"].as<int>());
     setLogToFile(vars["logfile"].as<bool>());
-
-    if (vars.count("serve") > 0) {
-        _multiplayerMode = MultiplayerMode::Server;
-    } else if (vars.count("join") > 0) {
-        _multiplayerMode = MultiplayerMode::Client;
-    }
 }
 
 int Program::runGame() {
-    unique_ptr<Game> game;
-    switch (_multiplayerMode) {
-        case MultiplayerMode::Client:
-        case MultiplayerMode::Server:
-            game = make_unique<MultiplayerGame>(_multiplayerMode, _gamePath, _gameOpts);
-            break;
-        case MultiplayerMode::None:
-        default:
-            game = make_unique<Game>(_gamePath, _gameOpts);
-            break;
-    }
-    return game->run();
+    return Game(_gamePath, _gameOpts).run();
 }
 
 } // namespace reone

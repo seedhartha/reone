@@ -21,7 +21,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
-#include "experimental/mp/types.h"
 #include "game/options.h"
 
 namespace reone {
@@ -52,7 +51,6 @@ private:
     bool _showHelp { false };
     boost::filesystem::path _gamePath;
     game::Options _gameOpts;
-    mp::MultiplayerMode _multiplayerMode { mp::MultiplayerMode::None };
 
     void initOptions();
     void loadOptions();
