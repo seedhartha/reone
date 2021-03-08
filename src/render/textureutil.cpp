@@ -53,7 +53,8 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
         properties.borderColor = glm::vec4(1.0f);
     }
 
-    if (usage == TextureUsage::EnvironmentMap ||
+    if (usage == TextureUsage::CubeMapDefault ||
+        usage == TextureUsage::EnvironmentMap ||
         usage == TextureUsage::IrradianceMap ||
         usage == TextureUsage::PrefilterMap ||
         usage == TextureUsage::CubeMapDepthBuffer) {

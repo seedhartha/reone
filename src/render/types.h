@@ -47,6 +47,7 @@ enum class PixelFormat {
  */
 enum class TextureUsage {
     Default,
+    CubeMapDefault,
     GUI,
     Diffuse,
     Lightmap,
@@ -99,6 +100,18 @@ struct GraphicsOptions {
     bool fullscreen { false };
     int numLights { 8 };
     int shadowResolution { 0 };
+};
+
+struct TextureUnits {
+    static constexpr int diffuse { 0 };
+    static constexpr int lightmap { 1 };
+    static constexpr int envmap { 2 };
+    static constexpr int bumpmap { 3 };
+    static constexpr int bloom { 5 };
+    static constexpr int irradianceMap { 6 };
+    static constexpr int prefilterMap { 7 };
+    static constexpr int brdfLookup { 8 };
+    static constexpr int shadowMap { 9 };
 };
 
 class IEventHandler {

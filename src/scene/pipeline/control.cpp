@@ -24,6 +24,7 @@
 #include "../../render/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
+#include "../../render/textures.h"
 #include "../../render/textureutil.h"
 
 #include "../node/cameranode.h"
@@ -56,6 +57,7 @@ void ControlRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
+    Textures::instance().bindDefaults();
     _geometry.attachColor(*_geometryColor);
     _geometry.attachDepth(*_geometryDepth);
     _geometry.checkCompleteness();
