@@ -40,6 +40,8 @@ public:
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 
+    const std::vector<glm::vec3> &vertices() const { return _vertices; }
+
 private:
     struct Edge {
         uint16_t toIndex { 0 };
