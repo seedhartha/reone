@@ -29,8 +29,15 @@ namespace render {
 void Walkmesh::computeAABB() {
     _aabb.reset();
 
-    for (auto &vert : _vertices) {
-        _aabb.expand(vert);
+    for (auto &face : _walkableFaces) {
+        _aabb.expand(face.vertices[0]);
+        _aabb.expand(face.vertices[1]);
+        _aabb.expand(face.vertices[2]);
+    }
+    for (auto &face : _nonWalkableFaces) {
+        _aabb.expand(face.vertices[0]);
+        _aabb.expand(face.vertices[1]);
+        _aabb.expand(face.vertices[2]);
     }
 }
 
@@ -39,9 +46,9 @@ bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walka
     glm::vec2 baryPosition(0.0f);
 
     for (auto &face : faces) {
-        const glm::vec3 &p0 = _vertices[face.indices[0]];
-        const glm::vec3 &p1 = _vertices[face.indices[1]];
-        const glm::vec3 &p2 = _vertices[face.indices[2]];
+        const glm::vec3 &p0 = face.vertices[0];
+        const glm::vec3 &p1 = face.vertices[1];
+        const glm::vec3 &p2 = face.vertices[2];
 
         if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, distance) && distance >= 0.0f && distance <= maxDistance) {
             return true;

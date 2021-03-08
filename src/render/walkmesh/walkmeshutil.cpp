@@ -15,42 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "walkmeshutil.h"
 
-#include <vector>
+#include <unordered_set>
 
-#include <boost/noncopyable.hpp>
-
-#include "../aabb.h"
-#include "../types.h"
+using namespace std;
 
 namespace reone {
 
 namespace render {
 
-class BwmFile;
-
-class Walkmesh : boost::noncopyable {
-public:
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
-
-    const AABB &aabb() const { return _aabb; }
-
-private:
-    struct Face {
-        WalkmeshMaterial material { WalkmeshMaterial::Dirt };
-        std::vector<glm::vec3> vertices;
-        glm::vec3 normal { 0.0f };
-    };
-
-    std::vector<Face> _walkableFaces;
-    std::vector<Face> _nonWalkableFaces;
-    AABB _aabb;
-
-    void computeAABB();
-
-    friend class BwmFile;
+static const unordered_set<WalkmeshMaterial> g_walkableMaterials {
+    WalkmeshMaterial::Dirt,
+    WalkmeshMaterial::Grass,
+    WalkmeshMaterial::Sand,
+    WalkmeshMaterial::Wood,
+    WalkmeshMaterial::Carpet,
+    WalkmeshMaterial::Metal
 };
+
+bool isMaterialWalkable(WalkmeshMaterial material) {
+    return g_walkableMaterials.count(material) > 0;
+}
 
 } // namespace render
 

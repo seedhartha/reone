@@ -191,6 +191,7 @@ set(RENDER_HEADERS
     src/render/walkmesh/bwmfile.h
     src/render/walkmesh/walkmesh.h
     src/render/walkmesh/walkmeshes.h
+    src/render/walkmesh/walkmeshutil.h
     src/render/window.h)
 
 set(RENDER_SOURCES
@@ -229,6 +230,7 @@ set(RENDER_SOURCES
     src/render/walkmesh/bwmfile.cpp
     src/render/walkmesh/walkmesh.cpp
     src/render/walkmesh/walkmeshes.cpp
+    src/render/walkmesh/walkmeshutil.cpp
     src/render/window.cpp)
 
 add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})

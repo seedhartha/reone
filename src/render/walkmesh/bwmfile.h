@@ -32,22 +32,43 @@ public:
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
 private:
-    uint32_t _type { 0 };
-    uint32_t _vertexCount { 0 };
-    uint32_t _vertexOffset { 0 };
-    uint32_t _faceCount { 0 };
-    uint32_t _faceOffset { 0 };
-    uint32_t _faceTypeOffset { 0 };
+    enum class WalkmeshType {
+        PWK_DWK = 0,
+        WOK = 1
+    };
+
+    WalkmeshType _type { WalkmeshType::WOK };
+
+    uint32_t _numVertices { 0 };
+    uint32_t _offsetVertices { 0 };
+    uint32_t _numFaces { 0 };
+    uint32_t _offsetIndices { 0 };
+    uint32_t _offsetMaterials { 0 };
+    uint32_t _offsetNormals { 0 };
+    uint32_t _offsetPlanarDistances { 0 };
+    uint32_t _numAabb { 0 };
+    uint32_t _offsetAabb { 0 };
+    uint32_t _numAdjacencies { 0 };
+    uint32_t _offsetAdjacencies { 0 };
+    uint32_t _numEdges { 0 };
+    uint32_t _offsetEdges { 0 };
+    uint32_t _numPerimeters { 0 };
+    uint32_t _offsetPerimeters { 0 };
+
     std::vector<float> _vertices;
     std::vector<uint32_t> _indices;
-    std::vector<uint32_t> _faceTypes;
+    std::vector<WalkmeshMaterial> _materials;
+    std::vector<float> _normals;
+
     std::shared_ptr<Walkmesh> _walkmesh;
 
     void doLoad() override;
 
     void loadVertices();
-    void loadFaces();
-    void loadFaceTypes();
+    void loadIndices();
+    void loadMaterials();
+    void loadNormals();
+
     void makeWalkmesh();
 };
 
