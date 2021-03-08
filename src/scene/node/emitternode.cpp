@@ -136,12 +136,12 @@ void EmitterSceneNode::doSpawnParticle() {
     }
     float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
 
-    auto particle = make_shared<Particle>(position, velocity, _emitter.get());
+    auto particle = make_shared<Particle>(position, velocity, this);
     _particles.push_back(particle);
 }
 
-void EmitterSceneNode::renderSingle(bool shadowPass) {
-    if (shadowPass || _particles.empty()) return;
+void EmitterSceneNode::renderParticles(const vector<Particle *> &particles) {
+    if (particles.empty()) return;
 
     shared_ptr<Texture> texture(_emitter->texture());
     if (!texture) return;
@@ -151,11 +151,11 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
     uniforms.billboard.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
     uniforms.billboard.render = static_cast<int>(_emitter->renderMode());
 
-    for (size_t i = 0; i < _particles.size(); ++i) {
-        const Particle &particle = *_particles[i];
+    for (size_t i = 0; i < particles.size(); ++i) {
+        const Particle &particle = *particles[i];
 
         glm::mat4 transform(_absoluteTransform);
-        transform = glm::translate(transform, _particles[i]->position());
+        transform = glm::translate(transform, particles[i]->position());
         if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
             transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * particle.size(), particle.size(), particle.size()));
         } else {
@@ -177,9 +177,9 @@ void EmitterSceneNode::renderSingle(bool shadowPass) {
 
     bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
     if (lighten) {
-        withAdditiveBlending([this]() { Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(_particles.size())); });
+        withAdditiveBlending([&particles]() { Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(particles.size())); });
     } else {
-        Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(_particles.size()));
+        Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(particles.size()));
     }
 }
 

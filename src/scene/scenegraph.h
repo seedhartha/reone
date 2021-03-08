@@ -38,6 +38,7 @@ class CameraSceneNode;
 class EmitterSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
+class Particle;
 class SceneNode;
 
 class SceneGraph : boost::noncopyable {
@@ -98,6 +99,7 @@ private:
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
+    std::vector<std::pair<EmitterSceneNode *, std::vector<Particle *>>> _particles;
     std::shared_ptr<CameraSceneNode> _activeCamera;
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

@@ -39,11 +39,18 @@ public:
     EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<render::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt) override;
-    void renderSingle(bool shadowPass) override;
+
+    /**
+     * Renders the specified particles.
+     *
+     * @param particles subset of this emitters particles
+     */
+    void renderParticles(const std::vector<Particle *> &particles);
 
     void detonate();
 
     std::shared_ptr<render::Emitter> emitter() const { return _emitter; }
+    const std::vector<std::shared_ptr<Particle>> &particles() const { return _particles; }
 
 private:
     const ModelSceneNode *_modelSceneNode;
