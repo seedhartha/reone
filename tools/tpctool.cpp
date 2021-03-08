@@ -165,6 +165,16 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Cleanup
 
     TGAClose(tga);
+
+    // Write TXI
+
+    if (!tpc.txiData().empty()) {
+        fs::path txiPath(tgaPath);
+        txiPath.replace_extension("txi");
+
+        fs::ofstream txi(txiPath, ios::binary);
+        txi.write(tpc.txiData().data(), tpc.txiData().size());
+    }
 }
 
 bool TpcTool::supports(Operation operation, const fs::path &target) const {
