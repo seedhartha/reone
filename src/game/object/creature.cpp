@@ -26,7 +26,6 @@
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
-#include "../../experimental/mp/types.h"
 #include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"

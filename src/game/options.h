@@ -20,7 +20,6 @@
 #include <string>
 
 #include "../audio/types.h"
-#include "../experimental/mp/types.h"
 #include "../render/types.h"
 
 namespace reone {
@@ -32,7 +31,6 @@ struct Options {
     std::string module;
     render::GraphicsOptions graphics;
     audio::AudioOptions audio;
-    mp::NetworkOptions network;
 };
 
 } // namespace game
