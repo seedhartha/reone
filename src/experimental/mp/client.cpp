@@ -33,7 +33,7 @@ namespace reone {
 namespace mp {
 
 void Client::start(const string &address, int port) {
-    tcp::endpoint endpoint(ip::make_address(address), port);
+    tcp::endpoint endpoint(ip::address::from_string(address), port);
 
     _socket = make_shared<tcp::socket>(_service);
     _socket->async_connect(endpoint, bind(&Client::handleConnect, this, _1));
