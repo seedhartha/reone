@@ -28,11 +28,13 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../render/meshes.h"
 #include "../../render/model/models.h"
 #include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/format/lytfile.h"
 #include "../../resource/format/visfile.h"
 #include "../../resource/resources.h"
+#include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
@@ -63,6 +65,8 @@ static constexpr float kMaxDistanceToTestCollision = 8.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kCreatureObstacleTestZ = 0.1f;
 static constexpr int kMaxSoundCount = 4;
+
+static bool g_debugPath = false;
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
@@ -728,6 +732,15 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
+        }
+    }
+
+    if (g_debugPath) {
+        shared_ptr<Mesh> cubeMesh(Meshes::instance().getCube());
+        for (auto &vert : _pathfinder.vertices()) {
+            auto cubeNode = make_shared<MeshSceneNode>(&sceneGraph, cubeMesh);
+            cubeNode->setLocalTransform(glm::translate(glm::mat4(1.0f), vert));
+            sceneGraph.addRoot(cubeNode);
         }
     }
 }
