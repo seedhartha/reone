@@ -24,7 +24,6 @@
 #include "../audio/soundhandle.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../experimental/tor/gr2file.h"
 #include "../render/featureutil.h"
 #include "../render/lip/lips.h"
 #include "../render/materials.h"
@@ -54,7 +53,6 @@ using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
-using namespace reone::tor;
 using namespace reone::video;
 
 namespace fs = boost::filesystem;
@@ -125,7 +123,6 @@ void Game::init() {
 
 void Game::registerModelLoaders() {
     Models::instance().registerLoader(ResourceType::Mdl, make_shared<MdlModelLoader>());
-    Models::instance().registerLoader(ResourceType::Gr2, make_shared<Gr2ModelLoader>());
 }
 
 void Game::setCursorType(CursorType type) {
