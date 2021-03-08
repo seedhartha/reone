@@ -17,40 +17,13 @@
 
 #pragma once
 
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "../aabb.h"
 #include "../types.h"
 
 namespace reone {
 
 namespace render {
 
-class BwmFile;
-
-class Walkmesh : boost::noncopyable {
-public:
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float maxDistance, float &distance) const;
-
-    const AABB &aabb() const { return _aabb; }
-
-private:
-    struct Face {
-        WalkmeshMaterial material { WalkmeshMaterial::Dirt };
-        std::vector<glm::vec3> vertices;
-        glm::vec3 normal { 0.0f };
-    };
-
-    std::vector<Face> _walkableFaces;
-    std::vector<Face> _nonWalkableFaces;
-    AABB _aabb;
-
-    void computeAABB();
-
-    friend class BwmFile;
-};
+bool isMaterialWalkable(WalkmeshMaterial material);
 
 } // namespace render
 

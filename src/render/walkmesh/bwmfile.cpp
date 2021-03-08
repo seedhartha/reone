@@ -19,85 +19,112 @@
 
 #include "glm/ext.hpp"
 
+#include "walkmeshutil.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace render {
 
-static vector<uint32_t> g_walkableTypes = { 1, 3, 4, 5, 9, 10 };
-
 BwmFile::BwmFile() : BinaryFile(8, "BWM V1.0") {
 }
 
 void BwmFile::doLoad() {
-    _type = readUint32();
-    ignore(60);
+    _type = static_cast<WalkmeshType>(readUint32());
 
-    _vertexCount = readUint32();
-    if (_vertexCount == 0) return;
+    ignore(48 + 12); // reserved + position
 
-    _vertexOffset = readUint32();
-    _faceCount = readUint32();
-    _faceOffset = readUint32();
-    _faceTypeOffset = readUint32();
+    _numVertices = readUint32();
+    if (_numVertices == 0) return;
+
+    _offsetVertices = readUint32();
+    _numFaces = readUint32();
+    _offsetIndices = readUint32();
+    _offsetMaterials = readUint32();
+    _offsetNormals = readUint32();
+    _offsetPlanarDistances = readUint32();
+
+    if (_type == WalkmeshType::WOK) {
+        _numAabb = readUint32();
+        _offsetAabb = readUint32();
+
+        ignore(4); // unknown
+
+        _numAdjacencies = readUint32();
+        _offsetAdjacencies = readUint32();
+        _numEdges = readUint32();
+        _offsetEdges = readUint32();
+        _numPerimeters = readUint32();
+        _offsetPerimeters = readUint32();
+    }
 
     loadVertices();
-    loadFaces();
-    loadFaceTypes();
+    loadIndices();
+    loadMaterials();
+    loadNormals();
+
     makeWalkmesh();
 }
 
 void BwmFile::loadVertices() {
-    _vertices.reserve(3 * _vertexCount);
-    seek(_vertexOffset);
+    _vertices.reserve(3 * _numVertices);
+    seek(_offsetVertices);
 
-    for (uint32_t i = 0; i < _vertexCount; ++i) {
+    for (uint32_t i = 0; i < _numVertices; ++i) {
         _vertices.push_back(readFloat());
         _vertices.push_back(readFloat());
         _vertices.push_back(readFloat());
     }
 }
 
-void BwmFile::loadFaces() {
-    _indices.reserve(3 * _faceCount);
-    seek(_faceOffset);
+void BwmFile::loadIndices() {
+    _indices.reserve(3 * _numFaces);
+    seek(_offsetIndices);
 
-    for (uint32_t i = 0; i < _faceCount; ++i) {
+    for (uint32_t i = 0; i < _numFaces; ++i) {
         _indices.push_back(readUint32());
         _indices.push_back(readUint32());
         _indices.push_back(readUint32());
     }
 }
 
-void BwmFile::loadFaceTypes() {
-    _faceTypes.reserve(_faceCount);
-    seek(_faceTypeOffset);
+void BwmFile::loadMaterials() {
+    _materials.reserve(_numFaces);
+    seek(_offsetMaterials);
 
-    for (uint32_t i = 0; i < _faceCount; ++i) {
-        _faceTypes.push_back(readUint32());
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        auto material = static_cast<WalkmeshMaterial>(readUint32());
+        _materials.push_back(material);
+    }
+}
+
+void BwmFile::loadNormals() {
+    _normals.reserve(3 * _numFaces);
+    seek(_offsetNormals);
+
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        _normals.push_back(readFloat());
+        _normals.push_back(readFloat());
+        _normals.push_back(readFloat());
     }
 }
 
 void BwmFile::makeWalkmesh() {
     _walkmesh = make_shared<Walkmesh>();
-    _walkmesh->_vertices.reserve(_vertexCount);
-    _walkmesh->_walkableFaces.reserve(_faceCount);
 
-    for (uint32_t i = 0; i < 3 * _vertexCount; i += 3) {
-        _walkmesh->_vertices.push_back(glm::make_vec3(&_vertices[i]));
-    }
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        WalkmeshMaterial material = _materials[i];
+        bool walkable = isMaterialWalkable(material);
 
-    for (uint32_t i = 0; i < _faceCount; ++i) {
-        uint32_t type = _faceTypes[i];
-        bool walkable = find(g_walkableTypes.begin(), g_walkableTypes.end(), type) != g_walkableTypes.end();
+        uint32_t *indices = &_indices[3 * i + 0];
 
-        int off = 3 * i;
         Walkmesh::Face face;
-        face.type = type;
-        face.indices.push_back(_indices[off + 0]);
-        face.indices.push_back(_indices[off + 1]);
-        face.indices.push_back(_indices[off + 2]);
+        face.material = material;
+        face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[0]]));
+        face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[1]]));
+        face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
+        face.normal = glm::make_vec3(&_normals[3 * i]);
 
         if (walkable) {
             _walkmesh->_walkableFaces.push_back(move(face));
