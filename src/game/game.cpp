@@ -22,7 +22,6 @@
 #include "../audio/files.h"
 #include "../audio/player.h"
 #include "../audio/soundhandle.h"
-#include "../common/jobs.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../experimental/tor/gr2file.h"
@@ -525,9 +524,6 @@ void Game::updateMusic() {
 }
 
 void Game::loadNextModule() {
-    JobExecutor::instance().cancel();
-    JobExecutor::instance().await();
-
     loadModule(_nextModule, _nextEntry);
 
     _nextModule.clear();
@@ -553,7 +549,6 @@ void Game::loadCharacterGeneration() {
 }
 
 void Game::deinit() {
-    JobExecutor::instance().deinit();
     AudioPlayer::instance().deinit();
     RenderWindow::instance().deinit();
 }
