@@ -85,6 +85,41 @@ void SceneGraph::prepareFrame() {
 
         return leftDistance > rightDistance;
     });
+
+    // Extract particles from all emitters, sort them by depth
+    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+    vector<pair<Particle *, float>> particlesZ;
+    for (auto &emitter : _emitters) {
+        glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
+        for (auto &particle : emitter->particles()) {
+            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
+            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                particlesZ.push_back(make_pair(particle.get(), screen.z));
+            }
+        }
+    }
+    sort(particlesZ.begin(), particlesZ.end(), [](auto &left, auto &right) {
+        return left.second > right.second;
+    });
+
+    // Group particles by emitter
+    _particles.clear();
+    vector<Particle *> emitterParticles;
+    EmitterSceneNode *emitter = nullptr;
+    for (auto &particle : particlesZ) {
+        EmitterSceneNode *particleEmitter = particle.first->emitter();
+        if (particleEmitter != emitter) {
+            if (!emitterParticles.empty()) {
+                _particles.push_back(make_pair(emitter, emitterParticles));
+                emitterParticles.clear();
+            }
+            emitter = particleEmitter;
+        }
+        emitterParticles.push_back(particle.first);
+    }
+    if (!emitterParticles.empty()) {
+        _particles.push_back(make_pair(emitter, emitterParticles));
+    }
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -221,8 +256,8 @@ void SceneGraph::render(bool shadowPass) {
     }
 
     // Render particles
-    for (auto &emitter : _emitters) {
-        emitter->renderSingle(false);
+    for (auto &pair : _particles) {
+        pair.first->renderParticles(pair.second);
     }
 }
 

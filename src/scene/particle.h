@@ -17,20 +17,23 @@
 
 #pragma once
 
-#include "../render/model/emitter.h"
+#include "glm/vec3.hpp"
 
 namespace reone {
 
 namespace scene {
 
+class EmitterSceneNode;
+
 class Particle {
 public:
-    Particle(glm::vec3 position, float velocity, const render::Emitter *emitter);
+    Particle(glm::vec3 position, float velocity, EmitterSceneNode *emitter);
 
     void update(float dt);
 
     bool isExpired() const;
 
+    EmitterSceneNode *emitter() const { return _emitter; }
     const glm::vec3 &position() const { return _position; }
     float size() const { return _size; }
     int frame() const { return _frame; }
@@ -40,7 +43,7 @@ public:
 private:
     glm::vec3 _position;
     float _velocity;
-    const render::Emitter *_emitter;
+    EmitterSceneNode *_emitter;
 
     float _animLength { 0.0f };
     int _renderOrder { 0 };
