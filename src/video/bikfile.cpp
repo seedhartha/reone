@@ -27,8 +27,6 @@
 
 #include "video.h"
 
-#if REONE_ENABLE_VIDEO
-
 extern "C" {
 
 #include "libavformat/avformat.h"
@@ -36,8 +34,6 @@ extern "C" {
 #include "libswscale/swscale.h"
 
 }
-
-#endif
 
 namespace fs = boost::filesystem;
 
@@ -50,8 +46,6 @@ namespace reone {
 namespace video {
 
 static const char kSignature[] = "BIKi";
-
-#if REONE_ENABLE_VIDEO
 
 class BinkVideoDecoder : public MediaStream<Video::Frame> {
 public:
@@ -318,13 +312,10 @@ private:
     }
 };
 
-#endif
-
 BikFile::BikFile(const fs::path &path) : _path(path) {
 }
 
 void BikFile::load() {
-#if REONE_ENABLE_VIDEO
     if (!fs::exists(_path)) {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
@@ -335,7 +326,6 @@ void BikFile::load() {
     _video = decoder->video();
     _video->setMediaStream(decoder);
     _video->init();
-#endif // REONE_ENABLE_VIDEO
 }
 
 } // namespace video

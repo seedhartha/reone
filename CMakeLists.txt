@@ -21,7 +21,6 @@ add_subdirectory(external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_TESTS "build unit tests" OFF)
-option(ENABLE_VIDEO "enable video playback" ON)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -33,23 +32,16 @@ find_package(MAD REQUIRED)
 if(WIN32)
     find_package(OpenAL CONFIG REQUIRED)
     find_package(SDL2 CONFIG REQUIRED)
+    find_package(FFMPEG REQUIRED)
 else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(OpenAL REQUIRED openal)
     pkg_check_modules(SDL2 REQUIRED sdl2)
+    pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libavutil libswresample libswscale)
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/external/libtga ${CMAKE_SOURCE_DIR}/external/s3tc)
-
-if(ENABLE_VIDEO)
-    if(WIN32)
-        find_package(FFMPEG REQUIRED)
-    else()
-        pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libavutil libswresample libswscale)
-    endif()
-    include_directories(${FFMPEG_INCLUDE_DIRS})
-endif()
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${FFMPEG_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/libtga ${CMAKE_SOURCE_DIR}/external/s3tc)
 
 if(USE_EXTERNAL_GLM)
     include_directories(${CMAKE_SOURCE_DIR}/external/glm)
@@ -274,10 +266,6 @@ set(VIDEO_SOURCES
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
 set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-if(ENABLE_VIDEO)
-    target_compile_definitions(libvideo PRIVATE -DREONE_ENABLE_VIDEO)
-endif()
 
 ## END libvideo static library
 
@@ -676,11 +664,8 @@ target_link_libraries(reone PRIVATE
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
     ${OPENGL_LIBRARIES}
-    ${MAD_LIBRARY})
-
-if(ENABLE_VIDEO)
-    target_link_libraries(reone PRIVATE ${FFMPEG_LIBRARIES})
-endif()
+    ${MAD_LIBRARY}
+    ${FFMPEG_LIBRARIES})
 
 if(WIN32)
     target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
