@@ -27,7 +27,6 @@
 
 #include "glm/ext.hpp"
 
-#include "stateutil.h"
 #include "texture.h"
 #include "textures.h"
 
@@ -1100,43 +1099,15 @@ void Shaders::initUniformBlocks() {
 }
 
 void Shaders::initTextureUniforms() {
-    shared_ptr<Texture> defaultTexture(Textures::instance().getDefault());
-
     setUniform("uDiffuse", TextureUnits::diffuse);
-    setActiveTextureUnit(TextureUnits::diffuse);
-    defaultTexture->bind();
-
     setUniform("uLightmap", TextureUnits::lightmap);
-    setActiveTextureUnit(TextureUnits::lightmap);
-    defaultTexture->bind();
-
     setUniform("uEnvmap", TextureUnits::envmap);
-    setActiveTextureUnit(TextureUnits::envmap);
-    defaultTexture->bind();
-
     setUniform("uBumpmap", TextureUnits::bumpmap);
-    setActiveTextureUnit(TextureUnits::bumpmap);
-    defaultTexture->bind();
-
     setUniform("uBloom", TextureUnits::bloom);
-    setActiveTextureUnit(TextureUnits::bloom);
-    defaultTexture->bind();
-
     setUniform("uIrradianceMap", TextureUnits::irradianceMap);
-    setActiveTextureUnit(TextureUnits::irradianceMap);
-    defaultTexture->bind();
-
     setUniform("uPrefilterMap", TextureUnits::prefilterMap);
-    setActiveTextureUnit(TextureUnits::prefilterMap);
-    defaultTexture->bind();
-
     setUniform("uBRDFLookup", TextureUnits::brdfLookup);
-    setActiveTextureUnit(TextureUnits::brdfLookup);
-    defaultTexture->bind();
-
     setUniform("uShadowMap", TextureUnits::shadowMap);
-    setActiveTextureUnit(TextureUnits::shadowMap);
-    defaultTexture->bind();
 }
 
 Shaders::~Shaders() {

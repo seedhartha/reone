@@ -76,6 +76,7 @@ void WorldRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
+    Textures::instance().bindDefaults();
     _geometry.attachColor(*_geometryColor1, 0);
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);

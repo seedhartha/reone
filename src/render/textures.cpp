@@ -27,7 +27,9 @@
 #include "image/tgafile.h"
 #include "image/tpcfile.h"
 #include "image/txifile.h"
+#include "stateutil.h"
 #include "textureutil.h"
+#include "types.h"
 
 using namespace std;
 
@@ -50,10 +52,45 @@ void Textures::init(GameID gameId) {
     _default->init();
     _default->bind();
     _default->clearPixels(1, 1, PixelFormat::RGB);
+
+    // Initialize default cubemap texture
+    _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::CubeMapDefault));
+    _defaultCubemap->init();
+    _defaultCubemap->bind();
+    _defaultCubemap->clearPixels(1, 1, PixelFormat::RGB);
 }
 
 void Textures::invalidateCache() {
     _cache.clear();
+}
+
+void Textures::bindDefaults() {
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::lightmap);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::envmap);
+    _defaultCubemap->bind();
+
+    setActiveTextureUnit(TextureUnits::bumpmap);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::bloom);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::irradianceMap);
+    _defaultCubemap->bind();
+
+    setActiveTextureUnit(TextureUnits::prefilterMap);
+    _defaultCubemap->bind();
+
+    setActiveTextureUnit(TextureUnits::brdfLookup);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::shadowMap);
+    _defaultCubemap->bind();
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {

@@ -40,13 +40,17 @@ public:
     void init(resource::GameID gameId);
     void invalidateCache();
 
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
+    /**
+     * Binds default textures to all texture units. Call once per framebuffer.
+     */
+    void bindDefaults();
 
-    std::shared_ptr<Texture> getDefault() const { return _default; }
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
     resource::GameID _gameId { resource::GameID::KotOR };
     std::shared_ptr<render::Texture> _default;
+    std::shared_ptr<render::Texture> _defaultCubemap;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);

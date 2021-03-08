@@ -51,18 +51,6 @@ enum class ShaderProgram {
     BillboardBillboard
 };
 
-struct TextureUnits {
-    static constexpr int diffuse { 0 };
-    static constexpr int lightmap { 1 };
-    static constexpr int envmap { 2 };
-    static constexpr int bumpmap { 3 };
-    static constexpr int bloom { 5 };
-    static constexpr int irradianceMap { 6 };
-    static constexpr int prefilterMap { 7 };
-    static constexpr int brdfLookup { 8 };
-    static constexpr int shadowMap { 9 };
-};
-
 struct UniformFeatureFlags {
     static constexpr int diffuse = 1;
     static constexpr int lightmap = 2;
