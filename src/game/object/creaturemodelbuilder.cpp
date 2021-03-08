@@ -63,7 +63,9 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
         shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureUsage::Diffuse));
-        modelSceneNode->setDiffuseTexture(texture);
+        if (texture) {
+            modelSceneNode->setDiffuseTexture(texture);
+        }
     }
 
     // Mask
@@ -155,15 +157,20 @@ string CreatureModelBuilder::getBodyTextureName() const {
 
     shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
-    string texName(appearance->getString(_creature->appearance(), column));
-    boost::to_lower(texName);
-
+    string texName(boost::to_lower_copy(appearance->getString(_creature->appearance(), column)));
     if (texName.empty()) return "";
 
     if (_creature->modelType() == Creature::ModelType::Character) {
+        bool texFound = false;
         if (bodyItem) {
-            texName += str(boost::format("%02d") % bodyItem->textureVariation());
-        } else {
+            string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
+            shared_ptr<Texture> texture(Textures::instance().get(tmp, TextureUsage::Diffuse));
+            if (texture) {
+                texName = move(tmp);
+                texFound = true;
+            }
+        }
+        if (!texFound) {
             texName += "01";
         }
     }
