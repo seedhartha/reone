@@ -140,9 +140,13 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     debugChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
     debugChannelsSizer->Add(_choiceDebugChannels, 1, wxEXPAND | wxALL, 3);
 
-    auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debugging");
+    _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxLogFile->SetValue(_config.logfile);
+
+    auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debug");
     debugSizer->Add(debugLevelSizer, 0, wxEXPAND, 0);
     debugSizer->Add(debugChannelsSizer, 0, wxEXPAND, 0);
+    debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
@@ -164,7 +168,8 @@ void LauncherFrame::LoadConfiguration() {
         ("height", po::value<int>())
         ("fullscreen", po::value<bool>())
         ("debug", po::value<int>())
-        ("debugch", po::value<int>());
+        ("debugch", po::value<int>())
+        ("logfile", po::value<bool>());
 
     po::variables_map vars;
     if (fs::exists(kConfigFilename)) {
@@ -179,6 +184,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
     _config.debug = vars.count("debug") > 0 ? vars["debug"].as<int>() : 0;
     _config.debugch = vars.count("debugch") > 0 ? vars["debugch"].as<int>() : DebugChannels::all;
+    _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
 }
 
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
@@ -216,6 +222,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.debug = stoi(string(_choiceDebugLevel->GetStringSelection()));
     _config.debugch = debugch;
+    _config.logfile = _checkBoxLogFile->IsChecked();
 
     SaveConfiguration();
 
@@ -230,7 +237,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=" };
+    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=", "logfile=" };
 
     vector<string> lines;
 
@@ -256,6 +263,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "debug=" << _config.debug << endl;
     config << "debugch=" << _config.debugch << endl;
+    config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
     for (auto &line : lines) {
         config << line << endl;
     }

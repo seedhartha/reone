@@ -35,6 +35,7 @@ struct WindowID {
     static constexpr wxWindowID fullscreen = wxID_HIGHEST + 5;
     static constexpr wxWindowID debug = wxID_HIGHEST + 6;
     static constexpr wxWindowID debugChannels = wxID_HIGHEST + 7;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 8;
 };
 
 class LauncherFrame : public wxFrame {
@@ -50,6 +51,7 @@ private:
         bool fullscreen { false };
         int debug { 0 };
         int debugch { 0 };
+        bool logfile { false };
     } _config;
 
     wxTextCtrl *_textCtrlGameDir;
@@ -58,6 +60,7 @@ private:
     wxCheckBox *_checkBoxFullscreen;
     wxChoice *_choiceDebugLevel;
     wxChoice *_choiceDebugChannels;
+    wxCheckBox *_checkBoxLogFile;
 
     void OnLaunch(wxCommandEvent &event);
     void OnGameDirLeftDown(wxMouseEvent &event);
