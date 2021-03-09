@@ -306,8 +306,10 @@ bool Conversation::handleKeyUp(const SDL_KeyboardEvent &event) {
     SDL_Scancode key = event.keysym.scancode;
     if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
         int index = key - SDL_SCANCODE_1;
-        pickReply(index);
-        return true;
+        if (_entryEnded || _dialog->isSkippable() || g_allEntriesSkippable) {
+            pickReply(index);
+            return true;
+        }
     }
 
     return false;
