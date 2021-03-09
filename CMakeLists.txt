@@ -20,7 +20,9 @@ add_subdirectory(external/libtga)
 add_subdirectory(external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
+option(BUILD_LAUNCHER "build launcher executable" OFF)
 option(BUILD_TESTS "build unit tests" OFF)
+
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -28,6 +30,7 @@ find_package(Boost REQUIRED COMPONENTS filesystem program_options system)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
+find_package(wxWidgets COMPONENTS core base)
 
 if(WIN32)
     find_package(OpenAL CONFIG REQUIRED)
@@ -687,6 +690,37 @@ if(BUILD_TOOLS)
 endif()
 
 ## END reone-tools executable
+
+## Launcher executable
+
+if(BUILD_LAUNCHER)
+    if(wxWidgets_FOUND)
+        set(LAUNCHER_HEADERS
+            launcher/app.h
+            launcher/frame.h)
+
+        set(LAUNCHER_SOURCES
+            launcher/app.cpp
+            launcher/frame.cpp)
+
+        if(WIN32)
+            list(APPEND LAUNCHER_SOURCES res/reone.rc)
+            add_executable(launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
+        else()
+            add_executable(launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
+        endif()
+
+        include(${wxWidgets_USE_FILE})
+        target_link_libraries(launcher ${wxWidgets_LIBRARIES})
+
+        set_target_properties(launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    else()
+        message(WARNING "wxWidgets not found - launcher cannot be built")
+    endif()
+
+endif()
+
+## END Launcher executable
 
 ## Unit tests
 
