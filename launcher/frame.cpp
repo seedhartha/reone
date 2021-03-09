@@ -87,14 +87,14 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     debugChoices.Add("2");
     debugChoices.Add("3");
 
-    int debugSelection = _config.debug >= 0 && _config.debug <= 3 ? _config.debug : 0;
+    int debugLevelSelection = _config.debug >= 0 && _config.debug <= 3 ? _config.debug : 0;
 
-    _choiceDebug = new wxChoice(this, WindowID::debug, wxDefaultPosition, wxDefaultSize, debugChoices);
-    _choiceDebug->SetSelection(debugSelection);
+    _choiceDebugLevel = new wxChoice(this, WindowID::debug, wxDefaultPosition, wxDefaultSize, debugChoices);
+    _choiceDebugLevel->SetSelection(debugLevelSelection);
 
-    auto debugSizer = new wxBoxSizer(wxHORIZONTAL);
-    debugSizer->Add(new wxStaticText(this, wxID_ANY, "Debug Log Level", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    debugSizer->Add(_choiceDebug, 1, wxEXPAND | wxALL, 3);
+    auto debugLevelSizer = new wxBoxSizer(wxHORIZONTAL);
+    debugLevelSizer->Add(new wxStaticText(this, wxID_ANY, "Log Level", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    debugLevelSizer->Add(_choiceDebugLevel, 1, wxEXPAND | wxALL, 3);
 
     wxArrayString debugChannelsChoices;
     debugChannelsChoices.Add("All");
@@ -130,16 +130,19 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _choiceDebugChannels->SetSelection(debugChannelsSelection);
 
     auto debugChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
-    debugChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Debug Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    debugChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
     debugChannelsSizer->Add(_choiceDebugChannels, 1, wxEXPAND | wxALL, 3);
+
+    auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debugging");
+    debugSizer->Add(debugLevelSizer, 0, wxEXPAND, 0);
+    debugSizer->Add(debugChannelsSizer, 0, wxEXPAND, 0);
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(resSizer, 0, wxEXPAND, 0);
-    topSizer->Add(debugSizer, 0, wxEXPAND, 0);
-    topSizer->Add(debugChannelsSizer, 0, wxEXPAND, 0);
+    topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
 
     SetSizer(topSizer);
 }
@@ -200,7 +203,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     _config.devMode = _checkBoxDev->IsChecked();
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
-    _config.debug = stoi(string(_choiceDebug->GetStringSelection()));
+    _config.debug = stoi(string(_choiceDebugLevel->GetStringSelection()));
     _config.debugch = debugch;
 
     SaveConfiguration();
