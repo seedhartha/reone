@@ -30,8 +30,10 @@ namespace reone {
 struct WindowID {
     static constexpr wxWindowID launch = wxID_HIGHEST + 1;
     static constexpr wxWindowID gameDir = wxID_HIGHEST + 2;
-    static constexpr wxWindowID resolution = wxID_HIGHEST + 3;
-    static constexpr wxWindowID devMode = wxID_HIGHEST + 4;
+    static constexpr wxWindowID devMode = wxID_HIGHEST + 3;
+    static constexpr wxWindowID resolution = wxID_HIGHEST + 4;
+    static constexpr wxWindowID debug = wxID_HIGHEST + 5;
+    static constexpr wxWindowID debugChannels = wxID_HIGHEST + 6;
 };
 
 class LauncherFrame : public wxFrame {
@@ -41,13 +43,17 @@ public:
 private:
     struct Configuration {
         std::string gameDir;
+        bool devMode { false };
         int width { 0 };
         int height { 0 };
-        bool devMode { false };
+        int debug { 0 };
+        int debugch { 0 };
     } _config;
 
     wxTextCtrl *_textCtrlGameDir;
     wxChoice *_choiceResolution;
+    wxChoice *_choiceDebug;
+    wxChoice *_choiceDebugChannels;
     wxCheckBox *_checkBoxDev;
 
     void OnLaunch(wxCommandEvent &event);
