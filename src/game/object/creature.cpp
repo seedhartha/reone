@@ -500,7 +500,7 @@ void Creature::die() {
     _dead = true;
     _name = Resources::instance().getString(kStrRefRemains);
 
-    debug(boost::format("Creature: '%s' is dead") % _tag, 2);
+    debug(boost::format("Creature %s is dead") % _tag, 2);
 
     playSound(SoundSetEntry::Dead);
     playAnimation(_animResolver.getDieAnimation());
