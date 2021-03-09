@@ -62,6 +62,10 @@ void Framebuffer::attachColor(const Texture &texture, int index, int mip) const 
     }
 }
 
+void Framebuffer::attachColor(const Renderbuffer &renderbuffer, int index) const {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer.id());
+}
+
 void Framebuffer::attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index, int mip) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face), texture.textureId(), mip);
