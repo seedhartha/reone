@@ -52,7 +52,7 @@ private:
 
     wxTextCtrl *_textCtrlGameDir;
     wxChoice *_choiceResolution;
-    wxChoice *_choiceDebug;
+    wxChoice *_choiceDebugLevel;
     wxChoice *_choiceDebugChannels;
     wxCheckBox *_checkBoxDev;
 
