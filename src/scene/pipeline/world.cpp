@@ -122,6 +122,7 @@ void WorldRenderPipeline::init() {
     _shadows.bind();
     _shadows.attachDepth(*_shadowsDepth);
     _shadows.checkCompleteness();
+    _shadows.unbind();
 }
 
 void WorldRenderPipeline::render() {
