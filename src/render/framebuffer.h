@@ -51,6 +51,7 @@ public:
      */
     void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
 
+    void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
     void attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index = 0, int mip = 0) const;
 
     /**
