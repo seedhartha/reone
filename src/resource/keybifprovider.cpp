@@ -32,16 +32,9 @@ namespace reone {
 
 namespace resource {
 
-static const char kKeyFilename[] = "chitin.key";
-
-void KeyBifResourceProvider::init(const fs::path &gamePath) {
-    _gamePath = gamePath;
-
-    fs::path path(getPathIgnoreCase(gamePath, kKeyFilename));
-    if (path.empty()) {
-        throw runtime_error(str(boost::format("Key file not found: %s %s") % gamePath % kKeyFilename));
-    }
-    _keyFile.load(path);
+void KeyBifResourceProvider::init(const fs::path &keyPath) {
+    _gamePath = keyPath.parent_path();
+    _keyFile.load(keyPath);
 }
 
 shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, ResourceType type) {

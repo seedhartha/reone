@@ -180,7 +180,7 @@ void MdlFile::readNodeNames(const vector<uint32_t> &offsets) {
 
         int hitCount = nameHits[name]++;
         if (hitCount > 0) {
-            warn(boost::format("MDL: duplicate node name: %s, model %s") % name % _name);
+            warn("MDL: duplicate node name: " + name);
             name = str(boost::format("%s_dup%d") % name % hitCount);
         }
         _nodeNames.push_back(move(name));
@@ -408,7 +408,7 @@ void MdlFile::readControllers(uint32_t keyCount, uint32_t keyOffset, const vecto
                 break;
 
             default:
-                debug(boost::format("MDL: unsupported controller type: \"%s\" %d") % _name % static_cast<int>(type), 3);
+                debug(boost::format("MDL: unsupported controller type: %d") % static_cast<int>(type), 3);
                 break;
         }
     }
@@ -714,14 +714,8 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
     uint32_t vertCoordsOffset = readUint32();
     size_t endPos = tell();
 
-    if (faceCount == 0) {
-        warn(boost::format("MDL: invalid face count: %d, model %s") % to_string(faceCount) % _name);
-        return nullptr;
-    }
-    if (mdxVertexSize == 0 && !(nodeFlags & kNodeHasSaber)) {
-        warn(boost::format("MDL: invalid MDX vertex size: %d, model %s") % to_string(mdxVertexSize) % _name);
-        return nullptr;
-    }
+    if (faceCount == 0) return nullptr;
+    if (mdxVertexSize == 0 && !(nodeFlags & kNodeHasSaber)) return nullptr;
 
     vector<float> vertices;
     Mesh::VertexOffsets offsets;

@@ -100,7 +100,7 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
             executePlayAnimation(object, dynamic_pointer_cast<PlayAnimationAction>(action), dt);
             break;
         default:
-            warn("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)));
+            debug("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)), 2);
             action->complete();
             break;
     }

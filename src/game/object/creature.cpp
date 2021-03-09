@@ -161,10 +161,7 @@ void Creature::loadPortrait(int appearance) {
     };
 
     int row = portraits->indexByCellValuesAny(columnValues);
-    if (row == -1) {
-        warn("Creature: portrait not found: " + appearanceString);
-        return;
-    }
+    if (row == -1) return;
 
     string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
     _portrait = Textures::instance().get(resRef, TextureUsage::GUI);

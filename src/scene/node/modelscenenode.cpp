@@ -223,10 +223,8 @@ ModelNodeSceneNode *ModelSceneNode::getModelNodeByIndex(int index) const {
 
 shared_ptr<ModelSceneNode> ModelSceneNode::getAttachedModel(const string &parent) const {
     shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
-    if (!parentModelNode) {
-        warn("ModelSceneNode: parent node not found: " + parent);
-        return nullptr;
-    }
+    if (!parentModelNode) return nullptr;
+
     auto maybeAttached = _attachedModels.find(parentModelNode->nodeNumber());
     return maybeAttached != _attachedModels.end() ? maybeAttached->second : nullptr;
 }
@@ -234,7 +232,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::getAttachedModel(const string &parent
 void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &node) {
     shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
     if (!parentModelNode) {
-        warn("ModelSceneNode: parent node not found: " + parent);
+        warn(boost::format("Scene node %s: model node not found: %s") % _model->name() % parent);
         return;
     }
     uint16_t parentNumber = parentModelNode->nodeNumber();

@@ -77,10 +77,14 @@ void Resources::init(GameID gameId, const fs::path &gamePath) {
 }
 
 void Resources::indexKeyBifFiles() {
+    fs::path keyPath(getPathIgnoreCase(_gamePath, "chitin.key"));
+
     auto keyBif = make_unique<KeyBifResourceProvider>();
-    keyBif->init(_gamePath);
+    keyBif->init(keyPath);
 
     _providers.push_back(move(keyBif));
+
+    debug("Indexed " + keyPath.string());
 }
 
 void Resources::indexTexturePacks() {
@@ -102,7 +106,7 @@ void Resources::indexErfFile(const fs::path &path) {
 
     _providers.push_back(move(erf));
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::indexAudioFiles() {
@@ -145,7 +149,7 @@ void Resources::indexRimFile(const fs::path &path) {
 
     _providers.push_back(move(rim));
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::indexDirectory(const fs::path &path) {
@@ -154,7 +158,7 @@ void Resources::indexDirectory(const fs::path &path) {
 
     _providers.push_back(move(folder));
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::indexOverrideDirectory() {
@@ -166,7 +170,7 @@ void Resources::indexTalkTable() {
     fs::path path(getPathIgnoreCase(_gamePath, kTalkTableFileName));
     _tlkFile.load(path);
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::indexExeFile() {
@@ -175,7 +179,7 @@ void Resources::indexExeFile() {
 
     _exeFile.load(path);
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::loadModuleNames() {
@@ -243,7 +247,7 @@ void Resources::indexTransientRimFile(const fs::path &path) {
 
     _transientProviders.push_back(move(rim));
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 void Resources::indexTransientErfFile(const fs::path &path) {
@@ -252,7 +256,7 @@ void Resources::indexTransientErfFile(const fs::path &path) {
 
     _transientProviders.push_back(move(erf));
 
-    debug(boost::format("Resources: indexed: %s") % path);
+    debug("Indexed " + path.string());
 }
 
 template <class T>
@@ -266,9 +270,9 @@ static shared_ptr<T> findResource(const string &key, unordered_map<string, share
     return inserted.first->second;
 }
 
-shared_ptr<TwoDA> Resources::get2DA(const string &resRef) {
-    return findResource<TwoDA>(resRef, _2daCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(get(resRef, ResourceType::TwoDa));
+shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
+    return findResource<TwoDA>(resRef, _2daCache, [&]() {
+        shared_ptr<ByteArray> data(get(resRef, ResourceType::TwoDa, logNotFound));
         shared_ptr<TwoDA> twoDa;
 
         if (data) {
@@ -282,19 +286,18 @@ shared_ptr<TwoDA> Resources::get2DA(const string &resRef) {
 }
 
 shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bool logNotFound) {
+    if (resRef.empty()) return nullptr;
+
     string cacheKey(getCacheKey(resRef, type));
     auto res = _resCache.find(cacheKey);
-    if (res != _resCache.end()) {
-        return res->second;
-    }
-    debug("Resources: load " + cacheKey, 2);
+    if (res != _resCache.end()) return res->second;
 
     shared_ptr<ByteArray> data = get(_transientProviders, resRef, type);
     if (!data) {
         data = get(_providers, resRef, type);
     }
     if (!data && logNotFound) {
-        warn("Resources: not found: " + cacheKey);
+        warn("Resource not found: " + cacheKey);
     }
     auto pair = _resCache.insert(make_pair(cacheKey, move(data)));
 

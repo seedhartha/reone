@@ -88,14 +88,13 @@ void Module::loadInfo(const GffStruct &ifo) {
 }
 
 void Module::loadArea(const GffStruct &ifo) {
-    reone::info("Module: load area: " + _info.entryArea);
+    reone::info("Load area " + _info.entryArea);
 
     shared_ptr<GffStruct> are(Resources::instance().getGFF(_info.entryArea, ResourceType::Are));
     shared_ptr<GffStruct> git(Resources::instance().getGFF(_info.entryArea, ResourceType::Git));
 
-    shared_ptr<Area> area(_game->objectFactory().newArea());
-    area->load(_info.entryArea, *are, *git);
-    _area = move(area);
+    _area = _game->objectFactory().newArea();
+    _area->load(_info.entryArea, *are, *git);
 }
 
 void Module::loadPlayer() {

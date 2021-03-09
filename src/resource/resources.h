@@ -54,7 +54,7 @@ public:
 
     void loadModule(const std::string &name);
 
-    std::shared_ptr<TwoDA> get2DA(const std::string &resRef);
+    std::shared_ptr<TwoDA> get2DA(const std::string &resRef, bool logNotFound = true);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
     std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);

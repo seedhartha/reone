@@ -47,7 +47,6 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
     for (size_t i = 0; i < _rows.size(); ++i) {
         if (_rows[i].values[columnIdx] == value) return static_cast<int>(i);
     }
-    warn(boost::format("2DA: row not found by cell value: %s %s") % column % value);
 
     return -1;
 }
@@ -79,8 +78,6 @@ int TwoDA::indexByCellValues(const vector<pair<string, string>> &values) const {
         if (match) return static_cast<int>(i);
     }
 
-    warn("2DA: row not found by cell values");
-
     return -1;
 }
 
@@ -106,8 +103,6 @@ int TwoDA::indexByCellValuesAny(const vector<pair<string, string>> &values) cons
             if (_rows[i].values[columnIdx] == values[j].second) return static_cast<int>(i);
         }
     }
-
-    warn("2DA: row not found by cell values");
 
     return -1;
 }
