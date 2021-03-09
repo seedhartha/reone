@@ -42,7 +42,7 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     if (_func) {
         return _func(args, ctx);
     }
-    warn("Routines: not implemented: " + _name);
+    debug("Routine not implemented: " + _name, 2);
 
     Variable result;
     result.type = _returnType;

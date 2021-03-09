@@ -132,7 +132,7 @@ Texture::Blending TxiFile::parseBlending(const string &s) const {
     if (s == "additive") {
         result = Texture::Blending::Additive;
     } else {
-        warn("TXI: unsupported blending mode: " + s);
+        debug("TXI: unsupported blending: " + s);
     }
     return result;
 }

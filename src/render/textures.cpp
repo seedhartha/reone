@@ -94,6 +94,8 @@ void Textures::bindDefaults() {
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
+    if (resRef.empty()) return nullptr;
+
     auto maybeTexture = _cache.find(resRef);
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;
@@ -133,7 +135,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (!texture) {
-        warn("Textures: not found: " + resRef);
+        warn("Texture not found: " + resRef);
     }
 
     return move(texture);

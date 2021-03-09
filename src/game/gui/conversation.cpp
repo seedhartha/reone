@@ -48,7 +48,7 @@ Conversation::Conversation(Game *game) :
 }
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
-    debug("Conversation: start " + dialog->resRef());
+    debug("Start conversation " + dialog->resRef());
 
     _dialog = dialog;
     _owner = owner;

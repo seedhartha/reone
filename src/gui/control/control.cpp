@@ -92,7 +92,7 @@ unique_ptr<Control> Control::of(GUI *gui, ControlType type, const string &tag) {
             control = make_unique<ListBox>(gui);
             break;
         default:
-            warn("GUI: unsupported control type: " + to_string(static_cast<int>(type)));
+            debug("GUI: unsupported control type: " + to_string(static_cast<int>(type)));
             return nullptr;
     }
 

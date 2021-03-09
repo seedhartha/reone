@@ -38,7 +38,7 @@ Materials &Materials::instance() {
 
 void Materials::init() {
     if (!_inited) {
-        shared_ptr<TwoDA> materials(Resources::instance().get2DA("material"));
+        shared_ptr<TwoDA> materials(Resources::instance().get2DA("material", false));
         if (materials) {
             for (int row = 0; row < materials->getRowCount(); ++row) {
                 string tex(boost::to_lower_copy(materials->getString(row, "tex")));

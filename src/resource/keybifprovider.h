@@ -29,7 +29,7 @@ namespace resource {
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:
-    void init(const boost::filesystem::path &gamePath);
+    void init(const boost::filesystem::path &keyPath);
 
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
 
