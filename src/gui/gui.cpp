@@ -51,7 +51,7 @@ void GUI::load() {
     if (_resRef.empty()) {
         throw logic_error("resRef must not be empty");
     }
-    debug("Load GUI " + _resRef);
+    debug("GUI: load " + _resRef, 1, DebugChannels::gui);
 
     shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));
     loadBackground(_backgroundType);
@@ -218,7 +218,7 @@ bool GUI::handle(const SDL_Event &event) {
                 glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
                 if (control) {
-                    debug("GUI: click " + control->tag(), 2);
+                    debug("GUI: click " + control->tag(), 2, DebugChannels::gui);
                     return control->handleClick(ctrlCoords.x, ctrlCoords.y);
                 }
             }

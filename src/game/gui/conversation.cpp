@@ -48,7 +48,7 @@ Conversation::Conversation(Game *game) :
 }
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
-    debug("Start conversation " + dialog->resRef());
+    debug("Conversation: start" + dialog->resRef(), 1, DebugChannels::conversation);
 
     _dialog = dialog;
     _owner = owner;
@@ -87,7 +87,7 @@ void Conversation::onStart() {
 void Conversation::loadStartEntry() {
     int entryIdx = indexOfFirstActive(_dialog->startEntries());
     if (entryIdx == -1) {
-        debug("Conversation: finish (no active start entry)");
+        debug("Conversation: finish (no active start entry)", 1, DebugChannels::conversation);
         finish();
         return;
     }
@@ -123,7 +123,7 @@ void Conversation::onFinish() {
 }
 
 void Conversation::loadEntry(int index, bool start) {
-    debug("Conversation: load entry " + to_string(index), 2);
+    debug("Conversation: load entry " + to_string(index), 2, DebugChannels::conversation);
     _currentEntry = &_dialog->getEntry(index);
 
     setMessage(_currentEntry->text);
@@ -240,7 +240,7 @@ void Conversation::onListBoxItemClick(const string &control, const string &item)
 }
 
 void Conversation::pickReply(int index) {
-    debug("Conversation: pick reply " + to_string(index), 2);
+    debug("Conversation: pick reply " + to_string(index), 2, DebugChannels::conversation);
     const Dialog::EntryReply &reply = *_replies[index];
 
     // Run reply script
@@ -250,7 +250,7 @@ void Conversation::pickReply(int index) {
 
     int entryIdx = indexOfFirstActive(reply.entries);
     if (entryIdx == -1) {
-        debug("Conversation: finish (no active entries)", 2);
+        debug("Conversation: finish (no active entries)", 2, DebugChannels::conversation);
         finish();
         return;
     }
@@ -294,7 +294,7 @@ void Conversation::endCurrentEntry() {
     if (_autoPickFirstReply) {
         pickReply(0);
     } else if (_replies.empty()) {
-        debug("Conversation: finish (no active replies", 2);
+        debug("Conversation: finish (no active replies", 2, DebugChannels::conversation);
         finish();
     }
 }

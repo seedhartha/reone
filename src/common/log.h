@@ -22,6 +22,8 @@
 
 #include <boost/format.hpp>
 
+#include "types.h"
+
 namespace reone {
 
 void error(const std::string &s);
@@ -30,12 +32,13 @@ void warn(const std::string &s);
 void warn(const boost::format &s);
 void info(const std::string &s);
 void info(const boost::format &s);
-void debug(const std::string &s, uint32_t level = 1);
-void debug(const boost::format &s, uint32_t level = 1);
+void debug(const std::string &s, uint32_t level = 1, int channel = DebugChannels::general);
+void debug(const boost::format &s, uint32_t level = 1, int channel = DebugChannels::general);
 
 uint32_t getDebugLogLevel();
 
 void setDebugLogLevel(uint32_t level);
+void setDebugChannels(int mask);
 void setLogToFile(bool logToFile);
 
 } // namespace reone

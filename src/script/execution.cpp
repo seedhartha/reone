@@ -83,7 +83,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 }
 
 int ScriptExecution::run() {
-    debug("Run script " + _program->name());
+    debug("Script: run " + _program->name(), 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {
@@ -102,13 +102,13 @@ int ScriptExecution::run() {
         auto handler = _handlers.find(ins.byteCode);
 
         if (handler == _handlers.end()) {
-            warn("Byte code not implemented: " + describeByteCode(ins.byteCode));
+            debug("Script: byte code not implemented: " + describeByteCode(ins.byteCode), 1, DebugChannels::script);
             return -1;
         }
         _nextInstruction = ins.nextOffset;
 
         if (getDebugLogLevel() >= 2) {
-            debug(boost::format("Script instruction: %s") % describeInstruction(ins), 3);
+            debug(boost::format("Script: instruction: %s") % describeInstruction(ins), 3, DebugChannels::script);
         }
         handler->second(ins);
 
@@ -241,7 +241,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     Variable retValue = routine.invoke(args, _context);
 
     if (getDebugLogLevel() >= 2) {
-        debug(boost::format("Script action: %x %s -> %s") % ins.offset % routine.name() % retValue.toString(), 2);
+        debug(boost::format("Script: action: %04x %s -> %s") % ins.offset % routine.name() % retValue.toString(), 2, DebugChannels::script);
     }
     switch (routine.returnType()) {
         case VariableType::Void:

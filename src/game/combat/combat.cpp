@@ -134,7 +134,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
 }
 
 shared_ptr<Combat::Combatant> Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enemies) {
-    debug(boost::format("Combat: add combatant '%s' with %d enemies") % creature->tag() % enemies.size(), 2);
+    debug(boost::format("Combat: add combatant '%s' with %d enemies") % creature->tag() % enemies.size(), 2, DebugChannels::combat);
 
     creature->setInCombat(true);
 
@@ -188,7 +188,7 @@ void Combat::updateCombatantAI(Combatant &combatant) {
     actions.clear();
     actions.add(make_unique<AttackAction>(enemy, creature->getAttackRange()));
 
-    debug(boost::format("Combat: attack action added: '%s' -> '%s'") % creature->tag() % enemy->tag(), 2);
+    debug(boost::format("Combat: attack action added: '%s' -> '%s'") % creature->tag() % enemy->tag(), 2, DebugChannels::combat);
 }
 
 shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
@@ -259,7 +259,7 @@ void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<Sp
 }
 
 void Combat::addRound(const shared_ptr<Round> &round) {
-    debug(boost::format("Combat: add round: '%s' -> '%s'") % round->attacker->creature->tag() % round->target->tag(), 2);
+    debug(boost::format("Combat: add round: '%s' -> '%s'") % round->attacker->creature->tag() % round->target->tag(), 2, DebugChannels::combat);
     _roundByAttackerId.insert(make_pair(round->attacker->creature->id(), round));
 }
 
@@ -294,7 +294,7 @@ void Combat::updateRound(Round &round, float dt) {
             }
 
             round.state = RoundState::FirstTurn;
-            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
+            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
             break;
         }
         case RoundState::FirstTurn:
@@ -319,7 +319,7 @@ void Combat::updateRound(Round &round, float dt) {
                     attacker->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
                 }
                 round.state = RoundState::SecondTurn;
-                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
+                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
 
             } else if (round.time >= 0.5f) {
                 if (!round.projectile) {
@@ -365,7 +365,7 @@ void Combat::finishRound(Round &round) {
     round.projectile.reset();
 
     round.state = RoundState::Finished;
-    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2);
+    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
 }
 
 void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
@@ -428,12 +428,12 @@ void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const share
         case AttackResultType::AttackFailed:
         case AttackResultType::Parried:
         case AttackResultType::Deflected:
-            debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+            debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2, DebugChannels::combat);
             break;
         case AttackResultType::HitSuccessful:
         case AttackResultType::CriticalHit:
         case AttackResultType::AutomaticHit: {
-            debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2);
+            debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2, DebugChannels::combat);
             if (damage == -1) {
                 auto effects = _damageResolver.getDamageEffects(attacker);
                 for (auto &effect : effects) {

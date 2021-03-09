@@ -38,6 +38,7 @@ enum class LogLevel {
 };
 
 static uint32_t g_debugLevel = 0;
+static int g_debugChannels = 0;
 static bool g_logToFile = false;
 
 static std::unique_ptr<fs::ofstream> g_logFile;
@@ -45,13 +46,13 @@ static std::unique_ptr<fs::ofstream> g_logFile;
 static constexpr char *describeLogLevel(LogLevel level) {
     switch (level) {
         case LogLevel::Error:
-            return "ERROR";
+            return "ERR";
         case LogLevel::Warn:
-            return "WARN";
+            return "WRN";
         case LogLevel::Info:
-            return "INFO";
+            return "INF";
         case LogLevel::Debug:
-            return "DEBUG";
+            return "DBG";
         default:
             throw invalid_argument("Invalid log level: " + to_string(static_cast<int>(level)));
     }
@@ -98,14 +99,14 @@ void info(const boost::format &s) {
     log(LogLevel::Info, str(s));
 }
 
-void debug(const string &s, uint32_t level) {
-    if (level <= getDebugLogLevel()) {
+void debug(const string &s, uint32_t level, int channel) {
+    if (level <= getDebugLogLevel() && (g_debugChannels & channel)) {
         log(LogLevel::Debug, s);
     }
 }
 
-void debug(const boost::format &s, uint32_t level) {
-    return debug(str(s), level);
+void debug(const boost::format &s, uint32_t level, int channel) {
+    return debug(str(s), level, channel);
 }
 
 uint32_t getDebugLogLevel() {
@@ -114,6 +115,10 @@ uint32_t getDebugLogLevel() {
 
 void setDebugLogLevel(uint32_t level) {
     g_debugLevel = level;
+}
+
+void setDebugChannels(int mask) {
+    g_debugChannels = mask;
 }
 
 void setLogToFile(bool logToFile) {
