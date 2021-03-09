@@ -50,8 +50,8 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
 
     // Setup controls
 
-    _textGameDir = new wxTextCtrl(this, WindowID::gameDir, _config.gameDir, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-    _textGameDir->Bind(wxEVT_LEFT_DOWN, &LauncherFrame::OnGameDirLeftDown, this, WindowID::gameDir);
+    _textCtrlGameDir = new wxTextCtrl(this, WindowID::gameDir, _config.gameDir, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    _textCtrlGameDir->Bind(wxEVT_LEFT_DOWN, &LauncherFrame::OnGameDirLeftDown, this, WindowID::gameDir);
 
     wxArrayString choices;
     choices.Add("800x600");
@@ -67,7 +67,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
 
     auto gameSizer = new wxBoxSizer(wxHORIZONTAL);
     gameSizer->Add(new wxStaticText(this, wxID_ANY, "Game Directory", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    gameSizer->Add(_textGameDir, 1, wxEXPAND | wxALL, 3);
+    gameSizer->Add(_textCtrlGameDir, 1, wxEXPAND | wxALL, 3);
 
     _choiceResolution = new wxChoice(this, WindowID::resolution, wxDefaultPosition, wxDefaultSize, choices);
     _choiceResolution->SetSelection(selection);
@@ -76,10 +76,14 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     resSizer->Add(new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
     resSizer->Add(_choiceResolution, 1, wxEXPAND | wxALL, 3);
 
+    _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxDev->SetValue(_config.devMode);
+
     auto topSizer = new wxBoxSizer(wxVERTICAL);
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(resSizer, 0, wxEXPAND, 0);
+    topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
 
     SetSizer(topSizer);
 }
@@ -87,9 +91,10 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
     options.add_options()
-        ("game", po::value<string>()->default_value(""))
-        ("width", po::value<int>()->default_value(1024))
-        ("height", po::value<int>()->default_value(768));
+        ("game", po::value<string>())
+        ("width", po::value<int>())
+        ("height", po::value<int>())
+        ("dev", po::value<bool>());
 
     po::variables_map vars;
     if (fs::exists(kConfigFilename)) {
@@ -97,9 +102,10 @@ void LauncherFrame::LoadConfiguration() {
     }
     po::notify(vars);
 
-    _config.gameDir = vars["game"].as<string>();
-    _config.width = vars["width"].as<int>();
-    _config.height = vars["height"].as<int>();
+    _config.gameDir = vars.count("game") > 0 ? vars["game"].as<string>() : "";
+    _config.width = vars.count("width") > 0 ? vars["width"].as<int>() : 1024;
+    _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
+    _config.devMode = vars.count("dev") > 0 ? vars["dev"].as<bool>() : false;
 }
 
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
@@ -108,9 +114,10 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     vector<string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
-    _config.gameDir = _textGameDir->GetValue();
+    _config.gameDir = _textCtrlGameDir->GetValue();
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
+    _config.devMode = _checkBoxDev->IsChecked();
 
     SaveConfiguration();
 
@@ -126,30 +133,38 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
+    static set<string> recognized { "game=", "width=", "height=", "dev=" };
+
     vector<string> lines;
 
     fs::ifstream in(kConfigFilename);
     for (string line; getline(in, line); ) {
-        if (boost::starts_with(line, "game=") ||
-            boost::starts_with(line, "width=") ||
-            boost::starts_with(line, "height=")) continue;
-
-        lines.push_back(line);
+        bool add = true;
+        for (auto &opt : recognized) {
+            if (boost::starts_with(line, opt)) {
+                add = false;
+                break;
+            }
+        }
+        if (add) {
+            lines.push_back(line);
+        }
     }
 
     fs::ofstream config(kConfigFilename);
     config << "game=" << _config.gameDir << endl;
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
+    config << "dev=" << (_config.devMode ? 1 : 0) << endl;
     for (auto &line : lines) {
         config << line << endl;
     }
 }
 
 void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
-    wxDirDialog dlg(nullptr, "Choose game directory", _textGameDir->GetValue(), wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    wxDirDialog dlg(nullptr, "Choose game directory", _textCtrlGameDir->GetValue(), wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dlg.ShowModal() == wxID_OK) {
-        _textGameDir->SetValue(dlg.GetPath());
+        _textCtrlGameDir->SetValue(dlg.GetPath());
     }
 }
 
