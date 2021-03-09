@@ -138,7 +138,8 @@ GffStruct::Field GffFile::readField(int idx) {
         }
         case GffStruct::FieldType::Orientation: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float)));
-            field.quatValue = glm::make_quat(reinterpret_cast<float *>(&data[0]));
+            auto floatData = reinterpret_cast<float *>(&data[0]);
+            field.quatValue = glm::quat(floatData[0], floatData[1], floatData[2], floatData[3]);
             break;
         }
         case GffStruct::FieldType::Vector: {
