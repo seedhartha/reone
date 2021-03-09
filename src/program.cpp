@@ -24,6 +24,7 @@
 #include <boost/program_options.hpp>
 
 #include "common/log.h"
+#include "common/types.h"
 #include "game/game.h"
 
 using namespace std;

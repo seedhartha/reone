@@ -365,7 +365,7 @@ void ModelSceneNode::refreshAABB() {
 }
 
 void ModelSceneNode::signalEvent(const string &name) {
-    debug(boost::format("ModelSceneNode: event signalled: %s %s") % name % _model->name(), 2);
+    debug(boost::format("Animation event signalled: %s %s") % _model->name() % name, 2);
 
     if (name == "detonate") {
         for (auto &emitter : _emitters) {
