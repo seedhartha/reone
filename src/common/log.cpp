@@ -38,7 +38,7 @@ enum class LogLevel {
 };
 
 static uint32_t g_debugLevel = 0;
-static int g_debugChannels = 0;
+static int g_debugChannels = DebugChannels::all;
 static bool g_logToFile = false;
 
 static std::unique_ptr<fs::ofstream> g_logFile;

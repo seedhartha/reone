@@ -78,7 +78,7 @@ void Program::initOptions() {
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
         ("debug", po::value<int>()->default_value(0), "debug log level (0-3)")
-        ("debugch", po::value<int>()->default_value(DebugChannels::all), "debug channel mask")
+        ("debugch", po::value<int>(), "debug channel mask")
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     _cmdLineOpts.add(_commonOpts).add_options()
@@ -112,8 +112,11 @@ void Program::loadOptions() {
     _gameOpts.audio.movieVolume = vars["movievol"].as<int>();
 
     setDebugLogLevel(vars["debug"].as<int>());
-    setDebugChannels(vars["debugch"].as<int>());
     setLogToFile(vars["logfile"].as<bool>());
+
+    if (vars.count("debugch") > 0) {
+        setDebugChannels(vars["debugch"].as<int>());
+    }
 }
 
 int Program::runGame() {
