@@ -36,7 +36,7 @@ namespace reone {
 static const char kIconName[] = "reone";
 static const char kConfigFilename[] = "reone.cfg";
 
-static const wxSize g_windowSize { 400, 250 };
+static const wxSize g_windowSize { 400, 300 };
 
 LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
     // Configure this frame
@@ -62,11 +62,15 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxDev->SetValue(_config.devMode);
 
+    int displayWidth, displayHeight;
+    wxDisplaySize(&displayWidth, &displayHeight);
+
     wxArrayString resChoices;
     resChoices.Add("800x600");
     resChoices.Add("1024x768");
     resChoices.Add("1280x960");
     resChoices.Add("1280x1024");
+    resChoices.Add(str(boost::format("%dx%d") % displayWidth % displayHeight));
 
     string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
@@ -80,6 +84,9 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     auto resSizer = new wxBoxSizer(wxHORIZONTAL);
     resSizer->Add(new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
     resSizer->Add(_choiceResolution, 1, wxEXPAND | wxALL, 3);
+
+    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxFullscreen->SetValue(_config.fullscreen);
 
     wxArrayString debugChoices;
     debugChoices.Add("0");
@@ -142,6 +149,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(resSizer, 0, wxEXPAND, 0);
+    topSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
 
     SetSizer(topSizer);
@@ -154,6 +162,7 @@ void LauncherFrame::LoadConfiguration() {
         ("dev", po::value<bool>())
         ("width", po::value<int>())
         ("height", po::value<int>())
+        ("fullscreen", po::value<bool>())
         ("debug", po::value<int>())
         ("debugch", po::value<int>());
 
@@ -167,6 +176,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.devMode = vars.count("dev") > 0 ? vars["dev"].as<bool>() : false;
     _config.width = vars.count("width") > 0 ? vars["width"].as<int>() : 1024;
     _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
+    _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
     _config.debug = vars.count("debug") > 0 ? vars["debug"].as<int>() : 0;
     _config.debugch = vars.count("debugch") > 0 ? vars["debugch"].as<int>() : DebugChannels::all;
 }
@@ -203,6 +213,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     _config.devMode = _checkBoxDev->IsChecked();
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
+    _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.debug = stoi(string(_choiceDebugLevel->GetStringSelection()));
     _config.debugch = debugch;
 
@@ -219,7 +230,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "dev=", "debug=", "debugch=" };
+    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=" };
 
     vector<string> lines;
 
@@ -242,6 +253,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "dev=" << (_config.devMode ? 1 : 0) << endl;
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
+    config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "debug=" << _config.debug << endl;
     config << "debugch=" << _config.debugch << endl;
     for (auto &line : lines) {
