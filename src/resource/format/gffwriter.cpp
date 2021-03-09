@@ -165,7 +165,10 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
 
         case GffStruct::FieldType::Orientation:
             complex.resize(16);
-            memcpy(&complex[0], &field.quatValue[0], 16);
+            memcpy(&complex[0], &field.quatValue.w, 4);
+            memcpy(&complex[4], &field.quatValue.x, 4);
+            memcpy(&complex[8], &field.quatValue.y, 4);
+            memcpy(&complex[12], &field.quatValue.z, 4);
             return FieldClassification::Complex;
 
         case GffStruct::FieldType::Vector:

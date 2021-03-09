@@ -111,7 +111,7 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
                 break;
             }
             case GffStruct::FieldType::Orientation:
-                tree.put(id, boost::format("%f|%f|%f|%f") % field.quatValue[0] % field.quatValue[1] % field.quatValue[2] % field.quatValue[3]);
+                tree.put(id, boost::format("%f|%f|%f|%f") % field.quatValue.w % field.quatValue.x % field.quatValue.y % field.quatValue.z);
                 break;
             case GffStruct::FieldType::Vector:
                 tree.put(id, boost::format("%f|%f|%f") % field.vecValue[0] % field.vecValue[1] % field.vecValue[2]);
