@@ -26,6 +26,16 @@ enum class Endianess {
     Big
 };
 
+struct DebugChannels {
+    static constexpr int general = 1;
+    static constexpr int gui = 2;
+    static constexpr int script = 4;
+    static constexpr int conversation = 8;
+    static constexpr int combat = 16;
+
+    static constexpr int all = general | gui | script | conversation | combat;
+};
+
 typedef std::vector<char> ByteArray;
 
 } // namespace reone
