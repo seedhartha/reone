@@ -31,6 +31,7 @@ struct WindowID {
     static constexpr wxWindowID launch = wxID_HIGHEST + 1;
     static constexpr wxWindowID gameDir = wxID_HIGHEST + 2;
     static constexpr wxWindowID resolution = wxID_HIGHEST + 3;
+    static constexpr wxWindowID devMode = wxID_HIGHEST + 4;
 };
 
 class LauncherFrame : public wxFrame {
@@ -42,10 +43,12 @@ private:
         std::string gameDir;
         int width { 0 };
         int height { 0 };
+        bool devMode { false };
     } _config;
 
-    wxTextCtrl *_textGameDir;
+    wxTextCtrl *_textCtrlGameDir;
     wxChoice *_choiceResolution;
+    wxCheckBox *_checkBoxDev;
 
     void OnLaunch(wxCommandEvent &event);
     void OnGameDirLeftDown(wxMouseEvent &event);
