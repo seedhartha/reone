@@ -25,6 +25,7 @@
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../render/window.h"
+#include "../resource/gameidutil.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -44,7 +45,7 @@ GUI::GUI(GameID gameId, const GraphicsOptions &opts) : _gameId(gameId), _gfxOpts
 }
 
 string GUI::getResRef(const string &base) const {
-    return _gameId == GameID::TSL ? base + "_p" : base;
+    return isTSL(_gameId) ? base + "_p" : base;
 }
 
 void GUI::load() {
@@ -86,7 +87,7 @@ void GUI::load() {
 void GUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         switch (type) {
             case BackgroundType::Computer0:
             case BackgroundType::Computer1:

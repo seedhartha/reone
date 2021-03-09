@@ -19,6 +19,8 @@
 
 #include <unordered_map>
 
+#include "../../../resource/gameidutil.h"
+
 #include "../../game.h"
 
 using namespace std;
@@ -48,7 +50,7 @@ InGameMenu::InGameMenu(Game *game) :
 
     _resRef = getResRef("top");
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         _resolutionX = 800;
         _resolutionY = 600;
     }

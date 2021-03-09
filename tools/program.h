@@ -55,7 +55,6 @@ private:
 
     void initOptions();
     void loadOptions();
-    void determineGameID();
     void loadTools();
 
     std::shared_ptr<ITool> getTool() const;

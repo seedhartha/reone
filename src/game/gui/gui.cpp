@@ -18,6 +18,7 @@
 #include "gui.h"
 
 #include "../../audio/player.h"
+#include "../../resource/gameidutil.h"
 
 #include "colorutil.h"
 #include "sounds.h"
@@ -47,7 +48,7 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
 }
 
 void GameGUI::initForGame() {
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {

@@ -17,14 +17,16 @@
 
 #include "stringprocessor.h"
 
+#include "gameidutil.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace resource {
 
-void StringProcessor::process(string &str, GameID ver) const {
-    if (ver == GameID::TSL) {
+void StringProcessor::process(string &str, GameID gameId) const {
+    if (isTSL(gameId)) {
         stripDeveloperNotes(str);
     }
 }

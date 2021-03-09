@@ -19,6 +19,7 @@
 
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
+#include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
 
 #include "../../characterutil.h"
@@ -137,23 +138,20 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
 }
 
 void ClassSelection::configureClassModels() {
-    switch (_gameId) {
-        case GameID::TSL:
-            configureClassModel(0, Gender::Male, ClassType::JediConsular);
-            configureClassModel(1, Gender::Male, ClassType::JediSentinel);
-            configureClassModel(2, Gender::Male, ClassType::JediGuardian);
-            configureClassModel(3, Gender::Female, ClassType::JediGuardian);
-            configureClassModel(4, Gender::Female, ClassType::JediSentinel);
-            configureClassModel(5, Gender::Female, ClassType::JediConsular);
-            break;
-        default:
-            configureClassModel(0, Gender::Male, ClassType::Scoundrel);
-            configureClassModel(1, Gender::Male, ClassType::Scout);
-            configureClassModel(2, Gender::Male, ClassType::Soldier);
-            configureClassModel(3, Gender::Female, ClassType::Soldier);
-            configureClassModel(4, Gender::Female, ClassType::Scout);
-            configureClassModel(5, Gender::Female, ClassType::Scoundrel);
-            break;
+    if (isTSL(_gameId)) {
+        configureClassModel(0, Gender::Male, ClassType::JediConsular);
+        configureClassModel(1, Gender::Male, ClassType::JediSentinel);
+        configureClassModel(2, Gender::Male, ClassType::JediGuardian);
+        configureClassModel(3, Gender::Female, ClassType::JediGuardian);
+        configureClassModel(4, Gender::Female, ClassType::JediSentinel);
+        configureClassModel(5, Gender::Female, ClassType::JediConsular);
+    } else {
+        configureClassModel(0, Gender::Male, ClassType::Scoundrel);
+        configureClassModel(1, Gender::Male, ClassType::Scout);
+        configureClassModel(2, Gender::Male, ClassType::Soldier);
+        configureClassModel(3, Gender::Female, ClassType::Soldier);
+        configureClassModel(4, Gender::Female, ClassType::Scout);
+        configureClassModel(5, Gender::Female, ClassType::Scoundrel);
     }
 }
 

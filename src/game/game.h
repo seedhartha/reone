@@ -266,8 +266,6 @@ private:
     */
     void deinit();
 
-    void determineGameID();
-
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     void loadNextModule();

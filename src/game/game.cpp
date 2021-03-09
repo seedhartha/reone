@@ -34,6 +34,7 @@
 #include "../render/textures.h"
 #include "../render/walkmesh/walkmeshes.h"
 #include "../render/window.h"
+#include "../resource/gameidutil.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
 #include "../video/bikfile.h"
@@ -72,14 +73,8 @@ Game::Game(const fs::path &path, const Options &opts) :
     _party(this),
     _scriptRunner(this) {
 
-    determineGameID();
-
+    _gameId = determineGameID(path);
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
-}
-
-void Game::determineGameID() {
-    fs::path exePath(getPathIgnoreCase(_path, "swkotor2.exe", false));
-    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
 int Game::run() {
@@ -174,12 +169,7 @@ void Game::changeScreen(GameScreen screen) {
 }
 
 string Game::getMainMenuMusic() const {
-    switch (_gameId) {
-        case GameID::TSL:
-            return "mus_sion";
-        default:
-            return "mus_theme_cult";
-    }
+    return isTSL(_gameId) ? "mus_sion" : "mus_theme_cult";
 }
 
 void Game::playMusic(const string &resRef) {
@@ -551,7 +541,7 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    string imageResRef(_gameId == GameID::TSL ? "load_default" : "load_chargen");
+    string imageResRef(isTSL(_gameId) ? "load_default" : "load_chargen");
     withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
@@ -564,12 +554,7 @@ void Game::startCharacterGeneration() {
 }
 
 string Game::getCharacterGenerationMusic() const {
-    switch (_gameId) {
-        case GameID::TSL:
-            return "mus_main";
-        default:
-            return "mus_theme_rep";
-    }
+    return isTSL(_gameId) ? "mus_main" : "mus_theme_rep";
 }
 
 void Game::quit() {

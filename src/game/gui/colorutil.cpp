@@ -17,6 +17,8 @@
 
 #include "colorutil.h"
 
+#include "../../resource/gameidutil.h"
+
 using namespace reone::resource;
 
 namespace reone {
@@ -31,30 +33,15 @@ static glm::vec3 g_tslHilightColor(0.768627f, 0.768627f, 0.686275f);
 static glm::vec3 g_tslDisabledColor(0.513725f, 0.513725f, 0.415686f);
 
 glm::vec3 getBaseColor(GameID gameId) {
-    switch (gameId) {
-        case GameID::TSL:
-            return g_tslBaseColor;
-        default:
-            return g_kotorBaseColor;
-    }
+    return isTSL(gameId) ? g_tslBaseColor : g_kotorBaseColor;
 }
 
 glm::vec3 getHilightColor(GameID gameId) {
-    switch (gameId) {
-        case GameID::TSL:
-            return g_tslHilightColor;
-        default:
-            return g_kotorHilightColor;
-    }
+    return isTSL(gameId) ? g_tslHilightColor : g_kotorHilightColor;
 }
 
 glm::vec3 getDisabledColor(GameID gameId) {
-    switch (gameId) {
-        case GameID::TSL:
-            return g_tslDisabledColor;
-        default:
-            return g_kotorDisabledColor;
-    }
+    return isTSL(gameId) ? g_tslDisabledColor : g_kotorDisabledColor;
 }
 
 } // namespace game

@@ -17,23 +17,20 @@
 
 #pragma once
 
-#include <string>
+#include <boost/filesystem/path.hpp>
 
 #include "types.h"
-
-using namespace std;
 
 namespace reone {
 
 namespace resource {
 
-class StringProcessor {
-public:
-    void process(std::string &str, GameID gameId) const;
+/**
+ * @return GameID determined from the specified game directory
+ */
+GameID determineGameID(const boost::filesystem::path &gameDir);
 
-private:
-    void stripDeveloperNotes(std::string &str) const;
-};
+bool isTSL(GameID gameId);
 
 } // namespace resource
 

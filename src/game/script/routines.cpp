@@ -18,6 +18,7 @@
 #include "routines.h"
 
 #include "../../common/log.h"
+#include "../../resource/gameidutil.h"
 
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"
@@ -41,13 +42,10 @@ Routines &Routines::instance() {
 void Routines::init(GameID gameId, Game *game) {
     _game = game;
 
-    switch (gameId) {
-        case GameID::KotOR:
-            addKotorRoutines();
-            break;
-        case GameID::TSL:
-            addTslRoutines();
-            break;
+    if (isTSL(gameId)) {
+        addTslRoutines();
+    } else {
+        addKotorRoutines();
     }
 }
 

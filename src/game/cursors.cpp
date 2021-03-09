@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefKotor = {
+static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefKotorTsl = {
     { CursorType::Default, { 4, 5 } },
     { CursorType::Talk, { 14, 15 } },
     { CursorType::Door, { 26, 27 } },
@@ -43,7 +43,7 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefKotor 
     { CursorType::Attack, { 54, 55 } }
 };
 
-static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefTsl = {
+static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefSteamTsl = {
     { CursorType::Default, { 3, 4 } },
     { CursorType::Talk, { 13, 14 } },
     { CursorType::Door, { 25, 26 } },
@@ -86,7 +86,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
 }
 
 const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type) {
-    auto &nameByResRef = (_gameId == GameID::TSL) ? g_namesByResRefTsl : g_namesByResRefKotor;
+    auto &nameByResRef = (_gameId == GameID::TSL_Steam) ? g_namesByResRefSteamTsl : g_namesByResRefKotorTsl;
     return getCursorNames(type, nameByResRef);
 }
 

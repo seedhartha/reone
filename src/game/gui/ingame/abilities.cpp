@@ -19,6 +19,7 @@
 
 #include "../../../gui/control/listbox.h"
 #include "../../../render/textures.h"
+#include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
@@ -77,7 +78,7 @@ void AbilitiesMenu::load() {
 
 static shared_ptr<Texture> getFrameTexture(GameID gameId) {
     string resRef;
-    if (gameId == GameID::TSL) {
+    if (isTSL(gameId)) {
         resRef = "uibit_eqp_itm1";
     } else {
         resRef = "lbl_hex_3";

@@ -18,6 +18,7 @@
 #include "loadscreen.h"
 
 #include "../../gui/control/progressbar.h"
+#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -37,7 +38,7 @@ LoadingScreen::LoadingScreen(Game *game) :
 
     _resRef = getResRef("loadscreen");
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
