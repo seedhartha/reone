@@ -31,7 +31,10 @@ static const char kIconName[] = "reone";
 static const wxSize g_windowSize { 400, 150 };
 
 LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
+#ifdef _WIN32
     SetIcon(wxIcon(kIconName));
+#endif
+
     SetSize(g_windowSize);
 
     wxArrayString choices;
@@ -64,7 +67,12 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     int width = stoi(tokens[0]);
     int height = stoi(tokens[1]);
 
-    string cmd(str(boost::format("reone --width=%d --height=%d") % width % height));
+    string exe("reone");
+#ifndef _WIN32
+    exe.insert(0, "./");
+#endif
+
+    string cmd(str(boost::format("%s --width=%d --height=%d") % exe % width % height));
     system(cmd.c_str());
 
     Close(true);
