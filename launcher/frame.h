@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -26,8 +28,9 @@
 namespace reone {
 
 struct WindowID {
-    static constexpr wxWindowID btnLaunch = wxID_HIGHEST + 1;
-    static constexpr wxWindowID choiceResolution = wxID_HIGHEST + 2;
+    static constexpr wxWindowID launch = wxID_HIGHEST + 1;
+    static constexpr wxWindowID gameDir = wxID_HIGHEST + 2;
+    static constexpr wxWindowID resolution = wxID_HIGHEST + 3;
 };
 
 class LauncherFrame : public wxFrame {
@@ -35,9 +38,20 @@ public:
     LauncherFrame();
 
 private:
+    struct Configuration {
+        std::string gameDir;
+        int width { 0 };
+        int height { 0 };
+    } _config;
+
+    wxTextCtrl *_textGameDir;
     wxChoice *_choiceResolution;
 
     void OnLaunch(wxCommandEvent &event);
+    void OnGameDirLeftDown(wxMouseEvent &event);
+
+    void LoadConfiguration();
+    void SaveConfiguration();
 
     wxDECLARE_EVENT_TABLE();
 };

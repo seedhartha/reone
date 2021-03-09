@@ -711,7 +711,7 @@ if(BUILD_LAUNCHER)
         endif()
 
         include(${wxWidgets_USE_FILE})
-        target_link_libraries(launcher ${wxWidgets_LIBRARIES})
+        target_link_libraries(launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
         set_target_properties(launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     else()
