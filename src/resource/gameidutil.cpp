@@ -15,25 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "gameidutil.h"
 
-#include <string>
+#include "../common/pathutil.h"
 
-#include "types.h"
-
-using namespace std;
+namespace fs = boost::filesystem;
 
 namespace reone {
 
 namespace resource {
 
-class StringProcessor {
-public:
-    void process(std::string &str, GameID gameId) const;
+GameID determineGameID(const fs::path &gameDir) {
+    // If there is no swkotor2 executable, then this is KotOR
+    fs::path exePath(getPathIgnoreCase(gameDir, "swkotor2.exe", false));
+    if (exePath.empty()) return GameID::KotOR;
 
-private:
-    void stripDeveloperNotes(std::string &str) const;
-};
+    // If there is a "steam_api.dll" file, then this is a Steam version of TSL
+    fs::path dllPath(getPathIgnoreCase(gameDir, "steam_api.dll", false));
+    if (!dllPath.empty()) return GameID::TSL_Steam;
+
+    return GameID::TSL;
+}
+
+bool isTSL(GameID gameId) {
+    switch (gameId) {
+        case GameID::TSL:
+        case GameID::TSL_Steam:
+            return true;
+        default:
+            return false;
+    }
+}
 
 } // namespace resource
 

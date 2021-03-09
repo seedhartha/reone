@@ -21,6 +21,7 @@
 
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
+#include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
@@ -419,7 +420,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
         setControlText("NEW_REFL_LBL", to_string(throws.reflex));
         setControlText("NEW_WILL_LBL", to_string(throws.will));

@@ -24,6 +24,7 @@
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
 #include "../../render/model/models.h"
+#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
@@ -56,14 +57,11 @@ MainMenu::MainMenu(Game *game) :
     GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    switch (game->gameId()) {
-        case GameID::TSL:
-            _resRef = "mainmenu8x6_p";
-            break;
-        default:
-            _resRef = "mainmenu16x12";
+    if (isTSL(game->gameId())) {
+        _resRef = "mainmenu8x6_p";
+    } else {
+        _resRef = "mainmenu16x12";
             _backgroundType = BackgroundType::Menu;
-            break;
     }
 
     _resolutionX = 800;
@@ -99,7 +97,7 @@ void MainMenu::configureButtons() {
     setButtonColors("BTN_NEWGAME");
     setButtonColors("BTN_OPTIONS");
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         setButtonColors("BTN_MUSIC");
     }
 }
@@ -186,15 +184,12 @@ void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<CreatureBlueprint> playerBlueprint;
     shared_ptr<CreatureBlueprint> companionBlueprint;
 
-    switch (_gameId) {
-        case GameID::TSL:
-            playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
-            companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
-            break;
-        default:
-            playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefCarth);
-            companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefBastila);
-            break;
+    if (isTSL(_gameId)) {
+        playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
+        companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
+    } else {
+        playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefCarth);
+        companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefBastila);
     }
 
     Party &party = _game->party();
@@ -211,14 +206,11 @@ void MainMenu::onModuleSelected(const string &name) {
     companion->setImmortal(true);
     party.addMember(0, companion);
 
-    switch (_gameId) {
-        case GameID::TSL:
-            player->equip("w_blaste_01");
-            companion->equip("w_melee_06");
-            break;
-        default:
-            companion->equip("g_w_dblsbr004");
-            break;
+    if (isTSL(_gameId)) {
+        player->equip("w_blaste_01");
+        companion->equip("w_melee_06");
+    } else {
+        companion->equip("g_w_dblsbr004");
     }
 
     _game->loadModule(name);

@@ -20,6 +20,7 @@
 #include "../../gui/control/imagebutton.h"
 #include "../../gui/control/listbox.h"
 #include "../../render/textures.h"
+#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -98,7 +99,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
 
 shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

@@ -21,6 +21,7 @@
 #include "../../gui/control/label.h"
 #include "../../render/meshes.h"
 #include "../../render/window.h"
+#include "../../resource/gameidutil.h"
 
 #include "../game.h"
 
@@ -228,7 +229,7 @@ void HUD::drawMinimap() {
 }
 
 void HUD::drawHealth(int memberIndex) {
-    if (_gameId == GameID::TSL) return;
+    if (isTSL(_gameId)) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));

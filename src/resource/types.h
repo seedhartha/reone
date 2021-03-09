@@ -28,7 +28,8 @@ namespace resource {
 
 enum class GameID {
     KotOR,
-    TSL
+    TSL,
+    TSL_Steam
 };
 
 /**

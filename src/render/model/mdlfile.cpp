@@ -23,6 +23,7 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
 #include "../model/models.h"
@@ -708,7 +709,7 @@ unique_ptr<ModelMesh> MdlFile::readMesh(const string &nodeName, int nodeFlags) {
 
     ignore(10);
 
-    if (_gameId == GameID::TSL) ignore(8);
+    if (isTSL(_gameId)) ignore(8);
 
     uint32_t mdxDataOffset = readUint32();
     uint32_t vertCoordsOffset = readUint32();

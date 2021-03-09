@@ -29,6 +29,7 @@
 #include "format/gfffile.h"
 #include "format/rimfile.h"
 #include "folder.h"
+#include "gameidutil.h"
 #include "typeutil.h"
 
 using namespace std;
@@ -116,17 +117,12 @@ void Resources::indexAudioFiles() {
     indexDirectory(musicPath);
     indexDirectory(soundsPath);
 
-    switch (_gameId) {
-        case GameID::TSL: {
-            fs::path voicePath(getPathIgnoreCase(_gamePath, kVoiceDirectoryName));
-            indexDirectory(voicePath);
-            break;
-        }
-        default: {
-            fs::path wavesPath(getPathIgnoreCase(_gamePath, kWavesDirectoryName));
-            indexDirectory(wavesPath);
-            break;
-        }
+    if (isTSL(_gameId)) {
+        fs::path voicePath(getPathIgnoreCase(_gamePath, kVoiceDirectoryName));
+        indexDirectory(voicePath);
+    } else {
+        fs::path wavesPath(getPathIgnoreCase(_gamePath, kWavesDirectoryName));
+        indexDirectory(wavesPath);
     }
 }
 
@@ -174,7 +170,7 @@ void Resources::indexTalkTable() {
 }
 
 void Resources::indexExeFile() {
-    string filename(_gameId == GameID::TSL ? kExeFileNameTsl : kExeFileNameKotor);
+    string filename(isTSL(_gameId) ? kExeFileNameTsl : kExeFileNameKotor);
     fs::path path(getPathIgnoreCase(_gamePath, filename));
 
     _exeFile.load(path);
@@ -235,7 +231,7 @@ void Resources::loadModule(const string &name) {
     if (fs::exists(lipModPath)) {
         indexTransientErfFile(lipModPath);
     }
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         fs::path dlgPath(getPathIgnoreCase(modulesPath, name + "_dlg.erf"));
         indexTransientErfFile(dlgPath);
     }

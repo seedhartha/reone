@@ -30,6 +30,7 @@
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../render/window.h"
+#include "../resource/gameidutil.h"
 #include "../resource/types.h"
 
 #include "game.h"
@@ -73,7 +74,7 @@ void Map::loadTextures(const string &area) {
 
     if (!_arrowTexture) {
         string resRef("mm_barrow");
-        if (_game->gameId() == GameID::TSL) {
+        if (isTSL(_game->gameId())) {
             resRef += "_p";
         }
         _arrowTexture = Textures::instance().get(resRef, TextureUsage::GUI);

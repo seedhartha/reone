@@ -25,6 +25,7 @@
 #include <boost/program_options.hpp>
 
 #include "../src/common/pathutil.h"
+#include "../src/resource/gameidutil.h"
 
 #include "tools.h"
 #include "types.h"
@@ -57,7 +58,9 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 int Program::run() {
     initOptions();
     loadOptions();
-    determineGameID();
+
+    _gameId = determineGameID(_gamePath);
+
     loadTools();
 
     switch (_operation) {
@@ -132,11 +135,6 @@ void Program::loadOptions() {
             break;
         }
     }
-}
-
-void Program::determineGameID() {
-    fs::path exePath = getPathIgnoreCase(_gamePath, "swkotor2.exe");
-    _gameId = exePath.empty() ? GameID::KotOR : GameID::TSL;
 }
 
 void Program::loadTools() {

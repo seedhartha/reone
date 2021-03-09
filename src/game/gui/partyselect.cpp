@@ -22,6 +22,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
 #include "../../render/textures.h"
+#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 #include "../../script/types.h"
 
@@ -58,7 +59,7 @@ PartySelection::PartySelection(Game *game) :
     GameGUI(game->gameId(), game->options().graphics),
     _game(game) {
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";

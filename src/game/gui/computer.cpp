@@ -18,6 +18,7 @@
 #include "computer.h"
 
 #include "../../gui/control/listbox.h"
+#include "../../resource/gameidutil.h"
 
 #include "colorutil.h"
 
@@ -38,7 +39,7 @@ ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
     _scaling = ScalingMode::Stretch;
     _repliesControlTag = kControlTagReplies;
 
-    if (_gameId == GameID::TSL) {
+    if (isTSL(_gameId)) {
         _resolutionX = 800;
         _resolutionY = 600;
     }

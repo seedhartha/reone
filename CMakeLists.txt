@@ -89,6 +89,7 @@ set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(RESOURCE_HEADERS
     src/resource/2da.h
+    src/resource/gameidutil.h
     src/resource/gffstruct.h
     src/resource/folder.h
     src/resource/format/2dafile.h
@@ -115,6 +116,7 @@ set(RESOURCE_HEADERS
 
 set(RESOURCE_SOURCES
     src/resource/2da.cpp
+    src/resource/gameidutil.cpp
     src/resource/gffstruct.cpp
     src/resource/folder.cpp
     src/resource/format/2dafile.cpp
