@@ -36,7 +36,7 @@ namespace reone {
 static const char kIconName[] = "reone";
 static const char kConfigFilename[] = "reone.cfg";
 
-static const wxSize g_windowSize { 400, 300 };
+static const wxSize g_windowSize { 400, 400 };
 
 LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
     // Configure this frame
@@ -153,11 +153,12 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
-    topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(graphicsSizer, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
+    topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
+    topSizer->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), 0, wxEXPAND | wxALL, 3);
 
     SetSizer(topSizer);
 }
@@ -191,6 +192,21 @@ void LauncherFrame::LoadConfiguration() {
 }
 
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
+    SaveConfiguration();
+
+    string exe("reone");
+#ifndef _WIN32
+    exe.insert(0, "./");
+#endif
+
+    system(exe.c_str());
+
+    Close(true);
+}
+
+void LauncherFrame::SaveConfiguration() {
+    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=", "logfile=" };
+
     string resolution(_choiceResolution->GetStringSelection());
 
     vector<string> tokens;
@@ -227,21 +243,6 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     _config.debugch = debugch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 
-    SaveConfiguration();
-
-    string exe("reone");
-#ifndef _WIN32
-    exe.insert(0, "./");
-#endif
-
-    system(exe.c_str());
-
-    Close(true);
-}
-
-void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=", "logfile=" };
-
     vector<string> lines;
 
     fs::ifstream in(kConfigFilename);
@@ -272,6 +273,10 @@ void LauncherFrame::SaveConfiguration() {
     }
 }
 
+void LauncherFrame::OnSaveConfig(wxCommandEvent &event) {
+    SaveConfiguration();
+}
+
 void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
     wxDirDialog dlg(nullptr, "Choose game directory", _textCtrlGameDir->GetValue(), wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dlg.ShowModal() == wxID_OK) {
@@ -281,6 +286,7 @@ void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
 
 wxBEGIN_EVENT_TABLE(LauncherFrame, wxFrame)
 EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)
+EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig)
 wxEND_EVENT_TABLE()
 
 } // namespace reone
