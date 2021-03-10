@@ -26,10 +26,12 @@
 #include "common/log.h"
 #include "common/types.h"
 #include "game/game.h"
+#include "render/featureutil.h"
 
 using namespace std;
 
 using namespace reone::game;
+using namespace reone::render;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -71,6 +73,7 @@ void Program::initOptions() {
         ("width", po::value<int>()->default_value(800), "window width")
         ("height", po::value<int>()->default_value(600), "window height")
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
+        ("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")
         ("numlights", po::value<int>()->default_value(kDefaultNumLights), "maximum number of lights")
         ("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution")
         ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
@@ -116,6 +119,11 @@ void Program::loadOptions() {
 
     if (vars.count("debugch") > 0) {
         setDebugChannels(vars["debugch"].as<int>());
+    }
+    if (vars["pbr"].as<bool>()) {
+        setFeatureEnabled(Feature::PBR, true);
+        setFeatureEnabled(Feature::HDR, true);
+        setFeatureEnabled(Feature::DynamicRoomLighting, true);
     }
 }
 
