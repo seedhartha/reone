@@ -67,7 +67,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     wxArrayString resChoices;
     set<string> uniqueRes;
 
-    wxArrayVideoModes modes(wxDisplay(this).GetModes());
+    wxArrayVideoModes modes(wxDisplay(wxDisplay::GetFromWindow(this)).GetModes());
     for (size_t i = 0; i < modes.GetCount(); ++i) {
         wxVideoMode mode = modes[i];
         string res(str(boost::format("%dx%d") % mode.GetWidth() % mode.GetHeight()));
