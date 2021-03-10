@@ -93,9 +93,13 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
+    _checkBoxEnhancedGfx = new wxCheckBox(this, WindowID::enhancedGfx, "Enhanced Graphics", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxEnhancedGfx->SetValue(_config.pbr);
+
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, 0, wxEXPAND, 0);
     graphicsSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
+    graphicsSizer->Add(_checkBoxEnhancedGfx, 0, wxEXPAND | wxALL, 3);
 
     wxArrayString debugChoices;
     debugChoices.Add("0");
@@ -176,6 +180,7 @@ void LauncherFrame::LoadConfiguration() {
         ("width", po::value<int>())
         ("height", po::value<int>())
         ("fullscreen", po::value<bool>())
+        ("pbr", po::value<bool>())
         ("debug", po::value<int>())
         ("debugch", po::value<int>())
         ("logfile", po::value<bool>());
@@ -191,6 +196,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.width = vars.count("width") > 0 ? vars["width"].as<int>() : 1024;
     _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
     _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
+    _config.pbr = vars.count("pbr") > 0 ? vars["pbr"].as<bool>() : false;
     _config.debug = vars.count("debug") > 0 ? vars["debug"].as<int>() : 0;
     _config.debugch = vars.count("debugch") > 0 ? vars["debugch"].as<int>() : DebugChannels::all;
     _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
@@ -210,7 +216,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "dev=", "debug=", "debugch=", "logfile=" };
+    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "debug=", "debugch=", "logfile=" };
 
     string resolution(_choiceResolution->GetStringSelection());
 
@@ -244,6 +250,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
+    _config.pbr = _checkBoxEnhancedGfx->IsChecked();
     _config.debug = stoi(string(_choiceDebugLevel->GetStringSelection()));
     _config.debugch = debugch;
     _config.logfile = _checkBoxLogFile->IsChecked();
@@ -270,6 +277,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
+    config << "pbr=" << (_config.pbr ? 1 : 0) << endl;
     config << "debug=" << _config.debug << endl;
     config << "debugch=" << _config.debugch << endl;
     config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
