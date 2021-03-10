@@ -88,6 +88,10 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
+    auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
+    graphicsSizer->Add(resSizer, 0, wxEXPAND, 0);
+    graphicsSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
+
     wxArrayString debugChoices;
     debugChoices.Add("0");
     debugChoices.Add("1");
@@ -152,8 +156,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(resSizer, 0, wxEXPAND, 0);
-    topSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
+    topSizer->Add(graphicsSizer, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
 
     SetSizer(topSizer);
