@@ -32,7 +32,9 @@ Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.
 
 ## Usage
 
-Specify a game path to run the game, e.g. `reone --game C:\swkotor`
+Launch reone either using the launcher application, or from the command line:
+
+`reone --game C:\swkotor`
 
 Controls:
 
@@ -51,7 +53,9 @@ Developer mode controls:
 
 ## Configuration
 
-reone can be configured from either a command line or a configuration file. Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of options [here](https://github.com/seedhartha/reone/wiki/Program-options).
+reone can be configured from either the launcher, the configuration file, or the command line.
+
+Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of program options [here](https://github.com/seedhartha/reone/wiki/Program-options).
 
 ## Similar Projects
 
