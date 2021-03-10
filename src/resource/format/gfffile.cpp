@@ -144,7 +144,7 @@ GffStruct::Field GffFile::readField(int idx) {
         }
         case GffStruct::FieldType::Vector: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float)));
-            field.vecValue = glm::make_vec3((reinterpret_cast<float *>(&data[0])));
+            field.vecValue = glm::make_vec3(reinterpret_cast<float *>(&data[0]));
             break;
         }
         case GffStruct::FieldType::StrRef:
