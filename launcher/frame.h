@@ -36,6 +36,7 @@ struct WindowID {
     static constexpr wxWindowID debug = wxID_HIGHEST + 6;
     static constexpr wxWindowID debugChannels = wxID_HIGHEST + 7;
     static constexpr wxWindowID logFile = wxID_HIGHEST + 8;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 9;
 };
 
 class LauncherFrame : public wxFrame {
@@ -63,6 +64,7 @@ private:
     wxCheckBox *_checkBoxLogFile;
 
     void OnLaunch(wxCommandEvent &event);
+    void OnSaveConfig(wxCommandEvent &event);
     void OnGameDirLeftDown(wxMouseEvent &event);
 
     void LoadConfiguration();
