@@ -1020,6 +1020,10 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         if (model) {
             _game->sceneGraph().addRoot(model);
         }
+        auto creature = dynamic_pointer_cast<Creature>(object);
+        if (creature) {
+            creature->runSpawnScript();
+        }
     }
 
     return move(object);
