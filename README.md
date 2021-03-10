@@ -37,21 +37,6 @@ Launch reone either using the launcher application, or from the command line:
 
 `reone --game C:\swkotor`
 
-Controls:
-
-- Use WASD and ZC keys to move around
-- Left click to interact with an object
-- Right click and move the mouse to rotate the camera
-- Press Space to pause the game
-- Press "~" to toggle the debug console
-
-Developer mode controls:
-
-- Press V to switch the camera type
-- Use "+" and "-" keys to adjust the game speed
-- Press F1-F3 to toggle graphical features
-- Use "[" and "]" keys to adjust PBR HDR mode exposure
-
 ## Configuration
 
 reone can be configured from either the launcher, the configuration file, or the command line.
