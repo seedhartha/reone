@@ -24,6 +24,8 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include <wx/display.h>
+
 #include "../src/common/types.h"
 
 using namespace std;
@@ -62,15 +64,18 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxDev->SetValue(_config.devMode);
 
-    int displayWidth, displayHeight;
-    wxDisplaySize(&displayWidth, &displayHeight);
-
     wxArrayString resChoices;
-    resChoices.Add("800x600");
-    resChoices.Add("1024x768");
-    resChoices.Add("1280x960");
-    resChoices.Add("1280x1024");
-    resChoices.Add(str(boost::format("%dx%d") % displayWidth % displayHeight));
+    set<string> uniqueRes;
+
+    wxArrayVideoModes modes(wxDisplay(this).GetModes());
+    for (size_t i = 0; i < modes.GetCount(); ++i) {
+        wxVideoMode mode = modes[i];
+        string res(str(boost::format("%dx%d") % mode.GetWidth() % mode.GetHeight()));
+        if (uniqueRes.count(res) == 0) {
+            resChoices.Add(res);
+            uniqueRes.insert(res);
+        }
+    }
 
     string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
