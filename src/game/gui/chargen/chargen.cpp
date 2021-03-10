@@ -311,6 +311,8 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
+        _character->attributes().addClassLevels(_character->attributes().getEffectiveClass(), 1);
+
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
         partyLeader->attributes() = _character->attributes();
         _game->openInGame();
