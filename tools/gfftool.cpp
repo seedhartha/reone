@@ -114,7 +114,7 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
                 tree.put(id, boost::format("%f|%f|%f|%f") % field.quatValue.w % field.quatValue.x % field.quatValue.y % field.quatValue.z);
                 break;
             case GffStruct::FieldType::Vector:
-                tree.put(id, boost::format("%f|%f|%f") % field.vecValue[0] % field.vecValue[1] % field.vecValue[2]);
+                tree.put(id, boost::format("%f|%f|%f") % field.vecValue.x % field.vecValue.y % field.vecValue.z);
                 break;
             default:
                 cerr << "Unsupported GFF field type: " << to_string(static_cast<int>(field.type)) << endl;
@@ -219,7 +219,7 @@ static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
             case GffStruct::FieldType::Vector: {
                 string value(child.second.get_value<string>());
                 boost::split(tokens, value, boost::is_any_of("|"), boost::token_compress_on);
-                field.quatValue = glm::vec3(stof(tokens[0]), stof(tokens[1]), stof(tokens[2]));
+                field.vecValue = glm::vec3(stof(tokens[0]), stof(tokens[1]), stof(tokens[2]));
                 break;
             }
             case GffStruct::FieldType::StrRef:
