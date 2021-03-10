@@ -55,8 +55,6 @@ static DispositionsMap initDispositions() {
 
     // Friendlies
 
-    setMutualEnemies(Faction::Friendly1, Faction::Friendly2, result);
-
     setMutualEnemies(Faction::Friendly1, Faction::Hostile1, result);
     setMutualEnemies(Faction::Friendly1, Faction::Hostile2, result);
     setMutualEnemies(Faction::Friendly1, Faction::Insane, result);
