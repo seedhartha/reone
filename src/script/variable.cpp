@@ -204,12 +204,24 @@ const string Variable::toString() const {
             return to_string(intValue);
         case VariableType::Float:
             return to_string(floatValue);
-        case VariableType::Object:
-            return object ? to_string(object->id()) : empty;
         case VariableType::String:
             return str(boost::format("\"%s\"") % strValue);
+        case VariableType::Object:
+            return object ? to_string(object->id()) : empty;
+        case VariableType::Vector:
+            return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
+        case VariableType::Effect:
+            return "effect";
+        case VariableType::Event:
+            return "event";
+        case VariableType::Location:
+            return "location";
+        case VariableType::Talent:
+            return "talent";
+        case VariableType::Action:
+            return "action";
         default:
-            return "[not implemented]";
+            throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
     }
 }
 

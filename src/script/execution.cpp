@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include "../common/log.h"
@@ -90,7 +91,7 @@ int ScriptExecution::run() {
     } else {
         callerTag = "[empty]";
     }
-    debug(boost::format("Script: run %s %s") % callerTag % _program->name(), 1, DebugChannels::script);
+    debug(boost::format("Script: run %s as %s") % _program->name() % callerTag, 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {
@@ -248,7 +249,12 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     Variable retValue = routine.invoke(args, _context);
 
     if (getDebugLogLevel() >= 2) {
-        debug(boost::format("Script: action: %04x %s -> %s") % ins.offset % routine.name() % retValue.toString(), 2, DebugChannels::script);
+        vector<string> argStrings;
+        for (auto &arg : args) {
+            argStrings.push_back(arg.toString());
+        }
+        string argsString(boost::join(argStrings, ", "));
+        debug(boost::format("Script: action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), 2, DebugChannels::script);
     }
     switch (routine.returnType()) {
         case VariableType::Void:
