@@ -71,6 +71,7 @@ public:
     std::shared_ptr<render::Texture> icon() const { return _icon; }
     WeaponType weaponType() const { return _weaponType; }
     WeaponWield weaponWield() const { return _weaponWield; }
+    const std::string &descIdentified() const { return _descIdentified; }
 
     void setDropable(bool dropable);
     void setStackSize(int size);
@@ -97,6 +98,7 @@ private:
     bool _identified { true };
     bool _equipped { false };
     std::shared_ptr<AmmunitionType> _ammunitionType;
+    std::string _descIdentified;
 
     friend class ItemBlueprint;
 };
