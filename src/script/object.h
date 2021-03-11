@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include <boost/noncopyable.hpp>
 
@@ -30,11 +31,15 @@ public:
     virtual ~ScriptObject() = default;
 
     uint32_t id() const { return _id; }
+    const std::string &tag() const { return _tag; }
+
+    void setTag(std::string tag);
 
 protected:
     uint32_t _id { 0 };
+    std::string _tag;
 
-    ScriptObject(uint32_t id) : _id(id) { }
+    ScriptObject(uint32_t id);
 };
 
 } // namespace script

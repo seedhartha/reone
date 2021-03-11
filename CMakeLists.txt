@@ -376,6 +376,7 @@ set(SCRIPT_SOURCES
     src/script/execution.cpp
     src/script/instrutil.cpp
     src/script/ncsreader.cpp
+    src/script/object.cpp
     src/script/program.cpp
     src/script/routine.cpp
     src/script/scripts.cpp
