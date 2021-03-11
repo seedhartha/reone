@@ -23,6 +23,7 @@
 #include "../common/streamutil.h"
 #include "../resource/format/ssfreader.h"
 #include "../resource/resources.h"
+#include "../resource/strings.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -53,7 +54,7 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
 
     vector<uint32_t> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
-        string soundResRef(boost::to_lower_copy(Resources::instance().getSoundByStrRef(sounds[i])));
+        string soundResRef(boost::to_lower_copy(Strings::instance().getSound(sounds[i])));
         shared_ptr<AudioStream> sound(AudioFiles::instance().get(soundResRef));
         if (sound) {
             result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));

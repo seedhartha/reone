@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 using namespace std;
 
@@ -36,8 +37,8 @@ CreatureClass::CreatureClass(ClassType type) : _type(type) {
 }
 
 void CreatureClass::load(const TwoDA &twoDa, int row) {
-    _name = Resources::instance().getString(twoDa.getInt(row, "name"));
-    _description = Resources::instance().getString(twoDa.getInt(row, "description"));
+    _name = Strings::instance().get(twoDa.getInt(row, "name"));
+    _description = Strings::instance().get(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
     _skillPointBase = twoDa.getInt(row, "skillpointbase");
 

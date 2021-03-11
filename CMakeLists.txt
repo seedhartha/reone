@@ -115,7 +115,7 @@ set(RESOURCE_HEADERS
     src/resource/keybifprovider.h
     src/resource/resourceprovider.h
     src/resource/resources.h
-    src/resource/stringprocessor.h
+    src/resource/strings.h
     src/resource/types.h
     src/resource/typeutil.h)
 
@@ -142,7 +142,7 @@ set(RESOURCE_SOURCES
     src/resource/format/visreader.cpp
     src/resource/keybifprovider.cpp
     src/resource/resources.cpp
-    src/resource/stringprocessor.cpp
+    src/resource/strings.cpp
     src/resource/typeutil.cpp)
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})

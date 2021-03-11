@@ -23,6 +23,7 @@
 #include "../../render/model/models.h"
 #include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/types.h"
 #include "../../script/scripts.h"
@@ -65,7 +66,7 @@ void Door::load(const GffStruct &gffs) {
 
     int transDestStrRef = gffs.getInt("TransitionDestin");
     if (transDestStrRef != -1) {
-        _transitionDestin = Resources::instance().getString(transDestStrRef);
+        _transitionDestin = Strings::instance().get(transDestStrRef);
     }
 
     loadBlueprint(gffs);

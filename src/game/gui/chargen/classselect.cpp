@@ -20,7 +20,7 @@
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
 #include "../../../resource/gameidutil.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../characterutil.h"
 #include "../../game.h"
@@ -207,10 +207,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
     ClassButton &button = _classButtons[idx];
     ClassType clazz = button.character->attributes().getEffectiveClass();
 
-    string classText(Resources::instance().getString(g_genderStrRefs[button.character->gender()]));
+    string classText(Strings::instance().get(g_genderStrRefs[button.character->gender()]));
     classText += " " + Classes::instance().get(clazz)->name();
 
-    string descText(Resources::instance().getString(g_classDescStrRefs[clazz]));
+    string descText(Strings::instance().get(g_classDescStrRefs[clazz]));
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);

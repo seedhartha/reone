@@ -34,6 +34,7 @@
 #include "../../resource/format/lytreader.h"
 #include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 #include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
 
@@ -174,7 +175,7 @@ void Area::loadPTH() {
 }
 
 void Area::loadARE(const GffStruct &are) {
-    _localizedName = Resources::instance().getString(are.getInt("Name", -1));
+    _localizedName = Strings::instance().get(are.getInt("Name", -1));
 
     loadCameraStyle(are);
     loadAmbientColor(are);

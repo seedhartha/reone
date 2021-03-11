@@ -29,6 +29,7 @@
 #include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 #include "../../scene/types.h"
 #include "../../script/types.h"
 
@@ -498,7 +499,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = Resources::instance().getString(kStrRefRemains);
+    _name = Strings::instance().get(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag, 2);
 

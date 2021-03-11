@@ -24,6 +24,7 @@
 #include "../../common/log.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../object/creature.h"
 #include "../portraitutil.h"
@@ -83,11 +84,11 @@ void CreatureBlueprint::loadName(Creature &creature) {
 
     int firstNameStrRef = _utc->getInt("FirstName", -1);
     if (firstNameStrRef != -1) {
-        firstName = Resources::instance().getString(firstNameStrRef);
+        firstName = Strings::instance().get(firstNameStrRef);
     }
     int lastNameStrRef = _utc->getInt("LastName", -1);
     if (lastNameStrRef != -1) {
-        lastName = Resources::instance().getString(lastNameStrRef);
+        lastName = Strings::instance().get(lastNameStrRef);
     }
 
     if (!firstName.empty() && !lastName.empty()) {

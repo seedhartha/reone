@@ -22,7 +22,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../../gui/control/listbox.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../rp/classes.h"
 
@@ -222,7 +222,7 @@ void CharGenSkills::onFocusChanged(const string &control, bool focus) {
     if (maybeSkill != g_skillByLabelTag.end() && focus) {
         auto maybeDescription = g_descStrRefBySkill.find(maybeSkill->second);
         if (maybeDescription != g_descStrRefBySkill.end()) {
-            string description(Resources::instance().getString(maybeDescription->second));
+            string description(Strings::instance().get(maybeDescription->second));
             ListBox &listBox = getControl<ListBox>("LB_DESC");
             listBox.clearItems();
             listBox.addTextLinesAsItems(description);

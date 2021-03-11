@@ -21,7 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../object/door.h"
 
@@ -48,7 +48,7 @@ void DoorBlueprint::load(Door &door) {
 
     int locNameStrRef = _utd->getInt("LocName", -1);
     if (locNameStrRef != -1) {
-        door._name = Resources::instance().getString(locNameStrRef);
+        door._name = Strings::instance().get(locNameStrRef);
     }
 
     door._conversation = boost::to_lower_copy(_utd->getString("Conversation"));

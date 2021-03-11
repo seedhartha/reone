@@ -23,6 +23,7 @@
 
 #include "../../common/log.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 #include "../../scene/node/meshnode.h"
 
 #include "../blueprint/blueprints.h"
@@ -59,7 +60,7 @@ void Trigger::load(const GffStruct &gffs) {
 
     int transDestIdx = gffs.getInt("TransitionDestin", -1);
     if (transDestIdx != -1) {
-        _transitionDestin = Resources::instance().getString(transDestIdx);
+        _transitionDestin = Strings::instance().get(transDestIdx);
     }
 
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));

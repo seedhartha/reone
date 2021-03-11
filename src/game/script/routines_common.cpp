@@ -22,7 +22,7 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../game.h"
 
@@ -265,7 +265,7 @@ Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionConte
 
 Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    return Variable(Resources::instance().getString(strRef));
+    return Variable(Strings::instance().get(strRef));
 }
 
 Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &ctx) {

@@ -21,7 +21,7 @@
 #include "../../gui/control/listbox.h"
 #include "../../render/textures.h"
 #include "../../resource/gameidutil.h"
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../game.h"
 #include "../object/item.h"
@@ -54,12 +54,12 @@ Container::Container(Game *game) :
 void Container::load() {
     GUI::load();
 
-    string btnMessage(Resources::instance().getString(kSwitchToResRef) + " " + Resources::instance().getString(kGiveItemResRef));
+    string btnMessage(Strings::instance().get(kSwitchToResRef) + " " + Strings::instance().get(kGiveItemResRef));
 
     Control &btnGiveItems = getControl("BTN_GIVEITEMS");
     btnGiveItems.setTextMessage(btnMessage);
 
-    string lblMessage(Resources::instance().getString(kInventoryResRef));
+    string lblMessage(Strings::instance().get(kInventoryResRef));
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
     configureItemsListBox();

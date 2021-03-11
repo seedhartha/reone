@@ -23,6 +23,7 @@
 
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../blueprint/blueprints.h"
 
@@ -54,9 +55,9 @@ void Waypoint::load(const GffStruct &gffs) {
     loadBlueprint(gffs);
 
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _localizedName = Resources::instance().getString(gffs.getInt("LocalizedName", -1));
-    _description = Resources::instance().getString(gffs.getInt("Description", -1));
-    _mapNote = Resources::instance().getString(gffs.getInt("MapNote", -1));
+    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName", -1));
+    _description = Strings::instance().get(gffs.getInt("Description", -1));
+    _mapNote = Strings::instance().get(gffs.getInt("MapNote", -1));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
 
     _position[0] = gffs.getFloat("XPosition");

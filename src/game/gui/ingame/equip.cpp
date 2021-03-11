@@ -23,7 +23,7 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../render/textures.h"
 #include "../../../resource/gameidutil.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../blueprint/blueprints.h"
 #include "../../game.h"
@@ -193,7 +193,7 @@ void Equipment::onFocusChanged(const string &control, bool focus) {
 
         auto maybeStrRef = g_slotStrRefs.find(name.first);
         if (maybeStrRef != g_slotStrRefs.end()) {
-            slotDesc = Resources::instance().getString(maybeStrRef->second);
+            slotDesc = Strings::instance().get(maybeStrRef->second);
         }
         break;
     }
@@ -348,7 +348,7 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = Resources::instance().getString(kStrRefNone);
+        lbItem.text = Strings::instance().get(kStrRefNone);
         lbItem.iconTexture = Textures::instance().get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 

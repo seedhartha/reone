@@ -29,7 +29,7 @@
 #include "../../render/textures.h"
 #include "../../render/textutil.h"
 #include "../../render/window.h"
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../gui.h"
 
@@ -167,7 +167,7 @@ void Control::loadText(const GffStruct &gffs) {
     _text.font = Fonts::instance().get(gffs.getString("FONT"));
 
     int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? gffs.getString("TEXT") : Resources::instance().getString(strRef);
+    _text.text = strRef == -1 ? gffs.getString("TEXT") : Strings::instance().get(strRef);
 
     _text.color = gffs.getVector("COLOR");
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));

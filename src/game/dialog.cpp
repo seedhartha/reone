@@ -21,7 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../resource/resources.h"
+#include "../resource/strings.h"
 
 using namespace std;
 
@@ -69,7 +69,7 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
 
     EntryReply entry;
     entry.speaker = gffs.getString("Speaker");
-    entry.text = strRef == -1 ? "" : Resources::instance().getString(strRef);
+    entry.text = strRef == -1 ? "" : Strings::instance().get(strRef);
     entry.voResRef = gffs.getString("VO_ResRef");
     entry.script = gffs.getString("Script");
     entry.sound = gffs.getString("Sound");

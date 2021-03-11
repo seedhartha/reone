@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "format/tlkreader.h"
+
 #include "types.h"
 
 using namespace std;
@@ -27,12 +29,32 @@ namespace reone {
 
 namespace resource {
 
-class StringProcessor {
+class Strings {
 public:
-    void process(std::string &str, GameID gameId) const;
+    static Strings &instance();
+
+    void init(GameID gameId, const boost::filesystem::path &gameDir);
+
+    /**
+     * Searches for a string in the global talktable by StrRef.
+     *
+     * @return string from the global talktable if found, empty string otherwise
+     */
+    std::string get(int strRef);
+
+    /**
+     * Searches for a sound in the global talktable by StrRef.
+     *
+     * @return ResRef of a sound from the global talktable if found, empty string otherwise
+     */
+    std::string getSound(int strRef);
 
 private:
-    void stripDeveloperNotes(std::string &str) const;
+    GameID _gameId { GameID::KotOR };
+    TlkReader _tlk;
+
+    void process(std::string &str);
+    void stripDeveloperNotes(std::string &str);
 };
 
 } // namespace resource
