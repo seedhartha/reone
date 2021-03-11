@@ -108,6 +108,7 @@ set(RESOURCE_HEADERS
     src/resource/format/lytreader.h
     src/resource/format/pereader.h
     src/resource/format/rimreader.h
+    src/resource/format/rimwriter.h
     src/resource/format/ssfreader.h
     src/resource/format/tlkreader.h
     src/resource/format/visreader.h
@@ -135,6 +136,7 @@ set(RESOURCE_SOURCES
     src/resource/format/lytreader.cpp
     src/resource/format/pereader.cpp
     src/resource/format/rimreader.cpp
+    src/resource/format/rimwriter.cpp
     src/resource/format/ssfreader.cpp
     src/resource/format/tlkreader.cpp
     src/resource/format/visreader.cpp

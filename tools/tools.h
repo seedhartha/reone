@@ -86,6 +86,7 @@ public:
 private:
     void list(const resource::RimReader &rim);
     void extract(resource::RimReader &rim, const boost::filesystem::path &destPath);
+    void toRIM(const boost::filesystem::path &target);
 };
 
 class TwoDaTool : public ITool {

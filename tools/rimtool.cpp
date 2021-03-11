@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include "../src/resource/format/rimwriter.h"
 #include "../src/resource/typeutil.h"
 
 using namespace std;
@@ -32,13 +33,23 @@ namespace reone {
 namespace tools {
 
 void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    RimReader rim;
-    rim.load(target);
-
-    if (operation == Operation::List) {
-        list(rim);
-    } else if (operation == Operation::Extract) {
-        extract(rim, destPath);
+    switch (operation) {
+        case Operation::List:
+        case Operation::Extract: {
+            RimReader rim;
+            rim.load(target);
+            if (operation == Operation::List) {
+                list(rim);
+            } else if (operation == Operation::Extract) {
+                extract(rim, destPath);
+            }
+            break;
+        }
+        case Operation::ToRIM:
+            toRIM(target);
+            break;
+        default:
+            break;
     }
 }
 
@@ -65,11 +76,52 @@ void RimTool::extract(RimReader &rim, const fs::path &destPath) {
     }
 }
 
+void RimTool::toRIM(const fs::path &target) {
+    RimWriter rim;
+
+    for (auto &entry : fs::directory_iterator(target)) {
+        fs::path path(entry);
+        if (fs::is_directory(path)) continue;
+
+        string ext(path.extension().string());
+        ext.erase(0, 1);
+
+        ResourceType resType = getResTypeByExt(ext, false);
+        if (resType == ResourceType::Invalid) continue;
+
+        fs::ifstream in(path, ios::binary);
+        in.seekg(0, ios::end);
+        size_t size = in.tellg();
+        ByteArray data(size);
+        in.seekg(0);
+        in.read(&data[0], size);
+
+        fs::path resRef(path.filename());
+        resRef.replace_extension("");
+
+        RimWriter::Resource res;
+        res.resRef = resRef.string();
+        res.resType = resType;
+        res.data = move(data);
+
+        rim.add(move(res));
+    }
+
+    fs::path rimPath(target.parent_path());
+    rimPath.append(target.filename().string() + ".rim");
+    rim.save(rimPath);
+}
+
 bool RimTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        target.extension() == ".rim" &&
-        (operation == Operation::List || operation == Operation::Extract);
+    switch (operation) {
+        case Operation::List:
+        case Operation::Extract:
+            return !fs::is_directory(target) && target.extension() == ".rim";
+        case Operation::ToRIM:
+            return fs::is_directory(target);
+        default:
+            return false;
+    }
 }
 
 } // namespace tools

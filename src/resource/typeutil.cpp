@@ -97,7 +97,7 @@ const string &getExtByResType(ResourceType type) {
     return g_extByType[type];
 }
 
-ResourceType getResTypeByExt(const string &ext) {
+ResourceType getResTypeByExt(const string &ext, bool logNotFound) {
     if (!g_typeByExtInited) {
         for (auto &entry : g_extByType) {
             g_typeByExt.insert(make_pair(entry.second, entry.first));
@@ -106,7 +106,9 @@ ResourceType getResTypeByExt(const string &ext) {
     }
     auto it = g_typeByExt.find(ext);
     if (it == g_typeByExt.end()) {
-        warn("Resource type not found by extension: " + ext);
+        if (logNotFound) {
+            warn("Resource type not found by extension: " + ext);
+        }
         return ResourceType::Invalid;
     }
 

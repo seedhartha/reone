@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 const std::string &getExtByResType(ResourceType type);
-ResourceType getResTypeByExt(const std::string &ext);
+ResourceType getResTypeByExt(const std::string &ext, bool logNotFound = true);
 
 } // namespace resource
 
