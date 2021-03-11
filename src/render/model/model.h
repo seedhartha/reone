@@ -71,7 +71,6 @@ public:
     float animationScale() const { return _animationScale; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
-    int maxNodeIndex() { return _maxNodeIndex; }
 
     void setAnimationScale(float scale);
 
@@ -86,7 +85,6 @@ private:
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
     float _animationScale { 1.0f };
-    int _maxNodeIndex { 0 }; /**< the maximum node index in this model, used to stitch multiple models together */
 
     void init(const std::shared_ptr<ModelNode> &node);
 

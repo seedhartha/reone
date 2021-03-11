@@ -52,7 +52,6 @@ Model::Model(
 void Model::init(const shared_ptr<ModelNode> &node) {
     _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
     _nodeByName.insert(make_pair(node->name(), node));
-    _maxNodeIndex = glm::max(_maxNodeIndex, node->index());
 
     shared_ptr<ModelMesh> mesh(node->mesh());
     if (mesh) {

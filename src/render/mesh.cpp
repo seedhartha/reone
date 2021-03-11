@@ -133,12 +133,11 @@ void Mesh::renderInstanced(int count) {
 void Mesh::computeAABB() {
     _aabb.reset();
 
-    const uint8_t *vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _offsets.vertexCoords;
-
     int stride = _offsets.stride;
     if (stride == 0) {
         stride = 3 * sizeof(float);
     }
+    auto vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _offsets.vertexCoords;
 
     for (size_t i = 0; i < _vertexCount; ++i) {
         _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
