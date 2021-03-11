@@ -96,6 +96,7 @@ public:
     void addTranslationKeyframe(Keyframe keyframe);
     void addOrientationKeyframe(Keyframe keyframe);
 
+    bool isAABB() const { return _aabb; }
     bool isSaber() const { return _saber; }
 
     bool getTranslation(float time, glm::vec3 &translation, float scale = 1.0f) const;
@@ -147,6 +148,7 @@ private:
     float _alpha { 1.0f };
     float _radius { 0.0f };
     float _multiplier { 1.0f };
+    bool _aabb { false };
     bool _saber { false };
 
     std::shared_ptr<ModelMesh> _mesh;

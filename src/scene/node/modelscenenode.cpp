@@ -44,7 +44,7 @@ namespace scene {
 
 static constexpr int kSelfIlluminatedPriority = 5;
 
-static bool g_drawAABB = false;
+static bool g_debugAABB = false;
 
 ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
     SceneNode(sceneGraph),
@@ -164,7 +164,7 @@ void ModelSceneNode::update(float dt) {
 }
 
 void ModelSceneNode::render() {
-    if (g_drawAABB) {
+    if (g_debugAABB) {
         glm::mat4 transform(_absoluteTransform * _aabb.transform());
 
         ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());

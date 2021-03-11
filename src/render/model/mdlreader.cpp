@@ -42,16 +42,18 @@ namespace render {
 static constexpr int kSignatureSize = 4;
 static constexpr int kMdlDataOffset = 12;
 
-static constexpr int kNodeHasHeader = 1;
-static constexpr int kNodeHasLight = 2;
-static constexpr int kNodeHasEmitter = 4;
-static constexpr int kNodeHasReference = 16;
-static constexpr int kNodeHasMesh = 32;
-static constexpr int kNodeHasSkin = 64;
-static constexpr int kNodeHasAnim = 128;
-static constexpr int kNodeHasDangly = 256;
-static constexpr int kNodeHasAABB = 512;
-static constexpr int kNodeHasSaber = 2048;
+struct NodeFlags {
+    static constexpr int header = 1;
+    static constexpr int light = 2;
+    static constexpr int emitter = 4;
+    static constexpr int reference = 0x10;
+    static constexpr int mesh = 0x20;
+    static constexpr int skin = 0x40;
+    static constexpr int anim = 0x80;
+    static constexpr int dangly = 0x100;
+    static constexpr int aabb = 0x200;
+    static constexpr int saber = 0x800;
+};
 
 static const char kSignature[] = "\0\0\0\0";
 
@@ -233,28 +235,31 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     node->_orientation = orientation;
     node->_localTransform = transform;
 
-    if (flags & kNodeHasEmitter) {
+    if (flags & NodeFlags::emitter) {
         node->_emitter = make_shared<Emitter>();
     }
 
     readControllers(controllerKeyCount, controllerKeyOffset, controllerData, *node);
 
-    if (flags & kNodeHasLight) {
+    if (flags & NodeFlags::light) {
         readLight(*node);
     }
-    if (flags & kNodeHasEmitter) {
+    if (flags & NodeFlags::emitter) {
         readEmitter(*node);
     }
-    if (flags & kNodeHasReference) {
+    if (flags & NodeFlags::reference) {
         ignore(68);
     }
-    if (flags & kNodeHasMesh) {
+    if (flags & NodeFlags::mesh) {
         node->_mesh = readMesh(name, flags);
     }
-    if (flags & kNodeHasSkin) {
+    if (flags & NodeFlags::skin) {
         readSkin(*node);
     }
-    if (flags & kNodeHasSaber) {
+    if (flags & NodeFlags::aabb) {
+        node->_aabb = true;
+    }
+    if (flags & NodeFlags::saber) {
         node->_saber = true;
     }
 
@@ -298,34 +303,34 @@ void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vec
                 readColorController(dataIndex, data, node);
                 break;
             case ControllerType::Radius_Birthrate:
-                if (node._flags & kNodeHasLight) {
+                if (node._flags & NodeFlags::light) {
                     readRadiusController(dataIndex, data, node);
-                } else if (node._flags & kNodeHasEmitter) {
+                } else if (node._flags & NodeFlags::emitter) {
                     readBirthrateController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SelfIllumColor:
-                if (!(node._flags & kNodeHasLight) && !(node._flags & kNodeHasEmitter)) {
+                if (!(node._flags & NodeFlags::light) && !(node._flags & NodeFlags::emitter)) {
                     readSelfIllumColorController(rowCount, timeIndex, dataIndex, data, node);
                 }
                 break;
             case ControllerType::FPS:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readFPSController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::FrameEnd:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readFrameEndController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::FrameStart:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readFrameStartController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::LifeExpectancy:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readLifeExpectancyController(dataIndex, data, node);
                 }
                 break;
@@ -333,77 +338,77 @@ void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vec
                 readAlphaController(rowCount, timeIndex, dataIndex, data, node);
                 break;
             case ControllerType::Multiplier_RandomVelocity:
-                if (node._flags & kNodeHasLight) {
+                if (node._flags & NodeFlags::light) {
                     readMultiplierController(dataIndex, data, node);
-                } else if (node._flags & kNodeHasEmitter) {
+                } else if (node._flags & NodeFlags::emitter) {
                     readRandomVelocityController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::Spread:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSpreadController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::Velocity:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readVelocityController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeX:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSizeXController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeY:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSizeYController(dataIndex, data, node);
                 }
                 break;
 
             case ControllerType::SizeStart:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSizeStartController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeMid:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSizeMidController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::SizeEnd:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readSizeEndController(dataIndex, data, node);
                 }
                 break;
 
             case ControllerType::ColorStart:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readColorStartController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::ColorMid:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readColorMidController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::ColorEnd:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readColorEndController(dataIndex, data, node);
                 }
                 break;
 
             case ControllerType::AlphaStart:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readAlphaStartController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::AlphaMid:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readAlphaMidController(dataIndex, data, node);
                 }
                 break;
             case ControllerType::AlphaEnd:
-                if (node._flags & kNodeHasEmitter) {
+                if (node._flags & NodeFlags::emitter) {
                     readAlphaEndController(dataIndex, data, node);
                 }
                 break;
@@ -716,13 +721,13 @@ unique_ptr<ModelMesh> MdlReader::readMesh(const string &nodeName, int nodeFlags)
     size_t endPos = tell();
 
     if (faceCount == 0) return nullptr;
-    if (mdxVertexSize == 0 && !(nodeFlags & kNodeHasSaber)) return nullptr;
+    if (mdxVertexSize == 0 && !(nodeFlags & NodeFlags::saber)) return nullptr;
 
     vector<float> vertices;
     Mesh::VertexOffsets offsets;
     vector<uint16_t> indices;
 
-    if (nodeFlags & kNodeHasSaber) {
+    if (nodeFlags & NodeFlags::saber) {
         // Lightsaber blade is a special case. It consists of four to eight
         // planes. Some of these planes are normal meshes, but some differ in
         // that their geometry is stored in the MDL, not MDX.
@@ -813,7 +818,7 @@ unique_ptr<ModelMesh> MdlReader::readMesh(const string &nodeName, int nodeFlags)
     mesh->computeAABB();
 
     auto modelMesh = make_unique<ModelMesh>(move(mesh));
-    modelMesh->setRender(render && (_classification == Model::Classification::Character || (!diffuse.empty() && diffuse != "null")));
+    modelMesh->setRender(render);
     modelMesh->setTransparency(transparency);
     modelMesh->setShadow(shadow);
     modelMesh->setBackgroundGeometry(backgroundGeometry != 0);
