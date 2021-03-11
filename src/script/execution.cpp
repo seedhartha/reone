@@ -89,7 +89,7 @@ int ScriptExecution::run() {
     if (_context.caller) {
         callerTag = _context.caller->tag();
     } else {
-        callerTag = "[empty]";
+        callerTag = "[invalid]";
     }
     debug(boost::format("Script: run %s as %s") % _program->name() % callerTag, 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;

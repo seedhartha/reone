@@ -207,7 +207,7 @@ const string Variable::toString() const {
         case VariableType::String:
             return str(boost::format("\"%s\"") % strValue);
         case VariableType::Object:
-            return object ? to_string(object->id()) : empty;
+            return to_string(object ? object->id() : kObjectInvalid);
         case VariableType::Vector:
             return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
         case VariableType::Effect:
