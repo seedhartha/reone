@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/gffreader.h"
 
 #include "../blueprint/placeable.h"
 

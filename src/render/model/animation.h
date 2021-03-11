@@ -27,7 +27,7 @@ namespace reone {
 
 namespace render {
 
-class MdlFile;
+class MdlReader;
 
 class Animation : boost::noncopyable {
 public:
@@ -64,7 +64,7 @@ private:
 
     void initNodeByName();
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

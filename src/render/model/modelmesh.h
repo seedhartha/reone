@@ -26,7 +26,7 @@ namespace reone {
 
 namespace render {
 
-class MdlFile;
+class MdlReader;
 
 /**
  * Corresponds to a Trimesh model node from an MDL model.
@@ -96,7 +96,7 @@ private:
 
     // END Textures
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

@@ -39,7 +39,7 @@ namespace tools {
 void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     bool isKey = target.extension() == ".key";
     if (isKey) {
-        KeyFile key;
+        KeyReader key;
         key.load(target);
 
         listKEY(key);
@@ -47,7 +47,7 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
     } else {
         fs::path keyPath(getPathIgnoreCase(gamePath, "chitin.key"));
 
-        KeyFile key;
+        KeyReader key;
         key.load(keyPath);
 
         int bifIdx = -1;
@@ -59,7 +59,7 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
         }
         if (bifIdx == -1) return;
 
-        BifFile bif;
+        BifReader bif;
         bif.load(target);
 
         if (operation == Operation::List) {
@@ -70,13 +70,13 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
     }
 }
 
-void KeyBifTool::listKEY(const KeyFile &key) {
+void KeyBifTool::listKEY(const KeyReader &key) {
     for (auto &file : key.files()) {
         cout << file.filename << " " << file.fileSize << endl;
     }
 }
 
-void KeyBifTool::listBIF(const KeyFile &key, const BifFile &bif, int bifIdx) {
+void KeyBifTool::listBIF(const KeyReader &key, const BifReader &bif, int bifIdx) {
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx == bifIdx) {
             cout << keyEntry.resRef << " " << getExtByResType(keyEntry.resType) << endl;
@@ -84,7 +84,7 @@ void KeyBifTool::listBIF(const KeyFile &key, const BifFile &bif, int bifIdx) {
     }
 }
 
-void KeyBifTool::extractBIF(const KeyFile &key, BifFile &bif, int bifIdx, const fs::path &destPath) {
+void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, const fs::path &destPath) {
     if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
 
     for (auto &keyEntry : key.keys()) {

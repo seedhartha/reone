@@ -24,7 +24,7 @@
 #include "glm/vec4.hpp"
 
 #include "../render/texture.h"
-#include "../resource/format/gfffile.h"
+#include "../resource/format/gffreader.h"
 
 namespace reone {
 

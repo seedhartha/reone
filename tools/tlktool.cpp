@@ -19,7 +19,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/format/tlkfile.h"
+#include "../src/resource/format/tlkreader.h"
 
 using namespace std;
 
@@ -42,7 +42,7 @@ void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::ptree children;
 
-    TlkFile tlk;
+    TlkReader tlk;
     tlk.load(path);
 
     shared_ptr<TalkTable> table(tlk.table());

@@ -29,7 +29,7 @@ namespace reone {
 
 namespace video {
 
-class BikFile;
+class BikReader;
 
 class Video {
 public:

@@ -32,7 +32,7 @@ namespace reone {
 namespace tools {
 
 void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    RimFile rim;
+    RimReader rim;
     rim.load(target);
 
     if (operation == Operation::List) {
@@ -42,17 +42,17 @@ void RimTool::invoke(Operation operation, const fs::path &target, const fs::path
     }
 }
 
-void RimTool::list(const RimFile &rim) {
+void RimTool::list(const RimReader &rim) {
     for (auto &res : rim.resources()) {
         cout << res.resRef << " " << getExtByResType(res.resType) << endl;
     }
 }
 
-void RimTool::extract(RimFile &rim, const fs::path &destPath) {
+void RimTool::extract(RimReader &rim, const fs::path &destPath) {
     if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
 
     for (size_t i = 0; i < rim.resources().size(); ++i) {
-        const RimFile::Resource &resEntry = rim.resources()[i];
+        const RimReader::Resource &resEntry = rim.resources()[i];
         string ext(getExtByResType(resEntry.resType));
         cout << "Extracting " << resEntry.resRef << " " << ext << endl;
         ByteArray data(rim.getResourceData(static_cast<int>(i)));

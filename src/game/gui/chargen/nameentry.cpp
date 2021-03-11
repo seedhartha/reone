@@ -55,7 +55,7 @@ void NameEntry::load() {
     _nameBoxEdit->setTextMessage("");
 }
 
-void NameEntry::loadLtrFile(const string &resRef, LtrFile &ltr) {
+void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
     shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
@@ -89,7 +89,7 @@ void NameEntry::loadRandomName() {
 
 string NameEntry::getRandomName() const {
     Gender gender = _charGen->character().gender();
-    const LtrFile &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
+    const LtrReader &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
     return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }
 

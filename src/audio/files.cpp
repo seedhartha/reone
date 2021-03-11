@@ -20,8 +20,8 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "format/mp3file.h"
-#include "format/wavfile.h"
+#include "format/mp3reader.h"
+#include "format/wavreader.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -45,14 +45,14 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
 
     shared_ptr<ByteArray> mp3Data(Resources::instance().get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
-        Mp3File mp3;
+        Mp3Reader mp3;
         mp3.load(wrap(mp3Data));
         result = mp3.stream();
     }
     if (!result) {
         shared_ptr<ByteArray> wavData(Resources::instance().get(resRef, ResourceType::Wav));
         if (wavData) {
-            WavFile wav;
+            WavReader wav;
             wav.load(wrap(wavData));
             result = wav.stream();
         }

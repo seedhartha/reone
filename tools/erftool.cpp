@@ -32,7 +32,7 @@ namespace reone {
 namespace tools {
 
 void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    ErfFile erf;
+    ErfReader erf;
     erf.load(target);
 
     if (operation == Operation::List) {
@@ -42,17 +42,17 @@ void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path
     }
 }
 
-void ErfTool::list(const ErfFile &erf) {
+void ErfTool::list(const ErfReader &erf) {
     for (auto &key : erf.keys()) {
         cout << key.resRef << " " << getExtByResType(key.resType) << endl;
     }
 }
 
-void ErfTool::extract(ErfFile &erf, const fs::path &destPath) {
+void ErfTool::extract(ErfReader &erf, const fs::path &destPath) {
     if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
 
     for (size_t i = 0; i < erf.keys().size(); ++i) {
-        const ErfFile::Key &key = erf.keys()[i];
+        const ErfReader::Key &key = erf.keys()[i];
         string ext(getExtByResType(key.resType));
         cout << "Extracting " << key.resRef << " " << ext << endl;
         ByteArray data(erf.getResourceData(static_cast<int>(i)));

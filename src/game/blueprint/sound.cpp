@@ -21,7 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../resource/format/2dafile.h"
+#include "../../resource/format/2dareader.h"
 #include "../../resource/resources.h"
 
 #include "../object/sound.h"

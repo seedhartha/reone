@@ -22,7 +22,7 @@
 #include "../../audio/stream.h"
 #include "../../render/model/model.h"
 #include "../../render/texture.h"
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/gffreader.h"
 
 #include "../blueprint/item.h"
 #include "../types.h"

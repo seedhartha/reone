@@ -23,10 +23,10 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "image/curfile.h"
-#include "image/tgafile.h"
-#include "image/tpcfile.h"
-#include "image/txifile.h"
+#include "image/curreader.h"
+#include "image/tgareader.h"
+#include "image/tpcreader.h"
+#include "image/txireader.h"
 #include "stateutil.h"
 #include "textureutil.h"
 #include "types.h"
@@ -111,14 +111,14 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
 
     shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
     if (tgaData) {
-        TgaFile tga(resRef, usage);
+        TgaReader tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
         if (texture) {
             shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
             if (txiData) {
-                TxiFile txi;
+                TxiReader txi;
                 txi.load(wrap(txiData));
                 texture->setFeatures(txi.features());
             }
@@ -128,7 +128,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     if (!texture) {
         shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Tpc, false));
         if (tpcData) {
-            TpcFile tpc(resRef, usage);
+            TpcReader tpc(resRef, usage);
             tpc.load(wrap(tpcData));
             texture = tpc.texture();
         }

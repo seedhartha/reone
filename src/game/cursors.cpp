@@ -21,7 +21,7 @@
 
 #include "../common/streamutil.h"
 #include "../render/cursor.h"
-#include "../render/image/curfile.h"
+#include "../render/image/curreader.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -101,7 +101,7 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type, const u
 shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
     shared_ptr<ByteArray> data(Resources::instance().getFromExe(name, PEResourceType::Cursor));
 
-    CurFile curFile;
+    CurReader curFile;
     curFile.load(wrap(data));
 
     return curFile.texture();

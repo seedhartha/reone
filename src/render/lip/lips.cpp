@@ -21,7 +21,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "lipfile.h"
+#include "lipreader.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -44,7 +44,7 @@ shared_ptr<LipAnimation> Lips::doGet(string resRef) {
     shared_ptr<ByteArray> lipData(Resources::instance().get(resRef, ResourceType::Lip));
     if (!lipData) return nullptr;
 
-    LipFile lip;
+    LipReader lip;
     lip.load(wrap(lipData));
 
     return lip.animation();

@@ -26,7 +26,7 @@
 
 #include "../../common/timer.h"
 #include "../../render/types.h"
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 
 #include "../actionexecutor.h"

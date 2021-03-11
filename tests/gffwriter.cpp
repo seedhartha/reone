@@ -21,7 +21,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "../src/resource/format/gfffile.h"
+#include "../src/resource/format/gffreader.h"
 #include "../src/resource/format/gffwriter.h"
 
 using namespace std;
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(test_save_load) {
     writer.save(out);
 
     auto in = make_shared<istringstream>(out->str());
-    GffFile gffFile;
-    gffFile.load(in);
-    auto readRoot = gffFile.root();
+    GffReader gff;
+    gff.load(in);
+    auto readRoot = gff.root();
 
     BOOST_TEST((readRoot->fields().size() == 2ll));
     BOOST_TEST((readRoot->fields()[0].children.size() == 1ll));

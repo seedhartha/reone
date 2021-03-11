@@ -20,7 +20,7 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "ncsfile.h"
+#include "ncsreader.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -43,7 +43,7 @@ shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
     shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ncs));
     if (!data) return nullptr;
 
-    NcsFile ncs(resRef);
+    NcsReader ncs(resRef);
     ncs.load(wrap(data));
 
     return ncs.program();

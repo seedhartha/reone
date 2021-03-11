@@ -22,8 +22,8 @@
 
 #include "../../audio/stream.h"
 #include "../../render/lip/lipanimation.h"
-#include "../../resource/format/2dafile.h"
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/2dareader.h"
+#include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 #include "../../script/types.h"
 

@@ -22,7 +22,7 @@
 #include "s3tc.h"
 
 #include "../src/common/log.h"
-#include "../src/render/image/tpcfile.h"
+#include "../src/render/image/tpcreader.h"
 
 extern "C" {
 
@@ -133,7 +133,7 @@ static void convertTpcToTga(const Texture &texture, TGAHeader &header, TGAData &
 void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Read TPC
 
-    TpcFile tpc("", TextureUsage::GUI, true);
+    TpcReader tpc("", TextureUsage::GUI, true);
     tpc.load(path);
 
     // Convert TPC to TGA

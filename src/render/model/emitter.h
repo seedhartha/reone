@@ -107,7 +107,7 @@ private:
     Constraints<glm::vec3> _color;
     Constraints<float> _alpha;
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

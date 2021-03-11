@@ -19,8 +19,8 @@
 
 #include <unordered_map>
 
-#include "format/biffile.h"
-#include "format/keyfile.h"
+#include "format/bifreader.h"
+#include "format/keyreader.h"
 #include "resourceprovider.h"
 
 namespace reone {
@@ -37,8 +37,8 @@ public:
 
 private:
     boost::filesystem::path _gamePath;
-    KeyFile _keyFile;
-    std::unordered_map<int, std::unique_ptr<BifFile>> _bifCache;
+    KeyReader _keyFile;
+    std::unordered_map<int, std::unique_ptr<BifReader>> _bifCache;
 };
 
 } // namespace resource

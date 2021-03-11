@@ -92,21 +92,21 @@ set(RESOURCE_HEADERS
     src/resource/gameidutil.h
     src/resource/gffstruct.h
     src/resource/folder.h
-    src/resource/format/2dafile.h
+    src/resource/format/2dareader.h
     src/resource/format/2dawriter.h
-    src/resource/format/biffile.h
-    src/resource/format/binfile.h
-    src/resource/format/erffile.h
-    src/resource/format/gfffile.h
+    src/resource/format/bifreader.h
+    src/resource/format/binreader.h
+    src/resource/format/erfreader.h
+    src/resource/format/gffreader.h
     src/resource/format/gffwriter.h
-    src/resource/format/keyfile.h
-    src/resource/format/ltrfile.h
-    src/resource/format/lytfile.h
-    src/resource/format/pefile.h
-    src/resource/format/rimfile.h
-    src/resource/format/ssffile.h
-    src/resource/format/tlkfile.h
-    src/resource/format/visfile.h
+    src/resource/format/keyreader.h
+    src/resource/format/ltrreader.h
+    src/resource/format/lytreader.h
+    src/resource/format/pereader.h
+    src/resource/format/rimreader.h
+    src/resource/format/ssfreader.h
+    src/resource/format/tlkreader.h
+    src/resource/format/visreader.h
     src/resource/keybifprovider.h
     src/resource/resourceprovider.h
     src/resource/resources.h
@@ -119,21 +119,21 @@ set(RESOURCE_SOURCES
     src/resource/gameidutil.cpp
     src/resource/gffstruct.cpp
     src/resource/folder.cpp
-    src/resource/format/2dafile.cpp
+    src/resource/format/2dareader.cpp
     src/resource/format/2dawriter.cpp
-    src/resource/format/biffile.cpp
-    src/resource/format/binfile.cpp
-    src/resource/format/erffile.cpp
-    src/resource/format/gfffile.cpp
+    src/resource/format/bifreader.cpp
+    src/resource/format/binreader.cpp
+    src/resource/format/erfreader.cpp
+    src/resource/format/gffreader.cpp
     src/resource/format/gffwriter.cpp
-    src/resource/format/keyfile.cpp
-    src/resource/format/ltrfile.cpp
-    src/resource/format/lytfile.cpp
-    src/resource/format/pefile.cpp
-    src/resource/format/rimfile.cpp
-    src/resource/format/ssffile.cpp
-    src/resource/format/tlkfile.cpp
-    src/resource/format/visfile.cpp
+    src/resource/format/keyreader.cpp
+    src/resource/format/ltrreader.cpp
+    src/resource/format/lytreader.cpp
+    src/resource/format/pereader.cpp
+    src/resource/format/rimreader.cpp
+    src/resource/format/ssfreader.cpp
+    src/resource/format/tlkreader.cpp
+    src/resource/format/visreader.cpp
     src/resource/keybifprovider.cpp
     src/resource/resources.cpp
     src/resource/stringprocessor.cpp
@@ -154,12 +154,12 @@ set(RENDER_HEADERS
     src/render/fonts.h
     src/render/fps.h
     src/render/framebuffer.h
-    src/render/image/curfile.h
-    src/render/image/tgafile.h
-    src/render/image/tpcfile.h
-    src/render/image/txifile.h
+    src/render/image/curreader.h
+    src/render/image/tgareader.h
+    src/render/image/tpcreader.h
+    src/render/image/txireader.h
     src/render/lip/lipanimation.h
-    src/render/lip/lipfile.h
+    src/render/lip/lipreader.h
     src/render/lip/lips.h
     src/render/material.h
     src/render/materials.h
@@ -167,7 +167,7 @@ set(RENDER_HEADERS
     src/render/meshes.h
     src/render/model/animation.h
     src/render/model/emitter.h
-    src/render/model/mdlfile.h
+    src/render/model/mdlreader.h
     src/render/model/model.h
     src/render/model/modelloader.h
     src/render/model/modelmesh.h
@@ -183,7 +183,7 @@ set(RENDER_HEADERS
     src/render/textureutil.h
     src/render/textutil.h
     src/render/types.h
-    src/render/walkmesh/bwmfile.h
+    src/render/walkmesh/bwmreader.h
     src/render/walkmesh/walkmesh.h
     src/render/walkmesh/walkmeshes.h
     src/render/walkmesh/walkmeshutil.h
@@ -197,18 +197,18 @@ set(RENDER_SOURCES
     src/render/fonts.cpp
     src/render/fps.cpp
     src/render/framebuffer.cpp
-    src/render/image/curfile.cpp
-    src/render/image/tgafile.cpp
-    src/render/image/tpcfile.cpp
-    src/render/image/txifile.cpp
+    src/render/image/curreader.cpp
+    src/render/image/tgareader.cpp
+    src/render/image/tpcreader.cpp
+    src/render/image/txireader.cpp
     src/render/lip/lipanimation.cpp
-    src/render/lip/lipfile.cpp
+    src/render/lip/lipreader.cpp
     src/render/lip/lips.cpp
     src/render/materials.cpp
     src/render/mesh.cpp
     src/render/meshes.cpp
     src/render/model/animation.cpp
-    src/render/model/mdlfile.cpp
+    src/render/model/mdlreader.cpp
     src/render/model/model.cpp
     src/render/model/modelmesh.cpp
     src/render/model/modelnode.cpp
@@ -222,7 +222,7 @@ set(RENDER_SOURCES
     src/render/textures.cpp
     src/render/textureutil.cpp
     src/render/textutil.cpp
-    src/render/walkmesh/bwmfile.cpp
+    src/render/walkmesh/bwmreader.cpp
     src/render/walkmesh/walkmesh.cpp
     src/render/walkmesh/walkmeshes.cpp
     src/render/walkmesh/walkmeshutil.cpp
@@ -237,8 +237,8 @@ set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(AUDIO_HEADERS
     src/audio/files.h
-    src/audio/format/mp3file.h
-    src/audio/format/wavfile.h
+    src/audio/format/mp3reader.h
+    src/audio/format/wavreader.h
     src/audio/player.h
     src/audio/soundhandle.h
     src/audio/soundinstance.h
@@ -247,8 +247,8 @@ set(AUDIO_HEADERS
 
 set(AUDIO_SOURCES
     src/audio/files.cpp
-    src/audio/format/mp3file.cpp
-    src/audio/format/wavfile.cpp
+    src/audio/format/mp3reader.cpp
+    src/audio/format/wavreader.cpp
     src/audio/player.cpp
     src/audio/soundhandle.cpp
     src/audio/soundinstance.cpp
@@ -262,11 +262,11 @@ set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libvideo static library
 
 set(VIDEO_HEADERS
-    src/video/bikfile.h
+    src/video/bikreader.h
     src/video/video.h)
 
 set(VIDEO_SOURCES
-    src/video/bikfile.cpp
+    src/video/bikreader.cpp
     src/video/video.cpp)
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
@@ -356,7 +356,7 @@ set(SCRIPT_HEADERS
     src/script/enginetype.h
     src/script/execution.h
     src/script/instrutil.h
-    src/script/ncsfile.h
+    src/script/ncsreader.h
     src/script/object.h
     src/script/program.h
     src/script/routine.h
@@ -367,7 +367,7 @@ set(SCRIPT_HEADERS
 set(SCRIPT_SOURCES
     src/script/execution.cpp
     src/script/instrutil.cpp
-    src/script/ncsfile.cpp
+    src/script/ncsreader.cpp
     src/script/program.cpp
     src/script/routine.cpp
     src/script/scripts.cpp

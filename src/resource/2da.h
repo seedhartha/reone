@@ -27,7 +27,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDaFile;
+class TwoDaReader;
 
 /**
  * Two-dimensional array, similar to a database table.
@@ -75,7 +75,7 @@ private:
     int getColumnIndex(const std::string &column) const;
     std::vector<int> getColumnIndices(const std::vector<std::string> &columns) const;
 
-    friend class TwoDaFile;
+    friend class TwoDaReader;
 };
 
 } // namespace resource

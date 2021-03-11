@@ -28,7 +28,7 @@
 #include "../render/lip/lips.h"
 #include "../render/materials.h"
 #include "../render/meshes.h"
-#include "../render/model/mdlfile.h"
+#include "../render/model/mdlreader.h"
 #include "../render/model/models.h"
 #include "../render/pbribl.h"
 #include "../render/textures.h"
@@ -37,7 +37,7 @@
 #include "../resource/gameidutil.h"
 #include "../resource/resources.h"
 #include "../script/scripts.h"
-#include "../video/bikfile.h"
+#include "../video/bikreader.h"
 #include "../video/video.h"
 
 #include "blueprint/blueprints.h"
@@ -134,7 +134,7 @@ void Game::setCursorType(CursorType type) {
 void Game::playVideo(const string &name) {
     fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
 
-    BikFile bik(path);
+    BikReader bik(path);
     bik.load();
 
     _video = bik.video();

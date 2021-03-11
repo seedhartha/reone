@@ -42,7 +42,7 @@ void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::pa
 }
 
 void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    TwoDaFile twoDaFile;
+    TwoDaReader twoDaFile;
     twoDaFile.load(path);
 
     pt::ptree tree;

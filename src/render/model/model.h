@@ -90,7 +90,7 @@ private:
 
     void init(const std::shared_ptr<ModelNode> &node);
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

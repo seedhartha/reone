@@ -31,8 +31,8 @@
 #include "../../render/meshes.h"
 #include "../../render/model/models.h"
 #include "../../render/walkmesh/walkmeshes.h"
-#include "../../resource/format/lytfile.h"
-#include "../../resource/format/visfile.h"
+#include "../../resource/format/lytreader.h"
+#include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
@@ -108,7 +108,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 }
 
 void Area::loadLYT() {
-    LytFile lyt;
+    LytReader lyt;
     lyt.load(wrap(Resources::instance().get(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
@@ -134,7 +134,7 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    VisFile vis;
+    VisReader vis;
     vis.load(wrap(Resources::instance().get(_name, ResourceType::Vis)));
 
     _visibility = fixVisibility(vis.visibility());

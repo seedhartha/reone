@@ -101,7 +101,7 @@ private:
 
     const Field *get(const std::string &name) const;
 
-    friend class GffFile;
+    friend class GffReader;
 };
 
 } // namespace resource
