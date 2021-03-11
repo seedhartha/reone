@@ -21,6 +21,7 @@
 #include "../../../render/textures.h"
 #include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../game.h"
 
@@ -60,9 +61,9 @@ void AbilitiesMenu::load() {
     disableControl("BTN_POWERS");
     disableControl("BTN_FEATS");
 
-    setControlText("LBL_SKILLRANK", Resources::instance().getString(kStrRefSkillRank));
-    setControlText("LBL_BONUS", Resources::instance().getString(kStrRefBonus));
-    setControlText("LBL_TOTAL", Resources::instance().getString(kStrRefTotalRank));
+    setControlText("LBL_SKILLRANK", Strings::instance().get(kStrRefSkillRank));
+    setControlText("LBL_BONUS", Strings::instance().get(kStrRefBonus));
+    setControlText("LBL_TOTAL", Strings::instance().get(kStrRefTotalRank));
 
     setControlText("LBL_RANKVAL", "");
     setControlText("LBL_BONUSVAL", "");
@@ -93,8 +94,8 @@ void AbilitiesMenu::loadSkills() {
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = Resources::instance().getString(skills->getInt(row, "name"));
-        skillInfo.description = Resources::instance().getString(skills->getInt(row, "description"));
+        skillInfo.name = Strings::instance().get(skills->getInt(row, "name"));
+        skillInfo.description = Strings::instance().get(skills->getInt(row, "description"));
         skillInfo.icon = Textures::instance().get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));

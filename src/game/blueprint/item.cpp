@@ -26,6 +26,7 @@
 #include "../../render/model/models.h"
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../object/item.h"
 
@@ -51,8 +52,8 @@ ItemBlueprint::ItemBlueprint(const string &resRef, const shared_ptr<GffStruct> &
 void ItemBlueprint::load(Item &item) {
     item._blueprintResRef = _resRef;
     item._tag = boost::to_lower_copy(_uti->getString("Tag"));
-    item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
-    item._descIdentified = Resources::instance().getString(_uti->getInt("DescIdentified"));
+    item._localizedName = Strings::instance().get(_uti->getInt("LocalizedName"));
+    item._descIdentified = Strings::instance().get(_uti->getInt("DescIdentified"));
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = _uti->getInt("BaseItem");

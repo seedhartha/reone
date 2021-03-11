@@ -23,7 +23,7 @@
 #include "../../gui/control/togglebutton.h"
 #include "../../render/textures.h"
 #include "../../resource/gameidutil.h"
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 #include "../../script/types.h"
 
 #include "../blueprint/blueprints.h"
@@ -178,7 +178,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(Resources::instance().getString(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(Strings::instance().get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     Button &btnAccept = getControl<Button>("BTN_ACCEPT");
     btnAccept.setTextMessage(text);
 }

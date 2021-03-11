@@ -21,7 +21,7 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
-#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../game.h"
 #include "../savedgame.h"
@@ -77,12 +77,12 @@ void SaveLoad::load() {
 }
 
 void SaveLoad::refresh() {
-    string panelName(Resources::instance().getString(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    string panelName(Strings::instance().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
 
     Control &lblPanelName = getControl("LBL_PANELNAME");
     lblPanelName.setTextMessage(panelName);
 
-    string actionName(Resources::instance().getString(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
+    string actionName(Strings::instance().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
 
     setControlDisabled("BTN_DELETE", _mode != Mode::Save);
 

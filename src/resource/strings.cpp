@@ -15,23 +15,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "stringprocessor.h"
+#include "strings.h"
+
+#include "../common/pathutil.h"
 
 #include "gameidutil.h"
 
 using namespace std;
 
+namespace fs = boost::filesystem;
+
 namespace reone {
 
 namespace resource {
 
-void StringProcessor::process(string &str, GameID gameId) const {
-    if (isTSL(gameId)) {
+Strings &Strings::instance() {
+    static Strings instance;
+    return instance;
+}
+
+void Strings::init(GameID gameId, const fs::path &gameDir) {
+    _gameId = gameId;
+
+    fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
+    _tlk.load(tlkPath);
+}
+
+string Strings::get(int strRef) {
+    shared_ptr<TalkTable> table(_tlk.table());
+    if (strRef == -1 || strRef >= table->getStringCount()) return "";
+
+    string text(table->getString(strRef).text);
+    process(text);
+
+    return move(text);
+}
+
+string Strings::getSound(int strRef) {
+    shared_ptr<TalkTable> table(_tlk.table());
+    if (strRef == -1 || strRef >= table->getStringCount()) return "";
+
+    return table->getString(strRef).soundResRef;
+}
+
+void Strings::process(string &str) {
+    if (isTSL(_gameId)) {
         stripDeveloperNotes(str);
     }
 }
 
-void StringProcessor::stripDeveloperNotes(string &str) const {
+void Strings::stripDeveloperNotes(string &str) {
     do {
         size_t openBracketIdx = str.find_first_of('{', 0);
         if (openBracketIdx == -1) break;

@@ -36,6 +36,7 @@
 #include "../render/window.h"
 #include "../resource/gameidutil.h"
 #include "../resource/resources.h"
+#include "../resource/strings.h"
 #include "../script/scripts.h"
 #include "../video/bikreader.h"
 #include "../video/video.h"
@@ -96,6 +97,7 @@ int Game::run() {
 
 void Game::init() {
     RenderWindow::instance().init(_options.graphics, this);
+    Strings::instance().init(_gameId, _path);
     Resources::instance().init(_gameId, _path);
     Meshes::instance().init();
     Textures::instance().init(_gameId);

@@ -29,11 +29,9 @@
 #include "2da.h"
 #include "format/keyreader.h"
 #include "format/pereader.h"
-#include "format/tlkreader.h"
 #include "gffstruct.h"
 #include "keybifprovider.h"
 #include "resourceprovider.h"
-#include "stringprocessor.h"
 #include "types.h"
 
 namespace reone {
@@ -57,26 +55,11 @@ public:
     std::shared_ptr<TwoDA> get2DA(const std::string &resRef, bool logNotFound = true);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
-    std::shared_ptr<TalkTable> getTalkTable(const std::string &resRef);
 
     /**
      * Searches for the raw resource data by ResRef and ResType.
      */
     std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
-
-    /**
-     * Searches for a string in the global talktable by StrRef.
-     *
-     * @return string from the global talktable if found, empty string otherwise
-     */
-    std::string getString(int strRef) const;
-
-    /**
-     * Searches for a sound in the global talktable by StrRef.
-     *
-     * @return ResRef of a sound from the global talktable if found, empty string otherwise
-     */
-    std::string getSoundByStrRef(int strRef) const;
 
     /**
      * @return list of available module names
@@ -87,11 +70,9 @@ private:
     GameID _gameId { GameID::KotOR };
     boost::filesystem::path _gamePath;
     std::vector<std::string> _moduleNames;
-    StringProcessor _stringProcessor;
 
     // Resource providers
 
-    TlkReader _tlkFile;
     PEReader _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
@@ -103,7 +84,6 @@ private:
     std::unordered_map<std::string, std::shared_ptr<TwoDA>> _2daCache;
     std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
     std::unordered_map<std::string, std::shared_ptr<ByteArray>> _resCache;
-    std::unordered_map<std::string, std::shared_ptr<TalkTable>> _talkTableCache;
 
     // END Resource caches
 
@@ -111,7 +91,6 @@ private:
 
     void indexKeyBifFiles();
     void indexTexturePacks();
-    void indexTalkTable();
     void indexAudioFiles();
     void indexLipModFiles();
     void indexExeReader();

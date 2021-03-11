@@ -41,7 +41,6 @@ namespace reone {
 namespace resource {
 
 static const char kPatchFileName[] = "patch.erf";
-static const char kTalkTableFileName[] = "dialog.tlk";
 static const char kExeFileNameKotor[] = "swkotor.exe";
 static const char kExeFileNameTsl[] = "swkotor2.exe";
 
@@ -68,7 +67,6 @@ void Resources::init(GameID gameId, const fs::path &gamePath) {
 
     indexKeyBifFiles();
     indexTexturePacks();
-    indexTalkTable();
     indexAudioFiles();
     indexLipModFiles();
     indexExeReader();
@@ -162,13 +160,6 @@ void Resources::indexOverrideDirectory() {
     indexDirectory(path);
 }
 
-void Resources::indexTalkTable() {
-    fs::path path(getPathIgnoreCase(_gamePath, kTalkTableFileName));
-    _tlkFile.load(path);
-
-    debug("Indexed " + path.string());
-}
-
 void Resources::indexExeReader() {
     string filename(isTSL(_gameId) ? kExeFileNameTsl : kExeFileNameKotor);
     fs::path path(getPathIgnoreCase(_gamePath, filename));
@@ -211,7 +202,6 @@ void Resources::invalidateCache() {
     _2daCache.clear();
     _gffCache.clear();
     _resCache.clear();
-    _talkTableCache.clear();
 }
 
 void Resources::loadModule(const string &name) {
@@ -334,44 +324,8 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
     });
 }
 
-shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
-    return findResource<TalkTable>(resRef, _talkTableCache, [this, &resRef]() {
-        shared_ptr<ByteArray> data(get(resRef, ResourceType::Dlg));
-        shared_ptr<TalkTable> table;
-
-        if (data) {
-            TlkReader tlk;
-            tlk.load(wrap(data));
-            table = tlk.table();
-        }
-
-        return move(table);
-    });
-}
-
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
     return _exeFile.find(name, type);
-}
-
-string Resources::getString(int strRef) const {
-    static string empty;
-
-    shared_ptr<TalkTable> table(_tlkFile.table());
-    if (strRef == -1 || strRef >= table->getStringCount()) {
-        return empty;
-    }
-
-    string text(table->getString(strRef).text);
-    _stringProcessor.process(text, _gameId);
-
-    return move(text);
-}
-
-string Resources::getSoundByStrRef(int strRef) const {
-    shared_ptr<TalkTable> table(_tlkFile.table());
-    if (strRef == -1 || strRef >= table->getStringCount()) return "";
-
-    return table->getString(strRef).soundResRef;
 }
 
 } // namespace resource

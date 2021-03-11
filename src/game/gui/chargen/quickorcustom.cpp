@@ -18,7 +18,7 @@
 #include "quickorcustom.h"
 
 #include "../../../gui/control/listbox.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../colorutil.h"
 
@@ -75,9 +75,9 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
     if (focus) {
         string text;
         if (control == "QUICK_CHAR_BTN") {
-            text = Resources::instance().getString(kStrRefQuickHelpText);
+            text = Strings::instance().get(kStrRefQuickHelpText);
         } else if (control == "CUST_CHAR_BTN") {
-            text = Resources::instance().getString(kStrRefCustomHelpText);
+            text = Strings::instance().get(kStrRefCustomHelpText);
         }
         auto &lbDesc = getControl<ListBox>("LB_DESC");
         lbDesc.clearItems();

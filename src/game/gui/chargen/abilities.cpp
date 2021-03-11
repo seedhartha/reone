@@ -24,7 +24,7 @@
 #include "glm/common.hpp"
 
 #include "../../../gui/control/listbox.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../rp/classes.h"
 
@@ -191,7 +191,7 @@ void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
         if (maybeAbility != g_abilityByAlias.end()) {
             auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
             if (maybeDescription != g_descStrRefByAbility.end()) {
-                string description(Resources::instance().getString(maybeDescription->second));
+                string description(Strings::instance().get(maybeDescription->second));
                 ListBox &listBox = getControl<ListBox>("LB_DESC");
                 listBox.clearItems();
                 listBox.addTextLinesAsItems(description);

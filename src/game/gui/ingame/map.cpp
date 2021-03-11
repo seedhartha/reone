@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../../game.h"
 #include "../../map.h"
@@ -110,7 +110,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(Resources::instance().getString(kStrRefMapNote));
+        string text(Strings::instance().get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 
