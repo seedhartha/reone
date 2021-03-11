@@ -699,7 +699,7 @@ endif()
 
 ## END reone-tools executable
 
-## Launcher executable
+## reone-launcher executable
 
 if(BUILD_LAUNCHER)
     if(wxWidgets_FOUND)
@@ -713,22 +713,22 @@ if(BUILD_LAUNCHER)
 
         if(WIN32)
             list(APPEND LAUNCHER_SOURCES res/reone.rc)
-            add_executable(launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
+            add_executable(reone-launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
         else()
-            add_executable(launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
+            add_executable(reone-launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
         endif()
 
         include(${wxWidgets_USE_FILE})
-        target_link_libraries(launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+        target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-        set_target_properties(launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+        set_target_properties(reone-launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     else()
         message(WARNING "wxWidgets not found - launcher cannot be built")
     endif()
 
 endif()
 
-## END Launcher executable
+## END reone-launcher executable
 
 ## Unit tests
 
