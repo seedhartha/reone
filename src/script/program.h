@@ -101,7 +101,7 @@ enum class InstructionType {
     FloatVector = 0x3c
 };
 
-class NcsFile;
+class NcsReader;
 
 struct Instruction {
     uint32_t offset { 0 };
@@ -148,7 +148,7 @@ private:
     uint32_t _length { 0 };
     std::unordered_map<uint32_t, Instruction> _instructions;
 
-    friend class NcsFile;
+    friend class NcsReader;
 };
 
 } // namespace script

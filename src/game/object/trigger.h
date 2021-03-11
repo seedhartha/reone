@@ -19,7 +19,7 @@
 
 #include <set>
 
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/gffreader.h"
 
 #include "spatial.h"
 

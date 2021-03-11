@@ -23,11 +23,11 @@
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
-#include "format/2dafile.h"
-#include "format/biffile.h"
-#include "format/erffile.h"
-#include "format/gfffile.h"
-#include "format/rimfile.h"
+#include "format/2dareader.h"
+#include "format/bifreader.h"
+#include "format/erfreader.h"
+#include "format/gffreader.h"
+#include "format/rimreader.h"
 #include "folder.h"
 #include "gameidutil.h"
 #include "typeutil.h"
@@ -71,7 +71,7 @@ void Resources::init(GameID gameId, const fs::path &gamePath) {
     indexTalkTable();
     indexAudioFiles();
     indexLipModFiles();
-    indexExeFile();
+    indexExeReader();
     indexOverrideDirectory();
 
     loadModuleNames();
@@ -102,7 +102,7 @@ void Resources::indexTexturePacks() {
 }
 
 void Resources::indexErfFile(const fs::path &path) {
-    auto erf = make_unique<ErfFile>();
+    auto erf = make_unique<ErfReader>();
     erf->load(path);
 
     _providers.push_back(move(erf));
@@ -140,7 +140,7 @@ void Resources::indexLipModFiles() {
 }
 
 void Resources::indexRimFile(const fs::path &path) {
-    auto rim = make_unique<RimFile>();
+    auto rim = make_unique<RimReader>();
     rim->load(path);
 
     _providers.push_back(move(rim));
@@ -169,7 +169,7 @@ void Resources::indexTalkTable() {
     debug("Indexed " + path.string());
 }
 
-void Resources::indexExeFile() {
+void Resources::indexExeReader() {
     string filename(isTSL(_gameId) ? kExeFileNameTsl : kExeFileNameKotor);
     fs::path path(getPathIgnoreCase(_gamePath, filename));
 
@@ -238,7 +238,7 @@ void Resources::loadModule(const string &name) {
 }
 
 void Resources::indexTransientRimFile(const fs::path &path) {
-    auto rim = make_unique<RimFile>();
+    auto rim = make_unique<RimReader>();
     rim->load(path);
 
     _transientProviders.push_back(move(rim));
@@ -247,7 +247,7 @@ void Resources::indexTransientRimFile(const fs::path &path) {
 }
 
 void Resources::indexTransientErfFile(const fs::path &path) {
-    auto erf = make_unique<ErfFile>();
+    auto erf = make_unique<ErfReader>();
     erf->load(path);
 
     _transientProviders.push_back(move(erf));
@@ -272,7 +272,7 @@ shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
         shared_ptr<TwoDA> twoDa;
 
         if (data) {
-            TwoDaFile file;
+            TwoDaReader file;
             file.load(wrap(data));
             twoDa = file.twoDa();
         }
@@ -325,7 +325,7 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
         shared_ptr<GffStruct> gffs;
 
         if (data) {
-            GffFile gff;
+            GffReader gff;
             gff.load(wrap(data));
             gffs = gff.root();
         }
@@ -340,7 +340,7 @@ shared_ptr<TalkTable> Resources::getTalkTable(const string &resRef) {
         shared_ptr<TalkTable> table;
 
         if (data) {
-            TlkFile tlk;
+            TlkReader tlk;
             tlk.load(wrap(data));
             table = tlk.table();
         }

@@ -20,7 +20,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "bwmfile.h"
+#include "bwmreader.h"
 
 using namespace std;
 
@@ -54,7 +54,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
-        BwmFile bwm;
+        BwmReader bwm;
         bwm.load(wrap(data));
         walkmesh = bwm.walkmesh();
     }

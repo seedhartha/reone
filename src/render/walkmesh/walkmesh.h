@@ -28,7 +28,7 @@ namespace reone {
 
 namespace render {
 
-class BwmFile;
+class BwmReader;
 
 class Walkmesh : boost::noncopyable {
 public:
@@ -49,7 +49,7 @@ private:
 
     void computeAABB();
 
-    friend class BwmFile;
+    friend class BwmReader;
 };
 
 } // namespace render

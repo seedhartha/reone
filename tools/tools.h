@@ -19,11 +19,11 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "../src/resource/format/2dafile.h"
-#include "../src/resource/format/biffile.h"
-#include "../src/resource/format/erffile.h"
-#include "../src/resource/format/keyfile.h"
-#include "../src/resource/format/rimfile.h"
+#include "../src/resource/format/2dareader.h"
+#include "../src/resource/format/bifreader.h"
+#include "../src/resource/format/erfreader.h"
+#include "../src/resource/format/keyreader.h"
+#include "../src/resource/format/rimreader.h"
 
 #include "types.h"
 
@@ -53,9 +53,9 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    void listKEY(const resource::KeyFile &key);
-    void listBIF(const resource::KeyFile &key, const resource::BifFile &bif, int bifIdx);
-    void extractBIF(const resource::KeyFile &key, resource::BifFile &bif, int bifIdx, const boost::filesystem::path &destPath);
+    void listKEY(const resource::KeyReader &key);
+    void listBIF(const resource::KeyReader &key, const resource::BifReader &bif, int bifIdx);
+    void extractBIF(const resource::KeyReader &key, resource::BifReader &bif, int bifIdx, const boost::filesystem::path &destPath);
 };
 
 class ErfTool : public ITool {
@@ -69,8 +69,8 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    void list(const resource::ErfFile &erf);
-    void extract(resource::ErfFile &erf, const boost::filesystem::path &destPath);
+    void list(const resource::ErfReader &erf);
+    void extract(resource::ErfReader &erf, const boost::filesystem::path &destPath);
 };
 
 class RimTool : public ITool {
@@ -84,8 +84,8 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    void list(const resource::RimFile &rim);
-    void extract(resource::RimFile &rim, const boost::filesystem::path &destPath);
+    void list(const resource::RimReader &rim);
+    void extract(resource::RimReader &rim, const boost::filesystem::path &destPath);
 };
 
 class TwoDaTool : public ITool {

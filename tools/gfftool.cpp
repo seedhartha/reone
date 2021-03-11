@@ -23,7 +23,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/format/gfffile.h"
+#include "../src/resource/format/gffreader.h"
 #include "../src/resource/format/gffwriter.h"
 #include "../src/resource/typeutil.h"
 
@@ -126,7 +126,7 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
 }
 
 void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    GffFile gff;
+    GffReader gff;
     gff.load(path);
 
     shared_ptr<GffStruct> gffs(gff.root());

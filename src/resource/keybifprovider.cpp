@@ -38,7 +38,7 @@ void KeyBifResourceProvider::init(const fs::path &keyPath) {
 }
 
 shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, ResourceType type) {
-    KeyFile::KeyEntry key;
+    KeyReader::KeyEntry key;
     if (!_keyFile.find(resRef, type, key)) return nullptr;
 
     shared_ptr<ByteArray> result;
@@ -56,7 +56,7 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, Re
             throw runtime_error(str(boost::format("BIF file not found: %s %s") % _gamePath % filename));
         }
 
-        auto bif = make_unique<BifFile>();
+        auto bif = make_unique<BifReader>();
         bif->load(bifPath);
 
         result = bif->getResourceData(key.resIdx);

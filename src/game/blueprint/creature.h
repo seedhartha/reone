@@ -23,7 +23,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../../resource/format/gfffile.h"
+#include "../../resource/format/gffreader.h"
 
 #include "../rp/attributes.h"
 

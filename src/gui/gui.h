@@ -26,7 +26,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
-#include "../resource/format/gfffile.h"
+#include "../resource/format/gffreader.h"
 #include "../resource/types.h"
 
 #include "control/control.h"

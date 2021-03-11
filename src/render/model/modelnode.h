@@ -176,7 +176,7 @@ private:
 
     // END Keyframes
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

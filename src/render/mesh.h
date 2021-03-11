@@ -28,7 +28,7 @@ namespace reone {
 
 namespace render {
 
-class MdlFile;
+class MdlReader;
 
 /**
  * Polygonal mesh, containing vertex and index data. Renders itself,
@@ -81,7 +81,7 @@ protected:
     uint32_t _vao { 0 };
     AABB _aabb;
 
-    friend class MdlFile;
+    friend class MdlReader;
 };
 
 } // namespace render

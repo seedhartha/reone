@@ -21,7 +21,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "../model/mdlfile.h"
+#include "../model/mdlreader.h"
 
 using namespace std;
 

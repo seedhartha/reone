@@ -27,9 +27,9 @@
 #include <boost/noncopyable.hpp>
 
 #include "2da.h"
-#include "format/keyfile.h"
-#include "format/pefile.h"
-#include "format/tlkfile.h"
+#include "format/keyreader.h"
+#include "format/pereader.h"
+#include "format/tlkreader.h"
 #include "gffstruct.h"
 #include "keybifprovider.h"
 #include "resourceprovider.h"
@@ -91,8 +91,8 @@ private:
 
     // Resource providers
 
-    TlkFile _tlkFile;
-    PEFile _exeFile;
+    TlkReader _tlkFile;
+    PEReader _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
 
@@ -114,7 +114,7 @@ private:
     void indexTalkTable();
     void indexAudioFiles();
     void indexLipModFiles();
-    void indexExeFile();
+    void indexExeReader();
     void indexOverrideDirectory();
 
     void indexErfFile(const boost::filesystem::path &path);

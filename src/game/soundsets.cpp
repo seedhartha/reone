@@ -21,7 +21,7 @@
 
 #include "../audio/files.h"
 #include "../common/streamutil.h"
-#include "../resource/format/ssffile.h"
+#include "../resource/format/ssfreader.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -48,7 +48,7 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
 
     auto result = make_shared<SoundSet>();
 
-    SsfFile ssf;
+    SsfReader ssf;
     ssf.load(wrap(data));
 
     vector<uint32_t> sounds(ssf.soundSet());

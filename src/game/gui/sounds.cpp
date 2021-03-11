@@ -19,7 +19,7 @@
 
 #include "../../audio/files.h"
 #include "../../resource/resources.h"
-#include "../../resource/format/2dafile.h"
+#include "../../resource/format/2dareader.h"
 
 using namespace std;
 

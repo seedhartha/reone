@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../../gui/textinput.h"
-#include "../../../resource/format/ltrfile.h"
+#include "../../../resource/format/ltrreader.h"
 
 #include "../gui.h"
 
@@ -41,13 +41,13 @@ private:
     CharacterGeneration *_charGen { nullptr };
     gui::TextInput _input;
     gui::Control *_nameBoxEdit { nullptr };
-    resource::LtrFile _maleLtr;
-    resource::LtrFile _femaleLtr;
-    resource::LtrFile _lastNameLtr;
+    resource::LtrReader _maleLtr;
+    resource::LtrReader _femaleLtr;
+    resource::LtrReader _lastNameLtr;
 
     void onClick(const std::string &control) override;
 
-    void loadLtrFile(const std::string &resRef, resource::LtrFile &ltr);
+    void loadLtrFile(const std::string &resRef, resource::LtrReader &ltr);
 
     std::string getRandomName() const;
 };
