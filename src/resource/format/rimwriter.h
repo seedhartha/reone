@@ -17,21 +17,34 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include <boost/filesystem/path.hpp>
+
+#include "../../common/types.h"
+
+#include "../types.h"
+
 namespace reone {
 
-namespace tools {
+namespace resource {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    ToJSON,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM
+class RimWriter {
+public:
+    struct Resource {
+        std::string resRef;
+        ResourceType resType { ResourceType::Invalid };
+        ByteArray data;
+    };
+
+    void add(Resource &&res);
+    void save(const boost::filesystem::path &path);
+
+private:
+    std::vector<Resource> _resources;
 };
 
-} // namespace tools
+} // namespace resource
 
 } // namespace reone

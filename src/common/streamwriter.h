@@ -42,6 +42,7 @@ public:
     void putString(const std::string &str);
     void putCString(const std::string &str);
     void putBytes(const ByteArray &bytes);
+    void putBytes(int count, uint8_t val = 0);
 
     size_t tell() const;
 

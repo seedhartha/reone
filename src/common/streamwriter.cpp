@@ -68,6 +68,11 @@ void StreamWriter::putBytes(const ByteArray &bytes) {
     _stream->write(&bytes[0], bytes.size());
 }
 
+void StreamWriter::putBytes(int count, uint8_t val) {
+    ByteArray data(count, val);
+    _stream->write(&data[0], count);
+}
+
 size_t StreamWriter::tell() const {
     return _stream->tellp();
 }
