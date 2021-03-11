@@ -24,6 +24,7 @@
 #include "../common/log.h"
 
 #include "instrutil.h"
+#include "object.h"
 #include "routine.h"
 
 using namespace std;
@@ -83,7 +84,13 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 }
 
 int ScriptExecution::run() {
-    debug("Script: run " + _program->name(), 1, DebugChannels::script);
+    string callerTag;
+    if (_context.caller) {
+        callerTag = _context.caller->tag();
+    } else {
+        callerTag = "[empty]";
+    }
+    debug(boost::format("Script: run %s %s") % callerTag % _program->name(), 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context.savedState) {

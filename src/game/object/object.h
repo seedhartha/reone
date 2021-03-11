@@ -40,13 +40,11 @@ public:
 
     ObjectType type() const { return _type; }
     const std::string &blueprintResRef() const { return _blueprintResRef; }
-    const std::string &tag() const { return _tag; }
     const std::string &name() const { return _name; }
     const std::string &conversation() const { return _conversation; }
     ActionQueue &actionQueue() { return _actionQueue; }
     int plotFlag() const { return _plotFlag; }
 
-    void setTag(const std::string &tag);
     void setPlotFlag(int flag);
     void setCommandable(bool value);
 
@@ -76,7 +74,6 @@ public:
 protected:
     ObjectType _type { ObjectType::Invalid };
     std::string _blueprintResRef;
-    std::string _tag;
     std::string _name;
     std::string _conversation;
     ActionQueue _actionQueue;

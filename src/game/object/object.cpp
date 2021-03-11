@@ -38,10 +38,6 @@ void Object::clearAllActions() {
     _actionQueue.clear();
 }
 
-void Object::setTag(const string &tag) {
-    _tag = tag;
-}
-
 void Object::setMinOneHP(bool minOneHP) {
     _minOneHP = minOneHP;
 }
