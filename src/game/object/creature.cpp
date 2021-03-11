@@ -246,7 +246,13 @@ void Creature::clearAllActions() {
 
 void Creature::playAnimation(AnimationType type, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
     string animName(_animResolver.getAnimationName(type));
-    if (animName.empty()) return;
+    if (animName.empty()) {
+        // If animation is not supported, complete the action immediately
+        if (actionToComplete) {
+            actionToComplete->complete();
+        }
+        return;
+    }
 
     // If animation is looping by type, set flags accordingly
     if (isAnimationLooping(type)) {
