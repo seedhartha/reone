@@ -46,14 +46,20 @@ class ModelSceneNode;
 class AnimationChannel {
 public:
     /**
-     * @param modelSceneNode scene node to apply animations to
+     * @param sceneNode scene node to apply animations to
      * @param skipNodes list of model node names to ignore
      */
-    AnimationChannel(ModelSceneNode *modelSceneNode, std::set<std::string> ignoreNodes);
+    AnimationChannel(ModelSceneNode *sceneNode, std::set<std::string> ignoreNodes);
 
     void reset();
     void reset(std::shared_ptr<render::Animation> anim, AnimationProperties properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
-    void update(float dt);
+
+    /**
+     * @param dt frame delta time
+     * @param visible whether the animated scene node is visible
+     */
+    void update(float dt, bool visible = true);
+
     void freeze();
 
     bool isSameAnimation(const render::Animation &anim, const AnimationProperties &properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr) const;
@@ -81,7 +87,7 @@ public:
     void setTime(float time);
 
 private:
-    ModelSceneNode *_modelSceneNode;
+    ModelSceneNode *_sceneNode;
     std::set<std::string> _ignoreNodes;
 
     std::shared_ptr<render::Animation> _animation;

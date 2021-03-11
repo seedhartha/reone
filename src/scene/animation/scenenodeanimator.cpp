@@ -33,19 +33,19 @@ namespace scene {
 
 static constexpr float kTransitionDuration = 0.25f;
 
-SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *modelSceneNode, set<string> ignoreNodes) :
-    _modelSceneNode(modelSceneNode),
+SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *sceneNode, set<string> ignoreNodes) :
+    _sceneNode(sceneNode),
     _ignoreNodes(ignoreNodes) {
 
-    if (!modelSceneNode) {
-        throw invalid_argument("modelSceneNode must not be null");
+    if (!sceneNode) {
+        throw invalid_argument("sceneNode must not be null");
     }
     for (int i = 0; i < kChannelCount; ++i) {
-        _channels.push_back(AnimationChannel(modelSceneNode, ignoreNodes));
+        _channels.push_back(AnimationChannel(sceneNode, ignoreNodes));
     }
 }
 
-void SceneNodeAnimator::update(float dt) {
+void SceneNodeAnimator::update(float dt, bool visible) {
     // Regardless of the composition mode, when there is not active animation on
     // the first channel, start the default animation
     if (!_channels[0].isActive()) {
@@ -62,13 +62,15 @@ void SceneNodeAnimator::update(float dt) {
 
     // Update animation channels
     for (auto &channel : _channels) {
-        channel.update(dt);
+        channel.update(dt, visible);
     }
 
-    // Compute and apply node states to the managed model
-    _stateByNumber.clear();
-    computeSceneNodeStates(*_modelSceneNode->model()->rootNode());
-    applySceneNodeStates(*_modelSceneNode->model()->rootNode());
+    if (visible) {
+        // Compute and apply node states to the managed model
+        _stateByNumber.clear();
+        computeSceneNodeStates(*_sceneNode->model()->rootNode());
+        applySceneNodeStates(*_sceneNode->model()->rootNode());
+    }
 }
 
 void SceneNodeAnimator::playDefaultAnimation() {
@@ -203,7 +205,7 @@ void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
     auto maybeState = _stateByNumber.find(modelNode.nodeNumber());
     if (maybeState != _stateByNumber.end()) {
         const SceneNodeState &state = maybeState->second;
-        ModelNodeSceneNode *sceneNode = _modelSceneNode->getModelNodeByIndex(modelNode.index());
+        ModelNodeSceneNode *sceneNode = _sceneNode->getModelNodeByIndex(modelNode.index());
         if (state.flags & SceneNodeStateFlags::transform) {
             sceneNode->setLocalTransform(state.transform);
             sceneNode->setBoneTransform(state.transform * modelNode.absoluteTransformInverse());
@@ -222,7 +224,7 @@ void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
 }
 
 void SceneNodeAnimator::playAnimation(const string &name, AnimationProperties properties) {
-    shared_ptr<Model> model(_modelSceneNode->model());
+    shared_ptr<Model> model(_sceneNode->model());
     shared_ptr<Animation> anim(model->getAnimation(name));
     if (anim) {
         playAnimation(move(anim), move(properties));
@@ -239,7 +241,7 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
 
     // If scale is 0.0, replace it with models scale
     if (properties.scale == 0.0f) {
-        properties.scale = _modelSceneNode->model()->animationScale();
+        properties.scale = _sceneNode->model()->animationScale();
     }
 
     switch (_compositionMode) {

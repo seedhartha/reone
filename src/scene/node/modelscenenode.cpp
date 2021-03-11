@@ -159,10 +159,7 @@ unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &
 }
 
 void ModelSceneNode::update(float dt) {
-    if (!_visible || !_onScreen) return;
-
-    _animator.update(dt);
-
+    _animator.update(dt, _visible && _onScreen);
     SceneNode::update(dt);
 }
 
