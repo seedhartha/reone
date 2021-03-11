@@ -33,12 +33,12 @@ namespace reone {
 
 namespace scene {
 
-AnimationChannel::AnimationChannel(ModelSceneNode *modelSceneNode, set<string> ignoreNodes) :
-    _modelSceneNode(modelSceneNode),
+AnimationChannel::AnimationChannel(ModelSceneNode *sceneNode, set<string> ignoreNodes) :
+    _sceneNode(sceneNode),
     _ignoreNodes(move(ignoreNodes)) {
 
-    if (!modelSceneNode) {
-        throw invalid_argument("modelSceneNode must not be null");
+    if (!sceneNode) {
+        throw invalid_argument("sceneNode must not be null");
     }
 }
 
@@ -62,7 +62,7 @@ void AnimationChannel::reset(shared_ptr<Animation> anim, AnimationProperties pro
     _finished = false;
 }
 
-void AnimationChannel::update(float dt) {
+void AnimationChannel::update(float dt, bool visible) {
     if (!_animation || _freeze || _finished) return;
 
     float newTime, length;
@@ -78,13 +78,15 @@ void AnimationChannel::update(float dt) {
         // Signal animation events between the previous time and the current time
         for (auto &event : _animation->events()) {
             if (_time < event.time && event.time <= newTime) {
-                _modelSceneNode->signalEvent(event.name);
+                _sceneNode->signalEvent(event.name);
             }
         }
     }
 
-    _stateByNumber.clear();
-    computeSceneNodeStates(*_animation->rootNode());
+    if (visible) {
+        _stateByNumber.clear();
+        computeSceneNodeStates(*_animation->rootNode());
+    }
 
     _time = newTime;
 
@@ -101,7 +103,7 @@ void AnimationChannel::update(float dt) {
 
 void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
     if (_ignoreNodes.count(animNode.name()) == 0) {
-        ModelNodeSceneNode *modelNodeSceneNode = _modelSceneNode->getModelNode(animNode.name());
+        ModelNodeSceneNode *modelNodeSceneNode = _sceneNode->getModelNode(animNode.name());
         if (modelNodeSceneNode) {
             const ModelNode *modelNode = modelNodeSceneNode->modelNode();
             bool transformChanged = false;

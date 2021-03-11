@@ -46,12 +46,16 @@ class ModelSceneNode;
 class SceneNodeAnimator {
 public:
     /**
-     * @param modelSceneNode scene node to apply animations to
+     * @param sceneNode scene node to apply animations to
      * @param skipNodes names of model nodes to ignore
      */
-    SceneNodeAnimator(ModelSceneNode *modelSceneNode, std::set<std::string> ignoreNodes);
+    SceneNodeAnimator(ModelSceneNode *sceneNode, std::set<std::string> ignoreNodes);
 
-    void update(float dt);
+    /**
+     * @param dt frame delta time
+     * @param visible whether the animated scene node is visible
+     */
+    void update(float dt, bool visible = true);
 
     void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
     void playAnimation(std::shared_ptr<render::Animation> anim, AnimationProperties properties = AnimationProperties(), std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
@@ -76,7 +80,7 @@ private:
         glm::vec3 selfIllumColor { 0.0f };
     };
 
-    ModelSceneNode *_modelSceneNode;
+    ModelSceneNode *_sceneNode;
     std::set<std::string> _ignoreNodes;
     std::vector<AnimationChannel> _channels;
 
