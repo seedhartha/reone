@@ -52,6 +52,7 @@ void ItemBlueprint::load(Item &item) {
     item._blueprintResRef = _resRef;
     item._tag = boost::to_lower_copy(_uti->getString("Tag"));
     item._localizedName = Resources::instance().getString(_uti->getInt("LocalizedName"));
+    item._descIdentified = Resources::instance().getString(_uti->getInt("DescIdentified"));
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     int baseItem = _uti->getInt("BaseItem");
