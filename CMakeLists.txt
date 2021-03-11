@@ -52,7 +52,11 @@ else()
     find_package(glm REQUIRED)
 endif()
 
-add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+
+if(WIN32)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
 
 ## libcommon static library
 
@@ -708,7 +712,6 @@ if(BUILD_LAUNCHER)
         if(WIN32)
             list(APPEND LAUNCHER_SOURCES res/reone.rc)
             add_executable(launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
-            target_compile_definitions(launcher PRIVATE _CRT_SECURE_NO_WARNINGS)
         else()
             add_executable(launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
         endif()
