@@ -47,6 +47,8 @@ namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
 
+static bool g_debugWalkmesh = false;
+
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
     SceneNode(sceneGraph),
     _modelSceneNode(modelSceneNode),
@@ -130,7 +132,9 @@ void ModelNodeSceneNode::update(float dt) {
 
 bool ModelNodeSceneNode::shouldRender() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    return mesh && mesh->shouldRender();
+    if (!mesh || !mesh->shouldRender()) return false;
+
+    return _modelNode->isAABB() ? g_debugWalkmesh : true;
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
