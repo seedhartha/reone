@@ -20,7 +20,6 @@ Developer resources:
 - [Code Style](https://github.com/seedhartha/reone/wiki/Code-Style)
 - [Tooling](https://github.com/seedhartha/reone/wiki/Tooling)
 - [Modding](https://github.com/seedhartha/reone/wiki/Modding)
-- [Research](https://github.com/seedhartha/reone/wiki/Research)
 - [Knowledge Database](https://github.com/seedhartha/reone/wiki/Knowledge-Database)
 
 ## Installation
