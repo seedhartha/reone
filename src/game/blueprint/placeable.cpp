@@ -72,8 +72,9 @@ void PlaceableBlueprint::loadItems(Placeable &placeable) {
 }
 
 void PlaceableBlueprint::loadScripts(Placeable &placeable) {
-    placeable._heartbeat = _utp->getString("OnHeartbeat");
-    placeable._onInvDisturbed = _utp->getString("OnInvDisturbed");
+    placeable._heartbeat = boost::to_lower_copy(_utp->getString("OnHeartbeat"));
+    placeable._onInvDisturbed = boost::to_lower_copy(_utp->getString("OnInvDisturbed"));
+    placeable._onUserDefined = boost::to_lower_copy(_utp->getString("OnUserDefined"));
 }
 
 } // namespace game
