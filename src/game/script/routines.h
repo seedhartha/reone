@@ -159,6 +159,7 @@ private:
     script::Variable getArea(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getAreaUnescapable(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getCommandable(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getCurrentAction(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceBetween2D(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getDistanceToObject(const VariablesList &args, script::ExecutionContext &ctx);

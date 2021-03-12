@@ -476,6 +476,20 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
     return static_pointer_cast<ScriptObject>(object);
 }
 
+Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+
+    auto object = getObjectOrCaller(args, 0, ctx);
+    if (object) {
+        shared_ptr<Action> action(object->actionQueue().getCurrentAction());
+        result = Variable(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
+    } else {
+        warn("Routines: getCurrentAction: object is invalid");
+    }
+
+    return move(result);
+}
+
 } // namespace game
 
 } // namespace reone

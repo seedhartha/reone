@@ -560,7 +560,7 @@ void Routines::addTslRoutines() {
     add("IsCreditSequenceInProgress", Int, { });
     add("SWMG_SetLateralAccelerationPerSecond", Void, { Float });
     add("SWMG_GetLateralAccelerationPerSecond", Float, { });
-    add("GetCurrentAction", Int, { Object });
+    add("GetCurrentAction", Int, { Object }, &Routines::getCurrentAction);
     add("GetDifficultyModifier", Float, { });
     add("GetAppearanceType", Int, { Object });
     add("FloatingTextStrRefOnCreature", Void, { Int, Object, Int });
