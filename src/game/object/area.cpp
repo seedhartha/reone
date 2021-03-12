@@ -62,7 +62,6 @@ namespace reone {
 namespace game {
 
 static constexpr float kDefaultFieldOfView = 75.0f;
-static constexpr float kMaxDistanceToTestCollision = 8.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kCreatureObstacleTestZ = 0.1f;
 static constexpr int kMaxSoundCount = 4;
@@ -164,7 +163,7 @@ void Area::loadPTH() {
         Room *room = nullptr;
         float z = 0.0f;
 
-        if (!getElevationAt(glm::vec2(point.x, point.y), nullptr, room, z)) {
+        if (!getElevationAt(glm::vec2(point.x, point.y), room, z)) {
             warn(boost::format("Area: point %d elevation not found") % i);
             continue;
         }
@@ -325,11 +324,13 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
 }
 
 bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const {
+    // Check whether camera is blocked by room and door walkmeshes, and return the intersection point
+
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
 
     RaycastProperties props;
-    props.flags = RaycastFlags::roomsObjects;
+    props.flags = RaycastFlags::rooms;
     props.origin = origin;
     props.direction = dir;
     props.objectTypes = { ObjectType::Door };
@@ -337,7 +338,7 @@ bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm
     RaycastResult result;
 
     if (_collisionDetector.raycast(props, result)) {
-        float dist = glm::min(glm::length(originToDest), result.distance);
+        float dist = glm::min(result.distance, glm::length(originToDest));
         intersection = origin + dist * dir;
         return true;
     }
@@ -346,26 +347,41 @@ bool Area::getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm
 }
 
 bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const {
+    glm::vec3 creatureToDest(dest - creature.position());
+    glm::vec3 dir(glm::normalize(creatureToDest));
+
     glm::vec3 origin(creature.position());
     origin.z += kCreatureObstacleTestZ;
 
-    glm::vec3 adjustedDest(dest);
-    adjustedDest.z += kCreatureObstacleTestZ;
+    float maxObstacleDist = glm::max(glm::length(creatureToDest), 0.5f);
 
-    glm::vec3 originToDest(adjustedDest - origin);
-    glm::vec3 dir(glm::normalize(originToDest));
+    // Check whether creatures movement is blocked by AABB of other (alive) creatures
+    {
+        RaycastProperties props;
+        props.flags = RaycastFlags::aabb | RaycastFlags::alive;
+        props.origin = origin;
+        props.direction = dir;
+        props.objectTypes = { ObjectType::Creature };
+        props.except = &creature;
 
-    RaycastProperties props;
-    props.flags = RaycastFlags::objectsAABBAlive;
-    props.origin = origin;
-    props.direction = dir;
-    props.objectTypes = { ObjectType::Creature, ObjectType::Door };
-    props.except = &creature;
+        RaycastResult result;
 
-    RaycastResult result;
+        if (_collisionDetector.raycast(props, result) &&
+            result.distance <= maxObstacleDist) return true;
+    }
 
-    if (_collisionDetector.raycast(props, result)) {
-        return result.distance <= glm::length(originToDest);
+    // Check whether creatures movement is blocked by room and door walkmeshes
+    {
+        RaycastProperties props;
+        props.flags = RaycastFlags::rooms;
+        props.origin = origin;
+        props.direction = dir;
+        props.objectTypes = { ObjectType::Door };
+
+        RaycastResult result;
+
+        if (_collisionDetector.raycast(props, result) &&
+            result.distance <= maxObstacleDist) return true;
     }
 
     return false;
@@ -384,7 +400,7 @@ void Area::determineObjectRoom(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
 
-    if (getElevationAt(position, &object, room, position.z)) {
+    if (getElevationAt(position, room, position.z)) {
         object.setRoom(room);
     }
 }
@@ -464,7 +480,7 @@ void Area::landObject(SpatialObject &object) {
     float facing = object.facing();
     Room *room = nullptr;
 
-    if (getElevationAt(position, &object, room, position.z)) {
+    if (getElevationAt(position, room, position.z, true, &object)) {
         object.setPosition(position);
         return;
     }
@@ -472,7 +488,7 @@ void Area::landObject(SpatialObject &object) {
         float angle = i * glm::half_pi<float>();
         position = object.position() + glm::vec3(glm::sin(angle), glm::cos(angle), 0.0f);
 
-        if (getElevationAt(position, &object, room, position.z)) {
+        if (getElevationAt(position, room, position.z, true, &object)) {
             object.setPosition(position);
             return;
         }
@@ -548,34 +564,50 @@ void Area::printDebugInfo(const SpatialObject &object) {
     debug("Selected object: " + ss.str());
 }
 
-bool Area::getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const {
-    RaycastProperties props;
-    props.origin = glm::vec3(position, kElevationTestZ);
-    props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
-    props.maxDistance = 2.0f * kElevationTestZ;
+bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z, bool creatures, const SpatialObject *except) const {
+    // Test AABB of alive creatures
+    if (creatures) {
+        RaycastProperties props;
+        props.flags |= RaycastFlags::aabb | RaycastFlags::alive;
+        props.origin = glm::vec3(position, kElevationTestZ);
+        props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
+        props.objectTypes = { ObjectType::Creature };
+        props.except = except;
+        props.distance = 2.0f * kElevationTestZ;
 
-    RaycastResult result;
+        RaycastResult result;
 
-    props.flags = RaycastFlags::objects;
-    props.objectTypes = { ObjectType::Placeable };
-    props.except = nullptr;
+        if (_collisionDetector.raycast(props, result)) return false;
+    }
 
-    if (_collisionDetector.raycast(props, result)) return false;
+    // Test non-walkable faces of placeables
+    {
+        RaycastProperties props;
+        props.origin = glm::vec3(position, kElevationTestZ);
+        props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
+        props.objectTypes = { ObjectType::Placeable };
+        props.distance = 2.0f * kElevationTestZ;
 
-    props.flags = RaycastFlags::objectsAABBAlive;
-    props.objectTypes = { ObjectType::Creature };
-    props.except = except;
+        RaycastResult result;
 
-    if (_collisionDetector.raycast(props, result)) return false;
+        if (_collisionDetector.raycast(props, result)) return false;
+    }
 
-    props.flags = RaycastFlags::roomsWalkable;
-    props.objectTypes.clear();
-    props.except = nullptr;
+    // Test walkable faces of rooms
+    {
+        RaycastProperties props;
+        props.flags = RaycastFlags::rooms | RaycastFlags::walkable;
+        props.origin = glm::vec3(position, kElevationTestZ);
+        props.direction = glm::vec3(0.0f, 0.0f, -1.0f);
+        props.distance = 2.0f * kElevationTestZ;
 
-    if (_collisionDetector.raycast(props, result)) {
-        room = result.room;
-        z = result.intersection.z;
-        return true;
+        RaycastResult result;
+
+        if (_collisionDetector.raycast(props, result)) {
+            room = result.room;
+            z = result.intersection.z;
+            return true;
+        }
     }
 
     return false;
@@ -643,7 +675,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
     float z;
     Room *room;
 
-    if (getElevationAt(dest, creature.get(), room, z)) {
+    if (getElevationAt(dest, room, z)) {
         creature->setRoom(room);
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
@@ -700,12 +732,12 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
     RaycastProperties props;
-    props.flags = RaycastFlags::objectsAABBSelectable;
+    props.flags = RaycastFlags::aabb | RaycastFlags::selectable;
     props.origin = fromWorld;
     props.direction = glm::normalize(toWorld - fromWorld);
     props.objectTypes = { ObjectType::Creature, ObjectType::Door, ObjectType::Placeable };
     props.except = partyLeader.get();
-    props.maxDistance = 2.0f * kSelectionDistance;
+    props.distance = kSelectionDistance;
 
     RaycastResult result;
 
@@ -888,7 +920,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->distanceTo(position2d) > kMaxDistanceToTestCollision) continue;
+        if (trigger->distanceTo(position2d) > kDefaultRaycastDistance) continue;
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) continue;
 
         debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());

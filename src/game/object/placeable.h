@@ -48,18 +48,20 @@ public:
 
     bool isUsable() const { return _usable; }
 
+    std::shared_ptr<render::Walkmesh> getWalkmesh() const override;
+
     const std::string &getOnInvDisturbed() const { return _onInvDisturbed; }
 
 private:
     int  _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };
+    std::shared_ptr<render::Walkmesh> _walkmesh;
 
     // Scripts
 
     std::string _onInvDisturbed;
 
-    // END Scripts
 
     void loadBlueprint(const resource::GffStruct &gffs);
 

@@ -30,25 +30,16 @@ namespace reone {
 
 namespace game {
 
-constexpr float kDefaultRaycastDistance = 8.0f;
-
 class Area;
 class Room;
 class SpatialObject;
 
 struct RaycastFlags {
-    static constexpr int rooms = 1;
-    static constexpr int objects = 2;
-    static constexpr int walkable = 4;
-    static constexpr int aabb = 8;
-    static constexpr int selectable = 0x10;
-    static constexpr int alive = 0x20;
-
-    static constexpr int roomsWalkable = rooms | walkable;
-    static constexpr int roomsObjects = rooms | objects;
-    static constexpr int roomsObjectsAABB = roomsObjects | aabb;
-    static constexpr int objectsAABBSelectable = objects | aabb | selectable;
-    static constexpr int objectsAABBAlive = objects | aabb | alive;
+    static constexpr int aabb = 1; /**< use AABB of objects, not walkmeshes */
+    static constexpr int rooms = 2; /**< test room walkmeshes */
+    static constexpr int walkable = 4; /**< test walkable faces of the walkmesh */
+    static constexpr int selectable = 8; /**< test only selectable objects */
+    static constexpr int alive = 0x10; /**< test only objects that are alive  */
 };
 
 struct RaycastProperties {
@@ -57,7 +48,7 @@ struct RaycastProperties {
     glm::vec3 direction { 0.0f };
     std::set<ObjectType> objectTypes;
     const SpatialObject *except { nullptr };
-    float maxDistance { kDefaultRaycastDistance };
+    float distance { kDefaultRaycastDistance };
 };
 
 struct RaycastResult {
@@ -72,15 +63,17 @@ public:
     CollisionDetector(Area *area);
 
     /**
-     * @return true if ray intersects an obstacle, false otherwise
+     * Casts a ray and tests if it intersects an obstacle.
+     *
+     * @return true if the ray intersects an obstacle, false otherwise
      */
     bool raycast(const RaycastProperties &props, RaycastResult &result) const;
 
 private:
     Area *_area;
 
-    bool rayTestObjects(const RaycastProperties &props, RaycastResult &result) const;
     bool rayTestRooms(const RaycastProperties &props, RaycastResult &result) const;
+    bool rayTestObjects(const RaycastProperties &props, RaycastResult &result) const;
 };
 
 } // namespace game

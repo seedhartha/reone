@@ -48,7 +48,7 @@ public:
     const std::string &name() const { return _name; }
     const glm::vec3 &position() const { return _position; }
     std::shared_ptr<scene::ModelSceneNode> model() const { return _model; }
-    const render::Walkmesh *walkmesh() const { return _walkmesh.get(); }
+    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
 
     void setVisible(bool visible);
 

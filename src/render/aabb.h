@@ -38,7 +38,15 @@ public:
     bool contains(const glm::vec2 &point) const;
     bool contains(const glm::vec3 &point) const;
     bool intersect(const AABB &other) const;
-    bool intersectLine(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const;
+
+    /**
+     * Casts a ray and tests if it intersects this AABB.
+     *
+     * @param origin ray origin
+     * @param invDir ray direction inverse
+     * @param[out] distance to the intersection point (negative if ray origin is inside this AABB)
+     */
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float &distance) const;
 
     glm::vec3 getSize() const;
 
