@@ -132,7 +132,7 @@ void ModelNodeSceneNode::update(float dt) {
 
 bool ModelNodeSceneNode::shouldRender() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh || !mesh->shouldRender()) return false;
+    if (!mesh || !mesh->shouldRender() || _modelNode->alpha() == 0.0f) return false;
 
     return _modelNode->isAABB() ? g_debugWalkmesh : true;
 }
