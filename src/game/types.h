@@ -802,6 +802,17 @@ enum class ForcePower {
     // END TSL
 };
 
+enum class CreatureType {
+    RacialType = 0,
+    PlayerChar = 1,
+    Class = 2,
+    Reputation = 3,
+    IsAlive = 4,
+    HasSpellEffect = 5,
+    DoesNotHaveSpellEffect = 6,
+    Perception = 7
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;
