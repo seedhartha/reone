@@ -46,7 +46,7 @@ SceneNodeAnimator::SceneNodeAnimator(ModelSceneNode *sceneNode, set<string> igno
 }
 
 void SceneNodeAnimator::update(float dt, bool visible) {
-    // Regardless of the composition mode, when there is not active animation on
+    // Regardless of the composition mode, when there is no active animation on
     // the first channel, start the default animation
     if (!_channels[0].isActive()) {
         playDefaultAnimation();
@@ -256,12 +256,16 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
             break;
         case CompositionMode::Blend:
             if (!_channels[0].isSameAnimation(*anim, properties, lipAnim)) {
-                // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed
-                _channels[1] = _channels[0];
-                _channels[0].reset(anim, properties, lipAnim);
-                _channels[0].setTime(glm::max(0.0f, anim->transitionTime() - kTransitionDuration));
-                _channels[1].freeze();
-                _transition = true;
+                if (_channels[1].isActive()) {
+                    // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed
+                    _channels[1] = _channels[0];
+                    _channels[0].reset(anim, properties, lipAnim);
+                    _channels[0].setTime(glm::max(0.0f, anim->transitionTime() - kTransitionDuration));
+                    _channels[1].freeze();
+                    _transition = true;
+                } else {
+                    _channels[0].reset(anim, properties, lipAnim);
+                }
             }
             break;
         case CompositionMode::Overlay:

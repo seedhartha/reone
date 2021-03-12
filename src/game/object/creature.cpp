@@ -271,7 +271,7 @@ void Creature::playAnimation(const string &name, AnimationProperties properties,
 
         _animAction = actionToComplete;
 
-        // Extract propagate to head model flag
+        // Extract "propagate to head model" flag
         bool propagateHead = properties.flags & AnimationFlags::propagateHead;
         properties.flags &= ~AnimationFlags::propagateHead;
 
