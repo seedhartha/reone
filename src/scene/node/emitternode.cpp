@@ -74,19 +74,6 @@ void EmitterSceneNode::update(float dt) {
     for (auto &particle : _particles) {
         particle->update(dt);
     }
-
-    // Sort particles by depth
-    unordered_map<Particle *, float> particlesZ;
-    for (auto &particle : _particles) {
-        glm::vec4 screen(camera->projection() * camera->view() * _absoluteTransform * glm::vec4(particle->position(), 1.0f));
-        screen /= screen.w;
-        particlesZ.insert(make_pair(particle.get(), screen.z));
-    }
-    sort(_particles.begin(), _particles.end(), [&particlesZ](auto &left, auto &right) {
-        float leftZ = particlesZ.find(left.get())->second;
-        float rightZ = particlesZ.find(right.get())->second;
-        return leftZ > rightZ;
-    });
 }
 
 void EmitterSceneNode::removeExpiredParticles(float dt) {
