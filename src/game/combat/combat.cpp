@@ -118,11 +118,11 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
         castProps.origin = adjustedCombatantPos;
         castProps.direction = glm::normalize(combatantToCreature);
         castProps.objectTypes = { ObjectType::Door };
+        castProps.distance = glm::length(combatantToCreature);
 
         RaycastResult castResult;
 
-        if (area->collisionDetector().raycast(castProps, castResult) &&
-            castResult.distance <= glm::length(combatantToCreature)) continue;
+        if (area->collisionDetector().raycast(castProps, castResult)) continue;
 
 
         result.push_back(move(creature));
