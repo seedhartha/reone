@@ -65,6 +65,7 @@ public:
     virtual glm::vec3 getSelectablePosition() const;
 
     std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const { return std::dynamic_pointer_cast<scene::ModelSceneNode>(_sceneNode); }
+    virtual std::shared_ptr<render::Walkmesh> getWalkmesh() const;
 
     ObjectFactory &objectFactory() { return *_objectFactory; }
     scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
@@ -74,7 +75,6 @@ public:
     const glm::mat4 &transform() const { return _transform; }
     bool visible() const { return _visible; }
     std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
-    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
     float drawDistance() const { return _drawDistance; }
 
     void setRoom(Room *room);
@@ -142,7 +142,6 @@ protected:
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
     std::shared_ptr<scene::SceneNode> _sceneNode;
-    std::shared_ptr<render::Walkmesh> _walkmesh;
     float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;

@@ -42,13 +42,33 @@ CollisionDetector::CollisionDetector(Area *area) : _area(area) {
 }
 
 bool CollisionDetector::raycast(const RaycastProperties &props, RaycastResult &result) const {
-    if (props.flags & RaycastFlags::objects) {
-        if (rayTestObjects(props, result)) {
-            return true;
-        }
-    }
+    // Only test rooms when rooms flag is set
     if (props.flags & RaycastFlags::rooms) {
-        if (rayTestRooms(props, result)) {
+        if (rayTestRooms(props, result)) return true;
+    }
+    return rayTestObjects(props, result);
+}
+
+bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResult &result) const {
+    float distance;
+
+    for (auto &room : _area->rooms()) {
+        shared_ptr<ModelSceneNode> model(room.second->model());
+        if (!model) continue;
+
+        // Optimization: ensure that the ray origin is inside a room in 2D space
+        AABB aabb(model->aabb() * model->absoluteTransform());
+        if (!aabb.contains(glm::vec2(props.origin))) continue;
+
+        shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
+        if (!walkmesh) continue;
+
+        if (walkmesh->raycast(props.origin, props.direction, props.flags & RaycastFlags::walkable, distance) &&
+            distance >= 0.0f && distance <= props.distance) {
+
+            result.room = room.second.get();
+            result.intersection = props.origin + distance * props.direction;
+            result.distance = distance;
             return true;
         }
     }
@@ -57,77 +77,59 @@ bool CollisionDetector::raycast(const RaycastProperties &props, RaycastResult &r
 }
 
 bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastResult &result) const {
-    glm::mat4 invTransform(0.0f);
-    glm::vec3 origin(0.0f);
-    glm::vec3 dir(0.0f);
-    float distance = 0.0f;
+    float distance;
     vector<pair<shared_ptr<SpatialObject>, float>> collisions;
 
     for (auto &object : _area->objects()) {
-        if (object.get() == props.except) continue;
+        if (object.get() == props.except) continue; // Object is not be to be tested
+        if (props.objectTypes.count(object->type()) == 0) continue; // Objects of this type are not to be tested
+        if ((props.flags & RaycastFlags::selectable) && !object->isSelectable()) continue; // Non-selectable objects are not to be tested
+        if ((props.flags & RaycastFlags::alive) && object->isDead()) continue; // Dead objects are not to be tested
+        if (object->distanceTo(glm::vec2(props.origin)) > props.distance) continue; // Optimization: object must not be too far away in 2D space
 
-        ObjectType type = object->type();
-        if (props.objectTypes.count(type) == 0) continue;
-
-        if ((props.flags & RaycastFlags::alive) && object->isDead()) continue;
-        if (type == ObjectType::Door && static_cast<Door &>(*object).isOpen()) continue;
-        if ((props.flags & RaycastFlags::selectable) && !object->isSelectable()) continue;
-
-        float dist = object->distanceTo(glm::vec2(props.origin));
-        if (dist > props.maxDistance) continue;
-
-        invTransform = glm::inverse(object->transform());
-        origin = invTransform * glm::vec4(props.origin, 1.0f);
-        dir = invTransform * glm::vec4(props.direction, 0.0f);
+        // Do testing in object space
+        glm::mat4 invObjTransform(glm::inverse(object->transform()));
+        glm::vec3 objSpaceOrigin(invObjTransform * glm::vec4(props.origin, 1.0f));
+        glm::vec3 objSpaceDir(glm::normalize(invObjTransform * glm::vec4(props.direction, 0.0f)));
 
         if (props.flags & RaycastFlags::aabb) {
+            // Test using AABB
             shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
-            if (!model) continue;
-            if (model->aabb().contains(origin)) continue;
+            if (model) {
+                // Prevent division by zero
+                if (objSpaceDir.x == 0.0f) objSpaceDir.x = 1e-7f;
+                if (objSpaceDir.y == 0.0f) objSpaceDir.y = 1e-7f;
+                if (objSpaceDir.z == 0.0f) objSpaceDir.z = 1e-7f;
+                glm::vec3 invDir(1.0f / objSpaceDir);
 
-            if (model->aabb().intersectLine(origin, dir, distance)) {
+                if (model->aabb().raycast(objSpaceOrigin, invDir, distance) &&
+                    distance >= 0.0f && distance <= props.distance) {
+
+                    collisions.push_back(make_pair(object, distance));
+                }
+            }
+        } else {
+            // Test using a walkmesh
+            shared_ptr<Walkmesh> walkmesh(object->getWalkmesh());
+            if (walkmesh && walkmesh->raycast(objSpaceOrigin, objSpaceDir, props.flags & RaycastFlags::walkable, distance) &&
+                distance >= 0.0f && distance <= props.distance) {
+
                 collisions.push_back(make_pair(object, distance));
             }
-            continue;
-        }
-        shared_ptr<Walkmesh> walkmesh(object->walkmesh());
-        if (!walkmesh) continue;
-
-        if (walkmesh->raycast(origin, dir, false, props.maxDistance, distance)) {
-            collisions.push_back(make_pair(object, distance));
-            continue;
         }
     }
+
     if (collisions.empty()) return false;
 
-    sort(collisions.begin(), collisions.end(), [](const pair<const shared_ptr<SpatialObject> &, float> &left, const pair<const shared_ptr<SpatialObject> &, float> &right) {
+    sort(collisions.begin(), collisions.end(), [](auto &left, auto &right) {
         return left.second < right.second;
     });
+
     result.object = collisions[0].first;
     result.intersection = props.origin + collisions[0].second * props.direction;
     result.distance = collisions[0].second;
 
     return true;
-}
-
-bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResult &result) const {
-    float distance = 0.0f;
-
-    for (auto &pair : _area->rooms()) {
-        Room &room = *pair.second;
-
-        const Walkmesh *walkmesh = room.walkmesh();
-        if (!walkmesh) continue;
-
-        if (walkmesh->raycast(props.origin, props.direction, props.flags & RaycastFlags::walkable, props.maxDistance, distance)) {
-            result.room = &room;
-            result.intersection = props.origin + distance * props.direction;
-            result.distance = distance;
-            return true;
-        }
-    }
-
-    return false;
 }
 
 } // namespace game

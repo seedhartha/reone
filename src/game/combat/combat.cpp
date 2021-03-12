@@ -107,25 +107,23 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
 
         glm::vec3 adjustedCombatantPos(combatant.position());
         adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
-
         glm::vec3 adjustedCreaturePos(creature->position());
         adjustedCreaturePos.z += creature->getModelSceneNode()->aabb().center().z;
-
         glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
 
+        // Ensure that combatants line of sight is not blocked by room and door walkmeshes
+
         RaycastProperties castProps;
-        castProps.flags = RaycastFlags::roomsObjectsAABB;
-        castProps.objectTypes = { ObjectType::Door };
+        castProps.flags = RaycastFlags::rooms;
         castProps.origin = adjustedCombatantPos;
         castProps.direction = glm::normalize(combatantToCreature);
-        castProps.maxDistance = glm::length(combatantToCreature);
+        castProps.objectTypes = { ObjectType::Door };
 
         RaycastResult castResult;
 
-        const CollisionDetector &detector = area->collisionDetector();
-        if (detector.raycast(castProps, castResult)) continue;
+        if (area->collisionDetector().raycast(castProps, castResult) &&
+            castResult.distance <= glm::length(combatantToCreature)) continue;
 
-        // TODO: check field of view
 
         result.push_back(move(creature));
     }

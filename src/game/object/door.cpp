@@ -84,7 +84,10 @@ void Door::loadBlueprint(const GffStruct &gffs) {
     auto model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Door, Models::instance().get(modelName), _sceneGraph);
 
     _sceneNode = move(model);
-    _walkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
+
+    _closedWalkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
+    _open1Walkmesh = Walkmeshes::instance().get(modelName + "1", ResourceType::Dwk);
+    _open2Walkmesh = Walkmeshes::instance().get(modelName + "2", ResourceType::Dwk);
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {
@@ -103,6 +106,10 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
         model->animator().playAnimation("closing1");
     }
     _open = false;
+}
+
+shared_ptr<Walkmesh> Door::getWalkmesh() const {
+    return _open ? _open1Walkmesh : _closedWalkmesh;
 }
 
 void Door::setLocked(bool locked) {

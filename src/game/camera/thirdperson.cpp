@@ -147,22 +147,22 @@ void ThirdPersonCamera::update(float dt) {
 }
 
 void ThirdPersonCamera::updateSceneNode() {
-    glm::vec3 position(_targetPosition);
-    position.x += _style.distance * glm::sin(_facing);
-    position.y -= _style.distance * glm::cos(_facing);
-    position.z += _style.height;
+    glm::vec3 cameraPosition(_targetPosition);
+    cameraPosition.x += _style.distance * glm::sin(_facing);
+    cameraPosition.y -= _style.distance * glm::cos(_facing);
+    cameraPosition.z += _style.height;
 
     if (_findObstacle) {
-        glm::vec3 intersection { 0.0f };
-        if (_findObstacle(_targetPosition, position, intersection)) {
-            position = intersection;
+        glm::vec3 intersection(0.0f);
+        if (_findObstacle(_targetPosition, cameraPosition, intersection)) {
+            cameraPosition = intersection;
         }
     }
     glm::vec3 up(0.0f, 0.0f, 1.0f);
-    glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - position), up));
+    glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - cameraPosition), up));
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, position);
+    transform = glm::translate(transform, cameraPosition);
     transform *= glm::mat4_cast(orientation);
 
     _sceneNode->setLocalTransform(transform);

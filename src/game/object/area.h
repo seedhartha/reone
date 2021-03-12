@@ -279,16 +279,16 @@ private:
     bool getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
 
     /**
-    * Find the closest obstacle in the creatures path.
-    *
-    * @param creature moving creature
-    * @param dest creatures destination
-    *
-    * @return true if obstacle is found, false otherwise
-    */
+     * Find the closest obstacle in the creatures path.
+     *
+     * @param creature moving creature
+     * @param dest creatures destination
+     *
+     * @return true if obstacle is found, false otherwise
+     */
     bool getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
 
-    bool getElevationAt(const glm::vec2 &position, const SpatialObject *except, Room *&room, float &z) const;
+    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z, bool creatures = false, const SpatialObject *except = nullptr) const;
 
     // END Collision detection
 };

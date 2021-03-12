@@ -46,6 +46,8 @@ public:
     bool isStatic() const { return _static; }
     bool isKeyRequired() const { return _keyRequired; }
 
+    std::shared_ptr<render::Walkmesh> getWalkmesh() const override;
+
     const std::string &getOnOpen() const { return _onOpen; }
     const std::string &getOnFailToOpen() const { return _onFailToOpen; }
 
@@ -71,7 +73,13 @@ private:
     std::string _onOpen;
     std::string _onFailToOpen;
 
-    // END Scripts
+
+    // Walkmeshes
+
+    std::shared_ptr<render::Walkmesh> _closedWalkmesh;
+    std::shared_ptr<render::Walkmesh> _open1Walkmesh;
+    std::shared_ptr<render::Walkmesh> _open2Walkmesh;
+
 
     void loadBlueprint(const resource::GffStruct &gffs);
 

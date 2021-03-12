@@ -88,6 +88,10 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
     _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
 }
 
+shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
+    return _walkmesh;
+}
+
 } // namespace game
 
 } // namespace reone
