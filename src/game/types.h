@@ -813,6 +813,12 @@ enum class CreatureType {
     Perception = 7
 };
 
+enum class ReputationType {
+    Friend = 0,
+    Enemy = 1,
+    Neutral = 2
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;

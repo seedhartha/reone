@@ -76,7 +76,8 @@ Area::Area(uint32_t id, Game *game) :
     _actionExecutor(game),
     _combat(game),
     _map(game),
-    _heartbeatTimer(kHeartbeatInterval) {
+    _heartbeatTimer(kHeartbeatInterval),
+    _creatureFinder(this) {
 
     init();
 }
