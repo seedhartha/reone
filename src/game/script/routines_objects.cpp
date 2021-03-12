@@ -414,12 +414,18 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
     int thirdCriteriaType = getInt(args, 6, -1);
     int thirdCriteriaValue = getInt(args, 7, -1);
 
-    // TODO: handle criterias
-    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [](auto &object) {
-        return object->type() == ObjectType::Creature;
-    }));
+    CreatureFinder::CriteriaList criterias;
+    criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
+    if (secondCriteriaType != -1) {
+        criterias.push_back(make_pair(static_cast<CreatureType>(secondCriteriaType), secondCriteriaValue));
+    }
+    if (thirdCriteriaType != -1) {
+        criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
+    }
 
-    return static_pointer_cast<ScriptObject>(object);
+    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(*target, criterias, nth - 1));
+
+    return static_pointer_cast<ScriptObject>(creature);
 }
 
 Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -432,12 +438,18 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
     int thirdCriteriaType = getInt(args, 6, -1);
     int thirdCriteriaValue = getInt(args, 7, -1);
 
-    // TODO: handle criterias
-    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [](auto &object) {
-        return object->type() == ObjectType::Creature;
-    }));
+    CreatureFinder::CriteriaList criterias;
+    criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
+    if (secondCriteriaType != -1) {
+        criterias.push_back(make_pair(static_cast<CreatureType>(secondCriteriaType), secondCriteriaValue));
+    }
+    if (thirdCriteriaType != -1) {
+        criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
+    }
 
-    return static_pointer_cast<ScriptObject>(object);
+    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreatureToLocation(*location, criterias, nth - 1));
+
+    return static_pointer_cast<ScriptObject>(creature);
 }
 
 Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {

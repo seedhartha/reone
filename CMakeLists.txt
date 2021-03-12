@@ -427,6 +427,7 @@ set(GAME_HEADERS
     src/game/combat/attackutil.h
     src/game/combat/combat.h
     src/game/combat/damageresolver.h
+    src/game/creaturefinder.h
     src/game/cursors.h
     src/game/dialog.h
     src/game/enginetype/effect.h
@@ -539,6 +540,7 @@ set(GAME_SOURCES
     src/game/combat/attackresolver.cpp
     src/game/combat/combat.cpp
     src/game/combat/damageresolver.cpp
+    src/game/creaturefinder.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp

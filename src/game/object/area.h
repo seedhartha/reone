@@ -37,6 +37,7 @@
 #include "../camera/thirdperson.h"
 #include "../collisiondetect.h"
 #include "../combat/combat.h"
+#include "../creaturefinder.h"
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
@@ -98,6 +99,7 @@ public:
     const RoomMap &rooms() const { return _rooms; }
     Combat &combat() { return _combat; }
     Map &map() { return _map; }
+    CreatureFinder &creatureFinder() { return _creatureFinder; }
 
     void setUnescapable(bool value);
 
@@ -181,6 +183,7 @@ private:
     Timer _heartbeatTimer;
     Map _map;
     bool _unescapable { false };
+    CreatureFinder _creatureFinder;
 
     // Scripts
 
