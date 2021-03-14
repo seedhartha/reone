@@ -115,6 +115,12 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
                 action->complete();
             }
             break;
+        case ActionType::FollowLeader:
+            executeFollowLeader(object, *action, dt);
+            break;
+        case ActionType::MoveToLocation:
+            executeMoveToLocation(object, *static_pointer_cast<MoveToLocationAction>(action), dt);
+            break;
         default:
             debug("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)), 2);
             action->complete();
@@ -370,6 +376,24 @@ void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const
 
     auto spatial = static_pointer_cast<SpatialObject>(actor);
     spatial->playAnimation(action->animation(), move(properties), action);
+}
+
+void ActionExecutor::executeFollowLeader(const shared_ptr<Object> &actor, Action &action, float dt) {
+    auto creatureActor = static_pointer_cast<Creature>(actor);
+    glm::vec3 destination(_game->party().getLeader()->position());
+    float distance = creatureActor->distanceTo(glm::vec2(destination));
+    bool run = distance > kDistanceWalk;
+
+    navigateCreature(creatureActor, destination, run, kDefaultFollowDistance, dt);
+}
+
+void ActionExecutor::executeMoveToLocation(const shared_ptr<Object> &actor, MoveToLocationAction &action, float dt) {
+    glm::vec3 destination(action.location()->position());
+
+    bool reached = navigateCreature(static_pointer_cast<Creature>(actor), destination, action.isRun(), 1.0f, dt);
+    if (reached) {
+        action.complete();
+    }
 }
 
 } // namespace game
