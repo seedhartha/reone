@@ -158,8 +158,6 @@ protected:
 
     virtual void updateTransform();
 
-    bool isAnimationLooping(AnimationType animation) const;
-
 private:
     int _itemIndex { 0 };
 

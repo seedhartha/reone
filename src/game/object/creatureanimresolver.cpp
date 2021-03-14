@@ -126,12 +126,13 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
             return "treatinj";
         case AnimationType::FireForgetOpen:
             return "open";
+        case AnimationType::LoopingReady:
+            return getAnimationName(CombatAnimation::Ready, _creature->getWieldType(), 0);
 
         case AnimationType::LoopingWorship:
         case AnimationType::LoopingGetLow:
         case AnimationType::LoopingGetMid:
         case AnimationType::LoopingPauseDrunk:
-        case AnimationType::LoopingReady:
         case AnimationType::LoopingDeadProne:
         case AnimationType::LoopingKneelTalkAngry:
         case AnimationType::LoopingKneelTalkSad:

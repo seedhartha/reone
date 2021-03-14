@@ -206,14 +206,6 @@ void SpatialObject::updateEffects(float dt) {
 void SpatialObject::playAnimation(AnimationType animation, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
 }
 
-bool SpatialObject::isAnimationLooping(AnimationType animation) const {
-    int ordinal = static_cast<int>(animation);
-
-    return
-        animation == AnimationType::LoopingChoke ||
-        (ordinal >= static_cast<int>(AnimationType::LoopingPause) && ordinal <= static_cast<int>(AnimationType::LoopingMeditateStand));
-}
-
 bool SpatialObject::isSelectable() const {
     return false;
 }

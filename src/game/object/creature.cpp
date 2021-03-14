@@ -34,6 +34,7 @@
 #include "../../script/types.h"
 
 #include "../action/attack.h"
+#include "../animationutil.h"
 #include "../blueprint/blueprints.h"
 #include "../portraitutil.h"
 
@@ -245,19 +246,18 @@ void Creature::clearAllActions() {
 }
 
 void Creature::playAnimation(AnimationType type, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
-    string animName(_animResolver.getAnimationName(type));
-    if (animName.empty()) {
-        // If animation is not supported, complete the action immediately
-        if (actionToComplete) {
-            actionToComplete->complete();
-        }
-        return;
-    }
-
     // If animation is looping by type, set flags accordingly
-    if (isAnimationLooping(type)) {
+    bool looping = isAnimationLooping(type);
+    if (looping) {
         properties.flags |= AnimationFlags::loop;
     }
+
+    // If animation is not supported or is looping, complete the action immediately
+    string animName(_animResolver.getAnimationName(type));
+    if (actionToComplete && (animName.empty() || looping)) {
+        actionToComplete->complete();
+    }
+    if (animName.empty()) return;
 
     playAnimation(animName, move(properties), move(actionToComplete));
 }
