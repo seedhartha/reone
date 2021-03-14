@@ -99,6 +99,16 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
         case ActionType::PlayAnimation:
             executePlayAnimation(object, dynamic_pointer_cast<PlayAnimationAction>(action), dt);
             break;
+        case ActionType::PauseConversation: {
+            _game->conversation().pause();
+            action->complete();
+            break;
+        }
+        case ActionType::ResumeConversation: {
+            _game->conversation().resume();
+            action->complete();
+            break;
+        }
         default:
             debug("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)), 2);
             action->complete();

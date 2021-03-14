@@ -273,11 +273,15 @@ bool Conversation::handle(const SDL_Event &event) {
 }
 
 bool Conversation::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button == SDL_BUTTON_LEFT && !_entryEnded && (_dialog->isSkippable() || g_allEntriesSkippable)) {
+    if (event.button == SDL_BUTTON_LEFT && !_entryEnded && isSkippableEntry()) {
         endCurrentEntry();
         return true;
     }
     return false;
+}
+
+bool Conversation::isSkippableEntry() const {
+    return g_allEntriesSkippable || (_dialog->isSkippable() && !_paused);
 }
 
 void Conversation::endCurrentEntry() {
@@ -306,7 +310,7 @@ bool Conversation::handleKeyUp(const SDL_KeyboardEvent &event) {
     SDL_Scancode key = event.keysym.scancode;
     if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
         int index = key - SDL_SCANCODE_1;
-        if (_entryEnded || _dialog->isSkippable() || g_allEntriesSkippable) {
+        if (_entryEnded) {
             pickReply(index);
             return true;
         }
@@ -335,6 +339,14 @@ CameraType Conversation::getCamera(int &cameraId) const {
         return CameraType::Static;
     }
     return CameraType::Dialog;
+}
+
+void Conversation::pause() {
+    _paused = true;
+}
+
+void Conversation::resume() {
+    _paused = false;
 }
 
 } // namespace game

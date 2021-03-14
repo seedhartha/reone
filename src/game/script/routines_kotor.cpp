@@ -243,7 +243,7 @@ void Routines::addKotorRoutines() {
     add("ActionWait", Void, { Float }, &Routines::actionWait);
     add("SetAreaTransitionBMP", Void, { Int, String });
     add("ActionStartConversation", Void, { Object, String, Int, Int, Int, String, String, String, String, String, String, Int }, &Routines::actionStartConversation);
-    add("ActionPauseConversation", Void, { }), &Routines::actionPauseConversation;
+    add("ActionPauseConversation", Void, { }, &Routines::actionPauseConversation);
     add("ActionResumeConversation", Void, { }, &Routines::actionResumeConversation);
     add("EffectBeam", Effect, { Int, Object, Int, Int }, &Routines::effectBeam);
     add("GetReputation", Int, { Object, Object });
