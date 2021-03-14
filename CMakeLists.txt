@@ -403,6 +403,7 @@ set(GAME_HEADERS
     src/game/action/waitaction.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
+    src/game/animationutil.h
     src/game/blueprint/blueprint.h
     src/game/blueprint/blueprints.h
     src/game/blueprint/creature.h
@@ -519,6 +520,7 @@ set(GAME_SOURCES
     src/game/action/startconversation.cpp
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
+    src/game/animationutil.cpp
     src/game/blueprint/blueprints.cpp
     src/game/blueprint/creature.cpp
     src/game/blueprint/door.cpp
