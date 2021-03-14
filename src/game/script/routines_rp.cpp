@@ -21,7 +21,7 @@
 
 #include "../game.h"
 #include "../object/creature.h"
-#include "../rp/factionutil.h"
+#include "../reputes.h"
 
 using namespace std;
 
@@ -191,7 +191,7 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
         warn("Routines: getIsEnemy: source is invalid");
         return 0;
     }
-    return game::getIsEnemy(*target, *source);
+    return Reputes::instance().getIsEnemy(*target, *source);
 }
 
 Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx) {
@@ -205,7 +205,7 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
         warn("Routines: getIsFriend: source is invalid");
         return 0;
     }
-    return game::getIsFriend(*target, *source);
+    return Reputes::instance().getIsFriend(*target, *source);
 }
 
 Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx) {
@@ -219,7 +219,7 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
         warn("Routines: getIsNeutral: source is invalid");
         return 0;
     }
-    return game::getIsNeutral(*target, *source);
+    return Reputes::instance().getIsNeutral(*target, *source);
 }
 
 Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &ctx) {

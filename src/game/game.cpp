@@ -43,6 +43,7 @@
 
 #include "blueprint/blueprints.h"
 #include "cursors.h"
+#include "reputes.h"
 #include "gui/sounds.h"
 #include "script/routines.h"
 #include "soundsets.h"
@@ -107,6 +108,7 @@ void Game::init() {
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
     Routines::instance().init(_gameId, this);
+    Reputes::instance().init();
 
     Models::instance().init(_gameId);
     registerModelLoaders();

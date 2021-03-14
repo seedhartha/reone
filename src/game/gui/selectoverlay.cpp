@@ -30,7 +30,7 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
-#include "../rp/factionutil.h"
+#include "../reputes.h"
 
 #include "colorutil.h"
 
@@ -157,7 +157,7 @@ void SelectionOverlay::update() {
             _hilightedObject = hilightedObject;
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(hilightedObject));
-            _hilightedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
+            _hilightedHostile = target && !target->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 
@@ -170,7 +170,7 @@ void SelectionOverlay::update() {
             _actions = module->getContextualActions(selectedObject);
 
             shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(selectedObject));
-            _selectedHostile = target && !target->isDead() && getIsEnemy(*(_game->party().getLeader()), *target);
+            _selectedHostile = target && !target->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *target);
         }
     }
 }
