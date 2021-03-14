@@ -122,11 +122,10 @@ Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext
     int npc = getInt(args, 0);
     if (!_game->party().isMember(npc)) return 0;
 
-    shared_ptr<Area> area(_game->module()->area());
-    area->unloadParty();
-
     _game->party().removeMember(npc);
 
+    shared_ptr<Area> area(_game->module()->area());
+    area->unloadParty();
     area->reloadParty();
 
     return 1;
