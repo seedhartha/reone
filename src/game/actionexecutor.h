@@ -25,6 +25,7 @@
 #include "action/commandaction.h"
 #include "action/follow.h"
 #include "action/locationaction.h"
+#include "action/movetolocation.h"
 #include "action/movetoobject.h"
 #include "action/movetopoint.h"
 #include "action/playanimation.h"
@@ -66,6 +67,8 @@ private:
     void executeJumpToObject(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeJumpToLocation(const std::shared_ptr<Object> &actor, LocationAction &action, float dt);
     void executePlayAnimation(const std::shared_ptr<Object> &actor, const std::shared_ptr<PlayAnimationAction> &action, float dt);
+    void executeFollowLeader(const std::shared_ptr<Object> &actor, Action &action, float dt);
+    void executeMoveToLocation(const std::shared_ptr<Object> &actor, MoveToLocationAction &action, float dt);
 
     // END Actions
 };

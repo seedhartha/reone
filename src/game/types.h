@@ -28,7 +28,7 @@ namespace game {
 
 constexpr int kNpcPlayer = -1;
 constexpr int kEngineTypeInvalid = -1;
-constexpr float kDefaultFollowDistance = 2.0f;
+constexpr float kDefaultFollowDistance = 5.0f;
 constexpr char kObjectTagPlayer[] = "player";
 constexpr float kDefaultRaycastDistance = 8.0f;
 

@@ -21,6 +21,7 @@
 
 #include "../action/commandaction.h"
 #include "../action/locationaction.h"
+#include "../action/movetolocation.h"
 #include "../action/movetoobject.h"
 #include "../action/playanimation.h"
 #include "../action/startconversation.h"
@@ -254,10 +255,11 @@ Variable Routines::actionRandomWalk(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        auto action = make_unique<Action>(ActionType::MoveToLocation);
+        auto destination = getLocationEngineType(args, 0);
+        bool run = getBool(args, 1, false);
+        auto action = make_unique<MoveToLocationAction>(destination, run);
         caller->actionQueue().add(move(action));
     } else {
         warn("Routines: actionMoveToLocation: caller is invalid");
