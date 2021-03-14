@@ -203,7 +203,7 @@ void SpatialObject::updateEffects(float dt) {
     }
 }
 
-void SpatialObject::playAnimation(AnimationType animation, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
+void SpatialObject::playAnimation(AnimationType animation, AnimationProperties properties, shared_ptr<PlayAnimationAction> actionToComplete) {
 }
 
 bool SpatialObject::isSelectable() const {
