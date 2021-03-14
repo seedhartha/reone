@@ -108,6 +108,7 @@ public:
     CharacterGeneration &characterGeneration() { return *_charGen; }
     CameraType cameraType() const { return _cameraType; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
+    Conversation &conversation() { return *_conversation; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);

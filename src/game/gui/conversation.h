@@ -61,6 +61,13 @@ public:
      */
     CameraType getCamera(int &cameraId) const;
 
+    /**
+     * Pause this conversation. When paused, entries cannot be skipped by clicking the mouse.
+     */
+    void pause();
+
+    void resume();
+
 protected:
     Game *_game;
     std::string _repliesControlTag;
@@ -71,6 +78,7 @@ protected:
     std::shared_ptr<render::LipAnimation> _lipAnimation;
     const Dialog::EntryReply *_currentEntry { nullptr };
     bool _entryEnded { false };
+    bool _paused { false };
 
     virtual void onStart();
     virtual void onFinish();
@@ -98,6 +106,8 @@ private:
     void loadVoiceOver();
     void scheduleEndOfEntry();
     void loadReplies();
+
+    bool isSkippableEntry() const;
 
     /**
      * Replaces text in the message control.
