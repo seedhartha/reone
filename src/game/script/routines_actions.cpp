@@ -24,6 +24,7 @@
 #include "../action/movetoobject.h"
 #include "../action/playanimation.h"
 #include "../action/startconversation.h"
+#include "../action/waitaction.h"
 #include "../enginetype/location.h"
 #include "../game.h"
 
@@ -417,10 +418,10 @@ Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionC
 }
 
 Variable Routines::actionWait(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCaller(ctx);
     if (caller) {
-        auto action = make_unique<Action>(ActionType::Wait);
+        float seconds = getFloat(args, 0);
+        auto action = make_unique<WaitAction>(seconds);
         caller->actionQueue().add(move(action));
     } else {
         warn("Routines: actionWait: caller is invalid");

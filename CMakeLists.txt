@@ -400,6 +400,7 @@ set(GAME_HEADERS
     src/game/action/objectaction.h
     src/game/action/playanimation.h
     src/game/action/startconversation.h
+    src/game/action/waitaction.h
     src/game/actionexecutor.h
     src/game/actionqueue.h
     src/game/blueprint/blueprint.h

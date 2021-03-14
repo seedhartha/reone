@@ -25,6 +25,7 @@
 #include "../scene/types.h"
 #include "../script/execution.h"
 
+#include "action/waitaction.h"
 #include "enginetype/location.h"
 #include "game.h"
 #include "object/area.h"
@@ -109,6 +110,11 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
             action->complete();
             break;
         }
+        case ActionType::Wait:
+            if (static_pointer_cast<WaitAction>(action)->advance(dt)) {
+                action->complete();
+            }
+            break;
         default:
             debug("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)), 2);
             action->complete();
