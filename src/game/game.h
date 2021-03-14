@@ -93,6 +93,7 @@ public:
 
     bool isLoadFromSaveGame() const;
     bool isPaused() const { return _paused; }
+    bool isInConversation() const { return _screen == GameScreen::Conversation; }
 
     Camera *getActiveCamera() const;
     int getRunScriptVar() const;

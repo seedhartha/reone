@@ -72,7 +72,11 @@ void Combat::update(float dt) {
 void Combat::updateCombatants() {
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
-        if (!creature->isDead()) {
+        bool needUpdate =
+            !creature->isDead() &&
+            (!_game->party().isMember(*creature) || !_game->isInConversation());
+
+        if (needUpdate) {
             updateCombatant(creature);
         }
     }
