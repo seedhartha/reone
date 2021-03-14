@@ -29,6 +29,7 @@
 #include "../../render/walkmesh/walkmesh.h"
 #include "../../scene/node/modelscenenode.h"
 
+#include "../action/playanimation.h"
 #include "../enginetype/effect.h"
 #include "../types.h"
 
@@ -84,7 +85,7 @@ public:
 
     // Animation
 
-    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<PlayAnimationAction> actionToComplete = nullptr);
 
     // END Animation
 
