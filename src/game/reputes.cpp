@@ -43,13 +43,23 @@ Reputes &Reputes::instance() {
 
 void Reputes::init() {
     shared_ptr<TwoDA> repute(Resources::instance().get2DA("repute"));
+
     for (int row = 0; row < repute->getRowCount(); ++row) {
         g_factionLabels.push_back(boost::to_lower_copy(repute->getString(row, "label")));
     }
+
     for (int row = 0; row < repute->getRowCount(); ++row) {
         vector<int> values;
         for (size_t i = 0; i < g_factionLabels.size(); ++i) {
-            int value = repute->getInt(row, g_factionLabels[i]);
+            int value;
+
+            const string &label = g_factionLabels[i];
+            if (label == "player" || label == "glb_xor") {
+                value = kDefaultRepute;
+            } else {
+                value = repute->getInt(row, g_factionLabels[i], kDefaultRepute);
+            }
+
             values.push_back(value);
         }
         g_factionValues.push_back(move(values));
@@ -57,6 +67,13 @@ void Reputes::init() {
 }
 
 bool Reputes::getIsEnemy(const Creature &left, const Creature &right) {
+    // HACK: friendlies must not attack each other, unless both are immortal
+    if ((left.faction() == Faction::Friendly1 && right.faction() == Faction::Friendly2) ||
+        (left.faction() == Faction::Friendly2 && right.faction() == Faction::Friendly1)) {
+
+        return left.isMinOneHP() && right.isMinOneHP();
+    }
+
     return getRepute(left, right) < 50;
 }
 

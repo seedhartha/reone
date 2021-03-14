@@ -41,7 +41,7 @@ void TwoDA::add(Row row) {
 int TwoDA::indexByCellValue(const string &column, const string &value) const {
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
-        error("2DA: column not found: " + column);
+        warn("2DA: column not found: " + column);
         return -1;
     }
     for (size_t i = 0; i < _rows.size(); ++i) {
@@ -109,13 +109,13 @@ int TwoDA::indexByCellValuesAny(const vector<pair<string, string>> &values) cons
 
 string TwoDA::getString(int row, const string &column, string defValue) const {
     if (row < 0 || row >= _rows.size()) {
-        error("2DA: row index out of range: " + to_string(row));
+        warn("2DA: row index out of range: " + to_string(row));
         return move(defValue);
     }
 
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
-        error("2DA: column not found: " + column);
+        warn("2DA: column not found: " + column);
         return move(defValue);
     }
 
