@@ -95,6 +95,7 @@ private:
     void indexLipModFiles();
     void indexExeReader();
     void indexOverrideDirectory();
+    void indexDataDirectory();
 
     void indexErfFile(const boost::filesystem::path &path);
     void indexTransientErfFile(const boost::filesystem::path &path);

@@ -71,6 +71,7 @@ void Resources::init(GameID gameId, const fs::path &gamePath) {
     indexLipModFiles();
     indexExeReader();
     indexOverrideDirectory();
+    indexDataDirectory();
 
     loadModuleNames();
 }
@@ -158,6 +159,13 @@ void Resources::indexDirectory(const fs::path &path) {
 void Resources::indexOverrideDirectory() {
     fs::path path(getPathIgnoreCase(_gamePath, kOverrideDirectoryName));
     indexDirectory(path);
+}
+
+void Resources::indexDataDirectory() {
+    fs::path path(getPathIgnoreCase(fs::current_path(), "data", false));
+    if (!path.empty()) {
+        indexDirectory(path);
+    }
 }
 
 void Resources::indexExeReader() {
