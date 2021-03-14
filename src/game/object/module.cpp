@@ -279,7 +279,7 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
     vector<ContextualAction> actions;
 
     auto door = dynamic_pointer_cast<Door>(object);
-    if (door && door->isLocked() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
+    if (door && door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
         actions.push_back(ContextualAction::Unlock);
     }
 
