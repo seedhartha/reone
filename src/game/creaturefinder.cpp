@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 #include "object/area.h"
-#include "rp/factionutil.h"
+#include "reputes.h"
 
 using namespace std;
 
@@ -59,13 +59,13 @@ bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaLi
                 auto reputation = static_cast<ReputationType>(criteria.second);
                 switch (reputation) {
                     case ReputationType::Friend:
-                        if (!target || !getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !Reputes::instance().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Enemy:
-                        if (!target || !getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !Reputes::instance().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Neutral:
-                        if (!target || !getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !Reputes::instance().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     default:
                         break;

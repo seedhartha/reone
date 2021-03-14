@@ -21,7 +21,7 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
-#include "../rp/factionutil.h"
+#include "../reputes.h"
 
 #include "objectfactory.h"
 
@@ -159,7 +159,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                     cursor = CursorType::Pickup;
                 } else {
                     auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = getIsEnemy(*creature, *_game->party().getLeader());
+                    bool isEnemy = Reputes::instance().getIsEnemy(*creature, *_game->party().getLeader());
                     cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
                 }
                 break;
@@ -230,7 +230,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
             actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
         }
     } else {
-        bool isEnemy = getIsEnemy(*partyLeader, *creature);
+        bool isEnemy = Reputes::instance().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             actions.clear();
             actions.add(make_unique<AttackAction>(creature));
@@ -284,7 +284,7 @@ vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &
     }
 
     auto hostile = dynamic_pointer_cast<Creature>(object);
-    if (hostile && !hostile->isDead() && getIsEnemy(*(_game->party().getLeader()), *hostile)) {
+    if (hostile && !hostile->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *hostile)) {
         actions.push_back(ContextualAction::Attack);
     }
 

@@ -27,7 +27,7 @@
 #include "../../common/random.h"
 
 #include "../game.h"
-#include "../rp/factionutil.h"
+#include "../reputes.h"
 
 using namespace std;
 
@@ -103,7 +103,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
             object->distanceTo(combatant) > range) continue;
 
         auto creature = static_pointer_cast<Creature>(object);
-        if (!getIsEnemy(combatant, *creature)) continue;
+        if (!Reputes::instance().getIsEnemy(combatant, *creature)) continue;
 
         glm::vec3 adjustedCombatantPos(combatant.position());
         adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
