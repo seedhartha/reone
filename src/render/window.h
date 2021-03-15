@@ -52,16 +52,11 @@ public:
 
     glm::mat4 getOrthoProjection(float near = -100.0f, float far = 100.0f) const;
 
-    int width() const { return _width; }
-    int height() const { return _height; }
-
     void setRelativeMouseMode(bool enabled);
     void setCursor(const std::shared_ptr<Cursor> &cursor);
 
 private:
     bool _inited { false };
-    int _width { 0 };
-    int _height { 0 };
     GraphicsOptions _options;
     IEventHandler *_eventHandler { nullptr };
     SDL_Window *_window { nullptr };
@@ -72,10 +67,13 @@ private:
 
     RenderWindow() = default;
 
-    void configureGL();
+    void initSDL();
+    void initGL();
 
     bool handleEvent(const SDL_Event &event, bool &quit);
     bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);
+
+    inline int getWindowFlags() const;
 };
 
 } // namespace render

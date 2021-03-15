@@ -40,26 +40,29 @@ RenderWindow &RenderWindow::instance() {
 }
 
 void RenderWindow::init(GraphicsOptions options, IEventHandler *eventHandler) {
-    if (_inited) return;
-
     if (!eventHandler) {
         throw invalid_argument("eventHandler must not be null");
     }
 
-    _width = options.width;
-    _height = options.height;
+    if (_inited) return;
+
     _options = move(options);
     _eventHandler = eventHandler;
 
+    initSDL();
+    initGL();
+
+    _inited = true;
+}
+
+void RenderWindow::initSDL() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
-    if (_options.fullscreen) {
-        flags |= SDL_WINDOW_FULLSCREEN;
-    }
+    int flags = getWindowFlags();
+
     _window = SDL_CreateWindow(
         "reone",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -71,17 +74,23 @@ void RenderWindow::init(GraphicsOptions options, IEventHandler *eventHandler) {
     }
 
     _context = SDL_GL_CreateContext(_window);
+
     if (!_context) {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
 
     SDL_GL_SetSwapInterval(0);
-    configureGL();
-
-    _inited = true;
 }
 
-void RenderWindow::configureGL() {
+int RenderWindow::getWindowFlags() const {
+    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
+    if (_options.fullscreen) {
+        flags |= SDL_WINDOW_FULLSCREEN;
+    }
+    return flags;
+}
+
+void RenderWindow::initGL() {
     glewInit();
 
     glEnable(GL_BLEND);
@@ -115,7 +124,6 @@ void RenderWindow::processEvents(bool &quit) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (handleEvent(event, quit)) continue;
-        if (!_eventHandler) continue;
 
         _eventHandler->handle(event);
     }
@@ -185,7 +193,7 @@ void RenderWindow::swapBuffers() const {
 }
 
 glm::mat4 RenderWindow::getOrthoProjection(float near, float far) const {
-    return glm::ortho(0.0f, static_cast<float>(_width), static_cast<float>(_height), 0.0f, near, far);
+    return glm::ortho(0.0f, static_cast<float>(_options.width), static_cast<float>(_options.height), 0.0f, near, far);
 }
 
 void RenderWindow::setRelativeMouseMode(bool enabled) {
