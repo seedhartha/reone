@@ -160,7 +160,6 @@ set(RENDER_HEADERS
     src/render/featureutil.h
     src/render/font.h
     src/render/fonts.h
-    src/render/fps.h
     src/render/framebuffer.h
     src/render/image/curreader.h
     src/render/image/tgareader.h
@@ -203,7 +202,6 @@ set(RENDER_SOURCES
     src/render/featureutil.cpp
     src/render/font.cpp
     src/render/fonts.cpp
-    src/render/fps.cpp
     src/render/framebuffer.cpp
     src/render/image/curreader.cpp
     src/render/image/tgareader.cpp
@@ -469,6 +467,7 @@ set(GAME_HEADERS
     src/game/gui/loadscreen.h
     src/game/gui/mainmenu.h
     src/game/gui/partyselect.h
+    src/game/gui/profileoverlay.h
     src/game/gui/saveload.h
     src/game/gui/selectoverlay.h
     src/game/gui/sounds.h
@@ -580,6 +579,7 @@ set(GAME_SOURCES
     src/game/gui/loadscreen.cpp
     src/game/gui/mainmenu.cpp
     src/game/gui/partyselect.cpp
+    src/game/gui/profileoverlay.cpp
     src/game/gui/saveload.cpp
     src/game/gui/selectoverlay.cpp
     src/game/gui/sounds.cpp

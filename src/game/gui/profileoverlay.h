@@ -18,27 +18,52 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <vector>
+
+#include "SDL2/SDL_events.h"
+
+#include "../../common/timer.h"
+#include "../../render/font.h"
+#include "../../render/types.h"
 
 namespace reone {
 
-namespace render {
+namespace game {
 
-class FpsCounter {
+class ProfileOverlay {
 public:
-    void reset();
+    ProfileOverlay(render::GraphicsOptions options);
+
+    void init();
+    bool handle(const SDL_Event &event);
     void update(float dt);
-
-    bool hasAverage() const { return _hasAverage; }
-
-    float average() const { return _average; }
+    void render();
 
 private:
-    uint32_t _startTicks { 0 };
-    uint64_t _frameCount { 0 };
-    bool _hasAverage { false };
-    float _average { 0.0f };
+    struct FPS {
+        int min { 0 };
+        int average { 0 };
+    };
+
+    render::GraphicsOptions _options;
+
+    uint64_t _frequency { 0 };
+    uint64_t _counter { 0 };
+    std::shared_ptr<render::Font> _font;
+
+    bool _enabled { false };
+
+    Timer _refreshTimer;
+    std::vector<float> _frametimes;
+    FPS _fps;
+
+    void calculateFPS();
+
+    void drawBackground();
+    void drawText();
 };
 
-} // namespace render
+} // namespace game
 
 } // namespace reone
