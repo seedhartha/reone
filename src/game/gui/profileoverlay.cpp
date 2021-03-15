@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2020-2021 The reone project contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "profileoverlay.h"
+
+#include <sstream>
+
+#include "SDL2/SDL_timer.h"
+
+#include "glm/ext.hpp"
+
+#include "../../render/fonts.h"
+#include "../../render/meshes.h"
+#include "../../render/shaders.h"
+#include "../../render/textutil.h"
+#include "../../render/window.h"
+
+using namespace std;
+
+using namespace reone::render;
+
+namespace reone {
+
+namespace game {
+
+static constexpr int kFrameWidth = 125;
+static constexpr char kFontResRef[] = "fnt_console";
+static constexpr float kRefreshInterval = 1.0f; // seconds
+
+ProfileOverlay::ProfileOverlay(render::GraphicsOptions options) :
+    _options(move(options)),
+    _refreshTimer(kRefreshInterval) {
+}
+
+void ProfileOverlay::init() {
+    _frequency = SDL_GetPerformanceFrequency();
+    _counter = SDL_GetPerformanceCounter();
+    _font = Fonts::instance().get(kFontResRef);
+}
+
+bool ProfileOverlay::handle(const SDL_Event &event) {
+    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
+        _enabled = !_enabled;
+        return true;
+    }
+    return false;
+}
+
+void ProfileOverlay::update(float dt) {
+    if (!_enabled) return;
+
+    uint64_t counter = SDL_GetPerformanceCounter();
+    float frametime = static_cast<float>((counter - _counter) / static_cast<double>(_frequency));
+    _frametimes.push_back(frametime);
+
+    if (_refreshTimer.advance(dt)) {
+        calculateFPS();
+        _frametimes.clear();
+        _refreshTimer.reset(kRefreshInterval);
+    }
+
+    _counter = counter;
+}
+
+void ProfileOverlay::calculateFPS() {
+    if (_frametimes.empty()) return;
+
+    int minfps = INT_MAX;
+    int avgfps = 0;
+    for (size_t i = 0; i < _frametimes.size(); ++i) {
+        int fps = glm::iround(1.0f / _frametimes[i]);
+        if (fps < minfps) {
+            minfps = fps;
+        }
+        avgfps += fps;
+    }
+    avgfps /= _frametimes.size();
+
+    _fps.min = minfps;
+    _fps.average = avgfps;
+}
+
+void ProfileOverlay::render() {
+    if (!_enabled) return;
+
+    drawBackground();
+    drawText();
+}
+
+void ProfileOverlay::drawBackground() {
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
+
+    ShaderUniforms uniforms;
+    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.general.alpha = 0.5f;
+
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
+    Meshes::instance().getQuad()->render();
+}
+
+void ProfileOverlay::drawText() {
+    stringstream ss;
+    ss << "Min FPS: " << _fps.min << endl;
+    ss << "Avg FPS: " << _fps.average << endl;
+
+    vector<string> lines(breakText(ss.str(), *_font, kFrameWidth));
+    glm::mat4 transform(1.0f);
+
+    for (auto &line : lines) {
+        _font->render(line, transform, glm::vec3(1.0f), TextGravity::RightBottom);
+        transform = glm::translate(transform, glm::vec3(0.0f, _font->height(), 0.0f));
+    }
+}
+
+} // namespace game
+
+} // namespace reone

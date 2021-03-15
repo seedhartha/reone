@@ -25,7 +25,6 @@
 #include "glm/mat4x4.hpp"
 
 #include "cursor.h"
-#include "fps.h"
 #include "texture.h"
 #include "types.h"
 
@@ -43,7 +42,6 @@ public:
     void deinit();
 
     void processEvents(bool &quit);
-    void update(float dt);
 
     void show();
     void clear() const;
@@ -63,7 +61,6 @@ private:
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };
     std::shared_ptr<Cursor> _cursor;
-    FpsCounter _fps;
 
     RenderWindow() = default;
 

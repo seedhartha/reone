@@ -157,17 +157,6 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
     }
 }
 
-void RenderWindow::update(float dt) {
-    if (!_inited) return;
-
-    _fps.update(dt);
-
-    if (_fps.hasAverage()) {
-        SDL_SetWindowTitle(_window, str(boost::format("reone [FPS: %d]") % static_cast<int>(_fps.average())).c_str());
-        _fps.reset();
-    }
-}
-
 void RenderWindow::clear() const {
     if (_inited) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

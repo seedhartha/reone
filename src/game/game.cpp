@@ -73,7 +73,8 @@ Game::Game(const fs::path &path, const Options &opts) :
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
     _party(this),
-    _scriptRunner(this) {
+    _scriptRunner(this),
+    _profileOverlay(opts.graphics) {
 
     _gameId = determineGameID(path);
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
@@ -118,6 +119,7 @@ void Game::init() {
 
     _worldPipeline.init();
     _console.load();
+    _profileOverlay.init();
 }
 
 void Game::registerModelLoaders() {
@@ -287,6 +289,8 @@ void Game::drawAll() {
         drawGUI();
         RenderWindow::instance().drawCursor();
     }
+
+    _profileOverlay.render();
 
     RenderWindow::instance().swapBuffers();
 }
@@ -487,11 +491,11 @@ void Game::update() {
         gui->update(dt);
     }
 
-    RenderWindow::instance().update(dt);
-
     if (!_paused) {
         _sceneGraph.update(dt);
     }
+
+    _profileOverlay.update(dt);
 }
 
 void Game::updateVideo(float dt) {
@@ -701,6 +705,8 @@ void Game::updateCamera(float dt) {
 }
 
 bool Game::handle(const SDL_Event &event) {
+    if (_profileOverlay.handle(event)) return true;
+
     if (!_video) {
         GUI *gui = getScreenGUI();
         if (gui && gui->handle(event)) {

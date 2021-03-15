@@ -40,6 +40,7 @@
 #include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/partyselect.h"
+#include "gui/profileoverlay.h"
 #include "gui/saveload.h"
 #include "object/module.h"
 #include "object/objectfactory.h"
@@ -219,6 +220,7 @@ private:
     ScriptRunner _scriptRunner;
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
+    ProfileOverlay _profileOverlay;
 
     // Modules
 
