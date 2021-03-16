@@ -44,7 +44,7 @@ namespace scene {
 static constexpr float kMotionBlurStrength = 0.25f;
 
 EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
-    SceneNode(sceneGraph),
+    SceneNode(SceneNodeType::Emitter, sceneGraph),
     _modelSceneNode(modelSceneNode),
     _emitter(emitter) {
 

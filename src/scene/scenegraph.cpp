@@ -60,9 +60,8 @@ void SceneGraph::prepareFrame() {
     refreshShadowLight();
 
     for (auto &root : _roots) {
-        ModelSceneNode *modelNode = dynamic_cast<ModelSceneNode *>(root.get());
-        if (modelNode) {
-            modelNode->updateLighting();
+        if (root->type() == SceneNodeType::Model) {
+            static_pointer_cast<ModelSceneNode>(root)->updateLighting();
         }
     }
 
@@ -135,15 +134,16 @@ void SceneGraph::refreshNodeLists() {
 }
 
 void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
-    auto model = dynamic_pointer_cast<ModelSceneNode>(node);
-    if (model) {
-        // Skip the model and its children if it is not currently visible
-        if (!model->isVisible() || !model->isOnScreen()) return;
-
-    } else {
-        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(node);
-        if (modelNode) {
+    switch (node->type()) {
+        case SceneNodeType::Model: {
+            // Skip the model and its children if it is not currently visible
+            auto model = static_pointer_cast<ModelSceneNode>(node);
+            if (!model->isVisible() || !model->isOnScreen()) return;
+            break;
+        }
+        case SceneNodeType::ModelNode: {
             // For model nodes, determine whether they should be rendered and cast shadows
+            auto modelNode = static_pointer_cast<ModelNodeSceneNode>(node);
             if (modelNode->shouldRender()) {
                 // Sort model nodes into transparent and opaque
                 if (modelNode->isTransparent()) {
@@ -155,17 +155,16 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
             if (modelNode->shouldCastShadows()) {
                 _shadowMeshes.push_back(modelNode.get());
             }
-        } else {
-            auto light = dynamic_pointer_cast<LightSceneNode>(node);
-            if (light) {
-                _lights.push_back(light.get());
-            } else {
-                auto emitter = dynamic_pointer_cast<EmitterSceneNode>(node);
-                if (emitter) {
-                    _emitters.push_back(emitter.get());
-                }
-            }
+            break;
         }
+        case SceneNodeType::Light:
+            _lights.push_back(static_pointer_cast<LightSceneNode>(node).get());
+            break;
+        case SceneNodeType::Emitter:
+            _emitters.push_back(static_pointer_cast<EmitterSceneNode>(node).get());
+            break;
+        default:
+            break;
     }
 
     for (auto &child : node->children()) {

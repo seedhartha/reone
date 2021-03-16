@@ -21,6 +21,15 @@ namespace reone {
 
 namespace scene {
 
+enum class SceneNodeType {
+    Mesh,
+    Model,
+    ModelNode,
+    Camera,
+    Light,
+    Emitter
+};
+
 struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int blend = 2; /**< blend previous animation into the next one */

@@ -26,6 +26,8 @@
 
 #include "../../render/aabb.h"
 
+#include "../types.h"
+
 namespace reone {
 
 namespace scene {
@@ -62,6 +64,7 @@ public:
      */
     float getDistanceTo(const SceneNode &other) const;
 
+    SceneNodeType type() const { return _type; }
     const SceneNode *parent() const { return _parent; }
     const glm::mat4 &localTransform() const { return _localTransform; }
     const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
@@ -76,6 +79,7 @@ public:
     void setTransparent(bool transparent);
 
 protected:
+    SceneNodeType _type;
     SceneGraph *_sceneGraph;
 
     const SceneNode *_parent { nullptr };
@@ -90,7 +94,7 @@ protected:
     bool _transparent { false };
     bool _volumetric { false };
 
-    SceneNode(SceneGraph *sceneGraph);
+    SceneNode(SceneNodeType type, SceneGraph *sceneGraph);
 
     virtual void updateAbsoluteTransform();
 };

@@ -47,7 +47,7 @@ static constexpr int kSelfIlluminatedPriority = 5;
 static bool g_debugAABB = false;
 
 ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
-    SceneNode(sceneGraph),
+    SceneNode(SceneNodeType::Model, sceneGraph),
     _classification(classification),
     _model(model),
     _animator(this, ignoreNodes) {
@@ -293,9 +293,8 @@ const string &ModelSceneNode::getName() const {
 
 void ModelSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
     for (auto &child : _children) {
-        auto modelNode = dynamic_pointer_cast<ModelNodeSceneNode>(child);
-        if (modelNode) {
-            modelNode->setDiffuseTexture(texture);
+        if (child->type() == SceneNodeType::ModelNode) {
+            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseTexture(texture);
         }
     }
 }
@@ -347,9 +346,9 @@ void ModelSceneNode::refreshAABB() {
         SceneNode *node = nodes.top();
         nodes.pop();
 
-        auto modelNodeSceneNode = dynamic_cast<ModelNodeSceneNode *>(node);
-        if (modelNodeSceneNode) {
-            shared_ptr<ModelMesh> mesh(modelNodeSceneNode->modelNode()->mesh());
+        if (node->type() == SceneNodeType::ModelNode) {
+            auto modelNode = static_cast<ModelNodeSceneNode *>(node);
+            shared_ptr<ModelMesh> mesh(modelNode->modelNode()->mesh());
             if (mesh) {
                 _aabb.expand(mesh->mesh()->aabb() * node->localTransform());
             }

@@ -29,7 +29,7 @@ namespace reone {
 
 namespace scene {
 
-SceneNode::SceneNode(SceneGraph *sceneGraph) : _sceneGraph(sceneGraph) {
+SceneNode::SceneNode(SceneNodeType type, SceneGraph *sceneGraph) : _type(type), _sceneGraph(sceneGraph) {
 }
 
 void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
