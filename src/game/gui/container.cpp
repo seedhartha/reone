@@ -25,6 +25,7 @@
 
 #include "../game.h"
 #include "../object/item.h"
+#include "../objectconverter.h"
 
 #include "colorutil.h"
 
@@ -122,7 +123,7 @@ void Container::transferItemsToPlayer() {
     shared_ptr<Creature> player(_game->party().player());
     _container->moveDropableItemsTo(*player);
 
-    auto placeable = dynamic_pointer_cast<Placeable>(_container);
+    auto placeable = ObjectConverter::toPlaceable(_container);
     if (placeable) {
         string script(placeable->getOnInvDisturbed());
         if (!script.empty()) {

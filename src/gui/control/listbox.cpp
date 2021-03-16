@@ -198,7 +198,7 @@ void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
             _protoItem->setHeight(static_cast<int>(item._textLines.size() * (_protoItem->text().font->height() + _padding)));
         }
         _protoItem->setFocus(_hilightedIndex == itemIdx);
-    
+
         auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
             imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);

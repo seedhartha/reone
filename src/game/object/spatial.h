@@ -65,7 +65,7 @@ public:
 
     virtual glm::vec3 getSelectablePosition() const;
 
-    std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const { return std::dynamic_pointer_cast<scene::ModelSceneNode>(_sceneNode); }
+    std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const;
     virtual std::shared_ptr<render::Walkmesh> getWalkmesh() const;
 
     ObjectFactory &objectFactory() { return *_objectFactory; }

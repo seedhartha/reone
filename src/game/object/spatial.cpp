@@ -210,6 +210,12 @@ bool SpatialObject::isSelectable() const {
     return false;
 }
 
+shared_ptr<ModelSceneNode> SpatialObject::getModelSceneNode() const {
+    if (!_sceneNode || _sceneNode->type() != SceneNodeType::Model) return nullptr;
+
+    return static_pointer_cast<ModelSceneNode>(_sceneNode);
+}
+
 shared_ptr<Walkmesh> SpatialObject::getWalkmesh() const {
     return nullptr;
 }

@@ -199,22 +199,16 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
 }
 
 void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
-    shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
-    if (creature) {
-        onCreatureClick(creature);
-        return;
-    }
-    debug(boost::format("Module: click: object '%s'") % object->tag());
-
-    shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
-    if (door) {
-        onDoorClick(door);
-        return;
-    }
-    shared_ptr<Placeable> placeable(dynamic_pointer_cast<Placeable>(object));
-    if (placeable) {
-        onPlaceableClick(placeable);
-        return;
+    switch (object->type()) {
+        case ObjectType::Creature:
+            onCreatureClick(static_pointer_cast<Creature>(object));
+            break;
+        case ObjectType::Door:
+            onDoorClick(static_pointer_cast<Door>(object));
+            break;
+        case ObjectType::Placeable:
+            onPlaceableClick(static_pointer_cast<Placeable>(object));
+            break;
     }
 }
 
@@ -278,14 +272,23 @@ void Module::update(float dt) {
 vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
     vector<ContextualAction> actions;
 
-    auto door = dynamic_pointer_cast<Door>(object);
-    if (door && door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
-        actions.push_back(ContextualAction::Unlock);
-    }
-
-    auto hostile = dynamic_pointer_cast<Creature>(object);
-    if (hostile && !hostile->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *hostile)) {
-        actions.push_back(ContextualAction::Attack);
+    switch (object->type()) {
+        case ObjectType::Creature: {
+            auto creature = static_pointer_cast<Creature>(object);
+            if (!creature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *creature)) {
+                actions.push_back(ContextualAction::Attack);
+            }
+            break;
+        }
+        case ObjectType::Door: {
+            auto door = static_pointer_cast<Door>(object);
+            if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().skills().contains(Skill::Security)) {
+                actions.push_back(ContextualAction::Unlock);
+            }
+            break;
+        }
+        default:
+            break;
     }
 
     return move(actions);
