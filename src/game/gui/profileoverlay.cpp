@@ -17,6 +17,7 @@
 
 #include "profileoverlay.h"
 
+#include <algorithm>
 #include <sstream>
 
 #include "SDL2/SDL_timer.h"
@@ -79,19 +80,26 @@ void ProfileOverlay::update(float dt) {
 void ProfileOverlay::calculateFPS() {
     if (_frametimes.empty()) return;
 
-    int minfps = INT_MAX;
-    int avgfps = 0;
+    vector<int> fps;
     for (size_t i = 0; i < _frametimes.size(); ++i) {
-        int fps = glm::iround(1.0f / _frametimes[i]);
-        if (fps < minfps) {
-            minfps = fps;
-        }
-        avgfps += fps;
+        fps.push_back(glm::iround(1.0f / _frametimes[i]));
     }
-    avgfps /= _frametimes.size();
+    sort(fps.begin(), fps.end(), less<int>());
 
-    _fps.min = minfps;
-    _fps.average = avgfps;
+    // Average FPS
+    _fps.average = 0;
+    for (size_t i = 0; i < fps.size(); ++i) {
+        _fps.average += fps[i];
+    }
+    _fps.average /= static_cast<int>(fps.size());
+
+    // 1% Low FPS
+    int numOnePer = glm::max(1, static_cast<int>(fps.size()) / 100);
+    _fps.onePerLow = 0;
+    for (int i = 0; i < numOnePer; ++i) {
+        _fps.onePerLow += fps[i];
+    }
+    _fps.onePerLow /= numOnePer;
 }
 
 void ProfileOverlay::render() {
@@ -117,8 +125,8 @@ void ProfileOverlay::drawBackground() {
 
 void ProfileOverlay::drawText() {
     stringstream ss;
-    ss << "Min FPS: " << _fps.min << endl;
-    ss << "Avg FPS: " << _fps.average << endl;
+    ss << "FPS: " << _fps.average << endl;
+    ss << "1% Low: " << _fps.onePerLow << endl;
 
     vector<string> lines(breakText(ss.str(), *_font, kFrameWidth));
     glm::mat4 transform(1.0f);

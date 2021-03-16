@@ -42,8 +42,8 @@ public:
 
 private:
     struct FPS {
-        int min { 0 };
         int average { 0 };
+        int onePerLow { 0 }; /**< 1% Low */
     };
 
     render::GraphicsOptions _options;
