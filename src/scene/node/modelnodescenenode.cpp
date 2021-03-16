@@ -235,12 +235,12 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
         }
 
         if (_textures.bumpmap) {
-            uniforms.general.featureMask |= UniformFeatureFlags::bumpmap;
-            uniforms.bumpmap.grayscale = _textures.bumpmap->isGrayscale();
-            uniforms.bumpmap.scaling = _textures.bumpmap->features().bumpMapScaling;
-            uniforms.bumpmap.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
-            uniforms.bumpmap.frame = _bumpmapFrame;
-            uniforms.bumpmap.swizzled = mesh->isBumpmapSwizzled();
+            uniforms.general.featureMask |= UniformFeatureFlags::bumpmaps;
+            uniforms.bumpmaps.grayscale = _textures.bumpmap->isGrayscale();
+            uniforms.bumpmaps.scaling = _textures.bumpmap->features().bumpMapScaling;
+            uniforms.bumpmaps.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
+            uniforms.bumpmaps.frame = _bumpmapFrame;
+            uniforms.bumpmaps.swizzled = mesh->isBumpmapSwizzled();
         }
 
         bool receivesShadows = isReceivingShadows(*_modelSceneNode, *this);
@@ -277,12 +277,12 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
             if (_material.custom) {
                 uniforms.general.featureMask |= UniformFeatureFlags::customMat;
             }
-            uniforms.lighting.materialAmbient = glm::vec4(mesh->ambientColor(), 1.0f);
-            uniforms.lighting.materialDiffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
-            uniforms.lighting.materialSpecular = _material.specular;
-            uniforms.lighting.materialShininess = _material.shininess;
-            uniforms.lighting.materialMetallic = _material.metallic;
-            uniforms.lighting.materialRoughness = _material.roughness;
+            uniforms.material.ambient = glm::vec4(mesh->ambientColor(), 1.0f);
+            uniforms.material.diffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
+            uniforms.material.specular = _material.specular;
+            uniforms.material.shininess = _material.shininess;
+            uniforms.material.metallic = _material.metallic;
+            uniforms.material.roughness = _material.roughness;
             uniforms.lighting.lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < uniforms.lighting.lightCount; ++i) {

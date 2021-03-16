@@ -48,7 +48,7 @@ enum class ShaderProgram {
     ModelColor,
     ModelBlinnPhong,
     ModelPBR,
-    BillboardBillboard
+    ParticleParticle
 };
 
 struct UniformFeatureFlags {
@@ -56,44 +56,44 @@ struct UniformFeatureFlags {
     static constexpr int lightmap = 2;
     static constexpr int envmap = 4;
     static constexpr int pbrIbl = 8;
-    static constexpr int bumpmap = 0x10;
+    static constexpr int bumpmaps = 0x10;
     static constexpr int skeletal = 0x20;
     static constexpr int lighting = 0x40;
     static constexpr int selfIllum = 0x80;
     static constexpr int discard = 0x100;
     static constexpr int shadows = 0x200;
-    static constexpr int billboard = 0x400;
+    static constexpr int particles = 0x400;
     static constexpr int water = 0x800;
     static constexpr int hdr = 0x1000;
     static constexpr int customMat = 0x2000;
+    static constexpr int blur = 0x4000;
 };
 
 struct GeneralUniforms {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
     glm::mat4 model { 1.0f };
-    glm::mat4 shadowMatrices[kNumCubeFaces];
     glm::vec4 cameraPosition { 0.0f };
-    glm::vec4 shadowLightPosition { 0.0f };
     glm::vec4 color { 1.0f };
     glm::vec4 ambientColor { 1.0f };
     glm::vec4 selfIllumColor { 1.0f };
     glm::vec4 discardColor { 0.0f };
     glm::vec2 uvOffset { 0.0f };
-    glm::vec2 blurResolution { 0.0f };
-    glm::vec2 blurDirection { 0.0f };
     float alpha { 1.0f };
     float waterAlpha { 1.0f };
     int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
-    int shadowLightPresent { false };
-    float shadowStrength { 1.0f };
     float roughness { 0.0f };
     float exposure { 1.0f };
-    char padding[12];
+    char padding[4];
 };
 
-struct SkeletalUniforms {
-    glm::mat4 bones[kMaxBoneCount];
+struct MaterialUniforms {
+    glm::vec4 ambient { 1.0f };
+    glm::vec4 diffuse { 0.0f };
+    float specular { 0.0f };
+    float shininess { 0.0f };
+    float metallic { 0.0f };
+    float roughness { 1.0f };
 };
 
 struct ShaderLight {
@@ -105,15 +105,21 @@ struct ShaderLight {
 };
 
 struct LightingUniforms {
-    glm::vec4 materialAmbient { 1.0f };
-    glm::vec4 materialDiffuse { 0.0f };
-    float materialSpecular { 0.0f };
-    float materialShininess { 0.0f };
-    float materialMetallic { 0.0f };
-    float materialRoughness { 1.0f };
     int lightCount { 0 };
     char padding[12];
     ShaderLight lights[kMaxLightCount];
+};
+
+struct ShadowUniforms {
+    glm::mat4 matrices[kNumCubeFaces];
+    glm::vec4 lightPosition { 0.0f };
+    int lightPresent { false };
+    float strength { 1.0f };
+    char padding[8];
+};
+
+struct SkeletalUniforms {
+    glm::mat4 bones[kMaxBoneCount];
 };
 
 struct ShaderParticle {
@@ -125,14 +131,14 @@ struct ShaderParticle {
     int frame { 0 };
 };
 
-struct BillboardUniforms {
+struct ParticlesUniforms {
     glm::vec2 gridSize { 0.0f };
     int render { 0 };
     char padding[4];
     ShaderParticle particles[kMaxParticleCount];
 };
 
-struct BumpmapUniforms {
+struct BumpmapsUniforms {
     int grayscale { 0 };
     float scaling { 0.0f };
     glm::vec2 gridSize { 1.0f };
@@ -141,12 +147,20 @@ struct BumpmapUniforms {
     char padding[8];
 };
 
+struct BlurUniforms {
+    glm::vec2 resolution { 0.0f };
+    glm::vec2 direction { 0.0f };
+};
+
 struct ShaderUniforms {
     GeneralUniforms general;
-    BillboardUniforms billboard;
-    BumpmapUniforms bumpmap;
-    SkeletalUniforms skeletal;
+    MaterialUniforms material;
+    ShadowUniforms shadows;
+    BumpmapsUniforms bumpmaps;
+    BlurUniforms blur;
     LightingUniforms lighting;
+    SkeletalUniforms skeletal;
+    ParticlesUniforms particles;
 };
 
 class Shaders : boost::noncopyable {
@@ -163,14 +177,14 @@ private:
     enum class ShaderName {
         VertexSimple,
         VertexModel,
-        VertexBillboard,
+        VertexParticle,
         GeometryDepth,
         FragmentColor,
         FragmentDepth,
         FragmentGUI,
         FragmentBlinnPhong,
         FragmentPBR,
-        FragmentBillboard,
+        FragmentParticle,
         FragmentIrradiance,
         FragmentPrefilter,
         FragmentBRDF,
@@ -183,22 +197,13 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
-
-    // Uniform buffer objects
-
-    uint32_t _generalUbo { 0 };
-    uint32_t _lightingUbo { 0 };
-    uint32_t _skeletalUbo { 0 };
-    uint32_t _billboardUbo { 0 };
-    uint32_t _bumpmapUbo { 0 };
-
-    // END Uniform buffer objects
+    uint32_t _ubo { 0 };
 
     ~Shaders();
 
     void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
-    void initUniformBlocks();
+    void initUBO();
     void initTextureUniforms();
 
     void setUniforms(const ShaderUniforms &locals);
