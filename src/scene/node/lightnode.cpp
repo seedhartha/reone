@@ -26,7 +26,7 @@ namespace reone {
 namespace scene {
 
 LightSceneNode::LightSceneNode(glm::vec3 color, int priority, SceneGraph *sceneGraph) :
-    SceneNode(sceneGraph),
+    SceneNode(SceneNodeType::Light, sceneGraph),
     _color(move(color)),
     _priority(priority) {
 }

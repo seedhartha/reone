@@ -35,7 +35,10 @@ namespace reone {
 
 namespace scene {
 
-MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mesh) : SceneNode(sceneGraph), _mesh(mesh) {
+MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mesh) :
+    SceneNode(SceneNodeType::Mesh, sceneGraph),
+    _mesh(mesh) {
+
     if (!mesh) {
         throw invalid_argument("mesh must not be null");
     }

@@ -26,7 +26,9 @@ namespace reone {
 namespace scene {
 
 CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection, float farPlane) :
-    SceneNode(sceneGraph), _projection(projection), _farPlane(farPlane) {
+    SceneNode(SceneNodeType::Camera, sceneGraph),
+    _projection(projection),
+    _farPlane(farPlane) {
 
     updateFrustum();
 }

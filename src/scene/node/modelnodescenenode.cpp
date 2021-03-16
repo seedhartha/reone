@@ -50,7 +50,7 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 static bool g_debugWalkmesh = false;
 
 ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
-    SceneNode(sceneGraph),
+    SceneNode(SceneNodeType::ModelNode, sceneGraph),
     _modelSceneNode(modelSceneNode),
     _modelNode(modelNode) {
 
