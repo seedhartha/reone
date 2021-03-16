@@ -27,6 +27,7 @@
 #include "../../common/random.h"
 
 #include "../game.h"
+#include "../objectconverter.h"
 #include "../reputes.h"
 
 using namespace std;
@@ -46,7 +47,10 @@ static const char kModelEventDetonate[] = "detonate";
 static bool g_projectilesEnabled = true;
 
 static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
-    return dynamic_pointer_cast<AttackAction>(combatant->actionQueue().getCurrentAction());
+    shared_ptr<Action> action(combatant->actionQueue().getCurrentAction());
+    if (!action || action->type() != ActionType::AttackObject) return nullptr;
+
+    return static_pointer_cast<AttackAction>(action);
 }
 
 void Combat::Round::advance(float dt) {
@@ -358,8 +362,8 @@ void Combat::finishRound(Round &round) {
     shared_ptr<Creature> attacker(round.attacker->creature);
     attacker->setMovementRestricted(false);
 
-    if (round.target->type() == ObjectType::Creature) {
-        auto targetCreature = static_pointer_cast<Creature>(round.target);
+    auto targetCreature = ObjectConverter::toCreature(round.target);
+    if (targetCreature) {
         targetCreature->setMovementRestricted(false);
     }
 

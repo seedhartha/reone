@@ -32,6 +32,7 @@
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/placeable.h"
+#include "objectconverter.h"
 
 using namespace std;
 
@@ -168,7 +169,7 @@ void ActionExecutor::executeDoCommand(const shared_ptr<Object> &actor, CommandAc
 }
 
 void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, StartConversationAction &action, float dt) {
-    auto creatureActor = dynamic_pointer_cast<Creature>(actor);
+    auto creatureActor = ObjectConverter::toCreature(actor);
     auto object = static_pointer_cast<SpatialObject>(action.object());
 
     bool reached =
@@ -277,8 +278,8 @@ void ActionExecutor::updateCreaturePath(const shared_ptr<Creature> &creature, co
 }
 
 void ActionExecutor::executeOpenDoor(const shared_ptr<Object> &actor, ObjectAction &action, float dt) {
-    auto creatureActor = dynamic_pointer_cast<Creature>(actor);
-    auto door = static_pointer_cast<Door>(action.object());
+    auto creatureActor = ObjectConverter::toCreature(actor);
+    auto door = ObjectConverter::toDoor(action.object());
 
     bool reached = !creatureActor || navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
@@ -302,8 +303,8 @@ void ActionExecutor::executeOpenDoor(const shared_ptr<Object> &actor, ObjectActi
 }
 
 void ActionExecutor::executeCloseDoor(const shared_ptr<Object> &actor, ObjectAction &action, float dt) {
-    auto creatureActor = dynamic_pointer_cast<Creature>(actor);
-    auto door = static_pointer_cast<Door>(action.object());
+    auto creatureActor = ObjectConverter::toCreature(actor);
+    auto door = ObjectConverter::toDoor(action.object());
 
     bool reached = !creatureActor || navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
@@ -324,29 +325,31 @@ void ActionExecutor::executeOpenContainer(const shared_ptr<Object> &actor, Objec
 }
 
 void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectAction &action, float dt) {
-    auto door = dynamic_pointer_cast<Door>(action.object());
-    if (door) {
-        auto creatureActor = static_pointer_cast<Creature>(actor);
-
-        bool reached = navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
-        if (reached) {
-            creatureActor->face(*door);
-            creatureActor->playAnimation(AnimationType::LoopingUnlockDoor);
-
-            if (!door->isKeyRequired()) {
-                door->setLocked(false);
-                door->open(actor);
-
-                string onOpen(door->getOnOpen());
-                if (!onOpen.empty()) {
-                    _game->scriptRunner().run(onOpen, door->id(), actor->id());
-                }
-            }
-
-            action.complete();
-        }
-    } else {
+    shared_ptr<Object> object(action.object());
+    if (!object || object->type() != ObjectType::Door) {
         warn("ActionExecutor: unsupported OpenLock object: " + to_string(action.object()->id()));
+        action.complete();
+        return;
+    }
+
+    auto door = static_pointer_cast<Door>(object);
+    auto creatureActor = static_pointer_cast<Creature>(actor);
+
+    bool reached = navigateCreature(creatureActor, door->position(), true, kDefaultMaxObjectDistance, dt);
+    if (reached) {
+        creatureActor->face(*door);
+        creatureActor->playAnimation(AnimationType::LoopingUnlockDoor);
+
+        if (!door->isKeyRequired()) {
+            door->setLocked(false);
+            door->open(actor);
+
+            string onOpen(door->getOnOpen());
+            if (!onOpen.empty()) {
+                _game->scriptRunner().run(onOpen, door->id(), actor->id());
+            }
+        }
+
         action.complete();
     }
 }

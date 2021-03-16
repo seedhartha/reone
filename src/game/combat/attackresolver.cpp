@@ -20,6 +20,7 @@
 #include "../../common/random.h"
 
 #include "../object/creature.h"
+#include "../objectconverter.h"
 
 #include "attackutil.h"
 
@@ -73,7 +74,7 @@ AttackResult AttackResolver::getAttackResult(const shared_ptr<Creature> &attacke
     CreatureWieldType attackerWield = attacker->getWieldType();
     CreatureWieldType targetWield = CreatureWieldType::None;
 
-    auto targetCreature = dynamic_pointer_cast<Creature>(target);
+    auto targetCreature = ObjectConverter::toCreature(target);
     if (targetCreature) {
         targetWield = targetCreature->getWieldType();
     }

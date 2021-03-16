@@ -30,6 +30,7 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
+#include "../objectconverter.h"
 #include "../reputes.h"
 
 #include "colorutil.h"
@@ -156,8 +157,10 @@ void SelectionOverlay::update() {
         if (_hilightedScreenCoords.z < 1.0f) {
             _hilightedObject = hilightedObject;
 
-            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(hilightedObject));
-            _hilightedHostile = target && !target->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *target);
+            auto hilightedCreature = ObjectConverter::toCreature(hilightedObject);
+            if (hilightedCreature) {
+                _hilightedHostile = !hilightedCreature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *hilightedCreature);
+            }
         }
     }
 
@@ -169,8 +172,10 @@ void SelectionOverlay::update() {
             _selectedObject = selectedObject;
             _actions = module->getContextualActions(selectedObject);
 
-            shared_ptr<Creature> target(dynamic_pointer_cast<Creature>(selectedObject));
-            _selectedHostile = target && !target->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *target);
+            auto selectedCreature = ObjectConverter::toCreature(hilightedObject);
+            if (selectedCreature) {
+                _selectedHostile = !selectedCreature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *selectedCreature);
+            }
         }
     }
 }

@@ -183,17 +183,20 @@ void Console::cmdGiveXP(vector<string> tokens) {
         print("Usage: givexp amount");
         return;
     }
+
     ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = dynamic_pointer_cast<Creature>(selector.selectedObject());
+    auto object = selector.selectedObject();
+
     if (!object) {
         object = _game->party().getLeader();
-        if (!object) {
-            print("givexp: no object selected");
-            return;
-        }
     }
+    if (!object || object->type() != ObjectType::Creature) {
+        print("givexp: no creature selected");
+        return;
+    }
+
     int amount = stoi(tokens[1]);
-    object->giveXP(amount);
+    static_pointer_cast<Creature>(object)->giveXP(amount);
 }
 
 void Console::print(const string &text) {

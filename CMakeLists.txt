@@ -488,6 +488,7 @@ set(GAME_HEADERS
     src/game/object/spatial.h
     src/game/object/trigger.h
     src/game/object/waypoint.h
+    src/game/objectconverter.h
     src/game/objectselect.h
     src/game/options.h
     src/game/party.h

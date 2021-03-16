@@ -148,7 +148,7 @@ Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContex
 
     auto itemTag = boost::to_lower_copy(getString(args, 1));
 
-    return dynamic_pointer_cast<ScriptObject>(creature->getItemByTag(itemTag));
+    return static_pointer_cast<ScriptObject>(creature->getItemByTag(itemTag));
 }
 
 } // namespace game
