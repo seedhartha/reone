@@ -149,11 +149,12 @@ void WorldRenderPipeline::drawShadows() {
         glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
 
         ShaderUniforms uniforms;
-        uniforms.general.shadowLightPosition = glm::vec4(lightPosition, 1.0f);
+        uniforms.general.featureMask |= UniformFeatureFlags::shadows;
+        uniforms.shadows.lightPosition = glm::vec4(lightPosition, 1.0f);
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             auto side = static_cast<CubeMapFace>(i);
-            uniforms.general.shadowMatrices[i] = projection * getShadowView(lightPosition, side);
+            uniforms.shadows.matrices[i] = projection * getShadowView(lightPosition, side);
         }
 
         _scene->setUniformsPrototype(move(uniforms));
@@ -194,9 +195,9 @@ void WorldRenderPipeline::drawGeometry() {
     uniforms.general.projection = _scene->activeCamera()->projection();
     uniforms.general.view = _scene->activeCamera()->view();
     uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
-    uniforms.general.shadowLightPresent = static_cast<bool>(shadowLight);
-    uniforms.general.shadowLightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
-    uniforms.general.shadowStrength = _scene->shadowStrength();
+    uniforms.shadows.lightPresent = static_cast<bool>(shadowLight);
+    uniforms.shadows.lightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
+    uniforms.shadows.strength = _scene->shadowStrength();
     _scene->setUniformsPrototype(move(uniforms));
 
     if (shadowLight) {
@@ -227,10 +228,11 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
+    uniforms.general.featureMask |= UniformFeatureFlags::blur;
     uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
     uniforms.general.model = move(transform);
-    uniforms.general.blurResolution = glm::vec2(w, h);
-    uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
+    uniforms.blur.resolution = glm::vec2(w, h);
+    uniforms.blur.direction = glm::vec2(1.0f, 0.0f);
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
@@ -253,10 +255,11 @@ void WorldRenderPipeline::applyVerticalBlur() {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
+    uniforms.general.featureMask |= UniformFeatureFlags::blur;
     uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
     uniforms.general.model = move(transform);
-    uniforms.general.blurResolution = glm::vec2(_opts.width, _opts.height);
-    uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
+    uniforms.blur.resolution = glm::vec2(_opts.width, _opts.height);
+    uniforms.blur.direction = glm::vec2(0.0f, 1.0f);
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuse);
