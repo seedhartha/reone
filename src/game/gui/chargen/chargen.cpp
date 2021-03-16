@@ -177,14 +177,14 @@ void CharacterGeneration::update(float dt) {
     getSubGUI()->update(dt);
 }
 
-void CharacterGeneration::render() {
-    GUI::render();
-    getSubGUI()->render();
+void CharacterGeneration::draw() {
+    GUI::draw();
+    getSubGUI()->draw();
 }
 
-void CharacterGeneration::render3D() {
-    GUI::render3D();
-    getSubGUI()->render3D();
+void CharacterGeneration::draw3D() {
+    GUI::draw3D();
+    getSubGUI()->draw3D();
 }
 
 void CharacterGeneration::openClassSelection() {

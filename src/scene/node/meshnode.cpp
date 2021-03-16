@@ -44,16 +44,16 @@ MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mes
     }
 }
 
-void MeshSceneNode::render() {
+void MeshSceneNode::draw() {
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.general.model = _absoluteTransform;
     uniforms.general.color = glm::vec4(_color, 1.0f);
     uniforms.general.alpha = _alpha;
     Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
-    _mesh->render();
+    _mesh->draw();
 
-    SceneNode::render();
+    SceneNode::draw();
 }
 
 void MeshSceneNode::setColor(glm::vec3 color) {

@@ -33,7 +33,7 @@ class Cursor : boost::noncopyable {
 public:
     Cursor(const std::shared_ptr<Texture> &up, const std::shared_ptr<Texture> &down);
 
-    void render();
+    void draw();
 
     void setPosition(const glm::ivec2 &position);
     void setPressed(bool pressed);

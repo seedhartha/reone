@@ -219,13 +219,13 @@ void SceneGraph::update(float dt) {
     }
 }
 
-void SceneGraph::render(bool shadowPass) {
+void SceneGraph::draw(bool shadowPass) {
     if (!_activeCamera) return;
 
     if (shadowPass) {
         // Render shadow meshes
         for (auto &mesh : _shadowMeshes) {
-            mesh->renderSingle(true);
+            mesh->drawSingle(true);
         }
         return;
     }
@@ -233,30 +233,30 @@ void SceneGraph::render(bool shadowPass) {
     // Render opaque roots
     for (auto &root : _roots) {
         if (!root->isTransparent()) {
-            root->render();
+            root->draw();
         }
     }
 
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
-        mesh->renderSingle(false);
+        mesh->drawSingle(false);
     }
 
     // Render transparent roots
     for (auto &root : _roots) {
         if (root->isTransparent()) {
-            root->render();
+            root->draw();
         }
     }
 
     // Render transparent meshes
     for (auto &mesh : _transparentMeshes) {
-        mesh->renderSingle(false);
+        mesh->drawSingle(false);
     }
 
     // Render particles
     for (auto &pair : _particles) {
-        pair.first->renderParticles(pair.second);
+        pair.first->drawParticles(pair.second);
     }
 }
 

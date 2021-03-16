@@ -283,14 +283,14 @@ void Game::drawAll() {
     RenderWindow::instance().clear();
 
     if (_video) {
-        _video->render();
+        _video->draw();
     } else {
         drawWorld();
         drawGUI();
         RenderWindow::instance().drawCursor();
     }
 
-    _profileOverlay.render();
+    _profileOverlay.draw();
 
     RenderWindow::instance().swapBuffers();
 }
@@ -369,18 +369,18 @@ void Game::drawGUI() {
     switch (_screen) {
         case GameScreen::InGame:
             if (_cameraType == CameraType::ThirdPerson) {
-                _hud->render();
+                _hud->draw();
             }
             if (_console.isOpen()) {
-                _console.render();
+                _console.draw();
             }
             break;
 
         default: {
             GUI *gui = getScreenGUI();
             if (gui) {
-                gui->render();
-                gui->render3D();
+                gui->draw();
+                gui->draw3D();
             }
             break;
         }

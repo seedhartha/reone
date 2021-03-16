@@ -41,7 +41,7 @@ public:
     void deinit();
 
     void update(float dt);
-    void render();
+    void draw();
 
     void finish();
 

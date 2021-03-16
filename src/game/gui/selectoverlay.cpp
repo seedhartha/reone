@@ -180,7 +180,7 @@ void SelectionOverlay::update() {
     }
 }
 
-void SelectionOverlay::render() {
+void SelectionOverlay::draw() {
     if (_hilightedObject) {
         drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
     }
@@ -211,7 +211,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     setActiveTextureUnit(TextureUnits::diffuse);
     texture.bind();
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -238,7 +238,7 @@ void SelectionOverlay::drawTitleBar() {
 
         Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -250,7 +250,7 @@ void SelectionOverlay::drawTitleBar() {
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
 
-        _font->render(_selectedObject->name(), transform, getColorFromSelectedObject());
+        _font->draw(_selectedObject->name(), transform, getColorFromSelectedObject());
     }
 }
 
@@ -273,7 +273,7 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -303,7 +303,7 @@ void SelectionOverlay::drawActionBar() {
         setActiveTextureUnit(TextureUnits::diffuse);
         frameTexture->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
 
         if (i < static_cast<int>(_actions.size())) {
             ContextualAction action = _actions[i];
@@ -324,7 +324,7 @@ void SelectionOverlay::drawActionBar() {
                 setActiveTextureUnit(TextureUnits::diffuse);
                 texture->bind();
 
-                Meshes::instance().getQuad()->render();
+                Meshes::instance().getQuad()->draw();
             }
         }
     }

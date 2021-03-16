@@ -38,7 +38,7 @@ public:
     void init();
     bool handle(const SDL_Event &event);
     void update(float dt);
-    void render();
+    void draw();
 
 private:
     struct FPS {

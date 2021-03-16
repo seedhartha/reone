@@ -55,13 +55,13 @@ void SceneNode::update(float dt) {
     }
 }
 
-void SceneNode::render() {
+void SceneNode::draw() {
     for (auto &child : _children) {
-        child->render();
+        child->draw();
     }
 }
 
-void SceneNode::renderSingle(bool shadowPass) {
+void SceneNode::drawSingle(bool shadowPass) {
 }
 
 glm::vec3 SceneNode::getOrigin() const {

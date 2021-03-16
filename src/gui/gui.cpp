@@ -284,18 +284,18 @@ void GUI::update(float dt) {
     }
 }
 
-void GUI::render() {
+void GUI::draw() {
     if (_background) drawBackground();
-    if (_rootControl) _rootControl->render(_rootOffset, _rootControl->textLines());
+    if (_rootControl) _rootControl->draw(_rootOffset, _rootControl->textLines());
 
     for (auto &control : _controls) {
-        control->render(_controlOffset, control->textLines());
+        control->draw(_controlOffset, control->textLines());
     }
 }
 
-void GUI::render3D() {
+void GUI::draw3D() {
     for (auto &control : _controls) {
-        control->render3D(_controlOffset);
+        control->draw3D(_controlOffset);
     }
 }
 
@@ -312,7 +312,7 @@ void GUI::drawBackground() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void GUI::resetFocus() {

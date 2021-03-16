@@ -40,7 +40,7 @@ void DebugOverlay::load() {
     _font = Fonts::instance().get(kFontResRef);
 }
 
-void DebugOverlay::render() {
+void DebugOverlay::draw() {
     glm::mat4 transform;
     glm::vec3 red(1.0f, 0.0f, 0.0f);
 
@@ -50,7 +50,7 @@ void DebugOverlay::render() {
         transform = glm::mat4(1.0f);
         transform = glm::translate(transform, glm::vec3(_opts.width * object.screenCoords.x, _opts.height * (1.0f - object.screenCoords.y), 0.0f));
 
-        _font->render(object.tag, transform, red);
+        _font->draw(object.tag, transform, red);
     }
 }
 

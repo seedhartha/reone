@@ -44,7 +44,7 @@ public:
     void load(const std::shared_ptr<Texture> &texture);
     void initGL();
 
-    void render(
+    void draw(
         const std::string &text,
         const glm::mat4 &transform,
         const glm::vec3 &color = glm::vec3(1.0f, 1.0f, 1.0f),

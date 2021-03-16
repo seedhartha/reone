@@ -44,8 +44,8 @@ public:
 
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
-    virtual void render();
-    virtual void render3D();
+    virtual void draw();
+    virtual void draw3D();
 
     void configureRootContol(const std::function<void(Control &)> &fn);
     void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);

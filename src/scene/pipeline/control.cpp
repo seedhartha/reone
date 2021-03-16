@@ -77,7 +77,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->render(); });
+        withDepthTest([this]() { _scene->draw(); });
 
         _geometry.unbind();
     });
@@ -106,7 +106,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 } // namespace scene

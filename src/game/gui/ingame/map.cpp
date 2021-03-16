@@ -53,8 +53,8 @@ void MapMenu::load() {
     disableControl("BTN_RETURN");
 }
 
-void MapMenu::render() {
-    GUI::render();
+void MapMenu::draw() {
+    GUI::draw();
 
     Control &label = getControl("LBL_Map");
     const Control::Extent &extent = label.extent();
@@ -65,7 +65,7 @@ void MapMenu::render() {
         extent.width,
         extent.height);
 
-    _game->module()->area()->map().render(Map::Mode::Default, bounds);
+    _game->module()->area()->map().draw(Map::Mode::Default, bounds);
 }
 
 void MapMenu::refreshControls() {

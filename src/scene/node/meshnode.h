@@ -29,7 +29,7 @@ class MeshSceneNode : public SceneNode {
 public:
     MeshSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Mesh> &mesh);
 
-    void render() override;
+    void draw() override;
 
     void setColor(glm::vec3 color);
     void setAlpha(float alpha);

@@ -292,7 +292,7 @@ void Console::executeInputText() {
     }
 }
 
-void Console::render() {
+void Console::draw() {
     drawBackground();
     drawLines();
 }
@@ -310,7 +310,7 @@ void Console::drawBackground() {
     uniforms.general.alpha = 0.5f;
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void Console::drawLines() {
@@ -322,14 +322,14 @@ void Console::drawLines() {
     // Input
 
     string text("> " + _input.text());
-    _font->render(text, transform, glm::vec3(1.0f), TextGravity::RightCenter);
+    _font->draw(text, transform, glm::vec3(1.0f), TextGravity::RightCenter);
 
     // Output
 
     for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
         const string &line = _output[static_cast<size_t>(i) + _outputOffset];
         transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
-        _font->render(line, transform, glm::vec3(1.0f), TextGravity::RightCenter);
+        _font->draw(line, transform, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
 

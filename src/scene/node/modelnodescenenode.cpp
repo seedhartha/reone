@@ -192,7 +192,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const ModelNodeScene
         !modelNode.isSelfIlluminated();
 }
 
-void ModelNodeSceneNode::renderSingle(bool shadowPass) {
+void ModelNodeSceneNode::drawSingle(bool shadowPass) {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
@@ -342,9 +342,9 @@ void ModelNodeSceneNode::renderSingle(bool shadowPass) {
 
 
     if (additive) {
-        withAdditiveBlending([&mesh]() { mesh->render(); });
+        withAdditiveBlending([&mesh]() { mesh->draw(); });
     } else {
-        mesh->render();
+        mesh->draw();
     }
 }
 

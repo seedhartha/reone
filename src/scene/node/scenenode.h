@@ -41,8 +41,8 @@ public:
 
     virtual void update(float dt);
 
-    virtual void render();
-    virtual void renderSingle(bool shadowPass);
+    virtual void draw();
+    virtual void drawSingle(bool shadowPass);
 
     bool isVisible() const { return _visible; }
     virtual bool isTransparent() const { return _transparent; }

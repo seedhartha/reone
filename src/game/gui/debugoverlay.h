@@ -33,7 +33,7 @@ public:
 
     void load();
 
-    void render();
+    void draw();
 
 private:
     struct DebugObject {

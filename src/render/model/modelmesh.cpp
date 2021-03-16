@@ -39,8 +39,8 @@ void ModelMesh::deinitGL() {
     _mesh->deinit();
 }
 
-void ModelMesh::render() {
-    _mesh->render();
+void ModelMesh::draw() {
+    _mesh->draw();
 }
 
 void ModelMesh::setRender(bool render) {

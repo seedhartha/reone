@@ -160,8 +160,8 @@ public:
 
     // Rendering
 
-    virtual void render(const glm::ivec2 &offset, const std::vector<std::string> &text);
-    void render3D(const glm::ivec2 &offset);
+    virtual void draw(const glm::ivec2 &offset, const std::vector<std::string> &text);
+    void draw3D(const glm::ivec2 &offset);
 
     // END Rendering
 

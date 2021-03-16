@@ -45,7 +45,7 @@ public:
      *
      * @param particles subset of this emitters particles
      */
-    void renderParticles(const std::vector<Particle *> &particles);
+    void drawParticles(const std::vector<Particle *> &particles);
 
     void detonate();
 

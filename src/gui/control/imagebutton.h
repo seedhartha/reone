@@ -29,7 +29,7 @@ public:
 
     void load(const resource::GffStruct &gffs) override;
 
-    void render(
+    void draw(
         const glm::ivec2 &offset,
         const std::vector<std::string> &text,
         const std::string &iconText,
