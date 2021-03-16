@@ -32,7 +32,7 @@ public:
     MapMenu(Game *game);
 
     void load() override;
-    void render() override;
+    void draw() override;
 
     void refreshControls();
 

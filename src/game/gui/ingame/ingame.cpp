@@ -163,12 +163,12 @@ void InGameMenu::update(float dt) {
     }
 }
 
-void InGameMenu::render() {
+void InGameMenu::draw() {
     GUI *tabGui = getActiveTabGUI();
     if (tabGui) {
-        tabGui->render();
+        tabGui->draw();
     }
-    GUI::render();
+    GUI::draw();
 }
 
 void InGameMenu::openEquipment() {

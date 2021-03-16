@@ -44,7 +44,7 @@ void ProgressBar::load(const GffStruct &gffs) {
     }
 }
 
-void ProgressBar::render(const glm::ivec2 &offset, const vector<string> &text) {
+void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) return;
 
     setActiveTextureUnit(TextureUnits::diffuse);
@@ -57,7 +57,7 @@ void ProgressBar::render(const glm::ivec2 &offset, const vector<string> &text) {
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(w, _extent.height, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void ProgressBar::setValue(int value) {

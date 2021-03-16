@@ -127,7 +127,7 @@ void EmitterSceneNode::doSpawnParticle() {
     _particles.push_back(particle);
 }
 
-void EmitterSceneNode::renderParticles(const vector<Particle *> &particles) {
+void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
     if (particles.empty()) return;
 
     shared_ptr<Texture> texture(_emitter->texture());
@@ -164,9 +164,9 @@ void EmitterSceneNode::renderParticles(const vector<Particle *> &particles) {
 
     bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
     if (lighten) {
-        withAdditiveBlending([&particles]() { Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(particles.size())); });
+        withAdditiveBlending([&particles]() { Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size())); });
     } else {
-        Meshes::instance().getBillboard()->renderInstanced(static_cast<int>(particles.size()));
+        Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
     }
 }
 

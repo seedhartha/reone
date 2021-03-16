@@ -228,7 +228,7 @@ void Control::update(float dt) {
     }
 }
 
-void Control::render(const glm::ivec2 &offset, const vector<string> &text) {
+void Control::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible) return;
 
     glm::ivec2 size(_extent.width, _extent.height);
@@ -271,10 +271,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         bool additive = border.fill->isAdditive();
         if (additive) {
             withAdditiveBlending([]() {
-                Meshes::instance().getQuad()->render();
+                Meshes::instance().getQuad()->draw();
             });
         } else {
-            Meshes::instance().getQuad()->render();
+            Meshes::instance().getQuad()->draw();
         }
     }
     if (border.edge) {
@@ -302,7 +302,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.general.color = glm::vec4(color, 1.0f);
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
-            Meshes::instance().getQuad()->render();
+            Meshes::instance().getQuad()->draw();
 
             // Right edge
             {
@@ -317,7 +317,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.general.color = glm::vec4(color, 1.0f);
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
-            Meshes::instance().getQuadFlipX()->render();
+            Meshes::instance().getQuadFlipX()->draw();
         }
 
         if (width > 0.0f) {
@@ -337,7 +337,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.general.color = glm::vec4(color, 1.0f);
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
-            Meshes::instance().getQuad()->render();
+            Meshes::instance().getQuad()->draw();
 
             // Bottom edge
             {
@@ -351,7 +351,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.general.color = glm::vec4(color, 1.0f);
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
             }
-            Meshes::instance().getQuadFlipY()->render();
+            Meshes::instance().getQuadFlipY()->draw();
         }
     }
     if (border.corner) {
@@ -373,7 +373,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.color = glm::vec4(color, 1.0f);
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
 
         // Bottom left corner
         {
@@ -387,7 +387,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.color = glm::vec4(color, 1.0f);
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
-        Meshes::instance().getQuadFlipY()->render();
+        Meshes::instance().getQuadFlipY()->draw();
 
         // Top right corner
         {
@@ -401,7 +401,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.color = glm::vec4(color, 1.0f);
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
-        Meshes::instance().getQuadFlipX()->render();
+        Meshes::instance().getQuadFlipX()->draw();
 
         // Bottom right corner
         {
@@ -415,7 +415,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.color = glm::vec4(color, 1.0f);
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
-        Meshes::instance().getQuadFlipXY()->render();
+        Meshes::instance().getQuadFlipXY()->draw();
     }
 }
 
@@ -437,7 +437,7 @@ void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, co
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f));
 
-        _text.font->render(line, transform, color, gravity);
+        _text.font->draw(line, transform, color, gravity);
         position.y += static_cast<int>(_text.font->height());
     }
 }
@@ -502,7 +502,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
     }
 }
 
-void Control::render3D(const glm::ivec2 &offset) {
+void Control::draw3D(const glm::ivec2 &offset) {
     if (!_visible || !_scene3d) return;
 
     _pipeline->render(offset);

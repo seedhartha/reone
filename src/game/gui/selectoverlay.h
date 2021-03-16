@@ -50,7 +50,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update();
-    void render();
+    void draw();
 
 private:
     Game *_game { nullptr };

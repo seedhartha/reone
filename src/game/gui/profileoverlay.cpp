@@ -102,7 +102,7 @@ void ProfileOverlay::calculateFPS() {
     _fps.onePerLow /= numOnePer;
 }
 
-void ProfileOverlay::render() {
+void ProfileOverlay::draw() {
     if (!_enabled) return;
 
     drawBackground();
@@ -120,7 +120,7 @@ void ProfileOverlay::drawBackground() {
     uniforms.general.alpha = 0.5f;
 
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void ProfileOverlay::drawText() {
@@ -132,7 +132,7 @@ void ProfileOverlay::drawText() {
     glm::mat4 transform(1.0f);
 
     for (auto &line : lines) {
-        _font->render(line, transform, glm::vec3(1.0f), TextGravity::RightBottom);
+        _font->draw(line, transform, glm::vec3(1.0f), TextGravity::RightBottom);
         transform = glm::translate(transform, glm::vec3(0.0f, _font->height(), 0.0f));
     }
 }

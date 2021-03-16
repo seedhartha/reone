@@ -28,7 +28,7 @@ public:
     ProgressBar(GUI *gui);
 
     void load(const resource::GffStruct &gffs) override;
-    void render(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void draw(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
     void setValue(int value);
 

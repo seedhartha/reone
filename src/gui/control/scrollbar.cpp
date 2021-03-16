@@ -52,7 +52,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     }
 }
 
-void ScrollBar::render(const glm::ivec2 &offset, const vector<string> &text) {
+void ScrollBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     drawThumb(offset);
     drawArrows(offset);
 }
@@ -70,25 +70,25 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 
     // Left edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 
     // Right edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 
     // Bottom edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 
     // Thumb
 
@@ -99,7 +99,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 
     // END Thumb
 }
@@ -132,7 +132,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
@@ -146,7 +146,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void ScrollBar::setScrollState(ScrollState state) {

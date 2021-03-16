@@ -44,7 +44,7 @@ public:
 
     void load();
     bool handle(const SDL_Event &event);
-    void render();
+    void draw();
 
     bool isOpen() const { return _open; }
 

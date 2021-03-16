@@ -48,7 +48,7 @@ public:
     void initGL();
     void deinitGL();
 
-    void render();
+    void draw();
 
     bool shouldRender() const { return _render; }
     bool shouldCastShadows() const { return _shadow; }

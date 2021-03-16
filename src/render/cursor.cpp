@@ -43,7 +43,7 @@ Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) :
     }
 }
 
-void Cursor::render() {
+void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
     setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
@@ -57,7 +57,7 @@ void Cursor::render() {
     uniforms.general.model = move(transform);
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

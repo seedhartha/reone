@@ -113,9 +113,7 @@ void RenderWindow::deinit() {
 }
 
 void RenderWindow::show() {
-    if (_inited) {
-        SDL_ShowWindow(_window);
-    }
+    SDL_ShowWindow(_window);
 }
 
 void RenderWindow::processEvents(bool &quit) {
@@ -158,13 +156,11 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
 }
 
 void RenderWindow::clear() const {
-    if (_inited) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderWindow::drawCursor() const {
-    if (!_inited || _relativeMouseMode) return;
+    if (_relativeMouseMode) return;
 
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
@@ -172,7 +168,7 @@ void RenderWindow::drawCursor() const {
 
     _cursor->setPosition({ x, y });
     _cursor->setPressed(pressed);
-    _cursor->render();
+    _cursor->draw();
 }
 
 void RenderWindow::swapBuffers() const {
@@ -186,17 +182,13 @@ glm::mat4 RenderWindow::getOrthoProjection(float near, float far) const {
 }
 
 void RenderWindow::setRelativeMouseMode(bool enabled) {
-    if (_inited) {
-        SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
-        _relativeMouseMode = enabled;
-    }
+    SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
+    _relativeMouseMode = enabled;
 }
 
 void RenderWindow::setCursor(const shared_ptr<Cursor> &cursor) {
     _cursor = cursor;
-    if (_inited) {
-        SDL_ShowCursor(!static_cast<bool>(cursor));
-    }
+    SDL_ShowCursor(!static_cast<bool>(cursor));
 }
 
 } // namespace render

@@ -46,7 +46,7 @@ public:
     SceneGraph(const render::GraphicsOptions &opts);
 
     void update(float dt);
-    void render(bool shadowPass = false);
+    void draw(bool shadowPass = false);
 
     void clear();
     void addRoot(const std::shared_ptr<SceneNode> &node);

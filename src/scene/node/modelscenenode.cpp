@@ -163,7 +163,7 @@ void ModelSceneNode::update(float dt) {
     SceneNode::update(dt);
 }
 
-void ModelSceneNode::render() {
+void ModelSceneNode::draw() {
     if (g_debugAABB) {
         glm::mat4 transform(_absoluteTransform * _aabb.transform());
 
@@ -171,7 +171,7 @@ void ModelSceneNode::render() {
         uniforms.general.model = move(transform);
         Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
-        Meshes::instance().getAABB()->render();
+        Meshes::instance().getAABB()->draw();
     }
 }
 

@@ -45,9 +45,7 @@ void Renderbuffer::deinit() {
 }
 
 void Renderbuffer::bind() const {
-    if (_inited) {
-        glBindRenderbuffer(GL_RENDERBUFFER, _id);
-    }
+    glBindRenderbuffer(GL_RENDERBUFFER, _id);
 }
 
 void Renderbuffer::unbind() const {

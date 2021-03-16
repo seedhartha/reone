@@ -55,14 +55,13 @@ public:
     };
 
     Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexOffsets offsets, DrawMode mode = DrawMode::Triangles);
-
-    virtual ~Mesh();
+    ~Mesh();
 
     void init();
     void deinit();
 
-    void render();
-    void renderInstanced(int count);
+    void draw();
+    void drawInstanced(int count);
 
     void computeAABB();
 

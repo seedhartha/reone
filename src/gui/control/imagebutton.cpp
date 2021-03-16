@@ -42,7 +42,7 @@ void ImageButton::load(const GffStruct &gffs) {
     _iconFont = Fonts::instance().get(kIconFontResRef);
 }
 
-void ImageButton::render(
+void ImageButton::draw(
     const glm::ivec2 &offset,
     const vector<string> &text,
     const string &iconText,
@@ -98,7 +98,7 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconFrame->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
 
     if (iconTexture) {
@@ -115,13 +115,13 @@ void ImageButton::drawIcon(
         setActiveTextureUnit(TextureUnits::diffuse);
         iconTexture->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
 
     if (!iconText.empty()) {
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
-        _iconFont->render(iconText, transform, color, TextGravity::LeftCenter);
+        _iconFont->draw(iconText, transform, color, TextGravity::LeftCenter);
     }
 }
 

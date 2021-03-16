@@ -160,7 +160,7 @@ void WorldRenderPipeline::drawShadows() {
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->render(true); });
+        withDepthTest([this]() { _scene->draw(true); });
     });
 }
 
@@ -209,10 +209,10 @@ void WorldRenderPipeline::drawGeometry() {
 
     if (g_wireframesEnabled) {
         withWireframes([this]() {
-            withDepthTest([this]() { _scene->render(); });
+            withDepthTest([this]() { _scene->draw(); });
         });
     } else {
-        withDepthTest([this]() { _scene->render(); });
+        withDepthTest([this]() { _scene->draw(); });
     }
 }
 
@@ -239,7 +239,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     _geometryColor2->bind();
 
     withDepthTest([]() {
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     });
 }
 
@@ -266,7 +266,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
     _horizontalBlurColor->bind();
 
     withDepthTest([]() {
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     });
 
     _verticalBlur.unbind();
@@ -295,7 +295,7 @@ void WorldRenderPipeline::drawResult() {
         }
         //_shadowsDepth->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
 
     } else {
         ShaderUniforms uniforms;
@@ -309,7 +309,7 @@ void WorldRenderPipeline::drawResult() {
         setActiveTextureUnit(TextureUnits::bloom);
         _verticalBlurColor->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
 }
 

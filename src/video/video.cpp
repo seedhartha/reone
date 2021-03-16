@@ -79,7 +79,7 @@ void Video::updateFrameTexture() {
     _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
 
-void Video::render() {
+void Video::draw() {
     if (!_inited) return;
 
     ShaderUniforms uniforms;
@@ -89,7 +89,7 @@ void Video::render() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void Video::finish() {

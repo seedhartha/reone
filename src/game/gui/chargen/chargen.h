@@ -68,8 +68,8 @@ public:
     void load() override;
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void render() override;
-    void render3D() override;
+    void draw() override;
+    void draw3D() override;
 
     void startQuick();
     void startCustom();

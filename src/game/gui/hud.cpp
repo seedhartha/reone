@@ -199,8 +199,8 @@ void HUD::update(float dt) {
     setControlVisible("LBL_MAPBORDER", _game->module()->area()->map().isLoaded());
 }
 
-void HUD::render() {
-    GUI::render();
+void HUD::draw() {
+    GUI::draw();
 
     drawMinimap();
 
@@ -209,9 +209,9 @@ void HUD::render() {
         drawHealth(i);
     }
 
-    _barkBubble->render();
-    _select.render();
-    _debug.render();
+    _barkBubble->draw();
+    _select.draw();
+    _debug.draw();
 }
 
 void HUD::drawMinimap() {
@@ -225,7 +225,7 @@ void HUD::drawMinimap() {
     bounds[3] = static_cast<float>(extent.height);
 
     shared_ptr<Area> area(_game->module()->area());
-    area->map().render(Map::Mode::Minimap, bounds);
+    area->map().draw(Map::Mode::Minimap, bounds);
 }
 
 void HUD::drawHealth(int memberIndex) {
@@ -251,7 +251,7 @@ void HUD::drawHealth(int memberIndex) {
     uniforms.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void HUD::showCombatHud() {

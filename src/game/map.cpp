@@ -86,7 +86,7 @@ void Map::loadTextures(const string &area) {
 }
 
 
-void Map::render(Mode mode, const glm::vec4 &bounds) {
+void Map::draw(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) return;
 
     drawArea(mode, bounds);
@@ -120,7 +120,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 
         int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        withScissorTest(scissorBounds, []() { Meshes::instance().getQuad()->render(); });
+        withScissorTest(scissorBounds, []() { Meshes::instance().getQuad()->draw(); });
 
     } else {
         glm::mat4 transform(1.0f);
@@ -135,7 +135,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         setActiveTextureUnit(TextureUnits::diffuse);
         _areaTexture->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
 }
 
@@ -170,7 +170,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         setActiveTextureUnit(TextureUnits::diffuse);
         _noteTexture->bind();
 
-        Meshes::instance().getQuad()->render();
+        Meshes::instance().getQuad()->draw();
     }
 }
 
@@ -251,7 +251,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     setActiveTextureUnit(TextureUnits::diffuse);
     _arrowTexture->bind();
 
-    Meshes::instance().getQuad()->render();
+    Meshes::instance().getQuad()->draw();
 }
 
 void Map::setSelectedNote(const shared_ptr<Waypoint> &waypoint) {

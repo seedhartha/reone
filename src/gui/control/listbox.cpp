@@ -180,10 +180,10 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
+void ListBox::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible) return;
 
-    Control::render(offset, text);
+    Control::draw(offset, text);
 
     if (!_protoItem) return;
 
@@ -201,9 +201,9 @@ void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
 
         auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
-            imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
+            imageButton->draw(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
         } else {
-            _protoItem->render(itemOffset, item._textLines);
+            _protoItem->draw(itemOffset, item._textLines);
         }
 
         if (_protoMatchContent) {
@@ -220,7 +220,7 @@ void ListBox::render(const glm::ivec2 &offset, const vector<string> &text) {
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setScrollState(move(state));
-        scrollBar.render(offset, vector<string>());
+        scrollBar.draw(offset, vector<string>());
     }
 }
 
