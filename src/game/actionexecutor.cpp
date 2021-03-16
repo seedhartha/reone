@@ -62,43 +62,43 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
     ActionType type = action->type();
     switch (type) {
         case ActionType::MoveToPoint:
-            executeMoveToPoint(object, *dynamic_pointer_cast<MoveToPointAction>(action), dt);
+            executeMoveToPoint(object, *static_pointer_cast<MoveToPointAction>(action), dt);
             break;
         case ActionType::MoveToObject:
-            executeMoveToObject(object, *dynamic_pointer_cast<MoveToObjectAction>(action), dt);
+            executeMoveToObject(object, *static_pointer_cast<MoveToObjectAction>(action), dt);
             break;
         case ActionType::Follow:
-            executeFollow(object, *dynamic_pointer_cast<FollowAction>(action), dt);
+            executeFollow(object, *static_pointer_cast<FollowAction>(action), dt);
             break;
         case ActionType::DoCommand:
-            executeDoCommand(object, *dynamic_pointer_cast<CommandAction>(action), dt);
+            executeDoCommand(object, *static_pointer_cast<CommandAction>(action), dt);
             break;
         case ActionType::StartConversation:
-            executeStartConversation(object, *dynamic_pointer_cast<StartConversationAction>(action), dt);
+            executeStartConversation(object, *static_pointer_cast<StartConversationAction>(action), dt);
             break;
         case ActionType::AttackObject:
-            executeAttack(object, *dynamic_pointer_cast<AttackAction>(action), dt);
+            executeAttack(object, *static_pointer_cast<AttackAction>(action), dt);
             break;
         case ActionType::OpenDoor:
-            executeOpenDoor(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
+            executeOpenDoor(object, *static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::CloseDoor:
-            executeCloseDoor(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
+            executeCloseDoor(object, *static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::OpenContainer:
-            executeOpenContainer(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
+            executeOpenContainer(object, *static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::OpenLock:
-            executeOpenLock(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
+            executeOpenLock(object, *static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::JumpToObject:
-            executeJumpToObject(object, *dynamic_pointer_cast<ObjectAction>(action), dt);
+            executeJumpToObject(object, *static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::JumpToLocation:
-            executeJumpToLocation(object, *dynamic_pointer_cast<LocationAction>(action), dt);
+            executeJumpToLocation(object, *static_pointer_cast<LocationAction>(action), dt);
             break;
         case ActionType::PlayAnimation:
-            executePlayAnimation(object, dynamic_pointer_cast<PlayAnimationAction>(action), dt);
+            executePlayAnimation(object, static_pointer_cast<PlayAnimationAction>(action), dt);
             break;
         case ActionType::PauseConversation: {
             _game->conversation().pause();
