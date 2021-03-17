@@ -67,7 +67,7 @@ Creature::Creature(
     _modelBuilder(this),
     _animResolver(this) {
 
-    _drawDistance = 2048.0f;
+    _drawDistance = 32.0f;
 }
 
 bool Creature::isSelectable() const {
