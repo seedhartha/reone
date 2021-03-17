@@ -316,20 +316,19 @@ void Console::drawBackground() {
 void Console::drawLines() {
     float height = kVisibleLineCount * _font->height();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(3.0f, height - 0.5f * _font->height(), 0.0f));
+    glm::vec3 position(3.0f, height - 0.5f * _font->height(), 0.0f);
 
     // Input
 
     string text("> " + _input.text());
-    _font->draw(text, transform, glm::vec3(1.0f), TextGravity::RightCenter);
+    _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
 
     // Output
 
     for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
         const string &line = _output[static_cast<size_t>(i) + _outputOffset];
-        transform = glm::translate(transform, glm::vec3(0.0f, -_font->height(), 0.0f));
-        _font->draw(line, transform, glm::vec3(1.0f), TextGravity::RightCenter);
+        position.y -= _font->height();
+        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
 

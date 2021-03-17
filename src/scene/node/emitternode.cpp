@@ -92,7 +92,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
         case Emitter::UpdateMode::Fountain:
             if (_emitter->birthrate() != 0.0f) {
                 if (_birthTimer.advance(dt)) {
-                    if (_particles.size() < kMaxParticleCount) {
+                    if (_particles.size() < kMaxParticles) {
                         doSpawnParticle();
                     }
                     _birthTimer.reset(_birthInterval);

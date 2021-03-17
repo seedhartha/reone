@@ -41,16 +41,17 @@ void DebugOverlay::load() {
 }
 
 void DebugOverlay::draw() {
-    glm::mat4 transform;
-    glm::vec3 red(1.0f, 0.0f, 0.0f);
+    static glm::vec3 red(1.0f, 0.0f, 0.0f);
+    
+    glm::vec3 position(0.0f);
 
     for (auto &object : _objects) {
         if (object.screenCoords.z >= 1.0f) continue;
 
-        transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(_opts.width * object.screenCoords.x, _opts.height * (1.0f - object.screenCoords.y), 0.0f));
+        position.x = _opts.width * object.screenCoords.x;
+        position.y = _opts.height * (1.0f - object.screenCoords.y);
 
-        _font->draw(object.tag, transform, red);
+        _font->draw(object.tag, position, red);
     }
 }
 

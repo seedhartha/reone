@@ -431,13 +431,13 @@ void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, co
     TextGravity gravity;
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
 
+    glm::vec3 linePosition(0.0f);
     glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
     for (auto &line : lines) {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(position.x + offset.x, position.y + offset.y, 0.0f));
-
-        _text.font->draw(line, transform, color, gravity);
+        linePosition.x = position.x + offset.x;
+        linePosition.y = position.y + offset.y;
+        _text.font->draw(line, linePosition, color, gravity);
         position.y += static_cast<int>(_text.font->height());
     }
 }

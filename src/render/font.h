@@ -20,6 +20,8 @@
 #include <memory>
 
 #include "glm/mat4x4.hpp"
+#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
 
 #include "texture.h"
 
@@ -40,16 +42,12 @@ enum class TextGravity {
 class Font {
 public:
     Font() = default;
-    ~Font();
-
-    void init();
-    void deinit();
 
     void load(const std::shared_ptr<Texture> &texture);
 
     void draw(
         const std::string &text,
-        const glm::mat4 &transform,
+        const glm::vec3 &position,
         const glm::vec3 &color = glm::vec3(1.0f, 1.0f, 1.0f),
         TextGravity align = TextGravity::CenterCenter);
 
@@ -58,16 +56,17 @@ public:
     float height() const { return _height; }
 
 private:
-    bool _inited { false };
-    std::vector<float> _vertices;
-    std::vector<uint16_t> _indices;
-    int _glyphCount { 0 };
-    float _height { 0.0f };
-    std::vector<float> _glyphWidths;
+    struct Glyph {
+        glm::vec2 ul { 0.0f };
+        glm::vec2 lr { 0.0f };
+        glm::vec2 size { 0.0f };
+    };
+
     std::shared_ptr<Texture> _texture;
-    uint32_t _vertexBufferId { 0 };
-    uint32_t _indexBufferId { 0 };
-    uint32_t _vertexArrayId { 0 };
+    float _height { 0.0f };
+    std::vector<Glyph> _glyphs;
+
+    glm::vec2 getTextOffset(const std::string &text, TextGravity gravity) const;
 };
 
 } // namespace render
