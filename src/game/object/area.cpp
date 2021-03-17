@@ -869,9 +869,9 @@ void Area::updateVisibility() {
         AABB aabb(model->aabb() * model->absoluteTransform());
         glm::vec3 objectCenter(model->getCenterOfAABB());
         glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
-        float distanceToCamera = glm::distance2(objectCenter, cameraPosition);
-        float drawDistance = object->drawDistance();
-        bool onScreen = object->isStuntMode() || (distanceToCamera < drawDistance && cameraNode->isInFrustum(aabb));
+        float distanceToCamera2 = glm::distance2(objectCenter, cameraPosition);
+        float drawDistance2 = object->drawDistance() * object->drawDistance();
+        bool onScreen = object->isStuntMode() || (distanceToCamera2 < drawDistance2 && cameraNode->isInFrustum(aabb));
         model->setOnScreen(onScreen);
     }
 }

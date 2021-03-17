@@ -49,7 +49,7 @@ Placeable::Placeable(
 ) :
     SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph, scriptRunner) {
 
-    _drawDistance = 4096.0f;
+    _drawDistance = 64.0f;
 }
 
 bool Placeable::isSelectable() const {
