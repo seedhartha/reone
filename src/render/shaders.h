@@ -154,7 +154,7 @@ struct ParticlesUniforms {
 };
 
 struct ShaderCharacter {
-    glm::mat4 transform { 0.0f };
+    glm::vec4 posScale { 0.0f };
     glm::vec4 uv { 0.0f };
 };
 

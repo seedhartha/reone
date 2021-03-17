@@ -41,16 +41,6 @@ static constexpr int kBindingPointIndex = 1;
 static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
 
-const float PI = 3.14159265359;
-const float GAMMA = 2.2;
-const int NUM_CUBE_FACES = 6;
-const int MAX_BONES = 128;
-const int MAX_LIGHTS = 16;
-const int MAX_PARTICLES = 32;
-const int MAX_CHARS = 128;
-const float SHADOW_FAR_PLANE = 10000.0;
-const vec3 LUMINANCE = vec3(0.2126, 0.7152, 0.0722);
-
 const int FEATURE_DIFFUSE = 1;
 const int FEATURE_LIGHTMAP = 2;
 const int FEATURE_ENVMAP = 4;
@@ -65,6 +55,20 @@ const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
 const int FEATURE_CUSTOMMAT = 0x2000;
+
+const int NUM_CUBE_FACES = 6;
+const int MAX_BONES = 128;
+const int MAX_LIGHTS = 16;
+const int MAX_PARTICLES = 32;
+const int MAX_CHARS = 128;
+
+const float PI = 3.14159265359;
+const float GAMMA = 2.2;
+const float SHADOW_FAR_PLANE = 10000.0;
+
+const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
+const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
+const vec3 LUMINANCE = vec3(0.2126, 0.7152, 0.0722);
 
 struct General {
     mat4 projection;
@@ -143,7 +147,7 @@ struct Particles {
 };
 
 struct Character {
-    mat4 transform;
+    vec4 posScale;
     vec4 uv;
 };
 
@@ -479,9 +483,6 @@ const int BILLBOARD_RENDER_MOTION_BLUR = 3;
 const int BILLBOARD_RENDER_TO_LOCAL_Z = 4;
 const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 5;
 
-const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
-const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -532,7 +533,10 @@ flat out int fragInstanceID;
 
 void main() {
     vec4 P = vec4(aPosition, 1.0);
-    gl_Position = uGeneral.projection * uGeneral.view * uText.chars[gl_InstanceID].transform * P;
+    P.x += uText.chars[gl_InstanceID].posScale[0] + aPosition.x * uText.chars[gl_InstanceID].posScale[2];
+    P.y += uText.chars[gl_InstanceID].posScale[1] + aPosition.y * uText.chars[gl_InstanceID].posScale[3];
+
+    gl_Position = uGeneral.projection * uGeneral.view * P;
     fragTexCoords = aTexCoords;
     fragInstanceID = gl_InstanceID;
 }
