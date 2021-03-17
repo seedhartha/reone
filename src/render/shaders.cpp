@@ -36,7 +36,8 @@ namespace reone {
 
 namespace render {
 
-static constexpr int kBindingPointIndex = 1;
+static constexpr int kBindingPointIndexCombined = 1;
+static constexpr int kBindingPointIndexSkeletal = 2;
 
 static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
@@ -128,10 +129,6 @@ struct Lighting {
     Light lights[MAX_LIGHTS];
 };
 
-struct Skeletal {
-    mat4 bones[MAX_BONES];
-};
-
 struct Particle {
     mat4 transform;
     vec4 color;
@@ -162,9 +159,12 @@ layout(std140) uniform Combined {
     Bumpmap uBumpmaps;
     Blur uBlur;
     Lighting uLighting;
-    Skeletal uSkeletal;
     Particles uParticles;
     Text uText;
+};
+
+layout(std140) uniform Skeletal {
+    mat4 uBones[MAX_BONES];
 };
 
 bool isFeatureEnabled(int flag) {
@@ -449,10 +449,10 @@ void main() {
 
         vec4 position = vec4(aPosition, 1.0);
 
-        P += weight0 * uSkeletal.bones[index0] * position;
-        P += weight1 * uSkeletal.bones[index1] * position;
-        P += weight2 * uSkeletal.bones[index2] * position;
-        P += weight3 * uSkeletal.bones[index3] * position;
+        P += weight0 * uBones[index0] * position;
+        P += weight1 * uBones[index1] * position;
+        P += weight2 * uBones[index2] * position;
+        P += weight3 * uBones[index3] * position;
 
         P = vec4(P.xyz, 1.0);
 
@@ -1031,6 +1031,8 @@ Shaders &Shaders::instance() {
 }
 
 void Shaders::init() {
+    if (_inited) return;
+
     initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
     initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexParticle });
@@ -1065,7 +1067,8 @@ void Shaders::init() {
     initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
     initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
 
-    glGenBuffers(1, &_ubo);
+    glGenBuffers(1, &_uboCombined);
+    glGenBuffers(1, &_uboSkeletal);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -1077,6 +1080,8 @@ void Shaders::init() {
         _activeOrdinal = 0;
         glUseProgram(0);
     }
+
+    _inited = true;
 }
 
 void Shaders::initShader(ShaderName name, unsigned int type, vector<const char *> sources) {
@@ -1120,13 +1125,22 @@ void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
 }
 
 void Shaders::initUBO() {
-    uint32_t blockIdx = glGetUniformBlockIndex(_activeOrdinal, "Combined");
-    if (blockIdx != GL_INVALID_INDEX) {
-        glUniformBlockBinding(_activeOrdinal, blockIdx, kBindingPointIndex);
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndex, _ubo);
+    uint32_t blockIdxCombined = glGetUniformBlockIndex(_activeOrdinal, "Combined");
+    if (blockIdxCombined != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, blockIdxCombined, kBindingPointIndexCombined);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
 
         ShaderUniforms defaults;
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderUniforms), &defaults, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, skeletal), &defaults, GL_STATIC_DRAW);
+    }
+
+    uint32_t blockIdxSkeletal = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
+    if (blockIdxSkeletal != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, blockIdxSkeletal, kBindingPointIndexSkeletal);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
+
+        SkeletalUniforms defaults;
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &defaults, GL_STATIC_DRAW);
     }
 }
 
@@ -1147,9 +1161,15 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinit() {
-    if (_ubo) {
-        glDeleteBuffers(1, &_ubo);
-        _ubo = 0;
+    if (!_inited) return;
+
+    if (_uboCombined) {
+        glDeleteBuffers(1, &_uboCombined);
+        _uboCombined = 0;
+    }
+    if (_uboSkeletal) {
+        glDeleteBuffers(1, &_uboSkeletal);
+        _uboSkeletal = 0;
     }
     for (auto &pair : _programs) {
         glDeleteProgram(pair.second);
@@ -1160,6 +1180,8 @@ void Shaders::deinit() {
         glDeleteShader(pair.second);
     }
     _shaders.clear();
+
+    _inited = false;
 }
 
 void Shaders::activate(ShaderProgram program, const ShaderUniforms &uniforms) {
@@ -1182,20 +1204,22 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 }
 
 void Shaders::setUniforms(const ShaderUniforms &uniforms) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndex, _ubo);
+    glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, offsetof(ShaderUniforms, lighting), &uniforms);
 
     if (uniforms.general.featureMask & UniformFeatureFlags::lighting) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, lighting), sizeof(LightingUniforms), &uniforms.lighting);
-    }
-    if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
-        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, skeletal), sizeof(SkeletalUniforms), &uniforms.skeletal);
     }
     if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, particles), sizeof(ParticlesUniforms), &uniforms.particles);
     }
     if (uniforms.general.featureMask & UniformFeatureFlags::text) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, text), sizeof(TextUniforms), &uniforms.text);
+    }
+
+    if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), &uniforms.skeletal);
     }
 }
 
