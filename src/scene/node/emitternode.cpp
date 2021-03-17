@@ -150,7 +150,6 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
         }
 
         uniforms.particles.particles[i].transform = move(transform);
-        uniforms.particles.particles[i].position = _absoluteTransform * glm::vec4(particle.position(), 1.0f);
         uniforms.particles.particles[i].color = glm::vec4(particle.color(), 1.0f);
         uniforms.particles.particles[i].size = glm::vec2(particle.size());
         uniforms.particles.particles[i].alpha = particle.alpha();

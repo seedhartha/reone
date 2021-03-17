@@ -130,7 +130,6 @@ struct Skeletal {
 
 struct Particle {
     mat4 transform;
-    vec4 position;
     vec4 color;
     vec2 size;
     float alpha;
@@ -493,8 +492,9 @@ void main() {
     vec4 P;
 
     if (uParticles.render == BILLBOARD_RENDER_TO_WORLD_Z) {
+        vec3 particlePos = vec3(uParticles.particles[gl_InstanceID].transform[3]);
         P = vec4(
-            uParticles.particles[gl_InstanceID].position.xyz +
+            particlePos +
                 RIGHT * aPosition.x * uParticles.particles[gl_InstanceID].size.x +
                 FORWARD * aPosition.y * uParticles.particles[gl_InstanceID].size.y,
             1.0);
@@ -506,11 +506,12 @@ void main() {
         P = uParticles.particles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
 
     } else {
+        vec3 particlePos = vec3(uParticles.particles[gl_InstanceID].transform[3]);
         vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
         vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
 
         P = vec4(
-            uParticles.particles[gl_InstanceID].position.xyz +
+            particlePos +
                 cameraRight * aPosition.x * uParticles.particles[gl_InstanceID].size.x +
                 cameraUp * aPosition.y * uParticles.particles[gl_InstanceID].size.y,
             1.0);
