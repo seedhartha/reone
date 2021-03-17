@@ -892,12 +892,13 @@ void Area::updateSounds() {
 
         if (!soundPtr->isActive()) continue;
 
-        float maxDist = soundPtr->maxDistance();
+        float maxDist2 = soundPtr->maxDistance();
+        maxDist2 *= maxDist2;
 
-        float dist = soundPtr->distanceTo(refPosition);
-        if (dist > maxDist) continue;
+        float dist2 = soundPtr->getDistanceTo2(refPosition);
+        if (dist2 > maxDist2) continue;
 
-        soundDistances.push_back(make_pair(soundPtr, dist));
+        soundDistances.push_back(make_pair(soundPtr, dist2));
     }
 
     sort(soundDistances.begin(), soundDistances.end(), [](auto &left, auto &right) {
@@ -922,7 +923,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->distanceTo(position2d) > kDefaultRaycastDistance) continue;
+        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance * kDefaultRaycastDistance) continue;
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) continue;
 
         debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
@@ -1069,7 +1070,7 @@ shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nt
 
     for (auto &object : _objects) {
         if (predicate(object)) {
-            candidates.push_back(make_pair(object, object->distanceTo(origin)));
+            candidates.push_back(make_pair(object, object->getDistanceTo2(origin)));
         }
     }
     sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });

@@ -108,7 +108,7 @@ vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float
     for (auto &object : area->getObjectsByType(ObjectType::Creature)) {
         if (object.get() == &combatant ||
             object->isDead() ||
-            object->distanceTo(combatant) > range) continue;
+            object->getDistanceTo2(combatant) > range * range) continue;
 
         auto creature = static_pointer_cast<Creature>(object);
         if (!Reputes::instance().getIsEnemy(combatant, *creature)) continue;
@@ -199,14 +199,14 @@ void Combat::updateCombatantAI(Combatant &combatant) {
 
 shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
     shared_ptr<Creature> result;
-    float minDist = FLT_MAX;
+    float minDist2 = FLT_MAX;
 
     for (auto &enemy : combatant.enemies) {
-        float dist = enemy->distanceTo(*combatant.creature);
-        if (dist >= minDist) continue;
-
-        result = enemy;
-        minDist = dist;
+        float dist2 = enemy->getDistanceTo2(*combatant.creature);
+        if (dist2 < minDist2) {
+            minDist2 = dist2;
+            result = enemy;
+        }
     }
 
     return move(result);
@@ -232,7 +232,7 @@ void Combat::updateRounds(float dt) {
         if (!action) continue;
 
         shared_ptr<SpatialObject> target(action->target());
-        if (!target || target->distanceTo(*attacker->creature) > action->range()) continue;
+        if (!target || target->getDistanceTo2(*attacker->creature) > action->range() * action->range()) continue;
 
         attacker->target = target;
 

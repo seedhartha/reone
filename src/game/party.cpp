@@ -143,7 +143,7 @@ void Party::onHeartbeat() {
         if (!action) {
             actions.add(make_unique<FollowAction>(leader, kDefaultFollowDistance));
         }
-        if (member->distanceTo(*leader) > kTeleMemberDistance) {
+        if (member->getDistanceTo2(*leader) > kTeleMemberDistance * kTeleMemberDistance) {
             member->setPosition(leader->position());
             _game->module()->area()->landObject(*member);
         }

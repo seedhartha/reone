@@ -119,6 +119,10 @@ private:
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
     void refreshShadowLight();
+
+    void prepareOpaqueMeshes();
+    void prepareTransparentMeshes();
+    void prepareParticles();
 };
 
 } // namespace scene

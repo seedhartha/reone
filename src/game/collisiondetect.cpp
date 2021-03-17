@@ -85,7 +85,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         if (props.objectTypes.count(object->type()) == 0) continue; // Objects of this type are not to be tested
         if ((props.flags & RaycastFlags::selectable) && !object->isSelectable()) continue; // Non-selectable objects are not to be tested
         if ((props.flags & RaycastFlags::alive) && object->isDead()) continue; // Dead objects are not to be tested
-        if (object->distanceTo(glm::vec2(props.origin)) > props.distance) continue; // Optimization: object must not be too far away in 2D space
+        if (object->getDistanceTo2(glm::vec2(props.origin)) > props.distance * props.distance) continue; // Optimization: object must not be too far away in 2D space
 
         // Do testing in object space
         glm::mat4 invObjTransform(glm::inverse(object->transform()));

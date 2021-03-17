@@ -60,9 +60,19 @@ public:
     float getDistanceTo(const glm::vec3 &point) const;
 
     /**
+     * @return squared distance from the origin of this node to the point
+     */
+    float getDistanceTo2(const glm::vec3 &point) const;
+
+    /**
      * @return shortest distance from the origin of this node to the other node
      */
     float getDistanceTo(const SceneNode &other) const;
+
+    /**
+     * @return shortest distance (squared) from the origin of this node to the other node
+     */
+    float getDistanceTo2(const SceneNode &other) const;
 
     SceneNodeType type() const { return _type; }
     const SceneNode *parent() const { return _parent; }

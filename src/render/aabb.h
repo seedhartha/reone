@@ -55,6 +55,11 @@ public:
      */
     float getDistanceFromClosestPoint(const glm::vec3 &point) const;
 
+    /**
+     * @return squared distance from the closest point of this AABB to the specified point
+     */
+    float getDistanceFromClosestPoint2(const glm::vec3 &point) const;
+
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
     const glm::vec3 &center() const { return _center; }
@@ -68,6 +73,8 @@ private:
     glm::mat4 _transform { 1.0f };
 
     void updateTransform();
+
+    inline glm::vec3 getClosestPoint(const glm::vec3 &point) const;
 };
 
 } // namespace render

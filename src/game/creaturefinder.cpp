@@ -40,8 +40,8 @@ shared_ptr<Creature> CreatureFinder::getNearestCreature(const SpatialObject &tar
     for (auto &object : _area->getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
-            float distance = creature->distanceTo(target);
-            candidates.push_back(make_pair(move(creature), distance));
+            float distance2 = creature->getDistanceTo2(target);
+            candidates.push_back(make_pair(move(creature), distance2));
         }
     }
 
@@ -87,8 +87,8 @@ shared_ptr<Creature> CreatureFinder::getNearestCreatureToLocation(const Location
     for (auto &object : _area->getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
-            float distance = creature->distanceTo(location.position());
-            candidates.push_back(make_pair(move(creature), distance));
+            float distance2 = creature->getDistanceTo2(location.position());
+            candidates.push_back(make_pair(move(creature), distance2));
         }
     }
 
