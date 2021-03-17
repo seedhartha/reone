@@ -37,7 +37,7 @@ namespace reone {
 namespace render {
 
 static constexpr int kVertexValuesPerGlyph = 20;
-static constexpr int kIndicesPerGlyph = 6;
+static constexpr int kIndicesPerGlyph = 4;
 
 void Font::load(const shared_ptr<Texture> &texture) {
     if (!texture) {
@@ -64,15 +64,17 @@ void Font::load(const shared_ptr<Texture> &texture) {
         float width = aspect * _height;
 
         float *pv = &_vertices[kVertexValuesPerGlyph * i];
-        pv[0] = 0.0f; pv[1] = _height; pv[2] = 0.0f; pv[3] = ul.x; pv[4] = lr.y;
-        pv[5] = width; pv[6] = _height; pv[7] = 0.0f; pv[8] = lr.x; pv[9] = lr.y;
-        pv[10] = width; pv[11] = 0.0f; pv[12] = 0.0f; pv[13] = lr.x; pv[14] = ul.y;
-        pv[15] = 0.0f; pv[16] = 0.0f; pv[17] = 0.0f; pv[18] = ul.x; pv[19] = ul.y;
+        *pv++ = 0.0f; *pv++ = _height; *pv++ = 0.0f; *pv++ = ul.x; *pv++ = lr.y;
+        *pv++ = 0.0f; *pv++ = 0.0f; *pv++ = 0.0f; *pv++ = ul.x; *pv++ = ul.y;
+        *pv++ = width; *pv++ = _height; *pv++ = 0.0f; *pv++ = lr.x; *pv++ = lr.y;
+        *pv++ = width; *pv++ = 0.0f; *pv++ = 0.0f; *pv++ = lr.x; *pv++ = ul.y;
 
         uint16_t *iv = &_indices[kIndicesPerGlyph * i];
         int off = 4 * i;
-        iv[0] = off + 0; iv[1] = off + 1; iv[2] = off + 2;
-        iv[3] = off + 2; iv[4] = off + 3; iv[5] = off + 0;
+        iv[0] = off + 0;
+        iv[1] = off + 1;
+        iv[2] = off + 2;
+        iv[3] = off + 3;
 
         _glyphWidths[i] = width;
     }
@@ -154,8 +156,8 @@ void Font::draw(const string &text, const glm::mat4 &transform, const glm::vec3 
         uniforms.general.color = glm::vec4(color, 1.0f);
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-        int off = kIndicesPerGlyph * glyph * sizeof(uint16_t);
-        glDrawElements(GL_TRIANGLES, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));
+        int off = kIndicesPerGlyph * static_cast<int>(glyph) * sizeof(uint16_t);
+        glDrawElements(GL_TRIANGLE_STRIP, kIndicesPerGlyph, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(off));
 
         float w = _glyphWidths[glyph];
         textTransform = glm::translate(textTransform, glm::vec3(w, 0.0f, 0.0f));
