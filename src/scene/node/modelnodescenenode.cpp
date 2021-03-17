@@ -252,7 +252,7 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
         if (skin) {
             uniforms.general.featureMask |= UniformFeatureFlags::skeletal;
 
-            for (int i = 0; i < kMaxBoneCount; ++i) {
+            for (int i = 0; i < kMaxBones; ++i) {
                 uniforms.skeletal.bones[i] = glm::mat4(1.0f);
             }
             for (auto &pair : skin->nodeIdxByBoneIdx) {

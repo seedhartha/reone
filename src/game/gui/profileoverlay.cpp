@@ -129,11 +129,11 @@ void ProfileOverlay::drawText() {
     ss << "1% Low: " << _fps.onePerLow << endl;
 
     vector<string> lines(breakText(ss.str(), *_font, kFrameWidth));
-    glm::mat4 transform(1.0f);
+    glm::vec3 position(0.0f);
 
     for (auto &line : lines) {
-        _font->draw(line, transform, glm::vec3(1.0f), TextGravity::RightBottom);
-        transform = glm::translate(transform, glm::vec3(0.0f, _font->height(), 0.0f));
+        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightBottom);
+        position.y += _font->height();
     }
 }
 

@@ -48,7 +48,8 @@ enum class ShaderProgram {
     ModelColor,
     ModelBlinnPhong,
     ModelPBR,
-    ParticleParticle
+    ParticleParticle,
+    TextText
 };
 
 struct UniformFeatureFlags {
@@ -67,6 +68,7 @@ struct UniformFeatureFlags {
     static constexpr int hdr = 0x1000;
     static constexpr int customMat = 0x2000;
     static constexpr int blur = 0x4000;
+    static constexpr int text = 0x8000;
 };
 
 struct GeneralUniforms {
@@ -96,46 +98,12 @@ struct MaterialUniforms {
     float roughness { 1.0f };
 };
 
-struct ShaderLight {
-    glm::vec4 position { 0.0f };
-    glm::vec4 color { 1.0f };
-    float multiplier { 1.0f };
-    float radius { 1.0f };
-    char padding[8];
-};
-
-struct LightingUniforms {
-    int lightCount { 0 };
-    char padding[12];
-    ShaderLight lights[kMaxLightCount];
-};
-
 struct ShadowUniforms {
     glm::mat4 matrices[kNumCubeFaces];
     glm::vec4 lightPosition { 0.0f };
     int lightPresent { false };
     float strength { 1.0f };
     char padding[8];
-};
-
-struct SkeletalUniforms {
-    glm::mat4 bones[kMaxBoneCount];
-};
-
-struct ShaderParticle {
-    glm::mat4 transform { 1.0f };
-    glm::vec4 position { 0.0f };
-    glm::vec4 color { 1.0f };
-    glm::vec2 size { 0.0f };
-    float alpha { 1.0f };
-    int frame { 0 };
-};
-
-struct ParticlesUniforms {
-    glm::vec2 gridSize { 0.0f };
-    int render { 0 };
-    char padding[4];
-    ShaderParticle particles[kMaxParticleCount];
 };
 
 struct BumpmapsUniforms {
@@ -152,6 +120,49 @@ struct BlurUniforms {
     glm::vec2 direction { 0.0f };
 };
 
+struct ShaderLight {
+    glm::vec4 position { 0.0f };
+    glm::vec4 color { 1.0f };
+    float multiplier { 1.0f };
+    float radius { 1.0f };
+    char padding[8];
+};
+
+struct LightingUniforms {
+    int lightCount { 0 };
+    char padding[12];
+    ShaderLight lights[kMaxLights];
+};
+
+struct SkeletalUniforms {
+    glm::mat4 bones[kMaxBones];
+};
+
+struct ShaderParticle {
+    glm::mat4 transform { 1.0f };
+    glm::vec4 position { 0.0f };
+    glm::vec4 color { 1.0f };
+    glm::vec2 size { 0.0f };
+    float alpha { 1.0f };
+    int frame { 0 };
+};
+
+struct ParticlesUniforms {
+    glm::vec2 gridSize { 0.0f };
+    int render { 0 };
+    char padding[4];
+    ShaderParticle particles[kMaxParticles];
+};
+
+struct ShaderCharacter {
+    glm::mat4 transform { 0.0f };
+    glm::vec4 uv { 0.0f };
+};
+
+struct TextUniforms {
+    ShaderCharacter chars[kMaxCharacters];
+};
+
 struct ShaderUniforms {
     GeneralUniforms general;
     MaterialUniforms material;
@@ -161,6 +172,7 @@ struct ShaderUniforms {
     LightingUniforms lighting;
     SkeletalUniforms skeletal;
     ParticlesUniforms particles;
+    TextUniforms text;
 };
 
 class Shaders : boost::noncopyable {
@@ -178,10 +190,12 @@ private:
         VertexSimple,
         VertexModel,
         VertexParticle,
+        VertexText,
         GeometryDepth,
         FragmentColor,
         FragmentDepth,
         FragmentGUI,
+        FragmentText,
         FragmentBlinnPhong,
         FragmentPBR,
         FragmentParticle,

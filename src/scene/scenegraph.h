@@ -79,7 +79,7 @@ public:
     void getLightsAt(
         const SceneNode &reference,
         std::vector<LightSceneNode *> &lights,
-        int count = render::kMaxLightCount,
+        int count = render::kMaxLights,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }

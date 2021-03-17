@@ -119,9 +119,10 @@ void ImageButton::drawIcon(
     }
 
     if (!iconText.empty()) {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left + _extent.height, offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height(), 0.0f));
-        _iconFont->draw(iconText, transform, color, TextGravity::LeftCenter);
+        glm::vec3 position(0.0f);
+        position.x = offset.x + _extent.left + _extent.height;
+        position.y = offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height();
+        _iconFont->draw(iconText, position, color, TextGravity::LeftCenter);
     }
 }
 

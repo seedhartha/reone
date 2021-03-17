@@ -47,6 +47,7 @@ const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 128;
 const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 32;
+const int MAX_CHARS = 128;
 const float SHADOW_FAR_PLANE = 10000.0;
 const vec3 LUMINANCE = vec3(0.2126, 0.7152, 0.0722);
 
@@ -142,6 +143,15 @@ struct Particles {
     Particle particles[MAX_PARTICLES];
 };
 
+struct Character {
+    mat4 transform;
+    vec4 uv;
+};
+
+struct Text {
+    Character chars[MAX_CHARS];
+};
+
 layout(std140) uniform Combined {
     General uGeneral;
     Material uMaterial;
@@ -151,6 +161,7 @@ layout(std140) uniform Combined {
     Lighting uLighting;
     Skeletal uSkeletal;
     Particles uParticles;
+    Text uText;
 };
 
 bool isFeatureEnabled(int flag) {
@@ -511,6 +522,21 @@ void main() {
 }
 )END";
 
+static constexpr GLchar kShaderVertexText[] = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aTexCoords;
+
+out vec2 fragTexCoords;
+flat out int fragInstanceID;
+
+void main() {
+    vec4 P = vec4(aPosition, 1.0);
+    gl_Position = uGeneral.projection * uGeneral.view * uText.chars[gl_InstanceID].transform * P;
+    fragTexCoords = aTexCoords;
+    fragInstanceID = gl_InstanceID;
+}
+)END";
+
 static constexpr GLchar kShaderGeometryDepth[] = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
@@ -566,6 +592,22 @@ void main() {
 
     fragColor = vec4(objectColor, uGeneral.alpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
+}
+)END";
+
+static constexpr GLchar kShaderFragmentText[] = R"END(
+uniform sampler2D uDiffuse;
+
+in vec2 fragTexCoords;
+flat in int fragInstanceID;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = fragTexCoords * uText.chars[fragInstanceID].uv.zw + uText.chars[fragInstanceID].uv.xy;
+    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
+    fragColor = vec4(objectColor, diffuseSample.a);
 }
 )END";
 
@@ -987,10 +1029,12 @@ void Shaders::init() {
     initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
     initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexParticle });
+    initShader(ShaderName::VertexText, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexText });
     initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
     initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
     initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
     initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentGUI });
+    initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentText });
     initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBaseModel, kShaderFragmentBlinnPhong });
     initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderBaseModel, kShaderFragmentPBR });
     initShader(ShaderName::FragmentParticle, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentParticle });
@@ -1014,6 +1058,7 @@ void Shaders::init() {
     initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
     initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });
     initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
+    initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
 
     glGenBuffers(1, &_ubo);
 
@@ -1143,6 +1188,9 @@ void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     }
     if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, particles), sizeof(ParticlesUniforms), &uniforms.particles);
+    }
+    if (uniforms.general.featureMask & UniformFeatureFlags::text) {
+        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, text), sizeof(TextUniforms), &uniforms.text);
     }
 }
 
