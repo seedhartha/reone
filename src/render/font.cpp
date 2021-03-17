@@ -84,11 +84,13 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
         for (int j = 0; j < numChars; ++j) {
             const Glyph &glyph = _glyphs[static_cast<int>(text[i * kMaxCharacters + j])];
 
-            glm::mat4 textTransform(1.0f);
-            textTransform = glm::translate(textTransform, position + textOffset);
-            textTransform = glm::scale(textTransform, glm::vec3(glyph.size.x, glyph.size.y, 1.0f));
+            glm::vec4 posScale;
+            posScale[0] = position.x + textOffset.x;
+            posScale[1] = position.y + textOffset.y;
+            posScale[2] = glyph.size.x;
+            posScale[3] = glyph.size.y;
 
-            uniforms.text.chars[j].transform = move(textTransform);
+            uniforms.text.chars[j].posScale = move(posScale);
             uniforms.text.chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
 
             textOffset.x += glyph.size.x;
