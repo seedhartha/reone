@@ -40,9 +40,12 @@ enum class TextGravity {
 class Font {
 public:
     Font() = default;
+    ~Font();
+
+    void init();
+    void deinit();
 
     void load(const std::shared_ptr<Texture> &texture);
-    void initGL();
 
     void draw(
         const std::string &text,
@@ -55,7 +58,7 @@ public:
     float height() const { return _height; }
 
 private:
-    bool _glInited { false };
+    bool _inited { false };
     std::vector<float> _vertices;
     std::vector<uint16_t> _indices;
     int _glyphCount { 0 };

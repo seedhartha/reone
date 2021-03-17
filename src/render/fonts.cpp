@@ -55,7 +55,7 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     auto font = make_shared<Font>();
     font->load(texture);
     if (font) {
-        font->initGL();
+        font->init();
     }
 
     return move(font);
