@@ -80,8 +80,8 @@ void Font::load(const shared_ptr<Texture> &texture) {
     }
 }
 
-void Font::initGL() {
-    if (_glInited) return;
+void Font::init() {
+    if (_inited) return;
 
     glGenBuffers(1, &_vertexBufferId);
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
@@ -107,7 +107,30 @@ void Font::initGL() {
 
     glBindVertexArray(0);
 
-    _glInited = true;
+    _inited = true;
+}
+
+Font::~Font() {
+    deinit();
+}
+
+void Font::deinit() {
+    if (!_inited) return;
+
+    if (_vertexArrayId) {
+        glDeleteVertexArrays(1, &_vertexArrayId);
+        _vertexArrayId = 0;
+    }
+    if (_vertexBufferId) {
+        glDeleteBuffers(1, &_vertexBufferId);
+        _vertexBufferId = 0;
+    }
+    if (_indexBufferId) {
+        glDeleteBuffers(1, &_indexBufferId);
+        _indexBufferId = 0;
+    }
+
+    _inited = false;
 }
 
 void Font::draw(const string &text, const glm::mat4 &transform, const glm::vec3 &color, TextGravity gravity) {
