@@ -163,15 +163,20 @@ struct TextUniforms {
 };
 
 struct ShaderUniforms {
+    // Buffered at once
     GeneralUniforms general;
     MaterialUniforms material;
     ShadowUniforms shadows;
     BumpmapsUniforms bumpmaps;
     BlurUniforms blur;
+
+    // Buffered separately
     LightingUniforms lighting;
-    SkeletalUniforms skeletal;
     ParticlesUniforms particles;
     TextUniforms text;
+
+    // Separate UBOs
+    SkeletalUniforms skeletal;
 };
 
 class Shaders : boost::noncopyable {
@@ -206,11 +211,13 @@ private:
         FragmentDebugCubeMap
     };
 
+    bool _inited { false };
     std::unordered_map<ShaderName, uint32_t> _shaders;
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
-    uint32_t _ubo { 0 };
+    uint32_t _uboCombined { 0 };
+    uint32_t _uboSkeletal { 0 };
 
     ~Shaders();
 
