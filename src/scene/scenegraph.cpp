@@ -206,23 +206,10 @@ void SceneGraph::prepareParticles() {
         return left.second > right.second;
     });
 
-    // Group particles by emitter
+    // Map (particle, Z) pairs to (emitter, particle)
     _particles.clear();
-    vector<Particle *> emitterParticles;
-    EmitterSceneNode *emitter = nullptr;
-    for (auto &particle : particlesZ) {
-        EmitterSceneNode *particleEmitter = particle.first->emitter();
-        if (particleEmitter != emitter) {
-            if (!emitterParticles.empty()) {
-                _particles.push_back(make_pair(emitter, emitterParticles));
-                emitterParticles.clear();
-            }
-            emitter = particleEmitter;
-        }
-        emitterParticles.push_back(particle.first);
-    }
-    if (!emitterParticles.empty()) {
-        _particles.push_back(make_pair(emitter, emitterParticles));
+    for (auto &pair : particlesZ) {
+        _particles.push_back(make_pair(pair.first->emitter(), pair.first));
     }
 }
 
@@ -276,8 +263,11 @@ void SceneGraph::draw(bool shadowPass) {
     }
 
     // Render particles
+    vector<Particle *> emitterParticles;
+    emitterParticles.resize(1);
     for (auto &pair : _particles) {
-        pair.first->drawParticles(pair.second);
+        emitterParticles[0] = pair.second;
+        pair.first->drawParticles(emitterParticles);
     }
 }
 
