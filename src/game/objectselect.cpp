@@ -93,10 +93,10 @@ vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
         shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
         if (!model || !model->isVisible()) continue;
 
-        float dist = object->distanceTo(origin);
-        if (dist > kSelectionDistance) continue;
+        float dist2 = object->getDistanceTo2(origin);
+        if (dist2 > kSelectionDistance * kSelectionDistance) continue;
 
-        distances.push_back(make_pair(object, dist));
+        distances.push_back(make_pair(object, dist2));
     }
 
     sort(distances.begin(), distances.end(), [](auto &left, auto &right) {

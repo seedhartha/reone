@@ -154,8 +154,8 @@ void ActionExecutor::executeFollow(const shared_ptr<Object> &actor, FollowAction
     auto creatureActor = static_pointer_cast<Creature>(actor);
     auto object = static_pointer_cast<SpatialObject>(action.object());
     glm::vec3 dest(object->position());
-    float distance = creatureActor->distanceTo(glm::vec2(dest));
-    bool run = distance > kDistanceWalk;
+    float distance2 = creatureActor->getDistanceTo2(glm::vec2(dest));
+    bool run = distance2 > kDistanceWalk * kDistanceWalk;
 
     navigateCreature(creatureActor, dest, run, action.distance(), dt);
 }
@@ -199,14 +199,13 @@ void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, AttackAction
 bool ActionExecutor::navigateCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest, bool run, float distance, float dt) {
     if (creature->isMovementRestricted()) return false;
 
-    glm::vec2 origin(creature->position());
-    float distToDest = glm::distance(origin, glm::vec2(dest));
-
-    if (distToDest <= distance) {
+    float distToDest2 = creature->getDistanceTo2(glm::vec2(dest));
+    if (distToDest2 <= distance * distance) {
         creature->setMovementType(Creature::MovementType::None);
         creature->clearPath();
         return true;
     }
+
     bool updatePath = true;
     shared_ptr<Creature::Path> path(creature->path());
 
@@ -384,8 +383,8 @@ void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const
 void ActionExecutor::executeFollowLeader(const shared_ptr<Object> &actor, Action &action, float dt) {
     auto creatureActor = static_pointer_cast<Creature>(actor);
     glm::vec3 destination(_game->party().getLeader()->position());
-    float distance = creatureActor->distanceTo(glm::vec2(destination));
-    bool run = distance > kDistanceWalk;
+    float distance2 = creatureActor->getDistanceTo2(glm::vec2(destination));
+    bool run = distance2 > kDistanceWalk;
 
     navigateCreature(creatureActor, destination, run, kDefaultFollowDistance, dt);
 }

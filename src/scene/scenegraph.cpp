@@ -65,60 +65,9 @@ void SceneGraph::prepareFrame() {
         }
     }
 
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
-
-    // Sort transparent meshes by transparency and distance to camera
-    unordered_map<SceneNode *, float> meshToCamera;
-    for (auto &mesh : _transparentMeshes) {
-        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo(cameraPosition)));
-    }
-    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
-        int leftTransparency = left->modelNode()->mesh()->transparency();
-        int rightTransparency = right->modelNode()->mesh()->transparency();
-
-        if (leftTransparency < rightTransparency) return true;
-        if (leftTransparency > rightTransparency) return false;
-
-        float leftDistance = meshToCamera.find(left)->second;
-        float rightDistance = meshToCamera.find(right)->second;
-
-        return leftDistance > rightDistance;
-    });
-
-    // Extract particles from all emitters, sort them by depth
-    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
-    vector<pair<Particle *, float>> particlesZ;
-    for (auto &emitter : _emitters) {
-        glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
-        for (auto &particle : emitter->particles()) {
-            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
-            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                particlesZ.push_back(make_pair(particle.get(), screen.z));
-            }
-        }
-    }
-    sort(particlesZ.begin(), particlesZ.end(), [](auto &left, auto &right) {
-        return left.second > right.second;
-    });
-
-    // Group particles by emitter
-    _particles.clear();
-    vector<Particle *> emitterParticles;
-    EmitterSceneNode *emitter = nullptr;
-    for (auto &particle : particlesZ) {
-        EmitterSceneNode *particleEmitter = particle.first->emitter();
-        if (particleEmitter != emitter) {
-            if (!emitterParticles.empty()) {
-                _particles.push_back(make_pair(emitter, emitterParticles));
-                emitterParticles.clear();
-            }
-            emitter = particleEmitter;
-        }
-        emitterParticles.push_back(particle.first);
-    }
-    if (!emitterParticles.empty()) {
-        _particles.push_back(make_pair(emitter, emitterParticles));
-    }
+    prepareOpaqueMeshes();
+    prepareTransparentMeshes();
+    prepareParticles();
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -205,6 +154,78 @@ void SceneGraph::refreshShadowLight() {
     }
 }
 
+void SceneGraph::prepareOpaqueMeshes() {
+    // Sort opaque meshes by distance to camera, so as to take advantage of early Z-test. Disabled due to performance degradation.
+    /*
+    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
+    unordered_map<SceneNode *, float> meshToCamera;
+    for (auto &mesh : _opaqueMeshes) {
+        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo(cameraPosition)));
+    }
+    sort(_opaqueMeshes.begin(), _opaqueMeshes.end(), [&meshToCamera](auto &left, auto &right) {
+        return meshToCamera.find(left)->second > meshToCamera.find(right)->second;
+    });
+    */
+}
+
+void SceneGraph::prepareTransparentMeshes() {
+    // Sort transparent meshes by transparency and distance to camera, so as to ensure correct blending
+    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
+    unordered_map<SceneNode *, float> meshToCamera;
+    for (auto &mesh : _transparentMeshes) {
+        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo2(cameraPosition)));
+    }
+    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
+        int leftTransparency = left->modelNode()->mesh()->transparency();
+        int rightTransparency = right->modelNode()->mesh()->transparency();
+
+        if (leftTransparency < rightTransparency) return true;
+        if (leftTransparency > rightTransparency) return false;
+
+        float leftDistance = meshToCamera.find(left)->second;
+        float rightDistance = meshToCamera.find(right)->second;
+
+        return leftDistance > rightDistance;
+    });
+}
+
+void SceneGraph::prepareParticles() {
+    // Extract particles from all emitters, sort them by depth
+    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+    vector<pair<Particle *, float>> particlesZ;
+    for (auto &emitter : _emitters) {
+        glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
+        for (auto &particle : emitter->particles()) {
+            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
+            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                particlesZ.push_back(make_pair(particle.get(), screen.z));
+            }
+        }
+    }
+    sort(particlesZ.begin(), particlesZ.end(), [](auto &left, auto &right) {
+        return left.second > right.second;
+    });
+
+    // Group particles by emitter
+    _particles.clear();
+    vector<Particle *> emitterParticles;
+    EmitterSceneNode *emitter = nullptr;
+    for (auto &particle : particlesZ) {
+        EmitterSceneNode *particleEmitter = particle.first->emitter();
+        if (particleEmitter != emitter) {
+            if (!emitterParticles.empty()) {
+                _particles.push_back(make_pair(emitter, emitterParticles));
+                emitterParticles.clear();
+            }
+            emitter = particleEmitter;
+        }
+        emitterParticles.push_back(particle.first);
+    }
+    if (!emitterParticles.empty()) {
+        _particles.push_back(make_pair(emitter, emitterParticles));
+    }
+}
+
 void SceneGraph::update(float dt) {
     if (!_update) return;
 
@@ -274,8 +295,8 @@ void SceneGraph::getLightsAt(
 
         // Only account for lights whose distance to the reference node is
         // within range of the light.
-        float distance = light->getDistanceTo(node);
-        if (distance > light->radius()) continue;
+        float distance = light->getDistanceTo2(node);
+        if (distance > light->radius() * light->radius()) continue;
 
         lights.push_back(light);
         distances.insert(make_pair(light, distance));

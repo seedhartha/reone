@@ -20,6 +20,9 @@
 #include <utility>
 
 #include "glm/ext.hpp"
+#include "glm/gtx/norm.hpp"
+
+using namespace std;
 
 namespace reone {
 
@@ -147,6 +150,10 @@ glm::vec3 AABB::getSize() const {
 }
 
 float AABB::getDistanceFromClosestPoint(const glm::vec3 &point) const {
+    return glm::distance(getClosestPoint(point), point);
+}
+
+glm::vec3 AABB::getClosestPoint(const glm::vec3 &point) const {
     glm::vec3 closest;
     for (int i = 0; i < 3; ++i) {
         if (point[i] > _max[i]) {
@@ -157,7 +164,11 @@ float AABB::getDistanceFromClosestPoint(const glm::vec3 &point) const {
             closest[i] = point[i];
         }
     }
-    return glm::distance(closest, point);
+    return move(closest);
+}
+
+float AABB::getDistanceFromClosestPoint2(const glm::vec3 &point) const {
+    return glm::distance2(getClosestPoint(point), point);
 }
 
 } // namespace render

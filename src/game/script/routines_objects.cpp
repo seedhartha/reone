@@ -130,7 +130,7 @@ Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionConte
         return -1.0f;
     }
 
-    return caller->distanceTo(*object);
+    return caller->getDistanceTo(*object);
 }
 
 Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
@@ -145,7 +145,7 @@ Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionCon
         return -1.0f;
     }
 
-    return caller->distanceTo(glm::vec2(object->position()));
+    return caller->getDistanceTo(glm::vec2(object->position()));
 }
 
 Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
@@ -202,7 +202,7 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
         return -1.0f;
     }
 
-    return objectA->distanceTo(*objectB);
+    return objectA->getDistanceTo(*objectB);
 }
 
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
@@ -216,7 +216,7 @@ Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionCont
         warn("Routines: getDistanceBetween2D: objectB is invalid");
         return 0.0f;
     }
-    return objectA->distanceTo(glm::vec2(objectB->position()));
+    return objectA->getDistanceTo(glm::vec2(objectB->position()));
 }
 
 Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {

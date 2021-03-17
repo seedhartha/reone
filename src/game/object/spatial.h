@@ -54,9 +54,12 @@ public:
     void face(const glm::vec3 &point);
     void faceAwayFrom(const SpatialObject &other);
 
-    float distanceTo(const glm::vec2 &point) const;
-    float distanceTo(const glm::vec3 &point) const;
-    float distanceTo(const SpatialObject &other) const;
+    float getDistanceTo(const glm::vec2 &point) const;
+    float getDistanceTo2(const glm::vec2 &point) const;
+    float getDistanceTo(const glm::vec3 &point) const;
+    float getDistanceTo2(const glm::vec3 &point) const;
+    float getDistanceTo(const SpatialObject &other) const;
+    float getDistanceTo2(const SpatialObject &other) const;
 
     bool contains(const glm::vec3 &point) const;
 
