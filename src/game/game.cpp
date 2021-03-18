@@ -47,6 +47,7 @@
 #include "gui/sounds.h"
 #include "script/routines.h"
 #include "soundsets.h"
+#include "surfaces.h"
 
 using namespace std;
 
@@ -110,6 +111,9 @@ void Game::init() {
     GUISounds::instance().init();
     Routines::instance().init(_gameId, this);
     Reputes::instance().init();
+
+    Surfaces::instance().init();
+    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
 
     Models::instance().init(_gameId);
     registerModelLoaders();

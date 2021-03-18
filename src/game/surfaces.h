@@ -15,29 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "walkmeshutil.h"
+#pragma once
 
-#include <unordered_set>
+#include <cstdint>
+#include <set>
+#include <vector>
 
-using namespace std;
+#include <boost/noncopyable.hpp>
+
+#include "surface.h"
 
 namespace reone {
 
-namespace render {
+namespace game {
 
-static const unordered_set<WalkmeshMaterial> g_nonWalkableMaterials {
-    WalkmeshMaterial::NonWalk,
-    WalkmeshMaterial::Obscuring,
-    WalkmeshMaterial::Snow,
-    WalkmeshMaterial::Transparent,
-    WalkmeshMaterial::DeepWater,
-    WalkmeshMaterial::Lava
+class Surfaces : boost::noncopyable {
+public:
+    static Surfaces &instance();
+
+    void init();
+
+    bool isWalkable(int index) const;
+
+    const Surface &getSurface(int index) const;
+    std::set<uint32_t> getWalkableSurfaceIndices() const;
+
+private:
+    std::vector<Surface> _surfaces;
 };
 
-bool isMaterialWalkable(WalkmeshMaterial material) {
-    return g_nonWalkableMaterials.count(material) == 0;
-}
-
-} // namespace render
+} // namespace game
 
 } // namespace reone

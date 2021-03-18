@@ -35,6 +35,10 @@ Walkmeshes &Walkmeshes::instance() {
     return instance;
 }
 
+void Walkmeshes::init(set<uint32_t> walkableSurfaces) {
+    _walkableSurfaces = move(walkableSurfaces);
+}
+
 void Walkmeshes::invalidateCache() {
     _cache.clear();
 }
@@ -54,7 +58,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
-        BwmReader bwm;
+        BwmReader bwm(_walkableSurfaces);
         bwm.load(wrap(data));
         walkmesh = bwm.walkmesh();
     }

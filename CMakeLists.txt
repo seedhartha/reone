@@ -193,7 +193,6 @@ set(RENDER_HEADERS
     src/render/walkmesh/bwmreader.h
     src/render/walkmesh/walkmesh.h
     src/render/walkmesh/walkmeshes.h
-    src/render/walkmesh/walkmeshutil.h
     src/render/window.h)
 
 set(RENDER_SOURCES
@@ -231,7 +230,6 @@ set(RENDER_SOURCES
     src/render/walkmesh/bwmreader.cpp
     src/render/walkmesh/walkmesh.cpp
     src/render/walkmesh/walkmeshes.cpp
-    src/render/walkmesh/walkmeshutil.cpp
     src/render/window.cpp)
 
 add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})
@@ -509,6 +507,8 @@ set(GAME_HEADERS
     src/game/script/routines.h
     src/game/script/runner.h
     src/game/soundsets.h
+    src/game/surface.h
+    src/game/surfaces.h
     src/game/types.h)
 
 set(GAME_SOURCES
@@ -631,7 +631,8 @@ set(GAME_SOURCES
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
     src/game/script/runner.cpp
-    src/game/soundsets.cpp)
+    src/game/soundsets.cpp
+    src/game/surfaces.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

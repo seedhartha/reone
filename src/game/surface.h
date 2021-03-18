@@ -17,14 +17,19 @@
 
 #pragma once
 
-#include "../types.h"
+#include <string>
 
 namespace reone {
 
-namespace render {
+namespace game {
 
-bool isMaterialWalkable(WalkmeshMaterial material);
+struct Surface {
+    std::string label;
+    bool walkable { false };
+    bool grass { false };
+    std::string soundResRef;
+};
 
-} // namespace render
+} // namespace game
 
 } // namespace reone
