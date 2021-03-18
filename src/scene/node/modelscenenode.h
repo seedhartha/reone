@@ -22,6 +22,7 @@
 
 #include "../../render/model/model.h"
 #include "../../render/shaders.h"
+#include "../../render/walkmesh/walkmesh.h"
 
 #include "../animation/scenenodeanimator.h"
 
@@ -73,6 +74,7 @@ public:
 
     Classification classification() const { return _classification; }
     std::shared_ptr<render::Model> model() const { return _model; }
+    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
     float alpha() const { return _alpha; }
     float projectileSpeed() const { return _projectileSpeed; }
     SceneNodeAnimator &animator() { return _animator; }
@@ -83,6 +85,7 @@ public:
     void setOnScreen(bool onScreen);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
+    void setWalkmesh(std::shared_ptr<render::Walkmesh> walkmesh);
 
     // Dynamic lighting
 
@@ -98,6 +101,7 @@ public:
 private:
     Classification _classification;
     std::shared_ptr<render::Model> _model;
+    std::shared_ptr<render::Walkmesh> _walkmesh;
     SceneNodeAnimator _animator;
 
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;

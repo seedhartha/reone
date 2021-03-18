@@ -38,7 +38,7 @@ class Walkmeshes : boost::noncopyable {
 public:
     static Walkmeshes &instance();
 
-    void init(std::set<uint32_t> walkableSurfaces);
+    void init(std::set<uint32_t> walkableSurfaces, std::set<uint32_t> grassSurfaces);
 
     void invalidateCache();
 
@@ -46,6 +46,8 @@ public:
 
 private:
     std::set<uint32_t> _walkableSurfaces;
+    std::set<uint32_t> _grassSurfaces;
+
     std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
 
     std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResourceType type);

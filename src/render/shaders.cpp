@@ -62,6 +62,7 @@ const int MAX_BONES = 128;
 const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 32;
 const int MAX_CHARS = 128;
+const int MAX_GRASS_CLUSTERS = 128;
 
 const float PI = 3.14159265359;
 const float GAMMA = 2.2;
@@ -143,6 +144,15 @@ struct Particles {
     Particle particles[MAX_PARTICLES];
 };
 
+struct GrassCluster {
+    vec4 positionVariant;
+};
+
+struct Grass {
+    vec2 quadSize;
+    GrassCluster clusters[MAX_GRASS_CLUSTERS];
+};
+
 struct Character {
     vec4 posScale;
     vec4 uv;
@@ -160,6 +170,7 @@ layout(std140) uniform Combined {
     Blur uBlur;
     Lighting uLighting;
     Particles uParticles;
+    Grass uGrass;
     Text uText;
 };
 
@@ -524,6 +535,29 @@ void main() {
 }
 )END";
 
+static constexpr GLchar kShaderVertexGrass[] = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aTexCoords;
+
+out vec2 fragTexCoords;
+flat out int fragInstanceID;
+
+void main() {
+    vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
+    vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
+
+    vec4 P = vec4(
+        uGrass.clusters[gl_InstanceID].positionVariant.xyz +
+            cameraRight * aPosition.x * uGrass.quadSize.x +
+            cameraUp * aPosition.y * uGrass.quadSize.y,
+        1.0);
+
+    gl_Position = uGeneral.projection * uGeneral.view * P;
+    fragTexCoords = aTexCoords;
+    fragInstanceID = gl_InstanceID;
+}
+)END";
+
 static constexpr GLchar kShaderVertexText[] = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
@@ -873,6 +907,25 @@ void main() {
 }
 )END";
 
+static constexpr GLchar kShaderFragmentGrass[] = R"END(
+uniform sampler2D uDiffuse;
+
+in vec2 fragTexCoords;
+flat in int fragInstanceID;
+
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorBright;
+
+void main() {
+    vec2 uv = vec2(0.5) * fragTexCoords;
+    uv.y += 0.5 * (int(uGrass.clusters[fragInstanceID].positionVariant[3]) / 2);
+    uv.x += 0.5 * (int(uGrass.clusters[fragInstanceID].positionVariant[3]) % 2);
+
+    fragColor = texture(uDiffuse, uv);
+    fragColorBright = vec4(vec3(0.0), 1.0);
+}
+)END";
+
 static constexpr GLchar kShaderFragmentIrradiance[] = R"END(
 uniform samplerCube uEnvmap;
 
@@ -1036,6 +1089,7 @@ void Shaders::init() {
     initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexSimple });
     initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexModel });
     initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexParticle });
+    initShader(ShaderName::VertexGrass, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexGrass });
     initShader(ShaderName::VertexText, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexText });
     initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
     initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
@@ -1045,6 +1099,7 @@ void Shaders::init() {
     initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBaseModel, kShaderFragmentBlinnPhong });
     initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderBaseModel, kShaderFragmentPBR });
     initShader(ShaderName::FragmentParticle, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentParticle });
+    initShader(ShaderName::FragmentGrass, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentGrass });
     initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentIrradiance });
     initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentPrefilter });
     initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentBRDF });
@@ -1065,6 +1120,7 @@ void Shaders::init() {
     initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
     initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });
     initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
+    initProgram(ShaderProgram::GrassGrass, { ShaderName::VertexGrass, ShaderName::FragmentGrass });
     initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
 
     glGenBuffers(1, &_uboCombined);
@@ -1212,6 +1268,9 @@ void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     }
     if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, particles), sizeof(ParticlesUniforms), &uniforms.particles);
+    }
+    if (uniforms.general.featureMask & UniformFeatureFlags::grass) {
+        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, grass), sizeof(GrassUniforms), &uniforms.grass);
     }
     if (uniforms.general.featureMask & UniformFeatureFlags::text) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, text), sizeof(TextUniforms), &uniforms.text);

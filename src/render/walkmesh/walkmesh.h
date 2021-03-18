@@ -37,15 +37,20 @@ public:
 
     const AABB &aabb() const { return _aabb; }
 
+    std::vector<glm::vec3> getGrassCentroids() const;
+
 private:
     struct Face {
         uint32_t material { 0 };
         std::vector<glm::vec3> vertices;
         glm::vec3 normal { 0.0f };
+        glm::vec3 centroid { 0.0f };
     };
 
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;
+    std::vector<Face> _grassFaces;
+
     AABB _aabb;
 
     void computeAABB();

@@ -29,7 +29,7 @@ namespace render {
 
 class BwmReader : public resource::BinaryReader {
 public:
-    BwmReader(std::set<uint32_t> walkableSurfaces);
+    BwmReader(std::set<uint32_t> walkableSurfaces, std::set<uint32_t> grassSurfaces);
 
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
@@ -40,6 +40,7 @@ private:
     };
 
     std::set<uint32_t> _walkableSurfaces;
+    std::set<uint32_t> _grassSurfaces;
 
     WalkmeshType _type { WalkmeshType::WOK };
 

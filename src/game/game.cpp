@@ -113,7 +113,7 @@ void Game::init() {
     Reputes::instance().init();
 
     Surfaces::instance().init();
-    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
+    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices(), Surfaces::instance().getGrassSurfaceIndices());
 
     Models::instance().init(_gameId);
     registerModelLoaders();

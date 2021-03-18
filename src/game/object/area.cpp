@@ -27,6 +27,7 @@
 #include "glm/gtx/norm.hpp"
 
 #include "../../common/log.h"
+#include "../../common/random.h"
 #include "../../common/streamutil.h"
 #include "../../render/meshes.h"
 #include "../../render/model/models.h"
@@ -36,6 +37,7 @@
 #include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
+#include "../../scene/node/grassnode.h"
 #include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
 
@@ -119,19 +121,18 @@ void Area::loadLYT() {
         if (!model) continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
+        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
 
         auto sceneNode = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Room, model, &_game->sceneGraph());
+        sceneNode->setWalkmesh(walkmesh);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
                 sceneNode->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
             }
         }
 
-        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
         auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
-
         _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
@@ -778,6 +779,20 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<ModelSceneNode> sceneNode(room.second->model());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
+        }
+        // Add grass node
+        if (_grass.texture) {
+            shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
+            if (walkmesh) {
+                auto grass = make_shared<GrassSceneNode>(&sceneGraph, _grass.texture, glm::vec2(_grass.quadSize));
+                for (auto &centroid : walkmesh->getGrassCentroids()) {
+                    GrassSceneNode::GrassCluster cluster;
+                    cluster.position = centroid;
+                    cluster.variant = random(0, 3); // TODO: use ARE probability
+                    grass->addCluster(move(cluster));
+                }
+                sceneGraph.addGrass(grass);
+            }
         }
     }
     for (auto &object : _objects) {
