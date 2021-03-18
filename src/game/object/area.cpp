@@ -30,6 +30,7 @@
 #include "../../common/streamutil.h"
 #include "../../render/meshes.h"
 #include "../../render/model/models.h"
+#include "../../render/textures.h"
 #include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/format/lytreader.h"
 #include "../../resource/format/visreader.h"
@@ -183,6 +184,7 @@ void Area::loadARE(const GffStruct &are) {
     loadScripts(are);
     loadMap(are);
     loadStealthXP(are);
+    loadGrass(are);
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
@@ -224,6 +226,21 @@ void Area::loadStealthXP(const GffStruct &are) {
     _stealthXPEnabled = are.getBool("StealthXPEnabled");
     _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
     _maxStealthXP = are.getInt("StealthXPMax");
+}
+
+void Area::loadGrass(const GffStruct &are) {
+    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
+    if (!texName.empty()) {
+        _grass.texture = Textures::instance().get(texName, TextureUsage::Diffuse);
+    }
+    _grass.density = are.getFloat("Grass_Density");
+    _grass.quadSize = are.getFloat("Grass_QuadSize");
+    _grass.ambient = are.getFloat("Grass_Ambient");
+    _grass.diffuse = are.getFloat("Grass_Diffuse");
+    _grass.probability.lowerLeft = are.getFloat("Grass_Prob_LL");
+    _grass.probability.lowerRight = are.getFloat("Grass_Prob_LR");
+    _grass.probability.upperLeft = are.getFloat("Grass_Prob_UL");
+    _grass.probability.upperRight = are.getFloat("Grass_Prob_UR");
 }
 
 void Area::loadGIT(const GffStruct &git) {

@@ -167,6 +167,22 @@ public:
     // END Scripts
 
 private:
+    struct GrassProbability {
+        float lowerLeft { 0.25f };
+        float lowerRight { 0.25f };
+        float upperLeft { 0.25f };
+        float upperRight { 0.25f };
+    };
+
+    struct Grass {
+        std::shared_ptr<render::Texture> texture;
+        float density { 0.0f };
+        float quadSize { 0.0f };
+        float ambient { 1.0f };
+        float diffuse { 1.0f };
+        GrassProbability probability;
+    };
+
     Game *_game;
 
     CollisionDetector _collisionDetector;
@@ -184,6 +200,7 @@ private:
     Map _map;
     bool _unescapable { false };
     CreatureFinder _creatureFinder;
+    Grass _grass;
 
     // Scripts
 
@@ -256,6 +273,7 @@ private:
     void loadScripts(const resource::GffStruct &are);
     void loadMap(const resource::GffStruct &are);
     void loadStealthXP(const resource::GffStruct &are);
+    void loadGrass(const resource::GffStruct &are);
 
     void loadProperties(const resource::GffStruct &git);
     void loadCreatures(const resource::GffStruct &git);
