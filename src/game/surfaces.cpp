@@ -63,13 +63,21 @@ const Surface &Surfaces::getSurface(int index) const {
 }
 
 set<uint32_t> Surfaces::getWalkableSurfaceIndices() const {
+    return getSurfaceIndices([](auto &surface) { return surface.walkable; });
+}
+
+set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> &pred) const {
     set<uint32_t> result;
     for (size_t i = 0; i < _surfaces.size(); ++i) {
-        if (_surfaces[i].walkable) {
+        if (pred(_surfaces[i])) {
             result.insert(static_cast<uint32_t>(i));
         }
     }
     return move(result);
+}
+
+set<uint32_t> Surfaces::getGrassSurfaceIndices() const {
+    return getSurfaceIndices([](auto &surface) { return surface.grass; });
 }
 
 } // namespace game
