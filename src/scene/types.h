@@ -27,7 +27,8 @@ enum class SceneNodeType {
     ModelNode,
     Camera,
     Light,
-    Emitter
+    Emitter,
+    Grass
 };
 
 struct AnimationFlags {
