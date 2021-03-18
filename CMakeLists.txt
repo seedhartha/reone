@@ -287,6 +287,7 @@ set(SCENE_HEADERS
     src/scene/animation/scenenodestate.h
     src/scene/node/cameranode.h
     src/scene/node/emitternode.h
+    src/scene/node/grassnode.h
     src/scene/node/lightnode.h
     src/scene/node/meshnode.h
     src/scene/node/modelnodescenenode.h
@@ -303,6 +304,7 @@ set(SCENE_SOURCES
     src/scene/animation/scenenodeanimator.cpp
     src/scene/node/cameranode.cpp
     src/scene/node/emitternode.cpp
+    src/scene/node/grassnode.cpp
     src/scene/node/lightnode.cpp
     src/scene/node/meshnode.cpp
     src/scene/node/modelnodescenenode.cpp

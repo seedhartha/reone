@@ -35,7 +35,7 @@ public:
 
     void update(float dt) override;
 
-    void drawSingle(bool shadowPass) override;
+    void drawSingle(bool shadowPass);
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

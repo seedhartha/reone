@@ -61,9 +61,6 @@ void SceneNode::draw() {
     }
 }
 
-void SceneNode::drawSingle(bool shadowPass) {
-}
-
 glm::vec3 SceneNode::getOrigin() const {
     return glm::vec3(_absoluteTransform[3]);
 }
