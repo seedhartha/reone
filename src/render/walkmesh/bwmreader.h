@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <set>
+
 #include "../../resource/format/binreader.h"
 
 #include "walkmesh.h"
@@ -27,7 +29,7 @@ namespace render {
 
 class BwmReader : public resource::BinaryReader {
 public:
-    BwmReader();
+    BwmReader(std::set<uint32_t> walkableSurfaces);
 
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
@@ -36,6 +38,8 @@ private:
         PWK_DWK = 0,
         WOK = 1
     };
+
+    std::set<uint32_t> _walkableSurfaces;
 
     WalkmeshType _type { WalkmeshType::WOK };
 
@@ -57,7 +61,7 @@ private:
 
     std::vector<float> _vertices;
     std::vector<uint32_t> _indices;
-    std::vector<WalkmeshMaterial> _materials;
+    std::vector<uint32_t> _materials;
     std::vector<float> _normals;
 
     std::shared_ptr<Walkmesh> _walkmesh;

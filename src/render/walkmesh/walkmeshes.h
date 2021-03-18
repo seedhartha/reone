@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <set>
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -37,11 +38,14 @@ class Walkmeshes : boost::noncopyable {
 public:
     static Walkmeshes &instance();
 
+    void init(std::set<uint32_t> walkableSurfaces);
+
     void invalidateCache();
 
     std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type);
 
 private:
+    std::set<uint32_t> _walkableSurfaces;
     std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
 
     std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResourceType type);

@@ -19,15 +19,15 @@
 
 #include "glm/ext.hpp"
 
-#include "walkmeshutil.h"
-
 using namespace std;
 
 namespace reone {
 
 namespace render {
 
-BwmReader::BwmReader() : BinaryReader(8, "BWM V1.0") {
+BwmReader::BwmReader(set<uint32_t> walkableSurfaces) :
+    BinaryReader(8, "BWM V1.0"),
+    _walkableSurfaces(move(walkableSurfaces)) {
 }
 
 void BwmReader::doLoad() {
@@ -94,8 +94,7 @@ void BwmReader::loadMaterials() {
     seek(_offsetMaterials);
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
-        auto material = static_cast<WalkmeshMaterial>(readUint32());
-        _materials.push_back(material);
+        _materials.push_back(readUint32());
     }
 }
 
@@ -114,8 +113,8 @@ void BwmReader::makeWalkmesh() {
     _walkmesh = make_shared<Walkmesh>();
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
-        WalkmeshMaterial material = _materials[i];
-        bool walkable = isMaterialWalkable(material);
+        uint32_t material = _materials[i];
+        bool walkable = _walkableSurfaces.count(material) > 0;
 
         uint32_t *indices = &_indices[3 * i + 0];
 

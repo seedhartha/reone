@@ -72,29 +72,6 @@ enum class CubeMapFace {
     NegativeZ = 5
 };
 
-enum class WalkmeshMaterial {
-    Dirt = 1,
-    Obscuring = 2,
-    Grass = 3,
-    Stone = 4,
-    Wood = 5,
-    Water = 6,
-    NonWalk = 7,
-    Transparent = 8,
-    Carpet = 9,
-    Metal = 10,
-    Puddles = 11,
-    Swamp = 12,
-    Mud = 13,
-    Leaves = 14,
-    Lava = 15,
-    BottomlessPit = 16,
-    DeepWater = 17,
-    Door = 18,
-    Snow = 19,
-    Sand = 20
-};
-
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };

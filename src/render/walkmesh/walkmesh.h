@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
@@ -38,7 +39,7 @@ public:
 
 private:
     struct Face {
-        WalkmeshMaterial material { WalkmeshMaterial::Dirt };
+        uint32_t material { 0 };
         std::vector<glm::vec3> vertices;
         glm::vec3 normal { 0.0f };
     };
