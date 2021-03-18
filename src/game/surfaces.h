@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <set>
 #include <vector>
 
@@ -39,9 +40,12 @@ public:
 
     const Surface &getSurface(int index) const;
     std::set<uint32_t> getWalkableSurfaceIndices() const;
+    std::set<uint32_t> getGrassSurfaceIndices() const;
 
 private:
     std::vector<Surface> _surfaces;
+
+    inline std::set<uint32_t> getSurfaceIndices(const std::function<bool(const Surface &)> &pred) const;
 };
 
 } // namespace game
