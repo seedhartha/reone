@@ -25,9 +25,10 @@ namespace reone {
 
 namespace render {
 
-BwmReader::BwmReader(set<uint32_t> walkableSurfaces) :
+BwmReader::BwmReader(set<uint32_t> walkableSurfaces, set<uint32_t> grassSurfaces) :
     BinaryReader(8, "BWM V1.0"),
-    _walkableSurfaces(move(walkableSurfaces)) {
+    _walkableSurfaces(move(walkableSurfaces)),
+    _grassSurfaces(move(grassSurfaces)) {
 }
 
 void BwmReader::doLoad() {
@@ -114,9 +115,9 @@ void BwmReader::makeWalkmesh() {
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
         uint32_t material = _materials[i];
-        bool walkable = _walkableSurfaces.count(material) > 0;
-
         uint32_t *indices = &_indices[3 * i + 0];
+        bool grass = _grassSurfaces.count(material) > 0;
+        bool walkable = _walkableSurfaces.count(material) > 0;
 
         Walkmesh::Face face;
         face.material = material;
@@ -124,7 +125,14 @@ void BwmReader::makeWalkmesh() {
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[1]]));
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
         face.normal = glm::make_vec3(&_normals[3 * i]);
+        for (int i = 0; i < 3; ++i) {
+            face.centroid += face.vertices[i];
+        }
+        face.centroid /= 3.0f;
 
+        if (grass) {
+            _walkmesh->_grassFaces.push_back(face);
+        }
         if (walkable) {
             _walkmesh->_walkableFaces.push_back(move(face));
         } else {

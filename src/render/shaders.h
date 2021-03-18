@@ -49,6 +49,7 @@ enum class ShaderProgram {
     ModelBlinnPhong,
     ModelPBR,
     ParticleParticle,
+    GrassGrass,
     TextText
 };
 
@@ -69,6 +70,7 @@ struct UniformFeatureFlags {
     static constexpr int customMat = 0x2000;
     static constexpr int blur = 0x4000;
     static constexpr int text = 0x8000;
+    static constexpr int grass = 0x10000;
 };
 
 struct GeneralUniforms {
@@ -153,6 +155,16 @@ struct ParticlesUniforms {
     ShaderParticle particles[kMaxParticles];
 };
 
+struct ShaderGrassCluster {
+    glm::vec4 positionVariant { 0.0f }; /**< fourth component is a variant (0-3) */
+};
+
+struct GrassUniforms {
+    glm::vec2 quadSize { 0.0f };
+    char padding[8];
+    ShaderGrassCluster clusters[kMaxGrassClusters];
+};
+
 struct ShaderCharacter {
     glm::vec4 posScale { 0.0f };
     glm::vec4 uv { 0.0f };
@@ -173,6 +185,7 @@ struct ShaderUniforms {
     // Buffered separately
     LightingUniforms lighting;
     ParticlesUniforms particles;
+    GrassUniforms grass;
     TextUniforms text;
 
     // Separate UBOs
@@ -194,6 +207,7 @@ private:
         VertexSimple,
         VertexModel,
         VertexParticle,
+        VertexGrass,
         VertexText,
         GeometryDepth,
         FragmentColor,
@@ -203,6 +217,7 @@ private:
         FragmentBlinnPhong,
         FragmentPBR,
         FragmentParticle,
+        FragmentGrass,
         FragmentIrradiance,
         FragmentPrefilter,
         FragmentBRDF,

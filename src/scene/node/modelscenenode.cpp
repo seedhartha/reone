@@ -336,6 +336,10 @@ void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights)
     _lightsAffectedBy = lights;
 }
 
+void ModelSceneNode::setWalkmesh(shared_ptr<Walkmesh> walkmesh) {
+    _walkmesh = move(walkmesh);
+}
+
 void ModelSceneNode::refreshAABB() {
     _aabb.reset();
 

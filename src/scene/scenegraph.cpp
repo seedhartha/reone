@@ -23,6 +23,7 @@
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"
+#include "node/grassnode.h"
 #include "node/lightnode.h"
 #include "node/modelnodescenenode.h"
 #include "node/modelscenenode.h"
@@ -40,6 +41,7 @@ SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 
 void SceneGraph::clear() {
     _roots.clear();
+    _grass.clear();
 }
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
@@ -51,6 +53,10 @@ void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
     if (maybeRoot != _roots.end()) {
         _roots.erase(maybeRoot);
     }
+}
+
+void SceneGraph::addGrass(shared_ptr<GrassSceneNode> node) {
+    _grass.push_back(move(node));
 }
 
 void SceneGraph::prepareFrame() {
@@ -68,6 +74,7 @@ void SceneGraph::prepareFrame() {
     prepareOpaqueMeshes();
     prepareTransparentMeshes();
     prepareParticles();
+    prepareGrass();
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -213,6 +220,12 @@ void SceneGraph::prepareParticles() {
     }
 }
 
+void SceneGraph::prepareGrass() {
+    for (auto &grass : _grass) {
+        grass->sortClustersBackToFront(*_activeCamera);
+    }
+}
+
 void SceneGraph::update(float dt) {
     if (!_update) return;
 
@@ -260,6 +273,11 @@ void SceneGraph::draw(bool shadowPass) {
     // Render transparent meshes
     for (auto &mesh : _transparentMeshes) {
         mesh->drawSingle(false);
+    }
+
+    // Render grass
+    for (auto &grass : _grass) {
+        grass->drawSingle();
     }
 
     // Render particles

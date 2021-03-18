@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <memory>
+#include <set>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
@@ -36,6 +37,7 @@ constexpr float kDefaultExposure = 1.0f;
 
 class CameraSceneNode;
 class EmitterSceneNode;
+class GrassSceneNode;
 class LightSceneNode;
 class ModelNodeSceneNode;
 class Particle;
@@ -49,8 +51,11 @@ public:
     void draw(bool shadowPass = false);
 
     void clear();
+
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
+
+    void addGrass(std::shared_ptr<GrassSceneNode> node);
 
     /**
      * Prepares this scene graph for rendering the next frame. Meshes, lights
@@ -93,14 +98,17 @@ public:
 private:
     render::GraphicsOptions _opts;
 
+    std::shared_ptr<CameraSceneNode> _activeCamera;
     std::vector<std::shared_ptr<SceneNode>> _roots;
+    std::vector<std::shared_ptr<GrassSceneNode>> _grass;
+
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<std::pair<EmitterSceneNode *, Particle *>> _particles;
-    std::shared_ptr<CameraSceneNode> _activeCamera;
+
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
     bool _update { true };
@@ -123,6 +131,7 @@ private:
     void prepareOpaqueMeshes();
     void prepareTransparentMeshes();
     void prepareParticles();
+    void prepareGrass();
 };
 
 } // namespace scene
