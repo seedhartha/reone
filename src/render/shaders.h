@@ -185,11 +185,11 @@ struct ShaderUniforms {
     // Buffered separately
     LightingUniforms lighting;
     ParticlesUniforms particles;
-    GrassUniforms grass;
     TextUniforms text;
 
     // Separate UBOs
     SkeletalUniforms skeletal;
+    GrassUniforms grass;
 };
 
 class Shaders : boost::noncopyable {
@@ -233,6 +233,7 @@ private:
     uint32_t _activeOrdinal { 0 };
     uint32_t _uboCombined { 0 };
     uint32_t _uboSkeletal { 0 };
+    uint32_t _uboGrass { 0 };
 
     ~Shaders();
 

@@ -28,7 +28,7 @@ constexpr int kMaxBones = 128;
 constexpr int kMaxLights = 16;
 constexpr int kMaxParticles = 32;
 constexpr int kMaxCharacters = 128;
-constexpr int kMaxGrassClusters = 128;
+constexpr int kMaxGrassClusters = 256;
 
 enum class PixelFormat {
     Grayscale,
