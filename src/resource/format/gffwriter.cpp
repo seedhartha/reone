@@ -53,7 +53,8 @@ static const unordered_map<ResourceType, string> g_signatures {
     { ResourceType::Utp, "UTP" },
     { ResourceType::Uts, "UTS" },
     { ResourceType::Utt, "UTT" },
-    { ResourceType::Utw, "UTW" }
+    { ResourceType::Utw, "UTW" },
+    { ResourceType::Pth, "PTH" }
 };
 
 GffWriter::GffWriter(ResourceType resType, const shared_ptr<GffStruct> &root) : _resType(resType), _root(root) {
