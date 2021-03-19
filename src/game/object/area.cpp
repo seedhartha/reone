@@ -155,6 +155,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 
 void Area::loadPTH() {
     shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Pth));
+    if (!pth) return;
 
     Path path;
     path.load(*pth);
