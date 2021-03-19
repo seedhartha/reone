@@ -41,7 +41,7 @@ SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 
 void SceneGraph::clear() {
     _roots.clear();
-    _grass.clear();
+    _grass.reset();
 }
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
@@ -55,8 +55,8 @@ void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
     }
 }
 
-void SceneGraph::addGrass(shared_ptr<GrassSceneNode> node) {
-    _grass.push_back(move(node));
+void SceneGraph::setGrass(shared_ptr<GrassSceneNode> node) {
+    _grass = move(node);
 }
 
 void SceneGraph::prepareFrame() {
@@ -221,8 +221,28 @@ void SceneGraph::prepareParticles() {
 }
 
 void SceneGraph::prepareGrass() {
-    for (auto &grass : _grass) {
-        grass->sortClustersBackToFront(*_activeCamera);
+    static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+
+    _grassClusters.clear();
+
+    if (_grass && _activeCamera) {
+        vector<pair<GrassCluster, float>> clustersZ;
+        for (auto &cluster : _grass->clusters()) {
+            glm::vec3 screen(glm::project(cluster.position, _activeCamera->view(), _activeCamera->projection(), viewport));
+            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                clustersZ.push_back(make_pair(cluster, screen.z));
+            }
+        }
+        sort(clustersZ.begin(), clustersZ.end(), [](auto &left, auto &right) {
+            return left.second > right.second;
+        });
+        int numClustersToErase = glm::max(0, static_cast<int>(clustersZ.size()) - kMaxGrassClusters);
+        if (numClustersToErase > 0) {
+            clustersZ.erase(clustersZ.begin(), clustersZ.begin() + numClustersToErase);
+        }
+        for (auto &cluster : clustersZ) {
+            _grassClusters.push_back(move(cluster.first));
+        }
     }
 }
 
@@ -276,8 +296,8 @@ void SceneGraph::draw(bool shadowPass) {
     }
 
     // Render grass
-    for (auto &grass : _grass) {
-        grass->drawSingle();
+    if (_grass && !_grassClusters.empty()) {
+        _grass->drawClusters(_grassClusters);
     }
 
     // Render particles

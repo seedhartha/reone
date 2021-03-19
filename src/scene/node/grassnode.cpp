@@ -17,19 +17,13 @@
 
 #include "grassnode.h"
 
-#include <algorithm>
 #include <stdexcept>
-#include <unordered_map>
-
-#include "glm/gtx/norm.hpp"
 
 #include "../../render/meshes.h"
 #include "../../render/shaders.h"
 #include "../../render/stateutil.h"
 
 #include "../scenegraph.h"
-
-#include "cameranode.h"
 
 using namespace std;
 
@@ -58,33 +52,21 @@ void GrassSceneNode::addCluster(GrassCluster cluster) {
     _clusters.push_back(move(cluster));
 }
 
-void GrassSceneNode::sortClustersBackToFront(const CameraSceneNode &camera) {
-    unordered_map<GrassCluster *, float> clusterZ;
-    for (auto &cluster : _clusters) {
-        glm::vec4 screenCoords(camera.projection() * camera.view() * glm::vec4(cluster.position, 1.0f));
-        screenCoords /= screenCoords.w;
-        clusterZ.insert(make_pair(&cluster, screenCoords.z));
-    }
-    sort(_clusters.begin(), _clusters.end(), [&](auto &left, auto &right) {
-        return clusterZ.find(&left)->second > clusterZ.find(&right)->second;
-    });
-}
-
-void GrassSceneNode::drawSingle() {
-    if (_clusters.empty()) return;
-
+void GrassSceneNode::drawClusters(const vector<GrassCluster> &clusters) {
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.general.featureMask |= UniformFeatureFlags::grass;
-    for (size_t i = 0; i < _clusters.size(); ++i) {
+
+    int numClusters = static_cast<int>(clusters.size());
+    for (int i = 0; i < numClusters; ++i) {
         uniforms.grass.quadSize = _quadSize;
-        uniforms.grass.clusters[i].positionVariant = glm::vec4(_clusters[i].position, static_cast<float>(_clusters[i].variant));
+        uniforms.grass.clusters[i].positionVariant = glm::vec4(clusters[i].position, static_cast<float>(clusters[i].variant));
     }
 
     Shaders::instance().activate(ShaderProgram::GrassGrass, uniforms);
-    Meshes::instance().getQuadFlipY()->drawInstanced(static_cast<int>(_clusters.size()));
+    Meshes::instance().getQuadFlipY()->drawInstanced(numClusters);
 }
 
 } // namespace scene

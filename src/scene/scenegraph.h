@@ -29,6 +29,8 @@
 #include "../render/shaders.h"
 #include "../render/types.h"
 
+#include "grasscluster.h"
+
 namespace reone {
 
 namespace scene {
@@ -55,7 +57,7 @@ public:
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
-    void addGrass(std::shared_ptr<GrassSceneNode> node);
+    void setGrass(std::shared_ptr<GrassSceneNode> node);
 
     /**
      * Prepares this scene graph for rendering the next frame. Meshes, lights
@@ -98,9 +100,9 @@ public:
 private:
     render::GraphicsOptions _opts;
 
-    std::shared_ptr<CameraSceneNode> _activeCamera;
     std::vector<std::shared_ptr<SceneNode>> _roots;
-    std::vector<std::shared_ptr<GrassSceneNode>> _grass;
+    std::shared_ptr<GrassSceneNode> _grass;
+    std::shared_ptr<CameraSceneNode> _activeCamera;
 
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
     std::vector<ModelNodeSceneNode *> _transparentMeshes;
@@ -108,6 +110,7 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<std::pair<EmitterSceneNode *, Particle *>> _particles;
+    std::vector<GrassCluster> _grassClusters;
 
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

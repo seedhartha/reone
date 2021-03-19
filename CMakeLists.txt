@@ -285,6 +285,7 @@ set(SCENE_HEADERS
     src/scene/animation/properties.h
     src/scene/animation/scenenodeanimator.h
     src/scene/animation/scenenodestate.h
+    src/scene/grasscluster.h
     src/scene/node/cameranode.h
     src/scene/node/emitternode.h
     src/scene/node/grassnode.h
