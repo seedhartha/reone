@@ -236,8 +236,8 @@ void Area::loadGrass(const GffStruct &are) {
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
-    _grass.ambient = are.getFloat("Grass_Ambient");
-    _grass.diffuse = are.getFloat("Grass_Diffuse");
+    _grass.ambient = are.getInt("Grass_Ambient");
+    _grass.diffuse = are.getInt("Grass_Diffuse");
     _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
     _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
     _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
@@ -772,6 +772,14 @@ void Area::destroyObject(const SpatialObject &object) {
     _objectsToDestroy.insert(object.id());
 }
 
+// Adapted from https://math.stackexchange.com/q/18686
+static glm::vec3 getRandomPointInTriangle(const Walkmesh::Face &face) {
+    float r1sqrt = glm::sqrt(random(0.0f, 1.0f));
+    float r2 = random(0.0f, 1.0f);
+
+    return (1.0f - r1sqrt) * face.vertices[0] + r1sqrt * (1.0f - r2) * face.vertices[1] + r2 * r1sqrt * face.vertices[2];
+}
+
 void Area::fill(SceneGraph &sceneGraph) {
     sceneGraph.clear();
 
@@ -791,11 +799,13 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (grass) {
             shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
             if (walkmesh) {
-                for (auto &centroid : walkmesh->getGrassCentroids()) {
-                    GrassCluster cluster;
-                    cluster.position = centroid;
-                    cluster.variant = getRandomGrassVariant();
-                    grass->addCluster(move(cluster));
+                for (auto &face : walkmesh->grassFaces()) {
+                    for (int i = 0; i < static_cast<int>(_grass.density); ++i) {
+                        GrassCluster cluster;
+                        cluster.position = getRandomPointInTriangle(face);
+                        cluster.variant = getRandomGrassVariant();
+                        grass->addCluster(move(cluster));
+                    }
                 }
             }
         }
