@@ -45,6 +45,7 @@ public:
     std::shared_ptr<Mesh> getQuadFlipXY() const { return _quadFlipXY; }
     std::shared_ptr<Mesh> getQuadNDC() const { return _quadNDC; }
     std::shared_ptr<Mesh> getBillboard() const { return _billboard; }
+    std::shared_ptr<Mesh> getGrass() const { return _grass; }
     std::shared_ptr<Mesh> getCube() const { return _cube; }
     std::shared_ptr<Mesh> getSphere() const { return _sphere; }
     std::shared_ptr<Mesh> getCubemap() const { return _cubemap; }
@@ -58,9 +59,10 @@ private:
     std::shared_ptr<Mesh> _quadFlipY;
     std::shared_ptr<Mesh> _quadFlipXY;
     std::shared_ptr<Mesh> _quadNDC;
+    std::shared_ptr<Mesh> _billboard;
+    std::shared_ptr<Mesh> _grass;
     std::shared_ptr<Mesh> _cube;
     std::shared_ptr<Mesh> _sphere;
-    std::shared_ptr<Mesh> _billboard;
     std::shared_ptr<Mesh> _cubemap;
     std::shared_ptr<Mesh> _aabb;
 };

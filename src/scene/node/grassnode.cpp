@@ -66,7 +66,7 @@ void GrassSceneNode::drawClusters(const vector<GrassCluster> &clusters) {
     }
 
     Shaders::instance().activate(ShaderProgram::GrassGrass, uniforms);
-    Meshes::instance().getQuadFlipY()->drawInstanced(numClusters);
+    Meshes::instance().getGrass()->drawInstanced(numClusters);
 }
 
 } // namespace scene
