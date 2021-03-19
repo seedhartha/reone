@@ -26,7 +26,7 @@ namespace reone {
 
 namespace render {
 
-// Quad
+// Quads
 
 static const vector<float> g_quadVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -63,11 +63,25 @@ static const vector<float> g_quadNDCVertices {
     -1.0f, -1.0f, 0.0f, 0.0f, 0.0f
 };
 
+static const vector<float> g_billboardVertices = {
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+};
+
+static const vector<float> g_grassVertices = {
+    -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
+     0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+     0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
+    -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
+};
+
 static const vector<uint16_t> g_quadIndices = { 0, 1, 2, 2, 3, 0 };
 
 static const Mesh::VertexOffsets g_quadOffsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, -1, -1, 5 * sizeof(float) };
 
-// END Quad
+// END Quads
 
 // Cube
 
@@ -94,23 +108,6 @@ static const vector<uint16_t> g_cubeIndices = {
 static const Mesh::VertexOffsets g_cubeOffsets = { 0, -1, -1, -1, -1, -1, -1, -1, 3 * sizeof(float) };
 
 // END Cube
-
-// Billboard
-
-static const vector<float> g_billboardVertices = {
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-};
-
-static const vector<uint16_t> g_billboardIndices = {
-    0, 1, 2, 2, 3, 0
-};
-
-static Mesh::VertexOffsets g_billboardOffsets = { 0, -1, 3 * sizeof(float), -1, -1, -1, -1, -1, 5 * sizeof(float) };
-
-// END Billboard
 
 // Cubemap
 
@@ -262,9 +259,10 @@ void Meshes::init() {
         _quadFlipY = getMesh(4, g_quadFlipYVertices, g_quadIndices, g_quadOffsets);
         _quadFlipXY = getMesh(4, g_quadFlipXYVertices, g_quadIndices, g_quadOffsets);
         _quadNDC = getMesh(4, g_quadNDCVertices, g_quadIndices, g_quadOffsets);
+        _billboard = getMesh(4, g_billboardVertices, g_quadIndices, g_quadOffsets);
+        _grass = getMesh(4, g_grassVertices, g_quadIndices, g_quadOffsets);
         _cube = getMesh(8, g_cubeVertices, g_cubeIndices, g_cubeOffsets);
         _sphere = getSphereMesh();
-        _billboard = getMesh(4, g_billboardVertices, g_billboardIndices, g_billboardOffsets);
         _cubemap = getMesh(24, g_cubemapVertices, g_cubemapIndices, g_cubemapOffsets);
         _aabb = getMesh(8, g_aabbVertices, g_aabbIndices, g_aabbOffsets, Mesh::DrawMode::Lines);
 
@@ -283,8 +281,9 @@ void Meshes::deinit() {
         _quadFlipY.reset();
         _quadFlipXY.reset();
         _quadNDC.reset();
-        _cube.reset();
         _billboard.reset();
+        _grass.reset();
+        _cube.reset();
         _cubemap.reset();
         _aabb.reset();
 
