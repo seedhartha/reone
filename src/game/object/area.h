@@ -171,8 +171,8 @@ private:
         std::shared_ptr<render::Texture> texture;
         float density { 0.0f };
         float quadSize { 0.0f };
-        float ambient { 1.0f };
-        float diffuse { 1.0f };
+        int ambient { 0 };
+        int diffuse { 0 };
         float probabilities[4];
     };
 

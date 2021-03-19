@@ -33,13 +33,6 @@ class BwmReader;
 
 class Walkmesh : boost::noncopyable {
 public:
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const;
-
-    const AABB &aabb() const { return _aabb; }
-
-    std::vector<glm::vec3> getGrassCentroids() const;
-
-private:
     struct Face {
         uint32_t material { 0 };
         std::vector<glm::vec3> vertices;
@@ -47,6 +40,12 @@ private:
         glm::vec3 centroid { 0.0f };
     };
 
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance) const;
+
+    const std::vector<Face> &grassFaces() const { return _grassFaces; }
+    const AABB &aabb() const { return _aabb; }
+
+private:
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;
     std::vector<Face> _grassFaces;

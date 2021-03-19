@@ -65,14 +65,6 @@ bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walka
     return true;
 }
 
-vector<glm::vec3> Walkmesh::getGrassCentroids() const {
-    vector<glm::vec3> result;
-    for (auto &face : _grassFaces) {
-        result.push_back(face.centroid);
-    }
-    return move(result);
-}
-
 } // namespace render
 
 } // namespace reone
