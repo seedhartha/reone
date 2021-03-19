@@ -167,20 +167,13 @@ public:
     // END Scripts
 
 private:
-    struct GrassProbability {
-        float lowerLeft { 0.25f };
-        float lowerRight { 0.25f };
-        float upperLeft { 0.25f };
-        float upperRight { 0.25f };
-    };
-
     struct Grass {
         std::shared_ptr<render::Texture> texture;
         float density { 0.0f };
         float quadSize { 0.0f };
         float ambient { 1.0f };
         float diffuse { 1.0f };
-        GrassProbability probability;
+        float probabilities[4];
     };
 
     Game *_game;
@@ -259,6 +252,8 @@ private:
     void printDebugInfo(const SpatialObject &object);
 
     bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
+
+    int getRandomGrassVariant() const;
 
     // Loading
 

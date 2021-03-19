@@ -17,33 +17,15 @@
 
 #pragma once
 
-#include "../../render/texture.h"
-
-#include "../grasscluster.h"
-
-#include "scenenode.h"
+#include "glm/vec3.hpp"
 
 namespace reone {
 
 namespace scene {
 
-class CameraSceneNode;
-
-class GrassSceneNode : public SceneNode {
-public:
-    GrassSceneNode(SceneGraph *graph, std::shared_ptr<render::Texture> texture, glm::vec2 quadSize);
-
-    void clear();
-    void addCluster(GrassCluster cluster);
-
-    void drawClusters(const std::vector<GrassCluster> &clusters);
-
-    const std::vector<GrassCluster> &clusters() const { return _clusters; }
-
-private:
-    std::shared_ptr<render::Texture> _texture;
-    glm::vec2 _quadSize { 0.0f };
-    std::vector<GrassCluster> _clusters;
+struct GrassCluster {
+    glm::vec3 position { 0.0f };
+    int variant { 0 };
 };
 
 } // namespace scene

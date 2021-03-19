@@ -238,10 +238,10 @@ void Area::loadGrass(const GffStruct &are) {
     _grass.quadSize = are.getFloat("Grass_QuadSize");
     _grass.ambient = are.getFloat("Grass_Ambient");
     _grass.diffuse = are.getFloat("Grass_Diffuse");
-    _grass.probability.lowerLeft = are.getFloat("Grass_Prob_LL");
-    _grass.probability.lowerRight = are.getFloat("Grass_Prob_LR");
-    _grass.probability.upperLeft = are.getFloat("Grass_Prob_UL");
-    _grass.probability.upperRight = are.getFloat("Grass_Prob_UR");
+    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
+    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
+    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
+    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
 }
 
 void Area::loadGIT(const GffStruct &git) {
@@ -775,32 +775,42 @@ void Area::destroyObject(const SpatialObject &object) {
 void Area::fill(SceneGraph &sceneGraph) {
     sceneGraph.clear();
 
+    // Room models + grass
+
+    shared_ptr<GrassSceneNode> grass;
+    if (_grass.texture) {
+        grass = make_shared<GrassSceneNode>(&sceneGraph, _grass.texture, glm::vec2(_grass.quadSize));
+        sceneGraph.setGrass(grass);
+    }
+
     for (auto &room : _rooms) {
         shared_ptr<ModelSceneNode> sceneNode(room.second->model());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
-        // Add grass node
-        if (_grass.texture) {
+        if (grass) {
             shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
             if (walkmesh) {
-                auto grass = make_shared<GrassSceneNode>(&sceneGraph, _grass.texture, glm::vec2(_grass.quadSize));
                 for (auto &centroid : walkmesh->getGrassCentroids()) {
-                    GrassSceneNode::GrassCluster cluster;
+                    GrassCluster cluster;
                     cluster.position = centroid;
-                    cluster.variant = random(0, 3); // TODO: use ARE probability
+                    cluster.variant = getRandomGrassVariant();
                     grass->addCluster(move(cluster));
                 }
-                sceneGraph.addGrass(grass);
             }
         }
     }
+
+    // Objects
+
     for (auto &object : _objects) {
         shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
     }
+
+    // Path points
 
     if (g_debugPath) {
         shared_ptr<Mesh> cubeMesh(Meshes::instance().getCube());
@@ -810,6 +820,19 @@ void Area::fill(SceneGraph &sceneGraph) {
             sceneGraph.addRoot(cubeNode);
         }
     }
+}
+
+int Area::getRandomGrassVariant() const {
+    float sum = _grass.probabilities[0] + _grass.probabilities[1] + _grass.probabilities[2] + _grass.probabilities[3];
+    float val = random(0.0f, 1.0f) * sum;
+    float upper = 0.0f;
+
+    for (int i = 0; i < 3; ++i) {
+        upper += _grass.probabilities[i];
+        if (val < upper) return i;
+    }
+
+    return 3;
 }
 
 glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
