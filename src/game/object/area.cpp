@@ -69,6 +69,7 @@ static constexpr float kDefaultFieldOfView = 75.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kCreatureObstacleTestZ = 0.1f;
 static constexpr int kMaxSoundCount = 4;
+static constexpr float kGrassDensityFactor = 0.25f;
 
 static bool g_debugPath = false;
 
@@ -801,7 +802,7 @@ void Area::fill(SceneGraph &sceneGraph) {
             shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
             if (walkmesh) {
                 for (auto &face : walkmesh->grassFaces()) {
-                    for (int i = 0; i < static_cast<int>(_grass.density); ++i) {
+                    for (int i = 0; i < getNumGrassClusters(face); ++i) {
                         GrassCluster cluster;
                         cluster.position = getRandomPointInTriangle(face);
                         cluster.variant = getRandomGrassVariant();
@@ -831,6 +832,10 @@ void Area::fill(SceneGraph &sceneGraph) {
             sceneGraph.addRoot(cubeNode);
         }
     }
+}
+
+int Area::getNumGrassClusters(const Walkmesh::Face &face) const {
+    return glm::round(kGrassDensityFactor * _grass.density * face.area);
 }
 
 int Area::getRandomGrassVariant() const {

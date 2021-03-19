@@ -110,6 +110,15 @@ void BwmReader::loadNormals() {
     }
 }
 
+// Adapted from https://www.omnicalculator.com/math/herons-formula
+static float calculateTriangleArea(const vector<glm::vec3> &verts) {
+    float a = glm::distance(verts[0], verts[1]);
+    float b = glm::distance(verts[0], verts[2]);
+    float c = glm::distance(verts[1], verts[2]);
+
+    return 0.25f * glm::sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
+}
+
 void BwmReader::makeWalkmesh() {
     _walkmesh = make_shared<Walkmesh>();
 
@@ -129,6 +138,7 @@ void BwmReader::makeWalkmesh() {
             face.centroid += face.vertices[i];
         }
         face.centroid /= 3.0f;
+        face.area = calculateTriangleArea(face.vertices);
 
         if (grass) {
             _walkmesh->_grassFaces.push_back(face);

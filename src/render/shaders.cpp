@@ -38,6 +38,7 @@ namespace render {
 
 static constexpr int kBindingPointIndexCombined = 1;
 static constexpr int kBindingPointIndexSkeletal = 2;
+static constexpr int kBindingPointIndexGrass = 3;
 
 static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
@@ -62,7 +63,7 @@ const int MAX_BONES = 128;
 const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 32;
 const int MAX_CHARS = 128;
-const int MAX_GRASS_CLUSTERS = 128;
+const int MAX_GRASS_CLUSTERS = 256;
 
 const float PI = 3.14159265359;
 const float GAMMA = 2.2;
@@ -148,11 +149,6 @@ struct GrassCluster {
     vec4 positionVariant;
 };
 
-struct Grass {
-    vec2 quadSize;
-    GrassCluster clusters[MAX_GRASS_CLUSTERS];
-};
-
 struct Character {
     vec4 posScale;
     vec4 uv;
@@ -170,12 +166,16 @@ layout(std140) uniform Combined {
     Blur uBlur;
     Lighting uLighting;
     Particles uParticles;
-    Grass uGrass;
     Text uText;
 };
 
 layout(std140) uniform Skeletal {
     mat4 uBones[MAX_BONES];
+};
+
+layout(std140) uniform Grass {
+    vec2 uGrassQuadSize;
+    GrassCluster uGrassClusters[MAX_GRASS_CLUSTERS];
 };
 
 bool isFeatureEnabled(int flag) {
@@ -547,9 +547,9 @@ void main() {
     vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
 
     vec4 P = vec4(
-        uGrass.clusters[gl_InstanceID].positionVariant.xyz +
-            cameraRight * aPosition.x * uGrass.quadSize.x +
-            cameraUp * aPosition.y * uGrass.quadSize.y,
+        uGrassClusters[gl_InstanceID].positionVariant.xyz +
+            cameraRight * aPosition.x * uGrassQuadSize.x +
+            cameraUp * aPosition.y * uGrassQuadSize.y,
         1.0);
 
     gl_Position = uGeneral.projection * uGeneral.view * P;
@@ -918,8 +918,8 @@ layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     vec2 uv = vec2(0.5) * fragTexCoords;
-    uv.y += 0.5 * (int(uGrass.clusters[fragInstanceID].positionVariant[3]) / 2);
-    uv.x += 0.5 * (int(uGrass.clusters[fragInstanceID].positionVariant[3]) % 2);
+    uv.y += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) / 2);
+    uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     fragColor = texture(uDiffuse, uv);
     fragColorBright = vec4(vec3(0.0), 1.0);
@@ -1125,6 +1125,7 @@ void Shaders::init() {
 
     glGenBuffers(1, &_uboCombined);
     glGenBuffers(1, &_uboSkeletal);
+    glGenBuffers(1, &_uboGrass);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -1198,6 +1199,15 @@ void Shaders::initUBO() {
         SkeletalUniforms defaults;
         glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &defaults, GL_STATIC_DRAW);
     }
+
+    uint32_t blockIdxGrass = glGetUniformBlockIndex(_activeOrdinal, "Grass");
+    if (blockIdxGrass != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, blockIdxGrass, kBindingPointIndexGrass);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
+
+        GrassUniforms defaults;
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(GrassUniforms), &defaults, GL_STATIC_DRAW);
+    }
 }
 
 void Shaders::initTextureUniforms() {
@@ -1269,9 +1279,6 @@ void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, particles), sizeof(ParticlesUniforms), &uniforms.particles);
     }
-    if (uniforms.general.featureMask & UniformFeatureFlags::grass) {
-        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, grass), sizeof(GrassUniforms), &uniforms.grass);
-    }
     if (uniforms.general.featureMask & UniformFeatureFlags::text) {
         glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, text), sizeof(TextUniforms), &uniforms.text);
     }
@@ -1279,6 +1286,10 @@ void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), &uniforms.skeletal);
+    }
+    if (uniforms.general.featureMask & UniformFeatureFlags::grass) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboGrass);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), &uniforms.grass);
     }
 }
 
