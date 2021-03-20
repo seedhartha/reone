@@ -123,7 +123,6 @@ void Program::loadOptions() {
     if (vars["pbr"].as<bool>()) {
         setFeatureEnabled(Feature::PBR, true);
         setFeatureEnabled(Feature::HDR, true);
-        setFeatureEnabled(Feature::DynamicRoomLighting, true);
     }
 }
 
