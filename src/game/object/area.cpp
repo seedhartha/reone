@@ -897,6 +897,11 @@ void Area::update3rdPersonCameraTarget() {
 }
 
 void Area::updateVisibility() {
+    updateRoomVisibility();
+    cullObjects();
+}
+
+void Area::updateRoomVisibility() {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
@@ -924,12 +929,15 @@ void Area::updateVisibility() {
             room.second->setVisible(visible);
         }
     }
+}
+
+void Area::cullObjects() {
+    static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
     Camera *camera = _game->getActiveCamera();
     if (!camera) return;
 
     shared_ptr<CameraSceneNode> cameraNode(camera->sceneNode());
-    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
     for (auto &object : _objects) {
         if (!object->visible()) continue;
@@ -937,13 +945,28 @@ void Area::updateVisibility() {
         shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
         if (!model) continue;
 
-        AABB aabb(model->aabb() * model->absoluteTransform());
-        glm::vec3 objectCenter(model->getCenterOfAABB());
-        glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
-        float distanceToCamera2 = glm::distance2(objectCenter, cameraPosition);
-        float drawDistance2 = object->drawDistance() * object->drawDistance();
-        bool onScreen = object->isStuntMode() || (distanceToCamera2 < drawDistance2 && cameraNode->isInFrustum(aabb));
-        model->setOnScreen(onScreen);
+        bool culledOut = false;
+
+        // Stunts must never be culled out
+        if (!object->isStuntMode()) {
+            glm::vec3 objectCenter(model->getCenterOfAABB());
+            glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
+            float distanceToCamera2 = glm::distance2(objectCenter, cameraPosition);
+            float drawDistance2 = object->drawDistance() * object->drawDistance();
+
+            // Draw distance culling
+            if (distanceToCamera2 > drawDistance2) {
+                culledOut = true;
+            } else {
+                // Frustum culling
+                AABB aabb(model->aabb() * model->absoluteTransform());
+                if (!cameraNode->isInFrustum(aabb)) {
+                    culledOut = true;
+                }
+            }
+        }
+
+        model->setCulledOut(culledOut);
     }
 }
 

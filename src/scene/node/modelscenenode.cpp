@@ -159,7 +159,7 @@ unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &
 }
 
 void ModelSceneNode::update(float dt) {
-    _animator.update(dt, _visible && _onScreen);
+    _animator.update(dt, _visible && !_culledOut);
     SceneNode::update(dt);
 }
 
@@ -312,11 +312,11 @@ void ModelSceneNode::setVisible(bool visible) {
     }
 }
 
-void ModelSceneNode::setOnScreen(bool onScreen) {
-    _onScreen = onScreen;
+void ModelSceneNode::setCulledOut(bool culled) {
+    _culledOut = culled;
 
     for (auto &attached : _attachedModels) {
-        attached.second->setOnScreen(onScreen);
+        attached.second->setCulledOut(culled);
     }
 }
 

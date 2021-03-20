@@ -94,7 +94,7 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
         case SceneNodeType::Model: {
             // Skip the model and its children if it is not currently visible
             auto model = static_pointer_cast<ModelSceneNode>(node);
-            if (!model->isVisible() || !model->isOnScreen()) return;
+            if (!model->isVisible() || model->isCulledOut()) return;
             break;
         }
         case SceneNodeType::ModelNode: {
@@ -197,8 +197,9 @@ void SceneGraph::prepareTransparentMeshes() {
 }
 
 void SceneGraph::prepareParticles() {
+    static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
+
     // Extract particles from all emitters, sort them by depth
-    glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
     vector<pair<Particle *, float>> particlesZ;
     for (auto &emitter : _emitters) {
         glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
