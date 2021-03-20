@@ -182,13 +182,11 @@ struct ShaderUniforms {
     BumpmapsUniforms bumpmaps;
     BlurUniforms blur;
 
-    // Buffered separately
-    LightingUniforms lighting;
-    ParticlesUniforms particles;
-    TextUniforms text;
-
     // Separate UBOs
+    TextUniforms text;
+    LightingUniforms lighting;
     SkeletalUniforms skeletal;
+    ParticlesUniforms particles;
     GrassUniforms grass;
 };
 
@@ -231,16 +229,27 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
+
+    // UBO
+
     uint32_t _uboCombined { 0 };
+    uint32_t _uboText { 0 };
+    uint32_t _uboLighting { 0 };
     uint32_t _uboSkeletal { 0 };
+    uint32_t _uboParticles { 0 };
     uint32_t _uboGrass { 0 };
+
+    // END UBO
 
     ~Shaders();
 
     void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
-    void initUBO();
+    void initUBOs();
     void initTextureUniforms();
+
+    template <class T>
+    void initUBO(const std::string &block, int bindingPoint, uint32_t ubo, const T &defaults, size_t size = sizeof(T));
 
     void setUniforms(const ShaderUniforms &locals);
     void setUniform(const std::string &name, int value);
