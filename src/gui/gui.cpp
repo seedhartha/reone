@@ -300,18 +300,18 @@ void GUI::draw3D() {
 }
 
 void GUI::drawBackground() {
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _background->bind();
+
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-    setActiveTextureUnit(TextureUnits::diffuse);
-    _background->bind();
-
     Meshes::instance().getQuad()->draw();
 }
 

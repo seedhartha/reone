@@ -70,10 +70,10 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
 
-    ShaderUniforms uniforms;
-    uniforms.general.featureMask |= UniformFeatureFlags::text;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.color = glm::vec4(color, 1.0f);
+    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+    uniforms.combined.featureMask |= UniformFeatureFlags::text;
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
     int numBlocks = static_cast<int>(text.size()) / kMaxCharacters;
     if (text.size() % kMaxCharacters > 0) {
@@ -90,8 +90,8 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
             posScale[2] = glyph.size.x;
             posScale[3] = glyph.size.y;
 
-            uniforms.text.chars[j].posScale = move(posScale);
-            uniforms.text.chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
+            uniforms.text->chars[j].posScale = move(posScale);
+            uniforms.text->chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
 
             textOffset.x += glyph.size.x;
         }

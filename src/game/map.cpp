@@ -99,6 +99,9 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
         if (!partyLeader) return;
 
+        setActiveTextureUnit(TextureUnits::diffuse);
+        _areaTexture->bind();
+
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
 
@@ -111,36 +114,36 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = transform;
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = transform;
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        _areaTexture->bind();
 
         int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
         withScissorTest(scissorBounds, []() { Meshes::instance().getQuad()->draw(); });
 
     } else {
+        setActiveTextureUnit(TextureUnits::diffuse);
+        _areaTexture->bind();
+
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = move(transform);
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = move(transform);
+
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        _areaTexture->bind();
-
         Meshes::instance().getQuad()->draw();
     }
 }
 
 void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) return;
+
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _noteTexture->bind();
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
@@ -162,14 +165,11 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = transform;
-        uniforms.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = transform;
+        uniforms.combined.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
+
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        _noteTexture->bind();
-
         Meshes::instance().getQuad()->draw();
     }
 }
@@ -204,6 +204,9 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
+
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _arrowTexture->bind();
 
     glm::vec3 arrowPos(0.0f);
 
@@ -244,13 +247,10 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = transform;
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-    setActiveTextureUnit(TextureUnits::diffuse);
-    _arrowTexture->bind();
-
     Meshes::instance().getQuad()->draw();
 }
 

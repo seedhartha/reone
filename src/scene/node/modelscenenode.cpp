@@ -168,7 +168,7 @@ void ModelSceneNode::draw() {
         glm::mat4 transform(_absoluteTransform * _aabb.transform());
 
         ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-        uniforms.general.model = move(transform);
+        uniforms.combined.general.model = move(transform);
         Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
         Meshes::instance().getAABB()->draw();

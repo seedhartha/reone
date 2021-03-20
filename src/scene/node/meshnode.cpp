@@ -46,9 +46,9 @@ MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mes
 
 void MeshSceneNode::draw() {
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-    uniforms.general.model = _absoluteTransform;
-    uniforms.general.color = glm::vec4(_color, 1.0f);
-    uniforms.general.alpha = _alpha;
+    uniforms.combined.general.model = _absoluteTransform;
+    uniforms.combined.general.color = glm::vec4(_color, 1.0f);
+    uniforms.combined.general.alpha = _alpha;
     Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
     _mesh->draw();

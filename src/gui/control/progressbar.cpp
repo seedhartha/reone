@@ -52,10 +52,14 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
 
     float w = _extent.width * _value / 100.0f;
 
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
+
     ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-    uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(w, _extent.height, 1.0f));
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
     Meshes::instance().getQuad()->draw();
 }

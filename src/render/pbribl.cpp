@@ -121,11 +121,11 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
             _irradianceFB.checkCompleteness();
 
             ShaderUniforms uniforms;
-            uniforms.general.projection = g_captureProjection;
-            uniforms.general.view = g_captureViews[i];
-            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, uniforms);
+            uniforms.combined.general.projection = g_captureProjection;
+            uniforms.combined.general.view = g_captureViews[i];
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, uniforms);
             Meshes::instance().getCubemap()->draw();
         }
     });
@@ -162,10 +162,10 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 _prefilterFB.attachDepth(*prefilterDepth);
                 _prefilterFB.checkCompleteness();
 
-                ShaderUniforms uniforms;
-                uniforms.general.projection = g_captureProjection;
-                uniforms.general.view = g_captureViews[face];
-                uniforms.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
+                ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+                uniforms.combined.general.projection = g_captureProjection;
+                uniforms.combined.general.view = g_captureViews[face];
+                uniforms.combined.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
                 Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,7 +199,7 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
 
     withViewport(viewport, [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Shaders::instance().activate(ShaderProgram::SimpleBRDF, ShaderUniforms());
+        Shaders::instance().activate(ShaderProgram::SimpleBRDF, Shaders::instance().defaultUniforms());
         Meshes::instance().getQuadNDC()->draw();
     });
 
