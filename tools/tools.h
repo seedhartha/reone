@@ -71,6 +71,7 @@ public:
 private:
     void list(const resource::ErfReader &erf);
     void extract(resource::ErfReader &erf, const boost::filesystem::path &destPath);
+    void toERF(Operation operation, const boost::filesystem::path &target);
 };
 
 class RimTool : public ITool {
