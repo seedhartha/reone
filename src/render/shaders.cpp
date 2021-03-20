@@ -88,7 +88,6 @@ struct General {
     vec2 uvOffset;
     float alpha;
     float waterAlpha;
-    int featureMask;
     float roughness;
     float exposure;
 };
@@ -123,6 +122,7 @@ struct Blur {
 };
 
 layout(std140) uniform Combined {
+    int uFeatureMask;
     General uGeneral;
     Material uMaterial;
     Shadows uShadows;
@@ -179,7 +179,7 @@ layout(std140) uniform Grass {
 };
 
 bool isFeatureEnabled(int flag) {
-    return (uGeneral.featureMask & flag) != 0;
+    return (uFeatureMask & flag) != 0;
 }
 )END";
 
@@ -1141,6 +1141,12 @@ void Shaders::init() {
         glUseProgram(0);
     }
 
+    _defaultUniforms.text = make_shared<TextUniforms>();
+    _defaultUniforms.lighting = make_shared<LightingUniforms>();
+    _defaultUniforms.skeletal = make_shared<SkeletalUniforms>();
+    _defaultUniforms.particles = make_shared<ParticlesUniforms>();
+    _defaultUniforms.grass = make_shared<GrassUniforms>();
+
     _inited = true;
 }
 
@@ -1291,27 +1297,27 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 
 void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, offsetof(ShaderUniforms, text), &uniforms);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CombinedUniforms), &uniforms.combined);
 
-    if (uniforms.general.featureMask & UniformFeatureFlags::text) {
+    if (uniforms.combined.featureMask & UniformFeatureFlags::text) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexText, _uboText);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextUniforms), &uniforms.text);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextUniforms), uniforms.text.get());
     }
-    if (uniforms.general.featureMask & UniformFeatureFlags::lighting) {
+    if (uniforms.combined.featureMask & UniformFeatureFlags::lighting) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexLighting, _uboLighting);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightingUniforms), &uniforms.lighting);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightingUniforms), uniforms.lighting.get());
     }
-    if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
+    if (uniforms.combined.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), &uniforms.skeletal);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), uniforms.skeletal.get());
     }
-    if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
+    if (uniforms.combined.featureMask & UniformFeatureFlags::particles) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexParticles, _uboParticles);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ParticlesUniforms), &uniforms.particles);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ParticlesUniforms), uniforms.particles.get());
     }
-    if (uniforms.general.featureMask & UniformFeatureFlags::grass) {
+    if (uniforms.combined.featureMask & UniformFeatureFlags::grass) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), &uniforms.grass);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), uniforms.grass.get());
     }
 }
 

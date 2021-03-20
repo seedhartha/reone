@@ -82,13 +82,13 @@ void Video::updateFrameTexture() {
 void Video::draw() {
     if (!_inited) return;
 
-    ShaderUniforms uniforms;
-    uniforms.general.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
     setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
+    ShaderUniforms uniforms;
+    uniforms.combined.general.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
+
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
     Meshes::instance().getQuad()->draw();
 }
 

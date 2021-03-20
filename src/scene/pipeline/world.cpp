@@ -148,13 +148,13 @@ void WorldRenderPipeline::drawShadows() {
         glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
         glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
 
-        ShaderUniforms uniforms;
-        uniforms.general.featureMask |= UniformFeatureFlags::shadows;
-        uniforms.shadows.lightPosition = glm::vec4(lightPosition, 1.0f);
+        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+        uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
+        uniforms.combined.shadows.lightPosition = glm::vec4(lightPosition, 1.0f);
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             auto side = static_cast<CubeMapFace>(i);
-            uniforms.shadows.matrices[i] = projection * getShadowView(lightPosition, side);
+            uniforms.combined.shadows.matrices[i] = projection * getShadowView(lightPosition, side);
         }
 
         _scene->setUniformsPrototype(move(uniforms));
@@ -191,13 +191,13 @@ void WorldRenderPipeline::drawGeometry() {
 
     const LightSceneNode *shadowLight = _scene->shadowLight();
 
-    ShaderUniforms uniforms;
-    uniforms.general.projection = _scene->activeCamera()->projection();
-    uniforms.general.view = _scene->activeCamera()->view();
-    uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
-    uniforms.shadows.lightPresent = static_cast<bool>(shadowLight);
-    uniforms.shadows.lightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
-    uniforms.shadows.strength = _scene->shadowStrength();
+    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+    uniforms.combined.general.projection = _scene->activeCamera()->projection();
+    uniforms.combined.general.view = _scene->activeCamera()->view();
+    uniforms.combined.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+    uniforms.combined.shadows.lightPresent = static_cast<bool>(shadowLight);
+    uniforms.combined.shadows.lightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
+    uniforms.combined.shadows.strength = _scene->shadowStrength();
     _scene->setUniformsPrototype(move(uniforms));
 
     if (shadowLight) {
@@ -224,19 +224,20 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _geometryColor2->bind();
+
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.featureMask |= UniformFeatureFlags::blur;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.blur.resolution = glm::vec2(w, h);
-    uniforms.blur.direction = glm::vec2(1.0f, 0.0f);
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
+    uniforms.combined.featureMask |= UniformFeatureFlags::blur;
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+    uniforms.combined.blur.resolution = glm::vec2(w, h);
+    uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    setActiveTextureUnit(TextureUnits::diffuse);
-    _geometryColor2->bind();
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([]() {
         Meshes::instance().getQuad()->draw();
@@ -251,19 +252,20 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _horizontalBlurColor->bind();
+
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.featureMask |= UniformFeatureFlags::blur;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.blur.resolution = glm::vec2(_opts.width, _opts.height);
-    uniforms.blur.direction = glm::vec2(0.0f, 1.0f);
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
+    uniforms.combined.featureMask |= UniformFeatureFlags::blur;
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+    uniforms.combined.blur.resolution = glm::vec2(_opts.width, _opts.height);
+    uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    setActiveTextureUnit(TextureUnits::diffuse);
-    _horizontalBlurColor->bind();
+    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([]() {
         Meshes::instance().getQuad()->draw();
@@ -280,11 +282,6 @@ void WorldRenderPipeline::drawResult() {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     if (g_debugCubeMap) {
-        ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = move(transform);
-        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, uniforms);
-
         setActiveTextureUnit(TextureUnits::diffuse);
         auto envmap = Textures::instance().get("cm_baremetal", TextureUsage::EnvironmentMap);
         PBRIBL::Derived derived;
@@ -295,20 +292,25 @@ void WorldRenderPipeline::drawResult() {
         }
         //_shadowsDepth->bind();
 
+        ShaderUniforms uniforms;
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = move(transform);
+
+        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, uniforms);
         Meshes::instance().getQuad()->draw();
 
     } else {
-        ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = move(transform);
-        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
-
         setActiveTextureUnit(TextureUnits::diffuse);
         _geometryColor1->bind();
 
         setActiveTextureUnit(TextureUnits::bloom);
         _verticalBlurColor->bind();
 
+        ShaderUniforms uniforms;
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = move(transform);
+
+        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
         Meshes::instance().getQuad()->draw();
     }
 }

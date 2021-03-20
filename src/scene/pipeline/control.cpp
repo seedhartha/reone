@@ -70,10 +70,10 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
 
-        ShaderUniforms uniforms;
-        uniforms.general.projection = _scene->activeCamera()->projection();
-        uniforms.general.view = _scene->activeCamera()->view();
-        uniforms.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+        uniforms.combined.general.projection = _scene->activeCamera()->projection();
+        uniforms.combined.general.view = _scene->activeCamera()->view();
+        uniforms.combined.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -96,16 +96,16 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     glGetIntegerv(GL_VIEWPORT, &viewport[0]);
 
     ShaderUniforms uniforms;
-    uniforms.general.projection = glm::ortho(
+    uniforms.combined.general.projection = glm::ortho(
         0.0f,
         static_cast<float>(viewport[2]),
         static_cast<float>(viewport[3]),
         0.0f,
         -100.0f, 100.0f);
 
-    uniforms.general.model = move(transform);
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    uniforms.combined.general.model = move(transform);
 
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
     Meshes::instance().getQuad()->draw();
 }
 

@@ -53,10 +53,10 @@ void Cursor::draw() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
 
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
     Meshes::instance().getQuad()->draw();
 }
 

@@ -85,36 +85,36 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
+        setActiveTextureUnit(TextureUnits::diffuse);
+        iconFrame->bind();
+
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = move(transform);
-        uniforms.general.color = glm::vec4(color, 1.0f);
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = move(transform);
+        uniforms.combined.general.color = glm::vec4(color, 1.0f);
+
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        iconFrame->bind();
-
         Meshes::instance().getQuad()->draw();
     }
 
     if (iconTexture) {
+        setActiveTextureUnit(TextureUnits::diffuse);
+        iconTexture->bind();
+
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-        uniforms.general.model = move(transform);
-        uniforms.general.color = glm::vec4(1.0f);
+        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.model = move(transform);
+        uniforms.combined.general.color = glm::vec4(1.0f);
+
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-
-        setActiveTextureUnit(TextureUnits::diffuse);
-        iconTexture->bind();
-
         Meshes::instance().getQuad()->draw();
     }
 

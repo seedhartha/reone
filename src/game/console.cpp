@@ -304,12 +304,12 @@ void Console::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.general.alpha = 0.5f;
-    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+    uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.combined.general.alpha = 0.5f;
 
+    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
     Meshes::instance().getQuad()->draw();
 }
 

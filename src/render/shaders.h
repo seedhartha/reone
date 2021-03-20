@@ -73,7 +73,7 @@ struct UniformFeatureFlags {
     static constexpr int grass = 0x10000;
 };
 
-struct GeneralUniforms {
+struct ShaderGeneral {
     glm::mat4 projection { 1.0f };
     glm::mat4 view { 1.0f };
     glm::mat4 model { 1.0f };
@@ -85,13 +85,12 @@ struct GeneralUniforms {
     glm::vec2 uvOffset { 0.0f };
     float alpha { 1.0f };
     float waterAlpha { 1.0f };
-    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
     float roughness { 0.0f };
     float exposure { 1.0f };
-    char padding[4];
+    char padding[8];
 };
 
-struct MaterialUniforms {
+struct ShaderMaterial {
     glm::vec4 ambient { 1.0f };
     glm::vec4 diffuse { 0.0f };
     float specular { 0.0f };
@@ -100,7 +99,7 @@ struct MaterialUniforms {
     float roughness { 1.0f };
 };
 
-struct ShadowUniforms {
+struct ShaderShadows {
     glm::mat4 matrices[kNumCubeFaces];
     glm::vec4 lightPosition { 0.0f };
     int lightPresent { false };
@@ -108,7 +107,7 @@ struct ShadowUniforms {
     char padding[8];
 };
 
-struct BumpmapsUniforms {
+struct ShaderBumpmaps {
     int grayscale { 0 };
     float scaling { 0.0f };
     glm::vec2 gridSize { 1.0f };
@@ -117,9 +116,20 @@ struct BumpmapsUniforms {
     char padding[8];
 };
 
-struct BlurUniforms {
+struct ShaderBlur {
     glm::vec2 resolution { 0.0f };
     glm::vec2 direction { 0.0f };
+};
+
+struct CombinedUniforms {
+    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
+    char padding[12];
+
+    ShaderGeneral general;
+    ShaderMaterial material;
+    ShaderShadows shadows;
+    ShaderBumpmaps bumpmaps;
+    ShaderBlur blur;
 };
 
 struct ShaderLight {
@@ -175,19 +185,13 @@ struct TextUniforms {
 };
 
 struct ShaderUniforms {
-    // Buffered at once
-    GeneralUniforms general;
-    MaterialUniforms material;
-    ShadowUniforms shadows;
-    BumpmapsUniforms bumpmaps;
-    BlurUniforms blur;
+    CombinedUniforms combined;
 
-    // Separate UBOs
-    TextUniforms text;
-    LightingUniforms lighting;
-    SkeletalUniforms skeletal;
-    ParticlesUniforms particles;
-    GrassUniforms grass;
+    std::shared_ptr<TextUniforms> text;
+    std::shared_ptr<LightingUniforms> lighting;
+    std::shared_ptr<SkeletalUniforms> skeletal;
+    std::shared_ptr<ParticlesUniforms> particles;
+    std::shared_ptr<GrassUniforms> grass;
 };
 
 class Shaders : boost::noncopyable {
@@ -199,6 +203,8 @@ public:
 
     void activate(ShaderProgram program, const ShaderUniforms &uniforms);
     void deactivate();
+
+    const ShaderUniforms &defaultUniforms() const { return _defaultUniforms; }
 
 private:
     enum class ShaderName {
@@ -229,6 +235,7 @@ private:
     std::unordered_map<ShaderProgram, uint32_t> _programs;
     ShaderProgram _activeProgram { ShaderProgram::None };
     uint32_t _activeOrdinal { 0 };
+    ShaderUniforms _defaultUniforms;
 
     // UBO
 

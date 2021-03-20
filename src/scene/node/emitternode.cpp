@@ -134,9 +134,9 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
     if (!texture) return;
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-    uniforms.general.featureMask |= UniformFeatureFlags::particles;
-    uniforms.particles.gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
-    uniforms.particles.render = static_cast<int>(_emitter->renderMode());
+    uniforms.combined.featureMask |= UniformFeatureFlags::particles;
+    uniforms.particles->gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
+    uniforms.particles->render = static_cast<int>(_emitter->renderMode());
 
     for (size_t i = 0; i < particles.size(); ++i) {
         const Particle &particle = *particles[i];
@@ -149,11 +149,11 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
             transform = glm::scale(transform, glm::vec3(particle.size()));
         }
 
-        uniforms.particles.particles[i].transform = move(transform);
-        uniforms.particles.particles[i].color = glm::vec4(particle.color(), 1.0f);
-        uniforms.particles.particles[i].size = glm::vec2(particle.size());
-        uniforms.particles.particles[i].alpha = particle.alpha();
-        uniforms.particles.particles[i].frame = particle.frame();
+        uniforms.particles->particles[i].transform = move(transform);
+        uniforms.particles->particles[i].color = glm::vec4(particle.color(), 1.0f);
+        uniforms.particles->particles[i].size = glm::vec2(particle.size());
+        uniforms.particles->particles[i].alpha = particle.alpha();
+        uniforms.particles->particles[i].frame = particle.frame();
     }
 
     Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
