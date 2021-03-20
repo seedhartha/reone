@@ -113,11 +113,11 @@ void ProfileOverlay::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
-    ShaderUniforms uniforms;
-    uniforms.general.projection = RenderWindow::instance().getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.general.alpha = 0.5f;
+    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+    uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.combined.general.alpha = 0.5f;
 
     Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
     Meshes::instance().getQuad()->draw();
