@@ -109,7 +109,7 @@ private:
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
-    std::vector<std::pair<EmitterSceneNode *, Particle *>> _particles;
+    std::vector<std::pair<EmitterSceneNode *, std::vector<Particle *>>> _particles;
     std::vector<GrassCluster> _grassClusters;
 
     glm::vec3 _ambientLightColor { 0.5f };
@@ -135,6 +135,8 @@ private:
     void prepareTransparentMeshes();
     void prepareParticles();
     void prepareGrass();
+
+    inline void flushEmitterParticles(EmitterSceneNode *emitter, std::vector<Particle *> &particles);
 };
 
 } // namespace scene
