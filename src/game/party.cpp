@@ -130,7 +130,7 @@ void Party::onLeaderChanged() {
         member.creature->actionQueue().clear();
     }
 
-    _game->module()->area()->onPartyLeaderMoved();
+    _game->module()->area()->onPartyLeaderMoved(true);
 }
 
 void Party::onHeartbeat() {
