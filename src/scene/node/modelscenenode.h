@@ -63,7 +63,7 @@ public:
     void refreshAABB();
     void signalEvent(const std::string &name);
 
-    bool isOnScreen() const { return _onScreen; }
+    bool isCulledOut() const { return _culledOut; }
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
@@ -82,7 +82,7 @@ public:
     void setVisible(bool visible) override;
 
     void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
-    void setOnScreen(bool onScreen);
+    void setCulledOut(bool culled);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
     void setWalkmesh(std::shared_ptr<render::Walkmesh> walkmesh);
@@ -109,7 +109,7 @@ private:
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     bool _visible { true };
-    bool _onScreen { true };
+    bool _culledOut { false }; /**< determined to be outside of the view frustum */
     float _alpha { 1.0f };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };
