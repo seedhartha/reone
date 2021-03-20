@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-constexpr int kDefaultRepute = 50;
+static constexpr int kDefaultRepute = 50;
 
 static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
