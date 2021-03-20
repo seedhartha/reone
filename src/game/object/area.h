@@ -75,7 +75,9 @@ public:
     void destroyObject(const SpatialObject &object);
     void fill(scene::SceneGraph &sceneGraph);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
-    void onPartyLeaderMoved();
+
+    void onPartyLeaderMoved(bool roomChanged = false);
+
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();

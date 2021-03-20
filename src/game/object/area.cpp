@@ -698,12 +698,15 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
     Room *room;
 
     if (getElevationAt(dest, room, z)) {
+        const Room *oldRoom = creature->room();
+
         creature->setRoom(room);
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
 
         if (creature == _game->party().getLeader()) {
-            onPartyLeaderMoved();
+            onPartyLeaderMoved(room != oldRoom);
         }
+
         checkTriggersIntersection(creature);
 
         return true;
@@ -874,31 +877,15 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
     _game->startDialog(object, finalResRef);
 }
 
-void Area::onPartyLeaderMoved() {
+void Area::onPartyLeaderMoved(bool roomChanged) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
+    if (roomChanged) {
+        updateRoomVisibility();
+    }
     update3rdPersonCameraTarget();
     _objectSelector.selectNearest();
-}
-
-void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
-    if (!partyLeader) return;
-
-    glm::vec3 position;
-
-    if (partyLeader->getModelSceneNode()->getNodeAbsolutePosition("camerahook", position)) {
-        position += partyLeader->position();
-    } else {
-        position = partyLeader->position();
-    }
-    _thirdPersonCamera->setTargetPosition(position);
-}
-
-void Area::updateVisibility() {
-    updateRoomVisibility();
-    cullObjects();
 }
 
 void Area::updateRoomVisibility() {
@@ -929,6 +916,27 @@ void Area::updateRoomVisibility() {
             room.second->setVisible(visible);
         }
     }
+}
+
+void Area::update3rdPersonCameraTarget() {
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
+    if (!partyLeader) return;
+
+    glm::vec3 position;
+
+    if (partyLeader->getModelSceneNode()->getNodeAbsolutePosition("camerahook", position)) {
+        position += partyLeader->position();
+    } else {
+        position = partyLeader->position();
+    }
+    _thirdPersonCamera->setTargetPosition(position);
+}
+
+void Area::updateVisibility() {
+    if (_game->cameraType() != CameraType::ThirdPerson) {
+        updateRoomVisibility();
+    }
+    cullObjects();
 }
 
 void Area::cullObjects() {
