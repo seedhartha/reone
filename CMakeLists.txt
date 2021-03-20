@@ -103,6 +103,7 @@ set(RESOURCE_HEADERS
     src/resource/format/bifreader.h
     src/resource/format/binreader.h
     src/resource/format/erfreader.h
+    src/resource/format/erfwriter.h
     src/resource/format/gffreader.h
     src/resource/format/gffwriter.h
     src/resource/format/keyreader.h
@@ -131,6 +132,7 @@ set(RESOURCE_SOURCES
     src/resource/format/bifreader.cpp
     src/resource/format/binreader.cpp
     src/resource/format/erfreader.cpp
+    src/resource/format/erfwriter.cpp
     src/resource/format/gffreader.cpp
     src/resource/format/gffwriter.cpp
     src/resource/format/keyreader.cpp

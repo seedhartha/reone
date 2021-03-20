@@ -51,6 +51,8 @@ static const unordered_map<string, Operation> g_operations {
     { "to-2da", Operation::To2DA },
     { "to-gff", Operation::ToGFF },
     { "to-rim", Operation::ToRIM },
+    { "to-erf", Operation::ToERF },
+    { "to-mod", Operation::ToMOD }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -95,6 +97,8 @@ void Program::initOptions() {
         ("to-2da", "convert JSON to 2DA")
         ("to-gff", "convert JSON to GFF")
         ("to-rim", "create RIM archive from directory")
+        ("to-erf", "create ERF archive from directory")
+        ("to-mod", "create MOD archive from directory")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
