@@ -37,8 +37,11 @@ namespace reone {
 namespace render {
 
 static constexpr int kBindingPointIndexCombined = 1;
-static constexpr int kBindingPointIndexSkeletal = 2;
-static constexpr int kBindingPointIndexGrass = 3;
+static constexpr int kBindingPointIndexText = 2;
+static constexpr int kBindingPointIndexLighting = 3;
+static constexpr int kBindingPointIndexSkeletal = 4;
+static constexpr int kBindingPointIndexParticles = 5;
+static constexpr int kBindingPointIndexGrass = 6;
 
 static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
@@ -119,6 +122,23 @@ struct Blur {
     vec2 direction;
 };
 
+layout(std140) uniform Combined {
+    General uGeneral;
+    Material uMaterial;
+    Shadows uShadows;
+    Bumpmap uBumpmaps;
+    Blur uBlur;
+};
+
+struct Character {
+    vec4 posScale;
+    vec4 uv;
+};
+
+layout(std140) uniform Text {
+    Character uChars[MAX_CHARS];
+};
+
 struct Light {
     vec4 position;
     vec4 color;
@@ -126,9 +146,13 @@ struct Light {
     float radius;
 };
 
-struct Lighting {
-    int lightCount;
-    Light lights[MAX_LIGHTS];
+layout(std140) uniform Lighting {
+    int uLightCount;
+    Light uLights[MAX_LIGHTS];
+};
+
+layout(std140) uniform Skeletal {
+    mat4 uBones[MAX_BONES];
 };
 
 struct Particle {
@@ -139,38 +163,14 @@ struct Particle {
     int frame;
 };
 
-struct Particles {
-    vec2 gridSize;
-    int render;
-    Particle particles[MAX_PARTICLES];
+layout(std140) uniform Particles {
+    vec2 uParticleGridSize;
+    int uParticleRender;
+    Particle uParticles[MAX_PARTICLES];
 };
 
 struct GrassCluster {
     vec4 positionVariant;
-};
-
-struct Character {
-    vec4 posScale;
-    vec4 uv;
-};
-
-struct Text {
-    Character chars[MAX_CHARS];
-};
-
-layout(std140) uniform Combined {
-    General uGeneral;
-    Material uMaterial;
-    Shadows uShadows;
-    Bumpmap uBumpmaps;
-    Blur uBlur;
-    Lighting uLighting;
-    Particles uParticles;
-    Text uText;
-};
-
-layout(std140) uniform Skeletal {
-    mat4 uBones[MAX_BONES];
 };
 
 layout(std140) uniform Grass {
@@ -286,10 +286,10 @@ float getShadow() {
 }
 
 float getLightAttenuation(int light) {
-    float D = uLighting.lights[light].radius;
+    float D = uLights[light].radius;
     D *= D;
 
-    float r = length(uLighting.lights[light].position.xyz - fragPosition);
+    float r = length(uLights[light].position.xyz - fragPosition);
     r *= r;
 
     return D / (D + r);
@@ -503,29 +503,29 @@ flat out int fragInstanceID;
 void main() {
     vec4 P;
 
-    if (uParticles.render == BILLBOARD_RENDER_TO_WORLD_Z) {
-        vec3 particlePos = vec3(uParticles.particles[gl_InstanceID].transform[3]);
+    if (uParticleRender == BILLBOARD_RENDER_TO_WORLD_Z) {
+        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
         P = vec4(
             particlePos +
-                RIGHT * aPosition.x * uParticles.particles[gl_InstanceID].size.x +
-                FORWARD * aPosition.y * uParticles.particles[gl_InstanceID].size.y,
+                RIGHT * aPosition.x * uParticles[gl_InstanceID].size.x +
+                FORWARD * aPosition.y * uParticles[gl_InstanceID].size.y,
             1.0);
 
-    } else if (uParticles.render == BILLBOARD_RENDER_MOTION_BLUR || uParticles.render == BILLBOARD_RENDER_TO_LOCAL_Z) {
-        P = uParticles.particles[gl_InstanceID].transform * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
+    } else if (uParticleRender == BILLBOARD_RENDER_MOTION_BLUR || uParticleRender == BILLBOARD_RENDER_TO_LOCAL_Z) {
+        P = uParticles[gl_InstanceID].transform * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
 
-    } else if (uParticles.render == BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR) {
-        P = uParticles.particles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
+    } else if (uParticleRender == BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR) {
+        P = uParticles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
 
     } else {
-        vec3 particlePos = vec3(uParticles.particles[gl_InstanceID].transform[3]);
+        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
         vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
         vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
 
         P = vec4(
             particlePos +
-                cameraRight * aPosition.x * uParticles.particles[gl_InstanceID].size.x +
-                cameraUp * aPosition.y * uParticles.particles[gl_InstanceID].size.y,
+                cameraRight * aPosition.x * uParticles[gl_InstanceID].size.x +
+                cameraUp * aPosition.y * uParticles[gl_InstanceID].size.y,
             1.0);
     }
 
@@ -567,8 +567,8 @@ flat out int fragInstanceID;
 
 void main() {
     vec4 P = vec4(aPosition, 1.0);
-    P.x += uText.chars[gl_InstanceID].posScale[0] + aPosition.x * uText.chars[gl_InstanceID].posScale[2];
-    P.y += uText.chars[gl_InstanceID].posScale[1] + aPosition.y * uText.chars[gl_InstanceID].posScale[3];
+    P.x += uChars[gl_InstanceID].posScale[0] + aPosition.x * uChars[gl_InstanceID].posScale[2];
+    P.y += uChars[gl_InstanceID].posScale[1] + aPosition.y * uChars[gl_InstanceID].posScale[3];
 
     gl_Position = uGeneral.projection * uGeneral.view * P;
     fragTexCoords = aTexCoords;
@@ -643,7 +643,7 @@ flat in int fragInstanceID;
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = fragTexCoords * uText.chars[fragInstanceID].uv.zw + uText.chars[fragInstanceID].uv.xy;
+    vec2 uv = fragTexCoords * uChars[fragInstanceID].uv.zw + uChars[fragInstanceID].uv.xy;
     vec4 diffuseSample = texture(uDiffuse, uv);
     vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
     fragColor = vec4(objectColor, diffuseSample.a);
@@ -675,15 +675,15 @@ void main() {
     if (isFeatureEnabled(FEATURE_LIGHTING)) {
         objectColor = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb * diffuseSample.rgb;
 
-        for (int i = 0; i < uLighting.lightCount; ++i) {
-            vec3 L = normalize(uLighting.lights[i].position.xyz - fragPosition);
+        for (int i = 0; i < uLightCount; ++i) {
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 
             float diff = max(dot(L, N), 0.0);
-            vec3 diffuse = uLighting.lights[i].multiplier * uLighting.lights[i].color.rgb * diff * uMaterial.diffuse.rgb * diffuseSample.rgb;
+            vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff * uMaterial.diffuse.rgb * diffuseSample.rgb;
 
             float spec = pow(max(dot(N, H), 0.0), uMaterial.shininess);
-            vec3 specular = uLighting.lights[i].multiplier * uLighting.lights[i].color.rgb * spec * vec3(uMaterial.specular);
+            vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec * vec3(uMaterial.specular);
 
             float attenuation = getLightAttenuation(i);
             diffuse *= attenuation;
@@ -801,12 +801,12 @@ void main() {
 
         vec3 Lo = vec3(0.0);
 
-        for (int i = 0; i < uLighting.lightCount; ++i) {
-            vec3 L = normalize(uLighting.lights[i].position.xyz - fragPosition);
+        for (int i = 0; i < uLightCount; ++i) {
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 
             float attenuation = getLightAttenuation(i);
-            vec3 radiance = uLighting.lights[i].multiplier * uLighting.lights[i].color.rgb;
+            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb;
             radiance *= attenuation;
 
             float NDF = DistributionGGX(N, H, roughness);
@@ -888,21 +888,21 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    float oneOverGridX = 1.0 / uParticles.gridSize.x;
-    float oneOverGridY = 1.0 / uParticles.gridSize.y;
+    float oneOverGridX = 1.0 / uParticleGridSize.x;
+    float oneOverGridY = 1.0 / uParticleGridSize.y;
 
     vec2 texCoords = fragTexCoords;
     texCoords.x *= oneOverGridX;
     texCoords.y *= oneOverGridY;
 
-    if (uParticles.particles[fragInstanceID].frame > 0) {
-        texCoords.y += oneOverGridY * (uParticles.particles[fragInstanceID].frame / int(uParticles.gridSize.x));
-        texCoords.x += oneOverGridX * (uParticles.particles[fragInstanceID].frame % int(uParticles.gridSize.x));
+    if (uParticles[fragInstanceID].frame > 0) {
+        texCoords.y += oneOverGridY * (uParticles[fragInstanceID].frame / int(uParticleGridSize.x));
+        texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % int(uParticleGridSize.x));
     }
 
     vec4 diffuseSample = texture(uDiffuse, texCoords);
 
-    fragColor = vec4(uParticles.particles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles.particles[fragInstanceID].alpha * diffuseSample.a);
+    fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].alpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
@@ -1124,14 +1124,17 @@ void Shaders::init() {
     initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
 
     glGenBuffers(1, &_uboCombined);
+    glGenBuffers(1, &_uboText);
+    glGenBuffers(1, &_uboLighting);
     glGenBuffers(1, &_uboSkeletal);
+    glGenBuffers(1, &_uboParticles);
     glGenBuffers(1, &_uboGrass);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
 
-        initUBO();
+        initUBOs();
         initTextureUniforms();
 
         _activeOrdinal = 0;
@@ -1181,32 +1184,29 @@ void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
     _programs.insert(make_pair(program, ordinal));
 }
 
-void Shaders::initUBO() {
-    uint32_t blockIdxCombined = glGetUniformBlockIndex(_activeOrdinal, "Combined");
-    if (blockIdxCombined != GL_INVALID_INDEX) {
-        glUniformBlockBinding(_activeOrdinal, blockIdxCombined, kBindingPointIndexCombined);
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
+void Shaders::initUBOs() {
+    static ShaderUniforms defaultsCombined;
+    static TextUniforms defaultsText;
+    static LightingUniforms defaultsLighting;
+    static SkeletalUniforms defaultsSkeletal;
+    static ParticlesUniforms defaultsParticles;
+    static GrassUniforms defaultsGrass;
 
-        ShaderUniforms defaults;
-        glBufferData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, skeletal), &defaults, GL_STATIC_DRAW);
-    }
+    initUBO("Combined", kBindingPointIndexCombined, _uboCombined, defaultsCombined, offsetof(ShaderUniforms, text));
+    initUBO("Text", kBindingPointIndexText, _uboText, defaultsText);
+    initUBO("Lighting", kBindingPointIndexLighting, _uboLighting, defaultsLighting);
+    initUBO("Skeletal", kBindingPointIndexSkeletal, _uboSkeletal, defaultsSkeletal);
+    initUBO("Particles", kBindingPointIndexParticles, _uboParticles, defaultsParticles);
+    initUBO("Grass", kBindingPointIndexGrass, _uboGrass, defaultsGrass);
+}
 
-    uint32_t blockIdxSkeletal = glGetUniformBlockIndex(_activeOrdinal, "Skeletal");
-    if (blockIdxSkeletal != GL_INVALID_INDEX) {
-        glUniformBlockBinding(_activeOrdinal, blockIdxSkeletal, kBindingPointIndexSkeletal);
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
-
-        SkeletalUniforms defaults;
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(SkeletalUniforms), &defaults, GL_STATIC_DRAW);
-    }
-
-    uint32_t blockIdxGrass = glGetUniformBlockIndex(_activeOrdinal, "Grass");
-    if (blockIdxGrass != GL_INVALID_INDEX) {
-        glUniformBlockBinding(_activeOrdinal, blockIdxGrass, kBindingPointIndexGrass);
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
-
-        GrassUniforms defaults;
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(GrassUniforms), &defaults, GL_STATIC_DRAW);
+template <class T>
+void Shaders::initUBO(const string &block, int bindingPoint, uint32_t ubo, const T &defaults, size_t size) {
+    uint32_t blockIdx = glGetUniformBlockIndex(_activeOrdinal, block.c_str());
+    if (blockIdx != GL_INVALID_INDEX) {
+        glUniformBlockBinding(_activeOrdinal, blockIdx, bindingPoint);
+        glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
+        glBufferData(GL_UNIFORM_BUFFER, size, &defaults, GL_STATIC_DRAW);
     }
 }
 
@@ -1229,19 +1229,39 @@ Shaders::~Shaders() {
 void Shaders::deinit() {
     if (!_inited) return;
 
+    // Delete UBO
     if (_uboCombined) {
         glDeleteBuffers(1, &_uboCombined);
         _uboCombined = 0;
+    }
+    if (_uboText) {
+        glDeleteBuffers(1, &_uboText);
+        _uboText = 0;
+    }
+    if (_uboLighting) {
+        glDeleteBuffers(1, &_uboLighting);
+        _uboLighting = 0;
     }
     if (_uboSkeletal) {
         glDeleteBuffers(1, &_uboSkeletal);
         _uboSkeletal = 0;
     }
+    if (_uboParticles) {
+        glDeleteBuffers(1, &_uboParticles);
+        _uboParticles = 0;
+    }
+    if (_uboGrass) {
+        glDeleteBuffers(1, &_uboGrass);
+        _uboGrass = 0;
+    }
+
+    // Delete programs
     for (auto &pair : _programs) {
         glDeleteProgram(pair.second);
     }
     _programs.clear();
 
+    // Delete shaders
     for (auto &pair : _shaders) {
         glDeleteShader(pair.second);
     }
@@ -1271,24 +1291,26 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 
 void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, offsetof(ShaderUniforms, lighting), &uniforms);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, offsetof(ShaderUniforms, text), &uniforms);
 
-    if (uniforms.general.featureMask & UniformFeatureFlags::lighting) {
-        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, lighting), sizeof(LightingUniforms), &uniforms.lighting);
-    }
-    if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
-        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, particles), sizeof(ParticlesUniforms), &uniforms.particles);
-    }
     if (uniforms.general.featureMask & UniformFeatureFlags::text) {
-        glBufferSubData(GL_UNIFORM_BUFFER, offsetof(ShaderUniforms, text), sizeof(TextUniforms), &uniforms.text);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexText, _uboText);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextUniforms), &uniforms.text);
     }
-
+    if (uniforms.general.featureMask & UniformFeatureFlags::lighting) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexLighting, _uboLighting);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightingUniforms), &uniforms.lighting);
+    }
     if (uniforms.general.featureMask & UniformFeatureFlags::skeletal) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), &uniforms.skeletal);
     }
+    if (uniforms.general.featureMask & UniformFeatureFlags::particles) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexParticles, _uboParticles);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ParticlesUniforms), &uniforms.particles);
+    }
     if (uniforms.general.featureMask & UniformFeatureFlags::grass) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboGrass);
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), &uniforms.grass);
     }
 }
