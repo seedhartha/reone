@@ -57,9 +57,6 @@ public:
     void update(float dt) override;
     void draw() override;
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
-    void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
-
     void refreshAABB();
     void signalEvent(const std::string &name);
 
@@ -86,6 +83,14 @@ public:
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
     void setWalkmesh(std::shared_ptr<render::Walkmesh> walkmesh);
+
+    // Attachments
+
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
+    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
+    void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
+
+    // END Attachments
 
     // Dynamic lighting
 

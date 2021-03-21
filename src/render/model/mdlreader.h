@@ -59,6 +59,7 @@ private:
     void readLight(render::ModelNode &node);
     void readNodeNames(const std::vector<uint32_t> &offsets);
     void readSkin(render::ModelNode &node);
+    void readReference(render::ModelNode &node);
 
     Model::Classification getClassification(int value) const;
 

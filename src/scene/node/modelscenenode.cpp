@@ -146,6 +146,12 @@ void ModelSceneNode::initModelNodes() {
                 childNode->addChild(emitterNode);
                 _emitters.push_back(emitterNode);
             }
+
+            // If model node is a reference, attach the model it contains to the model nodes scene node
+            shared_ptr<ModelNode::Reference> reference(child->reference());
+            if (reference) {
+                attach(*childNode, reference->model, _classification);
+            }
         }
     }
 
@@ -177,14 +183,16 @@ void ModelSceneNode::draw() {
 
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
-    if (!parentNode) return nullptr;
+    return parentNode ? attach(*parentNode, model, classification) : nullptr;
+}
 
-    const ModelNode *parentModelNode = parentNode->modelNode();
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
+    const ModelNode *parentModelNode = parent.modelNode();
     uint16_t parentNumber = parentModelNode->nodeNumber();
 
     auto maybeAttached = _attachedModels.find(parentNumber);
     if (maybeAttached != _attachedModels.end()) {
-        parentNode->removeChild(*maybeAttached->second);
+        parent.removeChild(*maybeAttached->second);
         _attachedModels.erase(maybeAttached);
     }
     if (model) {
@@ -193,12 +201,13 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
             ignoreNodes.insert(node->name());
         }
         auto modelNode = make_shared<ModelSceneNode>(classification, model, _sceneGraph, ignoreNodes);
-        parentNode->addChild(modelNode);
+        parent.addChild(modelNode);
 
         return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
     }
 
     return nullptr;
+
 }
 
 ModelNodeSceneNode *ModelSceneNode::getModelNode(const string &name) const {
