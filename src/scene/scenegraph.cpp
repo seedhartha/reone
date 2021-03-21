@@ -222,9 +222,8 @@ void SceneGraph::prepareParticles() {
         if (pair.first->emitter() != emitter) {
             flushEmitterParticles(emitter, emitterParticles);
             emitter = pair.first->emitter();
-        } else {
-            emitterParticles.push_back(pair.first);
         }
+        emitterParticles.push_back(pair.first);
     }
     flushEmitterParticles(emitter, emitterParticles);
 }
