@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_map>
 
 #include <boost/noncopyable.hpp>
@@ -29,6 +30,8 @@
 namespace reone {
 
 namespace render {
+
+class Model;
 
 /**
  * Node of a 3D model or an animation, which are tree-like data structures.
@@ -64,6 +67,11 @@ public:
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };
+    };
+
+    struct Reference {
+        std::shared_ptr<Model> model;
+        bool reattachable { false };
     };
 
     struct Skin {
@@ -125,10 +133,6 @@ public:
     float alpha() const { return _alpha; }
     float radius() const { return _radius; }
     float multiplier() const { return _multiplier; }
-    std::shared_ptr<Light> light() const { return _light; }
-    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
-    std::shared_ptr<Skin> skin() const { return _skin; }
-    std::shared_ptr<Emitter> emitter() const { return _emitter; }
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
     void setName(std::string name);
@@ -136,6 +140,16 @@ public:
     void setAbsoluteTransform(glm::mat4 transform);
     void setMesh(std::shared_ptr<ModelMesh> mesh);
     void setSkin(std::shared_ptr<Skin> skin);
+
+    // Components
+
+    std::shared_ptr<Light> light() const { return _light; }
+    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
+    std::shared_ptr<Skin> skin() const { return _skin; }
+    std::shared_ptr<Emitter> emitter() const { return _emitter; }
+    std::shared_ptr<Reference> reference() const { return _reference; }
+
+    // END Components
 
 private:
     int _index { 0 };
@@ -151,11 +165,6 @@ private:
     bool _aabb { false };
     bool _saber { false };
 
-    std::shared_ptr<ModelMesh> _mesh;
-    std::shared_ptr<Skin> _skin;
-    std::shared_ptr<Light> _light;
-    std::shared_ptr<Emitter> _emitter;
-
     std::vector<std::shared_ptr<ModelNode>> _children;
 
     // Spatial properties
@@ -167,6 +176,16 @@ private:
     glm::mat4 _absTransformInv { 1.0f };
 
     // END Spatial properties
+
+    // Components
+
+    std::shared_ptr<ModelMesh> _mesh;
+    std::shared_ptr<Skin> _skin;
+    std::shared_ptr<Light> _light;
+    std::shared_ptr<Emitter> _emitter;
+    std::shared_ptr<Reference> _reference;
+
+    // END Components
 
     // Keyframes
 

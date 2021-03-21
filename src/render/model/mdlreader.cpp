@@ -248,7 +248,7 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
         readEmitter(*node);
     }
     if (flags & NodeFlags::reference) {
-        ignore(68);
+        readReference(*node);
     }
     if (flags & NodeFlags::mesh) {
         node->_mesh = readMesh(name, flags);
@@ -653,6 +653,15 @@ void MdlReader::readLight(ModelNode &node) {
     node._light->shadow = static_cast<bool>(readUint32());
 
     ignore(8);
+}
+
+void MdlReader::readReference(ModelNode &node) {
+    string modelResRef(boost::to_lower_copy(readCString(32)));
+    bool reattachable = static_cast<bool>(readUint32());
+
+    node._reference = make_shared<ModelNode::Reference>();
+    node._reference->model = Models::instance().get(modelResRef);
+    node._reference->reattachable = reattachable;
 }
 
 unique_ptr<ModelMesh> MdlReader::readMesh(const string &nodeName, int nodeFlags) {
