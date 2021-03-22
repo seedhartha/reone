@@ -24,6 +24,7 @@
 
 #include "glm/gtx/quaternion.hpp"
 
+#include "aabbnode.h"
 #include "emitter.h"
 #include "modelmesh.h"
 
@@ -110,7 +111,7 @@ public:
     void addAlphaKeyframe(Keyframe keyframe);
     void addSelfIllumColorKeyframe(Keyframe keyframe);
 
-    bool isAABB() const { return _aabb; }
+    bool isAABB() const { return static_cast<bool>(_aabb); }
     bool isSaber() const { return _saber; }
 
     bool getTranslation(float time, glm::vec3 &translation, float scale = 1.0f) const;
@@ -151,10 +152,11 @@ public:
     // Components
 
     std::shared_ptr<Light> light() const { return _light; }
-    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
-    std::shared_ptr<Skin> skin() const { return _skin; }
     std::shared_ptr<Emitter> emitter() const { return _emitter; }
     std::shared_ptr<Reference> reference() const { return _reference; }
+    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
+    std::shared_ptr<Skin> skin() const { return _skin; }
+    std::shared_ptr<AABBNode> aabb() const { return _aabb; }
 
     // END Components
 
@@ -167,7 +169,6 @@ private:
     glm::vec3 _color { 0.0f };
     glm::vec3 _selfIllumColor { 0.0f };
     float _alpha { 1.0f };
-    bool _aabb { false };
     bool _saber { false };
 
     std::vector<std::shared_ptr<ModelNode>> _children;
@@ -184,11 +185,12 @@ private:
 
     // Components
 
-    std::shared_ptr<ModelMesh> _mesh;
-    std::shared_ptr<Skin> _skin;
     std::shared_ptr<Light> _light;
     std::shared_ptr<Emitter> _emitter;
     std::shared_ptr<Reference> _reference;
+    std::shared_ptr<ModelMesh> _mesh;
+    std::shared_ptr<Skin> _skin;
+    std::shared_ptr<AABBNode> _aabb;
 
     // END Components
 
