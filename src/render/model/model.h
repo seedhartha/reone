@@ -52,31 +52,31 @@ public:
     };
 
     Model(
-        const std::string &name,
+        std::string name,
         Classification classification,
-        const std::shared_ptr<ModelNode> &rootNode,
-        std::vector<std::shared_ptr<Animation>> &anims,
-        const std::shared_ptr<Model> &superModel = nullptr);
+        float animationScale,
+        std::shared_ptr<ModelNode> rootNode,
+        std::vector<std::shared_ptr<Animation>> animations,
+        std::shared_ptr<Model> superModel = nullptr);
 
-    void initGL();
+    void init();
 
     std::vector<std::string> getAnimationNames() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
 
-    Classification classification() const { return _classification; }
     const std::string &name() const { return _name; }
-    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
+    Classification classification() const { return _classification; }
     float animationScale() const { return _animationScale; }
+    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
-
-    void setAnimationScale(float scale);
 
 private:
     std::string _name;
     Classification _classification;
+    float _animationScale;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
@@ -84,9 +84,8 @@ private:
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
-    float _animationScale { 1.0f };
 
-    void init(const std::shared_ptr<ModelNode> &node);
+    void initInternal(const std::shared_ptr<ModelNode> &node);
 
     friend class MdlReader;
 };

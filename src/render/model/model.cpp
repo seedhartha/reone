@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../../common/collectionutil.h"
 #include "../../common/log.h"
 
 using namespace std;
@@ -28,28 +29,29 @@ namespace reone {
 namespace render {
 
 Model::Model(
-    const string &name,
+    string name,
     Classification classification,
-    const shared_ptr<ModelNode> &rootNode,
-    vector<shared_ptr<Animation>> &anims,
-    const shared_ptr<Model> &superModel
+    float animationScale,
+    shared_ptr<ModelNode> rootNode,
+    vector<shared_ptr<Animation>> animations,
+    shared_ptr<Model> superModel
 ) :
-    _name(name),
+    _name(move(name)),
     _classification(classification),
+    _animationScale(animationScale),
     _rootNode(rootNode),
-    _superModel(superModel) {
+    _superModel(move(superModel)) {
 
     if (!rootNode) {
         throw invalid_argument("rootNode must not be null");
     }
-    for (auto &anim : anims) {
+    for (auto &anim : animations) {
         _animations.insert(make_pair(anim->name(), move(anim)));
     }
-
-    init(_rootNode);
+    initInternal(_rootNode);
 }
 
-void Model::init(const shared_ptr<ModelNode> &node) {
+void Model::initInternal(const shared_ptr<ModelNode> &node) {
     _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
     _nodeByName.insert(make_pair(node->name(), node));
 
@@ -59,11 +61,11 @@ void Model::init(const shared_ptr<ModelNode> &node) {
     }
 
     for (auto &child : node->children()) {
-        init(child);
+        initInternal(child);
     }
 }
 
-void Model::initGL() {
+void Model::init() {
     _rootNode->initGL();
 }
 
@@ -85,29 +87,25 @@ vector<string> Model::getAnimationNames() const {
 
 shared_ptr<Animation> Model::getAnimation(const string &name) const {
     auto maybeAnim = _animations.find(name);
-    if (maybeAnim != _animations.end()) {
-        return maybeAnim->second;
-    }
-    if (_superModel) {
-        return _superModel->getAnimation(name);
-    }
-    debug(boost::format("Model: animation not found: '%s' '%s'") % name % _name, 2);
+    if (maybeAnim != _animations.end()) return maybeAnim->second;
 
-    return nullptr;
+    shared_ptr<Animation> anim;
+    if (_superModel) {
+        anim = _superModel->getAnimation(name);
+    }
+    if (!anim) {
+        debug(boost::format("Model animation not found: '%s' '%s'") % name % _name, 2);
+    }
+
+    return move(anim);
 }
 
 shared_ptr<ModelNode> Model::findNodeByNumber(uint16_t number) const {
-    auto it = _nodeByNumber.find(number);
-    return it != _nodeByNumber.end() ? it->second : nullptr;
+    return getFromLookupOrNull(_nodeByNumber, number);
 }
 
 shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
-    auto it = _nodeByName.find(name);
-    return it != _nodeByName.end() ? it->second : nullptr;
-}
-
-void Model::setAnimationScale(float scale) {
-    _animationScale = scale;
+    return getFromLookupOrNull(_nodeByName, name);
 }
 
 } // namespace render
