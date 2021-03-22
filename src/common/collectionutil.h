@@ -42,10 +42,16 @@ std::map<Src, Dest> associate(const std::vector<Src> &source, const std::functio
     return move(result);
 }
 
-template <class T>
-T getFromLookupOrNull(const std::unordered_map<uint32_t, T> &lookup, uint32_t key) {
+template <class K, class V>
+V getFromLookupOrNull(const std::unordered_map<K, V> &lookup, K key) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : nullptr;
+}
+
+template <class K, class V>
+V getFromLookupOrDefault(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : defaultValue;
 }
 
 } // namespace reone
