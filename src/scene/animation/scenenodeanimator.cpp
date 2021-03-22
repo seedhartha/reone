@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../node/lightnode.h"
 #include "../node/modelnodescenenode.h"
 #include "../node/modelscenenode.h"
 #include "../types.h"
@@ -94,7 +95,7 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
     if (isInTransition()) {
         float delta = 1.0f - (_channels[0].getTransitionTime() - _channels[0].time()) / _channels[0].getTransitionTime();
 
-        // In the Blend mode, blend animations on the first two channels
+        // In the Blend mode, blend animations on the first two channels (only transforms)
         SceneNodeState channel0State, channel1State;
         bool hasChannel0State = _channels[0].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel0State);
         bool hasChannel1State = _channels[1].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel1State);
@@ -112,62 +113,62 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
         } else if (hasChannel1State && (channel1State.flags & SceneNodeStateFlags::transform)) {
             localTransform = move(channel1State.transform);
         }
-        if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha) &&
-            hasChannel1State && (channel1State.flags & SceneNodeStateFlags::alpha)) {
-
-            state.flags |= SceneNodeStateFlags::alpha;
-            state.alpha = glm::mix(channel1State.alpha, channel0State.alpha, delta);
-
-        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha)) {
-            state.flags |= SceneNodeStateFlags::alpha;
-            state.alpha = channel0State.alpha;
-
-        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::alpha)) {
-            state.flags |= SceneNodeStateFlags::alpha;
-            state.alpha = channel1State.alpha;
-        }
-        if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum) &&
-            hasChannel1State && (channel1State.flags & SceneNodeStateFlags::selfIllum)) {
-
-            state.flags |= SceneNodeStateFlags::selfIllum;
-            state.selfIllumColor = glm::mix(channel1State.selfIllumColor, channel0State.selfIllumColor, delta);
-
-        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum)) {
-            state.flags |= SceneNodeStateFlags::selfIllum;
-            state.selfIllumColor = channel0State.selfIllumColor;
-
-        } else if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::selfIllum)) {
-            state.flags |= SceneNodeStateFlags::selfIllum;
-            state.selfIllumColor = channel1State.selfIllumColor;
+        if (hasChannel0State) {
+            if (channel0State.flags & SceneNodeStateFlags::alpha) {
+                state.flags |= SceneNodeStateFlags::alpha;
+                state.alpha = channel0State.alpha;
+            }
+            if (channel0State.flags & SceneNodeStateFlags::selfIllum) {
+                state.flags |= SceneNodeStateFlags::selfIllum;
+                state.selfIllumColor = channel0State.selfIllumColor;
+            }
+            if (channel0State.flags & SceneNodeStateFlags::lightColor) {
+                state.flags |= SceneNodeStateFlags::lightColor;
+                state.lightColor = channel0State.lightColor;
+            }
+            if (channel0State.flags & SceneNodeStateFlags::lightMultiplier) {
+                state.flags |= SceneNodeStateFlags::lightMultiplier;
+                state.lightMultiplier = channel0State.lightMultiplier;
+            }
+            if (channel0State.flags & SceneNodeStateFlags::lightRadius) {
+                state.flags |= SceneNodeStateFlags::lightRadius;
+                state.lightRadius = channel0State.lightRadius;
+            }
         }
     } else if (_compositionMode == CompositionMode::Overlay) {
         // In the Overlay mode, for each state component select the first animation channel to have state for the given node
+        int componentsLeft = SceneNodeStateFlags::all;
         for (int i = kChannelCount - 1; i >= 0; --i) {
             SceneNodeState channelState;
             if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
-                if (channelState.flags & SceneNodeStateFlags::transform) {
+                if ((channelState.flags & SceneNodeStateFlags::transform) && (componentsLeft & SceneNodeStateFlags::transform)) {
                     localTransform = move(channelState.transform);
-                    break;
+                    componentsLeft &= ~SceneNodeStateFlags::transform;
                 }
-            }
-        }
-        for (int i = kChannelCount - 1; i >= 0; --i) {
-            SceneNodeState channelState;
-            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
-                if (channelState.flags & SceneNodeStateFlags::alpha) {
+                if ((channelState.flags & SceneNodeStateFlags::alpha) && (componentsLeft & SceneNodeStateFlags::alpha)) {
                     state.flags |= SceneNodeStateFlags::alpha;
                     state.alpha = channelState.alpha;
-                    break;
+                    componentsLeft &= ~SceneNodeStateFlags::alpha;
                 }
-            }
-        }
-        for (int i = kChannelCount - 1; i >= 0; --i) {
-            SceneNodeState channelState;
-            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
-                if (channelState.flags & SceneNodeStateFlags::selfIllum) {
+                if ((channelState.flags & SceneNodeStateFlags::selfIllum) && (componentsLeft & SceneNodeStateFlags::selfIllum)) {
                     state.flags |= SceneNodeStateFlags::selfIllum;
                     state.selfIllumColor = move(channelState.selfIllumColor);
-                    break;
+                    componentsLeft &= ~SceneNodeStateFlags::selfIllum;
+                }
+                if ((channelState.flags & SceneNodeStateFlags::lightColor) && (componentsLeft & SceneNodeStateFlags::lightColor)) {
+                    state.flags |= SceneNodeStateFlags::lightColor;
+                    state.lightColor = move(channelState.lightColor);
+                    componentsLeft &= ~SceneNodeStateFlags::lightColor;
+                }
+                if ((channelState.flags & SceneNodeStateFlags::lightMultiplier) && (componentsLeft & SceneNodeStateFlags::lightMultiplier)) {
+                    state.flags |= SceneNodeStateFlags::lightMultiplier;
+                    state.lightMultiplier = channelState.lightMultiplier;
+                    componentsLeft &= ~SceneNodeStateFlags::lightMultiplier;
+                }
+                if ((channelState.flags & SceneNodeStateFlags::lightRadius) && (componentsLeft & SceneNodeStateFlags::lightRadius)) {
+                    state.flags |= SceneNodeStateFlags::lightRadius;
+                    state.lightRadius = channelState.lightRadius;
+                    componentsLeft &= ~SceneNodeStateFlags::lightRadius;
                 }
             }
         }
@@ -185,6 +186,18 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
             if (channelState.flags & SceneNodeStateFlags::selfIllum) {
                 state.flags |= SceneNodeStateFlags::selfIllum;
                 state.selfIllumColor = move(channelState.selfIllumColor);
+            }
+            if (channelState.flags & SceneNodeStateFlags::lightColor) {
+                state.flags |= SceneNodeStateFlags::lightColor;
+                state.lightColor = move(channelState.lightColor);
+            }
+            if (channelState.flags & SceneNodeStateFlags::lightMultiplier) {
+                state.flags |= SceneNodeStateFlags::lightMultiplier;
+                state.lightMultiplier = channelState.lightMultiplier;
+            }
+            if (channelState.flags & SceneNodeStateFlags::lightRadius) {
+                state.flags |= SceneNodeStateFlags::lightRadius;
+                state.lightRadius = channelState.lightRadius;
             }
         }
     }
@@ -215,6 +228,18 @@ void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
         }
         if (state.flags & SceneNodeStateFlags::selfIllum) {
             sceneNode->setSelfIllumColor(state.selfIllumColor);
+        }
+        LightSceneNode *light = _sceneNode->getLightNodeByNumber(modelNode.nodeNumber());
+        if (light) {
+            if (state.flags & SceneNodeStateFlags::lightColor) {
+                light->setColor(state.lightColor);
+            }
+            if (state.flags & SceneNodeStateFlags::lightMultiplier) {
+                light->setMultiplier(state.lightMultiplier);
+            }
+            if (state.flags & SceneNodeStateFlags::lightRadius) {
+                light->setRadius(state.lightRadius);
+            }
         }
     }
 

@@ -27,7 +27,7 @@ namespace scene {
 
 class LightSceneNode : public SceneNode {
 public:
-    LightSceneNode(glm::vec3 color, int priority, SceneGraph *sceneGraph);
+    LightSceneNode(int priority, SceneGraph *sceneGraph);
 
     bool isShadow() const { return _shadow; }
     bool isAmbientOnly() const { return _ambientOnly; }
@@ -37,15 +37,16 @@ public:
     float multiplier() const { return _multiplier; }
     float radius() const { return _radius; }
 
+    void setColor(glm::vec3 color);
     void setMultiplier(float multiplier);
     void setRadius(float radius);
     void setShadow(bool shadow);
     void setAmbientOnly(bool ambientOnly);
 
 private:
-    glm::vec3 _color;
     int _priority;
 
+    glm::vec3 _color { 1.0f };
     float _multiplier { 1.0f };
     float _radius { 1.0f };
     bool _shadow { false };

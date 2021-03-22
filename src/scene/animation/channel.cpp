@@ -160,6 +160,21 @@ void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
                 state.flags |= SceneNodeStateFlags::selfIllum;
                 state.selfIllumColor = move(selfIllumColor);
             }
+            glm::vec3 lightColor;
+            if (animNode.lightColors().getByTime(_time, lightColor)) {
+                state.flags |= SceneNodeStateFlags::lightColor;
+                state.lightColor = move(lightColor);
+            }
+            float lightMultiplier;
+            if (animNode.lightMultipliers().getByTime(_time, lightMultiplier)) {
+                state.flags |= SceneNodeStateFlags::lightMultiplier;
+                state.lightMultiplier = lightMultiplier;
+            }
+            float lightRadius;
+            if (animNode.lightRadii().getByTime(_time, lightRadius)) {
+                state.flags |= SceneNodeStateFlags::lightRadius;
+                state.lightRadius = lightRadius;
+            }
             if (transformChanged) {
                 glm::mat4 transform(1.0f);
                 transform = glm::scale(transform, glm::vec3(scale));

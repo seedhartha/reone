@@ -34,6 +34,9 @@ struct SceneNodeState {
     glm::mat4 transform { 1.0f };
     float alpha { 1.0f };
     glm::vec3 selfIllumColor { 0.0f };
+    glm::vec3 lightColor { 1.0f };
+    float lightMultiplier { 1.0f };
+    float lightRadius { 1.0f };
 };
 
 } // namespace scene
