@@ -536,8 +536,7 @@ void MdlReader::doLoad() {
         superModel = Models::instance().get(superModelName);
     }
 
-    _model = make_unique<Model>(name, getClassification(_modelHeader.classification), move(rootNode), anims, superModel);
-    _model->setAnimationScale(_modelHeader.animationScale);
+    _model = make_unique<Model>(name, getClassification(_modelHeader.classification), _modelHeader.animationScale, move(rootNode), anims, superModel);
 }
 
 void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {

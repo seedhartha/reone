@@ -68,7 +68,7 @@ shared_ptr<Model> Models::doGet(const string &resRef, ResourceType type) {
     debug("Load model " + resRef);
     shared_ptr<Model> model(maybeLoader->second->loadModel(_gameId, resRef));
     if (model) {
-        model->initGL();
+        model->init();
     }
 
     return move(model);
