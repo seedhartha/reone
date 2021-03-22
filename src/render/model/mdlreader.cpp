@@ -268,12 +268,12 @@ static const unordered_map<uint32_t, ControllerFn> g_genericControllers {
     { 8, &readPositionController },
     { 20, &readOrientationController },
     { 36, &readScaleController },
-    { 76, &readColorController },
     { 100, &readSelfIllumColorController },
     { 132, &readAlphaController }
 };
 
 static const unordered_map<uint32_t, ControllerFn> g_lightControllers {
+    { 76, &readColorController },
     { 88, &readRadiusController },
     { 140, &readMultiplierController }
 };
