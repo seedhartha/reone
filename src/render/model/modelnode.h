@@ -73,6 +73,13 @@ public:
         std::unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     };
 
+    struct Danglymesh {
+        float displacement { 0.0f };
+        float tightness { 0.0f };
+        float period { 0.0f };
+        std::vector<float> constraints;
+    };
+
     ModelNode(int index, const ModelNode *parent = nullptr);
 
     void init();
@@ -128,6 +135,7 @@ public:
     std::shared_ptr<Reference> reference() const { return _reference; }
     std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
     std::shared_ptr<Skin> skin() const { return _skin; }
+    std::shared_ptr<Danglymesh> danglymesh() const { return _danglymesh; }
     std::shared_ptr<AABBNode> aabb() const { return _aabb; }
 
     // END Components
@@ -173,6 +181,7 @@ private:
     std::shared_ptr<Reference> _reference;
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
+    std::shared_ptr<Danglymesh> _danglymesh;
     std::shared_ptr<AABBNode> _aabb;
     bool _saber { false };
 
