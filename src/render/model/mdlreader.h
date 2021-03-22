@@ -246,6 +246,9 @@ private:
 
     int _nodeIndex { 0 };
     std::vector<std::string> _nodeNames;
+    std::unordered_map<uint32_t, int> _nodeFlags;
+    bool _animations { false }; /**< currently reading animations */
+
     std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
@@ -255,7 +258,7 @@ private:
     std::vector<std::shared_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
 
-    void readControllers(uint32_t keyCount, uint32_t keyOffset, const std::vector<float> &data, render::ModelNode &node);
+    void readControllers(int nodeFlags, uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, render::ModelNode &node);
     void readLight(render::ModelNode &node);
     void readEmitter(render::ModelNode &node);
     void readReference(render::ModelNode &node);

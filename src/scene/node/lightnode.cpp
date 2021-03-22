@@ -25,10 +25,13 @@ namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(glm::vec3 color, int priority, SceneGraph *sceneGraph) :
+LightSceneNode::LightSceneNode(int priority, SceneGraph *sceneGraph) :
     SceneNode(SceneNodeType::Light, sceneGraph),
-    _color(move(color)),
     _priority(priority) {
+}
+
+void LightSceneNode::setColor(glm::vec3 color) {
+    _color = move(color);
 }
 
 void LightSceneNode::setMultiplier(float multiplier) {

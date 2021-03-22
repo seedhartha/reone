@@ -78,6 +78,12 @@ public:
         return _keyframes[frame].second;
     }
 
+    V getByKeyframeOrDefault(int frame, V defaultValue) const {
+        return frame < static_cast<int>(_keyframes.size()) ?
+            getByKeyframe(frame) :
+            move(defaultValue);
+    }
+
     void addKeyframe(float time, V value) {
         _keyframes.push_back(make_pair(time, value));
     }

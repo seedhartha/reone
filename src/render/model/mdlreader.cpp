@@ -38,8 +38,6 @@ using namespace std;
 
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace render {
@@ -173,7 +171,6 @@ static void readScaleController(const ControllerKey &key, const vector<float> &d
         float scale = data[key.dataIndex + i];
         node.scales().addKeyframe(time, scale);
     }
-
     node.scales().update();
 }
 
@@ -183,7 +180,6 @@ static void readAlphaController(const ControllerKey &key, const vector<float> &d
         float alpha = data[key.dataIndex + i];
         node.alphas().addKeyframe(time, alpha);
     }
-
     node.alphas().update();
 }
 
@@ -193,16 +189,25 @@ static void readSelfIllumColorController(const ControllerKey &key, const vector<
         glm::vec3 color(glm::make_vec3(&data[key.dataIndex + 3 * i]));
         node.selfIllumColors().addKeyframe(time, move(color));
     }
-
     node.selfIllumColors().update();
 }
 
 static void readColorController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.light()->color = glm::make_vec3(&data[key.dataIndex]);
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        float time = data[key.timeIndex + i];
+        glm::vec3 color(glm::make_vec3(&data[key.dataIndex + 3 * i]));
+        node.lightColors().addKeyframe(time, move(color));
+    }
+    node.lightColors().update();
 }
 
 static void readRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.light()->radius = data[key.dataIndex];
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        float time = data[key.timeIndex + i];
+        float radius = data[key.dataIndex + i];
+        node.lightRadii().addKeyframe(time, radius);
+    }
+    node.lightRadii().update();
 }
 
 static void readShadowRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -214,7 +219,12 @@ static void readVerticalDisplacementController(const ControllerKey &key, const v
 }
 
 static void readMultiplierController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.light()->multiplier = data[key.dataIndex];
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        float time = data[key.timeIndex + i];
+        float multiplier = data[key.dataIndex + i];
+        node.lightMultipliers().addKeyframe(time, multiplier);
+    }
+    node.lightMultipliers().update();
 }
 
 static void readAlphaEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -412,7 +422,10 @@ static void readDetonateController(const ControllerKey &key, const vector<float>
 static const unordered_map<uint32_t, ControllerFn> g_genericControllers {
     { 8, &readPositionController },
     { 20, &readOrientationController },
-    { 36, &readScaleController },
+    { 36, &readScaleController }
+};
+
+static const unordered_map<uint32_t, ControllerFn> g_meshControllers {
     { 100, &readSelfIllumColorController },
     { 132, &readAlphaController }
 };
@@ -478,7 +491,9 @@ static const unordered_map<uint32_t, ControllerFn> g_emitterControllers {
 
 static function<void(const ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
-    if (nodeFlags & NodeFlags::light) {
+    if (nodeFlags & NodeFlags::mesh) {
+        fn = getFromLookupOrNull(g_meshControllers, type);
+    } else if (nodeFlags & NodeFlags::light) {
         fn = getFromLookupOrNull(g_lightControllers, type);
     } else if (nodeFlags & NodeFlags::emitter) {
         fn = getFromLookupOrNull(g_emitterControllers, type);
@@ -557,6 +572,7 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     transform = glm::translate(transform, position);
     transform *= glm::mat4_cast(orientation);
 
+
     auto node = make_unique<ModelNode>(_nodeIndex++, parent);
     node->_flags = header.flags;
     node->_nodeNumber = header.nodeNumber;
@@ -584,8 +600,17 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
         node->_saber = true;
     }
 
+    // When reading animation node controllers, take node flags from the
+    // corresponding model node. This is needed to determine which controller
+    // lookup table to use.
+    int controllerNodeFlags;
+    if (_animations) {
+        controllerNodeFlags = _nodeFlags.find(header.nodeNumber)->second;
+    } else {
+        controllerNodeFlags = header.flags;
+    }
     vector<float> controllerData(readArray<float>(kMdlDataOffset + header.controllerData.offset, header.controllerData.count));
-    readControllers(header.controllers.count, header.controllers.offset, controllerData, *node);
+    readControllers(controllerNodeFlags, header.controllers.offset, header.controllers.count, controllerData, *node);
 
     if (header.flags & NodeFlags::light) {
         readLight(*node);
@@ -621,16 +646,24 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
 
     seek(pos);
 
+    // When reading model (not animation) nodes, fill node flags lookup table
+    if (!_animations) {
+        _nodeFlags.insert(make_pair(header.nodeNumber, header.flags));
+    }
+
     return move(node);
 }
 
-void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vector<float> &data, ModelNode &node) {
+void MdlReader::readControllers(int nodeFlags, uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, ModelNode &node) {
+    // TODO: enable animating emitter properties
+    if (_animations && (nodeFlags & NodeFlags::emitter)) return;
+
     size_t pos = tell();
     seek(kMdlDataOffset + keyOffset);
 
     vector<ControllerKey> keys(readArray<ControllerKey>(keyCount));
     for (ControllerKey key : keys) {
-        auto fn = getControllerFn(key.type, node._flags);
+        auto fn = getControllerFn(key.type, nodeFlags);
         if (fn) {
             fn(key, data, node);
         } else {
@@ -933,7 +966,9 @@ vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &
     vector<shared_ptr<Animation>> anims;
     anims.reserve(offsets.size());
 
+    _animations = true;
     for (uint32_t offset : offsets) {
+        _nodeIndex = 0;
         anims.push_back(readAnimation(offset));
     }
 
@@ -944,10 +979,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     seek(kMdlDataOffset + offset);
 
     AnimationHeader header(readStruct<AnimationHeader>());
-
     string name(getStringLower(header.geometry.name, 32));
-
-    _nodeIndex = 0;
     unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + header.geometry.offRootNode, nullptr));
 
     vector<Animation::Event> events;

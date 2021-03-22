@@ -18,6 +18,7 @@
 #include <stack>
 #include <stdexcept>
 
+#include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../render/featureutil.h"
 #include "../../render/meshes.h"
@@ -112,12 +113,14 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                auto lightNode = make_shared<LightSceneNode>(light->color, light->priority, _sceneGraph);
-                lightNode->setMultiplier(light->multiplier);
-                lightNode->setRadius(light->radius);
+                auto lightNode = make_shared<LightSceneNode>(light->priority, _sceneGraph);
+                lightNode->setColor(child->lightColors().getByKeyframeOrDefault(0, glm::vec3(1.0f)));
+                lightNode->setMultiplier(child->lightMultipliers().getByKeyframeOrDefault(0, 1.0f));
+                lightNode->setRadius(child->lightRadii().getByKeyframeOrDefault(0, 1.0f));
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
                 childNode->addChild(lightNode);
+                _lightNodeByNumber.insert(make_pair(modelNode->nodeNumber(), lightNode.get()));
             }
 
             shared_ptr<Emitter> emitter(child->emitter());
@@ -155,8 +158,8 @@ void ModelSceneNode::draw() {
 
         ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
         uniforms.combined.general.model = move(transform);
-        Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
 
+        Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
         Meshes::instance().getAABB()->draw();
     }
 }
@@ -194,25 +197,22 @@ ModelNodeSceneNode *ModelSceneNode::getModelNode(const string &name) const {
     shared_ptr<ModelNode> modelNode(_model->findNodeByName(name));
     if (!modelNode) return nullptr;
 
-    auto maybeSceneNode = _modelNodeByNumber.find(modelNode->nodeNumber());
-    if (maybeSceneNode == _modelNodeByNumber.end()) return nullptr;
-
-    return maybeSceneNode->second;
+    return getFromLookupOrNull(_modelNodeByNumber, modelNode->nodeNumber());
 }
 
 ModelNodeSceneNode *ModelSceneNode::getModelNodeByIndex(int index) const {
-    auto maybeNode = _modelNodeByIndex.find(index);
-    if (maybeNode == _modelNodeByIndex.end()) return nullptr;
+    return getFromLookupOrNull(_modelNodeByIndex, static_cast<uint16_t>(index));
+}
 
-    return maybeNode->second;
+LightSceneNode *ModelSceneNode::getLightNodeByNumber(uint16_t nodeNumber) const {
+    return getFromLookupOrNull(_lightNodeByNumber, nodeNumber);
 }
 
 shared_ptr<ModelSceneNode> ModelSceneNode::getAttachedModel(const string &parent) const {
     shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
     if (!parentModelNode) return nullptr;
 
-    auto maybeAttached = _attachedModels.find(parentModelNode->nodeNumber());
-    return maybeAttached != _attachedModels.end() ? maybeAttached->second : nullptr;
+    return getFromLookupOrNull(_attachedModels, parentModelNode->nodeNumber());
 }
 
 void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &node) {

@@ -64,6 +64,7 @@ public:
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
+    LightSceneNode *getLightNodeByNumber(uint16_t nodeNumber) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
     glm::vec3 getCenterOfAABB() const;
@@ -111,6 +112,7 @@ private:
 
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
+    std::unordered_map<uint16_t, LightSceneNode *> _lightNodeByNumber;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     bool _visible { true };

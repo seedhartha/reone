@@ -57,11 +57,6 @@ public:
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };
-
-        // These come from controllers
-        glm::vec3 color { 1.0f };
-        float multiplier { 1.0f };
-        float radius { 1.0f };
     };
 
     struct Reference {
@@ -152,6 +147,12 @@ public:
     AnimatedProperty<float> &alphas() { return _alphas; }
     const AnimatedProperty<glm::vec3> &selfIllumColors() const { return _selfIllumColors; }
     AnimatedProperty<glm::vec3> &selfIllumColors() { return _selfIllumColors; }
+    const AnimatedProperty<glm::vec3> &lightColors() const { return _lightColors; }
+    AnimatedProperty<glm::vec3> &lightColors() { return _lightColors; }
+    const AnimatedProperty<float> &lightMultipliers() const { return _lightMultipliers; }
+    AnimatedProperty<float> &lightMultipliers() { return _lightMultipliers; }
+    const AnimatedProperty<float> &lightRadii() const { return _lightRadii; }
+    AnimatedProperty<float> &lightRadii() { return _lightRadii; }
 
     // END Animation
 
@@ -194,6 +195,9 @@ private:
     AnimatedProperty<float> _scales;
     AnimatedProperty<float> _alphas;
     AnimatedProperty<glm::vec3> _selfIllumColors;
+    AnimatedProperty<glm::vec3> _lightColors;
+    AnimatedProperty<float> _lightMultipliers;
+    AnimatedProperty<float> _lightRadii;
 
     // END Animation
 

@@ -46,6 +46,11 @@ struct SceneNodeStateFlags {
     static constexpr int transform = 1;
     static constexpr int alpha = 2;
     static constexpr int selfIllum = 4;
+    static constexpr int lightColor = 8;
+    static constexpr int lightMultiplier = 0x10;
+    static constexpr int lightRadius = 0x20;
+
+    static constexpr int all = transform | alpha | selfIllum | lightColor | lightMultiplier | lightRadius;
 };
 
 } // namespace scene
