@@ -56,7 +56,6 @@ private:
     std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
-    void openMDX();
 
     std::unique_ptr<render::Animation> readAnimation(uint32_t offset);
     std::unique_ptr<render::ModelMesh> readMesh(const std::string &nodeName, int nodeFlags);
