@@ -26,6 +26,7 @@
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../common/stringutil.h"
 #include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
@@ -42,7 +43,6 @@ namespace reone {
 
 namespace render {
 
-static constexpr int kSignatureSize = 4;
 static constexpr int kMdlDataOffset = 12;
 
 struct NodeFlags {
@@ -59,11 +59,39 @@ struct NodeFlags {
     static constexpr int saber = 0x800;
 };
 
-static constexpr char kSignature[] = "\0\0\0\0";
+// Classificaiton
 
-typedef function<void(const MdlReader::ControllerKey &, const vector<float> &, ModelNode &)> ControllerFn;
+static unordered_map<uint8_t, Model::Classification> g_classifications {
+    { 0, Model::Classification::Other },
+    { 1, Model::Classification::Effect },
+    { 2, Model::Classification::Tile },
+    { 4, Model::Classification::Character },
+    { 8, Model::Classification::Door },
+    { 0x10, Model::Classification::Lightsaber },
+    { 0x20, Model::Classification::Placeable },
+    { 0x40, Model::Classification::Flyer }
+};
 
-static void readPositionController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static Model::Classification getClassification(uint8_t ordinal) {
+    return getFromLookupOrDefault(g_classifications, ordinal, Model::Classification::Other);
+}
+
+// END Classification
+
+// Controllers
+
+struct ControllerKey {
+    uint32_t type { 0 };
+    uint16_t unknown1 { 0 };
+    uint16_t rowCount { 0 };
+    uint16_t timeIndex { 0 };
+    uint16_t dataIndex { 0 };
+    uint8_t columnCount { 0 };
+};
+
+typedef function<void(const ControllerKey &, const vector<float> &, ModelNode &)> ControllerFn;
+
+static void readPositionController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     bool bezier = key.columnCount & 16;
 
     switch (key.columnCount) {
@@ -85,7 +113,7 @@ static void readPositionController(const MdlReader::ControllerKey &key, const ve
     }
 }
 
-static void readOrientationController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readOrientationController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     switch (key.columnCount) {
         case 2:
             for (uint16_t i = 0; i < key.rowCount; ++i) {
@@ -137,7 +165,7 @@ static void readOrientationController(const MdlReader::ControllerKey &key, const
     }
 }
 
-static void readScaleController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readScaleController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     for (uint16_t i = 0; i < key.rowCount; ++i) {
         ModelNode::Keyframe frame;
         frame.time = data[key.timeIndex + i];
@@ -147,7 +175,7 @@ static void readScaleController(const MdlReader::ControllerKey &key, const vecto
     }
 }
 
-static void readAlphaController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readAlphaController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     if (key.rowCount == 1) {
         node.setAlpha(data[key.dataIndex]);
         return;
@@ -162,7 +190,7 @@ static void readAlphaController(const MdlReader::ControllerKey &key, const vecto
     }
 }
 
-static void readSelfIllumColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSelfIllumColorController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     if (key.rowCount == 1) {
         node.setSelfIllumColor(glm::make_vec3(&data[key.dataIndex]));
         return;
@@ -177,215 +205,215 @@ static void readSelfIllumColorController(const MdlReader::ControllerKey &key, co
     }
 }
 
-static void readColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readColorController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.setColor(glm::make_vec3(&data[key.dataIndex]));
 }
 
-static void readRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.light()->radius = data[key.dataIndex];
 }
 
-static void readShadowRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readShadowRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readVerticalDisplacementController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readVerticalDisplacementController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readMultiplierController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readMultiplierController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.light()->multiplier = data[key.dataIndex];
 }
 
-static void readAlphaEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readAlphaEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->alpha().end = data[key.dataIndex];
 }
 
-static void readAlphaStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readAlphaStartController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->alpha().start = data[key.dataIndex];
 }
 
-static void readBirthrateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readBirthrateController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setBirthrate(static_cast<int>(data[key.dataIndex]));
 }
 
-static void readBounceCoController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readBounceCoController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readCombineTimeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readCombineTimeController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readDragController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readDragController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readFPSController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readFPSController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setFPS(static_cast<int>(data[key.dataIndex]));
 }
 
-static void readFrameEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readFrameEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setFrameEnd(static_cast<int>(data[key.dataIndex]));
 }
 
-static void readFrameStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readFrameStartController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setFrameStart(static_cast<int>(data[key.dataIndex]));
 }
 
-static void readGravController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readGravController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLifeExpController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLifeExpController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setLifeExpectancy(static_cast<int>(data[key.dataIndex]));
 }
 
-static void readMassController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readMassController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readP2PBezier2Controller(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readP2PBezier2Controller(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readP2PBezier3Controller(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readP2PBezier3Controller(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readParticleRotController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readParticleRotController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readRandVelController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readRandVelController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setRandomVelocity(data[key.dataIndex]);
 }
 
-static void readSizeStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeStartController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->particleSize().start = data[key.dataIndex];
 }
 
-static void readSizeEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->particleSize().end = data[key.dataIndex];
 }
 
-static void readSizeStartYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeStartYController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readSizeEndYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeEndYController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSpreadController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setSpread(data[key.dataIndex]);
 }
 
-static void readThresholdController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readThresholdController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readVelocityController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setVelocity(data[key.dataIndex]);
 }
 
-static void readXSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readXSizeController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->size().x = data[key.dataIndex];
 }
 
-static void readYSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readYSizeController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->size().y = data[key.dataIndex];
 }
 
-static void readBlurLengthController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readBlurLengthController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLightingDelayController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLightingDelayController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLightingRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLightingRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLightingScaleController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLightingScaleController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLightingSubDivController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLightingSubDivController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readLightingZigZagController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readLightingZigZagController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readAlphaMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readAlphaMidController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->alpha().mid = data[key.dataIndex];
 }
 
-static void readPercentStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readPercentStartController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readPercentMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readPercentMidController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readPercentEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readPercentEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readSizeMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeMidController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->particleSize().mid = data[key.dataIndex];
 }
 
-static void readSizeMidYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readSizeMidYController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readRandomBirthRateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readRandomBirthRateController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readTargetSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readTargetSizeController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readNumControlPtsController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readNumControlPtsController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readControlPtRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readControlPtRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readControlPtDelayController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readControlPtDelayController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readTangentSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readTangentSpreadController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readTangentLengthController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readTangentLengthController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
-static void readColorMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readColorMidController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->color().mid = glm::make_vec3(&data[key.dataIndex]);
 }
 
-static void readColorEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readColorEndController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->color().end = glm::make_vec3(&data[key.dataIndex]);
 }
 
-static void readColorStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readColorStartController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->color().start = glm::make_vec3(&data[key.dataIndex]);
 }
 
-static void readDetonateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readDetonateController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     // TODO: implement
 }
 
@@ -459,185 +487,7 @@ static const unordered_map<uint32_t, ControllerFn> g_emitterControllers {
     { 502, &readDetonateController }
 };
 
-MdlReader::MdlReader(GameID gameId) : BinaryReader(kSignatureSize, kSignature), _gameId(gameId) {
-}
-
-void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
-    _mdx = mdx;
-    _mdxReader = make_unique<StreamReader>(mdx);
-
-    BinaryReader::load(mdl);
-}
-
-void MdlReader::doLoad() {
-    uint32_t mdlDataSize = readUint32();
-    uint32_t mdxSize = readUint32();
-
-    ignore(8);
-
-    _name = readCString(32);
-    boost::to_lower(_name);
-
-    uint32_t rootNodeOffset = readUint32();
-    uint32_t nodeCount = readUint32();
-
-    ignore(28);
-
-    uint8_t type = readByte();
-
-    ignore(3);
-
-    uint8_t classificationVal = readByte();
-    _classification = getClassification(classificationVal);
-
-    ignore(2);
-
-    uint8_t fogged = readByte();
-
-    ignore(4);
-
-    uint32_t animOffOffset, animCount;
-    readArrayDefinition(animOffOffset, animCount);
-    vector<uint32_t> animOffsets(readArray<uint32_t>(kMdlDataOffset + animOffOffset, animCount));
-
-    ignore(28);
-
-    float radius = readFloat();
-    float scale = readFloat();
-
-    string superModelName(readCString(32));
-    boost::to_lower(superModelName);
-
-    ignore(16);
-
-    uint32_t nameOffOffset, nameCount;
-    readArrayDefinition(nameOffOffset, nameCount);
-    vector<uint32_t> nameOffsets(readArray<uint32_t>(kMdlDataOffset + nameOffOffset, nameCount));
-    readNodeNames(nameOffsets);
-
-    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
-    rootNode->computeAbsoluteTransforms();
-
-    vector<shared_ptr<Animation>> anims(readAnimations(animOffsets));
-    shared_ptr<Model> superModel;
-
-    if (!superModelName.empty() && superModelName != "null") {
-        superModel = Models::instance().get(superModelName);
-    }
-
-    _model = make_unique<Model>(_name, _classification, move(rootNode), anims, superModel);
-    _model->setAnimationScale(scale);
-}
-
-void MdlReader::readArrayDefinition(uint32_t &offset, uint32_t &count) {
-    offset = readUint32();
-    count = readUint32();
-    ignore(4);
-}
-
-void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
-    map<string, int> nameHits;
-
-    for (uint32_t offset : offsets) {
-        string name(readCStringAt(kMdlDataOffset + offset));
-        boost::to_lower(name);
-
-        int hitCount = nameHits[name]++;
-        if (hitCount > 0) {
-            warn("MDL: duplicate node name: " + name);
-            name = str(boost::format("%s_dup%d") % name % hitCount);
-        }
-        _nodeNames.push_back(move(name));
-    }
-}
-
-unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
-    size_t pos = tell();
-    seek(offset);
-
-    uint16_t flags = readUint16();
-    if (flags & 0xf408) {
-        throw runtime_error("MDL: unsupported node flags: " + to_string(flags));
-    }
-
-    ignore(2);
-
-    uint16_t nodeNumber = readUint16();
-    string name(_nodeNames[nodeNumber]);
-
-    ignore(10);
-
-    vector<float> positionValues(readArray<float>(3));
-    glm::vec3 position(glm::make_vec3(&positionValues[0]));
-
-    vector<float> orientationValues(readArray<float>(4));
-    glm::quat orientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, position);
-    transform *= glm::mat4_cast(orientation);
-
-    uint32_t childOffOffset, childCount;
-    readArrayDefinition(childOffOffset, childCount);
-    vector<uint32_t> childOffsets(readArray<uint32_t>(kMdlDataOffset + childOffOffset, childCount));
-
-    uint32_t controllerKeyOffset, controllerKeyCount;
-    readArrayDefinition(controllerKeyOffset, controllerKeyCount);
-
-    uint32_t controllerDataOffset, controllerDataCount;
-    readArrayDefinition(controllerDataOffset, controllerDataCount);
-    vector<float> controllerData(readArray<float>(kMdlDataOffset + controllerDataOffset, controllerDataCount));
-
-    auto node = make_unique<ModelNode>(_nodeIndex++, parent);
-    node->_flags = flags;
-    node->_nodeNumber = nodeNumber;
-    node->_name = name;
-    node->_position = position;
-    node->_orientation = orientation;
-    node->_localTransform = transform;
-
-    if (flags & NodeFlags::light) {
-        node->_light = make_shared<ModelNode::Light>();
-    }
-    if (flags & NodeFlags::emitter) {
-        node->_emitter = make_shared<Emitter>();
-    }
-
-    readControllers(controllerKeyCount, controllerKeyOffset, controllerData, *node);
-
-    if (flags & NodeFlags::light) {
-        readLight(*node);
-    }
-    if (flags & NodeFlags::emitter) {
-        readEmitter(*node);
-    }
-    if (flags & NodeFlags::reference) {
-        readReference(*node);
-    }
-    if (flags & NodeFlags::mesh) {
-        node->_mesh = readMesh(name, flags);
-    }
-    if (flags & NodeFlags::skin) {
-        readSkin(*node);
-    }
-    if (flags & NodeFlags::aabb) {
-        node->_aabb = true;
-    }
-    if (flags & NodeFlags::saber) {
-        node->_saber = true;
-    }
-
-    for (auto offset : childOffsets) {
-        unique_ptr<ModelNode> child(readNode(kMdlDataOffset + offset, node.get()));
-        node->_children.push_back(move(child));
-    }
-
-    seek(pos);
-
-    return move(node);
-}
-
-static function<void(const MdlReader::ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
+static function<void(const ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
     if (nodeFlags & NodeFlags::mesh) {
         fn = getFromLookupOrNull(g_meshControllers, type);
@@ -650,6 +500,139 @@ static function<void(const MdlReader::ControllerKey &, const vector<float> &, Mo
         fn = getFromLookupOrNull(g_genericControllers, type);
     }
     return move(fn);
+}
+
+// END Controllers
+
+MdlReader::MdlReader(GameID gameId) : BinaryReader(0), _gameId(gameId) {
+}
+
+void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
+    _mdxReader = make_unique<StreamReader>(mdx);
+
+    BinaryReader::load(mdl);
+}
+
+void MdlReader::doLoad() {
+    _fileHeader = readStruct<FileHeader>();
+    _modelHeader = readStruct<ModelHeader>();
+    _namesHeader = readStruct<NamesHeader>();
+
+    string name(getStringLower(_modelHeader.geometry.name, 32));
+
+    vector<uint32_t> nameOffsets(readArray<uint32_t>(kMdlDataOffset + _namesHeader.names.offset, _namesHeader.names.count));
+    readNodeNames(nameOffsets);
+
+    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + _modelHeader.geometry.offRootNode, nullptr));
+    rootNode->computeAbsoluteTransforms();
+
+    vector<uint32_t> animOffsets(readArray<uint32_t>(kMdlDataOffset + _modelHeader.animations.offset, _modelHeader.animations.count));
+    vector<shared_ptr<Animation>> anims(readAnimations(animOffsets));
+
+    shared_ptr<Model> superModel;
+    string superModelName(getStringLower(_modelHeader.superModel, 32));
+    if (!superModelName.empty() && superModelName != "null") {
+        superModel = Models::instance().get(superModelName);
+    }
+
+    _model = make_unique<Model>(name, getClassification(_modelHeader.classification), move(rootNode), anims, superModel);
+    _model->setAnimationScale(_modelHeader.animationScale);
+}
+
+void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
+    unordered_map<string, int> nameHits;
+
+    for (uint32_t offset : offsets) {
+        string name(boost::to_lower_copy(readCStringAt(kMdlDataOffset + offset)));
+        int hitCount = nameHits[name]++;
+        if (hitCount > 0) {
+            debug("Duplicate model node name: " + name);
+            name = str(boost::format("%s_dup%d") % name % hitCount);
+        }
+        _nodeNames.push_back(move(name));
+    }
+}
+
+unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
+    size_t pos = tell();
+    seek(offset);
+
+    NodeHeader header(readStruct<NodeHeader>());
+    if (header.flags & 0xf408) {
+        throw runtime_error("Unsupported model node flags: " + to_string(header.flags));
+    }
+
+    string name(_nodeNames[header.nodeNumber]);
+
+    glm::vec3 position(glm::make_vec3(header.position));
+    glm::quat orientation(header.orientation[0], header.orientation[1], header.orientation[2], header.orientation[3]);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, position);
+    transform *= glm::mat4_cast(orientation);
+
+    auto node = make_unique<ModelNode>(_nodeIndex++, parent);
+    node->_flags = header.flags;
+    node->_nodeNumber = header.nodeNumber;
+    node->_name = name;
+    node->_position = position;
+    node->_orientation = orientation;
+    node->_localTransform = transform;
+
+    if (header.flags & NodeFlags::light) {
+        node->_light = make_shared<ModelNode::Light>();
+    }
+    if (header.flags & NodeFlags::emitter) {
+        node->_emitter = make_shared<Emitter>();
+    }
+    if (header.flags & NodeFlags::reference) {
+        node->_reference = make_shared<ModelNode::Reference>();
+    }
+    if (header.flags & NodeFlags::skin) {
+        node->_skin = make_shared<ModelNode::Skin>();
+    }
+    if (header.flags & NodeFlags::aabb) {
+        node->_aabb = true;
+    }
+    if (header.flags & NodeFlags::saber) {
+        node->_saber = true;
+    }
+
+    vector<float> controllerData(readArray<float>(kMdlDataOffset + header.controllerData.offset, header.controllerData.count));
+    readControllers(header.controllers.count, header.controllers.offset, controllerData, *node);
+
+    if (header.flags & NodeFlags::light) {
+        readLight(*node);
+    }
+    if (header.flags & NodeFlags::emitter) {
+        readEmitter(*node);
+    }
+    if (header.flags & NodeFlags::reference) {
+        readReference(*node);
+    }
+    // Mesh will be loaded by either readMesh here, or readSaber
+    if ((header.flags & NodeFlags::mesh) && !(header.flags & NodeFlags::saber)) {
+        readMesh(*node);
+    }
+    if (header.flags & NodeFlags::skin) {
+        readSkin(*node);
+    }
+    if (header.flags & NodeFlags::aabb) {
+        // TODO: read AABB tree
+    }
+    if (header.flags & NodeFlags::saber) {
+        readSaber(*node);
+    }
+
+    vector<uint32_t> childOffsets(readArray<uint32_t>(kMdlDataOffset + header.children.offset, header.children.count));
+    for (auto offset : childOffsets) {
+        unique_ptr<ModelNode> child(readNode(kMdlDataOffset + offset, node.get()));
+        node->_children.push_back(move(child));
+    }
+
+    seek(pos);
+
+    return move(node);
 }
 
 void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vector<float> &data, ModelNode &node) {
@@ -670,228 +653,140 @@ void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vec
 }
 
 void MdlReader::readLight(ModelNode &node) {
-    ignore(64);
+    LightHeader header(readStruct<LightHeader>());
 
-    node._light->priority = readUint32();
-    node._light->ambientOnly = static_cast<bool>(readUint32());
-    node._light->dynamicType = readUint32();
-    node._light->affectDynamic = static_cast<bool>(readUint32());
-    node._light->shadow = static_cast<bool>(readUint32());
+    node._light->priority = header.priority;
+    node._light->ambientOnly = static_cast<bool>(header.ambientOnly);
+    node._light->dynamicType = header.dynamicType;
+    node._light->affectDynamic = static_cast<bool>(header.affectDynamic);
+    node._light->shadow = static_cast<bool>(header.shadow);
+}
 
-    ignore(8);
+static Emitter::UpdateMode parseEmitterUpdate(const char *cString) {
+    string str(getStringLower(cString, 32));
+
+    auto result = Emitter::UpdateMode::Invalid;
+    if (str == "fountain") {
+        result = Emitter::UpdateMode::Fountain;
+    } else if (str == "single") {
+        result = Emitter::UpdateMode::Single;
+    } else if (str == "explosion") {
+        result = Emitter::UpdateMode::Explosion;
+    } else {
+        warn("parseEmitterUpdate: unsupported value: " + str);
+    }
+
+    return result;
+}
+
+static Emitter::RenderMode parseEmitterRender(const char *cString) {
+    string str(getStringLower(cString, 32));
+
+    auto result = Emitter::RenderMode::Invalid;
+    if (str == "normal") {
+        result = Emitter::RenderMode::Normal;
+    } else if (str == "billboard_to_world_z") {
+        result = Emitter::RenderMode::BillboardToWorldZ;
+    } else if (str == "motion_blur") {
+        result = Emitter::RenderMode::MotionBlur;
+    } else if (str == "billboard_to_local_z") {
+        result = Emitter::RenderMode::BillboardToLocalZ;
+    } else if (str == "aligned_to_particle_dir") {
+        result = Emitter::RenderMode::AlignedToParticleDir;
+    } else {
+        warn("parseEmitterRender: unsupported value: " + str);
+    }
+
+    return result;
+}
+
+static Emitter::BlendMode parseEmitterBlend(const char *cString) {
+    string str(getStringLower(cString, 32));
+
+    auto result = Emitter::BlendMode::Invalid;
+    if (str == "normal") {
+        result = Emitter::BlendMode::Normal;
+    } else if (str == "punch") {
+        result = Emitter::BlendMode::Punch;
+    } else if (str == "lighten") {
+        result = Emitter::BlendMode::Lighten;
+    } else {
+        warn("parseEmitterBlend: unsupported value: " + str);
+    }
+
+    return result;
+}
+
+void MdlReader::readEmitter(ModelNode &node) {
+    EmitterHeader header(readStruct<EmitterHeader>());
+    string texResRef(getStringLower(header.texture, 32));
+
+    node._emitter->_gridWidth = glm::max(header.xGrid, 1u);
+    node._emitter->_gridHeight = glm::max(header.yGrid, 1u);
+    node._emitter->_updateMode = parseEmitterUpdate(header.update);
+    node._emitter->_renderMode = parseEmitterRender(header.render);
+    node._emitter->_blendMode = parseEmitterBlend(header.blend);
+    node._emitter->_texture = Textures::instance().get(texResRef, TextureUsage::Diffuse);
+    node._emitter->_loop = static_cast<bool>(header.loop);
+    node._emitter->_renderOrder = header.renderOrder;
 }
 
 void MdlReader::readReference(ModelNode &node) {
-    string modelResRef(boost::to_lower_copy(readCString(32)));
-    bool reattachable = static_cast<bool>(readUint32());
+    ReferenceHeader header(readStruct<ReferenceHeader>());
+    string modelResRef(getStringLower(header.modelResRef, 32));
 
-    node._reference = make_shared<ModelNode::Reference>();
     node._reference->model = Models::instance().get(modelResRef);
-    node._reference->reattachable = reattachable;
+    node._reference->reattachable = static_cast<bool>(header.reattachable);
 }
 
-unique_ptr<ModelMesh> MdlReader::readMesh(const string &nodeName, int nodeFlags) {
-    ignore(8);
-
-    uint32_t faceOffset, faceCount;
-    readArrayDefinition(faceOffset, faceCount);
-
-    ignore(40);
-
-    vector<float> diffuseColor(readArray<float>(3));
-    vector<float> ambientColor(readArray<float>(3));
-    uint32_t transparency = readUint32();
-    string diffuse(boost::to_lower_copy(readCString(32)));
-    string lightmap(boost::to_lower_copy(readCString(32)));
-
-    ignore(36);
-
-    uint32_t indexOffOffset, indexCount;
-    readArrayDefinition(indexOffOffset, indexCount);
-
-    ignore(32);
-
-    bool animateUv = readUint32() != 0;
-    float uvDirectionX = readFloat();
-    float uvDirectionY = readFloat();
-    float uvJitter = readFloat();
-    float uvJitterSpeed = readFloat();
-
-    uint32_t mdxVertexSize = readUint32();
-
-    ignore(4);
-
-    uint32_t mdxVerticesOffset = readUint32();
-    uint32_t mdxNormalsOffset = readUint32();
-
-    ignore(4);
-
-    uint32_t mdxTextureOffset = readUint32();
-    uint32_t mdxLightmapOffset = readUint32();
-
-    ignore(8);
-
-    uint32_t mdxTanSpaceOffset = readUint32();
-
-    ignore(12);
-
-    uint16_t vertexCount = readUint16();
-    uint16_t textureCount = readUint16();
-
-    ignore(2);
-
-    uint8_t backgroundGeometry = readByte();
-    uint8_t shadow = readByte();
-
-    ignore(1);
-
-    uint8_t render = readByte();
-
-    ignore(10);
+void MdlReader::readMesh(ModelNode &node) {
+    MeshHeader header(readStruct<MeshHeader>());
 
     if (isTSL(_gameId)) ignore(8);
 
-    uint32_t mdxDataOffset = readUint32();
-    uint32_t vertCoordsOffset = readUint32();
+    uint32_t offMdxData = readUint32();
+    uint32_t offVertices = readUint32();
+
     size_t endPos = tell();
 
-    if (faceCount == 0) return nullptr;
-    if (mdxVertexSize == 0 && !(nodeFlags & NodeFlags::saber)) return nullptr;
+    if (header.faces.count == 0 || header.mdxVertexSize == 0) return;
 
     vector<float> vertices;
+    _mdxReader->seek(offMdxData);
+    vertices = _mdxReader->getArray<float>(header.numVertices * header.mdxVertexSize / sizeof(float));
+
     Mesh::VertexOffsets offsets;
-    vector<uint16_t> indices;
-
-    if (nodeFlags & NodeFlags::saber) {
-        // Lightsaber blade is a special case. It consists of four to eight
-        // planes. Some of these planes are normal meshes, but some differ in
-        // that their geometry is stored in the MDL, not MDX.
-        //
-        // Values stored in the MDL are vertex coordinates, texture coordinates
-        // and normals. However, most of the vertex coordinates seem to be
-        // procedurally generated based on vertices 0-7 and 88-95.
-
-        static int referenceIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
-
-        uint32_t saberCoordsOffset = readUint32();
-        uint32_t texCoordsOffset = readUint32();
-        uint32_t normalsOffset = readUint32();
-
-        seek(static_cast<size_t>(kMdlDataOffset) + saberCoordsOffset);
-        vector<float> vertexCoords(readArray<float>(3 * vertexCount));
-
-        seek(static_cast<size_t>(kMdlDataOffset) + texCoordsOffset);
-        vector<float> texCoords(readArray<float>(2 * vertexCount));
-
-        seek(static_cast<size_t>(kMdlDataOffset) + normalsOffset);
-        vector<float> normals(readArray<float>(3 * vertexCount));
-
-        vertexCount = 16;
-        vertices.resize(8ll * vertexCount);
-        float *verticesPtr = &vertices[0];
-
-        for (int i = 0; i < vertexCount; ++i) {
-            int referenceIdx = referenceIndices[i];
-
-            // Vertex coordinates
-            float *vertexCoordsPtr = &vertexCoords[3ll * referenceIdx];
-            *(verticesPtr++) = vertexCoordsPtr[0];
-            *(verticesPtr++) = vertexCoordsPtr[1];
-            *(verticesPtr++) = vertexCoordsPtr[2];
-
-            // Texture coordinates
-            float *texCoordsPtr = &texCoords[2ll * referenceIdx];
-            *(verticesPtr++) = texCoordsPtr[0];
-            *(verticesPtr++) = texCoordsPtr[1];
-
-            // Normals
-            float *normalsPtr = &normals[3ll * referenceIdx];
-            *(verticesPtr++) = normalsPtr[0];
-            *(verticesPtr++) = normalsPtr[1];
-            *(verticesPtr++) = normalsPtr[2];
-        }
-
-        offsets.vertexCoords = 0;
-        offsets.texCoords1 = 3 * sizeof(float);
-        offsets.normals = 5 * sizeof(float);
-        offsets.stride = 8 * sizeof(float);
-
-        indices = {
-            0, 13, 12, 0, 1, 13,
-            1, 14, 13, 1, 2, 14,
-            2, 15, 14, 2, 3, 15,
-            8, 4, 5, 8, 5, 9,
-            9, 5, 6, 9, 6, 10,
-            10, 6, 7, 10, 7, 11
-        };
-
-    } else {
-        int valPerVert = mdxVertexSize / sizeof(float);
-        int vertValCount = valPerVert * vertexCount;
-        _mdxReader->seek(mdxDataOffset);
-        vertices = _mdxReader->getArray<float>(vertValCount);
-
-        offsets.vertexCoords = mdxVerticesOffset;
-        offsets.normals = mdxNormalsOffset != 0xffffffff ? mdxNormalsOffset : -1;
-        offsets.texCoords1 = mdxTextureOffset != 0xffffffff ? mdxTextureOffset : -1;
-        offsets.texCoords2 = mdxLightmapOffset != 0xffffffff ? mdxLightmapOffset : -1;
-        if (mdxTanSpaceOffset != 0xffffffff) {
-            offsets.bitangents = mdxTanSpaceOffset + 0 * sizeof(float);
-            offsets.tangents = mdxTanSpaceOffset + 3 * sizeof(float);
-        }
-        offsets.stride = mdxVertexSize;
-
-        seek(kMdlDataOffset + indexOffOffset);
-        uint32_t indexOffset = readUint32();
-        seek(kMdlDataOffset + indexOffset);
-        indices = readArray<uint16_t>(3 * faceCount);
+    offsets.stride = header.mdxVertexSize;
+    offsets.vertexCoords = header.offMdxVertices;
+    offsets.normals = header.offMdxNormals != 0xffffffff ? header.offMdxNormals : -1;
+    offsets.texCoords1 = header.offMdxTexCoords1 != 0xffffffff ? header.offMdxTexCoords1 : -1;
+    offsets.texCoords2 = header.offMdxTexCoords2 != 0xffffffff ? header.offMdxTexCoords2 : -1;
+    if (header.offMdxTanSpace != 0xffffffff) {
+        offsets.bitangents = header.offMdxTanSpace + 0 * sizeof(float);
+        offsets.tangents = header.offMdxTanSpace + 3 * sizeof(float);
     }
+
+    vector<uint16_t> indices;
+    seek(kMdlDataOffset + header.indicesOffsets.offset);
+    uint32_t offIndices = readUint32();
+    seek(kMdlDataOffset + offIndices);
+    indices = readArray<uint16_t>(3 * header.faces.count);
 
     seek(endPos);
 
-    auto mesh = make_unique<Mesh>(vertexCount, move(vertices), move(indices), move(offsets));
-    mesh->computeAABB();
-
-    auto modelMesh = make_unique<ModelMesh>(move(mesh));
-    modelMesh->setRender(render);
-    modelMesh->setTransparency(transparency);
-    modelMesh->setShadow(shadow);
-    modelMesh->setBackgroundGeometry(backgroundGeometry != 0);
-    modelMesh->setDiffuseColor(glm::make_vec3(&diffuseColor[0]));
-    modelMesh->setAmbientColor(glm::make_vec3(&ambientColor[0]));
-
-    if (!diffuse.empty() && diffuse != "null") {
-        modelMesh->_diffuse = Textures::instance().get(diffuse, TextureUsage::Diffuse);
-    }
-    if (!lightmap.empty()) {
-        modelMesh->_lightmap = Textures::instance().get(lightmap, TextureUsage::Lightmap);
-    }
-    if (animateUv) {
-        modelMesh->_uvAnimation.animated = true;
-        modelMesh->_uvAnimation.directionX = uvDirectionX;
-        modelMesh->_uvAnimation.directionY = uvDirectionY;
-        modelMesh->_uvAnimation.jitter = uvJitter;
-        modelMesh->_uvAnimation.jitterSpeed = uvJitterSpeed;
-    }
-
-    return move(modelMesh);
+    loadMesh(header, header.numVertices, move(vertices), move(indices), move(offsets), node);
 }
 
 void MdlReader::readSkin(ModelNode &node) {
-    ignore(12);
+    SkinHeader header(readStruct<SkinHeader>());
 
-    uint32_t boneWeightsOffset = readUint32();
-    uint32_t boneIndicesOffset = readUint32();
-    uint32_t bonesOffset = readUint32();
-    uint32_t boneCount = readUint32();
-
-    node._mesh->_mesh->_offsets.boneWeights = boneWeightsOffset;
-    node._mesh->_mesh->_offsets.boneIndices = boneIndicesOffset;
+    node._mesh->_mesh->_offsets.boneWeights = header.offMdxBoneWeights;
+    node._mesh->_mesh->_offsets.boneIndices = header.offMdxBoneIndices;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
-    seek(kMdlDataOffset + bonesOffset);
+    seek(kMdlDataOffset + header.offBones);
 
-    for (uint32_t i = 0; i < boneCount; ++i) {
+    for (uint32_t i = 0; i < header.numBones; ++i) {
         uint16_t boneIdx = static_cast<uint16_t>(readFloat());
         if (boneIdx == 0xffff) continue;
 
@@ -901,6 +796,111 @@ void MdlReader::readSkin(ModelNode &node) {
 
     node._skin = make_unique<ModelNode::Skin>();
     node._skin->nodeIdxByBoneIdx = move(nodeIdxByBoneIdx);
+}
+
+void MdlReader::readSaber(ModelNode &node) {
+    // Lightsaber blade is a special case. It consists of four to eight
+    // planes. Some of these planes are normal meshes, but some differ in
+    // that their geometry is stored in the MDL, not MDX.
+    //
+    // Values stored in the MDL are vertex coordinates, texture coordinates
+    // and normals. However, most of the vertex coordinates seem to be
+    // procedurally generated based on vertices 0-7 and 88-95.
+
+    MeshHeader meshHeader(readStruct<MeshHeader>());
+
+    if (isTSL(_gameId)) ignore(8);
+
+    uint32_t offMdxData = readUint32();
+    uint32_t offVertices = readUint32();
+
+    SaberHeader saberHeader(readStruct<SaberHeader>());
+
+    static int referenceIndices[] { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
+
+    seek(static_cast<size_t>(kMdlDataOffset) + saberHeader.offVertices);
+    vector<float> saberVertices(readArray<float>(3 * meshHeader.numVertices));
+
+    seek(static_cast<size_t>(kMdlDataOffset) + saberHeader.offTexCoords);
+    vector<float> texCoords(readArray<float>(2 * meshHeader.numVertices));
+
+    seek(static_cast<size_t>(kMdlDataOffset) + saberHeader.offNormals);
+    vector<float> normals(readArray<float>(3 * meshHeader.numVertices));
+
+    int numVertices = 16;
+    vector<float> vertices;
+    vertices.resize(8ll * numVertices);
+    float *verticesPtr = &vertices[0];
+
+    for (int i = 0; i < numVertices; ++i) {
+        int referenceIdx = referenceIndices[i];
+
+        // Vertex coordinates
+        float *vertexCoordsPtr = &saberVertices[3ll * referenceIdx];
+        *(verticesPtr++) = vertexCoordsPtr[0];
+        *(verticesPtr++) = vertexCoordsPtr[1];
+        *(verticesPtr++) = vertexCoordsPtr[2];
+
+        // Texture coordinates
+        float *texCoordsPtr = &texCoords[2ll * referenceIdx];
+        *(verticesPtr++) = texCoordsPtr[0];
+        *(verticesPtr++) = texCoordsPtr[1];
+
+        // Normals
+        float *normalsPtr = &normals[3ll * referenceIdx];
+        *(verticesPtr++) = normalsPtr[0];
+        *(verticesPtr++) = normalsPtr[1];
+        *(verticesPtr++) = normalsPtr[2];
+    }
+
+    Mesh::VertexOffsets offsets;
+    offsets.vertexCoords = 0;
+    offsets.texCoords1 = 3 * sizeof(float);
+    offsets.normals = 5 * sizeof(float);
+    offsets.stride = 8 * sizeof(float);
+
+    vector<uint16_t> indices {
+        0, 13, 12, 0, 1, 13,
+        1, 14, 13, 1, 2, 14,
+        2, 15, 14, 2, 3, 15,
+        8, 4, 5, 8, 5, 9,
+        9, 5, 6, 9, 6, 10,
+        10, 6, 7, 10, 7, 11
+    };
+
+    loadMesh(meshHeader, numVertices, move(vertices), move(indices), move(offsets), node);
+}
+
+void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, ModelNode &node) {
+    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, offsets);
+    mesh->computeAABB();
+
+    node._mesh = make_unique<ModelMesh>(move(mesh));
+    node._mesh->setRender(static_cast<bool>(header.render));
+    node._mesh->setTransparency(static_cast<int>(header.transparencyHint));
+    node._mesh->setShadow(static_cast<bool>(header.shadow));
+    node._mesh->setBackgroundGeometry(static_cast<bool>(header.backgroundGeometry) != 0);
+    node._mesh->setDiffuseColor(glm::make_vec3(header.diffuse));
+    node._mesh->setAmbientColor(glm::make_vec3(header.ambient));
+
+    string tex1ResRef(getStringLower(header.texture1, 32));
+    string tex2ResRef(getStringLower(header.texture2, 32));
+    string tex3ResRef(getStringLower(header.texture3, 12));
+    string tex4ResRef(getStringLower(header.texture4, 12));
+
+    if (!tex1ResRef.empty() && tex1ResRef != "null") {
+        node._mesh->_diffuse = Textures::instance().get(tex1ResRef, TextureUsage::Diffuse);
+    }
+    if (!tex2ResRef.empty()) {
+        node._mesh->_lightmap = Textures::instance().get(tex2ResRef, TextureUsage::Lightmap);
+    }
+    if (header.animateUV) {
+        node._mesh->_uvAnimation.animated = true;
+        node._mesh->_uvAnimation.directionX = header.uvDirectionX;
+        node._mesh->_uvAnimation.directionY = header.uvDirectionY;
+        node._mesh->_uvAnimation.jitter = header.uvJitter;
+        node._mesh->_uvAnimation.jitterSpeed = header.uvJitterSpeed;
+    }
 }
 
 vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &offsets) {
@@ -916,126 +916,25 @@ vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &
 
 unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     seek(kMdlDataOffset + offset);
-    ignore(8);
 
-    string name(readCString(32));
-    boost::to_lower(name);
+    AnimationHeader header(readStruct<AnimationHeader>());
 
-    uint32_t rootNodeOffset = readUint32();
+    string name(getStringLower(header.geometry.name, 32));
 
-    ignore(36);
-
-    float length = readFloat();
-    float transitionTime = readFloat();
-
-    ignore(32);
+    _nodeIndex = 0;
+    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + header.geometry.offRootNode, nullptr));
 
     vector<Animation::Event> events;
-    int eventsOffset = readInt32();
-    int eventsCount = readInt32();
-    if (eventsCount > 0) {
-        seek(kMdlDataOffset + eventsOffset);
-        for (int i = 0; i < eventsCount; ++i) {
+    if (header.events.count > 0) {
+        for (uint32_t i = 0; i < header.events.count; ++i) {
             Animation::Event event;
             event.time = readFloat();
             event.name = boost::to_lower_copy(readCString(32));
-            events.push_back(move(event));
         }
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });
     }
 
-    _nodeIndex = 0;
-    unique_ptr<ModelNode> rootNode(readNode(kMdlDataOffset + rootNodeOffset, nullptr));
-
-    return make_unique<Animation>(name, length, transitionTime, move(events), move(rootNode));
-}
-
-Model::Classification MdlReader::getClassification(int value) const {
-    switch (value) {
-        case 1:
-            return Model::Classification::Effect;
-        case 2:
-            return Model::Classification::Tile;
-        case 4:
-            return Model::Classification::Character;
-        case 8:
-            return Model::Classification::Door;
-        case 0x10:
-            return Model::Classification::Lightsaber;
-        case 0x20:
-            return Model::Classification::Placeable;
-        case 0x40:
-            return Model::Classification::Flyer;
-        default:
-            return Model::Classification::Other;
-    }
-}
-
-static Emitter::UpdateMode parseEmitterUpdate(const string &str) {
-    auto result = Emitter::UpdateMode::Invalid;
-    if (str == "Fountain") {
-        result = Emitter::UpdateMode::Fountain;
-    } else if (str == "Single") {
-        result = Emitter::UpdateMode::Single;
-    } else if (str == "Explosion") {
-        result = Emitter::UpdateMode::Explosion;
-    } else {
-        warn("parseEmitterUpdate: unsupported value: " + str);
-    }
-    return result;
-}
-
-static Emitter::RenderMode parseEmitterRender(const string &str) {
-    auto result = Emitter::RenderMode::Invalid;
-    if (str == "Normal") {
-        result = Emitter::RenderMode::Normal;
-    } else if (str == "Billboard_to_World_Z") {
-        result = Emitter::RenderMode::BillboardToWorldZ;
-    } else if (str == "Motion_Blur") {
-        result = Emitter::RenderMode::MotionBlur;
-    } else if (str == "Billboard_to_Local_Z") {
-        result = Emitter::RenderMode::BillboardToLocalZ;
-    } else if (str == "Aligned_to_Particle_Dir") {
-        result = Emitter::RenderMode::AlignedToParticleDir;
-    } else {
-        warn("parseEmitterRender: unsupported value: " + str);
-    }
-    return result;
-}
-
-static Emitter::BlendMode parseEmitterBlend(const string &str) {
-    auto result = Emitter::BlendMode::Invalid;
-    if (str == "Normal") {
-        result = Emitter::BlendMode::Normal;
-    } else if (str == "Punch") {
-        result = Emitter::BlendMode::Punch;
-    } else if (str == "Lighten") {
-        result = Emitter::BlendMode::Lighten;
-    } else {
-        warn("parseEmitterBlend: unsupported value: " + str);
-    }
-    return result;
-}
-
-void MdlReader::readEmitter(ModelNode &node) {
-    ignore(5 * 4);
-
-    node._emitter->_gridWidth = glm::max(readUint32(), 1u);
-    node._emitter->_gridHeight = glm::max(readUint32(), 1u);
-
-    ignore(4);
-
-    node._emitter->_updateMode = parseEmitterUpdate(readCString(32));
-    node._emitter->_renderMode = parseEmitterRender(readCString(32));
-    node._emitter->_blendMode = parseEmitterBlend(readCString(32));
-    node._emitter->_texture = Textures::instance().get(boost::to_lower_copy(readCString(32)), TextureUsage::Diffuse);
-
-    ignore(20);
-
-    node._emitter->_loop = readUint32() != 0;
-    node._emitter->_renderOrder = readUint16();
-
-    ignore(30);
+    return make_unique<Animation>(name, header.length, header.transitionTime, move(events), move(rootNode));
 }
 
 shared_ptr<Model> MdlModelLoader::loadModel(GameID gameId, const string &resRef) {
