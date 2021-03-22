@@ -49,6 +49,7 @@ struct NodeFlags {
     static constexpr int header = 1;
     static constexpr int light = 2;
     static constexpr int emitter = 4;
+    static constexpr int camera = 8;
     static constexpr int reference = 0x10;
     static constexpr int mesh = 0x20;
     static constexpr int skin = 0x40;
@@ -146,8 +147,19 @@ static void readScaleController(const MdlReader::ControllerKey &key, const vecto
     }
 }
 
-static void readColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.setColor(glm::make_vec3(&data[key.dataIndex]));
+static void readAlphaController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    if (key.rowCount == 1) {
+        node.setAlpha(data[key.dataIndex]);
+        return;
+    }
+
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[key.timeIndex + i];
+        frame.alpha = data[key.dataIndex + i];
+
+        node.addAlphaKeyframe(move(frame));
+    }
 }
 
 static void readSelfIllumColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -165,51 +177,200 @@ static void readSelfIllumColorController(const MdlReader::ControllerKey &key, co
     }
 }
 
-static void readAlphaController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    if (key.rowCount == 1) {
-        node.setAlpha(data[key.dataIndex]);
-        return;
-    }
-
-    for (uint16_t i = 0; i < key.rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[key.timeIndex + i];
-        frame.alpha = data[key.dataIndex + i];
-
-        node.addAlphaKeyframe(move(frame));
-    }
+static void readColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.setColor(glm::make_vec3(&data[key.dataIndex]));
 }
 
 static void readRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.light()->radius = data[key.dataIndex];
 }
 
-static void readBirthrateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setBirthrate(static_cast<int>(data[key.dataIndex]));
+static void readShadowRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readVerticalDisplacementController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
 }
 
 static void readMultiplierController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.light()->multiplier = data[key.dataIndex];
 }
 
-static void readLifeExpectancyController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+static void readAlphaEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().end = data[key.dataIndex];
+}
+
+static void readAlphaStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().start = data[key.dataIndex];
+}
+
+static void readBirthrateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setBirthrate(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readBounceCoController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readCombineTimeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readDragController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readFPSController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFPS(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readFrameEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFrameEnd(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readFrameStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFrameStart(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readGravController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLifeExpController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->setLifeExpectancy(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readMassController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readP2PBezier2Controller(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readP2PBezier3Controller(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readParticleRotController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readRandVelController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setRandomVelocity(data[key.dataIndex]);
 }
 
 static void readSizeStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->particleSize().start = data[key.dataIndex];
 }
 
-static void readSizeMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->particleSize().mid = data[key.dataIndex];
-}
-
 static void readSizeEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
     node.emitter()->particleSize().end = data[key.dataIndex];
 }
 
-static void readColorStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->color().start = glm::make_vec3(&data[key.dataIndex]);
+static void readSizeStartYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readSizeEndYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setSpread(data[key.dataIndex]);
+}
+
+static void readThresholdController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setVelocity(data[key.dataIndex]);
+}
+
+static void readXSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->size().x = data[key.dataIndex];
+}
+
+static void readYSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->size().y = data[key.dataIndex];
+}
+
+static void readBlurLengthController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLightingDelayController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLightingRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLightingScaleController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLightingSubDivController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readLightingZigZagController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readAlphaMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().mid = data[key.dataIndex];
+}
+
+static void readPercentStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readPercentMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readPercentEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readSizeMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->particleSize().mid = data[key.dataIndex];
+}
+
+static void readSizeMidYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readRandomBirthRateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readTargetSizeController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readNumControlPtsController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readControlPtRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readControlPtDelayController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readTangentSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
+}
+
+static void readTangentLengthController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
 }
 
 static void readColorMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -220,82 +381,82 @@ static void readColorEndController(const MdlReader::ControllerKey &key, const ve
     node.emitter()->color().end = glm::make_vec3(&data[key.dataIndex]);
 }
 
-static void readAlphaStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->alpha().start = data[key.dataIndex];
+static void readColorStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->color().start = glm::make_vec3(&data[key.dataIndex]);
 }
 
-static void readAlphaMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->alpha().mid = data[key.dataIndex];
-}
-
-static void readAlphaEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->alpha().end = data[key.dataIndex];
-}
-
-static void readSizeXController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->size().x = data[key.dataIndex];
-}
-
-static void readSizeYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->size().y = data[key.dataIndex];
-}
-
-static void readFrameStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setFrameStart(static_cast<int>(data[key.dataIndex]));
-}
-
-static void readFrameEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setFrameEnd(static_cast<int>(data[key.dataIndex]));
-}
-
-static void readVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setVelocity(data[key.dataIndex]);
-}
-
-static void readRandomVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setRandomVelocity(data[key.dataIndex]);
-}
-
-static void readSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setSpread(data[key.dataIndex]);
-}
-
-static void readFPSController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.emitter()->setFPS(static_cast<int>(data[key.dataIndex]));
+static void readDetonateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    // TODO: implement
 }
 
 static const unordered_map<uint32_t, ControllerFn> g_genericControllers {
     { 8, &readPositionController },
     { 20, &readOrientationController },
     { 36, &readScaleController },
-    { 100, &readSelfIllumColorController },
     { 132, &readAlphaController }
+};
+
+static const unordered_map<uint32_t, ControllerFn> g_meshControllers {
+    { 100, &readSelfIllumColorController }
 };
 
 static const unordered_map<uint32_t, ControllerFn> g_lightControllers {
     { 76, &readColorController },
     { 88, &readRadiusController },
+    { 96, &readShadowRadiusController },
+    { 100, &readVerticalDisplacementController },
     { 140, &readMultiplierController }
 };
 
 static const unordered_map<uint32_t, ControllerFn> g_emitterControllers {
+    { 80, &readAlphaEndController },
+    { 84, &readAlphaStartController },
     { 88, &readBirthrateController },
+    { 92, &readBounceCoController },
+    { 96, &readCombineTimeController },
+    { 100, &readDragController },
     { 104, &readFPSController },
     { 108, &readFrameEndController },
     { 112, &readFrameStartController },
-    { 120, &readLifeExpectancyController },
-    { 140, &readRandomVelocityController },
+    { 116, &readGravController },
+    { 120, &readLifeExpController },
+    { 124, &readMassController },
+    { 128, &readP2PBezier2Controller },
+    { 132, &readP2PBezier3Controller },
+    { 136, &readParticleRotController },
+    { 140, &readRandVelController },
     { 144, &readSizeStartController },
     { 148, &readSizeEndController },
+    { 152, &readSizeStartYController },
+    { 156, &readSizeEndYController },
     { 160, &readSpreadController },
+    { 164, &readThresholdController },
     { 168, &readVelocityController },
-    { 172, &readSizeXController },
-    { 176, &readSizeYController },
+    { 172, &readXSizeController },
+    { 176, &readYSizeController },
+    { 180, &readBlurLengthController },
+    { 184, &readLightingDelayController },
+    { 188, &readLightingRadiusController },
+    { 192, &readLightingScaleController },
+    { 196, &readLightingSubDivController },
+    { 200, &readLightingZigZagController },
     { 216, &readAlphaMidController },
+    { 220, &readPercentStartController },
+    { 224, &readPercentMidController },
+    { 228, &readPercentEndController },
     { 232, &readSizeMidController },
+    { 236, &readSizeMidYController },
+    { 240, &readRandomBirthRateController },
+    { 252, &readTargetSizeController },
+    { 256, &readNumControlPtsController },
+    { 260, &readControlPtRadiusController },
+    { 264, &readControlPtDelayController },
+    { 268, &readTangentSpreadController },
+    { 272, &readTangentLengthController },
     { 284, &readColorMidController },
     { 380, &readColorEndController },
-    { 392, &readColorStartController }
+    { 392, &readColorStartController },
+    { 502, &readDetonateController }
 };
 
 MdlReader::MdlReader(GameID gameId) : BinaryReader(kSignatureSize, kSignature), _gameId(gameId) {
@@ -478,7 +639,9 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
 
 static function<void(const MdlReader::ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
-    if (nodeFlags & NodeFlags::light) {
+    if (nodeFlags & NodeFlags::mesh) {
+        fn = getFromLookupOrNull(g_meshControllers, type);
+    } else if (nodeFlags & NodeFlags::light) {
         fn = getFromLookupOrNull(g_lightControllers, type);
     } else if (nodeFlags & NodeFlags::emitter) {
         fn = getFromLookupOrNull(g_emitterControllers, type);
