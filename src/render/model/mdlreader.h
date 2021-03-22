@@ -20,8 +20,9 @@
 #include "../../resource/format/binreader.h"
 #include "../../resource/types.h"
 
-#include "../model/model.h"
-#include "../model/modelloader.h"
+#include "aabbnode.h"
+#include "model.h"
+#include "modelloader.h"
 
 namespace reone {
 
@@ -211,6 +212,23 @@ private:
         uint8_t unknown[72]; // QBones, TBones, etc.
     };
 
+    struct DanglymeshHeader {
+        ArrayHeader constraints;
+        float displacement { 0.0f };
+        float tightness { 0.0f };
+        float period { 0.0f };
+        uint32_t unknown1 { 0 };
+    };
+
+    struct AABBNodeHeader {
+        float bbMin[3];
+        float bbMax[3];
+        uint32_t offChildLeft { 0 };
+        uint32_t offChildRight { 0 };
+        int faceIndex { 0 };
+        uint32_t mostSignificantPlane { 0 };
+    };
+
     struct SaberHeader {
         uint32_t offVertices { 0 };
         uint32_t offTexCoords { 0 };
@@ -243,8 +261,12 @@ private:
     void readReference(render::ModelNode &node);
     void readMesh(render::ModelNode &node);
     void readSkin(render::ModelNode &node);
+    void readDanglymesh(render::ModelNode &node);
+    void readAABB(render::ModelNode &node);
     void readSaber(render::ModelNode &node);
+
     void loadMesh(const MeshHeader &header, int numVertices, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, render::ModelNode &node);
+    std::shared_ptr<AABBNode> readAABBNode(uint32_t offset);
 };
 
 class MdlModelLoader : public IModelLoader {

@@ -30,8 +30,9 @@
 #include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
-#include "../model/models.h"
 #include "../textures.h"
+
+#include "models.h"
 
 using namespace std;
 
@@ -591,9 +592,6 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     if (header.flags & NodeFlags::skin) {
         node->_skin = make_shared<ModelNode::Skin>();
     }
-    if (header.flags & NodeFlags::aabb) {
-        node->_aabb = true;
-    }
     if (header.flags & NodeFlags::saber) {
         node->_saber = true;
     }
@@ -610,15 +608,18 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     if (header.flags & NodeFlags::reference) {
         readReference(*node);
     }
-    // Mesh will be loaded by either readMesh here, or readSaber
+    // Mesh will be loaded by either readMesh here, or readSaber below
     if ((header.flags & NodeFlags::mesh) && !(header.flags & NodeFlags::saber)) {
         readMesh(*node);
     }
     if (header.flags & NodeFlags::skin) {
         readSkin(*node);
     }
+    if (header.flags & NodeFlags::dangly) {
+        readDanglymesh(*node);
+    }
     if (header.flags & NodeFlags::aabb) {
-        // TODO: read AABB tree
+        readAABB(*node);
     }
     if (header.flags & NodeFlags::saber) {
         readSaber(*node);
@@ -777,6 +778,38 @@ void MdlReader::readMesh(ModelNode &node) {
     loadMesh(header, header.numVertices, move(vertices), move(indices), move(offsets), node);
 }
 
+void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, ModelNode &node) {
+    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, offsets);
+    mesh->computeAABB();
+
+    node._mesh = make_unique<ModelMesh>(move(mesh));
+    node._mesh->setRender(static_cast<bool>(header.render));
+    node._mesh->setTransparency(static_cast<int>(header.transparencyHint));
+    node._mesh->setShadow(static_cast<bool>(header.shadow));
+    node._mesh->setBackgroundGeometry(static_cast<bool>(header.backgroundGeometry) != 0);
+    node._mesh->setDiffuseColor(glm::make_vec3(header.diffuse));
+    node._mesh->setAmbientColor(glm::make_vec3(header.ambient));
+
+    string tex1ResRef(getStringLower(header.texture1, 32));
+    string tex2ResRef(getStringLower(header.texture2, 32));
+    string tex3ResRef(getStringLower(header.texture3, 12));
+    string tex4ResRef(getStringLower(header.texture4, 12));
+
+    if (!tex1ResRef.empty() && tex1ResRef != "null") {
+        node._mesh->_diffuse = Textures::instance().get(tex1ResRef, TextureUsage::Diffuse);
+    }
+    if (!tex2ResRef.empty()) {
+        node._mesh->_lightmap = Textures::instance().get(tex2ResRef, TextureUsage::Lightmap);
+    }
+    if (header.animateUV) {
+        node._mesh->_uvAnimation.animated = true;
+        node._mesh->_uvAnimation.directionX = header.uvDirectionX;
+        node._mesh->_uvAnimation.directionY = header.uvDirectionY;
+        node._mesh->_uvAnimation.jitter = header.uvJitter;
+        node._mesh->_uvAnimation.jitterSpeed = header.uvJitterSpeed;
+    }
+}
+
 void MdlReader::readSkin(ModelNode &node) {
     SkinHeader header(readStruct<SkinHeader>());
 
@@ -871,36 +904,37 @@ void MdlReader::readSaber(ModelNode &node) {
     loadMesh(meshHeader, numVertices, move(vertices), move(indices), move(offsets), node);
 }
 
-void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, ModelNode &node) {
-    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, offsets);
-    mesh->computeAABB();
+void MdlReader::readDanglymesh(ModelNode &node) {
+    DanglymeshHeader header(readStruct<DanglymeshHeader>());
+    // TODO: fill ModelNode
+}
 
-    node._mesh = make_unique<ModelMesh>(move(mesh));
-    node._mesh->setRender(static_cast<bool>(header.render));
-    node._mesh->setTransparency(static_cast<int>(header.transparencyHint));
-    node._mesh->setShadow(static_cast<bool>(header.shadow));
-    node._mesh->setBackgroundGeometry(static_cast<bool>(header.backgroundGeometry) != 0);
-    node._mesh->setDiffuseColor(glm::make_vec3(header.diffuse));
-    node._mesh->setAmbientColor(glm::make_vec3(header.ambient));
+void MdlReader::readAABB(ModelNode &node) {
+    uint32_t offTree = readUint32();
+    size_t pos = tell();
 
-    string tex1ResRef(getStringLower(header.texture1, 32));
-    string tex2ResRef(getStringLower(header.texture2, 32));
-    string tex3ResRef(getStringLower(header.texture3, 12));
-    string tex4ResRef(getStringLower(header.texture4, 12));
+    node._aabb = readAABBNode(offTree);
 
-    if (!tex1ResRef.empty() && tex1ResRef != "null") {
-        node._mesh->_diffuse = Textures::instance().get(tex1ResRef, TextureUsage::Diffuse);
+    seek(pos);
+}
+
+shared_ptr<AABBNode> MdlReader::readAABBNode(uint32_t offset) {
+    auto node = make_shared<AABBNode>();
+
+    seek(kMdlDataOffset + offset);
+    AABBNodeHeader header(readStruct<AABBNodeHeader>());
+
+    node->faceIndex = header.faceIndex;
+    node->mostSignificantPlane = static_cast<AABBNode::Plane>(header.mostSignificantPlane);
+    node->aabb.expand(glm::make_vec3(header.bbMin));
+    node->aabb.expand(glm::make_vec3(header.bbMax));
+
+    if (header.faceIndex == -1) {
+        node->leftChild = readAABBNode(header.offChildLeft);
+        node->rightChild = readAABBNode(header.offChildRight);
     }
-    if (!tex2ResRef.empty()) {
-        node._mesh->_lightmap = Textures::instance().get(tex2ResRef, TextureUsage::Lightmap);
-    }
-    if (header.animateUV) {
-        node._mesh->_uvAnimation.animated = true;
-        node._mesh->_uvAnimation.directionX = header.uvDirectionX;
-        node._mesh->_uvAnimation.directionY = header.uvDirectionY;
-        node._mesh->_uvAnimation.jitter = header.uvJitter;
-        node._mesh->_uvAnimation.jitterSpeed = header.uvJitterSpeed;
-    }
+
+    return move(node);
 }
 
 vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &offsets) {
@@ -940,12 +974,15 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
 shared_ptr<Model> MdlModelLoader::loadModel(GameID gameId, const string &resRef) {
     shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
     shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
+    shared_ptr<Model> model;
+
     if (mdlData && mdxData) {
         MdlReader mdl(gameId);
         mdl.load(wrap(mdlData), wrap(mdxData));
-        return mdl.model();
+        model = mdl.model();
     }
-    return nullptr;
+
+    return move(model);
 }
 
 } // namespace render

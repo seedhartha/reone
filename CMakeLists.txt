@@ -175,6 +175,7 @@ set(RENDER_HEADERS
     src/render/materials.h
     src/render/mesh.h
     src/render/meshes.h
+    src/render/model/aabbnode.h
     src/render/model/animation.h
     src/render/model/emitter.h
     src/render/model/mdlreader.h
@@ -215,6 +216,7 @@ set(RENDER_SOURCES
     src/render/materials.cpp
     src/render/mesh.cpp
     src/render/meshes.cpp
+    src/render/model/aabbnode.cpp
     src/render/model/animation.cpp
     src/render/model/mdlreader.cpp
     src/render/model/model.cpp
