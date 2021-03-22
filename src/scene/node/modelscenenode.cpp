@@ -42,8 +42,6 @@ namespace reone {
 
 namespace scene {
 
-static constexpr int kSelfIlluminatedPriority = 5;
-
 static bool g_debugAABB = false;
 
 ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
@@ -112,27 +110,9 @@ void ModelSceneNode::initModelNodes() {
             addChild(childNode);
             nodes.push(childNode.get());
 
-            // Optionally convert self-illuminated model nodes to light sources
-            if (isFeatureEnabled(Feature::SelfIllumAsLights)) {
-                glm::vec3 color;
-                if (child->getSelfIllumColor(0.0f, color) && glm::dot(color, color) > 0.0f) {
-                    float radius;
-                    shared_ptr<ModelMesh> mesh(child->mesh());
-                    if (mesh) {
-                        glm::vec3 size(mesh->mesh()->aabb().getSize());
-                        radius = glm::max(1.0f, glm::sqrt(glm::dot(size, size)));
-                    } else {
-                        radius = 1.0f;
-                    }
-                    auto lightNode = make_shared<LightSceneNode>(move(color), kSelfIlluminatedPriority, _sceneGraph);
-                    lightNode->setRadius(radius);
-                    childNode->addChild(lightNode);
-                }
-            }
-
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
-                auto lightNode = make_shared<LightSceneNode>(child->color(), light->priority, _sceneGraph);
+                auto lightNode = make_shared<LightSceneNode>(light->color, light->priority, _sceneGraph);
                 lightNode->setMultiplier(light->multiplier);
                 lightNode->setRadius(light->radius);
                 lightNode->setShadow(light->shadow);

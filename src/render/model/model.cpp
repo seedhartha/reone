@@ -66,7 +66,7 @@ void Model::initInternal(const shared_ptr<ModelNode> &node) {
 }
 
 void Model::init() {
-    _rootNode->initGL();
+    _rootNode->init();
 }
 
 vector<string> Model::getAnimationNames() const {

@@ -24,8 +24,7 @@ namespace render {
 enum class Feature {
     PBR,
     HDR,
-    DynamicRoomLighting,
-    SelfIllumAsLights
+    DynamicRoomLighting
 };
 
 bool isFeatureEnabled(Feature feature);

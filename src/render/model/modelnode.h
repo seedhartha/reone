@@ -25,6 +25,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 #include "aabbnode.h"
+#include "animatedproperty.h"
 #include "emitter.h"
 #include "modelmesh.h"
 
@@ -50,17 +51,6 @@ class Model;
  */
 class ModelNode : boost::noncopyable {
 public:
-    struct Keyframe {
-        float time { 0.0f };
-        union {
-            glm::quat orientation { 0.0f, 0.0f, 0.0f, 0.0f };
-            glm::vec3 translation;
-            float scale;
-            float alpha;
-            glm::vec3 selfIllumColor;
-        };
-    };
-
     struct Light {
         int priority { 0 };
         int dynamicType { 0 };
@@ -69,8 +59,9 @@ public:
         bool shadow { false };
 
         // These come from controllers
+        glm::vec3 color { 1.0f };
         float multiplier { 1.0f };
-        float radius { 0.0f };
+        float radius { 1.0f };
     };
 
     struct Reference {
@@ -84,7 +75,7 @@ public:
 
     ModelNode(int index, const ModelNode *parent = nullptr);
 
-    void initGL();
+    void init();
 
     /**
      * Adds the specified node to the list of this nodes children. Also sets the
@@ -105,24 +96,12 @@ public:
      */
     void computeAbsoluteTransforms();
 
-    void addTranslationKeyframe(Keyframe keyframe);
-    void addOrientationKeyframe(Keyframe keyframe);
-    void addScaleKeyframe(Keyframe keyframe);
-    void addAlphaKeyframe(Keyframe keyframe);
-    void addSelfIllumColorKeyframe(Keyframe keyframe);
-
     bool isAABB() const { return static_cast<bool>(_aabb); }
     bool isSaber() const { return _saber; }
 
-    bool getTranslation(float time, glm::vec3 &translation, float scale = 1.0f) const;
-    bool getOrientation(float time, glm::quat &orientation) const;
-    bool getScale(float time, float &scale) const;
-    bool getAlpha(float time, float &alpha) const;
-    bool getSelfIllumColor(float time, glm::vec3 &color) const;
-
-    bool getTranslation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::vec3 &translation, float scale = 1.0f) const;
-    bool getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const;
-    bool getScale(int leftFrameIx, int rightFrameIdx, float interpolant, float &scale) const;
+    bool getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const;
+    bool getOrientation(int leftFrameIdx, int rightFrameIdx, float factor, glm::quat &orientation) const;
+    bool getScale(int leftFrameIx, int rightFrameIdx, float factor, float &scale) const;
 
     const glm::vec3 &getCenterOfAABB() const;
 
@@ -130,24 +109,17 @@ public:
     const ModelNode *parent() const { return _parent; }
     uint16_t nodeNumber() const { return _nodeNumber; }
     const std::string &name() const { return _name; }
+    const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
+
+    // Transformation
+
     const glm::vec3 &position() const { return _position; }
     const glm::quat &orientation() const { return _orientation; }
     const glm::mat4 &localTransform() const { return _localTransform; }
     const glm::mat4 &absoluteTransform() const { return _absTransform; }
     const glm::mat4 &absoluteTransformInverse() const { return _absTransformInv; }
-    const glm::vec3 &color() const { return _color; }
-    const glm::vec3 &selfIllumColor() const { return _selfIllumColor; }
-    float alpha() const { return _alpha; }
-    const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
-    void setName(std::string name);
-    void setNodeNumber(uint16_t nodeNumber);
-    void setAbsoluteTransform(glm::mat4 transform);
-    void setMesh(std::shared_ptr<ModelMesh> mesh);
-    void setSkin(std::shared_ptr<Skin> skin);
-    void setColor(glm::vec3 color);
-    void setSelfIllumColor(glm::vec3 color);
-    void setAlpha(float alpha);
+    // END Transformation
 
     // Components
 
@@ -160,20 +132,31 @@ public:
 
     // END Components
 
+    // Animation
+
+    const AnimatedProperty<glm::vec3> &positions() const { return _positions; }
+    AnimatedProperty<glm::vec3> &positions() { return _positions; }
+    const AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> &orientations() const { return _orientations; }
+    AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> &orientations() { return _orientations; }
+    const AnimatedProperty<float> &scales() const { return _scales; }
+    AnimatedProperty<float> &scales() { return _scales; }
+    const AnimatedProperty<float> &alphas() const { return _alphas; }
+    AnimatedProperty<float> &alphas() { return _alphas; }
+    const AnimatedProperty<glm::vec3> &selfIllumColors() const { return _selfIllumColors; }
+    AnimatedProperty<glm::vec3> &selfIllumColors() { return _selfIllumColors; }
+
+    // END Animation
+
 private:
-    int _index { 0 };
-    const ModelNode *_parent { nullptr };
+    int _index;
+    const ModelNode *_parent;
+
     uint16_t _flags { 0 };
     uint16_t _nodeNumber { 0 };
     std::string _name;
-    glm::vec3 _color { 0.0f };
-    glm::vec3 _selfIllumColor { 0.0f };
-    float _alpha { 1.0f };
-    bool _saber { false };
-
     std::vector<std::shared_ptr<ModelNode>> _children;
 
-    // Spatial properties
+    // Transformation
 
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
@@ -181,7 +164,7 @@ private:
     glm::mat4 _absTransform { 1.0f };
     glm::mat4 _absTransformInv { 1.0f };
 
-    // END Spatial properties
+    // END Transformation
 
     // Components
 
@@ -191,18 +174,19 @@ private:
     std::shared_ptr<ModelMesh> _mesh;
     std::shared_ptr<Skin> _skin;
     std::shared_ptr<AABBNode> _aabb;
+    bool _saber { false };
 
     // END Components
 
-    // Keyframes
+    // Animation
 
-    std::vector<Keyframe> _translationFrames;
-    std::vector<Keyframe> _orientationFrames;
-    std::vector<Keyframe> _scaleFrames;
-    std::vector<Keyframe> _alphaFrames;
-    std::vector<Keyframe> _selfIllumFrames;
+    AnimatedProperty<glm::vec3> _positions;
+    AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> _orientations;
+    AnimatedProperty<float> _scales;
+    AnimatedProperty<float> _alphas;
+    AnimatedProperty<glm::vec3> _selfIllumColors;
 
-    // END Keyframes
+    // END Animation
 
     friend class MdlReader;
 };

@@ -22,6 +22,8 @@
 #include "../mesh.h"
 #include "../texture.h"
 
+#include "animatedproperty.h"
+
 namespace reone {
 
 namespace render {
@@ -45,8 +47,8 @@ public:
 
     ModelMesh(const std::shared_ptr<Mesh> &mesh);
 
-    void initGL();
-    void deinitGL();
+    void init();
+    void deinit();
 
     void draw();
 
