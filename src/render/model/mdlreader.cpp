@@ -309,8 +309,6 @@ void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &
 }
 
 void MdlReader::doLoad() {
-    if (!_mdx) openMDX();
-
     uint32_t mdlDataSize = readUint32();
     uint32_t mdxSize = readUint32();
 
@@ -368,17 +366,6 @@ void MdlReader::doLoad() {
 
     _model = make_unique<Model>(_name, _classification, move(rootNode), anims, superModel);
     _model->setAnimationScale(scale);
-}
-
-void MdlReader::openMDX() {
-    fs::path mdxPath(_path);
-    mdxPath.replace_extension(".mdx");
-
-    if (!fs::exists(mdxPath)) {
-        throw runtime_error("MDL: MDX file not found: " + mdxPath.string());
-    }
-    _mdx = make_unique<fs::ifstream>(mdxPath, ios::binary);
-    _mdxReader = make_unique<StreamReader>(_mdx);
 }
 
 void MdlReader::readArrayDefinition(uint32_t &offset, uint32_t &count) {
