@@ -28,8 +28,7 @@ namespace render {
 static unordered_map<Feature, int> g_features {
     { Feature::PBR, 0 },
     { Feature::HDR, 0 },
-    { Feature::DynamicRoomLighting, 0 },
-    { Feature::SelfIllumAsLights, 0 }
+    { Feature::DynamicRoomLighting, 0 }
 };
 
 bool isFeatureEnabled(Feature feature) {

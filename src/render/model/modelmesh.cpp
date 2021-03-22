@@ -31,11 +31,11 @@ ModelMesh::ModelMesh(const shared_ptr<Mesh> &mesh) : _mesh(mesh) {
     }
 }
 
-void ModelMesh::initGL() {
+void ModelMesh::init() {
     _mesh->init();
 }
 
-void ModelMesh::deinitGL() {
+void ModelMesh::deinit() {
     _mesh->deinit();
 }
 

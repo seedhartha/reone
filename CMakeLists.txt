@@ -176,6 +176,7 @@ set(RENDER_HEADERS
     src/render/mesh.h
     src/render/meshes.h
     src/render/model/aabbnode.h
+    src/render/model/animatedproperty.h
     src/render/model/animation.h
     src/render/model/emitter.h
     src/render/model/mdlreader.h

@@ -60,10 +60,12 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
     if (!modelNode) {
         throw invalid_argument("modelNode must not be null");
     }
-
-    _alpha = _modelNode->alpha();
-    _selfIllumColor = _modelNode->selfIllumColor();
-
+    if (_modelNode->alphas().getNumKeyframes() > 0) {
+        _alpha = _modelNode->alphas().getByKeyframe(0);
+    }
+    if (_modelNode->selfIllumColors().getNumKeyframes() > 0) {
+        _selfIllumColor = _modelNode->selfIllumColors().getByKeyframe(0);
+    }
     initTextures();
 }
 
@@ -132,7 +134,7 @@ void ModelNodeSceneNode::update(float dt) {
 
 bool ModelNodeSceneNode::shouldRender() const {
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh || !mesh->shouldRender() || _modelNode->alpha() == 0.0f) return false;
+    if (!mesh || !mesh->shouldRender() /* || _modelNode->alpha() == 0.0f */) return false;
 
     return _modelNode->isAABB() ? g_debugWalkmesh : true;
 }

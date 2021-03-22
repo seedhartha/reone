@@ -102,16 +102,16 @@ static void readPositionController(const ControllerKey &key, const vector<float>
                 int rowTimeIdx = key.timeIndex + i;
                 int rowDataIdx = key.dataIndex + i * (bezier ? 9 : 3);
 
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.translation = glm::make_vec3(&data[rowDataIdx]);
-
-                node.addTranslationKeyframe(move(frame));
+                float time = data[rowTimeIdx];
+                glm::vec3 position(glm::make_vec3(&data[rowDataIdx]));
+                node.positions().addKeyframe(time, move(position));
             }
             break;
         default:
             break;
     }
+
+    node.positions().update();
 }
 
 static void readOrientationController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -138,11 +138,9 @@ static void readOrientationController(const ControllerKey &key, const vector<flo
                     w = -glm::sqrt(1.0f - dot);
                 }
 
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.orientation = glm::quat(w, x, y, z);
-
-                node.addOrientationKeyframe(move(frame));
+                float time = data[rowTimeIdx];
+                glm::quat orientation(w, x, y, z);
+                node.orientations().addKeyframe(time, move(orientation));
             }
             break;
 
@@ -151,63 +149,56 @@ static void readOrientationController(const ControllerKey &key, const vector<flo
                 int rowTimeIdx = key.timeIndex + i;
                 int rowDataIdx = key.dataIndex + i * 4;
 
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.orientation.x = data[rowDataIdx + 0];
-                frame.orientation.y = data[rowDataIdx + 1];
-                frame.orientation.z = data[rowDataIdx + 2];
-                frame.orientation.w = data[rowDataIdx + 3];
+                float time = data[rowTimeIdx];
 
-                node.addOrientationKeyframe(move(frame));
+                float x = data[rowDataIdx + 0];
+                float y = data[rowDataIdx + 1];
+                float z = data[rowDataIdx + 2];
+                float w = data[rowDataIdx + 3];
+                glm::quat orientation(w, x, y, z);
+
+                node.orientations().addKeyframe(time, move(orientation));
             }
             break;
         default:
             break;
     }
+
+    node.orientations().update();
 }
 
 static void readScaleController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     for (uint16_t i = 0; i < key.rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[key.timeIndex + i];
-        frame.scale = data[key.dataIndex + i];
-
-        node.addScaleKeyframe(move(frame));
+        float time = data[key.timeIndex + i];
+        float scale = data[key.dataIndex + i];
+        node.scales().addKeyframe(time, scale);
     }
+
+    node.scales().update();
 }
 
 static void readAlphaController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    if (key.rowCount == 1) {
-        node.setAlpha(data[key.dataIndex]);
-        return;
-    }
-
     for (uint16_t i = 0; i < key.rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[key.timeIndex + i];
-        frame.alpha = data[key.dataIndex + i];
-
-        node.addAlphaKeyframe(move(frame));
+        float time = data[key.timeIndex + i];
+        float alpha = data[key.dataIndex + i];
+        node.alphas().addKeyframe(time, alpha);
     }
+
+    node.alphas().update();
 }
 
 static void readSelfIllumColorController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    if (key.rowCount == 1) {
-        node.setSelfIllumColor(glm::make_vec3(&data[key.dataIndex]));
-        return;
-    }
-
     for (uint16_t i = 0; i < key.rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[key.timeIndex + i];
-        frame.selfIllumColor = glm::make_vec3(&data[key.dataIndex + 3 * i]);
-
-        node.addSelfIllumColorKeyframe(move(frame));
+        float time = data[key.timeIndex + i];
+        glm::vec3 color(glm::make_vec3(&data[key.dataIndex + 3 * i]));
+        node.selfIllumColors().addKeyframe(time, move(color));
     }
+
+    node.selfIllumColors().update();
 }
 
 static void readColorController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
-    node.setColor(glm::make_vec3(&data[key.dataIndex]));
+    node.light()->color = glm::make_vec3(&data[key.dataIndex]);
 }
 
 static void readRadiusController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -422,11 +413,8 @@ static const unordered_map<uint32_t, ControllerFn> g_genericControllers {
     { 8, &readPositionController },
     { 20, &readOrientationController },
     { 36, &readScaleController },
+    { 100, &readSelfIllumColorController },
     { 132, &readAlphaController }
-};
-
-static const unordered_map<uint32_t, ControllerFn> g_meshControllers {
-    { 100, &readSelfIllumColorController }
 };
 
 static const unordered_map<uint32_t, ControllerFn> g_lightControllers {
@@ -490,9 +478,7 @@ static const unordered_map<uint32_t, ControllerFn> g_emitterControllers {
 
 static function<void(const ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
-    if (nodeFlags & NodeFlags::mesh) {
-        fn = getFromLookupOrNull(g_meshControllers, type);
-    } else if (nodeFlags & NodeFlags::light) {
+    if (nodeFlags & NodeFlags::light) {
         fn = getFromLookupOrNull(g_lightControllers, type);
     } else if (nodeFlags & NodeFlags::emitter) {
         fn = getFromLookupOrNull(g_emitterControllers, type);
