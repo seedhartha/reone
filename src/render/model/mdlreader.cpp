@@ -55,7 +55,7 @@ struct NodeFlags {
     static constexpr int mesh = 0x20;
     static constexpr int skin = 0x40;
     static constexpr int anim = 0x80;
-    static constexpr int dangly = 0x100;
+    static constexpr int danglymesh = 0x100;
     static constexpr int aabb = 0x200;
     static constexpr int saber = 0x800;
 };
@@ -577,6 +577,9 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     if (header.flags & NodeFlags::skin) {
         node->_skin = make_shared<ModelNode::Skin>();
     }
+    if (header.flags & NodeFlags::danglymesh) {
+        node->_danglymesh = make_shared<ModelNode::Danglymesh>();
+    }
     if (header.flags & NodeFlags::saber) {
         node->_saber = true;
     }
@@ -600,7 +603,7 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     if (header.flags & NodeFlags::skin) {
         readSkin(*node);
     }
-    if (header.flags & NodeFlags::dangly) {
+    if (header.flags & NodeFlags::danglymesh) {
         readDanglymesh(*node);
     }
     if (header.flags & NodeFlags::aabb) {
@@ -891,7 +894,11 @@ void MdlReader::readSaber(ModelNode &node) {
 
 void MdlReader::readDanglymesh(ModelNode &node) {
     DanglymeshHeader header(readStruct<DanglymeshHeader>());
-    // TODO: fill ModelNode
+
+    node._danglymesh->displacement = header.displacement;
+    node._danglymesh->tightness = header.tightness;
+    node._danglymesh->period = header.period;
+    node._danglymesh->constraints = readArray<float>(kMdlDataOffset + header.constraints.offset, header.constraints.count);
 }
 
 void MdlReader::readAABB(ModelNode &node) {
