@@ -20,6 +20,7 @@
 #include <functional>
 #include <map>
 #include <vector>
+#include <unordered_map>
 
 namespace reone {
 
@@ -39,6 +40,12 @@ std::map<Src, Dest> associate(const std::vector<Src> &source, const std::functio
         result.insert(make_pair(item, fn(item)));
     }
     return move(result);
+}
+
+template <class T>
+T getFromLookupOrNull(const std::unordered_map<uint32_t, T> &lookup, uint32_t key) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : nullptr;
 }
 
 } // namespace reone

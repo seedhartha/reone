@@ -133,8 +133,8 @@ void ModelSceneNode::initModelNodes() {
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
                 auto lightNode = make_shared<LightSceneNode>(child->color(), light->priority, _sceneGraph);
-                lightNode->setMultiplier(child->multiplier());
-                lightNode->setRadius(child->radius());
+                lightNode->setMultiplier(light->multiplier);
+                lightNode->setRadius(light->radius);
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
                 childNode->addChild(lightNode);

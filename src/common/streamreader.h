@@ -52,7 +52,19 @@ public:
     bool eof() const;
 
     template <class T>
-    std::vector<T> getArray(int count);
+    T getStruct() {
+        T result;
+        _stream->read(reinterpret_cast<char *>(&result), sizeof(T));
+        return std::move(result);
+    }
+
+    template <class T>
+    std::vector<T> getArray(int count) {
+        std::vector<T> result;
+        result.resize(count);
+        _stream->read(reinterpret_cast<char *>(&result[0]), count * sizeof(T));
+        return std::move(result);
+    }
 
 private:
     std::shared_ptr<std::istream> _stream;

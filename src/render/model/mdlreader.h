@@ -29,6 +29,15 @@ namespace render {
 
 class MdlReader : public resource::BinaryReader {
 public:
+    struct ControllerKey {
+        uint32_t type { 0 };
+        uint16_t unknown1 { 0 };
+        uint16_t rowCount { 0 };
+        uint16_t timeIndex { 0 };
+        uint16_t dataIndex { 0 };
+        uint8_t columnCount { 0 };
+    };
+
     MdlReader(resource::GameID gameId);
 
     void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
@@ -62,38 +71,6 @@ private:
     void readReference(render::ModelNode &node);
 
     Model::Classification getClassification(int value) const;
-
-    // Controllers
-
-    void readAlphaController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readAlphaEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readAlphaMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readAlphaStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readBirthrateController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readColorController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readColorEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readColorMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readColorStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readFPSController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readFrameEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readFrameStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readLifeExpectancyController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readMultiplierController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readOrientationController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readRadiusController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readRandomVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSelfIllumColorController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSizeEndController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSizeMidController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSizeStartController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSizeXController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSizeYController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readSpreadController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-    void readVelocityController(uint16_t dataIndex, const std::vector<float> &data, render::ModelNode &node);
-
-    // END Controllers
 };
 
 class MdlModelLoader : public IModelLoader {

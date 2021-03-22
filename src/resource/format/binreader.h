@@ -86,6 +86,11 @@ protected:
         return std::move(result);
     }
 
+    template <class T>
+    T readStruct() {
+        return _reader->getStruct<T>();
+    }
+
 private:
     int _signSize { 0 };
     ByteArray _sign;

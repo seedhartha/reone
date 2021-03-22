@@ -62,11 +62,14 @@ public:
 
     struct Light {
         int priority { 0 };
-        float multiplier { 1.0f };
         int dynamicType { 0 };
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };
+
+        // These come from controllers
+        float multiplier { 1.0f };
+        float radius { 0.0f };
     };
 
     struct Reference {
@@ -103,6 +106,9 @@ public:
 
     void addTranslationKeyframe(Keyframe keyframe);
     void addOrientationKeyframe(Keyframe keyframe);
+    void addScaleKeyframe(Keyframe keyframe);
+    void addAlphaKeyframe(Keyframe keyframe);
+    void addSelfIllumColorKeyframe(Keyframe keyframe);
 
     bool isAABB() const { return _aabb; }
     bool isSaber() const { return _saber; }
@@ -131,8 +137,6 @@ public:
     const glm::vec3 &color() const { return _color; }
     const glm::vec3 &selfIllumColor() const { return _selfIllumColor; }
     float alpha() const { return _alpha; }
-    float radius() const { return _radius; }
-    float multiplier() const { return _multiplier; }
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
 
     void setName(std::string name);
@@ -140,6 +144,9 @@ public:
     void setAbsoluteTransform(glm::mat4 transform);
     void setMesh(std::shared_ptr<ModelMesh> mesh);
     void setSkin(std::shared_ptr<Skin> skin);
+    void setColor(glm::vec3 color);
+    void setSelfIllumColor(glm::vec3 color);
+    void setAlpha(float alpha);
 
     // Components
 
@@ -160,8 +167,6 @@ private:
     glm::vec3 _color { 0.0f };
     glm::vec3 _selfIllumColor { 0.0f };
     float _alpha { 1.0f };
-    float _radius { 0.0f };
-    float _multiplier { 1.0f };
     bool _aabb { false };
     bool _saber { false };
 
