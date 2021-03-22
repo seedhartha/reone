@@ -128,49 +128,4 @@ bool StreamReader::eof() const {
     return _stream->eof();
 }
 
-template <>
-vector<char> StreamReader::getArray(int count) {
-    vector<char> result(count);
-    if (count > 0) {
-        _stream->read(&result[0], count);
-    }
-    return move(result);
-}
-
-template <>
-vector<uint8_t> StreamReader::getArray(int count) {
-    vector<uint8_t> result(count);
-    if (count > 0) {
-        _stream->read(reinterpret_cast<char *>(&result[0]), count);
-    }
-    return move(result);
-}
-
-template <>
-vector<uint16_t> StreamReader::getArray(int count) {
-    vector<uint16_t> result(count);
-    for (int i = 0; i < count; ++i) {
-        result[i] = getUint16();
-    }
-    return move(result);
-}
-
-template <>
-vector<uint32_t> StreamReader::getArray(int count) {
-    vector<uint32_t> result(count);
-    for (int i = 0; i < count; ++i) {
-        result[i] = getUint32();
-    }
-    return move(result);
-}
-
-template <>
-vector<float> StreamReader::getArray(int count) {
-    vector<float> result(count);
-    for (int i = 0; i < count; ++i) {
-        result[i] = getFloat();
-    }
-    return move(result);
-}
-
 } // namespace reone

@@ -84,6 +84,18 @@ void ModelNode::addOrientationKeyframe(Keyframe keyframe) {
     _orientationFrames.push_back(move(keyframe));
 }
 
+void ModelNode::addScaleKeyframe(Keyframe keyframe) {
+    _scaleFrames.push_back(move(keyframe));
+}
+
+void ModelNode::addAlphaKeyframe(Keyframe keyframe) {
+    _alphaFrames.push_back(move(keyframe));
+}
+
+void ModelNode::addSelfIllumColorKeyframe(Keyframe keyframe) {
+    _selfIllumFrames.push_back(move(keyframe));
+}
+
 /**
  * @return false if keyframes vector is empty, true otherwise
  */
@@ -246,6 +258,18 @@ void ModelNode::setMesh(shared_ptr<ModelMesh> mesh) {
 
 void ModelNode::setSkin(shared_ptr<Skin> skin) {
     _skin = move(skin);
+}
+
+void ModelNode::setColor(glm::vec3 color) {
+    _color = move(color);
+}
+
+void ModelNode::setSelfIllumColor(glm::vec3 color) {
+    _selfIllumColor = move(color);
+}
+
+void ModelNode::setAlpha(float alpha) {
+    _alpha = alpha;
 }
 
 } // namespace render

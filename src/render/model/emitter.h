@@ -70,9 +70,13 @@ public:
     int frameStart() const { return _frameStart; }
     int frameEnd() const { return _frameEnd; }
 
+    glm::vec2 &size() { return _size; }
     const glm::vec2 &size() const { return _size; }
+    Constraints<float> &particleSize() { return _particleSize; }
     const Constraints<float> &particleSize() const { return _particleSize; }
+    Constraints<glm::vec3> &color() { return _color; }
     const Constraints<glm::vec3> &color() const { return _color; }
+    Constraints<float> &alpha() { return _alpha; }
     const Constraints<float> &alpha() const { return _alpha; }
     int birthrate() const { return _birthrate; }
     int lifeExpectancy() const { return _lifeExpectancy; }
@@ -81,6 +85,16 @@ public:
     float spread() const { return _spread; }
     bool loop() const { return _loop; }
     int fps() const { return _fps; }
+
+    void setFrameStart(int value) { _frameStart = value; }
+    void setFrameEnd(int value) { _frameEnd = value; }
+    void setBirthrate(int value) { _birthrate = value; }
+    void setLifeExpectancy(int value) { _lifeExpectancy = value; }
+    void setVelocity(float value) { _velocity = value; }
+    void setRandomVelocity(float value) { _randomVelocity = value; }
+    void setSpread(float value) { _spread = value; }
+    void setLoop(bool value) { _loop = value; }
+    void setFPS(int value) { _fps = value; }
 
 private:
     UpdateMode _updateMode { UpdateMode::Invalid };

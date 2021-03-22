@@ -17,10 +17,13 @@
 
 #include "mdlreader.h"
 
+#include <functional>
+
 #include <boost/algorithm/string.hpp>
 
 #include "glm/ext.hpp"
 
+#include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../resource/gameidutil.h"
@@ -55,34 +58,244 @@ struct NodeFlags {
     static constexpr int saber = 0x800;
 };
 
-static const char kSignature[] = "\0\0\0\0";
+static constexpr char kSignature[] = "\0\0\0\0";
 
-enum class ControllerType {
-    Position = 8,
-    Orientation = 20,
-    Scale = 36,
-    Color = 76,
-    AlphaEnd = 80,
-    AlphaStart = 84,
-    Radius_Birthrate = 88,
-    SelfIllumColor = 100,
-    FPS = 104,
-    FrameEnd = 108,
-    FrameStart = 112,
-    LifeExpectancy = 120,
-    Alpha = 132,
-    Multiplier_RandomVelocity = 140,
-    SizeStart = 144,
-    SizeEnd = 148,
-    Spread = 160,
-    Velocity = 168,
-    SizeX = 172,
-    SizeY = 176,
-    AlphaMid = 216,
-    SizeMid = 232,
-    ColorMid = 284,
-    ColorEnd = 380,
-    ColorStart = 392
+typedef function<void(const MdlReader::ControllerKey &, const vector<float> &, ModelNode &)> ControllerFn;
+
+static void readPositionController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    bool bezier = key.columnCount & 16;
+
+    switch (key.columnCount) {
+        case 3:
+        case 19:
+            for (uint16_t i = 0; i < key.rowCount; ++i) {
+                int rowTimeIdx = key.timeIndex + i;
+                int rowDataIdx = key.dataIndex + i * (bezier ? 9 : 3);
+
+                ModelNode::Keyframe frame;
+                frame.time = data[rowTimeIdx];
+                frame.translation = glm::make_vec3(&data[rowDataIdx]);
+
+                node.addTranslationKeyframe(move(frame));
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+static void readOrientationController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    switch (key.columnCount) {
+        case 2:
+            for (uint16_t i = 0; i < key.rowCount; ++i) {
+                int rowTimeIdx = key.timeIndex + i;
+                int rowDataIdx = key.dataIndex + i;
+
+                uint32_t temp = *reinterpret_cast<const uint32_t *>(&data[rowDataIdx]);
+                float x = 1.0f - static_cast<float>(temp & 0x7ff) / 1023.0f;
+                float y = 1.0f - static_cast<float>((temp >> 11) & 0x7ff) / 1023.0f;
+                float z = 1.0f - static_cast<float>(temp >> 22) / 511.0f;
+                float dot = x * x + y * y + z * z;
+                float w;
+
+                if (dot >= 1.0f) {
+                    float len = glm::sqrt(dot);
+                    x /= len;
+                    y /= len;
+                    z /= len;
+                    w = 0.0f;
+                } else {
+                    w = -glm::sqrt(1.0f - dot);
+                }
+
+                ModelNode::Keyframe frame;
+                frame.time = data[rowTimeIdx];
+                frame.orientation = glm::quat(w, x, y, z);
+
+                node.addOrientationKeyframe(move(frame));
+            }
+            break;
+
+        case 4:
+            for (uint16_t i = 0; i < key.rowCount; ++i) {
+                int rowTimeIdx = key.timeIndex + i;
+                int rowDataIdx = key.dataIndex + i * 4;
+
+                ModelNode::Keyframe frame;
+                frame.time = data[rowTimeIdx];
+                frame.orientation.x = data[rowDataIdx + 0];
+                frame.orientation.y = data[rowDataIdx + 1];
+                frame.orientation.z = data[rowDataIdx + 2];
+                frame.orientation.w = data[rowDataIdx + 3];
+
+                node.addOrientationKeyframe(move(frame));
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+static void readScaleController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[key.timeIndex + i];
+        frame.scale = data[key.dataIndex + i];
+
+        node.addScaleKeyframe(move(frame));
+    }
+}
+
+static void readColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.setColor(glm::make_vec3(&data[key.dataIndex]));
+}
+
+static void readSelfIllumColorController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    if (key.rowCount == 1) {
+        node.setSelfIllumColor(glm::make_vec3(&data[key.dataIndex]));
+        return;
+    }
+
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[key.timeIndex + i];
+        frame.selfIllumColor = glm::make_vec3(&data[key.dataIndex + 3 * i]);
+
+        node.addSelfIllumColorKeyframe(move(frame));
+    }
+}
+
+static void readAlphaController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    if (key.rowCount == 1) {
+        node.setAlpha(data[key.dataIndex]);
+        return;
+    }
+
+    for (uint16_t i = 0; i < key.rowCount; ++i) {
+        ModelNode::Keyframe frame;
+        frame.time = data[key.timeIndex + i];
+        frame.alpha = data[key.dataIndex + i];
+
+        node.addAlphaKeyframe(move(frame));
+    }
+}
+
+static void readRadiusController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.light()->radius = data[key.dataIndex];
+}
+
+static void readBirthrateController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setBirthrate(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readMultiplierController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.light()->multiplier = data[key.dataIndex];
+}
+
+static void readLifeExpectancyController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setLifeExpectancy(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readSizeStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->particleSize().start = data[key.dataIndex];
+}
+
+static void readSizeMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->particleSize().mid = data[key.dataIndex];
+}
+
+static void readSizeEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->particleSize().end = data[key.dataIndex];
+}
+
+static void readColorStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->color().start = glm::make_vec3(&data[key.dataIndex]);
+}
+
+static void readColorMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->color().mid = glm::make_vec3(&data[key.dataIndex]);
+}
+
+static void readColorEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->color().end = glm::make_vec3(&data[key.dataIndex]);
+}
+
+static void readAlphaStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().start = data[key.dataIndex];
+}
+
+static void readAlphaMidController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().mid = data[key.dataIndex];
+}
+
+static void readAlphaEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->alpha().end = data[key.dataIndex];
+}
+
+static void readSizeXController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->size().x = data[key.dataIndex];
+}
+
+static void readSizeYController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->size().y = data[key.dataIndex];
+}
+
+static void readFrameStartController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFrameStart(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readFrameEndController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFrameEnd(static_cast<int>(data[key.dataIndex]));
+}
+
+static void readVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setVelocity(data[key.dataIndex]);
+}
+
+static void readRandomVelocityController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setRandomVelocity(data[key.dataIndex]);
+}
+
+static void readSpreadController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setSpread(data[key.dataIndex]);
+}
+
+static void readFPSController(const MdlReader::ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    node.emitter()->setFPS(static_cast<int>(data[key.dataIndex]));
+}
+
+static const unordered_map<uint32_t, ControllerFn> g_genericControllers {
+    { 8, &readPositionController },
+    { 20, &readOrientationController },
+    { 36, &readScaleController },
+    { 76, &readColorController },
+    { 100, &readSelfIllumColorController },
+    { 132, &readAlphaController }
+};
+
+static const unordered_map<uint32_t, ControllerFn> g_lightControllers {
+    { 88, &readRadiusController },
+    { 140, &readMultiplierController }
+};
+
+static const unordered_map<uint32_t, ControllerFn> g_emitterControllers {
+    { 88, &readBirthrateController },
+    { 104, &readFPSController },
+    { 108, &readFrameEndController },
+    { 112, &readFrameStartController },
+    { 120, &readLifeExpectancyController },
+    { 140, &readRandomVelocityController },
+    { 144, &readSizeStartController },
+    { 148, &readSizeEndController },
+    { 160, &readSpreadController },
+    { 168, &readVelocityController },
+    { 172, &readSizeXController },
+    { 176, &readSizeYController },
+    { 216, &readAlphaMidController },
+    { 232, &readSizeMidController },
+    { 284, &readColorMidController },
+    { 380, &readColorEndController },
+    { 392, &readColorStartController }
 };
 
 MdlReader::MdlReader(GameID gameId) : BinaryReader(kSignatureSize, kSignature), _gameId(gameId) {
@@ -235,6 +448,9 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     node->_orientation = orientation;
     node->_localTransform = transform;
 
+    if (flags & NodeFlags::light) {
+        node->_light = make_shared<ModelNode::Light>();
+    }
     if (flags & NodeFlags::emitter) {
         node->_emitter = make_shared<Emitter>();
     }
@@ -273,377 +489,37 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     return move(node);
 }
 
+static function<void(const MdlReader::ControllerKey &, const vector<float> &, ModelNode &)> getControllerFn(uint32_t type, int nodeFlags) {
+    ControllerFn fn;
+    if (nodeFlags & NodeFlags::light) {
+        fn = getFromLookupOrNull(g_lightControllers, type);
+    } else if (nodeFlags & NodeFlags::emitter) {
+        fn = getFromLookupOrNull(g_emitterControllers, type);
+    }
+    if (!fn) {
+        fn = getFromLookupOrNull(g_genericControllers, type);
+    }
+    return move(fn);
+}
+
 void MdlReader::readControllers(uint32_t keyCount, uint32_t keyOffset, const vector<float> &data, ModelNode &node) {
     size_t pos = tell();
     seek(kMdlDataOffset + keyOffset);
 
-    for (uint32_t i = 0; i < keyCount; ++i) {
-        ControllerType type = static_cast<ControllerType>(readUint32());
-
-        ignore(2);
-
-        uint16_t rowCount = readUint16();
-        uint16_t timeIndex = readUint16();
-        uint16_t dataIndex = readUint16();
-        uint8_t columnCount = readByte();
-
-        ignore(3);
-
-        switch (type) {
-            case ControllerType::Position:
-                readPositionController(rowCount, columnCount, timeIndex, dataIndex, data, node);
-                break;
-            case ControllerType::Orientation:
-                readOrientationController(rowCount, columnCount, timeIndex, dataIndex, data, node);
-                break;
-            case ControllerType::Scale:
-                readScaleController(rowCount, timeIndex, dataIndex, data, node);
-                break;
-            case ControllerType::Color:
-                readColorController(dataIndex, data, node);
-                break;
-            case ControllerType::Radius_Birthrate:
-                if (node._flags & NodeFlags::light) {
-                    readRadiusController(dataIndex, data, node);
-                } else if (node._flags & NodeFlags::emitter) {
-                    readBirthrateController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::SelfIllumColor:
-                if (!(node._flags & NodeFlags::light) && !(node._flags & NodeFlags::emitter)) {
-                    readSelfIllumColorController(rowCount, timeIndex, dataIndex, data, node);
-                }
-                break;
-            case ControllerType::FPS:
-                if (node._flags & NodeFlags::emitter) {
-                    readFPSController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::FrameEnd:
-                if (node._flags & NodeFlags::emitter) {
-                    readFrameEndController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::FrameStart:
-                if (node._flags & NodeFlags::emitter) {
-                    readFrameStartController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::LifeExpectancy:
-                if (node._flags & NodeFlags::emitter) {
-                    readLifeExpectancyController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::Alpha:
-                readAlphaController(rowCount, timeIndex, dataIndex, data, node);
-                break;
-            case ControllerType::Multiplier_RandomVelocity:
-                if (node._flags & NodeFlags::light) {
-                    readMultiplierController(dataIndex, data, node);
-                } else if (node._flags & NodeFlags::emitter) {
-                    readRandomVelocityController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::Spread:
-                if (node._flags & NodeFlags::emitter) {
-                    readSpreadController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::Velocity:
-                if (node._flags & NodeFlags::emitter) {
-                    readVelocityController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::SizeX:
-                if (node._flags & NodeFlags::emitter) {
-                    readSizeXController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::SizeY:
-                if (node._flags & NodeFlags::emitter) {
-                    readSizeYController(dataIndex, data, node);
-                }
-                break;
-
-            case ControllerType::SizeStart:
-                if (node._flags & NodeFlags::emitter) {
-                    readSizeStartController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::SizeMid:
-                if (node._flags & NodeFlags::emitter) {
-                    readSizeMidController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::SizeEnd:
-                if (node._flags & NodeFlags::emitter) {
-                    readSizeEndController(dataIndex, data, node);
-                }
-                break;
-
-            case ControllerType::ColorStart:
-                if (node._flags & NodeFlags::emitter) {
-                    readColorStartController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::ColorMid:
-                if (node._flags & NodeFlags::emitter) {
-                    readColorMidController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::ColorEnd:
-                if (node._flags & NodeFlags::emitter) {
-                    readColorEndController(dataIndex, data, node);
-                }
-                break;
-
-            case ControllerType::AlphaStart:
-                if (node._flags & NodeFlags::emitter) {
-                    readAlphaStartController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::AlphaMid:
-                if (node._flags & NodeFlags::emitter) {
-                    readAlphaMidController(dataIndex, data, node);
-                }
-                break;
-            case ControllerType::AlphaEnd:
-                if (node._flags & NodeFlags::emitter) {
-                    readAlphaEndController(dataIndex, data, node);
-                }
-                break;
-
-            default:
-                debug(boost::format("MDL: unsupported controller type: %d") % static_cast<int>(type), 3);
-                break;
+    vector<ControllerKey> keys(readArray<ControllerKey>(keyCount));
+    for (ControllerKey key : keys) {
+        auto fn = getControllerFn(key.type, node._flags);
+        if (fn) {
+            fn(key, data, node);
+        } else {
+            debug(boost::format("Unsupported MDL controller: %d") % static_cast<int>(key.type), 3);
         }
     }
 
     seek(pos);
 }
 
-void MdlReader::readPositionController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    bool bezier = columnCount & 16;
-    node._translationFrames.reserve(rowCount);
-
-    switch (columnCount) {
-        case 3:
-        case 19:
-            for (int i = 0; i < rowCount; ++i) {
-                int rowTimeIdx = timeIndex + i;
-                int rowDataIdx = dataIndex + i * (bezier ? 9 : 3);
-
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.translation = glm::make_vec3(&data[rowDataIdx]);
-
-                node._translationFrames.push_back(move(frame));
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-void MdlReader::readOrientationController(uint16_t rowCount, uint8_t columnCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._orientationFrames.reserve(rowCount);
-
-    switch (columnCount) {
-        case 2:
-            for (int i = 0; i < rowCount; ++i) {
-                int rowTimeIdx = timeIndex + i;
-                int rowDataIdx = dataIndex + i;
-
-                uint32_t temp = *reinterpret_cast<const uint32_t *>(&data[rowDataIdx]);
-                float x = 1.0f - static_cast<float>(temp & 0x7ff) / 1023.0f;
-                float y = 1.0f - static_cast<float>((temp >> 11) & 0x7ff) / 1023.0f;
-                float z = 1.0f - static_cast<float>(temp >> 22) / 511.0f;
-                float dot = x * x + y * y + z * z;
-                float w;
-
-                if (dot >= 1.0f) {
-                    float len = glm::sqrt(dot);
-                    x /= len;
-                    y /= len;
-                    z /= len;
-                    w = 0.0f;
-                } else {
-                    w = -glm::sqrt(1.0f - dot);
-                }
-
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.orientation = glm::quat(w, x, y, z);
-
-                node._orientationFrames.push_back(move(frame));
-            }
-            break;
-
-        case 4:
-            for (int i = 0; i < rowCount; ++i) {
-                int rowTimeIdx = timeIndex + i;
-                int rowDataIdx = dataIndex + i * 4;
-
-                ModelNode::Keyframe frame;
-                frame.time = data[rowTimeIdx];
-                frame.orientation.x = data[rowDataIdx + 0];
-                frame.orientation.y = data[rowDataIdx + 1];
-                frame.orientation.z = data[rowDataIdx + 2];
-                frame.orientation.w = data[rowDataIdx + 3];
-
-                node._orientationFrames.push_back(move(frame));
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-void MdlReader::readScaleController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._scaleFrames.resize(rowCount);
-
-    for (int i = 0; i < rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[timeIndex + i];
-        frame.scale = data[dataIndex + i];
-
-        node._scaleFrames[i] = move(frame);
-    }
-}
-
-void MdlReader::readColorController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._color.r = data[dataIndex + 0];
-    node._color.g = data[dataIndex + 1];
-    node._color.b = data[dataIndex + 2];
-}
-
-void MdlReader::readSelfIllumColorController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    if (rowCount == 1) {
-        node._selfIllumColor = glm::make_vec3(&data[dataIndex]);
-        return;
-    }
-
-    node._selfIllumFrames.resize(rowCount);
-
-    for (uint16_t i = 0; i < rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[timeIndex + i];
-        frame.selfIllumColor = glm::make_vec3(&data[dataIndex + 3 * i]);
-
-        node._selfIllumFrames[i] = move(frame);
-    }
-}
-
-void MdlReader::readAlphaController(uint16_t rowCount, uint16_t timeIndex, uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    if (rowCount == 1) {
-        node._alpha = data[dataIndex];
-        return;
-    }
-
-    node._alphaFrames.resize(rowCount);
-
-    for (uint16_t i = 0; i < rowCount; ++i) {
-        ModelNode::Keyframe frame;
-        frame.time = data[timeIndex + i];
-        frame.alpha = data[dataIndex + i];
-
-        node._alphaFrames[i] = move(frame);
-    }
-}
-
-void MdlReader::readRadiusController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._radius = data[dataIndex];
-}
-
-void MdlReader::readBirthrateController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_birthrate = static_cast<int>(data[dataIndex]);
-}
-
-void MdlReader::readMultiplierController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._multiplier = data[dataIndex];
-}
-
-void MdlReader::readLifeExpectancyController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_lifeExpectancy = static_cast<int>(data[dataIndex]);
-}
-
-void MdlReader::readSizeStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_particleSize.start = data[dataIndex];
-}
-
-void MdlReader::readSizeMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_particleSize.mid = data[dataIndex];
-}
-
-void MdlReader::readSizeEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_particleSize.end = data[dataIndex];
-}
-
-void MdlReader::readColorStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.start.r = data[dataIndex + 0ll];
-    node._emitter->_color.start.g = data[dataIndex + 1ll];
-    node._emitter->_color.start.b = data[dataIndex + 2ll];
-}
-
-void MdlReader::readColorMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.mid.r = data[dataIndex + 0ll];
-    node._emitter->_color.mid.g = data[dataIndex + 1ll];
-    node._emitter->_color.mid.b = data[dataIndex + 2ll];
-}
-
-void MdlReader::readColorEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_color.end.r = data[dataIndex + 0ll];
-    node._emitter->_color.end.g = data[dataIndex + 1ll];
-    node._emitter->_color.end.b = data[dataIndex + 2ll];
-}
-
-void MdlReader::readAlphaStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_alpha.start = data[dataIndex];
-}
-
-void MdlReader::readAlphaMidController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_alpha.mid = data[dataIndex];
-}
-
-void MdlReader::readAlphaEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_alpha.end = data[dataIndex];
-}
-
-void MdlReader::readSizeXController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_size.x = data[dataIndex];
-}
-
-void MdlReader::readSizeYController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_size.y = data[dataIndex];
-}
-
-void MdlReader::readFrameEndController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_frameEnd = static_cast<int>(data[dataIndex]);
-}
-
-void MdlReader::readFrameStartController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_frameStart = static_cast<int>(data[dataIndex]);
-}
-
-void MdlReader::readRandomVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_randomVelocity = data[dataIndex];
-}
-
-void MdlReader::readVelocityController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_velocity = data[dataIndex];
-}
-
-void MdlReader::readSpreadController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_spread = data[dataIndex];
-}
-
-void MdlReader::readFPSController(uint16_t dataIndex, const vector<float> &data, ModelNode &node) {
-    node._emitter->_fps = static_cast<int>(data[dataIndex]);
-}
-
 void MdlReader::readLight(ModelNode &node) {
-    node._light = make_shared<ModelNode::Light>();
-
     ignore(64);
 
     node._light->priority = readUint32();
