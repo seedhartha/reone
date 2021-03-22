@@ -759,10 +759,10 @@ void MdlReader::readMesh(ModelNode &node) {
     Mesh::VertexOffsets offsets;
     offsets.stride = header.mdxVertexSize;
     offsets.vertexCoords = header.offMdxVertices;
-    offsets.normals = header.offMdxNormals != 0xffffffff ? header.offMdxNormals : -1;
-    offsets.texCoords1 = header.offMdxTexCoords1 != 0xffffffff ? header.offMdxTexCoords1 : -1;
-    offsets.texCoords2 = header.offMdxTexCoords2 != 0xffffffff ? header.offMdxTexCoords2 : -1;
-    if (header.offMdxTanSpace != 0xffffffff) {
+    offsets.normals = header.offMdxNormals;
+    offsets.texCoords1 = header.offMdxTexCoords1;
+    offsets.texCoords2 = header.offMdxTexCoords2;
+    if (header.offMdxTanSpace != -1) {
         offsets.bitangents = header.offMdxTanSpace + 0 * sizeof(float);
         offsets.tangents = header.offMdxTanSpace + 3 * sizeof(float);
     }
