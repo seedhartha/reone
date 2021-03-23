@@ -50,8 +50,8 @@ public:
     bool getByTime(float time, V &value) const {
         if (_keyframes.empty()) return false;
 
-        const pair<float, V> *frame1 = &_keyframes[0];
-        const pair<float, V> *frame2 = &_keyframes[0];
+        const std::pair<float, V> *frame1 = &_keyframes[0];
+        const std::pair<float, V> *frame2 = &_keyframes[0];
         for (auto it = _keyframes.begin(); it != _keyframes.end(); ++it) {
             if (it->first >= time) {
                 frame2 = &*it;
