@@ -67,6 +67,7 @@ void CreatureBlueprint::load(Creature &creature) {
     creature._currentHitPoints = _utc->getInt("CurrentHitPoints");
     creature._maxHitPoints = _utc->getInt("MaxHitPoints");
     creature._racialType = static_cast<RacialType>(_utc->getInt("Race"));
+    creature._subrace = static_cast<Subrace>(_utc->getInt("SubraceIndex"));
 
     loadName(creature);
     loadAttributes(creature);
@@ -159,7 +160,7 @@ void CreatureBlueprint::loadBodyBag(Creature &creature) {
 }
 
 void CreatureBlueprint::loadPerception(Creature &creature) {
-    int rangeIdx = _utc->getInt("PerceptionRange", 0);
+    int rangeIdx = _utc->getInt("PerceptionRange");
     shared_ptr<TwoDA> ranges(Resources::instance().get2DA("ranges"));
     creature._perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
     creature._perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");

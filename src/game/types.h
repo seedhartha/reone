@@ -856,6 +856,11 @@ enum class RacialType {
     Invalid = 8
 };
 
+enum class Subrace {
+    None = 0,
+    Wookie = 1
+};
+
 enum class NPCAIStyle {
     DefaultAttack = 0,
     RangedAttack = 1,

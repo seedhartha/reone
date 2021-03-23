@@ -149,6 +149,16 @@ Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &c
     return static_pointer_cast<ScriptObject>(_game->party().getLeader());
 }
 
+Variable Routines::getSoloMode(const VariablesList &args, ExecutionContext &ctx) {
+    return _game->party().isSoloMode() ? 1 : 0;
+}
+
+Variable Routines::setSoloMode(const VariablesList &args, ExecutionContext &ctx) {
+    auto activate = getBool(args, 0);
+    _game->party().setSoloMode(activate);
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone

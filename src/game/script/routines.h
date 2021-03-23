@@ -195,7 +195,6 @@ private:
     script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getRacialType(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Objects
 
@@ -210,6 +209,7 @@ private:
     script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setIdentified(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getBaseItemType(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Items
 
@@ -267,6 +267,8 @@ private:
     script::Variable removePartyMember(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setPartyLeader(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable showPartySelectionGUI(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getSoloMode(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setSoloMode(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Party
 
@@ -341,6 +343,7 @@ private:
     script::Variable getSkillRank(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getHasSpell(const VariablesList &args, script::ExecutionContext &ctx);
 
     script::Variable changeFaction(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable changeToStandardFaction(const VariablesList &args, script::ExecutionContext &ctx);
@@ -362,6 +365,9 @@ private:
     script::Variable setMaxStealthXP(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setStealthXPDecrement(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable setStealthXPEnabled(const VariablesList &args, script::ExecutionContext &ctx);
+
+    script::Variable getRacialType(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getSubRace(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Role-playing
 

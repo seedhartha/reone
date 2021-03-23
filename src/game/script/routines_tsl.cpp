@@ -416,7 +416,7 @@ void Routines::addTslRoutines() {
     add("SendMessageToPC", Void, { Object, String });
     add("GetAttemptedSpellTarget", Object, { }, &Routines::getAttemptedSpellTarget);
     add("GetLastOpenedBy", Object, { }, &Routines::getLastOpenedBy);
-    add("GetHasSpell", Int, { Int, Object });
+    add("GetHasSpell", Int, { Int, Object }, &Routines::getHasSpell);
     add("OpenStore", Void, { Object, Object, Int, Int });
     add("ActionSurrenderToEnemies", Void, { }, &Routines::actionSurrenderToEnemies);
     add("GetFirstFactionMember", Object, { Object, Int });
@@ -436,7 +436,7 @@ void Routines::addTslRoutines() {
     add("SetXP", Void, { Object, Int }, &Routines::setXP);
     add("GetXP", Int, { Object }, &Routines::getXP);
     add("IntToHexString", String, { Int }, &Routines::intToHexString);
-    add("GetBaseItemType", Int, { Object });
+    add("GetBaseItemType", Int, { Object }, &Routines::getBaseItemType);
     add("GetItemHasItemProperty", Int, { Object, Int });
     add("ActionEquipMostDamagingMelee", Void, { Object, Int }, &Routines::actionEquipMostDamagingMelee);
     add("ActionEquipMostDamagingRanged", Void, { Object }, &Routines::actionEquipMostDamagingRanged);
@@ -536,7 +536,7 @@ void Routines::addTslRoutines() {
     add("GetChallengeRating", Float, { Object });
     add("GetFoundEnemyCreature", Object, { Object });
     add("GetMovementRate", Int, { Object });
-    add("GetSubRace", Int, { Object });
+    add("GetSubRace", Int, { Object }, &Routines::getSubRace);
     add("GetStealthXPDecrement", Int, { }, &Routines::getStealthXPDecrement);
     add("SetStealthXPDecrement", Void, { Int }, &Routines::setStealthXPDecrement);
     add("DuplicateHeadAppearance", Void, { Object, Object });

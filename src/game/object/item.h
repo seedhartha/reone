@@ -72,6 +72,7 @@ public:
     WeaponType weaponType() const { return _weaponType; }
     WeaponWield weaponWield() const { return _weaponWield; }
     const std::string &descIdentified() const { return _descIdentified; }
+    int baseItemType() const { return _baseItemType; }
 
     void setDropable(bool dropable);
     void setStackSize(int size);
@@ -99,6 +100,7 @@ private:
     bool _equipped { false };
     std::shared_ptr<AmmunitionType> _ammunitionType;
     std::string _descIdentified;
+    int _baseItemType { 0 };
 
     friend class ItemBlueprint;
 };

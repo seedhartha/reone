@@ -327,6 +327,49 @@ Variable Routines::setStealthXPDecrement(const VariablesList &args, ExecutionCon
     return Variable();
 }
 
+Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        result.intValue = static_cast<int>(creature->racialType());
+    } else {
+        debug("Script: getRacialType: creature is invalid");
+    }
+
+    return move(result);
+}
+
+Variable Routines::getSubRace(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        result.intValue = static_cast<int>(creature->subrace());
+    } else {
+        debug("Script: getSubRace: creature is invalid");
+    }
+
+    return move(result);
+}
+
+Variable Routines::getHasSpell(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto creature = getCreatureOrCaller(args, 1, ctx);
+    if (creature) {
+        auto spell = static_cast<ForcePower>(getInt(args, 0));
+        // TODO: Force Powers, aka spells, are not supported at the moment
+    } else {
+        debug("Script: getHasSpell: creature is invalid");
+    }
+
+    return move(result);
+}
+
 } // namespace game
 
 } // namespace reone
