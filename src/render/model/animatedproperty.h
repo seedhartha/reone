@@ -78,7 +78,7 @@ public:
         return _keyframes[frame].second;
     }
 
-    V getByKeyframeOrDefault(int frame, V defaultValue) const {
+    V getByKeyframeOrElse(int frame, V defaultValue) const {
         return frame < static_cast<int>(_keyframes.size()) ?
             getByKeyframe(frame) :
             std::move(defaultValue);

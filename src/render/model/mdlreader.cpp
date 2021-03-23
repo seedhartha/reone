@@ -72,7 +72,7 @@ static unordered_map<uint8_t, Model::Classification> g_classifications {
 };
 
 static Model::Classification getClassification(uint8_t ordinal) {
-    return getFromLookupOrDefault(g_classifications, ordinal, Model::Classification::Other);
+    return getFromLookupOrElse(g_classifications, ordinal, Model::Classification::Other);
 }
 
 // END Classification
@@ -81,7 +81,7 @@ static Model::Classification getClassification(uint8_t ordinal) {
 
 struct ControllerKey {
     uint32_t type { 0 };
-    uint16_t unk1 { 0 };
+    uint16_t _unk1 { 0 };
     uint16_t rowCount { 0 };
     uint16_t timeIndex { 0 };
     uint16_t dataIndex { 0 };
@@ -506,7 +506,7 @@ static function<void(const ControllerKey &, const vector<float> &, ModelNode &)>
 
 // END Controllers
 
-MdlReader::MdlReader() : BinaryReader(0) {
+MdlReader::MdlReader() : BinaryReader(4, "\000\000\000\000") {
 }
 
 void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {

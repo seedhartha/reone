@@ -49,7 +49,7 @@ V getFromLookupOrNull(const std::unordered_map<K, V> &lookup, K key) {
 }
 
 template <class K, class V>
-V getFromLookupOrDefault(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
+V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : defaultValue;
 }

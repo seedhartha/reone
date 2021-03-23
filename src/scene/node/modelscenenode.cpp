@@ -114,9 +114,9 @@ void ModelSceneNode::initModelNodes() {
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
                 auto lightNode = make_shared<LightSceneNode>(light->priority, _sceneGraph);
-                lightNode->setColor(child->lightColors().getByKeyframeOrDefault(0, glm::vec3(1.0f)));
-                lightNode->setMultiplier(child->lightMultipliers().getByKeyframeOrDefault(0, 1.0f));
-                lightNode->setRadius(child->lightRadii().getByKeyframeOrDefault(0, 1.0f));
+                lightNode->setColor(child->lightColors().getByKeyframeOrElse(0, glm::vec3(1.0f)));
+                lightNode->setMultiplier(child->lightMultipliers().getByKeyframeOrElse(0, 1.0f));
+                lightNode->setRadius(child->lightRadii().getByKeyframeOrElse(0, 1.0f));
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
                 childNode->addChild(lightNode);
