@@ -141,6 +141,7 @@ public:
     Faction faction() const { return _faction; }
     int xp() const { return _xp; }
     RacialType racialType() const { return _racialType; }
+    Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
     Combat &combat() { return _combat; }
 
@@ -229,6 +230,7 @@ private:
     BodyBag _bodyBag;
     Perception _perception;
     RacialType _racialType { RacialType::Unknown };
+    Subrace _subrace { Subrace::None };
     NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
     Combat _combat;
 

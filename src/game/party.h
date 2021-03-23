@@ -47,6 +47,7 @@ public:
     void onHeartbeat();
 
     bool isEmpty() const;
+    bool isSoloMode() const { return _solo; }
 
     int getSize() const;
     std::shared_ptr<Creature> getLeader() const;
@@ -55,6 +56,7 @@ public:
 
     void setPartyLeader(int npc);
     void setPlayer(const std::shared_ptr<Creature> &player);
+    void setSoloMode(bool value) { _solo = value; }
 
     // Members
 
@@ -93,6 +95,7 @@ private:
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<Member> _members;
+    bool _solo { false };
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 

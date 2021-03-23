@@ -838,7 +838,7 @@ void Area::fill(SceneGraph &sceneGraph) {
 }
 
 int Area::getNumGrassClusters(const Walkmesh::Face &face) const {
-    return glm::round(kGrassDensityFactor * _grass.density * face.area);
+    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * face.area));
 }
 
 int Area::getRandomGrassVariant() const {

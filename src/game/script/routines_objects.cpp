@@ -502,20 +502,6 @@ Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext 
     return move(result);
 }
 
-Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
-
-    auto creature = getCreature(args, 0);
-    if (creature) {
-        result.intValue = static_cast<int>(creature->racialType());
-    } else {
-        debug("Script: getRacialType: creature is invalid");
-    }
-
-    return move(result);
-}
-
 } // namespace game
 
 } // namespace reone

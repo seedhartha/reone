@@ -151,6 +151,20 @@ Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContex
     return static_pointer_cast<ScriptObject>(creature->getItemByTag(itemTag));
 }
 
+Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto item = getItem(args, 0);
+    if (item) {
+        result.intValue = item->baseItemType();
+    } else {
+        debug("Script: getBaseItemType: item is invalid");
+    }
+
+    return move(result);
+}
+
 } // namespace game
 
 } // namespace reone

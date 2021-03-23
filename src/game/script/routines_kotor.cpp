@@ -415,7 +415,7 @@ void Routines::addKotorRoutines() {
     add("SendMessageToPC", Void, { Object, String });
     add("GetAttemptedSpellTarget", Object, { }, &Routines::getAttemptedSpellTarget);
     add("GetLastOpenedBy", Object, { }, &Routines::getLastOpenedBy);
-    add("GetHasSpell", Int, { Int, Object });
+    add("GetHasSpell", Int, { Int, Object }, &Routines::getHasSpell);
     add("OpenStore", Void, { Object, Object, Int, Int });
     add("ActionSurrenderToEnemies", Void, { }, &Routines::actionSurrenderToEnemies);
     add("GetFirstFactionMember", Object, { Object, Int });
@@ -435,7 +435,7 @@ void Routines::addKotorRoutines() {
     add("SetXP", Void, { Object, Int }, &Routines::setXP);
     add("GetXP", Int, { Object }, &Routines::getXP);
     add("IntToHexString", String, { Int }, &Routines::intToHexString);
-    add("GetBaseItemType", Int, { Object });
+    add("GetBaseItemType", Int, { Object }, &Routines::getBaseItemType);
     add("GetItemHasItemProperty", Int, { Object, Int });
     add("ActionEquipMostDamagingMelee", Void, { Object, Int }, &Routines::actionEquipMostDamagingMelee);
     add("ActionEquipMostDamagingRanged", Void, { Object }, &Routines::actionEquipMostDamagingRanged);
@@ -500,7 +500,7 @@ void Routines::addKotorRoutines() {
     add("EffectForceShield", Effect, { Int }, &Routines::effectForceShield);
     add("EffectDispelMagicAll", Effect, { Int }, &Routines::effectDispelMagicAll);
     add("SetDialogPlaceableCamera", Void, { Int });
-    add("GetSoloMode", Int, { });
+    add("GetSoloMode", Int, { }, &Routines::getSoloMode);
     add("EffectDisguise", Effect, { Int }, &Routines::effectDisguise);
     add("GetMaxStealthXP", Int, { }, &Routines::getMaxStealthXP);
     add("EffectTrueSeeing", Effect, { }, &Routines::effectTrueSeeing);
@@ -535,7 +535,7 @@ void Routines::addKotorRoutines() {
     add("GetChallengeRating", Float, { Object });
     add("GetFoundEnemyCreature", Object, { Object });
     add("GetMovementRate", Int, { Object });
-    add("GetSubRace", Int, { Object });
+    add("GetSubRace", Int, { Object }, &Routines::getSubRace);
     add("GetStealthXPDecrement", Int, { }, &Routines::getStealthXPDecrement);
     add("SetStealthXPDecrement", Void, { Int }, &Routines::setStealthXPDecrement);
     add("DuplicateHeadAppearance", Void, { Object, Object });
@@ -801,7 +801,7 @@ void Routines::addKotorRoutines() {
     add("SetGoodEvilValue", Void, { Object, Int });
     add("GetIsPoisoned", Int, { Object });
     add("GetSpellTarget", Object, { Object }, &Routines::getSpellTarget);
-    add("SetSoloMode", Void, { Int });
+    add("SetSoloMode", Void, { Int }, &Routines::setSoloMode);
     add("EffectCutSceneHorrified", Effect, { }, &Routines::effectCutSceneHorrified);
     add("EffectCutSceneParalyze", Effect, { }, &Routines::effectCutSceneParalyze);
     add("EffectCutSceneStunned", Effect, { }, &Routines::effectCutSceneStunned);

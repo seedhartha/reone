@@ -56,17 +56,16 @@ void ItemBlueprint::load(Item &item) {
     item._descIdentified = Strings::instance().get(_uti->getInt("DescIdentified"));
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
-    int baseItem = _uti->getInt("BaseItem");
+    item._baseItemType = _uti->getInt("BaseItem");
+    item._equipableSlots = baseItems->getUint(item._baseItemType, "equipableslots", 0);
 
-    item._equipableSlots = baseItems->getUint(baseItem, "equipableslots", 0);
-
-    string itemClass(baseItems->getString(baseItem, "itemclass"));
+    string itemClass(baseItems->getString(item._baseItemType, "itemclass"));
     item._itemClass = boost::to_lower_copy(itemClass);
 
     string iconResRef;
 
     if (item.isEquippable(InventorySlot::body)) {
-        item._baseBodyVariation = boost::to_lower_copy(baseItems->getString(baseItem, "bodyvar"));
+        item._baseBodyVariation = boost::to_lower_copy(baseItems->getString(item._baseItemType, "bodyvar"));
         item._bodyVariation = _uti->getInt("BodyVariation", 1);
         item._textureVariation = _uti->getInt("TextureVar", 1);
 
@@ -82,14 +81,14 @@ void ItemBlueprint::load(Item &item) {
     }
     item._icon = Textures::instance().get(iconResRef, TextureUsage::GUI);
 
-    item._attackRange = baseItems->getInt(baseItem, "maxattackrange");
-    item._numDice = baseItems->getInt(baseItem, "numdice");
-    item._dieToRoll = baseItems->getInt(baseItem, "dietoroll");
-    item._damageFlags = baseItems->getInt(baseItem, "damageflags");
-    item._weaponType = static_cast<WeaponType>(baseItems->getInt(baseItem, "weapontype"));
-    item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(baseItem, "weaponwield"));
+    item._attackRange = baseItems->getInt(item._baseItemType, "maxattackrange");
+    item._numDice = baseItems->getInt(item._baseItemType, "numdice");
+    item._dieToRoll = baseItems->getInt(item._baseItemType, "dietoroll");
+    item._damageFlags = baseItems->getInt(item._baseItemType, "damageflags");
+    item._weaponType = static_cast<WeaponType>(baseItems->getInt(item._baseItemType, "weapontype"));
+    item._weaponWield = static_cast<WeaponWield>(baseItems->getInt(item._baseItemType, "weaponwield"));
 
-    int ammunitionType = baseItems->getInt(baseItem, "ammunitiontype", -1);
+    int ammunitionType = baseItems->getInt(item._baseItemType, "ammunitiontype", -1);
     if (ammunitionType != -1) {
         loadAmmunitionType(ammunitionType, item);
     }
