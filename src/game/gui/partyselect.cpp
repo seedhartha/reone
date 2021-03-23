@@ -22,12 +22,12 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
 #include "../../render/textures.h"
-#include "../../resource/gameidutil.h"
 #include "../../resource/strings.h"
 #include "../../script/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../game.h"
+#include "../gameidutil.h"
 #include "../portraitutil.h"
 
 #include "colorutil.h"
@@ -63,7 +63,7 @@ PartySelection::PartySelection(Game *game) :
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";
-        _backgroundType = BackgroundType::Menu;
+        loadBackground(BackgroundType::Menu);
     }
 
     initForGame();

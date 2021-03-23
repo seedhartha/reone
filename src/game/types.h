@@ -32,6 +32,20 @@ constexpr float kDefaultFollowDistance = 5.0f;
 constexpr char kObjectTagPlayer[] = "player";
 constexpr float kDefaultRaycastDistance = 8.0f;
 
+enum class GameID {
+    KotOR,
+    TSL,
+    TSL_Steam
+};
+
+enum class BackgroundType {
+    None,
+    Menu,
+    Load,
+    Computer0,
+    Computer1
+};
+
 enum class CursorType {
     None,
     Default,

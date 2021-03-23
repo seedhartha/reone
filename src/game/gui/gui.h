@@ -19,6 +19,8 @@
 
 #include "../../gui/gui.h"
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
@@ -28,12 +30,19 @@ namespace game {
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(resource::GameID gameId, const render::GraphicsOptions &options);
+    GameGUI(GameID gameId, const render::GraphicsOptions &options);
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
 
     void initForGame();
+
+    std::string getResRef(const std::string &base) const;
+
+protected:
+    GameID _gameId;
+
+    void loadBackground(BackgroundType type);
 };
 
 } // namespace game

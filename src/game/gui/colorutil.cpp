@@ -17,9 +17,7 @@
 
 #include "colorutil.h"
 
-#include "../../resource/gameidutil.h"
-
-using namespace reone::resource;
+#include "../gameidutil.h"
 
 namespace reone {
 

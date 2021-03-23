@@ -19,11 +19,11 @@
 
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
-#include "../../../resource/gameidutil.h"
 #include "../../../resource/strings.h"
 
 #include "../../characterutil.h"
 #include "../../game.h"
+#include "../../gameidutil.h"
 #include "../../object/creature.h"
 #include "../../rp/classes.h"
 
@@ -65,7 +65,7 @@ ClassSelection::ClassSelection(Game *game) :
     _resRef = getResRef("classsel");
 
     if (_gameId == GameID::KotOR) {
-        _backgroundType = BackgroundType::Menu;
+        loadBackground(BackgroundType::Menu);
     }
 
     initForGame();

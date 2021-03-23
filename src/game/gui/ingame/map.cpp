@@ -42,9 +42,9 @@ MapMenu::MapMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("map");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void MapMenu::load() {

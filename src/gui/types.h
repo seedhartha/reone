@@ -33,14 +33,6 @@ enum class ControlType {
     ListBox = 11
 };
 
-enum class BackgroundType {
-    None,
-    Menu,
-    Load,
-    Computer0,
-    Computer1
-};
-
 } // namespace gui
 
 } // namespace reone

@@ -35,9 +35,9 @@ JournalMenu::JournalMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("journal");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void JournalMenu::load() {

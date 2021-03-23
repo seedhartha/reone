@@ -25,7 +25,6 @@
 #include <boost/program_options.hpp>
 
 #include "../src/common/pathutil.h"
-#include "../src/resource/gameidutil.h"
 
 #include "tools.h"
 #include "types.h"
@@ -61,9 +60,6 @@ Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
 int Program::run() {
     initOptions();
     loadOptions();
-
-    _gameId = determineGameID(_gamePath);
-
     loadTools();
 
     switch (_operation) {

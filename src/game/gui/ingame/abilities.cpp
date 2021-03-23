@@ -19,11 +19,11 @@
 
 #include "../../../gui/control/listbox.h"
 #include "../../../render/textures.h"
-#include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
 #include "../../game.h"
+#include "../../gameidutil.h"
 
 #include "../colorutil.h"
 
@@ -46,9 +46,9 @@ AbilitiesMenu::AbilitiesMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("abilities");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void AbilitiesMenu::load() {

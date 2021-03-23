@@ -96,7 +96,6 @@ set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(RESOURCE_HEADERS
     src/resource/2da.h
-    src/resource/gameidutil.h
     src/resource/gffstruct.h
     src/resource/folder.h
     src/resource/format/2dareader.h
@@ -125,7 +124,6 @@ set(RESOURCE_HEADERS
 
 set(RESOURCE_SOURCES
     src/resource/2da.cpp
-    src/resource/gameidutil.cpp
     src/resource/gffstruct.cpp
     src/resource/folder.cpp
     src/resource/format/2dareader.cpp
@@ -181,7 +179,6 @@ set(RENDER_HEADERS
     src/render/model/emitter.h
     src/render/model/mdlreader.h
     src/render/model/model.h
-    src/render/model/modelloader.h
     src/render/model/modelmesh.h
     src/render/model/modelnode.h
     src/render/model/models.h
@@ -442,6 +439,7 @@ set(GAME_HEADERS
     src/game/enginetype/event.h
     src/game/enginetype/location.h
     src/game/game.h
+    src/game/gameidutil.h
     src/game/gui/barkbubble.h
     src/game/gui/chargen/abilities.h
     src/game/gui/chargen/chargen.h
@@ -557,6 +555,9 @@ set(GAME_SOURCES
     src/game/cursors.cpp
     src/game/dialog.cpp
     src/game/game.cpp
+    src/game/game_kotor.cpp
+    src/game/game_tsl.cpp
+    src/game/gameidutil.cpp
     src/game/gui/barkbubble.cpp
     src/game/gui/chargen/abilities.cpp
     src/game/gui/chargen/chargen.cpp

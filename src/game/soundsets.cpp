@@ -44,7 +44,7 @@ SoundSets::SoundSets() : MemoryCache(bind(&SoundSets::doGet, this, _1)) {
 }
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
-    auto data = Resources::instance().get(resRef, ResourceType::Ssf);
+    auto data = Resources::instance().getRaw(resRef, ResourceType::Ssf);
     if (!data) return nullptr;
 
     auto result = make_shared<SoundSet>();

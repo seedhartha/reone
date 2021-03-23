@@ -53,7 +53,7 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     string modelName(getBodyModelName());
     if (modelName.empty()) return nullptr;
 
-    shared_ptr<Model> model(Models::instance().get(modelName, ResourceType::Mdl));
+    shared_ptr<Model> model(Models::instance().get(modelName));
     if (!model) return nullptr;
 
     auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, &_creature->sceneGraph());

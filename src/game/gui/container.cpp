@@ -20,10 +20,10 @@
 #include "../../gui/control/imagebutton.h"
 #include "../../gui/control/listbox.h"
 #include "../../render/textures.h"
-#include "../../resource/gameidutil.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
+#include "../gameidutil.h"
 #include "../object/item.h"
 #include "../objectconverter.h"
 

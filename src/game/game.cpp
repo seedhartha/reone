@@ -17,6 +17,8 @@
 
 #include "game.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "SDL2/SDL_timer.h"
 
 #include "../audio/files.h"
@@ -34,7 +36,6 @@
 #include "../render/textures.h"
 #include "../render/walkmesh/walkmeshes.h"
 #include "../render/window.h"
-#include "../resource/gameidutil.h"
 #include "../resource/resources.h"
 #include "../resource/strings.h"
 #include "../script/scripts.h"
@@ -43,6 +44,7 @@
 
 #include "blueprint/blueprints.h"
 #include "cursors.h"
+#include "gameidutil.h"
 #include "reputes.h"
 #include "gui/sounds.h"
 #include "script/routines.h"
@@ -64,6 +66,9 @@ namespace fs = boost::filesystem;
 namespace reone {
 
 namespace game {
+
+static constexpr char kDataDirectoryName[] = "data";
+static constexpr char kModulesDirectoryName[] = "modules";
 
 static bool g_conversationsEnabled = true;
 
@@ -99,24 +104,22 @@ int Game::run() {
 }
 
 void Game::init() {
+    initResourceProviders();
+    loadModuleNames();
+
     RenderWindow::instance().init(_options.graphics, this);
-    Strings::instance().init(_gameId, _path);
-    Resources::instance().init(_gameId, _path);
+    Strings::instance().init(_path);
     Meshes::instance().init();
-    Textures::instance().init(_gameId);
+    Textures::instance().init();
     Materials::instance().init();
     PBRIBL::instance().init();
     Shaders::instance().init();
     AudioPlayer::instance().init(_options.audio);
     GUISounds::instance().init();
-    Routines::instance().init(_gameId, this);
+    Routines::instance().init(this);
     Reputes::instance().init();
-
     Surfaces::instance().init();
     Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices(), Surfaces::instance().getGrassSurfaceIndices());
-
-    Models::instance().init(_gameId);
-    registerModelLoaders();
 
     Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);
@@ -126,8 +129,27 @@ void Game::init() {
     _profileOverlay.init();
 }
 
-void Game::registerModelLoaders() {
-    Models::instance().registerLoader(ResourceType::Mdl, make_shared<MdlModelLoader>());
+void Game::initResourceProviders() {
+    if (isTSL(_gameId)) {
+        initResourceProvidersForTSL();
+    } else {
+        initResourceProvidersForKotOR();
+    }
+    Resources::instance().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+}
+
+void Game::loadModuleNames() {
+    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+
+    for (auto &entry : fs::directory_iterator(modules)) {
+        string filename(boost::to_lower_copy(entry.path().filename().string()));
+        if (!boost::ends_with(filename, ".rim") || boost::ends_with(filename, "_s.rim")) continue;
+
+        string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
+        _moduleNames.push_back(move(moduleName));
+    }
+
+    sort(_moduleNames.begin(), _moduleNames.end());
 }
 
 void Game::setCursorType(CursorType type) {
@@ -232,7 +254,7 @@ void Game::loadModule(const string &name, string entry) {
         SoundSets::instance().invalidate();
         Lips::instance().invalidate();
 
-        Resources::instance().loadModule(name);
+        loadModuleResources(name);
 
         if (_module) {
             _module->area()->runOnExitScript();
@@ -278,6 +300,22 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
     changeScreen(GameScreen::Loading);
     drawAll();
     block();
+}
+
+void Game::loadModuleResources(const string &moduleName) {
+    Resources::instance().invalidateCache();
+    Resources::instance().clearTransientProviders();
+
+    fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
+    Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+    Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+
+    fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
+    Resources::instance().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+
+    if (isTSL(_gameId)) {
+        Resources::instance().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+    }
 }
 
 void Game::drawAll() {

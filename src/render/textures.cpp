@@ -44,9 +44,7 @@ Textures &Textures::instance() {
     return instance;
 }
 
-void Textures::init(GameID gameId) {
-    _gameId = gameId;
-
+void Textures::init() {
     // Initialize default texture
     _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
     _default->init();
@@ -109,14 +107,14 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
-    shared_ptr<ByteArray> tgaData(Resources::instance().get(resRef, ResourceType::Tga, false));
+    shared_ptr<ByteArray> tgaData(Resources::instance().getRaw(resRef, ResourceType::Tga, false));
     if (tgaData) {
         TgaReader tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
         if (texture) {
-            shared_ptr<ByteArray> txiData(Resources::instance().get(resRef, ResourceType::Txi, false));
+            shared_ptr<ByteArray> txiData(Resources::instance().getRaw(resRef, ResourceType::Txi, false));
             if (txiData) {
                 TxiReader txi;
                 txi.load(wrap(txiData));
@@ -126,7 +124,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tpcData(Resources::instance().get(resRef, ResourceType::Tpc, false));
+        shared_ptr<ByteArray> tpcData(Resources::instance().getRaw(resRef, ResourceType::Tpc, false));
         if (tpcData) {
             TpcReader tpc(resRef, usage);
             tpc.load(wrap(tpcData));

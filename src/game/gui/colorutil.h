@@ -19,15 +19,15 @@
 
 #include "glm/vec3.hpp"
 
-#include "../../resource/types.h"
+#include "../types.h"
 
 namespace reone {
 
 namespace game {
 
-glm::vec3 getBaseColor(resource::GameID gameId);
-glm::vec3 getHilightColor(resource::GameID gameId);
-glm::vec3 getDisabledColor(resource::GameID gameId);
+glm::vec3 getBaseColor(GameID gameId);
+glm::vec3 getHilightColor(GameID gameId);
+glm::vec3 getDisabledColor(GameID gameId);
 
 } // namespace game
 

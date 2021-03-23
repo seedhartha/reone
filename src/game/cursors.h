@@ -44,13 +44,13 @@ public:
 
     ~Cursors();
 
-    void init(resource::GameID gameId);
+    void init(GameID gameId);
     void deinit();
 
     std::shared_ptr<render::Cursor> get(CursorType type);
 
 private:
-    resource::GameID _gameId { resource::GameID::KotOR };
+    GameID _gameId { GameID::KotOR };
     std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);

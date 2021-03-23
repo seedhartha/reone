@@ -26,12 +26,6 @@ namespace reone {
 
 namespace resource {
 
-enum class GameID {
-    KotOR,
-    TSL,
-    TSL_Steam
-};
-
 /**
  * Used together with a ResRef to locate game resources.
  */

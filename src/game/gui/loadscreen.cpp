@@ -18,10 +18,10 @@
 #include "loadscreen.h"
 
 #include "../../gui/control/progressbar.h"
-#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
+#include "../gameidutil.h"
 
 using namespace std;
 
@@ -33,8 +33,7 @@ namespace reone {
 namespace game {
 
 LoadingScreen::LoadingScreen(Game *game) :
-    GUI(game->gameId(), game->options().graphics),
-    _game(game) {
+    GameGUI(game->gameId(), game->options().graphics) {
 
     _resRef = getResRef("loadscreen");
 
@@ -42,7 +41,7 @@ LoadingScreen::LoadingScreen(Game *game) :
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
-        _backgroundType = BackgroundType::Load;
+        loadBackground(BackgroundType::Load);
     }
 }
 

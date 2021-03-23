@@ -40,7 +40,7 @@ Scripts::Scripts() : MemoryCache(bind(&Scripts::doGet, this, _1)) {
 }
 
 shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
-    shared_ptr<ByteArray> data(Resources::instance().get(resRef, ResourceType::Ncs));
+    shared_ptr<ByteArray> data(Resources::instance().getRaw(resRef, ResourceType::Ncs));
     if (!data) return nullptr;
 
     NcsReader ncs(resRef);

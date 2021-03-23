@@ -24,12 +24,12 @@
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
 #include "../../render/model/models.h"
-#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
 #include "../blueprint/blueprints.h"
 #include "../game.h"
+#include "../gameidutil.h"
 
 #include "colorutil.h"
 
@@ -61,7 +61,7 @@ MainMenu::MainMenu(Game *game) :
         _resRef = "mainmenu8x6_p";
     } else {
         _resRef = "mainmenu16x12";
-            _backgroundType = BackgroundType::Menu;
+        loadBackground(BackgroundType::Menu);
     }
 
     _resolutionX = 800;
@@ -166,7 +166,7 @@ void MainMenu::startModuleSelection() {
 
 void MainMenu::loadModuleNames() {
     auto &modules = getControl<ListBox>("LB_MODULES");
-    for (auto &module : Resources::instance().moduleNames()) {
+    for (auto &module : _game->moduleNames()) {
         ListBox::Item item;
         item.tag = module;
         item.text = module;

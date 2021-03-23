@@ -21,10 +21,10 @@
 
 #include "../../../gui/scenebuilder.h"
 #include "../../../render/model/models.h"
-#include "../../../resource/gameidutil.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
+#include "../../gameidutil.h"
 #include "../../portraitutil.h"
 #include "../../rp/classes.h"
 
@@ -56,9 +56,9 @@ CharacterGeneration::CharacterGeneration(Game *game) :
     _game(game) {
 
     _resRef = getResRef("maincg");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 };
 
 void CharacterGeneration::load() {

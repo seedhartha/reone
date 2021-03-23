@@ -115,7 +115,7 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytReader lyt;
-    lyt.load(wrap(Resources::instance().get(_name, ResourceType::Lyt)));
+    lyt.load(wrap(Resources::instance().getRaw(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(Models::instance().get(lytRoom.name));
@@ -140,7 +140,7 @@ void Area::loadLYT() {
 
 void Area::loadVIS() {
     VisReader vis;
-    vis.load(wrap(Resources::instance().get(_name, ResourceType::Vis)));
+    vis.load(wrap(Resources::instance().getRaw(_name, ResourceType::Vis)));
 
     _visibility = fixVisibility(vis.visibility());
 }

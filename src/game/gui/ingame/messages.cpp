@@ -35,9 +35,9 @@ MessagesMenu::MessagesMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("messages");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void MessagesMenu::load() {

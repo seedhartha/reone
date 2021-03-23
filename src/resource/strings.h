@@ -33,7 +33,7 @@ class Strings {
 public:
     static Strings &instance();
 
-    void init(GameID gameId, const boost::filesystem::path &gameDir);
+    void init(const boost::filesystem::path &gameDir);
 
     /**
      * Searches for a string in the global talktable by StrRef.
@@ -50,7 +50,6 @@ public:
     std::string getSound(int strRef);
 
 private:
-    GameID _gameId { GameID::KotOR };
     TlkReader _tlk;
 
     void process(std::string &str);

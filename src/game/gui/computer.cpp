@@ -18,7 +18,8 @@
 #include "computer.h"
 
 #include "../../gui/control/listbox.h"
-#include "../../resource/gameidutil.h"
+
+#include "../gameidutil.h"
 
 #include "colorutil.h"
 
