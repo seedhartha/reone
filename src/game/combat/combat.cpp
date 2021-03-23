@@ -64,6 +64,9 @@ Combat::Combat(Game *game) : _game(game) {
 }
 
 void Combat::update(float dt) {
+    // TODO: rewrite for k_ai_master
+    return;
+
     if (_heartbeatTimer.advance(dt)) {
         updateCombatants();
         updateAI();

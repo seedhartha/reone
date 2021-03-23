@@ -490,13 +490,28 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
 
 Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
     Variable result;
+    result.type = VariableType::Int;
 
     auto object = getObjectOrCaller(args, 0, ctx);
     if (object) {
         shared_ptr<Action> action(object->actionQueue().getCurrentAction());
-        result = Variable(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
+        result.intValue = static_cast<int>(action ? action->type() : ActionType::QueueEmpty);
     } else {
         warn("Script: getCurrentAction: object is invalid");
+    }
+
+    return move(result);
+}
+
+Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto creature = getCreature(args, 0);
+    if (creature) {
+        result.intValue = static_cast<int>(creature->racialType());
+    } else {
+        warn("Script: getRacialType: creature is invalid");
     }
 
     return move(result);

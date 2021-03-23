@@ -195,6 +195,7 @@ private:
     script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getRacialType(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Objects
 
