@@ -281,7 +281,7 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
             break;
         case CompositionMode::Blend:
             if (!_channels[0].isSameAnimation(*anim, properties, lipAnim)) {
-                if (_channels[1].isActive()) {
+                if (_channels[0].isActive()) {
                     // Play the specified animation on the first channel - previous animation is moved onto the second channel and is freezed
                     _channels[1] = _channels[0];
                     _channels[0].reset(anim, properties, lipAnim);
