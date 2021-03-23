@@ -36,7 +36,6 @@
 #include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
 #include "../collisiondetect.h"
-#include "../combat/combat.h"
 #include "../creaturefinder.h"
 #include "../map.h"
 #include "../objectselect.h"
@@ -100,7 +99,6 @@ public:
     const Pathfinder &pathfinder() const { return _pathfinder; }
     const std::string &localizedName() const { return _localizedName; }
     const RoomMap &rooms() const { return _rooms; }
-    Combat &combat() { return _combat; }
     Map &map() { return _map; }
     CreatureFinder &creatureFinder() { return _creatureFinder; }
 
@@ -184,7 +182,6 @@ private:
     CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
-    Combat _combat;
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;

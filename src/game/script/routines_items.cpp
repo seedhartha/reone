@@ -40,7 +40,7 @@ Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ct
         int slot = getInt(args, 0);
         result.object = creature->getEquippedItem(slot);
     } else {
-        warn("Script: getItemInSlot: creature is invalid");
+        debug("Script: getItemInSlot: creature is invalid");
     }
 
     return move(result);
@@ -59,10 +59,10 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
             int stackSize = getInt(args, 2, 1);
             result.object = target->addItem(itemTemplate, stackSize, true);
         } else {
-            warn("Script: createItemOnObject: itemTemplate is invalid");
+            debug("Script: createItemOnObject: itemTemplate is invalid");
         }
     } else {
-        warn("Script: createItemOnObject: target is invalid");
+        debug("Script: createItemOnObject: target is invalid");
     }
 
     return move(result);
@@ -79,7 +79,7 @@ Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionC
             result.object = move(item);
         }
     } else {
-        warn("Script: getFirstItemInInventory: target is invalid");
+        debug("Script: getFirstItemInInventory: target is invalid");
     }
 
     return move(result);
@@ -96,7 +96,7 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
             result.object = move(item);
         }
     } else {
-        warn("Script: getNextItemInInventory: target is invalid");
+        debug("Script: getNextItemInInventory: target is invalid");
     }
 
     return move(result);
@@ -105,7 +105,7 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
 Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
     auto item = getItem(args, 0);
     if (!item) {
-        warn("Script: getItemStackSize: item is invalid");
+        debug("Script: getItemStackSize: item is invalid");
         return 0;
     }
     return item->stackSize();
@@ -117,7 +117,7 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
         int stackSize = getInt(args, 1);
         item->setStackSize(stackSize);
     } else {
-        warn("Script: setItemStackSize: item is invalid");
+        debug("Script: setItemStackSize: item is invalid");
     }
     return Variable();
 }
@@ -125,7 +125,7 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
 Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
     auto item = getItem(args, 0);
     if (!item) {
-        warn("Script: getIdentified: item is invalid");
+        debug("Script: getIdentified: item is invalid");
         return 0;
     }
     return item->isIdentified() ? 1 : 0;
@@ -137,7 +137,7 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
         bool identified = getBool(args, 1);
         item->setIdentified(identified);
     } else {
-        warn("Script: setIdentified: item is invalid");
+        debug("Script: setIdentified: item is invalid");
     }
     return Variable();
 }

@@ -44,10 +44,10 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
             debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
             _game->scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
         } else {
-            warn("Script: signalEvent: toRun is invalid");
+            debug("Script: signalEvent: toRun is invalid");
         }
     } else {
-        warn("Script: signalEvent: object is invalid");
+        debug("Script: signalEvent: object is invalid");
     }
     return Variable();
 }

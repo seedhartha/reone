@@ -95,6 +95,9 @@ public:
         std::shared_ptr<SpatialObject> attemptedAttackTarget;
         std::shared_ptr<SpatialObject> spellTarget;
         std::shared_ptr<SpatialObject> attemptedSpellTarget;
+        std::shared_ptr<SpatialObject> lastHostileTarget;
+        ActionType lastAttackAction { ActionType::Invalid };
+        bool debilitated { false };
 
         void reset();
     };
@@ -226,7 +229,7 @@ private:
     BodyBag _bodyBag;
     Perception _perception;
     RacialType _racialType { RacialType::Unknown };
-    NPCAIStyle _aiStyle { NPCAIStyle::MeleeAttack };
+    NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
     Combat _combat;
 
     // Animation

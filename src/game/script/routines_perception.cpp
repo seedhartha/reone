@@ -38,7 +38,7 @@ Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext 
     if (caller) {
         result.object = caller->perception().lastPerceived;
     } else {
-        warn("Script: getLastPerceived: invalid caller");
+        debug("Script: getLastPerceived: caller is invalid");
     }
 
     return move(result);
@@ -52,7 +52,7 @@ Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionCon
     if (caller) {
         result.intValue = caller->perception().lastPerception == PerceptionType::Seen;
     } else {
-        warn("Script: getLastPerceptionSeen: invalid caller");
+        debug("Script: getLastPerceptionSeen: caller is invalid");
     }
 
     return move(result);
@@ -66,7 +66,7 @@ Variable Routines::getLastPerceptionVanished(const VariablesList &args, Executio
     if (caller) {
         result.intValue = caller->perception().lastPerception == PerceptionType::NotSeen;
     } else {
-        warn("Script: getLastPerceptionVanished: invalid caller");
+        debug("Script: getLastPerceptionVanished: caller is invalid");
     }
 
     return move(result);
@@ -80,7 +80,7 @@ Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionCo
     if (caller) {
         result.intValue = caller->perception().lastPerception == PerceptionType::Heard;
     } else {
-        warn("Script: getLastPerceptionHeard: invalid caller");
+        debug("Script: getLastPerceptionHeard: caller is invalid");
     }
 
     return move(result);
@@ -94,7 +94,49 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
     if (caller) {
         result.intValue = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
-        warn("Script: getLastPerceptionInaudible: invalid caller");
+        debug("Script: getLastPerceptionInaudible: caller is invalid");
+    }
+
+    return move(result);
+}
+
+Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto target = getCreature(args, 0);
+    if (!target) {
+        debug("Script: getObjectSeen: target is invalid");
+    }
+
+    auto source = getCreatureOrCaller(args, 1, ctx);
+    if (!source) {
+        debug("Script: getObjectSeen: source is invalid");
+    }
+
+    if (target && source) {
+        result.intValue = source->perception().seen.count(target) > 0 ? 1 : 0;
+    }
+
+    return move(result);
+}
+
+Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &ctx) {
+    Variable result;
+    result.type = VariableType::Int;
+
+    auto target = getCreature(args, 0);
+    if (!target) {
+        debug("Script: getObjectHeard: target is invalid");
+    }
+
+    auto source = getCreatureOrCaller(args, 1, ctx);
+    if (!source) {
+        debug("Script: getObjectHeard: source is invalid");
+    }
+
+    if (target && source) {
+        result.intValue = source->perception().heard.count(target) > 0 ? 1 : 0;
     }
 
     return move(result);

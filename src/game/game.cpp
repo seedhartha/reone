@@ -80,7 +80,8 @@ Game::Game(const fs::path &path, const Options &opts) :
     _console(this),
     _party(this),
     _scriptRunner(this),
-    _profileOverlay(opts.graphics) {
+    _profileOverlay(opts.graphics),
+    _combat(this) {
 
     _gameId = determineGameID(path);
     _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
@@ -526,6 +527,10 @@ void Game::update() {
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule) {
         _module->update(dt);
+
+        if (!_paused) {
+            _combat.update(dt);
+        }
     }
 
     GUI *gui = getScreenGUI();

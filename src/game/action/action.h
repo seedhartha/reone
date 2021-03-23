@@ -103,12 +103,16 @@ public:
     void complete();
 
     bool isCompleted() const { return _completed; }
+    bool isUserAction() const { return _userAction; }
 
     ActionType type() const { return _type; }
+
+    void setUserAction(bool value) { _userAction = value; }
 
 protected:
     ActionType _type { ActionType::QueueEmpty };
     bool _completed { false };
+    bool _userAction { false };
 };
 
 } // namespace game

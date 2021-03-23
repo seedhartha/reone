@@ -53,7 +53,7 @@ Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ct
         auto action = make_unique<CommandAction>(getAction(args, 1));
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: assignCommand: subject is invalid");
+        debug("Script: assignCommand: subject is invalid");
     }
     return Variable();
 }
@@ -78,7 +78,7 @@ Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContex
         subject->actionQueue().add(move(action));
 
     } else {
-        warn("Script: actionMoveToObject: moveTo is invalid");
+        debug("Script: actionMoveToObject: moveTo is invalid");
     }
 
     return Variable();
@@ -99,7 +99,7 @@ Variable Routines::actionStartConversation(const VariablesList &args, ExecutionC
         subject->actionQueue().add(move(action));
 
     } else {
-        warn("Script: actionStartConversation: objectToConverse is invalid");
+        debug("Script: actionStartConversation: objectToConverse is invalid");
     }
 
     return Variable();
@@ -130,7 +130,7 @@ Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &c
         auto subject = getCaller(ctx);
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: actionOpenDoor: door is invalid");
+        debug("Script: actionOpenDoor: door is invalid");
     }
 
     return Variable();
@@ -143,7 +143,7 @@ Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &
         auto subject = getCaller(ctx);
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: actionCloseDoor: door is invalid");
+        debug("Script: actionCloseDoor: door is invalid");
     }
 
     return Variable();
@@ -162,7 +162,7 @@ Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContex
         auto subject = getCaller(ctx);
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: actionJumpToObject: toJumpTo is invalid");
+        debug("Script: actionJumpToObject: toJumpTo is invalid");
     }
 
     return Variable();
@@ -175,7 +175,7 @@ Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionCont
         auto subject = getCaller(ctx);
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: actionJumpToLocation: location is invalid");
+        debug("Script: actionJumpToLocation: location is invalid");
     }
 
     return Variable();
@@ -192,7 +192,7 @@ Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionC
         subject->actionQueue().add(move(action));
 
     } else {
-        warn("Script: actionForceMoveToObject: moveTo is invalid");
+        debug("Script: actionForceMoveToObject: moveTo is invalid");
     }
 
     return Variable();
@@ -205,7 +205,7 @@ Variable Routines::actionForceMoveToLocation(const VariablesList &args, Executio
         auto subject = getCaller(ctx);
         subject->actionQueue().add(move(action));
     } else {
-        warn("Script: actionForceMoveToLocation: destination is invalid");
+        debug("Script: actionForceMoveToLocation: destination is invalid");
     }
 
     return Variable();
@@ -221,7 +221,7 @@ Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx
         subject->actionQueue().add(move(action));
 
     } else {
-        warn("Script: jumpToObject: toJumpTo is invalid");
+        debug("Script: jumpToObject: toJumpTo is invalid");
     }
 
     return Variable();
@@ -237,7 +237,7 @@ Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &c
         subject->actionQueue().add(move(action));
 
     } else {
-        warn("Script: jumpToLocation: location is invalid");
+        debug("Script: jumpToLocation: location is invalid");
     }
 
     return Variable();
@@ -249,7 +249,7 @@ Variable Routines::actionRandomWalk(const VariablesList &args, ExecutionContext 
         auto action = make_unique<Action>(ActionType::RandomWalk);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionRandomWalk: caller is invalid");
+        debug("Script: actionRandomWalk: caller is invalid");
     }
     return Variable();
 }
@@ -262,7 +262,7 @@ Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionCont
         auto action = make_unique<MoveToLocationAction>(destination, run);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionMoveToLocation: caller is invalid");
+        debug("Script: actionMoveToLocation: caller is invalid");
     }
     return Variable();
 }
@@ -274,7 +274,7 @@ Variable Routines::actionMoveAwayFromObject(const VariablesList &args, Execution
         auto action = make_unique<Action>(ActionType::MoveAwayFromObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionMoveAwayFromObject: caller is invalid");
+        debug("Script: actionMoveAwayFromObject: caller is invalid");
     }
     return Variable();
 }
@@ -286,7 +286,7 @@ Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &
         auto action = make_unique<Action>(ActionType::EquipItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionEquipItem: caller is invalid");
+        debug("Script: actionEquipItem: caller is invalid");
     }
     return Variable();
 }
@@ -298,7 +298,7 @@ Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::UnequipItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUnequipItem: caller is invalid");
+        debug("Script: actionUnequipItem: caller is invalid");
     }
     return Variable();
 }
@@ -310,7 +310,7 @@ Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext 
         auto action = make_unique<Action>(ActionType::PickUpItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionPickUpItem: caller is invalid");
+        debug("Script: actionPickUpItem: caller is invalid");
     }
     return Variable();
 }
@@ -322,7 +322,7 @@ Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::DropItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionPutDownItem: caller is invalid");
+        debug("Script: actionPutDownItem: caller is invalid");
     }
     return Variable();
 }
@@ -330,12 +330,12 @@ Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext
 Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
     if (!caller) {
-        warn("Script: actionAttack: caller is invalid");
+        debug("Script: actionAttack: caller is invalid");
         return Variable();
     }
     auto attackee = getSpatialObject(args, 0);
     if (!attackee) {
-        warn("Script: actionAttack: attackee is invalid");
+        debug("Script: actionAttack: attackee is invalid");
         return Variable();
     }
     auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
@@ -351,7 +351,7 @@ Variable Routines::actionSpeakString(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::SpeakString);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionSpeakString: caller is invalid");
+        debug("Script: actionSpeakString: caller is invalid");
     }
     return Variable();
 }
@@ -366,7 +366,7 @@ Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionConte
         auto action = make_unique<PlayAnimationAction>(animation, speed, duration);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionPlayAnimation: caller is invalid");
+        debug("Script: actionPlayAnimation: caller is invalid");
     }
     return Variable();
 }
@@ -378,7 +378,7 @@ Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionC
         auto action = make_unique<Action>(ActionType::CastSpellAtObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionCastSpellAtObject: caller is invalid");
+        debug("Script: actionCastSpellAtObject: caller is invalid");
     }
     return Variable();
 }
@@ -390,7 +390,7 @@ Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::GiveItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionGiveItem: caller is invalid");
+        debug("Script: actionGiveItem: caller is invalid");
     }
     return Variable();
 }
@@ -402,7 +402,7 @@ Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::TakeItem);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionTakeItem: caller is invalid");
+        debug("Script: actionTakeItem: caller is invalid");
     }
     return Variable();
 }
@@ -414,7 +414,7 @@ Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionC
         auto action = make_unique<Action>(ActionType::ForceFollowObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionForceFollowObject: caller is invalid");
+        debug("Script: actionForceFollowObject: caller is invalid");
     }
     return Variable();
 }
@@ -426,7 +426,7 @@ Variable Routines::actionWait(const VariablesList &args, ExecutionContext &ctx) 
         auto action = make_unique<WaitAction>(seconds);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionWait: caller is invalid");
+        debug("Script: actionWait: caller is invalid");
     }
     return Variable();
 }
@@ -438,7 +438,7 @@ Variable Routines::actionCastSpellAtLocation(const VariablesList &args, Executio
         auto action = make_unique<Action>(ActionType::CastSpellAtLocation);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionCastSpellAtLocation: caller is invalid");
+        debug("Script: actionCastSpellAtLocation: caller is invalid");
     }
     return Variable();
 }
@@ -450,7 +450,7 @@ Variable Routines::actionSpeakStringByStrRef(const VariablesList &args, Executio
         auto action = make_unique<Action>(ActionType::SpeakStringByStrRef);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionSpeakStringByStrRef: caller is invalid");
+        debug("Script: actionSpeakStringByStrRef: caller is invalid");
     }
     return Variable();
 }
@@ -462,7 +462,7 @@ Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ct
         auto action = make_unique<Action>(ActionType::UseFeat);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUseFeat: caller is invalid");
+        debug("Script: actionUseFeat: caller is invalid");
     }
     return Variable();
 }
@@ -474,7 +474,7 @@ Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::UseSkill);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUseSkill: caller is invalid");
+        debug("Script: actionUseSkill: caller is invalid");
     }
     return Variable();
 }
@@ -486,7 +486,7 @@ Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionC
         auto action = make_unique<Action>(ActionType::UseTalentOnObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUseSkill: caller is invalid");
+        debug("Script: actionUseSkill: caller is invalid");
     }
     return Variable();
 }
@@ -498,7 +498,7 @@ Variable Routines::actionUseTalentAtLocation(const VariablesList &args, Executio
         auto action = make_unique<Action>(ActionType::UseTalentAtLocation);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUseTalentAtLocation: caller is invalid");
+        debug("Script: actionUseTalentAtLocation: caller is invalid");
     }
     return Variable();
 }
@@ -510,7 +510,7 @@ Variable Routines::actionInteractObject(const VariablesList &args, ExecutionCont
         auto action = make_unique<Action>(ActionType::InteractObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionInteractObject: caller is invalid");
+        debug("Script: actionInteractObject: caller is invalid");
     }
     return Variable();
 }
@@ -522,7 +522,7 @@ Variable Routines::actionMoveAwayFromLocation(const VariablesList &args, Executi
         auto action = make_unique<Action>(ActionType::MoveAwayFromLocation);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionMoveAwayFromLocation: caller is invalid");
+        debug("Script: actionMoveAwayFromLocation: caller is invalid");
     }
     return Variable();
 }
@@ -534,7 +534,7 @@ Variable Routines::actionSurrenderToEnemies(const VariablesList &args, Execution
         auto action = make_unique<Action>(ActionType::SurrenderToEnemies);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionSurrenderToEnemies: caller is invalid");
+        debug("Script: actionSurrenderToEnemies: caller is invalid");
     }
     return Variable();
 }
@@ -546,7 +546,7 @@ Variable Routines::actionEquipMostDamagingMelee(const VariablesList &args, Execu
         auto action = make_unique<Action>(ActionType::EquipMostDamagingMelee);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionEquipMostDamagingMelee: caller is invalid");
+        debug("Script: actionEquipMostDamagingMelee: caller is invalid");
     }
     return Variable();
 }
@@ -558,7 +558,7 @@ Variable Routines::actionEquipMostDamagingRanged(const VariablesList &args, Exec
         auto action = make_unique<Action>(ActionType::EquipMostDamagingRanged);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionEquipMostDamagingRanged: caller is invalid");
+        debug("Script: actionEquipMostDamagingRanged: caller is invalid");
     }
     return Variable();
 }
@@ -570,7 +570,7 @@ Variable Routines::actionEquipMostEffectiveArmor(const VariablesList &args, Exec
         auto action = make_unique<Action>(ActionType::EquipMostEffectiveArmor);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionEquipMostEffectiveArmor: caller is invalid");
+        debug("Script: actionEquipMostEffectiveArmor: caller is invalid");
     }
     return Variable();
 }
@@ -582,7 +582,7 @@ Variable Routines::actionUnlockObject(const VariablesList &args, ExecutionContex
         auto action = make_unique<Action>(ActionType::UnlockObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionUnlockObject: caller is invalid");
+        debug("Script: actionUnlockObject: caller is invalid");
     }
     return Variable();
 }
@@ -594,7 +594,7 @@ Variable Routines::actionLockObject(const VariablesList &args, ExecutionContext 
         auto action = make_unique<Action>(ActionType::LockObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionLockObject: caller is invalid");
+        debug("Script: actionLockObject: caller is invalid");
     }
     return Variable();
 }
@@ -606,7 +606,7 @@ Variable Routines::actionCastFakeSpellAtObject(const VariablesList &args, Execut
         auto action = make_unique<Action>(ActionType::CastFakeSpellAtObject);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionCastFakeSpellAtObject: caller is invalid");
+        debug("Script: actionCastFakeSpellAtObject: caller is invalid");
     }
     return Variable();
 }
@@ -618,7 +618,7 @@ Variable Routines::actionCastFakeSpellAtLocation(const VariablesList &args, Exec
         auto action = make_unique<Action>(ActionType::CastFakeSpellAtLocation);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionCastFakeSpellAtLocation: caller is invalid");
+        debug("Script: actionCastFakeSpellAtLocation: caller is invalid");
     }
     return Variable();
 }
@@ -630,7 +630,7 @@ Variable Routines::actionBarkString(const VariablesList &args, ExecutionContext 
         auto action = make_unique<Action>(ActionType::BarkString);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionBarkString: caller is invalid");
+        debug("Script: actionBarkString: caller is invalid");
     }
     return Variable();
 }
@@ -642,7 +642,7 @@ Variable Routines::actionFollowLeader(const VariablesList &args, ExecutionContex
         auto action = make_unique<Action>(ActionType::FollowLeader);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionFollowLeader: caller is invalid");
+        debug("Script: actionFollowLeader: caller is invalid");
     }
     return Variable();
 }
@@ -654,7 +654,7 @@ Variable Routines::actionFollowOwner(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::FollowOwner);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionFollowOwner: caller is invalid");
+        debug("Script: actionFollowOwner: caller is invalid");
     }
     return Variable();
 }
@@ -666,7 +666,7 @@ Variable Routines::actionSwitchWeapons(const VariablesList &args, ExecutionConte
         auto action = make_unique<Action>(ActionType::SwitchWeapons);
         caller->actionQueue().add(move(action));
     } else {
-        warn("Script: actionSwitchWeapons: caller is invalid");
+        debug("Script: actionSwitchWeapons: caller is invalid");
     }
     return Variable();
 }

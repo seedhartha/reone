@@ -502,24 +502,27 @@ private:
     script::Variable getLastPerceptionVanished(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLastPerceptionHeard(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getLastPerceptionInaudible(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getObjectSeen(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getObjectHeard(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Perception
 
     // Combat
 
+    script::Variable getNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getAttemptedAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
     script::Variable getAttemptedSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getIsDebilitated(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastHostileTarget(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastAttackAction(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getPlayerRestrictMode(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setPlayerRestrictMode(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getUserActionsPending(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Combat
-
-    // AI
-
-    script::Variable getNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END AI
 };
 
 } // namespace game
