@@ -20,7 +20,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "glm/glm.hpp"
+#include "glm/common.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 namespace reone {
 
@@ -28,14 +29,13 @@ namespace render {
 
 template <class T>
 struct MixInterpolator {
-    T operator()(const T &left, const T &right, float factor) const {
+    static T interpolate(const T &left, const T &right, float factor) {
         return glm::mix(left, right, factor);
     }
 };
 
-template <class T>
 struct SlerpInterpolator {
-    T operator()(const T &left, const T &right, float factor) const {
+    static glm::quat interpolate(const glm::quat &left, const glm::quat &right, float factor) {
         return glm::slerp(left, right, factor);
     }
 };
@@ -69,7 +69,7 @@ public:
             factor = (time - frame1->first) / (frame2->first - frame1->first);
         }
 
-        value = _interpolate(frame1->second, frame2->second, factor);
+        value = Interpolator::interpolate(frame1->second, frame2->second, factor);
 
         return true;
     }
@@ -81,11 +81,11 @@ public:
     V getByKeyframeOrDefault(int frame, V defaultValue) const {
         return frame < static_cast<int>(_keyframes.size()) ?
             getByKeyframe(frame) :
-            move(defaultValue);
+            std::move(defaultValue);
     }
 
     void addKeyframe(float time, V value) {
-        _keyframes.push_back(make_pair(time, value));
+        _keyframes.push_back(std::make_pair(time, value));
     }
 
     void update() {
@@ -95,7 +95,6 @@ public:
     }
 
 private:
-    Interpolator _interpolate;
     std::vector<std::pair<float, V>> _keyframes;
 };
 

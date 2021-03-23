@@ -139,8 +139,8 @@ public:
 
     const AnimatedProperty<glm::vec3> &positions() const { return _positions; }
     AnimatedProperty<glm::vec3> &positions() { return _positions; }
-    const AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> &orientations() const { return _orientations; }
-    AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> &orientations() { return _orientations; }
+    const AnimatedProperty<glm::quat, SlerpInterpolator> &orientations() const { return _orientations; }
+    AnimatedProperty<glm::quat, SlerpInterpolator> &orientations() { return _orientations; }
     const AnimatedProperty<float> &scales() const { return _scales; }
     AnimatedProperty<float> &scales() { return _scales; }
     const AnimatedProperty<float> &alphas() const { return _alphas; }
@@ -191,7 +191,7 @@ private:
     // Animation
 
     AnimatedProperty<glm::vec3> _positions;
-    AnimatedProperty<glm::quat, SlerpInterpolator<glm::quat>> _orientations;
+    AnimatedProperty<glm::quat, SlerpInterpolator> _orientations;
     AnimatedProperty<float> _scales;
     AnimatedProperty<float> _alphas;
     AnimatedProperty<glm::vec3> _selfIllumColors;
