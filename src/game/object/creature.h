@@ -129,6 +129,7 @@ public:
     Faction faction() const { return _faction; }
     int xp() const { return _xp; }
     RacialType racialType() const { return _racialType; }
+    NPCAIStyle aiStyle() const { return _aiStyle; }
 
     void setMovementType(MovementType type);
     void setFaction(Faction faction);
@@ -136,6 +137,7 @@ public:
     void setInCombat(bool inCombat);
     void setImmortal(bool immortal);
     void setXP(int xp);
+    void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
 
     // Animation
 
@@ -214,6 +216,7 @@ private:
     BodyBag _bodyBag;
     Perception _perception;
     RacialType _racialType { RacialType::Unknown };
+    NPCAIStyle _aiStyle { NPCAIStyle::MeleeAttack };
 
     // Animation
 

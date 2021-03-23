@@ -750,9 +750,9 @@ void Routines::addTslRoutines() {
     add("EffectLightsaberThrow", Effect, { Object, Object, Object, Int }, &Routines::effectLightsaberThrow);
     add("EffectWhirlWind", Effect, { }, &Routines::effectWhirlWind);
     add("GetPartyAIStyle", Int, { });
-    add("GetNPCAIStyle", Int, { Object });
+    add("GetNPCAIStyle", Int, { Object }, &Routines::getNPCAIStyle);
     add("SetPartyAIStyle", Void, { Int });
-    add("SetNPCAIStyle", Void, { Object, Int });
+    add("SetNPCAIStyle", Void, { Object, Int }, &Routines::setNPCAIStyle);
     add("SetNPCSelectability", Void, { Int, Int });
     add("GetNPCSelectability", Int, { Int });
     add("ClearAllEffects", Void, { }, &Routines::clearAllEffects);
