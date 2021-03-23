@@ -844,6 +844,18 @@ enum class PerceptionType {
     Seen = 7
 };
 
+enum class RacialType {
+    Unknown = 0,
+    Elf = 1,
+    Gnome = 2,
+    Halfling = 3,
+    Halfelf = 4,
+    Droid = 5,
+    Human = 6,
+    All = 7,
+    Invalid = 8
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;

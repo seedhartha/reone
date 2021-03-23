@@ -128,6 +128,7 @@ public:
     CreatureAttributes &attributes() { return _attributes; }
     Faction faction() const { return _faction; }
     int xp() const { return _xp; }
+    RacialType racialType() const { return _racialType; }
 
     void setMovementType(MovementType type);
     void setFaction(Faction faction);
@@ -212,6 +213,7 @@ private:
     std::shared_ptr<SoundSet> _soundSet;
     BodyBag _bodyBag;
     Perception _perception;
+    RacialType _racialType { RacialType::Unknown };
 
     // Animation
 

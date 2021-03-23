@@ -60,12 +60,13 @@ void CreatureBlueprint::load(Creature &creature) {
     string portrait(getPortrait(_utc->getInt("PortraitId", -1)));
     creature._portrait = Textures::instance().get(portrait, TextureUsage::GUI);
 
-    creature._faction = static_cast<Faction>(_utc->getInt("FactionID", -1));
+    creature._faction = static_cast<Faction>(_utc->getInt("FactionID"));
     creature._conversation = boost::to_lower_copy(_utc->getString("Conversation"));
     creature._minOneHP = _utc->getBool("Min1HP");
     creature._hitPoints = _utc->getInt("HitPoints");
     creature._currentHitPoints = _utc->getInt("CurrentHitPoints");
     creature._maxHitPoints = _utc->getInt("MaxHitPoints");
+    creature._racialType = static_cast<RacialType>(_utc->getInt("Race"));
 
     loadName(creature);
     loadAttributes(creature);

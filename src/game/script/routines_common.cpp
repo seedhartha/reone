@@ -35,7 +35,7 @@ namespace reone {
 
 namespace game {
 
-static bool g_shipBuild = true;
+static bool g_shipBuild = false;
 
 Variable Routines::d2(const VariablesList &args, ExecutionContext &ctx) {
     int numDice = getInt(args, 0, 1);
