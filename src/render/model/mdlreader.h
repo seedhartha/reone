@@ -38,7 +38,8 @@ public:
 
 private:
     struct FileHeader {
-        uint32_t magic { 0 };
+        // Technically, this also contains the magic number (four zeroes)
+
         uint32_t mdlSize { 0 };
         uint32_t mdxSize { 0 };
     };
