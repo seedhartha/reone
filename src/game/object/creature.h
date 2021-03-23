@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <functional>
+#include <set>
 
 #include "../../audio/stream.h"
 #include "../../render/lip/lipanimation.h"
@@ -78,6 +79,15 @@ public:
         std::string name;
         int appearance { 0 }; /**< index into placeables.2da */
         bool corpse { false };
+    };
+
+    struct Perception {
+        float sightRange { 0.0f };
+        float hearingRange { 0.0f };
+        std::set<std::shared_ptr<SpatialObject>> seen;
+        std::set<std::shared_ptr<SpatialObject>> heard;
+        PerceptionType lastPerception { PerceptionType::Seen };
+        std::shared_ptr<SpatialObject> lastPerceived;
     };
 
     Creature(
@@ -162,6 +172,17 @@ public:
 
     // END Pathfinding
 
+    // Perception
+
+    void onObjectSeen(const std::shared_ptr<SpatialObject> &object);
+    void onObjectVanished(const std::shared_ptr<SpatialObject> &object);
+    void onObjectHeard(const std::shared_ptr<SpatialObject> &object);
+    void onObjectInaudible(const std::shared_ptr<SpatialObject> &object);
+
+    const Perception &perception() const { return _perception; }
+
+    // END Perception
+
     // Scripts
 
     void runSpawnScript();
@@ -190,6 +211,7 @@ private:
     int _xp { 0 };
     std::shared_ptr<SoundSet> _soundSet;
     BodyBag _bodyBag;
+    Perception _perception;
 
     // Animation
 
@@ -205,13 +227,15 @@ private:
 
     std::string _onSpawn;
     std::string _onDeath;
+    std::string _onNotice;
 
     // END Scripts
 
     void updateModel();
     void updateHealth();
 
-    void runDeathScript();
+    inline void runDeathScript();
+    inline void runOnNoticeScript();
 
     ModelType parseModelType(const std::string &s) const;
 

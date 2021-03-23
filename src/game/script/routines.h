@@ -493,6 +493,16 @@ private:
     script::Variable setTime(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Time
+
+    // Perception
+
+    script::Variable getLastPerceived(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastPerceptionSeen(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastPerceptionVanished(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastPerceptionHeard(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getLastPerceptionInaudible(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END Perception
 };
 
 } // namespace game

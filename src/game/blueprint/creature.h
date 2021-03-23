@@ -60,6 +60,7 @@ private:
     void loadItems(Creature &creature);
     void loadSoundSet(Creature &creature);
     void loadBodyBag(Creature &creature);
+    void loadPerception(Creature &creature);
 };
 
 /**

@@ -294,12 +294,12 @@ void Routines::addKotorRoutines() {
     add("GetName", String, { Object }, &Routines::getName);
     add("GetLastSpeaker", Object, { });
     add("BeginConversation", Int, { String, Object });
-    add("GetLastPerceived", Object, { });
-    add("GetLastPerceptionHeard", Int, { });
-    add("GetLastPerceptionInaudible", Int, { });
-    add("GetLastPerceptionSeen", Int, { });
+    add("GetLastPerceived", Object, { }, &Routines::getLastPerceived);
+    add("GetLastPerceptionHeard", Int, { }, &Routines::getLastPerceptionHeard);
+    add("GetLastPerceptionInaudible", Int, { }, &Routines::getLastPerceptionInaudible);
+    add("GetLastPerceptionSeen", Int, { }, &Routines::getLastPerceptionSeen);
     add("GetLastClosedBy", Object, { });
-    add("GetLastPerceptionVanished", Int, { });
+    add("GetLastPerceptionVanished", Int, { }, &Routines::getLastPerceptionVanished);
     add("GetFirstInPersistentObject", Object, { Object, Int, Int });
     add("GetNextInPersistentObject", Object, { Object, Int, Int });
     add("GetAreaOfEffectCreator", Object, { Object });

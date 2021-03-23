@@ -82,7 +82,8 @@ Area::Area(uint32_t id, Game *game) :
     _combat(game),
     _map(game),
     _heartbeatTimer(kHeartbeatInterval),
-    _creatureFinder(this) {
+    _creatureFinder(this),
+    _perception(this) {
 
     init();
 }
@@ -659,6 +660,7 @@ void Area::update(float dt) {
             }
         }
 
+        _perception.update(dt);
         _combat.update(dt);
 
         updateHeartbeat(dt);

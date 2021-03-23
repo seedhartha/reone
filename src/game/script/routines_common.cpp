@@ -245,7 +245,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
         _game->setRunScriptVar(scriptVar);
         _game->scriptRunner().run(script, target->id());
     } else {
-        warn("Routines: executeScript: target is invalid");
+        warn("Script: executeScript: target is invalid");
     }
 
     return Variable();

@@ -563,6 +563,40 @@ void Creature::stopTalking() {
     }
 }
 
+void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
+    _perception.seen.insert(object);
+    _perception.lastPerception = PerceptionType::Seen;
+    _perception.lastPerceived = object;
+    runOnNoticeScript();
+}
+
+void Creature::runOnNoticeScript() {
+    if (!_onNotice.empty()) {
+        _scriptRunner->run(_onNotice, _id, _perception.lastPerceived->id());
+    }
+}
+
+void Creature::onObjectVanished(const shared_ptr<SpatialObject> &object) {
+    _perception.seen.erase(object);
+    _perception.lastPerception = PerceptionType::Vanished;
+    _perception.lastPerceived = object;
+    runOnNoticeScript();
+}
+
+void Creature::onObjectHeard(const shared_ptr<SpatialObject> &object) {
+    _perception.heard.insert(move(object));
+    _perception.lastPerception = PerceptionType::Heard;
+    _perception.lastPerceived = object;
+    runOnNoticeScript();
+}
+
+void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
+    _perception.heard.erase(object);
+    _perception.lastPerception = PerceptionType::Inaudible;
+    _perception.lastPerceived = object;
+    runOnNoticeScript();
+}
+
 } // namespace game
 
 } // namespace reone

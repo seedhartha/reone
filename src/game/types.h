@@ -833,6 +833,13 @@ enum class ReputationType {
     Neutral = 2
 };
 
+enum class PerceptionType {
+    Seen,
+    Vanished,
+    Heard,
+    Inaudible
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;
