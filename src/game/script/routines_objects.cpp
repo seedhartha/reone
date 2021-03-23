@@ -423,7 +423,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(*target, criterias, nth - 1));
+    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(target, criterias, nth - 1));
 
     return static_pointer_cast<ScriptObject>(creature);
 }

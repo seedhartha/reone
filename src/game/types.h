@@ -834,10 +834,14 @@ enum class ReputationType {
 };
 
 enum class PerceptionType {
-    Seen,
-    Vanished,
-    Heard,
-    Inaudible
+    SeenAndHeard = 0,
+    NotSeenAndNotHeard = 1,
+    HeardAndNotSeen = 2,
+    SeenAndNotHeard = 3,
+    NotHeard = 4,
+    Heard = 5,
+    NotSeen = 6,
+    Seen = 7
 };
 
 struct InventorySlot {

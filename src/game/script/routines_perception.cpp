@@ -64,7 +64,7 @@ Variable Routines::getLastPerceptionVanished(const VariablesList &args, Executio
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::Vanished;
+        result.intValue = caller->perception().lastPerception == PerceptionType::NotSeen;
     } else {
         warn("Script: getLastPerceptionVanished: invalid caller");
     }
@@ -92,7 +92,7 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::Inaudible;
+        result.intValue = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
         warn("Script: getLastPerceptionInaudible: invalid caller");
     }

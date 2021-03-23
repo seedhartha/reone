@@ -34,13 +34,13 @@ CreatureFinder::CreatureFinder(Area *area) : _area(area) {
     }
 }
 
-shared_ptr<Creature> CreatureFinder::getNearestCreature(const SpatialObject &target, const CreatureFinder::CriteriaList &criterias, int nth) {
+shared_ptr<Creature> CreatureFinder::getNearestCreature(const std::shared_ptr<SpatialObject> &target, const CreatureFinder::CriteriaList &criterias, int nth) {
     vector<pair<shared_ptr<Creature>, float>> candidates;
 
     for (auto &object : _area->getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
-        if (matchesCriterias(*creature, criterias)) {
-            float distance2 = creature->getDistanceTo2(target);
+        if (matchesCriterias(*creature, criterias, target)) {
+            float distance2 = creature->getDistanceTo2(*target);
             candidates.push_back(make_pair(move(creature), distance2));
         }
     }
@@ -52,7 +52,7 @@ shared_ptr<Creature> CreatureFinder::getNearestCreature(const SpatialObject &tar
     return nth < candidates.size() ? candidates[nth].first : nullptr;
 }
 
-bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaList &criterias, shared_ptr<SpatialObject> target) const {
+bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
     for (auto &criteria : criterias) {
         switch (criteria.first) {
             case CreatureType::Reputation: {
@@ -70,6 +70,44 @@ bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaLi
                     default:
                         break;
                 }
+                break;
+            }
+            case CreatureType::Perception: {
+                if (!target) return false;
+
+                bool seen = creature.perception().seen.count(target) > 0;
+                bool heard = creature.perception().heard.count(target) > 0;
+                bool matches = false;
+                auto perception = static_cast<PerceptionType>(criteria.second);
+                switch (perception) {
+                    case PerceptionType::SeenAndHeard:
+                        matches = seen && heard;
+                        break;
+                    case PerceptionType::NotSeenAndNotHeard:
+                        matches = !seen && !heard;
+                        break;
+                    case PerceptionType::HeardAndNotSeen:
+                        matches = heard && !seen;
+                        break;
+                    case PerceptionType::SeenAndNotHeard:
+                        matches = seen && !heard;
+                        break;
+                    case PerceptionType::NotHeard:
+                        matches = !heard;
+                        break;
+                    case PerceptionType::Heard:
+                        matches = heard;
+                        break;
+                    case PerceptionType::NotSeen:
+                        matches = !seen;
+                        break;
+                    case PerceptionType::Seen:
+                        matches = seen;
+                        break;
+                    default:
+                        break;
+                }
+                if (!matches) return false;
                 break;
             }
             default:
