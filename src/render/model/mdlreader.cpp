@@ -27,7 +27,6 @@
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../common/stringutil.h"
-#include "../../resource/gameidutil.h"
 #include "../../resource/resources.h"
 
 #include "../textures.h"
@@ -43,6 +42,7 @@ namespace reone {
 namespace render {
 
 static constexpr int kMdlDataOffset = 12;
+static constexpr uint32_t kTslFunctionPtr = 4285200;
 
 struct NodeFlags {
     static constexpr int header = 1;
@@ -81,7 +81,7 @@ static Model::Classification getClassification(uint8_t ordinal) {
 
 struct ControllerKey {
     uint32_t type { 0 };
-    uint16_t unknown1 { 0 };
+    uint16_t unk1 { 0 };
     uint16_t rowCount { 0 };
     uint16_t timeIndex { 0 };
     uint16_t dataIndex { 0 };
@@ -506,7 +506,7 @@ static function<void(const ControllerKey &, const vector<float> &, ModelNode &)>
 
 // END Controllers
 
-MdlReader::MdlReader(GameID gameId) : BinaryReader(0), _gameId(gameId) {
+MdlReader::MdlReader() : BinaryReader(0) {
 }
 
 void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
@@ -520,6 +520,7 @@ void MdlReader::doLoad() {
     _modelHeader = readStruct<ModelHeader>();
     _namesHeader = readStruct<NamesHeader>();
 
+    _tsl = _modelHeader.geometry.fp[0] == kTslFunctionPtr;
     string name(getStringLower(_modelHeader.geometry.name, 32));
 
     vector<uint32_t> nameOffsets(readArray<uint32_t>(kMdlDataOffset + _namesHeader.names.offset, _namesHeader.names.count));
@@ -764,7 +765,7 @@ void MdlReader::readReference(ModelNode &node) {
 void MdlReader::readMesh(ModelNode &node) {
     MeshHeader header(readStruct<MeshHeader>());
 
-    if (isTSL(_gameId)) ignore(8);
+    if (_tsl) ignore(8);
 
     uint32_t offMdxData = readUint32();
     uint32_t offVertices = readUint32();
@@ -863,7 +864,7 @@ void MdlReader::readSaber(ModelNode &node) {
 
     MeshHeader meshHeader(readStruct<MeshHeader>());
 
-    if (isTSL(_gameId)) ignore(8);
+    if (_tsl) ignore(8);
 
     uint32_t offMdxData = readUint32();
     uint32_t offVertices = readUint32();
@@ -1001,7 +1002,7 @@ shared_ptr<Model> MdlModelLoader::loadModel(GameID gameId, const string &resRef)
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        MdlReader mdl(gameId);
+        MdlReader mdl;
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
     }

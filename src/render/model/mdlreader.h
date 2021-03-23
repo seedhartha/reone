@@ -30,7 +30,7 @@ namespace render {
 
 class MdlReader : public resource::BinaryReader {
 public:
-    MdlReader(resource::GameID gameId);
+    MdlReader();
 
     void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
 
@@ -48,9 +48,9 @@ private:
         char name[32];
         uint32_t offRootNode { 0 };
         uint32_t numNodes { 0 };
-        uint32_t unknown[7];
+        uint32_t _unk1[7];
         uint8_t type { 0 };
-        uint8_t padding[3];
+        uint8_t _pad1[3];
     };
 
     struct ArrayHeader {
@@ -63,11 +63,11 @@ private:
         GeometryHeader geometry;
         uint8_t classification { 0 };
         uint8_t classification2 { 0 };
-        uint8_t padding { 0 };
+        uint8_t _pad1 { 0 };
         uint8_t ignoreFog { 0 };
         uint32_t numChildModels { 0 };
         ArrayHeader animations;
-        uint32_t unknown { 0 };
+        uint32_t _unk1 { 0 };
         float bbMin[3];
         float bbMax[3];
         float radius { 0.0f };
@@ -77,7 +77,7 @@ private:
 
     struct NamesHeader {
         uint32_t offRootNode { 0 };
-        uint32_t unused { 0 };
+        uint32_t _unk1 { 0 };
         uint32_t mdxSize { 0 };
         uint32_t mdxOffset { 0 };
         ArrayHeader names;
@@ -87,7 +87,7 @@ private:
         uint16_t flags { 0 };
         uint16_t index { 0 };
         uint16_t nodeNumber { 0 };
-        uint16_t padding { 0 };
+        uint16_t _pad1 { 0 };
         uint32_t offRootNode { 0 };
         uint32_t offParentNode { 0 };
         float position[3];
@@ -103,11 +103,11 @@ private:
         float transitionTime { 0.0f };
         char root[32];
         ArrayHeader events;
-        uint32_t unknown { 0 };
+        uint32_t _unk1 { 0 };
     };
 
     struct LightHeader {
-        ArrayHeader unknown;
+        ArrayHeader _unk1;
         ArrayHeader lensFlareSizes;
         ArrayHeader flarePositions;
         ArrayHeader flareColorShifts;
@@ -130,7 +130,7 @@ private:
         float controlPointSmoothing { 0.0f };
         uint32_t xGrid { 0 };
         uint32_t yGrid { 0 };
-        uint32_t unknown { 0 };
+        uint32_t _unk1 { 0 };
         char update[32];
         char render[32];
         char blend[32];
@@ -141,7 +141,7 @@ private:
         uint32_t renderOrder { 0 };
         uint32_t frameBlending { 0 };
         char depthTexture[32];
-        uint8_t padding { 0 };
+        uint8_t _pad1 { 0 };
         uint32_t flags { 0 };
     };
 
@@ -167,8 +167,8 @@ private:
         ArrayHeader indicesCounts;
         ArrayHeader indicesOffsets;
         ArrayHeader invCounters;
-        uint32_t unknown1[3];
-        uint8_t unknown2[8];
+        uint32_t _unk1[3];
+        uint8_t _unk2[8];
         uint32_t animateUV { 0 };
         float uvDirectionX { 0.0f };
         float uvDirectionY { 0.0f };
@@ -184,7 +184,7 @@ private:
         int offMdxTexCoords3 { 0 };
         int offMdxTexCoords4 { 0 };
         int offMdxTanSpace { 0 };
-        uint32_t unknown3[3];
+        uint32_t _unk3[3];
         uint16_t numVertices { 0 };
         uint16_t numTextures { 0 };
         uint8_t lightmapped { 0 };
@@ -193,9 +193,9 @@ private:
         uint8_t shadow { 0 };
         uint8_t beaming { 0 };
         uint8_t render { 0 };
-        uint8_t unknown4[2];
+        uint8_t _unk4[2];
         float totalArea { 0.0f };
-        uint32_t unknown5 { 0 };
+        uint32_t _unk5 { 0 };
 
         // Technically, this also contains:
         // - TSL values (8 bytes)
@@ -204,12 +204,12 @@ private:
     };
 
     struct SkinHeader {
-        int uknown[3];
+        int _unk1[3];
         uint32_t offMdxBoneWeights { 0 };
         uint32_t offMdxBoneIndices { 0 };
         uint32_t offBones { 0 };
         uint32_t numBones { 0 };
-        uint8_t unknown[72]; // QBones, TBones, etc.
+        uint8_t _unk2[72]; // QBones, TBones, etc.
     };
 
     struct DanglymeshHeader {
@@ -217,7 +217,7 @@ private:
         float displacement { 0.0f };
         float tightness { 0.0f };
         float period { 0.0f };
-        uint32_t unknown1 { 0 };
+        uint32_t _unk1 { 0 };
     };
 
     struct AABBNodeHeader {
@@ -233,10 +233,8 @@ private:
         uint32_t offVertices { 0 };
         uint32_t offTexCoords { 0 };
         uint32_t offNormals { 0 };
-        uint32_t unknown[2];
+        uint32_t _unk1[2];
     };
-
-    resource::GameID _gameId;
 
     std::unique_ptr<StreamReader> _mdxReader;
 
@@ -244,10 +242,11 @@ private:
     ModelHeader _modelHeader;
     NamesHeader _namesHeader;
 
+    bool _tsl { false }; /**< is this a TSL model? */
     int _nodeIndex { 0 };
     std::vector<std::string> _nodeNames;
     std::unordered_map<uint32_t, int> _nodeFlags;
-    bool _animations { false }; /**< currently reading animations */
+    bool _animations { false }; /**< is currently reading animations? */
 
     std::shared_ptr<render::Model> _model;
 
