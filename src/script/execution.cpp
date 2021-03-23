@@ -271,9 +271,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
 }
 
 Variable ScriptExecution::getVectorFromStack() {
-    float z = getFloatFromStack().floatValue;
-    float y = getFloatFromStack().floatValue;
     float x = getFloatFromStack().floatValue;
+    float y = getFloatFromStack().floatValue;
+    float z = getFloatFromStack().floatValue;
 
     return glm::vec3(x, y, z);
 }
