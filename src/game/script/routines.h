@@ -504,6 +504,13 @@ private:
     script::Variable getLastPerceptionInaudible(const VariablesList &args, script::ExecutionContext &ctx);
 
     // END Perception
+
+    // AI
+
+    script::Variable getNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable setNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END AI
 };
 
 } // namespace game
