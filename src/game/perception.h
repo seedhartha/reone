@@ -19,6 +19,8 @@
 
 #include "../common/timer.h"
 
+#include "object/creature.h"
+
 namespace reone {
 
 namespace game {
@@ -40,6 +42,8 @@ private:
     Timer _updateTimer;
 
     void doUpdate();
+
+    bool isInLineOfSight(const Creature &subject, const SpatialObject &target) const;
 };
 
 } // namespace game
