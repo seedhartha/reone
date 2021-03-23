@@ -185,15 +185,15 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
 }
 
 void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, AttackAction &action, float dt) {
-    auto target = action.target();
+    shared_ptr<SpatialObject> target(action.target());
     if (target->isDead()) {
         action.complete();
         return;
     }
-    glm::vec3 dest(target->position());
     auto creatureActor = static_pointer_cast<Creature>(actor);
-
-    navigateCreature(creatureActor, dest, true, action.range(), dt);
+    if (navigateCreature(creatureActor, target->position(), true, action.range(), dt)) {
+        // TODO: start a combat round
+    }
 }
 
 bool ActionExecutor::navigateCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest, bool run, float distance, float dt) {

@@ -505,6 +505,15 @@ private:
 
     // END Perception
 
+    // Combat
+
+    script::Variable getAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getAttemptedAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
+    script::Variable getAttemptedSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
+
+    // END Combat
+
     // AI
 
     script::Variable getNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);

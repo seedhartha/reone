@@ -90,6 +90,15 @@ public:
         std::shared_ptr<SpatialObject> lastPerceived;
     };
 
+    struct Combat {
+        std::shared_ptr<SpatialObject> attackTarget;
+        std::shared_ptr<SpatialObject> attemptedAttackTarget;
+        std::shared_ptr<SpatialObject> spellTarget;
+        std::shared_ptr<SpatialObject> attemptedSpellTarget;
+
+        void reset();
+    };
+
     Creature(
         uint32_t id,
         ObjectFactory *objectFactory,
@@ -130,6 +139,7 @@ public:
     int xp() const { return _xp; }
     RacialType racialType() const { return _racialType; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
+    Combat &combat() { return _combat; }
 
     void setMovementType(MovementType type);
     void setFaction(Faction faction);
@@ -217,6 +227,7 @@ private:
     Perception _perception;
     RacialType _racialType { RacialType::Unknown };
     NPCAIStyle _aiStyle { NPCAIStyle::MeleeAttack };
+    Combat _combat;
 
     // Animation
 

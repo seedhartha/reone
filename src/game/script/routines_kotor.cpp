@@ -354,7 +354,7 @@ void Routines::addKotorRoutines() {
     add("JumpToLocation", Void, { Location }, &Routines::jumpToLocation);
     add("EffectTemporaryHitpoints", Effect, { Int }, &Routines::effectTemporaryHitpoints);
     add("GetSkillRank", Int, { Int, Object }, &Routines::getSkillRank);
-    add("GetAttackTarget", Object, { Object });
+    add("GetAttackTarget", Object, { Object }, &Routines::getAttackTarget);
     add("GetLastAttackType", Int, { Object });
     add("GetLastAttackMode", Int, { Object });
     add("GetDistanceBetween2D", Float, { Object, Object }, &Routines::getDistanceBetween2D);
@@ -399,7 +399,7 @@ void Routines::addKotorRoutines() {
     add("GetGender", Int, { Object }, &Routines::getGender);
     add("GetIsTalentValid", Int, { Talent });
     add("ActionMoveAwayFromLocation", Void, { Location, Int, Float }, &Routines::actionMoveAwayFromLocation);
-    add("GetAttemptedAttackTarget", Object, { });
+    add("GetAttemptedAttackTarget", Object, { }, &Routines::getAttemptedAttackTarget);
     add("GetTypeFromTalent", Int, { Talent });
     add("GetIdFromTalent", Int, { Talent });
     add("PlayPazaak", Void, { Int, String, Int, Int, Object });
@@ -413,7 +413,7 @@ void Routines::addKotorRoutines() {
     add("EffectDamageForcePoints", Effect, { Int }, &Routines::effectDamageForcePoints);
     add("EffectHealForcePoints", Effect, { Int }, &Routines::effectHealForcePoints);
     add("SendMessageToPC", Void, { Object, String });
-    add("GetAttemptedSpellTarget", Object, { });
+    add("GetAttemptedSpellTarget", Object, { }, &Routines::getAttemptedSpellTarget);
     add("GetLastOpenedBy", Object, { }, &Routines::getLastOpenedBy);
     add("GetHasSpell", Int, { Int, Object });
     add("OpenStore", Void, { Object, Object, Int, Int });
@@ -800,7 +800,7 @@ void Routines::addKotorRoutines() {
     add("ResetDialogState", Void, { });
     add("SetGoodEvilValue", Void, { Object, Int });
     add("GetIsPoisoned", Int, { Object });
-    add("GetSpellTarget", Object, { Object });
+    add("GetSpellTarget", Object, { Object }, &Routines::getSpellTarget);
     add("SetSoloMode", Void, { Int });
     add("EffectCutSceneHorrified", Effect, { }, &Routines::effectCutSceneHorrified);
     add("EffectCutSceneParalyze", Effect, { }, &Routines::effectCutSceneParalyze);
