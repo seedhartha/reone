@@ -338,7 +338,7 @@ Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx
         warn("Script: actionAttack: attackee is invalid");
         return Variable();
     }
-    auto action = make_unique<AttackAction>(attackee);
+    auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
     caller->actionQueue().add(move(action));
 
     return Variable();

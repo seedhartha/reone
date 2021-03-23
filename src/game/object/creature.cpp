@@ -57,6 +57,13 @@ static constexpr int kStrRefRemains = 38151;
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
+void Creature::Combat::reset() {
+    attackTarget.reset();
+    attemptedAttackTarget.reset();
+    spellTarget.reset();
+    attemptedSpellTarget.reset();
+}
+
 Creature::Creature(
     uint32_t id,
     ObjectFactory *objectFactory,
