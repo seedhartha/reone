@@ -39,7 +39,7 @@ public:
      * @param nth 0-based index of the creature
      * @return nth nearest creature to the target object, that matches the specified criterias
      */
-    std::shared_ptr<Creature> getNearestCreature(const SpatialObject &target, const CriteriaList &criterias, int nth = 0);
+    std::shared_ptr<Creature> getNearestCreature(const std::shared_ptr<SpatialObject> &target, const CriteriaList &criterias, int nth = 0);
 
     /**
      * @param nth 0-based index of the creature

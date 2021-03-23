@@ -578,7 +578,7 @@ void Creature::runOnNoticeScript() {
 
 void Creature::onObjectVanished(const shared_ptr<SpatialObject> &object) {
     _perception.seen.erase(object);
-    _perception.lastPerception = PerceptionType::Vanished;
+    _perception.lastPerception = PerceptionType::NotSeen;
     _perception.lastPerceived = object;
     runOnNoticeScript();
 }
@@ -592,7 +592,7 @@ void Creature::onObjectHeard(const shared_ptr<SpatialObject> &object) {
 
 void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
     _perception.heard.erase(object);
-    _perception.lastPerception = PerceptionType::Inaudible;
+    _perception.lastPerception = PerceptionType::NotHeard;
     _perception.lastPerceived = object;
     runOnNoticeScript();
 }
