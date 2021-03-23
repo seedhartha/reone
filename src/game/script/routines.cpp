@@ -18,12 +18,12 @@
 #include "routines.h"
 
 #include "../../common/log.h"
-#include "../../resource/gameidutil.h"
 
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"
 
 #include "../game.h"
+#include "../gameidutil.h"
 
 using namespace std;
 
@@ -39,10 +39,10 @@ Routines &Routines::instance() {
     return instance;
 }
 
-void Routines::init(GameID gameId, Game *game) {
+void Routines::init(Game *game) {
     _game = game;
 
-    if (isTSL(gameId)) {
+    if (isTSL(game->gameId())) {
         addTslRoutines();
     } else {
         addKotorRoutines();

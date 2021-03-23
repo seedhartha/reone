@@ -25,9 +25,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
-#include "../../common/streamutil.h"
 #include "../../common/stringutil.h"
-#include "../../resource/resources.h"
 
 #include "../textures.h"
 
@@ -573,7 +571,6 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, ModelNode *parent) {
     transform = glm::translate(transform, position);
     transform *= glm::mat4_cast(orientation);
 
-
     auto node = make_unique<ModelNode>(_nodeIndex++, parent);
     node->_flags = header.flags;
     node->_nodeNumber = header.nodeNumber;
@@ -994,20 +991,6 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     }
 
     return make_unique<Animation>(name, header.length, header.transitionTime, move(events), move(rootNode));
-}
-
-shared_ptr<Model> MdlModelLoader::loadModel(GameID gameId, const string &resRef) {
-    shared_ptr<ByteArray> mdlData(Resources::instance().get(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(Resources::instance().get(resRef, ResourceType::Mdx));
-    shared_ptr<Model> model;
-
-    if (mdlData && mdxData) {
-        MdlReader mdl;
-        mdl.load(wrap(mdlData), wrap(mdxData));
-        model = mdl.model();
-    }
-
-    return move(model);
 }
 
 } // namespace render

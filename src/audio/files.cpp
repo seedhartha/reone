@@ -43,14 +43,14 @@ AudioFiles::AudioFiles() : MemoryCache(bind(&AudioFiles::doGet, this, _1)) {
 shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
     shared_ptr<AudioStream> result;
 
-    shared_ptr<ByteArray> mp3Data(Resources::instance().get(resRef, ResourceType::Mp3, false));
+    shared_ptr<ByteArray> mp3Data(Resources::instance().getRaw(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
         Mp3Reader mp3;
         mp3.load(wrap(mp3Data));
         result = mp3.stream();
     }
     if (!result) {
-        shared_ptr<ByteArray> wavData(Resources::instance().get(resRef, ResourceType::Wav));
+        shared_ptr<ByteArray> wavData(Resources::instance().getRaw(resRef, ResourceType::Wav));
         if (wavData) {
             WavReader wav;
             wav.load(wrap(wavData));

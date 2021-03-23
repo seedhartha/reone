@@ -17,8 +17,12 @@
 
 #include "gui.h"
 
+#include <boost/format.hpp>
+
 #include "../../audio/player.h"
-#include "../../resource/gameidutil.h"
+#include "../../render/textures.h"
+
+#include "../gameidutil.h"
 
 #include "colorutil.h"
 #include "sounds.h"
@@ -34,7 +38,7 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(GameID gameId, const GraphicsOptions &options) : GUI(gameId, options) {
+GameGUI::GameGUI(GameID gameId, const GraphicsOptions &options) : GUI(options), _gameId(gameId) {
 }
 
 void GameGUI::onClick(const string &control) {
@@ -55,6 +59,53 @@ void GameGUI::initForGame() {
         _hasDefaultHilightColor = true;
         _defaultHilightColor = getHilightColor(_gameId);
     }
+}
+
+string GameGUI::getResRef(const std::string &base) const {
+    return isTSL(_gameId) ? base + "_p" : base;
+}
+
+void GameGUI::loadBackground(BackgroundType type) {
+    string resRef;
+
+    if (isTSL(_gameId)) {
+        switch (type) {
+            case BackgroundType::Computer0:
+            case BackgroundType::Computer1:
+                resRef = "pnl_computer_pc";
+                break;
+            default:
+                break;
+        }
+    } else {
+        if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
+            (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
+            (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
+            (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
+
+            resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
+        } else {
+            resRef = "1600x1200";
+        }
+        switch (type) {
+            case BackgroundType::Menu:
+                resRef += "back";
+                break;
+            case BackgroundType::Load:
+                resRef += "load";
+                break;
+            case BackgroundType::Computer0:
+                resRef += "comp0";
+                break;
+            case BackgroundType::Computer1:
+                resRef += "comp1";
+                break;
+            default:
+                return;
+        }
+    }
+
+    _background = Textures::instance().get(resRef, TextureUsage::Diffuse);
 }
 
 } // namespace game

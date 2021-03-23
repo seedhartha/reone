@@ -36,9 +36,9 @@ InventoryMenu::InventoryMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("inventory");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void InventoryMenu::load() {

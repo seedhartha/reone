@@ -50,7 +50,6 @@ private:
     boost::filesystem::path _destPath;
     std::string _target;
     Operation _operation { Operation::None };
-    resource::GameID _gameId { resource::GameID::KotOR };
     std::vector<std::shared_ptr<ITool>> _tools;
 
     void initOptions();

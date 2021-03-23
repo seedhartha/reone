@@ -35,9 +35,9 @@ OptionsMenu::OptionsMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("optionsingame");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void OptionsMenu::load() {

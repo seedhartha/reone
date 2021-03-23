@@ -21,9 +21,9 @@
 #include "../../gui/control/label.h"
 #include "../../render/meshes.h"
 #include "../../render/window.h"
-#include "../../resource/gameidutil.h"
 
 #include "../game.h"
+#include "../gameidutil.h"
 
 using namespace std;
 

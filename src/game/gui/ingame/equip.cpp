@@ -22,11 +22,11 @@
 #include "../../../gui/control/imagebutton.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../render/textures.h"
-#include "../../../resource/gameidutil.h"
 #include "../../../resource/strings.h"
 
 #include "../../blueprint/blueprints.h"
 #include "../../game.h"
+#include "../../gameidutil.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
 
@@ -78,9 +78,9 @@ Equipment::Equipment(Game *game) :
     _game(game) {
 
     _resRef = getResRef("equip");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void Equipment::load() {

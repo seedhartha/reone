@@ -39,9 +39,9 @@ CharacterMenu::CharacterMenu(Game *game) :
     _game(game) {
 
     _resRef = getResRef("character");
-    _backgroundType = BackgroundType::Menu;
 
     initForGame();
+    loadBackground(BackgroundType::Menu);
 }
 
 void CharacterMenu::load() {

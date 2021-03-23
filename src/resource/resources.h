@@ -27,10 +27,8 @@
 #include <boost/noncopyable.hpp>
 
 #include "2da.h"
-#include "format/keyreader.h"
 #include "format/pereader.h"
 #include "gffstruct.h"
-#include "keybifprovider.h"
 #include "resourceprovider.h"
 #include "types.h"
 
@@ -47,67 +45,40 @@ class Resources : boost::noncopyable {
 public:
     static Resources &instance();
 
-    void init(GameID gameId, const boost::filesystem::path &gamePath);
-    void deinit();
+    void indexKeyFile(const boost::filesystem::path &path);
+    void indexErfFile(const boost::filesystem::path &path, bool transient = false);
+    void indexRimFile(const boost::filesystem::path &path, bool transient = false);
+    void indexDirectory(const boost::filesystem::path &path);
+    void indexExeFile(const boost::filesystem::path &path);
 
-    void loadModule(const std::string &name);
+    void invalidateCache();
+    void clearTransientProviders();
 
+    std::shared_ptr<ByteArray> getRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<TwoDA> get2DA(const std::string &resRef, bool logNotFound = true);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
-    /**
-     * Searches for the raw resource data by ResRef and ResType.
-     */
-    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
-
-    /**
-     * @return list of available module names
-     */
-    const std::vector<std::string> &moduleNames() const { return _moduleNames; }
-
 private:
-    GameID _gameId { GameID::KotOR };
-    boost::filesystem::path _gamePath;
-    std::vector<std::string> _moduleNames;
-
-    // Resource providers
+    // Providers
 
     PEReader _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
 
-    // END Resource providers
+    // END Providers
 
-    // Resource caches
+    // Caches
 
+    std::unordered_map<std::string, std::shared_ptr<ByteArray>> _rawCache;
     std::unordered_map<std::string, std::shared_ptr<TwoDA>> _2daCache;
     std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
-    std::unordered_map<std::string, std::shared_ptr<ByteArray>> _resCache;
 
-    // END Resource caches
+    // END Caches
 
-    ~Resources();
-
-    void indexKeyBifFiles();
-    void indexTexturePacks();
-    void indexAudioFiles();
-    void indexLipModFiles();
-    void indexExeReader();
-    void indexOverrideDirectory();
-    void indexDataDirectory();
-
-    void indexErfFile(const boost::filesystem::path &path);
-    void indexTransientErfFile(const boost::filesystem::path &path);
-    void indexRimFile(const boost::filesystem::path &path);
-    void indexTransientRimFile(const boost::filesystem::path &path);
-    void indexDirectory(const boost::filesystem::path &path);
-
-    void invalidateCache();
-    void loadModuleNames();
-
-    std::shared_ptr<ByteArray> get(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
     std::string getCacheKey(const std::string &resRef, ResourceType type) const;
+
+    std::shared_ptr<ByteArray> doGetRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
 };
 
 } // namespace resource

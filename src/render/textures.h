@@ -37,7 +37,7 @@ class Textures : boost::noncopyable {
 public:
     static Textures &instance();
 
-    void init(resource::GameID gameId);
+    void init();
     void invalidateCache();
 
     /**
@@ -48,7 +48,6 @@ public:
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
-    resource::GameID _gameId { resource::GameID::KotOR };
     std::shared_ptr<render::Texture> _default;
     std::shared_ptr<render::Texture> _defaultCubemap;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;

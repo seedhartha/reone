@@ -26,7 +26,6 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../resource/types.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
 
@@ -66,6 +65,15 @@ class Video;
 
 namespace game {
 
+constexpr char kKeyFilename[] = "chitin.key";
+constexpr char kTexturePackDirectoryName[] = "texturepacks";
+constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+constexpr char kMusicDirectoryName[] = "streammusic";
+constexpr char kSoundsDirectoryName[] = "streamsounds";
+constexpr char kLipsDirectoryName[] = "lips";
+constexpr char kOverrideDirectoryName[] = "override";
+
 /**
  * Entry point for the game logic: contains the main game loop and delegates
  * work to the instances of Module and GUI. Serves as a Service Locator.
@@ -76,7 +84,6 @@ namespace game {
 class Game : public render::IEventHandler, boost::noncopyable {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
-    virtual ~Game() = default;
 
     /**
      * Initialize the engine, run the main game loop and clean up on exit.
@@ -100,7 +107,7 @@ public:
     int getRunScriptVar() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    resource::GameID gameId() const { return _gameId; }
+    GameID gameId() const { return _gameId; }
     const Options &options() const { return _options; }
     scene::SceneGraph &sceneGraph() { return _sceneGraph; }
     ObjectFactory &objectFactory() { return *_objectFactory; }
@@ -111,6 +118,7 @@ public:
     CameraType cameraType() const { return _cameraType; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
     Conversation &conversation() { return *_conversation; }
+    const std::vector<std::string> &moduleNames() const { return _moduleNames; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -205,7 +213,7 @@ private:
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
-    resource::GameID _gameId { resource::GameID::KotOR };
+    GameID _gameId { GameID::KotOR };
     std::unique_ptr<ObjectFactory> _objectFactory;
     GameScreen _screen { GameScreen::MainMenu };
     Party _party;
@@ -221,6 +229,7 @@ private:
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     ProfileOverlay _profileOverlay;
+    std::vector<std::string> _moduleNames;
 
     // Modules
 
@@ -282,11 +291,21 @@ private:
     void changeScreen(GameScreen screen);
     void updateVideo(float dt);
     void updateMusic();
-    void registerModelLoaders();
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
+
+    // Resource management
+
+    void initResourceProviders();
+    void initResourceProvidersForKotOR();
+    void initResourceProvidersForTSL();
+
+    void loadModuleNames();
+    void loadModuleResources(const std::string &moduleName);
+
+    // END Resource management
 
     // Loading
 

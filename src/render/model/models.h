@@ -23,11 +23,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../../resource/types.h"
-
 #include "../types.h"
-
-#include "modelloader.h"
 
 namespace reone {
 
@@ -39,22 +35,14 @@ class Models : boost::noncopyable {
 public:
     static Models &instance();
 
-    void init(resource::GameID gameId);
     void invalidateCache();
 
-    /**
-     * Associates the specified model loader with the specified ResType.
-     */
-    void registerLoader(resource::ResourceType type, std::shared_ptr<IModelLoader> loader);
-
-    std::shared_ptr<Model> get(const std::string &resRef, resource::ResourceType type = resource::ResourceType::Mdl);
+    std::shared_ptr<Model> get(const std::string &resRef);
 
 private:
-    resource::GameID _gameId { resource::GameID::KotOR };
-    std::unordered_map<resource::ResourceType, std::shared_ptr<IModelLoader>> _loaders;
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 
-    std::shared_ptr<Model> doGet(const std::string &resRef, resource::ResourceType type);
+    std::shared_ptr<Model> doGet(const std::string &resRef);
 };
 
 } // namespace render

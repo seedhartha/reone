@@ -36,39 +36,34 @@ Models &Models::instance() {
     return instance;
 }
 
-void Models::init(GameID gameId) {
-    _gameId = gameId;
-}
-
 void Models::invalidateCache() {
     _cache.clear();
 }
 
-void Models::registerLoader(ResourceType type, shared_ptr<IModelLoader> loader) {
-    _loaders.insert(make_pair(type, move(loader)));
-}
-
-shared_ptr<Model> Models::get(const string &resRef, ResourceType type) {
+shared_ptr<Model> Models::get(const string &resRef) {
     if (resRef.empty()) return nullptr;
 
     auto maybeModel = _cache.find(resRef);
     if (maybeModel != _cache.end()) return maybeModel->second;
 
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, type)));
+    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
     return inserted.first->second;
 }
 
-shared_ptr<Model> Models::doGet(const string &resRef, ResourceType type) {
-    auto maybeLoader = _loaders.find(type);
-    if (maybeLoader == _loaders.end()) {
-        warn("Model loader not found by ResType: " + to_string(static_cast<int>(type)));
-        return nullptr;
-    }
-
+shared_ptr<Model> Models::doGet(const string &resRef) {
     debug("Load model " + resRef);
-    shared_ptr<Model> model(maybeLoader->second->loadModel(_gameId, resRef));
-    if (model) {
-        model->init();
+
+    shared_ptr<ByteArray> mdlData(Resources::instance().getRaw(resRef, ResourceType::Mdl));
+    shared_ptr<ByteArray> mdxData(Resources::instance().getRaw(resRef, ResourceType::Mdx));
+    shared_ptr<Model> model;
+
+    if (mdlData && mdxData) {
+        MdlReader mdl;
+        mdl.load(wrap(mdlData), wrap(mdxData));
+        model = mdl.model();
+        if (model) {
+            model->init();
+        }
     }
 
     return move(model);

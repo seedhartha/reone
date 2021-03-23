@@ -18,11 +18,9 @@
 #pragma once
 
 #include "../../resource/format/binreader.h"
-#include "../../resource/types.h"
 
 #include "aabbnode.h"
 #include "model.h"
-#include "modelloader.h"
 
 namespace reone {
 
@@ -270,11 +268,6 @@ private:
 
     void loadMesh(const MeshHeader &header, int numVertices, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, render::ModelNode &node);
     std::shared_ptr<AABBNode> readAABBNode(uint32_t offset);
-};
-
-class MdlModelLoader : public IModelLoader {
-public:
-    std::shared_ptr<Model> loadModel(resource::GameID gameId, const std::string &resRef) override;
 };
 
 } // namespace render

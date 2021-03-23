@@ -23,7 +23,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 GameID determineGameID(const fs::path &gameDir) {
     // If there is no swkotor2 executable, then this is KotOR
@@ -47,6 +47,6 @@ bool isTSL(GameID gameId) {
     }
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

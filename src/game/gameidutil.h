@@ -23,7 +23,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 /**
  * @return GameID determined from the specified game directory
@@ -32,6 +32,6 @@ GameID determineGameID(const boost::filesystem::path &gameDir);
 
 bool isTSL(GameID gameId);
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

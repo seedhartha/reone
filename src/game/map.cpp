@@ -30,10 +30,10 @@
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../render/window.h"
-#include "../resource/gameidutil.h"
 #include "../resource/types.h"
 
 #include "game.h"
+#include "gameidutil.h"
 #include "gui/colorutil.h"
 
 using namespace std;

@@ -72,10 +72,8 @@ protected:
         Stretch
     };
 
-    resource::GameID _gameId { resource::GameID::KotOR };
     render::GraphicsOptions _gfxOpts;
     std::string _resRef;
-    BackgroundType _backgroundType { BackgroundType::None };
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
     ScalingMode _scaling { ScalingMode::Center };
@@ -92,15 +90,13 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(resource::GameID gameId, const render::GraphicsOptions &opts);
+    GUI(const render::GraphicsOptions &opts);
 
-    void loadBackground(BackgroundType type);
     void loadControl(const resource::GffStruct &gffs);
     virtual void onFocusChanged(const std::string &control, bool focus);
     virtual void preloadControl(Control &control);
 
     Control &getControl(const std::string &tag) const;
-    std::string getResRef(const std::string &base) const;
 
     template <class T>
     T &getControl(const std::string &tag) const {

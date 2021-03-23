@@ -53,11 +53,11 @@ PortraitSelection::PortraitSelection(Game *game, CharacterGeneration *charGen) :
 
     _resRef = getResRef("portcust");
 
-    if (_gameId == GameID::KotOR) {
-        _backgroundType = BackgroundType::Menu;
-    }
-
     initForGame();
+
+    if (_gameId == GameID::KotOR) {
+        loadBackground(BackgroundType::Menu);
+    }
 }
 
 void PortraitSelection::load() {

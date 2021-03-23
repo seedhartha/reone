@@ -25,7 +25,6 @@
 #include "../render/stateutil.h"
 #include "../render/textures.h"
 #include "../render/window.h"
-#include "../resource/gameidutil.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -38,14 +37,10 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(GameID gameId, const GraphicsOptions &opts) : _gameId(gameId), _gfxOpts(opts) {
+GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
-}
-
-string GUI::getResRef(const string &base) const {
-    return isTSL(_gameId) ? base + "_p" : base;
 }
 
 void GUI::load() {
@@ -55,8 +50,6 @@ void GUI::load() {
     debug("GUI: load " + _resRef, 1, DebugChannels::gui);
 
     shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));
-    loadBackground(_backgroundType);
-
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -82,49 +75,6 @@ void GUI::load() {
     for (auto &ctrlGffs : gui->getList("CONTROLS")) {
         loadControl(*ctrlGffs);
     }
-}
-
-void GUI::loadBackground(BackgroundType type) {
-    string resRef;
-
-    if (isTSL(_gameId)) {
-        switch (type) {
-            case BackgroundType::Computer0:
-            case BackgroundType::Computer1:
-                resRef = "pnl_computer_pc";
-                break;
-            default:
-                break;
-        }
-    } else {
-        if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
-            (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
-            (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
-            (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
-
-            resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
-        } else {
-            resRef = "1600x1200";
-        }
-        switch (type) {
-            case BackgroundType::Menu:
-                resRef += "back";
-                break;
-            case BackgroundType::Load:
-                resRef += "load";
-                break;
-            case BackgroundType::Computer0:
-                resRef += "comp0";
-                break;
-            case BackgroundType::Computer1:
-                resRef += "comp1";
-                break;
-            default:
-                return;
-        }
-    }
-
-    _background = Textures::instance().get(resRef, TextureUsage::Diffuse);
 }
 
 void GUI::stretchControl(Control &control) {

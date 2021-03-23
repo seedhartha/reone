@@ -19,9 +19,8 @@
 
 #include <unordered_map>
 
-#include "../../../resource/gameidutil.h"
-
 #include "../../game.h"
+#include "../../gameidutil.h"
 
 using namespace std;
 

@@ -19,8 +19,6 @@
 
 #include "../common/pathutil.h"
 
-#include "gameidutil.h"
-
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -34,9 +32,7 @@ Strings &Strings::instance() {
     return instance;
 }
 
-void Strings::init(GameID gameId, const fs::path &gameDir) {
-    _gameId = gameId;
-
+void Strings::init(const fs::path &gameDir) {
     fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
     _tlk.load(tlkPath);
 }
@@ -59,9 +55,7 @@ string Strings::getSound(int strRef) {
 }
 
 void Strings::process(string &str) {
-    if (isTSL(_gameId)) {
-        stripDeveloperNotes(str);
-    }
+    stripDeveloperNotes(str);
 }
 
 void Strings::stripDeveloperNotes(string &str) {

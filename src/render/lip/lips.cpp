@@ -41,7 +41,7 @@ Lips::Lips() : MemoryCache(bind(&Lips::doGet, this, _1)) {
 }
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(Resources::instance().get(resRef, ResourceType::Lip));
+    shared_ptr<ByteArray> lipData(Resources::instance().getRaw(resRef, ResourceType::Lip));
     if (!lipData) return nullptr;
 
     LipReader lip;
