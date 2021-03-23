@@ -20,7 +20,8 @@
 #include <set>
 #include <stdexcept>
 
-#include "object/creature.h"
+#include "../common/log.h"
+
 #include "object/area.h"
 
 using namespace std;
@@ -56,33 +57,60 @@ void Perception::doUpdate() {
         float hearingRange2 = creature->perception().hearingRange * creature->perception().hearingRange;
 
         for (auto &other : creatures) {
+            // Skip self
+            if (other == object) continue;
+
             bool seen = false;
             bool heard = false;
 
             float distance2 = creature->getDistanceTo2(*object);
             if (distance2 <= sightRange2) {
-                // TODO: check line-of-sight
-                seen = true;
+                seen = isInLineOfSight(*creature, *other);
             }
             if (distance2 <= hearingRange2) {
                 heard = true;
             }
 
+            // Sight
             bool wasSeen = creature->perception().seen.count(other) > 0;
             if (!wasSeen && seen) {
                 creature->onObjectSeen(other);
+                debug(boost::format("Perception: %s seen by %s") % other->tag() % creature->tag(), 2);
             } else if (wasSeen && !seen) {
                 creature->onObjectVanished(other);
+                debug(boost::format("Perception: %s vanished from %s") % other->tag() % creature->tag(), 2);
             }
 
+            // Hearing
             bool wasHeard = creature->perception().heard.count(other) > 0;
             if (!wasHeard && heard) {
                 creature->onObjectHeard(other);
+                debug(boost::format("Perception: %s heard by %s") % other->tag() % creature->tag(), 2);
             } else if (wasHeard && !heard) {
                 creature->onObjectInaudible(other);
+                debug(boost::format("Perception: %s inaudible to %s") % other->tag() % creature->tag(), 2);
             }
         }
     }
+}
+
+bool Perception::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
+    glm::vec3 subjectPos(subject.getModelSceneNode()->getCenterOfAABB());
+    glm::vec3 targetPos(target.getModelSceneNode()->getCenterOfAABB());
+    glm::vec3 subjectToTarget(targetPos - subjectPos);
+
+    // Ensure that subjects line of sight is not blocked by room and door walkmeshes
+
+    RaycastProperties castProps;
+    castProps.flags = RaycastFlags::rooms;
+    castProps.origin = subjectPos;
+    castProps.direction = glm::normalize(subjectToTarget);
+    castProps.objectTypes = { ObjectType::Door };
+    castProps.distance = glm::length(subjectToTarget);
+
+    RaycastResult castResult;
+
+    return !_area->collisionDetector().raycast(castProps, castResult);
 }
 
 } // namespace game
