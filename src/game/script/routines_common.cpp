@@ -35,6 +35,8 @@ namespace reone {
 
 namespace game {
 
+static bool g_shipBuild = true;
+
 Variable Routines::d2(const VariablesList &args, ExecutionContext &ctx) {
     int numDice = getInt(args, 0, 1);
     int result = 0;
@@ -233,7 +235,7 @@ Variable Routines::findSubString(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::shipBuild(const VariablesList &args, ExecutionContext &ctx) {
-    return 1;
+    return g_shipBuild ? 1 : 0;
 }
 
 Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ctx) {
