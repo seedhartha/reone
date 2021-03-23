@@ -96,7 +96,7 @@ void Routines::addKotorRoutines() {
     add("GetCurrentForcePoints", Int, { Object });
     add("GetMaxForcePoints", Int, { Object });
     add("PauseGame", Void, { Int });
-    add("SetPlayerRestrictMode", Void, { Int });
+    add("SetPlayerRestrictMode", Void, { Int }, &Routines::setPlayerRestrictMode);
     add("GetStringLength", Int, { String }, &Routines::getStringLength);
     add("GetStringUpperCase", String, { String }, &Routines::getStringUpperCase);
     add("GetStringLowerCase", String, { String }, &Routines::getStringLowerCase);
@@ -121,7 +121,7 @@ void Routines::addKotorRoutines() {
     add("EffectAbilityIncrease", Effect, { Int, Int }, &Routines::effectAbilityIncrease);
     add("EffectDamageResistance", Effect, { Int, Int, Int }, &Routines::effectDamageResistance);
     add("EffectResurrection", Effect, { }, &Routines::effectResurrection);
-    add("GetPlayerRestrictMode", Int, { Object });
+    add("GetPlayerRestrictMode", Int, { Object }, &Routines::getPlayerRestrictMode);
     add("GetCasterLevel", Int, { Object });
     add("GetFirstEffect", Effect, { Object });
     add("GetNextEffect", Effect, { Object });
@@ -327,8 +327,8 @@ void Routines::addKotorRoutines() {
     add("GetHasSkill", Int, { Int, Object }, &Routines::getHasSkill);
     add("ActionUseFeat", Void, { Int, Object }, &Routines::actionUseFeat);
     add("ActionUseSkill", Void, { Int, Object, Int, Object }, &Routines::actionUseSkill);
-    add("GetObjectSeen", Int, { Object, Object });
-    add("GetObjectHeard", Int, { Object, Object });
+    add("GetObjectSeen", Int, { Object, Object }, &Routines::getObjectSeen);
+    add("GetObjectHeard", Int, { Object, Object }, &Routines::getObjectHeard);
     add("GetLastPlayerDied", Object, { });
     add("GetModuleItemLost", Object, { });
     add("GetModuleItemLostBy", Object, { });
@@ -552,7 +552,7 @@ void Routines::addKotorRoutines() {
     add("GetWeaponRanged", Int, { Object });
     add("DoSinglePlayerAutoSave", Void, { });
     add("GetGameDifficulty", Int, { });
-    add("GetUserActionsPending", Int, { });
+    add("GetUserActionsPending", Int, { }, &Routines::getUserActionsPending);
     add("RevealMap", Void, { TVector, Int });
     add("SetTutorialWindowsEnabled", Void, { Int });
     add("ShowTutorialWindow", Void, { Int });
@@ -769,8 +769,8 @@ void Routines::addKotorRoutines() {
 
     add("SetGlobalFadeIn", Void, { Float, Float, Float, Float, Float });
     add("SetGlobalFadeOut", Void, { Float, Float, Float, Float, Float });
-    add("GetLastHostileTarget", Object, { Object });
-    add("GetLastAttackAction", Int, { Object });
+    add("GetLastHostileTarget", Object, { Object }, &Routines::getLastHostileTarget);
+    add("GetLastAttackAction", Int, { Object }, &Routines::getLastAttackAction);
     add("GetLastForcePowerUsed", Int, { Object });
     add("GetLastCombatFeatUsed", Int, { Object });
     add("GetLastAttackResult", Int, { Object });
@@ -780,7 +780,7 @@ void Routines::addKotorRoutines() {
     add("SetFormation", Void, { Object, Object, Int, Int });
     add("ActionFollowLeader", Void, { }, &Routines::actionFollowLeader);
     add("SetForcePowerUnsuccessful", Void, { Int, Object });
-    add("GetIsDebilitated", Int, { Object });
+    add("GetIsDebilitated", Int, { Object }, &Routines::getIsDebilitated);
     add("PlayMovie", Void, { String }, &Routines::playMovie);
     add("SaveNPCState", Void, { Int });
     add("GetCategoryFromTalent", Int, { Talent });

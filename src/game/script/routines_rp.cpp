@@ -34,7 +34,7 @@ namespace game {
 Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: getGender: creature is invalid");
+        debug("Script: getGender: creature is invalid");
         return static_cast<int>(Gender::None);
     }
     return static_cast<int>(creature->gender());
@@ -43,7 +43,7 @@ Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: getGender: creature is invalid");
+        debug("Script: getGender: creature is invalid");
         return static_cast<int>(Gender::None);
     }
     return static_cast<int>(creature->attributes().getAggregateLevel());
@@ -52,7 +52,7 @@ Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) 
 Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (!creature) {
-        warn("Script: getClassByPosition: creature is invalid");
+        debug("Script: getClassByPosition: creature is invalid");
         return static_cast<int>(ClassType::Invalid);
     }
     int position = getInt(args, 0);
@@ -62,7 +62,7 @@ Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContex
 Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (!creature) {
-        warn("Script: getLevelByClass: creature is invalid");
+        debug("Script: getLevelByClass: creature is invalid");
         return 0;
     }
     ClassType clazz = static_cast<ClassType>(getInt(args, 0));
@@ -72,7 +72,7 @@ Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &
 Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (!creature) {
-        warn("Script: getHasSkill: creature is invalid");
+        debug("Script: getHasSkill: creature is invalid");
         return 0;
     }
     Skill skill = static_cast<Skill>(getInt(args, 0));
@@ -82,7 +82,7 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObjectOrCaller(args, 0, ctx);
     if (!object) {
-        warn("Script: getCurrentHitPoints: object is invalid");
+        debug("Script: getCurrentHitPoints: object is invalid");
         return 0;
     }
     return object->currentHitPoints();
@@ -91,7 +91,7 @@ Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionConte
 Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObjectOrCaller(args, 0, ctx);
     if (!object) {
-        warn("Script: getMaxHitPoints: object is invalid");
+        debug("Script: getMaxHitPoints: object is invalid");
         return 0;
     }
     return object->maxHitPoints();
@@ -100,7 +100,7 @@ Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &
 Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: getMinOneHP: object is invalid");
+        debug("Script: getMinOneHP: object is invalid");
         return 0;
     }
     return object->isMinOneHP() ? 1 : 0;
@@ -109,7 +109,7 @@ Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: setMaxHitPoints: object is invalid");
+        debug("Script: setMaxHitPoints: object is invalid");
         return 0;
     }
     int maxHP = getInt(args, 1);
@@ -121,7 +121,7 @@ Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &
 Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: setMinOneHP: object is invalid");
+        debug("Script: setMinOneHP: object is invalid");
         return 0;
     }
     bool minOneHP = getBool(args, 1);
@@ -133,12 +133,12 @@ Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ctx) {
     auto objectToChangeFaction = getCreature(args, 0);
     if (!objectToChangeFaction) {
-        warn("Script: changeFaction: objectToChangeFaction is invalid");
+        debug("Script: changeFaction: objectToChangeFaction is invalid");
         return Variable();
     }
     auto memberOfFactionToJoin = getCreature(args, 1);
     if (!memberOfFactionToJoin) {
-        warn("Script: changeFaction: memberOfFactionToJoin is invalid");
+        debug("Script: changeFaction: memberOfFactionToJoin is invalid");
         return Variable();
     }
     objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
@@ -152,7 +152,7 @@ Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionC
         Faction faction = static_cast<Faction>(getInt(args, 1));
         creatureToChange->setFaction(faction);
     } else {
-        warn("Script: changeToStandardFaction: creatureToChange is invalid");
+        debug("Script: changeToStandardFaction: creatureToChange is invalid");
     }
     return Variable();
 }
@@ -160,12 +160,12 @@ Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionC
 Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &ctx) {
     auto firstObject = getCreature(args, 0);
     if (!firstObject) {
-        warn("Script: getStandardFaction: firstObject is invalid");
+        debug("Script: getStandardFaction: firstObject is invalid");
         return 0;
     }
     auto secondObject = getCreatureOrCaller(args, 1, ctx);
     if (!secondObject) {
-        warn("Script: getStandardFaction: secondObject is invalid");
+        debug("Script: getStandardFaction: secondObject is invalid");
         return 0;
     }
     return firstObject->faction() == secondObject->faction() ? 1 : 0;
@@ -174,7 +174,7 @@ Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &
 Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getCreature(args, 0);
     if (!object) {
-        warn("Script: getStandardFaction: object is invalid");
+        debug("Script: getStandardFaction: object is invalid");
         return static_cast<int>(Faction::Invalid);
     }
     return static_cast<int>(object->faction());
@@ -183,12 +183,12 @@ Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContex
 Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getCreature(args, 0);
     if (!target) {
-        warn("Script: getIsEnemy: target is invalid");
+        debug("Script: getIsEnemy: target is invalid");
         return 0;
     }
     auto source = getCreatureOrCaller(args, 1, ctx);
     if (!source) {
-        warn("Script: getIsEnemy: source is invalid");
+        debug("Script: getIsEnemy: source is invalid");
         return 0;
     }
     return Reputes::instance().getIsEnemy(*target, *source);
@@ -197,12 +197,12 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
 Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getCreature(args, 0);
     if (!target) {
-        warn("Script: getIsFriend: target is invalid");
+        debug("Script: getIsFriend: target is invalid");
         return 0;
     }
     auto source = getCreatureOrCaller(args, 1, ctx);
     if (!source) {
-        warn("Script: getIsFriend: source is invalid");
+        debug("Script: getIsFriend: source is invalid");
         return 0;
     }
     return Reputes::instance().getIsFriend(*target, *source);
@@ -211,12 +211,12 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getCreature(args, 0);
     if (!target) {
-        warn("Script: getIsNeutral: target is invalid");
+        debug("Script: getIsNeutral: target is invalid");
         return 0;
     }
     auto source = getCreatureOrCaller(args, 1, ctx);
     if (!source) {
-        warn("Script: getIsNeutral: source is invalid");
+        debug("Script: getIsNeutral: source is invalid");
         return 0;
     }
     return Reputes::instance().getIsNeutral(*target, *source);
@@ -225,7 +225,7 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
 Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: getAbilityScore: creature is invalid");
+        debug("Script: getAbilityScore: creature is invalid");
         return 0;
     }
     Ability type = static_cast<Ability>(getInt(args, 1));
@@ -236,7 +236,7 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
 Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (!creature) {
-        warn("Script: getLevelByPosition: creature is invalid");
+        debug("Script: getLevelByPosition: creature is invalid");
         return 0;
     }
     int position = getInt(args, 0);
@@ -247,7 +247,7 @@ Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContex
 Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getCreatureOrCaller(args, 1, ctx);
     if (!object) {
-        warn("Script: getSkillRank: object is invalid");
+        debug("Script: getSkillRank: object is invalid");
         return 0;
     }
     Skill skill = static_cast<Skill>(getInt(args, 0));
@@ -258,7 +258,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
 Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: getXP: creature is invalid");
+        debug("Script: getXP: creature is invalid");
         return 0;
     }
     return creature->xp();
@@ -270,7 +270,7 @@ Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
         int xpAmount = getInt(args, 1);
         creature->setXP(xpAmount);
     } else {
-        warn("Script: setXP: creature is invalid");
+        debug("Script: setXP: creature is invalid");
     }
     return Variable();
 }
@@ -281,7 +281,7 @@ Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext 
         int xpAmount = getInt(args, 1);
         creature->giveXP(xpAmount);
     } else {
-        warn("Script: giveXPToCreature: creature is invalid");
+        debug("Script: giveXPToCreature: creature is invalid");
     }
     return Variable();
 }

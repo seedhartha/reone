@@ -490,7 +490,7 @@ Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionConte
     if (target) {
         target->applyEffect(effect, durationType, duration);
     } else {
-        warn("Script: applyEffectToObject: target is invalid");
+        debug("Script: applyEffectToObject: target is invalid");
     }
 
     return Variable();

@@ -63,7 +63,7 @@ Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionCon
 Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: getIsPC: creature is invalid");
+        debug("Script: getIsPC: creature is invalid");
         return 0;
     }
     auto player = _game->party().player();
@@ -79,7 +79,7 @@ Variable Routines::isAvailableCreature(const VariablesList &args, ExecutionConte
 Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Script: isObjectPartyMember: creature is invalid");
+        debug("Script: isObjectPartyMember: creature is invalid");
         return 0;
     }
     return _game->party().isMember(*creature) ? 1 : 0;
@@ -109,7 +109,7 @@ Variable Routines::setPartyLeader(const VariablesList &args, ExecutionContext &c
 Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 1);
     if (!creature) {
-        warn("Script: addPartyMember: creature is invalid");
+        debug("Script: addPartyMember: creature is invalid");
         return 0;
     }
     int npc = getInt(args, 0);

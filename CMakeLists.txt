@@ -629,7 +629,6 @@ set(GAME_SOURCES
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp
-    src/game/script/routines_ai.cpp
     src/game/script/routines_combat.cpp
     src/game/script/routines_common.cpp
     src/game/script/routines_effects.cpp

@@ -44,6 +44,9 @@ public:
     void stopMovement();
 
     bool isMovementRequested() const;
+    bool isRestrictMode() const { return _restrictMode; }
+
+    void setRestrictMode(bool value) { _restrictMode = value; }
 
 private:
     Module *_module;
@@ -56,6 +59,7 @@ private:
     bool _moveBackward { false };
     bool _moveRight { false };
     bool _leftPressedInMouseLook { false };
+    bool _restrictMode { false };
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);

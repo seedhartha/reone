@@ -74,6 +74,14 @@ bool ActionQueue::isEmpty() const {
     return _actions.empty();
 }
 
+bool ActionQueue::containsUserActions() const {
+    for (auto &action : _actions) {
+        if (action->isUserAction()) return true;
+    }
+
+    return false;
+}
+
 int ActionQueue::getSize() const {
     return static_cast<int>(_actions.size());
 }

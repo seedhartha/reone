@@ -33,7 +33,7 @@ namespace game {
 Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionContext &ctx) {
     auto location = getLocationEngineType(args, 0);
     if (!location) {
-        warn("Script: getFacingFromLocation: location is invalid");
+        debug("Script: getFacingFromLocation: location is invalid");
         return -1.0f;
     }
     return location->facing();
@@ -49,7 +49,7 @@ Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx)
         float facing = object->facing();
         result.engineType = make_shared<Location>(move(position), facing);
     } else {
-        warn("Script: getLocation: object is invalid");
+        debug("Script: getLocation: object is invalid");
     }
 
     return move(result);
@@ -58,7 +58,7 @@ Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionContext &ctx) {
     auto location = getLocationEngineType(args, 0);
     if (!location) {
-        warn("Script: getPositionFromLocation: location is invalid");
+        debug("Script: getPositionFromLocation: location is invalid");
         return glm::vec3(0.0f);
     }
     return location->position();
@@ -75,12 +75,12 @@ Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getDistanceBetweenLocations(const VariablesList &args, ExecutionContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     if (!locationA) {
-        warn("Script: getDistanceBetweenLocations: locationA is invalid");
+        debug("Script: getDistanceBetweenLocations: locationA is invalid");
         return 0.0f;
     }
     auto locationB = getLocationEngineType(args, 1);
     if (!locationB) {
-        warn("Script: getDistanceBetweenLocations: locationB is invalid");
+        debug("Script: getDistanceBetweenLocations: locationB is invalid");
         return 0.0f;
     }
     return glm::distance(locationA->position(), locationB->position());
@@ -89,12 +89,12 @@ Variable Routines::getDistanceBetweenLocations(const VariablesList &args, Execut
 Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, ExecutionContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     if (!locationA) {
-        warn("Script: getDistanceBetweenLocations2D: locationA is invalid");
+        debug("Script: getDistanceBetweenLocations2D: locationA is invalid");
         return 0.0f;
     }
     auto locationB = getLocationEngineType(args, 1);
     if (!locationB) {
-        warn("Script: getDistanceBetweenLocations2D: locationB is invalid");
+        debug("Script: getDistanceBetweenLocations2D: locationB is invalid");
         return 0.0f;
     }
     return glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));

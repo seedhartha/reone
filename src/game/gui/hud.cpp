@@ -184,7 +184,7 @@ void HUD::update(float dt) {
         }
     }
 
-    if (_game->module()->area()->combat().isActive()) {
+    if (_game->combat().isActive()) {
         showCombatHud();
         refreshActionQueueItems();
     }

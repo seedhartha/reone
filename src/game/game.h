@@ -30,6 +30,7 @@
 #include "../scene/scenegraph.h"
 
 #include "console.h"
+#include "combat/combat.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/computer.h"
@@ -119,6 +120,7 @@ public:
     ScriptRunner &scriptRunner() { return _scriptRunner; }
     Conversation &conversation() { return *_conversation; }
     const std::vector<std::string> &moduleNames() const { return _moduleNames; }
+    Combat &combat() { return _combat; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -230,6 +232,7 @@ private:
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     ProfileOverlay _profileOverlay;
     std::vector<std::string> _moduleNames;
+    Combat _combat;
 
     // Modules
 

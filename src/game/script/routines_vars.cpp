@@ -48,7 +48,7 @@ Variable Routines::getGlobalString(const VariablesList &args, ExecutionContext &
 Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: getLocalBoolean: object is invalid");
+        debug("Script: getLocalBoolean: object is invalid");
         return false;
     }
     int index = getInt(args, 1);
@@ -59,7 +59,7 @@ Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &
 Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: getLocalNumber: object is invalid");
+        debug("Script: getLocalNumber: object is invalid");
         return false;
     }
     int index = getInt(args, 1);
@@ -97,7 +97,7 @@ Variable Routines::setGlobalString(const VariablesList &args, ExecutionContext &
 Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: setLocalBoolean: object is invalid");
+        debug("Script: setLocalBoolean: object is invalid");
         return false;
     }
     int index = getInt(args, 1);
@@ -110,7 +110,7 @@ Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &
 Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Script: setLocalNumber: object is invalid");
+        debug("Script: setLocalNumber: object is invalid");
         return false;
     }
     int index = getInt(args, 1);
@@ -131,7 +131,7 @@ Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext
     if (value) {
         _game->setGlobalLocation(id, value);
     } else {
-        warn("Script: setGlobalLocation: value is invalid");
+        debug("Script: setGlobalLocation: value is invalid");
     }
     return Variable();
 }

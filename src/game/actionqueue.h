@@ -38,6 +38,7 @@ public:
     void update(float dt);
 
     bool isEmpty() const;
+    bool containsUserActions() const;
 
     int getSize() const;
     std::shared_ptr<Action> getCurrentAction() const;

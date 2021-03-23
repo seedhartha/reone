@@ -62,6 +62,9 @@ void Creature::Combat::reset() {
     attemptedAttackTarget.reset();
     spellTarget.reset();
     attemptedSpellTarget.reset();
+    lastHostileTarget.reset();
+    lastAttackAction = ActionType::Invalid;
+    debilitated = false;
 }
 
 Creature::Creature(
