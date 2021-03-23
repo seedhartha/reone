@@ -41,6 +41,7 @@
 #include "../map.h"
 #include "../objectselect.h"
 #include "../pathfinder.h"
+#include "../perception.h"
 #include "../script/runner.h"
 #include "../types.h"
 
@@ -196,6 +197,7 @@ private:
     bool _unescapable { false };
     CreatureFinder _creatureFinder;
     Grass _grass;
+    Perception _perception;
 
     // Scripts
 

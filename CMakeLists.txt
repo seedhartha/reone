@@ -499,6 +499,7 @@ set(GAME_HEADERS
     src/game/party.h
     src/game/path.h
     src/game/pathfinder.h
+    src/game/perception.h
     src/game/player.h
     src/game/portrait.h
     src/game/portraitutil.h
@@ -615,6 +616,7 @@ set(GAME_SOURCES
     src/game/party.cpp
     src/game/path.cpp
     src/game/pathfinder.cpp
+    src/game/perception.cpp
     src/game/player.cpp
     src/game/portraitutil.cpp
     src/game/reputes.cpp
@@ -637,6 +639,7 @@ set(GAME_SOURCES
     src/game/script/routines_math.cpp
     src/game/script/routines_rp.cpp
     src/game/script/routines_party.cpp
+    src/game/script/routines_perception.cpp
     src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp

@@ -73,6 +73,7 @@ void CreatureBlueprint::load(Creature &creature) {
     loadItems(creature);
     loadSoundSet(creature);
     loadBodyBag(creature);
+    loadPerception(creature);
 }
 
 int CreatureBlueprint::getAppearanceFromUtc() const {
@@ -131,6 +132,7 @@ void CreatureBlueprint::loadScripts(Creature &creature) {
     creature._onSpawn = boost::to_lower_copy(_utc->getString("ScriptSpawn"));
     creature._onDeath = boost::to_lower_copy(_utc->getString("ScriptDeath"));
     creature._onUserDefined = boost::to_lower_copy(_utc->getString("ScriptUserDefine"));
+    creature._onNotice = boost::to_lower_copy(_utc->getString("ScriptOnNotice"));
 }
 
 void CreatureBlueprint::loadItems(Creature &creature) {
@@ -153,6 +155,13 @@ void CreatureBlueprint::loadSoundSet(Creature &creature) {
 }
 
 void CreatureBlueprint::loadBodyBag(Creature &creature) {
+}
+
+void CreatureBlueprint::loadPerception(Creature &creature) {
+    int rangeIdx = _utc->getInt("PerceptionRange", 0);
+    shared_ptr<TwoDA> ranges(Resources::instance().get2DA("ranges"));
+    creature._perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
+    creature._perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");
 }
 
 void StaticCreatureBlueprint::load(Creature &creature) {

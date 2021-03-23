@@ -39,7 +39,7 @@ Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ct
     if (destroy) {
         _game->module()->area()->destroyObject(*destroy);
     } else {
-        warn("Routines: destroyObject: destroy is invalid");
+        warn("Script: destroyObject: destroy is invalid");
     }
     return Variable();
 }
@@ -88,7 +88,7 @@ Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
         bool locked = getBool(args, 1);
         target->setLocked(locked);
     } else {
-        warn("Routines: setLocked: target is invalid");
+        warn("Script: setLocked: target is invalid");
     }
     return Variable();
 }
@@ -96,7 +96,7 @@ Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getDoor(args, 0);
     if (!target) {
-        warn("Routines: getLocked: target is invalid");
+        warn("Script: getLocked: target is invalid");
         return 0;
     }
     return target->isLocked() ? 1 : 0;
@@ -111,7 +111,7 @@ Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
 
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Routines: getTag: object is invalid");
+        warn("Script: getTag: object is invalid");
         return empty;
     }
 
@@ -121,12 +121,12 @@ Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (!caller) {
-        warn("Routines: getDistanceToObject: caller is invalid");
+        warn("Script: getDistanceToObject: caller is invalid");
         return -1.0f;
     }
     auto object = getSpatialObject(args, 0);
     if (!object) {
-        warn("Routines: getDistanceToObject: object is invalid");
+        warn("Script: getDistanceToObject: object is invalid");
         return -1.0f;
     }
 
@@ -136,12 +136,12 @@ Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionConte
 Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (!caller) {
-        warn("Routines: getDistanceToObject2D: caller is invalid");
+        warn("Script: getDistanceToObject2D: caller is invalid");
         return -1.0f;
     }
     auto object = getSpatialObject(args, 0);
     if (!object) {
-        warn("Routines: getDistanceToObject2D: object is invalid");
+        warn("Script: getDistanceToObject2D: object is invalid");
         return -1.0f;
     }
 
@@ -155,7 +155,7 @@ Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getSpatialObject(args, 0);
     if (!target) {
-        warn("Routines: getFacing: target is invalid");
+        warn("Script: getFacing: target is invalid");
         return -1.0f;
     }
     return glm::degrees(target->facing());
@@ -164,7 +164,7 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getSpatialObject(args, 0);
     if (!target) {
-        warn("Routines: getPosition: target is invalid");
+        warn("Script: getPosition: target is invalid");
         return glm::vec3(0.0f);
     }
     return target->position();
@@ -175,7 +175,7 @@ Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &
     if (sound) {
         sound->play();
     } else {
-        warn("Routines: soundObjectPlay: sound is invalid");
+        warn("Script: soundObjectPlay: sound is invalid");
     }
     return Variable();
 }
@@ -185,7 +185,7 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
     if (sound) {
         sound->stop();
     } else {
-        warn("Routines: soundObjectStop: sound is invalid");
+        warn("Script: soundObjectStop: sound is invalid");
     }
     return Variable();
 }
@@ -193,12 +193,12 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
 Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
-        warn("Routines: getDistanceBetween: objectA is invalid");
+        warn("Script: getDistanceBetween: objectA is invalid");
         return -1.0f;
     }
     auto objectB = getSpatialObject(args, 1);
     if (!objectB) {
-        warn("Routines: getDistanceBetween: objectB is invalid");
+        warn("Script: getDistanceBetween: objectB is invalid");
         return -1.0f;
     }
 
@@ -208,12 +208,12 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
-        warn("Routines: getDistanceBetween2D: objectA is invalid");
+        warn("Script: getDistanceBetween2D: objectA is invalid");
         return 0.0f;
     }
     auto objectB = getSpatialObject(args, 1);
     if (!objectB) {
-        warn("Routines: getDistanceBetween2D: objectB is invalid");
+        warn("Script: getDistanceBetween2D: objectB is invalid");
         return 0.0f;
     }
     return objectA->getDistanceTo(glm::vec2(objectB->position()));
@@ -222,7 +222,7 @@ Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionCont
 Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
-        warn("Routines: getIsDead: creature is invalid");
+        warn("Script: getIsDead: creature is invalid");
         return false;
     }
     return creature->isDead();
@@ -231,7 +231,7 @@ Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (!creature) {
-        warn("Routines: getIsInCombat: creature is invalid");
+        warn("Script: getIsInCombat: creature is invalid");
         return false;
     }
     return creature->isInCombat();
@@ -240,7 +240,7 @@ Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ct
 Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getSpatialObject(args, 0);
     if (!object) {
-        warn("Routines: getIsOpen: object is invalid");
+        warn("Script: getIsOpen: object is invalid");
         return false;
     }
     return object->isOpen();
@@ -252,7 +252,7 @@ Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
         float direction = getFloat(args, 0);
         caller->setFacing(glm::radians(direction));
     } else {
-        warn("Routines: setFacing: caller is invalid");
+        warn("Script: setFacing: caller is invalid");
     }
     return Variable();
 }
@@ -263,7 +263,7 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
         glm::vec3 target(getVector(args, 0));
         caller->face(target);
     } else {
-        warn("Routines: setFacingPoint: caller is invalid");
+        warn("Script: setFacingPoint: caller is invalid");
     }
     return Variable();
 }
@@ -273,7 +273,7 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
 
     auto object = getObject(args, 0);
     if (!object) {
-        warn("Routines: getName: object is invalid");
+        warn("Script: getName: object is invalid");
         return empty;
     }
 
@@ -283,7 +283,7 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObject(args, 0);
     if (!target) {
-        warn("Routines: getObjectType: target is invalid");
+        warn("Script: getObjectType: target is invalid");
         return static_cast<int>(ObjectType::Invalid);
     }
     return static_cast<int>(target->type());
@@ -292,7 +292,7 @@ Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ct
 Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObjectOrCaller(args, 0, ctx);
     if (!target) {
-        warn("Routines: getPlotFlag: target is invalid");
+        warn("Script: getPlotFlag: target is invalid");
         return 0;
     }
     return target->plotFlag();
@@ -304,7 +304,7 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
         int plotFlag = getInt(args, 1);
         target->setPlotFlag(plotFlag);
     } else {
-        warn("Routines: setPlotFlag: target is invalid");
+        warn("Script: setPlotFlag: target is invalid");
     }
     return Variable();
 }
@@ -312,12 +312,12 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
 Variable Routines::faceObjectAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
     auto facer = getSpatialObject(args, 0);
     if (!facer) {
-        warn("Routines: faceObjectAwayFromObject: facer is invalid");
+        warn("Script: faceObjectAwayFromObject: facer is invalid");
         return Variable();
     }
     auto objectToFaceAwayFrom = getSpatialObject(args, 1);
     if (!objectToFaceAwayFrom) {
-        warn("Routines: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid");
+        warn("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid");
         return Variable();
     }
     facer->faceAwayFrom(*objectToFaceAwayFrom);
@@ -328,7 +328,7 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
 Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObjectOrCaller(args, 0, ctx);
     if (!target) {
-        warn("Routines: getCommandable: target is invalid");
+        warn("Script: getCommandable: target is invalid");
         return 0;
     }
     return target->isCommandable() ? 1 : 0;
@@ -340,7 +340,7 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
         bool commandable = getBool(args, 0);
         target->setCommandable(commandable);
     } else {
-        warn("Routines: setCommandable: target is invalid");
+        warn("Script: setCommandable: target is invalid");
     }
     return Variable();
 }
@@ -355,7 +355,7 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
         properties.speed = speed;
         caller->playAnimation(animType, move(properties));
     } else {
-        warn("Routines: playAnimation: caller is invalid");
+        warn("Script: playAnimation: caller is invalid");
     }
     return Variable();
 }
@@ -377,12 +377,12 @@ Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContex
 Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
     if (!caller) {
-        warn("Routines: cutsceneAttack: caller is invalid");
+        warn("Script: cutsceneAttack: caller is invalid");
         return Variable();
     }
     auto target = getSpatialObject(args, 0);
     if (!target) {
-        warn("Routines: cutsceneAttack: target is invalid");
+        warn("Script: cutsceneAttack: target is invalid");
         return Variable();
     }
     int animation = getInt(args, 1);
@@ -496,7 +496,7 @@ Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext 
         shared_ptr<Action> action(object->actionQueue().getCurrentAction());
         result = Variable(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
     } else {
-        warn("Routines: getCurrentAction: object is invalid");
+        warn("Script: getCurrentAction: object is invalid");
     }
 
     return move(result);
