@@ -164,7 +164,7 @@ Variable Variable::ofTalent(shared_ptr<EngineType> engineType) {
     return move(result);
 }
 
-Variable Variable::ofAction(ExecutionContext context) {
+Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
     Variable result;
     result.type = VariableType::Action;
     result.context = move(context);

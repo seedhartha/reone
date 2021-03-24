@@ -79,7 +79,7 @@ private:
     void addTslRoutines();
 
     bool getBool(const VariablesList &args, int index, bool defValue = false) const;
-    const script::ExecutionContext &getAction(const VariablesList &args, int index) const;
+    std::shared_ptr<script::ExecutionContext> getAction(const VariablesList &args, int index) const;
     float getFloat(const VariablesList &args, int index, float defValue = 0.0f) const;
     glm::vec3 getVector(const VariablesList &args, int index, glm::vec3 defValue = glm::vec3(0.0f)) const;
     int getInt(const VariablesList &args, int index, int defValue = 0) const;

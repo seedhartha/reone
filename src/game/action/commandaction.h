@@ -27,12 +27,13 @@ namespace game {
 
 class CommandAction : public Action {
 public:
-    CommandAction(const script::ExecutionContext &ctx);
+    CommandAction(std::shared_ptr<script::ExecutionContext> context) : Action(ActionType::DoCommand), _context(move(context)) {
+    }
 
-    const script::ExecutionContext &context() const { return _context; }
+    std::shared_ptr<script::ExecutionContext> context() const { return _context; }
 
 private:
-    script::ExecutionContext _context;
+    std::shared_ptr<script::ExecutionContext> _context;
 };
 
 } // namespace game

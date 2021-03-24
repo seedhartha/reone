@@ -161,10 +161,11 @@ void ActionExecutor::executeFollow(const shared_ptr<Object> &actor, FollowAction
 }
 
 void ActionExecutor::executeDoCommand(const shared_ptr<Object> &actor, CommandAction &action, float dt) {
-    ExecutionContext ctx(action.context());
-    ctx.caller = actor;
+    auto context = make_unique<ExecutionContext>(*action.context());
+    context->caller = actor;
 
-    ScriptExecution(ctx.savedState->program, move(ctx)).run();
+    shared_ptr<ScriptProgram> program(action.context()->savedState->program);
+    ScriptExecution(program, move(context)).run();
     action.complete();
 }
 

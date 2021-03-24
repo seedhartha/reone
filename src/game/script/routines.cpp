@@ -156,7 +156,7 @@ shared_ptr<Event> Routines::getEvent(const VariablesList &args, int index) const
     return index < argCount ? dynamic_pointer_cast<Event>(args[index].engineType) : nullptr;
 }
 
-const ExecutionContext &Routines::getAction(const VariablesList &args, int index) const {
+shared_ptr<ExecutionContext> Routines::getAction(const VariablesList &args, int index) const {
     int argCount = static_cast<int>(args.size());
     if (index >= argCount) {
         throw out_of_range("index is out of range");

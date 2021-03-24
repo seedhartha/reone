@@ -34,7 +34,7 @@ namespace script {
 
 class ScriptExecution : boost::noncopyable {
 public:
-    ScriptExecution(const std::shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx);
+    ScriptExecution(const std::shared_ptr<ScriptProgram> &program, std::unique_ptr<ExecutionContext> context);
 
     int run();
 
@@ -43,7 +43,7 @@ public:
 
 private:
     std::shared_ptr<ScriptProgram> _program;
-    ExecutionContext _context;
+    std::unique_ptr<ExecutionContext> _context;
     std::unordered_map<ByteCode, std::function<void(const Instruction &)>> _handlers;
     std::vector<Variable> _stack;
     std::vector<uint32_t> _returnOffsets;

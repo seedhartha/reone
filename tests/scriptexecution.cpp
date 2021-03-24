@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
 
     program->setLength(instr.nextOffset);
 
-    ExecutionContext context;
-    ScriptExecution execution(program, context);
+    auto context = make_unique<ExecutionContext>();
+    ScriptExecution execution(program, move(context));
     execution.run();
 
     BOOST_TEST((execution.getStackSize() == 1));
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE(test_cptopbp) {
 
     program->setLength(instr.nextOffset);
 
-    ExecutionContext context;
-    ScriptExecution execution(program, context);
+    auto context = make_unique<ExecutionContext>();
+    ScriptExecution execution(program, move(context));
     execution.run();
 
     BOOST_TEST((execution.getStackSize() == 6));
