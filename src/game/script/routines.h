@@ -28,6 +28,8 @@
 #include "../../script/types.h"
 #include "../../script/variable.h"
 
+#define REO_DECL_ROUTINE(x) script::Variable (x)(const VariablesList &args, script::ExecutionContext &ctx);
+
 namespace reone {
 
 namespace game {
@@ -99,436 +101,362 @@ private:
     std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::string getString(const VariablesList &args, int index, std::string defValue = "") const;
 
-    // Common
+    // Routine implementations
 
-    script::Variable d2(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d3(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d4(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d6(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d8(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d10(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d12(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d20(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable d100(const VariablesList &args, script::ExecutionContext &ctx);
+    REO_DECL_ROUTINE(abs)
+    REO_DECL_ROUTINE(acos)
+    REO_DECL_ROUTINE(actionAttack)
+    REO_DECL_ROUTINE(actionBarkString)
+    REO_DECL_ROUTINE(actionCastFakeSpellAtLocation)
+    REO_DECL_ROUTINE(actionCastFakeSpellAtObject)
+    REO_DECL_ROUTINE(actionCastSpellAtLocation)
+    REO_DECL_ROUTINE(actionCastSpellAtObject)
+    REO_DECL_ROUTINE(actionCloseDoor)
+    REO_DECL_ROUTINE(actionDoCommand)
+    REO_DECL_ROUTINE(actionEquipItem)
+    REO_DECL_ROUTINE(actionEquipMostDamagingMelee)
+    REO_DECL_ROUTINE(actionEquipMostDamagingRanged)
+    REO_DECL_ROUTINE(actionEquipMostEffectiveArmor)
+    REO_DECL_ROUTINE(actionFollowLeader)
+    REO_DECL_ROUTINE(actionFollowOwner)
+    REO_DECL_ROUTINE(actionForceFollowObject)
+    REO_DECL_ROUTINE(actionForceMoveToLocation)
+    REO_DECL_ROUTINE(actionForceMoveToObject)
+    REO_DECL_ROUTINE(actionGiveItem)
+    REO_DECL_ROUTINE(actionInteractObject)
+    REO_DECL_ROUTINE(actionJumpToLocation)
+    REO_DECL_ROUTINE(actionJumpToObject)
+    REO_DECL_ROUTINE(actionLockObject)
+    REO_DECL_ROUTINE(actionMoveAwayFromLocation)
+    REO_DECL_ROUTINE(actionMoveAwayFromObject)
+    REO_DECL_ROUTINE(actionMoveToLocation)
+    REO_DECL_ROUTINE(actionMoveToObject)
+    REO_DECL_ROUTINE(actionOpenDoor)
+    REO_DECL_ROUTINE(actionPauseConversation)
+    REO_DECL_ROUTINE(actionPickUpItem)
+    REO_DECL_ROUTINE(actionPlayAnimation)
+    REO_DECL_ROUTINE(actionPutDownItem)
+    REO_DECL_ROUTINE(actionRandomWalk)
+    REO_DECL_ROUTINE(actionResumeConversation)
+    REO_DECL_ROUTINE(actionSpeakString)
+    REO_DECL_ROUTINE(actionSpeakStringByStrRef)
+    REO_DECL_ROUTINE(actionStartConversation)
+    REO_DECL_ROUTINE(actionSurrenderToEnemies)
+    REO_DECL_ROUTINE(actionSwitchWeapons)
+    REO_DECL_ROUTINE(actionTakeItem)
+    REO_DECL_ROUTINE(actionUnequipItem)
+    REO_DECL_ROUTINE(actionUnlockObject)
+    REO_DECL_ROUTINE(actionUseFeat)
+    REO_DECL_ROUTINE(actionUseSkill)
+    REO_DECL_ROUTINE(actionUseTalentAtLocation)
+    REO_DECL_ROUTINE(actionUseTalentOnObject)
+    REO_DECL_ROUTINE(actionWait)
+    REO_DECL_ROUTINE(addAvailableNPCByTemplate)
+    REO_DECL_ROUTINE(addPartyMember)
+    REO_DECL_ROUTINE(applyEffectToObject)
+    REO_DECL_ROUTINE(asin)
+    REO_DECL_ROUTINE(assignCommand)
+    REO_DECL_ROUTINE(atan)
+    REO_DECL_ROUTINE(changeFaction)
+    REO_DECL_ROUTINE(changeToStandardFaction)
+    REO_DECL_ROUTINE(clearAllActions)
+    REO_DECL_ROUTINE(clearAllEffects)
+    REO_DECL_ROUTINE(cos)
+    REO_DECL_ROUTINE(createItemOnObject)
+    REO_DECL_ROUTINE(createObject)
+    REO_DECL_ROUTINE(cutsceneAttack)
+    REO_DECL_ROUTINE(d10)
+    REO_DECL_ROUTINE(d100)
+    REO_DECL_ROUTINE(d12)
+    REO_DECL_ROUTINE(d2)
+    REO_DECL_ROUTINE(d20)
+    REO_DECL_ROUTINE(d3)
+    REO_DECL_ROUTINE(d4)
+    REO_DECL_ROUTINE(d6)
+    REO_DECL_ROUTINE(d8)
+    REO_DECL_ROUTINE(delayCommand)
+    REO_DECL_ROUTINE(destroyObject)
+    REO_DECL_ROUTINE(effectAbilityDecrease)
+    REO_DECL_ROUTINE(effectAbilityIncrease)
+    REO_DECL_ROUTINE(effectACDecrease)
+    REO_DECL_ROUTINE(effectACIncrease)
+    REO_DECL_ROUTINE(effectAreaOfEffect)
+    REO_DECL_ROUTINE(effectAssuredDeflection)
+    REO_DECL_ROUTINE(effectAssuredHit)
+    REO_DECL_ROUTINE(effectAttackDecrease)
+    REO_DECL_ROUTINE(effectAttackIncrease)
+    REO_DECL_ROUTINE(effectBeam)
+    REO_DECL_ROUTINE(effectBlasterDeflectionDecrease)
+    REO_DECL_ROUTINE(effectBlasterDeflectionIncrease)
+    REO_DECL_ROUTINE(effectBlind)
+    REO_DECL_ROUTINE(effectBodyFuel)
+    REO_DECL_ROUTINE(effectChoke)
+    REO_DECL_ROUTINE(effectConcealment)
+    REO_DECL_ROUTINE(effectConfused)
+    REO_DECL_ROUTINE(effectCrush)
+    REO_DECL_ROUTINE(effectCutSceneHorrified)
+    REO_DECL_ROUTINE(effectCutSceneParalyze)
+    REO_DECL_ROUTINE(effectCutSceneStunned)
+    REO_DECL_ROUTINE(effectDamage)
+    REO_DECL_ROUTINE(effectDamageDecrease)
+    REO_DECL_ROUTINE(effectDamageForcePoints)
+    REO_DECL_ROUTINE(effectDamageImmunityDecrease)
+    REO_DECL_ROUTINE(effectDamageImmunityIncrease)
+    REO_DECL_ROUTINE(effectDamageIncrease)
+    REO_DECL_ROUTINE(effectDamageReduction)
+    REO_DECL_ROUTINE(effectDamageResistance)
+    REO_DECL_ROUTINE(effectDamageShield)
+    REO_DECL_ROUTINE(effectDeath)
+    REO_DECL_ROUTINE(effectDisguise)
+    REO_DECL_ROUTINE(effectDispelMagicAll)
+    REO_DECL_ROUTINE(effectDispelMagicBest)
+    REO_DECL_ROUTINE(effectDroidConfused)
+    REO_DECL_ROUTINE(effectDroidScramble)
+    REO_DECL_ROUTINE(effectDroidStun)
+    REO_DECL_ROUTINE(effectEntangle)
+    REO_DECL_ROUTINE(effectFactionModifier)
+    REO_DECL_ROUTINE(effectForceBody)
+    REO_DECL_ROUTINE(effectForceDrain)
+    REO_DECL_ROUTINE(effectForceFizzle)
+    REO_DECL_ROUTINE(effectForceJump)
+    REO_DECL_ROUTINE(effectForcePushed)
+    REO_DECL_ROUTINE(effectForcePushTargeted)
+    REO_DECL_ROUTINE(effectForceResistanceDecrease)
+    REO_DECL_ROUTINE(effectForceResistanceIncrease)
+    REO_DECL_ROUTINE(effectForceResisted)
+    REO_DECL_ROUTINE(effectForceShield)
+    REO_DECL_ROUTINE(effectForceSight)
+    REO_DECL_ROUTINE(effectFPRegenModifier)
+    REO_DECL_ROUTINE(effectFrightened)
+    REO_DECL_ROUTINE(effectFury)
+    REO_DECL_ROUTINE(effectHaste)
+    REO_DECL_ROUTINE(effectHeal)
+    REO_DECL_ROUTINE(effectHealForcePoints)
+    REO_DECL_ROUTINE(effectHitPointChangeWhenDying)
+    REO_DECL_ROUTINE(effectHorrified)
+    REO_DECL_ROUTINE(effectImmunity)
+    REO_DECL_ROUTINE(effectInvisibility)
+    REO_DECL_ROUTINE(effectKnockdown)
+    REO_DECL_ROUTINE(effectLightsaberThrow)
+    REO_DECL_ROUTINE(effectLinkEffects)
+    REO_DECL_ROUTINE(effectMindTrick)
+    REO_DECL_ROUTINE(effectMissChance)
+    REO_DECL_ROUTINE(effectModifyAttacks)
+    REO_DECL_ROUTINE(effectMovementSpeedDecrease)
+    REO_DECL_ROUTINE(effectMovementSpeedIncrease)
+    REO_DECL_ROUTINE(effectParalyze)
+    REO_DECL_ROUTINE(effectPoison)
+    REO_DECL_ROUTINE(effectPsychicStatic)
+    REO_DECL_ROUTINE(effectRegenerate)
+    REO_DECL_ROUTINE(effectResurrection)
+    REO_DECL_ROUTINE(effectSavingThrowDecrease)
+    REO_DECL_ROUTINE(effectSavingThrowIncrease)
+    REO_DECL_ROUTINE(effectSeeInvisible)
+    REO_DECL_ROUTINE(effectSkillDecrease)
+    REO_DECL_ROUTINE(effectSkillIncrease)
+    REO_DECL_ROUTINE(effectSleep)
+    REO_DECL_ROUTINE(effectSpellImmunity)
+    REO_DECL_ROUTINE(effectSpellLevelAbsorption)
+    REO_DECL_ROUTINE(effectStunned)
+    REO_DECL_ROUTINE(effectTemporaryForcePoints)
+    REO_DECL_ROUTINE(effectTemporaryHitpoints)
+    REO_DECL_ROUTINE(effectTimeStop)
+    REO_DECL_ROUTINE(effectTrueSeeing)
+    REO_DECL_ROUTINE(effectVisualEffect)
+    REO_DECL_ROUTINE(effectVPRegenModifier)
+    REO_DECL_ROUTINE(effectWhirlWind)
+    REO_DECL_ROUTINE(eventUserDefined)
+    REO_DECL_ROUTINE(executeScript)
+    REO_DECL_ROUTINE(fabs)
+    REO_DECL_ROUTINE(faceObjectAwayFromObject)
+    REO_DECL_ROUTINE(feetToMeters)
+    REO_DECL_ROUTINE(findSubString)
+    REO_DECL_ROUTINE(floatToInt)
+    REO_DECL_ROUTINE(floatToString)
+    REO_DECL_ROUTINE(getAbilityScore)
+    REO_DECL_ROUTINE(getArea)
+    REO_DECL_ROUTINE(getAreaUnescapable)
+    REO_DECL_ROUTINE(getAttackTarget)
+    REO_DECL_ROUTINE(getAttemptedAttackTarget)
+    REO_DECL_ROUTINE(getAttemptedSpellTarget)
+    REO_DECL_ROUTINE(getBaseItemType)
+    REO_DECL_ROUTINE(getClassByPosition)
+    REO_DECL_ROUTINE(getCommandable)
+    REO_DECL_ROUTINE(getCurrentAction)
+    REO_DECL_ROUTINE(getCurrentHitPoints)
+    REO_DECL_ROUTINE(getCurrentStealthXP)
+    REO_DECL_ROUTINE(getDistanceBetween)
+    REO_DECL_ROUTINE(getDistanceBetween2D)
+    REO_DECL_ROUTINE(getDistanceBetweenLocations)
+    REO_DECL_ROUTINE(getDistanceBetweenLocations2D)
+    REO_DECL_ROUTINE(getDistanceToObject)
+    REO_DECL_ROUTINE(getDistanceToObject2D)
+    REO_DECL_ROUTINE(getEnteringObject)
+    REO_DECL_ROUTINE(getExitingObject)
+    REO_DECL_ROUTINE(getFacing)
+    REO_DECL_ROUTINE(getFacingFromLocation)
+    REO_DECL_ROUTINE(getFactionEqual)
+    REO_DECL_ROUTINE(getFirstItemInInventory)
+    REO_DECL_ROUTINE(getFirstPC)
+    REO_DECL_ROUTINE(getGender)
+    REO_DECL_ROUTINE(getGlobalBoolean)
+    REO_DECL_ROUTINE(getGlobalLocation)
+    REO_DECL_ROUTINE(getGlobalNumber)
+    REO_DECL_ROUTINE(getGlobalString)
+    REO_DECL_ROUTINE(getHasSkill)
+    REO_DECL_ROUTINE(getHasSpell)
+    REO_DECL_ROUTINE(getHitDice)
+    REO_DECL_ROUTINE(getIdentified)
+    REO_DECL_ROUTINE(getIsDawn)
+    REO_DECL_ROUTINE(getIsDay)
+    REO_DECL_ROUTINE(getIsDead)
+    REO_DECL_ROUTINE(getIsDebilitated)
+    REO_DECL_ROUTINE(getIsDusk)
+    REO_DECL_ROUTINE(getIsEnemy)
+    REO_DECL_ROUTINE(getIsFriend)
+    REO_DECL_ROUTINE(getIsInCombat)
+    REO_DECL_ROUTINE(getIsNeutral)
+    REO_DECL_ROUTINE(getIsNight)
+    REO_DECL_ROUTINE(getIsObjectValid)
+    REO_DECL_ROUTINE(getIsOpen)
+    REO_DECL_ROUTINE(getIsPC)
+    REO_DECL_ROUTINE(getItemInSlot)
+    REO_DECL_ROUTINE(getItemPossessedBy)
+    REO_DECL_ROUTINE(getItemStackSize)
+    REO_DECL_ROUTINE(getLastAttackAction)
+    REO_DECL_ROUTINE(getLastHostileTarget)
+    REO_DECL_ROUTINE(getLastOpenedBy)
+    REO_DECL_ROUTINE(getLastPerceived)
+    REO_DECL_ROUTINE(getLastPerceptionHeard)
+    REO_DECL_ROUTINE(getLastPerceptionInaudible)
+    REO_DECL_ROUTINE(getLastPerceptionSeen)
+    REO_DECL_ROUTINE(getLastPerceptionVanished)
+    REO_DECL_ROUTINE(getLevelByClass)
+    REO_DECL_ROUTINE(getLevelByPosition)
+    REO_DECL_ROUTINE(getLoadFromSaveGame)
+    REO_DECL_ROUTINE(getLocalBoolean)
+    REO_DECL_ROUTINE(getLocalNumber)
+    REO_DECL_ROUTINE(getLocation)
+    REO_DECL_ROUTINE(getLocked)
+    REO_DECL_ROUTINE(getMaxHitPoints)
+    REO_DECL_ROUTINE(getMaxStealthXP)
+    REO_DECL_ROUTINE(getMinOneHP)
+    REO_DECL_ROUTINE(getModule)
+    REO_DECL_ROUTINE(getName)
+    REO_DECL_ROUTINE(getNearestCreature)
+    REO_DECL_ROUTINE(getNearestCreatureToLocation)
+    REO_DECL_ROUTINE(getNearestObject)
+    REO_DECL_ROUTINE(getNearestObjectByTag)
+    REO_DECL_ROUTINE(getNearestObjectToLocation)
+    REO_DECL_ROUTINE(getNextItemInInventory)
+    REO_DECL_ROUTINE(getNPCAIStyle)
+    REO_DECL_ROUTINE(getObjectByTag)
+    REO_DECL_ROUTINE(getObjectHeard)
+    REO_DECL_ROUTINE(getObjectSeen)
+    REO_DECL_ROUTINE(getObjectType)
+    REO_DECL_ROUTINE(getPartyLeader)
+    REO_DECL_ROUTINE(getPartyMemberByIndex)
+    REO_DECL_ROUTINE(getPartyMemberCount)
+    REO_DECL_ROUTINE(getPCSpeaker)
+    REO_DECL_ROUTINE(getPlayerRestrictMode)
+    REO_DECL_ROUTINE(getPlotFlag)
+    REO_DECL_ROUTINE(getPosition)
+    REO_DECL_ROUTINE(getPositionFromLocation)
+    REO_DECL_ROUTINE(getRacialType)
+    REO_DECL_ROUTINE(getRunScriptVar)
+    REO_DECL_ROUTINE(getSkillRank)
+    REO_DECL_ROUTINE(getSoloMode)
+    REO_DECL_ROUTINE(getSpellTarget)
+    REO_DECL_ROUTINE(getStandardFaction)
+    REO_DECL_ROUTINE(getStartingLocation)
+    REO_DECL_ROUTINE(getStealthXPDecrement)
+    REO_DECL_ROUTINE(getStealthXPEnabled)
+    REO_DECL_ROUTINE(getStringByStrRef)
+    REO_DECL_ROUTINE(getStringLeft)
+    REO_DECL_ROUTINE(getStringLength)
+    REO_DECL_ROUTINE(getStringLowerCase)
+    REO_DECL_ROUTINE(getStringRight)
+    REO_DECL_ROUTINE(getStringUpperCase)
+    REO_DECL_ROUTINE(getSubRace)
+    REO_DECL_ROUTINE(getSubString)
+    REO_DECL_ROUTINE(getTag)
+    REO_DECL_ROUTINE(getTimeHour)
+    REO_DECL_ROUTINE(getTimeMillisecond)
+    REO_DECL_ROUTINE(getTimeMinute)
+    REO_DECL_ROUTINE(getTimeSecond)
+    REO_DECL_ROUTINE(getUserActionsPending)
+    REO_DECL_ROUTINE(getUserDefinedEventNumber)
+    REO_DECL_ROUTINE(getWaypointByTag)
+    REO_DECL_ROUTINE(getXP)
+    REO_DECL_ROUTINE(giveXPToCreature)
+    REO_DECL_ROUTINE(hoursToSeconds)
+    REO_DECL_ROUTINE(insertString)
+    REO_DECL_ROUTINE(intToFloat)
+    REO_DECL_ROUTINE(intToHexString)
+    REO_DECL_ROUTINE(intToString)
+    REO_DECL_ROUTINE(isAvailableCreature)
+    REO_DECL_ROUTINE(isNPCPartyMember)
+    REO_DECL_ROUTINE(isObjectPartyMember)
+    REO_DECL_ROUTINE(jumpToLocation)
+    REO_DECL_ROUTINE(jumpToObject)
+    REO_DECL_ROUTINE(location)
+    REO_DECL_ROUTINE(log)
+    REO_DECL_ROUTINE(playAnimation)
+    REO_DECL_ROUTINE(playMovie)
+    REO_DECL_ROUTINE(pow)
+    REO_DECL_ROUTINE(printFloat)
+    REO_DECL_ROUTINE(printInteger)
+    REO_DECL_ROUTINE(printObject)
+    REO_DECL_ROUTINE(printString)
+    REO_DECL_ROUTINE(printVector)
+    REO_DECL_ROUTINE(random)
+    REO_DECL_ROUTINE(removeAvailableNPC)
+    REO_DECL_ROUTINE(removePartyMember)
+    REO_DECL_ROUTINE(roundsToSeconds)
+    REO_DECL_ROUTINE(setAreaUnescapable)
+    REO_DECL_ROUTINE(setCommandable)
+    REO_DECL_ROUTINE(setCurrentStealthXP)
+    REO_DECL_ROUTINE(setFacing)
+    REO_DECL_ROUTINE(setFacingPoint)
+    REO_DECL_ROUTINE(setGlobalBoolean)
+    REO_DECL_ROUTINE(setGlobalLocation)
+    REO_DECL_ROUTINE(setGlobalNumber)
+    REO_DECL_ROUTINE(setGlobalString)
+    REO_DECL_ROUTINE(setIdentified)
+    REO_DECL_ROUTINE(setItemStackSize)
+    REO_DECL_ROUTINE(setLocalBoolean)
+    REO_DECL_ROUTINE(setLocalNumber)
+    REO_DECL_ROUTINE(setLocked)
+    REO_DECL_ROUTINE(setMaxHitPoints)
+    REO_DECL_ROUTINE(setMaxStealthXP)
+    REO_DECL_ROUTINE(setMinOneHP)
+    REO_DECL_ROUTINE(setNPCAIStyle)
+    REO_DECL_ROUTINE(setPartyLeader)
+    REO_DECL_ROUTINE(setPlayerRestrictMode)
+    REO_DECL_ROUTINE(setPlotFlag)
+    REO_DECL_ROUTINE(setSoloMode)
+    REO_DECL_ROUTINE(setStealthXPDecrement)
+    REO_DECL_ROUTINE(setStealthXPEnabled)
+    REO_DECL_ROUTINE(setTime)
+    REO_DECL_ROUTINE(setXP)
+    REO_DECL_ROUTINE(shipBuild)
+    REO_DECL_ROUTINE(showPartySelectionGUI)
+    REO_DECL_ROUTINE(signalEvent)
+    REO_DECL_ROUTINE(sin)
+    REO_DECL_ROUTINE(soundObjectPlay)
+    REO_DECL_ROUTINE(soundObjectStop)
+    REO_DECL_ROUTINE(sqrt)
+    REO_DECL_ROUTINE(startNewModule)
+    REO_DECL_ROUTINE(stringToFloat)
+    REO_DECL_ROUTINE(stringToInt)
+    REO_DECL_ROUTINE(tan)
+    REO_DECL_ROUTINE(turnsToSeconds)
+    REO_DECL_ROUTINE(vectorCreate)
+    REO_DECL_ROUTINE(vectorMagnitude)
+    REO_DECL_ROUTINE(vectorNormalize)
+    REO_DECL_ROUTINE(yardsToMeters)
 
-    script::Variable feetToMeters(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable floatToInt(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable floatToString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable hoursToSeconds(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable intToFloat(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable intToHexString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable intToString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable roundsToSeconds(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable stringToFloat(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable stringToInt(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable turnsToSeconds(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable yardsToMeters(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable getStringLength(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStringUpperCase(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStringLowerCase(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStringRight(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStringLeft(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable insertString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getSubString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable findSubString(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable executeScript(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLoadFromSaveGame(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getRunScriptVar(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStringByStrRef(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable playMovie(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable random(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable shipBuild(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable startNewModule(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable printString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable printFloat(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable printInteger(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable printObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable printVector(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Common
-
-    // Objects
-
-    script::Variable createObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable cutsceneAttack(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable destroyObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable faceObjectAwayFromObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getArea(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getAreaUnescapable(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getCommandable(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getCurrentAction(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getDistanceBetween(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getDistanceBetween2D(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getDistanceToObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getDistanceToObject2D(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getEnteringObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getExitingObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFacing(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsDead(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsInCombat(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsObjectValid(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsOpen(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastOpenedBy(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLocked(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getModule(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getName(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNearestCreature(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNearestCreatureToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNearestObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNearestObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNearestObjectToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getObjectByTag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getObjectType(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPosition(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getTag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getWaypointByTag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable playAnimation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setAreaUnescapable(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setCommandable(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setFacing(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setFacingPoint(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setLocked(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setPlotFlag(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable soundObjectPlay(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable soundObjectStop(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Objects
-
-    // Items
-
-    script::Variable createItemOnObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFirstItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIdentified(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getItemInSlot(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getItemPossessedBy(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getNextItemInInventory(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setIdentified(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setItemStackSize(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getBaseItemType(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Items
-
-    // Engine types
-
-    script::Variable getDistanceBetweenLocations(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getDistanceBetweenLocations2D(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFacingFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPositionFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStartingLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable location(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Engine types
-
-    // Globals/locals
-
-    script::Variable getGlobalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getGlobalLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getGlobalNumber(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getGlobalString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLocalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLocalNumber(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalNumber(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setGlobalString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setLocalBoolean(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setLocalNumber(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Globals/locals
-
-    // Events
-
-    script::Variable eventUserDefined(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable signalEvent(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getUserDefinedEventNumber(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Events
-
-    // Party
-
-    script::Variable addAvailableNPCByTemplate(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable addPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFirstPC(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsPC(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPartyLeader(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPartyMemberByIndex(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPartyMemberCount(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPCSpeaker(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable isAvailableCreature(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable isNPCPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable isObjectPartyMember(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable removeAvailableNPC(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable removePartyMember(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setPartyLeader(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable showPartySelectionGUI(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getSoloMode(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setSoloMode(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Party
-
-    // Actions
-
-    script::Variable actionAttack(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionBarkString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionCastFakeSpellAtLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionCastFakeSpellAtObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionCastSpellAtLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionCastSpellAtObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionCloseDoor(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionDoCommand(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionEquipItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionEquipMostDamagingMelee(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionEquipMostDamagingRanged(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionEquipMostEffectiveArmor(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionFollowLeader(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionFollowOwner(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionForceFollowObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionForceMoveToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionForceMoveToObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionGiveItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionInteractObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionJumpToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionJumpToObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionLockObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionMoveAwayFromLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionMoveAwayFromObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionMoveToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionMoveToObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionOpenDoor(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionPauseConversation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionPickUpItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionPlayAnimation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionPutDownItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionRandomWalk(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionResumeConversation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionSpeakString(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionSpeakStringByStrRef(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionStartConversation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionSurrenderToEnemies(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionSwitchWeapons(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionTakeItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUnequipItem(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUnlockObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUseFeat(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUseSkill(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUseTalentAtLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionUseTalentOnObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable actionWait(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable assignCommand(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable clearAllActions(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable delayCommand(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable jumpToLocation(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable jumpToObject(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Actions
-
-    // Role-playing
-
-    script::Variable getAbilityScore(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getClassByPosition(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getCurrentHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getGender(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getHasSkill(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getHitDice(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLevelByClass(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLevelByPosition(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getSkillRank(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setMaxHitPoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setMinOneHP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getHasSpell(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable changeFaction(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable changeToStandardFaction(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getFactionEqual(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsEnemy(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsFriend(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsNeutral(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStandardFaction(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable getXP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable giveXPToCreature(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setXP(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable getCurrentStealthXP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getMaxStealthXP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStealthXPDecrement(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getStealthXPEnabled(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setCurrentStealthXP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setMaxStealthXP(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setStealthXPDecrement(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setStealthXPEnabled(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable getRacialType(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getSubRace(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Role-playing
-
-    // Math
-
-    script::Variable abs(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable acos(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable asin(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable atan(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable cos(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable fabs(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable log(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable pow(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable sin(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable sqrt(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable tan(const VariablesList &args, script::ExecutionContext &ctx);
-
-    script::Variable vectorCreate(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable vectorNormalize(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable vectorMagnitude(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Math
-
-    // Effects
-
-    script::Variable applyEffectToObject(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable clearAllEffects(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAbilityDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAbilityIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectACDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectACIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAreaOfEffect(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAssuredDeflection(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAssuredHit(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAttackDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectAttackIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectBeam(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectBlasterDeflectionDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectBlasterDeflectionIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectBlind(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectBodyFuel(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectChoke(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectConcealment(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectConfused(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectCrush(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectCutSceneHorrified(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectCutSceneParalyze(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectCutSceneStunned(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamage(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageImmunityDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageImmunityIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageReduction(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageResistance(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDamageShield(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDeath(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDisguise(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDispelMagicAll(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDispelMagicBest(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDroidConfused(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDroidScramble(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectDroidStun(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectEntangle(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectFactionModifier(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceBody(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceDrain(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceFizzle(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceJump(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForcePushed(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForcePushTargeted(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceResistanceDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceResistanceIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceResisted(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceShield(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectForceSight(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectFPRegenModifier(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectFrightened(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectFury(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectHaste(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectHeal(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectHealForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectHitPointChangeWhenDying(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectHorrified(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectImmunity(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectInvisibility(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectKnockdown(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectLightsaberThrow(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectLinkEffects(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectMindTrick(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectMissChance(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectModifyAttacks(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectMovementSpeedDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectMovementSpeedIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectParalyze(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectPoison(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectPsychicStatic(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectRegenerate(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectResurrection(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSavingThrowDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSavingThrowIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSeeInvisible(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSkillDecrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSkillIncrease(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSleep(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSpellImmunity(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectSpellLevelAbsorption(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectStunned(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectTemporaryForcePoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectTemporaryHitpoints(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectTimeStop(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectTrueSeeing(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectVisualEffect(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectVPRegenModifier(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable effectWhirlWind(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Effects
-
-    // Time
-
-    script::Variable getIsDawn(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsDay(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsDusk(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsNight(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getTimeHour(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getTimeMillisecond(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getTimeMinute(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getTimeSecond(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setTime(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Time
-
-    // Perception
-
-    script::Variable getLastPerceived(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastPerceptionSeen(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastPerceptionVanished(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastPerceptionHeard(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastPerceptionInaudible(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getObjectSeen(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getObjectHeard(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Perception
-
-    // Combat
-
-    script::Variable getNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setNPCAIStyle(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getAttemptedAttackTarget(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getAttemptedSpellTarget(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getIsDebilitated(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastHostileTarget(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getLastAttackAction(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getPlayerRestrictMode(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable setPlayerRestrictMode(const VariablesList &args, script::ExecutionContext &ctx);
-    script::Variable getUserActionsPending(const VariablesList &args, script::ExecutionContext &ctx);
-
-    // END Combat
+    // END Routine implementations
 };
 
 } // namespace game
