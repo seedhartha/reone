@@ -521,7 +521,6 @@ set(GAME_HEADERS
 
 set(GAME_SOURCES
     src/game/action/action.cpp
-    src/game/action/commandaction.cpp
     src/game/action/follow.cpp
     src/game/action/movetoobject.cpp
     src/game/action/movetopoint.cpp

@@ -37,7 +37,7 @@ namespace script {
 
 static constexpr int kStartInstructionOffset = 13;
 
-ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const ExecutionContext &ctx) : _context(ctx), _program(program) {
+ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, unique_ptr<ExecutionContext> context) : _context(move(context)), _program(program) {
     registerHandler(ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP);
     registerHandler(ByteCode::Reserve, &ScriptExecution::executeReserve);
     registerHandler(ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP);
@@ -86,23 +86,23 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, const
 
 int ScriptExecution::run() {
     string callerTag;
-    if (_context.caller) {
-        callerTag = _context.caller->tag();
+    if (_context->caller) {
+        callerTag = _context->caller->tag();
     } else {
         callerTag = "[invalid]";
     }
     debug(boost::format("Script: run %s as %s") % _program->name() % callerTag, 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
-    if (_context.savedState) {
-        vector<Variable> globals(_context.savedState->globals);
+    if (_context->savedState) {
+        vector<Variable> globals(_context->savedState->globals);
         copy(globals.begin(), globals.end(), back_inserter(_stack));
         _globalCount = static_cast<int>(_stack.size());
 
-        vector<Variable> locals(_context.savedState->locals);
+        vector<Variable> locals(_context->savedState->locals);
         copy(locals.begin(), locals.end(), back_inserter(_stack));
 
-        insOff = _context.savedState->insOffset;
+        insOff = _context->savedState->insOffset;
     }
 
     while (insOff < _program->length()) {
@@ -195,7 +195,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             shared_ptr<ScriptObject> object;
             switch (ins.objectId) {
                 case kObjectSelf:
-                    object = _context.caller;
+                    object = _context->caller;
                     break;
                 case kObjectInvalid:
                     break;
@@ -214,7 +214,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
 }
 
 void ScriptExecution::executeCallRoutine(const Instruction &ins) {
-    const Routine &routine = _context.routines->get(ins.routine);
+    const Routine &routine = _context->routines->get(ins.routine);
 
     if (ins.argCount > routine.getArgumentCount()) {
         throw runtime_error("Script: too many routine arguments");
@@ -230,9 +230,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
                 break;
 
             case VariableType::Action: {
-                ExecutionContext ctx(_context);
-                ctx.savedState = make_shared<ExecutionState>(_savedState);
-                args.push_back(Variable::ofAction(ctx));
+                auto ctx = make_shared<ExecutionContext>(*_context);
+                ctx->savedState = make_shared<ExecutionState>(_savedState);
+                args.push_back(Variable::ofAction(move(ctx)));
                 break;
             }
             default:
@@ -246,7 +246,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
                 break;
         }
     }
-    Variable retValue = routine.invoke(args, _context);
+    Variable retValue = routine.invoke(args, *_context);
 
     if (getDebugLogLevel() >= 2) {
         vector<string> argStrings;

@@ -51,7 +51,7 @@ struct Variable {
     glm::vec3 vecValue { 0.0f };
     std::shared_ptr<ScriptObject> object;
     std::shared_ptr<EngineType> engineType;
-    ExecutionContext context;
+    std::shared_ptr<ExecutionContext> context;
 
     union {
         int intValue { 0 };
@@ -69,7 +69,7 @@ struct Variable {
     static Variable ofEvent(std::shared_ptr<EngineType> engineType);
     static Variable ofLocation(std::shared_ptr<EngineType> engineType);
     static Variable ofTalent(std::shared_ptr<EngineType> engineType);
-    static Variable ofAction(ExecutionContext context);
+    static Variable ofAction(std::shared_ptr<ExecutionContext> context);
 
     Variable operator+(const Variable &other) const;
     Variable operator-(const Variable &other) const;

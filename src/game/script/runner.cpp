@@ -44,13 +44,13 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
     auto program = Scripts::instance().get(resRef);
     if (!program) return -1;
 
-    ExecutionContext ctx;
-    ctx.routines = &Routines::instance();
-    ctx.caller = _game->getObjectById(callerId);
-    ctx.triggerer = _game->getObjectById(triggerrerId);
-    ctx.userDefinedEventNumber = userDefinedEventNumber;
+    auto ctx = make_unique<ExecutionContext>();
+    ctx->routines = &Routines::instance();
+    ctx->caller = _game->getObjectById(callerId);
+    ctx->triggerer = _game->getObjectById(triggerrerId);
+    ctx->userDefinedEventNumber = userDefinedEventNumber;
 
-    return ScriptExecution(program, ctx).run();
+    return ScriptExecution(program, move(ctx)).run();
 }
 
 } // namespace game
