@@ -27,8 +27,8 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(const std::shared_ptr<SpatialObject> &object, float range = kDefaultAttackRange) :
-        ObjectAction(ActionType::AttackObject, object),
+    AttackAction(std::shared_ptr<SpatialObject> object, float range = kDefaultAttackRange) :
+        ObjectAction(ActionType::AttackObject, std::move(object)),
         _range(range) {
     }
 

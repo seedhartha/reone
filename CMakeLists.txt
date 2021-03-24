@@ -520,12 +520,6 @@ set(GAME_HEADERS
     src/game/types.h)
 
 set(GAME_SOURCES
-    src/game/action/action.cpp
-    src/game/action/follow.cpp
-    src/game/action/movetoobject.cpp
-    src/game/action/movetopoint.cpp
-    src/game/action/objectaction.cpp
-    src/game/action/startconversation.cpp
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
     src/game/animationutil.cpp

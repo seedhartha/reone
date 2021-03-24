@@ -25,7 +25,9 @@ namespace game {
 
 class MoveToLocationAction : public LocationAction {
 public:
-    MoveToLocationAction(const std::shared_ptr<Location> &destination, bool run = false) : LocationAction(ActionType::MoveToLocation, destination), _run(run) {
+    MoveToLocationAction(std::shared_ptr<Location> destination, bool run = false) :
+        LocationAction(ActionType::MoveToLocation, std::move(destination)),
+        _run(run) {
     }
 
     bool isRun() const { return _run; }

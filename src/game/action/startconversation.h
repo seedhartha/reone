@@ -27,7 +27,11 @@ namespace game {
 
 class StartConversationAction : public ObjectAction {
 public:
-    StartConversationAction(const std::shared_ptr<Object> &object, const std::string &dialogResRef, bool ignoreStartRange = false);
+    StartConversationAction(std::shared_ptr<Object> object, std::string dialogResRef, bool ignoreStartRange = false) :
+        ObjectAction(ActionType::StartConversation, std::move(object)),
+        _dialogResRef(std::move(dialogResRef)),
+        _ignoreStartRange(ignoreStartRange) {
+    }
 
     bool isStartRangeIgnored() const { return _ignoreStartRange; }
 
