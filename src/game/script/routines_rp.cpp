@@ -65,7 +65,7 @@ Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &
         debug("Script: getLevelByClass: creature is invalid");
         return Variable::ofInt(0);
     }
-    ClassType clazz = static_cast<ClassType>(getInt(args, 0));
+    auto clazz = getEnum<ClassType>(args, 0, ClassType::Invalid);
     return Variable::ofInt(creature->attributes().getClassLevel(clazz));
 }
 
@@ -75,7 +75,7 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
         debug("Script: getHasSkill: creature is invalid");
         return Variable::ofInt(0);
     }
-    Skill skill = static_cast<Skill>(getInt(args, 0));
+    auto skill = getEnum<Skill>(args, 0, Skill::ComputerUse);
     return Variable::ofInt(creature->attributes().skills().contains(skill) ? 1 : 0);
 }
 
@@ -146,7 +146,7 @@ Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ct
 Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
     auto creatureToChange = getCreature(args, 0);
     if (creatureToChange) {
-        Faction faction = static_cast<Faction>(getInt(args, 1));
+        auto faction = getEnum<Faction>(args, 1, Faction::Invalid);
         creatureToChange->setFaction(faction);
     } else {
         debug("Script: changeToStandardFaction: creatureToChange is invalid");
@@ -225,7 +225,7 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
         debug("Script: getAbilityScore: creature is invalid");
         return Variable::ofInt(0);
     }
-    Ability type = static_cast<Ability>(getInt(args, 1));
+    auto type = getEnum<Ability>(args, 1, Ability::Strength);
 
     return Variable::ofInt(creature->attributes().abilities().getScore(type));
 }
@@ -247,7 +247,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
         debug("Script: getSkillRank: object is invalid");
         return Variable::ofInt(0);
     }
-    Skill skill = static_cast<Skill>(getInt(args, 0));
+    auto skill = getEnum<Skill>(args, 0, Skill::ComputerUse);
 
     return Variable::ofInt(object->attributes().skills().getRank(skill));
 }
@@ -358,7 +358,7 @@ Variable Routines::getHasSpell(const VariablesList &args, ExecutionContext &ctx)
 
     auto creature = getCreatureOrCaller(args, 1, ctx);
     if (creature) {
-        auto spell = static_cast<ForcePower>(getInt(args, 0));
+        auto spell = getEnum<ForcePower>(args, 0, ForcePower::All);
         // TODO: Force Powers, aka spells, are not supported at the moment
     } else {
         debug("Script: getHasSpell: creature is invalid");

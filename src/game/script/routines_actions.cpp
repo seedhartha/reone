@@ -359,7 +359,7 @@ Variable Routines::actionSpeakString(const VariablesList &args, ExecutionContext
 Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        AnimationType animation = static_cast<AnimationType>(getInt(args, 0));
+        auto animation = getEnum<AnimationType>(args, 0, AnimationType::Invalid);
         float speed = getFloat(args, 1, 1.0f);
         float duration = getFloat(args, 2, 0.0f);
 

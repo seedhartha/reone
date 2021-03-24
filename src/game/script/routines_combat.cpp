@@ -48,7 +48,7 @@ Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ct
 Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (creature) {
-        auto style = static_cast<NPCAIStyle>(getInt(args, 1));
+        auto style = getEnum(args, 1, NPCAIStyle::DefaultAttack);
         creature->setAIStyle(style);
     } else {
         debug("Script: setNPCAIStyle: creature is invalid");

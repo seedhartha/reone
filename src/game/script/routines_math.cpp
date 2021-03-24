@@ -105,7 +105,7 @@ Variable Routines::vectorNormalize(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::vectorMagnitude(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(getVector(args, 0).length());
+    return Variable::ofFloat(glm::length(getVector(args, 0)));
 }
 
 } // namespace game
