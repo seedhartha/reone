@@ -32,19 +32,19 @@ namespace script {
 
 Variable Variable::operator+(const Variable &other) const {
     if (type == VariableType::Int && other.type == VariableType::Int) {
-        return intValue + other.intValue;
+        return Variable::ofInt(intValue + other.intValue);
     }
     if (type == VariableType::Int && other.type == VariableType::Float) {
-        return intValue + other.floatValue;
+        return Variable::ofFloat(intValue + other.floatValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Int) {
-        return floatValue + other.intValue;
+        return Variable::ofFloat(floatValue + other.intValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Float) {
-        return floatValue + other.floatValue;
+        return Variable::ofFloat(floatValue + other.floatValue);
     }
     if (type == VariableType::String && other.type == VariableType::String) {
-        return strValue + other.strValue;
+        return Variable::ofString(strValue + other.strValue);
     }
 
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
@@ -52,16 +52,16 @@ Variable Variable::operator+(const Variable &other) const {
 
 Variable Variable::operator-(const Variable &other) const {
     if (type == VariableType::Int && other.type == VariableType::Int) {
-        return intValue - other.intValue;
+        return Variable::ofInt(intValue - other.intValue);
     }
     if (type == VariableType::Int && other.type == VariableType::Float) {
-        return intValue - other.floatValue;
+        return Variable::ofFloat(intValue - other.floatValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Int) {
-        return floatValue - other.intValue;
+        return Variable::ofFloat(floatValue - other.intValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Float) {
-        return floatValue - other.floatValue;
+        return Variable::ofFloat(floatValue - other.floatValue);
     }
 
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
@@ -69,16 +69,16 @@ Variable Variable::operator-(const Variable &other) const {
 
 Variable Variable::operator*(const Variable &other) const {
     if (type == VariableType::Int && other.type == VariableType::Int) {
-        return intValue * other.intValue;
+        return Variable::ofInt(intValue * other.intValue);
     }
     if (type == VariableType::Int && other.type == VariableType::Float) {
-        return intValue * other.floatValue;
+        return Variable::ofFloat(intValue * other.floatValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Int) {
-        return floatValue * other.intValue;
+        return Variable::ofFloat(floatValue * other.intValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Float) {
-        return floatValue * other.floatValue;
+        return Variable::ofFloat(floatValue * other.floatValue);
     }
 
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
@@ -86,40 +86,89 @@ Variable Variable::operator*(const Variable &other) const {
 
 Variable Variable::operator/(const Variable &other) const {
     if (type == VariableType::Int && other.type == VariableType::Int) {
-        return intValue / other.intValue;
+        return Variable::ofInt(intValue / other.intValue);
     }
     if (type == VariableType::Int && other.type == VariableType::Float) {
-        return intValue / other.floatValue;
+        return Variable::ofFloat(intValue / other.floatValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Int) {
-        return floatValue / other.intValue;
+        return Variable::ofFloat(floatValue / other.intValue);
     }
     if (type == VariableType::Float && other.type == VariableType::Float) {
-        return floatValue / other.floatValue;
+        return Variable::ofFloat(floatValue / other.floatValue);
     }
 
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
 }
 
-Variable::Variable(int value) : type(VariableType::Int), intValue(value) {
+Variable Variable::ofInt(int value) {
+    Variable result;
+    result.type = VariableType::Int;
+    result.intValue = value;
+    return move(result);
 }
 
-Variable::Variable(float value) : type(VariableType::Float), floatValue(value) {
+Variable Variable::ofFloat(float value) {
+    Variable result;
+    result.type = VariableType::Float;
+    result.floatValue = value;
+    return move(result);
 }
 
-Variable::Variable(string value) : type(VariableType::String), strValue(move(value)) {
+Variable Variable::ofString(string value) {
+    Variable result;
+    result.type = VariableType::String;
+    result.strValue = move(value);
+    return move(result);
 }
 
-Variable::Variable(glm::vec3 value) : type(VariableType::Vector), vecValue(move(value)) {
+Variable Variable::ofVector(glm::vec3 value) {
+    Variable result;
+    result.type = VariableType::Vector;
+    result.vecValue = move(value);
+    return move(result);
 }
 
-Variable::Variable(const shared_ptr<ScriptObject> &object) : type(VariableType::Object), object(object) {
+Variable Variable::ofObject(shared_ptr<ScriptObject> object) {
+    Variable result;
+    result.type = VariableType::Object;
+    result.object = move(object);
+    return move(result);
 }
 
-Variable::Variable(VariableType type, const shared_ptr<EngineType> &engineType) : type(type), engineType(engineType) {
+Variable Variable::ofEffect(shared_ptr<EngineType> engineType) {
+    Variable result;
+    result.type = VariableType::Effect;
+    result.engineType = move(engineType);
+    return move(result);
 }
 
-Variable::Variable(const ExecutionContext &ctx) : type(VariableType::Action), context(ctx) {
+Variable Variable::ofEvent(shared_ptr<EngineType> engineType) {
+    Variable result;
+    result.type = VariableType::Event;
+    result.engineType = move(engineType);
+    return move(result);
+}
+
+Variable Variable::ofLocation(shared_ptr<EngineType> engineType) {
+    Variable result;
+    result.type = VariableType::Location;
+    result.engineType = move(engineType);
+    return move(result);
+}
+
+Variable Variable::ofTalent(shared_ptr<EngineType> engineType) {
+    Variable result;
+    result.type = VariableType::Talent;
+    result.engineType = move(engineType);
+    return move(result);
+}
+
+Variable Variable::ofAction(ExecutionContext context) {
+    Variable result;
+    result.type = VariableType::Action;
+    result.context = move(context);
+    return move(result);
 }
 
 bool Variable::operator==(const Variable &other) const {

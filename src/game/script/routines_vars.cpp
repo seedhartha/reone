@@ -32,39 +32,39 @@ namespace game {
 
 Variable Routines::getGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return _game->getGlobalBoolean(id);
+    return Variable::ofInt(static_cast<int>(_game->getGlobalBoolean(id)));
 }
 
 Variable Routines::getGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return _game->getGlobalNumber(id);
+    return Variable::ofInt(_game->getGlobalNumber(id));
 }
 
 Variable Routines::getGlobalString(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return _game->getGlobalString(id);
+    return Variable::ofString(_game->getGlobalString(id));
 }
 
 Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
         debug("Script: getLocalBoolean: object is invalid");
-        return false;
+        return Variable::ofInt(0);
     }
     int index = getInt(args, 1);
 
-    return _game->getLocalBoolean(object->id(), index);
+    return Variable::ofInt(static_cast<int>(_game->getLocalBoolean(object->id(), index)));
 }
 
 Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
     if (!object) {
         debug("Script: getLocalNumber: object is invalid");
-        return false;
+        return Variable::ofInt(0);
     }
     int index = getInt(args, 1);
 
-    return _game->getLocalNumber(object->id(), index);
+    return Variable::ofInt(_game->getLocalNumber(object->id(), index));
 }
 
 Variable Routines::setGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
@@ -96,33 +96,31 @@ Variable Routines::setGlobalString(const VariablesList &args, ExecutionContext &
 
 Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
-    if (!object) {
+    if (object) {
+        int index = getInt(args, 1);
+        bool value = getBool(args, 2);
+        _game->setLocalBoolean(object->id(), index, value);
+    } else {
         debug("Script: setLocalBoolean: object is invalid");
-        return false;
     }
-    int index = getInt(args, 1);
-    bool value = getBool(args, 2);
-    _game->setLocalBoolean(object->id(), index, value);
-
     return Variable();
 }
 
 Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
-    if (!object) {
+    if (object) {
+        int index = getInt(args, 1);
+        int value = getInt(args, 2);
+        _game->setLocalNumber(object->id(), index, value);
+    } else {
         debug("Script: setLocalNumber: object is invalid");
-        return false;
     }
-    int index = getInt(args, 1);
-    int value = getInt(args, 2);
-    _game->setLocalNumber(object->id(), index, value);
-
     return Variable();
 }
 
 Variable Routines::getGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable(VariableType::Location, _game->getGlobalLocation(id));
+    return Variable::ofLocation(_game->getGlobalLocation(id));
 }
 
 Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {

@@ -33,8 +33,8 @@ enum class VariableType {
     Int,
     Float,
     String,
-    Object,
     Vector,
+    Object,
     Effect,
     Event,
     Location,
@@ -59,13 +59,17 @@ struct Variable {
     };
 
     Variable() = default;
-    Variable(int value);
-    Variable(float value);
-    Variable(std::string value);
-    Variable(glm::vec3 value);
-    Variable(const std::shared_ptr<ScriptObject> &object);
-    Variable(VariableType type, const std::shared_ptr<EngineType> &engineType);
-    Variable(const ExecutionContext &context);
+
+    static Variable ofInt(int value);
+    static Variable ofFloat(float value);
+    static Variable ofString(std::string value);
+    static Variable ofVector(glm::vec3 value);
+    static Variable ofObject(std::shared_ptr<ScriptObject> object);
+    static Variable ofEffect(std::shared_ptr<EngineType> engineType);
+    static Variable ofEvent(std::shared_ptr<EngineType> engineType);
+    static Variable ofLocation(std::shared_ptr<EngineType> engineType);
+    static Variable ofTalent(std::shared_ptr<EngineType> engineType);
+    static Variable ofAction(ExecutionContext context);
 
     Variable operator+(const Variable &other) const;
     Variable operator-(const Variable &other) const;

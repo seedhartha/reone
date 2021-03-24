@@ -45,11 +45,11 @@ Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
+    return Variable::ofObject(getTriggerrer(ctx));
 }
 
 Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
-    return static_cast<bool>(getObject(args, 0));
+    return Variable::ofInt(static_cast<bool>(getObject(args, 0)) ? 1 : 0);
 }
 
 Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -58,11 +58,11 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
 
     // Apparently, empty string in this context stands for the player
     if (tag.empty()) {
-        return static_pointer_cast<ScriptObject>(_game->party().player());
+        return Variable::ofObject(_game->party().player());
     }
     int nth = getInt(args, 1, 0);
 
-    return static_pointer_cast<ScriptObject>(_game->module()->area()->getObjectByTag(tag, nth));
+    return Variable::ofObject(_game->module()->area()->getObjectByTag(tag, nth));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -71,15 +71,15 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
 
     for (auto &waypoint : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
-            return static_pointer_cast<ScriptObject>(waypoint);
+            return Variable::ofObject(waypoint);
         }
     }
 
-    return shared_ptr<ScriptObject>();
+    return Variable::ofObject(shared_ptr<ScriptObject>());
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->module()->area());
+    return Variable::ofObject(_game->module()->area());
 }
 
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
@@ -97,77 +97,74 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getDoor(args, 0);
     if (!target) {
         debug("Script: getLocked: target is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return target->isLocked() ? 1 : 0;
+    return Variable::ofInt(target->isLocked() ? 1 : 0);
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->module());
+    return Variable::ofObject(_game->module());
 }
 
 Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
-    static string empty;
-
     auto object = getObject(args, 0);
     if (!object) {
         debug("Script: getTag: object is invalid");
-        return empty;
+        return Variable::ofString("");
     }
-
-    return object->tag();
+    return Variable::ofString(object->tag());
 }
 
 Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (!caller) {
         debug("Script: getDistanceToObject: caller is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
     auto object = getSpatialObject(args, 0);
     if (!object) {
         debug("Script: getDistanceToObject: object is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
 
-    return caller->getDistanceTo(*object);
+    return Variable::ofFloat(caller->getDistanceTo(*object));
 }
 
 Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (!caller) {
         debug("Script: getDistanceToObject2D: caller is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
     auto object = getSpatialObject(args, 0);
     if (!object) {
         debug("Script: getDistanceToObject2D: object is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
 
-    return caller->getDistanceTo(glm::vec2(object->position()));
+    return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
 }
 
 Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
+    return Variable::ofObject(getTriggerrer(ctx));
 }
 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getSpatialObject(args, 0);
     if (!target) {
         debug("Script: getFacing: target is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
-    return glm::degrees(target->facing());
+    return Variable::ofFloat(glm::degrees(target->facing()));
 }
 
 Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getSpatialObject(args, 0);
     if (!target) {
         debug("Script: getPosition: target is invalid");
-        return glm::vec3(0.0f);
+        return Variable::ofVector(glm::vec3(0.0f));
     }
-    return target->position();
+    return Variable::ofVector(target->position());
 }
 
 Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &ctx) {
@@ -194,56 +191,56 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
         debug("Script: getDistanceBetween: objectA is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
     auto objectB = getSpatialObject(args, 1);
     if (!objectB) {
         debug("Script: getDistanceBetween: objectB is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
 
-    return objectA->getDistanceTo(*objectB);
+    return Variable::ofFloat(objectA->getDistanceTo(*objectB));
 }
 
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(args, 0);
     if (!objectA) {
         debug("Script: getDistanceBetween2D: objectA is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
     auto objectB = getSpatialObject(args, 1);
     if (!objectB) {
         debug("Script: getDistanceBetween2D: objectB is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
-    return objectA->getDistanceTo(glm::vec2(objectB->position()));
+    return Variable::ofFloat(objectA->getDistanceTo(glm::vec2(objectB->position())));
 }
 
 Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
         debug("Script: getIsDead: creature is invalid");
-        return false;
+        return Variable::ofInt(0);
     }
-    return creature->isDead();
+    return Variable::ofInt(creature->isDead() ? 1 : 0);
 }
 
 Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (!creature) {
         debug("Script: getIsInCombat: creature is invalid");
-        return false;
+        return Variable::ofInt(0);
     }
-    return creature->isInCombat();
+    return Variable::ofInt(creature->isInCombat() ? 1 : 0);
 }
 
 Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getSpatialObject(args, 0);
     if (!object) {
         debug("Script: getIsOpen: object is invalid");
-        return false;
+        return Variable::ofInt(0);
     }
-    return object->isOpen();
+    return Variable::ofInt(object->isOpen() ? 1 : 0);
 }
 
 Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
@@ -269,33 +266,31 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
-    static string empty;
-
     auto object = getObject(args, 0);
     if (!object) {
         debug("Script: getName: object is invalid");
-        return empty;
+        return Variable::ofString("");
     }
 
-    return object->name();
+    return Variable::ofString(object->name());
 }
 
 Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObject(args, 0);
     if (!target) {
         debug("Script: getObjectType: target is invalid");
-        return static_cast<int>(ObjectType::Invalid);
+        return Variable::ofInt(static_cast<int>(ObjectType::Invalid));
     }
-    return static_cast<int>(target->type());
+    return Variable::ofInt(static_cast<int>(target->type()));
 }
 
 Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObjectOrCaller(args, 0, ctx);
     if (!target) {
         debug("Script: getPlotFlag: target is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return target->plotFlag();
+    return Variable::ofInt(target->plotFlag());
 }
 
 Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
@@ -329,9 +324,9 @@ Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &c
     auto target = getObjectOrCaller(args, 0, ctx);
     if (!target) {
         debug("Script: getCommandable: target is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return target->isCommandable() ? 1 : 0;
+    return Variable::ofInt(target->isCommandable() ? 1 : 0);
 }
 
 Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &ctx) {
@@ -361,11 +356,11 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(getTriggerrer(ctx));
+    return Variable::ofObject(getTriggerrer(ctx));
 }
 
 Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->area()->isUnescapable() ? 1 : 0;
+    return Variable::ofInt(_game->module()->area()->isUnescapable() ? 1 : 0);
 }
 
 Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
@@ -400,7 +395,7 @@ Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
 
-    return static_pointer_cast<ScriptObject>(_game->module()->area()->createObject(objectType, blueprintResRef, location));
+    return Variable::ofObject(_game->module()->area()->createObject(objectType, blueprintResRef, location));
 }
 
 Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContext &ctx) {
@@ -424,7 +419,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(target, criterias, nth - 1));
 
-    return static_pointer_cast<ScriptObject>(creature);
+    return Variable::ofObject(creature);
 }
 
 Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -448,7 +443,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreatureToLocation(*location, criterias, nth - 1));
 
-    return static_pointer_cast<ScriptObject>(creature);
+    return Variable::ofObject(creature);
 }
 
 Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
@@ -460,7 +455,7 @@ Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext 
         return object->type() == objectType;
     }));
 
-    return static_pointer_cast<ScriptObject>(object);
+    return Variable::ofObject(object);
 }
 
 Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -472,7 +467,7 @@ Variable Routines::getNearestObjectToLocation(const VariablesList &args, Executi
         return object->type() == objectType;
     }));
 
-    return static_pointer_cast<ScriptObject>(object);
+    return Variable::ofObject(object);
 }
 
 Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -484,7 +479,7 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
         return object->tag() == tag;
     }));
 
-    return static_pointer_cast<ScriptObject>(object);
+    return Variable::ofObject(object);
 }
 
 Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {

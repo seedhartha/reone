@@ -29,83 +29,83 @@ namespace game {
 
 Variable Routines::fabs(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return glm::abs(value);
+    return Variable::ofFloat(glm::abs(value));
 }
 
 Variable Routines::cos(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return glm::cos(value);
+    return Variable::ofFloat(glm::cos(value));
 }
 
 Variable Routines::sin(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return glm::sin(value);
+    return Variable::ofFloat(glm::sin(value));
 }
 
 Variable Routines::tan(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return glm::tan(value);
+    return Variable::ofFloat(glm::tan(value));
 }
 
 Variable Routines::acos(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    if (value > 1 || value < -1) return 0.0f;
+    if (value > 1 || value < -1) return Variable::ofFloat(0.0f);
 
-    return glm::acos(value);
+    return Variable::ofFloat(glm::acos(value));
 }
 
 Variable Routines::asin(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    if (value > 1 || value < -1) return 0.0f;
+    if (value > 1 || value < -1) return Variable::ofFloat(0.0f);
 
-    return glm::asin(value);
+    return Variable::ofFloat(glm::asin(value));
 }
 
 Variable Routines::atan(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return glm::atan(value);
+    return Variable::ofFloat(glm::atan(value));
 }
 
 Variable Routines::log(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    if (value <= 0.0f) return 0.0f;
+    if (value <= 0.0f) return Variable::ofFloat(0.0f);
 
-    return glm::log(value);
+    return Variable::ofFloat(glm::log(value));
 }
 
 Variable Routines::pow(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
     float exponent = getFloat(args, 1);
-    if (value == 0.0f && exponent < 0.0f) return 0.0f;
+    if (value == 0.0f && exponent < 0.0f) return Variable::ofFloat(0.0f);
 
-    return glm::pow(value, exponent);
+    return Variable::ofFloat(glm::pow(value, exponent));
 }
 
 Variable Routines::sqrt(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    if (value < 0.0f) return 0.0f;
+    if (value < 0.0f) return Variable::ofFloat(0.0f);
 
-    return glm::sqrt(value);
+    return Variable::ofFloat(glm::sqrt(value));
 }
 
 Variable Routines::abs(const VariablesList &args, ExecutionContext &ctx) {
     int value = getInt(args, 0);
-    return glm::abs(value);
+    return Variable::ofInt(glm::abs(value));
 }
 
 Variable Routines::vectorCreate(const VariablesList &args, ExecutionContext &ctx) {
     float x = getFloat(args, 0);
     float y = getFloat(args, 1);
     float z = getFloat(args, 2);
-    return glm::vec3(x, y, z);
+    return Variable::ofVector(glm::vec3(x, y, z));
 }
 
 Variable Routines::vectorNormalize(const VariablesList &args, ExecutionContext &ctx) {
-    return glm::normalize(getVector(args, 0));
+    return Variable::ofVector(glm::normalize(getVector(args, 0)));
 }
 
 Variable Routines::vectorMagnitude(const VariablesList &args, ExecutionContext &ctx) {
-    return getVector(args, 0).length();
+    return Variable::ofFloat(getVector(args, 0).length());
 }
 
 } // namespace game
