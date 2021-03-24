@@ -38,49 +38,53 @@ namespace script {
 static constexpr int kStartInstructionOffset = 13;
 
 ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, unique_ptr<ExecutionContext> context) : _context(move(context)), _program(program) {
-    registerHandler(ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP);
-    registerHandler(ByteCode::Reserve, &ScriptExecution::executeReserve);
-    registerHandler(ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP);
-    registerHandler(ByteCode::PushConstant, &ScriptExecution::executePushConstant);
-    registerHandler(ByteCode::CallRoutine, &ScriptExecution::executeCallRoutine);
-    registerHandler(ByteCode::LogicalAnd, &ScriptExecution::executeLogicalAnd);
-    registerHandler(ByteCode::LogicalOr, &ScriptExecution::executeLogicalOr);
-    registerHandler(ByteCode::InclusiveBitwiseOr, &ScriptExecution::executeInclusiveBitwiseOr);
-    registerHandler(ByteCode::ExclusiveBitwiseOr, &ScriptExecution::executeExclusiveBitwiseOr);
-    registerHandler(ByteCode::BitwiseAnd, &ScriptExecution::executeBitwiseAnd);
-    registerHandler(ByteCode::Equal, &ScriptExecution::executeEqual);
-    registerHandler(ByteCode::NotEqual, &ScriptExecution::executeNotEqual);
-    registerHandler(ByteCode::GreaterThanOrEqual, &ScriptExecution::executeGreaterThanOrEqual);
-    registerHandler(ByteCode::GreaterThan, &ScriptExecution::executeGreaterThan);
-    registerHandler(ByteCode::LessThan, &ScriptExecution::executeLessThan);
-    registerHandler(ByteCode::LessThanOrEqual, &ScriptExecution::executeLessThanOrEqual);
-    registerHandler(ByteCode::ShiftLeft, &ScriptExecution::executeShiftLeft);
-    registerHandler(ByteCode::ShiftRight, &ScriptExecution::executeShiftRight);
-    registerHandler(ByteCode::UnsignedShiftRight, &ScriptExecution::executeUnsignedShiftRight);
-    registerHandler(ByteCode::Add, &ScriptExecution::executeAdd);
-    registerHandler(ByteCode::Subtract, &ScriptExecution::executeSubtract);
-    registerHandler(ByteCode::Multiply, &ScriptExecution::executeMultiply);
-    registerHandler(ByteCode::Divide, &ScriptExecution::executeDivide);
-    registerHandler(ByteCode::Mod, &ScriptExecution::executeMod);
-    registerHandler(ByteCode::Negate, &ScriptExecution::executeNegate);
-    registerHandler(ByteCode::AdjustSP, &ScriptExecution::executeAdjustSP);
-    registerHandler(ByteCode::Jump, &ScriptExecution::executeJump);
-    registerHandler(ByteCode::JumpToSubroutine, &ScriptExecution::executeJumpToSubroutine);
-    registerHandler(ByteCode::JumpIfZero, &ScriptExecution::executeJumpIfZero);
-    registerHandler(ByteCode::Return, &ScriptExecution::executeReturn);
-    registerHandler(ByteCode::Destruct, &ScriptExecution::executeDestruct);
-    registerHandler(ByteCode::LogicalNot, &ScriptExecution::executeLogicalNot);
-    registerHandler(ByteCode::DecRelToSP, &ScriptExecution::executeDecRelToSP);
-    registerHandler(ByteCode::IncRelToSP, &ScriptExecution::executeIncRelToSP);
-    registerHandler(ByteCode::JumpIfNonZero, &ScriptExecution::executeJumpIfNonZero);
-    registerHandler(ByteCode::CopyDownBP, &ScriptExecution::executeCopyDownBP);
-    registerHandler(ByteCode::CopyTopBP, &ScriptExecution::executeCopyTopBP);
-    registerHandler(ByteCode::DecRelToBP, &ScriptExecution::executeDecRelToBP);
-    registerHandler(ByteCode::IncRelToBP, &ScriptExecution::executeIncRelToBP);
-    registerHandler(ByteCode::SaveBP, &ScriptExecution::executeSaveBP);
-    registerHandler(ByteCode::RestoreBP, &ScriptExecution::executeRestoreBP);
-    registerHandler(ByteCode::StoreState, &ScriptExecution::executeStoreState);
-
+    static unordered_map<ByteCode, function<void(ScriptExecution *, const Instruction &)>> handlers {
+        { ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP },
+        { ByteCode::Reserve, &ScriptExecution::executeReserve },
+        { ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP },
+        { ByteCode::PushConstant, &ScriptExecution::executePushConstant },
+        { ByteCode::CallRoutine, &ScriptExecution::executeCallRoutine },
+        { ByteCode::LogicalAnd, &ScriptExecution::executeLogicalAnd },
+        { ByteCode::LogicalOr, &ScriptExecution::executeLogicalOr },
+        { ByteCode::InclusiveBitwiseOr, &ScriptExecution::executeInclusiveBitwiseOr },
+        { ByteCode::ExclusiveBitwiseOr, &ScriptExecution::executeExclusiveBitwiseOr },
+        { ByteCode::BitwiseAnd, &ScriptExecution::executeBitwiseAnd },
+        { ByteCode::Equal, &ScriptExecution::executeEqual },
+        { ByteCode::NotEqual, &ScriptExecution::executeNotEqual },
+        { ByteCode::GreaterThanOrEqual, &ScriptExecution::executeGreaterThanOrEqual },
+        { ByteCode::GreaterThan, &ScriptExecution::executeGreaterThan },
+        { ByteCode::LessThan, &ScriptExecution::executeLessThan },
+        { ByteCode::LessThanOrEqual, &ScriptExecution::executeLessThanOrEqual },
+        { ByteCode::ShiftLeft, &ScriptExecution::executeShiftLeft },
+        { ByteCode::ShiftRight, &ScriptExecution::executeShiftRight },
+        { ByteCode::UnsignedShiftRight, &ScriptExecution::executeUnsignedShiftRight },
+        { ByteCode::Add, &ScriptExecution::executeAdd },
+        { ByteCode::Subtract, &ScriptExecution::executeSubtract },
+        { ByteCode::Multiply, &ScriptExecution::executeMultiply },
+        { ByteCode::Divide, &ScriptExecution::executeDivide },
+        { ByteCode::Mod, &ScriptExecution::executeMod },
+        { ByteCode::Negate, &ScriptExecution::executeNegate },
+        { ByteCode::AdjustSP, &ScriptExecution::executeAdjustSP },
+        { ByteCode::Jump, &ScriptExecution::executeJump },
+        { ByteCode::JumpToSubroutine, &ScriptExecution::executeJumpToSubroutine },
+        { ByteCode::JumpIfZero, &ScriptExecution::executeJumpIfZero },
+        { ByteCode::Return, &ScriptExecution::executeReturn },
+        { ByteCode::Destruct, &ScriptExecution::executeDestruct },
+        { ByteCode::LogicalNot, &ScriptExecution::executeLogicalNot },
+        { ByteCode::DecRelToSP, &ScriptExecution::executeDecRelToSP },
+        { ByteCode::IncRelToSP, &ScriptExecution::executeIncRelToSP },
+        { ByteCode::JumpIfNonZero, &ScriptExecution::executeJumpIfNonZero },
+        { ByteCode::CopyDownBP, &ScriptExecution::executeCopyDownBP },
+        { ByteCode::CopyTopBP, &ScriptExecution::executeCopyTopBP },
+        { ByteCode::DecRelToBP, &ScriptExecution::executeDecRelToBP },
+        { ByteCode::IncRelToBP, &ScriptExecution::executeIncRelToBP },
+        { ByteCode::SaveBP, &ScriptExecution::executeSaveBP },
+        { ByteCode::RestoreBP, &ScriptExecution::executeRestoreBP },
+        { ByteCode::StoreState, &ScriptExecution::executeStoreState }
+    };
+    for (auto &pair : handlers) {
+        registerHandler(pair.first, pair.second);
+    }
     _handlers.insert(make_pair(ByteCode::Noop, [](const Instruction &) {}));
 }
 
