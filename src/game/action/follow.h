@@ -25,7 +25,10 @@ namespace game {
 
 class FollowAction : public ObjectAction {
 public:
-    FollowAction(const std::shared_ptr<Object> &object, float distance);
+    FollowAction(std::shared_ptr<Object> object, float distance) :
+        ObjectAction(ActionType::Follow, std::move(object)),
+        _distance(distance) {
+    }
 
     float distance() const { return _distance; }
 

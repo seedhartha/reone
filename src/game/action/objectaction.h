@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 
 #include "action.h"
 
@@ -29,7 +30,11 @@ class Object;
 
 class ObjectAction : public Action {
 public:
-    ObjectAction(ActionType type, const std::shared_ptr<Object> &object);
+    ObjectAction(ActionType type, std::shared_ptr<Object> object) : Action(type), _object(std::move(object)) {
+        if (!_object) {
+            throw std::invalid_argument("object must not be null");
+        }
+    }
 
     std::shared_ptr<Object> object() const { return _object; }
 
