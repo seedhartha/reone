@@ -36,6 +36,8 @@ namespace reone {
 
 namespace scene {
 
+static constexpr float kMaxGrassDistance = 16.0f;
+
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
 
@@ -241,11 +243,17 @@ void SceneGraph::prepareGrass() {
     _grassClusters.clear();
 
     if (_grass && _activeCamera) {
+        glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
+        float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
+
         vector<pair<GrassCluster, float>> clustersZ;
         for (auto &cluster : _grass->clusters()) {
-            glm::vec3 screen(glm::project(cluster.position, _activeCamera->view(), _activeCamera->projection(), viewport));
-            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                clustersZ.push_back(make_pair(cluster, screen.z));
+            float distance2 = glm::distance2(cameraPos, cluster.position);
+            if (distance2 <= grassDistance2) {
+                glm::vec3 screen(glm::project(cluster.position, _activeCamera->view(), _activeCamera->projection(), viewport));
+                if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                    clustersZ.push_back(make_pair(cluster, screen.z));
+                }
             }
         }
         sort(clustersZ.begin(), clustersZ.end(), [](auto &left, auto &right) {
