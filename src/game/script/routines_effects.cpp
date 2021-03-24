@@ -482,7 +482,7 @@ Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto durationType = static_cast<DurationType>(getInt(args, 0));
+    auto durationType = getEnum<DurationType>(args, 0, DurationType::Instant);
     auto effect = getEffect(args, 1);
     auto target = getSpatialObject(args, 2);
     float duration = getFloat(args, 3, 0.0f);

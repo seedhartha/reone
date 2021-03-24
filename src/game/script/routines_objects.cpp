@@ -343,7 +343,7 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
 Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
     if (caller) {
-        auto animType = static_cast<AnimationType>(getInt(args, 0));
+        auto animType = getEnum<AnimationType>(args, 0, AnimationType::Invalid);
         float speed = getFloat(args, 1, 1.0f);
         float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
         AnimationProperties properties;
@@ -381,7 +381,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
         return Variable();
     }
     int animation = getInt(args, 1);
-    AttackResultType attackResult = static_cast<AttackResultType>(getInt(args, 2));
+    auto attackResult = getEnum<AttackResultType>(args, 2, AttackResultType::Invalid);
     int damage = getInt(args, 3);
 
     _game->combat().cutsceneAttack(caller, target, animation, attackResult, damage);
@@ -390,7 +390,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::Invalid);
     string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
@@ -447,7 +447,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
 }
 
 Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = static_cast<ObjectType>(getInt(args, 0, static_cast<int>(ObjectType::All)));
+    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::All);
     auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
@@ -459,7 +459,7 @@ Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = static_cast<ObjectType>(getInt(args, 0));
+    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::Invalid);
     auto location = getLocationEngineType(args, 1);
     int nth = getInt(args, 2, 1);
 

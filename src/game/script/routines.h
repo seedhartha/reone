@@ -78,28 +78,41 @@ private:
     void addKotorRoutines();
     void addTslRoutines();
 
+    // Helper functions
+
     bool getBool(const VariablesList &args, int index, bool defValue = false) const;
-    std::shared_ptr<script::ExecutionContext> getAction(const VariablesList &args, int index) const;
-    float getFloat(const VariablesList &args, int index, float defValue = 0.0f) const;
-    glm::vec3 getVector(const VariablesList &args, int index, glm::vec3 defValue = glm::vec3(0.0f)) const;
     int getInt(const VariablesList &args, int index, int defValue = 0) const;
+    float getFloat(const VariablesList &args, int index, float defValue = 0.0f) const;
+    std::string getString(const VariablesList &args, int index, std::string defValue = "") const;
+    glm::vec3 getVector(const VariablesList &args, int index, glm::vec3 defValue = glm::vec3(0.0f)) const;
+    std::shared_ptr<script::ExecutionContext> getAction(const VariablesList &args, int index) const;
+
+    std::shared_ptr<Object> getCaller(script::ExecutionContext &ctx) const;
+    std::shared_ptr<SpatialObject> getCallerAsSpatial(script::ExecutionContext &ctx) const;
     std::shared_ptr<Creature> getCallerAsCreature(script::ExecutionContext &ctx) const;
+    std::shared_ptr<Object> getTriggerrer(script::ExecutionContext &ctx) const;
+    std::shared_ptr<Object> getObject(const VariablesList &args, int index) const;
+    std::shared_ptr<Object> getObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index) const;
+    std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<Creature> getCreature(const VariablesList &args, int index) const;
     std::shared_ptr<Creature> getCreatureOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<Door> getDoor(const VariablesList &args, int index) const;
+    std::shared_ptr<Item> getItem(const VariablesList &args, int index) const;
+    std::shared_ptr<Sound> getSound(const VariablesList &args, int index) const;
+
     std::shared_ptr<Effect> getEffect(const VariablesList &args, int index) const;
     std::shared_ptr<Event> getEvent(const VariablesList &args, int index) const;
-    std::shared_ptr<Item> getItem(const VariablesList &args, int index) const;
     std::shared_ptr<Location> getLocationEngineType(const VariablesList &args, int index) const;
-    std::shared_ptr<Object> getCaller(script::ExecutionContext &ctx) const;
-    std::shared_ptr<Object> getObject(const VariablesList &args, int index) const;
-    std::shared_ptr<Object> getObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::shared_ptr<Object> getTriggerrer(script::ExecutionContext &ctx) const;
-    std::shared_ptr<Sound> getSound(const VariablesList &args, int index) const;
-    std::shared_ptr<SpatialObject> getCallerAsSpatial(script::ExecutionContext &ctx) const;
-    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index) const;
-    std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::string getString(const VariablesList &args, int index, std::string defValue = "") const;
+
+    template <class T>
+    inline T getEnum(const VariablesList &args, int index, T defValue) const {
+        if (index < 0 || index >= static_cast<int>(args.size())) return std::move(defValue);
+
+        return static_cast<T>(args[index].intValue);
+    }
+
+    // END Helper functions
 
     // Routine implementations
 
