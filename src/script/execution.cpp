@@ -186,10 +186,10 @@ void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
 void ScriptExecution::executePushConstant(const Instruction &ins) {
     switch (ins.type) {
         case InstructionType::Int:
-            _stack.push_back(ins.intValue);
+            _stack.push_back(Variable::ofInt(ins.intValue));
             break;
         case InstructionType::Float:
-            _stack.push_back(ins.floatValue);
+            _stack.push_back(Variable::ofFloat(ins.floatValue));
             break;
         case InstructionType::Object: {
             shared_ptr<ScriptObject> object;
@@ -202,11 +202,11 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
                 default:
                     throw logic_error("Invalid object id");
             }
-            _stack.emplace_back(object);
+            _stack.push_back(Variable::ofObject(object));
             break;
         }
         case InstructionType::String:
-            _stack.push_back(ins.strValue);
+            _stack.push_back(Variable::ofString(ins.strValue));
             break;
         default:
             throw invalid_argument("Script: invalid instruction type: " + to_string(static_cast<int>(ins.type)));
@@ -232,7 +232,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
             case VariableType::Action: {
                 ExecutionContext ctx(_context);
                 ctx.savedState = make_shared<ExecutionState>(_savedState);
-                args.push_back(ctx);
+                args.push_back(Variable::ofAction(ctx));
                 break;
             }
             default:
@@ -260,9 +260,9 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
         case VariableType::Void:
             break;
         case VariableType::Vector:
-            _stack.push_back(retValue.vecValue.z);
-            _stack.push_back(retValue.vecValue.y);
-            _stack.push_back(retValue.vecValue.x);
+            _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
+            _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
+            _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
             break;
         default:
             _stack.push_back(retValue);
@@ -275,7 +275,7 @@ Variable ScriptExecution::getVectorFromStack() {
     float y = getFloatFromStack().floatValue;
     float z = getFloatFromStack().floatValue;
 
-    return glm::vec3(x, y, z);
+    return Variable::ofVector(glm::vec3(x, y, z));
 }
 
 Variable ScriptExecution::getFloatFromStack() {
@@ -293,7 +293,7 @@ void ScriptExecution::executeLogicalAnd(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue && right.intValue);
+    _stack.push_back(Variable::ofInt(static_cast<int>(left.intValue && right.intValue)));
 }
 
 void ScriptExecution::getTwoIntegersFromStack(Variable &left, Variable &right) {
@@ -308,28 +308,28 @@ void ScriptExecution::executeLogicalOr(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue || right.intValue);
+    _stack.push_back(Variable::ofInt(static_cast<int>(left.intValue || right.intValue)));
 }
 
 void ScriptExecution::executeInclusiveBitwiseOr(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue | right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue | right.intValue));
 }
 
 void ScriptExecution::executeExclusiveBitwiseOr(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue ^ right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue ^ right.intValue));
 }
 
 void ScriptExecution::executeBitwiseAnd(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue & right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue & right.intValue));
 }
 
 void ScriptExecution::executeEqual(const Instruction &ins) {
@@ -338,7 +338,7 @@ void ScriptExecution::executeEqual(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(equal);
+    _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
 }
 
 void ScriptExecution::executeNotEqual(const Instruction &ins) {
@@ -347,7 +347,7 @@ void ScriptExecution::executeNotEqual(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(notEqual);
+    _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
 }
 
 void ScriptExecution::executeGreaterThanOrEqual(const Instruction &ins) {
@@ -356,7 +356,7 @@ void ScriptExecution::executeGreaterThanOrEqual(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(ge);
+    _stack.push_back(Variable::ofInt(static_cast<int>(ge)));
 }
 
 void ScriptExecution::executeGreaterThan(const Instruction &ins) {
@@ -365,7 +365,7 @@ void ScriptExecution::executeGreaterThan(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(greater);
+    _stack.push_back(Variable::ofInt(static_cast<int>(greater)));
 }
 
 void ScriptExecution::executeLessThan(const Instruction &ins) {
@@ -374,7 +374,7 @@ void ScriptExecution::executeLessThan(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(less);
+    _stack.push_back(Variable::ofInt(static_cast<int>(less)));
 }
 
 void ScriptExecution::executeLessThanOrEqual(const Instruction &ins) {
@@ -383,21 +383,21 @@ void ScriptExecution::executeLessThanOrEqual(const Instruction &ins) {
 
     _stack.pop_back();
     _stack.pop_back();
-    _stack.push_back(le);
+    _stack.push_back(Variable::ofInt(static_cast<int>(le)));
 }
 
 void ScriptExecution::executeShiftLeft(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue << right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue << right.intValue));
 }
 
 void ScriptExecution::executeShiftRight(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue >> right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
 }
 
 void ScriptExecution::executeUnsignedShiftRight(const Instruction &ins) {
@@ -405,7 +405,7 @@ void ScriptExecution::executeUnsignedShiftRight(const Instruction &ins) {
     getTwoIntegersFromStack(left, right);
 
     // TODO: proper unsigned shift
-    _stack.push_back(left.intValue >> right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
 }
 
 void ScriptExecution::executeAdd(const Instruction &ins) {
@@ -448,16 +448,16 @@ void ScriptExecution::executeMod(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
-    _stack.push_back(left.intValue % right.intValue);
+    _stack.push_back(Variable::ofInt(left.intValue % right.intValue));
 }
 
 void ScriptExecution::executeNegate(const Instruction &ins) {
     switch (ins.type) {
         case InstructionType::Int:
-            _stack.back() = -_stack.back().intValue;
+            _stack.back().intValue *= -1;
             break;
         case InstructionType::Float:
-            _stack.back() = -_stack.back().floatValue;
+            _stack.back().floatValue *= -1.0f;
             break;
         default:
             break;
@@ -523,7 +523,7 @@ void ScriptExecution::executeLogicalNot(const Instruction &ins) {
     bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
-    _stack.push_back(zero);
+    _stack.push_back(Variable::ofInt(static_cast<int>(zero)));
 }
 
 void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
@@ -566,7 +566,7 @@ void ScriptExecution::executeIncRelToBP(const Instruction &ins) {
 
 void ScriptExecution::executeSaveBP(const Instruction &ins) {
     _globalCount = static_cast<int>(_stack.size());
-    _stack.push_back(_globalCount);
+    _stack.push_back(Variable::ofInt(_globalCount));
 }
 
 void ScriptExecution::executeRestoreBP(const Instruction &ins) {

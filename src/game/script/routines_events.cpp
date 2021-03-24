@@ -33,7 +33,7 @@ namespace game {
 Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext &ctx) {
     int eventNumber = getInt(args, 0);
     auto event = make_shared<Event>(eventNumber);
-    return Variable(VariableType::Event, event);
+    return Variable::ofEvent(event);
 }
 
 Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx) {
@@ -53,7 +53,7 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::getUserDefinedEventNumber(const VariablesList &args, ExecutionContext &ctx) {
-    return ctx.userDefinedEventNumber;
+    return Variable::ofInt(ctx.userDefinedEventNumber);
 }
 
 } // namespace game

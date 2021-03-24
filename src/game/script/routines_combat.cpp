@@ -159,7 +159,7 @@ Variable Routines::getPlayerRestrictMode(const VariablesList &args, ExecutionCon
     // TODO: why is this object necessary?
     auto object = getCreatureOrCaller(args, 0, ctx);
 
-    return Variable(_game->module()->player().isRestrictMode() ? 1 : 0);
+    return Variable::ofInt(_game->module()->player().isRestrictMode() ? 1 : 0);
 }
 
 Variable Routines::setPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {

@@ -30,41 +30,41 @@ namespace game {
 Variable Routines::getIsDawn(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return time.hour == module->info().dawnHour ? 1 : 0;
+    return Variable::ofInt(time.hour == module->info().dawnHour ? 1 : 0);
 }
 
 Variable Routines::getIsDay(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return time.hour > module->info().dawnHour && time.hour < module->info().duskHour ? 1 : 0;
+    return Variable::ofInt(time.hour > module->info().dawnHour && time.hour < module->info().duskHour ? 1 : 0);
 }
 
 Variable Routines::getIsDusk(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return time.hour == module->info().duskHour ? 1 : 0;
+    return Variable::ofInt(time.hour == module->info().duskHour ? 1 : 0);
 }
 
 Variable Routines::getIsNight(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return time.hour < module->info().dawnHour || time.hour > module->info().duskHour ? 1 : 0;
+    return Variable::ofInt(time.hour < module->info().dawnHour || time.hour > module->info().duskHour ? 1 : 0);
 }
 
 Variable Routines::getTimeHour(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->time().hour;
+    return Variable::ofInt(_game->module()->time().hour);
 }
 
 Variable Routines::getTimeMillisecond(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->time().millisecond;
+    return Variable::ofInt(_game->module()->time().millisecond);
 }
 
 Variable Routines::getTimeMinute(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->time().minute;
+    return Variable::ofInt(_game->module()->time().minute);
 }
 
 Variable Routines::getTimeSecond(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->module()->time().second;
+    return Variable::ofInt(_game->module()->time().second);
 }
 
 Variable Routines::setTime(const VariablesList &args, ExecutionContext &ctx) {

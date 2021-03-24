@@ -34,9 +34,9 @@ Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionCon
     auto location = getLocationEngineType(args, 0);
     if (!location) {
         debug("Script: getFacingFromLocation: location is invalid");
-        return -1.0f;
+        return Variable::ofFloat(-1.0f);
     }
-    return location->facing();
+    return Variable::ofFloat(location->facing());
 }
 
 Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -59,9 +59,9 @@ Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionC
     auto location = getLocationEngineType(args, 0);
     if (!location) {
         debug("Script: getPositionFromLocation: location is invalid");
-        return glm::vec3(0.0f);
+        return Variable::ofVector(glm::vec3(0.0f));
     }
-    return location->position();
+    return Variable::ofVector(location->position());
 }
 
 Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
@@ -69,41 +69,41 @@ Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
     float orientation = getFloat(args, 1);
     auto location = make_shared<Location>(move(position), orientation);
 
-    return Variable(VariableType::Location, location);
+    return Variable::ofLocation(location);
 }
 
 Variable Routines::getDistanceBetweenLocations(const VariablesList &args, ExecutionContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     if (!locationA) {
         debug("Script: getDistanceBetweenLocations: locationA is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
     auto locationB = getLocationEngineType(args, 1);
     if (!locationB) {
         debug("Script: getDistanceBetweenLocations: locationB is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
-    return glm::distance(locationA->position(), locationB->position());
+    return Variable::ofFloat(glm::distance(locationA->position(), locationB->position()));
 }
 
 Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, ExecutionContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     if (!locationA) {
         debug("Script: getDistanceBetweenLocations2D: locationA is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
     auto locationB = getLocationEngineType(args, 1);
     if (!locationB) {
         debug("Script: getDistanceBetweenLocations2D: locationB is invalid");
-        return 0.0f;
+        return Variable::ofFloat(0.0f);
     }
-    return glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
+    return Variable::ofFloat(glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position())));
 }
 
 Variable Routines::getStartingLocation(const VariablesList &args, ExecutionContext &ctx) {
     const ModuleInfo &info = _game->module()->info();
     auto location = make_shared<Location>(info.entryPosition, info.entryFacing);
-    return Variable(VariableType::Location, move(location));
+    return Variable::ofLocation(move(location));
 }
 
 } // namespace game

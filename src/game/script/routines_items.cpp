@@ -106,9 +106,9 @@ Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext 
     auto item = getItem(args, 0);
     if (!item) {
         debug("Script: getItemStackSize: item is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return item->stackSize();
+    return Variable::ofInt(item->stackSize());
 }
 
 Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
@@ -126,9 +126,9 @@ Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ct
     auto item = getItem(args, 0);
     if (!item) {
         debug("Script: getIdentified: item is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return item->isIdentified() ? 1 : 0;
+    return Variable::ofInt(item->isIdentified() ? 1 : 0);
 }
 
 Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
@@ -144,11 +144,11 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
 
 Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
-    if (!creature) return shared_ptr<ScriptObject>();
+    if (!creature) return Variable::ofObject(shared_ptr<ScriptObject>());
 
     auto itemTag = boost::to_lower_copy(getString(args, 1));
 
-    return static_pointer_cast<ScriptObject>(creature->getItemByTag(itemTag));
+    return Variable::ofObject(creature->getItemByTag(itemTag));
 }
 
 Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &ctx) {

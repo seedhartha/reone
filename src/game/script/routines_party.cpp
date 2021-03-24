@@ -40,7 +40,7 @@ Variable Routines::addAvailableNPCByTemplate(const VariablesList &args, Executio
 
     bool added = _game->party().addAvailableMember(npc, blueprint);
 
-    return added ? 1 : 0;
+    return Variable::ofInt(added ? 1 : 0);
 }
 
 Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionContext &ctx) {
@@ -64,40 +64,40 @@ Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
         debug("Script: getIsPC: creature is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
     auto player = _game->party().player();
-    return player == creature ? 1 : 0;
+    return Variable::ofInt(player == creature ? 1 : 0);
 }
 
 Variable Routines::isAvailableCreature(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
     bool isAvailable = _game->party().isMemberAvailable(npc);
-    return isAvailable ? 1 : 0;
+    return Variable::ofInt(isAvailable ? 1 : 0);
 }
 
 Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
     if (!creature) {
         debug("Script: isObjectPartyMember: creature is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
-    return _game->party().isMember(*creature) ? 1 : 0;
+    return Variable::ofInt(_game->party().isMember(*creature) ? 1 : 0);
 }
 
 Variable Routines::getPartyMemberByIndex(const VariablesList &args, ExecutionContext &ctx) {
     int index = getInt(args, 0);
-    return static_pointer_cast<ScriptObject>(_game->party().getMember(index));
+    return Variable::ofObject(_game->party().getMember(index));
 }
 
 Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->party().player());
+    return Variable::ofObject(_game->party().player());
 }
 
 Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
     bool isMember = _game->party().isMember(npc);
-    return isMember ? 1 : 0;
+    return Variable::ofInt(isMember ? 1 : 0);
 }
 
 Variable Routines::setPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
@@ -110,17 +110,17 @@ Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &c
     auto creature = getCreature(args, 1);
     if (!creature) {
         debug("Script: addPartyMember: creature is invalid");
-        return 0;
+        return Variable::ofInt(0);
     }
     int npc = getInt(args, 0);
     _game->party().addAvailableMember(npc, creature->blueprintResRef());
 
-    return 1;
+    return Variable::ofInt(1);
 }
 
 Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    if (!_game->party().isMember(npc)) return 0;
+    if (!_game->party().isMember(npc)) return Variable::ofInt(0);
 
     _game->party().removeMember(npc);
 
@@ -128,29 +128,29 @@ Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext
     area->unloadParty();
     area->reloadParty();
 
-    return 1;
+    return Variable::ofInt(1);
 }
 
 Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->party().player());
+    return Variable::ofObject(_game->party().player());
 }
 
 Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->party().getSize();
+    return Variable::ofInt(_game->party().getSize());
 }
 
 Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
     bool removed = _game->party().removeAvailableMember(npc);
-    return removed ? 1 : 0;
+    return Variable::ofInt(removed ? 1 : 0);
 }
 
 Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
-    return static_pointer_cast<ScriptObject>(_game->party().getLeader());
+    return Variable::ofObject(_game->party().getLeader());
 }
 
 Variable Routines::getSoloMode(const VariablesList &args, ExecutionContext &ctx) {
-    return _game->party().isSoloMode() ? 1 : 0;
+    return Variable::ofInt(_game->party().isSoloMode() ? 1 : 0);
 }
 
 Variable Routines::setSoloMode(const VariablesList &args, ExecutionContext &ctx) {
