@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to object actions.
+ */
+
 #include "routines.h"
 
 #include "../../common/log.h"
@@ -38,45 +42,46 @@ namespace reone {
 namespace game {
 
 Variable Routines::delayCommand(const VariablesList &args, ExecutionContext &ctx) {
-    float delay = getFloat(args, 0);
-    auto action = make_unique<CommandAction>(getAction(args, 1));
+    float seconds = getFloat(args, 0);
+    auto action = getAction(args, 1);
 
-    auto subject = getCaller(ctx);
-    subject->actionQueue().delay(move(action), delay);
+    auto objectAction = make_unique<CommandAction>(move(action));
+    getCaller(ctx)->actionQueue().delay(move(objectAction), seconds);
 
     return Variable();
 }
 
 Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ctx) {
     auto subject = getObject(args, 0);
+    auto action = getAction(args, 1);
+
     if (subject) {
-        auto action = make_unique<CommandAction>(getAction(args, 1));
-        subject->actionQueue().add(move(action));
+        auto objectAction = make_unique<CommandAction>(move(action));
+        subject->actionQueue().add(move(objectAction));
     } else {
         debug("Script: assignCommand: subject is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionDoCommand(const VariablesList &args, ExecutionContext &ctx) {
-    auto action = make_unique<CommandAction>(getAction(args, 0));
+    auto action = getAction(args, 0);
 
-    auto subject = getCaller(ctx);
-    subject->actionQueue().add(move(action));
+    auto objectAction = make_unique<CommandAction>(move(action));
+    getCaller(ctx)->actionQueue().add(move(objectAction));
 
     return Variable();
 }
 
 Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
     auto moveTo = getObject(args, 0);
+    bool run = getBool(args, 1, false);
+    float range = getFloat(args, 2, 1.0f);
+
     if (moveTo) {
-        bool run = getBool(args, 1, false);
-        float range = getFloat(args, 2, 1.0f);
-        auto action = make_unique<MoveToObjectAction>(moveTo, run, range);
-
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
-
+        auto action = make_unique<MoveToObjectAction>(move(moveTo), run, range);
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionMoveToObject: moveTo is invalid");
     }
@@ -85,19 +90,18 @@ Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContex
 }
 
 Variable Routines::actionStartConversation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: figure out all arguments
     auto objectToConverse = getObject(args, 0);
+    string dialogResRef(getString(args, 1, ""));
+    bool ignoreStartRange = getBool(args, 4, false);
+
     if (objectToConverse) {
-        auto subject = getCaller(ctx);
-
-        string dialogResRef = getString(args, 1, "");
+        auto caller = getCaller(ctx);
         if (dialogResRef.empty()) {
-            dialogResRef = subject->conversation();
+            dialogResRef = caller->conversation();
         }
-
-        bool ignoreStartRange = getBool(args, 4, false);
-        auto action = make_unique<StartConversationAction>(objectToConverse, dialogResRef, ignoreStartRange);
-        subject->actionQueue().add(move(action));
-
+        auto action = make_unique<StartConversationAction>(move(objectToConverse), move(dialogResRef), ignoreStartRange);
+        caller->actionQueue().add(move(action));
     } else {
         debug("Script: actionStartConversation: objectToConverse is invalid");
     }
@@ -107,19 +111,13 @@ Variable Routines::actionStartConversation(const VariablesList &args, ExecutionC
 
 Variable Routines::actionPauseConversation(const VariablesList &args, ExecutionContext &ctx) {
     auto action = make_unique<Action>(ActionType::PauseConversation);
-
-    auto subject = getCaller(ctx);
-    subject->actionQueue().add(move(action));
-
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionResumeConversation(const VariablesList &args, ExecutionContext &ctx) {
     auto action = make_unique<Action>(ActionType::ResumeConversation);
-
-    auto subject = getCaller(ctx);
-    subject->actionQueue().add(move(action));
-
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
@@ -127,12 +125,10 @@ Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &c
     auto door = getObject(args, 0);
     if (door) {
         auto action = make_unique<ObjectAction>(ActionType::OpenDoor, door);
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionOpenDoor: door is invalid");
     }
-
     return Variable();
 }
 
@@ -140,29 +136,28 @@ Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &
     auto door = getObject(args, 0);
     if (door) {
         auto action = make_unique<ObjectAction>(ActionType::CloseDoor, door);
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionCloseDoor: door is invalid");
     }
-
     return Variable();
 }
 
 Variable Routines::clearAllActions(const VariablesList &args, ExecutionContext &ctx) {
-    auto subject = getCaller(ctx);
-    subject->clearAllActions();
+    getCaller(ctx)->clearAllActions();
     return Variable();
 }
 
 Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto toJumpTo = getObject(args, 0);
-    if (toJumpTo) {
-        auto action = make_unique<ObjectAction>(ActionType::JumpToObject, toJumpTo);
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
+    // TODO: pass all arguments to an action
+    auto jumpTo = getObject(args, 0);
+    bool walkStraightLine = getBool(args, 1, true);
+
+    if (jumpTo) {
+        auto action = make_unique<ObjectAction>(ActionType::JumpToObject, move(jumpTo));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionJumpToObject: toJumpTo is invalid");
+        debug("Script: actionJumpToObject: jumpTo is invalid");
     }
 
     return Variable();
@@ -171,26 +166,24 @@ Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContex
 Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
     auto location = getLocationEngineType(args, 0);
     if (location) {
-        auto action = make_unique<LocationAction>(ActionType::JumpToLocation, location);
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
+        auto action = make_unique<LocationAction>(ActionType::JumpToLocation, move(location));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionJumpToLocation: location is invalid");
     }
-
     return Variable();
 }
 
 Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
     auto moveTo = getObject(args, 0);
+    bool run = getBool(args, 1, false);
+    float range = getFloat(args, 2, 1.0f);
+    float timeout = getFloat(args, 3, 30.0f);
+
     if (moveTo) {
-        bool run = getInt(args, 1, false);
-        float range = getFloat(args, 2, 1.0f);
-        auto action = make_unique<MoveToObjectAction>(moveTo, run, range);
-
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
-
+        auto action = make_unique<MoveToObjectAction>(move(moveTo), run, range);
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionForceMoveToObject: moveTo is invalid");
     }
@@ -199,11 +192,14 @@ Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionC
 }
 
 Variable Routines::actionForceMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
     auto destination = getLocationEngineType(args, 0);
+    bool run = getBool(args, 1, false);
+    float timeout = getFloat(args, 2, 30.0f);
+
     if (destination) {
-        auto action = make_unique<MoveToPointAction>(destination->position());
-        auto subject = getCaller(ctx);
-        subject->actionQueue().add(move(action));
+        auto action = make_unique<MoveToLocationAction>(move(destination));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
         debug("Script: actionForceMoveToLocation: destination is invalid");
     }
@@ -212,463 +208,434 @@ Variable Routines::actionForceMoveToLocation(const VariablesList &args, Executio
 }
 
 Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto toJumpTo = getObject(args, 0);
-    if (toJumpTo) {
-        auto action = make_unique<ObjectAction>(ActionType::JumpToObject, toJumpTo);
+    // TODO: pass all arguments to an action
+    auto jumpTo = getObject(args, 0);
+    bool walkStraightLine = getBool(args, 1, true);
 
-        auto subject = static_pointer_cast<Object>(ctx.caller);
-        subject->actionQueue().clear();
-        subject->actionQueue().add(move(action));
-
+    if (jumpTo) {
+        auto action = make_unique<ObjectAction>(ActionType::JumpToObject, move(jumpTo));
+        getCaller(ctx)->actionQueue().addToTop(move(action));
     } else {
-        debug("Script: jumpToObject: toJumpTo is invalid");
+        debug("Script: jumpToObject: jumpTo is invalid");
     }
 
     return Variable();
 }
 
 Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto location = getLocationEngineType(args, 0);
-    if (location) {
-        auto action = make_unique<LocationAction>(ActionType::JumpToLocation, location);
-
-        auto subject = getCaller(ctx);
-        subject->actionQueue().clear();
-        subject->actionQueue().add(move(action));
-
+    auto destination = getLocationEngineType(args, 0);
+    if (destination) {
+        auto action = make_unique<LocationAction>(ActionType::JumpToLocation, move(destination));
+        getCaller(ctx)->actionQueue().addToTop(move(action));
     } else {
-        debug("Script: jumpToLocation: location is invalid");
+        debug("Script: jumpToLocation: destination is invalid");
     }
-
     return Variable();
 }
 
 Variable Routines::actionRandomWalk(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::RandomWalk);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionRandomWalk: caller is invalid");
-    }
+    auto action = make_unique<Action>(ActionType::RandomWalk);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto destination = getLocationEngineType(args, 0);
-        bool run = getBool(args, 1, false);
-        auto action = make_unique<MoveToLocationAction>(destination, run);
-        caller->actionQueue().add(move(action));
+    auto destination = getLocationEngineType(args, 0);
+    bool run = getBool(args, 1, false);
+
+    if (destination) {
+        auto action = make_unique<MoveToLocationAction>(move(destination), run);
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionMoveToLocation: caller is invalid");
+        debug("Script: actionMoveToLocation: destination is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionMoveAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto fleeFrom = getObject(args, 0);
+    bool run = getBool(args, 1, false);
+    float range = getFloat(args, 2, 40.0f);
+
+    if (fleeFrom) {
         auto action = make_unique<Action>(ActionType::MoveAwayFromObject);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionMoveAwayFromObject: caller is invalid");
+        debug("Script: actionMoveAwayFromObject: fleeFrom is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    int inventorySlot = getInt(args, 1);
+    bool instant = getBool(args, 2, false);
+
+    if (item) {
         auto action = make_unique<Action>(ActionType::EquipItem);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionEquipItem: caller is invalid");
+        debug("Script: actionEquipItem: item is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    bool instant = getBool(args, 1, false);
+
+    if (item) {
         auto action = make_unique<Action>(ActionType::UnequipItem);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUnequipItem: caller is invalid");
+        debug("Script: actionUnequipItem: item is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    if (item) {
         auto action = make_unique<Action>(ActionType::PickUpItem);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionPickUpItem: caller is invalid");
+        debug("Script: actionPickUpItem: item is invalid");
     }
     return Variable();
 }
 
 Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    if (item) {
         auto action = make_unique<Action>(ActionType::DropItem);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionPutDownItem: caller is invalid");
+        debug("Script: actionPutDownItem: item is invalid");
     }
     return Variable();
 }
 
 Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
     auto caller = getCallerAsCreature(ctx);
-    if (!caller) {
-        debug("Script: actionAttack: caller is invalid");
-        return Variable();
-    }
     auto attackee = getSpatialObject(args, 0);
-    if (!attackee) {
+    bool passive = getBool(args, 1, false);
+
+    if (caller && attackee) {
+        auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
+        caller->actionQueue().add(move(action));
+    } else if (!caller) {
+        debug("Script: actionAttack: caller is invalid");
+    } else if (!attackee) {
         debug("Script: actionAttack: attackee is invalid");
-        return Variable();
     }
-    auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
-    caller->actionQueue().add(move(action));
 
     return Variable();
 }
 
 Variable Routines::actionSpeakString(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::SpeakString);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionSpeakString: caller is invalid");
-    }
+    // TODO: pass all arguments to an action
+    string toSpeak(getString(args, 0));
+    auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
+
+    auto action = make_unique<Action>(ActionType::SpeakString);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto animation = getEnum<AnimationType>(args, 0, AnimationType::Invalid);
-        float speed = getFloat(args, 1, 1.0f);
-        float duration = getFloat(args, 2, 0.0f);
+    auto animation = getEnum<AnimationType>(args, 0);
+    float speed = getFloat(args, 1, 1.0f);
+    float duration = getFloat(args, 2, 0.0f);
 
-        auto action = make_unique<PlayAnimationAction>(animation, speed, duration);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionPlayAnimation: caller is invalid");
-    }
+    auto action = make_unique<PlayAnimationAction>(animation, speed, duration);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::CastSpellAtObject);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionCastSpellAtObject: caller is invalid");
-    }
+    // TODO: pass all arguments to an action
+    auto spell = getEnum<ForcePower>(args, 0);
+    auto target = getObject(args, 1);
+    int metaMagic = getInt(args, 2, 0);
+    bool cheat = getBool(args, 3, false);
+    int domainLevel = getInt(args, 4, 0);
+    auto projectilePathType = getEnum(args, 5, ProjectilePathType::Default);
+    bool instantSpell = getBool(args, 6, false);
+
+    auto action = make_unique<Action>(ActionType::CastSpellAtObject);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    auto giveTo = getObject(args, 1);
+
+    if (item && giveTo) {
         auto action = make_unique<Action>(ActionType::GiveItem);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionGiveItem: caller is invalid");
+        getCaller(ctx)->actionQueue().add(move(action));
+    } else if (!item) {
+        debug("Script: actionGiveItem: item is invalid");
+    } else if (!giveTo) {
+        debug("Script: actionGiveItem: giveTo is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto item = getItem(args, 0);
+    auto takeFrom = getObject(args, 1);
+
+    if (item && takeFrom) {
         auto action = make_unique<Action>(ActionType::TakeItem);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionTakeItem: caller is invalid");
+        getCaller(ctx)->actionQueue().add(move(action));
+    } else if (!item) {
+        debug("Script: actionTakeItem: item is invalid");
+    } else if (!takeFrom) {
+        debug("Script: actionTakeItem: takeFrom is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto follow = getObject(args, 0);
+    float followDistance = getFloat(args, 1, 0.0f);
+
+    if (follow) {
         auto action = make_unique<Action>(ActionType::ForceFollowObject);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionForceFollowObject: caller is invalid");
+        debug("Script: actionForceFollowObject: follow is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionWait(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCaller(ctx);
-    if (caller) {
-        float seconds = getFloat(args, 0);
-        auto action = make_unique<WaitAction>(seconds);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionWait: caller is invalid");
-    }
+    float seconds = getFloat(args, 0);
+
+    auto action = make_unique<WaitAction>(seconds);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionCastSpellAtLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto spell = getEnum<ForcePower>(args, 0);
+    auto targetLocation = getLocationEngineType(args, 1);
+    int metaMagic = getInt(args, 2, 0);
+    bool cheat = getBool(args, 3, false);
+    auto projectilePathType = getEnum(args, 4, ProjectilePathType::Default);
+    bool instantSpell = getBool(args, 5, false);
+
+    if (targetLocation) {
         auto action = make_unique<Action>(ActionType::CastSpellAtLocation);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionCastSpellAtLocation: caller is invalid");
+        debug("Script: actionCastSpellAtLocation: targetLocation is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionSpeakStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::SpeakStringByStrRef);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionSpeakStringByStrRef: caller is invalid");
-    }
+    // TODO: pass all arguments to an action
+    int strRef = getInt(args, 0);
+    auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
+
+    auto action = make_unique<Action>(ActionType::SpeakStringByStrRef);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto feat = getEnum<Feat>(args, 0);
+    auto target = getObject(args, 1);
+
+    if (target) {
         auto action = make_unique<Action>(ActionType::UseFeat);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseFeat: caller is invalid");
+        debug("Script: actionUseFeat: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto skill = getEnum<Skill>(args, 0);
+    auto target = getObject(args, 1);
+    int subSkill = getInt(args, 2, 0);
+    auto itemUsed = getObject(args, 3);
+
+    if (target) {
         auto action = make_unique<Action>(ActionType::UseSkill);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseSkill: caller is invalid");
+        debug("Script: actionUseSkill: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto chosenTalen = getTalent(args, 0);
+    auto target = getObject(args, 1);
+
+    if (target) {
         auto action = make_unique<Action>(ActionType::UseTalentOnObject);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseSkill: caller is invalid");
+        debug("Script: actionUseTalentOnObject: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionUseTalentAtLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
+    // TODO: pass all arguments to an action
+    auto chosenTalen = getTalent(args, 0);
+    auto targetLocation = getLocationEngineType(args, 1);
+
+    if (targetLocation) {
         auto action = make_unique<Action>(ActionType::UseTalentAtLocation);
-        caller->actionQueue().add(move(action));
+        getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseTalentAtLocation: caller is invalid");
+        debug("Script: actionUseTalentAtLocation: targetLocation is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::actionInteractObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::InteractObject);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionInteractObject: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::InteractObject);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionMoveAwayFromLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::MoveAwayFromLocation);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionMoveAwayFromLocation: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::MoveAwayFromLocation);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionSurrenderToEnemies(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::SurrenderToEnemies);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionSurrenderToEnemies: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::SurrenderToEnemies);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionEquipMostDamagingMelee(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::EquipMostDamagingMelee);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionEquipMostDamagingMelee: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::EquipMostDamagingMelee);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionEquipMostDamagingRanged(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::EquipMostDamagingRanged);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionEquipMostDamagingRanged: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::EquipMostDamagingRanged);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionEquipMostEffectiveArmor(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::EquipMostEffectiveArmor);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionEquipMostEffectiveArmor: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::EquipMostEffectiveArmor);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionUnlockObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::UnlockObject);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionUnlockObject: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::UnlockObject);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionLockObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::LockObject);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionLockObject: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::LockObject);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionCastFakeSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::CastFakeSpellAtObject);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionCastFakeSpellAtObject: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::CastFakeSpellAtObject);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionCastFakeSpellAtLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::CastFakeSpellAtLocation);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionCastFakeSpellAtLocation: caller is invalid");
-    }
+    // TODO: extract and pass all arguments to an action
+    auto action = make_unique<Action>(ActionType::CastFakeSpellAtLocation);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionBarkString(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::BarkString);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionBarkString: caller is invalid");
-    }
+    // TODO: pass all arguments to an action
+    int strRef = getInt(args, 0);
+
+    auto action = make_unique<Action>(ActionType::BarkString);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionFollowLeader(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::FollowLeader);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionFollowLeader: caller is invalid");
-    }
+    auto action = make_unique<Action>(ActionType::FollowLeader);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
 }
 
 Variable Routines::actionFollowOwner(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::FollowOwner);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionFollowOwner: caller is invalid");
-    }
+    // TODO: pass all arguments to an action
+    float range = getFloat(args, 0, 2.5f);
+
+    auto action = make_unique<Action>(ActionType::FollowOwner);
+    getCaller(ctx)->actionQueue().add(move(action));
+
     return Variable();
 }
 
 Variable Routines::actionSwitchWeapons(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: handle arguments
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        auto action = make_unique<Action>(ActionType::SwitchWeapons);
-        caller->actionQueue().add(move(action));
-    } else {
-        debug("Script: actionSwitchWeapons: caller is invalid");
-    }
+    auto action = make_unique<Action>(ActionType::SwitchWeapons);
+    getCaller(ctx)->actionQueue().add(move(action));
     return Variable();
+}
+
+Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getObjectOrCaller(args, 0, ctx);
+    shared_ptr<Action> action(object->actionQueue().getCurrentAction());
+    return Variable::ofInt(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
 }
 
 } // namespace game

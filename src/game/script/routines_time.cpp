@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of time-related routines.
+ */
+
 #include "routines.h"
 
 #include "../game.h"
@@ -30,25 +34,25 @@ namespace game {
 Variable Routines::getIsDawn(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return Variable::ofInt(time.hour == module->info().dawnHour ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(time.hour == module->info().dawnHour));
 }
 
 Variable Routines::getIsDay(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return Variable::ofInt(time.hour > module->info().dawnHour && time.hour < module->info().duskHour ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(time.hour > module->info().dawnHour && time.hour < module->info().duskHour));
 }
 
 Variable Routines::getIsDusk(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return Variable::ofInt(time.hour == module->info().duskHour ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(time.hour == module->info().duskHour));
 }
 
 Variable Routines::getIsNight(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(_game->module());
     const Module::Time &time = module->time();
-    return Variable::ofInt(time.hour < module->info().dawnHour || time.hour > module->info().duskHour ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(time.hour < module->info().dawnHour || time.hour > module->info().duskHour));
 }
 
 Variable Routines::getTimeHour(const VariablesList &args, ExecutionContext &ctx) {

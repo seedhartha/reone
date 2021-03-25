@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to object management.
+ */
+
 #include "routines.h"
 
 #include <boost/algorithm/string.hpp>
@@ -49,33 +53,37 @@ Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<bool>(getObject(args, 0)) ? 1 : 0);
+    auto object = getObject(args, 0);
+    return Variable::ofInt(static_cast<int>(static_cast<bool>(object)));
 }
 
 Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
-    string tag(getString(args, 0));
-    boost::to_lower(tag);
-
-    // Apparently, empty string in this context stands for the player
-    if (tag.empty()) {
-        return Variable::ofObject(_game->party().player());
-    }
+    shared_ptr<Object> result;
+    string tag(boost::to_lower_copy(getString(args, 0)));
     int nth = getInt(args, 1, 0);
 
-    return Variable::ofObject(_game->module()->area()->getObjectByTag(tag, nth));
+    if (!tag.empty()) {
+        result = _game->module()->area()->getObjectByTag(tag, nth);
+    } else {
+        // Apparently, empty tag in this context stands for the player
+        result = _game->party().player();
+    }
+
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
-    string tag(getString(args, 0));
-    boost::to_lower(tag);
+    shared_ptr<SpatialObject> result;
+    string tag(boost::to_lower_copy(getString(args, 0)));
 
     for (auto &waypoint : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
-            return Variable::ofObject(waypoint);
+            result = waypoint;
+            break;
         }
     }
 
-    return Variable::ofObject(shared_ptr<ScriptObject>());
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
@@ -84,22 +92,28 @@ Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
 
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getDoor(args, 0);
+    bool locked = getBool(args, 1);
+
     if (target) {
-        bool locked = getBool(args, 1);
         target->setLocked(locked);
     } else {
         debug("Script: setLocked: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
     auto target = getDoor(args, 0);
-    if (!target) {
+    if (target) {
+        result = target->isLocked();
+    } else {
         debug("Script: getLocked: target is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(target->isLocked() ? 1 : 0);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
@@ -107,42 +121,48 @@ Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
+    string result;
+
     auto object = getObject(args, 0);
-    if (!object) {
+    if (object) {
+        result = object->tag();
+    } else {
         debug("Script: getTag: object is invalid");
-        return Variable::ofString("");
     }
-    return Variable::ofString(object->tag());
+
+    return Variable::ofString(move(result));
 }
 
 Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionContext &ctx) {
+    float result = -1.0f;
     auto caller = getCallerAsSpatial(ctx);
-    if (!caller) {
-        debug("Script: getDistanceToObject: caller is invalid");
-        return Variable::ofFloat(-1.0f);
-    }
     auto object = getSpatialObject(args, 0);
-    if (!object) {
+
+    if (caller && object) {
+        result = caller->getDistanceTo(*object);
+    } else if (!caller) {
+        debug("Script: getDistanceToObject: caller is invalid");
+    } else if (!object) {
         debug("Script: getDistanceToObject: object is invalid");
-        return Variable::ofFloat(-1.0f);
     }
 
-    return Variable::ofFloat(caller->getDistanceTo(*object));
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
+    float result = -1.0f;
     auto caller = getCallerAsSpatial(ctx);
-    if (!caller) {
-        debug("Script: getDistanceToObject2D: caller is invalid");
-        return Variable::ofFloat(-1.0f);
-    }
     auto object = getSpatialObject(args, 0);
-    if (!object) {
+
+    if (caller && object) {
+        result = caller->getDistanceTo(glm::vec2(object->position()));
+    } else if (!caller) {
+        debug("Script: getDistanceToObject2D: caller is invalid");
+    } else if (!object) {
         debug("Script: getDistanceToObject2D: object is invalid");
-        return Variable::ofFloat(-1.0f);
     }
 
-    return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
@@ -150,21 +170,30 @@ Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
+    float result = -1.0f;
+
     auto target = getSpatialObject(args, 0);
-    if (!target) {
+    if (target) {
+        result = glm::degrees(target->facing());
+    } else {
         debug("Script: getFacing: target is invalid");
-        return Variable::ofFloat(-1.0f);
     }
-    return Variable::ofFloat(glm::degrees(target->facing()));
+
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {
+    glm::vec3 result(0.0f);
+
     auto target = getSpatialObject(args, 0);
-    if (!target) {
+    if (target) {
+        result = target->position();
+    } else {
         debug("Script: getPosition: target is invalid");
         return Variable::ofVector(glm::vec3(0.0f));
     }
-    return Variable::ofVector(target->position());
+
+    return Variable::ofVector(move(result));
 }
 
 Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &ctx) {
@@ -188,69 +217,86 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     auto objectA = getSpatialObject(args, 0);
-    if (!objectA) {
-        debug("Script: getDistanceBetween: objectA is invalid");
-        return Variable::ofFloat(-1.0f);
-    }
     auto objectB = getSpatialObject(args, 1);
-    if (!objectB) {
+
+    if (objectA && objectB) {
+        result = objectA->getDistanceTo(*objectB);
+    } else if (!objectA) {
+        debug("Script: getDistanceBetween: objectA is invalid");
+    } else if (!objectB) {
         debug("Script: getDistanceBetween: objectB is invalid");
-        return Variable::ofFloat(-1.0f);
     }
 
-    return Variable::ofFloat(objectA->getDistanceTo(*objectB));
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     auto objectA = getSpatialObject(args, 0);
-    if (!objectA) {
-        debug("Script: getDistanceBetween2D: objectA is invalid");
-        return Variable::ofFloat(0.0f);
-    }
     auto objectB = getSpatialObject(args, 1);
-    if (!objectB) {
+
+    if (objectA && objectB) {
+        result = objectA->getDistanceTo(glm::vec2(objectB->position()));
+    } else if (!objectA) {
+        debug("Script: getDistanceBetween2D: objectA is invalid");
+    } else if (!objectB) {
         debug("Script: getDistanceBetween2D: objectB is invalid");
-        return Variable::ofFloat(0.0f);
     }
-    return Variable::ofFloat(objectA->getDistanceTo(glm::vec2(objectB->position())));
+
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
     auto creature = getCreature(args, 0);
-    if (!creature) {
+    if (creature) {
+        result = creature->isDead();
+    } else {
         debug("Script: getIsDead: creature is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(creature->isDead() ? 1 : 0);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
     auto creature = getCreatureOrCaller(args, 0, ctx);
-    if (!creature) {
+    if (creature) {
+        result = creature->isInCombat();
+    } else {
         debug("Script: getIsInCombat: creature is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(creature->isInCombat() ? 1 : 0);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
     auto object = getSpatialObject(args, 0);
-    if (!object) {
+    if (object) {
+        result = object->isOpen();
+    } else {
         debug("Script: getIsOpen: object is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(object->isOpen() ? 1 : 0);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
+    float direction = getFloat(args, 0);
+
     if (caller) {
-        float direction = getFloat(args, 0);
         caller->setFacing(glm::radians(direction));
     } else {
         debug("Script: setFacing: caller is invalid");
     }
+
     return Variable();
 }
 
@@ -266,92 +312,112 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
+    string result;
+
     auto object = getObject(args, 0);
-    if (!object) {
+    if (object) {
+        result = object->name();
+    } else {
         debug("Script: getName: object is invalid");
-        return Variable::ofString("");
     }
 
-    return Variable::ofString(object->name());
+    return Variable::ofString(move(result));
 }
 
 Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
+    auto result = ObjectType::Invalid;
+
     auto target = getObject(args, 0);
-    if (!target) {
+    if (target) {
+        result = target->type();
+    } else {
         debug("Script: getObjectType: target is invalid");
-        return Variable::ofInt(static_cast<int>(ObjectType::Invalid));
     }
-    return Variable::ofInt(static_cast<int>(target->type()));
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
+    int result = 0;
+
     auto target = getObjectOrCaller(args, 0, ctx);
-    if (!target) {
+    if (target) {
+        result = target->plotFlag();
+    } else {
         debug("Script: getPlotFlag: target is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(target->plotFlag());
+
+    return Variable::ofInt(result);
 }
 
 Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObject(args, 0);
+    int plotFlag = getInt(args, 1);
+
     if (target) {
-        int plotFlag = getInt(args, 1);
         target->setPlotFlag(plotFlag);
     } else {
         debug("Script: setPlotFlag: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::faceObjectAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
     auto facer = getSpatialObject(args, 0);
-    if (!facer) {
-        debug("Script: faceObjectAwayFromObject: facer is invalid");
-        return Variable();
-    }
     auto objectToFaceAwayFrom = getSpatialObject(args, 1);
-    if (!objectToFaceAwayFrom) {
+
+    if (facer && objectToFaceAwayFrom) {
+        facer->faceAwayFrom(*objectToFaceAwayFrom);
+    } else if (!facer) {
+        debug("Script: faceObjectAwayFromObject: facer is invalid");
+    } else if (!objectToFaceAwayFrom) {
         debug("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid");
-        return Variable();
     }
-    facer->faceAwayFrom(*objectToFaceAwayFrom);
 
     return Variable();
 }
 
 Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
     auto target = getObjectOrCaller(args, 0, ctx);
-    if (!target) {
+    if (target) {
+        result = target->isCommandable();
+    } else {
         debug("Script: getCommandable: target is invalid");
-        return Variable::ofInt(0);
     }
-    return Variable::ofInt(target->isCommandable() ? 1 : 0);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &ctx) {
+    bool commandable = getBool(args, 0);
     auto target = getObjectOrCaller(args, 1, ctx);
+
     if (target) {
-        bool commandable = getBool(args, 0);
         target->setCommandable(commandable);
     } else {
         debug("Script: setCommandable: target is invalid");
     }
+
     return Variable();
 }
 
 Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
+    auto animType = getEnum<AnimationType>(args, 0);
+    float speed = getFloat(args, 1, 1.0f);
+    float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
+
     if (caller) {
-        auto animType = getEnum<AnimationType>(args, 0, AnimationType::Invalid);
-        float speed = getFloat(args, 1, 1.0f);
-        float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
         AnimationProperties properties;
         properties.speed = speed;
         caller->playAnimation(animType, move(properties));
     } else {
         debug("Script: playAnimation: caller is invalid");
     }
+
     return Variable();
 }
 
@@ -360,7 +426,7 @@ Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->module()->area()->isUnescapable() ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(_game->module()->area()->isUnescapable()));
 }
 
 Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
@@ -371,26 +437,24 @@ Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContex
 
 Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
-    if (!caller) {
-        debug("Script: cutsceneAttack: caller is invalid");
-        return Variable();
-    }
     auto target = getSpatialObject(args, 0);
-    if (!target) {
-        debug("Script: cutsceneAttack: target is invalid");
-        return Variable();
-    }
     int animation = getInt(args, 1);
-    auto attackResult = getEnum<AttackResultType>(args, 2, AttackResultType::Invalid);
+    auto attackResult = getEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
 
-    _game->combat().cutsceneAttack(caller, target, animation, attackResult, damage);
+    if (caller && target) {
+        _game->combat().cutsceneAttack(caller, target, animation, attackResult, damage);
+    } else if (!caller) {
+        debug("Script: cutsceneAttack: caller is invalid");
+    } else if (!target) {
+        debug("Script: cutsceneAttack: target is invalid");
+    }
 
     return Variable();
 }
 
 Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::Invalid);
+    auto objectType = getEnum<ObjectType>(args, 0);
     string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
@@ -419,7 +483,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(target, criterias, nth - 1));
 
-    return Variable::ofObject(creature);
+    return Variable::ofObject(move(creature));
 }
 
 Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -443,11 +507,11 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreatureToLocation(*location, criterias, nth - 1));
 
-    return Variable::ofObject(creature);
+    return Variable::ofObject(move(creature));
 }
 
 Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::All);
+    auto objectType = getEnum(args, 0, ObjectType::All);
     auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
@@ -455,11 +519,11 @@ Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext 
         return object->type() == objectType;
     }));
 
-    return Variable::ofObject(object);
+    return Variable::ofObject(move(object));
 }
 
 Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectType = getEnum<ObjectType>(args, 0, ObjectType::Invalid);
+    auto objectType = getEnum<ObjectType>(args, 0);
     auto location = getLocationEngineType(args, 1);
     int nth = getInt(args, 2, 1);
 
@@ -467,7 +531,7 @@ Variable Routines::getNearestObjectToLocation(const VariablesList &args, Executi
         return object->type() == objectType;
     }));
 
-    return Variable::ofObject(object);
+    return Variable::ofObject(move(object));
 }
 
 Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -479,22 +543,7 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
         return object->tag() == tag;
     }));
 
-    return Variable::ofObject(object);
-}
-
-Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
-
-    auto object = getObjectOrCaller(args, 0, ctx);
-    if (object) {
-        shared_ptr<Action> action(object->actionQueue().getCurrentAction());
-        result.intValue = static_cast<int>(action ? action->type() : ActionType::QueueEmpty);
-    } else {
-        debug("Script: getCurrentAction: object is invalid");
-    }
-
-    return move(result);
+    return Variable::ofObject(move(object));
 }
 
 } // namespace game

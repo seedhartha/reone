@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of combat-related routines.
+ */
+
 #include "routines.h"
 
 #include "../../common/log.h"
@@ -32,23 +36,23 @@ namespace reone {
 namespace game {
 
 Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    auto result = NPCAIStyle::DefaultAttack;
 
     auto creature = getCreature(args, 0);
     if (creature) {
-        result.intValue = static_cast<int>(creature->aiStyle());
+        result = creature->aiStyle();
     } else {
         debug("Script: getNPCAIStyle: creature is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
     auto creature = getCreature(args, 0);
+    auto style = getEnum<NPCAIStyle>(args, 1);
+
     if (creature) {
-        auto style = getEnum(args, 1, NPCAIStyle::DefaultAttack);
         creature->setAIStyle(style);
     } else {
         debug("Script: setNPCAIStyle: creature is invalid");
@@ -58,127 +62,110 @@ Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result.object = creature->combat().attackTarget;
+        result = creature->combat().attackTarget;
     } else {
         debug("Script: getAttackTarget: creature is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getAttemptedAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.object = caller->combat().attemptedAttackTarget;
+        result = caller->combat().attemptedAttackTarget;
     } else {
         debug("Script: getAttemptedAttackTarget: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result.object = creature->combat().spellTarget;
+        result = creature->combat().spellTarget;
     } else {
         debug("Script: getSpellTarget: creature is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.object = caller->combat().attemptedSpellTarget;
+        result = caller->combat().attemptedSpellTarget;
     } else {
         debug("Script: getAttemptedSpellTarget: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = false;
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result.intValue = creature->combat().debilitated ? 1 : 0;
+        result = creature->combat().debilitated;
     } else {
         debug("Script: getIsDebilitated: creature is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto attacker = getCreatureOrCaller(args, 0, ctx);
     if (attacker) {
-        result.object = attacker->combat().lastHostileTarget;
+        result = attacker->combat().lastHostileTarget;
     } else {
-        debug("Script: getLastHostileTarget: attacker is invalid");
+        debug("Script: getIsDebilitated: attacker is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(result);
 }
 
 Variable Routines::getLastAttackAction(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
-
-    auto attacker = getCreatureOrCaller(args, 0, ctx);
-    if (attacker) {
-        result.intValue = attacker->combat().debilitated ? 1 : 0;
-    } else {
-        debug("Script: getLastAttackAction: attacker is invalid");
-    }
-
-    return move(result);
+    // TODO: implement
+    auto attacker = getObjectOrCaller(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(ActionType::QueueEmpty));
 }
 
 Variable Routines::getPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: why is this object necessary?
     auto object = getCreatureOrCaller(args, 0, ctx);
-
-    return Variable::ofInt(_game->module()->player().isRestrictMode() ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(_game->module()->player().isRestrictMode()));
 }
 
 Variable Routines::setPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
     bool restrict = getBool(args, 0);
     _game->module()->player().setRestrictMode(restrict);
-
     return Variable();
 }
 
 Variable Routines::getUserActionsPending(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = 0;
 
     shared_ptr<Creature> leader(_game->party().getLeader());
     if (leader) {
-        result.intValue = leader->actionQueue().containsUserActions() ? 1 : 0;
+        result = leader->actionQueue().containsUserActions();
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 } // namespace game

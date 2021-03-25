@@ -104,8 +104,7 @@ int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links
 }
 
 bool Conversation::evaluateCondition(const string &scriptResRef) {
-    int result = _game->scriptRunner().run(scriptResRef, _owner->id());
-    return result == -1 || result == 1;
+    return _game->scriptRunner().run(scriptResRef, _owner->id()) != 0;
 }
 
 void Conversation::finish() {

@@ -18,11 +18,13 @@
 #pragma once
 
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
 
+#include "../../common/collectionutil.h"
 #include "../../resource/types.h"
 #include "../../script/routine.h"
 #include "../../script/types.h"
@@ -44,6 +46,7 @@ class Location;
 class Object;
 class Sound;
 class SpatialObject;
+class Talent;
 
 class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
@@ -104,12 +107,21 @@ private:
     std::shared_ptr<Effect> getEffect(const VariablesList &args, int index) const;
     std::shared_ptr<Event> getEvent(const VariablesList &args, int index) const;
     std::shared_ptr<Location> getLocationEngineType(const VariablesList &args, int index) const;
+    std::shared_ptr<Talent> getTalent(const VariablesList &args, int index) const;
+
+    template <class T>
+    inline T getEnum(const VariablesList &args, int index) const {
+        if (isOutOfRange(args, index)) {
+            throw std::out_of_range("index is out of range");
+        }
+        return static_cast<T>(args[index].intValue);
+    }
 
     template <class T>
     inline T getEnum(const VariablesList &args, int index, T defValue) const {
-        if (index < 0 || index >= static_cast<int>(args.size())) return std::move(defValue);
-
-        return static_cast<T>(args[index].intValue);
+        return isOutOfRange(args, index) ?
+            std::move(defValue) :
+            static_cast<T>(args[index].intValue);
     }
 
     // END Helper functions

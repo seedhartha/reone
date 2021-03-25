@@ -17,10 +17,14 @@
 
 #include "routines.h"
 
-#include "../../common/log.h"
-
+#include "../enginetype/effect.h"
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"
+#include "../enginetype/talent.h"
+#include "../object/creature.h"
+#include "../object/door.h"
+#include "../object/item.h"
+#include "../object/sound.h"
 
 #include "../game.h"
 #include "../gameidutil.h"
@@ -66,28 +70,25 @@ const Routine &Routines::get(int index) {
 }
 
 bool Routines::getBool(const VariablesList &args, int index, bool defValue) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? (args[index].intValue != 0) : defValue;
+    return isOutOfRange(args, index) ?
+        defValue :
+        static_cast<bool>(args[index].intValue);
 }
 
 int Routines::getInt(const VariablesList &args, int index, int defValue) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? args[index].intValue : defValue;
+    return isOutOfRange(args, index) ? defValue : args[index].intValue;
 }
 
 float Routines::getFloat(const VariablesList &args, int index, float defValue) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? args[index].floatValue : defValue;
+    return isOutOfRange(args, index) ? defValue : args[index].floatValue;
 }
 
 string Routines::getString(const VariablesList &args, int index, string defValue) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? args[index].strValue : move(defValue);
+    return isOutOfRange(args, index) ? move(defValue) : args[index].strValue;
 }
 
 glm::vec3 Routines::getVector(const VariablesList &args, int index, glm::vec3 defValue) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? args[index].vecValue : move(defValue);
+    return isOutOfRange(args, index) ? move(defValue) : args[index].vecValue;
 }
 
 shared_ptr<Object> Routines::getCaller(ExecutionContext &ctx) const {
@@ -107,71 +108,59 @@ shared_ptr<Object> Routines::getTriggerrer(ExecutionContext &ctx) const {
 }
 
 shared_ptr<Object> Routines::getObject(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? static_pointer_cast<Object>(args[index].object) : nullptr;
+    return static_pointer_cast<Object>(isOutOfRange(args, index) ? nullptr : args[index].object);
 }
 
 shared_ptr<Object> Routines::getObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    int argCount = static_cast<int>(args.size());
-    return static_pointer_cast<Object>(index < argCount ? args[index].object : ctx.caller);
+    return static_pointer_cast<Object>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
 }
 
 shared_ptr<SpatialObject> Routines::getSpatialObject(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<SpatialObject>(args[index].object) : nullptr;
+    return dynamic_pointer_cast<SpatialObject>(isOutOfRange(args, index) ? nullptr : args[index].object);
 }
 
 shared_ptr<SpatialObject> Routines::getSpatialObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    int argCount = static_cast<int>(args.size());
-    return dynamic_pointer_cast<SpatialObject>(index < argCount ? args[index].object : ctx.caller);
+    return dynamic_pointer_cast<SpatialObject>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
 }
 
 shared_ptr<Creature> Routines::getCreature(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Creature>(args[index].object) : nullptr;
+    return dynamic_pointer_cast<Creature>(isOutOfRange(args, index) ? nullptr : args[index].object);
 }
 
 shared_ptr<Creature> Routines::getCreatureOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    int argCount = static_cast<int>(args.size());
-    return dynamic_pointer_cast<Creature>(index < argCount ? args[index].object : ctx.caller);
+    return dynamic_pointer_cast<Creature>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
 }
 
 shared_ptr<Door> Routines::getDoor(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Door>(args[index].object) : nullptr;
-}
-
-shared_ptr<Sound> Routines::getSound(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Sound>(args[index].object) : nullptr;
-}
-
-shared_ptr<Location> Routines::getLocationEngineType(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Location>(args[index].engineType) : nullptr;
-}
-
-shared_ptr<Event> Routines::getEvent(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Event>(args[index].engineType) : nullptr;
-}
-
-shared_ptr<ExecutionContext> Routines::getAction(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    if (index >= argCount) {
-        throw out_of_range("index is out of range");
-    }
-    return args[index].context;
+    return dynamic_pointer_cast<Door>(isOutOfRange(args, index) ? nullptr : args[index].object);
 }
 
 shared_ptr<Item> Routines::getItem(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Item>(args[index].object) : nullptr;
+    return dynamic_pointer_cast<Item>(isOutOfRange(args, index) ? nullptr : args[index].object);
+}
+
+shared_ptr<Sound> Routines::getSound(const VariablesList &args, int index) const {
+    return dynamic_pointer_cast<Sound>(isOutOfRange(args, index) ? nullptr : args[index].object);
 }
 
 shared_ptr<Effect> Routines::getEffect(const VariablesList &args, int index) const {
-    int argCount = static_cast<int>(args.size());
-    return index < argCount ? dynamic_pointer_cast<Effect>(args[index].engineType) : nullptr;
+    return dynamic_pointer_cast<Effect>(isOutOfRange(args, index) ? nullptr : args[index].engineType);
+}
+
+shared_ptr<Event> Routines::getEvent(const VariablesList &args, int index) const {
+    return dynamic_pointer_cast<Event>(isOutOfRange(args, index) ? nullptr : args[index].engineType);
+}
+
+shared_ptr<Location> Routines::getLocationEngineType(const VariablesList &args, int index) const {
+    return dynamic_pointer_cast<Location>(isOutOfRange(args, index) ? nullptr : args[index].engineType);
+}
+
+shared_ptr<Talent> Routines::getTalent(const VariablesList &args, int index) const {
+    return dynamic_pointer_cast<Talent>(isOutOfRange(args, index) ? nullptr : args[index].engineType);
+}
+
+shared_ptr<ExecutionContext> Routines::getAction(const VariablesList &args, int index) const {
+    return args[index].context;
 }
 
 } // namespace game

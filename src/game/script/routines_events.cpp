@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to the Event engine type.
+ */
+
 #include "routines.h"
 
 #include "../../common/log.h"
@@ -38,17 +42,17 @@ Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext 
 
 Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0);
-    if (object) {
-        auto toRun = getEvent(args, 1);
-        if (toRun) {
-            debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
-            _game->scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
-        } else {
-            debug("Script: signalEvent: toRun is invalid");
-        }
-    } else {
+    auto toRun = getEvent(args, 1);
+
+    if (object && toRun) {
+        debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
+        _game->scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+    } else if (!object) {
         debug("Script: signalEvent: object is invalid");
+    } else if (!toRun) {
+        debug("Script: signalEvent: toRun is invalid");
     }
+
     return Variable();
 }
 

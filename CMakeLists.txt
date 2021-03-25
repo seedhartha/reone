@@ -438,6 +438,7 @@ set(GAME_HEADERS
     src/game/enginetype/effect.h
     src/game/enginetype/event.h
     src/game/enginetype/location.h
+    src/game/enginetype/talent.h
     src/game/game.h
     src/game/gameidutil.h
     src/game/gui/barkbubble.h
@@ -624,16 +625,19 @@ set(GAME_SOURCES
     src/game/script/routines_actions.cpp
     src/game/script/routines_combat.cpp
     src/game/script/routines_common.cpp
+    src/game/script/routines_d20.cpp
     src/game/script/routines_effects.cpp
-    src/game/script/routines_enginetypes.cpp
     src/game/script/routines_events.cpp
+    src/game/script/routines_faction.cpp
     src/game/script/routines_items.cpp
     src/game/script/routines_kotor.cpp
-    src/game/script/routines_objects.cpp
+    src/game/script/routines_locations.cpp
     src/game/script/routines_math.cpp
-    src/game/script/routines_rp.cpp
+    src/game/script/routines_objects.cpp
     src/game/script/routines_party.cpp
     src/game/script/routines_perception.cpp
+    src/game/script/routines_stealth.cpp
+    src/game/script/routines_strings.cpp
     src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp

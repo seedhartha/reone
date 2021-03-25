@@ -24,8 +24,13 @@
 
 namespace reone {
 
+template <class T>
+inline bool isOutOfRange(const std::vector<T> &arr, int index) {
+    return index < 0 || index >= static_cast<int>(arr.size());
+}
+
 template <class Src, class Dest>
-std::vector<Dest> transform(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
+inline std::vector<Dest> transform(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
     std::vector<Dest> result;
     for (auto &item : source) {
         result.push_back(fn(item));
@@ -34,7 +39,7 @@ std::vector<Dest> transform(const std::vector<Src> &source, const std::function<
 }
 
 template <class Src, class Dest>
-std::map<Src, Dest> associate(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
+inline std::map<Src, Dest> associate(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
     std::map<Src, Dest> result;
     for (auto &item : source) {
         result.insert(make_pair(item, fn(item)));
@@ -43,13 +48,13 @@ std::map<Src, Dest> associate(const std::vector<Src> &source, const std::functio
 }
 
 template <class K, class V>
-V getFromLookupOrNull(const std::unordered_map<K, V> &lookup, K key) {
+inline V getFromLookupOrNull(const std::unordered_map<K, V> &lookup, K key) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : nullptr;
 }
 
 template <class K, class V>
-V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
+inline V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : defaultValue;
 }

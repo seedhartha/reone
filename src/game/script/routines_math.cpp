@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of math-related routines.
+ */
+
 #include "routines.h"
 
 #include "glm/glm.hpp"
@@ -33,59 +37,69 @@ Variable Routines::fabs(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::cos(const VariablesList &args, ExecutionContext &ctx) {
-    float value = getFloat(args, 0);
+    float value = glm::radians(getFloat(args, 0));
     return Variable::ofFloat(glm::cos(value));
 }
 
 Variable Routines::sin(const VariablesList &args, ExecutionContext &ctx) {
-    float value = getFloat(args, 0);
+    float value = glm::radians(getFloat(args, 0));
     return Variable::ofFloat(glm::sin(value));
 }
 
 Variable Routines::tan(const VariablesList &args, ExecutionContext &ctx) {
-    float value = getFloat(args, 0);
+    float value = glm::radians(getFloat(args, 0));
     return Variable::ofFloat(glm::tan(value));
 }
 
 Variable Routines::acos(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     float value = getFloat(args, 0);
-    if (value > 1 || value < -1) return Variable::ofFloat(0.0f);
-
-    return Variable::ofFloat(glm::acos(value));
+    if (glm::abs(value) <= 1.0f) {
+        result = glm::degrees(glm::acos(value));
+    }
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::asin(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     float value = getFloat(args, 0);
-    if (value > 1 || value < -1) return Variable::ofFloat(0.0f);
-
-    return Variable::ofFloat(glm::asin(value));
+    if (glm::abs(value) <= 1.0f) {
+        result = glm::degrees(glm::asin(value));
+    }
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::atan(const VariablesList &args, ExecutionContext &ctx) {
     float value = getFloat(args, 0);
-    return Variable::ofFloat(glm::atan(value));
+    return Variable::ofFloat(glm::degrees(glm::atan(value)));
 }
 
 Variable Routines::log(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     float value = getFloat(args, 0);
-    if (value <= 0.0f) return Variable::ofFloat(0.0f);
-
-    return Variable::ofFloat(glm::log(value));
+    if (value > 0.0f) {
+        result = glm::log(value);
+    }
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::pow(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     float value = getFloat(args, 0);
     float exponent = getFloat(args, 1);
-    if (value == 0.0f && exponent < 0.0f) return Variable::ofFloat(0.0f);
-
-    return Variable::ofFloat(glm::pow(value, exponent));
+    if (value != 0.0f || exponent >= 0.0f) {
+        result = glm::pow(value, exponent);
+    }
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::sqrt(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     float value = getFloat(args, 0);
-    if (value < 0.0f) return Variable::ofFloat(0.0f);
-
-    return Variable::ofFloat(glm::sqrt(value));
+    if (value >= 0.0f) {
+        result = glm::sqrt(value);
+    }
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::abs(const VariablesList &args, ExecutionContext &ctx) {
