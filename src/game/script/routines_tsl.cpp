@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  TSL routines registration.
+ */
+
 #include "routines.h"
 
 using namespace std;

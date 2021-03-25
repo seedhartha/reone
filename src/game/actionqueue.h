@@ -33,6 +33,7 @@ public:
     void clear();
 
     void add(std::unique_ptr<Action> action);
+    void addToTop(std::unique_ptr<Action> action);
     void delay(std::unique_ptr<Action> action, float seconds);
 
     void update(float dt);

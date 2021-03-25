@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of utility and miscellaneous routines.
+ */
+
 #include "routines.h"
 
 #include <boost/algorithm/string.hpp>
@@ -36,105 +40,6 @@ namespace reone {
 namespace game {
 
 static bool g_shipBuild = false;
-
-Variable Routines::d2(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 2);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d3(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 3);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d4(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 4);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d6(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 6);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d8(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 8);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d10(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 10);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d12(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 12);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d20(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 20);
-    }
-
-    return Variable::ofInt(result);
-}
-
-Variable Routines::d100(const VariablesList &args, ExecutionContext &ctx) {
-    int numDice = getInt(args, 0, 1);
-    int result = 0;
-
-    for (int i = 0; i < numDice; ++i) {
-        result += reone::random(1, 100);
-    }
-
-    return Variable::ofInt(result);
-}
 
 Variable Routines::feetToMeters(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofFloat(getFloat(args, 0) * 0.3048f);
@@ -185,65 +90,16 @@ Variable Routines::yardsToMeters(const VariablesList &args, ExecutionContext &ct
     return Variable::ofFloat(getFloat(args, 0) * 0.9144f);
 }
 
-Variable Routines::getStringLength(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(getString(args, 0).length()));
-}
-
-Variable Routines::getStringUpperCase(const VariablesList &args, ExecutionContext &ctx) {
-    string result(getString(args, 0));
-    boost::to_upper(result);
-    return Variable::ofString(move(result));
-}
-
-Variable Routines::getStringLowerCase(const VariablesList &args, ExecutionContext &ctx) {
-    string result(getString(args, 0));
-    boost::to_lower(result);
-    return Variable::ofString(move(result));
-}
-
-Variable Routines::getStringRight(const VariablesList &args, ExecutionContext &ctx) {
-    string str(getString(args, 0));
-    int count = getInt(args, 1);
-    return Variable::ofString(str.substr(str.length() - count, count));
-}
-
-Variable Routines::getStringLeft(const VariablesList &args, ExecutionContext &ctx) {
-    string str(getString(args, 0));
-    int count = getInt(args, 1);
-    return Variable::ofString(str.substr(0, count));
-}
-
-Variable Routines::insertString(const VariablesList &args, ExecutionContext &ctx) {
-    string dest(getString(args, 0));
-    string str(getString(args, 1));
-    int pos = getInt(args, 2);
-    return Variable::ofString(dest.insert(pos, str));
-}
-
-Variable Routines::getSubString(const VariablesList &args, ExecutionContext &ctx) {
-    string str(getString(args, 0));
-    int start = getInt(args, 1);
-    int count = getInt(args, 2);
-    return Variable::ofString(str.substr(start, count));
-}
-
-Variable Routines::findSubString(const VariablesList &args, ExecutionContext &ctx) {
-    string str(getString(args, 0));
-    string substr(getString(args, 1));
-    size_t pos = str.find(substr);
-    return Variable::ofInt(pos != string::npos ? static_cast<int>(pos) : -1);
-}
-
 Variable Routines::shipBuild(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(g_shipBuild ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(g_shipBuild));
 }
 
 Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ctx) {
+    string script(getString(args, 0));
     auto target = getObject(args, 1);
-    if (target) {
-        string script(getString(args, 0));
-        int scriptVar = getInt(args, 2, -1);
+    int scriptVar = getInt(args, 2, -1);
 
+    if (target) {
         _game->setRunScriptVar(scriptVar);
         _game->scriptRunner().run(script, target->id());
     } else {
@@ -257,12 +113,8 @@ Variable Routines::getRunScriptVar(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(_game->getRunScriptVar());
 }
 
-Variable Routines::random(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(reone::random(0, getInt(args, 0) - 1));
-}
-
 Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->isLoadFromSaveGame() ? 1 : 0);
+    return Variable::ofInt(static_cast<int>(_game->isLoadFromSaveGame()));
 }
 
 Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
@@ -271,11 +123,8 @@ Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &ctx) {
-    string moduleName(getString(args, 0));
-    boost::to_lower(moduleName);
-
-    string waypoint(getString(args, 1, ""));
-    boost::to_lower(waypoint);
+    string moduleName(boost::to_lower_copy(getString(args, 0)));
+    string waypoint(boost::to_lower_copy(getString(args, 1, "")));
 
     _game->scheduleModuleTransition(moduleName, waypoint);
 
@@ -283,11 +132,8 @@ Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::playMovie(const VariablesList &args, ExecutionContext &ctx) {
-    string movie(getString(args, 0));
-    boost::to_lower(movie);
-
+    string movie(boost::to_lower_copy(getString(args, 0)));
     _game->playVideo(movie);
-
     return Variable();
 }
 
@@ -298,13 +144,18 @@ Variable Routines::printString(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::printFloat(const VariablesList &args, ExecutionContext &ctx) {
-    float value(getFloat(args, 0));
+    // TODO: use formatting parameters
+    float value = getFloat(args, 0);
+    int width = getInt(args, 1, 18);
+    int decimals = getInt(args, 2, 9);
+
     info(to_string(value));
+
     return Variable();
 }
 
 Variable Routines::printInteger(const VariablesList &args, ExecutionContext &ctx) {
-    int value(getInt(args, 0));
+    int value = getInt(args, 0);
     info(to_string(value));
     return Variable();
 }
@@ -319,6 +170,10 @@ Variable Routines::printVector(const VariablesList &args, ExecutionContext &ctx)
     glm::vec3 value(getVector(args, 0));
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
     return Variable();
+}
+
+Variable Routines::random(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::ofInt(reone::random(0, getInt(args, 0) - 1));
 }
 
 } // namespace game

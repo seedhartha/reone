@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  KotOR routines registration.
+ */
+
 #include "routines.h"
 
 using namespace std;

@@ -15,7 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to the Location engine type.
+ */
+
 #include "routines.h"
+
+#include "glm/trigonometric.hpp"
 
 #include "../../common/log.h"
 
@@ -31,73 +37,84 @@ namespace reone {
 namespace game {
 
 Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+    float result = -1.0f;
+
     auto location = getLocationEngineType(args, 0);
-    if (!location) {
+    if (location) {
+        result = glm::degrees(location->facing());
+    } else {
         debug("Script: getFacingFromLocation: location is invalid");
-        return Variable::ofFloat(-1.0f);
     }
-    return Variable::ofFloat(location->facing());
+
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Location;
+    shared_ptr<Location> result;
 
     auto object = getSpatialObject(args, 0);
     if (object) {
         glm::vec3 position(object->position());
         float facing = object->facing();
-        result.engineType = make_shared<Location>(move(position), facing);
+        result = make_shared<Location>(move(position), facing);
     } else {
         debug("Script: getLocation: object is invalid");
     }
 
-    return move(result);
+    return Variable::ofLocation(move(result));
 }
 
 Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+    glm::vec3 result(0.0f);
+
     auto location = getLocationEngineType(args, 0);
-    if (!location) {
+    if (location) {
+        result = location->position();
+    } else {
         debug("Script: getPositionFromLocation: location is invalid");
-        return Variable::ofVector(glm::vec3(0.0f));
     }
-    return Variable::ofVector(location->position());
+
+    return Variable::ofVector(move(result));
 }
 
 Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
     glm::vec3 position(getVector(args, 0));
-    float orientation = getFloat(args, 1);
+    float orientation = glm::radians(getFloat(args, 1));
     auto location = make_shared<Location>(move(position), orientation);
 
     return Variable::ofLocation(location);
 }
 
 Variable Routines::getDistanceBetweenLocations(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
-    if (!locationA) {
-        debug("Script: getDistanceBetweenLocations: locationA is invalid");
-        return Variable::ofFloat(0.0f);
-    }
     auto locationB = getLocationEngineType(args, 1);
-    if (!locationB) {
+
+    if (locationA && locationB) {
+        result = glm::distance(locationA->position(), locationB->position());
+    } else if (!locationA) {
+        debug("Script: getDistanceBetweenLocations: locationA is invalid");
+    } else if (!locationB) {
         debug("Script: getDistanceBetweenLocations: locationB is invalid");
-        return Variable::ofFloat(0.0f);
     }
-    return Variable::ofFloat(glm::distance(locationA->position(), locationB->position()));
+
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, ExecutionContext &ctx) {
+    float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
-    if (!locationA) {
-        debug("Script: getDistanceBetweenLocations2D: locationA is invalid");
-        return Variable::ofFloat(0.0f);
-    }
     auto locationB = getLocationEngineType(args, 1);
-    if (!locationB) {
+
+    if (locationA && locationB) {
+        result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
+    } else if (!locationA) {
+        debug("Script: getDistanceBetweenLocations2D: locationA is invalid");
+    } else if (!locationB) {
         debug("Script: getDistanceBetweenLocations2D: locationB is invalid");
-        return Variable::ofFloat(0.0f);
     }
-    return Variable::ofFloat(glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position())));
+
+    return Variable::ofFloat(result);
 }
 
 Variable Routines::getStartingLocation(const VariablesList &args, ExecutionContext &ctx) {

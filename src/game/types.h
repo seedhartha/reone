@@ -954,6 +954,28 @@ enum class ActionType {
     QueueEmpty = 0xfffe
 };
 
+enum class TalkVolume {
+    Talk = 0,
+    Whisper = 1,
+    Shout = 2,
+    SilentTalk = 3,
+    SilentShout = 4
+};
+
+enum class ProjectilePathType {
+    Default = 0,
+    Homing = 1,
+    Ballistic = 2,
+    HighBallistic = 3,
+    Accelerating = 4
+};
+
+enum class SubSkill {
+    FlagTrap = 100,
+    RecoverTrap = 101,
+    ExamineTrap = 102
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;

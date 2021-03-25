@@ -35,6 +35,10 @@ void ActionQueue::add(unique_ptr<Action> action) {
     _actions.push_back(move(action));
 }
 
+void ActionQueue::addToTop(unique_ptr<Action> action) {
+    _actions.push_front(move(action));
+}
+
 void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = move(action);

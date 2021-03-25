@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to creature perception.
+ */
+
 #include "routines.h"
 
 #include "../../common/log.h"
@@ -31,115 +35,100 @@ namespace reone {
 namespace game {
 
 Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Object;
+    shared_ptr<SpatialObject> result;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.object = caller->perception().lastPerceived;
+        result = caller->perception().lastPerceived;
     } else {
         debug("Script: getLastPerceived: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofObject(move(result));
 }
 
 Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = false;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::Seen;
+        result = caller->perception().lastPerception == PerceptionType::Seen;
     } else {
         debug("Script: getLastPerceptionSeen: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getLastPerceptionVanished(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = false;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::NotSeen;
+        result = caller->perception().lastPerception == PerceptionType::NotSeen;
     } else {
         debug("Script: getLastPerceptionVanished: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = false;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::Heard;
+        result = caller->perception().lastPerception == PerceptionType::Heard;
     } else {
         debug("Script: getLastPerceptionHeard: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getLastPerceptionInaudible(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
+    bool result = false;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result.intValue = caller->perception().lastPerception == PerceptionType::NotHeard;
+        result = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
         debug("Script: getLastPerceptionInaudible: caller is invalid");
     }
 
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
-
+    bool result = false;
     auto target = getCreature(args, 0);
-    if (!target) {
-        debug("Script: getObjectSeen: target is invalid");
-    }
-
     auto source = getCreatureOrCaller(args, 1, ctx);
-    if (!source) {
+
+    if (target && source) {
+        result = source->perception().seen.count(target) > 0;
+    } else if (!target) {
+        debug("Script: getObjectSeen: target is invalid");
+    } else if (!source) {
         debug("Script: getObjectSeen: source is invalid");
     }
 
-    if (target && source) {
-        result.intValue = source->perception().seen.count(target) > 0 ? 1 : 0;
-    }
-
-    return move(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &ctx) {
-    Variable result;
-    result.type = VariableType::Int;
-
+    bool result = false;
     auto target = getCreature(args, 0);
-    if (!target) {
-        debug("Script: getObjectHeard: target is invalid");
-    }
-
     auto source = getCreatureOrCaller(args, 1, ctx);
-    if (!source) {
+
+    if (target && source) {
+        result = source->perception().heard.count(target) > 0;
+    } else if (!target) {
+        debug("Script: getObjectHeard: target is invalid");
+    } else if (!source) {
         debug("Script: getObjectHeard: source is invalid");
     }
 
-    if (target && source) {
-        result.intValue = source->perception().heard.count(target) > 0 ? 1 : 0;
-    }
-
-    return move(result);
+    return Variable::ofInt(static_cast<int>(move(result)));
 }
 
 } // namespace game

@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of routines related to the Effect object type.
+ */
+
 #include "routines.h"
 
 #include "../../common/log.h"
@@ -477,12 +481,16 @@ Variable Routines::effectDroidScramble(const VariablesList &args, ExecutionConte
 
 Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(ctx);
-    caller->clearAllEffects();
+    if (caller) {
+        caller->clearAllEffects();
+    } else {
+        debug("Script: clearAllEffects: caller is invalid");
+    }
     return Variable();
 }
 
 Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto durationType = getEnum<DurationType>(args, 0, DurationType::Instant);
+    auto durationType = getEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
     auto target = getSpatialObject(args, 2);
     float duration = getFloat(args, 3, 0.0f);
