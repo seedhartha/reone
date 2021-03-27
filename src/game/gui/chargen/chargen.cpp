@@ -23,10 +23,10 @@
 #include "../../../render/model/models.h"
 #include "../../../resource/resources.h"
 
+#include "../../d20/classes.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
 #include "../../portraitutil.h"
-#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 

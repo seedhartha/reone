@@ -25,7 +25,7 @@
 
 #include "../../resource/format/gffreader.h"
 
-#include "../rp/attributes.h"
+#include "../d20/attributes.h"
 
 #include "blueprint.h"
 

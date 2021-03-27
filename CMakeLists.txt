@@ -506,12 +506,12 @@ set(GAME_HEADERS
     src/game/portraitutil.h
     src/game/reputes.h
     src/game/room.h
-    src/game/rp/abilities.h
-    src/game/rp/attributes.h
-    src/game/rp/class.h
-    src/game/rp/classes.h
-    src/game/rp/savingthrows.h
-    src/game/rp/skills.h
+    src/game/d20/abilities.h
+    src/game/d20/attributes.h
+    src/game/d20/class.h
+    src/game/d20/classes.h
+    src/game/d20/savingthrows.h
+    src/game/d20/skills.h
     src/game/savedgame.h
     src/game/script/routines.h
     src/game/script/runner.h
@@ -615,11 +615,11 @@ set(GAME_SOURCES
     src/game/portraitutil.cpp
     src/game/reputes.cpp
     src/game/room.cpp
-    src/game/rp/abilities.cpp
-    src/game/rp/attributes.cpp
-    src/game/rp/class.cpp
-    src/game/rp/classes.cpp
-    src/game/rp/skills.cpp
+    src/game/d20/abilities.cpp
+    src/game/d20/attributes.cpp
+    src/game/d20/class.cpp
+    src/game/d20/classes.cpp
+    src/game/d20/skills.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

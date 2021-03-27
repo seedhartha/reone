@@ -19,8 +19,8 @@
 
 #include <boost/format.hpp>
 
+#include "../../d20/classes.h"
 #include "../../game.h"
-#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 

@@ -19,7 +19,7 @@
 
 #include "../gui.h"
 
-#include "../../rp/skills.h"
+#include "../../d20/skills.h"
 
 namespace reone {
 

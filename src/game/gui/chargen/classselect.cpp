@@ -22,10 +22,10 @@
 #include "../../../resource/strings.h"
 
 #include "../../characterutil.h"
+#include "../../d20/classes.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
 #include "../../object/creature.h"
-#include "../../rp/classes.h"
 
 #include "../colorutil.h"
 
