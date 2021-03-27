@@ -78,7 +78,7 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
             executeStartConversation(object, *static_pointer_cast<StartConversationAction>(action), dt);
             break;
         case ActionType::AttackObject:
-            executeAttack(object, *static_pointer_cast<AttackAction>(action), dt);
+            executeAttack(object, static_pointer_cast<AttackAction>(action), dt);
             break;
         case ActionType::OpenDoor:
             executeOpenDoor(object, *static_pointer_cast<ObjectAction>(action), dt);
@@ -185,15 +185,18 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
     }
 }
 
-void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, AttackAction &action, float dt) {
-    shared_ptr<SpatialObject> target(action.target());
+void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<AttackAction> action, float dt) {
+    shared_ptr<SpatialObject> target(action->target());
     if (target->isDead()) {
-        action.complete();
+        action->complete();
         return;
     }
-    auto creatureActor = static_pointer_cast<Creature>(actor);
-    if (navigateCreature(creatureActor, target->position(), true, action.range(), dt)) {
-        // TODO: start a combat round
+
+    auto creature = static_pointer_cast<Creature>(actor);
+    creature->setInCombat(true);
+
+    if (navigateCreature(creature, target->position(), true, action->range(), dt)) {
+        _game->combat().addAttack(creature, target, move(action));
     }
 }
 

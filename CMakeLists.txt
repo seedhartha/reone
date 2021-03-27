@@ -427,11 +427,7 @@ set(GAME_HEADERS
     src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
-    src/game/combat/attackresolver.h
-    src/game/combat/attackresult.h
-    src/game/combat/attackutil.h
     src/game/combat/combat.h
-    src/game/combat/damageresolver.h
     src/game/creaturefinder.h
     src/game/cursors.h
     src/game/dialog.h
@@ -543,9 +539,10 @@ set(GAME_SOURCES
     src/game/characterutil.cpp
     src/game/collisiondetect.cpp
     src/game/console.cpp
-    src/game/combat/attackresolver.cpp
     src/game/combat/combat.cpp
-    src/game/combat/damageresolver.cpp
+    src/game/combat/combat_attack.cpp
+    src/game/combat/combat_damage.cpp
+    src/game/combat/combat_projectiles.cpp
     src/game/creaturefinder.cpp
     src/game/cursors.cpp
     src/game/dialog.cpp

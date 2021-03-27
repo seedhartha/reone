@@ -15,28 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/** @file
+ *  Combat functions related to damage calculation.
+ */
 
-#include <memory>
-#include <vector>
+#include "combat.h"
+
+#include "../../common/random.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-class Creature;
-class DamageEffect;
-class SpatialObject;
+vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager) const {
+    shared_ptr<Item> item(damager->getEquippedItem(InventorySlot::rightWeapon));
+    int amount = 0;
+    DamageType type = DamageType::Bludgeoning;
 
-/**
- * Calculates damage effects based on damager abilities and equipment.
- *
- * https://strategywiki.org/wiki/Star_Wars:_Knights_of_the_Old_Republic/Combat
- */
-class DamageResolver {
-public:
-    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(const std::shared_ptr<Creature> &damager);
-};
+    if (item) {
+        for (int i = 0; i < item->numDice(); ++i) {
+            amount += random(1, item->dieToRoll());
+        }
+        type = static_cast<DamageType>(item->damageFlags());
+    }
+    amount = glm::max(1, amount);
+    shared_ptr<DamageEffect> effect(make_shared<DamageEffect>(amount, type, move(damager)));
+
+    return vector<shared_ptr<DamageEffect>> { effect };
+}
 
 } // namespace game
 

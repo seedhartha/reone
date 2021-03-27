@@ -184,11 +184,10 @@ void HUD::update(float dt) {
         }
     }
 
-    if (_game->combat().isActive()) {
+    if (party.getLeader()->isInCombat()) {
         showCombatHud();
         refreshActionQueueItems();
-    }
-    else {
+    } else {
         hideCombatHud();
     }
 

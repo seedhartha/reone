@@ -29,9 +29,6 @@
 #include "../object/creature.h"
 #include "../types.h"
 
-#include "attackresolver.h"
-#include "damageresolver.h"
-
 namespace reone {
 
 namespace game {
@@ -42,94 +39,87 @@ class Game;
 
 class Combat {
 public:
+    struct Attack {
+        std::shared_ptr<Creature> attacker;
+        std::shared_ptr<SpatialObject> target;
+        std::shared_ptr<Action> action; /**< action to complete on round end */
+        AttackResultType resultType { AttackResultType::Invalid };
+        int damage { -1 };
+    };
+
     Combat(Game *game);
 
-    void update(float dt);
-
     /**
-     * Initiates a combat round between the attacker and the target with a
-     * predefined animation, attack result and damage. If attacker is already
-     * participating in a combat round, said round if finished.
+     * Appends the attack to an existing combat round, or starts a new round,
+     * based on attacker and target.
+     *
+     * @param resultType result type of the attack, Invalid to calculate
+     * @param damage damage to inflict, -1 to calculate
      */
-    void cutsceneAttack(
-        const std::shared_ptr<Creature> &attacker,
-        const std::shared_ptr<SpatialObject> &target,
-        int animation,
-        AttackResultType result,
-        int damage);
+    void addAttack(
+        std::shared_ptr<Creature> attacker,
+        std::shared_ptr<SpatialObject> target,
+        std::shared_ptr<Action> action,
+        AttackResultType resultType = AttackResultType::Invalid,
+        int damage = -1);
 
-    bool isActive() const { return _active; }
+    void update(float dt);
 
 private:
     enum class RoundState {
         Started,
-        FirstTurn,
-        SecondTurn,
+        FirstAttack,
+        SecondAttack,
         Finished
     };
 
-    typedef std::vector<std::shared_ptr<Creature>> EnemiesList;
-
-    struct Combatant {
-        std::shared_ptr<Creature> creature;
-        EnemiesList enemies;
-        std::shared_ptr<SpatialObject> target;
-    };
-
-    typedef std::map<uint32_t, std::shared_ptr<Combatant>> CombatantMap;
-
+    /**
+     * Combat round consists of either one or two attacks. Second attack is only
+     * present when both combatants are creatures.
+     */
     struct Round {
-        std::shared_ptr<Combatant> attacker;
-        std::shared_ptr<SpatialObject> target;
+        std::unique_ptr<Attack> attack1;
+        std::unique_ptr<Attack> attack2;
+        bool duel { false };
+
         RoundState state { RoundState::Started };
         float time { 0.0f };
-        AttackResult attackResult;
-
-        bool cutscene { false }; /**< animation, attack result and damage are predefined */
-        int cutsceneAnimation { 0 };
-        AttackResultType cutsceneAttackResult { AttackResultType::Invalid };
-        int cutsceneDamage { -1 };
 
         std::shared_ptr<scene::ModelSceneNode> projectile;
         glm::vec3 projectileDir { 0.0f };
-
-        void advance(float dt);
     };
 
+    struct AttackAnimation {
+        CreatureWieldType attackerWieldType { CreatureWieldType::None };
+        CombatAnimation attackerAnimation { CombatAnimation::None };
+        CombatAnimation targetAnimation { CombatAnimation::None };
+        int animationVariant { 1 };
+    };
+
+    typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
+
     Game *_game;
-    bool _active { false };
-    AttackResolver _attackResolver;
-    DamageResolver _damageResolver;
 
-    Timer _heartbeatTimer { 0.0f };
-    CombatantMap _combatantById;
-    std::map<uint32_t, std::shared_ptr<Round>> _roundByAttackerId;
+    RoundMap _roundByAttacker;
 
-    void updateCombatants();
-    void updateCombatant(const std::shared_ptr<Creature> &creature);
-    void updateAI();
-    void updateCombatantAI(Combatant &combatant);
-    void updateRounds(float dt);
     void updateRound(Round &round, float dt);
-    void updateActivation();
-
-    void removeStaleCombatants();
-    std::shared_ptr<Combatant> addCombatant(const std::shared_ptr<Creature> &creature, EnemiesList enemies);
-    void addRound(const std::shared_ptr<Combatant> &attacker, const std::shared_ptr<SpatialObject> &target);
-    void addRound(const std::shared_ptr<Round> &round);
+    void startAttack(Attack &attack, bool duel);
+    void resetProjectile(Round &round);
     void finishRound(Round &round);
 
-    void onEnterCombatMode();
-    void onExitCombatMode();
+    // Attack
 
-    std::vector<std::shared_ptr<Creature>> getEnemies(const Creature &combatant, float range = kDetectionRange) const;
-    std::shared_ptr<Creature> getNearestEnemy(const Combatant &combatant) const;
+    AttackResultType determineAttackResult() const;
+    AttackAnimation determineAttackAnimation(const Attack &attack, bool duel) const;
+    void applyAttackResult(const Attack &attack);
 
-    // Attacks
+    // END Attack
 
-    void applyAttackResult(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, AttackResult result, int damage = -1);
+    // Damage
 
-    // END Attacks
+    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager) const;
+
+    // END Damage
 
     // Projectiles
 
