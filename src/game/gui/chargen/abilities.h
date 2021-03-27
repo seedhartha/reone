@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../rp/abilities.h"
+#include "../../d20/abilities.h"
 
 #include "../gui.h"
 

@@ -21,8 +21,8 @@
 #include "../resource/resources.h"
 
 #include "blueprint/creature.h"
+#include "d20/classes.h"
 #include "portrait.h"
-#include "rp/classes.h"
 
 using namespace std;
 

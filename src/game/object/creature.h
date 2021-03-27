@@ -29,7 +29,7 @@
 #include "../../script/types.h"
 
 #include "../blueprint/blueprint.h"
-#include "../rp/attributes.h"
+#include "../d20/attributes.h"
 
 #include "creatureanimresolver.h"
 #include "creaturemodelbuilder.h"

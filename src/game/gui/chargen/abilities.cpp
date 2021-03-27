@@ -26,7 +26,7 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 
-#include "../../rp/classes.h"
+#include "../../d20/classes.h"
 
 #include "../colorutil.h"
 
