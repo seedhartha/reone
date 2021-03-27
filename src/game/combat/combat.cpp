@@ -17,18 +17,10 @@
 
 #include "combat.h"
 
-#include <algorithm>
-#include <climits>
-
-#include "glm/common.hpp"
-#include "glm/gtx/euler_angles.hpp"
-
 #include "../../common/log.h"
 #include "../../common/random.h"
 
 #include "../game.h"
-#include "../objectconverter.h"
-#include "../reputes.h"
 
 using namespace std;
 
@@ -40,22 +32,7 @@ namespace reone {
 namespace game {
 
 static constexpr float kRoundDuration = 3.0f;
-static constexpr float kProjectileSpeed = 16.0f;
-
-static const char kModelEventDetonate[] = "detonate";
-
-static bool g_projectilesEnabled = true;
-
-static shared_ptr<AttackAction> getAttackAction(const shared_ptr<Creature> &combatant) {
-    shared_ptr<Action> action(combatant->actionQueue().getCurrentAction());
-    if (!action || action->type() != ActionType::AttackObject) return nullptr;
-
-    return static_pointer_cast<AttackAction>(action);
-}
-
-void Combat::Round::advance(float dt) {
-    time = glm::min(time + dt, kRoundDuration);
-}
+static constexpr float kProjectileDelay = 0.5f;
 
 Combat::Combat(Game *game) : _game(game) {
     if (!game) {
@@ -63,454 +40,143 @@ Combat::Combat(Game *game) : _game(game) {
     }
 }
 
-void Combat::update(float dt) {
-    // TODO: rewrite for k_ai_master
-    return;
-
-    if (_heartbeatTimer.advance(dt)) {
-        updateCombatants();
-        updateAI();
-        _heartbeatTimer.reset(kHeartbeatInterval);
-    }
-    updateRounds(dt);
-    updateActivation();
+static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {
+    auto attack = make_unique<Combat::Attack>();
+    attack->attacker = move(attacker);
+    attack->target = move(target);
+    attack->action = move(action);
+    attack->resultType = resultType;
+    attack->damage = damage;
+    return move(attack);
 }
 
-void Combat::updateCombatants() {
-    for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Creature)) {
-        auto creature = static_pointer_cast<Creature>(object);
-        bool needUpdate =
-            !creature->isDead() &&
-            (!_game->party().isMember(*creature) || !_game->isInConversation());
-
-        if (needUpdate) {
-            updateCombatant(creature);
-        }
-    }
-    removeStaleCombatants();
+static bool isRoundPastFirstAttack(float time) {
+    return time >= 0.5f * kRoundDuration;
 }
 
-void Combat::updateCombatant(const shared_ptr<Creature> &creature) {
-    vector<shared_ptr<Creature>> enemies(getEnemies(*creature));
+void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {
+    RoundMap::iterator maybeRound;
 
-    auto maybeCombatant = _combatantById.find(creature->id());
-    if (maybeCombatant != _combatantById.end()) {
-        maybeCombatant->second->enemies = move(enemies);
-        return;
-    }
+    // If attacker has already started a combat round, do nothing
+    maybeRound = _roundByAttacker.find(attacker->id());
+    if (maybeRound != _roundByAttacker.end()) return;
 
-    if (!enemies.empty()) {
-        addCombatant(creature, move(enemies));
-    }
-}
-
-vector<shared_ptr<Creature>> Combat::getEnemies(const Creature &combatant, float range) const {
-    vector<shared_ptr<Creature>> result;
-    shared_ptr<Area> area(_game->module()->area());
-
-    for (auto &object : area->getObjectsByType(ObjectType::Creature)) {
-        if (object.get() == &combatant ||
-            object->isDead() ||
-            object->getDistanceTo2(combatant) > range * range) continue;
-
-        auto creature = static_pointer_cast<Creature>(object);
-        if (!Reputes::instance().getIsEnemy(combatant, *creature)) continue;
-
-        glm::vec3 adjustedCombatantPos(combatant.position());
-        adjustedCombatantPos.z += 1.7f; // TODO: height based on appearance
-        glm::vec3 adjustedCreaturePos(creature->position());
-        adjustedCreaturePos.z += creature->getModelSceneNode()->aabb().center().z;
-        glm::vec3 combatantToCreature(adjustedCreaturePos - adjustedCombatantPos);
-
-        // Ensure that combatants line of sight is not blocked by room and door walkmeshes
-
-        RaycastProperties castProps;
-        castProps.flags = RaycastFlags::rooms;
-        castProps.origin = adjustedCombatantPos;
-        castProps.direction = glm::normalize(combatantToCreature);
-        castProps.objectTypes = { ObjectType::Door };
-        castProps.distance = glm::length(combatantToCreature);
-
-        RaycastResult castResult;
-
-        if (area->collisionDetector().raycast(castProps, castResult)) continue;
-
-
-        result.push_back(move(creature));
-    }
-
-    return move(result);
-}
-
-shared_ptr<Combat::Combatant> Combat::addCombatant(const shared_ptr<Creature> &creature, EnemiesList enemies) {
-    debug(boost::format("Combat: add combatant '%s' with %d enemies") % creature->tag() % enemies.size(), 2, DebugChannels::combat);
-
-    creature->setInCombat(true);
-
-    auto combatant = make_shared<Combatant>();
-    combatant->creature = creature;
-    combatant->enemies = move(enemies);
-
-    _combatantById.insert(make_pair(creature->id(), combatant));
-
-    return move(combatant);
-}
-
-void Combat::removeStaleCombatants() {
-    for (auto it = _combatantById.begin(); it != _combatantById.end(); ) {
-        shared_ptr<Combatant> combatantPtr(it->second);
-
-        // Combatant is considered stale if he is either dead or (has no enemies
-        // and is not participating in a combat round)
-        bool isStale = combatantPtr->creature->isDead();
-        if (!isStale) {
-            auto maybeRound = _roundByAttackerId.find(combatantPtr->creature->id());
-            if (maybeRound == _roundByAttackerId.end() && combatantPtr->enemies.empty()) {
-                isStale = true;
+    // If there is an incomplete combat round where attacker and target roles are reversed, append to that round
+    maybeRound = _roundByAttacker.find(target->id());
+    if (maybeRound != _roundByAttacker.end()) {
+        Round &round = *maybeRound->second;
+        if (round.attack1->target == attacker) {
+            if (!round.attack2 && !isRoundPastFirstAttack(round.time)) {
+                round.attack2 = makeAttack(attacker, target, action, resultType, damage);
+                round.duel = true;
+                debug(boost::format("Combat: append attack: %s -> %s") % attacker->tag() % target->tag(), 1, DebugChannels::combat);
             }
-        }
-        if (isStale) {
-            combatantPtr->creature->setInCombat(false);
-            it = _combatantById.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
-void Combat::updateAI() {
-    for (auto &pair : _combatantById) {
-        updateCombatantAI(*pair.second);
-    }
-}
-
-void Combat::updateCombatantAI(Combatant &combatant) {
-    shared_ptr<Creature> creature(combatant.creature);
-
-    shared_ptr<Creature> enemy(getNearestEnemy(combatant));
-    if (!enemy) return;
-
-    shared_ptr<AttackAction> action(getAttackAction(creature));
-    if (action && action->target() == enemy) return;
-
-    ActionQueue &actions = creature->actionQueue();
-    actions.clear();
-    actions.add(make_unique<AttackAction>(enemy, creature->getAttackRange()));
-
-    debug(boost::format("Combat: attack action added: '%s' -> '%s'") % creature->tag() % enemy->tag(), 2, DebugChannels::combat);
-}
-
-shared_ptr<Creature> Combat::getNearestEnemy(const Combatant &combatant) const {
-    shared_ptr<Creature> result;
-    float minDist2 = FLT_MAX;
-
-    for (auto &enemy : combatant.enemies) {
-        float dist2 = enemy->getDistanceTo2(*combatant.creature);
-        if (dist2 < minDist2) {
-            minDist2 = dist2;
-            result = enemy;
+            return;
         }
     }
 
-    return move(result);
+    // Otherwise, start a new combat round
+    auto round = make_unique<Round>();
+    round->attack1 = makeAttack(attacker, target, action, resultType, damage);
+    _roundByAttacker.insert(make_pair(attacker->id(), move(round)));
+    debug(boost::format("Combat: start round: %s -> %s") % attacker->tag() % target->tag(), 1, DebugChannels::combat);
 }
 
-void Combat::updateRounds(float dt) {
-    for (auto &pair : _combatantById) {
-        shared_ptr<Combatant> attacker(pair.second);
-        if (attacker->creature->isDead()) continue;
+void Combat::update(float dt) {
+    for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end(); ++it) {
+        Round &round = *it->second;
+        updateRound(round, dt);
 
-        // Do not start a combat round, if attacker is a moving party leader
-
-        if (attacker->creature->id() == _game->party().getLeader()->id() && _game->module()->player().isMovementRequested()) continue;
-
-        // Check if attacker already participates in a combat round
-
-        auto maybeAttackerRound = _roundByAttackerId.find(attacker->creature->id());
-        if (maybeAttackerRound != _roundByAttackerId.end()) continue;
-
-        // Check if attacker is close enough to attack its target
-
-        shared_ptr<AttackAction> action(getAttackAction(attacker->creature));
-        if (!action) continue;
-
-        shared_ptr<SpatialObject> target(action->target());
-        if (!target || target->getDistanceTo2(*attacker->creature) > action->range() * action->range()) continue;
-
-        attacker->target = target;
-
-        // Create a combat round if not a duel
-
-        auto maybeTargetRound = _roundByAttackerId.find(target->id());
-        bool duel = maybeTargetRound != _roundByAttackerId.end() && maybeTargetRound->second->target == attacker->creature;
-        if (!duel) {
-            addRound(attacker, target);
+        // Remove finished combat rounds
+        if (round.state == RoundState::Finished) {
+            it = _roundByAttacker.erase(it);
         }
     }
-    for (auto it = _roundByAttackerId.begin(); it != _roundByAttackerId.end(); ) {
-        shared_ptr<Round> round(it->second);
-        updateRound(*round, dt);
-
-        if (round->state == RoundState::Finished) {
-            round->attacker->target.reset();
-            it = _roundByAttackerId.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
-void Combat::addRound(const shared_ptr<Combatant> &attacker, const shared_ptr<SpatialObject> &target) {
-    auto round = make_shared<Round>();
-    round->attacker = attacker;
-    round->target = target;
-    addRound(round);
-}
-
-void Combat::addRound(const shared_ptr<Round> &round) {
-    debug(boost::format("Combat: add round: '%s' -> '%s'") % round->attacker->creature->tag() % round->target->tag(), 2, DebugChannels::combat);
-    _roundByAttackerId.insert(make_pair(round->attacker->creature->id(), round));
 }
 
 void Combat::updateRound(Round &round, float dt) {
-    round.advance(dt);
-
-    shared_ptr<Creature> attacker(round.attacker->creature);
-
-    if (attacker->isDead() || round.target->isDead()) {
-        finishRound(round);
-        return;
-    }
-
-    auto maybeTargetCombatant = _combatantById.find(round.target->id());
-    bool duel = maybeTargetCombatant != _combatantById.end() && maybeTargetCombatant->second->target == attacker;
+    round.time = glm::min(round.time + dt, kRoundDuration);
 
     switch (round.state) {
         case RoundState::Started: {
-            round.attackResult = _attackResolver.getAttackResult(attacker, round.target, duel, round.cutsceneAttackResult);
-
-            attacker->face(*round.target);
-            attacker->setMovementType(Creature::MovementType::None);
-            attacker->setMovementRestricted(true);
-            attacker->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
-
-            if (duel) {
-                auto targetCreature = static_pointer_cast<Creature>(round.target);
-                targetCreature->face(*attacker);
-                targetCreature->setMovementType(Creature::MovementType::None);
-                targetCreature->setMovementRestricted(true);
-                targetCreature->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
-            }
-
-            round.state = RoundState::FirstTurn;
-            debug(boost::format("Combat: first round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
+            startAttack(*round.attack1, round.duel);
+            round.state = RoundState::FirstAttack;
             break;
         }
-        case RoundState::FirstTurn:
-            if (round.time >= 0.5f * kRoundDuration) {
+        case RoundState::FirstAttack: {
+            if (isRoundPastFirstAttack(round.time)) {
+                resetProjectile(round);
+                applyAttackResult(*round.attack1);
+                if (round.attack2) {
+                    startAttack(*round.attack2, round.duel);
+                }
+                round.state = RoundState::SecondAttack;
+            } else if (round.time >= kProjectileDelay) {
                 if (round.projectile) {
-                    _game->sceneGraph().removeRoot(round.projectile);
-                    round.projectile.reset();
-                }
-                if (round.cutscene) {
-                    applyAttackResult(attacker, round.target, round.attackResult, round.cutsceneDamage);
+                    updateProjectile(round, dt);
                 } else {
-                    applyAttackResult(attacker, round.target, round.attackResult);
+                    fireProjectile(round.attack1->attacker, round.attack1->target, round);
                 }
-                if (duel) {
-                    auto targetCreature = static_pointer_cast<Creature>(round.target);
-                    round.attackResult = _attackResolver.getAttackResult(targetCreature, attacker, true);
-
-                    targetCreature->face(*attacker);
-                    targetCreature->playAnimation(round.attackResult.attackerAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
-
-                    attacker->face(*round.target);
-                    attacker->playAnimation(round.attackResult.targetAnimation, round.attackResult.attackerWieldType, round.attackResult.animationVariant);
-                }
-                round.state = RoundState::SecondTurn;
-                debug(boost::format("Combat: second round turn started: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
-
-            } else if (round.time >= 0.5f) {
-                if (!round.projectile) {
-                    fireProjectile(attacker, round.target, round);
-                }
-                updateProjectile(round, dt);
             }
             break;
-
-        case RoundState::SecondTurn:
+        }
+        case RoundState::SecondAttack: {
             if (round.time == kRoundDuration) {
-                if (round.projectile) {
-                    _game->sceneGraph().removeRoot(round.projectile);
-                    round.projectile.reset();
-                }
-                if (duel) {
-                    applyAttackResult(static_pointer_cast<Creature>(round.target), attacker, round.attackResult);
+                resetProjectile(round);
+                if (round.attack2) {
+                    applyAttackResult(*round.attack2);
                 }
                 finishRound(round);
-            } else if (duel && round.time >= 0.5 + 0.5f * kRoundDuration) {
-                if (!round.projectile) {
-                    fireProjectile(static_pointer_cast<Creature>(round.target), attacker, round);
+                round.state = RoundState::Finished;
+            } else if (round.attack2 && round.time >= 0.5f * kRoundDuration + kProjectileDelay) {
+                if (round.projectile) {
+                    updateProjectile(round, dt);
+                } else {
+                    fireProjectile(round.attack2->attacker, round.attack2->target, round);
                 }
-                updateProjectile(round, dt);
             }
             break;
-
+        }
         default:
             break;
+    }
+}
+
+void Combat::startAttack(Attack &attack, bool duel) {
+    if (attack.resultType == AttackResultType::Invalid) {
+        attack.resultType = determineAttackResult();
+    }
+    AttackAnimation animation = determineAttackAnimation(attack, duel);
+
+    attack.attacker->face(*attack.target);
+    attack.attacker->setMovementType(Creature::MovementType::None);
+    attack.attacker->setMovementRestricted(true);
+    attack.attacker->playAnimation(animation.attackerAnimation, animation.attackerWieldType, animation.animationVariant);
+
+    if (duel) {
+        auto target = static_pointer_cast<Creature>(attack.target);
+        target->face(*attack.attacker);
+        target->setMovementType(Creature::MovementType::None);
+        target->setMovementRestricted(true);
+        target->playAnimation(animation.targetAnimation, animation.attackerWieldType, animation.animationVariant);
+    }
+}
+
+static void finishAttack(Combat::Attack &attack) {
+    attack.attacker->setInCombat(false);
+    attack.attacker->setMovementRestricted(false);
+    if (attack.action) {
+        attack.action->complete();
     }
 }
 
 void Combat::finishRound(Round &round) {
-    shared_ptr<Creature> attacker(round.attacker->creature);
-    attacker->setMovementRestricted(false);
-
-    auto targetCreature = ObjectConverter::toCreature(round.target);
-    if (targetCreature) {
-        targetCreature->setMovementRestricted(false);
+    finishAttack(*round.attack1);
+    if (round.attack2) {
+        finishAttack(*round.attack2);
     }
-
-    _game->sceneGraph().removeRoot(round.projectile);
-    round.projectile.reset();
-
     round.state = RoundState::Finished;
-    debug(boost::format("Combat: round finished: '%s' -> '%s'") % attacker->tag() % round.target->tag(), 2, DebugChannels::combat);
-}
-
-void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
-    if (!g_projectilesEnabled) return;
-
-    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
-    if (!weapon) return;
-
-    shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
-    if (!ammunitionType) return;
-
-    shared_ptr<ModelSceneNode> weaponModel(attacker->getModelSceneNode()->getAttachedModel("rhand"));
-    if (!weaponModel) return;
-
-    glm::vec3 projectilePosition, bulletHookPosition;
-    if (weaponModel->getNodeAbsolutePosition("bullethook", bulletHookPosition)) {
-        projectilePosition = weaponModel->absoluteTransform() * glm::vec4(bulletHookPosition, 1.0f);
-    } else {
-        projectilePosition = weaponModel->absoluteTransform()[3];
-    }
-
-    weapon->playShotSound(0, projectilePosition);
-
-    round.projectile = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Projectile, ammunitionType->model, &_game->sceneGraph());
-    round.projectile->setPosition(projectilePosition);
-    round.projectile->signalEvent(kModelEventDetonate);
-
-    shared_ptr<ModelSceneNode> targetModel(target->getModelSceneNode());
-    glm::vec3 projectileTarget, impactPosition;
-    if (targetModel->getNodeAbsolutePosition("impact", impactPosition)) {
-        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impactPosition, 1.0f);
-    } else {
-        projectileTarget = targetModel->absoluteTransform()[3];
-    }
-    round.projectileDir = glm::normalize(projectileTarget - projectilePosition);
-
-    _game->sceneGraph().addRoot(round.projectile);
-}
-
-void Combat::updateProjectile(Round &round, float dt) {
-    if (!round.projectile) return;
-
-    glm::vec3 projectilePosition(round.projectile->absoluteTransform()[3]);
-    projectilePosition += kProjectileSpeed * round.projectileDir * dt;
-
-    float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, projectilePosition);
-    transform *= glm::eulerAngleZ(facing);
-
-    round.projectile->setProjectileSpeed(kProjectileSpeed);
-    round.projectile->setLocalTransform(transform);
-}
-
-void Combat::applyAttackResult(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, AttackResult result, int damage) {
-    switch (result.type) {
-        case AttackResultType::Miss:
-        case AttackResultType::AttackResisted:
-        case AttackResultType::AttackFailed:
-        case AttackResultType::Parried:
-        case AttackResultType::Deflected:
-            debug(boost::format("Combat: attack missed: '%s' -> '%s'") % attacker->tag() % target->tag(), 2, DebugChannels::combat);
-            break;
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
-        case AttackResultType::AutomaticHit: {
-            debug(boost::format("Combat: attack hit: '%s' -> '%s'") % attacker->tag() % target->tag(), 2, DebugChannels::combat);
-            if (damage == -1) {
-                auto effects = _damageResolver.getDamageEffects(attacker);
-                for (auto &effect : effects) {
-                    target->applyEffect(effect, DurationType::Instant);
-                }
-            } else {
-                target->applyEffect(make_shared<DamageEffect>(damage, DamageType::Universal, attacker), DurationType::Instant);
-            }
-            break;
-        }
-        default:
-            throw invalid_argument("Combat: applyAttackResult: result is invalid");
-    }
-}
-
-void Combat::updateActivation() {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    bool active = partyLeader && _combatantById.count(partyLeader->id()) != 0;
-    if (_active == active) return;
-
-    if (active) {
-        onEnterCombatMode();
-    } else {
-        onExitCombatMode();
-    }
-    _active = active;
-}
-
-void Combat::onEnterCombatMode() {
-    _game->module()->area()->setThirdPartyCameraStyle(CameraStyleType::Combat);
-}
-
-void Combat::onExitCombatMode() {
-    _game->module()->area()->setThirdPartyCameraStyle(CameraStyleType::Default);
-}
-
-void Combat::cutsceneAttack(
-    const shared_ptr<Creature> &attacker,
-    const shared_ptr<SpatialObject> &target,
-    int animation,
-    AttackResultType result,
-    int damage) {
-
-    shared_ptr<Combatant> combatant;
-
-    // If attacker is not a combatant, add him to the combatant map
-    auto maybeCombatant = _combatantById.find(attacker->id());
-    if (maybeCombatant != _combatantById.end()) {
-        combatant = maybeCombatant->second;
-    } else {
-        combatant = addCombatant(attacker, vector<shared_ptr<Creature>>());
-    }
-
-    // If attacker is already participating in a combat round, finish said round
-    auto maybeRound = _roundByAttackerId.find(attacker->id());
-    if (maybeRound != _roundByAttackerId.end()) {
-        finishRound(*maybeRound->second);
-    }
-
-    // Add a new combat round
-    auto round = make_shared<Round>();
-    round->attacker = move(combatant);
-    round->target = target;
-    round->cutscene = true;
-    round->cutsceneAnimation = animation;
-    round->cutsceneAttackResult = result;
-    round->cutsceneDamage = damage;
-    addRound(round);
+    debug(boost::format("Combat: finish round: %s -> %s") % round.attack1->attacker->tag() % round.attack1->target->tag(), 1, DebugChannels::combat);
 }
 
 } // namespace game

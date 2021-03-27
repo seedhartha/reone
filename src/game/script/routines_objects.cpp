@@ -443,7 +443,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     int damage = getInt(args, 3);
 
     if (caller && target) {
-        _game->combat().cutsceneAttack(caller, target, animation, attackResult, damage);
+        _game->combat().addAttack(caller, target, nullptr, attackResult, damage);
     } else if (!caller) {
         debug("Script: cutsceneAttack: caller is invalid");
     } else if (!target) {
