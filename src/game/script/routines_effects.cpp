@@ -484,7 +484,7 @@ Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &
     if (caller) {
         caller->clearAllEffects();
     } else {
-        debug("Script: clearAllEffects: caller is invalid");
+        debug("Script: clearAllEffects: caller is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -498,7 +498,7 @@ Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionConte
     if (target) {
         target->applyEffect(effect, durationType, duration);
     } else {
-        debug("Script: applyEffectToObject: target is invalid");
+        debug("Script: applyEffectToObject: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();

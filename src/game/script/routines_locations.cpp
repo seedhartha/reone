@@ -43,7 +43,7 @@ Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionCon
     if (location) {
         result = glm::degrees(location->facing());
     } else {
-        debug("Script: getFacingFromLocation: location is invalid");
+        debug("Script: getFacingFromLocation: location is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -58,7 +58,7 @@ Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx)
         float facing = object->facing();
         result = make_shared<Location>(move(position), facing);
     } else {
-        debug("Script: getLocation: object is invalid");
+        debug("Script: getLocation: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofLocation(move(result));
@@ -71,7 +71,7 @@ Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionC
     if (location) {
         result = location->position();
     } else {
-        debug("Script: getPositionFromLocation: location is invalid");
+        debug("Script: getPositionFromLocation: location is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofVector(move(result));
@@ -93,9 +93,9 @@ Variable Routines::getDistanceBetweenLocations(const VariablesList &args, Execut
     if (locationA && locationB) {
         result = glm::distance(locationA->position(), locationB->position());
     } else if (!locationA) {
-        debug("Script: getDistanceBetweenLocations: locationA is invalid");
+        debug("Script: getDistanceBetweenLocations: locationA is invalid", 1, DebugChannels::script);
     } else if (!locationB) {
-        debug("Script: getDistanceBetweenLocations: locationB is invalid");
+        debug("Script: getDistanceBetweenLocations: locationB is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -109,9 +109,9 @@ Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, Exec
     if (locationA && locationB) {
         result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
     } else if (!locationA) {
-        debug("Script: getDistanceBetweenLocations2D: locationA is invalid");
+        debug("Script: getDistanceBetweenLocations2D: locationA is invalid", 1, DebugChannels::script);
     } else if (!locationB) {
-        debug("Script: getDistanceBetweenLocations2D: locationB is invalid");
+        debug("Script: getDistanceBetweenLocations2D: locationB is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);

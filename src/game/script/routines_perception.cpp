@@ -41,7 +41,7 @@ Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext 
     if (caller) {
         result = caller->perception().lastPerceived;
     } else {
-        debug("Script: getLastPerceived: caller is invalid");
+        debug("Script: getLastPerceived: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -54,7 +54,7 @@ Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionCon
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::Seen;
     } else {
-        debug("Script: getLastPerceptionSeen: caller is invalid");
+        debug("Script: getLastPerceptionSeen: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -67,7 +67,7 @@ Variable Routines::getLastPerceptionVanished(const VariablesList &args, Executio
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::NotSeen;
     } else {
-        debug("Script: getLastPerceptionVanished: caller is invalid");
+        debug("Script: getLastPerceptionVanished: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -80,7 +80,7 @@ Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionCo
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::Heard;
     } else {
-        debug("Script: getLastPerceptionHeard: caller is invalid");
+        debug("Script: getLastPerceptionHeard: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -93,7 +93,7 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
-        debug("Script: getLastPerceptionInaudible: caller is invalid");
+        debug("Script: getLastPerceptionInaudible: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -107,9 +107,9 @@ Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ct
     if (target && source) {
         result = source->perception().seen.count(target) > 0;
     } else if (!target) {
-        debug("Script: getObjectSeen: target is invalid");
+        debug("Script: getObjectSeen: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
-        debug("Script: getObjectSeen: source is invalid");
+        debug("Script: getObjectSeen: source is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -123,9 +123,9 @@ Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &c
     if (target && source) {
         result = source->perception().heard.count(target) > 0;
     } else if (!target) {
-        debug("Script: getObjectHeard: target is invalid");
+        debug("Script: getObjectHeard: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
-        debug("Script: getObjectHeard: source is invalid");
+        debug("Script: getObjectHeard: source is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(move(result)));

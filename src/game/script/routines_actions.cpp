@@ -59,7 +59,7 @@ Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ct
         auto objectAction = make_unique<CommandAction>(move(action));
         subject->actionQueue().add(move(objectAction));
     } else {
-        debug("Script: assignCommand: subject is invalid");
+        debug("Script: assignCommand: subject is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -83,7 +83,7 @@ Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContex
         auto action = make_unique<MoveToObjectAction>(move(moveTo), run, range);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionMoveToObject: moveTo is invalid");
+        debug("Script: actionMoveToObject: moveTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -103,7 +103,7 @@ Variable Routines::actionStartConversation(const VariablesList &args, ExecutionC
         auto action = make_unique<StartConversationAction>(move(objectToConverse), move(dialogResRef), ignoreStartRange);
         caller->actionQueue().add(move(action));
     } else {
-        debug("Script: actionStartConversation: objectToConverse is invalid");
+        debug("Script: actionStartConversation: objectToConverse is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -127,7 +127,7 @@ Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<ObjectAction>(ActionType::OpenDoor, door);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionOpenDoor: door is invalid");
+        debug("Script: actionOpenDoor: door is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -138,7 +138,7 @@ Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &
         auto action = make_unique<ObjectAction>(ActionType::CloseDoor, door);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionCloseDoor: door is invalid");
+        debug("Script: actionCloseDoor: door is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -157,7 +157,7 @@ Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContex
         auto action = make_unique<ObjectAction>(ActionType::JumpToObject, move(jumpTo));
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionJumpToObject: jumpTo is invalid");
+        debug("Script: actionJumpToObject: jumpTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -169,7 +169,7 @@ Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionCont
         auto action = make_unique<LocationAction>(ActionType::JumpToLocation, move(location));
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionJumpToLocation: location is invalid");
+        debug("Script: actionJumpToLocation: location is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -185,7 +185,7 @@ Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionC
         auto action = make_unique<MoveToObjectAction>(move(moveTo), run, range);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionForceMoveToObject: moveTo is invalid");
+        debug("Script: actionForceMoveToObject: moveTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -201,7 +201,7 @@ Variable Routines::actionForceMoveToLocation(const VariablesList &args, Executio
         auto action = make_unique<MoveToLocationAction>(move(destination));
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionForceMoveToLocation: destination is invalid");
+        debug("Script: actionForceMoveToLocation: destination is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -216,7 +216,7 @@ Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx
         auto action = make_unique<ObjectAction>(ActionType::JumpToObject, move(jumpTo));
         getCaller(ctx)->actionQueue().addToTop(move(action));
     } else {
-        debug("Script: jumpToObject: jumpTo is invalid");
+        debug("Script: jumpToObject: jumpTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -228,7 +228,7 @@ Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<LocationAction>(ActionType::JumpToLocation, move(destination));
         getCaller(ctx)->actionQueue().addToTop(move(action));
     } else {
-        debug("Script: jumpToLocation: destination is invalid");
+        debug("Script: jumpToLocation: destination is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -247,7 +247,7 @@ Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionCont
         auto action = make_unique<MoveToLocationAction>(move(destination), run);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionMoveToLocation: destination is invalid");
+        debug("Script: actionMoveToLocation: destination is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -263,7 +263,7 @@ Variable Routines::actionMoveAwayFromObject(const VariablesList &args, Execution
         auto action = make_unique<Action>(ActionType::MoveAwayFromObject);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionMoveAwayFromObject: fleeFrom is invalid");
+        debug("Script: actionMoveAwayFromObject: fleeFrom is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -279,7 +279,7 @@ Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &
         auto action = make_unique<Action>(ActionType::EquipItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionEquipItem: item is invalid");
+        debug("Script: actionEquipItem: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -294,7 +294,7 @@ Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::UnequipItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUnequipItem: item is invalid");
+        debug("Script: actionUnequipItem: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -307,7 +307,7 @@ Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext 
         auto action = make_unique<Action>(ActionType::PickUpItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionPickUpItem: item is invalid");
+        debug("Script: actionPickUpItem: item is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -319,7 +319,7 @@ Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext
         auto action = make_unique<Action>(ActionType::DropItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionPutDownItem: item is invalid");
+        debug("Script: actionPutDownItem: item is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -334,9 +334,9 @@ Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx
         auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
         caller->actionQueue().add(move(action));
     } else if (!caller) {
-        debug("Script: actionAttack: caller is invalid");
+        debug("Script: actionAttack: caller is invalid", 1, DebugChannels::script);
     } else if (!attackee) {
-        debug("Script: actionAttack: attackee is invalid");
+        debug("Script: actionAttack: attackee is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -389,9 +389,9 @@ Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::GiveItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else if (!item) {
-        debug("Script: actionGiveItem: item is invalid");
+        debug("Script: actionGiveItem: item is invalid", 1, DebugChannels::script);
     } else if (!giveTo) {
-        debug("Script: actionGiveItem: giveTo is invalid");
+        debug("Script: actionGiveItem: giveTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -406,9 +406,9 @@ Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::TakeItem);
         getCaller(ctx)->actionQueue().add(move(action));
     } else if (!item) {
-        debug("Script: actionTakeItem: item is invalid");
+        debug("Script: actionTakeItem: item is invalid", 1, DebugChannels::script);
     } else if (!takeFrom) {
-        debug("Script: actionTakeItem: takeFrom is invalid");
+        debug("Script: actionTakeItem: takeFrom is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -423,7 +423,7 @@ Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionC
         auto action = make_unique<Action>(ActionType::ForceFollowObject);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionForceFollowObject: follow is invalid");
+        debug("Script: actionForceFollowObject: follow is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -451,7 +451,7 @@ Variable Routines::actionCastSpellAtLocation(const VariablesList &args, Executio
         auto action = make_unique<Action>(ActionType::CastSpellAtLocation);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionCastSpellAtLocation: targetLocation is invalid");
+        debug("Script: actionCastSpellAtLocation: targetLocation is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -477,7 +477,7 @@ Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ct
         auto action = make_unique<Action>(ActionType::UseFeat);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseFeat: target is invalid");
+        debug("Script: actionUseFeat: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -494,7 +494,7 @@ Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &c
         auto action = make_unique<Action>(ActionType::UseSkill);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseSkill: target is invalid");
+        debug("Script: actionUseSkill: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -509,7 +509,7 @@ Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionC
         auto action = make_unique<Action>(ActionType::UseTalentOnObject);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseTalentOnObject: target is invalid");
+        debug("Script: actionUseTalentOnObject: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -524,7 +524,7 @@ Variable Routines::actionUseTalentAtLocation(const VariablesList &args, Executio
         auto action = make_unique<Action>(ActionType::UseTalentAtLocation);
         getCaller(ctx)->actionQueue().add(move(action));
     } else {
-        debug("Script: actionUseTalentAtLocation: targetLocation is invalid");
+        debug("Script: actionUseTalentAtLocation: targetLocation is invalid", 1, DebugChannels::script);
     }
 
     return Variable();

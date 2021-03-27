@@ -42,7 +42,7 @@ Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ct
     if (creature) {
         result = creature->aiStyle();
     } else {
-        debug("Script: getNPCAIStyle: creature is invalid");
+        debug("Script: getNPCAIStyle: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -55,7 +55,7 @@ Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ct
     if (creature) {
         creature->setAIStyle(style);
     } else {
-        debug("Script: setNPCAIStyle: creature is invalid");
+        debug("Script: setNPCAIStyle: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -68,7 +68,7 @@ Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &
     if (creature) {
         result = creature->combat().attackTarget;
     } else {
-        debug("Script: getAttackTarget: creature is invalid");
+        debug("Script: getAttackTarget: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -81,7 +81,7 @@ Variable Routines::getAttemptedAttackTarget(const VariablesList &args, Execution
     if (caller) {
         result = caller->combat().attemptedAttackTarget;
     } else {
-        debug("Script: getAttemptedAttackTarget: caller is invalid");
+        debug("Script: getAttemptedAttackTarget: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -94,7 +94,7 @@ Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &c
     if (creature) {
         result = creature->combat().spellTarget;
     } else {
-        debug("Script: getSpellTarget: creature is invalid");
+        debug("Script: getSpellTarget: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -107,7 +107,7 @@ Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionC
     if (caller) {
         result = caller->combat().attemptedSpellTarget;
     } else {
-        debug("Script: getAttemptedSpellTarget: caller is invalid");
+        debug("Script: getAttemptedSpellTarget: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -120,7 +120,7 @@ Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext 
     if (creature) {
         result = creature->combat().debilitated;
     } else {
-        debug("Script: getIsDebilitated: creature is invalid");
+        debug("Script: getIsDebilitated: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -133,7 +133,7 @@ Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionCont
     if (attacker) {
         result = attacker->combat().lastHostileTarget;
     } else {
-        debug("Script: getIsDebilitated: attacker is invalid");
+        debug("Script: getIsDebilitated: attacker is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(result);

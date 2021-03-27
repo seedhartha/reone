@@ -67,7 +67,7 @@ Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
     if (creature) {
         result = creature == _game->party().player();
     } else {
-        debug("Script: getIsPC: creature is invalid");
+        debug("Script: getIsPC: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -86,7 +86,7 @@ Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionConte
     if (creature) {
         result = _game->party().isMember(*creature);
     } else {
-        debug("Script: isObjectPartyMember: creature is invalid");
+        debug("Script: isObjectPartyMember: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -121,7 +121,7 @@ Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &c
     if (creature) {
         _game->party().addAvailableMember(npc, creature->blueprintResRef());
     } else {
-        debug("Script: addPartyMember: creature is invalid");
+        debug("Script: addPartyMember: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));

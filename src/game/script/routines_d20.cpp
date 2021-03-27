@@ -141,7 +141,7 @@ Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
     if (creature) {
         result = creature->gender();
     } else {
-        debug("Script: getGender: creature is invalid");
+        debug("Script: getGender: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -154,7 +154,7 @@ Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) 
     if (creature) {
         result = creature->attributes().getAggregateLevel();
     } else {
-        debug("Script: getGender: creature is invalid");
+        debug("Script: getGender: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -168,7 +168,7 @@ Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContex
     if (creature) {
         result = creature->attributes().getClassByPosition(position);
     } else {
-        debug("Script: getClassByPosition: creature is invalid");
+        debug("Script: getClassByPosition: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -182,7 +182,7 @@ Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &
     if (creature) {
         result = creature->attributes().getClassLevel(clazz);
     } else {
-        debug("Script: getLevelByClass: creature is invalid");
+        debug("Script: getLevelByClass: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -196,7 +196,7 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
     if (creature) {
         result = creature->attributes().skills().contains(skill);
     } else {
-        debug("Script: getHasSkill: creature is invalid");
+        debug("Script: getHasSkill: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -209,7 +209,7 @@ Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionConte
     if (object) {
         result = object->currentHitPoints();
     } else {
-        debug("Script: getCurrentHitPoints: object is invalid");
+        debug("Script: getCurrentHitPoints: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -222,7 +222,7 @@ Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &
     if (object) {
         result = object->maxHitPoints();
     } else {
-        debug("Script: getMaxHitPoints: object is invalid");
+        debug("Script: getMaxHitPoints: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -235,7 +235,7 @@ Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx)
     if (object) {
         result = object->isMinOneHP();
     } else {
-        debug("Script: getMinOneHP: object is invalid");
+        debug("Script: getMinOneHP: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -248,7 +248,7 @@ Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &
     if (object) {
         object->setMaxHitPoints(maxHP);
     } else {
-        debug("Script: setMaxHitPoints: object is invalid");
+        debug("Script: setMaxHitPoints: object is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -260,7 +260,7 @@ Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx)
     if (object) {
         object->setMinOneHP(minOneHP);
     } else {
-        debug("Script: setMinOneHP: object is invalid");
+        debug("Script: setMinOneHP: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -274,7 +274,7 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
     if (creature) {
         result = creature->attributes().abilities().getScore(type);
     } else {
-        debug("Script: getAbilityScore: creature is invalid");
+        debug("Script: getAbilityScore: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -288,7 +288,7 @@ Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContex
     if (creature) {
         result = creature->attributes().getLevelByPosition(position);
     } else {
-        debug("Script: getLevelByPosition: creature is invalid");
+        debug("Script: getLevelByPosition: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -302,7 +302,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
     if (object) {
         result = object->attributes().skills().getRank(skill);
     } else {
-        debug("Script: getSkillRank: object is invalid");
+        debug("Script: getSkillRank: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -315,7 +315,7 @@ Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
     if (creature) {
         result = creature->xp();
     } else {
-        debug("Script: getXP: creature is invalid");
+        debug("Script: getXP: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -328,7 +328,7 @@ Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
     if (creature) {
         creature->setXP(xpAmount);
     } else {
-        debug("Script: setXP: creature is invalid");
+        debug("Script: setXP: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -341,7 +341,7 @@ Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext 
     if (creature) {
         creature->giveXP(xpAmount);
     } else {
-        debug("Script: giveXPToCreature: creature is invalid");
+        debug("Script: giveXPToCreature: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -354,7 +354,7 @@ Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ct
     if (creature) {
         result = creature->racialType();
     } else {
-        debug("Script: getRacialType: creature is invalid");
+        debug("Script: getRacialType: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -367,7 +367,7 @@ Variable Routines::getSubRace(const VariablesList &args, ExecutionContext &ctx) 
     if (creature) {
         result = creature->subrace();
     } else {
-        debug("Script: getSubRace: creature is invalid");
+        debug("Script: getSubRace: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -381,7 +381,7 @@ Variable Routines::getHasSpell(const VariablesList &args, ExecutionContext &ctx)
     if (creature) {
         // TODO: Force Powers, aka spells, are not supported at the moment
     } else {
-        debug("Script: getHasSpell: creature is invalid");
+        debug("Script: getHasSpell: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));

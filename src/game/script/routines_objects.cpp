@@ -43,7 +43,7 @@ Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ct
     if (destroy) {
         _game->module()->area()->destroyObject(*destroy);
     } else {
-        debug("Script: destroyObject: destroy is invalid");
+        debug("Script: destroyObject: destroy is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -97,7 +97,7 @@ Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
     if (target) {
         target->setLocked(locked);
     } else {
-        debug("Script: setLocked: target is invalid");
+        debug("Script: setLocked: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -110,7 +110,7 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
     if (target) {
         result = target->isLocked();
     } else {
-        debug("Script: getLocked: target is invalid");
+        debug("Script: getLocked: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -127,7 +127,7 @@ Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
     if (object) {
         result = object->tag();
     } else {
-        debug("Script: getTag: object is invalid");
+        debug("Script: getTag: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofString(move(result));
@@ -141,9 +141,9 @@ Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionConte
     if (caller && object) {
         result = caller->getDistanceTo(*object);
     } else if (!caller) {
-        debug("Script: getDistanceToObject: caller is invalid");
+        debug("Script: getDistanceToObject: caller is invalid", 1, DebugChannels::script);
     } else if (!object) {
-        debug("Script: getDistanceToObject: object is invalid");
+        debug("Script: getDistanceToObject: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -157,9 +157,9 @@ Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionCon
     if (caller && object) {
         result = caller->getDistanceTo(glm::vec2(object->position()));
     } else if (!caller) {
-        debug("Script: getDistanceToObject2D: caller is invalid");
+        debug("Script: getDistanceToObject2D: caller is invalid", 1, DebugChannels::script);
     } else if (!object) {
-        debug("Script: getDistanceToObject2D: object is invalid");
+        debug("Script: getDistanceToObject2D: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -176,7 +176,7 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
     if (target) {
         result = glm::degrees(target->facing());
     } else {
-        debug("Script: getFacing: target is invalid");
+        debug("Script: getFacing: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -189,7 +189,7 @@ Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx)
     if (target) {
         result = target->position();
     } else {
-        debug("Script: getPosition: target is invalid");
+        debug("Script: getPosition: target is invalid", 1, DebugChannels::script);
         return Variable::ofVector(glm::vec3(0.0f));
     }
 
@@ -201,7 +201,7 @@ Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &
     if (sound) {
         sound->play();
     } else {
-        debug("Script: soundObjectPlay: sound is invalid");
+        debug("Script: soundObjectPlay: sound is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -211,7 +211,7 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
     if (sound) {
         sound->stop();
     } else {
-        debug("Script: soundObjectStop: sound is invalid");
+        debug("Script: soundObjectStop: sound is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -224,9 +224,9 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
     if (objectA && objectB) {
         result = objectA->getDistanceTo(*objectB);
     } else if (!objectA) {
-        debug("Script: getDistanceBetween: objectA is invalid");
+        debug("Script: getDistanceBetween: objectA is invalid", 1, DebugChannels::script);
     } else if (!objectB) {
-        debug("Script: getDistanceBetween: objectB is invalid");
+        debug("Script: getDistanceBetween: objectB is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -240,9 +240,9 @@ Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionCont
     if (objectA && objectB) {
         result = objectA->getDistanceTo(glm::vec2(objectB->position()));
     } else if (!objectA) {
-        debug("Script: getDistanceBetween2D: objectA is invalid");
+        debug("Script: getDistanceBetween2D: objectA is invalid", 1, DebugChannels::script);
     } else if (!objectB) {
-        debug("Script: getDistanceBetween2D: objectB is invalid");
+        debug("Script: getDistanceBetween2D: objectB is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofFloat(result);
@@ -255,7 +255,7 @@ Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
     if (creature) {
         result = creature->isDead();
     } else {
-        debug("Script: getIsDead: creature is invalid");
+        debug("Script: getIsDead: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -268,7 +268,7 @@ Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ct
     if (creature) {
         result = creature->isInCombat();
     } else {
-        debug("Script: getIsInCombat: creature is invalid");
+        debug("Script: getIsInCombat: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -281,7 +281,7 @@ Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     if (object) {
         result = object->isOpen();
     } else {
-        debug("Script: getIsOpen: object is invalid");
+        debug("Script: getIsOpen: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -294,7 +294,7 @@ Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
     if (caller) {
         caller->setFacing(glm::radians(direction));
     } else {
-        debug("Script: setFacing: caller is invalid");
+        debug("Script: setFacing: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -306,7 +306,7 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
         glm::vec3 target(getVector(args, 0));
         caller->face(target);
     } else {
-        debug("Script: setFacingPoint: caller is invalid");
+        debug("Script: setFacingPoint: caller is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
@@ -318,7 +318,7 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
     if (object) {
         result = object->name();
     } else {
-        debug("Script: getName: object is invalid");
+        debug("Script: getName: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofString(move(result));
@@ -331,7 +331,7 @@ Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ct
     if (target) {
         result = target->type();
     } else {
-        debug("Script: getObjectType: target is invalid");
+        debug("Script: getObjectType: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -344,7 +344,7 @@ Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx)
     if (target) {
         result = target->plotFlag();
     } else {
-        debug("Script: getPlotFlag: target is invalid");
+        debug("Script: getPlotFlag: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -357,7 +357,7 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
     if (target) {
         target->setPlotFlag(plotFlag);
     } else {
-        debug("Script: setPlotFlag: target is invalid");
+        debug("Script: setPlotFlag: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -370,9 +370,9 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
     if (facer && objectToFaceAwayFrom) {
         facer->faceAwayFrom(*objectToFaceAwayFrom);
     } else if (!facer) {
-        debug("Script: faceObjectAwayFromObject: facer is invalid");
+        debug("Script: faceObjectAwayFromObject: facer is invalid", 1, DebugChannels::script);
     } else if (!objectToFaceAwayFrom) {
-        debug("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid");
+        debug("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -385,7 +385,7 @@ Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &c
     if (target) {
         result = target->isCommandable();
     } else {
-        debug("Script: getCommandable: target is invalid");
+        debug("Script: getCommandable: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -398,7 +398,7 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
     if (target) {
         target->setCommandable(commandable);
     } else {
-        debug("Script: setCommandable: target is invalid");
+        debug("Script: setCommandable: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -415,7 +415,7 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
         properties.speed = speed;
         caller->playAnimation(animType, move(properties));
     } else {
-        debug("Script: playAnimation: caller is invalid");
+        debug("Script: playAnimation: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -445,9 +445,9 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     if (caller && target) {
         _game->combat().addAttack(caller, target, nullptr, attackResult, damage);
     } else if (!caller) {
-        debug("Script: cutsceneAttack: caller is invalid");
+        debug("Script: cutsceneAttack: caller is invalid", 1, DebugChannels::script);
     } else if (!target) {
-        debug("Script: cutsceneAttack: target is invalid");
+        debug("Script: cutsceneAttack: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();

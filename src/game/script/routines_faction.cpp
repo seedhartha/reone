@@ -40,9 +40,9 @@ Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ct
     if (objectToChangeFaction && memberOfFactionToJoin) {
         objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
     } else if (!objectToChangeFaction) {
-        debug("Script: changeFaction: objectToChangeFaction is invalid");
+        debug("Script: changeFaction: objectToChangeFaction is invalid", 1, DebugChannels::script);
     } else if (!memberOfFactionToJoin) {
-        debug("Script: changeFaction: memberOfFactionToJoin is invalid");
+        debug("Script: changeFaction: memberOfFactionToJoin is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -55,7 +55,7 @@ Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionC
     if (creatureToChange) {
         creatureToChange->setFaction(faction);
     } else {
-        debug("Script: changeToStandardFaction: creatureToChange is invalid");
+        debug("Script: changeToStandardFaction: creatureToChange is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -69,9 +69,9 @@ Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &
     if (firstObject && secondObject) {
         result = firstObject->faction() == secondObject->faction();
     } else if (!firstObject) {
-        debug("Script: getStandardFaction: firstObject is invalid");
+        debug("Script: getStandardFaction: firstObject is invalid", 1, DebugChannels::script);
     } else if (!secondObject) {
-        debug("Script: getStandardFaction: secondObject is invalid");
+        debug("Script: getStandardFaction: secondObject is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -84,7 +84,7 @@ Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContex
     if (object) {
         result = object->faction();
     } else {
-        debug("Script: getStandardFaction: object is invalid");
+        debug("Script: getStandardFaction: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -98,9 +98,9 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
     if (target && source) {
         result = Reputes::instance().getIsEnemy(*target, *source);
     } else if (!target) {
-        debug("Script: getIsEnemy: target is invalid");
+        debug("Script: getIsEnemy: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
-        debug("Script: getIsEnemy: source is invalid");
+        debug("Script: getIsEnemy: source is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -114,9 +114,9 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
     if (target && source) {
         result = Reputes::instance().getIsFriend(*target, *source);
     } else if (!target) {
-        debug("Script: getIsFriend: target is invalid");
+        debug("Script: getIsFriend: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
-        debug("Script: getIsFriend: source is invalid");
+        debug("Script: getIsFriend: source is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -130,9 +130,9 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
     if (target && source) {
         result = Reputes::instance().getIsNeutral(*target, *source);
     } else if (!target) {
-        debug("Script: getIsNeutral: target is invalid");
+        debug("Script: getIsNeutral: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
-        debug("Script: getIsNeutral: source is invalid");
+        debug("Script: getIsNeutral: source is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
