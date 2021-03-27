@@ -203,6 +203,7 @@ public:
     // Scripts
 
     void runSpawnScript();
+    void runEndRoundScript();
 
     // END Scripts
 
@@ -249,6 +250,7 @@ private:
     std::string _onSpawn;
     std::string _onDeath;
     std::string _onNotice;
+    std::string _onEndRound;
 
     // END Scripts
 
