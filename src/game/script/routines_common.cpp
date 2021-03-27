@@ -103,7 +103,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
         _game->setRunScriptVar(scriptVar);
         _game->scriptRunner().run(script, target->id());
     } else {
-        debug("Script: executeScript: target is invalid");
+        debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable();

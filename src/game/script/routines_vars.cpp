@@ -84,7 +84,7 @@ Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &
     if (object) {
         result = _game->getLocalBoolean(object->id(), index);
     } else {
-        debug("Script: getLocalBoolean: object is invalid");
+        debug("Script: getLocalBoolean: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -98,7 +98,7 @@ Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &
     if (object) {
         _game->setLocalBoolean(object->id(), index, value);
     } else {
-        debug("Script: setLocalBoolean: object is invalid");
+        debug("Script: setLocalBoolean: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -112,7 +112,7 @@ Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &c
     if (object) {
         result = _game->getLocalNumber(object->id(), index);
     } else {
-        debug("Script: getLocalNumber: object is invalid");
+        debug("Script: getLocalNumber: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -126,7 +126,7 @@ Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &c
     if (object) {
         _game->setLocalNumber(object->id(), index, value);
     } else {
-        debug("Script: setLocalNumber: object is invalid");
+        debug("Script: setLocalNumber: object is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -144,7 +144,7 @@ Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext
     if (value) {
         _game->setGlobalLocation(id, value);
     } else {
-        debug("Script: setGlobalLocation: value is invalid");
+        debug("Script: setGlobalLocation: value is invalid", 1, DebugChannels::script);
     }
 
     return Variable();

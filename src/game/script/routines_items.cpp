@@ -43,7 +43,7 @@ Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ct
     if (creature) {
         result = creature->getEquippedItem(slot);
     } else {
-        debug("Script: getItemInSlot: creature is invalid");
+        debug("Script: getItemInSlot: creature is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -58,9 +58,9 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
     if (!itemTemplate.empty() && target) {
         result = target->addItem(itemTemplate, stackSize, true);
     } else if (itemTemplate.empty()) {
-        debug("Script: createItemOnObject: itemTemplate is invalid");
+        debug("Script: createItemOnObject: itemTemplate is invalid", 1, DebugChannels::script);
     } else if (!target) {
-        debug("Script: createItemOnObject: target is invalid");
+        debug("Script: createItemOnObject: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -73,7 +73,7 @@ Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionC
     if (target) {
         result = target->getFirstItem();
     } else {
-        debug("Script: getFirstItemInInventory: target is invalid");
+        debug("Script: getFirstItemInInventory: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -86,7 +86,7 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
     if (target) {
         result = target->getNextItem();
     } else {
-        debug("Script: getNextItemInInventory: target is invalid");
+        debug("Script: getNextItemInInventory: target is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -99,7 +99,7 @@ Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext 
     if (item) {
         result = item->stackSize();
     } else {
-        debug("Script: getItemStackSize: item is invalid");
+        debug("Script: getItemStackSize: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
@@ -112,7 +112,7 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
     if (item) {
         item->setStackSize(stackSize);
     } else {
-        debug("Script: setItemStackSize: item is invalid");
+        debug("Script: setItemStackSize: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -125,7 +125,7 @@ Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ct
     if (item) {
         result = item->isIdentified();
     } else {
-        debug("Script: getIdentified: item is invalid");
+        debug("Script: getIdentified: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));
@@ -138,7 +138,7 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
     if (item) {
         item->setIdentified(identified);
     } else {
-        debug("Script: setIdentified: item is invalid");
+        debug("Script: setIdentified: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -152,9 +152,9 @@ Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContex
     if (creature && !itemTag.empty()) {
         result = creature->getItemByTag(itemTag);
     } else if (!creature) {
-        debug("Script: getItemPossessedBy: creature is invalid");
+        debug("Script: getItemPossessedBy: creature is invalid", 1, DebugChannels::script);
     } else if (itemTag.empty()) {
-        debug("Script: getItemPossessedBy: itemTag is invalid");
+        debug("Script: getItemPossessedBy: itemTag is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(move(result));
@@ -167,7 +167,7 @@ Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &
     if (item) {
         result = item->baseItemType();
     } else {
-        debug("Script: getBaseItemType: item is invalid");
+        debug("Script: getBaseItemType: item is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(result);
