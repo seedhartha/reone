@@ -165,6 +165,7 @@ void Combat::startAttack(Attack &attack, bool duel) {
 static void finishAttack(Combat::Attack &attack) {
     attack.attacker->setInCombat(false);
     attack.attacker->setMovementRestricted(false);
+    attack.attacker->runEndRoundScript();
     if (attack.action) {
         attack.action->complete();
     }

@@ -135,6 +135,7 @@ void CreatureBlueprint::loadScripts(Creature &creature) {
     creature._onDeath = boost::to_lower_copy(_utc->getString("ScriptDeath"));
     creature._onUserDefined = boost::to_lower_copy(_utc->getString("ScriptUserDefine"));
     creature._onNotice = boost::to_lower_copy(_utc->getString("ScriptOnNotice"));
+    creature._onEndRound = boost::to_lower_copy(_utc->getString("ScriptEndRound"));
 }
 
 void CreatureBlueprint::loadItems(Creature &creature) {

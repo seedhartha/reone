@@ -498,6 +498,12 @@ void Creature::runSpawnScript() {
     }
 }
 
+void Creature::runEndRoundScript() {
+    if (!_onEndRound.empty()) {
+        _scriptRunner->run(_onEndRound, _id, kObjectInvalid);
+    }
+}
+
 void Creature::giveXP(int amount) {
     _xp += amount;
 }
