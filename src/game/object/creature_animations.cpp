@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "creatureanimresolver.h"
+/** @file
+ *  Animation-related Creature functions.
+ */
 
-#include <stdexcept>
+#include "creature.h"
 
 #include <boost/format.hpp>
 
 #include "../../common/log.h"
-
-#include "creature.h"
 
 using namespace std;
 
@@ -31,15 +31,7 @@ namespace reone {
 
 namespace game {
 
-CreatureAnimationResolver::CreatureAnimationResolver(const Creature *creature) : _creature(creature) {
-    if (!creature) {
-        throw invalid_argument("creature must not be null");
-    }
-}
-
-string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
-    static string empty;
-
+string Creature::getAnimationName(AnimationType anim) const {
     string result;
     switch (anim) {
         case AnimationType::LoopingPause:
@@ -57,7 +49,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
         case AnimationType::LoopingTalkForceful:
             return "tlkforce";
         case AnimationType::LoopingTalkLaughing:
-            return getFirstIfCreatureModel(empty, "tlklaugh");
+            return getFirstIfCreatureModel("", "tlklaugh");
         case AnimationType::LoopingTalkSad:
             return "tlksad";
         case AnimationType::LoopingPauseTired:
@@ -73,7 +65,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
         case AnimationType::LoopingHorror:
             return "horror";
         case AnimationType::LoopingDeactivate:
-            return getFirstIfCreatureModel(empty, "deactivate");
+            return getFirstIfCreatureModel("", "deactivate");
         case AnimationType::LoopingSpasm:
             return getFirstIfCreatureModel("cspasm", "spasm");
         case AnimationType::LoopingSleep:
@@ -81,7 +73,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
         case AnimationType::LoopingProne:
             return "prone";
         case AnimationType::LoopingPause3:
-            return getFirstIfCreatureModel(empty, "pause3");
+            return getFirstIfCreatureModel("", "pause3");
         case AnimationType::LoopingWeld:
             return "weld";
         case AnimationType::LoopingDead:
@@ -127,7 +119,7 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
         case AnimationType::FireForgetOpen:
             return "open";
         case AnimationType::LoopingReady:
-            return getAnimationName(CombatAnimation::Ready, _creature->getWieldType(), 0);
+            return getAnimationName(CombatAnimation::Ready, getWieldType(), 0);
 
         case AnimationType::LoopingWorship:
         case AnimationType::LoopingGetLow:
@@ -158,28 +150,28 @@ string CreatureAnimationResolver::getAnimationName(AnimationType anim) const {
         case AnimationType::FireForgetScream:
         default:
             debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)), 2);
-            return empty;
+            return "";
     }
 }
 
-string CreatureAnimationResolver::getDieAnimation() const {
+string Creature::getDieAnimation() const {
     return getFirstIfCreatureModel("cdie", "die");
 }
 
-string CreatureAnimationResolver::getFirstIfCreatureModel(string creatureAnim, string elseAnim) const {
-    return _creature->modelType() == Creature::ModelType::Creature ? move(creatureAnim) : move(elseAnim);
+string Creature::getFirstIfCreatureModel(string creatureAnim, string elseAnim) const {
+    return _modelType == Creature::ModelType::Creature ? move(creatureAnim) : move(elseAnim);
 }
 
-string CreatureAnimationResolver::getDeadAnimation() const {
+string Creature::getDeadAnimation() const {
     return getFirstIfCreatureModel("cdead", "dead");
 }
 
-string CreatureAnimationResolver::getPauseAnimation() const {
-    if (_creature->modelType() == Creature::ModelType::Creature) return "cpause1";
+string Creature::getPauseAnimation() const {
+    if (_modelType == Creature::ModelType::Creature) return "cpause1";
 
     // TODO: if (_lowHP) return "pauseinj" 
 
-    if (_creature->isInCombat()) {
+    if (_inCombat) {
         WeaponType type = WeaponType::None;
         WeaponWield wield = WeaponWield::None;
         getWeaponInfo(type, wield);
@@ -191,8 +183,8 @@ string CreatureAnimationResolver::getPauseAnimation() const {
     return "pause1";
 }
 
-bool CreatureAnimationResolver::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    shared_ptr<Item> item(_creature->getEquippedItem(InventorySlot::rightWeapon));
+bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
+    shared_ptr<Item> item(getEquippedItem(InventorySlot::rightWeapon));
     if (item) {
         type = item->weaponType();
         wield = item->weaponWield();
@@ -202,16 +194,16 @@ bool CreatureAnimationResolver::getWeaponInfo(WeaponType &type, WeaponWield &wie
     return false;
 }
 
-int CreatureAnimationResolver::getWeaponWieldNumber(WeaponWield wield) const {
+int Creature::getWeaponWieldNumber(WeaponWield wield) const {
     switch (wield) {
         case WeaponWield::StunBaton:
             return 1;
         case WeaponWield::SingleSword:
-            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
+            return isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
         case WeaponWield::DoubleBladedSword:
             return 3;
         case WeaponWield::BlasterPistol:
-            return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
+            return isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
         case WeaponWield::BlasterRifle:
             return 7;
         case WeaponWield::HeavyWeapon:
@@ -221,23 +213,23 @@ int CreatureAnimationResolver::getWeaponWieldNumber(WeaponWield wield) const {
     }
 }
 
-string CreatureAnimationResolver::getWalkAnimation() const {
+string Creature::getWalkAnimation() const {
     return getFirstIfCreatureModel("cwalk", "walk");
 }
 
-string CreatureAnimationResolver::getRunAnimation() const {
-    if (_creature->modelType() == Creature::ModelType::Creature) return "crun";
+string Creature::getRunAnimation() const {
+    if (_modelType == Creature::ModelType::Creature) return "crun";
 
     // TODO: if (_lowHP) return "runinj" 
 
-    if (_creature->isInCombat()) {
+    if (_inCombat) {
         WeaponType type = WeaponType::None;
         WeaponWield wield = WeaponWield::None;
         getWeaponInfo(type, wield);
 
         switch (wield) {
             case WeaponWield::SingleSword:
-                return _creature->isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
+                return isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
             case WeaponWield::DoubleBladedSword:
                 return "runst";
             case WeaponWield::BlasterRifle:
@@ -251,11 +243,11 @@ string CreatureAnimationResolver::getRunAnimation() const {
     return "run";
 }
 
-string CreatureAnimationResolver::getTalkNormalAnimation() const {
+string Creature::getTalkNormalAnimation() const {
     return "tlknorm";
 }
 
-string CreatureAnimationResolver::getHeadTalkAnimation() const {
+string Creature::getHeadTalkAnimation() const {
     return "talk";
 }
 
@@ -263,12 +255,10 @@ static string formatCombatAnimation(const string &format, CreatureWieldType wiel
     return str(boost::format(format) % static_cast<int>(wield) % variant);
 }
 
-string CreatureAnimationResolver::getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const {
-    static string empty;
-
+string Creature::getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const {
     switch (anim) {
         case CombatAnimation::Draw:
-            return getFirstIfCreatureModel(empty, formatCombatAnimation("g%dw%d", wield, 1));
+            return getFirstIfCreatureModel("", formatCombatAnimation("g%dw%d", wield, 1));
         case CombatAnimation::Ready:
             return getFirstIfCreatureModel("creadyr", formatCombatAnimation("g%dr%d", wield, 1));
         case CombatAnimation::Attack:
@@ -292,7 +282,7 @@ string CreatureAnimationResolver::getAnimationName(CombatAnimation anim, Creatur
         case CombatAnimation::BlasterAttack:
             return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
         default:
-            return empty;
+            return "";
     }
 }
 

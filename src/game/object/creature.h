@@ -31,8 +31,6 @@
 #include "../blueprint/blueprint.h"
 #include "../d20/attributes.h"
 
-#include "creatureanimresolver.h"
-#include "creaturemodelbuilder.h"
 #include "item.h"
 #include "spatial.h"
 
@@ -224,7 +222,6 @@ private:
     bool _movementRestricted { false };
     bool _inCombat { false };
     int _portraitId { 0 };
-    CreatureModelBuilder _modelBuilder;
     bool _immortal { false };
     int _xp { 0 };
     std::shared_ptr<SoundSet> _soundSet;
@@ -237,7 +234,6 @@ private:
 
     // Animation
 
-    CreatureAnimationResolver _animResolver;
     bool _animDirty { true };
     bool _animFireForget { false };
     std::shared_ptr<Action> _animAction; /**< action to complete when animation is finished */
@@ -271,9 +267,40 @@ private:
 
     // END Loading
 
+    // Appearance
+
+    std::shared_ptr<scene::ModelSceneNode> buildModel();
+
+    std::string getBodyModelName() const;
+    std::string getBodyTextureName() const;
+    std::string getHeadModelName() const;
+    std::string getMaskModelName() const;
+    std::string getWeaponModelName(int slot) const;
+
+    // END Appearance
+
     // Animation
 
     void doPlayAnimation(bool fireForget, const std::function<void()> &callback);
+
+    std::string getAnimationName(AnimationType anim) const;
+    std::string getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const;
+
+    std::string getDeadAnimation() const;
+    std::string getDieAnimation() const;
+    std::string getHeadTalkAnimation() const;
+    std::string getPauseAnimation() const;
+    std::string getRunAnimation() const;
+    std::string getTalkNormalAnimation() const;
+    std::string getWalkAnimation() const;
+
+    /**
+     * @return creatureAnim if model type is creature, elseAnim otherwise
+     */
+    inline std::string getFirstIfCreatureModel(std::string creatureAnim, std::string elseAnim) const;
+
+    bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
+    int getWeaponWieldNumber(WeaponWield wield) const;
 
     // END Animation
 
