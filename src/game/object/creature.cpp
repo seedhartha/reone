@@ -73,9 +73,7 @@ Creature::Creature(
     SceneGraph *sceneGraph,
     ScriptRunner *scriptRunner
 ) :
-    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph, scriptRunner),
-    _modelBuilder(this),
-    _animResolver(this) {
+    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph, scriptRunner) {
 
     _drawDistance = 32.0f;
 }
@@ -150,7 +148,7 @@ void Creature::updateModel() {
     if (_sceneNode) {
         _sceneGraph->removeRoot(_sceneNode);
     }
-    shared_ptr<ModelSceneNode> model(_modelBuilder.build());
+    shared_ptr<ModelSceneNode> model(buildModel());
     if (model) {
         _headModel = model->getAttachedModel(g_headHookNode);
         if (!_stunt) {
@@ -207,19 +205,19 @@ void Creature::updateModelAnimation() {
 
     switch (_movementType) {
         case MovementType::Run:
-            anim = model->model()->getAnimation(_animResolver.getRunAnimation());
+            anim = model->model()->getAnimation(getRunAnimation());
             break;
         case MovementType::Walk:
-            anim = model->model()->getAnimation(_animResolver.getWalkAnimation());
+            anim = model->model()->getAnimation(getWalkAnimation());
             break;
         default:
             if (_dead) {
-                anim = model->model()->getAnimation(_animResolver.getDeadAnimation());
+                anim = model->model()->getAnimation(getDeadAnimation());
             } else if (_talking) {
-                anim = model->model()->getAnimation(_animResolver.getTalkNormalAnimation());
-                talkAnim = model->model()->getAnimation(_animResolver.getHeadTalkAnimation());
+                anim = model->model()->getAnimation(getTalkNormalAnimation());
+                talkAnim = model->model()->getAnimation(getHeadTalkAnimation());
             } else {
-                anim = model->model()->getAnimation(_animResolver.getPauseAnimation());
+                anim = model->model()->getAnimation(getPauseAnimation());
             }
             break;
     }
@@ -263,7 +261,7 @@ void Creature::playAnimation(AnimationType type, AnimationProperties properties,
     }
 
     // If animation is not supported or is looping, complete the action immediately
-    string animName(_animResolver.getAnimationName(type));
+    string animName(getAnimationName(type));
     if (actionToComplete && (animName.empty() || looping)) {
         actionToComplete->complete();
     }
@@ -323,7 +321,7 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, AnimationPropert
 }
 
 void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant) {
-    string animName(_animResolver.getAnimationName(anim, wield, variant));
+    string animName(getAnimationName(anim, wield, variant));
     if (!animName.empty()) {
         playAnimation(animName);
     }
@@ -526,7 +524,7 @@ void Creature::die() {
     debug(boost::format("Creature %s is dead") % _tag, 2);
 
     playSound(SoundSetEntry::Dead);
-    playAnimation(_animResolver.getDieAnimation());
+    playAnimation(getDieAnimation());
     runDeathScript();
 }
 

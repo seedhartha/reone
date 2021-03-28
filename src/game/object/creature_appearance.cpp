@@ -15,9 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "creaturemodelbuilder.h"
+/** @file
+ *  Appearance-related Creature functions.
+ */
 
-#include <stdexcept>
+#include "creature.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -27,8 +29,6 @@
 #include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
-
-#include "creature.h"
 
 using namespace std;
 
@@ -43,20 +43,14 @@ namespace game {
 static const string g_headHookNode("headhook");
 static const string g_maskHookNode("gogglehook");
 
-CreatureModelBuilder::CreatureModelBuilder(Creature *creature) : _creature(creature) {
-    if (!creature) {
-        throw invalid_argument("creature must not be null");
-    }
-}
-
-shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
+shared_ptr<ModelSceneNode> Creature::buildModel() {
     string modelName(getBodyModelName());
     if (modelName.empty()) return nullptr;
 
     shared_ptr<Model> model(Models::instance().get(modelName));
     if (!model) return nullptr;
 
-    auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, &_creature->sceneGraph());
+    auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, _sceneGraph);
 
     // Body texture
 
@@ -112,13 +106,13 @@ shared_ptr<ModelSceneNode> CreatureModelBuilder::build() {
     return move(modelSceneNode);
 }
 
-string CreatureModelBuilder::getBodyModelName() const {
+string Creature::getBodyModelName() const {
     string column;
 
-    if (_creature->modelType() == Creature::ModelType::Character) {
+    if (_modelType == Creature::ModelType::Character) {
         column = "model";
 
-        shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
+        shared_ptr<Item> bodyItem(getEquippedItem(InventorySlot::body));
         if (bodyItem) {
             string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
@@ -132,17 +126,17 @@ string CreatureModelBuilder::getBodyModelName() const {
 
     shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
-    string modelName(appearance->getString(_creature->appearance(), column));
+    string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
 
     return move(modelName);
 }
 
-string CreatureModelBuilder::getBodyTextureName() const {
+string Creature::getBodyTextureName() const {
     string column;
-    shared_ptr<Item> bodyItem(_creature->getEquippedItem(InventorySlot::body));
+    shared_ptr<Item> bodyItem(getEquippedItem(InventorySlot::body));
 
-    if (_creature->modelType() == Creature::ModelType::Character) {
+    if (_modelType == Creature::ModelType::Character) {
         column = "tex";
 
         if (bodyItem) {
@@ -157,10 +151,10 @@ string CreatureModelBuilder::getBodyTextureName() const {
 
     shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
-    string texName(boost::to_lower_copy(appearance->getString(_creature->appearance(), column)));
+    string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
     if (texName.empty()) return "";
 
-    if (_creature->modelType() == Creature::ModelType::Character) {
+    if (_modelType == Creature::ModelType::Character) {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
@@ -178,12 +172,12 @@ string CreatureModelBuilder::getBodyTextureName() const {
     return move(texName);
 }
 
-string CreatureModelBuilder::getHeadModelName() const {
-    if (_creature->modelType() != Creature::ModelType::Character) return "";
+string Creature::getHeadModelName() const {
+    if (_modelType != Creature::ModelType::Character) return "";
 
     shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
 
-    int headIdx = appearance->getInt(_creature->appearance(), "normalhead", -1);
+    int headIdx = appearance->getInt(_appearance, "normalhead", -1);
     if (headIdx == -1) return "";
 
     shared_ptr<TwoDA> heads(Resources::instance().get2DA("heads"));
@@ -194,8 +188,8 @@ string CreatureModelBuilder::getHeadModelName() const {
     return move(modelName);
 }
 
-string CreatureModelBuilder::getMaskModelName() const {
-    shared_ptr<Item> headItem(_creature->getEquippedItem(InventorySlot::head));
+string Creature::getMaskModelName() const {
+    shared_ptr<Item> headItem(getEquippedItem(InventorySlot::head));
     if (!headItem) return "";
 
     string modelName(boost::to_lower_copy(headItem->itemClass()));
@@ -205,8 +199,8 @@ string CreatureModelBuilder::getMaskModelName() const {
 
 }
 
-string CreatureModelBuilder::getWeaponModelName(int slot) const {
-    shared_ptr<Item> bodyItem(_creature->getEquippedItem(slot));
+string Creature::getWeaponModelName(int slot) const {
+    shared_ptr<Item> bodyItem(getEquippedItem(slot));
     if (!bodyItem) return "";
 
     string modelName(bodyItem->itemClass());

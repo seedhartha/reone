@@ -476,8 +476,6 @@ set(GAME_HEADERS
     src/game/map.h
     src/game/object/area.h
     src/game/object/creature.h
-    src/game/object/creatureanimresolver.h
-    src/game/object/creaturemodelbuilder.h
     src/game/object/door.h
     src/game/object/encounter.h
     src/game/object/item.h
@@ -589,8 +587,8 @@ set(GAME_SOURCES
     src/game/map.cpp
     src/game/object/area.cpp
     src/game/object/creature.cpp
-    src/game/object/creatureanimresolver.cpp
-    src/game/object/creaturemodelbuilder.cpp
+    src/game/object/creature_animations.cpp
+    src/game/object/creature_appearance.cpp
     src/game/object/door.cpp
     src/game/object/encounter.cpp
     src/game/object/item.cpp
