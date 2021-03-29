@@ -41,7 +41,8 @@ public:
      */
     void cancel();
 
-    bool isTimedOut() const;
+    bool isSet() const { return _time > 0.0f; }
+    bool isTimedOut() const { return _time == 0.0f; }
 
 private:
     float _time { 0.0f };

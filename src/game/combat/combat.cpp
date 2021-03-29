@@ -33,6 +33,7 @@ namespace game {
 
 static constexpr float kRoundDuration = 3.0f;
 static constexpr float kProjectileDelay = 0.5f;
+static constexpr float kDeactivateDelay = 8.0f;
 
 Combat::Combat(Game *game) : _game(game) {
     if (!game) {
@@ -163,7 +164,7 @@ void Combat::startAttack(Attack &attack, bool duel) {
 }
 
 static void finishAttack(Combat::Attack &attack) {
-    attack.attacker->setInCombat(false);
+    attack.attacker->deactivateCombat(kDeactivateDelay);
     attack.attacker->setMovementRestricted(false);
     attack.attacker->runEndRoundScript();
     if (attack.action) {

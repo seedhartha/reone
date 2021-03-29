@@ -34,10 +34,6 @@ bool Timer::advance(float secs) {
     return isTimedOut();
 }
 
-bool Timer::isTimedOut() const {
-    return _time == 0.0f;
-}
-
 void Timer::cancel() {
     _time = 0.0f;
 }
