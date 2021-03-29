@@ -172,7 +172,7 @@ void SelectionOverlay::update() {
             _selectedObject = selectedObject;
             _actions = module->getContextualActions(selectedObject);
 
-            auto selectedCreature = ObjectConverter::toCreature(hilightedObject);
+            auto selectedCreature = ObjectConverter::toCreature(selectedObject);
             if (selectedCreature) {
                 _selectedHostile = !selectedCreature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *selectedCreature);
             }
