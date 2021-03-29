@@ -97,6 +97,8 @@ public:
         ActionType lastAttackAction { ActionType::Invalid };
         bool debilitated { false };
 
+        Timer _deactivationTimer;
+
         void reset();
     };
 
@@ -153,8 +155,6 @@ public:
 
     // Animation
 
-    // END Animation
-
     void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<PlayAnimationAction> actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
@@ -162,6 +162,8 @@ public:
     void playAnimation(const std::shared_ptr<render::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
+
+    // END Animation
 
     // Equipment
 
@@ -197,6 +199,12 @@ public:
     const Perception &perception() const { return _perception; }
 
     // END Perception
+
+    // Combat
+
+    void deactivateCombat(float delay);
+
+    // END Combat
 
     // Scripts
 
@@ -252,6 +260,7 @@ private:
 
     void updateModel();
     void updateHealth();
+    void updateCombat(float dt);
 
     inline void runDeathScript();
     inline void runOnNoticeScript();

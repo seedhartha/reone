@@ -181,6 +181,7 @@ void Creature::update(float dt) {
     SpatialObject::update(dt);
     updateModelAnimation();
     updateHealth();
+    updateCombat(dt);
 }
 
 void Creature::updateModelAnimation() {
@@ -246,6 +247,13 @@ void Creature::updateHealth() {
     if (_currentHitPoints > 0 || _immortal || _dead) return;
 
     die();
+}
+
+void Creature::updateCombat(float dt) {
+    if (_combat._deactivationTimer.isSet() && _combat._deactivationTimer.advance(dt)) {
+        _combat.reset();
+        _inCombat = false;
+    }
 }
 
 void Creature::clearAllActions() {
@@ -598,7 +606,7 @@ void Creature::onObjectVanished(const shared_ptr<SpatialObject> &object) {
 }
 
 void Creature::onObjectHeard(const shared_ptr<SpatialObject> &object) {
-    _perception.heard.insert(move(object));
+    _perception.heard.insert(object);
     _perception.lastPerception = PerceptionType::Heard;
     _perception.lastPerceived = object;
     runOnNoticeScript();
@@ -609,6 +617,10 @@ void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
     _perception.lastPerception = PerceptionType::NotHeard;
     _perception.lastPerceived = object;
     runOnNoticeScript();
+}
+
+void Creature::deactivateCombat(float delay) {
+    _combat._deactivationTimer.reset(delay);
 }
 
 } // namespace game

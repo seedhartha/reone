@@ -186,17 +186,20 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
 }
 
 void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<AttackAction> action, float dt) {
+    // If target is dead, complete the action
     shared_ptr<SpatialObject> target(action->target());
     if (target->isDead()) {
         action->complete();
         return;
     }
 
+    // Otherwise, put the actor in combat state
     auto creature = static_pointer_cast<Creature>(actor);
     creature->setInCombat(true);
 
+    // Make the actor follow its target. When reached, register an attack
     if (navigateCreature(creature, target->position(), true, action->range(), dt)) {
-        _game->combat().addAttack(creature, target, move(action));
+        _game->combat().addAttack(move(creature), move(target), action);
     }
 }
 

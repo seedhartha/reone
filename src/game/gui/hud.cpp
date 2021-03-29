@@ -291,15 +291,12 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    int i = 0;
+    auto actions = _game->party().getLeader()->actionQueue().actions();
 
-    for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
-        if (action->type() != ActionType::AttackObject) continue;
-
+    for (int i = 0; i < 4; ++i) {
+        bool attack = i < static_cast<int>(actions.size()) && actions[i]->type() == ActionType::AttackObject;
         Control &item = getControl("LBL_QUEUE" + to_string(i));
-        item.setBorderFill("i_attack");
-
-        if (++i == 4) break;
+        item.setBorderFill(attack ? "i_attack" : "");
     }
 }
 
