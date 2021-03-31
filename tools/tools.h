@@ -148,6 +148,19 @@ private:
     void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
+class PthTool : public ITool {
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toPTH(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
 } // namespace tools
 
 } // namespace reone
