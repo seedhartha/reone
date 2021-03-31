@@ -32,7 +32,8 @@ enum class Operation {
     ToRIM,
     ToERF,
     ToMOD,
-    ToPTH
+    ToPTH,
+    ToASCII
 };
 
 } // namespace tools

@@ -159,6 +159,7 @@ class PthTool : public ITool {
 
 private:
     void toPTH(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toASCII(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace tools

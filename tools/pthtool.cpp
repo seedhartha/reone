@@ -21,9 +21,12 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include "glm/vec3.hpp"
 
+#include "../src/common/streamutil.h"
+#include "../src/resource/format/gffreader.h"
 #include "../src/resource/format/gffwriter.h"
 
 using namespace std;
@@ -36,9 +39,6 @@ namespace reone {
 
 namespace tools {
 
-static constexpr int kMaxNameLen = 64;
-static constexpr int kBufferSize = 256;
-
 struct PathPoint {
     string name;
     glm::vec3 position { 0.0f };
@@ -48,6 +48,8 @@ struct PathPoint {
 void PthTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToPTH) {
         toPTH(target, destPath);
+    } else if (operation == Operation::ToASCII) {
+        toASCII(target, destPath);
     }
 }
 
@@ -157,11 +159,52 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
     writer.save(pthPath);
 }
 
+static string getPointName(int index) {
+    return str(boost::format("PathPoint%03d") % index);
+}
+
+void PthTool::toASCII(const fs::path &path, const fs::path &destPath) {
+    // Read binary PTH
+
+    GffReader reader;
+    reader.load(path);
+    shared_ptr<GffStruct> root(reader.root());
+
+    // Write ASCII PTH
+
+    string filename(path.filename().string());
+    int lastDotIdx = filename.find_last_of('.');
+    if (lastDotIdx != -1) {
+        filename = filename.substr(0, lastDotIdx);
+    }
+
+    fs::path asciiPath(destPath);
+    asciiPath.append(filename + "-ascii.pth");
+
+    auto ascii = make_shared<fs::ofstream>(asciiPath);
+    int pointIdx = 0;
+    StreamWriter writer(ascii);
+    for (auto &point : root->getList("Path_Points")) {
+        string name(getPointName(pointIdx++));
+        int conections = point->getInt("Conections");
+        int firstConection = point->getInt("First_Conection");
+        float x = point->getFloat("X");
+        float y = point->getFloat("Y");
+        writer.putString(str(boost::format("%s %f %f %f %d\n") % name % x % y % 0.0f % conections));
+        for (int i = 0; i < conections; ++i) {
+            shared_ptr<GffStruct> conection(root->getList("Path_Conections")[firstConection + i]);
+            int destination = conection->getInt("Destination");
+            string destName(getPointName(destination));
+            writer.putString(str(boost::format("  %s\n") % destName));
+        }
+    }
+}
+
 bool PthTool::supports(Operation operation, const fs::path &target) const {
     return
         !fs::is_directory(target) &&
         target.extension() == ".pth" &&
-        operation == Operation::ToPTH;
+        (operation == Operation::ToPTH || operation == Operation::ToASCII);
 }
 
 } // namespace tools
