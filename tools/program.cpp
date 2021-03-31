@@ -51,7 +51,8 @@ static const unordered_map<string, Operation> g_operations {
     { "to-gff", Operation::ToGFF },
     { "to-rim", Operation::ToRIM },
     { "to-erf", Operation::ToERF },
-    { "to-mod", Operation::ToMOD }
+    { "to-mod", Operation::ToMOD },
+    { "to-pth", Operation::ToPTH }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -95,6 +96,7 @@ void Program::initOptions() {
         ("to-rim", "create RIM archive from directory")
         ("to-erf", "create ERF archive from directory")
         ("to-mod", "create MOD archive from directory")
+        ("to-pth", "convert ASCII PTH to PTH")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -151,6 +153,7 @@ void Program::loadTools() {
     _tools.push_back(make_shared<TlkTool>());
     _tools.push_back(make_shared<GffTool>());
     _tools.push_back(make_shared<TpcTool>());
+    _tools.push_back(make_shared<PthTool>());
 }
 
 shared_ptr<ITool> Program::getTool() const {

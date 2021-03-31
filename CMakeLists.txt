@@ -693,6 +693,7 @@ if(BUILD_TOOLS)
         tools/keybiftool.cpp
         tools/main.cpp
         tools/program.cpp
+        tools/pthtool.cpp
         tools/rimtool.cpp
         tools/tlktool.cpp
         tools/tpctool.cpp)

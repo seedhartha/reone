@@ -195,10 +195,12 @@ void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<A
 
     // Otherwise, put the actor in combat state
     auto creature = static_pointer_cast<Creature>(actor);
+    creature->combat().attemptedAttackTarget = target;
     creature->setInCombat(true);
 
     // Make the actor follow its target. When reached, register an attack
     if (navigateCreature(creature, target->position(), true, action->range(), dt)) {
+        creature->combat().attackTarget = target;
         _game->combat().addAttack(move(creature), move(target), action);
     }
 }
