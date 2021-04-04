@@ -44,14 +44,6 @@ constexpr float kDefaultAttackRange = 2.0f;
 
 class ObjectFactory;
 
-enum class CombatState {
-    Idle,
-    Attack,
-    Defense,
-    Cooldown,
-    Staggered
-};
-
 class Creature : public SpatialObject {
 public:
     enum class ModelType {
