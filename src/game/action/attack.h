@@ -27,9 +27,11 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(std::shared_ptr<SpatialObject> object, float range = kDefaultAttackRange) :
+    AttackAction(std::shared_ptr<SpatialObject> object, float range = kDefaultAttackRange, bool userAction = false) :
         ObjectAction(ActionType::AttackObject, std::move(object)),
         _range(range) {
+
+        _userAction = userAction;
     }
 
     std::shared_ptr<SpatialObject> target() const { return std::static_pointer_cast<SpatialObject>(_object); }
