@@ -125,10 +125,7 @@ void Container::transferItemsToPlayer() {
 
     auto placeable = ObjectConverter::toPlaceable(_container);
     if (placeable) {
-        string script(placeable->getOnInvDisturbed());
-        if (!script.empty()) {
-            _game->scriptRunner().run(script, placeable->id(), player->id());
-        }
+        placeable->runOnInvDisturbed(player);
     }
 }
 

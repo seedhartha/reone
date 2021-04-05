@@ -255,10 +255,11 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
     if (placeable->hasInventory()) {
         actions.clear();
         actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
-
     } else if (!placeable->conversation().empty()) {
         actions.clear();
         actions.add(make_unique<StartConversationAction>(placeable, placeable->conversation()));
+    } else {
+        placeable->runOnUsed(move(partyLeader));
     }
 }
 

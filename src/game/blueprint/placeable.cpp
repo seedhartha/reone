@@ -73,6 +73,7 @@ void PlaceableBlueprint::loadItems(Placeable &placeable) {
 
 void PlaceableBlueprint::loadScripts(Placeable &placeable) {
     placeable._heartbeat = boost::to_lower_copy(_utp->getString("OnHeartbeat"));
+    placeable._onUsed = boost::to_lower_copy(_utp->getString("OnUsed"));
     placeable._onInvDisturbed = boost::to_lower_copy(_utp->getString("OnInvDisturbed"));
     placeable._onUserDefined = boost::to_lower_copy(_utp->getString("OnUserDefined"));
 }

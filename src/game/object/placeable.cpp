@@ -36,6 +36,7 @@ using namespace std;
 using namespace reone::render;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
@@ -90,6 +91,18 @@ void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
 
 shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
     return _walkmesh;
+}
+
+void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
+    if (!_onUsed.empty()) {
+        _scriptRunner->run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+    }
+}
+
+void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
+    if (!_onInvDisturbed.empty()) {
+        _scriptRunner->run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+    }
 }
 
 } // namespace game

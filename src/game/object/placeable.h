@@ -50,7 +50,10 @@ public:
 
     std::shared_ptr<render::Walkmesh> getWalkmesh() const override;
 
-    const std::string &getOnInvDisturbed() const { return _onInvDisturbed; }
+    // Scripts
+
+    void runOnUsed(std::shared_ptr<SpatialObject> usedBy);
+    void runOnInvDisturbed(std::shared_ptr<SpatialObject> triggerrer);
 
 private:
     int  _appearance { 0 };
@@ -60,6 +63,7 @@ private:
 
     // Scripts
 
+    std::string _onUsed;
     std::string _onInvDisturbed;
 
 
