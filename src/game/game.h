@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <set>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
@@ -119,7 +120,7 @@ public:
     CameraType cameraType() const { return _cameraType; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
     Conversation &conversation() { return *_conversation; }
-    const std::vector<std::string> &moduleNames() const { return _moduleNames; }
+    const std::set<std::string> &moduleNames() const { return _moduleNames; }
     Combat &combat() { return _combat; }
 
     void setCursorType(CursorType type);
@@ -231,7 +232,7 @@ private:
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     ProfileOverlay _profileOverlay;
-    std::vector<std::string> _moduleNames;
+    std::set<std::string> _moduleNames;
     Combat _combat;
 
     // Modules

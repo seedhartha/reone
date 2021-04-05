@@ -144,13 +144,11 @@ void Game::loadModuleNames() {
 
     for (auto &entry : fs::directory_iterator(modules)) {
         string filename(boost::to_lower_copy(entry.path().filename().string()));
-        if (!boost::ends_with(filename, ".rim") || boost::ends_with(filename, "_s.rim")) continue;
-
-        string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
-        _moduleNames.push_back(move(moduleName));
+        if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
+            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
+            _moduleNames.insert(move(moduleName));
+        }
     }
-
-    sort(_moduleNames.begin(), _moduleNames.end());
 }
 
 void Game::setCursorType(CursorType type) {
@@ -308,8 +306,13 @@ void Game::loadModuleResources(const string &moduleName) {
     Resources::instance().clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
-    Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-    Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
+    if (fs::exists(modPath)) {
+        Resources::instance().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+    } else {
+        Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+    }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     Resources::instance().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
