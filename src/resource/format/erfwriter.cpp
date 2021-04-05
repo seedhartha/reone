@@ -58,7 +58,8 @@ void ErfWriter::save(FileType type, const fs::path &path) {
     writer.putUint32(offResources); // offset to resource list
     writer.putUint32(0); // build year since 1900
     writer.putUint32(0); // build day since January 1st
-    writer.putBytes(120); // padding
+    writer.putInt32(-1); // StrRef for file description
+    writer.putBytes(116); // padding
 
     uint32_t id = 0;
 
@@ -69,11 +70,11 @@ void ErfWriter::save(FileType type, const fs::path &path) {
         writer.putString(resRef);
 
         writer.putUint32(id++);
-        writer.putUint32(static_cast<uint16_t>(res.resType));
+        writer.putUint16(static_cast<uint16_t>(res.resType));
         writer.putUint16(0); // unused
     }
 
-    uint32_t offset = offResources + (kKeyStructSize + kResourceStructSize) * numResources;
+    uint32_t offset = 0xa0 + (kKeyStructSize + kResourceStructSize) * numResources;
 
     // Write resources
     for (auto &res : _resources) {

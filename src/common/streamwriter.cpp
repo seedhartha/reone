@@ -50,6 +50,10 @@ void StreamWriter::putUint32(uint32_t val) {
     put(val);
 }
 
+void StreamWriter::putInt32(int32_t val) {
+    put(val);
+}
+
 void StreamWriter::putInt64(int64_t val) {
     put(val);
 }
