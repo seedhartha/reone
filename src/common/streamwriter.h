@@ -38,6 +38,7 @@ public:
     void putChar(char val);
     void putUint16(uint16_t val);
     void putUint32(uint32_t val);
+    void putInt32(int32_t val);
     void putInt64(int64_t val);
     void putString(const std::string &str);
     void putCString(const std::string &str);
