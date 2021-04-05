@@ -140,7 +140,10 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 
 void SelectionOverlay::update() {
     _hilightedObject.reset();
+    _hilightedHostile = false;
+
     _selectedObject.reset();
+    _selectedHostile = false;
 
     shared_ptr<Module> module(_game->module());
     shared_ptr<Area> area(module->area());
