@@ -883,26 +883,6 @@ shared_ptr<Location> Game::getGlobalLocation(const string &name) const {
     return maybeLocation != _globalLocations.end() ? maybeLocation->second : nullptr;
 }
 
-bool Game::getLocalBoolean(uint32_t objectId, int index) const {
-    auto maybeObject = _localBooleans.find(objectId);
-    if (maybeObject == _localBooleans.end()) return false;
-
-    auto maybeValue = maybeObject->second.find(index);
-    if (maybeValue == maybeObject->second.end()) return false;
-
-    return maybeValue->second;
-}
-
-int Game::getLocalNumber(uint32_t objectId, int index) const {
-    auto maybeObject = _localNumbers.find(objectId);
-    if (maybeObject == _localNumbers.end()) return 0;
-
-    auto maybeValue = maybeObject->second.find(index);
-    if (maybeValue == maybeObject->second.end()) return 0;
-
-    return maybeValue->second;
-}
-
 void Game::setGlobalBoolean(const string &name, bool value) {
     _globalBooleans[name] = value;
 }
@@ -917,14 +897,6 @@ void Game::setGlobalString(const string &name, const string &value) {
 
 void Game::setGlobalLocation(const string &name, const shared_ptr<Location> &location) {
     _globalLocations[name] = location;
-}
-
-void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
-    _localBooleans[objectId][index] = value;
-}
-
-void Game::setLocalNumber(uint32_t objectId, int index, int value) {
-    _localNumbers[objectId][index] = value;
 }
 
 void Game::setPaused(bool paused) {

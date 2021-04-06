@@ -26,8 +26,26 @@ namespace script {
 ScriptObject::ScriptObject(uint32_t id) : _id(id) {
 }
 
+bool ScriptObject::getLocalBoolean(int index) const {
+    auto maybeValue = _localBooleans.find(index);
+    return maybeValue != _localBooleans.end() ? maybeValue->second : false;
+}
+
+int ScriptObject::getLocalNumber(int index) const {
+    auto maybeValue = _localNumbers.find(index);
+    return maybeValue != _localNumbers.end() ? maybeValue->second : 0;
+}
+
 void ScriptObject::setTag(string tag) {
     _tag = move(tag);
+}
+
+void ScriptObject::setLocalBoolean(int index, bool value) {
+    _localBooleans[index] = value;
+}
+
+void ScriptObject::setLocalNumber(int index, int value) {
+    _localNumbers[index] = value;
 }
 
 } // namespace script
