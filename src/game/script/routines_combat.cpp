@@ -66,7 +66,7 @@ Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result = creature->combat().attackTarget;
+        creature->getAttackTarget();
     } else {
         debug("Script: getAttackTarget: creature is invalid", 1, DebugChannels::script);
     }
@@ -79,7 +79,7 @@ Variable Routines::getAttemptedAttackTarget(const VariablesList &args, Execution
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result = caller->combat().attemptedAttackTarget;
+        caller->getAttemptedAttackTarget();
     } else {
         debug("Script: getAttemptedAttackTarget: caller is invalid", 1, DebugChannels::script);
     }
@@ -92,7 +92,7 @@ Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &c
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result = creature->combat().spellTarget;
+        // TODO: implement
     } else {
         debug("Script: getSpellTarget: creature is invalid", 1, DebugChannels::script);
     }
@@ -105,7 +105,7 @@ Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionC
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result = caller->combat().attemptedSpellTarget;
+        // TODO: implement
     } else {
         debug("Script: getAttemptedSpellTarget: caller is invalid", 1, DebugChannels::script);
     }
@@ -118,7 +118,7 @@ Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext 
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        result = creature->combat().debilitated;
+        result = creature->isDebilitated();
     } else {
         debug("Script: getIsDebilitated: creature is invalid", 1, DebugChannels::script);
     }
@@ -131,18 +131,25 @@ Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionCont
 
     auto attacker = getCreatureOrCaller(args, 0, ctx);
     if (attacker) {
-        result = attacker->combat().lastHostileTarget;
+        // TODO: implement
     } else {
-        debug("Script: getIsDebilitated: attacker is invalid", 1, DebugChannels::script);
+        debug("Script: getLastHostileTarget: attacker is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofObject(result);
 }
 
 Variable Routines::getLastAttackAction(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: implement
-    auto attacker = getObjectOrCaller(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(ActionType::QueueEmpty));
+    auto result = ActionType::QueueEmpty;
+
+    auto attacker = getCreatureOrCaller(args, 0, ctx);
+    if (attacker) {
+        // TODO: implement
+    } else {
+        debug("Script: getLastAttackAction: attacker is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::getPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
@@ -160,9 +167,11 @@ Variable Routines::setPlayerRestrictMode(const VariablesList &args, ExecutionCon
 Variable Routines::getUserActionsPending(const VariablesList &args, ExecutionContext &ctx) {
     bool result = 0;
 
-    shared_ptr<Creature> leader(_game->party().getLeader());
-    if (leader) {
-        result = leader->actionQueue().containsUserActions();
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        result = caller->actionQueue().containsUserActions();
+    } else {
+        debug("Script: getUserActionsPending: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));

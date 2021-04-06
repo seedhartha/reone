@@ -57,16 +57,6 @@ static constexpr int kStrRefRemains = 38151;
 static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
-void Creature::Combat::reset() {
-    attackTarget.reset();
-    attemptedAttackTarget.reset();
-    spellTarget.reset();
-    attemptedSpellTarget.reset();
-    lastHostileTarget.reset();
-    lastAttackAction = ActionType::Invalid;
-    debilitated = false;
-}
-
 Creature::Creature(
     uint32_t id,
     ObjectFactory *objectFactory,
@@ -250,9 +240,9 @@ void Creature::updateHealth() {
 }
 
 void Creature::updateCombat(float dt) {
-    if (_combat._deactivationTimer.isSet() && _combat._deactivationTimer.advance(dt)) {
-        _combat.reset();
-        _inCombat = false;
+    if (_combat.deactivationTimer.isSet() && _combat.deactivationTimer.advance(dt)) {
+        _combat.active = false;
+        _combat.debilitated = false;
     }
 }
 
@@ -486,10 +476,6 @@ void Creature::setMovementRestricted(bool restricted) {
     _movementRestricted = restricted;
 }
 
-void Creature::setInCombat(bool inCombat) {
-    _inCombat = inCombat;
-}
-
 void Creature::setImmortal(bool immortal) {
     _immortal = immortal;
 }
@@ -619,8 +605,30 @@ void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
     runOnNoticeScript();
 }
 
+void Creature::activateCombat() {
+    _combat.active = true;
+    if (_combat.deactivationTimer.isSet()) {
+        _combat.deactivationTimer.reset();
+    }
+}
+
 void Creature::deactivateCombat(float delay) {
-    _combat._deactivationTimer.reset(delay);
+    if (_combat.active && !_combat.deactivationTimer.isSet()) {
+        _combat.deactivationTimer.reset(delay);
+    }
+}
+
+shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
+    shared_ptr<SpatialObject> result;
+
+    if (!_actionQueue.isEmpty()) {
+        auto attackAction = dynamic_pointer_cast<AttackAction>(_actionQueue.actions().front());
+        if (attackAction) {
+            result = attackAction->target();
+        }
+    }
+
+    return move(result);
 }
 
 } // namespace game

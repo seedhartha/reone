@@ -546,6 +546,19 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
     return Variable::ofObject(move(object));
 }
 
+Variable Routines::objectToString(const VariablesList &args, ExecutionContext &ctx) {
+    auto object = getObject(args, 0);
+    string result;
+
+    if (object) {
+        result = str(boost::format("%x") % object->id());
+    } else {
+        debug("Script: objectToString: object is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable::ofString(move(result));
+}
+
 } // namespace game
 
 } // namespace reone

@@ -171,7 +171,7 @@ string Creature::getPauseAnimation() const {
 
     // TODO: if (_lowHP) return "pauseinj" 
 
-    if (_inCombat) {
+    if (_combat.active) {
         WeaponType type = WeaponType::None;
         WeaponWield wield = WeaponWield::None;
         getWeaponInfo(type, wield);
@@ -222,7 +222,7 @@ string Creature::getRunAnimation() const {
 
     // TODO: if (_lowHP) return "runinj" 
 
-    if (_inCombat) {
+    if (_combat.active) {
         WeaponType type = WeaponType::None;
         WeaponWield wield = WeaponWield::None;
         getWeaponInfo(type, wield);

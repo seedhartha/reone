@@ -81,17 +81,10 @@ public:
     };
 
     struct Combat {
-        std::shared_ptr<SpatialObject> attackTarget;
-        std::shared_ptr<SpatialObject> attemptedAttackTarget;
-        std::shared_ptr<SpatialObject> spellTarget;
-        std::shared_ptr<SpatialObject> attemptedSpellTarget;
-        std::shared_ptr<SpatialObject> lastHostileTarget;
-        ActionType lastAttackAction { ActionType::Invalid };
+        bool active { false };
         bool debilitated { false };
-
-        Timer _deactivationTimer;
-
-        void reset();
+        std::shared_ptr<SpatialObject> attackTarget;
+        Timer deactivationTimer;
     };
 
     Creature(
@@ -116,7 +109,6 @@ public:
 
     bool isSelectable() const override;
     bool isMovementRestricted() const { return _movementRestricted; }
-    bool isInCombat() const { return _inCombat; }
     bool isLevelUpPending() const;
 
     glm::vec3 getSelectablePosition() const override;
@@ -135,12 +127,10 @@ public:
     RacialType racialType() const { return _racialType; }
     Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
-    Combat &combat() { return _combat; }
 
     void setMovementType(MovementType type);
     void setFaction(Faction faction);
     void setMovementRestricted(bool restricted);
-    void setInCombat(bool inCombat);
     void setImmortal(bool immortal);
     void setXP(int xp);
     void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
@@ -194,7 +184,16 @@ public:
 
     // Combat
 
+    void activateCombat();
     void deactivateCombat(float delay);
+
+    bool isInCombat() const { return _combat.active; }
+    bool isDebilitated() const { return _combat.debilitated; }
+
+    std::shared_ptr<SpatialObject> getAttemptedAttackTarget() const;
+    std::shared_ptr<SpatialObject> getAttackTarget() const { return _combat.attackTarget; }
+
+    void setAttackTarget(std::shared_ptr<SpatialObject> target) { _combat.attackTarget = move(target); }
 
     // END Combat
 
@@ -220,7 +219,7 @@ private:
     CreatureAttributes _attributes;
     Faction _faction { Faction::Invalid };
     bool _movementRestricted { false };
-    bool _inCombat { false };
+    Combat _combat;
     int _portraitId { 0 };
     bool _immortal { false };
     int _xp { 0 };
@@ -230,7 +229,6 @@ private:
     RacialType _racialType { RacialType::Unknown };
     Subrace _subrace { Subrace::None };
     NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
-    Combat _combat;
 
     // Animation
 

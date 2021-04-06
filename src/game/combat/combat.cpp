@@ -152,6 +152,8 @@ void Combat::startAttack(Attack &attack, bool duel) {
     attack.attacker->face(*attack.target);
     attack.attacker->setMovementType(Creature::MovementType::None);
     attack.attacker->setMovementRestricted(true);
+    attack.attacker->activateCombat();
+    attack.attacker->setAttackTarget(attack.target);
     attack.attacker->playAnimation(animation.attackerAnimation, animation.attackerWieldType, animation.animationVariant);
 
     if (duel) {
@@ -159,17 +161,20 @@ void Combat::startAttack(Attack &attack, bool duel) {
         target->face(*attack.attacker);
         target->setMovementType(Creature::MovementType::None);
         target->setMovementRestricted(true);
+        target->activateCombat();
+        target->setAttackTarget(attack.attacker);
         target->playAnimation(animation.targetAnimation, animation.attackerWieldType, animation.animationVariant);
     }
 }
 
 static void finishAttack(Combat::Attack &attack) {
-    attack.attacker->deactivateCombat(kDeactivateDelay);
-    attack.attacker->setMovementRestricted(false);
-    attack.attacker->runEndRoundScript();
     if (attack.action) {
         attack.action->complete();
     }
+    attack.attacker->deactivateCombat(kDeactivateDelay);
+    attack.attacker->setAttackTarget(nullptr);
+    attack.attacker->setMovementRestricted(false);
+    attack.attacker->runEndRoundScript();
 }
 
 void Combat::finishRound(Round &round) {
