@@ -106,7 +106,6 @@ public:
     bool isInConversation() const { return _screen == GameScreen::Conversation; }
 
     Camera *getActiveCamera() const;
-    int getRunScriptVar() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     GameID gameId() const { return _gameId; }
@@ -125,7 +124,6 @@ public:
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
-    void setRunScriptVar(int var);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
 
@@ -223,7 +221,6 @@ private:
     float _gameSpeed { 1.0f };
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
-    int _runScriptVar { -1 };
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     std::set<std::string> _moduleNames;
