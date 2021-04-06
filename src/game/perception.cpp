@@ -60,35 +60,35 @@ void Perception::doUpdate() {
             // Skip self
             if (other == object) continue;
 
-            bool seen = false;
             bool heard = false;
+            bool seen = false;
 
             float distance2 = creature->getDistanceTo2(*object);
-            if (distance2 <= sightRange2) {
-                seen = isInLineOfSight(*creature, *other);
-            }
             if (distance2 <= hearingRange2) {
                 heard = true;
             }
-
-            // Sight
-            bool wasSeen = creature->perception().seen.count(other) > 0;
-            if (!wasSeen && seen) {
-                creature->onObjectSeen(other);
-                debug(boost::format("Perception: %s seen by %s") % other->tag() % creature->tag(), 2);
-            } else if (wasSeen && !seen) {
-                creature->onObjectVanished(other);
-                debug(boost::format("Perception: %s vanished from %s") % other->tag() % creature->tag(), 2);
+            if (distance2 <= sightRange2) {
+                seen = isInLineOfSight(*creature, *other);
             }
 
             // Hearing
             bool wasHeard = creature->perception().heard.count(other) > 0;
             if (!wasHeard && heard) {
-                creature->onObjectHeard(other);
                 debug(boost::format("Perception: %s heard by %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectHeard(other);
             } else if (wasHeard && !heard) {
-                creature->onObjectInaudible(other);
                 debug(boost::format("Perception: %s inaudible to %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectInaudible(other);
+            }
+
+            // Sight
+            bool wasSeen = creature->perception().seen.count(other) > 0;
+            if (!wasSeen && seen) {
+                debug(boost::format("Perception: %s seen by %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectSeen(other);
+            } else if (wasSeen && !seen) {
+                debug(boost::format("Perception: %s vanished from %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectVanished(other);
             }
         }
     }

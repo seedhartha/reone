@@ -291,7 +291,7 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto actions = _game->party().getLeader()->actionQueue().actions();
+    auto &actions = _game->party().getLeader()->actionQueue().actions();
 
     for (int i = 0; i < 4; ++i) {
         bool attack = i < static_cast<int>(actions.size()) && actions[i]->type() == ActionType::AttackObject;

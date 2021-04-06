@@ -315,7 +315,7 @@ void Routines::addTslRoutines() {
     add("EffectForcePushTargeted", Effect, { Location, Int }, &Routines::effectForcePushTargeted);
     add("EffectHaste", Effect, { }, &Routines::effectHaste);
     add("GiveItem", Void, { Object, Object });
-    add("ObjectToString", String, { Object });
+    add("ObjectToString", String, { Object }, &Routines::objectToString);
     add("EffectImmunity", Effect, { Int }, &Routines::effectImmunity);
     add("GetIsImmune", Int, { Object, Int, Object });
     add("EffectDamageImmunityIncrease", Effect, { Int, Int }, &Routines::effectDamageImmunityIncrease);

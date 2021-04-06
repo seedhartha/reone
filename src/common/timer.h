@@ -27,7 +27,7 @@ public:
     Timer() = default;
     Timer(float timeout);
 
-    void reset(float timeout);
+    void reset(float timeout = 0.0f);
 
     /**
      * Advances this timer by the specified amount of seconds.

@@ -426,6 +426,7 @@ private:
     REO_DECL_ROUTINE(jumpToObject)
     REO_DECL_ROUTINE(location)
     REO_DECL_ROUTINE(log)
+    REO_DECL_ROUTINE(objectToString)
     REO_DECL_ROUTINE(playAnimation)
     REO_DECL_ROUTINE(playMovie)
     REO_DECL_ROUTINE(pow)
