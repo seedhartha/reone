@@ -55,6 +55,7 @@ struct ExecutionContext {
     std::shared_ptr<ScriptObject> caller;
     std::shared_ptr<ScriptObject> triggerer;
     int userDefinedEventNumber { -1 };
+    int scriptVar { -1 };
 };
 
 } // namespace script

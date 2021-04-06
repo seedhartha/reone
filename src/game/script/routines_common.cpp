@@ -100,8 +100,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
     int scriptVar = getInt(args, 2, -1);
 
     if (target) {
-        _game->setRunScriptVar(scriptVar);
-        _game->scriptRunner().run(script, target->id());
+        _game->scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
     } else {
         debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
@@ -110,7 +109,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getRunScriptVar(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->getRunScriptVar());
+    return Variable::ofInt(ctx.scriptVar);
 }
 
 Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionContext &ctx) {

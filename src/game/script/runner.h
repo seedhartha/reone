@@ -44,7 +44,8 @@ public:
         const std::string &resRef,
         uint32_t callerId = script::kObjectInvalid,
         uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1);
+        int userDefinedEventNumber = -1,
+        int scriptVar = -1);
 
 private:
     Game *_game;

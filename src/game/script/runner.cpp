@@ -40,7 +40,7 @@ ScriptRunner::ScriptRunner(Game *game) : _game(game) {
     }
 }
 
-int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber) {
+int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
     auto program = Scripts::instance().get(resRef);
     if (!program) return -1;
 
@@ -49,6 +49,7 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
     ctx->caller = _game->getObjectById(callerId);
     ctx->triggerer = _game->getObjectById(triggerrerId);
     ctx->userDefinedEventNumber = userDefinedEventNumber;
+    ctx->scriptVar = scriptVar;
 
     return ScriptExecution(program, move(ctx)).run();
 }

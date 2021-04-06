@@ -387,10 +387,6 @@ Camera *Game::getActiveCamera() const {
     return _module ? &(_module->area()->getCamera(_cameraType)) : nullptr;
 }
 
-int Game::getRunScriptVar() const {
-    return _runScriptVar;
-}
-
 shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     switch (id) {
         case kObjectSelf:
@@ -929,10 +925,6 @@ void Game::setLocalBoolean(uint32_t objectId, int index, bool value) {
 
 void Game::setLocalNumber(uint32_t objectId, int index, int value) {
     _localNumbers[objectId][index] = value;
-}
-
-void Game::setRunScriptVar(int var) {
-    _runScriptVar = var;
 }
 
 void Game::setPaused(bool paused) {
