@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <string>
 
 #include <boost/noncopyable.hpp>
@@ -30,16 +31,25 @@ class ScriptObject : boost::noncopyable {
 public:
     virtual ~ScriptObject() = default;
 
+    bool getLocalBoolean(int index) const;
+    int getLocalNumber(int index) const;
+
     uint32_t id() const { return _id; }
     const std::string &tag() const { return _tag; }
 
     void setTag(std::string tag);
+    void setLocalBoolean(int index, bool value);
+    void setLocalNumber(int index, int value);
 
 protected:
     uint32_t _id { 0 };
     std::string _tag;
 
     ScriptObject(uint32_t id);
+
+private:
+    std::map<int, bool> _localBooleans;
+    std::map<int, int> _localNumbers;
 };
 
 } // namespace script

@@ -165,9 +165,7 @@ public:
     // Globals/locals
 
     bool getGlobalBoolean(const std::string &name) const;
-    bool getLocalBoolean(uint32_t objectId, int index) const;
     int getGlobalNumber(const std::string &name) const;
-    int getLocalNumber(uint32_t objectId, int index) const;
     std::shared_ptr<Location> getGlobalLocation(const std::string &name) const;
     std::string getGlobalString(const std::string &name) const;
 
@@ -175,8 +173,6 @@ public:
     void setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location);
     void setGlobalNumber(const std::string &name, int value);
     void setGlobalString(const std::string &name, const std::string &value);
-    void setLocalBoolean(uint32_t objectId, int index, bool value);
-    void setLocalNumber(uint32_t objectId, int index, int value);
 
     // END Globals/locals
 
@@ -263,8 +259,6 @@ private:
     std::map<std::string, bool> _globalBooleans;
     std::map<std::string, int> _globalNumbers;
     std::map<std::string, std::shared_ptr<Location>> _globalLocations;
-    std::map<uint32_t, std::map<int, bool>> _localBooleans;
-    std::map<uint32_t, std::map<int, int>> _localNumbers;
 
     // END Globals/locals
 
