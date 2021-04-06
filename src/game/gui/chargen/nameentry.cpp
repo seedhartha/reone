@@ -88,7 +88,7 @@ void NameEntry::loadRandomName() {
 }
 
 string NameEntry::getRandomName() const {
-    Gender gender = _charGen->character().gender();
+    Gender gender = _charGen->character().gender;
     const LtrReader &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
     return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }

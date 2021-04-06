@@ -20,8 +20,7 @@
 #include "../../../scene/node/modelscenenode.h"
 #include "../../../scene/scenegraph.h"
 
-#include "../../blueprint/creature.h"
-#include "../../object/creature.h"
+#include "../../character.h"
 
 #include "../gui.h"
 
@@ -92,18 +91,15 @@ public:
 
     void goToNextStep();
 
-    StaticCreatureBlueprint &character() { return *_character; }
+    const Character &character() const { return _character; }
 
-    void setCharacter(StaticCreatureBlueprint character);
-    void setAbilities(CreatureAbilities abilities);
-    void setSkills(CreatureSkills skills);
+    void setCharacter(Character character);
 
 private:
     Game *_game { nullptr };
     CharGenScreen _screen { CharGenScreen::ClassSelection };
-    std::shared_ptr<StaticCreatureBlueprint> _character;
-    std::unique_ptr<Creature> _creature;
     Type _type  { Type::Quick };
+    Character _character;
 
     // Sub GUI
 
@@ -120,7 +116,7 @@ private:
 
     // END Sub GUI
 
-    void loadCharacterModel();
+    void reloadCharacterModel();
     void updateAttributes();
     void changeScreen(CharGenScreen screen);
 

@@ -35,7 +35,6 @@
 
 #include "../action/attack.h"
 #include "../animationutil.h"
-#include "../blueprint/blueprints.h"
 #include "../portraitutil.h"
 
 #include "objectfactory.h"
@@ -68,57 +67,25 @@ Creature::Creature(
     _drawDistance = 32.0f;
 }
 
-bool Creature::isSelectable() const {
-    bool hasDropableItems = false;
-    for (auto &item : _items) {
-        if (item->isDropable()) {
-            hasDropableItems = true;
-            break;
-        }
-    }
-    return !_dead || hasDropableItems;
+void Creature::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
+    loadTransformFromGIT(gffs);
 }
 
-void Creature::load(const GffStruct &gffs) {
-    loadTransform(gffs);
-    loadBlueprint(gffs);
+void Creature::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> utc(Resources::instance().getGFF(resRef, ResourceType::Utc));
+    loadUTC(*utc);
+    loadAppearance();
 }
 
-void Creature::loadTransform(const GffStruct &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
+void Creature::loadAppearance() {
+    shared_ptr<TwoDA> appearances(Resources::instance().get2DA("appearance"));
+    _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
+    _walkSpeed = appearances->getFloat(_appearance, "walkdist", 0.0f);
+    _runSpeed = appearances->getFloat(_appearance, "rundist", 0.0f);
 
-    float dirX = gffs.getFloat("XOrientation");
-    float dirY = gffs.getFloat("YOrientation");
-    _facing = -glm::atan(dirX, dirY);
-
-    updateTransform();
-}
-
-void Creature::loadBlueprint(const GffStruct &gffs) {
-    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
-    shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(resRef));
-    load(blueprint);
-}
-
-void Creature::load(const shared_ptr<Blueprint<Creature>> &blueprint) {
-    if (!blueprint) {
-        throw invalid_argument("blueprint must not be null");
-    }
-    blueprint->load(*this);
-
-    shared_ptr<TwoDA> appearance(Resources::instance().get2DA("appearance"));
-    loadAppearance(*appearance, _appearance);
-    loadPortrait(_appearance);
-}
-
-void Creature::loadAppearance(const TwoDA &table, int row) {
-    _appearance = row;
-    _modelType = parseModelType(table.getString(row, "modeltype"));
-    _walkSpeed = table.getFloat(row, "walkdist", 0.0f);
-    _runSpeed = table.getFloat(row, "rundist", 0.0f);
-
+    loadPortrait();
     updateModel();
 }
 
@@ -132,6 +99,23 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
     }
 
     throw logic_error("Unsupported model type: " + s);
+}
+
+void Creature::loadPortrait() {
+    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
+    string appearanceString(to_string(_appearance));
+
+    vector<pair<string, string>> columnValues {
+        { "appearancenumber", appearanceString },
+        { "appearance_s", appearanceString },
+        { "appearance_l", appearanceString }
+    };
+
+    int row = portraits->indexByCellValuesAny(columnValues);
+    if (row == -1) return;
+
+    string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
+    _portrait = Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void Creature::updateModel() {
@@ -150,21 +134,27 @@ void Creature::updateModel() {
     _sceneNode = model;
 }
 
-void Creature::loadPortrait(int appearance) {
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
-    string appearanceString(to_string(appearance));
+void Creature::loadTransformFromGIT(const GffStruct &gffs) {
+    _position[0] = gffs.getFloat("XPosition");
+    _position[1] = gffs.getFloat("YPosition");
+    _position[2] = gffs.getFloat("ZPosition");
 
-    vector<pair<string, string>> columnValues {
-        { "appearancenumber", appearanceString },
-        { "appearance_s", appearanceString },
-        { "appearance_l", appearanceString }
-    };
+    float sine = gffs.getFloat("XOrientation");
+    float cosine = gffs.getFloat("YOrientation");
+    _facing = -glm::atan(sine, cosine);
 
-    int row = portraits->indexByCellValuesAny(columnValues);
-    if (row == -1) return;
+    updateTransform();
+}
 
-    string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
-    _portrait = Textures::instance().get(resRef, TextureUsage::GUI);
+bool Creature::isSelectable() const {
+    bool hasDropableItems = false;
+    for (auto &item : _items) {
+        if (item->isDropable()) {
+            hasDropableItems = true;
+            break;
+        }
+    }
+    return !_dead || hasDropableItems;
 }
 
 void Creature::update(float dt) {
@@ -326,10 +316,8 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
 }
 
 bool Creature::equip(const string &resRef) {
-    shared_ptr<ItemBlueprint> blueprint(Blueprints::instance().getItem(resRef));
-
     shared_ptr<Item> item(_objectFactory->newItem());
-    item->load(blueprint);
+    item->loadFromBlueprint(resRef);
 
     bool equipped = false;
 
@@ -459,10 +447,6 @@ float Creature::getAttackRange() const {
     return result;
 }
 
-void Creature::setFaction(Faction faction) {
-    _faction = faction;
-}
-
 bool Creature::isLevelUpPending() const {
     return _xp >= getNeededXP();
 }
@@ -470,18 +454,6 @@ bool Creature::isLevelUpPending() const {
 int Creature::getNeededXP() const {
     int level = _attributes.getAggregateLevel();
     return level * (level + 1) * 500;
-}
-
-void Creature::setMovementRestricted(bool restricted) {
-    _movementRestricted = restricted;
-}
-
-void Creature::setImmortal(bool immortal) {
-    _immortal = immortal;
-}
-
-void Creature::setXP(int xp) {
-    _xp = xp;
 }
 
 void Creature::runSpawnScript() {

@@ -19,6 +19,7 @@
 
 #include "../../../resource/types.h"
 
+#include "../../character.h"
 #include "../../types.h"
 
 #include "../gui.h"
@@ -28,7 +29,6 @@ namespace reone {
 namespace game {
 
 class Game;
-class StaticCreatureBlueprint;
 
 class ClassSelection : public GameGUI {
 public:
@@ -40,7 +40,7 @@ private:
     struct ClassButton {
         gui::Control *control { nullptr };
         glm::ivec2 center { 0 };
-        std::shared_ptr<StaticCreatureBlueprint> character;
+        Character character;
     };
 
     Game *_game { nullptr };
@@ -48,14 +48,16 @@ private:
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;
 
-    void configureClassButtons();
-    void configureClassModels();
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(const std::shared_ptr<StaticCreatureBlueprint> &character, scene::SceneGraph &sceneGraph);
-    void configureClassModel(int index, Gender gender, ClassType clazz);
+    void setupClassButtons();
+    void setupClassButton(int index, Gender gender, ClassType clazz);
+
+    int getClassButtonIndexByTag(const std::string &tag) const;
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
+
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);
+
     void onFocusChanged(const std::string &control, bool focus) override;
-    int getClassButtonIndexByTag(const std::string &tag) const;
     void onClick(const std::string &control) override;
 };
 

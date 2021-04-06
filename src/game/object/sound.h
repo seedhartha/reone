@@ -19,15 +19,10 @@
 
 #include "spatial.h"
 
+#include "../../audio/soundhandle.h"
 #include "../../resource/format/gffreader.h"
 
 namespace reone {
-
-namespace audio {
-
-class SoundHandle;
-
-}
 
 namespace game {
 
@@ -39,9 +34,10 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
-    void update(float dt) override;
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
 
-    void load(const resource::GffStruct &gffs);
+    void update(float dt) override;
 
     void play();
     void stop();
@@ -77,11 +73,17 @@ private:
     bool _audible { false };
     std::shared_ptr<audio::SoundHandle> _sound;
 
-    void loadBlueprint(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
 
     void playSound(const std::string &resRef, bool loop);
 
-    friend class SoundBlueprint;
+    // Blueprint
+
+    void loadUTS(const resource::GffStruct &uts);
+
+    void loadPriorityFromUTS(const resource::GffStruct &uts);
+
+    // END Blueprint
 };
 
 } // namespace game

@@ -33,7 +33,8 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
-    void load(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
 
     bool isMapNoteEnabled() const { return _mapNoteEnabled; }
 
@@ -47,7 +48,9 @@ private:
     std::string _mapNote;
     bool _mapNoteEnabled { false };
 
-    void loadBlueprint(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
+
+    void loadUTW(const resource::GffStruct &utw);
 };
 
 } // namespace game

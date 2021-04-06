@@ -38,8 +38,8 @@ namespace reone {
 
 namespace scene {
 
-ControlRenderPipeline::ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent) :
-    _scene(scene), _extent(extent) {
+ControlRenderPipeline::ControlRenderPipeline(SceneGraph *scene, glm::ivec4 extent) :
+    _scene(scene), _extent(move(extent)) {
 }
 
 void ControlRenderPipeline::init() {

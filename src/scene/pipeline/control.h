@@ -34,7 +34,7 @@ namespace scene {
 
 class ControlRenderPipeline : boost::noncopyable {
 public:
-    ControlRenderPipeline(SceneGraph *scene, const glm::ivec4 &extent);
+    ControlRenderPipeline(SceneGraph *scene, glm::ivec4 extent);
 
     void init();
     void render(const glm::ivec2 &offset);

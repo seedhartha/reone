@@ -22,10 +22,10 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
 #include "../../render/textures.h"
+#include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../script/types.h"
 
-#include "../blueprint/blueprints.h"
 #include "../game.h"
 #include "../gameidutil.h"
 #include "../portraitutil.h"
@@ -103,20 +103,20 @@ void PartySelection::prepare(const Context &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
-            int appearance = blueprint->getAppearanceFromUtc();
-            string portrait;
+            shared_ptr<GffStruct> utc(Resources::instance().getGFF(blueprintResRef, ResourceType::Utc));
+            int appearance = utc->getInt("Appearance_Type");
 
+            string portrait;
             auto maybePortrait = g_portraitByAppearance.find(appearance);
             if (maybePortrait != g_portraitByAppearance.end()) {
                 portrait = maybePortrait->second;
             } else {
-                portrait = getPortraitByAppearance(blueprint->getAppearanceFromUtc());
+                portrait = getPortraitByAppearance(appearance);
             }
+
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(Textures::instance().get(portrait, TextureUsage::GUI));
             lblNa.setVisible(false);
-
         } else {
             btnNpc.setDisabled(true);
             lblChar.setBorderFill(shared_ptr<Texture>(nullptr));
@@ -223,10 +223,9 @@ void PartySelection::changeParty() {
         if (!_added[i]) continue;
 
         string blueprintResRef(party.getAvailableMember(i));
-        shared_ptr<CreatureBlueprint> blueprint(Blueprints::instance().getCreature(blueprintResRef));
 
         shared_ptr<Creature> creature(_game->objectFactory().newCreature());
-        creature->load(blueprint);
+        creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);
         creature->actionQueue().add(make_unique<FollowAction>(player, kDefaultFollowDistance));

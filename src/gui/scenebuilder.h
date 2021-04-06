@@ -27,8 +27,6 @@
 #include "../scene/node/modelscenenode.h"
 #include "../scene/scenegraph.h"
 
-#include "control/control.h"
-
 namespace reone {
 
 namespace gui {
@@ -40,7 +38,7 @@ class SceneBuilder {
 public:
     SceneBuilder(const render::GraphicsOptions &opts);
 
-    std::unique_ptr<Control::Scene3D> build();
+    std::unique_ptr<scene::SceneGraph> build();
 
     SceneBuilder &aspect(float aspect);
     SceneBuilder &depth(float zNear, float zFar);
@@ -52,6 +50,7 @@ public:
 
 private:
     render::GraphicsOptions _opts;
+
     float _aspect { 1.0f };
     float _zNear { 0.0f };
     float _zFar { 0.0f };

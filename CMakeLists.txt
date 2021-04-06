@@ -407,16 +407,6 @@ set(GAME_HEADERS
     src/game/actionexecutor.h
     src/game/actionqueue.h
     src/game/animationutil.h
-    src/game/blueprint/blueprint.h
-    src/game/blueprint/blueprints.h
-    src/game/blueprint/creature.h
-    src/game/blueprint/door.h
-    src/game/blueprint/encounter.h
-    src/game/blueprint/item.h
-    src/game/blueprint/placeable.h
-    src/game/blueprint/sound.h
-    src/game/blueprint/trigger.h
-    src/game/blueprint/waypoint.h
     src/game/camera/animatedcamera.h
     src/game/camera/camera.h
     src/game/camera/camerastyle.h
@@ -424,6 +414,7 @@ set(GAME_HEADERS
     src/game/camera/firstperson.h
     src/game/camera/staticcamera.h
     src/game/camera/thirdperson.h
+    src/game/character.h
     src/game/characterutil.h
     src/game/collisiondetect.h
     src/game/console.h
@@ -518,15 +509,6 @@ set(GAME_SOURCES
     src/game/actionexecutor.cpp
     src/game/actionqueue.cpp
     src/game/animationutil.cpp
-    src/game/blueprint/blueprints.cpp
-    src/game/blueprint/creature.cpp
-    src/game/blueprint/door.cpp
-    src/game/blueprint/encounter.cpp
-    src/game/blueprint/item.cpp
-    src/game/blueprint/placeable.cpp
-    src/game/blueprint/sound.cpp
-    src/game/blueprint/trigger.cpp
-    src/game/blueprint/waypoint.cpp
     src/game/camera/animatedcamera.cpp
     src/game/camera/camera.cpp
     src/game/camera/camerastyle.cpp
@@ -536,13 +518,18 @@ set(GAME_SOURCES
     src/game/camera/thirdperson.cpp
     src/game/characterutil.cpp
     src/game/collisiondetect.cpp
-    src/game/console.cpp
     src/game/combat/combat.cpp
     src/game/combat/combat_attack.cpp
     src/game/combat/combat_damage.cpp
     src/game/combat/combat_projectiles.cpp
+    src/game/console.cpp
     src/game/creaturefinder.cpp
     src/game/cursors.cpp
+    src/game/d20/abilities.cpp
+    src/game/d20/attributes.cpp
+    src/game/d20/class.cpp
+    src/game/d20/classes.cpp
+    src/game/d20/skills.cpp
     src/game/dialog.cpp
     src/game/game.cpp
     src/game/game_kotor.cpp
@@ -561,9 +548,9 @@ set(GAME_SOURCES
     src/game/gui/chargen/quickorcustom.cpp
     src/game/gui/chargen/skills.cpp
     src/game/gui/colorutil.cpp
+    src/game/gui/computer.cpp
     src/game/gui/container.cpp
     src/game/gui/conversation.cpp
-    src/game/gui/computer.cpp
     src/game/gui/debugoverlay.cpp
     src/game/gui/dialog.cpp
     src/game/gui/gui.cpp
@@ -586,21 +573,31 @@ set(GAME_SOURCES
     src/game/gui/sounds.cpp
     src/game/map.cpp
     src/game/object/area.cpp
+    src/game/object/area_are.cpp
+    src/game/object/area_git.cpp
     src/game/object/creature.cpp
     src/game/object/creature_animations.cpp
     src/game/object/creature_appearance.cpp
+    src/game/object/creature_blueprint.cpp
     src/game/object/door.cpp
+    src/game/object/door_blueprint.cpp
     src/game/object/encounter.cpp
+    src/game/object/encounter_blueprint.cpp
     src/game/object/item.cpp
+    src/game/object/item_blueprint.cpp
     src/game/object/module.cpp
     src/game/object/object.cpp
     src/game/object/objectfactory.cpp
     src/game/object/placeable.cpp
+    src/game/object/placeable_blueprint.cpp
     src/game/object/placeablecamera.cpp
     src/game/object/sound.cpp
+    src/game/object/sound_blueprint.cpp
     src/game/object/spatial.cpp
     src/game/object/trigger.cpp
+    src/game/object/trigger_blueprint.cpp
     src/game/object/waypoint.cpp
+    src/game/object/waypoint_blueprint.cpp
     src/game/objectselect.cpp
     src/game/party.cpp
     src/game/path.cpp
@@ -610,11 +607,6 @@ set(GAME_SOURCES
     src/game/portraitutil.cpp
     src/game/reputes.cpp
     src/game/room.cpp
-    src/game/d20/abilities.cpp
-    src/game/d20/attributes.cpp
-    src/game/d20/class.cpp
-    src/game/d20/classes.cpp
-    src/game/d20/skills.cpp
     src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp

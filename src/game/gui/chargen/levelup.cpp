@@ -50,8 +50,7 @@ void LevelUpMenu::load() {
 }
 
 void LevelUpMenu::reset() {
-    StaticCreatureBlueprint &character = _charGen->character();
-    int nextLevel = character.attributes().getAggregateLevel() + 1;
+    int nextLevel = _charGen->character().attributes.getAggregateLevel() + 1;
     _hasAttributes = nextLevel  % 4 == 0;
 
     // TODO: feats and Force Powers are not yet implemented

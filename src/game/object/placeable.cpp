@@ -17,19 +17,15 @@
 
 #include "placeable.h"
 
-#include <stdexcept>
-
 #include <boost/algorithm/string.hpp>
 
-#include "../../common/streamutil.h"
 #include "../../render/model/models.h"
 #include "../../render/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/modelscenenode.h"
+#include "../../script/types.h"
 
-#include "../blueprint/blueprints.h"
-
-#include "objectfactory.h"
+#include "../script/runner.h"
 
 using namespace std;
 
@@ -53,13 +49,27 @@ Placeable::Placeable(
     _drawDistance = 64.0f;
 }
 
-bool Placeable::isSelectable() const {
-    return _usable;
+void Placeable::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
+
+    loadTransformFromGIT(gffs);
 }
 
-void Placeable::load(const GffStruct &gffs) {
-    loadBlueprint(gffs);
+void Placeable::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> utp(Resources::instance().getGFF(resRef, ResourceType::Utp));
+    loadUTP(*utp);
 
+    shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
+    string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
+
+    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Placeable, Models::instance().get(modelName), _sceneGraph);
+    _sceneNode = move(model);
+
+    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
+}
+
+void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
@@ -69,24 +79,8 @@ void Placeable::load(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Placeable::loadBlueprint(const GffStruct &gffs) {
-    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
-    shared_ptr<PlaceableBlueprint> blueprint(Blueprints::instance().getPlaceable(resRef));
-    load(blueprint);
-}
-
-void Placeable::load(const shared_ptr<PlaceableBlueprint> &blueprint) {
-    if (!blueprint) {
-        throw invalid_argument("blueprint must not be null");
-    }
-    blueprint->load(*this);
-
-    shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
-    string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
-    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Placeable, Models::instance().get(modelName), _sceneGraph);
-
-    _sceneNode = move(model);
-    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
+bool Placeable::isSelectable() const {
+    return _usable;
 }
 
 shared_ptr<Walkmesh> Placeable::getWalkmesh() const {

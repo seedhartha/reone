@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../../audio/player.h"
+#include "../../resource/resources.h"
 
 using namespace std;
 
@@ -34,11 +35,9 @@ namespace game {
 Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 }
 
-void Item::load(const shared_ptr<ItemBlueprint> &blueprint) {
-    if (!blueprint) {
-        throw invalid_argument("blueprint must not be null");
-    }
-    blueprint->load(*this);
+void Item::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> uti(Resources::instance().getGFF(resRef, ResourceType::Uti));
+    loadUTI(*uti);
 }
 
 void Item::playShotSound(int variant, glm::vec3 position) {

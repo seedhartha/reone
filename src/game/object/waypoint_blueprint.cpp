@@ -15,36 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/** @file
+ *  Waypoint functions related to blueprint loading.
+ */
 
-#include <string>
-#include <memory>
+#include "waypoint.h"
 
-#include <boost/noncopyable.hpp>
-
-#include "../../resource/format/gffreader.h"
+using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-class Item;
+void Waypoint::loadUTW(const GffStruct &utw) {
+}
 
-class ItemBlueprint : boost::noncopyable {
-public:
-    ItemBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &uti);
-
-    void load(Item &item);
-
-    const std::string &resRef() const { return _resRef; }
-
-private:
-    std::string _resRef;
-    std::shared_ptr<resource::GffStruct> _uti;
-
-    void loadAmmunitionType(int ordinal, Item &item);
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

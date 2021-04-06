@@ -35,7 +35,7 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
-    void load(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::GffStruct &gffs);
 
     int cameraId() const { return _cameraId; }
     float fieldOfView() const { return _fieldOfView; }
@@ -43,6 +43,8 @@ public:
 private:
     int _cameraId { 0 };
     float _fieldOfView { 0.0f };
+
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
 };
 
 } // namespace game

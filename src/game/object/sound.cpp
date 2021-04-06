@@ -17,14 +17,13 @@
 
 #include "sound.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include "glm/glm.hpp"
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../audio/soundhandle.h"
 #include "../../resource/resources.h"
-
-#include "../blueprint/blueprints.h"
 
 using namespace std;
 
@@ -50,20 +49,24 @@ Sound::Sound(
         scriptRunner) {
 }
 
-void Sound::load(const GffStruct &gffs) {
-    loadBlueprint(gffs);
+void Sound::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
+    loadTransformFromGIT(gffs);
+}
+
+void Sound::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> uts(Resources::instance().getGFF(resRef, ResourceType::Uts));
+    loadUTS(*uts);
+}
+
+void Sound::loadTransformFromGIT(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
     updateTransform();
-}
-
-void Sound::loadBlueprint(const GffStruct &gffs) {
-    string resRef(gffs.getString("TemplateResRef"));
-    shared_ptr<SoundBlueprint> blueprint(Blueprints::instance().getSound(resRef));
-    blueprint->load(*this);
 }
 
 void Sound::update(float dt) {

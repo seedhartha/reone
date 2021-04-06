@@ -36,10 +36,10 @@ SceneBuilder::SceneBuilder(const GraphicsOptions &opts) : _opts(opts) {
     _aspect = opts.width / static_cast<float>(opts.height);
 }
 
-unique_ptr<Control::Scene3D> SceneBuilder::build() {
-    auto sceneGraph = make_unique<SceneGraph>(_opts);
+unique_ptr<SceneGraph> SceneBuilder::build() {
+    auto scene = make_unique<SceneGraph>(_opts);
 
-    shared_ptr<ModelSceneNode> model(_modelSupplier(*sceneGraph));
+    shared_ptr<ModelSceneNode> model(_modelSupplier(*scene));
     if (!model) {
         throw logic_error("model is null");
     }
@@ -51,7 +51,7 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    auto camera = make_shared<CameraSceneNode>(sceneGraph.get(), projection, _zFar);
+    auto camera = make_shared<CameraSceneNode>(scene.get(), projection, _zFar);
     if (_cameraNodeName.empty()) {
         camera->setLocalTransform(_cameraTransform);
     } else {
@@ -61,15 +61,11 @@ unique_ptr<Control::Scene3D> SceneBuilder::build() {
         }
     }
 
-    sceneGraph->addRoot(model);
-    sceneGraph->setAmbientLightColor(_ambientLightColor);
-    sceneGraph->setActiveCamera(camera);
+    scene->addRoot(move(model));
+    scene->setAmbientLightColor(_ambientLightColor);
+    scene->setActiveCamera(camera);
 
-    auto scene3d = make_unique<Control::Scene3D>();
-    scene3d->model = model;
-    scene3d->sceneGraph = move(sceneGraph);
-
-    return move(scene3d);
+    return move(scene);
 }
 
 SceneBuilder &SceneBuilder::aspect(float aspect) {
