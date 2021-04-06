@@ -28,7 +28,6 @@
 #include "../../resource/types.h"
 #include "../../script/types.h"
 
-#include "../blueprint/blueprint.h"
 #include "../d20/attributes.h"
 
 #include "item.h"
@@ -41,8 +40,6 @@ class Timer;
 namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
-
-class ObjectFactory;
 
 class Creature : public SpatialObject {
 public:
@@ -93,12 +90,13 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
+    void loadAppearance();
+
     void update(float dt) override;
     void clearAllActions() override;
     void die() override;
-
-    void load(const resource::GffStruct &gffs);
-    void load(const std::shared_ptr<Blueprint<Creature>> &blueprint);
 
     void giveXP(int amount);
 
@@ -128,11 +126,13 @@ public:
     Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
 
+    void setGender(Gender gender) { _gender = gender; }
+    void setAppearance(int appearance) { _appearance = appearance; }
     void setMovementType(MovementType type);
-    void setFaction(Faction faction);
-    void setMovementRestricted(bool restricted);
-    void setImmortal(bool immortal);
-    void setXP(int xp);
+    void setFaction(Faction faction) { _faction = faction; }
+    void setMovementRestricted(bool restricted) { _movementRestricted = restricted; }
+    void setImmortal(bool immortal) { _immortal = immortal; }
+    void setXP(int xp) { _xp = xp; }
     void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
 
     // Animation
@@ -248,6 +248,9 @@ private:
 
     // END Scripts
 
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadPortrait();
+
     void updateModel();
     void updateHealth();
     void updateCombat(float dt);
@@ -256,15 +259,6 @@ private:
     inline void runOnNoticeScript();
 
     ModelType parseModelType(const std::string &s) const;
-
-    // Loading
-
-    void loadTransform(const resource::GffStruct &gffs);
-    void loadBlueprint(const resource::GffStruct &gffs);
-    void loadAppearance(const resource::TwoDA &twoDa, int row);
-    void loadPortrait(int appearance);
-
-    // END Loading
 
     // Appearance
 
@@ -303,8 +297,18 @@ private:
 
     // END Animation
 
-    friend class CreatureBlueprint;
-    friend class StaticCreatureBlueprint;
+    // Blueprint
+
+    void loadUTC(const resource::GffStruct &utc);
+
+    void loadNameFromUTC(const resource::GffStruct &utc);
+    void loadAttributesFromUTC(const resource::GffStruct &utc);
+    void loadPortraitFromUTC(const resource::GffStruct &utc);
+    void loadPerceptionRangeFromUTC(const resource::GffStruct &utc);
+    void loadSoundSetFromUTC(const resource::GffStruct &utc);
+    void loadScriptsFromUTC(const resource::GffStruct &utc);
+
+    // END Blueprint
 };
 
 } // namespace game

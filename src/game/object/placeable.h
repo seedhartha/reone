@@ -21,8 +21,6 @@
 
 #include "../../resource/format/gffreader.h"
 
-#include "../blueprint/placeable.h"
-
 #include "spatial.h"
 
 namespace reone {
@@ -39,10 +37,10 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
-    bool isSelectable() const override;
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
 
-    void load(const resource::GffStruct &gffs);
-    void load(const std::shared_ptr<PlaceableBlueprint> &blueprint);
+    bool isSelectable() const override;
 
     bool hasInventory() const { return _hasInventory; }
 
@@ -55,6 +53,8 @@ public:
     void runOnUsed(std::shared_ptr<SpatialObject> usedBy);
     void runOnInvDisturbed(std::shared_ptr<SpatialObject> triggerrer);
 
+    // END Scripts
+
 private:
     int  _appearance { 0 };
     bool _hasInventory { false };
@@ -66,10 +66,18 @@ private:
     std::string _onUsed;
     std::string _onInvDisturbed;
 
+    // END Scripts
 
-    void loadBlueprint(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    friend class PlaceableBlueprint;
+    // Blueprint
+
+    void loadUTP(const resource::GffStruct &utp);
+
+    void loadNameFromUTP(const resource::GffStruct &utp);
+    void loadScriptsFromUTP(const resource::GffStruct &utp);
+
+    // END Blueprint
 };
 
 } // namespace game

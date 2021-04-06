@@ -24,9 +24,7 @@
 #include "../../common/log.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
-#include "../../scene/node/meshnode.h"
 
-#include "../blueprint/blueprints.h"
 #include "../script/runner.h"
 
 using namespace std;
@@ -38,8 +36,6 @@ using namespace reone::scene;
 namespace reone {
 
 namespace game {
-
-static bool g_debugTriggers = false;
 
 Trigger::Trigger(
     uint32_t id,
@@ -55,68 +51,45 @@ Trigger::Trigger(
         scriptRunner) {
 }
 
-void Trigger::load(const GffStruct &gffs) {
-    loadBlueprint(gffs);
+void Trigger::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
-    int transDestIdx = gffs.getInt("TransitionDestin", -1);
-    if (transDestIdx != -1) {
-        _transitionDestin = Strings::instance().get(transDestIdx);
-    }
-
-    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
 
+    loadGeometryFromGIT(gffs);
+    loadTransitionDestinFromGIT(gffs);
+    loadTransformFromGIT(gffs);
+}
+
+void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
     for (auto &child : gffs.getList("Geometry")) {
         float x = child->getFloat("PointX");
         float y = child->getFloat("PointY");
         float z = child->getFloat("PointZ");
-        _geometry.push_back(glm::vec4(x, y, z, 1.0f));
+        _geometry.push_back(glm::vec3(x, y, z));
     }
-    loadAppearance();
+}
 
+void Trigger::loadTransitionDestinFromGIT(const GffStruct &gffs) {
+    int transDestIdx = gffs.getInt("TransitionDestin", -1);
+    if (transDestIdx != -1) {
+        _transitionDestin = Strings::instance().get(transDestIdx);
+    }
+}
+
+void Trigger::loadTransformFromGIT(const GffStruct &gffs) {
     _position.x = gffs.getFloat("XPosition");
     _position.y = gffs.getFloat("YPosition");
     _position.z = gffs.getFloat("ZPosition");
+
     updateTransform();
 }
 
-void Trigger::loadBlueprint(const GffStruct &gffs) {
-    string resRef(gffs.getString("TemplateResRef"));
-    shared_ptr<TriggerBlueprint> blueprint(Blueprints::instance().getTrigger(resRef));
-    blueprint->load(*this);
-}
-
-void Trigger::loadAppearance() {
-    if (_geometry.empty() || !g_debugTriggers) return;
-
-    vector<float> vertices;
-    for (auto &point : _geometry) {
-        vertices.push_back(point.x);
-        vertices.push_back(point.y);
-        vertices.push_back(point.z);
-    }
-
-    vector<uint16_t> indices;
-    if (_geometry.size() >= 3) {
-        indices.insert(indices.end(), { 0, 1, 2 });
-    }
-    if (_geometry.size() >= 4) {
-        indices.insert(indices.end(), { 2, 3, 0 });
-    }
-    if (_geometry.size() >= 5) {
-        warn("Trigger: geometry contains more than 4 points - they will be ignored");
-    }
-
-    Mesh::VertexOffsets offsets;
-    offsets.stride = 3 * sizeof(float);
-
-    auto mesh = make_shared<Mesh>(static_cast<int>(_geometry.size()), move(vertices), move(indices), move(offsets));
-    mesh->init();
-
-    auto sceneNode = make_shared<MeshSceneNode>(_sceneGraph, mesh);
-    sceneNode->setTransparent(true);
-    sceneNode->setAlpha(0.5f);
-    _sceneNode = sceneNode;
+void Trigger::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> utt(Resources::instance().getGFF(resRef, ResourceType::Utt));
+    loadUTT(*utt);
 }
 
 void Trigger::update(float dt) {
@@ -134,12 +107,6 @@ void Trigger::update(float dt) {
             _scriptRunner->run(_onExit, _id, tenant->id());
         }
     }
-    if (_sceneNode) {
-        auto meshSceneNode = static_pointer_cast<MeshSceneNode>(_sceneNode);
-        meshSceneNode->setColor(!_tenants.empty() ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(1.0f));
-    }
-
-    SpatialObject::update(dt);
 }
 
 void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {

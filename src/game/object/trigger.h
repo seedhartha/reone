@@ -27,8 +27,6 @@ namespace reone {
 
 namespace game {
 
-class TriggerBlueprint;
-
 class Trigger : public SpatialObject {
 public:
     Trigger(
@@ -37,9 +35,11 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
+
     void update(float dt) override;
 
-    void load(const resource::GffStruct &gffs);
     void addTenant(const std::shared_ptr<SpatialObject> &object);
 
     bool isIn(const glm::vec2 &point) const;
@@ -65,10 +65,11 @@ private:
 
     // END Scripts
 
-    void loadBlueprint(const resource::GffStruct &gffs);
-    void loadAppearance();
+    void loadGeometryFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadTransitionDestinFromGIT(const resource::GffStruct &gffs);
 
-    friend class TriggerBlueprint;
+    void loadUTT(const resource::GffStruct &utt);
 };
 
 } // namespace game

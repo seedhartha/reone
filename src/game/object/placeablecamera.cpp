@@ -42,10 +42,14 @@ PlaceableCamera::PlaceableCamera(
         scriptRunner) {
 }
 
-void PlaceableCamera::load(const GffStruct &gffs) {
+void PlaceableCamera::loadFromGIT(const GffStruct &gffs) {
     _cameraId = gffs.getInt("CameraID");
     _fieldOfView = gffs.getFloat("FieldOfView");
 
+    loadTransformFromGIT(gffs);
+}
+
+void PlaceableCamera::loadTransformFromGIT(const GffStruct &gffs) {
     glm::vec3 position(gffs.getVector("Position"));
     float height = gffs.getFloat("Height");
 

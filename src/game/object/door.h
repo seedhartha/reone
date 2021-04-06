@@ -21,8 +21,6 @@
 
 #include "../../resource/format/gffreader.h"
 
-#include "../blueprint/door.h"
-
 namespace reone {
 
 namespace game {
@@ -35,9 +33,11 @@ public:
         scene::SceneGraph *sceneGraph,
         ScriptRunner *scriptRunner);
 
+    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromBlueprint(const std::string &resRef);
+
     bool isSelectable() const override;
 
-    void load(const resource::GffStruct &gffs);
     void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
 
@@ -73,6 +73,7 @@ private:
     std::string _onOpen;
     std::string _onFailToOpen;
 
+    // END Scripts
 
     // Walkmeshes
 
@@ -80,10 +81,19 @@ private:
     std::shared_ptr<render::Walkmesh> _open1Walkmesh;
     std::shared_ptr<render::Walkmesh> _open2Walkmesh;
 
+    // END Walkmeshes
 
-    void loadBlueprint(const resource::GffStruct &gffs);
+    void loadTransitionDestinFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    friend class DoorBlueprint;
+    // Blueprint
+
+    void loadUTD(const resource::GffStruct &utd);
+
+    void loadNameFromUTD(const resource::GffStruct &utd);
+    void loadScriptsFromUTD(const resource::GffStruct &utd);
+
+    // END Blueprint
 };
 
 } // namespace game

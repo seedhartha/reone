@@ -42,7 +42,6 @@
 #include "../video/bikreader.h"
 #include "../video/video.h"
 
-#include "blueprint/blueprints.h"
 #include "cursors.h"
 #include "gameidutil.h"
 #include "reputes.h"
@@ -81,10 +80,10 @@ Game::Game(const fs::path &path, const Options &opts) :
     _party(this),
     _scriptRunner(this),
     _profileOverlay(opts.graphics),
-    _combat(this) {
+    _combat(this),
+    _objectFactory(this, &_sceneGraph) {
 
     _gameId = determineGameID(path);
-    _objectFactory = make_unique<ObjectFactory>(this, &_sceneGraph);
 }
 
 int Game::run() {
@@ -249,7 +248,6 @@ void Game::loadModule(const string &name, string entry) {
         Textures::instance().invalidateCache();
         AudioFiles::instance().invalidate();
         Scripts::instance().invalidate();
-        Blueprints::instance().invalidateCache();
         SoundSets::instance().invalidate();
         Lips::instance().invalidate();
 
@@ -269,7 +267,7 @@ void Game::loadModule(const string &name, string entry) {
         } else {
             shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::Ifo));
 
-            _module = _objectFactory->newModule();
+            _module = _objectFactory.newModule();
             _module->load(name, *ifo);
 
             _loadedModules.insert(make_pair(name, _module));

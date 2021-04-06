@@ -24,7 +24,6 @@
 #include "../../../render/textures.h"
 #include "../../../resource/strings.h"
 
-#include "../../blueprint/blueprints.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
 #include "../../object/creature.h"
@@ -170,7 +169,7 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
                     partyLeader->equip(slot, itemObj);
                 } else {
                     shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
-                    clonedItem->load(Blueprints::instance().getItem(itemObj->blueprintResRef()));
+                    clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
             }

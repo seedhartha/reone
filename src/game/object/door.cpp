@@ -28,8 +28,6 @@
 #include "../../scene/types.h"
 #include "../../script/scripts.h"
 
-#include "../blueprint/blueprints.h"
-
 using namespace std;
 
 using namespace reone::render;
@@ -51,43 +49,51 @@ Door::Door(
     _drawDistance = FLT_MAX;
 }
 
-bool Door::isSelectable() const {
-    return !_static && !_open;
-}
+void Door::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
-void Door::load(const GffStruct &gffs) {
-    _position[0] = gffs.getFloat("X");
-    _position[1] = gffs.getFloat("Y");
-    _position[2] = gffs.getFloat("Z");
-
-    _facing = gffs.getFloat("Bearing");
-    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
 
-    int transDestStrRef = gffs.getInt("TransitionDestin");
-    if (transDestStrRef != -1) {
-        _transitionDestin = Strings::instance().get(transDestStrRef);
-    }
-
-    loadBlueprint(gffs);
-    updateTransform();
+    loadTransitionDestinFromGIT(gffs);
+    loadTransformFromGIT(gffs);
 }
 
-void Door::loadBlueprint(const GffStruct &gffs) {
-    string resRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Door::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> utd(Resources::instance().getGFF(resRef, ResourceType::Utd));
+    loadUTD(*utd);
 
-    shared_ptr<DoorBlueprint> blueprint(Blueprints::instance().getDoor(resRef));
-    blueprint->load(*this);
+    shared_ptr<TwoDA> doors(Resources::instance().get2DA("genericdoors"));
+    string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    shared_ptr<TwoDA> genericDoors(Resources::instance().get2DA("genericdoors"));
-    string modelName(boost::to_lower_copy(genericDoors->getString(_genericType, "modelname")));
     auto model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Door, Models::instance().get(modelName), _sceneGraph);
-
     _sceneNode = move(model);
 
     _closedWalkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
     _open1Walkmesh = Walkmeshes::instance().get(modelName + "1", ResourceType::Dwk);
     _open2Walkmesh = Walkmeshes::instance().get(modelName + "2", ResourceType::Dwk);
+}
+
+void Door::loadTransitionDestinFromGIT(const GffStruct &gffs) {
+    int transDestStrRef = gffs.getInt("TransitionDestin");
+    if (transDestStrRef != -1) {
+        _transitionDestin = Strings::instance().get(transDestStrRef);
+    }
+}
+
+void Door::loadTransformFromGIT(const GffStruct &gffs) {
+    _position[0] = gffs.getFloat("X");
+    _position[1] = gffs.getFloat("Y");
+    _position[2] = gffs.getFloat("Z");
+
+    _facing = gffs.getFloat("Bearing");
+
+    updateTransform();
+}
+
+bool Door::isSelectable() const {
+    return !_static && !_open;
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {

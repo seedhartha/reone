@@ -17,28 +17,18 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
+#include "d20/attributes.h"
 
-#include <boost/noncopyable.hpp>
-
-#include "../../resource/format/gffreader.h"
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-class Trigger;
-
-class TriggerBlueprint : boost::noncopyable {
-public:
-    TriggerBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utt);
-
-    void load(Trigger &trigger);
-
-private:
-    std::string _resRef;
-    std::shared_ptr<resource::GffStruct> _utt;
+struct Character {
+    Gender gender { Gender::Male };
+    int appearance { 0 };
+    CreatureAttributes attributes;
 };
 
 } // namespace game

@@ -112,7 +112,7 @@ public:
     GameID gameId() const { return _gameId; }
     const Options &options() const { return _options; }
     scene::SceneGraph &sceneGraph() { return _sceneGraph; }
-    ObjectFactory &objectFactory() { return *_objectFactory; }
+    ObjectFactory &objectFactory() { return _objectFactory; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
     Party &party() { return _party; }
@@ -188,16 +188,6 @@ public:
 
     // END IEventHandler
 
-protected:
-    Options _options;
-
-    /**
-     * Initializes the engine subsytems.
-     */
-    virtual void init();
-
-    virtual void update();
-
 private:
     enum class GameScreen {
         None,
@@ -213,13 +203,19 @@ private:
     };
 
     boost::filesystem::path _path;
+    Options _options;
+
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
-    GameID _gameId { GameID::KotOR };
-    std::unique_ptr<ObjectFactory> _objectFactory;
-    GameScreen _screen { GameScreen::MainMenu };
     Party _party;
+    ScriptRunner _scriptRunner;
+    ProfileOverlay _profileOverlay;
+    Combat _combat;
+    GameID _gameId { GameID::KotOR };
+    ObjectFactory _objectFactory;
+
+    GameScreen _screen { GameScreen::MainMenu };
     uint32_t _ticks { 0 };
     bool _quit { false };
     std::shared_ptr<video::Video> _video;
@@ -228,12 +224,9 @@ private:
     bool _loadFromSaveGame { false };
     CameraType _cameraType { CameraType::ThirdPerson };
     int _runScriptVar { -1 };
-    ScriptRunner _scriptRunner;
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
-    ProfileOverlay _profileOverlay;
     std::set<std::string> _moduleNames;
-    Combat _combat;
 
     // Modules
 
@@ -279,9 +272,16 @@ private:
     // END Globals/locals
 
     /**
-    * Releases the engine subsystems.
-    */
+     * Initialize engine subsytems.
+     */
+    void init();
+
+    /**
+     * Release engine subsystems.
+     */
     void deinit();
+
+    void update();
 
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);

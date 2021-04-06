@@ -27,7 +27,6 @@
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
-#include "../blueprint/blueprints.h"
 #include "../game.h"
 #include "../gameidutil.h"
 
@@ -115,7 +114,7 @@ void MainMenu::setup3DView() {
     const Control::Extent &extent = control.extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
@@ -124,7 +123,7 @@ void MainMenu::setup3DView() {
         .ambientLightColor(glm::vec3(0.1f))
         .build());
 
-    control.setScene3D(move(scene));
+    control.setScene(move(scene));
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
@@ -181,28 +180,28 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    shared_ptr<CreatureBlueprint> playerBlueprint;
-    shared_ptr<CreatureBlueprint> companionBlueprint;
+    string playerBlueprint;
+    string companionBlueprint;
 
     if (isTSL(_gameId)) {
-        playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefAtton);
-        companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefKreia);
+        playerBlueprint = kBlueprintResRefAtton;
+        companionBlueprint = kBlueprintResRefKreia;
     } else {
-        playerBlueprint = Blueprints::instance().getCreature(kBlueprintResRefCarth);
-        companionBlueprint = Blueprints::instance().getCreature(kBlueprintResRefBastila);
+        playerBlueprint = kBlueprintResRefCarth;
+        companionBlueprint = kBlueprintResRefBastila;
     }
 
     Party &party = _game->party();
 
     shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->load(playerBlueprint);
+    player->loadFromBlueprint(playerBlueprint);
     player->setTag(kObjectTagPlayer);
     player->setImmortal(true);
     party.addMember(kNpcPlayer, player);
     party.setPlayer(player);
 
     shared_ptr<Creature> companion(_game->objectFactory().newCreature());
-    companion->load(companionBlueprint);
+    companion->loadFromBlueprint(companionBlueprint);
     companion->setImmortal(true);
     party.addMember(0, companion);
 

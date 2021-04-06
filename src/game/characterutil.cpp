@@ -20,8 +20,6 @@
 #include "../common/random.h"
 #include "../resource/resources.h"
 
-#include "blueprint/creature.h"
-#include "d20/classes.h"
 #include "portrait.h"
 
 using namespace std;
@@ -33,8 +31,8 @@ namespace reone {
 
 namespace game {
 
-unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz) {
-    vector<Portrait> portraits;
+static vector<Portrait> getPCPortraitsByGender(Gender gender) {
+    vector<Portrait> result;
     shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
 
@@ -51,37 +49,34 @@ unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType cla
             portrait.appearanceS = appearanceS;
             portrait.appearanceL = appearanceL;
 
-            portraits.push_back(move(portrait));
+            result.push_back(move(portrait));
         }
     }
 
+    return move(result);
+}
+
+int getRandomCharacterAppearance(Gender gender, ClassType clazz) {
+    int result = 0;
+    vector<Portrait> portraits(getPCPortraitsByGender(gender));
     int portraitIdx = random(0, static_cast<int>(portraits.size()) - 1);
     const Portrait &portrait = portraits[portraitIdx];
-    int appearance = 0;
 
     switch (clazz) {
         case ClassType::Scoundrel:
         case ClassType::JediConsular:
-            appearance = portrait.appearanceS;
+            result = portrait.appearanceS;
             break;
         case ClassType::Soldier:
         case ClassType::JediGuardian:
-            appearance = portrait.appearanceL;
+            result = portrait.appearanceL;
             break;
         default:
-            appearance = portrait.appearanceNumber;
+            result = portrait.appearanceNumber;
             break;
     }
 
-    shared_ptr<CreatureClass> creatureClass = Classes::instance().get(clazz);
-
-    auto character = make_unique<StaticCreatureBlueprint>();
-    character->setGender(gender);
-    character->setAppearance(appearance);
-    character->setAttributes(creatureClass->defaultAttributes());
-    character->addEquippedItem("g_a_clothes01");
-
-    return move(character);
+    return result;
 }
 
 } // namespace game

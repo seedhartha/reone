@@ -25,7 +25,6 @@
 
 #include "../../common/log.h"
 
-#include "../blueprint/blueprints.h"
 #include "../enginetype/location.h"
 #include "../game.h"
 

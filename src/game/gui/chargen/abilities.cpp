@@ -96,8 +96,7 @@ void CharGenAbilities::load() {
 }
 
 void CharGenAbilities::reset(bool newGame) {
-    CreatureAttributes &attributes = _charGen->character().attributes();
-    _abilities = attributes.abilities();
+    _abilities = _charGen->character().attributes.abilities();
     _points = newGame ? kStartingPoints : 1;
 
     if (newGame) {
@@ -160,7 +159,7 @@ void CharGenAbilities::onClick(const string &control) {
         _charGen->openSteps();
 
     } else if (control == "BTN_RECOMMENDED") {
-        ClassType classType = _charGen->character().attributes().getEffectiveClass();
+        ClassType classType = _charGen->character().attributes.getEffectiveClass();
         shared_ptr<CreatureClass> clazz(Classes::instance().get(classType));
         _abilities = clazz->defaultAttributes().abilities();
         _points = 0;
@@ -181,7 +180,9 @@ void CharGenAbilities::onClick(const string &control) {
 }
 
 void CharGenAbilities::updateCharacter() {
-    _charGen->setAbilities(_abilities);
+    Character character(_charGen->character());
+    character.attributes.setAbilities(_abilities);
+    _charGen->setCharacter(move(character));
 }
 
 void CharGenAbilities::onFocusChanged(const string &control, bool focus) {

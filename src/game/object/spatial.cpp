@@ -21,7 +21,6 @@
 
 #include "../../common/log.h"
 
-#include "../blueprint/blueprints.h"
 #include "../room.h"
 
 #include "item.h"
@@ -50,9 +49,6 @@ SpatialObject::SpatialObject(
 }
 
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {
-    auto blueprint = Blueprints::instance().getItem(resRef);
-    if (!blueprint) return nullptr;
-
     shared_ptr<Item> result;
 
     auto maybeItem = find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
@@ -65,7 +61,7 @@ shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, boo
 
     } else {
         result = _objectFactory->newItem();
-        result->load(blueprint);
+        result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);
         result->setDropable(dropable);
 

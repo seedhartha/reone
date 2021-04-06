@@ -222,9 +222,9 @@ bool Control::handleClick(int x, int y) {
 }
 
 void Control::update(float dt) {
-    if (_scene3d) {
-        _scene3d->model->update(dt);
-        _scene3d->sceneGraph->prepareFrame();
+    if (_scene) {
+        _scene->update(dt);
+        _scene->prepareFrame();
     }
 }
 
@@ -510,7 +510,7 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
 }
 
 void Control::draw3D(const glm::ivec2 &offset) {
-    if (!_visible || !_scene3d) return;
+    if (!_visible || !_scene) return;
 
     _pipeline->render(offset);
 }
@@ -657,12 +657,12 @@ void Control::setTextColor(const glm::vec3 &color) {
     _text.color = color;
 }
 
-void Control::setScene3D(unique_ptr<Scene3D> scene) {
-    _scene3d = move(scene);
+void Control::setScene(unique_ptr<SceneGraph> scene) {
+    _scene = move(scene);
 
-    if (_scene3d) {
+    if (_scene) {
         glm::ivec4 extent(_extent.left, _extent.top, _extent.width, _extent.height);
-        _pipeline = make_unique<ControlRenderPipeline>(_scene3d->sceneGraph.get(), extent);
+        _pipeline = make_unique<ControlRenderPipeline>(_scene.get(), extent);
         _pipeline->init();
     }
 }

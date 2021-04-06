@@ -15,36 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/** @file
+ *  Trigger functions related to blueprint loading.
+ */
 
-#include <string>
-#include <memory>
+#include "trigger.h"
 
-#include <boost/noncopyable.hpp>
+#include <boost/algorithm/string.hpp>
 
-#include "../../resource/format/gffreader.h"
+using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-class Door;
+void Trigger::loadUTT(const GffStruct &utt) {
+    _tag = boost::to_lower_copy(utt.getString("Tag"));
+    _heartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
+    _onEnter = boost::to_lower_copy(utt.getString("ScriptOnEnter"));
+    _onExit = boost::to_lower_copy(utt.getString("ScriptOnExit"));
+}
 
-class DoorBlueprint : boost::noncopyable {
-public:
-    DoorBlueprint(const std::string &resRef, const std::shared_ptr<resource::GffStruct> &utd);
-
-    void load(Door &door);
-
-    const std::string &resRef() const { return _resRef; }
-
-private:
-    std::string _resRef;
-    std::shared_ptr<resource::GffStruct> _utd;
-
-    void loadScripts(Door &door);
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

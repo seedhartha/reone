@@ -90,11 +90,6 @@ public:
         TextAlign align { TextAlign::CenterCenter };
     };
 
-    struct Scene3D {
-        std::shared_ptr<scene::ModelSceneNode> model;
-        std::unique_ptr<scene::SceneGraph> sceneGraph;
-    };
-
     static ControlType getType(const resource::GffStruct &gffs);
     static std::string getTag(const resource::GffStruct &gffs);
     static std::string getParent(const resource::GffStruct &gffs);
@@ -142,7 +137,7 @@ public:
     void setHilightFill(const std::string &resRef);
     void setHilightFill(const std::shared_ptr<render::Texture> &texture);
     void setPadding(int padding);
-    void setScene3D(std::unique_ptr<Scene3D> scene);
+    void setScene(std::unique_ptr<scene::SceneGraph> scene);
     void setText(const Text &text);
     void setTextColor(const glm::vec3 & color);
     void setTextMessage(const std::string &text);
@@ -174,7 +169,7 @@ protected:
     std::shared_ptr<Border> _border;
     std::shared_ptr<Border> _hilight;
     Text _text;
-    std::unique_ptr<Scene3D> _scene3d;
+    std::unique_ptr<scene::SceneGraph> _scene;
     int _padding { 0 };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };

@@ -17,17 +17,13 @@
 
 #pragma once
 
-#include <memory>
-
 #include "types.h"
 
 namespace reone {
 
 namespace game {
 
-class StaticCreatureBlueprint;
-
-std::unique_ptr<StaticCreatureBlueprint> randomCharacter(Gender gender, ClassType clazz);
+int getRandomCharacterAppearance(Gender gender, ClassType clazz);
 
 } // namespace game
 

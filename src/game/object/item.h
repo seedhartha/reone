@@ -24,7 +24,6 @@
 #include "../../render/texture.h"
 #include "../../resource/format/gffreader.h"
 
-#include "../blueprint/item.h"
 #include "../types.h"
 
 #include "object.h"
@@ -45,7 +44,7 @@ public:
 
     Item(uint32_t id);
 
-    void load(const std::shared_ptr<ItemBlueprint> &blueprint);
+    void loadFromBlueprint(const std::string &resRef);
 
     void playShotSound(int variant, glm::vec3 position);
     void playImpactSound(int variant, glm::vec3 position);
@@ -102,7 +101,13 @@ private:
     std::string _descIdentified;
     int _baseItemType { 0 };
 
-    friend class ItemBlueprint;
+    // Blueprint
+
+    void loadUTI(const resource::GffStruct &uti);
+
+    void loadAmmunitionTypeFromUTI(const resource::GffStruct &uti);
+
+    // END Blueprint
 };
 
 } // namespace game

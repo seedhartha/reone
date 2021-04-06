@@ -23,7 +23,6 @@
 #include "../common/random.h"
 
 #include "action/follow.h"
-#include "blueprint/creature.h"
 #include "game.h"
 #include "object/creature.h"
 

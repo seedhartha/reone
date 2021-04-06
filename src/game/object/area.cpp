@@ -41,9 +41,6 @@
 #include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
 
-#include "../blueprint/blueprints.h"
-#include "../blueprint/trigger.h"
-#include "../blueprint/sound.h"
 #include "../enginetype/location.h"
 #include "../game.h"
 #include "../objectconverter.h"
@@ -177,150 +174,6 @@ void Area::loadPTH() {
     }
 
     _pathfinder.load(points, pointZ);
-}
-
-void Area::loadARE(const GffStruct &are) {
-    _localizedName = Strings::instance().get(are.getInt("Name", -1));
-
-    loadCameraStyle(are);
-    loadAmbientColor(are);
-    loadScripts(are);
-    loadMap(are);
-    loadStealthXP(are);
-    loadGrass(are);
-}
-
-void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(Resources::instance().get2DA("camerastyle"));
-
-    int areaStyleIdx = are.getInt("CameraStyle");
-    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
-
-    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
-    if (combatStyleIdx != -1) {
-        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
-    }
-}
-
-void Area::loadAmbientColor(const GffStruct &are) {
-    int ambientColorValue = are.getInt("DynAmbientColor");
-    glm::vec3 ambientColor(
-        ambientColorValue & 0xff,
-        (ambientColorValue >> 8) & 0xff,
-        (ambientColorValue >> 16) & 0xff);
-
-    ambientColor /= 255.0f;
-
-    _game->sceneGraph().setAmbientLightColor(ambientColor);
-}
-
-void Area::loadScripts(const GffStruct &are) {
-    _onEnter = are.getString("OnEnter");
-    _onExit = are.getString("OnExit");
-    _onHeartbeat = are.getString("OnHeartbeat");
-    _onUserDefined = are.getString("OnUserDefined");
-}
-
-void Area::loadMap(const GffStruct &are) {
-    _map.load(_name, *are.getStruct("Map"));
-}
-
-void Area::loadStealthXP(const GffStruct &are) {
-    _stealthXPEnabled = are.getBool("StealthXPEnabled");
-    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
-    _maxStealthXP = are.getInt("StealthXPMax");
-}
-
-void Area::loadGrass(const GffStruct &are) {
-    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
-    if (!texName.empty()) {
-        _grass.texture = Textures::instance().get(texName, TextureUsage::Diffuse);
-    }
-    _grass.density = are.getFloat("Grass_Density");
-    _grass.quadSize = are.getFloat("Grass_QuadSize");
-    _grass.ambient = are.getInt("Grass_Ambient");
-    _grass.diffuse = are.getInt("Grass_Diffuse");
-    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
-    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
-    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
-    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
-}
-
-void Area::loadGIT(const GffStruct &git) {
-    loadProperties(git);
-    loadCreatures(git);
-    loadDoors(git);
-    loadPlaceables(git);
-    loadWaypoints(git);
-    loadTriggers(git);
-    loadSounds(git);
-    loadCameras(git);
-}
-
-void Area::loadProperties(const GffStruct &git) {
-    shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
-    int musicIdx = props->getInt("MusicDay");
-    if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(Resources::instance().get2DA("ambientmusic"));
-        _music = musicTable->getString(musicIdx, "resource");
-    }
-}
-
-void Area::loadCreatures(const GffStruct &git) {
-    for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
-        creature->load(*gffs);
-        landObject(*creature);
-        add(creature);
-    }
-}
-
-void Area::loadDoors(const GffStruct &git) {
-    for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_game->objectFactory().newDoor());
-        door->load(*gffs);
-        add(door);
-    }
-}
-
-void Area::loadPlaceables(const GffStruct &git) {
-    for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_game->objectFactory().newPlaceable());
-        placeable->load(*gffs);
-        add(placeable);
-    }
-}
-
-void Area::loadWaypoints(const GffStruct &git) {
-    for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_game->objectFactory().newWaypoint());
-        waypoint->load(*gffs);
-        add(waypoint);
-    }
-}
-
-void Area::loadTriggers(const GffStruct &git) {
-    for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_game->objectFactory().newTrigger());
-        trigger->load(*gffs);
-        add(trigger);
-    }
-}
-
-void Area::loadSounds(const GffStruct &git) {
-    for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_game->objectFactory().newSound());
-        sound->load(*gffs);
-        add(sound);
-    }
-}
-
-void Area::loadCameras(const GffStruct &git) {
-    for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_game->objectFactory().newCamera());
-        camera->load(*gffs);
-        add(camera);
-    }
 }
 
 void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
@@ -1123,25 +976,22 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 
     switch (type) {
         case ObjectType::Item: {
-            auto blueprint = Blueprints::instance().getItem(blueprintResRef);
             auto item = _game->objectFactory().newItem();
-            item->load(blueprint);
+            item->loadFromBlueprint(blueprintResRef);
             object = move(item);
             break;
         }
         case ObjectType::Creature: {
-            auto blueprint = Blueprints::instance().getCreature(blueprintResRef);
             auto creature = _game->objectFactory().newCreature();
-            creature->load(blueprint);
+            creature->loadFromBlueprint(blueprintResRef);
             creature->setPosition(location->position());
             creature->setFacing(location->facing());
             object = move(creature);
             break;
         }
         case ObjectType::Placeable: {
-            auto blueprint = Blueprints::instance().getPlaceable(blueprintResRef);
             auto placeable = _game->objectFactory().newPlaceable();
-            placeable->load(blueprint);
+            placeable->loadFromBlueprint(blueprintResRef);
             object = move(placeable);
             break;
         }

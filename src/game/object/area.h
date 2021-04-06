@@ -236,6 +236,10 @@ private:
 
     void init();
 
+    void loadLYT();
+    void loadVIS();
+    void loadPTH();
+
     void add(const std::shared_ptr<SpatialObject> &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
@@ -260,13 +264,9 @@ private:
     int getNumGrassClusters(const render::Walkmesh::Face &face) const;
     int getRandomGrassVariant() const;
 
-    // Loading
+    // Loading ARE
 
-    void loadLYT();
-    void loadVIS();
-    void loadPTH();
     void loadARE(const resource::GffStruct &are);
-    void loadGIT(const resource::GffStruct &gffs);
 
     void loadCameraStyle(const resource::GffStruct &are);
     void loadAmbientColor(const resource::GffStruct &are);
@@ -274,6 +274,12 @@ private:
     void loadMap(const resource::GffStruct &are);
     void loadStealthXP(const resource::GffStruct &are);
     void loadGrass(const resource::GffStruct &are);
+
+    // END Loading ARE
+
+    // Loading GIT
+
+    void loadGIT(const resource::GffStruct &gffs);
 
     void loadProperties(const resource::GffStruct &git);
     void loadCreatures(const resource::GffStruct &git);
@@ -284,7 +290,7 @@ private:
     void loadSounds(const resource::GffStruct &git);
     void loadCameras(const resource::GffStruct &git);
 
-    // END Loading
+    // END Loading GIT
 
     // User input
 

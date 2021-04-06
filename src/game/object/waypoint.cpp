@@ -21,11 +21,8 @@
 
 #include "glm/glm.hpp"
 
-#include "../../render/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
-
-#include "../blueprint/blueprints.h"
 
 using namespace std;
 
@@ -51,30 +48,34 @@ Waypoint::Waypoint(
         scriptRunner) {
 }
 
-void Waypoint::load(const GffStruct &gffs) {
-    loadBlueprint(gffs);
+void Waypoint::loadFromGIT(const GffStruct &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
-    _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName", -1));
     _description = Strings::instance().get(gffs.getInt("Description", -1));
+    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName", -1));
     _mapNote = Strings::instance().get(gffs.getInt("MapNote", -1));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
+    _tag = boost::to_lower_copy(gffs.getString("Tag"));
 
+    loadTransformFromGIT(gffs);
+}
+
+void Waypoint::loadFromBlueprint(const string &resRef) {
+    shared_ptr<GffStruct> utw(Resources::instance().getGFF(resRef, ResourceType::Utw));
+    loadUTW(*utw);
+}
+
+void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
-    float dirX = gffs.getFloat("XOrientation");
-    float dirY = gffs.getFloat("YOrientation");
-    _facing = -glm::atan(dirX, dirY);
+    float sine = gffs.getFloat("XOrientation");
+    float cosine = gffs.getFloat("YOrientation");
+    _facing = -glm::atan(sine, cosine);
 
     updateTransform();
-}
-
-void Waypoint::loadBlueprint(const GffStruct &gffs) {
-    string resRef(gffs.getString("TemplateResRef"));
-    shared_ptr<WaypointBlueprint> blueprint(Blueprints::instance().getWaypoint(resRef));
-    blueprint->load(*this);
 }
 
 } // namespace game

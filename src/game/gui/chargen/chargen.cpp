@@ -168,7 +168,7 @@ GUI *CharacterGeneration::getSubGUI() const {
         case CharGenScreen::LevelUp:
             return _levelUp.get();
         default:
-            throw logic_error("CharGen: invalid screen: " + to_string(static_cast<int>(_screen)));
+            throw logic_error("Invalid screen: " + to_string(static_cast<int>(_screen)));
     }
 }
 
@@ -229,11 +229,11 @@ void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    const CreatureAttributes &attributes = partyLeader->attributes();
-    StaticCreatureBlueprint character;
-    character.setAppearance(partyLeader->appearance());
-    character.setGender(partyLeader->gender());
-    character.setAttributes(attributes);
+
+    Character character;
+    character.appearance = partyLeader->appearance();
+    character.gender = partyLeader->gender();
+    character.attributes = partyLeader->attributes();
     setCharacter(move(character));
 
     int nextLevel = partyLeader->attributes().getAggregateLevel() + 1;
@@ -311,65 +311,50 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
-        _character->attributes().addClassLevels(_character->attributes().getEffectiveClass(), 1);
-
+        _character.attributes.addClassLevels(_character.attributes.getEffectiveClass(), 1);
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
-        partyLeader->attributes() = _character->attributes();
+        partyLeader->attributes() = _character.attributes;
         _game->openInGame();
-
     } else {
-        string moduleName(_gameId == GameID::KotOR ? "end_m01aa" : "001ebo");
-
-        auto character = make_shared<StaticCreatureBlueprint>(*_character);
-        character->clearEquipment();
-
         shared_ptr<Creature> player(_game->objectFactory().newCreature());
-        player->load(character);
         player->setTag(kObjectTagPlayer);
+        player->setGender(_character.gender);
+        player->setAppearance(_character.appearance);
+        player->loadAppearance();
         player->setFaction(Faction::Friendly1);
         player->setImmortal(true);
+        player->attributes() = _character.attributes;
 
         Party &party = _game->party();
         party.clear();
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
+        string moduleName(_gameId == GameID::KotOR ? "end_m01aa" : "001ebo");
         _game->loadModule(moduleName);
     }
 }
 
-void CharacterGeneration::setCharacter(StaticCreatureBlueprint character) {
-    int currentAppearance = _character ? _character->appearance() : -1;
-    Gender currentGender = _character ? _character->gender() : Gender::None;
+void CharacterGeneration::setCharacter(Character character) {
+    bool appearanceChanged = character.appearance != _character.appearance;
 
-    _character = make_unique<StaticCreatureBlueprint>(move(character));
+    _character = move(character);
 
-    if (currentAppearance != character.appearance()) {
-        loadCharacterModel();
+    if (appearanceChanged) {
+        reloadCharacterModel();
         _portraitSelection->updatePortraits();
-    }
-    if (currentGender != character.gender()) {
         _nameEntry->loadRandomName();
     }
 
     updateAttributes();
 }
 
-void CharacterGeneration::setAbilities(CreatureAbilities abilities) {
-    _character->attributes().setAbilities(move(abilities));
-    updateAttributes();
-}
-
-void CharacterGeneration::setSkills(CreatureSkills skills) {
-    _character->attributes().setSkills(move(skills));
-}
-
-void CharacterGeneration::loadCharacterModel() {
+void CharacterGeneration::reloadCharacterModel() {
     Control &lblModel = getControl("MODEL_LBL");
     const Control::Extent &extent = lblModel.extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<Control::Scene3D> scene(SceneBuilder(_gfxOpts)
+    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
@@ -378,9 +363,9 @@ void CharacterGeneration::loadCharacterModel() {
         .ambientLightColor(glm::vec3(0.2f))
         .build());
 
-    lblModel.setScene3D(move(scene));
+    lblModel.setScene(move(scene));
 
-    string portrait(getPortraitByAppearance(_character->appearance()));
+    string portrait(getPortraitByAppearance(_character.appearance));
     if (!portrait.empty()) {
         Control &lblPortrait = getControl("PORTRAIT_LBL");
         lblPortrait.setBorderFill(portrait);
@@ -388,24 +373,26 @@ void CharacterGeneration::loadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    auto root = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
-
-    // Attach character model to the root model
     auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
-    unique_ptr<Creature> creature(objectFactory->newCreature());
-    creature->load(_character);
-    creature->setFacing(-glm::half_pi<float>());
-    creature->updateModelAnimation();
-    root->attach("cgbody_light", creature->getModelSceneNode());
 
-    return move(root);
+    unique_ptr<Creature> creature(objectFactory->newCreature());
+    creature->setFacing(-glm::half_pi<float>());
+    creature->setAppearance(_character.appearance);
+    creature->equip("g_a_clothes01");
+    creature->loadAppearance();
+    creature->updateModelAnimation();
+
+    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
+    model->attach("cgbody_light", creature->getModelSceneNode());
+
+    return move(model);
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character->attributes().getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character.attributes.getEffectiveClass()));
     setControlText("LBL_CLASS", clazz->name());
 
-    const CreatureAbilities &abilities =  _character->attributes().abilities();
+    const CreatureAbilities &abilities =  _character.attributes.abilities();
 
     int vitality = clazz->hitdie() + abilities.getModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));

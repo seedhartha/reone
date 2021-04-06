@@ -15,25 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/** @file
+ *  Encounter functions related to blueprint loading.
+ */
+
+#include "encounter.h"
 
 namespace reone {
 
 namespace game {
-
-/**
- * Generic blueprint interface.
- */
-template <class T>
-class Blueprint {
-public:
-    virtual ~Blueprint() = default;
-
-    /**
-     * Fill the specified object from this blueprint.
-     */
-    virtual void load(T &obj) = 0;
-};
 
 } // namespace game
 
