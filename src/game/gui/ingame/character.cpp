@@ -89,7 +89,7 @@ static string toStringOrEmptyIfZero(int value) {
 }
 
 static string describeAbilityModifier(int value) {
-    return value > 0 ? "+" + to_string(value) : (value < 0 ? to_string(value) : "");
+    return value > 0 ? "+" + to_string(value) : to_string(value);
 }
 
 void CharacterMenu::refreshControls() {
@@ -102,7 +102,7 @@ void CharacterMenu::refreshControls() {
     setControlText("LBL_LEVEL2", toStringOrEmptyIfZero(attributes.getLevelByPosition(2)));
 
     setControlText("LBL_VITALITY_STAT", str(boost::format("%d/%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
-    setControlText("LBL_DEFENSE_STAT", "");
+    setControlText("LBL_DEFENSE_STAT", to_string(attributes.getDefense()));
     setControlText("LBL_FORCE_STAT", "");
 
     setControlText("LBL_STR", to_string(attributes.abilities().strength()));
@@ -118,9 +118,10 @@ void CharacterMenu::refreshControls() {
     setControlText("LBL_CHA", to_string(attributes.abilities().charisma()));
     setControlText("LBL_CHA_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Charisma)));
 
-    setControlText("LBL_FORTITUDE_STAT", "");
-    setControlText("LBL_REFLEX_STAT", "");
-    setControlText("LBL_WILL_STAT", "");
+    SavingThrows savingThrows(attributes.getAggregateSavingThrows());
+    setControlText("LBL_FORTITUDE_STAT", to_string(savingThrows.fortitude));
+    setControlText("LBL_REFLEX_STAT", to_string(savingThrows.reflex));
+    setControlText("LBL_WILL_STAT", to_string(savingThrows.will));
 
     setControlText("LBL_EXPERIENCE_STAT", to_string(partyLeader->xp()));
     setControlText("LBL_NEEDED_XP", to_string(partyLeader->getNeededXP()));

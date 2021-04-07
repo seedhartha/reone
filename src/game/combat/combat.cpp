@@ -147,7 +147,7 @@ void Combat::updateRound(Round &round, float dt) {
 
 void Combat::startAttack(Attack &attack, bool duel) {
     if (attack.resultType == AttackResultType::Invalid) {
-        attack.resultType = determineAttackResult();
+        attack.resultType = determineAttackResult(attack);
     }
     AttackAnimation animation = determineAttackAnimation(attack, duel);
 

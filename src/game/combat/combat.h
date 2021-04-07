@@ -109,7 +109,7 @@ private:
 
     // Attack
 
-    AttackResultType determineAttackResult() const;
+    AttackResultType determineAttackResult(const Attack &attack) const;
     AttackAnimation determineAttackAnimation(const Attack &attack, bool duel) const;
     void applyAttackResult(const Attack &attack);
 

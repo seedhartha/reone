@@ -77,6 +77,24 @@ int CreatureAttributes::getAggregateLevel() const {
     return result;
 }
 
+SavingThrows CreatureAttributes::getAggregateSavingThrows() const {
+    SavingThrows result;
+    result.fortitude = 1;
+    result.reflex = 1;
+    result.will = 1;
+    for (auto &pair : _classLevels) {
+        auto classThrows = Classes::instance().get(pair.first)->getSavingThrows(pair.second);
+        result.fortitude += classThrows.fortitude;
+        result.reflex += classThrows.reflex;
+        result.will += classThrows.will;
+    }
+    return move(result);
+}
+
+int CreatureAttributes::getDefense() const {
+    return 10 + _abilities.getModifier(Ability::Dexterity);
+}
+
 void CreatureAttributes::setAbilities(CreatureAbilities abilities) {
     _abilities = move(abilities);
 }

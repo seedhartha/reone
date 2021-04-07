@@ -40,12 +40,6 @@ public:
     bool isClassSkill(Skill skill) const;
 
     /**
-     * Calculates a defense bonus that creature of this class and the specified
-     * level would have.
-     */
-    int getDefenseBonus(int level) const;
-
-    /**
      * @return class saving throws at the specified creature level
      */
     const SavingThrows &getSavingThrows(int level) const;

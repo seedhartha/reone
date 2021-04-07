@@ -31,14 +31,20 @@ namespace reone {
 
 namespace game {
 
-AttackResultType Combat::determineAttackResult() const {
+AttackResultType Combat::determineAttackResult(const Attack &attack) const {
     auto result = AttackResultType::Invalid;
-    int attack = random(1, 20);
-    int defense = 10; // TODO: add armor bonus and dexterity modifier
+    int roll = random(1, 20);
 
-    if (attack == 20) {
+    int defense;
+    if (attack.target->type() == ObjectType::Creature) {
+        defense = static_pointer_cast<Creature>(attack.target)->attributes().getDefense();
+    } else {
+        defense = 10;
+    }
+
+    if (roll == 20) {
         result = AttackResultType::AutomaticHit;
-    } else if (attack >= defense) {
+    } else if (roll >= defense) {
         result = AttackResultType::HitSuccessful;
     } else {
         result = AttackResultType::Miss;
