@@ -89,8 +89,6 @@ void Equipment::load() {
     hideControl("BTN_CHARLEFT");
     hideControl("BTN_CHARRIGHT");
     hideControl("LB_DESC");
-    hideControl("LBL_ATKL");
-    hideControl("LBL_ATKR");
     hideControl("LBL_CANTEQUIP");
 
     setControlFocusable("BTN_CHANGE1", false);
@@ -206,14 +204,6 @@ void Equipment::update() {
 
     string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
     setControlText("LBL_VITALITY", vitalityString);
-
-    int attackBonus = partyLeader->getAttackBonus();
-    string attackBonusString(to_string(attackBonus));
-    if (attackBonus > 0) {
-        attackBonusString.insert(0, "+");
-    }
-    setControlText("LBL_TOHITL", attackBonusString);
-    setControlText("LBL_TOHITR", attackBonusString);
 
     setControlText("LBL_DEF", to_string(partyLeader->getDefense()));
 }
@@ -350,6 +340,21 @@ void Equipment::updateEquipment() {
             control.setBorderFill(fill);
         });
     }
+
+    int min, max;
+    partyLeader->getMainHandDamage(min, max);
+    setControlText("LBL_ATKR", str(boost::format("%d-%d") % min % max));
+
+    partyLeader->getOffhandDamage(min, max);
+    setControlText("LBL_ATKL", str(boost::format("%d-%d") % min % max));
+
+    int attackBonus = partyLeader->getAttackBonus();
+    string attackBonusString(to_string(attackBonus));
+    if (attackBonus > 0) {
+        attackBonusString.insert(0, "+");
+    }
+    setControlText("LBL_TOHITL", attackBonusString);
+    setControlText("LBL_TOHITR", attackBonusString);
 }
 
 void Equipment::updateItems() {

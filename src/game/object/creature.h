@@ -194,6 +194,8 @@ public:
     std::shared_ptr<SpatialObject> getAttackTarget() const { return _combat.attackTarget; }
     int getAttackBonus() const;
     int getDefense() const;
+    void getMainHandDamage(int &min, int &max) const;
+    void getOffhandDamage(int &min, int &max) const;
 
     void setAttackTarget(std::shared_ptr<SpatialObject> target) { _combat.attackTarget = move(target); }
 
@@ -295,6 +297,7 @@ private:
 
     bool getWeaponInfo(WeaponType &type, WeaponWield &wield) const;
     int getWeaponWieldNumber(WeaponWield wield) const;
+    void getWeaponDamage(int slot, int &min, int &max) const;
 
     // END Animation
 
