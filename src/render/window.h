@@ -32,11 +32,11 @@ namespace reone {
 
 namespace render {
 
-class RenderWindow : boost::noncopyable {
+class Window : boost::noncopyable {
 public:
-    static RenderWindow &instance();
+    static Window &instance();
 
-    ~RenderWindow();
+    ~Window();
 
     void init(GraphicsOptions options, IEventHandler *eventHandler = nullptr);
     void deinit();
@@ -62,7 +62,7 @@ private:
     bool _relativeMouseMode { false };
     std::shared_ptr<Cursor> _cursor;
 
-    RenderWindow() = default;
+    Window() = default;
 
     void initSDL();
     void initGL();

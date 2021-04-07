@@ -245,7 +245,7 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
