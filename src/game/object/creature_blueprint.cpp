@@ -27,7 +27,7 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
-#include "../portraitutil.h"
+#include "../portraits.h"
 #include "../soundsets.h"
 
 using namespace std;
@@ -110,8 +110,10 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
 }
 
 void Creature::loadPortraitFromUTC(const GffStruct &utc) {
-    string portraitId(getPortrait(utc.getInt("PortraitId", -1)));
-    _portrait = Textures::instance().get(portraitId, TextureUsage::GUI);
+    int portraitId = utc.getInt("PortraitId", -1);
+    if (portraitId != -1) {
+        _portrait = Portraits::instance().getTextureByIndex(portraitId);
+    }
 }
 
 void Creature::loadPerceptionRangeFromUTC(const GffStruct &utc) {

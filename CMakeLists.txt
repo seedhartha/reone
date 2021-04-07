@@ -488,7 +488,7 @@ set(GAME_HEADERS
     src/game/perception.h
     src/game/player.h
     src/game/portrait.h
-    src/game/portraitutil.h
+    src/game/portraits.h
     src/game/reputes.h
     src/game/room.h
     src/game/d20/abilities.h
@@ -604,7 +604,7 @@ set(GAME_SOURCES
     src/game/pathfinder.cpp
     src/game/perception.cpp
     src/game/player.cpp
-    src/game/portraitutil.cpp
+    src/game/portraits.cpp
     src/game/reputes.cpp
     src/game/room.cpp
     src/game/savedgame.cpp

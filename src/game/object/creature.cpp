@@ -35,7 +35,7 @@
 
 #include "../action/attack.h"
 #include "../animationutil.h"
-#include "../portraitutil.h"
+#include "../portraits.h"
 
 #include "objectfactory.h"
 
@@ -85,7 +85,8 @@ void Creature::loadAppearance() {
     _walkSpeed = appearances->getFloat(_appearance, "walkdist", 0.0f);
     _runSpeed = appearances->getFloat(_appearance, "rundist", 0.0f);
 
-    loadPortrait();
+    _portrait = Portraits::instance().getTextureByAppearance(_appearance);
+
     updateModel();
 }
 
@@ -99,23 +100,6 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
     }
 
     throw logic_error("Unsupported model type: " + s);
-}
-
-void Creature::loadPortrait() {
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
-    string appearanceString(to_string(_appearance));
-
-    vector<pair<string, string>> columnValues {
-        { "appearancenumber", appearanceString },
-        { "appearance_s", appearanceString },
-        { "appearance_l", appearanceString }
-    };
-
-    int row = portraits->indexByCellValuesAny(columnValues);
-    if (row == -1) return;
-
-    string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
-    _portrait = Textures::instance().get(resRef, TextureUsage::GUI);
 }
 
 void Creature::updateModel() {

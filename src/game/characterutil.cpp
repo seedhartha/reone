@@ -21,6 +21,7 @@
 #include "../resource/resources.h"
 
 #include "portrait.h"
+#include "portraits.h"
 
 using namespace std;
 
@@ -33,26 +34,12 @@ namespace game {
 
 static vector<Portrait> getPCPortraitsByGender(Gender gender) {
     vector<Portrait> result;
-    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("portraits"));
     int sex = gender == Gender::Female ? 1 : 0;
-
-    for (int row = 0; row < twoDa->getRowCount(); ++row) {
-        if (twoDa->getInt(row, "forpc") == 1 && twoDa->getInt(row, "sex") == sex) {
-            string resRef(twoDa->getString(row, "baseresref"));
-            int appearanceNumber = twoDa->getInt(row, "appearancenumber");
-            int appearanceS = twoDa->getInt(row, "appearance_s");
-            int appearanceL = twoDa->getInt(row, "appearance_l");
-
-            Portrait portrait;
-            portrait.resRef = move(resRef);
-            portrait.appearanceNumber = appearanceNumber;
-            portrait.appearanceS = appearanceS;
-            portrait.appearanceL = appearanceL;
-
-            result.push_back(move(portrait));
+    for (auto &portrait : Portraits::instance().portraits()) {
+        if (portrait.forPC && portrait.sex == sex) {
+            result.push_back(portrait);
         }
     }
-
     return move(result);
 }
 

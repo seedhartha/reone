@@ -51,11 +51,6 @@ public:
      */
     int indexByCellValues(const std::vector<std::pair<std::string, std::string>> &values) const;
 
-    /**
-     * @return index of the first 2DA row, when at least one of its cell values equals the specified value, -1 otherwise
-     */
-    int indexByCellValuesAny(const std::vector<std::pair<std::string, std::string>> &values) const;
-
     int getColumnCount() const { return static_cast<int>(_columns.size()); }
     int getRowCount() const { return static_cast<int>(_rows.size()); }
 

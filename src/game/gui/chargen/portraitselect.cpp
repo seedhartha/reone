@@ -26,6 +26,8 @@
 #include "../../../scene/node/modelscenenode.h"
 
 #include "../../game.h"
+#include "../../portrait.h"
+#include "../../portraits.h"
 
 #include "../colorutil.h"
 
@@ -133,34 +135,12 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
-
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-
-    for (int row = 0; row < portraits->getRowCount(); ++row) {
-        // Skip non-PC rows
-        if (!portraits->getBool(row, "forpc")) continue;
-
-        // Skip rows for different gender
-        if (portraits->getInt(row, "sex") != sex) continue;
-
-        string resRef(portraits->getString(row, "baseresref"));
-        int appearanceNumber = portraits->getInt(row, "appearancenumber");
-        int appearanceS = portraits->getInt(row, "appearance_s");
-        int appearanceL = portraits->getInt(row, "appearance_l");
-
-        shared_ptr<Texture> image(Textures::instance().get(resRef, TextureUsage::GUI));
-
-        Portrait portrait;
-        portrait.resRef = move(resRef);
-        portrait.image = move(image);
-        portrait.appearanceNumber = appearanceNumber;
-        portrait.appearanceS = appearanceS;
-        portrait.appearanceL = appearanceL;
-
-        _portraits.push_back(move(portrait));
+    for (auto &portrait : Portraits::instance().portraits()) {
+        if (portrait.forPC && portrait.sex == sex) {
+            _portraits.push_back(move(portrait));
+        }
     }
-
     resetCurrentPortrait();
 }
 
@@ -183,7 +163,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     Control &control = getControl("LBL_PORTRAIT");
-    control.setBorderFill(_portraits[_currentPortrait].image);
+    control.setBorderFill(Textures::instance().get(_portraits[_currentPortrait].resRef, TextureUsage::GUI));
 }
 
 void PortraitSelection::onClick(const string &control) {
