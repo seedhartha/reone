@@ -85,7 +85,11 @@ void Creature::loadAppearance() {
     _walkSpeed = appearances->getFloat(_appearance, "walkdist", 0.0f);
     _runSpeed = appearances->getFloat(_appearance, "rundist", 0.0f);
 
-    _portrait = Portraits::instance().getTextureByAppearance(_appearance);
+    if (_portraitId > 0) {
+        _portrait = Portraits::instance().getTextureByIndex(_portraitId);
+    } else {
+        _portrait = Portraits::instance().getTextureByAppearance(_appearance);
+    }
 
     updateModel();
 }

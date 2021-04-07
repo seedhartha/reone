@@ -302,7 +302,6 @@ private:
 
     void loadNameFromUTC(const resource::GffStruct &utc);
     void loadAttributesFromUTC(const resource::GffStruct &utc);
-    void loadPortraitFromUTC(const resource::GffStruct &utc);
     void loadPerceptionRangeFromUTC(const resource::GffStruct &utc);
     void loadSoundSetFromUTC(const resource::GffStruct &utc);
     void loadScriptsFromUTC(const resource::GffStruct &utc);
