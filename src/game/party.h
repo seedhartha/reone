@@ -44,8 +44,6 @@ public:
     void clear();
     void switchLeader();
 
-    void onHeartbeat();
-
     bool isEmpty() const;
     bool isSoloMode() const { return _solo; }
 
