@@ -84,13 +84,15 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> 
 }
 
 void Combat::update(float dt) {
-    for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end(); ++it) {
+    for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end(); ) {
         Round &round = *it->second;
         updateRound(round, dt);
 
         // Remove finished combat rounds
         if (round.state == RoundState::Finished) {
             it = _roundByAttacker.erase(it);
+        } else {
+            ++it;
         }
     }
 }
