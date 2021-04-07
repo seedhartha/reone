@@ -262,15 +262,8 @@ private:
 
     // END Globals/locals
 
-    /**
-     * Initialize engine subsytems.
-     */
-    void init();
-
-    /**
-     * Release engine subsystems.
-     */
-    void deinit();
+    void initSubsystems();
+    void deinitSubsystems();
 
     void update();
 
