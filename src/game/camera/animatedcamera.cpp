@@ -77,7 +77,7 @@ void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
         (!_model && !model)) return;
 
     if (model) {
-        _model = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Other, model, _sceneGraph);
+        _model = make_unique<ModelSceneNode>(ModelUsage::Other, model, _sceneGraph);
         _model->attach("camerahook", _sceneNode);
     } else {
         _model.reset();

@@ -63,7 +63,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Placeable, Models::instance().get(modelName), _sceneGraph);
+    auto model = make_shared<ModelSceneNode>(ModelUsage::Placeable, Models::instance().get(modelName), _sceneGraph);
     _sceneNode = move(model);
 
     _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);

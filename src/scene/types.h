@@ -31,6 +31,16 @@ enum class SceneNodeType {
     Grass
 };
 
+enum class ModelUsage {
+    Room,
+    Creature,
+    Placeable,
+    Door,
+    Equipment,
+    Projectile,
+    Other
+};
+
 struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int blend = 2; /**< blend previous animation into the next one */

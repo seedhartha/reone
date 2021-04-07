@@ -50,7 +50,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     shared_ptr<Model> model(Models::instance().get(modelName));
     if (!model) return nullptr;
 
-    auto modelSceneNode = make_unique<ModelSceneNode>(ModelSceneNode::Classification::Creature, model, _sceneGraph);
+    auto modelSceneNode = make_unique<ModelSceneNode>(ModelUsage::Creature, model, _sceneGraph);
 
     // Body texture
 
@@ -76,9 +76,9 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
         if (headModel) {
-            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel, ModelSceneNode::Classification::Creature));
+            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel, ModelUsage::Creature));
             if (headSceneNode && maskModel) {
-                headSceneNode->attach(g_maskHookNode, maskModel, ModelSceneNode::Classification::Equipment);
+                headSceneNode->attach(g_maskHookNode, maskModel, ModelUsage::Equipment);
             }
         }
     }
@@ -89,7 +89,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
         if (leftWeaponModel) {
-            modelSceneNode->attach("lhand", leftWeaponModel, ModelSceneNode::Classification::Equipment);
+            modelSceneNode->attach("lhand", leftWeaponModel, ModelUsage::Equipment);
         }
     }
 
@@ -99,7 +99,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
         if (rightWeaponModel) {
-            modelSceneNode->attach("rhand", rightWeaponModel, ModelSceneNode::Classification::Equipment);
+            modelSceneNode->attach("rhand", rightWeaponModel, ModelUsage::Equipment);
         }
     }
 

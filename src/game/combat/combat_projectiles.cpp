@@ -66,7 +66,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Projectile, ammunitionType->model, &_game->sceneGraph());
+    round.projectile = make_shared<ModelSceneNode>(ModelUsage::Projectile, ammunitionType->model, &_game->sceneGraph());
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setPosition(projectilePos);
     round.projectile->setProjectileSpeed(kProjectileSpeed);

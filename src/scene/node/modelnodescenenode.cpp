@@ -140,7 +140,7 @@ bool ModelNodeSceneNode::shouldRender() const {
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
-    if (_modelSceneNode->classification() != ModelSceneNode::Classification::Creature) return false;
+    if (_modelSceneNode->usage() != ModelUsage::Creature) return false;
 
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
 
@@ -176,11 +176,11 @@ bool ModelNodeSceneNode::isTransparent() const {
     return true;
 }
 
-static bool isLightingEnabledByClassification(ModelSceneNode::Classification classification) {
-    if (classification == ModelSceneNode::Classification::Room) {
+static bool isLightingEnabledByUsage(ModelUsage usage) {
+    if (usage == ModelUsage::Room) {
         return isFeatureEnabled(Feature::DynamicRoomLighting);
     }
-    return classification != ModelSceneNode::Classification::Projectile;
+    return usage != ModelUsage::Projectile;
 }
 
 bool ModelNodeSceneNode::isSelfIlluminated() const {
@@ -190,7 +190,7 @@ bool ModelNodeSceneNode::isSelfIlluminated() const {
 static bool isReceivingShadows(const ModelSceneNode &model, const ModelNodeSceneNode &modelNode) {
     // Only room models receive shadows, unless model node is self-illuminated
     return
-        model.classification() == ModelSceneNode::Classification::Room &&
+        model.usage() == ModelUsage::Room &&
         !modelNode.isSelfIlluminated();
 }
 
@@ -351,7 +351,7 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
 }
 
 bool ModelNodeSceneNode::isLightingEnabled() const {
-    if (!isLightingEnabledByClassification(_modelSceneNode->classification())) return false;
+    if (!isLightingEnabledByUsage(_modelSceneNode->usage())) return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
     if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;

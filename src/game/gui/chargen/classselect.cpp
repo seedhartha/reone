@@ -150,7 +150,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(ModelSceneNode::Classification::Other, Models::instance().get("cgbody_light"), &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(ModelUsage::Other, Models::instance().get("cgbody_light"), &sceneGraph);
     model->attach("cgbody_light", character->getModelSceneNode());
 
     return move(model);
