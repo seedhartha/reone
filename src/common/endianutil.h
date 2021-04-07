@@ -32,7 +32,7 @@ Endianess getSystemEndianess();
  * @param val value whose endianess to invert
  */
 template <class T>
-std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value> swapBytes(T &val) {
+inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value> swapBytes(T &val) {
     uint8_t *b = reinterpret_cast<uint8_t *>(&val);
     for (size_t i = 0; i * 2 < sizeof(T); ++i) {
         std::swap(b[i], b[sizeof(T) - i - 1]);
@@ -47,7 +47,7 @@ std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value>
  * @param other endianess to compare with the system endianess
  */
 template <class T>
-void swapBytesIfNotSystemEndianess(T &val, Endianess other) {
+inline void swapBytesIfNotSystemEndianess(T &val, Endianess other) {
     if (other != getSystemEndianess()) {
         swapBytes(val);
     }
