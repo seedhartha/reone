@@ -91,6 +91,15 @@ SavingThrows CreatureAttributes::getAggregateSavingThrows() const {
     return move(result);
 }
 
+int CreatureAttributes::getAggregateAttackBonus() const {
+    int result = 0;
+    for (auto &pair : _classLevels) {
+        auto clazz = Classes::instance().get(pair.first);
+        result += clazz->getAttackBonus(pair.second);
+    }
+    return result;
+}
+
 int CreatureAttributes::getDefense() const {
     return 10 + _abilities.getModifier(Ability::Dexterity);
 }

@@ -18,6 +18,7 @@
 #include "equip.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include "../../../gui/control/imagebutton.h"
 #include "../../../gui/control/listbox.h"
@@ -91,10 +92,6 @@ void Equipment::load() {
     hideControl("LBL_ATKL");
     hideControl("LBL_ATKR");
     hideControl("LBL_CANTEQUIP");
-    hideControl("LBL_DEF");
-    hideControl("LBL_TOHITL");
-    hideControl("LBL_TOHITR");
-    hideControl("LBL_VITALITY");
 
     setControlFocusable("BTN_CHANGE1", false);
     setControlFocusable("BTN_CHANGE2", false);
@@ -204,6 +201,21 @@ void Equipment::update() {
     updatePortraits();
     updateEquipment();
     selectSlot(Slot::None);
+
+    auto partyLeader(_game->party().getLeader());
+
+    string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
+    setControlText("LBL_VITALITY", vitalityString);
+
+    int attackBonus = partyLeader->getAttackBonus();
+    string attackBonusString(to_string(attackBonus));
+    if (attackBonus > 0) {
+        attackBonusString.insert(0, "+");
+    }
+    setControlText("LBL_TOHITL", attackBonusString);
+    setControlText("LBL_TOHITR", attackBonusString);
+
+    setControlText("LBL_DEF", to_string(partyLeader->getDefense()));
 }
 
 void Equipment::updatePortraits() {

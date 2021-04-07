@@ -19,6 +19,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "../../resource/format/2dareader.h"
 
@@ -44,6 +45,11 @@ public:
      */
     const SavingThrows &getSavingThrows(int level) const;
 
+    /**
+     * @return base attack bonus at the specified creature level
+     */
+    int getAttackBonus(int level) const;
+
     const std::string &name() const { return _name; }
     const std::string &description() const { return _description; }
     int hitdie() const { return _hitdie; }
@@ -59,9 +65,11 @@ private:
     int _skillPointBase { 0 };
     std::unordered_set<Skill> _classSkills;
     std::unordered_map<int, SavingThrows> _savingThrowsByLevel;
+    std::vector<int> _attackBonuses;
 
     void loadClassSkills(const std::string &skillsTable);
     void loadSavingThrows(const std::string &savingThrowTable);
+    void loadAttackBonuses(const std::string &attackBonusTable);
 };
 
 } // namespace game

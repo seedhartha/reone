@@ -192,6 +192,8 @@ public:
 
     std::shared_ptr<SpatialObject> getAttemptedAttackTarget() const;
     std::shared_ptr<SpatialObject> getAttackTarget() const { return _combat.attackTarget; }
+    int getAttackBonus() const;
+    int getDefense() const;
 
     void setAttackTarget(std::shared_ptr<SpatialObject> target) { _combat.attackTarget = move(target); }
 
