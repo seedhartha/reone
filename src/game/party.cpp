@@ -33,7 +33,6 @@ namespace reone {
 namespace game {
 
 static constexpr int kMaxMemberCount = 3;
-static constexpr float kTeleMemberDistance = 32.0f;
 
 Party::Party(Game *game) : _game(game) {
     if (!game) {
@@ -130,23 +129,6 @@ void Party::onLeaderChanged() {
     }
 
     _game->module()->area()->onPartyLeaderMoved(true);
-}
-
-void Party::onHeartbeat() {
-    shared_ptr<Creature> leader(_members[0].creature);
-
-    for (int i = 1; i < _members.size(); ++i) {
-        shared_ptr<Creature> member(_members[i].creature);
-        ActionQueue &actions = member->actionQueue();
-        shared_ptr<Action> action(actions.getCurrentAction());
-        if (!action) {
-            actions.add(make_unique<FollowAction>(leader, kDefaultFollowDistance));
-        }
-        if (member->getDistanceTo2(*leader) > kTeleMemberDistance * kTeleMemberDistance) {
-            member->setPosition(leader->position());
-            _game->module()->area()->landObject(*member);
-        }
-    }
 }
 
 const string &Party::getAvailableMember(int npc) const {
