@@ -394,7 +394,7 @@ void CharacterGeneration::updateAttributes() {
     int vitality = clazz->hitdie() + abilities.getModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));
 
-    int defense = 10 + clazz->getDefenseBonus(1) + abilities.getModifier(Ability::Dexterity);
+    int defense = _character.attributes.getDefense();
     setControlText("LBL_DEF", to_string(defense));
 
     setControlText("STR_AB_LBL", to_string(abilities.strength()));

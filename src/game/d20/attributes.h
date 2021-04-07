@@ -22,6 +22,7 @@
 #include "../types.h"
 
 #include "abilities.h"
+#include "savingthrows.h"
 #include "skills.h"
 
 namespace reone {
@@ -55,6 +56,9 @@ public:
      * @return the sum of (level * hitdie) of all classes
      */
     int getAggregateHitDie() const;
+
+    SavingThrows getAggregateSavingThrows() const;
+    int getDefense() const;
 
     ClassType getEffectiveClass() const;
     int getClassLevel(ClassType clazz) const;

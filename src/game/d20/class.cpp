@@ -84,18 +84,6 @@ bool CreatureClass::isClassSkill(Skill skill) const {
     return _classSkills.count(skill) > 0;
 }
 
-int CreatureClass::getDefenseBonus(int level) const {
-    switch (_type) {
-        case ClassType::JediConsular:
-        case ClassType::JediGuardian:
-        case ClassType::JediSentinel:
-        case ClassType::Scoundrel:
-            return 2 + (2 * (level / 6));
-        default:
-            return 0;
-    }
-}
-
 const SavingThrows &CreatureClass::getSavingThrows(int level) const {
     auto maybeThrows = _savingThrowsByLevel.find(level);
     if (maybeThrows == _savingThrowsByLevel.end()) {
