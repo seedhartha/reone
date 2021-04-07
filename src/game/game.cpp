@@ -88,7 +88,7 @@ Game::Game(const fs::path &path, const Options &opts) :
 }
 
 int Game::run() {
-    init();
+    initSubsystems();
     openMainMenu();
 
     if (!_options.module.empty()) {
@@ -99,12 +99,12 @@ int Game::run() {
     RenderWindow::instance().show();
 
     runMainLoop();
-    deinit();
+    deinitSubsystems();
 
     return 0;
 }
 
-void Game::init() {
+void Game::initSubsystems() {
     initResourceProviders();
     loadModuleNames();
 
@@ -589,7 +589,7 @@ void Game::loadCharacterGeneration() {
     _charGen->load();
 }
 
-void Game::deinit() {
+void Game::deinitSubsystems() {
     AudioPlayer::instance().deinit();
     RenderWindow::instance().deinit();
 }
