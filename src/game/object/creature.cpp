@@ -595,7 +595,7 @@ int Creature::getAttackBonus() const {
     int modifier;
 
     auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
-    if (rightWeapon && rightWeapon->weaponType() == WeaponType::Ranged) {
+    if (rightWeapon && rightWeapon->isRanged()) {
         modifier = _attributes.abilities().getModifier(Ability::Dexterity);
     } else {
         modifier = _attributes.abilities().getModifier(Ability::Strength);
@@ -606,6 +606,35 @@ int Creature::getAttackBonus() const {
 
 int Creature::getDefense() const {
     return _attributes.getDefense();
+}
+
+void Creature::getMainHandDamage(int &min, int &max) const {
+    getWeaponDamage(InventorySlot::rightWeapon, min, max);
+}
+
+void Creature::getWeaponDamage(int slot, int &min, int &max) const {
+    auto weapon = getEquippedItem(slot);
+
+    if (!weapon) {
+        min = 1;
+        max = 1;
+    } else {
+        min = weapon->numDice();
+        max = weapon->numDice() * weapon->dieToRoll();
+    }
+
+    int modifier;
+    if (weapon && weapon->isRanged()) {
+        modifier = _attributes.abilities().getModifier(Ability::Dexterity);
+    } else {
+        modifier = _attributes.abilities().getModifier(Ability::Strength);
+    }
+    min += modifier;
+    max += modifier;
+}
+
+void Creature::getOffhandDamage(int &min, int &max) const {
+    getWeaponDamage(InventorySlot::leftWeapon, min, max);
 }
 
 } // namespace game

@@ -49,6 +49,8 @@ void Item::loadUTI(const GffStruct &uti) {
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     _attackRange = baseItems->getInt(_baseItemType, "maxattackrange");
+    _criticalHitMultiplier = baseItems->getInt(_baseItemType, "crithitmult");
+    _criticalThreat = baseItems->getInt(_baseItemType, "critthreat");
     _damageFlags = baseItems->getInt(_baseItemType, "damageflags");
     _dieToRoll = baseItems->getInt(_baseItemType, "dietoroll");
     _equipableSlots = baseItems->getUint(_baseItemType, "equipableslots", 0);

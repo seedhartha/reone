@@ -54,6 +54,7 @@ public:
     bool isDropable() const { return _dropable; }
     bool isIdentified() const { return _identified; }
     bool isEquipped() const { return _equipped; }
+    bool isRanged() const { return _weaponType == WeaponType::Ranged; }
 
     const std::string &baseBodyVariation() const { return _baseBodyVariation; }
     const std::string &itemClass() const { return _itemClass; }
@@ -72,6 +73,8 @@ public:
     WeaponWield weaponWield() const { return _weaponWield; }
     const std::string &descIdentified() const { return _descIdentified; }
     int baseItemType() const { return _baseItemType; }
+    int criticalThreat() const { return _criticalThreat; }
+    int criticalHitMultiplier() const { return _criticalHitMultiplier; }
 
     void setDropable(bool dropable);
     void setStackSize(int size);
@@ -100,6 +103,8 @@ private:
     std::shared_ptr<AmmunitionType> _ammunitionType;
     std::string _descIdentified;
     int _baseItemType { 0 };
+    int _criticalThreat { 0 };
+    int _criticalHitMultiplier { 0 };
 
     // Blueprint
 
