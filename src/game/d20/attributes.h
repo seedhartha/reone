@@ -58,6 +58,7 @@ public:
     int getAggregateHitDie() const;
 
     SavingThrows getAggregateSavingThrows() const;
+    int getAggregateAttackBonus() const;
     int getDefense() const;
 
     ClassType getEffectiveClass() const;

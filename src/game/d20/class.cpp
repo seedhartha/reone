@@ -55,6 +55,9 @@ void CreatureClass::load(const TwoDA &twoDa, int row) {
 
     string savingThrowTable(boost::to_lower_copy(twoDa.getString(row, "savingthrowtable")));
     loadSavingThrows(savingThrowTable);
+
+    string attackBonusTable(boost::to_lower_copy(twoDa.getString(row, "attackbonustable")));
+    loadAttackBonuses(attackBonusTable);
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
@@ -66,8 +69,8 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
     }
 }
 
-void CreatureClass::loadSavingThrows(const string &twoDaResRef) {
-    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(twoDaResRef));
+void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -77,6 +80,13 @@ void CreatureClass::loadSavingThrows(const string &twoDaResRef) {
         throws.will = twoDa->getInt(row, "willsave");
 
         _savingThrowsByLevel.insert(make_pair(level, move(throws)));
+    }
+}
+
+void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
+    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(attackBonusTable));
+    for (int row = 0; row < twoDa->getRowCount(); ++row) {
+        _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }
 }
 
@@ -90,6 +100,13 @@ const SavingThrows &CreatureClass::getSavingThrows(int level) const {
         throw logic_error("Saving throws not found for level " + to_string(level));
     }
     return maybeThrows->second;
+}
+
+int CreatureClass::getAttackBonus(int level) const {
+    if (level < 1 || level > static_cast<int>(_attackBonuses.size())) {
+        throw invalid_argument("level is invalid");
+    }
+    return _attackBonuses[level - 1];
 }
 
 } // namespace game

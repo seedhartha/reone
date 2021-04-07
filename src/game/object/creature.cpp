@@ -591,6 +591,23 @@ shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
     return move(result);
 }
 
+int Creature::getAttackBonus() const {
+    int modifier;
+
+    auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
+    if (rightWeapon && rightWeapon->weaponType() == WeaponType::Ranged) {
+        modifier = _attributes.abilities().getModifier(Ability::Dexterity);
+    } else {
+        modifier = _attributes.abilities().getModifier(Ability::Strength);
+    }
+
+    return _attributes.getAggregateAttackBonus() + modifier;
+}
+
+int Creature::getDefense() const {
+    return _attributes.getDefense();
+}
+
 } // namespace game
 
 } // namespace reone

@@ -37,14 +37,14 @@ AttackResultType Combat::determineAttackResult(const Attack &attack) const {
 
     int defense;
     if (attack.target->type() == ObjectType::Creature) {
-        defense = static_pointer_cast<Creature>(attack.target)->attributes().getDefense();
+        defense = static_pointer_cast<Creature>(attack.target)->getDefense();
     } else {
         defense = 10;
     }
 
     if (roll == 20) {
         result = AttackResultType::AutomaticHit;
-    } else if (roll >= defense) {
+    } else if (roll + attack.attacker->getAttackBonus() >= defense) {
         result = AttackResultType::HitSuccessful;
     } else {
         result = AttackResultType::Miss;
