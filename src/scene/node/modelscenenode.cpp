@@ -45,9 +45,9 @@ namespace scene {
 
 static bool g_debugAABB = false;
 
-ModelSceneNode::ModelSceneNode(Classification classification, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
+ModelSceneNode::ModelSceneNode(ModelUsage usage, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
     SceneNode(SceneNodeType::Model, sceneGraph),
-    _classification(classification),
+    _usage(usage),
     _model(model),
     _animator(this, ignoreNodes) {
 
@@ -133,7 +133,7 @@ void ModelSceneNode::initModelNodes() {
             // If model node is a reference, attach the model it contains to the model nodes scene node
             shared_ptr<ModelNode::Reference> reference(child->reference());
             if (reference) {
-                attach(*childNode, reference->model, _classification);
+                attach(*childNode, reference->model, _usage);
             }
         }
     }
@@ -164,12 +164,12 @@ void ModelSceneNode::draw() {
     }
 }
 
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelUsage usage) {
     ModelNodeSceneNode *parentNode = getModelNode(parent);
-    return parentNode ? attach(*parentNode, model, classification) : nullptr;
+    return parentNode ? attach(*parentNode, model, usage) : nullptr;
 }
 
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, const shared_ptr<Model> &model, ModelSceneNode::Classification classification) {
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, const shared_ptr<Model> &model, ModelUsage usage) {
     const ModelNode *parentModelNode = parent.modelNode();
     uint16_t parentNumber = parentModelNode->nodeNumber();
 
@@ -183,7 +183,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, co
         for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
             ignoreNodes.insert(node->name());
         }
-        auto modelNode = make_shared<ModelSceneNode>(classification, model, _sceneGraph, ignoreNodes);
+        auto modelNode = make_shared<ModelSceneNode>(usage, model, _sceneGraph, ignoreNodes);
         parent.addChild(modelNode);
 
         return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
@@ -248,7 +248,7 @@ void ModelSceneNode::updateLighting() {
 
 bool ModelSceneNode::isAffectableByLight(const LightSceneNode &light) const {
     if (light.isAmbientOnly()) {
-        return _classification == ModelSceneNode::Classification::Room;
+        return _usage == ModelUsage::Room;
     }
     return true;
 }

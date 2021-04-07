@@ -25,6 +25,7 @@
 #include "../../render/walkmesh/walkmesh.h"
 
 #include "../animation/scenenodeanimator.h"
+#include "../types.h"
 
 #include "scenenode.h"
 
@@ -38,18 +39,8 @@ class ModelNodeSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
-    enum class Classification {
-        Room,
-        Creature,
-        Placeable,
-        Door,
-        Equipment,
-        Projectile,
-        Other
-    };
-
     ModelSceneNode(
-        Classification classification,
+        ModelUsage usage,
         const std::shared_ptr<render::Model> &model,
         SceneGraph *sceneGraph,
         std::set<std::string> ignoreNodes = std::set<std::string>());
@@ -70,7 +61,7 @@ public:
     glm::vec3 getCenterOfAABB() const;
     const std::string &getName() const;
 
-    Classification classification() const { return _classification; }
+    ModelUsage usage() const { return _usage; }
     std::shared_ptr<render::Model> model() const { return _model; }
     std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
     float alpha() const { return _alpha; }
@@ -87,8 +78,8 @@ public:
 
     // Attachments
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
-    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<render::Model> &model, ModelSceneNode::Classification classification);
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelUsage usage);
+    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<render::Model> &model, ModelUsage usage);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     // END Attachments
@@ -105,7 +96,7 @@ public:
     // END Dynamic lighting
 
 private:
-    Classification _classification;
+    ModelUsage _usage;
     std::shared_ptr<render::Model> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;
     SceneNodeAnimator _animator;
