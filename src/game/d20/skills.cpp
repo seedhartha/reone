@@ -17,6 +17,8 @@
 
 #include "skills.h"
 
+#include "../../common/collectionutil.h"
+
 namespace reone {
 
 namespace game {
@@ -24,13 +26,11 @@ namespace game {
 static constexpr int kDefaultSkillRank = 0;
 
 bool CreatureSkills::contains(Skill skill) const {
-    auto maybeRank = _ranks.find(skill);
-    return maybeRank != _ranks.end() ? maybeRank->second > 0 : false;
+    return getRank(skill) > 0;
 }
 
 int CreatureSkills::getRank(Skill skill) const {
-    auto maybeRank = _ranks.find(skill);
-    return maybeRank != _ranks.end() ? maybeRank->second : kDefaultSkillRank;
+    return getFromLookupOrElse(_ranks, skill, kDefaultSkillRank);
 }
 
 int CreatureSkills::computerUse() const {

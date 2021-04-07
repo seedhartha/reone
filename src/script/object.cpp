@@ -17,6 +17,8 @@
 
 #include "object.h"
 
+#include "../common/collectionutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -27,13 +29,11 @@ ScriptObject::ScriptObject(uint32_t id) : _id(id) {
 }
 
 bool ScriptObject::getLocalBoolean(int index) const {
-    auto maybeValue = _localBooleans.find(index);
-    return maybeValue != _localBooleans.end() ? maybeValue->second : false;
+    return getFromLookupOrElse(_localBooleans, index, false);
 }
 
 int ScriptObject::getLocalNumber(int index) const {
-    auto maybeValue = _localNumbers.find(index);
-    return maybeValue != _localNumbers.end() ? maybeValue->second : 0;
+    return getFromLookupOrElse(_localNumbers, index, 0);
 }
 
 void ScriptObject::setTag(string tag) {
