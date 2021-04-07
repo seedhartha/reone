@@ -32,6 +32,7 @@ enum class SceneNodeType {
 };
 
 enum class ModelUsage {
+    GUI,
     Room,
     Creature,
     Placeable,

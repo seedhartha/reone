@@ -19,6 +19,8 @@
 
 #include "../gui.h"
 
+#include "../../../scene/node/modelscenenode.h"
+
 namespace reone {
 
 namespace game {
@@ -37,9 +39,12 @@ public:
 private:
     Game *_game { nullptr };
 
-    void onClick(const std::string &control) override;
-
     void refreshPortraits();
+    void refresh3D();
+
+    std::shared_ptr<scene::ModelSceneNode> getSceneModel(scene::SceneGraph &sceneGraph) const;
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game
