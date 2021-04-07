@@ -19,16 +19,21 @@
 
 #include <boost/format.hpp>
 
+#include "../../../gui/scenebuilder.h"
+#include "../../../render/model/models.h"
+
 #include "../../d20/classes.h"
 #include "../../game.h"
 
 #include "../colorutil.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::render;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -70,6 +75,7 @@ void CharacterMenu::update(float dt) {
     shared_ptr<Creature> leader(_game->party().getLeader());
     setControlVisible("BTN_LEVELUP", leader->isLevelUpPending());
     setControlVisible("BTN_AUTO", leader->isLevelUpPending());
+    GUI::update(dt);
 }
 
 static string describeClass(ClassType clazz) {
@@ -120,6 +126,7 @@ void CharacterMenu::refreshControls() {
     setControlText("LBL_NEEDED_XP", to_string(partyLeader->getNeededXP()));
 
     refreshPortraits();
+    refresh3D();
 }
 
 void CharacterMenu::refreshPortraits() {
@@ -136,6 +143,46 @@ void CharacterMenu::refreshPortraits() {
     Control &btnChange2 = getControl("BTN_CHANGE2");
     btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
     btnChange2.setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+}
+
+void CharacterMenu::refresh3D() {
+    Control &control3d = getControl("LBL_3DCHAR");
+    float aspect = control3d.extent().width / static_cast<float>(control3d.extent().height);
+
+    auto scene = SceneBuilder(_gfxOpts)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
+        .modelOffset(glm::vec2(0.0f, 1.7f))
+        .cameraFromModelNode("camerahook")
+        .ambientLightColor(glm::vec3(0.2f))
+        .build();
+
+    control3d.setScene(move(scene));
+}
+
+shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
+    auto partyLeader = _game->party().getLeader();
+    auto objectFactory = make_shared<ObjectFactory>(_game, &sceneGraph);
+    auto character = objectFactory->newCreature();
+    character->setFacing(-glm::half_pi<float>());
+    character->setAppearance(partyLeader->appearance());
+    for (auto &item : partyLeader->equipment()) {
+        switch (item.first) {
+            case InventorySlot::body:
+                character->equip(item.first, item.second);
+                break;
+            default:
+                break;
+        }
+    }
+    character->loadAppearance();
+    character->updateModelAnimation();
+
+    auto sceneModel = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("charmain_light"), &sceneGraph);
+    sceneModel->attach("charmain_light", character->getModelSceneNode());
+
+    return move(sceneModel);
 }
 
 void CharacterMenu::onClick(const string &control) {

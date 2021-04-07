@@ -89,6 +89,11 @@ SceneBuilder &SceneBuilder::modelScale(float scale) {
     return *this;
 }
 
+SceneBuilder &SceneBuilder::modelOffset(glm::vec2 offset) {
+    _modelOffset = move(offset);
+    return *this;
+}
+
 SceneBuilder &SceneBuilder::cameraTransform(const glm::mat4 &transform) {
     _cameraTransform = transform;
     return *this;

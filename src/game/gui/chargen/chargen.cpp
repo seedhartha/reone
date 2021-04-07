@@ -379,7 +379,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->loadAppearance();
     creature->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(ModelUsage::Other, Models::instance().get("cgbody_light"), &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("cgbody_light"), &sceneGraph);
     model->attach("cgbody_light", creature->getModelSceneNode());
 
     return move(model);
