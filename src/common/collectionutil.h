@@ -19,8 +19,8 @@
 
 #include <functional>
 #include <map>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace reone {
 
@@ -45,6 +45,18 @@ inline std::map<Src, Dest> associate(const std::vector<Src> &source, const std::
         result.insert(make_pair(item, fn(item)));
     }
     return move(result);
+}
+
+template <class K, class V>
+inline V getFromLookupOrNull(const std::map<K, V> &lookup, K key) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : nullptr;
+}
+
+template <class K, class V>
+inline V getFromLookupOrElse(const std::map<K, V> &lookup, K key, V defaultValue) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : defaultValue;
 }
 
 template <class K, class V>

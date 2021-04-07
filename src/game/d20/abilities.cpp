@@ -17,6 +17,8 @@
 
 #include "abilities.h"
 
+#include "../../common/collectionutil.h"
+
 namespace reone {
 
 namespace game {
@@ -24,8 +26,7 @@ namespace game {
 static constexpr int kDefaultAbilityScore = 8;
 
 int CreatureAbilities::getScore(Ability ability) const {
-    auto maybeScore = _scores.find(ability);
-    return maybeScore != _scores.end() ? maybeScore->second : kDefaultAbilityScore;
+    return getFromLookupOrElse(_scores, ability, kDefaultAbilityScore);
 }
 
 int CreatureAbilities::getModifier(Ability ability) const {

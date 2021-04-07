@@ -33,7 +33,7 @@ Endianess getSystemEndianess();
  */
 template <class T>
 inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value> swapBytes(T &val) {
-    uint8_t *b = reinterpret_cast<uint8_t *>(&val);
+    auto b = reinterpret_cast<uint8_t *>(&val);
     for (size_t i = 0; i * 2 < sizeof(T); ++i) {
         std::swap(b[i], b[sizeof(T) - i - 1]);
     }

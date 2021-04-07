@@ -19,6 +19,8 @@
 
 #include <unordered_map>
 
+#include "../common/collectionutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -36,8 +38,7 @@ bool isFeatureEnabled(Feature feature) {
 }
 
 int getFeatureParameter(Feature feature) {
-    auto maybeFeature = g_features.find(feature);
-    return maybeFeature != g_features.end() ? maybeFeature->second : 0;
+    return getFromLookupOrElse(g_features, feature, 0);
 }
 
 void setFeatureEnabled(Feature feature, bool enabled) {

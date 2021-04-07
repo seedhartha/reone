@@ -864,23 +864,20 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 bool Game::getGlobalBoolean(const string &name) const {
-    auto maybeValue = _globalBooleans.find(name);
-    return maybeValue != _globalBooleans.end() ? maybeValue->second : false;
+    return getFromLookupOrElse(_globalBooleans, name, false);
 }
 
 int Game::getGlobalNumber(const string &name) const {
-    auto maybeValue = _globalNumbers.find(name);
-    return maybeValue != _globalNumbers.end() ? maybeValue->second : 0;
+    return getFromLookupOrElse(_globalNumbers, name, 0);
 }
 
 string Game::getGlobalString(const string &name) const {
-    auto maybeValue = _globalStrings.find(name);
-    return maybeValue != _globalStrings.end() ? maybeValue->second : "";
+    static string empty;
+    return getFromLookupOrElse(_globalStrings, name, empty);
 }
 
 shared_ptr<Location> Game::getGlobalLocation(const string &name) const {
-    auto maybeLocation = _globalLocations.find(name);
-    return maybeLocation != _globalLocations.end() ? maybeLocation->second : nullptr;
+    return getFromLookupOrNull(_globalLocations, name);
 }
 
 void Game::setGlobalBoolean(const string &name, bool value) {
