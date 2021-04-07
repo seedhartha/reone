@@ -26,7 +26,7 @@
 #include "../../d20/classes.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
-#include "../../portraitutil.h"
+#include "../../portraits.h"
 
 #include "../colorutil.h"
 
@@ -365,11 +365,8 @@ void CharacterGeneration::reloadCharacterModel() {
 
     lblModel.setScene(move(scene));
 
-    string portrait(getPortraitByAppearance(_character.appearance));
-    if (!portrait.empty()) {
-        Control &lblPortrait = getControl("PORTRAIT_LBL");
-        lblPortrait.setBorderFill(portrait);
-    }
+    Control &lblPortrait = getControl("PORTRAIT_LBL");
+    lblPortrait.setBorderFill(Portraits::instance().getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {

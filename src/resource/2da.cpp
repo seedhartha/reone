@@ -93,20 +93,6 @@ vector<int> TwoDA::getColumnIndices(const vector<string> &columns) const {
     return move(indices);
 }
 
-int TwoDA::indexByCellValuesAny(const vector<pair<string, string>> &values) const {
-    vector<string> columns(getColumnNames(values));
-    vector<int> columnIndices(getColumnIndices(columns));
-
-    for (size_t i = 0; i < _rows.size(); ++i) {
-        for (size_t j = 0; j < values.size(); ++j) {
-            int columnIdx = columnIndices[j];
-            if (_rows[i].values[columnIdx] == values[j].second) return static_cast<int>(i);
-        }
-    }
-
-    return -1;
-}
-
 string TwoDA::getString(int row, const string &column, string defValue) const {
     if (row < 0 || row >= _rows.size()) {
         warn("2DA: row index out of range: " + to_string(row));

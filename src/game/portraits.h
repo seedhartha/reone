@@ -15,36 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "portraitutil.h"
+#pragma once
 
-#include "../resource/resources.h"
+#include <functional>
+#include <string>
+#include <unordered_map>
 
-using namespace std;
+#include <boost/noncopyable.hpp>
 
-using namespace reone::resource;
+#include "../render/texture.h"
+
+#include "portrait.h"
 
 namespace reone {
 
 namespace game {
 
-string getPortrait(int id) {
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
-    return portraits->getString(id, "baseresref");
-}
+class Portraits : boost::noncopyable {
+public:
+    static Portraits &instance();
 
-string getPortraitByAppearance(int appearance) {
-    vector<pair<string, string>> columnValues {
-        { "appearancenumber", to_string(appearance) },
-        { "appearance_s", to_string(appearance) },
-        { "appearance_l", to_string(appearance) }
-    };
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
+    void init();
 
-    int row = portraits->indexByCellValuesAny(columnValues);
-    if (row == -1) return "";
+    std::shared_ptr<render::Texture> getTextureByIndex(int index);
+    std::shared_ptr<render::Texture> getTextureByAppearance(int appearance);
 
-    return portraits->getString(row, "baseresref");
-}
+    const std::vector<Portrait> &portraits() const { return _portraits; }
+
+private:
+    std::vector<Portrait> _portraits;
+};
 
 } // namespace game
 

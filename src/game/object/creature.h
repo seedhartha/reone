@@ -249,7 +249,6 @@ private:
     // END Scripts
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
-    void loadPortrait();
 
     void updateModel();
     void updateHealth();

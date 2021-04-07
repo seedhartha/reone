@@ -28,10 +28,11 @@ namespace game {
 
 struct Portrait {
     std::string resRef;
-    std::shared_ptr<render::Texture> image;
     int appearanceNumber { 0 };
     int appearanceS { 0 };
     int appearanceL { 0 };
+    bool forPC { false };
+    int sex { 0 };
 };
 
 } // namespace game

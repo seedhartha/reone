@@ -28,7 +28,8 @@
 
 #include "../game.h"
 #include "../gameidutil.h"
-#include "../portraitutil.h"
+#include "../portrait.h"
+#include "../portraits.h"
 
 #include "colorutil.h"
 
@@ -50,10 +51,6 @@ static int g_strRefRemove = 38456;
 
 static glm::vec3 g_kotorColorOn = { 0.984314f, 1.0f, 0 };
 static glm::vec3 g_kotorColorAdded = { 0, 0.831373f, 0.090196f };
-
-static map<int, string> g_portraitByAppearance = {
-    { 378, "po_ptrask"}
-};
 
 PartySelection::PartySelection(Game *game) :
     GameGUI(game->gameId(), game->options().graphics),
@@ -105,17 +102,8 @@ void PartySelection::prepare(const Context &ctx) {
             string blueprintResRef(party.getAvailableMember(i));
             shared_ptr<GffStruct> utc(Resources::instance().getGFF(blueprintResRef, ResourceType::Utc));
             int appearance = utc->getInt("Appearance_Type");
-
-            string portrait;
-            auto maybePortrait = g_portraitByAppearance.find(appearance);
-            if (maybePortrait != g_portraitByAppearance.end()) {
-                portrait = maybePortrait->second;
-            } else {
-                portrait = getPortraitByAppearance(appearance);
-            }
-
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(Textures::instance().get(portrait, TextureUsage::GUI));
+            lblChar.setBorderFill(Portraits::instance().getTextureByAppearance(appearance));
             lblNa.setVisible(false);
         } else {
             btnNpc.setDisabled(true);

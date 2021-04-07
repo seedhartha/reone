@@ -44,8 +44,9 @@
 
 #include "cursors.h"
 #include "gameidutil.h"
-#include "reputes.h"
 #include "gui/sounds.h"
+#include "portraits.h"
+#include "reputes.h"
 #include "script/routines.h"
 #include "soundsets.h"
 #include "surfaces.h"
@@ -119,6 +120,7 @@ void Game::init() {
     Routines::instance().init(this);
     Reputes::instance().init();
     Surfaces::instance().init();
+    Portraits::instance().init();
     Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices(), Surfaces::instance().getGrassSurfaceIndices());
 
     Cursors::instance().init(_gameId);
