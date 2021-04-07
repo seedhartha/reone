@@ -45,12 +45,12 @@ private:
     int _argc;
     char **_argv;
 
-    boost::program_options::options_description _commonOpts;
-    boost::program_options::options_description _cmdLineOpts { "Usage" };
+    boost::program_options::options_description _optsCommon;
+    boost::program_options::options_description _optsCmdLine { "Usage" };
 
     bool _showHelp { false };
     boost::filesystem::path _gamePath;
-    game::Options _gameOpts;
+    game::Options _options;
 
     void initOptions();
     void loadOptions();

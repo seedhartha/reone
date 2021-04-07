@@ -58,7 +58,7 @@ int Program::run() {
     loadOptions();
 
     if (_showHelp) {
-        cout << _cmdLineOpts << endl;
+        cout << _optsCmdLine << endl;
         return 0;
     }
 
@@ -66,7 +66,7 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _commonOpts.add_options()
+    _optsCommon.add_options()
         ("game", po::value<string>(), "path to game directory")
         ("dev", po::value<bool>()->default_value(false), "enable developer mode")
         ("module", po::value<string>(), "name of a module to load")
@@ -84,35 +84,35 @@ void Program::initOptions() {
         ("debugch", po::value<int>(), "debug channel mask")
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
-    _cmdLineOpts.add(_commonOpts).add_options()
+    _optsCmdLine.add(_optsCommon).add_options()
         ("help", "print this message");
 }
 
 void Program::loadOptions() {
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
-        .options(_cmdLineOpts)
+        .options(_optsCmdLine)
         .run();
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
     if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts), vars);
+        po::store(po::parse_config_file<char>(kConfigFilename, _optsCommon), vars);
     }
     po::notify(vars);
 
     _showHelp = vars.count("help") > 0;
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
-    _gameOpts.developer = vars["dev"].as<bool>();
-    _gameOpts.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
-    _gameOpts.graphics.width = vars["width"].as<int>();
-    _gameOpts.graphics.height = vars["height"].as<int>();
-    _gameOpts.graphics.fullscreen = vars["fullscreen"].as<bool>();
-    _gameOpts.graphics.numLights = vars["numlights"].as<int>();
-    _gameOpts.graphics.shadowResolution = vars["shadowres"].as<int>();
-    _gameOpts.audio.musicVolume = vars["musicvol"].as<int>();
-    _gameOpts.audio.voiceVolume = vars["voicevol"].as<int>();
-    _gameOpts.audio.soundVolume = vars["soundvol"].as<int>();
-    _gameOpts.audio.movieVolume = vars["movievol"].as<int>();
+    _options.developer = vars["dev"].as<bool>();
+    _options.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
+    _options.graphics.width = vars["width"].as<int>();
+    _options.graphics.height = vars["height"].as<int>();
+    _options.graphics.fullscreen = vars["fullscreen"].as<bool>();
+    _options.graphics.numLights = vars["numlights"].as<int>();
+    _options.graphics.shadowResolution = vars["shadowres"].as<int>();
+    _options.audio.musicVolume = vars["musicvol"].as<int>();
+    _options.audio.voiceVolume = vars["voicevol"].as<int>();
+    _options.audio.soundVolume = vars["soundvol"].as<int>();
+    _options.audio.movieVolume = vars["movievol"].as<int>();
 
     setDebugLogLevel(vars["debug"].as<int>());
     setLogToFile(vars["logfile"].as<bool>());
@@ -127,7 +127,7 @@ void Program::loadOptions() {
 }
 
 int Program::runGame() {
-    return Game(_gamePath, _gameOpts).run();
+    return Game(_gamePath, _options).run();
 }
 
 } // namespace reone
