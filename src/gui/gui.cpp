@@ -258,7 +258,7 @@ void GUI::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

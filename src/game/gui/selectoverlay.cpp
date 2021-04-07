@@ -210,7 +210,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
@@ -234,7 +234,7 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.combined.general.alpha = 0.5f;
@@ -267,7 +267,7 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
@@ -298,7 +298,7 @@ void SelectionOverlay::drawActionBar() {
         transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
@@ -319,7 +319,7 @@ void SelectionOverlay::drawActionBar() {
                 transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
                 ShaderUniforms uniforms;
-                uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

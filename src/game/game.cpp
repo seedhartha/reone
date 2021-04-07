@@ -96,7 +96,7 @@ int Game::run() {
     } else {
         playVideo("legal");
     }
-    RenderWindow::instance().show();
+    Window::instance().show();
 
     runMainLoop();
     deinitSubsystems();
@@ -108,7 +108,7 @@ void Game::initSubsystems() {
     initResourceProviders();
     loadModuleNames();
 
-    RenderWindow::instance().init(_options.graphics, this);
+    Window::instance().init(_options.graphics, this);
     Strings::instance().init(_path);
     Meshes::instance().init();
     Textures::instance().init();
@@ -155,9 +155,9 @@ void Game::loadModuleNames() {
 void Game::setCursorType(CursorType type) {
     if (_cursorType != type) {
         if (type == CursorType::None) {
-            RenderWindow::instance().setCursor(nullptr);
+            Window::instance().setCursor(nullptr);
         } else {
-            RenderWindow::instance().setCursor(Cursors::instance().get(type));
+            Window::instance().setCursor(Cursors::instance().get(type));
         }
         _cursorType = type;
     }
@@ -327,19 +327,19 @@ void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
     PBRIBL::instance().refresh();
 
-    RenderWindow::instance().clear();
+    Window::instance().clear();
 
     if (_video) {
         _video->draw();
     } else {
         drawWorld();
         drawGUI();
-        RenderWindow::instance().drawCursor();
+        Window::instance().drawCursor();
     }
 
     _profileOverlay.draw();
 
-    RenderWindow::instance().swapBuffers();
+    Window::instance().swapBuffers();
 }
 
 void Game::drawWorld() {
@@ -502,7 +502,7 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        RenderWindow::instance().processEvents(_quit);
+        Window::instance().processEvents(_quit);
 
         update();
         drawAll();
@@ -592,7 +592,7 @@ void Game::loadCharacterGeneration() {
 
 void Game::deinitSubsystems() {
     AudioPlayer::instance().deinit();
-    RenderWindow::instance().deinit();
+    Window::instance().deinit();
 }
 
 void Game::startCharacterGeneration() {
@@ -904,7 +904,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    RenderWindow::instance().setRelativeMouseMode(relative);
+    Window::instance().setRelativeMouseMode(relative);
 }
 
 } // namespace game

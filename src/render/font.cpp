@@ -72,7 +72,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
     uniforms.combined.featureMask |= UniformFeatureFlags::text;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
     int numBlocks = static_cast<int>(text.size()) / kMaxCharacters;

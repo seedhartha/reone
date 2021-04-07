@@ -34,12 +34,12 @@ namespace reone {
 
 namespace render {
 
-RenderWindow &RenderWindow::instance() {
-    static RenderWindow instance;
+Window &Window::instance() {
+    static Window instance;
     return instance;
 }
 
-void RenderWindow::init(GraphicsOptions options, IEventHandler *eventHandler) {
+void Window::init(GraphicsOptions options, IEventHandler *eventHandler) {
     if (!eventHandler) {
         throw invalid_argument("eventHandler must not be null");
     }
@@ -55,7 +55,7 @@ void RenderWindow::init(GraphicsOptions options, IEventHandler *eventHandler) {
     _inited = true;
 }
 
-void RenderWindow::initSDL() {
+void Window::initSDL() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -82,7 +82,7 @@ void RenderWindow::initSDL() {
     SDL_GL_SetSwapInterval(0);
 }
 
-int RenderWindow::getWindowFlags() const {
+int Window::getWindowFlags() const {
     int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
     if (_options.fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN;
@@ -90,7 +90,7 @@ int RenderWindow::getWindowFlags() const {
     return flags;
 }
 
-void RenderWindow::initGL() {
+void Window::initGL() {
     glewInit();
 
     glEnable(GL_BLEND);
@@ -99,11 +99,11 @@ void RenderWindow::initGL() {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
-RenderWindow::~RenderWindow() {
+Window::~Window() {
     deinit();
 }
 
-void RenderWindow::deinit() {
+void Window::deinit() {
     if (_inited) {
         SDL_GL_DeleteContext(_context);
         SDL_DestroyWindow(_window);
@@ -112,11 +112,11 @@ void RenderWindow::deinit() {
     }
 }
 
-void RenderWindow::show() {
+void Window::show() {
     SDL_ShowWindow(_window);
 }
 
-void RenderWindow::processEvents(bool &quit) {
+void Window::processEvents(bool &quit) {
     if (!_inited) return;
 
     SDL_Event event;
@@ -127,7 +127,7 @@ void RenderWindow::processEvents(bool &quit) {
     }
 }
 
-bool RenderWindow::handleEvent(const SDL_Event &event, bool &quit) {
+bool Window::handleEvent(const SDL_Event &event, bool &quit) {
     switch (event.type) {
         case SDL_QUIT:
             quit = true;
@@ -141,7 +141,7 @@ bool RenderWindow::handleEvent(const SDL_Event &event, bool &quit) {
     }
 }
 
-bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit) {
+bool Window::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_C:
             if (event.keysym.mod & KMOD_CTRL) {
@@ -155,11 +155,11 @@ bool RenderWindow::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit
     }
 }
 
-void RenderWindow::clear() const {
+void Window::clear() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderWindow::drawCursor() const {
+void Window::drawCursor() const {
     if (_relativeMouseMode) return;
 
     int x, y;
@@ -171,22 +171,22 @@ void RenderWindow::drawCursor() const {
     _cursor->draw();
 }
 
-void RenderWindow::swapBuffers() const {
+void Window::swapBuffers() const {
     if (_inited) {
         SDL_GL_SwapWindow(_window);
     }
 }
 
-glm::mat4 RenderWindow::getOrthoProjection(float near, float far) const {
+glm::mat4 Window::getOrthoProjection(float near, float far) const {
     return glm::ortho(0.0f, static_cast<float>(_options.width), static_cast<float>(_options.height), 0.0f, near, far);
 }
 
-void RenderWindow::setRelativeMouseMode(bool enabled) {
+void Window::setRelativeMouseMode(bool enabled) {
     SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
     _relativeMouseMode = enabled;
 }
 
-void RenderWindow::setCursor(const shared_ptr<Cursor> &cursor) {
+void Window::setCursor(const shared_ptr<Cursor> &cursor) {
     _cursor = cursor;
     SDL_ShowCursor(!static_cast<bool>(cursor));
 }

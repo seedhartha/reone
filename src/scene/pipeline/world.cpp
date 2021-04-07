@@ -232,7 +232,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
@@ -260,7 +260,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
-    uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.blur.resolution = glm::vec2(_opts.width, _opts.height);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
@@ -293,7 +293,7 @@ void WorldRenderPipeline::drawResult() {
         //_shadowsDepth->bind();
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, uniforms);
@@ -307,7 +307,7 @@ void WorldRenderPipeline::drawResult() {
         _verticalBlurColor->bind();
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);

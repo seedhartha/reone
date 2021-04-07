@@ -93,7 +93,7 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -110,7 +110,7 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = RenderWindow::instance().getOrthoProjection();
+        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
 
