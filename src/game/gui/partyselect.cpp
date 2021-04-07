@@ -101,9 +101,16 @@ void PartySelection::prepare(const Context &ctx) {
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
             shared_ptr<GffStruct> utc(Resources::instance().getGFF(blueprintResRef, ResourceType::Utc));
-            int appearance = utc->getInt("Appearance_Type");
+            shared_ptr<Texture> portrait;
+            int portraitId = utc->getInt("PortraitId", 0);
+            if (portraitId > 0) {
+                portrait = Portraits::instance().getTextureByIndex(portraitId);
+            } else {
+                int appearance = utc->getInt("Appearance_Type");
+                portrait = Portraits::instance().getTextureByAppearance(appearance);
+            }
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(Portraits::instance().getTextureByAppearance(appearance));
+            lblChar.setBorderFill(move(portrait));
             lblNa.setVisible(false);
         } else {
             btnNpc.setDisabled(true);

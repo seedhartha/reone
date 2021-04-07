@@ -48,13 +48,13 @@ void Creature::loadUTC(const GffStruct &utc) {
     _hitPoints = utc.getInt("HitPoints");
     _maxHitPoints = utc.getInt("MaxHitPoints");
     _minOneHP = utc.getBool("Min1HP");
+    _portraitId = utc.getInt("PortraitId");
     _racialType = static_cast<RacialType>(utc.getInt("Race"));
     _subrace = static_cast<Subrace>(utc.getInt("SubraceIndex"));
     _tag = boost::to_lower_copy(utc.getString("Tag"));
 
     loadNameFromUTC(utc);
     loadAttributesFromUTC(utc);
-    loadPortraitFromUTC(utc);
     loadPerceptionRangeFromUTC(utc);
     loadSoundSetFromUTC(utc);
     loadScriptsFromUTC(utc);
@@ -106,13 +106,6 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
         attributes.skills().setRank(skill, skillsUtc[i]->getInt("Rank"));
-    }
-}
-
-void Creature::loadPortraitFromUTC(const GffStruct &utc) {
-    int portraitId = utc.getInt("PortraitId", -1);
-    if (portraitId != -1) {
-        _portrait = Portraits::instance().getTextureByIndex(portraitId);
     }
 }
 
