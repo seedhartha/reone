@@ -53,8 +53,8 @@ void Perception::doUpdate() {
         if (object->isDead()) continue;
 
         auto creature = static_pointer_cast<Creature>(object);
-        float sightRange2 = creature->perception().sightRange * creature->perception().sightRange;
         float hearingRange2 = creature->perception().hearingRange * creature->perception().hearingRange;
+        float sightRange2 = creature->perception().sightRange * creature->perception().sightRange;
 
         for (auto &other : creatures) {
             // Skip self
@@ -63,7 +63,7 @@ void Perception::doUpdate() {
             bool heard = false;
             bool seen = false;
 
-            float distance2 = creature->getDistanceTo2(*object);
+            float distance2 = creature->getDistanceTo2(*other);
             if (distance2 <= hearingRange2) {
                 heard = true;
             }
