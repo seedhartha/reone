@@ -21,11 +21,13 @@
 
 namespace reone {
 
-Stopwatch::Stopwatch() : _startTicks(SDL_GetTicks()) {
+Stopwatch::Stopwatch() :
+    _frequency(SDL_GetPerformanceFrequency()),
+    _counter(SDL_GetPerformanceCounter()) {
 }
 
 float Stopwatch::getElapsedTime() {
-    return (SDL_GetTicks() - _startTicks) / 1000.0f;
+    return (SDL_GetPerformanceCounter() - _counter) / static_cast<float>(_frequency);
 }
 
 } // namespace reone
