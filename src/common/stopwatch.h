@@ -21,6 +21,9 @@
 
 namespace reone {
 
+/**
+ * Utility class for use in profiling.
+ */
 class Stopwatch {
 public:
     Stopwatch();
@@ -31,7 +34,8 @@ public:
     float getElapsedTime();
 
 private:
-    uint32_t _startTicks { 0 };
+    uint64_t _frequency { 0 };
+    uint64_t _counter { 0 };
 };
 
 } // namespace reone
