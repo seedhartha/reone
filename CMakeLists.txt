@@ -119,6 +119,7 @@ set(RESOURCE_HEADERS
     src/resource/resourceprovider.h
     src/resource/resources.h
     src/resource/strings.h
+    src/resource/talktable.h
     src/resource/types.h
     src/resource/typeutil.h)
 
@@ -146,6 +147,7 @@ set(RESOURCE_SOURCES
     src/resource/keybifprovider.cpp
     src/resource/resources.cpp
     src/resource/strings.cpp
+    src/resource/talktable.cpp
     src/resource/typeutil.cpp)
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})

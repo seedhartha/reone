@@ -25,19 +25,11 @@ namespace reone {
 
 namespace resource {
 
-enum {
-    kTextPresent = 1,
-    kSoundPresent = 2,
-    kSoundLengthPresent = 4
+struct StringFlags {
+    static constexpr int textPresent = 1;
+    static constexpr int soundPresent = 2;
+    static constexpr int soundLengthPresent = 4;
 };
-
-const TalkTableString &TalkTable::getString(int32_t ref) const {
-    return _strings[ref];
-}
-
-int TalkTable::getStringCount() const {
-    return static_cast<int>(_strings.size());
-}
 
 TlkReader::TlkReader() : BinaryReader(8, "TLK V3.0") {
 }
@@ -67,10 +59,10 @@ void TlkReader::loadStrings() {
         float soundLength = readFloat();
 
         TalkTableString string;
-        if (flags & kTextPresent) {
+        if (flags & StringFlags::textPresent) {
             string.text = readString(_stringsOffset + stringOffset, stringSize);
         }
-        if (flags & kSoundPresent) {
+        if (flags & StringFlags::soundPresent) {
             string.soundResRef = soundResRef;
         }
 
