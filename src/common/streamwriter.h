@@ -45,6 +45,11 @@ public:
     void putBytes(const ByteArray &bytes);
     void putBytes(int count, uint8_t val = 0);
 
+    template <class T>
+    void putStruct(const T &val) {
+        _stream->write(reinterpret_cast<const char *>(&val), sizeof(T));
+    }
+
     size_t tell() const;
 
 private:

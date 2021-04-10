@@ -53,7 +53,8 @@ static const unordered_map<string, Operation> g_operations {
     { "to-erf", Operation::ToERF },
     { "to-mod", Operation::ToMOD },
     { "to-pth", Operation::ToPTH },
-    { "to-ascii", Operation::ToASCII }
+    { "to-ascii", Operation::ToASCII },
+    { "to-tlk", Operation::ToTLK }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -66,7 +67,7 @@ int Program::run() {
 
     switch (_operation) {
         case Operation::None:
-            cout << _cmdLineOpts << endl;
+            cout << _optsCmdLine << endl;
             break;
         default: {
             auto tool = getTool();
@@ -83,11 +84,11 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _commonOpts.add_options()
+    _optsCommon.add_options()
         ("game", po::value<string>(), "path to game directory")
         ("dest", po::value<string>(), "path to destination directory");
 
-    _cmdLineOpts.add(_commonOpts).add_options()
+    _optsCmdLine.add(_optsCommon).add_options()
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("to-json", "convert 2DA, GFF or TLK file to JSON")
@@ -99,6 +100,7 @@ void Program::initOptions() {
         ("to-mod", "create MOD archive from directory")
         ("to-pth", "convert ASCII PTH to binary PTH")
         ("to-ascii", "convert binary PTH to ASCII")
+        ("to-tlk", "convert JSON to TLK")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -119,14 +121,14 @@ void Program::loadOptions() {
     positional.add("target", 1);
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
-        .options(_cmdLineOpts)
+        .options(_optsCmdLine)
         .positional(positional)
         .run();
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
     if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, _commonOpts), vars);
+        po::store(po::parse_config_file<char>(kConfigFilename, _optsCommon), vars);
     }
     po::notify(vars);
 

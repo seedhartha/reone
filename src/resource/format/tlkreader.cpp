@@ -44,7 +44,6 @@ void TlkReader::doLoad() {
 
 void TlkReader::loadStrings() {
     _table = make_shared<TalkTable>();
-    _table->_strings.reserve(_stringCount);
 
     for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
@@ -58,15 +57,14 @@ void TlkReader::loadStrings() {
         uint32_t stringSize = readUint32();
         float soundLength = readFloat();
 
-        TalkTableString string;
+        TalkTableString tableString;
         if (flags & StringFlags::textPresent) {
-            string.text = readString(_stringsOffset + stringOffset, stringSize);
+            tableString.text = readString(_stringsOffset + stringOffset, stringSize);
         }
         if (flags & StringFlags::soundPresent) {
-            string.soundResRef = soundResRef;
+            tableString.soundResRef = soundResRef;
         }
-
-        _table->_strings.push_back(string);
+        _table->addString(move(tableString));
     }
 }
 

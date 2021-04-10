@@ -114,6 +114,7 @@ set(RESOURCE_HEADERS
     src/resource/format/rimwriter.h
     src/resource/format/ssfreader.h
     src/resource/format/tlkreader.h
+    src/resource/format/tlkwriter.h
     src/resource/format/visreader.h
     src/resource/keybifprovider.h
     src/resource/resourceprovider.h
@@ -143,6 +144,7 @@ set(RESOURCE_SOURCES
     src/resource/format/rimwriter.cpp
     src/resource/format/ssfreader.cpp
     src/resource/format/tlkreader.cpp
+    src/resource/format/tlkwriter.cpp
     src/resource/format/visreader.cpp
     src/resource/keybifprovider.cpp
     src/resource/resources.cpp

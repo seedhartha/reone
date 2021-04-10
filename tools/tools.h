@@ -132,6 +132,7 @@ public:
 
 private:
     void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toTLK(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 class TpcTool : public ITool {
