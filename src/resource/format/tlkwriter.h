@@ -17,29 +17,42 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include <cstdint>
+#include <memory>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
+
+#include "../talktable.h"
 
 namespace reone {
 
 namespace resource {
 
-struct TalkTableString {
-    std::string text;
-    std::string soundResRef;
-};
-
-struct TalkTable : boost::noncopyable {
+class TlkWriter : boost::noncopyable {
 public:
-    void addString(TalkTableString &&string);
+    TlkWriter(std::shared_ptr<TalkTable> talkTable);
 
-    int getStringCount() const;
-    const TalkTableString &getString(int index) const;
+    void save(const boost::filesystem::path &path);
 
 private:
-    std::vector<TalkTableString> _strings;
+    struct FileHeader {
+        uint32_t languageId { 0 };
+        uint32_t numStrings { 0 };
+        uint32_t offStringEntries { 0 };
+    };
+
+    struct StringDataElement {
+        uint32_t flags { 0 };
+        char soundResRef[16];
+        uint32_t volumeVariance { 0 };
+        uint32_t pitchVariance { 0 };
+        uint32_t offString { 0 };
+        uint32_t stringSize { 0 };
+        float soundLength { 0.0f };
+    };
+
+    std::shared_ptr<TalkTable> _talkTable;
 };
 
 } // namespace resource

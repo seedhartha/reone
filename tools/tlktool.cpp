@@ -20,6 +20,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../src/resource/format/tlkreader.h"
+#include "../src/resource/format/tlkwriter.h"
 
 using namespace std;
 
@@ -35,6 +36,8 @@ namespace tools {
 void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToJSON) {
         toJSON(target, destPath);
+    } else if (operation == Operation::ToTLK) {
+        toTLK(target, destPath);
     }
 }
 
@@ -47,11 +50,12 @@ void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
 
     shared_ptr<TalkTable> table(tlk.table());
     for (int i = 0; i < table->getStringCount(); ++i) {
-        string s(table->getString(i).text);
+        const TalkTableString &tableString = table->getString(i);
 
         pt::ptree child;
-        child.put("index", i);
-        child.put("string", s);
+        child.put("_index", i);
+        child.put("text", tableString.text);
+        child.put("soundResRef", tableString.soundResRef);
 
         children.push_back(make_pair("", child));
     }
@@ -63,11 +67,35 @@ void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::write_json(jsonPath.string(), tree);
 }
 
+void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
+    pt::ptree tree;
+    pt::read_json(path.string(), tree);
+
+    auto talkTable = make_shared<TalkTable>();
+    for (auto &str : tree.get_child("strings")) {
+        TalkTableString talkTableString;
+        talkTableString.text = str.second.get("text", "");
+        talkTableString.soundResRef = str.second.get("soundResRef", "");
+        talkTable->addString(move(talkTableString));
+    }
+
+    fs::path extensionless(path);
+    extensionless.replace_extension(); // remove .json
+    if (extensionless.extension() == ".tlk") {
+        extensionless.replace_extension();
+    }
+
+    fs::path tlkPath(destPath);
+    tlkPath.append(extensionless.filename().string() + ".tlk");
+
+    TlkWriter writer(move(talkTable));
+    writer.save(tlkPath);
+}
+
 bool TlkTool::supports(Operation operation, const fs::path &target) const {
     return
         !fs::is_directory(target) &&
-        target.extension() == ".tlk" &&
-        operation == Operation::ToJSON;
+        ((target.extension() == ".tlk" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToTLK));
 }
 
 } // namespace tools

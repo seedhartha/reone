@@ -236,13 +236,13 @@ static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
 }
 
 void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::read_json(path.string(), tree);
-
     if (path.extension() != ".json") {
         cerr << "Input file must have extension '.json'" << endl;
         return;
     }
+
+    pt::ptree tree;
+    pt::read_json(path.string(), tree);
 
     fs::path extensionless(path);
     extensionless.replace_extension();

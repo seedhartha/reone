@@ -33,7 +33,8 @@ enum class Operation {
     ToERF,
     ToMOD,
     ToPTH,
-    ToASCII
+    ToASCII,
+    ToTLK
 };
 
 } // namespace tools
