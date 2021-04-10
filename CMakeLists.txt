@@ -684,6 +684,7 @@ if(BUILD_TOOLS)
 
     set(TOOLS_SOURCES
         tools/2datool.cpp
+        tools/audiotool.cpp
         tools/erftool.cpp
         tools/gfftool.cpp
         tools/keybiftool.cpp

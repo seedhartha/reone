@@ -34,7 +34,8 @@ enum class Operation {
     ToMOD,
     ToPTH,
     ToASCII,
-    ToTLK
+    ToTLK,
+    Unwrap
 };
 
 } // namespace tools
