@@ -53,9 +53,7 @@ void TlkWriter::save(const fs::path &path) {
         auto strSize = static_cast<uint32_t>(str.text.length());
 
         StringDataElement strDataElem;
-        strDataElem.flags = 7; // all strings in dialog.tlk have this
-        strncpy(strDataElem.soundResRef, str.soundResRef.c_str(), str.soundResRef.length());
-        memset(strDataElem.soundResRef, 0, 16);
+        strDataElem.soundResRef = str.soundResRef;
         strDataElem.offString = offString;
         strDataElem.stringSize = strSize;
         strData.push_back(move(strDataElem));
@@ -66,17 +64,26 @@ void TlkWriter::save(const fs::path &path) {
     auto tlk = make_shared<fs::ofstream>(path, ios::binary);
     StreamWriter writer(tlk);
 
-    FileHeader fileHeader;
-    fileHeader.languageId = 0;
-    fileHeader.numStrings = _talkTable->getStringCount();
-    fileHeader.offStringEntries = 8 + sizeof(FileHeader) + _talkTable->getStringCount() * sizeof(StringDataElement);
-
     writer.putString("TLK V3.0");
-    writer.putStruct(fileHeader);
+    writer.putUint32(0); // language id
+    writer.putUint32(_talkTable->getStringCount());
+    writer.putUint32(20 + _talkTable->getStringCount() * sizeof(StringDataElement)); // offset to string entries
 
     for (int i = 0; i < _talkTable->getStringCount(); ++i) {
-        writer.putStruct(strData[i]);
+        const StringDataElement &strDataElem = strData[i];
+        writer.putUint32(7); // flags
+
+        string soundResRef(strDataElem.soundResRef);
+        soundResRef.resize(16);
+        writer.putString(soundResRef);
+
+        writer.putUint32(0); // volume variance
+        writer.putUint32(0); // pitch variance
+        writer.putUint32(strDataElem.offString);
+        writer.putUint32(strDataElem.stringSize);
+        writer.putFloat(0.0f); // sound length
     }
+
     for (int i = 0; i < _talkTable->getStringCount(); ++i) {
         writer.putCString(_talkTable->getString(i).text);
     }

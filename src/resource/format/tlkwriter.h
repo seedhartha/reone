@@ -36,20 +36,10 @@ public:
     void save(const boost::filesystem::path &path);
 
 private:
-    struct FileHeader {
-        uint32_t languageId { 0 };
-        uint32_t numStrings { 0 };
-        uint32_t offStringEntries { 0 };
-    };
-
     struct StringDataElement {
-        uint32_t flags { 0 };
-        char soundResRef[16];
-        uint32_t volumeVariance { 0 };
-        uint32_t pitchVariance { 0 };
+        std::string soundResRef;
         uint32_t offString { 0 };
         uint32_t stringSize { 0 };
-        float soundLength { 0.0f };
     };
 
     std::shared_ptr<TalkTable> _talkTable;

@@ -56,6 +56,10 @@ void StreamWriter::putInt64(int64_t val) {
     put(val);
 }
 
+void StreamWriter::putFloat(float val) {
+    put(val);
+}
+
 void StreamWriter::putString(const string &str) {
     _stream->write(&str[0], str.length());
 }
