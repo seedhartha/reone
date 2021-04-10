@@ -21,11 +21,6 @@
 
 namespace reone {
 
-enum class Endianess {
-    Little,
-    Big
-};
-
 struct DebugChannels {
     static constexpr int general = 1;
     static constexpr int gui = 2;

@@ -26,7 +26,7 @@ namespace reone {
 namespace script {
 
 NcsReader::NcsReader(const string &resRef) : BinaryReader(8, "NCS V1.0"), _resRef(resRef) {
-    _endianess = Endianess::Big;
+    _endianess = boost::endian::order::big;
 }
 
 void NcsReader::doLoad() {

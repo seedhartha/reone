@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/endian/detail/order.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "types.h"
@@ -31,7 +32,7 @@ namespace reone {
 
 class StreamReader : boost::noncopyable {
 public:
-    StreamReader(const std::shared_ptr<std::istream> &stream, Endianess endianess = Endianess::Little);
+    StreamReader(const std::shared_ptr<std::istream> &stream, boost::endian::order endianess = boost::endian::order::little);
 
     size_t tell();
     void seek(size_t pos);
@@ -68,7 +69,7 @@ public:
 
 private:
     std::shared_ptr<std::istream> _stream;
-    Endianess _endianess;
+    boost::endian::order _endianess;
 };
 
 } // namespace reone

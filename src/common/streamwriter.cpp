@@ -19,13 +19,11 @@
 
 #include <stdexcept>
 
-#include "endianutil.h"
-
 using namespace std;
 
 namespace reone {
 
-StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, Endianess endianess) :
+StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, boost::endian::order endianess) :
     _stream(stream),
     _endianess(endianess) {
 
