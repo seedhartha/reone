@@ -54,7 +54,8 @@ static const unordered_map<string, Operation> g_operations {
     { "to-mod", Operation::ToMOD },
     { "to-pth", Operation::ToPTH },
     { "to-ascii", Operation::ToASCII },
-    { "to-tlk", Operation::ToTLK }
+    { "to-tlk", Operation::ToTLK },
+    { "unwrap", Operation::Unwrap }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -101,6 +102,7 @@ void Program::initOptions() {
         ("to-pth", "convert ASCII PTH to binary PTH")
         ("to-ascii", "convert binary PTH to ASCII")
         ("to-tlk", "convert JSON to TLK")
+        ("unwrap", "unwrap an audio file")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -158,6 +160,7 @@ void Program::loadTools() {
     _tools.push_back(make_shared<GffTool>());
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<PthTool>());
+    _tools.push_back(make_shared<AudioTool>());
 }
 
 shared_ptr<ITool> Program::getTool() const {
