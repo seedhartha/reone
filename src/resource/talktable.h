@@ -17,29 +17,29 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <boost/noncopyable.hpp>
-
-#include "../talktable.h"
-
-#include "binreader.h"
 
 namespace reone {
 
 namespace resource {
 
-class TlkReader : public BinaryReader {
-public:
-    TlkReader();
+struct TalkTableString {
+    std::string text;
+    std::string soundResRef;
+};
 
-    std::shared_ptr<TalkTable> table() const { return _table; }
+struct TalkTable : boost::noncopyable {
+public:
+    int getStringCount() const;
+    const TalkTableString &getString(int32_t ref) const;
 
 private:
-    uint32_t _stringCount { 0 };
-    uint32_t _stringsOffset { 0 };
-    std::shared_ptr<TalkTable> _table;
+    std::vector<TalkTableString> _strings;
 
-    void doLoad() override;
-    void loadStrings();
+    friend class TlkReader;
 };
 
 } // namespace resource

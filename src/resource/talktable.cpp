@@ -15,32 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <boost/noncopyable.hpp>
-
-#include "../talktable.h"
-
-#include "binreader.h"
+#include "talktable.h"
 
 namespace reone {
 
 namespace resource {
 
-class TlkReader : public BinaryReader {
-public:
-    TlkReader();
+int TalkTable::getStringCount() const {
+    return static_cast<int>(_strings.size());
+}
 
-    std::shared_ptr<TalkTable> table() const { return _table; }
-
-private:
-    uint32_t _stringCount { 0 };
-    uint32_t _stringsOffset { 0 };
-    std::shared_ptr<TalkTable> _table;
-
-    void doLoad() override;
-    void loadStrings();
-};
+const TalkTableString &TalkTable::getString(int32_t ref) const {
+    return _strings[ref];
+}
 
 } // namespace resource
 
