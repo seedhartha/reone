@@ -63,7 +63,6 @@ endif()
 set(COMMON_HEADERS
     src/common/cache.h
     src/common/collectionutil.h
-    src/common/endianutil.h
     src/common/log.h
     src/common/mediastream.h
     src/common/pathutil.h
@@ -77,7 +76,6 @@ set(COMMON_HEADERS
     src/common/types.h)
 
 set(COMMON_SOURCES
-    src/common/endianutil.cpp
     src/common/log.cpp
     src/common/pathutil.cpp
     src/common/random.cpp

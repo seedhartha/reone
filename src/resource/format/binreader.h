@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/endian/detail/order.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -43,7 +44,7 @@ public:
     void load(const boost::filesystem::path &path);
 
 protected:
-    Endianess _endianess { Endianess::Little };
+    boost::endian::order _endianess { boost::endian::order::little };
     boost::filesystem::path _path;
     std::shared_ptr<std::istream> _in;
     std::unique_ptr<StreamReader> _reader;

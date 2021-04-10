@@ -23,16 +23,16 @@
 #include <ostream>
 #include <string>
 
+#include <boost/endian/conversion.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "endianutil.h"
 #include "types.h"
 
 namespace reone {
 
 class StreamWriter : boost::noncopyable {
 public:
-    StreamWriter(const std::shared_ptr<std::ostream> &stream, Endianess endianess = Endianess::Little);
+    StreamWriter(const std::shared_ptr<std::ostream> &stream, boost::endian::order endianess = boost::endian::order::little);
 
     void putByte(uint8_t val);
     void putChar(char val);
@@ -54,11 +54,11 @@ public:
 
 private:
     std::shared_ptr<std::ostream> _stream;
-    Endianess _endianess;
+    boost::endian::order _endianess;
 
     template <class T>
     void put(T val) {
-        swapBytesIfNotSystemEndianess(val, _endianess);
+        boost::endian::conditional_reverse_inplace(val, boost::endian::order::native, _endianess);
         char buf[sizeof(T)];
         memcpy(buf, &val, sizeof(T));
         _stream->write(buf, sizeof(T));

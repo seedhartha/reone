@@ -20,13 +20,15 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "endianutil.h"
+#include <boost/endian.hpp>
 
 using namespace std;
 
+namespace endian = boost::endian;
+
 namespace reone {
 
-StreamReader::StreamReader(const shared_ptr<istream> &stream, Endianess endianess) :
+StreamReader::StreamReader(const shared_ptr<istream> &stream, endian::order endianess) :
     _stream(stream),
     _endianess(endianess) {
 
@@ -57,56 +59,56 @@ uint8_t StreamReader::getByte() {
 uint16_t StreamReader::getUint16() {
     uint16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 uint32_t StreamReader::getUint32() {
     uint32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 uint64_t StreamReader::getUint64() {
     uint64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int16_t StreamReader::getInt16() {
     int16_t val;
     _stream->read(reinterpret_cast<char *>(&val), 2);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int32_t StreamReader::getInt32() {
     int32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int64_t StreamReader::getInt64() {
     int64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 float StreamReader::getFloat() {
     float val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 double StreamReader::getDouble() {
     double val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
-    swapBytesIfNotSystemEndianess(val, _endianess);
+    endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
