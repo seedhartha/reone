@@ -57,7 +57,7 @@ void StreamWriter::putInt64(int64_t val) {
 }
 
 void StreamWriter::putFloat(float val) {
-    put(val);
+    put(*reinterpret_cast<uint32_t *>(&val));
 }
 
 void StreamWriter::putString(const string &str) {
