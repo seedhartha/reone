@@ -49,21 +49,54 @@ public:
     double getDouble();
     std::string getCString();
     std::string getString(int len);
+    ByteArray getBytes(int count);
 
     bool eof() const;
 
-    template <class T>
-    T getStruct() {
-        T result;
-        _stream->read(reinterpret_cast<char *>(&result), sizeof(T));
+    inline std::vector<uint16_t> getUint16Array(int count) {
+        std::vector<uint16_t> result;
+        result.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            result.push_back(getUint16());
+        }
         return std::move(result);
     }
 
-    template <class T>
-    std::vector<T> getArray(int count) {
-        std::vector<T> result;
-        result.resize(count);
-        _stream->read(reinterpret_cast<char *>(&result[0]), count * sizeof(T));
+    inline std::vector<uint32_t> getUint32Array(int count) {
+        std::vector<uint32_t> result;
+        result.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            result.push_back(getUint32());
+        }
+        return std::move(result);
+    }
+
+    inline std::vector<uint32_t> getUint32Array(size_t offset, int count) {
+        size_t pos = tell();
+        seek(offset);
+
+        std::vector<uint32_t> result(getUint32Array(count));
+        seek(pos);
+
+        return std::move(result);
+    }
+
+    inline std::vector<float> getFloatArray(int count) {
+        std::vector<float> result;
+        result.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            result.push_back(getFloat());
+        }
+        return std::move(result);
+    }
+
+    inline std::vector<float> getFloatArray(size_t offset, int count) {
+        size_t pos = tell();
+        seek(offset);
+
+        std::vector<float> result(getFloatArray(count));
+        seek(pos);
+
         return std::move(result);
     }
 

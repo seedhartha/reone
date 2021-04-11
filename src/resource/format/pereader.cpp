@@ -43,7 +43,7 @@ shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
 }
 
 shared_ptr<ByteArray> PEReader::getResourceData(const Resource &res) {
-    return make_shared<ByteArray>(readArray<char>(res.offset, res.size));
+    return make_shared<ByteArray>(readBytes(res.offset, res.size));
 }
 
 void PEReader::doLoad() {

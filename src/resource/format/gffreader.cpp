@@ -163,7 +163,7 @@ string GffReader::readLabel(int idx) {
 }
 
 vector<uint32_t> GffReader::readFieldIndices(uint32_t off, int count) {
-    return readArray<uint32_t>(_fieldIndicesOffset + off, count);
+    return readUint32Array(_fieldIndicesOffset + off, count);
 }
 
 uint64_t GffReader::readQWordFieldData(uint32_t off) {
@@ -240,14 +240,14 @@ ByteArray GffReader::readByteArrayFieldData(uint32_t off) {
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
-    ByteArray arr(readArray<char>(size));
+    ByteArray arr(readBytes(size));
     seek(pos);
 
     return move(arr);
 }
 
 ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
-    return readArray<char>(_fieldDataOffset + off, size);
+    return readBytes(_fieldDataOffset + off, size);
 }
 
 vector<uint32_t> GffReader::readList(uint32_t off) {
@@ -255,7 +255,7 @@ vector<uint32_t> GffReader::readList(uint32_t off) {
     seek(static_cast<size_t>(_listIndicesOffset) + off);
 
     uint32_t count = readUint32();
-    vector<uint32_t> arr(readArray<uint32_t>(count));
+    vector<uint32_t> arr(readUint32Array(count));
     seek(pos);
 
     return move(arr);

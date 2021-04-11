@@ -71,7 +71,6 @@ set(COMMON_HEADERS
     src/common/streamreader.h
     src/common/streamutil.h
     src/common/streamwriter.h
-    src/common/stringutil.h
     src/common/timer.h
     src/common/types.h)
 

@@ -128,7 +128,7 @@ shared_ptr<ByteArray> ErfReader::find(const string &resRef, ResourceType type) {
 }
 
 ByteArray ErfReader::getResourceData(const Resource &res) {
-    return readArray<char>(res.offset, res.size);
+    return readBytes(res.offset, res.size);
 }
 
 ByteArray ErfReader::getResourceData(int idx) {

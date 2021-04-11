@@ -158,6 +158,20 @@ string BinaryReader::readString(size_t off, int len) {
     return move(result);
 }
 
+ByteArray BinaryReader::readBytes(int count) {
+    return _reader->getBytes(count);
+}
+
+ByteArray BinaryReader::readBytes(size_t off, int count) {
+    size_t pos = _reader->tell();
+    _reader->seek(off);
+
+    ByteArray result(_reader->getBytes(count));
+    _reader->seek(pos);
+
+    return move(result);
+}
+
 } // namespace resource
 
 } // namespace reone

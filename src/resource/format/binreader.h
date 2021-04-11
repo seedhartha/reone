@@ -70,26 +70,27 @@ protected:
     std::string readCStringAt(size_t off);
     std::string readString(int len);
     std::string readString(size_t off, int len);
+    ByteArray readBytes(int count);
+    ByteArray readBytes(size_t off, int count);
 
-    template <class T>
-    std::vector<T> readArray(int count) {
-        return _reader->getArray<T>(count);
+    inline std::vector<uint16_t> readUint16Array(int count) {
+        return _reader->getUint16Array(count);
     }
 
-    template <class T>
-    std::vector<T> readArray(uint32_t off, int count) {
-        size_t pos = _reader->tell();
-        _reader->seek(off);
-
-        std::vector<T> result(_reader->getArray<T>(count));
-        _reader->seek(pos);
-
-        return std::move(result);
+    inline std::vector<uint32_t> readUint32Array(int count) {
+        return _reader->getUint32Array(count);
     }
 
-    template <class T>
-    T readStruct() {
-        return _reader->getStruct<T>();
+    inline std::vector<uint32_t> readUint32Array(size_t offset, int count) {
+        return _reader->getUint32Array(offset, count);
+    }
+
+    inline std::vector<float> readFloatArray(int count) {
+        return _reader->getFloatArray(count);
+    }
+
+    inline std::vector<float> readFloatArray(size_t offset, int count) {
+        return _reader->getFloatArray(offset, count);
     }
 
 private:

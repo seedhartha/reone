@@ -85,7 +85,7 @@ shared_ptr<ByteArray> RimReader::find(const string &resRef, ResourceType type) {
 }
 
 ByteArray RimReader::getResourceData(const Resource &res) {
-    return readArray<char>(res.offset, res.size);
+    return readBytes(res.offset, res.size);
 }
 
 ByteArray RimReader::getResourceData(int idx) {

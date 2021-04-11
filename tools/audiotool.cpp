@@ -69,7 +69,7 @@ void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
     }
 
     int dataSize = static_cast<int>(filesize - reader.tell());
-    ByteArray data(reader.getArray<char>(dataSize));
+    ByteArray data(reader.getBytes(dataSize));
 
     fs::path unwrappedPath(path);
     unwrappedPath.replace_extension();

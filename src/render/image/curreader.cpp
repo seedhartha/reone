@@ -54,9 +54,9 @@ void CurReader::loadData() {
     int pixelCount = _width * _width;
     int colorCount = _bitCount == 8 ? 256 : 16;
 
-    ByteArray palette(_reader->getArray<char>(4 * colorCount));
-    ByteArray xorData(_reader->getArray<char>(pixelCount));
-    ByteArray andData(_reader->getArray<char>(pixelCount / 8));
+    ByteArray palette(_reader->getBytes(4 * colorCount));
+    ByteArray xorData(_reader->getBytes(pixelCount));
+    ByteArray andData(_reader->getBytes(pixelCount / 8));
 
     auto pixels = make_shared<ByteArray>(4 * pixelCount);
 
