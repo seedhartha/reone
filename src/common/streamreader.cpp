@@ -20,8 +20,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <boost/endian.hpp>
-
 using namespace std;
 
 namespace endian = boost::endian;
@@ -99,17 +97,17 @@ int64_t StreamReader::getInt64() {
 }
 
 float StreamReader::getFloat() {
-    float val;
+    uint32_t val;
     _stream->read(reinterpret_cast<char *>(&val), 4);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
-    return val;
+    return *reinterpret_cast<float *>(&val);
 }
 
 double StreamReader::getDouble() {
-    double val;
+    uint64_t val;
     _stream->read(reinterpret_cast<char *>(&val), 8);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
-    return val;
+    return *reinterpret_cast<double *>(&val);
 }
 
 string StreamReader::getCString() {

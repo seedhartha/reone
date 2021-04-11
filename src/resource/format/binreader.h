@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/endian/detail/order.hpp>
+#include <boost/endian/conversion.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/noncopyable.hpp>
 
