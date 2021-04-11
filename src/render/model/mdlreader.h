@@ -35,222 +35,55 @@ public:
     std::shared_ptr<render::Model> model() const { return _model; }
 
 private:
-    struct FileHeader {
-        // Technically, this also contains the magic number (four zeroes)
-
-        uint32_t mdlSize { 0 };
-        uint32_t mdxSize { 0 };
-    };
-
-    struct GeometryHeader {
-        uint32_t fp[2];
-        char name[32];
-        uint32_t offRootNode { 0 };
-        uint32_t numNodes { 0 };
-        uint32_t _unk1[7];
-        uint8_t type { 0 };
-        uint8_t _pad1[3];
-    };
-
-    struct ArrayHeader {
+    struct ArrayDefinition {
         uint32_t offset { 0 };
         uint32_t count { 0 };
         uint32_t count2 { 0 };
     };
 
-    struct ModelHeader {
-        GeometryHeader geometry;
-        uint8_t classification { 0 };
-        uint8_t classification2 { 0 };
-        uint8_t _pad1 { 0 };
-        uint8_t ignoreFog { 0 };
-        uint32_t numChildModels { 0 };
-        ArrayHeader animations;
-        uint32_t _unk1 { 0 };
-        float bbMin[3];
-        float bbMax[3];
-        float radius { 0.0f };
-        float animationScale { 0.0f };
-        char superModel[32];
-    };
-
-    struct NamesHeader {
-        uint32_t offRootNode { 0 };
-        uint32_t _unk1 { 0 };
-        uint32_t mdxSize { 0 };
-        uint32_t mdxOffset { 0 };
-        ArrayHeader names;
-    };
-
-    struct NodeHeader {
-        uint16_t flags { 0 };
-        uint16_t index { 0 };
-        uint16_t nodeNumber { 0 };
-        uint16_t _pad1 { 0 };
-        uint32_t offRootNode { 0 };
-        uint32_t offParentNode { 0 };
-        float position[3];
-        float orientation[4];
-        ArrayHeader children;
-        ArrayHeader controllers;
-        ArrayHeader controllerData;
-    };
-
-    struct AnimationHeader {
-        GeometryHeader geometry;
-        float length { 0.0f };
-        float transitionTime { 0.0f };
-        char root[32];
-        ArrayHeader events;
-        uint32_t _unk1 { 0 };
-    };
-
-    struct LightHeader {
-        ArrayHeader _unk1;
-        ArrayHeader lensFlareSizes;
-        ArrayHeader flarePositions;
-        ArrayHeader flareColorShifts;
-        ArrayHeader flareTextures;
-        float flareRadius { 0.0f };
-        uint32_t priority { 0 };
-        uint32_t ambientOnly { 0 };
-        uint32_t dynamicType { 0 };
-        uint32_t affectDynamic { 0 };
-        uint32_t shadow { 0 };
-        uint32_t flare { 0 };
-        uint32_t fading { 0 };
-    };
-
-    struct EmitterHeader {
-        float deadSpace { 0.0f };
-        float blastRadius { 0.0f };
-        float blastLength { 0.0f };
-        uint32_t branchCount { 0 };
-        float controlPointSmoothing { 0.0f };
-        uint32_t xGrid { 0 };
-        uint32_t yGrid { 0 };
-        uint32_t _unk1 { 0 };
-        char update[32];
-        char render[32];
-        char blend[32];
-        char texture[32];
-        char chunkName[16];
-        uint32_t twosided { 0 };
-        uint32_t loop { 0 };
-        uint32_t renderOrder { 0 };
-        uint32_t frameBlending { 0 };
-        char depthTexture[32];
-        uint8_t _pad1 { 0 };
-        uint32_t flags { 0 };
-    };
-
-    struct ReferenceHeader {
-        char modelResRef[32];
-        uint32_t reattachable { 0 };
-    };
-
     struct MeshHeader {
-        uint32_t fn[2];
-        ArrayHeader faces;
-        float bbMin[3];
-        float bbMax[3];
-        float radius { 0.0f };
-        float average[3];
-        float diffuse[3];
-        float ambient[3];
-        uint32_t transparencyHint { 0 };
-        char texture1[32];
-        char texture2[32];
-        char texture3[12];
-        char texture4[12];
-        ArrayHeader indicesCounts;
-        ArrayHeader indicesOffsets;
-        ArrayHeader invCounters;
-        uint32_t _unk1[3];
-        uint8_t _unk2[8];
-        uint32_t animateUV { 0 };
-        float uvDirectionX { 0.0f };
-        float uvDirectionY { 0.0f };
-        float uvJitter { 0.0f };
-        float uvJitterSpeed { 0.0f };
-        uint32_t mdxVertexSize { 0 };
-        uint32_t mdxDataFlags { 0 };
+        // Material
+        glm::vec3 ambient { 0.0f };
+        glm::vec3 diffuse { 0.0f };
+        std::string texture1;
+        std::string texture2;
+        bool render { false };
+        bool shadow { false };
+        bool backgroundGeometry { false };
+        int transparencyHint { 0 };
+
+        // Geometry
+        int numVertices { 0 };
+        int numFaces { 0 };
+        uint32_t offOffIndices { 0 };
+
+        // MDX
+        int mdxVertexSize { 0 };
         int offMdxVertices { 0 };
         int offMdxNormals { 0 };
-        int offMdxVertexColors { 0 };
         int offMdxTexCoords1 { 0 };
         int offMdxTexCoords2 { 0 };
-        int offMdxTexCoords3 { 0 };
-        int offMdxTexCoords4 { 0 };
         int offMdxTanSpace { 0 };
-        uint32_t _unk3[3];
-        uint16_t numVertices { 0 };
-        uint16_t numTextures { 0 };
-        uint8_t lightmapped { 0 };
-        uint8_t rotateTexture { 0 };
-        uint8_t backgroundGeometry { 0 };
-        uint8_t shadow { 0 };
-        uint8_t beaming { 0 };
-        uint8_t render { 0 };
-        uint8_t _unk4[2];
-        float totalArea { 0.0f };
-        uint32_t _unk5 { 0 };
 
-        // Technically, this also contains:
-        // - TSL values (8 bytes)
-        // - Offset to MDX data (4 bytes)
-        // - Offset to vertices (4 bytes)
-    };
-
-    struct SkinHeader {
-        int _unk1[3];
-        uint32_t offMdxBoneWeights { 0 };
-        uint32_t offMdxBoneIndices { 0 };
-        uint32_t offBones { 0 };
-        uint32_t numBones { 0 };
-        uint8_t _unk2[72]; // QBones, TBones, etc.
-    };
-
-    struct DanglymeshHeader {
-        ArrayHeader constraints;
-        float displacement { 0.0f };
-        float tightness { 0.0f };
-        float period { 0.0f };
-        uint32_t _unk1 { 0 };
-    };
-
-    struct AABBNodeHeader {
-        float bbMin[3];
-        float bbMax[3];
-        uint32_t offChildLeft { 0 };
-        uint32_t offChildRight { 0 };
-        int faceIndex { 0 };
-        uint32_t mostSignificantPlane { 0 };
-    };
-
-    struct SaberHeader {
-        uint32_t offVertices { 0 };
-        uint32_t offTexCoords { 0 };
-        uint32_t offNormals { 0 };
-        uint32_t _unk1[2];
+        // UV animation
+        bool animateUV { false };
+        float uvDirectionX { 0.0f };
+        float uvDirectionY { 0.0f };
     };
 
     std::unique_ptr<StreamReader> _mdxReader;
-
-    FileHeader _fileHeader;
-    ModelHeader _modelHeader;
-    NamesHeader _namesHeader;
 
     bool _tsl { false }; /**< is this a TSL model? */
     int _nodeIndex { 0 };
     std::vector<std::string> _nodeNames;
     std::unordered_map<uint32_t, int> _nodeFlags;
-    bool _animations { false }; /**< is currently reading animations? */
+    bool _readingAnimations { false };
 
     std::shared_ptr<render::Model> _model;
 
     void doLoad() override;
 
+    ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);
     std::unique_ptr<render::ModelNode> readNode(uint32_t offset, render::ModelNode *parent);
     std::vector<std::shared_ptr<render::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
@@ -267,6 +100,7 @@ private:
     void readSaber(render::ModelNode &node);
 
     void loadMesh(const MeshHeader &header, int numVertices, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, render::ModelNode &node);
+    MeshHeader readMeshHeader();
     std::shared_ptr<AABBNode> readAABBNode(uint32_t offset);
 };
 

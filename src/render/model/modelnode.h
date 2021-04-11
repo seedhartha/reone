@@ -68,11 +68,16 @@ public:
         std::unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     };
 
+    struct DanglymeshConstraint {
+        float number { 0.0f };
+        glm::vec3 position { 0.0f };
+    };
+
     struct Danglymesh {
         float displacement { 0.0f };
         float tightness { 0.0f };
         float period { 0.0f };
-        std::vector<float> constraints;
+        std::vector<DanglymeshConstraint> constraints;
     };
 
     ModelNode(int index, const ModelNode *parent = nullptr);

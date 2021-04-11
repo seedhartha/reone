@@ -115,7 +115,7 @@ void TpcReader::loadPixels() {
                 getMipMapSize(i, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
-            mipMap.pixels = make_shared<ByteArray>(_reader->getArray<char>(dataSize));
+            mipMap.pixels = make_shared<ByteArray>(_reader->getBytes(dataSize));
             mipMaps.push_back(move(mipMap));
         }
 
@@ -135,7 +135,7 @@ void TpcReader::loadPixels() {
 void TpcReader::loadFeatures() {
     size_t pos = tell();
     if (pos < _size) {
-        _txiData = _reader->getArray<char>(static_cast<int>(_size - pos));
+        _txiData = _reader->getBytes(static_cast<int>(_size - pos));
 
         TxiReader txi;
         txi.load(wrap(_txiData));

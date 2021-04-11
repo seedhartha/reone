@@ -124,6 +124,13 @@ string StreamReader::getString(int len) {
     return move(val);
 }
 
+ByteArray StreamReader::getBytes(int count) {
+    ByteArray result;
+    result.resize(count);
+    _stream->read(reinterpret_cast<char *>(&result[0]), count);
+    return move(result);
+}
+
 bool StreamReader::eof() const {
     return _stream->eof();
 }

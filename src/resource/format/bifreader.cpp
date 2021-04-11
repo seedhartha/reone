@@ -43,7 +43,7 @@ unique_ptr<ByteArray> BifReader::getResourceData(int idx) {
     }
     ResourceEntry entry(readResourceEntry(idx));
 
-    return make_unique<ByteArray>(readArray<char>(entry.offset, entry.fileSize));
+    return make_unique<ByteArray>(readBytes(entry.offset, entry.fileSize));
 }
 
 BifReader::ResourceEntry BifReader::readResourceEntry(int idx) {

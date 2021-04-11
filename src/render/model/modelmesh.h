@@ -41,8 +41,6 @@ public:
         bool animated { false };
         float directionX { 0.0f };
         float directionY { 0.0f };
-        float jitter { 0.0f };
-        float jitterSpeed { 0.0f };
     };
 
     ModelMesh(const std::shared_ptr<Mesh> &mesh);

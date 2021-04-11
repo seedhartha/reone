@@ -22,7 +22,6 @@
 #include <boost/filesystem.hpp>
 
 #include "../../common/streamwriter.h"
-#include "../../common/stringutil.h"
 
 using namespace std;
 

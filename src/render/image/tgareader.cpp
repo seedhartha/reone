@@ -123,7 +123,7 @@ ByteArray TgaReader::readPixels(int w, int h) {
     }
     int dataSize = (isRGBA() ? (_alpha ? 4 : 3) : 1) * w * h;
 
-    return _reader->getArray<char>(dataSize);
+    return _reader->getBytes(dataSize);
 }
 
 bool TgaReader::isRLE() const {
