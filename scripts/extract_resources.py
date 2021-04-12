@@ -24,9 +24,10 @@ import platform
 import shutil
 import subprocess
 
-game_dir = r"D:\Games\Star Wars - KotOR2"
+game_dir = r"D:\Games\Star Wars - KotOR"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\TSL"
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
 steps = {
     "extract_bifs": True,
@@ -36,7 +37,8 @@ steps = {
     "extract_textures": True,
     "convert_to_json": False,
     "convert_to_tga": False,
-    "convert_to_ascii_pth": False }
+    "convert_to_ascii_pth": False,
+    "disassemble_scripts": False }
 
 
 if not os.path.exists(game_dir):
@@ -49,15 +51,15 @@ if not os.path.exists(extract_dir):
     raise RuntimeError("Extraction directory does not exist")
 
 
-def append_tools_to_path(tools_dir):
-    if not tools_dir in os.environ["PATH"]:
+def append_dir_to_path(dir):
+    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
         separator = ":" if platform.system() == "Linux" else ";"
-        os.environ["PATH"] = separator.join([os.environ["PATH"], tools_dir])
+        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
 
 
-def run_tools(args, silent=True, check_retcode=True):
+def run_subprocess(args, silent=True, check_retcode=True):
     stdout = subprocess.DEVNULL if silent else None
-    process = subprocess.run(["reone-tools", *args], stdout=stdout)
+    process = subprocess.run(args, stdout=stdout)
     if check_retcode:
         process.check_returncode()
 
@@ -75,7 +77,7 @@ def extract_bifs(game_dir, extract_dir):
             if f.lower().endswith(".bif"):
                 print("Extracting {}...".format(f))
                 bif_path = os.path.join(data_dir, f)
-                run_tools(["--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
+                run_subprocess(["reone-tools", "--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
 
 
 def extract_patch(game_dir, extract_dir):
@@ -88,7 +90,7 @@ def extract_patch(game_dir, extract_dir):
     patch_path = os.path.join(game_dir, "patch.erf")
     if os.path.exists(patch_path):
         print("Extracting patch.erf")
-        run_tools(["--extract", patch_path, "--dest", dest_dir])
+        run_subprocess(["reone-tools", "--extract", patch_path, "--dest", dest_dir])
 
 
 def extract_modules(game_dir, extract_dir):
@@ -107,7 +109,7 @@ def extract_modules(game_dir, extract_dir):
                     os.mkdir(dest_dir)
                 print("Extracting {}...".format(f))
                 rim_path = os.path.join(modules_dir, f)
-                run_tools(["--extract", rim_path, "--dest", dest_dir])
+                run_subprocess(["reone-tools", "--extract", rim_path, "--dest", dest_dir])
 
 
 def extract_textures(game_dir, extract_dir):
@@ -125,7 +127,7 @@ def extract_textures(game_dir, extract_dir):
             if f in TEXTURE_PACKS:
                 texture_pack_dir = os.path.join(texture_packs_dir, f)
                 print("Extracting {}...".format(texture_pack_dir))
-                run_tools(["--extract", texture_pack_dir, "--dest", dest_dir])
+                run_subprocess(["reone-tools", "--extract", texture_pack_dir, "--dest", dest_dir])
 
 
 def extract_dialog(game_dir, extract_dir):
@@ -152,7 +154,7 @@ def convert_to_json(extract_dir):
             json_path = f + ".json"
             if not os.path.exists(json_path):
                 print("Converting {} to JSON...".format(f))
-                run_tools(["--to-json", f])
+                run_subprocess(["reone-tools", "--to-json", f])
 
 def convert_to_tga(extract_dir):
     for f in glob.glob("{}/**/*.tpc".format(extract_dir), recursive=True):
@@ -160,17 +162,27 @@ def convert_to_tga(extract_dir):
         tga_path = os.path.join(os.path.dirname(f), filename + ".tga")
         if not os.path.exists(tga_path):
             print("Converting {} to TGA/TXI...".format(f))
-            run_tools(["--to-tga", f], check_retcode=False)
+            run_subprocess(["reone-tools", "--to-tga", f], check_retcode=False)
 
 
 def convert_to_ascii_pth(extract_dir):
     for f in glob.glob("{}/**/*.pth".format(extract_dir), recursive=True):
         if not f.endswith("-ascii.pth"):
             print("Converting {} to ASCII PTH...".format(f))
-            run_tools(["--to-ascii", f])
+            run_subprocess(["reone-tools", "--to-ascii", f])
 
 
-append_tools_to_path(tools_dir)
+def disassemble_scripts(extract_dir):
+    for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
+        filename, _ = os.path.splitext(f)
+        pcode_path = os.path.join(os.path.dirname(f), filename + ".pcode")
+        if not os.path.exists(pcode_path):
+            print("Disassembling {}...".format(f))
+            run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path])
+
+
+append_dir_to_path(tools_dir)
+append_dir_to_path(nwnnsscomp_dir)
 
 if steps["extract_bifs"]:
     extract_bifs(game_dir, extract_dir)
@@ -195,3 +207,6 @@ if steps["convert_to_tga"]:
 
 if steps["convert_to_ascii_pth"]:
     convert_to_ascii_pth(extract_dir)
+
+if steps["disassemble_scripts"]:
+    disassemble_scripts(extract_dir)
