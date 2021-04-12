@@ -41,27 +41,32 @@ namespace reone {
 namespace game {
 
 void Item::loadUTI(const GffStruct &uti) {
-    _baseItemType = uti.getInt("BaseItem");
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
-    _descIdentified = Strings::instance().get(uti.getInt("DescIdentified"));
+    _baseItem = uti.getInt("BaseItem");
     _localizedName = Strings::instance().get(uti.getInt("LocalizedName"));
+    _descIdentified = Strings::instance().get(uti.getInt("DescIdentified"));
     _tag = boost::to_lower_copy(uti.getString("Tag"));
+    _charges = uti.getInt("Charges");
+    _cost = uti.getInt("Cost");
+    _stackSize = uti.getInt("StackSize");
+    _plot = uti.getBool("Plot");
+    _addCost = uti.getInt("AddCost");
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
-    _attackRange = baseItems->getInt(_baseItemType, "maxattackrange");
-    _criticalHitMultiplier = baseItems->getInt(_baseItemType, "crithitmult");
-    _criticalThreat = baseItems->getInt(_baseItemType, "critthreat");
-    _damageFlags = baseItems->getInt(_baseItemType, "damageflags");
-    _dieToRoll = baseItems->getInt(_baseItemType, "dietoroll");
-    _equipableSlots = baseItems->getUint(_baseItemType, "equipableslots", 0);
-    _itemClass = boost::to_lower_copy(baseItems->getString(_baseItemType, "itemclass"));
-    _numDice = baseItems->getInt(_baseItemType, "numdice");
-    _weaponType = static_cast<WeaponType>(baseItems->getInt(_baseItemType, "weapontype"));
-    _weaponWield = static_cast<WeaponWield>(baseItems->getInt(_baseItemType, "weaponwield"));
+    _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
+    _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
+    _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
+    _damageFlags = baseItems->getInt(_baseItem, "damageflags");
+    _dieToRoll = baseItems->getInt(_baseItem, "dietoroll");
+    _equipableSlots = baseItems->getUint(_baseItem, "equipableslots", 0);
+    _itemClass = boost::to_lower_copy(baseItems->getString(_baseItem, "itemclass"));
+    _numDice = baseItems->getInt(_baseItem, "numdice");
+    _weaponType = static_cast<WeaponType>(baseItems->getInt(_baseItem, "weapontype"));
+    _weaponWield = static_cast<WeaponWield>(baseItems->getInt(_baseItem, "weaponwield"));
 
     string iconResRef;
     if (isEquippable(InventorySlot::body)) {
-        _baseBodyVariation = boost::to_lower_copy(baseItems->getString(_baseItemType, "bodyvar"));
+        _baseBodyVariation = boost::to_lower_copy(baseItems->getString(_baseItem, "bodyvar"));
         _bodyVariation = uti.getInt("BodyVariation", 1);
         _textureVariation = uti.getInt("TextureVar", 1);
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
@@ -74,14 +79,21 @@ void Item::loadUTI(const GffStruct &uti) {
     }
     _icon = Textures::instance().get(iconResRef, TextureUsage::GUI);
 
-    loadAmmunitionTypeFromUTI(uti);
+    loadAmmunitionType();
+
+    // TODO: load properties
+
+    // These fields are ignored as being most likely unused:
+    //
+    // - Description
+    // - Stolen
+    // - Identified
 }
 
-void Item::loadAmmunitionTypeFromUTI(const GffStruct &uti) {
-    int baseItemIdx = uti.getInt("BaseItem");
+void Item::loadAmmunitionType() {
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
 
-    int ammunitionIdx = baseItems->getInt(baseItemIdx, "ammunitiontype", -1);
+    int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
     if (ammunitionIdx != -1) {
         shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
