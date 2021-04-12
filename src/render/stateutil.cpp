@@ -73,7 +73,7 @@ static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlp
 }
 
 void withAdditiveBlending(const function<void()> &block) {
-    withBlending(GL_ONE, GL_ONE, GL_ONE, GL_ONE, block);
+    withBlending(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
 }
 
 void setActiveTextureUnit(int n) {
