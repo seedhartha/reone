@@ -34,33 +34,59 @@ namespace reone {
 namespace game {
 
 void Door::loadUTD(const GffStruct &utd) {
-    _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
-    _conversation = boost::to_lower_copy(utd.getString("Conversation"));
-    _currentHitPoints = utd.getInt("CurrentHP");
-    _genericType = utd.getInt("GenericType");
-    _hitPoints = utd.getInt("HP");
-    _keyRequired = utd.getBool("KeyRequired");
-    _lockable = utd.getBool("Lockable");
-    _locked = utd.getBool("Locked");
-    _minOneHP = utd.getBool("Min1HP");
-    _static = utd.getBool("Static");
     _tag = boost::to_lower_copy(utd.getString("Tag"));
+    _name = Strings::instance().get(utd.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
+    _closeLockDC = utd.getInt("CloseLockDC");
+    _conversation = boost::to_lower_copy(utd.getString("Conversation"));
+    _interruptable = utd.getBool("Interruptable");
+    _faction = utd.getEnum("Faction", Faction::Invalid);
+    _plot = utd.getBool("Plot");
+    _minOneHP = utd.getBool("Min1HP");
+    _keyRequired = utd.getBool("KeyRequired");
+    _locked = utd.getBool("Locked");
+    _openLockDC = utd.getInt("OpenLockDC");
+    _portraitId = utd.getInt("PortraitId");
+    _animationState = utd.getInt("AnimationState");
+    _appearance = utd.getInt("Appearance");
+    _hitPoints = utd.getInt("HP");
+    _currentHitPoints = utd.getInt("CurrentHP");
+    _hardness = utd.getInt("Hardness");
+    _fortitude = utd.getInt("Fort");
+    _reflex = utd.getInt("Ref");
+    _will = utd.getInt("Will");
+    _loadScreenID = utd.getInt("LoadScreenID");
+    _genericType = utd.getInt("GenericType");
+    _static = utd.getBool("Static");
 
-    loadNameFromUTD(utd);
-    loadScriptsFromUTD(utd);
-}
-
-void Door::loadNameFromUTD(const GffStruct &utd) {
-    int locNameStrRef = utd.getInt("LocName", -1);
-    if (locNameStrRef != -1) {
-        _name = Strings::instance().get(locNameStrRef);
-    }
-}
-
-void Door::loadScriptsFromUTD(const GffStruct &utd) {
+    _onClosed = utd.getString("OnClosed");
+    _onDamaged = utd.getString("OnDamaged");
+    _onDeath = utd.getString("OnDeath");
     _onHeartbeat = utd.getString("OnHeartbeat");
-    _onFailToOpen = utd.getString("OnFailToOpen");
+    _onLock = utd.getString("OnLock");
+    _onMeleeAttacked = utd.getString("OnMeleeAttacked");
     _onOpen = utd.getString("OnOpen");
+    _onSpellCastAt = utd.getString("OnSpellCastAt");
+    _onUnlock = utd.getString("OnUnlock");
+    _onUserDefined = utd.getString("OnUserDefined");
+    _onClick = utd.getString("OnClick");
+    _onFailToOpen = utd.getString("OnFailToOpen");
+
+    // These fields are ignored as being most likely unused:
+    //
+    // - AutoRemoveKey
+    // - Lockable
+    // - TrapDetectable
+    // - TrapDetectDC
+    // - TrapDisarmable
+    // - DisarmDC
+    // - TrapFlag
+    // - TrapOneShot
+    // - TrapType
+    // - KeyName
+    // - OnDisarm
+    // - OnLock
+    // - OnTrapTriggered
 }
 
 } // namespace game

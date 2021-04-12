@@ -43,9 +43,9 @@ public:
     const std::string &name() const { return _name; }
     const std::string &conversation() const { return _conversation; }
     ActionQueue &actionQueue() { return _actionQueue; }
-    int plotFlag() const { return _plotFlag; }
+    bool plotFlag() const { return _plot; }
 
-    void setPlotFlag(int flag);
+    void setPlotFlag(bool plot);
     void setCommandable(bool value);
 
     // Hit Points
@@ -82,7 +82,7 @@ protected:
     int _maxHitPoints { 0 };
     int _currentHitPoints { 0 };
     bool _dead { false };
-    int _plotFlag { 0 };
+    bool _plot { false };
     bool _commandable { true };
 
     // Scripts

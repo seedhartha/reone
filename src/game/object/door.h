@@ -41,7 +41,6 @@ public:
     void open(const std::shared_ptr<Object> &triggerrer);
     void close(const std::shared_ptr<Object> &triggerrer);
 
-    bool isLockable() const { return _lockable; }
     bool isLocked() const { return _locked; }
     bool isStatic() const { return _static; }
     bool isKeyRequired() const { return _keyRequired; }
@@ -59,19 +58,39 @@ public:
     void setLocked(bool locked);
 
 private:
-    bool _lockable { false };
     bool _locked { false };
     int _genericType { 0 };
     bool _static { false };
     bool _keyRequired { false };
     std::string _linkedToModule;
     std::string _linkedTo;
+    int _linkedToFlags { 0 };
     std::string _transitionDestin;
+    Faction _faction { Faction::Invalid };
+    int _closeLockDC { 0 };
+    bool _interruptable { false };
+    int _openLockDC { 0 };
+    int _portraitId { 0 };
+    int _animationState { 0 };
+    int _appearance { 0 };
+    int _hardness { 0 };
+    int _fortitude { 0 };
+    int _reflex { 0 };
+    int _will { 0 };
+    int _loadScreenID { 0 };
 
     // Scripts
 
     std::string _onOpen;
     std::string _onFailToOpen;
+    std::string _onClosed;
+    std::string _onDamaged;
+    std::string _onDeath;
+    std::string _onMeleeAttacked;
+    std::string _onSpellCastAt;
+    std::string _onUnlock;
+    std::string _onClick;
+    std::string _onLock;
 
     // END Scripts
 
@@ -86,14 +105,7 @@ private:
     void loadTransitionDestinFromGIT(const resource::GffStruct &gffs);
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    // Blueprint
-
     void loadUTD(const resource::GffStruct &utd);
-
-    void loadNameFromUTD(const resource::GffStruct &utd);
-    void loadScriptsFromUTD(const resource::GffStruct &utd);
-
-    // END Blueprint
 };
 
 } // namespace game
