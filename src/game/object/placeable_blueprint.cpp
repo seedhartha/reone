@@ -34,37 +34,68 @@ namespace reone {
 namespace game {
 
 void Placeable::loadUTP(const GffStruct &utp) {
-    _appearance = utp.getInt("Appearance");
-    _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
-    _conversation = utp.getString("Conversation");
-    _currentHitPoints = utp.getInt("CurrentHP");
-    _hasInventory = utp.getBool("HasInventory");
-    _hitPoints = utp.getInt("HP");
-    _minOneHP = utp.getBool("Min1HP");
     _tag = boost::to_lower_copy(utp.getString("Tag"));
+    _name = Strings::instance().get(utp.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
+    _conversation = boost::to_lower_copy(utp.getString("Conversation"));
+    _interruptable = utp.getBool("Interruptable");
+    _faction = utp.getEnum("Faction", Faction::Invalid);
+    _plot = utp.getBool("Plot");
+    _minOneHP = utp.getBool("Min1HP");
+    _keyRequired = utp.getBool("KeyRequired");
+    _locked = utp.getBool("Locked");
+    _openLockDC = utp.getInt("OpenLockDC");
+    _animationState = utp.getInt("AnimationState");
+    _appearance = utp.getInt("Appearance");
+    _hitPoints = utp.getInt("HP");
+    _currentHitPoints = utp.getInt("CurrentHP");
+    _hardness = utp.getInt("Hardness");
+    _fortitude = utp.getInt("Fort");
+    _reflex = utp.getInt("Ref");
+    _will = utp.getInt("Will");
+    _hasInventory = utp.getBool("HasInventory");
+    _partyInteract = utp.getBool("PartyInteract");
+    _bodyBag = utp.getInt("BodyBag");
+    _static = utp.getBool("Static");
     _usable = utp.getBool("Useable");
 
-    loadNameFromUTP(utp);
-    loadScriptsFromUTP(utp);
+    _onClosed = boost::to_lower_copy(utp.getString("OnClosed"));
+    _onDamaged = boost::to_lower_copy(utp.getString("OnDamaged"));
+    _onDeath = boost::to_lower_copy(utp.getString("OnDeath"));
+    _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
+    _onLock = boost::to_lower_copy(utp.getString("OnLock"));
+    _onMeleeAttacked = boost::to_lower_copy(utp.getString("OnMeleeAttacked"));
+    _onOpen = boost::to_lower_copy(utp.getString("OnOpen"));
+    _onSpellCastAt = boost::to_lower_copy(utp.getString("OnSpellCastAt"));
+    _onUnlock = boost::to_lower_copy(utp.getString("OnUnlock"));
+    _onUserDefined = boost::to_lower_copy(utp.getString("OnUserDefined"));
+    _onEndDialogue = boost::to_lower_copy(utp.getString("OnEndDialogue"));
+    _onInvDisturbed = boost::to_lower_copy(utp.getString("OnInvDisturbed"));
+    _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
 
     for (auto &itemGffs : utp.getList("ItemList")) {
         string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
         addItem(resRef, 1, true);
     }
-}
 
-void Placeable::loadNameFromUTP(const GffStruct &utp) {
-    int locNameStrRef = utp.getInt("LocName", -1);
-    if (locNameStrRef != -1) {
-        _name = Strings::instance().get(locNameStrRef);
-    }
-}
-
-void Placeable::loadScriptsFromUTP(const GffStruct &utp) {
-    _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
-    _onInvDisturbed = boost::to_lower_copy(utp.getString("OnInvDisturbed"));
-    _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
-    _onUserDefined = boost::to_lower_copy(utp.getString("OnUserDefined"));
+    // These fields are ignored as being most likely unused:
+    //
+    // - Description
+    // - AutoRemoveKey
+    // - CloseLockDC
+    // - Lockable
+    // - PortraitId
+    // - TrapDetectable
+    // - TrapDetectDC
+    // - TrapDisarmable
+    // - DisarmDC
+    // - TrapFlag
+    // - TrapOneShot
+    // - TrapType
+    // - KeyName
+    // - Type
+    // - OnDisarm
+    // - OnTrapTriggered
 }
 
 } // namespace game

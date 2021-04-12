@@ -37,7 +37,6 @@ void Door::loadUTD(const GffStruct &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
     _name = Strings::instance().get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
-    _closeLockDC = utd.getInt("CloseLockDC");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));
     _interruptable = utd.getBool("Interruptable");
     _faction = utd.getEnum("Faction", Faction::Invalid);
@@ -46,7 +45,6 @@ void Door::loadUTD(const GffStruct &utd) {
     _keyRequired = utd.getBool("KeyRequired");
     _locked = utd.getBool("Locked");
     _openLockDC = utd.getInt("OpenLockDC");
-    _portraitId = utd.getInt("PortraitId");
     _animationState = utd.getInt("AnimationState");
     _appearance = utd.getInt("Appearance");
     _hitPoints = utd.getInt("HP");
@@ -75,7 +73,9 @@ void Door::loadUTD(const GffStruct &utd) {
     // These fields are ignored as being most likely unused:
     //
     // - AutoRemoveKey
+    // - CloseLockDC
     // - Lockable
+    // - PortraitId
     // - TrapDetectable
     // - TrapDetectDC
     // - TrapDisarmable

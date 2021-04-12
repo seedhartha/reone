@@ -67,10 +67,8 @@ private:
     int _linkedToFlags { 0 };
     std::string _transitionDestin;
     Faction _faction { Faction::Invalid };
-    int _closeLockDC { 0 };
     bool _interruptable { false };
     int _openLockDC { 0 };
-    int _portraitId { 0 };
     int _animationState { 0 };
     int _appearance { 0 };
     int _hardness { 0 };
