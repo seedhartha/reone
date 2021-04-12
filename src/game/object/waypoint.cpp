@@ -52,8 +52,8 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
-    _description = Strings::instance().get(gffs.getInt("Description"));
-    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName"));
+    _tag = gffs.getString("Tag");
+    _hasMapNote = gffs.getBool("HasMapNote");
     _mapNote = Strings::instance().get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
@@ -71,9 +71,9 @@ void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
-    float sine = gffs.getFloat("XOrientation");
-    float cosine = gffs.getFloat("YOrientation");
-    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(sine, cosine)));
+    float cosine = gffs.getFloat("XOrientation");
+    float sine = gffs.getFloat("YOrientation");
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(cosine, sine)));
 
     updateTransform();
 }

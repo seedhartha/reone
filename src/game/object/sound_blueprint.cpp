@@ -37,6 +37,7 @@ namespace game {
 void Sound::loadUTS(const GffStruct &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
     _name = Strings::instance().get(uts.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
     _looping = uts.getBool("Looping");

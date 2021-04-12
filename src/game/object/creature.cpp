@@ -127,9 +127,9 @@ void Creature::loadTransformFromGIT(const GffStruct &gffs) {
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
 
-    float sine = gffs.getFloat("XOrientation");
-    float cosine = gffs.getFloat("YOrientation");
-    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(sine, cosine)));
+    float cosine = gffs.getFloat("XOrientation");
+    float sine = gffs.getFloat("YOrientation");
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(cosine, sine)));
 
     updateTransform();
 }

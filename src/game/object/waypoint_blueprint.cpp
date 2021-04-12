@@ -21,6 +21,10 @@
 
 #include "waypoint.h"
 
+#include <boost/algorithm/string.hpp>
+
+#include "../../resource/strings.h"
+
 using namespace reone::resource;
 
 namespace reone {
@@ -28,6 +32,18 @@ namespace reone {
 namespace game {
 
 void Waypoint::loadUTW(const GffStruct &utw) {
+    _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
+    _tag = boost::to_lower_copy(utw.getString("Tag"));
+    _hasMapNote = utw.getBool("HasMapNote");
+    _mapNote = Strings::instance().get(utw.getInt("MapNote"));
+    _mapNoteEnabled = utw.getInt("MapNoteEnabled");
+
+    // Ignored as per Bioware specification:
+    //
+    // - Appearance
+    // - LinkedTo
+    // - LocalizedName
+    // - Description
 }
 
 } // namespace resource
