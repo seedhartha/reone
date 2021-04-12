@@ -54,7 +54,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
     shared_ptr<GffStruct> ute(Resources::instance().getGFF(blueprintResRef, ResourceType::Ute));
     if (ute) {
-        loadBlueprint(*ute);
+        loadUTE(*ute);
     }
 }
 
