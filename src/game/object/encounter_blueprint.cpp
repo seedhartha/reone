@@ -34,6 +34,7 @@ namespace game {
 void Encounter::loadUTE(const GffStruct &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
     _name = Strings::instance().get(ute.getInt("LocalizedName"));
+    _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
     _active = ute.getBool("Active");
     _difficulty = ute.getInt("Difficulty");
     _difficultyIndex = ute.getInt("DifficultyIndex");

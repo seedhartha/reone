@@ -39,7 +39,7 @@ void Strings::init(const fs::path &gameDir) {
 
 string Strings::get(int strRef) {
     shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef == -1 || strRef >= table->getStringCount()) return "";
+    if (strRef < 0 || strRef >= table->getStringCount()) return "";
 
     string text(table->getString(strRef).text);
     process(text);
@@ -49,7 +49,7 @@ string Strings::get(int strRef) {
 
 string Strings::getSound(int strRef) {
     shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef == -1 || strRef >= table->getStringCount()) return "";
+    if (strRef < 0 || strRef >= table->getStringCount()) return "";
 
     return table->getString(strRef).soundResRef;
 }
