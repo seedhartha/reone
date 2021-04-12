@@ -337,7 +337,7 @@ Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
-    int result = 0;
+    bool result = false;
 
     auto target = getObjectOrCaller(args, 0, ctx);
     if (target) {
@@ -346,12 +346,12 @@ Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx)
         debug("Script: getPlotFlag: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofInt(result);
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
     auto target = getObject(args, 0);
-    int plotFlag = getInt(args, 1);
+    bool plotFlag = getBool(args, 1);
 
     if (target) {
         target->setPlotFlag(plotFlag);

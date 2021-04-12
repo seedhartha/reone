@@ -46,8 +46,8 @@ void Object::setMaxHitPoints(int maxHitPoints) {
     _maxHitPoints = maxHitPoints;
 }
 
-void Object::setPlotFlag(int flag) {
-    _plotFlag = flag;
+void Object::setPlotFlag(bool plot) {
+    _plot = plot;
 }
 
 void Object::setCommandable(bool value) {

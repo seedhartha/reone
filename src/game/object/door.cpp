@@ -53,10 +53,11 @@ void Door::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
-    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToFlags = gffs.getInt("LinkedToFlags");
+    _transitionDestin = Strings::instance().get(gffs.getInt("TransitionDestin"));
 
-    loadTransitionDestinFromGIT(gffs);
     loadTransformFromGIT(gffs);
 }
 
@@ -73,13 +74,6 @@ void Door::loadFromBlueprint(const string &resRef) {
     _closedWalkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
     _open1Walkmesh = Walkmeshes::instance().get(modelName + "1", ResourceType::Dwk);
     _open2Walkmesh = Walkmeshes::instance().get(modelName + "2", ResourceType::Dwk);
-}
-
-void Door::loadTransitionDestinFromGIT(const GffStruct &gffs) {
-    int transDestStrRef = gffs.getInt("TransitionDestin");
-    if (transDestStrRef != -1) {
-        _transitionDestin = Strings::instance().get(transDestStrRef);
-    }
 }
 
 void Door::loadTransformFromGIT(const GffStruct &gffs) {
