@@ -42,6 +42,7 @@ void Area::loadGIT(const GffStruct &git) {
     loadTriggers(git);
     loadSounds(git);
     loadCameras(git);
+    loadEncounters(git);
 }
 
 void Area::loadProperties(const GffStruct &git) {
@@ -107,6 +108,14 @@ void Area::loadCameras(const GffStruct &git) {
         shared_ptr<PlaceableCamera> camera(_game->objectFactory().newCamera());
         camera->loadFromGIT(*gffs);
         add(camera);
+    }
+}
+
+void Area::loadEncounters(const GffStruct &git) {
+    for (auto &gffs : git.getList("Encounter List")) {
+        shared_ptr<Encounter> encounter(_game->objectFactory().newEncounter());
+        encounter->loadFromGIT(*gffs);
+        add(encounter);
     }
 }
 

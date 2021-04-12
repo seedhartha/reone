@@ -66,7 +66,7 @@ public:
 
     // Scripts
 
-    const std::string &getHeartbeat() const { return _heartbeat; }
+    const std::string &getOnHeartbeat() const { return _onHeartbeat; }
     const std::string &getOnUserDefined() const { return _onUserDefined; }
 
     // END Scripts
@@ -87,7 +87,7 @@ protected:
 
     // Scripts
 
-    std::string _heartbeat;
+    std::string _onHeartbeat;
     std::string _onUserDefined;
 
     // END Scripts

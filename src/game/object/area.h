@@ -289,6 +289,7 @@ private:
     void loadTriggers(const resource::GffStruct &git);
     void loadSounds(const resource::GffStruct &git);
     void loadCameras(const resource::GffStruct &git);
+    void loadEncounters(const resource::GffStruct &git);
 
     // END Loading GIT
 

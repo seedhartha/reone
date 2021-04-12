@@ -31,6 +31,7 @@
 #include "area.h"
 #include "creature.h"
 #include "door.h"
+#include "encounter.h"
 #include "module.h"
 #include "placeable.h"
 #include "placeablecamera.h"
@@ -58,6 +59,7 @@ public:
     std::unique_ptr<Item> newItem();
     std::unique_ptr<Sound> newSound();
     std::unique_ptr<PlaceableCamera> newCamera();
+    std::unique_ptr<Encounter> newEncounter();
 
 private:
     Game *_game;

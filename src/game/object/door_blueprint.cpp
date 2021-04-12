@@ -58,7 +58,7 @@ void Door::loadNameFromUTD(const GffStruct &utd) {
 }
 
 void Door::loadScriptsFromUTD(const GffStruct &utd) {
-    _heartbeat = utd.getString("OnHeartbeat");
+    _onHeartbeat = utd.getString("OnHeartbeat");
     _onFailToOpen = utd.getString("OnFailToOpen");
     _onOpen = utd.getString("OnOpen");
 }
