@@ -52,7 +52,7 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
 
         int bifIdx = -1;
         for (size_t i = 0; i < key.files().size(); ++i) {
-            if (boost::ends_with(key.getFilename(static_cast<int>(i)), target.filename().string())) {
+            if (boost::iends_with(key.getFilename(static_cast<int>(i)), target.filename().string())) {
                 bifIdx = static_cast<int>(i);
                 break;
             }
