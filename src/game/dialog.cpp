@@ -39,8 +39,8 @@ void Dialog::load(const GffStruct &dlg) {
     _cameraModel = dlg.getString("CameraModel");
     _endScript = dlg.getString("EndConversation");
     _animatedCutscene = dlg.getBool("AnimatedCut");
-    _conversationType = static_cast<ConversationType>(dlg.getInt("ConversationType"));
-    _computerType = static_cast<ComputerType>(dlg.getInt("ComputerType"));
+    _conversationType = dlg.getEnum("ConversationType", ConversationType::Cinematic);
+    _computerType = dlg.getEnum("ComputerType", ComputerType::Normal);
 
     for (auto &entry : dlg.getList("EntryList")) {
         _entries.push_back(getEntryReply(*entry));
