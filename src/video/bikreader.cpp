@@ -30,6 +30,7 @@
 extern "C" {
 
 #include "libavformat/avformat.h"
+#include "libavutil/imgutils.h"
 #include "libswresample/swresample.h"
 #include "libswscale/swscale.h"
 
@@ -140,8 +141,8 @@ private:
             throw runtime_error("BIK: failed to find stream info");
         }
         for (uint32_t i = 0; i < _formatCtx->nb_streams; ++i) {
-            AVMediaType codecType = _formatCtx->streams[i]->codec->codec_type;
-            switch (codecType) {
+            AVCodecParameters *codecParams = _formatCtx->streams[i]->codecpar;
+            switch (codecParams->codec_type) {
                 case AVMEDIA_TYPE_VIDEO:
                     _videoStreamIdx = i;
                     break;
@@ -158,14 +159,14 @@ private:
     }
 
     void openVideoCodec() {
-        AVCodecContext *codecCtx = _formatCtx->streams[_videoStreamIdx]->codec;
-        AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
+        AVCodecParameters *codecParams = _formatCtx->streams[_videoStreamIdx]->codecpar;
+        AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
         if (!codec) {
             throw runtime_error("BIK: video codec not found");
         }
         _videoCodecCtx = avcodec_alloc_context3(codec);
-        if (avcodec_copy_context(_videoCodecCtx, codecCtx) != 0) {
-            throw runtime_error("BIK: failed to copy a video codec context");
+        if (avcodec_parameters_to_context(_videoCodecCtx, codecParams) != 0) {
+            throw runtime_error("BIK: failed to copy video codec parameters");
         }
         if (avcodec_open2(_videoCodecCtx, codec, nullptr) != 0) {
             throw runtime_error("BIK: failed to open a video codec");
@@ -177,14 +178,14 @@ private:
     }
 
     void openAudioCodec() {
-        AVCodecContext *codecCtx = _formatCtx->streams[_audioStreamIdx]->codec;
-        AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
+        AVCodecParameters *codecParams = _formatCtx->streams[_audioStreamIdx]->codecpar;
+        AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
         if (!codec) {
             throw runtime_error("BIK: audio codec not found");
         }
         _audioCodecCtx = avcodec_alloc_context3(codec);
-        if (avcodec_copy_context(_audioCodecCtx, codecCtx) != 0) {
-            throw runtime_error("BIK: failed to copy an audio codec context");
+        if (avcodec_parameters_to_context(_audioCodecCtx, codecParams) != 0) {
+            throw runtime_error("BIK: failed to copy audio codec parameters");
         }
         if (avcodec_open2(_audioCodecCtx, codec, nullptr) != 0) {
             throw runtime_error("BIK: failed to open an audio codec");
@@ -215,9 +216,9 @@ private:
         _frame = av_frame_alloc();
         _frameRgb = av_frame_alloc();
 
-        int bufSize = avpicture_get_size(AV_PIX_FMT_RGB24, _videoCodecCtx->width, _videoCodecCtx->height);
+        int bufSize = av_image_get_buffer_size(AV_PIX_FMT_RGB24, _videoCodecCtx->width, _videoCodecCtx->height, 32);
         _videoBuffer = static_cast<uint8_t *>(av_malloc(bufSize));
-        avpicture_fill(reinterpret_cast<AVPicture *>(_frameRgb), _videoBuffer, AV_PIX_FMT_RGB24, _videoCodecCtx->width, _videoCodecCtx->height);
+        av_image_fill_arrays(_frameRgb->data, _frameRgb->linesize, _videoBuffer, AV_PIX_FMT_RGB24, _videoCodecCtx->width, _videoCodecCtx->height, 32);
     }
 
     void initVideo() {
@@ -245,9 +246,20 @@ private:
             }
             if (packet.stream_index != _videoStreamIdx) continue;
 
-            int gotFrame = 0;
-            avcodec_decode_video2(_videoCodecCtx, _frame, &gotFrame, &packet);
-            if (gotFrame == 0) continue;
+            bool gotFrame = false;
+
+            int retVal = avcodec_receive_frame(_videoCodecCtx, _frame);
+            if (retVal == 0) {
+                gotFrame = true;
+            }
+            if (retVal == AVERROR(EAGAIN)) {
+                retVal = 0;
+            }
+            if (retVal == 0) {
+                avcodec_send_packet(_videoCodecCtx, &packet);
+            }
+
+            if (gotFrame == false) continue;
 
             --count;
 
@@ -270,7 +282,7 @@ private:
             _frames.push_back(move(frame));
         }
 
-        av_free_packet(&packet);
+        av_packet_unref(&packet);
     }
 
     void readAudioFrames() {
@@ -301,7 +313,7 @@ private:
             _video->_audio->add(move(frame));
         }
 
-        av_free_packet(&packet);
+        av_packet_unref(&packet);
 
         seekBeginning();
     }
