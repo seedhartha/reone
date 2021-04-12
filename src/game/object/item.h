@@ -72,7 +72,7 @@ public:
     WeaponType weaponType() const { return _weaponType; }
     WeaponWield weaponWield() const { return _weaponWield; }
     const std::string &descIdentified() const { return _descIdentified; }
-    int baseItemType() const { return _baseItemType; }
+    int baseItemType() const { return _baseItem; }
     int criticalThreat() const { return _criticalThreat; }
     int criticalHitMultiplier() const { return _criticalHitMultiplier; }
 
@@ -102,15 +102,18 @@ private:
     bool _equipped { false };
     std::shared_ptr<AmmunitionType> _ammunitionType;
     std::string _descIdentified;
-    int _baseItemType { 0 };
+    int _baseItem { 0 };
     int _criticalThreat { 0 };
     int _criticalHitMultiplier { 0 };
+    int _charges { 0 };
+    int _cost { 0 };
+    int _addCost { 0 };
 
     // Blueprint
 
     void loadUTI(const resource::GffStruct &uti);
 
-    void loadAmmunitionTypeFromUTI(const resource::GffStruct &uti);
+    void loadAmmunitionType();
 
     // END Blueprint
 };
