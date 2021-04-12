@@ -122,7 +122,7 @@ public:
     CreatureAttributes &attributes() { return _attributes; }
     Faction faction() const { return _faction; }
     int xp() const { return _xp; }
-    RacialType racialType() const { return _racialType; }
+    RacialType racialType() const { return _race; }
     Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
 
@@ -230,9 +230,26 @@ private:
     std::shared_ptr<SoundSet> _soundSet;
     BodyBag _bodyBag;
     Perception _perception;
-    RacialType _racialType { RacialType::Unknown };
+    RacialType _race { RacialType::Unknown };
     Subrace _subrace { Subrace::None };
     NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
+    bool _isPC { false };
+    bool _interruptable { false };
+    bool _noPermDeath { false };
+    bool _notReorienting { false };
+    int _bodyVariation { 0 };
+    int _textureVar { 0 };
+    bool _partyInteract { false };
+    int _walkRate { 0 };
+    int _naturalAC { 0 };
+    int _forcePoints { 0 };
+    int _currentForce { 0 };
+    int _refBonus { 0 };
+    int _willBonus { 0 };
+    int _fortBonus { 0 };
+    int _goodEvil { 0 };
+    int _lawfulChaotic { 0 };
+    int _challengeRating { 0 };
 
     // Animation
 
@@ -249,6 +266,12 @@ private:
     std::string _onDeath;
     std::string _onNotice;
     std::string _onEndRound;
+    std::string _onSpellAt;
+    std::string _onAttacked;
+    std::string _onDamaged;
+    std::string _onDisturbed;
+    std::string _onEndDialogue;
+    std::string _onBlocked;
 
     // END Scripts
 
@@ -306,10 +329,10 @@ private:
     void loadUTC(const resource::GffStruct &utc);
 
     void loadNameFromUTC(const resource::GffStruct &utc);
+    void loadSoundSetFromUTC(const resource::GffStruct &utc);
+    void loadBodyBagFromUTC(const resource::GffStruct &utc);
     void loadAttributesFromUTC(const resource::GffStruct &utc);
     void loadPerceptionRangeFromUTC(const resource::GffStruct &utc);
-    void loadSoundSetFromUTC(const resource::GffStruct &utc);
-    void loadScriptsFromUTC(const resource::GffStruct &utc);
 
     // END Blueprint
 };
