@@ -52,9 +52,9 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
-    _description = Strings::instance().get(gffs.getInt("Description", -1));
-    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName", -1));
-    _mapNote = Strings::instance().get(gffs.getInt("MapNote", -1));
+    _description = Strings::instance().get(gffs.getInt("Description"));
+    _localizedName = Strings::instance().get(gffs.getInt("LocalizedName"));
+    _mapNote = Strings::instance().get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
 

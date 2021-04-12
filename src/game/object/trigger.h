@@ -55,6 +55,18 @@ private:
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;
+    int _linkedToFlags { 0 };
+    Faction _faction { Faction::Invalid };
+    float _hilightHeight { 0.0f };
+    int _loadScreenID { 0 };
+    int _triggerType { 0 };
+    bool _trapDetectable { false };
+    int _trapDetectDC { 0 };
+    bool _trapDisarmable { false };
+    int _disarmDC { 0 };
+    bool _trapFlag { false };
+    bool _trapOneShot { false };
+    int _trapType { 0 };
     std::vector<glm::vec3> _geometry;
     std::set<std::shared_ptr<SpatialObject>> _tenants;
 
@@ -65,9 +77,8 @@ private:
 
     // END Scripts
 
-    void loadGeometryFromGIT(const resource::GffStruct &gffs);
     void loadTransformFromGIT(const resource::GffStruct &gffs);
-    void loadTransitionDestinFromGIT(const resource::GffStruct &gffs);
+    void loadGeometryFromGIT(const resource::GffStruct &gffs);
 
     void loadUTT(const resource::GffStruct &utt);
 };

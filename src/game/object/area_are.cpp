@@ -37,7 +37,7 @@ namespace reone {
 namespace game {
 
 void Area::loadARE(const GffStruct &are) {
-    _localizedName = Strings::instance().get(are.getInt("Name", -1));
+    _localizedName = Strings::instance().get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);

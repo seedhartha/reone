@@ -55,12 +55,24 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
-    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _tag = boost::to_lower_copy(gffs.getString("Tag"));
+    _transitionDestin = Strings::instance().get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToFlags = gffs.getInt("LinkedToFlags");
 
-    loadGeometryFromGIT(gffs);
-    loadTransitionDestinFromGIT(gffs);
     loadTransformFromGIT(gffs);
+    loadGeometryFromGIT(gffs);
+}
+
+void Trigger::loadTransformFromGIT(const GffStruct &gffs) {
+    _position.x = gffs.getFloat("XPosition");
+    _position.y = gffs.getFloat("YPosition");
+    _position.z = gffs.getFloat("ZPosition");
+
+    // Orientation is ignored as per Bioware specification
+
+    updateTransform();
 }
 
 void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
@@ -70,21 +82,6 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
         float z = child->getFloat("PointZ");
         _geometry.push_back(glm::vec3(x, y, z));
     }
-}
-
-void Trigger::loadTransitionDestinFromGIT(const GffStruct &gffs) {
-    int transDestIdx = gffs.getInt("TransitionDestin", -1);
-    if (transDestIdx != -1) {
-        _transitionDestin = Strings::instance().get(transDestIdx);
-    }
-}
-
-void Trigger::loadTransformFromGIT(const GffStruct &gffs) {
-    _position.x = gffs.getFloat("XPosition");
-    _position.y = gffs.getFloat("YPosition");
-    _position.z = gffs.getFloat("ZPosition");
-
-    updateTransform();
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
