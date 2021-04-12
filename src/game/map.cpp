@@ -228,16 +228,16 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     float facing;
     switch (_northAxis) {
         case 0:
-            facing = -partyLeader->facing();
+            facing = -partyLeader->getFacing();
             break;
         case 1:
-            facing = glm::pi<float>() - partyLeader->facing();
+            facing = glm::pi<float>() - partyLeader->getFacing();
             break;
         case 2:
-            facing = glm::three_over_two_pi<float>() - partyLeader->facing();
+            facing = glm::three_over_two_pi<float>() - partyLeader->getFacing();
             break;
         default:
-            facing = glm::half_pi<float>() - partyLeader->facing();
+            facing = glm::half_pi<float>() - partyLeader->getFacing();
             break;
     }
     glm::mat4 transform(1.0f);

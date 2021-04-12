@@ -120,7 +120,7 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &f
         shared_ptr<SpatialObject> object(_area->getObjectByTag(waypoint));
         if (object) {
             position = object->position();
-            facing = object->facing();
+            facing = object->getFacing();
         }
     }
 }
