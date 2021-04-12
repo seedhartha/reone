@@ -87,6 +87,7 @@ protected:
 
     // Scripts
 
+    std::string _onDeath;
     std::string _onHeartbeat;
     std::string _onUserDefined;
 

@@ -73,13 +73,11 @@ private:
     bool _audible { false };
     std::shared_ptr<audio::SoundHandle> _sound;
     bool _randomPosition { false };
-    bool _random { false };
+    int _random { 0 };
     float _randomRangeX { 0.0f };
     float _randomRangeY { 0.0f };
     int _intervalVrtn { 0 };
     float _pitchVariation { 0.0f };
-    int _hours { 0 };
-    int _times { 0 };
     int _volumeVrtn { 0 };
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);

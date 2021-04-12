@@ -58,22 +58,23 @@ private:
     int _linkedToFlags { 0 };
     Faction _faction { Faction::Invalid };
     float _hilightHeight { 0.0f };
-    int _loadScreenID { 0 };
     int _triggerType { 0 };
     bool _trapDetectable { false };
     int _trapDetectDC { 0 };
     bool _trapDisarmable { false };
     int _disarmDC { 0 };
     bool _trapFlag { false };
-    bool _trapOneShot { false };
     int _trapType { 0 };
     std::vector<glm::vec3> _geometry;
     std::set<std::shared_ptr<SpatialObject>> _tenants;
+    int _cursor { 0 };
+    std::string _keyName;
 
     // Scripts
 
     std::string _onEnter;
     std::string _onExit;
+    std::string _onClick;
 
     // END Scripts
 

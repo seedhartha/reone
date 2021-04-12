@@ -43,7 +43,7 @@ void Sound::loadUTS(const GffStruct &uts) {
     _looping = uts.getBool("Looping");
     _positional = uts.getBool("Positional");
     _randomPosition = uts.getBool("RandomPosition");
-    _random = uts.getBool("Random");
+    _random = uts.getInt("Random");
     _elevation = uts.getFloat("Elevation");
     _maxDistance = uts.getFloat("MaxDistance");
     _minDistance = uts.getFloat("MinDistance");
@@ -52,8 +52,6 @@ void Sound::loadUTS(const GffStruct &uts) {
     _interval = uts.getInt("Interval");
     _intervalVrtn = uts.getInt("IntervalVrtn");
     _pitchVariation = uts.getFloat("PitchVariation");
-    _hours = uts.getInt("Hours");
-    _times = uts.getInt("Times");
     _volume = uts.getInt("Volume");
     _volumeVrtn = uts.getInt("VolumeVrtn");
 
@@ -62,6 +60,13 @@ void Sound::loadUTS(const GffStruct &uts) {
     for (auto &soundGffs : uts.getList("Sounds")) {
         _sounds.push_back(boost::to_lower_copy(soundGffs->getString("Sound")));
     }
+
+    // Unused fields:
+    //
+    // - Hours
+    // - Times
+    // - PaletteID
+    // - Comment
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {
