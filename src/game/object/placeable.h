@@ -60,24 +60,39 @@ private:
     bool _hasInventory { false };
     bool _usable { false };
     std::shared_ptr<render::Walkmesh> _walkmesh;
+    bool _interruptable { false };
+    Faction _faction { Faction::Invalid };
+    bool _keyRequired { false };
+    bool _locked { false };
+    int _openLockDC { 0 };
+    int _animationState { 0 };
+    int _hardness { 0 };
+    int _fortitude { 0 };
+    int _reflex { 0 };
+    int _will { 0 };
+    bool _partyInteract { false };
+    int _bodyBag { 0 };
+    bool _static { false };
 
     // Scripts
 
     std::string _onUsed;
     std::string _onInvDisturbed;
+    std::string _onClosed;
+    std::string _onDamaged;
+    std::string _onDeath;
+    std::string _onLock;
+    std::string _onMeleeAttacked;
+    std::string _onOpen;
+    std::string _onSpellCastAt;
+    std::string _onUnlock;
+    std::string _onEndDialogue;
 
     // END Scripts
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    // Blueprint
-
     void loadUTP(const resource::GffStruct &utp);
-
-    void loadNameFromUTP(const resource::GffStruct &utp);
-    void loadScriptsFromUTP(const resource::GffStruct &utp);
-
-    // END Blueprint
 };
 
 } // namespace game
