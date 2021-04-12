@@ -67,28 +67,18 @@ private:
     int _linkedToFlags { 0 };
     std::string _transitionDestin;
     Faction _faction { Faction::Invalid };
-    bool _interruptable { false };
     int _openLockDC { 0 };
-    int _animationState { 0 };
-    int _appearance { 0 };
     int _hardness { 0 };
     int _fortitude { 0 };
-    int _reflex { 0 };
-    int _will { 0 };
-    int _loadScreenID { 0 };
+    bool _autoRemoveKey { false };
+    bool _lockable { false };
+    std::string _keyName;
 
     // Scripts
 
     std::string _onOpen;
     std::string _onFailToOpen;
-    std::string _onClosed;
-    std::string _onDamaged;
-    std::string _onDeath;
-    std::string _onMeleeAttacked;
-    std::string _onSpellCastAt;
-    std::string _onUnlock;
     std::string _onClick;
-    std::string _onLock;
 
     // END Scripts
 
@@ -100,7 +90,6 @@ private:
 
     // END Walkmeshes
 
-    void loadTransitionDestinFromGIT(const resource::GffStruct &gffs);
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
     void loadUTD(const resource::GffStruct &utd);

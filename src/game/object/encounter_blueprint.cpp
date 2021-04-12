@@ -44,15 +44,20 @@ void Encounter::loadUTE(const GffStruct &ute) {
     _reset = ute.getBool("Reset");
     _resetTime = ute.getInt("ResetTime");
     _respawns = ute.getInt("Respawns");
-    _spawnOption = ute.getInt("SpawnOption");
 
     _onEntered = ute.getString("OnEntered");
-    _onExit = ute.getString("OnExit");
-    _onExhausted = ute.getString("OnExhausted");
-    _onHeartbeat = ute.getString("OnHeartbeat");
-    _onUserDefined = ute.getString("OnUserDefined");
 
     loadCreaturesFromUTE(ute);
+
+    // Unused fields:
+    //
+    // - SpawnOption
+    // - OnExit
+    // - OnExhausted
+    // - OnHeartbeat
+    // - OnUserDefined
+    // - PaletteID
+    // - Commnet
 }
 
 void Encounter::loadCreaturesFromUTE(const GffStruct &ute) {

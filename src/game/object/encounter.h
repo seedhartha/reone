@@ -58,7 +58,6 @@ private:
     bool _reset { false };
     int _resetTime { 0 };
     int _respawns { 0 };
-    int _spawnOption { 0 };
     std::vector<EncounterCreature> _creatures;
     std::vector<glm::vec3> _geometry;
     std::vector<SpawnPoint> _spawnPoints;
@@ -66,8 +65,6 @@ private:
     // Scripts
 
     std::string _onEntered;
-    std::string _onExit;
-    std::string _onExhausted;
 
     // END Scripts
 

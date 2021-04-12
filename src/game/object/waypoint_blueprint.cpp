@@ -32,18 +32,19 @@ namespace reone {
 namespace game {
 
 void Waypoint::loadUTW(const GffStruct &utw) {
+    _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));
+    _name = Strings::instance().get(utw.getInt("LocalizedName"));
     _hasMapNote = utw.getBool("HasMapNote");
     _mapNote = Strings::instance().get(utw.getInt("MapNote"));
     _mapNoteEnabled = utw.getInt("MapNoteEnabled");
 
-    // Ignored as per Bioware specification:
+    // Unused fields:
     //
-    // - Appearance
-    // - LinkedTo
-    // - LocalizedName
     // - Description
+    // - PaletteID
+    // - Comment
 }
 
 } // namespace resource
