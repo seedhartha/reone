@@ -55,7 +55,7 @@ Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx)
     auto object = getSpatialObject(args, 0);
     if (object) {
         glm::vec3 position(object->position());
-        float facing = object->facing();
+        float facing = object->getFacing();
         result = make_shared<Location>(move(position), facing);
     } else {
         debug("Script: getLocation: object is invalid", 1, DebugChannels::script);

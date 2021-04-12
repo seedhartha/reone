@@ -173,7 +173,7 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
 
     auto target = getSpatialObject(args, 0);
     if (target) {
-        result = glm::degrees(target->facing());
+        result = glm::degrees(target->getFacing());
     } else {
         debug("Script: getFacing: target is invalid", 1, DebugChannels::script);
     }

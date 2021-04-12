@@ -67,6 +67,7 @@ public:
     bool isOpen() const { return _open; }
 
     virtual glm::vec3 getSelectablePosition() const;
+    float getFacing() const { return glm::eulerAngles(_orientation).z; }
 
     std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const;
     virtual std::shared_ptr<render::Walkmesh> getWalkmesh() const;
@@ -75,7 +76,6 @@ public:
     scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
     Room *room() const { return _room; }
     const glm::vec3 &position() const { return _position; }
-    float facing() const { return _facing; }
     const glm::mat4 &transform() const { return _transform; }
     bool visible() const { return _visible; }
     std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
@@ -142,7 +142,6 @@ protected:
     ScriptRunner *_scriptRunner;
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    float _facing { 0.0f };
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
     std::shared_ptr<scene::SceneNode> _sceneNode;

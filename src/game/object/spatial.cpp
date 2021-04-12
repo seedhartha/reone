@@ -17,8 +17,6 @@
 
 #include "spatial.h"
 
-#include "glm/gtx/euler_angles.hpp"
-
 #include "../../common/log.h"
 
 #include "../room.h"
@@ -138,7 +136,7 @@ void SpatialObject::face(const SpatialObject &other) {
 
 void SpatialObject::face(const glm::vec3 &point) {
     glm::vec2 dir(glm::normalize(point - _position));
-    _facing = -glm::atan(dir.x, dir.y);
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
     updateTransform();
 }
 
@@ -146,7 +144,7 @@ void SpatialObject::faceAwayFrom(const SpatialObject &other) {
     if (_id == other._id) return;
 
     glm::vec2 dir(glm::normalize(_position - other.position()));
-    _facing = -glm::atan(dir.x, dir.y);
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
     updateTransform();
 }
 
@@ -252,17 +250,13 @@ void SpatialObject::setPosition(const glm::vec3 &position) {
 void SpatialObject::updateTransform() {
     _transform = glm::translate(glm::mat4(1.0f), _position);
     _transform *= glm::mat4_cast(_orientation);
-
-    if (_facing != 0.0f) {
-        _transform *= glm::eulerAngleZ(_facing);
-    }
     if (_sceneNode && !_stunt) {
         _sceneNode->setLocalTransform(_transform);
     }
 }
 
 void SpatialObject::setFacing(float facing) {
-    _facing = facing;
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, facing));
     updateTransform();
 }
 

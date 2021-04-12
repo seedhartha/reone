@@ -363,7 +363,7 @@ void ActionExecutor::executeJumpToObject(const shared_ptr<Object> &actor, Object
 
     auto spatialActor = static_pointer_cast<SpatialObject>(actor);
     spatialActor->setPosition(spatialObject->position());
-    spatialActor->setFacing(spatialObject->facing());
+    spatialActor->setFacing(spatialObject->getFacing());
 
     action.complete();
 }

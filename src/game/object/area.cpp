@@ -352,7 +352,6 @@ ObjectList &Area::getObjectsByType(ObjectType type) {
 
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
-    float facing = object.facing();
     Room *room = nullptr;
 
     if (getElevationAt(position, room, position.z, true, &object)) {
@@ -393,7 +392,7 @@ void Area::unloadParty() {
 
 void Area::reloadParty() {
     shared_ptr<Creature> player(_game->party().player());
-    loadParty(player->position(), player->facing());
+    loadParty(player->position(), player->getFacing());
 
     fill(_game->sceneGraph());
 }
@@ -719,7 +718,7 @@ void Area::update3rdPersonCameraFacing() {
     shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
-    _thirdPersonCamera->setFacing(partyLeader->facing());
+    _thirdPersonCamera->setFacing(partyLeader->getFacing());
 }
 
 void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {

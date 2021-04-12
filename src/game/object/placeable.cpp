@@ -74,7 +74,7 @@ void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
 
-    _facing = gffs.getFloat("Bearing");
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
 
     updateTransform();
 }
