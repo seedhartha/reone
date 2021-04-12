@@ -44,13 +44,13 @@ void Creature::loadUTC(const GffStruct &utc) {
     _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utc.getString("Conversation"));
     _currentHitPoints = utc.getInt("CurrentHitPoints");
-    _faction = static_cast<Faction>(utc.getInt("FactionID"));
+    _faction = utc.getEnum("FactionID", Faction::Invalid);
     _hitPoints = utc.getInt("HitPoints");
     _maxHitPoints = utc.getInt("MaxHitPoints");
     _minOneHP = utc.getBool("Min1HP");
     _portraitId = utc.getInt("PortraitId");
-    _racialType = static_cast<RacialType>(utc.getInt("Race"));
-    _subrace = static_cast<Subrace>(utc.getInt("SubraceIndex"));
+    _racialType = utc.getEnum("Race", RacialType::Invalid);
+    _subrace = utc.getEnum("SubraceIndex", Subrace::None);
     _tag = boost::to_lower_copy(utc.getString("Tag"));
 
     loadNameFromUTC(utc);
