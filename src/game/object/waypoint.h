@@ -38,13 +38,10 @@ public:
 
     bool isMapNoteEnabled() const { return _mapNoteEnabled; }
 
-    const std::string &localizedName() const { return _localizedName; }
-    const std::string &description() const { return _description; }
     const std::string &mapNote() const { return _mapNote; }
 
 private:
-    std::string _localizedName;
-    std::string _description;
+    bool _hasMapNote { false };
     std::string _mapNote;
     bool _mapNoteEnabled { false };
 
