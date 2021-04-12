@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void Encounter::loadBlueprint(const GffStruct &ute) {
+void Encounter::loadUTE(const GffStruct &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
     _name = Strings::instance().get(ute.getInt("LocalizedName"));
     _active = ute.getBool("Active");

@@ -76,7 +76,7 @@ private:
     void loadGeometryFromGIT(const resource::GffStruct &gffs);
     void loadSpawnPointsFromGIT(const resource::GffStruct &gffs);
 
-    void loadBlueprint(const resource::GffStruct &ute);
+    void loadUTE(const resource::GffStruct &ute);
     void loadCreaturesFromUTE(const resource::GffStruct &ute);
 };
 

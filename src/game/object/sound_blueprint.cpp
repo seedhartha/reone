@@ -24,6 +24,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 using namespace std;
 
@@ -34,16 +35,26 @@ namespace reone {
 namespace game {
 
 void Sound::loadUTS(const GffStruct &uts) {
+    _tag = boost::to_lower_copy(uts.getString("Tag"));
+    _name = Strings::instance().get(uts.getInt("LocName"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
-    _elevation = uts.getFloat("Elevation");
-    _interval = uts.getInt("Interval");
     _looping = uts.getBool("Looping");
+    _positional = uts.getBool("Positional");
+    _randomPosition = uts.getBool("RandomPosition");
+    _random = uts.getBool("Random");
+    _elevation = uts.getFloat("Elevation");
     _maxDistance = uts.getFloat("MaxDistance");
     _minDistance = uts.getFloat("MinDistance");
-    _positional = uts.getBool("Positional");
-    _tag = boost::to_lower_copy(uts.getString("Tag"));
+    _randomRangeX = uts.getFloat("RandomRangeX");
+    _randomRangeY = uts.getFloat("RandomRangeY");
+    _interval = uts.getInt("Interval");
+    _intervalVrtn = uts.getInt("IntervalVrtn");
+    _pitchVariation = uts.getFloat("PitchVariation");
+    _hours = uts.getInt("Hours");
+    _times = uts.getInt("Times");
     _volume = uts.getInt("Volume");
+    _volumeVrtn = uts.getInt("VolumeVrtn");
 
     loadPriorityFromUTS(uts);
 
