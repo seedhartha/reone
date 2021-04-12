@@ -80,6 +80,10 @@ unique_ptr<PlaceableCamera> ObjectFactory::newCamera() {
     return make_unique<PlaceableCamera>(_counter++, this, _sceneGraph, &_game->scriptRunner());
 }
 
+unique_ptr<Encounter> ObjectFactory::newEncounter() {
+    return make_unique<Encounter>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+}
+
 } // namespace game
 
 } // namespace reone

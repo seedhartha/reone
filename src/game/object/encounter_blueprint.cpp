@@ -21,9 +21,49 @@
 
 #include "encounter.h"
 
+#include <boost/algorithm/string.hpp>
+
+#include "../../resource/strings.h"
+
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
+
+void Encounter::loadBlueprint(const GffStruct &ute) {
+    _tag = boost::to_lower_copy(ute.getString("Tag"));
+    _name = Strings::instance().get(ute.getInt("LocalizedName"));
+    _active = ute.getBool("Active");
+    _difficulty = ute.getInt("Difficulty");
+    _difficultyIndex = ute.getInt("DifficultyIndex");
+    _faction = ute.getEnum("Faction", Faction::Invalid);
+    _maxCreatures = ute.getInt("MaxCreatures");
+    _playerOnly = ute.getBool("PlayerOnly");
+    _reset = ute.getBool("Reset");
+    _resetTime = ute.getInt("ResetTime");
+    _respawns = ute.getInt("Respawns");
+    _spawnOption = ute.getInt("SpawnOption");
+
+    _onEntered = ute.getString("OnEntered");
+    _onExit = ute.getString("OnExit");
+    _onExhausted = ute.getString("OnExhausted");
+    _onHeartbeat = ute.getString("OnHeartbeat");
+    _onUserDefined = ute.getString("OnUserDefined");
+
+    loadCreaturesFromUTE(ute);
+}
+
+void Encounter::loadCreaturesFromUTE(const GffStruct &ute) {
+    for (auto &creatureGffs : ute.getList("CreatureList")) {
+        EncounterCreature creature;
+        creature._appearance = creatureGffs->getInt("Appearance");
+        creature._cr = creatureGffs->getFloat("CR");
+        creature._resRef = creatureGffs->getString("ResRef");
+        creature._singleSpawn = creatureGffs->getBool("SingleSpawn");
+        _creatures.push_back(move(creature));
+    }
+}
 
 } // namespace game
 

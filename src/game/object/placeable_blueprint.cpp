@@ -61,7 +61,7 @@ void Placeable::loadNameFromUTP(const GffStruct &utp) {
 }
 
 void Placeable::loadScriptsFromUTP(const GffStruct &utp) {
-    _heartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
+    _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
     _onInvDisturbed = boost::to_lower_copy(utp.getString("OnInvDisturbed"));
     _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
     _onUserDefined = boost::to_lower_copy(utp.getString("OnUserDefined"));

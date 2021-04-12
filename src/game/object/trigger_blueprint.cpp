@@ -31,7 +31,7 @@ namespace game {
 
 void Trigger::loadUTT(const GffStruct &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
-    _heartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
+    _onHeartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
     _onEnter = boost::to_lower_copy(utt.getString("ScriptOnEnter"));
     _onExit = boost::to_lower_copy(utt.getString("ScriptOnExit"));
 }

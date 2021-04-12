@@ -900,7 +900,7 @@ void Area::updateHeartbeat(float dt) {
             _game->scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
-            string heartbeat(object->getHeartbeat());
+            string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
                 _game->scriptRunner().run(heartbeat, object->id());
             }

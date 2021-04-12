@@ -128,7 +128,7 @@ void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
 }
 
 void Creature::loadScriptsFromUTC(const GffStruct &utc) {
-    _heartbeat = boost::to_lower_copy(utc.getString("ScriptHeartbeat"));
+    _onHeartbeat = boost::to_lower_copy(utc.getString("ScriptHeartbeat"));
     _onDeath = boost::to_lower_copy(utc.getString("ScriptDeath"));
     _onEndRound = boost::to_lower_copy(utc.getString("ScriptEndRound"));
     _onNotice = boost::to_lower_copy(utc.getString("ScriptOnNotice"));

@@ -95,6 +95,11 @@ public:
     uint32_t type() const { return _type; }
     const std::vector<Field> &fields() const { return _fields; }
 
+    template <class T>
+    T getEnum(const std::string &name, T defValue) const {
+        return static_cast<T>(getInt(name, static_cast<int>(defValue)));
+    }
+
 private:
     uint32_t _type { 0 };
     std::vector<Field> _fields;
