@@ -246,20 +246,11 @@ private:
             }
             if (packet.stream_index != _videoStreamIdx) continue;
 
-            bool gotFrame = false;
-
             int retVal = avcodec_receive_frame(_videoCodecCtx, _frame);
-            if (retVal == 0) {
-                gotFrame = true;
-            }
-            if (retVal == AVERROR(EAGAIN)) {
-                retVal = 0;
-            }
-            if (retVal == 0) {
+            if (retVal == 0 || retVal == AVERROR(EAGAIN)) {
                 avcodec_send_packet(_videoCodecCtx, &packet);
+                if (retVal == AVERROR(EAGAIN)) continue;
             }
-
-            if (gotFrame == false) continue;
 
             --count;
 
