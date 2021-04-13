@@ -79,6 +79,12 @@ private:
     std::string _onOpen;
     std::string _onFailToOpen;
     std::string _onClick;
+    std::string _onClosed;
+    std::string _onDamaged;
+    std::string _onLock;
+    std::string _onUnlock;
+    std::string _onMeleeAttacked;
+    std::string _onSpellCastAt;
 
     // END Scripts
 

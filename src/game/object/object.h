@@ -84,6 +84,7 @@ protected:
     bool _dead { false };
     bool _plot { false };
     bool _commandable { true };
+    bool _autoRemoveKey { false };
 
     // Scripts
 

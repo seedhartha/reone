@@ -63,10 +63,10 @@ void Sound::loadUTS(const GffStruct &uts) {
 
     // Unused fields:
     //
-    // - Hours
-    // - Times
-    // - PaletteID
-    // - Comment
+    // - Hours (always 0)
+    // - Times (always 3)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {

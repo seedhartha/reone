@@ -46,18 +46,18 @@ void Encounter::loadUTE(const GffStruct &ute) {
     _respawns = ute.getInt("Respawns");
 
     _onEntered = ute.getString("OnEntered");
+    _onExit = ute.getString("OnExit"); // always empty, but could be useful
+    _onExhausted = ute.getString("OnExhausted"); // always empty, but could be useful
+    _onHeartbeat = ute.getString("OnHeartbeat"); // always empty, but could be useful
+    _onUserDefined = ute.getString("OnUserDefined"); // always empty, but could be useful
 
     loadCreaturesFromUTE(ute);
 
     // Unused fields:
     //
-    // - SpawnOption
-    // - OnExit
-    // - OnExhausted
-    // - OnHeartbeat
-    // - OnUserDefined
-    // - PaletteID
-    // - Commnet
+    // - SpawnOption (always 1)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 void Encounter::loadCreaturesFromUTE(const GffStruct &ute) {
