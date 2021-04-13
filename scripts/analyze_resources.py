@@ -3,6 +3,7 @@
 import glob
 import json
 import re
+import sys
 from functools import partial
 
 extract_dir = r"D:\OpenKotOR\Extract\KotOR"
@@ -50,24 +51,27 @@ def extract_values_simple(key, obj):
     return values
 
 
-path_pattern = "uti.json"
+if len(sys.argv) > 2:
+    # If at least two command line arguments were passed, interpret them as
+    # filepath pattern and JSON key. In this mode we count unique field values
+    # in JSON files.
+    path_pattern = sys.argv[1]
+    json_key = sys.argv[2]
+    analyze_unique_json_values(extract_dir, path_pattern, partial(extract_values_simple, json_key))
+else:
+    # If not enough command line arguments were provided, custom logic here will
+    # be invoked.
+    '''
+    def extract_uti_property_names(obj):
+        values = []
 
-# Simple
+        if "PropertiesList|15" in obj:
+            for prop in obj["PropertiesList|15"]:
+                values.append(prop["PropertyName|2"])
 
-json_key = "Identified"
-analyze_unique_json_values(extract_dir, path_pattern, partial(extract_values_simple, json_key))
-
-# Nested
-
-
-def extract_uti_property_names(obj):
-    values = []
-
-    if "PropertiesList|15" in obj:
-        for prop in obj["PropertiesList|15"]:
-            values.append(prop["PropertyName|2"])
-
-    return values
+        return values
 
 
-analyze_unique_json_values(extract_dir, path_pattern, extract_uti_property_names)
+    analyze_unique_json_values(extract_dir, path_pattern, extract_uti_property_names)
+    '''
+    pass
