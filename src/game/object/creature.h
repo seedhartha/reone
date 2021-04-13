@@ -234,7 +234,6 @@ private:
     Subrace _subrace { Subrace::None };
     NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
     bool _isPC { false };
-    bool _interruptable { false };
     bool _noPermDeath { false };
     bool _notReorienting { false };
     int _bodyVariation { 0 };
@@ -250,6 +249,7 @@ private:
     int _goodEvil { 0 };
     int _lawfulChaotic { 0 };
     int _challengeRating { 0 };
+    bool _disarmable { false };
 
     // Animation
 
@@ -272,6 +272,7 @@ private:
     std::string _onDisturbed;
     std::string _onEndDialogue;
     std::string _onBlocked;
+    std::string _onDialogue;
 
     // END Scripts
 

@@ -41,15 +41,16 @@ namespace game {
 
 void Creature::loadUTC(const GffStruct &utc) {
     _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
-    _race = utc.getEnum("Race", RacialType::Invalid);
-    _subrace = utc.getEnum("SubraceIndex", Subrace::None);
-    _appearance = utc.getInt("Appearance_Type");
-    _gender = utc.getEnum("Gender", Gender::None);
-    _portraitId = utc.getInt("PortraitId");
+    _race = utc.getEnum("Race", RacialType::Invalid); // index into racialtypes.2da
+    _subrace = utc.getEnum("SubraceIndex", Subrace::None); // index into subrace.2da
+    _appearance = utc.getInt("Appearance_Type"); // index into appearance.2da
+    _gender = utc.getEnum("Gender", Gender::None); // index into gender.2da
+    _portraitId = utc.getInt("PortraitId"); // index into portrait.2da
     _tag = boost::to_lower_copy(utc.getString("Tag"));
     _conversation = boost::to_lower_copy(utc.getString("Conversation"));
-    _isPC = utc.getBool("IsPC");
-    _faction = utc.getEnum("FactionID", Faction::Invalid);
+    _isPC = utc.getBool("IsPC"); // always 0
+    _faction = utc.getEnum("FactionID", Faction::Invalid); // index into repute.2da
+    _disarmable = utc.getBool("Disarmable");
     _plot = utc.getBool("Plot");
     _interruptable = utc.getBool("Interruptable");
     _noPermDeath = utc.getBool("NoPermDeath");
@@ -58,7 +59,7 @@ void Creature::loadUTC(const GffStruct &utc) {
     _textureVar = utc.getInt("TextureVar");
     _minOneHP = utc.getBool("Min1HP");
     _partyInteract = utc.getBool("PartyInteract");
-    _walkRate = utc.getInt("WalkRate");
+    _walkRate = utc.getInt("WalkRate"); // index into creaturespeed.2da
     _naturalAC = utc.getInt("NaturalAC");
     _hitPoints = utc.getInt("HitPoints");
     _currentHitPoints = utc.getInt("CurrentHitPoints");
@@ -69,7 +70,6 @@ void Creature::loadUTC(const GffStruct &utc) {
     _willBonus = utc.getInt("willbonus");
     _fortBonus = utc.getInt("fortbonus");
     _goodEvil = utc.getInt("GoodEvil");
-    _lawfulChaotic = utc.getInt("LawfulChaotic");
     _challengeRating = utc.getInt("ChallengeRating");
 
     _onHeartbeat = boost::to_lower_copy(utc.getString("ScriptHeartbeat"));
@@ -80,6 +80,7 @@ void Creature::loadUTC(const GffStruct &utc) {
     _onDisturbed = boost::to_lower_copy(utc.getString("ScriptDisturbed"));
     _onEndRound = boost::to_lower_copy(utc.getString("ScriptEndRound"));
     _onEndDialogue = boost::to_lower_copy(utc.getString("ScriptEndDialogu"));
+    _onDialogue = boost::to_lower_copy(utc.getString("ScriptDialogue"));
     _onSpawn = boost::to_lower_copy(utc.getString("ScriptSpawn"));
     _onDeath = boost::to_lower_copy(utc.getString("ScriptDeath"));
     _onUserDefined = boost::to_lower_copy(utc.getString("ScriptUserDefine"));
@@ -100,13 +101,16 @@ void Creature::loadUTC(const GffStruct &utc) {
         addItem(resRef, 1, dropable);
     }
 
-    // These fields are ignored as being most likely unused:
+    // Unused fields:
     //
-    // - Phenotype
-    // - Description
-    // - Disarmable
-    // - Subrace
-    // - Deity
+    // - Phenotype (not applicable, always 0)
+    // - Description (not applicable)
+    // - Subrace (unknown, we already use SubraceIndex)
+    // - Deity (not applicable, always empty)
+    // - LawfulChaotic (not applicable)
+    // - ScriptRested (not applicable, mostly empty)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 void Creature::loadNameFromUTC(const GffStruct &utc) {

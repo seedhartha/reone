@@ -85,6 +85,7 @@ protected:
     bool _plot { false };
     bool _commandable { true };
     bool _autoRemoveKey { false };
+    bool _interruptable { false };
 
     // Scripts
 

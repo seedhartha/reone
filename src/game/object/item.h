@@ -108,6 +108,8 @@ private:
     int _charges { 0 };
     int _cost { 0 };
     int _addCost { 0 };
+    std::string _description;
+    bool _stolen { false };
 
     // Blueprint
 

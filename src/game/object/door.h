@@ -70,7 +70,6 @@ private:
     int _openLockDC { 0 };
     int _hardness { 0 };
     int _fortitude { 0 };
-    bool _autoRemoveKey { false };
     bool _lockable { false };
     std::string _keyName;
 

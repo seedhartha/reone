@@ -42,15 +42,21 @@ namespace game {
 
 void Item::loadUTI(const GffStruct &uti) {
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
-    _baseItem = uti.getInt("BaseItem");
+    _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
     _localizedName = Strings::instance().get(uti.getInt("LocalizedName"));
+    _description = Strings::instance().get(uti.getInt("Description"));
     _descIdentified = Strings::instance().get(uti.getInt("DescIdentified"));
     _tag = boost::to_lower_copy(uti.getString("Tag"));
     _charges = uti.getInt("Charges");
     _cost = uti.getInt("Cost");
+    _stolen = uti.getBool("Stolen");
     _stackSize = uti.getInt("StackSize");
     _plot = uti.getBool("Plot");
     _addCost = uti.getInt("AddCost");
+    _identified = uti.getInt("Identified");
+    _modelVariation = uti.getInt("ModelVariation", 1);
+    _textureVariation = uti.getInt("TextureVar", 1);
+    _bodyVariation = uti.getInt("BodyVariation", 1);
 
     shared_ptr<TwoDA> baseItems(Resources::instance().get2DA("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
@@ -67,14 +73,10 @@ void Item::loadUTI(const GffStruct &uti) {
     string iconResRef;
     if (isEquippable(InventorySlot::body)) {
         _baseBodyVariation = boost::to_lower_copy(baseItems->getString(_baseItem, "bodyvar"));
-        _bodyVariation = uti.getInt("BodyVariation", 1);
-        _textureVariation = uti.getInt("TextureVar", 1);
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
     } else if (isEquippable(InventorySlot::rightWeapon)) {
-        _modelVariation = uti.getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     } else {
-        _modelVariation = uti.getInt("ModelVariation", 1);
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
     _icon = Textures::instance().get(iconResRef, TextureUsage::GUI);
@@ -83,11 +85,10 @@ void Item::loadUTI(const GffStruct &uti) {
 
     // TODO: load properties
 
-    // These fields are ignored as being most likely unused:
+    // Unused fields:
     //
-    // - Description
-    // - Stolen
-    // - Identified
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 void Item::loadAmmunitionType() {
