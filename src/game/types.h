@@ -858,7 +858,8 @@ enum class RacialType {
 
 enum class Subrace {
     None = 0,
-    Wookie = 1
+    Wookie = 1,
+    Beast = 2
 };
 
 enum class NPCAIStyle {

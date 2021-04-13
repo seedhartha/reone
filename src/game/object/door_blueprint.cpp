@@ -39,6 +39,7 @@ void Door::loadUTD(const GffStruct &utd) {
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
     _autoRemoveKey = utd.getBool("AutoRemoveKey");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));
+    _interruptable = utd.getBool("Interruptable");
     _faction = utd.getEnum("Faction", Faction::Invalid);
     _plot = utd.getBool("Plot");
     _minOneHP = utd.getBool("Min1HP");
@@ -71,7 +72,6 @@ void Door::loadUTD(const GffStruct &utd) {
     //
     // - Description (always -1)
     // - CloseLockDC (always 0)
-    // - Interruptable (always 1)
     // - PortraitId (not applicable, mostly 0)
     // - TrapDetectable (not applicable, always 1)
     // - TrapDetectDC (not applicable, always 0)

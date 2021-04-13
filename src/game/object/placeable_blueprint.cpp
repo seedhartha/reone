@@ -38,6 +38,7 @@ void Placeable::loadUTP(const GffStruct &utp) {
     _name = Strings::instance().get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
+    _interruptable = utp.getBool("Interruptable");
     _faction = utp.getEnum("Faction", Faction::Invalid);
     _plot = utp.getBool("Plot");
     _minOneHP = utp.getBool("Min1HP");
@@ -80,7 +81,6 @@ void Placeable::loadUTP(const GffStruct &utp) {
     // - Description (not applicable, mostly -1)
     // - AutoRemoveKey (not applicable, always 0)
     // - CloseLockDC (not applicable, always 0)
-    // - Interruptable (always 1)
     // - PortraitId (not applicable, always 0)
     // - TrapDetectable (not applicable, always 1)
     // - TrapDetectDC (not applicable, always 0)
