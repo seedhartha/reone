@@ -67,14 +67,14 @@ private:
     int _trapType { 0 };
     std::vector<glm::vec3> _geometry;
     std::set<std::shared_ptr<SpatialObject>> _tenants;
-    int _cursor { 0 };
     std::string _keyName;
 
     // Scripts
 
     std::string _onEnter;
     std::string _onExit;
-    std::string _onClick;
+    std::string _onDisarm;
+    std::string _onTrapTriggered;
 
     // END Scripts
 

@@ -65,6 +65,8 @@ private:
     // Scripts
 
     std::string _onEntered;
+    std::string _onExit;
+    std::string _onExhausted;
 
     // END Scripts
 

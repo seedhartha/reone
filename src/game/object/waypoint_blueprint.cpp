@@ -42,9 +42,10 @@ void Waypoint::loadUTW(const GffStruct &utw) {
 
     // Unused fields:
     //
-    // - Description
-    // - PaletteID
-    // - Comment
+    // - LinkedTo (not applicable, always empty)
+    // - Description (toolset only)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 } // namespace resource

@@ -60,18 +60,15 @@ private:
     bool _hasInventory { false };
     bool _usable { false };
     std::shared_ptr<render::Walkmesh> _walkmesh;
-    bool _interruptable { false };
     Faction _faction { Faction::Invalid };
     bool _keyRequired { false };
+    bool _lockable { false };
     bool _locked { false };
     int _openLockDC { 0 };
     int _animationState { 0 };
     int _hardness { 0 };
     int _fortitude { 0 };
-    int _reflex { 0 };
-    int _will { 0 };
     bool _partyInteract { false };
-    int _bodyBag { 0 };
     bool _static { false };
 
     // Scripts
