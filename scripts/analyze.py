@@ -21,7 +21,7 @@ def get_unique_json_values(extract_dir, path_pattern, extract_values):
     # Recursively process files in extraction directory, whose path matches a pattern
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         if re.search(path_pattern, f):
-            with open(f, 'r') as fp:
+            with open(f, "r") as fp:
                 obj = json.load(fp)
                 for value in extract_values(obj):
                     count_value(value, values)
