@@ -24,17 +24,17 @@ import platform
 import shutil
 import subprocess
 
-game_dir = r"D:\Games\Star Wars - KotOR"
+game_dir = r"D:\Games\Star Wars - KotOR2"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+extract_dir = r"D:\OpenKotOR\Extract\TSL"
 nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
 steps = {
-    "extract_bifs": True,
-    "extract_patch": True,
-    "extract_modules": True,
-    "extract_dialog": True,
-    "extract_textures": True,
+    "extract_bifs": False,
+    "extract_patch": False,
+    "extract_modules": False,
+    "extract_dialog": False,
+    "extract_textures": False,
     "extract_voices": True,
     "convert_to_json": False,
     "convert_to_tga": False,
