@@ -36,6 +36,7 @@ def clear_text(text):
     while True:
         text, _ = erase_brackets(text, "[", "]")
         text, found = erase_brackets(text, "{", "}")
+        text, found = erase_brackets(text, ":", ":")
         if not found:
             break
 
