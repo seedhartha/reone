@@ -47,6 +47,8 @@ def clear_text(text):
 
 
 def get_lines_from_dlg(obj, speaker, tlk_strings, uniq_sound):
+    global wav_dir
+
     lines = []
     if "EntryList|15" in obj:
         for entry in obj["EntryList|15"]:
