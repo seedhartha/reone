@@ -35,6 +35,7 @@ steps = {
     "extract_modules": True,
     "extract_dialog": True,
     "extract_textures": True,
+    "extract_voices": True,
     "convert_to_json": False,
     "convert_to_tga": False,
     "convert_to_ascii_pth": False,
@@ -139,6 +140,28 @@ def extract_dialog(game_dir, extract_dir):
         except PermissionError:
             pass
 
+
+def extract_voices(game_dir, extract_dir):
+    # Create destination directory if it does not exist
+    dest_dir = os.path.join(extract_dir, "voices")
+    if not os.path.exists(dest_dir):
+        os.mkdir(dest_dir)
+
+    # Extract audio files from streamwaves/streamvoice
+    voices_dir = os.path.join(game_dir, "streamwaves")
+    if not os.path.exists(voices_dir):
+        voices_dir = os.path.join(game_dir, "streamvoice")
+    if os.path.exists(voices_dir):
+        for f in glob.glob("{}/**".format(voices_dir), recursive=True):
+            _, extension = os.path.splitext(f)
+            if extension == ".wav":
+                unwrapped_path = os.path.join(dest_dir, os.path.basename(f))
+                try:
+                    shutil.copyfile(f, unwrapped_path)
+                except PermissionError:
+                    pass
+
+
 def convert_to_json(extract_dir):
     CONVERTIBLE_EXT = [
         ".2da",
@@ -155,6 +178,7 @@ def convert_to_json(extract_dir):
             if not os.path.exists(json_path):
                 print("Converting {} to JSON...".format(f))
                 run_subprocess(["reone-tools", "--to-json", f])
+
 
 def convert_to_tga(extract_dir):
     for f in glob.glob("{}/**/*.tpc".format(extract_dir), recursive=True):
@@ -198,6 +222,9 @@ if steps["extract_textures"]:
 
 if steps["extract_dialog"]:
     extract_dialog(game_dir, extract_dir)
+
+if steps["extract_voices"]:
+    extract_voices(game_dir, extract_dir)
 
 if steps["convert_to_json"]:
     convert_to_json(extract_dir)

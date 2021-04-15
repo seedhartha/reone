@@ -17,7 +17,7 @@ if not os.path.exists(wav_dir):
     raise RuntimeError("WAV directory does not exist")
 
 
-def is_suitable_text(text):
+def is_trainable_text(text):
     return not (text.startswith("[") and text.endswith("]"))
 
 
@@ -60,7 +60,7 @@ def get_lines_from_dlg(obj, speaker, tlk_strings):
                 textstrref = int(entry["Text|12"].split("|")[0])
                 if textstrref != -1:
                     text = tlk_strings[textstrref][1]
-                    if voresref and (not voresref in uniq_sound) and is_suitable_text(text):
+                    if voresref and (not voresref in uniq_sound) and is_trainable_text(text):
                         wav_filename = os.path.join(wav_dir, voresref + ".wav")
                         if os.path.exists(wav_filename):
                             lines.append("{}|{}|0\n".format(wav_filename, clear_text(text)))
