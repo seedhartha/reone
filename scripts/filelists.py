@@ -7,7 +7,7 @@ import random
 import sys
 
 extract_dir = r"D:\OpenKotOR\Extract\KotOR"
-wav_dir = r"D:\OpenKotOR\TTS\bastila\train"
+wav_dir = r"D:\OpenKotOR\Extract\KotOR\voices"
 
 
 if not os.path.exists(extract_dir):
