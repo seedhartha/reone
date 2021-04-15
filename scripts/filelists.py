@@ -6,7 +6,7 @@ import os
 import random
 import sys
 
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+extract_dir = r"D:\OpenKotOR\Extract\TSL"
 
 
 if not os.path.exists(extract_dir):
@@ -20,7 +20,7 @@ def index_or_negative_one(string, substr, beg=0):
         return -1
 
 
-def erase_brackets(string, left, right):
+def erase_special_chars(string, left, right):
     left_idx = index_or_negative_one(string, left)
     if left_idx == -1:
         return (string, False)
@@ -34,11 +34,13 @@ def erase_brackets(string, left, right):
 
 def clear_text(text):
     while True:
-        text, _ = erase_brackets(text, "[", "]")
-        text, found = erase_brackets(text, "{", "}")
-        text, found = erase_brackets(text, ":", ":")
+        text, found = erase_special_chars(text, "[", "]")
         if not found:
-            break
+            text, found = erase_special_chars(text, "{", "}")
+            if not found:
+                text, found = erase_special_chars(text, ":", ":")
+                    if not found:
+                        break
 
     return text.strip()
 
