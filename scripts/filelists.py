@@ -46,10 +46,9 @@ def clear_text(text):
     return text.strip()
 
 
-def get_lines_from_dlg(obj, speaker, tlk_strings):
+def get_lines_from_dlg(obj, speaker, tlk_strings, uniq_sound):
     lines = []
     if "EntryList|15" in obj:
-        uniq_sound = set()
         for entry in obj["EntryList|15"]:
             if "Speaker|10" in entry and "VO_ResRef|11" in entry:
                 voresref = entry["VO_ResRef|11"].lower()
@@ -83,11 +82,12 @@ def generate_filelist(extract_dir, speaker):
 
     # Extract lines from DLG files
     lines = []
+    uniq_sound = set()
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         if f.endswith(".dlg.json"):
             with open(f, "r") as fp:
                 obj = json.load(fp)
-                lines.extend(get_lines_from_dlg(obj, speaker, tlk_strings))
+                lines.extend(get_lines_from_dlg(obj, speaker, tlk_strings, uniq_sound))
 
     # Split lines into training and validation filelists
     random.shuffle(lines)
