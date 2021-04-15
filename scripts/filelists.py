@@ -25,11 +25,11 @@ def erase_special_chars(string, left, right):
     if left_idx == -1:
         return (string, False)
 
-    right_idx = index_or_negative_one(string, right, left_idx + 1)
+    right_idx = index_or_negative_one(string, right, left_idx + len(left))
     if right_idx == -1:
         return (string, False)
 
-    return (string[:left_idx] + string[(right_idx + 1):], True)
+    return (string[:left_idx] + string[(right_idx + len(right)):], True)
 
 
 def clear_text(text):
@@ -38,9 +38,9 @@ def clear_text(text):
         if not found:
             text, found = erase_special_chars(text, "{", "}")
             if not found:
-                text, found = erase_special_chars(text, ":", ":")
-                    if not found:
-                        break
+                text, found = erase_special_chars(text, "::", "::")
+                if not found:
+                    break
 
     return text.strip()
 
