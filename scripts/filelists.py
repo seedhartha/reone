@@ -6,8 +6,8 @@ import os
 import random
 import sys
 
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
-wav_dir = r"D:\OpenKotOR\Extract\KotOR\voices"
+extract_dir = r"D:\OpenKotOR\Extract\TSL"
+wav_dir = r"D:\OpenKotOR\Extract\TSL\voices"
 
 
 if not os.path.exists(extract_dir):
@@ -15,10 +15,6 @@ if not os.path.exists(extract_dir):
 
 if not os.path.exists(wav_dir):
     raise RuntimeError("WAV directory does not exist")
-
-
-def is_trainable_text(text):
-    return not (text.startswith("[") and text.endswith("]"))
 
 
 def index_or_negative_one(string, substr, beg=0):
@@ -55,15 +51,16 @@ def get_lines_from_dlg(obj, speaker, tlk_strings):
     if "EntryList|15" in obj:
         uniq_sound = set()
         for entry in obj["EntryList|15"]:
-            if "VO_ResRef|11" in entry:
+            if "Speaker|10" in entry and "VO_ResRef|11" in entry:
                 voresref = entry["VO_ResRef|11"].lower()
                 textstrref = int(entry["Text|12"].split("|")[0])
-                if textstrref != -1:
-                    text = tlk_strings[textstrref][1]
-                    if voresref and (not voresref in uniq_sound) and is_trainable_text(text):
+                entry_speaker = entry["Speaker|10"].lower()
+                if voresref and (not voresref in uniq_sound) and textstrref != -1 and speaker in entry_speaker:
+                    text = clear_text(tlk_strings[textstrref][1])
+                    if text:
                         wav_filename = os.path.join(wav_dir, voresref + ".wav")
                         if os.path.exists(wav_filename):
-                            lines.append("{}|{}|0\n".format(wav_filename, clear_text(text)))
+                            lines.append("{}|{}|0\n".format(wav_filename, text))
                             uniq_sound.add(voresref)
 
     return lines
