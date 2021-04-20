@@ -49,15 +49,27 @@ Variable Routines::getStringLowerCase(const VariablesList &args, ExecutionContex
 }
 
 Variable Routines::getStringRight(const VariablesList &args, ExecutionContext &ctx) {
+    string result;
     string str(getString(args, 0));
     int count = getInt(args, 1);
-    return Variable::ofString(str.substr(str.length() - count, count));
+
+    if (str.size() >= count) {
+        result = str.substr(str.length() - count, count);
+    }
+
+    return Variable::ofString(move(result));
 }
 
 Variable Routines::getStringLeft(const VariablesList &args, ExecutionContext &ctx) {
+    string result;
     string str(getString(args, 0));
     int count = getInt(args, 1);
-    return Variable::ofString(str.substr(0, count));
+
+    if (str.size() >= count) {
+        result = str.substr(0, count);
+    }
+
+    return Variable::ofString(move(result));
 }
 
 Variable Routines::insertString(const VariablesList &args, ExecutionContext &ctx) {
