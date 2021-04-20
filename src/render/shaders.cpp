@@ -60,6 +60,7 @@ const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
 const int FEATURE_CUSTOMMAT = 0x2000;
+const int FEATURE_FOG = 0x20000;
 
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 128;
@@ -85,11 +86,14 @@ struct General {
     vec4 ambientColor;
     vec4 selfIllumColor;
     vec4 discardColor;
+    vec4 fogColor;
     vec2 uvOffset;
     float alpha;
     float waterAlpha;
     float roughness;
     float exposure;
+    float fogNear;
+    float fogFar;
 };
 
 struct Material {
@@ -293,6 +297,11 @@ float getLightAttenuation(int light) {
     r *= r;
 
     return D / (D + r);
+}
+
+vec3 applyFog(vec3 rgb, float distance) {
+    float fogAmount = clamp(distance - uGeneral.fogNear, 0.0, uGeneral.fogFar - uGeneral.fogNear) / (uGeneral.fogFar - uGeneral.fogNear);
+    return mix(rgb, uGeneral.fogColor.rgb, fogAmount);
 }
 )END";
 
@@ -661,7 +670,8 @@ void main() {
         diffuseSample = vec4(vec3(0.5), 1.0);
     }
 
-    vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+    vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
+    vec3 V = normalize(cameraToFragment);
 
     vec3 N;
     if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
@@ -711,6 +721,9 @@ void main() {
         vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uGeneral.ambientColor.rgb);
         objectColor *= S;
     }
+    if (isFeatureEnabled(FEATURE_FOG)) {
+        objectColor = applyFog(objectColor, length(cameraToFragment));
+    }
 
     float objectAlpha = uGeneral.alpha;
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAPS)) {
@@ -754,7 +767,8 @@ void main() {
         N = normalize(fragNormal);
     }
 
-    vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+    vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
+    vec3 V = normalize(cameraToFragment);
     vec3 R = reflect(-V, N);
 
     vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
@@ -849,6 +863,9 @@ void main() {
     if (isFeatureEnabled(FEATURE_SHADOWS)) {
         vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uGeneral.ambientColor.rgb);
         objectColor *= S;
+    }
+    if (isFeatureEnabled(FEATURE_FOG)) {
+        objectColor = applyFog(objectColor, length(cameraToFragment));
     }
 
     float objectAlpha = uGeneral.alpha;

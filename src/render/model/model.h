@@ -61,6 +61,8 @@ public:
 
     void init();
 
+    bool isAffectedByFog() const { return _affectedByFog; }
+
     std::vector<std::string> getAnimationNames() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
@@ -73,6 +75,8 @@ public:
     std::shared_ptr<Model> superModel() const { return _superModel; }
     const AABB &aabb() const { return _aabb; }
 
+    void setAffectedByFog(bool affected) { _affectedByFog = affected; }
+
 private:
     std::string _name;
     Classification _classification;
@@ -84,6 +88,7 @@ private:
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
+    bool _affectedByFog { false };
 
     void initInternal(const std::shared_ptr<ModelNode> &node);
 

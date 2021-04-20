@@ -195,6 +195,7 @@ private:
     CreatureFinder _creatureFinder;
     Grass _grass;
     Perception _perception;
+    glm::vec3 _ambientColor { 0.0f };
 
     // Scripts
 
@@ -233,6 +234,15 @@ private:
     int _stealthXPDecrement { 0 };
 
     // END Stealth
+
+    // Fog
+
+    bool _fogEnabled { false };
+    float _fogNear { 0.0f };
+    float _fogFar { 0.0f };
+    glm::vec3 _fogColor { 0.0f };
+
+    // END Fog
 
     void init();
 
@@ -274,6 +284,7 @@ private:
     void loadMap(const resource::GffStruct &are);
     void loadStealthXP(const resource::GffStruct &are);
     void loadGrass(const resource::GffStruct &are);
+    void loadFog(const resource::GffStruct &are);
 
     // END Loading ARE
 

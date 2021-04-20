@@ -65,6 +65,24 @@ uint32_t GffStruct::getUint(const string &name, uint32_t defValue) const {
     return field->uintValue;
 }
 
+static glm::vec3 colorFromUint32(uint32_t value) {
+    glm::vec3 result(
+        value & 0xff,
+        (value >> 8) & 0xff,
+        (value >> 16) & 0xff);
+
+    result /= 255.0f;
+
+    return move(result);
+}
+
+glm::vec3 GffStruct::getColor(const string &name, glm::vec3 defValue) const {
+    const Field *field = get(name);
+    if (!field) return move(defValue);
+
+    return colorFromUint32(field->uintValue);
+}
+
 float GffStruct::getFloat(const string &name, float defValue) const {
     const Field *field = get(name);
     if (!field) return defValue;

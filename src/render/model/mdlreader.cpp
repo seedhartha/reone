@@ -521,7 +521,7 @@ void MdlReader::doLoad() {
     uint8_t classification = readByte();
     uint8_t subclassification = readByte();
     ignore(1); // unknown
-    uint8_t ignoreFog = readByte();
+    uint8_t affectedByFog = readByte();
     uint32_t numChildModels = readUint32();
     ArrayDefinition animationArrayDef(readArrayDefinition());
     uint32_t superModelRef = readUint32();
@@ -552,6 +552,7 @@ void MdlReader::doLoad() {
     }
 
     _model = make_unique<Model>(name, getClassification(classification), animationScale, move(rootNode), anims, superModel);
+    _model->setAffectedByFog(affectedByFog != 0);
 }
 
 MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {
