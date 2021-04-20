@@ -58,7 +58,9 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 
 void Sound::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> uts(Resources::instance().getGFF(resRef, ResourceType::Uts));
-    loadUTS(*uts);
+    if (uts) {
+        loadUTS(*uts);
+    }
 }
 
 void Sound::loadTransformFromGIT(const GffStruct &gffs) {

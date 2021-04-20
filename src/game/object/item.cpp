@@ -37,7 +37,9 @@ Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
 
 void Item::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> uti(Resources::instance().getGFF(resRef, ResourceType::Uti));
-    loadUTI(*uti);
+    if (uti) {
+        loadUTI(*uti);
+    }
 }
 
 void Item::playShotSound(int variant, glm::vec3 position) {

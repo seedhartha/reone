@@ -58,6 +58,8 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 
 void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utp(Resources::instance().getGFF(resRef, ResourceType::Utp));
+    if (!utp) return;
+
     loadUTP(*utp);
 
     shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
