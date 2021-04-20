@@ -63,6 +63,8 @@ void Door::loadFromGIT(const GffStruct &gffs) {
 
 void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utd(Resources::instance().getGFF(resRef, ResourceType::Utd));
+    if (!utd) return;
+
     loadUTD(*utd);
 
     shared_ptr<TwoDA> doors(Resources::instance().get2DA("genericdoors"));

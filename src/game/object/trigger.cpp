@@ -86,7 +86,9 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 
 void Trigger::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utt(Resources::instance().getGFF(resRef, ResourceType::Utt));
-    loadUTT(*utt);
+    if (utt) {
+        loadUTT(*utt);
+    }
 }
 
 void Trigger::update(float dt) {

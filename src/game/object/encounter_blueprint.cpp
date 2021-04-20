@@ -36,8 +36,7 @@ void Encounter::loadUTE(const GffStruct &ute) {
     _name = Strings::instance().get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
     _active = ute.getBool("Active");
-    _difficulty = ute.getInt("Difficulty");
-    _difficultyIndex = ute.getInt("DifficultyIndex");
+    _difficultyIndex = ute.getInt("DifficultyIndex"); // index into encdifficulty.2da
     _faction = ute.getEnum("Faction", Faction::Invalid);
     _maxCreatures = ute.getInt("MaxCreatures");
     _playerOnly = ute.getBool("PlayerOnly");
@@ -55,6 +54,7 @@ void Encounter::loadUTE(const GffStruct &ute) {
 
     // Unused fields:
     //
+    // - Difficulty (obsolete)
     // - SpawnOption (always 1)
     // - PaletteID (toolset only)
     // - Comment (toolset only)

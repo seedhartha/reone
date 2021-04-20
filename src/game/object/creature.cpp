@@ -75,8 +75,10 @@ void Creature::loadFromGIT(const GffStruct &gffs) {
 
 void Creature::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utc(Resources::instance().getGFF(resRef, ResourceType::Utc));
-    loadUTC(*utc);
-    loadAppearance();
+    if (utc) {
+        loadUTC(*utc);
+        loadAppearance();
+    }
 }
 
 void Creature::loadAppearance() {

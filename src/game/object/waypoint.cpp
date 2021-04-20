@@ -63,7 +63,9 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utw(Resources::instance().getGFF(resRef, ResourceType::Utw));
-    loadUTW(*utw);
+    if (utw) {
+        loadUTW(*utw);
+    }
 }
 
 void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {

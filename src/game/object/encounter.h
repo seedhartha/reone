@@ -49,7 +49,6 @@ private:
     };
 
     bool _active { false };
-    int _difficulty { 0 };
     int _difficultyIndex { 0 };
     Faction _faction { Faction::Invalid };
     int _maxCreatures { 0 };
