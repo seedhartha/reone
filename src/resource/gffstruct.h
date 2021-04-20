@@ -85,6 +85,7 @@ public:
     bool getBool(const std::string &name, bool defValue = false) const;
     int getInt(const std::string &name, int defValue = 0) const;
     uint32_t getUint(const std::string &name, uint32_t defValue = 0) const;
+    glm::vec3 getColor(const std::string &name, glm::vec3 defValue = glm::vec3(0.0f)) const;
     float getFloat(const std::string &name, float defValue = 0.0f) const;
     std::string getString(const std::string &name, std::string defValue = "") const;
     glm::vec3 getVector(const std::string &name, glm::vec3 defValue = glm::vec3(0.0f)) const;

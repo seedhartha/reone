@@ -97,6 +97,21 @@ public:
 
     // END Lights and shadows
 
+    // Fog
+
+    bool isFogEnabled() const { return _fogEnabled; }
+
+    float fogNear() const { return _fogNear; }
+    float fogFar() const { return _fogFar; }
+    const glm::vec3 &fogColor() const { return _fogColor; }
+
+    void setFogEnabled(bool enabled) { _fogEnabled = enabled; }
+    void setFogNear(float near) { _fogNear = near; }
+    void setFogFar(float far) { _fogFar = far; }
+    void setFogColor(glm::vec3 color) { _fogColor = std::move(color); }
+
+    // END Fog
+
 private:
     render::GraphicsOptions _opts;
 
@@ -126,6 +141,15 @@ private:
     bool _shadowFading { false };
 
     // END Shadows
+
+    // Fog
+
+    bool _fogEnabled { false };
+    float _fogNear { 0.0f };
+    float _fogFar { 0.0f };
+    glm::vec3 _fogColor { 0.0f };
+
+    // END Fog
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

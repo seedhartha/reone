@@ -45,6 +45,7 @@ void Area::loadARE(const GffStruct &are) {
     loadMap(are);
     loadStealthXP(are);
     loadGrass(are);
+    loadFog(are);
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
@@ -60,15 +61,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
 }
 
 void Area::loadAmbientColor(const GffStruct &are) {
-    int ambientColorValue = are.getInt("DynAmbientColor");
-    glm::vec3 ambientColor(
-        ambientColorValue & 0xff,
-        (ambientColorValue >> 8) & 0xff,
-        (ambientColorValue >> 16) & 0xff);
-
-    ambientColor /= 255.0f;
-
-    _game->sceneGraph().setAmbientLightColor(ambientColor);
+    _ambientColor = are.getColor("DynAmbientColor");
 }
 
 void Area::loadScripts(const GffStruct &are) {
@@ -101,6 +94,13 @@ void Area::loadGrass(const GffStruct &are) {
     _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
     _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
     _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
+}
+
+void Area::loadFog(const GffStruct &are) {
+    _fogEnabled = are.getBool("SunFogOn");
+    _fogNear = are.getFloat("SunFogNear");
+    _fogFar = are.getFloat("SunFogFar");
+    _fogColor = are.getColor("SunFogColor");
 }
 
 } // namespace game

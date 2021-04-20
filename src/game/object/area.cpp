@@ -640,13 +640,21 @@ static glm::vec3 getRandomPointInTriangle(const Walkmesh::Face &face) {
 void Area::fill(SceneGraph &sceneGraph) {
     sceneGraph.clear();
 
-    // Room models + grass
+    // Area properties
+
+    sceneGraph.setAmbientLightColor(_ambientColor);
+    sceneGraph.setFogEnabled(_fogEnabled);
+    sceneGraph.setFogNear(_fogNear);
+    sceneGraph.setFogFar(_fogFar);
+    sceneGraph.setFogColor(_fogColor);
 
     shared_ptr<GrassSceneNode> grass;
     if (_grass.texture) {
         grass = make_shared<GrassSceneNode>(&sceneGraph, _grass.texture, glm::vec2(_grass.quadSize));
         sceneGraph.setGrass(grass);
     }
+
+    // Room models
 
     for (auto &room : _rooms) {
         shared_ptr<ModelSceneNode> sceneNode(room.second->model());

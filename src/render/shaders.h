@@ -71,6 +71,7 @@ struct UniformFeatureFlags {
     static constexpr int blur = 0x4000;
     static constexpr int text = 0x8000;
     static constexpr int grass = 0x10000;
+    static constexpr int fog = 0x20000;
 };
 
 struct ShaderGeneral {
@@ -82,12 +83,14 @@ struct ShaderGeneral {
     glm::vec4 ambientColor { 1.0f };
     glm::vec4 selfIllumColor { 1.0f };
     glm::vec4 discardColor { 0.0f };
+    glm::vec4 fogColor { 0.0f };
     glm::vec2 uvOffset { 0.0f };
     float alpha { 1.0f };
     float waterAlpha { 1.0f };
     float roughness { 0.0f };
     float exposure { 1.0f };
-    char padding[8];
+    float fogNear { 0.0f };
+    float fogFar { 0.0f };
 };
 
 struct ShaderMaterial {

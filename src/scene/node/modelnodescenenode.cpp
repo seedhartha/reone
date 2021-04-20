@@ -305,6 +305,13 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
                 uniforms.combined.general.waterAlpha = waterAlpha;
             }
         }
+
+        if (_sceneGraph->isFogEnabled() && _modelSceneNode->model()->isAffectedByFog()) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::fog;
+            uniforms.combined.general.fogNear = _sceneGraph->fogNear();
+            uniforms.combined.general.fogFar = _sceneGraph->fogFar();
+            uniforms.combined.general.fogColor = glm::vec4(_sceneGraph->fogColor(), 1.0f);
+        }
     }
 
     Shaders::instance().activate(program, uniforms);
