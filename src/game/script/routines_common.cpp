@@ -39,7 +39,7 @@ namespace reone {
 
 namespace game {
 
-static bool g_shipBuild = false;
+static bool g_shipBuild = true;
 
 Variable Routines::feetToMeters(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofFloat(getFloat(args, 0) * 0.3048f);
