@@ -79,7 +79,14 @@ Variable Routines::stringToFloat(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::stringToInt(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(stoi(getString(args, 0)));
+    int result = 0;
+    string number(getString(args, 0));
+
+    if (!number.empty()) {
+        result = stoi(number);
+    }
+
+    return Variable::ofInt(result);
 }
 
 Variable Routines::turnsToSeconds(const VariablesList &args, ExecutionContext &ctx) {
