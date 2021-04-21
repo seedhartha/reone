@@ -25,27 +25,30 @@ namespace reone {
 
 namespace scene {
 
-const int kFrustumPlaneCount = 6;
+const int kNumFrustumPlanes = 6;
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(SceneGraph *sceneGraph, const glm::mat4 &projection, float farPlane);
+    CameraSceneNode(SceneGraph *sceneGraph, glm::mat4 projection, float aspect, float nearPlane, float farPlane);
 
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const render::AABB &aabb) const;
 
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }
+    float aspect() const { return _aspect; }
+    float nearPlane() const { return _nearPlane; }
     float farPlane() const { return _farPlane; }
 
     void setProjection(const glm::mat4 &projection);
-    void setFarPlane(float far);
 
 private:
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
-    glm::vec4 _frustum[kFrustumPlaneCount];
-    float _farPlane { 1.0f };
+    glm::vec4 _frustumPlanes[kNumFrustumPlanes];
+    float _aspect { 1.0f };
+    float _nearPlane { 0.0f };
+    float _farPlane { 0.0f };
 
     void updateAbsoluteTransform() override;
 

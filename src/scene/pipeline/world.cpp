@@ -43,13 +43,19 @@ namespace reone {
 
 namespace scene {
 
-static constexpr float kShadowFarPlane = 10000.0f;
+const float kShadowNearPlane = 0.0f;
+const float kShadowFarPlane = 10000.0f;
+const float kOrthographicScale = 10.0f;
 
 static bool g_wireframesEnabled = false;
 static bool g_debugCubeMap = false;
 
 WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
     _scene(scene), _opts(opts) {
+
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        _lightSpaceMatrices[i] = glm::mat4(1.0f);
+    }
 }
 
 void WorldRenderPipeline::init() {
@@ -113,19 +119,21 @@ void WorldRenderPipeline::init() {
 
     // Shadows framebuffer
 
-    _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
+    _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
     _shadowsDepth->clearPixels(1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution, PixelFormat::Depth);
 
+    _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
+    _cubeShadowsDepth->init();
+    _cubeShadowsDepth->bind();
+    _cubeShadowsDepth->clearPixels(1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution, PixelFormat::Depth);
+
     _shadows.init();
-    _shadows.bind();
-    _shadows.attachDepth(*_shadowsDepth);
-    _shadows.checkCompleteness();
-    _shadows.unbind();
 }
 
 void WorldRenderPipeline::render() {
+    computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
     applyHorizontalBlur();
@@ -133,39 +141,8 @@ void WorldRenderPipeline::render() {
     drawResult();
 }
 
-void WorldRenderPipeline::drawShadows() {
-    if (_opts.shadowResolution < 1) return;
-
-    const LightSceneNode *shadowLight = _scene->shadowLight();
-    if (!shadowLight) return;
-
-    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
-        _shadows.bind();
-
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-
-        glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, kShadowFarPlane));
-        glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
-
-        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
-        uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
-        uniforms.combined.shadows.lightPosition = glm::vec4(lightPosition, 1.0f);
-
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            auto side = static_cast<CubeMapFace>(i);
-            uniforms.combined.shadows.matrices[i] = projection * getShadowView(lightPosition, side);
-        }
-
-        _scene->setUniformsPrototype(move(uniforms));
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->draw(true); });
-    });
-}
-
-glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapFace side) const {
-    switch (side) {
+static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) {
+    switch (face) {
         case CubeMapFace::PositiveX:
             return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
         case CubeMapFace::NegativeX:
@@ -183,6 +160,65 @@ glm::mat4 WorldRenderPipeline::getShadowView(const glm::vec3 &lightPos, CubeMapF
     }
 }
 
+void WorldRenderPipeline::computeLightSpaceMatrices() {
+    static glm::vec3 up(0.0f, 0.0f, 1.0f);
+
+    const LightSceneNode *shadowLight = _scene->shadowLight();
+    if (!shadowLight) return;
+
+    shared_ptr<CameraSceneNode> camera(_scene->activeCamera());
+    if (!camera) return;
+
+    glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(camera->absoluteTransform()[3]);
+
+    if (shadowLight->isDirectional()) {
+        glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));
+        glm::mat4 lightView(glm::lookAt(lightPosition, cameraPosition, up));
+        _lightSpaceMatrices[0] = projection * lightView;
+    } else {
+        glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, kShadowNearPlane, kShadowFarPlane));
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            glm::mat4 lightView(getPointLightView(lightPosition, static_cast<CubeMapFace>(i)));
+            _lightSpaceMatrices[i] = projection * lightView;
+        }
+    }
+}
+
+void WorldRenderPipeline::drawShadows() {
+    if (_opts.shadowResolution < 1) return;
+
+    const LightSceneNode *shadowLight = _scene->shadowLight();
+    if (!shadowLight) return;
+
+    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
+        _shadows.bind();
+        if (shadowLight->isDirectional()) {
+            _shadows.attachDepth(*_shadowsDepth);
+        } else {
+            _shadows.attachDepth(*_cubeShadowsDepth);
+        }
+
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+
+        glm::vec4 lightPosition(
+            glm::vec3(shadowLight->absoluteTransform()[3]),
+            shadowLight->isDirectional() ? 0.0f : 1.0f);
+
+        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+        uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
+        uniforms.combined.shadows.lightPosition = move(lightPosition);
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
+        }
+        _scene->setUniformsPrototype(move(uniforms));
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+        withDepthTest([this]() { _scene->draw(true); });
+    });
+}
+
 void WorldRenderPipeline::drawGeometry() {
     _geometry.bind();
 
@@ -196,13 +232,30 @@ void WorldRenderPipeline::drawGeometry() {
     uniforms.combined.general.view = _scene->activeCamera()->view();
     uniforms.combined.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
     uniforms.combined.shadows.lightPresent = static_cast<bool>(shadowLight);
-    uniforms.combined.shadows.lightPosition = shadowLight ? shadowLight->absoluteTransform()[3] : glm::vec4(0.0f);
-    uniforms.combined.shadows.strength = _scene->shadowStrength();
+
+    if (shadowLight) {
+        glm::vec4 lightPosition(
+            glm::vec3(shadowLight->absoluteTransform()[3]),
+            shadowLight->isDirectional() ? 0.0f : 1.0f);
+
+        uniforms.combined.shadows.lightPosition = move(lightPosition);
+        uniforms.combined.shadows.strength = _scene->shadowStrength();
+
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
+        }
+    }
+
     _scene->setUniformsPrototype(move(uniforms));
 
     if (shadowLight) {
-        setActiveTextureUnit(TextureUnits::shadowMap);
-        _shadowsDepth->bind();
+        if (shadowLight->isDirectional()) {
+            setActiveTextureUnit(TextureUnits::shadowMap);
+            _shadowsDepth->bind();
+        } else {
+            setActiveTextureUnit(TextureUnits::cubeShadowMap);
+            _cubeShadowsDepth->bind();
+        }
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

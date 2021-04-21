@@ -19,8 +19,6 @@
 
 #include "../scenegraph.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace scene {
@@ -28,26 +26,6 @@ namespace scene {
 LightSceneNode::LightSceneNode(int priority, SceneGraph *sceneGraph) :
     SceneNode(SceneNodeType::Light, sceneGraph),
     _priority(priority) {
-}
-
-void LightSceneNode::setColor(glm::vec3 color) {
-    _color = move(color);
-}
-
-void LightSceneNode::setMultiplier(float multiplier) {
-    _multiplier = multiplier;
-}
-
-void LightSceneNode::setRadius(float radius) {
-    _radius = radius;
-}
-
-void LightSceneNode::setShadow(bool shadow) {
-    _shadow = shadow;
-}
-
-void LightSceneNode::setAmbientOnly(bool ambientOnly) {
-    _ambientOnly = ambientOnly;
 }
 
 } // namespace scene

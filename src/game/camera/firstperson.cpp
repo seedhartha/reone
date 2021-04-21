@@ -32,7 +32,7 @@ static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
 FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
     glm::mat4 projection(glm::perspective(fovy, aspect, zNear, zFar));
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, zFar);
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, aspect, zNear, zFar);
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

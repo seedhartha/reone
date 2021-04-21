@@ -103,8 +103,8 @@ struct ShaderMaterial {
 };
 
 struct ShaderShadows {
-    glm::mat4 matrices[kNumCubeFaces];
-    glm::vec4 lightPosition { 0.0f };
+    glm::mat4 lightSpaceMatrices[kNumCubeFaces];
+    glm::vec4 lightPosition { 0.0f }; /**< W = 0 if light is directional */
     int lightPresent { false };
     float strength { 1.0f };
     char padding[8];
@@ -136,7 +136,7 @@ struct CombinedUniforms {
 };
 
 struct ShaderLight {
-    glm::vec4 position { 0.0f };
+    glm::vec4 position { 0.0f }; /**< W = 0 if light is directional */
     glm::vec4 color { 1.0f };
     float multiplier { 1.0f };
     float radius { 1.0f };

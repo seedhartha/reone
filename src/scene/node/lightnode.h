@@ -31,17 +31,19 @@ public:
 
     bool isShadow() const { return _shadow; }
     bool isAmbientOnly() const { return _ambientOnly; }
+    bool isDirectional() const { return _directional; }
 
     const glm::vec3 &color() const { return _color; }
     int priority() const { return _priority; }
     float multiplier() const { return _multiplier; }
     float radius() const { return _radius; }
 
-    void setColor(glm::vec3 color);
-    void setMultiplier(float multiplier);
-    void setRadius(float radius);
-    void setShadow(bool shadow);
-    void setAmbientOnly(bool ambientOnly);
+    void setColor(glm::vec3 color) { _color = std::move(color); }
+    void setMultiplier(float multiplier) { _multiplier = multiplier; }
+    void setRadius(float radius) { _radius = radius; }
+    void setShadow(bool shadow) { _shadow = shadow; }
+    void setAmbientOnly(bool ambientOnly) { _ambientOnly = ambientOnly; }
+    void setDirectional(bool directional) { _directional = directional; }
 
 private:
     int _priority;
@@ -51,6 +53,7 @@ private:
     float _radius { 1.0f };
     bool _shadow { false };
     bool _ambientOnly { false };
+    bool _directional { false };
 };
 
 } // namespace scene
