@@ -51,7 +51,7 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    auto camera = make_shared<CameraSceneNode>(scene.get(), projection, _zFar);
+    auto camera = make_shared<CameraSceneNode>(scene.get(), projection, _aspect, _zNear, _zFar);
     if (_cameraNodeName.empty()) {
         camera->setLocalTransform(_cameraTransform);
     } else {

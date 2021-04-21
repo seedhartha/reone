@@ -36,7 +36,7 @@ static constexpr float kMouseRotationSpeed = 0.001f;
 
 ThirdPersonCamera::ThirdPersonCamera(Game *game, SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) : _game(game) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, zFar);
+    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, aspect, zNear, zFar);
     _style = style;
 }
 

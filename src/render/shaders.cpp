@@ -106,7 +106,7 @@ struct Material {
 };
 
 struct Shadows {
-    mat4 matrices[NUM_CUBE_FACES];
+    mat4 lightSpaceMatrices[NUM_CUBE_FACES];
     vec4 lightPosition;
     bool lightPresent;
     float strength;
@@ -193,13 +193,15 @@ const float SELFILLUM_THRESHOLD = 0.85;
 uniform sampler2D uDiffuse;
 uniform sampler2D uLightmap;
 uniform sampler2D uBumpmap;
+uniform sampler2D uShadowMap;
 uniform samplerCube uEnvmap;
-uniform samplerCube uShadowMap;
+uniform samplerCube uCubeShadowMap;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
+in vec4 fragPosLightSpace;
 in mat3 fragTanSpace;
 
 layout(location = 0) out vec4 fragColor;
@@ -263,30 +265,57 @@ vec3 getNormalFromBumpmap(vec2 uv) {
 }
 
 float getShadow() {
-    if (!uShadows.lightPresent) return 0.0;
-
-    vec3 fragToLight = fragPosition - uShadows.lightPosition.xyz;
-    float currentDepth = length(fragToLight);
-
     float shadow = 0.0;
-    float bias = 0.1;
-    float samples = 4.0;
-    float offset = 0.1;
 
-    for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
-        for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
-            for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                float closestDepth = texture(uShadowMap, fragToLight + vec3(x, y, z)).r;
-                closestDepth *= SHADOW_FAR_PLANE;
+    if (uShadows.lightPresent) {
+        if (uShadows.lightPosition.w == 0.0) {
+            // Directional light
 
-                if (currentDepth - bias > closestDepth) {
-                    shadow += 1.0;
+            vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+            projCoords = projCoords * 0.5 + 0.5;
+            float closestDepth = texture(uShadowMap, projCoords.xy).r;
+            float currentDepth = projCoords.z;
+
+            vec2 texelSize = 1.0 / textureSize(uShadowMap, 0);
+            for (int x = -1; x <= 1; ++x) {
+                for (int y = -1; y <= 1; ++y) {
+                    float pcfDepth = texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+                    shadow += currentDepth > pcfDepth  ? 1.0 : 0.0;
                 }
             }
+            shadow /= 9.0;
+
+            if (projCoords.z > 1.0) {
+                shadow = 0.0;
+            }
+        } else {
+            // Point light
+
+            vec3 fragToLight = fragPosition - uShadows.lightPosition.xyz;
+            float currentDepth = length(fragToLight);
+
+            float bias = 0.1;
+            float samples = 4.0;
+            float offset = 0.1;
+
+            for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
+                for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
+                    for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
+                        float closestDepth = texture(uCubeShadowMap, fragToLight + vec3(x, y, z)).r;
+                        closestDepth *= SHADOW_FAR_PLANE;
+
+                        if (currentDepth - bias > closestDepth) {
+                            shadow += 1.0;
+                        }
+                    }
+                }
+            }
+
+            shadow /= samples * samples * samples;
         }
     }
 
-    return uShadows.strength * shadow / (samples * samples * samples);
+    return uShadows.strength * shadow;
 }
 
 float getLightAttenuation(int light) {
@@ -451,6 +480,7 @@ out vec3 fragPosition;
 out vec3 fragNormal;
 out vec2 fragTexCoords;
 out vec2 fragLightmapCoords;
+out vec4 fragPosLightSpace;
 out mat3 fragTanSpace;
 
 void main() {
@@ -484,6 +514,13 @@ void main() {
     fragNormal = mat3(transpose(inverse(uGeneral.model))) * aNormal;
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
+
+    // Compute light space fragment position for directional lights
+    if (uShadows.lightPresent && uShadows.lightPosition.w == 0.0) {
+        fragPosLightSpace = uShadows.lightSpaceMatrices[0] * vec4(fragPosition, 1.0);
+    } else {
+        fragPosLightSpace = vec4(0.0);
+    }
 
     if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
         vec3 T = normalize(vec3(uGeneral.model * vec4(aTangent, 0.0)));
@@ -592,14 +629,23 @@ layout(triangle_strip, max_vertices=18) out;
 out vec4 fragPosition;
 
 void main() {
-    for (int face = 0; face < NUM_CUBE_FACES; ++face) {
-        gl_Layer = face;
+    if (uShadows.lightPosition.w == 0.0) {
         for (int i = 0; i < 3; ++i) {
             fragPosition = gl_in[i].gl_Position;
-            gl_Position = uShadows.matrices[face] * fragPosition;
+            gl_Position = uShadows.lightSpaceMatrices[0] * fragPosition;
             EmitVertex();
         }
         EndPrimitive();
+    } else {
+        for (int face = 0; face < NUM_CUBE_FACES; ++face) {
+            gl_Layer = face;
+            for (int i = 0; i < 3; ++i) {
+                fragPosition = gl_in[i].gl_Position;
+                gl_Position = uShadows.lightSpaceMatrices[face] * fragPosition;
+                EmitVertex();
+            }
+            EndPrimitive();
+        }
     }
 }
 )END";
@@ -1243,6 +1289,7 @@ void Shaders::initTextureUniforms() {
     setUniform("uPrefilterMap", TextureUnits::prefilterMap);
     setUniform("uBRDFLookup", TextureUnits::brdfLookup);
     setUniform("uShadowMap", TextureUnits::shadowMap);
+    setUniform("uCubeShadowMap", TextureUnits::cubeShadowMap);
 }
 
 Shaders::~Shaders() {

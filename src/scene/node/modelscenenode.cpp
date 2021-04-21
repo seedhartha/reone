@@ -43,6 +43,8 @@ namespace reone {
 
 namespace scene {
 
+const float kMinDirectionalLightRadius = 1000.0f;
+
 static bool g_debugAABB = false;
 
 ModelSceneNode::ModelSceneNode(ModelUsage usage, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
@@ -113,12 +115,17 @@ void ModelSceneNode::initModelNodes() {
 
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
+                // Light is considered directional if its radius exceeds a certain threshold
+                float radius = child->lightRadii().getByKeyframeOrElse(0, 1.0f);
+                bool directional = radius >= kMinDirectionalLightRadius;
+
                 auto lightNode = make_shared<LightSceneNode>(light->priority, _sceneGraph);
                 lightNode->setColor(child->lightColors().getByKeyframeOrElse(0, glm::vec3(1.0f)));
                 lightNode->setMultiplier(child->lightMultipliers().getByKeyframeOrElse(0, 1.0f));
-                lightNode->setRadius(child->lightRadii().getByKeyframeOrElse(0, 1.0f));
+                lightNode->setRadius(radius);
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
+                lightNode->setDirectional(directional);
                 childNode->addChild(lightNode);
                 _lightNodeByNumber.insert(make_pair(modelNode->nodeNumber(), lightNode.get()));
             }

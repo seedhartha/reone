@@ -288,8 +288,11 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             uniforms.lighting->lightCount = static_cast<int>(lights.size());
 
             for (int i = 0; i < uniforms.lighting->lightCount; ++i) {
+                glm::vec4 position(lights[i]->absoluteTransform()[3]);
+                position.w = lights[i]->isDirectional() ? 0.0f : 1.0f;
+
                 ShaderLight &shaderLight = uniforms.lighting->lights[i];
-                shaderLight.position = lights[i]->absoluteTransform()[3];
+                shaderLight.position = move(position);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.multiplier = lights[i]->multiplier();
                 shaderLight.radius = lights[i]->radius();

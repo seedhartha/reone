@@ -25,7 +25,8 @@
 #include "../../render/renderbuffer.h"
 #include "../../render/texture.h"
 #include "../../render/types.h"
-#include "../../scene/scenegraph.h"
+
+#include "../scenegraph.h"
 
 namespace reone {
 
@@ -41,6 +42,7 @@ public:
 private:
     SceneGraph *_scene { nullptr };
     render::GraphicsOptions _opts;
+    glm::mat4 _lightSpaceMatrices[render::kNumCubeFaces];
 
     // Framebuffers
 
@@ -59,16 +61,16 @@ private:
     std::unique_ptr<render::Texture> _verticalBlurColor;
     std::unique_ptr<render::Texture> _horizontalBlurColor;
     std::unique_ptr<render::Texture> _shadowsDepth;
+    std::unique_ptr<render::Texture> _cubeShadowsDepth;
 
     // END Framebuffers targets
 
+    void computeLightSpaceMatrices();
     void drawShadows();
     void drawGeometry();
     void applyHorizontalBlur();
     void applyVerticalBlur();
     void drawResult();
-
-    glm::mat4 getShadowView(const glm::vec3 &lightPos, render::CubeMapFace side) const;
 };
 
 } // namespace scene

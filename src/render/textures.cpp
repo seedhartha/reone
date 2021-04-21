@@ -88,6 +88,9 @@ void Textures::bindDefaults() {
     _default->bind();
 
     setActiveTextureUnit(TextureUnits::shadowMap);
+    _default->bind();
+
+    setActiveTextureUnit(TextureUnits::cubeShadowMap);
     _defaultCubemap->bind();
 }
 
