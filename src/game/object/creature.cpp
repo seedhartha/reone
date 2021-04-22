@@ -59,10 +59,9 @@ static string g_talkDummyNode("talkdummy");
 Creature::Creature(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph, scriptRunner) {
+    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph) {
 
     _drawDistance = 32.0f;
 }
@@ -448,13 +447,13 @@ int Creature::getNeededXP() const {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        _scriptRunner->run(_onSpawn, _id, kObjectInvalid);
+        runScript(_onSpawn, _id, kObjectInvalid);
     }
 }
 
 void Creature::runEndRoundScript() {
     if (!_onEndRound.empty()) {
-        _scriptRunner->run(_onEndRound, _id, kObjectInvalid);
+        runScript(_onEndRound, _id, kObjectInvalid);
     }
 }
 
@@ -486,7 +485,7 @@ void Creature::die() {
 
 void Creature::runDeathScript() {
     if (!_onDeath.empty()) {
-        _scriptRunner->run(_onDeath, _id, kObjectInvalid);
+        runScript(_onDeath, _id, kObjectInvalid);
     }
 }
 
@@ -542,7 +541,7 @@ void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
 
 void Creature::runOnNoticeScript() {
     if (!_onNotice.empty()) {
-        _scriptRunner->run(_onNotice, _id, _perception.lastPerceived->id());
+        runScript(_onNotice, _id, _perception.lastPerceived->id());
     }
 }
 

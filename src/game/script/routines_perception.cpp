@@ -101,7 +101,7 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
 
 Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0);
+    auto target = getCreature(args, 0, ctx);
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
@@ -117,7 +117,7 @@ Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ct
 
 Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0);
+    auto target = getCreature(args, 0, ctx);
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {

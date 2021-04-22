@@ -31,15 +31,13 @@ namespace game {
 PlaceableCamera::PlaceableCamera(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Camera,
         objectFactory,
-        sceneGraph,
-        scriptRunner) {
+        sceneGraph) {
 }
 
 void PlaceableCamera::loadFromGIT(const GffStruct &gffs) {

@@ -15,14 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "runner.h"
+#include "runutil.h"
 
 #include <stdexcept>
 
 #include "../../script/execution.h"
 #include "../../script/scripts.h"
-
-#include "../game.h"
 
 #include "routines.h"
 
@@ -34,20 +32,21 @@ namespace reone {
 
 namespace game {
 
-ScriptRunner::ScriptRunner(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
+int runScript(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
+    if (callerId == kObjectSelf) {
+        throw invalid_argument("Invalid callerId");
     }
-}
+    if (triggerrerId == kObjectSelf) {
+        throw invalid_argument("Invalid triggerrerId");
+    }
 
-int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
     auto program = Scripts::instance().get(resRef);
     if (!program) return -1;
 
     auto ctx = make_unique<ExecutionContext>();
     ctx->routines = &Routines::instance();
-    ctx->caller = _game->getObjectById(callerId);
-    ctx->triggerer = _game->getObjectById(triggerrerId);
+    ctx->callerId = callerId;
+    ctx->triggererId = triggerrerId;
     ctx->userDefinedEventNumber = userDefinedEventNumber;
     ctx->scriptVar = scriptVar;
 

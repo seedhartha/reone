@@ -89,13 +89,7 @@ ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, uniqu
 }
 
 int ScriptExecution::run() {
-    string callerTag;
-    if (_context->caller) {
-        callerTag = _context->caller->tag();
-    } else {
-        callerTag = "[invalid]";
-    }
-    debug(boost::format("Script: run %s as %s") % _program->name() % callerTag, 1, DebugChannels::script);
+    debug(boost::format("Script: run %s as %u") % _program->name() % _context->callerId, 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
@@ -196,17 +190,8 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             _stack.push_back(Variable::ofFloat(ins.floatValue));
             break;
         case InstructionType::Object: {
-            shared_ptr<ScriptObject> object;
-            switch (ins.objectId) {
-                case kObjectSelf:
-                    object = _context->caller;
-                    break;
-                case kObjectInvalid:
-                    break;
-                default:
-                    throw logic_error("Invalid object id");
-            }
-            _stack.push_back(Variable::ofObject(object));
+            uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
+            _stack.push_back(Variable::ofObject(objectId));
             break;
         }
         case InstructionType::String:

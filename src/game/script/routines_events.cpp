@@ -41,12 +41,12 @@ Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     auto toRun = getEvent(args, 1);
 
     if (object && toRun) {
         debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
-        _game->scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+        runScript(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
     } else if (!object) {
         debug("Script: signalEvent: object is invalid", 1, DebugChannels::script);
     } else if (!toRun) {

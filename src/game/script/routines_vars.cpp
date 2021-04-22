@@ -78,7 +78,7 @@ Variable Routines::setGlobalString(const VariablesList &args, ExecutionContext &
 
 Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
 
     if (object) {
@@ -91,7 +91,7 @@ Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
     bool value = getBool(args, 2);
 
@@ -106,7 +106,7 @@ Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &
 
 Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
 
     if (object) {
@@ -119,7 +119,7 @@ Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
     int value = getInt(args, 2);
 

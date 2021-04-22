@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <unordered_map>
 
 #include <boost/noncopyable.hpp>
 
@@ -49,23 +50,34 @@ class ObjectFactory {
 public:
     ObjectFactory(Game *game, scene::SceneGraph *sceneGraph);
 
-    std::unique_ptr<Module> newModule();
-    std::unique_ptr<Area> newArea();
-    std::unique_ptr<Creature> newCreature();
-    std::unique_ptr<Placeable> newPlaceable();
-    std::unique_ptr<Door> newDoor();
-    std::unique_ptr<Waypoint> newWaypoint();
-    std::unique_ptr<Trigger> newTrigger();
-    std::unique_ptr<Item> newItem();
-    std::unique_ptr<Sound> newSound();
-    std::unique_ptr<PlaceableCamera> newCamera();
-    std::unique_ptr<Encounter> newEncounter();
+    std::shared_ptr<Module> newModule();
+    std::shared_ptr<Area> newArea();
+    std::shared_ptr<Creature> newCreature();
+    std::shared_ptr<Placeable> newPlaceable();
+    std::shared_ptr<Door> newDoor();
+    std::shared_ptr<Waypoint> newWaypoint();
+    std::shared_ptr<Trigger> newTrigger();
+    std::shared_ptr<Item> newItem();
+    std::shared_ptr<Sound> newSound();
+    std::shared_ptr<PlaceableCamera> newCamera();
+    std::shared_ptr<Encounter> newEncounter();
+
+    std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
 private:
     Game *_game;
     scene::SceneGraph *_sceneGraph;
 
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
+    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
+
+    template <class T, class ...Args>
+    std::shared_ptr<T> newObject(Args &&... args) {
+        uint32_t id = _counter++;
+        std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));
+        _objectById.insert(std::make_pair(id, object));
+        return move(object);
+    }
 };
 
 } // namespace game

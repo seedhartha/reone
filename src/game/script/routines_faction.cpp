@@ -34,8 +34,8 @@ namespace reone {
 namespace game {
 
 Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectToChangeFaction = getCreature(args, 0);
-    auto memberOfFactionToJoin = getCreature(args, 1);
+    auto objectToChangeFaction = getCreature(args, 0, ctx);
+    auto memberOfFactionToJoin = getCreature(args, 1, ctx);
 
     if (objectToChangeFaction && memberOfFactionToJoin) {
         objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
@@ -49,7 +49,7 @@ Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
-    auto creatureToChange = getCreature(args, 0);
+    auto creatureToChange = getCreature(args, 0, ctx);
     auto faction = getEnum<Faction>(args, 1);
 
     if (creatureToChange) {
@@ -63,7 +63,7 @@ Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionC
 
 Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto firstObject = getCreature(args, 0);
+    auto firstObject = getCreature(args, 0, ctx);
     auto secondObject = getCreatureOrCaller(args, 1, ctx);
 
     if (firstObject && secondObject) {
@@ -80,7 +80,7 @@ Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &
 Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
     auto result = Faction::Invalid;
 
-    auto object = getCreature(args, 0);
+    auto object = getCreature(args, 0, ctx);
     if (object) {
         result = object->faction();
     } else {
@@ -92,7 +92,7 @@ Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContex
 
 Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0);
+    auto target = getCreature(args, 0, ctx);
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
@@ -108,7 +108,7 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
 
 Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0);
+    auto target = getCreature(args, 0, ctx);
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
@@ -124,7 +124,7 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
 
 Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0);
+    auto target = getCreature(args, 0, ctx);
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {

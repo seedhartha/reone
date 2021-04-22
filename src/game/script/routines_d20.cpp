@@ -137,7 +137,7 @@ Variable Routines::d100(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
     auto result = Gender::None;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->gender();
     } else {
@@ -150,7 +150,7 @@ Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->attributes().getAggregateLevel();
     } else {
@@ -231,7 +231,7 @@ Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &
 Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     if (object) {
         result = object->isMinOneHP();
     } else {
@@ -242,7 +242,7 @@ Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     int maxHP = getInt(args, 1);
 
     if (object) {
@@ -254,7 +254,7 @@ Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     bool minOneHP = getBool(args, 1);
 
     if (object) {
@@ -268,7 +268,7 @@ Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx)
 
 Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     auto type = getEnum<Ability>(args, 1);
 
     if (creature) {
@@ -311,7 +311,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
 Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->xp();
     } else {
@@ -322,7 +322,7 @@ Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     if (creature) {
@@ -335,7 +335,7 @@ Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     if (creature) {
@@ -350,7 +350,7 @@ Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext 
 Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ctx) {
     auto result = RacialType::Invalid;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->racialType();
     } else {
@@ -363,7 +363,7 @@ Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ct
 Variable Routines::getSubRace(const VariablesList &args, ExecutionContext &ctx) {
     auto result = Subrace::None;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->subrace();
     } else {

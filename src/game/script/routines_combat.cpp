@@ -38,7 +38,7 @@ namespace game {
 Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
     auto result = NPCAIStyle::DefaultAttack;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->aiStyle();
     } else {
@@ -49,7 +49,7 @@ Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     auto style = getEnum<NPCAIStyle>(args, 1);
 
     if (creature) {

@@ -51,7 +51,7 @@
 #include "options.h"
 #include "party.h"
 #include "savedgame.h"
-#include "script/runner.h"
+#include "script/runutil.h"
 #include "types.h"
 
 namespace reone {
@@ -108,7 +108,6 @@ public:
     Party &party() { return _party; }
     CharacterGeneration &characterGeneration() { return *_charGen; }
     CameraType cameraType() const { return _cameraType; }
-    ScriptRunner &scriptRunner() { return _scriptRunner; }
     Conversation &conversation() { return *_conversation; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
     Combat &combat() { return _combat; }
@@ -201,7 +200,6 @@ private:
     scene::WorldRenderPipeline _worldPipeline;
     Console _console;
     Party _party;
-    ScriptRunner _scriptRunner;
     ProfileOverlay _profileOverlay;
     Combat _combat;
     GameID _gameId { GameID::KotOR };

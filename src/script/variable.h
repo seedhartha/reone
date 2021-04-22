@@ -49,12 +49,12 @@ struct Variable {
     VariableType type { VariableType::Void };
     std::string strValue;
     glm::vec3 vecValue { 0.0f };
-    std::shared_ptr<ScriptObject> object;
     std::shared_ptr<EngineType> engineType;
     std::shared_ptr<ExecutionContext> context;
 
     union {
-        int intValue { 0 };
+        int32_t intValue { 0 };
+        uint32_t objectId;
         float floatValue;
     };
 
@@ -64,6 +64,7 @@ struct Variable {
     static Variable ofFloat(float value);
     static Variable ofString(std::string value);
     static Variable ofVector(glm::vec3 value);
+    static Variable ofObject(uint32_t objectId);
     static Variable ofObject(std::shared_ptr<ScriptObject> object);
     static Variable ofEffect(std::shared_ptr<EngineType> engineType);
     static Variable ofEvent(std::shared_ptr<EngineType> engineType);

@@ -41,7 +41,7 @@
 #include "../objectselect.h"
 #include "../pathfinder.h"
 #include "../perception.h"
-#include "../script/runner.h"
+#include "../script/runutil.h"
 #include "../types.h"
 
 #include "object.h"
@@ -108,10 +108,8 @@ public:
 
     std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
 
-    std::shared_ptr<SpatialObject> getObjectById(uint32_t id) const;
-    std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
-
     ObjectList &getObjectsByType(ObjectType type);
+    std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
 
     /**
      * Find the nth nearest object for which the specified predicate returns true.
@@ -220,7 +218,6 @@ private:
 
     ObjectList _objects;
     std::unordered_map<ObjectType, ObjectList> _objectsByType;
-    std::unordered_map<uint32_t, std::shared_ptr<SpatialObject>> _objectById;
     std::unordered_map<std::string, ObjectList> _objectsByTag;
     std::set<uint32_t> _objectsToDestroy;
 

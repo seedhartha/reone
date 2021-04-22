@@ -94,15 +94,15 @@ private:
     std::shared_ptr<SpatialObject> getCallerAsSpatial(script::ExecutionContext &ctx) const;
     std::shared_ptr<Creature> getCallerAsCreature(script::ExecutionContext &ctx) const;
     std::shared_ptr<Object> getTriggerrer(script::ExecutionContext &ctx) const;
-    std::shared_ptr<Object> getObject(const VariablesList &args, int index) const;
+    std::shared_ptr<Object> getObject(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<Object> getObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index) const;
+    std::shared_ptr<SpatialObject> getSpatialObject(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::shared_ptr<Creature> getCreature(const VariablesList &args, int index) const;
+    std::shared_ptr<Creature> getCreature(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
     std::shared_ptr<Creature> getCreatureOrCaller(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
-    std::shared_ptr<Door> getDoor(const VariablesList &args, int index) const;
-    std::shared_ptr<Item> getItem(const VariablesList &args, int index) const;
-    std::shared_ptr<Sound> getSound(const VariablesList &args, int index) const;
+    std::shared_ptr<Door> getDoor(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    std::shared_ptr<Item> getItem(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
+    std::shared_ptr<Sound> getSound(const VariablesList &args, int index, script::ExecutionContext &ctx) const;
 
     std::shared_ptr<Effect> getEffect(const VariablesList &args, int index) const;
     std::shared_ptr<Event> getEvent(const VariablesList &args, int index) const;

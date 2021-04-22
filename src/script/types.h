@@ -30,7 +30,6 @@ constexpr uint32_t kObjectInvalid = 1;
 
 struct Variable;
 
-class ScriptObject;
 class ScriptProgram;
 class Routine;
 
@@ -52,8 +51,8 @@ public:
 struct ExecutionContext {
     IRoutineProvider *routines { nullptr };
     std::shared_ptr<ExecutionState> savedState;
-    std::shared_ptr<ScriptObject> caller;
-    std::shared_ptr<ScriptObject> triggerer;
+    uint32_t callerId { kObjectInvalid };
+    uint32_t triggererId { kObjectInvalid };
     int userDefinedEventNumber { -1 };
     int scriptVar { -1 };
 };

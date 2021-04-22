@@ -103,11 +103,11 @@ Variable Routines::shipBuild(const VariablesList &args, ExecutionContext &ctx) {
 
 Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ctx) {
     string script(getString(args, 0));
-    auto target = getObject(args, 1);
+    auto target = getObject(args, 1, ctx);
     int scriptVar = getInt(args, 2, -1);
 
     if (target) {
-        _game->scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+        runScript(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
     } else {
         debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
@@ -167,7 +167,7 @@ Variable Routines::printInteger(const VariablesList &args, ExecutionContext &ctx
 }
 
 Variable Routines::printObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     info(to_string(object->id()));
     return Variable();
 }

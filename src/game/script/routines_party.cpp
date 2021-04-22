@@ -63,7 +63,7 @@ Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionCon
 Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature == _game->party().player();
     } else {
@@ -82,7 +82,7 @@ Variable Routines::isAvailableCreature(const VariablesList &args, ExecutionConte
 Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = _game->party().isMember(*creature);
     } else {
@@ -116,7 +116,7 @@ Variable Routines::setPartyLeader(const VariablesList &args, ExecutionContext &c
 Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
     int npc = getInt(args, 0);
-    auto creature = getCreature(args, 1);
+    auto creature = getCreature(args, 1, ctx);
 
     if (creature) {
         _game->party().addAvailableMember(npc, creature->blueprintResRef());

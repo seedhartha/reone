@@ -502,7 +502,7 @@ set(GAME_HEADERS
     src/game/d20/skills.h
     src/game/savedgame.h
     src/game/script/routines.h
-    src/game/script/runner.h
+    src/game/script/runutil.h
     src/game/soundsets.h
     src/game/surface.h
     src/game/surfaces.h
@@ -631,7 +631,7 @@ set(GAME_SOURCES
     src/game/script/routines_time.cpp
     src/game/script/routines_tsl.cpp
     src/game/script/routines_vars.cpp
-    src/game/script/runner.cpp
+    src/game/script/runutil.cpp
     src/game/soundsets.cpp
     src/game/surfaces.cpp)
 

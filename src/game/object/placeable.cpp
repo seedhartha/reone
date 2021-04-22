@@ -25,7 +25,7 @@
 #include "../../scene/node/modelscenenode.h"
 #include "../../script/types.h"
 
-#include "../script/runner.h"
+#include "../script/runutil.h"
 
 using namespace std;
 
@@ -41,10 +41,9 @@ namespace game {
 Placeable::Placeable(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph, scriptRunner) {
+    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph) {
 
     _drawDistance = 64.0f;
 }
@@ -91,13 +90,13 @@ shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
     if (!_onUsed.empty()) {
-        _scriptRunner->run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+        runScript(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
 void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
     if (!_onInvDisturbed.empty()) {
-        _scriptRunner->run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+        runScript(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
 }
 

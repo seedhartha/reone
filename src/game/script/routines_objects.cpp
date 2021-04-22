@@ -38,7 +38,7 @@ namespace reone {
 namespace game {
 
 Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto destroy = getSpatialObject(args, 0);
+    auto destroy = getSpatialObject(args, 0, ctx);
     if (destroy) {
         _game->module()->area()->destroyObject(*destroy);
     } else {
@@ -52,7 +52,7 @@ Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(static_cast<bool>(object)));
 }
 
@@ -90,7 +90,7 @@ Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
-    auto target = getDoor(args, 0);
+    auto target = getDoor(args, 0, ctx);
     bool locked = getBool(args, 1);
 
     if (target) {
@@ -105,7 +105,7 @@ Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto target = getDoor(args, 0);
+    auto target = getDoor(args, 0, ctx);
     if (target) {
         result = target->isLocked();
     } else {
@@ -122,7 +122,7 @@ Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
     string result;
 
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     if (object) {
         result = object->tag();
     } else {
@@ -135,7 +135,7 @@ Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionContext &ctx) {
     float result = -1.0f;
     auto caller = getCallerAsSpatial(ctx);
-    auto object = getSpatialObject(args, 0);
+    auto object = getSpatialObject(args, 0, ctx);
 
     if (caller && object) {
         result = caller->getDistanceTo(*object);
@@ -151,7 +151,7 @@ Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionConte
 Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
     float result = -1.0f;
     auto caller = getCallerAsSpatial(ctx);
-    auto object = getSpatialObject(args, 0);
+    auto object = getSpatialObject(args, 0, ctx);
 
     if (caller && object) {
         result = caller->getDistanceTo(glm::vec2(object->position()));
@@ -171,7 +171,7 @@ Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
     float result = -1.0f;
 
-    auto target = getSpatialObject(args, 0);
+    auto target = getSpatialObject(args, 0, ctx);
     if (target) {
         result = glm::degrees(target->getFacing());
     } else {
@@ -184,7 +184,7 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {
     glm::vec3 result(0.0f);
 
-    auto target = getSpatialObject(args, 0);
+    auto target = getSpatialObject(args, 0, ctx);
     if (target) {
         result = target->position();
     } else {
@@ -196,7 +196,7 @@ Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &ctx) {
-    auto sound = getSound(args, 0);
+    auto sound = getSound(args, 0, ctx);
     if (sound) {
         sound->play();
     } else {
@@ -206,7 +206,7 @@ Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &ctx) {
-    auto sound = getSound(args, 0);
+    auto sound = getSound(args, 0, ctx);
     if (sound) {
         sound->stop();
     } else {
@@ -217,8 +217,8 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
 
 Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContext &ctx) {
     float result = 0.0f;
-    auto objectA = getSpatialObject(args, 0);
-    auto objectB = getSpatialObject(args, 1);
+    auto objectA = getSpatialObject(args, 0, ctx);
+    auto objectB = getSpatialObject(args, 1, ctx);
 
     if (objectA && objectB) {
         result = objectA->getDistanceTo(*objectB);
@@ -233,8 +233,8 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
 
 Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
     float result = 0.0f;
-    auto objectA = getSpatialObject(args, 0);
-    auto objectB = getSpatialObject(args, 1);
+    auto objectA = getSpatialObject(args, 0, ctx);
+    auto objectB = getSpatialObject(args, 1, ctx);
 
     if (objectA && objectB) {
         result = objectA->getDistanceTo(glm::vec2(objectB->position()));
@@ -250,7 +250,7 @@ Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionCont
 Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     if (creature) {
         result = creature->isDead();
     } else {
@@ -276,7 +276,7 @@ Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ct
 Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto object = getSpatialObject(args, 0);
+    auto object = getSpatialObject(args, 0, ctx);
     if (object) {
         result = object->isOpen();
     } else {
@@ -313,7 +313,7 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
 Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
     string result;
 
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     if (object) {
         result = object->name();
     } else {
@@ -326,7 +326,7 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
     auto result = ObjectType::Invalid;
 
-    auto target = getObject(args, 0);
+    auto target = getObject(args, 0, ctx);
     if (target) {
         result = target->type();
     } else {
@@ -350,7 +350,7 @@ Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
-    auto target = getObject(args, 0);
+    auto target = getObject(args, 0, ctx);
     bool plotFlag = getBool(args, 1);
 
     if (target) {
@@ -363,8 +363,8 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
 }
 
 Variable Routines::faceObjectAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto facer = getSpatialObject(args, 0);
-    auto objectToFaceAwayFrom = getSpatialObject(args, 1);
+    auto facer = getSpatialObject(args, 0, ctx);
+    auto objectToFaceAwayFrom = getSpatialObject(args, 1, ctx);
 
     if (facer && objectToFaceAwayFrom) {
         facer->faceAwayFrom(*objectToFaceAwayFrom);
@@ -436,7 +436,7 @@ Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContex
 
 Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
-    auto target = getSpatialObject(args, 0);
+    auto target = getSpatialObject(args, 0, ctx);
     int animation = getInt(args, 1);
     auto attackResult = getEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
@@ -546,7 +546,7 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
 }
 
 Variable Routines::objectToString(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0);
+    auto object = getObject(args, 0, ctx);
     string result;
 
     if (object) {
