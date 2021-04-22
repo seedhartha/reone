@@ -24,9 +24,9 @@ import platform
 import shutil
 import subprocess
 
-game_dir = r"D:\Games\Star Wars - KotOR2"
+game_dir = r"D:\Games\Star Wars - KotOR"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\TSL"
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
 steps = {
@@ -35,8 +35,8 @@ steps = {
     "extract_modules": False,
     "extract_dialog": False,
     "extract_textures": False,
-    "extract_voices": True,
-    "convert_to_json": False,
+    "extract_voices": False,
+    "convert_to_json": True,
     "convert_to_tga": False,
     "convert_to_ascii_pth": False,
     "disassemble_scripts": False }
@@ -166,7 +166,7 @@ def convert_to_json(extract_dir):
     CONVERTIBLE_EXT = [
         ".2da",
         ".gui",
-        ".ifo", ".are", ".git", ".pth",
+        ".ifo", ".are", ".git",
         ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
         ".dlg",
         ".tlk"]

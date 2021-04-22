@@ -52,42 +52,46 @@ void GffTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 static pt::ptree getPropertyTree(const GffStruct &gffs) {
+    pt::ptree fields;
+    for (auto &field : gffs.fields()) {
+        fields.put(field.label, static_cast<int>(field.type));
+    }
+
     pt::ptree tree;
     tree.put("_type", gffs.type());
+    tree.add_child("_fields", fields);
 
     for (auto &field : gffs.fields()) {
-        string id(str(boost::format("%s|%d") % field.label % static_cast<int>(field.type)));
-
         switch (field.type) {
             case GffStruct::FieldType::Byte:
             case GffStruct::FieldType::Word:
             case GffStruct::FieldType::Dword:
-                tree.put(id, field.uintValue);
+                tree.put(field.label, field.uintValue);
                 break;
             case GffStruct::FieldType::Char:
             case GffStruct::FieldType::Short:
             case GffStruct::FieldType::Int:
             case GffStruct::FieldType::StrRef:
-                tree.put(id, field.intValue);
+                tree.put(field.label, field.intValue);
                 break;
             case GffStruct::FieldType::Dword64:
-                tree.put(id, field.uint64Value);
+                tree.put(field.label, field.uint64Value);
                 break;
             case GffStruct::FieldType::Int64:
-                tree.put(id, field.int64Value);
+                tree.put(field.label, field.int64Value);
                 break;
             case GffStruct::FieldType::Float:
-                tree.put(id, field.floatValue);
+                tree.put(field.label, field.floatValue);
                 break;
             case GffStruct::FieldType::Double:
-                tree.put(id, field.doubleValue);
+                tree.put(field.label, field.doubleValue);
                 break;
             case GffStruct::FieldType::CExoString:
             case GffStruct::FieldType::ResRef:
-                tree.put(id, field.strValue);
+                tree.put(field.label, field.strValue);
                 break;
             case GffStruct::FieldType::CExoLocString:
-                tree.put(id, boost::format("%d|%s") % field.intValue % field.strValue);
+                tree.put(field.label, boost::format("%d|%s") % field.intValue % field.strValue);
                 break;
             case GffStruct::FieldType::Void: {
                 string value;
@@ -95,11 +99,11 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
                 for (size_t i = 0; i < field.data.size(); ++i) {
                     sprintf(&value[2 * i], "%02hhx", field.data[i]);
                 }
-                tree.put(id, value);
+                tree.put(field.label, value);
                 break;
             }
             case GffStruct::FieldType::Struct: {
-                tree.add_child(id, getPropertyTree(*field.children[0]));
+                tree.add_child(field.label, getPropertyTree(*field.children[0]));
                 break;
             }
             case GffStruct::FieldType::List: {
@@ -107,14 +111,14 @@ static pt::ptree getPropertyTree(const GffStruct &gffs) {
                 for (auto &child : field.children) {
                     children.push_back(make_pair("", getPropertyTree(*child)));
                 }
-                tree.add_child(id, children);
+                tree.add_child(field.label, children);
                 break;
             }
             case GffStruct::FieldType::Orientation:
-                tree.put(id, boost::format("%f|%f|%f|%f") % field.quatValue.w % field.quatValue.x % field.quatValue.y % field.quatValue.z);
+                tree.put(field.label, boost::format("%f|%f|%f|%f") % field.quatValue.w % field.quatValue.x % field.quatValue.y % field.quatValue.z);
                 break;
             case GffStruct::FieldType::Vector:
-                tree.put(id, boost::format("%f|%f|%f") % field.vecValue.x % field.vecValue.y % field.vecValue.z);
+                tree.put(field.label, boost::format("%f|%f|%f") % field.vecValue.x % field.vecValue.y % field.vecValue.z);
                 break;
             default:
                 cerr << "Unsupported GFF field type: " << to_string(static_cast<int>(field.type)) << endl;
@@ -139,6 +143,13 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
 }
 
 static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
+    map<string, GffStruct::FieldType> fieldTypes;
+    if (tree.count("_fields") > 0) {
+        for (auto &child : tree.get_child("_fields")) {
+            fieldTypes.insert(make_pair(child.first, static_cast<GffStruct::FieldType>(child.second.get_value<int>())));
+        }
+    }
+
     auto gffs = make_unique<GffStruct>(tree.get<uint32_t>("_type"));
 
     vector<string> tokens;
@@ -146,13 +157,9 @@ static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
         // Properties with a leading underscore are metadata
         if (boost::starts_with(child.first, "_")) continue;
 
-        boost::split(tokens, child.first, boost::is_any_of("|"), boost::token_compress_on);
-        if (tokens.size() != 2ll) {
-            throw runtime_error("Invalid field name format: " + child.first);
-        }
         GffStruct::Field field;
-        field.type = static_cast<GffStruct::FieldType>(stoi(tokens[1]));
-        field.label = tokens[0];
+        field.type = fieldTypes[child.first];
+        field.label = child.first;
 
         switch (field.type) {
             case GffStruct::FieldType::Byte:
