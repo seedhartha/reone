@@ -59,7 +59,13 @@ void ErfTool::list(const ErfReader &erf) {
 }
 
 void ErfTool::extract(ErfReader &erf, const fs::path &destPath) {
-    if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
+    if (!fs::exists(destPath)) {
+        // Create destination directory if it does not exist
+        fs::create_directory(destPath);
+    } else if (!fs::is_directory(destPath)) {
+        // Return if destination exists, but is not a directory
+        return;
+    }
 
     for (size_t i = 0; i < erf.keys().size(); ++i) {
         const ErfReader::Key &key = erf.keys()[i];

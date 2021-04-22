@@ -85,7 +85,13 @@ void KeyBifTool::listBIF(const KeyReader &key, const BifReader &bif, int bifIdx)
 }
 
 void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, const fs::path &destPath) {
-    if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
+    if (!fs::exists(destPath)) {
+        // Create destination directory if it does not exist
+        fs::create_directory(destPath);
+    } else if (!fs::is_directory(destPath)) {
+        // Return if destination exists, but is not a directory
+        return;
+    }
 
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx != bifIdx) continue;
