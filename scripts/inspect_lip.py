@@ -26,7 +26,7 @@ if not os.path.exists(extract_dir):
 
 
 def _describe_shape(shape):
-    shapes = [
+    phonemes = [
         "EE",
         "EH",
         "SCHWA",
@@ -44,7 +44,12 @@ def _describe_shape(shape):
         "L/R",
         "K/G"]
 
-    return shapes[shape]
+    return phonemes[shape]
+
+
+def normalize_text(text):
+    result = "".join(filter(lambda s: str.isalpha(s) or s == " ", text)) # strip string of everything but letters and spaces
+    return result.upper()
 
 
 def examine_lip(extract_dir, strref):
@@ -62,12 +67,13 @@ def examine_lip(extract_dir, strref):
                     if os.path.exists(lip_path):
                         with open(lip_path) as lip:
                             lip_json = json.load(lip)
-                            print(text)
-                            print(" ".join([_describe_shape(int(x["shape"])) for x in lip_json["keyframes"]]))
+                            print("Text (original): " + text)
+                            print("Text (normalized): " + normalize_text(text))
+                            print("Phonemes: " + " ".join([_describe_shape(int(x["shape"])) for x in lip_json["keyframes"]]))
 
 
 if len(sys.argv) > 1:
     strref = int(sys.argv[1])
     examine_lip(extract_dir, strref)
 else:
-    print("Usage: python examine_lip.py STRREF")
+    print("Usage: python inspect_lip.py STRREF")
