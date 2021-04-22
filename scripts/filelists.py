@@ -21,7 +21,7 @@ import os
 import random
 import sys
 
-extract_dir = r"D:\OpenKotOR\Extract\TSL"
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 
 
 if not os.path.exists(extract_dir):
@@ -75,12 +75,12 @@ def get_lines_from_dlg(obj, speaker, voresref, tlk_strings, uniq_sounds):
         return []
 
     lines = []
-    if "EntryList|15" in obj:
-        for entry in obj["EntryList|15"]:
-            if "VO_ResRef|11" in entry:
-                textstrref = int(entry["Text|12"].split("|")[0])
-                entry_speaker = entry["Speaker|10"].lower()
-                entry_voresref = entry["VO_ResRef|11"].lower()
+    if "EntryList" in obj:
+        for entry in obj["EntryList"]:
+            if "VO_ResRef" in entry:
+                textstrref = int(entry["Text"].split("|")[0])
+                entry_speaker = entry["Speaker"].lower()
+                entry_voresref = entry["VO_ResRef"].lower()
                 if textstrref != -1 and match_entry(entry_speaker, entry_voresref, speaker, voresref) and not entry_voresref in uniq_sounds:
                     text = clear_text(tlk_strings[textstrref])
                     if text:
