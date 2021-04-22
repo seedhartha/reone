@@ -60,7 +60,13 @@ void RimTool::list(const RimReader &rim) {
 }
 
 void RimTool::extract(RimReader &rim, const fs::path &destPath) {
-    if (!fs::is_directory(destPath) || !fs::exists(destPath)) return;
+    if (!fs::exists(destPath)) {
+        // Create destination directory if it does not exist
+        fs::create_directory(destPath);
+    } else if (!fs::is_directory(destPath)) {
+        // Return if destination exists, but is not a directory
+        return;
+    }
 
     for (size_t i = 0; i < rim.resources().size(); ++i) {
         const RimReader::Resource &resEntry = rim.resources()[i];
