@@ -43,7 +43,6 @@ private:
     int _argc;
     char **_argv;
 
-    boost::program_options::options_description _optsCommon;
     boost::program_options::options_description _optsCmdLine { "Usage" };
 
     boost::filesystem::path _gamePath;
