@@ -176,6 +176,21 @@ private:
     void unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
+class LipTool : public ITool {
+public:
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
 } // namespace tools
 
 } // namespace reone

@@ -17,30 +17,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
+#include <memory>
+
+#include <boost/filesystem/path.hpp>
+
+#include "lipanimation.h"
 
 namespace reone {
 
 namespace render {
 
-class LipAnimation {
+class LipWriter {
 public:
-    struct Keyframe {
-        float time { 0.0f };
-        uint8_t shape { 0 }; /**< an index into the keyframes of the "talk" animation  */
-    };
+    LipWriter(LipAnimation &&animation);
 
-    LipAnimation(float length, std::vector<Keyframe> keyframes);
-
-    bool getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &interpolant) const;
-
-    float length() const { return _length; }
-    const std::vector<Keyframe> &keyframes() const { return _keyframes; }
+    void save(const boost::filesystem::path &path);
 
 private:
-    float _length { 0.0f };
-    std::vector<Keyframe> _keyframes;
+    LipAnimation _animation;
 };
 
 } // namespace render

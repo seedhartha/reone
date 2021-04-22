@@ -43,6 +43,7 @@ namespace tools {
 static const unordered_map<string, Operation> g_operations {
     { "list", Operation::List },
     { "extract", Operation::Extract },
+    { "unwrap", Operation::Unwrap },
     { "to-json", Operation::ToJSON },
     { "to-tga", Operation::ToTGA },
     { "to-2da", Operation::To2DA },
@@ -53,7 +54,7 @@ static const unordered_map<string, Operation> g_operations {
     { "to-pth", Operation::ToPTH },
     { "to-ascii", Operation::ToASCII },
     { "to-tlk", Operation::ToTLK },
-    { "unwrap", Operation::Unwrap }
+    { "to-lip", Operation::ToLIP }
 };
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
@@ -88,6 +89,7 @@ void Program::initOptions() {
         ("dest", po::value<string>(), "path to destination directory")
         ("list", "list file contents")
         ("extract", "extract file contents")
+        ("unwrap", "unwrap an audio file")
         ("to-json", "convert 2DA, GFF or TLK file to JSON")
         ("to-tga", "convert TPC image to TGA")
         ("to-2da", "convert JSON to 2DA")
@@ -98,7 +100,7 @@ void Program::initOptions() {
         ("to-pth", "convert ASCII PTH to binary PTH")
         ("to-ascii", "convert binary PTH to ASCII")
         ("to-tlk", "convert JSON to TLK")
-        ("unwrap", "unwrap an audio file")
+        ("to-lip", "convert JSON to LIP")
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -150,6 +152,7 @@ void Program::loadTools() {
     _tools.push_back(make_shared<RimTool>());
     _tools.push_back(make_shared<TwoDaTool>());
     _tools.push_back(make_shared<TlkTool>());
+    _tools.push_back(make_shared<LipTool>());
     _tools.push_back(make_shared<GffTool>());
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<PthTool>());
