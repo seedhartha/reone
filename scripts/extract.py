@@ -42,7 +42,6 @@ steps = [
     ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?", None] ]
 
-
 if not os.path.exists(game_dir):
     raise RuntimeError("Game directory does not exist")
 

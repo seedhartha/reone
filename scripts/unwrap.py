@@ -24,7 +24,6 @@ import sys
 wav_dir = r"D:\OpenKotOR\Extract\TSL\voices"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
 
-
 if not os.path.exists(wav_dir):
     raise RuntimeError("WAV directory does not exist")
 
@@ -72,4 +71,4 @@ if len(sys.argv) > 1:
     filelist = sys.argv[1]
     unwrap_from_filelist(filelist)
 else:
-    print('Usage: python ttsfilelist.py filelist')
+    print("Usage: python unwrap.py FILELIST_PATH")
