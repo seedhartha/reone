@@ -101,7 +101,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
 
     auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
 
-    unique_ptr<Creature> creature(objectFactory->newCreature());
+    shared_ptr<Creature> creature(objectFactory->newCreature());
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");

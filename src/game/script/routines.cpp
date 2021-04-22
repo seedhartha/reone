@@ -92,55 +92,63 @@ glm::vec3 Routines::getVector(const VariablesList &args, int index, glm::vec3 de
 }
 
 shared_ptr<Object> Routines::getCaller(ExecutionContext &ctx) const {
-    return static_pointer_cast<Object>(ctx.caller);
+    return _game->getObjectById(ctx.callerId);
 }
 
 shared_ptr<SpatialObject> Routines::getCallerAsSpatial(ExecutionContext &ctx) const {
-    return dynamic_pointer_cast<SpatialObject>(ctx.caller);
+    return dynamic_pointer_cast<SpatialObject>(getCaller(ctx));
 }
 
 shared_ptr<Creature> Routines::getCallerAsCreature(ExecutionContext &ctx) const {
-    return dynamic_pointer_cast<Creature>(ctx.caller);
+    return dynamic_pointer_cast<Creature>(getCaller(ctx));
 }
 
 shared_ptr<Object> Routines::getTriggerrer(ExecutionContext &ctx) const {
-    return static_pointer_cast<Object>(ctx.triggerer);
+    return _game->getObjectById(ctx.triggererId);
 }
 
-shared_ptr<Object> Routines::getObject(const VariablesList &args, int index) const {
-    return static_pointer_cast<Object>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<Object> Routines::getObject(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    uint32_t objectId = isOutOfRange(args, index) ? kObjectInvalid : args[index].objectId;
+    if (objectId == kObjectSelf) {
+        objectId = ctx.callerId;
+    }
+    return _game->getObjectById(objectId);
 }
 
 shared_ptr<Object> Routines::getObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    return static_pointer_cast<Object>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
+    uint32_t objectId = isOutOfRange(args, index) ? kObjectSelf : args[index].objectId;
+    if (objectId == kObjectSelf) {
+        objectId = ctx.callerId;
+    }
+    return _game->getObjectById(objectId);
 }
 
-shared_ptr<SpatialObject> Routines::getSpatialObject(const VariablesList &args, int index) const {
-    return dynamic_pointer_cast<SpatialObject>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<SpatialObject> Routines::getSpatialObject(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<SpatialObject>(getObject(args, index, ctx));
 }
 
 shared_ptr<SpatialObject> Routines::getSpatialObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    return dynamic_pointer_cast<SpatialObject>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
+    return dynamic_pointer_cast<SpatialObject>(getObjectOrCaller(args, index, ctx));
 }
 
-shared_ptr<Creature> Routines::getCreature(const VariablesList &args, int index) const {
-    return dynamic_pointer_cast<Creature>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<Creature> Routines::getCreature(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<Creature>(getObject(args, index, ctx));
 }
 
 shared_ptr<Creature> Routines::getCreatureOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
-    return dynamic_pointer_cast<Creature>(isOutOfRange(args, index) ? ctx.caller : args[index].object);
+    return dynamic_pointer_cast<Creature>(getObjectOrCaller(args, index, ctx));
 }
 
-shared_ptr<Door> Routines::getDoor(const VariablesList &args, int index) const {
-    return dynamic_pointer_cast<Door>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<Door> Routines::getDoor(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<Door>(getObject(args, index, ctx));
 }
 
-shared_ptr<Item> Routines::getItem(const VariablesList &args, int index) const {
-    return dynamic_pointer_cast<Item>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<Item> Routines::getItem(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<Item>(getObject(args, index, ctx));
 }
 
-shared_ptr<Sound> Routines::getSound(const VariablesList &args, int index) const {
-    return dynamic_pointer_cast<Sound>(isOutOfRange(args, index) ? nullptr : args[index].object);
+shared_ptr<Sound> Routines::getSound(const VariablesList &args, int index, ExecutionContext &ctx) const {
+    return dynamic_pointer_cast<Sound>(getObject(args, index, ctx));
 }
 
 shared_ptr<Effect> Routines::getEffect(const VariablesList &args, int index) const {

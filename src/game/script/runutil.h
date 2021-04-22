@@ -18,10 +18,7 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
 #include <string>
-
-#include <boost/noncopyable.hpp>
 
 #include "../../script/types.h"
 
@@ -29,27 +26,12 @@ namespace reone {
 
 namespace game {
 
-class Game;
-class Object;
-
-/**
- * An interface for game objects to run their scripts. This is needed because
- * runScript accepts smart pointers to game objects.
- */
-class ScriptRunner : boost::noncopyable {
-public:
-    ScriptRunner(Game *game);
-
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
-
-private:
-    Game *_game;
-};
+int runScript(
+    const std::string &resRef,
+    uint32_t callerId = script::kObjectInvalid,
+    uint32_t triggerrerId = script::kObjectInvalid,
+    int userDefinedEventNumber = -1,
+    int scriptVar = -1);
 
 } // namespace game
 

@@ -79,7 +79,6 @@ Game::Game(const fs::path &path, const Options &opts) :
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
     _party(this),
-    _scriptRunner(this),
     _profileOverlay(opts.graphics),
     _combat(this),
     _objectFactory(this, &_sceneGraph) {
@@ -397,15 +396,8 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
         case kObjectInvalid:
             return nullptr;
         default:
-            break;
+            return _objectFactory.getObjectById(id);
     }
-
-    if (_module->id() == id) return _module;
-
-    auto area = _module->area();
-    if (area->id() == id) return area;
-
-    return area->getObjectById(id);
 }
 
 void Game::drawGUI() {

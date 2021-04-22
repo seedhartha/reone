@@ -33,14 +33,9 @@ namespace game {
 Encounter::Encounter(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
-) : SpatialObject(
-    id,
-    ObjectType::Encounter,
-    objectFactory,
-    sceneGraph,
-    scriptRunner) {
+    SceneGraph *sceneGraph
+) :
+    SpatialObject(id, ObjectType::Encounter, objectFactory, sceneGraph) {
 }
 
 void Encounter::loadFromGIT(const GffStruct &gffs) {

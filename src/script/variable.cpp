@@ -129,10 +129,17 @@ Variable Variable::ofVector(glm::vec3 value) {
     return move(result);
 }
 
+Variable Variable::ofObject(uint32_t objectId) {
+    Variable result;
+    result.type = VariableType::Object;
+    result.objectId = objectId;
+    return move(result);
+}
+
 Variable Variable::ofObject(shared_ptr<ScriptObject> object) {
     Variable result;
     result.type = VariableType::Object;
-    result.object = move(object);
+    result.objectId = object ? object->id() : kObjectInvalid;
     return move(result);
 }
 
@@ -182,7 +189,7 @@ bool Variable::operator==(const Variable &other) const {
         case VariableType::String:
             return strValue == other.strValue;
         case VariableType::Object:
-            return object == other.object;
+            return objectId == other.objectId;
         case VariableType::Effect:
         case VariableType::Event:
         case VariableType::Location:
@@ -256,7 +263,7 @@ const string Variable::toString() const {
         case VariableType::String:
             return str(boost::format("\"%s\"") % strValue);
         case VariableType::Object:
-            return to_string(object ? object->id() : kObjectInvalid);
+            return to_string(objectId);
         case VariableType::Vector:
             return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
         case VariableType::Effect:

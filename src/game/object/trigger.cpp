@@ -25,7 +25,7 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
-#include "../script/runner.h"
+#include "../script/runutil.h"
 
 using namespace std;
 
@@ -40,15 +40,13 @@ namespace game {
 Trigger::Trigger(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Trigger,
         objectFactory,
-        sceneGraph,
-        scriptRunner) {
+        sceneGraph) {
 }
 
 void Trigger::loadFromGIT(const GffStruct &gffs) {
@@ -103,7 +101,7 @@ void Trigger::update(float dt) {
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
         if (!_onExit.empty()) {
-            _scriptRunner->run(_onExit, _id, tenant->id());
+            runScript(_onExit, _id, tenant->id());
         }
     }
 }

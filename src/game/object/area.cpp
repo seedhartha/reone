@@ -265,7 +265,6 @@ bool Area::getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) 
 void Area::add(const shared_ptr<SpatialObject> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
-    _objectById[object->id()] = object;
     _objectsByTag[object->tag()].push_back(object);
 
     determineObjectRoom(*object);
@@ -288,7 +287,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(getObjectById(objectId));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game->objectFactory().getObjectById(objectId)));
     if (!object) return;
     {
         Room *room = object->room();
@@ -308,7 +307,6 @@ void Area::doDestroyObject(uint32_t objectId) {
             _objects.erase(maybeObject);
         }
     }
-    _objectById.erase(objectId);
     {
         auto maybeTagObjects = _objectsByTag.find(object->tag());
         if (maybeTagObjects != _objectsByTag.end()) {
@@ -331,11 +329,8 @@ void Area::doDestroyObject(uint32_t objectId) {
     }
 }
 
-shared_ptr<SpatialObject> Area::getObjectById(uint32_t id) const {
-    auto object = _objectById.find(id);
-    if (object == _objectById.end()) return nullptr;
-
-    return object->second;
+ObjectList &Area::getObjectsByType(ObjectType type) {
+    return _objectsByType.find(type)->second;
 }
 
 shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const {
@@ -344,10 +339,6 @@ shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const
     if (nth >= objects->second.size()) return nullptr;
 
     return objects->second[nth];
-}
-
-ObjectList &Area::getObjectsByType(ObjectType type) {
-    return _objectsByType.find(type)->second;
 }
 
 void Area::landObject(SpatialObject &object) {
@@ -585,7 +576,7 @@ void Area::runOnEnterScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    _game->scriptRunner().run(_onEnter, _id, player->id());
+    runScript(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
@@ -594,7 +585,7 @@ void Area::runOnExitScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    _game->scriptRunner().run(_onExit, _id, player->id());
+    runScript(_onExit, _id, player->id());
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
@@ -896,7 +887,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            _game->scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
+            runScript(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -904,12 +895,12 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 void Area::updateHeartbeat(float dt) {
     if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
-            _game->scriptRunner().run(_onHeartbeat, _id);
+            runScript(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
             string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
-                _game->scriptRunner().run(heartbeat, object->id());
+                runScript(heartbeat, object->id());
             }
         }
         _heartbeatTimer.reset(kHeartbeatInterval);

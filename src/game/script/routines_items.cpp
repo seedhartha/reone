@@ -95,7 +95,7 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
 Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     if (item) {
         result = item->stackSize();
     } else {
@@ -106,7 +106,7 @@ Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     int stackSize = getInt(args, 1);
 
     if (item) {
@@ -121,7 +121,7 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
 Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     if (item) {
         result = item->isIdentified();
     } else {
@@ -132,7 +132,7 @@ Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     bool identified = getBool(args, 1);
 
     if (item) {
@@ -146,7 +146,7 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
 
 Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Item> result;
-    auto creature = getCreature(args, 0);
+    auto creature = getCreature(args, 0, ctx);
     auto itemTag = boost::to_lower_copy(getString(args, 1));
 
     if (creature && !itemTag.empty()) {
@@ -163,7 +163,7 @@ Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContex
 Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     if (item) {
         result = item->baseItemType();
     } else {

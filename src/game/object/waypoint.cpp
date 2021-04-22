@@ -37,15 +37,13 @@ namespace game {
 Waypoint::Waypoint(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Waypoint,
         objectFactory,
-        sceneGraph,
-        scriptRunner) {
+        sceneGraph) {
 }
 
 void Waypoint::loadFromGIT(const GffStruct &gffs) {

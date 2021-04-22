@@ -17,12 +17,10 @@
 
 #include "objectfactory.h"
 
-#include "../game.h"
+#include "../../common/collectionutil.h"
 
 using namespace std;
 
-using namespace reone::render;
-using namespace reone::resource;
 using namespace reone::scene;
 
 namespace reone {
@@ -40,48 +38,52 @@ ObjectFactory::ObjectFactory(Game *game, SceneGraph *sceneGraph) :
     }
 }
 
-unique_ptr<Module> ObjectFactory::newModule() {
-    return make_unique<Module>(_counter++, _game);
+shared_ptr<Module> ObjectFactory::newModule() {
+    return newObject<Module>(_game);
 }
 
-unique_ptr<Area> ObjectFactory::newArea() {
-    return make_unique<Area>(_counter++, _game);
+shared_ptr<Area> ObjectFactory::newArea() {
+    return newObject<Area>(_game);
 }
 
-unique_ptr<Creature> ObjectFactory::newCreature() {
-    return make_unique<Creature>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Creature> ObjectFactory::newCreature() {
+    return newObject<Creature>(this, _sceneGraph);
 }
 
-unique_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return make_unique<Placeable>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Placeable> ObjectFactory::newPlaceable() {
+    return newObject<Placeable>(this, _sceneGraph);
 }
 
-unique_ptr<Door> ObjectFactory::newDoor() {
-    return make_unique<Door>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Door> ObjectFactory::newDoor() {
+    return newObject<Door>(this, _sceneGraph);
 }
 
-unique_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return make_unique<Waypoint>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
+    return newObject<Waypoint>(this, _sceneGraph);
 }
 
-unique_ptr<Trigger> ObjectFactory::newTrigger() {
-    return make_unique<Trigger>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Trigger> ObjectFactory::newTrigger() {
+    return newObject<Trigger>(this, _sceneGraph);
 }
 
-unique_ptr<Item> ObjectFactory::newItem() {
-    return make_unique<Item>(_counter++);
+shared_ptr<Item> ObjectFactory::newItem() {
+    return newObject<Item>();
 }
 
-unique_ptr<Sound> ObjectFactory::newSound() {
-    return make_unique<Sound>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Sound> ObjectFactory::newSound() {
+    return newObject<Sound>(this, _sceneGraph);
 }
 
-unique_ptr<PlaceableCamera> ObjectFactory::newCamera() {
-    return make_unique<PlaceableCamera>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
+    return newObject<PlaceableCamera>(this, _sceneGraph);
 }
 
-unique_ptr<Encounter> ObjectFactory::newEncounter() {
-    return make_unique<Encounter>(_counter++, this, _sceneGraph, &_game->scriptRunner());
+shared_ptr<Encounter> ObjectFactory::newEncounter() {
+    return newObject<Encounter>(this, _sceneGraph);
+}
+
+shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {
+    return getFromLookupOrNull(_objectById, id);
 }
 
 } // namespace game

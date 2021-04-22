@@ -38,15 +38,13 @@ namespace game {
 Sound::Sound(
     uint32_t id,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Sound,
         objectFactory,
-        sceneGraph,
-        scriptRunner) {
+        sceneGraph) {
 }
 
 void Sound::loadFromGIT(const GffStruct &gffs) {

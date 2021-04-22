@@ -37,13 +37,11 @@ SpatialObject::SpatialObject(
     uint32_t id,
     ObjectType type,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph,
-    ScriptRunner *scriptRunner
+    SceneGraph *sceneGraph
 ) :
     Object(id, type),
     _objectFactory(objectFactory),
-    _sceneGraph(sceneGraph),
-    _scriptRunner(scriptRunner) {
+    _sceneGraph(sceneGraph) {
 }
 
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {

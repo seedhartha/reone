@@ -32,8 +32,7 @@ public:
     PlaceableCamera(
         uint32_t id,
         ObjectFactory *objectFactory,
-        scene::SceneGraph *sceneGraph,
-        ScriptRunner *scriptRunner);
+        scene::SceneGraph *sceneGraph);
 
     void loadFromGIT(const resource::GffStruct &gffs);
 

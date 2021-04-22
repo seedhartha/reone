@@ -162,7 +162,7 @@ void ActionExecutor::executeFollow(const shared_ptr<Object> &actor, FollowAction
 
 void ActionExecutor::executeDoCommand(const shared_ptr<Object> &actor, CommandAction &action, float dt) {
     auto context = make_unique<ExecutionContext>(*action.context());
-    context->caller = actor;
+    context->callerId = actor ? actor->id() : kObjectInvalid;
 
     shared_ptr<ScriptProgram> program(action.context()->savedState->program);
     ScriptExecution(program, move(context)).run();
@@ -291,14 +291,14 @@ void ActionExecutor::executeOpenDoor(const shared_ptr<Object> &actor, ObjectActi
         if (!isObjectSelf && door->isLocked()) {
             string onFailToOpen(door->getOnFailToOpen());
             if (!onFailToOpen.empty()) {
-                _game->scriptRunner().run(onFailToOpen, door->id(), actor->id());
+                runScript(onFailToOpen, door->id(), actor->id());
             }
         } else {
             door->open(actor);
             if (!isObjectSelf) {
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    _game->scriptRunner().run(onOpen, door->id(), actor->id(), -1);
+                    runScript(onOpen, door->id(), actor->id(), -1);
                 }
             }
         }
@@ -350,7 +350,7 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
 
             string onOpen(door->getOnOpen());
             if (!onOpen.empty()) {
-                _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                runScript(onOpen, door->id(), actor->id());
             }
         }
 

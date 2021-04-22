@@ -52,7 +52,7 @@ Variable Routines::delayCommand(const VariablesList &args, ExecutionContext &ctx
 }
 
 Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ctx) {
-    auto subject = getObject(args, 0);
+    auto subject = getObject(args, 0, ctx);
     auto action = getAction(args, 1);
 
     if (subject) {
@@ -68,14 +68,14 @@ Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ct
 Variable Routines::actionDoCommand(const VariablesList &args, ExecutionContext &ctx) {
     auto action = getAction(args, 0);
 
-    auto objectAction = make_unique<CommandAction>(move(action));
-    getCaller(ctx)->actionQueue().add(move(objectAction));
+    auto commandAction = make_unique<CommandAction>(move(action));
+    getCaller(ctx)->actionQueue().add(move(commandAction));
 
     return Variable();
 }
 
 Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto moveTo = getObject(args, 0);
+    auto moveTo = getObject(args, 0, ctx);
     bool run = getBool(args, 1, false);
     float range = getFloat(args, 2, 1.0f);
 
@@ -91,7 +91,7 @@ Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContex
 
 Variable Routines::actionStartConversation(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: figure out all arguments
-    auto objectToConverse = getObject(args, 0);
+    auto objectToConverse = getObject(args, 0, ctx);
     string dialogResRef(getString(args, 1, ""));
     bool ignoreStartRange = getBool(args, 4, false);
 
@@ -122,7 +122,7 @@ Variable Routines::actionResumeConversation(const VariablesList &args, Execution
 }
 
 Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &ctx) {
-    auto door = getObject(args, 0);
+    auto door = getObject(args, 0, ctx);
     if (door) {
         auto action = make_unique<ObjectAction>(ActionType::OpenDoor, door);
         getCaller(ctx)->actionQueue().add(move(action));
@@ -133,7 +133,7 @@ Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &ctx) {
-    auto door = getObject(args, 0);
+    auto door = getObject(args, 0, ctx);
     if (door) {
         auto action = make_unique<ObjectAction>(ActionType::CloseDoor, door);
         getCaller(ctx)->actionQueue().add(move(action));
@@ -150,7 +150,7 @@ Variable Routines::clearAllActions(const VariablesList &args, ExecutionContext &
 
 Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0);
+    auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getBool(args, 1, true);
 
     if (jumpTo) {
@@ -176,7 +176,7 @@ Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionCont
 
 Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto moveTo = getObject(args, 0);
+    auto moveTo = getObject(args, 0, ctx);
     bool run = getBool(args, 1, false);
     float range = getFloat(args, 2, 1.0f);
     float timeout = getFloat(args, 3, 30.0f);
@@ -209,7 +209,7 @@ Variable Routines::actionForceMoveToLocation(const VariablesList &args, Executio
 
 Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0);
+    auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getBool(args, 1, true);
 
     if (jumpTo) {
@@ -255,7 +255,7 @@ Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionCont
 
 Variable Routines::actionMoveAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto fleeFrom = getObject(args, 0);
+    auto fleeFrom = getObject(args, 0, ctx);
     bool run = getBool(args, 1, false);
     float range = getFloat(args, 2, 40.0f);
 
@@ -271,7 +271,7 @@ Variable Routines::actionMoveAwayFromObject(const VariablesList &args, Execution
 
 Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     int inventorySlot = getInt(args, 1);
     bool instant = getBool(args, 2, false);
 
@@ -287,7 +287,7 @@ Variable Routines::actionEquipItem(const VariablesList &args, ExecutionContext &
 
 Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     bool instant = getBool(args, 1, false);
 
     if (item) {
@@ -302,7 +302,7 @@ Variable Routines::actionUnequipItem(const VariablesList &args, ExecutionContext
 
 Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     if (item) {
         auto action = make_unique<Action>(ActionType::PickUpItem);
         getCaller(ctx)->actionQueue().add(move(action));
@@ -314,7 +314,7 @@ Variable Routines::actionPickUpItem(const VariablesList &args, ExecutionContext 
 
 Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
+    auto item = getItem(args, 0, ctx);
     if (item) {
         auto action = make_unique<Action>(ActionType::DropItem);
         getCaller(ctx)->actionQueue().add(move(action));
@@ -327,7 +327,7 @@ Variable Routines::actionPutDownItem(const VariablesList &args, ExecutionContext
 Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto caller = getCallerAsCreature(ctx);
-    auto attackee = getSpatialObject(args, 0);
+    auto attackee = getSpatialObject(args, 0, ctx);
     bool passive = getBool(args, 1, false);
 
     if (caller && attackee) {
@@ -367,7 +367,7 @@ Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionConte
 Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto spell = getEnum<ForcePower>(args, 0);
-    auto target = getObject(args, 1);
+    auto target = getObject(args, 1, ctx);
     int metaMagic = getInt(args, 2, 0);
     bool cheat = getBool(args, 3, false);
     int domainLevel = getInt(args, 4, 0);
@@ -382,8 +382,8 @@ Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionC
 
 Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
-    auto giveTo = getObject(args, 1);
+    auto item = getItem(args, 0, ctx);
+    auto giveTo = getObject(args, 1, ctx);
 
     if (item && giveTo) {
         auto action = make_unique<Action>(ActionType::GiveItem);
@@ -399,8 +399,8 @@ Variable Routines::actionGiveItem(const VariablesList &args, ExecutionContext &c
 
 Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto item = getItem(args, 0);
-    auto takeFrom = getObject(args, 1);
+    auto item = getItem(args, 0, ctx);
+    auto takeFrom = getObject(args, 1, ctx);
 
     if (item && takeFrom) {
         auto action = make_unique<Action>(ActionType::TakeItem);
@@ -416,7 +416,7 @@ Variable Routines::actionTakeItem(const VariablesList &args, ExecutionContext &c
 
 Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto follow = getObject(args, 0);
+    auto follow = getObject(args, 0, ctx);
     float followDistance = getFloat(args, 1, 0.0f);
 
     if (follow) {
@@ -471,7 +471,7 @@ Variable Routines::actionSpeakStringByStrRef(const VariablesList &args, Executio
 Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto feat = getEnum<Feat>(args, 0);
-    auto target = getObject(args, 1);
+    auto target = getObject(args, 1, ctx);
 
     if (target) {
         auto action = make_unique<Action>(ActionType::UseFeat);
@@ -486,9 +486,9 @@ Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ct
 Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto skill = getEnum<Skill>(args, 0);
-    auto target = getObject(args, 1);
+    auto target = getObject(args, 1, ctx);
     int subSkill = getInt(args, 2, 0);
-    auto itemUsed = getObject(args, 3);
+    auto itemUsed = getObject(args, 3, ctx);
 
     if (target) {
         auto action = make_unique<Action>(ActionType::UseSkill);
@@ -503,7 +503,7 @@ Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &c
 Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto chosenTalen = getTalent(args, 0);
-    auto target = getObject(args, 1);
+    auto target = getObject(args, 1, ctx);
 
     if (target) {
         auto action = make_unique<Action>(ActionType::UseTalentOnObject);

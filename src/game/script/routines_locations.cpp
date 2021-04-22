@@ -52,7 +52,7 @@ Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionCon
 Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx) {
     shared_ptr<Location> result;
 
-    auto object = getSpatialObject(args, 0);
+    auto object = getSpatialObject(args, 0, ctx);
     if (object) {
         glm::vec3 position(object->position());
         float facing = object->getFacing();

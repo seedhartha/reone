@@ -146,7 +146,7 @@ void PartySelection::onClick(const string &control) {
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
-            _game->scriptRunner().run(_context.exitScript);
+            runScript(_context.exitScript);
         }
     } else if (boost::starts_with(control, "BTN_NPC")) {
         onNpcButtonClick(control);

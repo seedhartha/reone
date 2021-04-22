@@ -372,7 +372,7 @@ void CharacterGeneration::reloadCharacterModel() {
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
     auto objectFactory = make_unique<ObjectFactory>(_game, &sceneGraph);
 
-    unique_ptr<Creature> creature(objectFactory->newCreature());
+    shared_ptr<Creature> creature(objectFactory->newCreature());
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");
