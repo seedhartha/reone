@@ -24,9 +24,9 @@ import platform
 import shutil
 import subprocess
 
-game_dir = r"D:\Games\Star Wars - KotOR2"
+game_dir = r"D:\Games\Star Wars - KotOR"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\TSL"
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
 steps = [
