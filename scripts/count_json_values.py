@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Script to process and analyze extracted resources."""
+"""Script to count unique JSON values in extracted resources."""
 
 import glob
 import json
@@ -44,7 +44,7 @@ def get_unique_json_values(extract_dir, path_pattern, extract_values):
     return values
 
 
-def analyze_unique_json_values(extract_dir, path_pattern, extract_values):
+def count_unique_json_values(extract_dir, path_pattern, extract_values):
     values = get_unique_json_values(extract_dir, path_pattern, extract_values)
     if values:
         print("{} unique values: {}".format(len(values), values))
@@ -60,6 +60,6 @@ if len(sys.argv) > 2:
     # in JSON files.
     path_pattern = sys.argv[1]
     json_key = sys.argv[2]
-    analyze_unique_json_values(extract_dir, path_pattern, partial(extract_values_simple, json_key))
+    count_unique_json_values(extract_dir, path_pattern, partial(extract_values_simple, json_key))
 else:
-    print("Usage: python analyze.py PATH_PATTERN JSON_KEY")
+    print("Usage: python count_json_values.py PATH_PATTERN JSON_KEY")
