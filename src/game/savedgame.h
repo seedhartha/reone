@@ -19,29 +19,12 @@
 
 #include <string>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
-
 namespace reone {
 
 namespace game {
 
-class Game;
-
-class SavedGame : boost::noncopyable {
-public:
-    SavedGame(const boost::filesystem::path &path);
-
-    void save(const Game *game, const std::string &name);
-    void peek();
-    void load(Game *game);
-
-    const std::string &name() const { return _name; }
-
-private:
-    boost::filesystem::path _path;
-    uint64_t _timestamp { 0 };
-    std::string _name;
+struct SavedGame {
+    std::string lastModule;
 };
 
 } // namespace game

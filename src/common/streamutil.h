@@ -30,4 +30,6 @@ inline std::unique_ptr<std::istream> wrap(const std::shared_ptr<ByteArray> &arr)
     return wrap(*arr.get());
 }
 
+ByteArray unwrap(std::ostream);
+
 } // namespace reone

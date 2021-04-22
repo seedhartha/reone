@@ -27,8 +27,10 @@
 
 #include "SDL2/SDL_events.h"
 
+#include "../audio/soundhandle.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
+#include "../video/video.h"
 
 #include "console.h"
 #include "combat/combat.h"
@@ -48,22 +50,11 @@
 #include "object/spatial.h"
 #include "options.h"
 #include "party.h"
+#include "savedgame.h"
 #include "script/runner.h"
 #include "types.h"
 
 namespace reone {
-
-namespace audio {
-
-class SoundHandle;
-
-}
-
-namespace video {
-
-class Video;
-
-}
 
 namespace game {
 
@@ -127,7 +118,7 @@ public:
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
 
-    // Module Loading
+    // Module loading
 
     /**
      * Load a module with the specified name and entry point.
@@ -145,9 +136,9 @@ public:
      */
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
 
-    // END Module Loading
+    // END Module loading
 
-    // Game Screens
+    // Game screens
 
     void openMainMenu();
     void openSaveLoad(SaveLoad::Mode mode);
@@ -160,7 +151,7 @@ public:
     void startCharacterGeneration();
     void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
 
-    // END Game Screens
+    // END Game screens
 
     // Globals/locals
 
@@ -175,6 +166,13 @@ public:
     void setGlobalString(const std::string &name, const std::string &value);
 
     // END Globals/locals
+
+    // Saved games
+
+    void saveToFile(const boost::filesystem::path &path);
+    void loadFromFile(const boost::filesystem::path &path);
+
+    // END Saved games
 
     // IEventHandler
 

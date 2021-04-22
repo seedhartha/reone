@@ -17,14 +17,19 @@
 
 #include "saveload.h"
 
+#include <algorithm>
+
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
 #include "../../common/log.h"
+#include "../../common/streamutil.h"
 #include "../../gui/control/listbox.h"
+#include "../../resource/format/erfreader.h"
+#include "../../resource/format/gffreader.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
-#include "../savedgame.h"
 
 #include "colorutil.h"
 
@@ -40,7 +45,6 @@ namespace reone {
 namespace game {
 
 static const char kSavesDirectoryName[] = "saves";
-static const char kSaveFilename[] = "savegame.sav";
 
 static constexpr int kStrRefLoadGame = 1585;
 static constexpr int kStrRefSave = 1587;
@@ -77,32 +81,24 @@ void SaveLoad::load() {
 }
 
 void SaveLoad::refresh() {
-    string panelName(Strings::instance().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
-
-    Control &lblPanelName = getControl("LBL_PANELNAME");
-    lblPanelName.setTextMessage(panelName);
-
-    string actionName(Strings::instance().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
-
     setControlDisabled("BTN_DELETE", _mode != Mode::Save);
 
-    Control &btnSaveLoad = getControl("BTN_SAVELOAD");
-    btnSaveLoad.setTextMessage(actionName);
+    string panelName(Strings::instance().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    setControlText("LBL_PANELNAME", panelName);
 
-    indexSavedGames();
+    string actionName(Strings::instance().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
+    setControlText("BTN_SAVELOAD", actionName);
 
-    ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.clearItems();
-
-    for (auto &save : _saves) {
-        ListBox::Item item;
-        item.tag = to_string(save.index);
-        item.text = save.name;
-        lbGames.addItem(move(item));
-    }
+    refreshSavedGames();
 }
 
-void SaveLoad::indexSavedGames() {
+static fs::path getSavesPath() {
+    fs::path savesPath(fs::current_path());
+    savesPath.append(kSavesDirectoryName);
+    return move(savesPath);
+}
+
+void SaveLoad::refreshSavedGames() {
     _saves.clear();
 
     fs::path savesPath(getSavesPath());
@@ -110,35 +106,52 @@ void SaveLoad::indexSavedGames() {
         fs::create_directory(savesPath);
     }
     for (auto &entry : fs::directory_iterator(savesPath)) {
-        if (!fs::is_directory(entry)) continue;
+        if (fs::is_regular_file(entry) && boost::to_lower_copy(entry.path().extension().string()) == ".sav") {
+            indexSavedGame(entry);
+        }
+    }
 
-        int saveIdx = stoi(entry.path().filename().string());
-        indexSavedGame(saveIdx, entry.path());
+    auto &lbGames = getControl<ListBox>("LB_GAMES");
+    lbGames.clearItems();
+    for (size_t i = 0; i < _saves.size(); ++i) {
+        string name(str(boost::format("%06d") % _saves[i].number));
+        ListBox::Item item;
+        item.tag = name;
+        item.text = name;
+        lbGames.addItem(move(item));
     }
 }
 
-fs::path SaveLoad::getSavesPath() const {
-    fs::path savesPath(fs::current_path());
-    savesPath.append(kSavesDirectoryName);
-    return move(savesPath);
+static SavedGame peekSavedGame(const fs::path &path) {
+    ErfReader erf;
+    erf.load(path);
+
+    shared_ptr<ByteArray> nfoData(erf.find("savenfo", ResourceType::Res));
+
+    GffReader nfo;
+    nfo.load(wrap(nfoData));
+
+    SavedGame result;
+    result.lastModule = nfo.root()->getString("LastModule");
+
+    return move(result);
 }
 
-void SaveLoad::indexSavedGame(int index, const fs::path &path) {
-    fs::path savPath(path);
-    savPath.append(kSaveFilename);
+void SaveLoad::indexSavedGame(fs::path path) {
+    try {
+        fs::path basename(path.filename());
+        basename.replace_extension();
+        int number = stoi(basename.string());
 
-    if (!fs::exists(savPath)) {
-        warn("SaveLoad: SAV file not found");
-        return;
+        SavedGameDescriptor descriptor;
+        descriptor.number = number;
+        descriptor.save = peekSavedGame(path);
+        descriptor.path = move(path);
+        _saves.push_back(move(descriptor));
     }
-    SavedGame sav(savPath);
-    sav.peek();
-
-    GameDescriptor save;
-    save.index = index;
-    save.path = savPath;
-    save.name = sav.name();
-    _saves.push_back(move(save));
+    catch (const exception &e) {
+        warn("Error indexing a saved game: " + string(e.what()));
+    }
 }
 
 void SaveLoad::setMode(Mode mode) {
@@ -149,25 +162,25 @@ void SaveLoad::onClick(const string &control) {
     GameGUI::onClick(control);
 
     if (control == "BTN_SAVELOAD") {
-        int saveIdx = getSelectedSaveIndex();
+        int number = getSelectedSaveNumber();
         switch (_mode) {
             case Mode::Save:
-                if (saveIdx == -1) {
-                    saveIdx = getNewSaveIndex();
+                if (number == -1) {
+                    number = getNewSaveNumber();
                 }
-                saveGame(saveIdx);
+                saveGame(number);
                 refresh();
                 break;
             default:
-                if (saveIdx != -1) {
-                    loadGame(saveIdx);
+                if (number != -1) {
+                    loadGame(number);
                 }
                 break;
         }
     } else if (control == "BTN_DELETE") {
-        int saveIdx = getSelectedSaveIndex();
-        if (saveIdx != -1) {
-            deleteGame(saveIdx);
+        int number = getSelectedSaveNumber();
+        if (number != -1) {
+            deleteGame(number);
             refresh();
         }
     } else if (control == "BTN_BACK") {
@@ -186,7 +199,7 @@ void SaveLoad::onClick(const string &control) {
     }
 }
 
-int SaveLoad::getSelectedSaveIndex() const {
+int SaveLoad::getSelectedSaveNumber() const {
     ListBox &lbGames = getControl<ListBox>("LB_GAMES");
 
     int hilightedIdx = lbGames.hilightedIndex();
@@ -197,53 +210,39 @@ int SaveLoad::getSelectedSaveIndex() const {
     return stoi(tag);
 }
 
-int SaveLoad::getNewSaveIndex() const {
-    fs::path savesPath(getSavesPath());
-    int saveIdx = 1;
-    for (auto &entry : fs::directory_iterator(savesPath)) {
-        int idx = stoi(entry.path().filename().string()) + 1;
-        if (saveIdx < idx) {
-            saveIdx = idx;
-        }
+int SaveLoad::getNewSaveNumber() const {
+    int number = 0;
+    for (auto &save : _saves) {
+        number = max(number, save.number);
     }
-    return saveIdx;
+    return number + 1;
 }
 
-void SaveLoad::saveGame(int index) {
-    fs::path saveDirPath(getSaveDirPath(index));
-    fs::create_directory(saveDirPath);
-
-    fs::path savPath(saveDirPath);
-    savPath.append(kSaveFilename);
-
-    SavedGame sav(savPath);
-    sav.save(_game, getSaveName(index));
+static fs::path getSaveGamePath(int number) {
+    fs::path result(getSavesPath());
+    result.append(str(boost::format("%06d") % number) + ".sav");
+    return move(result);
 }
 
-fs::path SaveLoad::getSaveDirPath(int index) const {
-    fs::path saveDirPath(getSavesPath());
-    saveDirPath.append(getSaveName(index));
-    return move(saveDirPath);
+void SaveLoad::saveGame(int number) {
+    fs::path savPath(getSaveGamePath(number));
+    _game->saveToFile(savPath);
+    refresh();
 }
 
-string SaveLoad::getSaveName(int index) const {
-    return str(boost::format("%06d") % index);
+void SaveLoad::loadGame(int number) {
+    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
+    if (maybeSave != _saves.end()) {
+        _game->loadFromFile(maybeSave->path);
+    }
 }
 
-void SaveLoad::loadGame(int index) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const GameDescriptor &save) { return save.index == index; });
-    if (maybeSave == _saves.end()) return;
-
-    SavedGame sav(maybeSave->path);
-    sav.load(_game);
-}
-
-void SaveLoad::deleteGame(int index) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&index](const GameDescriptor &save) { return save.index == index; });
-    if (maybeSave == _saves.end()) return;
-
-    fs::path saveDirPath(getSaveDirPath(index));
-    fs::remove_all(saveDirPath);
+void SaveLoad::deleteGame(int number) {
+    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
+    if (maybeSave != _saves.end()) {
+        fs::remove(maybeSave->path);
+        refresh();
+    }
 }
 
 } // namespace game
