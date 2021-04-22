@@ -25,6 +25,28 @@ if not os.path.exists(extract_dir):
     raise RuntimeError("Extraction directory does not exist")
 
 
+def _describe_shape(shape):
+    shapes = [
+        "EE",
+        "EH",
+        "SCHWA",
+        "AH",
+        "OH",
+        "OOH",
+        "Y",
+        "S/TS",
+        "F/V",
+        "N/NG",
+        "TH",
+        "M/P/B",
+        "T/D",
+        "J/SH",
+        "L/R",
+        "K/G"]
+
+    return shapes[shape]
+
+
 def examine_lip(extract_dir, strref):
     tlk_path = os.path.join(extract_dir, "dialog.tlk.json")
     lips_path = os.path.join(extract_dir, "lips")
@@ -41,7 +63,7 @@ def examine_lip(extract_dir, strref):
                         with open(lip_path) as lip:
                             lip_json = json.load(lip)
                             print(text)
-                            print(" ".join([x["shape"] for x in lip_json["keyframes"]]))
+                            print(" ".join([_describe_shape(int(x["shape"])) for x in lip_json["keyframes"]]))
 
 
 if len(sys.argv) > 1:
