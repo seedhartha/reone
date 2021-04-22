@@ -40,8 +40,6 @@ namespace reone {
 
 namespace tools {
 
-static const char kConfigFilename[] = "reone-tools.cfg";
-
 static const unordered_map<string, Operation> g_operations {
     { "list", Operation::List },
     { "extract", Operation::Extract },
@@ -85,11 +83,9 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _optsCommon.add_options()
+    _optsCmdLine.add_options()
         ("game", po::value<string>(), "path to game directory")
-        ("dest", po::value<string>(), "path to destination directory");
-
-    _optsCmdLine.add(_optsCommon).add_options()
+        ("dest", po::value<string>(), "path to destination directory")
         ("list", "list file contents")
         ("extract", "extract file contents")
         ("to-json", "convert 2DA, GFF or TLK file to JSON")
@@ -129,9 +125,6 @@ void Program::loadOptions() {
 
     po::variables_map vars;
     po::store(parsedCmdLineOpts, vars);
-    if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, _optsCommon), vars);
-    }
     po::notify(vars);
 
     _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
