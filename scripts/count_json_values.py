@@ -23,6 +23,10 @@ from functools import partial
 
 extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 
+if not os.path.exists(extract_dir):
+    raise RuntimeError("Extraction directory does not exist")
+
+
 def get_unique_json_values(extract_dir, path_pattern, extract_values):
 
     def count_value(value, values):

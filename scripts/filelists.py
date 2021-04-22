@@ -23,7 +23,6 @@ import sys
 
 extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 
-
 if not os.path.exists(extract_dir):
     raise RuntimeError("Extraction directory does not exist")
 
@@ -139,4 +138,4 @@ if len(sys.argv) > 1:
     voresref = sys.argv[2] if len(sys.argv) > 2 else None
     generate_filelist(speaker, voresref)
 else:
-    print('Usage: python ttsfilelist.py speaker [voresref]')
+    print("Usage: python filelist.py SPEAKER [VORESREF]")
