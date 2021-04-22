@@ -39,6 +39,7 @@ enum class FieldClassification {
 };
 
 static const unordered_map<ResourceType, string> g_signatures {
+    { ResourceType::Res, "RES" },
     { ResourceType::Are, "ARE" },
     { ResourceType::Dlg, "DLG" },
     { ResourceType::Git, "GIT" },

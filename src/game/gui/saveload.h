@@ -19,6 +19,8 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include "../savedgame.h"
+
 #include "gui.h"
 
 namespace reone {
@@ -44,31 +46,27 @@ public:
     void setMode(Mode mode);
 
 private:
-    struct GameDescriptor {
-        int index { 0 };
-        std::string name;
+    struct SavedGameDescriptor {
+        int number { 0 };
+        SavedGame save;
         boost::filesystem::path path;
     };
 
     Game *_game { nullptr };
     Mode _mode { Mode::Save };
-    std::vector<GameDescriptor> _saves;
-    int _selectedSaveIdx { -1 };
+    std::vector<SavedGameDescriptor> _saves;
+
+    void refreshSavedGames();
+    void indexSavedGame(boost::filesystem::path path);
 
     void onClick(const std::string &control) override;
 
-    void indexSavedGames();
-    void indexSavedGame(int index, const boost::filesystem::path &path);
+    void saveGame(int number);
+    void loadGame(int number);
+    void deleteGame(int number);
 
-    void saveGame(int index);
-    void loadGame(int index);
-    void deleteGame(int index);
-
-    boost::filesystem::path getSavesPath() const;
-    boost::filesystem::path getSaveDirPath(int index) const;
-    std::string getSaveName(int index) const;
-    int getSelectedSaveIndex() const;
-    int getNewSaveIndex() const;
+    int getSelectedSaveNumber() const;
+    int getNewSaveNumber() const;
 };
 
 } // namespace game

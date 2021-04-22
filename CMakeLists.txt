@@ -534,6 +534,7 @@ set(GAME_SOURCES
     src/game/dialog.cpp
     src/game/game.cpp
     src/game/game_kotor.cpp
+    src/game/game_save.cpp
     src/game/game_tsl.cpp
     src/game/gameidutil.cpp
     src/game/gui/barkbubble.cpp
@@ -608,7 +609,6 @@ set(GAME_SOURCES
     src/game/portraits.cpp
     src/game/reputes.cpp
     src/game/room.cpp
-    src/game/savedgame.cpp
     src/game/script/routines.cpp
     src/game/script/routines_actions.cpp
     src/game/script/routines_combat.cpp
