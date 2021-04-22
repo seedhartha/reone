@@ -29,17 +29,17 @@ tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
 extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
-steps = {
-    "extract_bifs": False,
-    "extract_patch": False,
-    "extract_modules": False,
-    "extract_dialog": False,
-    "extract_textures": False,
-    "extract_voices": False,
-    "convert_to_json": True,
-    "convert_to_tga": False,
-    "convert_to_ascii_pth": False,
-    "disassemble_scripts": False }
+steps = [
+    [ "extract_bifs", "Extract BIF files (y/n)?", None ],
+    [ "extract_patch", "Extract patch.erf (y/n)?", None ],
+    [ "extract_modules", "Extract modules (y/n)?", None ],
+    [ "extract_dialog", "Extract dialog.tlk (y/n)?", None ],
+    [ "extract_textures", "Extract texture packs (y/n)?", None ],
+    [ "extract_voices", "Extract streamwaves/streamvoices (y/n)?", None ],
+    [ "convert_to_json", "Convert 2DA, GFF and TLK to JSON (y/n)?", None ],
+    [ "convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None ],
+    [ "convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None ],
+    [ "disassemble_scripts", "Disassemble NCS scripts (y/n)?", None ] ]
 
 
 if not os.path.exists(game_dir):
@@ -208,32 +208,40 @@ def disassemble_scripts(extract_dir):
 append_dir_to_path(tools_dir)
 append_dir_to_path(nwnnsscomp_dir)
 
-if steps["extract_bifs"]:
-    extract_bifs(game_dir, extract_dir)
+for step in steps:
+    if step[2] is None:
+        choice = input(step[1] + " ")
+        run = choice.lower()[0] == 'y'
+    else:
+        run = step[2]
 
-if steps["extract_patch"]:
-    extract_patch(game_dir, extract_dir)
+    if run:
+        if steps[0] == "extract_bifs":
+            extract_bifs(game_dir, extract_dir)
 
-if steps["extract_modules"]:
-    extract_modules(game_dir, extract_dir)
+        if steps[0] == "extract_patch":
+            extract_patch(game_dir, extract_dir)
 
-if steps["extract_textures"]:
-    extract_textures(game_dir, extract_dir)
+        if steps[0] == "extract_modules":
+            extract_modules(game_dir, extract_dir)
 
-if steps["extract_dialog"]:
-    extract_dialog(game_dir, extract_dir)
+        if steps[0] == "extract_textures":
+            extract_textures(game_dir, extract_dir)
 
-if steps["extract_voices"]:
-    extract_voices(game_dir, extract_dir)
+        if steps[0] == "extract_dialog":
+            extract_dialog(game_dir, extract_dir)
 
-if steps["convert_to_json"]:
-    convert_to_json(extract_dir)
+        if steps[0] == "extract_voices":
+            extract_voices(game_dir, extract_dir)
 
-if steps["convert_to_tga"]:
-    convert_to_tga(extract_dir)
+        if steps[0] == "convert_to_json":
+            convert_to_json(extract_dir)
 
-if steps["convert_to_ascii_pth"]:
-    convert_to_ascii_pth(extract_dir)
+        if steps[0] == "convert_to_tga":
+            convert_to_tga(extract_dir)
 
-if steps["disassemble_scripts"]:
-    disassemble_scripts(extract_dir)
+        if steps[0] == "convert_to_ascii_pth":
+            convert_to_ascii_pth(extract_dir)
+
+        if steps[0] == "disassemble_scripts":
+            disassemble_scripts(extract_dir)
