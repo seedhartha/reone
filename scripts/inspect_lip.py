@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Script to examine LIP files and their respective TLK entries."""
+"""Script to inspect LIP files by StrRef."""
 
 import json
 import os
@@ -56,7 +56,7 @@ def examine_lip(extract_dir, strref):
     tlk_path = os.path.join(extract_dir, "dialog.tlk.json")
     lips_path = os.path.join(extract_dir, "lips")
     if os.path.exists(tlk_path) and os.path.exists(lips_path):
-        with open(tlk_path) as tlk:
+        with open(tlk_path, "r") as tlk:
             tlk_json = json.load(tlk)
             if "strings" in tlk_json and strref < len(tlk_json["strings"]):
                 string_json = tlk_json["strings"][strref]
@@ -65,7 +65,7 @@ def examine_lip(extract_dir, strref):
                 if soundresref:
                     lip_path = os.path.join(lips_path, soundresref + ".lip.json")
                     if os.path.exists(lip_path):
-                        with open(lip_path) as lip:
+                        with open(lip_path, "r") as lip:
                             lip_json = json.load(lip)
                             print("Text (original): " + text)
                             print("Text (normalized): " + normalize_text(text))
