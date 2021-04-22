@@ -170,6 +170,7 @@ set(RENDER_HEADERS
     src/render/lip/lipanimation.h
     src/render/lip/lipreader.h
     src/render/lip/lips.h
+    src/render/lip/lipwriter.h
     src/render/material.h
     src/render/materials.h
     src/render/mesh.h
@@ -212,6 +213,7 @@ set(RENDER_SOURCES
     src/render/lip/lipanimation.cpp
     src/render/lip/lipreader.cpp
     src/render/lip/lips.cpp
+    src/render/lip/lipwriter.cpp
     src/render/materials.cpp
     src/render/mesh.cpp
     src/render/meshes.cpp
@@ -685,6 +687,7 @@ if(BUILD_TOOLS)
         tools/erftool.cpp
         tools/gfftool.cpp
         tools/keybiftool.cpp
+        tools/liptool.cpp
         tools/main.cpp
         tools/program.cpp
         tools/pthtool.cpp

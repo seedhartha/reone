@@ -25,6 +25,7 @@ enum class Operation {
     None,
     List,
     Extract,
+    Unwrap,
     ToJSON,
     ToTGA,
     To2DA,
@@ -35,7 +36,7 @@ enum class Operation {
     ToPTH,
     ToASCII,
     ToTLK,
-    Unwrap
+    ToLIP
 };
 
 } // namespace tools

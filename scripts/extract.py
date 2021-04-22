@@ -24,23 +24,23 @@ import platform
 import shutil
 import subprocess
 
-game_dir = r"D:\Games\Star Wars - KotOR"
+game_dir = r"D:\Games\Star Wars - KotOR2"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+extract_dir = r"D:\OpenKotOR\Extract\TSL"
 nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
 
 steps = [
-    [ "extract_bifs", "Extract BIF files (y/n)?", None ],
-    [ "extract_patch", "Extract patch.erf (y/n)?", None ],
-    [ "extract_modules", "Extract modules (y/n)?", None ],
-    [ "extract_dialog", "Extract dialog.tlk (y/n)?", None ],
-    [ "extract_textures", "Extract texture packs (y/n)?", None ],
-    [ "extract_voices", "Extract streamwaves/streamvoices (y/n)?", None ],
-    [ "extract_lips", "Extract LIP files (y/n)?", None ],
-    [ "convert_to_json", "Convert 2DA, GFF and TLK to JSON (y/n)?", None ],
-    [ "convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None ],
-    [ "convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None ],
-    [ "disassemble_scripts", "Disassemble NCS scripts (y/n)?", None ] ]
+    ["extract_bifs", "Extract BIF files (y/n)?", None],
+    ["extract_patch", "Extract patch.erf (y/n)?", None],
+    ["extract_modules", "Extract modules (y/n)?", None],
+    ["extract_dialog", "Extract dialog.tlk (y/n)?", None],
+    ["extract_textures", "Extract texture packs (y/n)?", None],
+    ["extract_voices", "Extract streamwaves/streamvoices (y/n)?", None],
+    ["extract_lips", "Extract LIP files (y/n)?", None],
+    ["convert_to_json", "Convert 2DA, GFF, TLK and LIP to JSON (y/n)?", None],
+    ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None],
+    ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None],
+    ["disassemble_scripts", "Disassemble NCS scripts (y/n)?", None] ]
 
 
 if not os.path.exists(game_dir):
@@ -187,7 +187,8 @@ def convert_to_json(extract_dir):
         ".ifo", ".are", ".git",
         ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
         ".dlg",
-        ".tlk"]
+        ".tlk",
+        ".lip"]
 
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         _, extension = os.path.splitext(f)
