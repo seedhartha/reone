@@ -36,6 +36,7 @@ steps = [
     [ "extract_dialog", "Extract dialog.tlk (y/n)?", None ],
     [ "extract_textures", "Extract texture packs (y/n)?", None ],
     [ "extract_voices", "Extract streamwaves/streamvoices (y/n)?", None ],
+    [ "extract_lips", "Extract LIP files (y/n)?", None ],
     [ "convert_to_json", "Convert 2DA, GFF and TLK to JSON (y/n)?", None ],
     [ "convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None ],
     [ "convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None ],
@@ -162,6 +163,23 @@ def extract_voices(game_dir, extract_dir):
                     pass
 
 
+def extract_lips(game_dir, extract_dir):
+    # Create destination directory if it does not exist
+    dest_dir = os.path.join(extract_dir, "lips")
+    if not os.path.exists(dest_dir):
+        os.mkdir(dest_dir)
+
+    # Extract LIP files from lips
+    lips_dir = os.path.join(game_dir, "lips")
+    if os.path.exists(lips_dir):
+        for f in os.listdir(lips_dir):
+            _, extension = os.path.splitext(f)
+            if extension == ".mod":
+                mod_path = os.path.join(lips_dir, f)
+                print("Extracting {}...".format(mod_path))
+                run_subprocess(["reone-tools", "--extract", mod_path, "--dest", dest_dir])
+
+
 def convert_to_json(extract_dir):
     CONVERTIBLE_EXT = [
         ".2da",
@@ -216,32 +234,35 @@ for step in steps:
         run = step[2]
 
     if run:
-        if steps[0] == "extract_bifs":
+        if step[0] == "extract_bifs":
             extract_bifs(game_dir, extract_dir)
 
-        if steps[0] == "extract_patch":
+        if step[0] == "extract_patch":
             extract_patch(game_dir, extract_dir)
 
-        if steps[0] == "extract_modules":
+        if step[0] == "extract_modules":
             extract_modules(game_dir, extract_dir)
 
-        if steps[0] == "extract_textures":
+        if step[0] == "extract_textures":
             extract_textures(game_dir, extract_dir)
 
-        if steps[0] == "extract_dialog":
+        if step[0] == "extract_dialog":
             extract_dialog(game_dir, extract_dir)
 
-        if steps[0] == "extract_voices":
+        if step[0] == "extract_voices":
             extract_voices(game_dir, extract_dir)
 
-        if steps[0] == "convert_to_json":
+        if step[0] == "extract_lips":
+            extract_lips(game_dir, extract_dir)
+
+        if step[0] == "convert_to_json":
             convert_to_json(extract_dir)
 
-        if steps[0] == "convert_to_tga":
+        if step[0] == "convert_to_tga":
             convert_to_tga(extract_dir)
 
-        if steps[0] == "convert_to_ascii_pth":
+        if step[0] == "convert_to_ascii_pth":
             convert_to_ascii_pth(extract_dir)
 
-        if steps[0] == "disassemble_scripts":
+        if step[0] == "disassemble_scripts":
             disassemble_scripts(extract_dir)
