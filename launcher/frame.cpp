@@ -47,9 +47,6 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     SetIcon(wxIcon(kIconName));
 #endif
 
-    SetSize(g_windowSize);
-
-
     LoadConfiguration();
 
     // Setup controls
@@ -162,6 +159,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
+    topSizer->SetMinSize(400, 100);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(graphicsSizer, 0, wxEXPAND | wxALL, 3);
@@ -169,7 +167,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), 0, wxEXPAND | wxALL, 3);
 
-    SetSizer(topSizer);
+    SetSizerAndFit(topSizer);
 }
 
 void LauncherFrame::LoadConfiguration() {
