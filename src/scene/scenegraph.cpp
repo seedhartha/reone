@@ -327,6 +327,17 @@ void SceneGraph::draw(bool shadowPass) {
     for (auto &pair : _particles) {
         pair.first->drawParticles(pair.second);
     }
+
+    // Render lens flares
+    for (auto &light : _lights) {
+        // Ignore lights that are too far away or outside of camera frustums
+        if (_activeCamera->getDistanceTo2(*light) > light->flareRadius() * light->flareRadius() ||
+            !_activeCamera->isInFrustum(light->absoluteTransform()[3])) continue;
+
+        for (auto &flare : light->flares()) {
+            light->drawLensFlares(flare);
+        }
+    }
 }
 
 void SceneGraph::getLightsAt(

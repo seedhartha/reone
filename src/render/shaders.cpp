@@ -640,6 +640,27 @@ void main() {
 }
 )END";
 
+static constexpr GLchar kShaderVertexBillboard[] = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aTexCoords;
+
+out vec2 fragTexCoords;
+
+void main() {
+    vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
+    vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
+
+    vec4 P = vec4(
+        vec3(uGeneral.model[3]) +
+            cameraRight * aPosition.x * uGeneral.model[0][0] +
+            cameraUp * aPosition.y * uGeneral.model[1][1],
+        1.0);
+
+    gl_Position = uGeneral.projection * uGeneral.view * P;
+    fragTexCoords = aTexCoords;
+}
+)END";
+
 static constexpr GLchar kShaderGeometryDepth[] = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
@@ -1172,6 +1193,7 @@ void Shaders::init() {
     initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexParticle });
     initShader(ShaderName::VertexGrass, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexGrass });
     initShader(ShaderName::VertexText, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexText });
+    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { kShaderBaseHeader, kShaderVertexBillboard });
     initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { kShaderBaseHeader, kShaderGeometryDepth });
     initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentColor });
     initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDepth });
@@ -1203,6 +1225,7 @@ void Shaders::init() {
     initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
     initProgram(ShaderProgram::GrassGrass, { ShaderName::VertexGrass, ShaderName::FragmentGrass });
     initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
+    initProgram(ShaderProgram::BillboardGUI, { ShaderName::VertexBillboard, ShaderName::FragmentGUI });
 
     glGenBuffers(1, &_uboCombined);
     glGenBuffers(1, &_uboText);

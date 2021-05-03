@@ -754,6 +754,7 @@ void MdlReader::readLight(ModelNode &node) {
     node._light->dynamicType = dynamicType;
     node._light->affectDynamic = static_cast<bool>(affectDynamic);
     node._light->shadow = static_cast<bool>(shadow);
+    node._light->flareRadius = flareRadius;
 
     int numFlares = static_cast<int>(flareTexturesArrayDef.count);
     if (numFlares > 0) {
@@ -777,12 +778,12 @@ void MdlReader::readLight(ModelNode &node) {
         }
 
         for (int i = 0; i < numFlares; ++i) {
-            ModelNode::LightFlare lightFlare;
-            lightFlare.texture = flareTextures[i];
-            lightFlare.colorShift = colorShifts[i];
-            lightFlare.position = flarePositions[i];
-            lightFlare.size = flareSizes[i];
-            node._light->flares.push_back(move(lightFlare));
+            LensFlare lensFlare;
+            lensFlare.texture = flareTextures[i];
+            lensFlare.colorShift = colorShifts[i];
+            lensFlare.position = flarePositions[i];
+            lensFlare.size = flareSizes[i];
+            node._light->flares.push_back(move(lensFlare));
         }
     }
 }

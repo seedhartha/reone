@@ -179,6 +179,7 @@ set(RENDER_HEADERS
     src/render/model/animatedproperty.h
     src/render/model/animation.h
     src/render/model/emitter.h
+    src/render/model/lensflare.h
     src/render/model/mdlreader.h
     src/render/model/model.h
     src/render/model/modelmesh.h

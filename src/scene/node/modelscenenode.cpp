@@ -126,6 +126,9 @@ void ModelSceneNode::initModelNodes() {
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
                 lightNode->setDirectional(directional);
+                lightNode->setFlareRadius(light->flareRadius);
+                lightNode->setFlares(light->flares);
+
                 childNode->addChild(lightNode);
                 _lightNodeByNumber.insert(make_pair(modelNode->nodeNumber(), lightNode.get()));
             }
