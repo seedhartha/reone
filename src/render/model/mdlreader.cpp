@@ -737,10 +737,10 @@ void MdlReader::readControllers(int nodeFlags, uint32_t keyOffset, uint32_t keyC
 void MdlReader::readLight(ModelNode &node) {
     float flareRadius  = readFloat();
     ignore(3 * 4); // unknown
-    ArrayDefinition flareSizes(readArrayDefinition());
-    ArrayDefinition flarePositions(readArrayDefinition());
-    ArrayDefinition flareColorShifts(readArrayDefinition());
-    ArrayDefinition flareTextures(readArrayDefinition());
+    ArrayDefinition flareSizesArrayDef(readArrayDefinition());
+    ArrayDefinition flarePositionsArrayDef(readArrayDefinition());
+    ArrayDefinition flareColorShiftsArrayDef(readArrayDefinition());
+    ArrayDefinition flareTexturesArrayDef(readArrayDefinition());
     uint32_t priority = readUint32();
     uint32_t ambientOnly = readUint32();
     uint32_t dynamicType = readUint32();
@@ -754,6 +754,37 @@ void MdlReader::readLight(ModelNode &node) {
     node._light->dynamicType = dynamicType;
     node._light->affectDynamic = static_cast<bool>(affectDynamic);
     node._light->shadow = static_cast<bool>(shadow);
+
+    int numFlares = static_cast<int>(flareTexturesArrayDef.count);
+    if (numFlares > 0) {
+        vector<float> flareSizes(readFloatArray(kMdlDataOffset + flareSizesArrayDef.offset, flareSizesArrayDef.count));
+        vector<float> flarePositions(readFloatArray(kMdlDataOffset + flarePositionsArrayDef.offset, flarePositionsArrayDef.count));
+        vector<uint32_t> texNameOffsets(readUint32Array(kMdlDataOffset + flareTexturesArrayDef.offset, flareTexturesArrayDef.count));
+
+        vector<glm::vec3> colorShifts;
+        for (int i = 0; i < numFlares; ++i) {
+            seek(kMdlDataOffset + flareColorShiftsArrayDef.offset + 12 * i);
+            glm::vec3 colorShift(readFloat(), readFloat(), readFloat());
+            colorShifts.push_back(move(colorShift));
+        }
+
+        vector<shared_ptr<Texture>> flareTextures;
+        for (int i = 0; i < numFlares; ++i) {
+            seek(kMdlDataOffset + texNameOffsets[i]);
+            string textureName(boost::to_lower_copy(readCString(12)));
+            shared_ptr<Texture> texture(Textures::instance().get(textureName));
+            flareTextures.push_back(move(texture));
+        }
+
+        for (int i = 0; i < numFlares; ++i) {
+            ModelNode::LightFlare lightFlare;
+            lightFlare.texture = flareTextures[i];
+            lightFlare.colorShift = colorShifts[i];
+            lightFlare.position = flarePositions[i];
+            lightFlare.size = flareSizes[i];
+            node._light->flares.push_back(move(lightFlare));
+        }
+    }
 }
 
 static Emitter::UpdateMode parseEmitterUpdate(const string &str) {
