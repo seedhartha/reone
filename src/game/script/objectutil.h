@@ -15,39 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "object.h"
+#include <cstdint>
 
-#include "../common/collectionutil.h"
+#include "../../script/types.h"
 
-using namespace std;
+#include "../object/object.h"
 
 namespace reone {
 
-namespace script {
+namespace game {
 
-ScriptObject::ScriptObject(uint32_t id) : _id(id) {
+inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<Object> &object) {
+    return object ? object->id() : script::kObjectInvalid;
 }
 
-bool ScriptObject::getLocalBoolean(int index) const {
-    return getFromLookupOrElse(_localBooleans, index, false);
-}
+} // namespace game
 
-int ScriptObject::getLocalNumber(int index) const {
-    return getFromLookupOrElse(_localNumbers, index, 0);
-}
-
-void ScriptObject::setTag(string tag) {
-    _tag = move(tag);
-}
-
-void ScriptObject::setLocalBoolean(int index, bool value) {
-    _localBooleans[index] = value;
-}
-
-void ScriptObject::setLocalNumber(int index, int value) {
-    _localNumbers[index] = value;
-}
-
-} // namespace script
-
-} // namespae reone
+} // namespace reone

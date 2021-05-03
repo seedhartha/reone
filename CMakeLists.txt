@@ -370,7 +370,6 @@ set(SCRIPT_HEADERS
     src/script/execution.h
     src/script/instrutil.h
     src/script/ncsreader.h
-    src/script/object.h
     src/script/program.h
     src/script/routine.h
     src/script/scripts.h
@@ -381,7 +380,6 @@ set(SCRIPT_SOURCES
     src/script/execution.cpp
     src/script/instrutil.cpp
     src/script/ncsreader.cpp
-    src/script/object.cpp
     src/script/program.cpp
     src/script/routine.cpp
     src/script/scripts.cpp
@@ -501,6 +499,7 @@ set(GAME_HEADERS
     src/game/d20/savingthrows.h
     src/game/d20/skills.h
     src/game/savedgame.h
+    src/game/script/objectutil.h
     src/game/script/routines.h
     src/game/script/runutil.h
     src/game/soundsets.h

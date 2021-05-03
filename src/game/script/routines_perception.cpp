@@ -26,6 +26,8 @@
 #include "../object/creature.h"
 #include "../types.h"
 
+#include "objectutil.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -35,16 +37,16 @@ namespace reone {
 namespace game {
 
 Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> object;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result = caller->perception().lastPerceived;
+        object = caller->perception().lastPerceived;
     } else {
         debug("Script: getLastPerceived: caller is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionContext &ctx) {

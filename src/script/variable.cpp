@@ -22,7 +22,6 @@
 #include <boost/format.hpp>
 
 #include "enginetype.h"
-#include "object.h"
 
 using namespace std;
 
@@ -133,13 +132,6 @@ Variable Variable::ofObject(uint32_t objectId) {
     Variable result;
     result.type = VariableType::Object;
     result.objectId = objectId;
-    return move(result);
-}
-
-Variable Variable::ofObject(shared_ptr<ScriptObject> object) {
-    Variable result;
-    result.type = VariableType::Object;
-    result.objectId = object ? object->id() : kObjectInvalid;
     return move(result);
 }
 
