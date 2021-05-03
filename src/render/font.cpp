@@ -82,7 +82,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     for (int i = 0; i < numBlocks; ++i) {
         int numChars = glm::min(kMaxCharacters, static_cast<int>(text.size()) - i * kMaxCharacters);
         for (int j = 0; j < numChars; ++j) {
-            const Glyph &glyph = _glyphs[static_cast<int>(text[i * kMaxCharacters + j])];
+            const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxCharacters + j])];
 
             glm::vec4 posScale;
             posScale[0] = position.x + textOffset.x;
