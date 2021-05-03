@@ -51,12 +51,21 @@ class Model;
  */
 class ModelNode : boost::noncopyable {
 public:
+    struct LightFlare {
+        std::shared_ptr<Texture> texture;
+        glm::vec3 colorShift { 0.0f };
+        float position { 0.0f };
+        float size { 0.0f };
+    };
+
     struct Light {
         int priority { 0 };
         int dynamicType { 0 };
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };
+        float flareRadius { 0.0f };
+        std::vector<LightFlare> flares;
     };
 
     struct Reference {
