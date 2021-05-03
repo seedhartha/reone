@@ -115,6 +115,7 @@ void WorldRenderPipeline::init() {
     _horizontalBlur.attachColor(*_horizontalBlurColor);
     _horizontalBlur.attachDepth(*_depthRenderbuffer);
     _horizontalBlur.checkCompleteness();
+    _horizontalBlur.unbind();
 
 
     // Shadows framebuffer
