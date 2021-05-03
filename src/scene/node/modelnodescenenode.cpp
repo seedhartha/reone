@@ -128,7 +128,36 @@ void ModelNodeSceneNode::update(float dt) {
                 }
             }
         }
+
+        // Danglymesh animation
+        shared_ptr<ModelNode::Danglymesh> danglymesh(_modelNode->danglymesh());
+        if (danglymesh) {
+            bool forceApplied = glm::length2(_danglymeshAnimation.force) > 0.0f;
+            if (forceApplied) {
+                // When force is applied, stride in the opposite direction from the applied force
+                glm::vec3 strideDir(-_danglymeshAnimation.force);
+                glm::vec3 maxStride(danglymesh->displacement);
+                _danglymeshAnimation.stride = glm::clamp(_danglymeshAnimation.stride + danglymesh->period * strideDir * dt, -maxStride, maxStride);
+            } else {
+                // When force is not applied, gradually nullify stride
+                float strideMag2 = glm::length2(_danglymeshAnimation.stride);
+                if (strideMag2 > 0.0f) {
+                    glm::vec3 strideDir(-_danglymeshAnimation.stride);
+                    _danglymeshAnimation.stride += danglymesh->period * strideDir * dt;
+                    if ((strideDir.x > 0.0f && _danglymeshAnimation.stride.x > 0.0f) || (strideDir.x < 0.0f && _danglymeshAnimation.stride.x < 0.0f)) {
+                        _danglymeshAnimation.stride.x = 0.0f;
+                    }
+                    if ((strideDir.y > 0.0f && _danglymeshAnimation.stride.y > 0.0f) || (strideDir.y < 0.0f && _danglymeshAnimation.stride.y < 0.0f)) {
+                        _danglymeshAnimation.stride.y = 0.0f;
+                    }
+                    if ((strideDir.z > 0.0f && _danglymeshAnimation.stride.z > 0.0f) || (strideDir.z < 0.0f && _danglymeshAnimation.stride.z < 0.0f)) {
+                        _danglymeshAnimation.stride.z = 0.0f;
+                    }
+                }
+            }
+        }
     }
+
     SceneNode::update(dt);
 }
 
@@ -315,6 +344,17 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.general.fogFar = _sceneGraph->fogFar();
             uniforms.combined.general.fogColor = glm::vec4(_sceneGraph->fogColor(), 1.0f);
         }
+
+        shared_ptr<ModelNode::Danglymesh> danglymesh(_modelNode->danglymesh());
+        if (danglymesh) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::danglymesh;
+            uniforms.danglymesh->stride = glm::vec4(_danglymeshAnimation.stride, 0.0f);
+            uniforms.danglymesh->displacement = danglymesh->displacement;
+            size_t i = 0;
+            for (i = 0; i < danglymesh->constraints.size(); ++i) {
+                uniforms.danglymesh->constraints[i / 4][i % 4] = danglymesh->constraints[i].multiplier;
+            }
+        }
     }
 
     Shaders::instance().activate(program, uniforms);
@@ -373,6 +413,13 @@ bool ModelNodeSceneNode::isLightingEnabled() const {
     if (_textures.diffuse && _textures.diffuse->isAdditive()) return false;
 
     return true;
+}
+
+void ModelNodeSceneNode::setAppliedForce(glm::vec3 force) {
+    if (_modelNode->danglymesh()) {
+        // Convert force from world to object space
+        _danglymeshAnimation.force = _absoluteTransformInv * glm::vec4(force, 0.0f);
+    }
 }
 
 glm::vec3 ModelNodeSceneNode::getOrigin() const {

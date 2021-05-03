@@ -72,6 +72,7 @@ struct UniformFeatureFlags {
     static constexpr int text = 0x8000;
     static constexpr int grass = 0x10000;
     static constexpr int fog = 0x20000;
+    static constexpr int danglymesh = 0x40000;
 };
 
 struct ShaderGeneral {
@@ -187,6 +188,13 @@ struct TextUniforms {
     ShaderCharacter chars[kMaxCharacters];
 };
 
+struct DanglymeshUniforms {
+    glm::vec4 stride { 0.0f };
+    float displacement { 0.0f };
+    char padding[12];
+    glm::vec4 constraints[kMaxDanglymeshConstraints];
+};
+
 struct ShaderUniforms {
     CombinedUniforms combined;
 
@@ -195,6 +203,7 @@ struct ShaderUniforms {
     std::shared_ptr<SkeletalUniforms> skeletal;
     std::shared_ptr<ParticlesUniforms> particles;
     std::shared_ptr<GrassUniforms> grass;
+    std::shared_ptr<DanglymeshUniforms> danglymesh;
 };
 
 class Shaders : boost::noncopyable {
@@ -248,6 +257,7 @@ private:
     uint32_t _uboSkeletal { 0 };
     uint32_t _uboParticles { 0 };
     uint32_t _uboGrass { 0 };
+    uint32_t _uboDanglymesh { 0 };
 
     // END UBO
 

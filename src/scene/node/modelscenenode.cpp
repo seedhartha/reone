@@ -370,6 +370,15 @@ void ModelSceneNode::signalEvent(const string &name) {
     }
 }
 
+void ModelSceneNode::setAppliedForce(glm::vec3 force) {
+    for (auto &nodePair : _modelNodeByIndex) {
+        nodePair.second->setAppliedForce(force);
+    }
+    for (auto &attached : _attachedModels) {
+        attached.second->setAppliedForce(force);
+    }
+}
+
 } // namespace scene
 
 } // namespace reone
