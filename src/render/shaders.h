@@ -50,7 +50,8 @@ enum class ShaderProgram {
     ModelPBR,
     ParticleParticle,
     GrassGrass,
-    TextText
+    TextText,
+    BillboardGUI
 };
 
 struct UniformFeatureFlags {
@@ -225,6 +226,7 @@ private:
         VertexParticle,
         VertexGrass,
         VertexText,
+        VertexBillboard,
         GeometryDepth,
         FragmentColor,
         FragmentDepth,
