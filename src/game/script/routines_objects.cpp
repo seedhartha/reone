@@ -28,6 +28,8 @@
 #include "../enginetype/location.h"
 #include "../game.h"
 
+#include "objectutil.h"
+
 using namespace std;
 
 using namespace reone::scene;
@@ -48,7 +50,8 @@ Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(getTriggerrer(ctx));
+    auto triggerrer = getTriggerrer(ctx);
+    return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
 Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
@@ -57,36 +60,37 @@ Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Object> result;
+    shared_ptr<Object> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
     int nth = getInt(args, 1, 0);
 
     if (!tag.empty()) {
-        result = _game->module()->area()->getObjectByTag(tag, nth);
+        object = _game->module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        result = _game->party().player();
+        object = _game->party().player();
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
 
     for (auto &waypoint : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
-            result = waypoint;
+            object = waypoint;
             break;
         }
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(_game->module()->area());
+    auto area = _game->module()->area();
+    return Variable::ofObject(getObjectIdOrInvalid(area));
 }
 
 Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
@@ -116,7 +120,8 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(_game->module());
+    auto module = _game->module();
+    return Variable::ofObject(getObjectIdOrInvalid(module));
 }
 
 Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -165,7 +170,8 @@ Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionCon
 }
 
 Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(getTriggerrer(ctx));
+    auto triggerrer = getTriggerrer(ctx);
+    return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
 Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
@@ -421,7 +427,8 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(getTriggerrer(ctx));
+    auto triggerrer = getTriggerrer(ctx);
+    return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
 Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
@@ -458,7 +465,9 @@ Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
 
-    return Variable::ofObject(_game->module()->area()->createObject(objectType, blueprintResRef, location));
+    auto object = _game->module()->area()->createObject(objectType, blueprintResRef, location);
+
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContext &ctx) {
@@ -482,7 +491,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(target, criterias, nth - 1));
 
-    return Variable::ofObject(move(creature));
+    return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
 Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -506,7 +515,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
 
     shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreatureToLocation(*location, criterias, nth - 1));
 
-    return Variable::ofObject(move(creature));
+    return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
 Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
@@ -518,7 +527,7 @@ Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext 
         return object->type() == objectType;
     }));
 
-    return Variable::ofObject(move(object));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -530,7 +539,7 @@ Variable Routines::getNearestObjectToLocation(const VariablesList &args, Executi
         return object->type() == objectType;
     }));
 
-    return Variable::ofObject(move(object));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
@@ -542,7 +551,7 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
         return object->tag() == tag;
     }));
 
-    return Variable::ofObject(move(object));
+    return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable Routines::objectToString(const VariablesList &args, ExecutionContext &ctx) {

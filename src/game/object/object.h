@@ -17,10 +17,11 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include <unordered_map>
 
-#include "../../script/object.h"
+#include <boost/noncopyable.hpp>
 
 #include "../actionqueue.h"
 #include "../types.h"
@@ -29,8 +30,10 @@ namespace reone {
 
 namespace game {
 
-class Object : public script::ScriptObject {
+class Object : public boost::noncopyable {
 public:
+    virtual ~Object() = default;
+
     virtual void update(float dt);
     virtual void clearAllActions();
 
@@ -38,6 +41,8 @@ public:
     bool isDead() const { return _dead; }
     bool isCommandable() const { return _commandable; }
 
+    uint32_t id() const { return _id; }
+    const std::string &tag() const { return _tag; }
     ObjectType type() const { return _type; }
     const std::string &blueprintResRef() const { return _blueprintResRef; }
     const std::string &name() const { return _name; }
@@ -45,6 +50,7 @@ public:
     ActionQueue &actionQueue() { return _actionQueue; }
     bool plotFlag() const { return _plot; }
 
+    void setTag(std::string tag);
     void setPlotFlag(bool plot);
     void setCommandable(bool value);
 
@@ -64,6 +70,16 @@ public:
 
     // END Hit Points
 
+    // Local variables
+
+    bool getLocalBoolean(int index) const;
+    int getLocalNumber(int index) const;
+
+    void setLocalBoolean(int index, bool value);
+    void setLocalNumber(int index, int value);
+
+    // END Local variables
+
     // Scripts
 
     const std::string &getOnHeartbeat() const { return _onHeartbeat; }
@@ -72,6 +88,8 @@ public:
     // END Scripts
 
 protected:
+    uint32_t _id { 0 };
+    std::string _tag;
     ObjectType _type { ObjectType::Invalid };
     std::string _blueprintResRef;
     std::string _name;
@@ -86,6 +104,13 @@ protected:
     bool _commandable { true };
     bool _autoRemoveKey { false };
     bool _interruptable { false };
+
+    // Local variables
+
+    std::map<int, bool> _localBooleans;
+    std::map<int, int> _localNumbers;
+
+    // END Local variables
 
     // Scripts
 

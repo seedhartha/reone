@@ -65,7 +65,6 @@ struct Variable {
     static Variable ofString(std::string value);
     static Variable ofVector(glm::vec3 value);
     static Variable ofObject(uint32_t objectId);
-    static Variable ofObject(std::shared_ptr<ScriptObject> object);
     static Variable ofEffect(std::shared_ptr<EngineType> engineType);
     static Variable ofEvent(std::shared_ptr<EngineType> engineType);
     static Variable ofLocation(std::shared_ptr<EngineType> engineType);

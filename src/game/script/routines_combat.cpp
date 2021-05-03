@@ -27,6 +27,8 @@
 #include "../object/creature.h"
 #include "../types.h"
 
+#include "objectutil.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -62,33 +64,33 @@ Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> target;
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
-        creature->getAttackTarget();
+        target = creature->getAttackTarget();
     } else {
         debug("Script: getAttackTarget: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
 Variable Routines::getAttemptedAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> target;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        caller->getAttemptedAttackTarget();
+        target = caller->getAttemptedAttackTarget();
     } else {
         debug("Script: getAttemptedAttackTarget: caller is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
 Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> target;
 
     auto creature = getCreatureOrCaller(args, 0, ctx);
     if (creature) {
@@ -97,11 +99,11 @@ Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &c
         debug("Script: getSpellTarget: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
 Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    shared_ptr<SpatialObject> target;
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
@@ -110,7 +112,7 @@ Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionC
         debug("Script: getAttemptedSpellTarget: caller is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
 Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext &ctx) {
@@ -127,7 +129,7 @@ Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> result;
+    uint32_t result = kObjectInvalid;
 
     auto attacker = getCreatureOrCaller(args, 0, ctx);
     if (attacker) {

@@ -27,6 +27,8 @@
 
 #include "../game.h"
 
+#include "objectutil.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -36,60 +38,60 @@ namespace reone {
 namespace game {
 
 Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Item> result;
+    shared_ptr<Item> item;
     auto creature = getCreatureOrCaller(args, 1, ctx);
     int slot = getInt(args, 0);
 
     if (creature) {
-        result = creature->getEquippedItem(slot);
+        item = creature->getEquippedItem(slot);
     } else {
         debug("Script: getItemInSlot: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Item> result;
+    shared_ptr<Item> item;
     string itemTemplate(boost::to_lower_copy(getString(args, 0)));
     auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int stackSize = getInt(args, 2, 1);
 
     if (!itemTemplate.empty() && target) {
-        result = target->addItem(itemTemplate, stackSize, true);
+        item = target->addItem(itemTemplate, stackSize, true);
     } else if (itemTemplate.empty()) {
         debug("Script: createItemOnObject: itemTemplate is invalid", 1, DebugChannels::script);
     } else if (!target) {
         debug("Script: createItemOnObject: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Item> result;
+    shared_ptr<Item> item;
 
     auto target = getSpatialObjectOrCaller(args, 0, ctx);
     if (target) {
-        result = target->getFirstItem();
+        item = target->getFirstItem();
     } else {
         debug("Script: getFirstItemInInventory: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Item> result;
+    shared_ptr<Item> item;
 
     auto target = getSpatialObjectOrCaller(args, 0, ctx);
     if (target) {
-        result = target->getNextItem();
+        item = target->getNextItem();
     } else {
         debug("Script: getNextItemInInventory: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
@@ -145,19 +147,19 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
 }
 
 Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Item> result;
+    shared_ptr<Item> item;
     auto creature = getCreature(args, 0, ctx);
     auto itemTag = boost::to_lower_copy(getString(args, 1));
 
     if (creature && !itemTag.empty()) {
-        result = creature->getItemByTag(itemTag);
+        item = creature->getItemByTag(itemTag);
     } else if (!creature) {
         debug("Script: getItemPossessedBy: creature is invalid", 1, DebugChannels::script);
     } else if (itemTag.empty()) {
         debug("Script: getItemPossessedBy: itemTag is invalid", 1, DebugChannels::script);
     }
 
-    return Variable::ofObject(move(result));
+    return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &ctx) {

@@ -25,7 +25,6 @@
 #include "../common/log.h"
 
 #include "instrutil.h"
-#include "object.h"
 #include "routine.h"
 
 using namespace std;

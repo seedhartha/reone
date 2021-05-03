@@ -28,6 +28,8 @@
 
 #include "../game.h"
 
+#include "objectutil.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -94,11 +96,13 @@ Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionConte
 
 Variable Routines::getPartyMemberByIndex(const VariablesList &args, ExecutionContext &ctx) {
     int index = getInt(args, 0);
-    return Variable::ofObject(_game->party().getMember(index));
+    auto member = _game->party().getMember(index);
+    return Variable::ofObject(getObjectIdOrInvalid(member));
 }
 
 Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(_game->party().player());
+    auto player = _game->party().player();
+    return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
 Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
@@ -145,7 +149,8 @@ Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext
 }
 
 Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(_game->party().player());
+    auto player = _game->party().player();
+    return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
 Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
@@ -159,7 +164,8 @@ Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContex
 }
 
 Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofObject(_game->party().getLeader());
+    auto player = _game->party().getLeader();
+    return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
 Variable Routines::getSoloMode(const VariablesList &args, ExecutionContext &ctx) {
