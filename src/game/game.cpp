@@ -496,8 +496,10 @@ void Game::runMainLoop() {
     while (!_quit) {
         Window::instance().processEvents(_quit);
 
-        update();
-        drawAll();
+        if (Window::instance().isInFocus()) {
+            update();
+            drawAll();
+        }
 
         this_thread::yield();
     }
