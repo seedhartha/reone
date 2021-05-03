@@ -132,10 +132,10 @@ bool Window::handleEvent(const SDL_Event &event, bool &quit) {
         case SDL_QUIT:
             quit = true;
             return true;
-
         case SDL_KEYDOWN:
             return handleKeyDownEvent(event.key, quit);
-
+        case SDL_WINDOWEVENT:
+            return handleWindowEvent(event.window);
         default:
             return false;
     }
@@ -150,6 +150,19 @@ bool Window::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit) {
             }
             return false;
 
+        default:
+            return false;
+    }
+}
+
+bool Window::handleWindowEvent(const SDL_WindowEvent &event) {
+    switch (event.event) {
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            _focus = true;
+            return true;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            _focus = false;
+            return true;
         default:
             return false;
     }
